@@ -40,7 +40,8 @@ levels later. **Keep the scope narrow: one sandbox at a time, tuned until it fee
 ## ASSETS (may run beside the open sandbox)
 - [x] **m897** a procedural brute SHIELD (`blender-addons/pipeline/shield.py` -> `models/weapons/shield_brute.glb`, his
       convention: `weapon_root_left` -> `weapon_tip`). A generated one replaces it later.
-- [ ] the x-ray SKELETON for the stun zap: he picks/draws the image -> Tripo -> rig on the universal Mixamo rig.
+- [x] **m899** the x-ray SKELETON for the stun zap (`models/characters/xray_skeleton.glb`): his image -> Tripo -> ARP rig ->
+      Mixamo names + root. NO FINGER BONES (the finger AI found none: rigid hands). Not used in the game yet (STUN sandbox).
 - [ ] generated shields + weapons, **batched**: stack 3-4 weapon images in one picture and generate them in ONE Tripo task
       (he: "you can change the polygon slider so you can generate like four weapons at once"), then split the pieces
       apart in Blender (loose parts) and give each its mount bones. Saves credits.

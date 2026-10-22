@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m899 -- THE X-RAY SKELETON (asset only)
+His image (`blender-addons/pipeline/refs/colin/xray_skeleton_colin.png`, already a T-pose) -> `tripo_mv.py` (10 cr, four clean
+views) -> `tripo.py` (120 cr, balance 1,200 -> 1,080) -> `orient.py -90` -> `run_rig.sh`: ARP rig True, **fingers False** (no
+finger bones: the hands are rigid), the bind needed the PSEUDO_VOXELS 9 retry. `posecheck.py` clean (arms down, elbows, knee).
+`bake.py` from the warrior (idle, walk, run, three hits, fall, get-up -- mostly to get the `mixamorig_*` names) + `rootfix.py`
++ resize 2048 + draco -> `models/characters/xray_skeleton.glb`, 1.03 MB. Nothing loads it yet: the STUN sandbox drives it from
+the victim's pose (bones copied with the rest correction `bake.py` uses, `A * q * B`, since its rest is not the victim's).
+
 ## m898 -- DUEL b + c + d + e: the wind-up, the interrupt, the rush and bash, hitstop, EXPOSED and the finisher; the shield on his forearm
 *"Go ahead with the wind-up and interrupt... mount it to the outside of his forearm... do anything with the melee... that we can do
 right now."*

@@ -28,7 +28,7 @@ your own machine, and you turn into whatever."*
 
 ## DONE WHEN
 
-- [ ] The skeleton GLB on the universal rig, following any human's pose with nothing popping (every civilian checked).
+- [ ] (asset made at m899: `models/characters/xray_skeleton.glb`, 52->22 bones, no fingers) The skeleton GLB on the universal rig, following any human's pose with nothing popping (every civilian checked).
 - [ ] A zap strobes him between body and skeleton, with arcs and a buzz, and it reads as electrocution with no words.
 - [ ] Stunned for a beat afterwards, visibly.
 - [ ] The DNA claw takes a sample from a stunned body (the form use comes with the transformation work).
