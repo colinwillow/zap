@@ -5,6 +5,24 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m893 -- THE ARENA: spawn a warboss, beam him down, knock his armour off (Oct 22 2026)
+*"Build a little arena... like a little Pokemon stadium... a menu with a sub menu... choose war boss, and he spawns in... beam
+down, expanding out particles... he beats his chest... then you fight him... how to deal with guys that you kill."*
+- A new world `arena` (`ARENA`, `inArena()`, first under SANDBOX on the start menu). Built at module scope like the white box
+  (`arenaStage`): painted field, sand track, red wall (48 collider boxes), stepped stands with a 900-cube crowd in ONE
+  instanced draw, four floodlight towers, his pad (red) and yours (cyan). No crowd, no buildings, no heat.
+- A boss is `FOE` with another file (`arenaKind`): the warrior's clip names are baked onto the Brutes, so `foeAI` drives
+  them unchanged; every distance (reach, hold, hitR, r) scales by h / 1.85; `fling` .95 so a 70% charge does not floor a boss.
+  The weapon (culture_war's gen cleaver / maul, now `models/weapons/w_*.glb`) mounts on his `weapon_root_right`,
+  +Z to `weapon_tip_2`, edge toward `gun_tip_right` -- B255's rule, lifted from duel.js.
+- ARMOUR (`arenaArmourHit`, in `dummyBlow` before the health): the nearest `armor_<bone>` piece to the blow (the side it came
+  from, a random height -- `dummyBlow` carries a direction, not a point) takes .6 + .6*power; 1-2 hits a piece by size;
+  .35 of the blow gets through. A broken piece is `scene.attach`ed, its material cloned (his are disposed with him), and
+  flies; debris rests on the floor until CLEAR (cap 160).
+- DEATH: hp 0 -> `arenaKO`: 1.3 s of slow motion (`arenaTime` scales frameBody's dt), he lies `lie` 2.4 s, then the beam
+  takes him up (`beamOut`) and `arenaStep` removes him AFTER `stepDummies` (a splice inside it skips the next body).
+- Headless: spawn, taunt, 14/19 pieces off, KO, beam out -- 0 errors, 0 404s. Feel is unverified.
+
 ## m891 -- ZAP: the fresh start (Oct 22 2026)
 *"I've been toying with the idea of cloning the repository to a full fresh new repository and stripping it down... keeping
 the pieces, but eradicating a lot of the stuff, starting with a few of the white box areas, the sandboxes, and one

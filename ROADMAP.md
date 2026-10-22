@@ -13,7 +13,10 @@ levels later. **Keep the scope narrow: one sandbox at a time, tuned until it fee
   bare body -> rig + weapon bones -> `armorfit.py`). The arena in `colinwillow/culture_war` (`duel.html`) is the fight lab.
 
 ## SANDBOX (in order)
-- [ ] BRAWL: Zap (existing controls) vs the armoured Warboss + Skullback in the white box. Port from culture_war
+- [x] **m893 ARENA** (`?w=arena`, first on the menu): a little stadium; SPAWN > WARBOSS > Brute Warboss / Skullback beams
+      down on the far pad (column + expanding ring of particles), chest thump, then the warrior's brain (`foeAI`) fights you.
+      Armour chips and flies off; at zero he is KO'd in slow motion, lies there, beams back up. Armour stays until CLEAR.
+- [ ] BRAWL, the rest: Zap (existing controls) vs the armoured Warboss + Skullback. Port from culture_war
       `src/duel/duel.js`: MELEE/GUN AI, RULE, block/parry/guard break, sizeK, ARMOR/armorHit/armorOff/stepDebris.
       Models: culture_war `models/characters/brute_warboss_armor.glb`, `rept_heavy_armor.glb` (armor_<bone> pieces,
       weapon_root/weapon_tip/gun_tip bones), weapons `models/gen/w_brute_cleaver.glb`, `w_rept_maul.glb`.
