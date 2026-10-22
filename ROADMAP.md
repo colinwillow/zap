@@ -3,7 +3,7 @@
 Fresh start (Oct 22 2026), stripped down from `colinwillow/weirdport` (which stays untouched as the archive).
 **The model is LEVELS, not a continuous world** (Mario Sunshine style: each level a finished, polished mix of
 acrobatics, a little puzzle and fighting). The story (Zap & Clancy, Earth act -> alien worlds act) threads through the
-levels later. **Keep the scope narrow: one sandbox at a time, tuned until it feels great, before anything is combined.**
+levels later. **Each sandbox is tuned until it feels great on its own before anything is combined** (several can be open at once).
 
 ## STEER
 - Two worlds only: **WEIRDPORT** (`tkit`, PLAIN: the breakable kit city, the hydrant, the repair crew -- no story) and
@@ -12,7 +12,7 @@ levels later. **Keep the scope narrow: one sandbox at a time, tuned until it fee
 - Characters and armour come from the pipeline in `colinwillow/blender-addons` (armoured model -> Tripo segment ->
   bare body -> rig + weapon bones -> `armorfit.py`). The arena in `colinwillow/culture_war` (`duel.html`) is the fight lab.
 
-## SANDBOX (in order -- ONE open at a time; see the WHOLE-PIECE RULE in CLAUDE.md)
+## SANDBOX (several may be open at once; see the WHOLE-PIECE RULE in CLAUDE.md)
 - [x] **m893 ARENA** (`?w=arena`): the stadium, SPAWN > WARBOSS > Brute Warboss / Skullback beams down, chest thump, armour
       flies off, KO slow-mo, beam out, CLEAR. This is the STAGE for the duel, not the duel.
 - [ ] **DUEL -- OPEN.** Spec and DONE WHEN: `DUEL.md` (the triangle: shield beats shot, melee breaks shield, a shot
@@ -27,10 +27,10 @@ levels later. **Keep the scope narrow: one sandbox at a time, tuned until it fee
   - [ ] f. tune on his phone until he signs it off.
 - [ ] **WHITE BOX HUB**: the arena is the one sandbox world; a MODE switch on its menu (DUEL / TRANSFORM / ...), so
       every sandbox lives in one place. (Small; can ride with the DUEL's first build.)
-- [ ] **TRANSFORMATION** (next, after DUEL is signed): `TRANSFORM.md` -- a civilian turns into his alien region by
+- [ ] **TRANSFORMATION** : `TRANSFORM.md` -- a civilian turns into his alien region by
       region from the wound (veins, bulge, green, armour bursts out, the cry); triggers: drink, alien syringe/beacon, Zap's
       stab/dart, debug toggle; a speed slider.
-- [ ] **STUN ZAP** (after TRANSFORMATION): `STUN.md` -- Zap's stun shot strobes the victim between his body and an x-ray
+- [ ] **STUN ZAP**: `STUN.md` -- Zap's stun shot strobes the victim between his body and an x-ray
       SKELETON (one skeleton on the universal Mixamo rig, driven by the victim's pose), then he is stunned; the DNA CLAW
       clips a sample from a stunned body.
 - [ ] WEAPON FEEL: big kickback that shoves the shooter, dramatic blaster sound, exaggerated impacts.

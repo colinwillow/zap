@@ -12,8 +12,8 @@ right."* Weirdport broke this for 890 builds: a fight that was never a fight, un
 - **Every sandbox has a design doc with a DONE WHEN checklist** (`DUEL.md`, `TRANSFORM.md`). ROADMAP points at it.
 - **A sandbox is not done until every box is ticked WITH EVIDENCE in a NOTES entry**, and the last box is always **his
   sign-off on his phone**. "It runs" and "the code is there" tick nothing.
-- **Only one sandbox is open at a time.** No new sandbox (and no combining sandboxes into a level) while the current one is
-  unsigned. Asset work (pipeline, models, clips) may run beside it.
+- **Several sandboxes can be open at once** (his correction, m900: *"I don't need a one sandbox rule... we can have many, we can
+  have one"*). What the rule forbids is BUILDING ON a piece that is not finished -- combining unsigned pieces into a level.
 - **Before ticking anything, check yourself against this rule** and say in the NOTES entry which box the build moves and
   what is still open. If a build adds to a piece that is not finished, it is the wrong build.
 

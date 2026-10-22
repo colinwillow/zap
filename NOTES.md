@@ -5,6 +5,12 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m900 -- RULE CORRECTED: several sandboxes at once; the stun skeleton as RIGID SEGMENTS (docs)
+*"I don't need a one sandbox rule... we can have many, we can have one."* The whole-piece rule stays (finish a piece before building
+on it, his sign-off last); "only one sandbox open at a time" was MINE and is gone from CLAUDE.md, ROADMAP, STUN.md, TRANSFORM.md.
+STUN.md now carries his segmented-skeleton method: pieces cut by dominant weight, fitted per kind onto the victim's own skeleton
+as rigid-weighted skin -- one draw, no retarget, works on any Mixamo-named rig.
+
 ## m899 -- THE X-RAY SKELETON (asset only)
 His image (`blender-addons/pipeline/refs/colin/xray_skeleton_colin.png`, already a T-pose) -> `tripo_mv.py` (10 cr, four clean
 views) -> `tripo.py` (120 cr, balance 1,200 -> 1,080) -> `orient.py -90` -> `run_rig.sh`: ARP rig True, **fingers False** (no

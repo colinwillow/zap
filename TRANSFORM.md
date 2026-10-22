@@ -1,6 +1,6 @@
 # The transformation — a person turning into an alien
 
-**Status: DESIGN, not built.** The second sandbox, after the duel is signed off. He owns this file.
+**Status: DESIGN, not built.** A sandbox of its own. He owns this file.
 
 *"I'm really excited to rig a character that will transform and morph into his alien self... see an NPC look like a zombie
 breaking out, with a bigger bulge, alien green skin, armour coming out of his body one piece at a time: the arm goes, the

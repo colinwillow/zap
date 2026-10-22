@@ -1,7 +1,6 @@
 # The stun zap — the x-ray electrocution
 
-**Status: DESIGN, assets first.** A sandbox after the duel and the transformation (one sandbox open at a time), but its
-ASSET can be made now, beside the duel. He owns this file.
+**Status: DESIGN, assets first.** A sandbox of its own, open now beside the duel. He owns this file.
 
 *"One of the weapons in Zap's arsenal will be his stun blaster -- his name is Zap. When he zaps someone we flash the mesh
 between the NPC and a skeleton and back, so it looks like he's being electrocuted, with effects on top. Then he's stunned
@@ -15,7 +14,21 @@ your own machine, and you turn into whatever."*
   civilian, scaled to each one's height.
 - `models/characters/xray_skeleton.glb`, no clips needed (it copies the victim's bones every frame).
 
-## How the zap works
+## The method: a RIGID, SEGMENTED skeleton that fits ANY Mixamo rig (his idea, m900)
+
+*"If we broke the skeleton into its bone segments -- forearm, upper arm, head, neck, torso, leg up, leg down -- and aligned them
+rigidly to any Mixamo skeleton, scaled from the root of one bone to the next... it would work for everybody, from the aliens to
+the NPCs, and you don't have to generate more skeletons."*
+- **Split once, offline**: `xray_skeleton.glb`'s faces are cut by their dominant bone weight into ~20 rigid pieces, each with
+  its bone's head and tail on its own rest (bones are separate lumps in the art, so the cuts fall in the joints).
+- **Fit per victim KIND, once, at load**: for each piece, the victim's rest bone (head -> child joint) gives a rotation (align
+  the axis, plus a twist reference from the rig's own frame), a STRETCH along the bone (length ratio) and a girth scale (the
+  victim's overall size). The fitted vertices are written into a geometry with **every vertex 100% on that one bone** and bound
+  to the **victim's own skeleton** -- so it is a SkinnedMesh with rigid weights: no per-frame CPU work, one draw call, and it
+  is in his exact pose by construction (no retarget, no rest correction).
+- Cached per kind (the hick's fit, the blonde's fit, a Brute's...). A bone a rig does not have is simply left out (a Grey's
+  extra arms, a tail), and an extra bone has no piece -- it degrades instead of breaking.
+
 
 1. **The shot**: Zap's STUN mode (a slot beside CHARGE / AUTO on the blaster's wheel, or its own weapon): a crackling arc
    rather than a ball.
