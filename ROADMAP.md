@@ -30,7 +30,7 @@ levels later. **Each sandbox is tuned until it feels great on its own before any
 - [ ] **TRANSFORMATION** : `TRANSFORM.md` -- a civilian turns into his alien region by
       region from the wound (veins, bulge, green, armour bursts out, the cry); triggers: drink, alien syringe/beacon, Zap's
       stab/dart, debug toggle; a speed slider.
-- [ ] **STUN ZAP**: `STUN.md` -- Zap's stun shot strobes the victim between his body and an x-ray
+- [ ] **STUN ZAP -- OPEN** (m901: STUN toggle, x-ray strobe + daze, fitted skeleton on any rig; next: the DNA CLAW): `STUN.md` -- Zap's stun shot strobes the victim between his body and an x-ray
       SKELETON (one skeleton on the universal Mixamo rig, driven by the victim's pose), then he is stunned; the DNA CLAW
       clips a sample from a stunned body.
 - [ ] WEAPON FEEL: big kickback that shoves the shooter, dramatic blaster sound, exaggerated impacts.

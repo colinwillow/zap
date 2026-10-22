@@ -1,6 +1,6 @@
 # The stun zap — the x-ray electrocution
 
-**Status: DESIGN, assets first.** A sandbox of its own, open now beside the duel. He owns this file.
+**Status: BUILT (m901): the fit, the strobe and the daze, on a STUN toggle in the arena. The DNA claw is not built.** A sandbox of its own, open now beside the duel. He owns this file.
 
 *"One of the weapons in Zap's arsenal will be his stun blaster -- his name is Zap. When he zaps someone we flash the mesh
 between the NPC and a skeleton and back, so it looks like he's being electrocuted, with effects on top. Then he's stunned

@@ -5,6 +5,24 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m901 -- THE STUN ZAP: the x-ray skeleton as rigid pieces fitted to ANY rig (his method)
+*"If we broke the skeleton into its bone segments... and aligned them rigidly to any Mixamo skeleton... it would work for
+everybody."* `ARENA.stun`, `xrayFit`, `xrayMake`, `arenaStun`, `arenaStunStep`.
+- FIT (once per KIND, cached `K.xrayGeo`): each skeleton triangle goes with its first vertex's dominant bone; each bone gets a
+  frame on both rigs from the BIND joints (`boneInverses`): head -> next joint (`next` table) as the axis, +Z forward projected
+  as the twist reference. Piece = victim head + victim frame x diag(stretch, g, g) x skeleton frame^T (minus skeleton head).
+  `g` = torso (Hips -> Neck) ratio; stretch = joint-to-joint length ratio clamped to g x [.55, 1.9]; end bones (Head, Hands,
+  ToeBase) take the parent axis and a uniform g. Every vertex 100% on the VICTIM's bone -> a SkinnedMesh bound to his own
+  skeleton: one draw, no per-frame work. Hick: 22 pieces, 1 dropped (the skeleton's `root`), 34,350 verts. Warboss: the same.
+- **RAW VERTEX SPACE, NOT bindMatrix**: the first cut went through the skeleton's `bindMatrix` and out through the victim's
+  `bindMatrixInverse` -- right on the Warboss (both ARP: the two cancelled) and 100x too big and lying down on the hick (Mixamo,
+  identity bindMatrix). glTF's inverse-bind matrices and the raw positions already share one space; nothing else is needed.
+- THE ZAP: STUN on the arena bar -> a bolt that lands (and is not shield-blocked) stuns instead of hurting: `flash` 1.0 s
+  strobing body / skeleton at `hz` 12, a jitter, arcs (`spkCling`), `zap` buzz; then dazed to `dur` 3.2 s (idle, twitches,
+  sparks dripping). The first stun loads the skeleton (`xrayLoad`; turning STUN on preloads it). SPAWN > PEOPLE: Hick, Hobo.
+- Headless: hick and Warboss both fitted and posed (screens). Open: the DNA CLAW, how it looks on his phone, and the finger
+  bones (the skeleton has none: the hands are rigid).
+
 ## m900 -- RULE CORRECTED: several sandboxes at once; the stun skeleton as RIGID SEGMENTS (docs)
 *"I don't need a one sandbox rule... we can have many, we can have one."* The whole-piece rule stays (finish a piece before building
 on it, his sign-off last); "only one sandbox open at a time" was MINE and is gone from CLAUDE.md, ROADMAP, STUN.md, TRANSFORM.md.
