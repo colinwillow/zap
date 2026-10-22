@@ -19,11 +19,11 @@ levels later. **Keep the scope narrow: one sandbox at a time, tuned until it fee
       interrupts a wind-up). Builds, in order:
   - [x] a. **m896** his SHIELD (stand-in mesh on `weapon_root_left` until his GLB) + shield state: blocks frontal bolts (spark, clang,
         no damage), raised at a shot after a difficulty-set reaction time; armour only from hits that land.
-  - [ ] b. the WIND-UP: a held, glowing, grunting raise before every swing; a bolt during it interrupts (stagger, shield
+  - [x] b. **m898** the WIND-UP: a held, glowing, grunting raise before every swing; a bolt during it interrupts (stagger, shield
         down, armour off). He closes the distance fast enough to be a threat (a lunge / charge, not a 1 m/s walk).
-  - [ ] c. the GUARD BREAK: Zap's charged hammer on a raised shield knocks it wide; a stagger window. His SHIELD BASH.
-  - [ ] d. size: `sizeK` damage + knockback both ways, hitstop on every blow, kickback on the attacker.
-  - [ ] e. EXPOSED / desperate phase + the finisher; EASY / MEDIUM / HARD on the arena menu.
+  - [x] c. **m896/m898** the GUARD BREAK: Zap's charged hammer on a raised shield knocks it wide; a stagger window. His SHIELD BASH.
+  - [x] d. **m898** size: `sizeK` damage + knockback both ways, hitstop on every blow, kickback on the attacker.
+  - [x] e. **m898** EXPOSED / desperate phase + the finisher; EASY / MEDIUM / HARD on the arena menu.
   - [ ] f. tune on his phone until he signs it off.
 - [ ] **WHITE BOX HUB**: the arena is the one sandbox world; a MODE switch on its menu (DUEL / TRANSFORM / ...), so
       every sandbox lives in one place. (Small; can ride with the DUEL's first build.)

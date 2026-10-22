@@ -1,6 +1,6 @@
 # The duel — hand-to-hand, one on one
 
-**Status: DESIGN, not built.** He owns this file. It is the spec for the first sandbox, and the sandbox is not done until
+**Status: BUILT, being tuned (m896-m898).** Every mechanic below is in; none of the DONE WHEN boxes is ticked until he plays it. He owns this file. It is the spec for the first sandbox, and the sandbox is not done until
 every box in **DONE WHEN** is ticked with evidence and he has signed it off on his phone (see the WHOLE-PIECE RULE in
 `CLAUDE.md`).
 

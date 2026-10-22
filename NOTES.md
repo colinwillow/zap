@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m898 -- DUEL b + c + d + e: the wind-up, the interrupt, the rush and bash, hitstop, EXPOSED and the finisher; the shield on his forearm
+*"Go ahead with the wind-up and interrupt... mount it to the outside of his forearm... do anything with the melee... that we can do
+right now."*
+- SHIELD ON THE FOREARM: `arenaShieldMake` fits it once on the bind pose to `mixamorig_LeftForeArm` -- forearm axis = elbow ->
+  wrist (the file's +Y), face = perpendicular to it and the knuckle line, flipped to the side AWAY from his body centre (the
+  outside of the arm) -- which came out BACKWARDS in the block pose headless (strap side out), so \`faceFlip\` 1 takes the
+  other side; 7 cm off the bone, x1.15 size. The arena wall's collider is 6 m tall now: a bash threw him over the 1.1 m lip. His block clip raises it. The shield brain now PLANTS behind it (block clip) while you fire (`firing` .35 s).
+- RUSH (`arenaRush`): pinned behind the shield for `rushAfter` (3 / 2 / 1.2 s by difficulty) he crouches `rushPre` .45 s (the tell)
+  and runs at you behind it at `rushV` (5 / 6 / 7 m/s), turning only 1.7 rad/s -- a roll sideways beats it. In reach: the BASH
+  (55% of his hit, a big shove) and a recovery. This is what closes the distance; `run` is also x1.5 now (tsHi 2.4).
+- WIND-UP (`arenaSwing`, replacing `foeSwing` for arena bodies): the swing clip runs to `raiseU` .22 (a GUESS at the raise;
+  contact is the measured .37) over `wind` (.85 / .6 / .38 s), the weapon glowing orange with sparks, a grunt. A blow landing then
+  is an INTERRUPT (`arenaBlow`): `stagger` 1.3 s, a second armour chip, hitstop .12. After the wind-up the swing is COMMITTED:
+  blows hurt but do not stop it. Then `recover` (1.3 / .9 / .55 s) open. Combos by difficulty (0 / .3 / .55), quicker wind.
+- HITSTOP: `ARENA.stop` -- `arenaTime` returns .04 while it runs: .035-.085 s per landed blow, .12 interrupt / his hit, .14 break.
+  A light melee blow on the shield bounces ZAP back. His push scales with size (x`s` x1.15).
+- EXPOSED (`arenaExpose`): 60% of the armour off or health under 35% -> he throws the shield away (debris), roars (the thump at
+  x1.25), pulses red, x1.2 pace, wind x.7. A melee blow at `finishAt` .85+ on him is the FINISHER (KO, slow motion, beam out).
+- Headless (scripted, `mel.arenaSwing` / `mel.arenaShot`): see the run below. DUEL.md boxes: none ticked -- every one wants his phone.
+
 ## m897 -- A REAL (PROCEDURAL) SHIELD, and the stun zap written down
 *"Build a shield procedurally with Blender for now... we'll get good shields generated later."* `blender-addons/pipeline/shield.py`
 (headless bpy): dished crimson team-paint face, iron rim, rivets, six rim spikes, a spiked boss, a grip bar and straps; 3,988
