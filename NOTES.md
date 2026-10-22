@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m903 -- A ZAP ELECTROCUTES; ENOUGH ZAPS STUN (stars, the drunk idle, awake in 5 s)
+*"One shot from the zap gun doesn't stun... the electrocution is just a quick little 1-2-3-4-5, under a second. The stun state is
+an animation... the drunk idle on the redneck, with the stars around his head... they wake up in five seconds... a Warboss,
+maybe three."* Two states now:
+- `zap` (every stun bolt that lands, not shield-blocked): `zapT` .6 s of strobe + bubble + arcs + zaps + convulsions, no damage.
+- the METER: `d.zapN` counts zaps inside `meterT` 4 s of each other; at `K.stunHits` (people 1, bosses 3 -- `ARENA.kinds`
+  `stunHits` overrides) the zap ends in `stunned`: `arenaStunClip` (his `clips.stun`, else `stunned` / `dizzy` /
+  `drunk_idle`, else idle -- the hick and hobo get drunk_idle, the bosses idle until a clip exists), five cartoon STARS
+  circling above his Head bone (`starsStep`), awake after `dur` 5 s. Zapped while stunned: the current runs over him again,
+  he stays down. Hits during either state play their reaction and do their damage without ending it. A KO clears both.
+- Headless: hick 1 zap -> stunned (drunk_idle + stars) -> woke; Warboss 1 zap -> idle (n1), 3 -> stunned.
+
 ## m902 -- THE SHOCK: a spiky electric bubble, lightning arcs, cartoon zaps; he convulses; a skeleton per species
 *"A shock electricity beam bubble with really pointy tips that move, and cartoon little zap zap things around it... he'll still
 react if he's been hit... one skeleton for the humans, one for each alien race."*
