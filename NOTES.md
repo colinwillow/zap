@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m897 -- A REAL (PROCEDURAL) SHIELD, and the stun zap written down
+*"Build a shield procedurally with Blender for now... we'll get good shields generated later."* `blender-addons/pipeline/shield.py`
+(headless bpy): dished crimson team-paint face, iron rim, rivets, six rim spikes, a spiked boss, a grip bar and straps; 3,988
+tris, 19 KB with draco. His convention: `weapon_root_left` at the grip with `weapon_tip` along the forearm; glTF face +Z,
+forearm +Y, built for a 2.4 m body. `arenaShieldMake` uses it (`ARENA.shieldFile`, read once with `weaponParts`) and falls back
+to the m896 disc if it does not load (`NO SHIELD GLB` in the chip). Still body-space, not on the hand (no shield clip yet).
+STUN.md: the x-ray skeleton zap, the stun, the DNA claw -- assets first. ROADMAP ASSETS: batch 3-4 weapons per Tripo task.
+
 ## m896 -- DUEL a: HIS SHIELD (`arenaShield*`, `ARENA.duel`, `BLOW_SRC`)
 DUEL.md, the first corner of the triangle. At range, while you aim or fire (`ARENA.threatT`), he raises a shield after the
 difficulty's `react` (.6 / .35 / .15 s) and ADVANCES behind it at .75 of his run, on the walk clip. A bolt meeting it inside

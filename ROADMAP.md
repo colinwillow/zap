@@ -30,9 +30,20 @@ levels later. **Keep the scope narrow: one sandbox at a time, tuned until it fee
 - [ ] **TRANSFORMATION** (next, after DUEL is signed): `TRANSFORM.md` -- a civilian turns into his alien region by
       region from the wound (veins, bulge, green, armour bursts out, the cry); triggers: drink, alien syringe/beacon, Zap's
       stab/dart, debug toggle; a speed slider.
+- [ ] **STUN ZAP** (after TRANSFORMATION): `STUN.md` -- Zap's stun shot strobes the victim between his body and an x-ray
+      SKELETON (one skeleton on the universal Mixamo rig, driven by the victim's pose), then he is stunned; the DNA CLAW
+      clips a sample from a stunned body.
 - [ ] WEAPON FEEL: big kickback that shoves the shooter, dramatic blaster sound, exaggerated impacts.
 - [ ] DESTRUCTION: buses and cars whose shell panels come off (buildings already break).
 - [ ] SCALE: grunts against a big guy.
+
+## ASSETS (may run beside the open sandbox)
+- [x] **m897** a procedural brute SHIELD (`blender-addons/pipeline/shield.py` -> `models/weapons/shield_brute.glb`, his
+      convention: `weapon_root_left` -> `weapon_tip`). A generated one replaces it later.
+- [ ] the x-ray SKELETON for the stun zap: he picks/draws the image -> Tripo -> rig on the universal Mixamo rig.
+- [ ] generated shields + weapons, **batched**: stack 3-4 weapon images in one picture and generate them in ONE Tripo task
+      (he: "you can change the polygon slider so you can generate like four weapons at once"), then split the pieces
+      apart in Blender (loose parts) and give each its mount bones. Saves credits.
 
 ## CUT (dead code from the story, one system per pass, `npm run check` + a tkit boot after each)
 - [ ] the POLICE / heat / stars system (`HEAT`, `COPS`, `copAI`, `heatHit`): switched OFF at m895 (`COPS.on = 0`), delete it.
