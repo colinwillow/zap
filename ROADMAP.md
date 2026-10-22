@@ -35,6 +35,7 @@ levels later. **Keep the scope narrow: one sandbox at a time, tuned until it fee
 - [ ] SCALE: grunts against a big guy.
 
 ## CUT (dead code from the story, one system per pass, `npm run check` + a tkit boot after each)
+- [ ] the POLICE / heat / stars system (`HEAT`, `COPS`, `copAI`, `heatHit`): switched OFF at m895 (`COPS.on = 0`), delete it.
 - [ ] remove the PLAIN-skipped builders and their data (farm, islands, gorge, waterfront, ferry, factory, underneath,
       Pearl, ship, camp, carts, site...) and the quest/chapter/save system; then the toon/kit/alien/plaza/weirdport
       world branches; then their notes.

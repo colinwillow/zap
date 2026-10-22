@@ -5,6 +5,10 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m895 -- THE POLICE ARE OFF
+*"We can probably get rid of the police star system... we are at phase one again."* `COPS.on = 0`: `heatAdd` returns 0, `heatStep`
+zeroes and returns, the stars div is gone, cops do not hunt (`copAI` is gated on `COPS.on`). Deleting it is in ROADMAP CUT.
+
 ## m894 -- THE WHOLE-PIECE RULE, the duel spec, the transformation spec (docs only)
 *"You shouldn't ever try to build the pieces of the game with incomplete pieces... a hand-to-hand duel needs to be interesting. It
 needs to exist on its own in a white sandbox and be fun in its own right."* CLAUDE.md now opens with the rule (DONE WHEN
