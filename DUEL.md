@@ -1,0 +1,97 @@
+# The duel — hand-to-hand, one on one
+
+**Status: DESIGN, not built.** He owns this file. It is the spec for the first sandbox, and the sandbox is not done until
+every box in **DONE WHEN** is ticked with evidence and he has signed it off on his phone (see the WHOLE-PIECE RULE in
+`CLAUDE.md`).
+
+## Why this exists
+
+*"Right now I never really built out the man-to-man battle. It's just really slow-moving ogre guys and I just shoot them and
+they barely get a chance to attack me. I skipped over this step, which is such a crucial step... A hand-to-hand duel needs to
+be interesting. It needs to exist on its own in a white sandbox and be fun in its own right."*
+
+What is wrong today (m893), measured off the code rather than felt:
+- `foeAI` was written for a street brawl with a crowd: he walks at 1.0-2.6 m/s against a player who sprints at 7.2, so he
+  cannot reach you, and the blaster kills him from range with no answer.
+- He has **no defence against the blaster at all** (his block only answers melee arcs), so shooting is strictly best.
+- His swing has **no readable wind-up**: the contact is at 37% of a 1.35 s clip, and nothing on screen says "now".
+- There is no reason to ever get close, no reason to ever stop shooting, and nothing to read. That is not a fight.
+
+## The triangle
+
+Three verbs, each beats one and loses to one. Rock-paper-scissors ("tic-tac-toe", his word): you win by **reading him and
+answering**, not by having the bigger number.
+
+| | beats | because | loses to |
+|---|---|---|---|
+| **SHIELD** (block) | the SHOT | bolts spark off it; he walks through your fire behind it | MELEE |
+| **MELEE** (strongest, close, slow) | the SHIELD | a heavy hit knocks the shield aside: a **guard break**, he staggers open | the SHOT |
+| **SHOT** (medium, ranged) | MELEE | a shot that lands **during a wind-up** interrupts it: he staggers, the swing never lands | the SHIELD |
+
+It works both ways round. Zap starts with SHOT + MELEE + the roll + his existing guard/parry (`BLOCK`); a real Zap shield
+comes later (*"not initially, but later"*), and when it does it is the same table from his side.
+
+## The loop, one exchange
+
+1. **He advances behind his shield.** Your bolts plink off it (spark, clang, no damage, no armour). Shooting at a raised
+   shield is the *wrong answer* and it has to look and sound wrong.
+2. **You close in, or he does.** In reach he picks: **swing**, **shield bash** (short, fast, knocks you back -- punishes
+   standing in front of the shield with a slow hammer), or **hold** (turtle).
+3. **His swing has a WIND-UP** -- weapon raised, a glow on it, a grunt. That is the window: **shoot him now** and the swing
+   is cancelled, he staggers, and his shield is DOWN, so the bolt hits the body and **an armour piece comes off**.
+   Miss the window and you roll (i-frames) or guard/parry (`BLOCK.perfect` = he staggers).
+4. **He holds the shield and turtles**: wind up the hammer (`padUp`) and **break the guard**. The shield flies wide, he
+   staggers, and for a beat everything lands.
+5. **Armour.** Pieces only come off from hits that LAND: interrupt shots, hits during a stagger, shots in the back or flank
+   (the shield covers his front arc only). While he is armoured, about a third of the damage gets through.
+6. **Exposed.** When enough armour is gone (or his health is low), he gets **desperate**: faster, combos, more bashes, but
+   hits now go straight through. **Knock him down and finish him**: a charged hammer on a downed boss launches him, the
+   slow-motion KO, the beam out (built at m893).
+
+## Size and weight
+
+Lifted from the culture_war arena (`sizeK`, B227), and true in both directions:
+- **Damage and knockback scale with the mass ratio.** A 2.4 m boss sends a 1.25 m Zap flying; Zap's swing barely rocks him
+  unless it is a guard break or a full charge.
+- **Small is fast.** Zap's recovery and roll beat the boss's; a grunt (later) swings quicker, hits softer, has no shield.
+- Every blow has **hitstop** (a few frames' freeze, longer for bigger blows) and **kickback** on the attacker.
+
+## Readability (*show, don't label*)
+
+Every state reads from the animation and effects alone, no words: shield up (the shield mesh is raised and the bolts
+spark), wind-up (weapon glow + grunt + slow raise), stagger (a big reaction clip + sparks + a ring), guard break (the shield
+flung wide + a heavy clang + a camera kick), exposed (armour gone, he breathes hard, red flashes).
+
+## Difficulty
+
+One switch on the arena menu: **EASY / MEDIUM / HARD.** It changes how readable and how punishing he is, never what the
+triangle is:
+
+| | easy | medium | hard |
+|---|---|---|---|
+| wind-up (the shoot-now window) | 0.8 s | 0.55 s | 0.35 s |
+| how fast his shield comes up at a shot | 0.6 s | 0.35 s | 0.15 s |
+| recovery after a whiff | 1.2 s | 0.8 s | 0.5 s |
+| combos / feints | none | some | feints (a wind-up he holds) |
+| his damage | x0.6 | x1 | x1.4 |
+
+## What he needs to supply (assets)
+
+- **A shield** for the Warboss (and Skullback): a GLB built on his `weapon_root_left` -> `weapon_tip` pair, the same
+  convention as the weapon bones, so it parents with identity on the left hand.
+- **Clips** (the warrior's set already has most): shield-up idle / walk, shield-hit react, guard-break stagger, a shield
+  bash, a big stagger, a wind-up that can be held. Until a clip exists the state still runs on the nearest clip, and the
+  chip says `NO CLIP`.
+
+## DONE WHEN (the whole-piece gate -- every box needs evidence in the NOTES entry that ticks it)
+
+- [ ] Every verb has a counter and is countered, both ways (the table above holds on the phone, not just in code).
+- [ ] Shooting a raised shield does nothing and reads as wrong; shooting a wind-up always interrupts it.
+- [ ] A guard break exists and is the only melee answer to a turtle.
+- [ ] Armour only comes off from hits that land; exposed is visibly different and dangerous.
+- [ ] He can beat you: on MEDIUM, standing still and holding fire loses.
+- [ ] You can beat him without taking a hit, by reading him (a perfect run is possible on every difficulty).
+- [ ] EASY / MEDIUM / HARD on the arena menu, and the difference is felt.
+- [ ] Hitstop, kickback, size-scaled knockback on every blow.
+- [ ] Every state readable with no words on screen.
+- [ ] **He played it on his phone and signed it off as fun.** (The only box nobody else can tick.)

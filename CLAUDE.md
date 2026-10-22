@@ -5,6 +5,18 @@
 building kit and the campaign models were NOT copied: any code still naming them is dead and is being cut (ROADMAP CUT).
 Everything below is inherited from Weirdport and still true of the code that remains.
 
+## THE WHOLE-PIECE RULE (Colin, Oct 22 2026) -- READ THIS BEFORE PICKING UP ANY WORK
+*"You shouldn't ever try to build the pieces of the game with incomplete pieces. The pieces of the puzzle need to be fleshed
+out. A hand-to-hand duel needs to be interesting. It needs to exist on its own in a white sandbox and be fun in its own
+right."* Weirdport broke this for 890 builds: a fight that was never a fight, under a city, a story and quests.
+- **Every sandbox has a design doc with a DONE WHEN checklist** (`DUEL.md`, `TRANSFORM.md`). ROADMAP points at it.
+- **A sandbox is not done until every box is ticked WITH EVIDENCE in a NOTES entry**, and the last box is always **his
+  sign-off on his phone**. "It runs" and "the code is there" tick nothing.
+- **Only one sandbox is open at a time.** No new sandbox (and no combining sandboxes into a level) while the current one is
+  unsigned. Asset work (pipeline, models, clips) may run beside it.
+- **Before ticking anything, check yourself against this rule** and say in the NOTES entry which box the build moves and
+  what is still open. If a build adds to a piece that is not finished, it is the wrong build.
+
 Mobile-first twin-stick action game. Single-file Three.js r180 in `index.html` (native ES
 modules, import map, **no build step**).
 

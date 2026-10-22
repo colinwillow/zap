@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m894 -- THE WHOLE-PIECE RULE, the duel spec, the transformation spec (docs only)
+*"You shouldn't ever try to build the pieces of the game with incomplete pieces... a hand-to-hand duel needs to be interesting. It
+needs to exist on its own in a white sandbox and be fun in its own right."* CLAUDE.md now opens with the rule (DONE WHEN
+checklists, evidence per box, his sign-off is the last box, one sandbox open at a time). DUEL.md is the fight spec (shield >
+shot > melee wind-up > shield, guard break, armour from landed hits, exposed phase, EASY/MEDIUM/HARD); TRANSFORM.md the second
+sandbox (region-by-region turn from the wound, four triggers). ROADMAP: DUEL is open, split a-f. No code changed.
+
 ## m893 -- THE ARENA: spawn a warboss, beam him down, knock his armour off (Oct 22 2026)
 *"Build a little arena... like a little Pokemon stadium... a menu with a sub menu... choose war boss, and he spawns in... beam
 down, expanding out particles... he beats his chest... then you fight him... how to deal with guys that you kill."*

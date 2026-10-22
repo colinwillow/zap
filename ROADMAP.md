@@ -12,19 +12,26 @@ levels later. **Keep the scope narrow: one sandbox at a time, tuned until it fee
 - Characters and armour come from the pipeline in `colinwillow/blender-addons` (armoured model -> Tripo segment ->
   bare body -> rig + weapon bones -> `armorfit.py`). The arena in `colinwillow/culture_war` (`duel.html`) is the fight lab.
 
-## SANDBOX (in order)
-- [x] **m893 ARENA** (`?w=arena`, first on the menu): a little stadium; SPAWN > WARBOSS > Brute Warboss / Skullback beams
-      down on the far pad (column + expanding ring of particles), chest thump, then the warrior's brain (`foeAI`) fights you.
-      Armour chips and flies off; at zero he is KO'd in slow motion, lies there, beams back up. Armour stays until CLEAR.
-- [ ] BRAWL, the rest: Zap (existing controls) vs the armoured Warboss + Skullback. Port from culture_war
-      `src/duel/duel.js`: MELEE/GUN AI, RULE, block/parry/guard break, sizeK, ARMOR/armorHit/armorOff/stepDebris.
-      Models: culture_war `models/characters/brute_warboss_armor.glb`, `rept_heavy_armor.glb` (armor_<bone> pieces,
-      weapon_root/weapon_tip/gun_tip bones), weapons `models/gen/w_brute_cleaver.glb`, `w_rept_maul.glb`.
-      Zap's blaster, rocket and hammer all knock armour off.
+## SANDBOX (in order -- ONE open at a time; see the WHOLE-PIECE RULE in CLAUDE.md)
+- [x] **m893 ARENA** (`?w=arena`): the stadium, SPAWN > WARBOSS > Brute Warboss / Skullback beams down, chest thump, armour
+      flies off, KO slow-mo, beam out, CLEAR. This is the STAGE for the duel, not the duel.
+- [ ] **DUEL -- OPEN.** Spec and DONE WHEN: `DUEL.md` (the triangle: shield beats shot, melee breaks shield, a shot
+      interrupts a wind-up). Builds, in order:
+  - [ ] a. his SHIELD (stand-in mesh on `weapon_root_left` until his GLB) + shield state: blocks frontal bolts (spark, clang,
+        no damage), raised at a shot after a difficulty-set reaction time; armour only from hits that land.
+  - [ ] b. the WIND-UP: a held, glowing, grunting raise before every swing; a bolt during it interrupts (stagger, shield
+        down, armour off). He closes the distance fast enough to be a threat (a lunge / charge, not a 1 m/s walk).
+  - [ ] c. the GUARD BREAK: Zap's charged hammer on a raised shield knocks it wide; a stagger window. His SHIELD BASH.
+  - [ ] d. size: `sizeK` damage + knockback both ways, hitstop on every blow, kickback on the attacker.
+  - [ ] e. EXPOSED / desperate phase + the finisher; EASY / MEDIUM / HARD on the arena menu.
+  - [ ] f. tune on his phone until he signs it off.
+- [ ] **WHITE BOX HUB**: the arena is the one sandbox world; a MODE switch on its menu (DUEL / TRANSFORM / ...), so
+      every sandbox lives in one place. (Small; can ride with the DUEL's first build.)
+- [ ] **TRANSFORMATION** (next, after DUEL is signed): `TRANSFORM.md` -- a civilian turns into his alien region by
+      region from the wound (veins, bulge, green, armour bursts out, the cry); triggers: drink, alien syringe/beacon, Zap's
+      stab/dart, debug toggle; a speed slider.
 - [ ] WEAPON FEEL: big kickback that shoves the shooter, dramatic blaster sound, exaggerated impacts.
 - [ ] DESTRUCTION: buses and cars whose shell panels come off (buildings already break).
-- [ ] TRANSFORMATION: one universal base mesh (Character Creator) wrapped onto every character (headless wrap in the
-      pipeline), so human <-> alien <-> Zap disguises are true blend-shape morphs.
 - [ ] SCALE: grunts against a big guy.
 
 ## CUT (dead code from the story, one system per pass, `npm run check` + a tkit boot after each)
