@@ -42,6 +42,8 @@ levels later. **Each sandbox is tuned until it feels great on its own before any
       convention: `weapon_root_left` -> `weapon_tip`). A generated one replaces it later.
 - [x] **m899** the x-ray SKELETON for the stun zap (`models/characters/xray_skeleton.glb`): his image -> Tripo -> ARP rig ->
       Mixamo names + root. NO FINGER BONES (the finger AI found none: rigid hands). Not used in the game yet (STUN sandbox).
+- [ ] a SKELETON PER SPECIES for the stun zap (his: "the Brutes will have a very distinctive skeleton, the Greys, the
+      lizards"): Brute, Reptilian, Grey -- each into `ARENA.stun.files` (brute / reptile / grey). Human done (m899).
 - [ ] generated shields + weapons, **batched**: stack 3-4 weapon images in one picture and generate them in ONE Tripo task
       (he: "you can change the polygon slider so you can generate like four weapons at once"), then split the pieces
       apart in Blender (loose parts) and give each its mount bones. Saves credits.

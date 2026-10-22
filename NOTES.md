@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m902 -- THE SHOCK: a spiky electric bubble, lightning arcs, cartoon zaps; he convulses; a skeleton per species
+*"A shock electricity beam bubble with really pointy tips that move, and cartoon little zap zap things around it... he'll still
+react if he's been hit... one skeleton for the humans, one for each alien race."*
+- BUBBLE (`shockMake`): an ellipsoid (2.3 x his radius, .62 x his height) whose vertices a hash kicks out to SPIKES, re-rolled
+  14x a second (`ARENA.shock.spikes` .55), additive, rim-lit, flickering; brighter on the skeleton frames.
+- ARCS (`shockArcs`): 7 jagged camera-facing lightning ribbons from inside him to the bubble, re-drawn every 50 ms; 0-2 while dazed.
+- ZAPS: cartoon zig-zag bolt sprites (canvas: yellow, white core, ink outline), 18/s popping in and out round the bubble.
+- HE REACTS: the zap lands as a hit reaction, he CONVULSES through the strobe (a new hit clip every `twitch` .3 s at 1.7x), and a
+  blow while stunned plays its reaction and does its damage but does NOT end the stun (`arenaBlow`).
+- SPECIES: a kind's `bones` (WARBOSS brute, SKULLBACK reptile) picks `ARENA.stun.files[bones]`; only `human` exists, so the
+  bosses use the human skeleton until theirs are made (ROADMAP ASSETS). Each file loads once, each kind is fitted once.
+
 ## m901 -- THE STUN ZAP: the x-ray skeleton as rigid pieces fitted to ANY rig (his method)
 *"If we broke the skeleton into its bone segments... and aligned them rigidly to any Mixamo skeleton... it would work for
 everybody."* `ARENA.stun`, `xrayFit`, `xrayMake`, `arenaStun`, `arenaStunStep`.
