@@ -17,7 +17,7 @@ levels later. **Keep the scope narrow: one sandbox at a time, tuned until it fee
       flies off, KO slow-mo, beam out, CLEAR. This is the STAGE for the duel, not the duel.
 - [ ] **DUEL -- OPEN.** Spec and DONE WHEN: `DUEL.md` (the triangle: shield beats shot, melee breaks shield, a shot
       interrupts a wind-up). Builds, in order:
-  - [ ] a. his SHIELD (stand-in mesh on `weapon_root_left` until his GLB) + shield state: blocks frontal bolts (spark, clang,
+  - [x] a. **m896** his SHIELD (stand-in mesh on `weapon_root_left` until his GLB) + shield state: blocks frontal bolts (spark, clang,
         no damage), raised at a shot after a difficulty-set reaction time; armour only from hits that land.
   - [ ] b. the WIND-UP: a held, glowing, grunting raise before every swing; a bolt during it interrupts (stagger, shield
         down, armour off). He closes the distance fast enough to be a threat (a lunge / charge, not a 1 m/s walk).

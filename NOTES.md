@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m896 -- DUEL a: HIS SHIELD (`arenaShield*`, `ARENA.duel`, `BLOW_SRC`)
+DUEL.md, the first corner of the triangle. At range, while you aim or fire (`ARENA.threatT`), he raises a shield after the
+difficulty's `react` (.6 / .35 / .15 s) and ADVANCES behind it at .75 of his run, on the walk clip. A bolt meeting it inside
+`arc` 1.15 rad of his nose sparks off: no damage, no armour (`BLOW_SRC` = 'shot' around the two bolt `dummyHit` calls is how
+`dummyBlow` tells a shot from a swing). In reach he drops it to swing. A melee blow at `breakAt` .6+ power is a GUARD BREAK:
+shield flung wide, big hit clip for `breakStun` 1.5 s, no re-raise until it ends; a light blow clangs. Flanks and back are bare.
+The shield is a STAND-IN disc held in BODY space (no shield clip, so a hand-mounted disc would sit wherever the block idle's left
+hand is); his GLB on `weapon_root_left` replaces it. EASY / MEDIUM / HARD on the arena bar also scales his damage (.6 / 1 / 1.4).
+DUEL.md boxes moved: none ticked yet (shield blocks shots and a guard break exists -- both want his phone). Open: b (wind-up +
+interrupt + closing speed), d, e, f. `mel.arenaShot(d, h, p)` fires a bolt-type blow for testing.
+
 ## m895 -- THE POLICE ARE OFF
 *"We can probably get rid of the police star system... we are at phase one again."* `COPS.on = 0`: `heatAdd` returns 0, `heatStep`
 zeroes and returns, the stars div is gone, cops do not hunt (`copAI` is gated on `COPS.on`). Deleting it is in ROADMAP CUT.
