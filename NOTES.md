@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m916 -- the Skullback held his maul upside down
+*"The lizard boss -- his weapon is facing the wrong pole... he's holding it upside down."* Both weapon files carry the head at
++Z with the grip at the origin (width by z-bin: maul head at z 1.0-1.75, cleaver blade 0-.85). The difference is the RIG: on
+the spawn T-pose, `weapon_root` -> `weapon_tip` points to the thumb on the Warboss (.92) and the CEO alien (.86), and BACKWARDS
+(-1.00 vs his forward) on the Skullback, whose rig has no finger bones for the mount placer (pipeline/mounts.py) to aim by.
+`mountFlip` turns a backwards axis round at spawn (thumb if he has one, else his forward), for the weapon and the hand shield;
+the chip says `MOUNT FLIPPED <kind>`. Render after: maul head up by his shoulder, as the cleaver is held. mounts.py itself should
+get the same rule for finger-less rigs.
+
 ## m915 -- the shield in his FIST, the cinematic T-pose back on purpose, one plate = one piece
 *"The shield refinement made it worse -- now it's under their arm... design a shield he holds in his hand the same way he'd hold
 a weapon... we have weapon joints in both hands." / "When it was T-pose it was really cinematic, now it doesn't have the same
