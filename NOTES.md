@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m921 -- NOISE by default, the stretch only on the way IN, he ROARS, the x-ray keeps his armour and sees through his skin
+*"The noise transformer is definitely better. When he transforms back he does the stretch -- only on the way from normal guy to
+alien. Isn't there a noise he's supposed to make? I haven't heard him roar. ... the stun on the boss: what if the armour stayed
+there while the skin flashes to the skeleton? And maybe 50% transparent, not completely -- like a cartoon would do it."*
+- Wave default NOISE (button order NOISE, LIMBS, FEET, CHEST).
+- Stretch only when the TARGET is a boss (`!ARENA.kinds[toKey].civ`): CEO -> alien stretches (2.64 s), alien -> CEO is the plain
+  2.0 s morph. Headless both ways, no errors.
+- WHY NO ROAR: `bodyVox` returns unless `K.voice && K.chirp`, and `chirp` gates the CITY's ambient chatter -- no arena boss ever had
+  it, so every arena "roar" (beam-in thump, rush, exposed, armour-up) has been SILENT since m893. Arena bodies speak now.
+  `arenaRoar(d, k)`: his grunt pitched by `voxSize` x .82, a creature growl 110 ms under it at x .72, a shake. In the morph at
+  `act.roarAt` .42 (the arms going wide), and on the armour-up roar.
+- X-RAY: only SKINNED meshes strobe (armour, weapon, shield are rigid objects on bones and stay solid); with the skeleton on, the
+  skin is drawn at `stun.see` .5 opacity, no depth write, instead of hidden (`see` 0 = the old swap). Render: armour solid, skull
+  and ribs through the skin.
+
 ## m920 -- he eases into the stretch instead of snapping to its first frame
 `act.ease` .4 s: `tmActOn` keeps the clips he is in (frozen, weights normalised to 1) and `tmActEase` hands them over to the stretch
 every morph frame (stretch e, the rest w(1-e), smoothstepped). **First try flashed toward the T-POSE at t .1**: `skinWeights` runs
