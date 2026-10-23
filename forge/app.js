@@ -6,6 +6,7 @@ import { DRACOLoader } from '../vendor/DRACOLoader.js';
 import { FBXLoader } from '../vendor/FBXLoader.js';
 import { GLTFExporter } from '../vendor/GLTFExporter.js';
 import { OrbitControls } from '../vendor/OrbitControls.js';
+import { TransformControls } from '../vendor/TransformControls.js';
 import { clone as skClone } from '../vendor/SkeletonUtils.js';
 import * as F from './core.js';
 
@@ -77,7 +78,7 @@ async function setCharacter(buf, name) {
     const I = ST.tg.info, nb = Object.keys(ST.tg.rig.bones).length;
     $('charNote').innerHTML = `${nb} Mixamo bones · hips ${ST.tg.hipH.toFixed(2)} m above his soles · ${ST.tg.rig.skinned.length} skinned mesh${ST.tg.rig.skinned.length === 1 ? '' : 'es'}` + (I.kept ? '' : ' · <span class="bad">no skin found: ground contact is off</span>');
     $('exNote').textContent = I.excluded.length ? I.excluded.join(', ') + ` (${I.dropped} sampled vertices)` : 'nothing: every vertex belongs to the body';
-    renderPack();
+    renderPack(); dotsBuild(); boneMenu();
     syncSliders(); if (ST.P.clips.length) await previewEntry(ST.P.clips[0]); else chip('pick clips in LIBRARY');
   } catch (e) { console.error(e); chip('could not load ' + name + ': ' + e.message); }
   busy(false);
@@ -195,18 +196,18 @@ async function source(en) {
   return s;
 }
 async function bake(en) {
-  const src = await source(en), r = F.carry(ST.tg, src, en.role, ST.P);
+  const src = await source(en), r = F.carry(ST.tg, src, en.role, ST.P, { fk: en.fk });
   return { src, rep: r.rep, clip: F.editLayer(r.clip, en.edit) };
 }
-async function previewEntry(en) {
+async function previewEntry(en, keepT) {
   if (!ST.tg) return; busy(true);
   try {
     const { src, clip, rep } = await bake(en);
-    play(clip, src, en.edit);
+    play(clip, src, en.edit); if (keepT !== undefined) { ST.act.time = Math.min(keepT, clip.duration); ST.tg.mixer.update(0); }
     const from = en.donor ? stemOf(en.donor) + ': ' + en.clip : ((LIB.index && LIB.index.find(x => x.stem === en.stem)) || {}).name || en.stem;
     chip(`${en.role}  ←  ${from}  ${clip.duration.toFixed(2)} s\n` +
       `stance ×${(rep.hipW / rep.leg).toFixed(2)} of the source's, for his leg length` + (rep.groundMax !== undefined ? ` · ground moved him up to ${(rep.groundMax * 100).toFixed(0)} cm (mean ${(rep.groundMean * 100).toFixed(0)})` : ' · ground off'));
-    ST.cur = en; ST.curSrcDur = src.clip.duration; renderPack(); showEdit();
+    ST.cur = en; ST.curSrcDur = src.clip.duration; renderPack(); showEdit(); showPose();
   } catch (e) { console.error(e); chip('could not carry ' + (en.clip || en.stem) + ': ' + e.message); }
   busy(false);
 }
@@ -214,12 +215,15 @@ const previewStem = (role, stem) => previewEntry({ role, stem });
 function play(clip, src, edit) {
   const mx = ST.tg.mixer; mx.stopAllAction(); if (ST.act) mx.uncacheAction(ST.act.getClip());
   ST.act = mx.clipAction(clip); ST.act.play(); ST.act.time = 0;
-  if (ST.ghost) { scene.remove(ST.ghost.root); ST.ghost = null; }
+  if (ST.ghost) { scene.remove(ST.ghost.root); scene.remove(ST.ghost.help); ST.ghost = null; }
   if ($('ghost').checked && src) {
     // the source body, at his hip height, a body-width to his right: what he is being asked to do
     const root = new THREE.Group(), copy = skClone(src.scene); root.add(copy); copy.traverse(o => { if (/^mixamorig_/.test(o.name)) o.isBone = true; });
     const k = ST.tg.hipH / (src.hipH || 1); root.scale.multiplyScalar(k); root.position.set(-ST.tg.hipH * 2.1, -src.restLow * k, 0);
-    const help = new THREE.SkeletonHelper(copy); root.add(help);
+    // a skin speaks for itself; a bare skeleton (the library's Y Bot) gets its lines. The helper goes in the SCENE: it already
+    // draws in its object's world space, and parented under `root` it would be scaled twice
+    let skinned = false; copy.traverse(o => { if (o.isSkinnedMesh) skinned = true; });
+    const help = new THREE.SkeletonHelper(copy); help.visible = !skinned; scene.add(help);
     const mix = new THREE.AnimationMixer(copy); mix.clipAction(src.clip).play();
     scene.add(root); ST.ghost = { root, mix, help, a: (edit && edit.trim && +edit.trim[0]) || 0, sp: (edit && +edit.speed) || 1 };
   }
@@ -259,7 +263,7 @@ const stemOf = f => f.split('/').pop().replace(/\.(glb|gltf|fbx)$/i, '');
 $('profSave').onclick = () => dl(new Blob([JSON.stringify(ST.P, null, 1)], { type: 'application/json' }), stemOf(ST.file) + '.profile.json');
 $('profLoadBtn').onclick = () => $('profLoad').click();
 $('profLoad').onchange = async () => { const f = $('profLoad').files[0]; if (!f) return; ST.P = JSON.parse(await f.text()); saveProf(); await reprep(); renderPack(); };
-async function reprep() { if (!ST.tg) return; const m = ST.tg.model; ST.tg.mixer.stopAllAction(); m.traverse(o => { if (o.isSkinnedMesh) o.skeleton.pose(); }); ST.tg = F.prepTarget(m, { exclude: ST.P.exclude }); syncSliders(); }
+async function reprep() { if (!ST.tg) return; const m = ST.tg.model; ST.tg.restore(); ST.tg = F.prepTarget(m, { exclude: ST.P.exclude }); syncSliders(); dotsBuild(); }
 
 // ---------------------------------------------------------------- layers and his sliders
 const relayer = () => { saveProf(); if (ST.cur) previewEntry(ST.cur); };
@@ -275,6 +279,92 @@ for (const id in SL) {
   $(id).onchange = () => { ST.P.adjust = ST.P.adjust || {}; ST.P.adjust[SL[id][0]] = +$(id).value; relayer(); };
 }
 
+// ---------------------------------------------------------------- POSE: the FK layer, by hand
+// Dots on his joints; tap one (or pick from the list), turn the rings. On release the change is KEYED at the playhead as a
+// rotation in the bone's parent frame on top of everything else (`fkLayer`), and the clip re-bakes so ground contact still holds.
+const POSE = { on: false, bone: '', drag: false, q0: null, t0: 0, space: 'local' };
+const gizmo = new TransformControls(cam, renderer.domElement); gizmo.setMode('rotate'); gizmo.setSpace('local'); gizmo.setSize(1.1);
+const gizmoH = gizmo.getHelper(); scene.add(gizmoH);
+const dotGeo = new THREE.SphereGeometry(1, 10, 8), dotMat = new THREE.MeshBasicMaterial({ color: 0xffffff, depthTest: false, transparent: true, opacity: .85 });
+let dots = null, dotBones = [];
+function dotsBuild() {
+  if (dots) { scene.remove(dots); dots.dispose(); dots = null; }
+  if (!ST.tg) return;
+  dotBones = Object.keys(ST.tg.rig.bones).filter(n => !/(Thumb|Index|Middle|Ring|Pinky)[2-4]|_End$|HeadTop|ToeBase_End/.test(n)).map(n => ST.tg.rig.bones[n]);
+  dots = new THREE.InstancedMesh(dotGeo, dotMat, dotBones.length); dots.renderOrder = 10; dots.frustumCulled = false; dots.visible = POSE.on; scene.add(dots);
+}
+const _m4 = new THREE.Matrix4(), _p = new THREE.Vector3(), _s = new THREE.Vector3(), _qq = new THREE.Quaternion();
+function dotsUpdate() {
+  if (!dots) return; const r = ST.tg.hipH * .022;
+  dotBones.forEach((b, i) => { b.getWorldPosition(_p); const sel = b.name === POSE.bone; _m4.compose(_p, _qq.identity(), _s.setScalar(sel ? r * 1.6 : r)); dots.setMatrixAt(i, _m4); dots.setColorAt(i, new THREE.Color(sel ? 0xffd04a : 0x3cd6ff)); });
+  dots.instanceMatrix.needsUpdate = true; if (dots.instanceColor) dots.instanceColor.needsUpdate = true;
+}
+const pretty = n => n.replace(/^mixamorig_/, '').replace(/([a-z])([A-Z])/g, '$1 $2');
+function boneMenu() {
+  const B = ST.tg ? Object.keys(ST.tg.rig.bones).filter(n => !/_End$|HeadTop/.test(n)) : [];
+  $('boneSel').innerHTML = '<option value="">— pick a bone —</option>' + B.map(n => `<option value="${n}">${pretty(n)}</option>`).join('');
+  $('boneSel').value = POSE.bone;
+}
+function selectBone(n) {
+  POSE.bone = n || ''; $('boneSel').value = POSE.bone;
+  if (POSE.bone && POSE.on && ST.cur && ST.P.clips.includes(ST.cur)) { gizmo.attach(ST.tg.rig.bones[POSE.bone]); ST.playing = false; $('play').textContent = '▶'; } else gizmo.detach();
+  renderKeys();
+}
+// the clip's SOURCE time for what is on screen: keys live before trim/speed, so a re-trim does not move them
+const srcT = () => { const E = (ST.cur && ST.cur.edit) || {}; return ((E.trim && +E.trim[0]) || 0) + (ST.act ? ST.act.time : 0) * (+E.speed || 1); };
+gizmo.addEventListener('dragging-changed', e => {
+  orbit.enabled = !e.value;
+  const b = ST.tg && ST.tg.rig.bones[POSE.bone]; if (!b) return;
+  if (e.value) { POSE.drag = true; POSE.q0 = b.quaternion.clone(); POSE.t0 = srcT(); return; }
+  POSE.drag = false;
+  const en = ST.cur; if (!en || !ST.P.clips.includes(en)) return;
+  // what the clip gave this bone BEFORE any key (the old key undone), and what he wants now: the new key is the difference
+  const old = F.fkAt(en.fk && en.fk[POSE.bone], POSE.t0), base = old.clone().invert().multiply(POSE.q0);
+  const D = b.quaternion.clone().multiply(base.invert());
+  en.fk = en.fk || {}; const keys = en.fk[POSE.bone] = en.fk[POSE.bone] || [], tol = 1 / 60;
+  const k = keys.find(x => Math.abs(x.t - POSE.t0) < tol), q = [D.x, D.y, D.z, D.w].map(v => +v.toFixed(5));
+  if (k) k.q = q; else { keys.push({ t: +POSE.t0.toFixed(3), q }); keys.sort((a, b) => a.t - b.t); }
+  saveProf(); previewEntry(en, ST.act ? ST.act.time : 0).then(() => selectBone(POSE.bone));
+});
+function showPose() {
+  const en = ST.cur, ok = en && ST.P.clips.includes(en);
+  $('poseH').textContent = ok ? 'Pose: ' + en.role : 'Pose';
+  $('poseNote').textContent = ok ? (Object.keys(en.fk || {}).length ? 'Keys show in the list. Tap a key to jump to it.' : 'No keys yet.') : 'Pick a clip in his PACK first (a library row being browsed has nowhere to keep keys).';
+  if (!ok) gizmo.detach(); else if (POSE.bone && POSE.on) gizmo.attach(ST.tg.rig.bones[POSE.bone]);
+  renderKeys();
+}
+function renderKeys() {
+  const en = ST.cur, fk = (en && en.fk) || {}, rows = [];
+  for (const bn in fk) for (const [i, k] of fk[bn].entries()) { const a = 2 * Math.acos(Math.min(1, Math.abs(k.q[3]))) * 180 / Math.PI;
+    rows.push(`<div class="item${bn === POSE.bone ? ' on' : ''}" data-b="${bn}" data-t="${k.t}"><div class="nm">${pretty(bn)} <small>at ${k.t.toFixed(2)} s · ${a.toFixed(0)}°</small></div><button class="btn" data-kb="${bn}" data-ki="${i}">✕</button></div>`); }
+  $('keyList').innerHTML = rows.join('') || '<div class="item"><div class="nm"><small>none</small></div></div>';
+}
+$('keyList').onclick = e => {
+  const en = ST.cur; if (!en || !en.fk) return;
+  if (e.target.dataset.kb) { const bn = e.target.dataset.kb; en.fk[bn].splice(+e.target.dataset.ki, 1); if (!en.fk[bn].length) delete en.fk[bn]; saveProf(); previewEntry(en, ST.act.time); return; }
+  const row = e.target.closest('.item'); if (!row || !row.dataset.b) return;
+  const E = en.edit || {}, t = (+row.dataset.t - ((E.trim && +E.trim[0]) || 0)) / (+E.speed || 1);
+  if (ST.act) { ST.act.time = Math.max(0, t); ST.tg.mixer.update(0); } selectBone(row.dataset.b);
+};
+$('keyBoneClr').onclick = () => { const en = ST.cur; if (!en || !en.fk || !POSE.bone) return; delete en.fk[POSE.bone]; saveProf(); previewEntry(en, ST.act.time); };
+$('keyAllClr').onclick = () => { const en = ST.cur; if (!en || !en.fk) return; delete en.fk; saveProf(); previewEntry(en, ST.act.time); };
+$('boneSel').onchange = () => selectBone($('boneSel').value);
+for (const id of ['spL', 'spW']) $(id).onclick = () => { POSE.space = $(id).dataset.sp; gizmo.setSpace(POSE.space); $('spL').classList.toggle('ac', POSE.space === 'local'); $('spW').classList.toggle('ac', POSE.space === 'world'); };
+// a TAP on a dot picks it (a drag is the camera)
+const ray = new THREE.Raycaster(); let downAt = null;
+renderer.domElement.addEventListener('pointerdown', e => { downAt = [e.clientX, e.clientY, performance.now()]; });
+renderer.domElement.addEventListener('pointerup', e => {
+  if (!POSE.on || !dots || !downAt || POSE.drag) return; const [x, y, t] = downAt; downAt = null;
+  if (Math.hypot(e.clientX - x, e.clientY - y) > 8 || performance.now() - t > 400) return;
+  const r = renderer.domElement.getBoundingClientRect(), v = new THREE.Vector2((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
+  ray.setFromCamera(v, cam);
+  // nearest dot to the ray, in screen terms -- a fingertip is wider than a dot
+  let best = -1, bd = Infinity; const pr = new THREE.Vector3();
+  dotBones.forEach((b, i) => { b.getWorldPosition(pr); pr.project(cam); const d = Math.hypot((pr.x - v.x) * r.width / 2, (pr.y - v.y) * r.height / 2); if (d < bd) { bd = d; best = i; } });
+  if (best >= 0 && bd < 28) selectBone(dotBones[best].name);
+});
+function poseMode(on) { POSE.on = on; if (dots) dots.visible = on; if (on) { boneMenu(); showPose(); } else gizmo.detach(); }
+
 // ---------------------------------------------------------------- export
 async function bakeAll(onStep) {
   const clips = [];
@@ -287,7 +377,7 @@ async function exportGLB(withMesh) {
   const clips = await bakeAll((i, c) => { $('expNote').textContent = `baking ${i + 1}/${ST.P.clips.length}: ${c.role}`; });
   const m = ST.tg.model, hid = [];
   m.traverse(o => { o.updateMatrix(); });
-  m.traverse(o => { if (o.isSkinnedMesh) o.skeleton.pose(); });
+  ST.tg.restore();
   if (!withMesh) m.traverse(o => { if (o.isMesh && o.visible) { o.visible = false; hid.push(o); } });
   const out = await new GLTFExporter().parseAsync(m, { binary: true, animations: clips, onlyVisible: true });
   hid.forEach(o => { o.visible = true; });
@@ -305,7 +395,7 @@ $('charFileBtn').onclick = () => $('charFile').click();
 $('charFile').onchange = async () => { const f = $('charFile').files[0]; if (f) await setCharacter(await f.arrayBuffer(), f.name); };
 
 // ---------------------------------------------------------------- tabs, time, loop
-$('tabs').onclick = e => { const p = e.target.dataset.p; if (!p) return; [...$('tabs').children].forEach(b => b.classList.toggle('on', b === e.target)); document.querySelectorAll('.pane').forEach(x => x.classList.toggle('on', x.id === 'p-' + p)); };
+$('tabs').onclick = e => { const p = e.target.dataset.p; if (!p) return; [...$('tabs').children].forEach(b => b.classList.toggle('on', b === e.target)); document.querySelectorAll('.pane').forEach(x => x.classList.toggle('on', x.id === 'p-' + p)); poseMode(p === 'pose'); };
 $('play').onclick = () => { ST.playing = !ST.playing; $('play').textContent = ST.playing ? '❚❚' : '▶'; };
 $('speed').onchange = () => { ST.speed = +$('speed').value; };
 let scrubbing = false;
@@ -315,7 +405,8 @@ const clock = new THREE.Clock();
 renderer.setAnimationLoop(() => {
   const dt = Math.min(.05, clock.getDelta()) * (ST.playing && !scrubbing ? ST.speed : 0);
   if (ST.tg && ST.act) {
-    ST.tg.mixer.update(dt);
+    if (!POSE.drag) ST.tg.mixer.update(dt);
+    if (POSE.on) dotsUpdate();
     const d = ST.act.getClip().duration, t = ST.act.time % d;
     if (ST.ghost) { const ga = ST.ghost.mix._actions[0]; if (ga) { ga.time = ST.ghost.a + t * ST.ghost.sp; ST.ghost.mix.update(0); } }
     if (!scrubbing) $('scrub').value = Math.round(t / d * 1000);
@@ -341,6 +432,7 @@ window.forge = {
   profile(P) { ST.P = P; return reprep(); },
   preview: (role, stem) => previewStem(role, stem || role),
   previewEntry: en => previewEntry(en),
+  POSE: () => POSE, gizmo: () => gizmo, selectBone: n => selectBone(n), poseMode: on => poseMode(on),
   donor: async name => (await donor(name)).map(s => s.clip.name),
   adjust(a) { ST.P.adjust = Object.assign(ST.P.adjust || {}, a); syncSliders(); },
   async export(withMesh) { const b = await exportGLB(withMesh); let s = ''; const u = new Uint8Array(b); for (let i = 0; i < u.length; i += 32768) s += String.fromCharCode.apply(null, u.subarray(i, i + 32768)); return btoa(s); },

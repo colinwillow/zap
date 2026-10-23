@@ -163,7 +163,11 @@ export function prepTarget(model, opts = {}) {
   const par = hips.parent, o = par.getWorldPosition(new THREE.Vector3());
   const up = par.worldToLocal(o.clone().add(new THREE.Vector3(0, 1, 0))).sub(par.worldToLocal(o.clone()));
   const mixer = new THREE.AnimationMixer(model);
-  return { model, rig, T, info, hipH: hp.y - restLow, restLow, up, mixer };
+  // his rest pose, every node, as LOCAL transforms -- `skeleton.pose()` cannot give it back: it treats a root bone's world matrix
+  // as its local one, which collapses any rig whose armature carries a scale (the 0.01 most of the cast has)
+  const snap = []; model.traverse(o => snap.push([o, o.position.clone(), o.quaternion.clone(), o.scale.clone()]));
+  const restore = () => { mixer.stopAllAction(); for (const [o, p, q, sc] of snap) { o.position.copy(p); o.quaternion.copy(q); o.scale.copy(sc); } model.updateMatrixWorld(true); };
+  return { model, rig, T, info, hipH: hp.y - restLow, restLow, up, mixer, restore, snap };
 }
 // ---- a source: one library clip (skeleton only), or a DONOR -- any character with clips of his own (old Zap, an FBX of takes).
 // A donor's bind pose is read ONCE, at load, before any mixer has touched him; every clip of his then shares it.
@@ -234,6 +238,30 @@ export function adjustLayer(tg, clip, A) {
   return new THREE.AnimationClip(clip.name, clip.duration, tracks);
 }
 
+// ---- LAYER 6, THE FK LAYER -- his hand on a bone. `fk` is { boneName: [{ t, q:[x,y,z,w] }, ...] }: at each key, a rotation ADDED
+// on top of the clip, in the bone's PARENT frame (so "lift the arm" stays a lift whatever the shoulder is doing). Between keys it
+// eases (smoothstep + slerp); before the first and after the last it holds. One key is the whole clip.
+export function fkAt(keys, t, out = new THREE.Quaternion()) {
+  if (!keys || !keys.length) return out.identity();
+  const k = keys; if (t <= k[0].t) return out.fromArray(k[0].q); if (t >= k[k.length - 1].t) return out.fromArray(k[k.length - 1].q);
+  let i = 0; while (k[i + 1].t < t) i++;
+  const a = k[i], b = k[i + 1], u = (t - a.t) / Math.max(1e-6, b.t - a.t), e = u * u * (3 - 2 * u);
+  return out.fromArray(a.q).slerp(_q2.fromArray(b.q), e);
+}
+export function fkLayer(tg, clip, fk) {
+  if (!fk || !Object.keys(fk).length) return clip;
+  const ref = clip.tracks.find(t => t.name === MHIPS + '.position') || clip.tracks[0], times = ref.times, D = new THREE.Quaternion(), L = new THREE.Quaternion();
+  let tracks = clip.tracks.slice();
+  for (const bn in fk) { const keys = (fk[bn] || []).slice().sort((a, b) => a.t - b.t); if (!keys.length || !tg.rig.bones[bn]) continue;
+    const nm = bn + '.quaternion', old = tracks.find(t => t.name === nm), rest = tg.T.rest[bn] || [0, 0, 0, 1];
+    const tt = old ? old.times : times, vals = new Float32Array(tt.length * 4);
+    for (let f = 0; f < tt.length; f++) {
+      if (old) L.fromArray(old.values, f * 4); else L.fromArray(rest);
+      fkAt(keys, tt[f], D); L.premultiply(D); vals.set([L.x, L.y, L.z, L.w], f * 4); }
+    tracks = tracks.filter(t => t !== old); tracks.push(new THREE.QuaternionKeyframeTrack(nm, tt, vals)); }
+  return new THREE.AnimationClip(clip.name, clip.duration, tracks);
+}
+
 // ---- LAYER 7, CLIP EDITS: trim (seconds in the source) and speed
 export function editLayer(clip, E) {
   if (!E) return clip;
@@ -279,12 +307,13 @@ export function groundLayer(tg, src, clip, amt = 1) {
 }
 
 // ---- one clip through every layer. `P` is the profile (see forge.html); returns the clip and what each layer did.
-export function carry(tg, src, role, P) {
+export function carry(tg, src, role, P, opt) {
   RTW.feet = P.layers.feet ? 1 : 0;
   const r = retargetW(src.S, tg.T, { [role]: src.clip }, tg.rig.bones);
   if (!r || !r.clips[role]) throw new Error('nothing carried for ' + role);
   let clip = r.clips[role]; const rep = { hipW: RTW.hr, leg: RTW.lr, ms: RTW.ms };
   if (P.adjust) clip = adjustLayer(tg, clip, P.adjust);
+  if (opt && opt.fk) clip = fkLayer(tg, clip, opt.fk);
   if (P.layers.ground) { const g = groundLayer(tg, src, clip, P.layers.ground); clip = g.clip; rep.groundMax = g.max; rep.groundMean = g.mean; }
   return { clip, rep };
 }

@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m930 -- THE FORGE, step 3: the FK layer -- POSE tab, rotate a bone with rings, keyed at the playhead, eased between keys
+*"clearly this rotation-based application, his arm is not over his shoulder. So you use the FK layer to pull his arm up"*.
+- **POSE tab**: dots on his joints (fingers 2-4 and end bones left out so a thumb can hit them); tap one or pick from the list;
+  TransformControls rings, bone's axes or world axes. Letting go KEYS it at the playhead. One key holds for the whole clip, a
+  second key at another time eases between them (smoothstep + slerp). Keys list: tap to jump there, ✕ to drop; clear a bone or all.
+- **`fkLayer` (core)**: a key is a rotation in the bone's PARENT frame added on top of the clip (`L' = D * L`), so a lift stays a
+  lift whatever the shoulder is doing. Order: carry -> his sliders -> FK -> ground contact -> trim/speed. Keys are stored in the
+  clip's SOURCE time, so re-trimming does not slide them. The new key is the difference from what the clip gave the bone with the
+  old key undone, so re-grabbing a keyed bone edits that key rather than stacking.
+- **Fixed: `skeleton.pose()` collapses a rig whose armature carries a scale** (it treats a root bone's world matrix as its local
+  one) -- loading a profile shrank the fat biker to a point at the origin, and m928/m929's export wrote that wrong rest for the
+  cast's 0.01 armatures (the clips themselves were right). Every node's rest is snapshotted at load (`tg.restore`).
+- The source body's stick lines were scaled twice (the helper was parented under the scaled ghost): in the scene now, and only
+  for a bare skeleton -- a donor with a skin shows its skin.
+- Tested headless (phone size): old Zap's rocket_launcher on the fat biker, Left Arm turned 46 deg -> keyed, hand moved 14 cm, the
+  key listed, no page errors.
+
 ## m929 -- THE FORGE, step 2: clips from ANY character (old Zap's whole set onto a new body), his sliders, trim/speed, flip through
 *"extract all of [old Zap's] animations... upload a completely different proportion character... transfer all the animations...
 flip through one by one... adjust the parts that need adjustments and then export -- that's the golden workflow"*.
