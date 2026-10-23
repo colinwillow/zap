@@ -5,6 +5,30 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m915 -- the shield in his FIST, the cinematic T-pose back on purpose, one plate = one piece
+*"The shield refinement made it worse -- now it's under their arm... design a shield he holds in his hand the same way he'd hold
+a weapon... we have weapon joints in both hands." / "When it was T-pose it was really cinematic, now it doesn't have the same
+hit." / "His shoulder pad went flying, but then there was still a shoulder pad there."*
+- SHIELD (`arenaShieldHand`, `duel.shieldHand` 1): on `weapon_root_left` -> `weapon_tip` (handle) + `gun_tip_left` (fingers),
+  the frame `arenaArm` builds on the right. First try faced it the FINGER way: flat at idle, an umbrella in the block. The face
+  is the BACK OF THE HAND (bind pose, palms down -> the side that points up). MEASURED: idle face fwd .68 / out .60 (right);
+  block clip fwd -.96 (the hand turns over). So with the guard up it swings 180 about the handle THROUGH THE FIST (`handTwist`
+  .22 s) -- block face fwd .88. `handGrip` .15 shield units (at .075 the fist came through the board). Renders checked from 4
+  sides on the Warboss and Skullback. The forearm fit (`shieldHand` 0) is still there.
+- CINEMATIC (`ARENA.morph.boss` pose 'T' / `simple` 'LIVE', wave 'FEET'/'CHEST', arena bar BOSS T-POSE / WAVE): m914 removed
+  a pose that was a BUG and with it the beat he liked. Now three beats on purpose: live pose -> REST pose (`cine.in` .45 s, the
+  proxy's raw positions through his mesh's world matrix), rest -> rest morph, rest -> the new idle (`cine.out` .55). Frame
+  strip of the CEO: walking, T, wave climbing, reptile T, reptile alive. `tmBuild` / `tmRun` shared by the arena and your own
+  DNA turn (which stays LIVE).
+- ARMOUR (`armorRegroup`, `armor.regroup` 1): one plate lit at a time showed the cut does not match the plates -- the Warboss's
+  RIGHT shoulder pad lived in the CHEST piece (`Spine2`), `RightArm` was a sliver of it; the CEO alien's LeftShoulder / Head /
+  RightShoulder / Spine1 are specks. Bare renders (all armour hidden) are clean: nothing baked in the skin. Now per kind at
+  spawn: connected parts (position-welded union-find), each real part to the nearest armour bone SEGMENT, specks (< `speck`
+  .045 x height) ride the nearest real part, rebuilt per bone + texture; pieces on one bone fly together. After: `RightArm`
+  IS the right pad, `Spine2` is the harness. Console: `armour <kind>: N cut -> M plates, P parts, S specks`.
+- The CEO's "penguin" idle is the borrowed warrior set on a fat body -- an asset question (his own Mixamo exports, then the
+  motion transfer tool: ROADMAP ASSETS).
+
 ## m914 -- THE CEO MORPH: no T-pose, no 180 flip, no walking during it
 *"When he transforms he goes ghost stiff, into T-pose, transforms into the other T-pose and goes back. Also he flips 180 -- he
 transforms facing away and then all of a sudden he's facing me. There's also some walks going on."*

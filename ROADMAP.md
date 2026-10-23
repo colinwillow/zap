@@ -51,6 +51,16 @@ levels later. **Each sandbox is tuned until it feels great on its own before any
       (he: "you can change the polygon slider so you can generate like four weapons at once"), then split the pieces
       apart in Blender (loose parts) and give each its mount bones. Saves credits.
 
+- [ ] **THE UNIVERSAL MOTION TRANSFER TOOL** (his, m915: *"the universal Mixamo FK motion transfer tool -- basically we just
+      had a library of animations to pull from. That would be so freaking amazing."*). One clip library, played on ANY
+      Mixamo-named rig with its own proportions: per-bone FK rotation transfer in each rig's own bind frame (rest-to-rest
+      delta, never a raw local copy -- Blender and ARP re-orient bones), hips height scaled by leg length, feet planted by
+      a two-bone IK pass after. The game already does a narrow version of this (`mphBorrow` puts zap's 121 clips on the
+      hick's 56 shared bones); the tool is that, general, offline in `blender-addons/pipeline` + a runtime path. Until then:
+      his own Mixamo exports with each character's own clips (the CEO's "penguin" idle is the borrowed set on his body).
+- [ ] a HAND-HELD shield model of his (board in front of the fist, a grip piece down into the hand) on `weapon_root_left` /
+      `weapon_tip` / `gun_tip_left` -- m915 fits the procedural one there, so his drops in by file.
+
 ## CUT (dead code from the story, one system per pass, `npm run check` + a tkit boot after each)
 - [ ] the POLICE / heat / stars system (`HEAT`, `COPS`, `copAI`, `heatHit`): switched OFF at m895 (`COPS.on = 0`), delete it.
 - [ ] remove the PLAIN-skipped builders and their data (farm, islands, gorge, waterfront, ferry, factory, underneath,
