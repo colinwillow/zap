@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m927 -- ZAP 2 ON THE MOTION LIBRARY: an A/B hero, "ZAP (LIBRARY)", beside "ZAP"
+*"yeah lets do it"* -- step 3 of the library plan: re-animate Zap 2 from the Mixamo library (Y Bot), keeping his custom set.
+- **28 of his 61 clips come from the library**, picked BY DATA (`retarget-anims/tools/identify.cjs`, sure + the likely ones
+  checked by eye), renamed to his clip names so nothing in the game changes: walk_fwd = Walking_20, run_fwd = Standard_Run,
+  run_fwd_fast = Fast_Run, run_bwd = Running_Backward, rifle_run = Run_Forward, strafe_left = Jog_Strafe_Left, idle_01 =
+  Orc_Idle, shoot = Gunplay_6, roll = Sprinting_Forward_Roll, slide_kick = Running_Slide, backflip, flying_kick,
+  hurricane_kick, driving, climbing_Ladder, the ledge-hang set, the cover set, lay_to_get_up = Getting_Up,
+  take_damage_head = Head_Hit_1, weapon_block (+ reaction), weapon_melee_01, hold_item = Goalkeeper_Idle_1.
+- **The other 33 are Zap 2's existing clips** (old Zap's, as in m923): his melee_01-05, the weapon melee set, front_flip,
+  in_air, the rockets -- edited or not Mixamo, nothing in the library matches them.
+- Baked in Blender onto his ARP rig with the foot pass (`bake.py`, new `source:name` alias), then rootfix / mounts / retex /
+  draco, exactly the m923 chain: `models/characters/zap_02_lib.glb`, 61 clips, 4.50 MB.
+- **A/B, not a replacement**: hero carousel `ZAP (LIBRARY)`. Same proxy (`tmKeyOf` maps it to ZAP2), same mounts conform.
+  If it reads better, it becomes `zap_02.glb`; if not, it goes.
+- Unverified: whether the library clips read better than old Zap's on HIS proportions -- that is the point of the A/B.
+
 ## m925 -- THE RIFLE ON ZAP 2: the mount rebuilt in the HAND's frame (old Zap's convention); weapons re-fitted on every re-host
 *"When you're holding the rifle and you press up to shoot, his body faces the right but the rifle faces forward -- as if it's
 pointing 90 degrees toward the left side of his body."*
