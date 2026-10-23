@@ -23,6 +23,11 @@ every body.
   that is transforming.
 - **Until the rig exists, the current per-character files keep working.** Nothing waits on it.
 
+## Satire, not names (his, Oct 23 2026)
+Caricatures of public figures are SATIRE (the Simpsons / Futurama rule): exaggerated, and **never named** -- parody names only
+(Dump Tower...). The CEO -- the evil CEO running the world, who breaks out into his reptilian self at the top of the tower -- is
+one; the Bob Lazar-type is another. Nobody in the game, the code, the files or the UI carries a real name.
+
 ## How a character is BUILT from now on (Colin, Oct 23 2026)
 
 *"Objects should never be part of the characters. They should be accessory assets."* And: *"remake the characters as just their

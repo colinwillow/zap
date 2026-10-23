@@ -26,6 +26,12 @@ Spreads outward **from where he was stuck** (the wound, or the mouth for the dri
 3. **The cry.** At the end he throws his head back and roars (the werewolf howl), and the full alien stands there.
 4. **And back again**, the reverse (Zap's cure, later the story).
 
+## Two tiers (his, Oct 23 2026)
+- **Everyday** (NPC -> alien, Zap <-> NPC, the street): the SIMPLE proxy morph (m910). Cheap per character -- wrap + proxy.
+- **Bosses** (the moments that matter -- the top of the tower): the SUPER transform below: bare body + separate armour + the
+  layered morph / bulges / roar / armour and spikes. Extra credits per boss. First test: the CEO at the top of Dump Tower.
+  If it is phenomenal, it may spread to everyone.
+
 ## The layered transformation (his, Oct 23 2026)
 
 *"The armour splitting -- two versions of the hybrid alien civilian -- is additive with the morph. The spikes, if they're separate,
