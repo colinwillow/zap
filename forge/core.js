@@ -191,7 +191,7 @@ export function prepDonor(scene, clips) {
 // left x up.
 const _q = new THREE.Quaternion(), _q2 = new THREE.Quaternion(), _a = new THREE.Vector3(), _b = new THREE.Vector3();
 function setWorldQ(bone, wq) { bone.parent.getWorldQuaternion(_q2); bone.quaternion.copy(_q2.invert().multiply(wq)); bone.updateMatrixWorld(true); }
-function legTo(B, up, kn, ft, target) {
+function legTo(B, up, kn, ft, target, keepEnd = true) {
   const H = B[up].getWorldPosition(new THREE.Vector3()), K = B[kn].getWorldPosition(new THREE.Vector3()), F = B[ft].getWorldPosition(new THREE.Vector3());
   const footW = B[ft].getWorldQuaternion(new THREE.Quaternion());
   const a = K.distanceTo(H), b = F.distanceTo(K), d = target.clone().sub(H), dl = Math.max(1e-6, Math.min(d.length(), (a + b) * .999)), n = d.normalize();
@@ -202,7 +202,7 @@ function legTo(B, up, kn, ft, target) {
   setWorldQ(B[up], _q.setFromUnitVectors(K.clone().sub(H).normalize(), K2.clone().sub(H).normalize()).multiply(uw));
   const Kn = B[kn].getWorldPosition(new THREE.Vector3()), Fn = B[ft].getWorldPosition(new THREE.Vector3()), kw = B[kn].getWorldQuaternion(new THREE.Quaternion());
   setWorldQ(B[kn], _q.setFromUnitVectors(Fn.sub(Kn).normalize(), F2.clone().sub(Kn).normalize()).multiply(kw));
-  setWorldQ(B[ft], footW);
+  if (keepEnd) setWorldQ(B[ft], footW);
 }
 export function adjustLayer(tg, clip, A) {
   const st = +A.stance || 1, arms = (+A.arms || 0) * Math.PI / 180, lean = (+A.lean || 0) * Math.PI / 180;
@@ -262,6 +262,32 @@ export function fkLayer(tg, clip, fk) {
   return new THREE.AnimationClip(clip.name, clip.duration, tracks);
 }
 
+// ---- LAYER 5, THE OTHER HAND ON THE PROP. `grip` = { bone: the mount the prop hangs from (weapon_root_right, or the hand),
+// M: the prop's placement under it (16 numbers), off: the grip point in the prop's own space, side: 'Left'|'Right', reach 0..1 }.
+// Per frame the grip point is found in the world -- it rides the carrying hand, FK and all -- and the other arm is re-solved onto
+// it (two bones, the elbow kept in its plane, the hand following its forearm). Reach 0.5 is halfway there.
+export function gripLayer(tg, clip, grip) {
+  if (!grip || !(+grip.reach > 0)) return clip;
+  const mount = tg.model.getObjectByName(grip.bone), sd = grip.side || 'Left', B = tg.rig.bones, M = 'mixamorig_';
+  const up = M + sd + 'Arm', kn = M + sd + 'ForeArm', ft = M + sd + 'Hand';
+  if (!mount || !B[up] || !B[kn] || !B[ft]) return clip;
+  const PM = new THREE.Matrix4().fromArray(grip.M), off = new THREE.Vector3().fromArray(grip.off), reach = Math.min(1, +grip.reach);
+  const ref = clip.tracks.find(t => t.name === MHIPS + '.position') || clip.tracks[0], times = ref.times, n = times.length;
+  const out = { [up]: new Float32Array(n * 4), [kn]: new Float32Array(n * 4), [ft]: new Float32Array(n * 4) };
+  tg.mixer.stopAllAction(); const ta = tg.mixer.clipAction(clip); ta.play();
+  const W = new THREE.Matrix4(), tgt = new THREE.Vector3(), cur = new THREE.Vector3();
+  for (let f = 0; f < n; f++) {
+    ta.time = times[f]; tg.mixer.update(0); tg.model.updateMatrixWorld(true);
+    tgt.copy(off).applyMatrix4(W.multiplyMatrices(mount.matrixWorld, PM));
+    B[ft].getWorldPosition(cur); tgt.lerp(cur, 1 - reach);
+    legTo(B, up, kn, ft, tgt, false);
+    for (const b in out) { const q = B[b].quaternion; out[b].set([q.x, q.y, q.z, q.w], f * 4); }
+  }
+  ta.stop(); tg.mixer.uncacheClip(clip);
+  const tracks = clip.tracks.filter(t => !out[t.name.slice(0, t.name.lastIndexOf('.'))] || !t.name.endsWith('.quaternion')).concat(Object.keys(out).map(b => new THREE.QuaternionKeyframeTrack(b + '.quaternion', times, out[b])));
+  return new THREE.AnimationClip(clip.name, clip.duration, tracks);
+}
+
 // ---- LAYER 7, CLIP EDITS: trim (seconds in the source) and speed
 export function editLayer(clip, E) {
   if (!E) return clip;
@@ -314,6 +340,7 @@ export function carry(tg, src, role, P, opt) {
   let clip = r.clips[role]; const rep = { hipW: RTW.hr, leg: RTW.lr, ms: RTW.ms };
   if (P.adjust) clip = adjustLayer(tg, clip, P.adjust);
   if (opt && opt.fk) clip = fkLayer(tg, clip, opt.fk);
+  if (opt && opt.grip) clip = gripLayer(tg, clip, opt.grip);
   if (P.layers.ground) { const g = groundLayer(tg, src, clip, P.layers.ground); clip = g.clip; rep.groundMax = g.max; rep.groundMean = g.mean; }
   return { clip, rep };
 }

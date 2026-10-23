@@ -62,7 +62,7 @@ label.sw { display:flex; gap:8px; align-items:center; }
 </head>
 <body>
 <div id="app">
-  <div id="top"><b>FORGE</b><span class="bld">f3</span><span class="who" id="who">no character</span></div>
+  <div id="top"><b>FORGE</b><span class="bld">f4</span><span class="who" id="who">no character</span></div>
   <div id="view"><div id="chip"></div><div id="busy">working…</div></div>
   <div id="time">
     <button class="btn" id="prev">◀</button><button class="btn" id="play">❚❚</button><button class="btn" id="next">▶</button>
@@ -147,6 +147,15 @@ label.sw { display:flex; gap:8px; align-items:center; }
       <div class="row"><select id="boneSel"></select></div>
       <div class="row"><button class="btn ac" data-sp="local" id="spL">Bone's axes</button><button class="btn" data-sp="world" id="spW">World axes</button></div>
       <div class="note">Tap a dot on him (or pick a bone above), turn the rings. Letting go KEYS it at the playhead. One key holds for the whole clip; a second key at another time makes it change between them, eased.</div>
+      <h3>Prop in his hand</h3>
+      <div class="row"><select id="propSel"></select><select id="propHand" style="flex:none;width:90px"><option value="Right">Right</option><option value="Left">Left</option></select></div>
+      <div class="row"><button class="btn" id="propFileBtn">Upload a prop GLB…</button><input type="file" id="propFile" accept=".glb,.gltf" hidden></div>
+      <div class="row" id="gzMode"><button class="btn ac" data-m="bone">Bone</button><button class="btn" data-m="move">Move prop</button><button class="btn" data-m="turn">Turn prop</button><button class="btn" data-m="grip">Grip point</button></div>
+      <div class="slider"><span>Prop size ×</span><input type="range" id="pSize" min="0.25" max="3" step="0.05" value="1"><span id="pSizeV">1.00</span></div>
+      <label class="sw"><input type="checkbox" id="gripOn"> The other hand grips it</label>
+      <div class="slider"><span>Reach</span><input type="range" id="gReach" min="0" max="1" step="0.05" value="1"><span id="gReachV">1.00</span></div>
+      <div class="note">A prop built around a <code>weapon_root</code> joint sits in the hand with no adjusting. Move / Turn / Size fit it to this body; the yellow ball is where the other hand holds it. Kept per clip.</div>
+      <div class="row"><button class="btn" id="propAll">Use this prop + grip on every clip</button></div>
       <h3>Keys in this clip</h3>
       <div class="list" id="keyList"></div>
       <div class="row" style="margin-top:8px"><button class="btn" id="keyBoneClr">Clear this bone</button><button class="btn" id="keyAllClr">Clear all keys</button></div>
@@ -163,6 +172,6 @@ label.sw { display:flex; gap:8px; align-items:center; }
     </div>
   </div>
 </div>
-<script type="module" src="./forge/app.js?v=f3"></script>
+<script type="module" src="./forge/app.js?v=f4"></script>
 </body>
 </html>

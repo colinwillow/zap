@@ -196,7 +196,7 @@ async function source(en) {
   return s;
 }
 async function bake(en) {
-  const src = await source(en), r = F.carry(ST.tg, src, en.role, ST.P, { fk: en.fk });
+  const src = await source(en), r = F.carry(ST.tg, src, en.role, ST.P, { fk: en.fk, grip: gripOf(en) });
   return { src, rep: r.rep, clip: F.editLayer(r.clip, en.edit) };
 }
 async function previewEntry(en, keepT) {
@@ -207,7 +207,7 @@ async function previewEntry(en, keepT) {
     const from = en.donor ? stemOf(en.donor) + ': ' + en.clip : ((LIB.index && LIB.index.find(x => x.stem === en.stem)) || {}).name || en.stem;
     chip(`${en.role}  ←  ${from}  ${clip.duration.toFixed(2)} s\n` +
       `stance ×${(rep.hipW / rep.leg).toFixed(2)} of the source's, for his leg length` + (rep.groundMax !== undefined ? ` · ground moved him up to ${(rep.groundMax * 100).toFixed(0)} cm (mean ${(rep.groundMean * 100).toFixed(0)})` : ' · ground off'));
-    ST.cur = en; ST.curSrcDur = src.clip.duration; renderPack(); showEdit(); showPose();
+    ST.cur = en; ST.curSrcDur = src.clip.duration; renderPack(); showEdit(); showPose(); await propShow(en);
   } catch (e) { console.error(e); chip('could not carry ' + (en.clip || en.stem) + ': ' + e.message); }
   busy(false);
 }
@@ -282,7 +282,7 @@ for (const id in SL) {
 // ---------------------------------------------------------------- POSE: the FK layer, by hand
 // Dots on his joints; tap one (or pick from the list), turn the rings. On release the change is KEYED at the playhead as a
 // rotation in the bone's parent frame on top of everything else (`fkLayer`), and the clip re-bakes so ground contact still holds.
-const POSE = { on: false, bone: '', drag: false, q0: null, t0: 0, space: 'local' };
+const POSE = { on: false, bone: '', drag: false, q0: null, t0: 0, space: 'local', mode: 'bone' };
 const gizmo = new TransformControls(cam, renderer.domElement); gizmo.setMode('rotate'); gizmo.setSpace('local'); gizmo.setSize(1.1);
 const gizmoH = gizmo.getHelper(); scene.add(gizmoH);
 const dotGeo = new THREE.SphereGeometry(1, 10, 8), dotMat = new THREE.MeshBasicMaterial({ color: 0xffffff, depthTest: false, transparent: true, opacity: .85 });
@@ -307,13 +307,15 @@ function boneMenu() {
 }
 function selectBone(n) {
   POSE.bone = n || ''; $('boneSel').value = POSE.bone;
-  if (POSE.bone && POSE.on && ST.cur && ST.P.clips.includes(ST.cur)) { gizmo.attach(ST.tg.rig.bones[POSE.bone]); ST.playing = false; $('play').textContent = '▶'; } else gizmo.detach();
+  if (POSE.bone) { POSE.mode = 'bone'; [...$('gzMode').children].forEach(b => b.classList.toggle('ac', b.dataset.m === 'bone')); }
+  if (POSE.bone && POSE.on && inPack()) { gizmo.attach(ST.tg.rig.bones[POSE.bone]); ST.playing = false; $('play').textContent = '▶'; } else gizmo.detach();
   renderKeys();
 }
 // the clip's SOURCE time for what is on screen: keys live before trim/speed, so a re-trim does not move them
 const srcT = () => { const E = (ST.cur && ST.cur.edit) || {}; return ((E.trim && +E.trim[0]) || 0) + (ST.act ? ST.act.time : 0) * (+E.speed || 1); };
 gizmo.addEventListener('dragging-changed', e => {
   orbit.enabled = !e.value;
+  if (POSE.mode !== 'bone') { POSE.drag = e.value; if (!e.value) propCommit(); return; }
   const b = ST.tg && ST.tg.rig.bones[POSE.bone]; if (!b) return;
   if (e.value) { POSE.drag = true; POSE.q0 = b.quaternion.clone(); POSE.t0 = srcT(); return; }
   POSE.drag = false;
@@ -330,7 +332,7 @@ function showPose() {
   const en = ST.cur, ok = en && ST.P.clips.includes(en);
   $('poseH').textContent = ok ? 'Pose: ' + en.role : 'Pose';
   $('poseNote').textContent = ok ? (Object.keys(en.fk || {}).length ? 'Keys show in the list. Tap a key to jump to it.' : 'No keys yet.') : 'Pick a clip in his PACK first (a library row being browsed has nowhere to keep keys).';
-  if (!ok) gizmo.detach(); else if (POSE.bone && POSE.on) gizmo.attach(ST.tg.rig.bones[POSE.bone]);
+  if (!ok || !POSE.on) gizmo.detach(); else gizmoTarget();
   renderKeys();
 }
 function renderKeys() {
@@ -364,6 +366,94 @@ renderer.domElement.addEventListener('pointerup', e => {
   if (best >= 0 && bd < 28) selectBone(dotBones[best].name);
 });
 function poseMode(on) { POSE.on = on; if (dots) dots.visible = on; if (on) { boneMenu(); showPose(); } else gizmo.detach(); }
+for (const id of ['spL', 'spW']) $(id).addEventListener('click', () => { if (POSE.mode === 'bone') gizmo.setSpace(POSE.space); });
+
+// ---------------------------------------------------------------- PROPS: a weapon in his hand, the other hand on it
+// A prop built around a `weapon_root*` joint (every Zap weapon) hangs from the matching joint on him with identity -- his
+// `weapon_root_right` if he has one, else the bare hand, and then Move / Turn / Size fit it. The yellow ball is the grip point.
+const PROPS = [['alien_launcher', 'Rocket launcher'], ['alien_antenna_blaster_game', 'Blaster'], ['alien_antenna_hammer_game', 'Antenna hammer'], ['hammer', 'Hammer'],
+  ['spikey_mace', 'Spiked mace'], ['w_brute_cleaver', 'Cleaver'], ['w_rept_maul', 'Maul'], ['shield_brute', 'Shield']];
+const propCache = new Map();
+async function propScene(file) {
+  if (propCache.has(file)) return propCache.get(file);
+  const buf = file.startsWith('idb:') ? await idbGet(file) : await (await fetch(file)).arrayBuffer();
+  const g = await parseGLB(buf); propCache.set(file, g.scene); return g.scene;
+}
+async function propMenu() {
+  const up = (await idbKeys()).filter(k => String(k).startsWith('idb:prop:'));
+  $('propSel').innerHTML = '<option value="">— no prop —</option>' + PROPS.map(([f, n]) => `<option value="models/weapons/${f}.glb">${n}</option>`).join('') + up.map(k => `<option value="${k}">${k.slice(9)} (uploaded)</option>`).join('');
+}
+const mountName = side => { const m = ST.tg.model, w = 'weapon_root_' + side.toLowerCase(); return m.getObjectByName(w) ? w : 'mixamorig_' + side + 'Hand'; };
+function gripOf(en) {
+  const P = en && en.prop, G = en && en.grip; if (!P || !G || !G.on || !(+G.reach > 0)) return null;
+  const M = new THREE.Matrix4().compose(new THREE.Vector3().fromArray(P.pos), new THREE.Quaternion().fromArray(P.quat), new THREE.Vector3().setScalar(P.unit * (P.size || 1)));
+  return { bone: P.bone, M: M.toArray(), off: G.off, side: P.hand === 'Right' ? 'Left' : 'Right', reach: +G.reach };
+}
+const PR = { holder: null, marker: null };
+async function propShow(en) {
+  if (PR.holder) { PR.holder.removeFromParent(); PR.holder = PR.marker = null; }
+  syncProp(en); if (!en || !en.prop || !ST.tg) return;
+  const P = en.prop; let sc;
+  try { sc = await propScene(P.file); } catch (e) { chip('could not load the prop: ' + e.message); return; }
+  const mount = ST.tg.model.getObjectByName(P.bone); if (!mount) return;
+  sc.updateMatrixWorld(true);
+  const root = (() => { let r = null; sc.traverse(o => { if (!r && /^weapon_root/.test(o.name)) r = o; }); return r; })();
+  const content = (root || sc).clone(true); content.position.set(0, 0, 0); content.quaternion.identity(); content.scale.set(1, 1, 1);
+  content.traverse(o => { if (o.isMesh) { o.frustumCulled = false; } });
+  const holder = new THREE.Group(); holder.add(content); mount.add(holder);
+  const mws = mount.getWorldScale(new THREE.Vector3()).x;
+  if (P.unit === undefined) {      // first placement: the prop's own units, said in the mount's
+    let u = root ? root.getWorldScale(new THREE.Vector3()).x : 1;
+    if (!root) { const b = new THREE.Box3().setFromObject(sc), d = b.getSize(new THREE.Vector3()); if (Math.max(d.x, d.y, d.z) > 5) u = .01; }
+    P.unit = u / mws; P.pos = [0, 0, 0]; P.quat = [0, 0, 0, 1]; P.size = 1;
+    const tip = content.getObjectByName(content.children.find(c => /^weapon_tip/.test(c.name)) ? content.children.find(c => /^weapon_tip/.test(c.name)).name : '__');
+    let off = tip ? tip.position.clone() : null;
+    if (!off) { const b = new THREE.Box3().setFromObject(content), c = b.getCenter(new THREE.Vector3()), d = b.getSize(new THREE.Vector3()); off = c; const ax = d.x > d.y ? (d.x > d.z ? 'x' : 'z') : (d.y > d.z ? 'y' : 'z'); off[ax] = b.min[ax] + d[ax] * .2; }
+    en.grip = en.grip || { on: false, reach: 1, off: off.toArray().map(v => +v.toFixed(4)) };
+    saveProf();
+  }
+  holder.position.fromArray(P.pos); holder.quaternion.fromArray(P.quat); holder.scale.setScalar(P.unit * (P.size || 1));
+  holder.updateMatrixWorld(true);
+  const hws = holder.getWorldScale(new THREE.Vector3()).x, r = ST.tg.hipH * .035 / (hws || 1);
+  const marker = new THREE.Mesh(new THREE.SphereGeometry(r, 12, 10), new THREE.MeshBasicMaterial({ color: 0xffd04a, depthTest: false, transparent: true, opacity: .9 }));
+  marker.renderOrder = 11; marker.position.fromArray((en.grip && en.grip.off) || [0, 0, 0]); holder.add(marker);
+  PR.holder = holder; PR.marker = marker;
+  if (POSE.on) gizmoTarget();
+}
+function syncProp(en) {
+  const P = en && en.prop, G = en && en.grip;
+  $('propSel').value = P ? P.file : ''; $('propHand').value = P ? P.hand : 'Right';
+  $('pSize').value = (P && P.size) || 1; $('pSizeV').textContent = (+$('pSize').value).toFixed(2);
+  $('gripOn').checked = !!(G && G.on); $('gReach').value = (G && G.reach) ?? 1; $('gReachV').textContent = (+$('gReach').value).toFixed(2);
+}
+const inPack = () => ST.cur && ST.P.clips.includes(ST.cur);
+$('propSel').onchange = async () => { if (!inPack()) return; const f = $('propSel').value, en = ST.cur;
+  if (!f) { delete en.prop; delete en.grip; } else { const hand = $('propHand').value; en.prop = { file: f, hand, bone: mountName(hand) }; delete en.grip; }
+  saveProf(); await propShow(en); if (en.grip && en.grip.on) previewEntry(en, ST.act.time); };
+$('propHand').onchange = () => { if (!inPack() || !ST.cur.prop) return; $('propSel').onchange(); };
+$('propFileBtn').onclick = () => $('propFile').click();
+$('propFile').onchange = async () => { const f = $('propFile').files[0]; if (!f) return; const k = 'idb:prop:' + f.name; await idbPut(k, await f.arrayBuffer()); propCache.delete(k); await propMenu(); $('propSel').value = k; $('propSel').onchange(); };
+$('pSize').oninput = () => { $('pSizeV').textContent = (+$('pSize').value).toFixed(2); if (PR.holder && ST.cur.prop) PR.holder.scale.setScalar(ST.cur.prop.unit * +$('pSize').value); };
+$('pSize').onchange = () => { const en = ST.cur; if (!inPack() || !en.prop) return; en.prop.size = +$('pSize').value; saveProf(); if (en.grip && en.grip.on) previewEntry(en, ST.act.time); };
+$('gripOn').onchange = () => { const en = ST.cur; if (!inPack() || !en.grip) return; en.grip.on = $('gripOn').checked; saveProf(); previewEntry(en, ST.act.time); };
+$('gReach').oninput = () => { $('gReachV').textContent = (+$('gReach').value).toFixed(2); };
+$('gReach').onchange = () => { const en = ST.cur; if (!inPack() || !en.grip) return; en.grip.reach = +$('gReach').value; saveProf(); if (en.grip.on) previewEntry(en, ST.act.time); };
+$('propAll').onclick = () => { const en = ST.cur; if (!inPack() || !en.prop) return; for (const c of ST.P.clips) if (c !== en) { c.prop = JSON.parse(JSON.stringify(en.prop)); c.grip = en.grip ? JSON.parse(JSON.stringify(en.grip)) : undefined; } saveProf(); chip('prop + grip on all ' + ST.P.clips.length + ' clips'); };
+function gizmoTarget() {
+  const m = POSE.mode;
+  if (m === 'bone') { gizmo.setMode('rotate'); gizmo.setSpace(POSE.space); if (POSE.bone && inPack()) gizmo.attach(ST.tg.rig.bones[POSE.bone]); else gizmo.detach(); return; }
+  if (!PR.holder) { gizmo.detach(); return; }
+  if (m === 'move') { gizmo.setMode('translate'); gizmo.setSpace('local'); gizmo.attach(PR.holder); }
+  else if (m === 'turn') { gizmo.setMode('rotate'); gizmo.setSpace('local'); gizmo.attach(PR.holder); }
+  else if (m === 'grip') { gizmo.setMode('translate'); gizmo.setSpace('world'); gizmo.attach(PR.marker); }
+}
+$('gzMode').onclick = e => { const m = e.target.dataset.m; if (!m) return; POSE.mode = m; [...$('gzMode').children].forEach(b => b.classList.toggle('ac', b === e.target)); gizmoTarget(); };
+function propCommit() {
+  const en = ST.cur; if (!inPack() || !en.prop || !PR.holder) return;
+  if (POSE.mode === 'grip') { en.grip.off = PR.marker.position.toArray().map(v => +v.toFixed(4)); saveProf(); if (en.grip.on) previewEntry(en, ST.act.time); return; }
+  en.prop.pos = PR.holder.position.toArray().map(v => +v.toFixed(5)); en.prop.quat = PR.holder.quaternion.toArray().map(v => +v.toFixed(5));
+  saveProf(); if (en.grip && en.grip.on) previewEntry(en, ST.act.time);
+}
 
 // ---------------------------------------------------------------- export
 async function bakeAll(onStep) {
@@ -417,7 +507,7 @@ renderer.setAnimationLoop(() => {
 
 // ---------------------------------------------------------------- start
 (async () => {
-  donorMenu();
+  donorMenu(); propMenu();
   if (Q.get('lib')) await libConnect('url', { base: Q.get('lib').replace(/\/?$/, '/') });
   else { const g = localStorage.getItem('forge.gh'); if (g) { const o = JSON.parse(g); $('ghRepo').value = o.repo; $('ghPath').value = o.path; $('ghTok').value = o.tok; await libConnect('gh', { gh: o }); } }
   const c = Q.get('char'); if (c) { $('charSel').value = c; const r = await fetch(c); await setCharacter(await r.arrayBuffer(), c); }
@@ -426,7 +516,7 @@ renderer.setAnimationLoop(() => {
 
 // the command line drives exactly this
 window.forge = {
-  THREE, F, ST, LIB,
+  THREE, F, ST, LIB, cam, orbit,
   async character(path) { const r = await fetch(path); await setCharacter(await r.arrayBuffer(), path); return { hipH: ST.tg.hipH, excluded: ST.tg.info.excluded }; },
   library: (base) => libConnect('url', { base: base.replace(/\/?$/, '/') }),
   profile(P) { ST.P = P; return reprep(); },

@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m931 -- THE FORGE, step 4: a PROP in his hand and the OTHER HAND on it (POSE tab)
+*"when he holds the rocket launcher, the gun is cutting through his body. His hands aren't even in the right positions"*.
+- **Prop in his hand** (POSE): the eight Zap weapons, or upload a GLB (kept in the browser). A prop built around a
+  `weapon_root*` joint hangs from his `weapon_root_right/_left` with IDENTITY -- the game's own rule -- else from the bare hand.
+  Its units come from the prop's armature (0.01) over the mount's world scale. Move / Turn (rings) and Size fit it to this body.
+- **The other hand grips it** (+ Reach 0..1): the yellow ball is the grip point, in the prop's own space (default: its
+  `weapon_tip*`, else a fifth of the way along its long axis). `gripLayer` (core) finds it in the world every frame -- it rides
+  the carrying hand, FK keys and all -- and re-solves the other arm onto it (two bones, elbow in its plane, the hand following its
+  forearm). Order: carry -> sliders -> FK -> GRIP -> ground -> trim/speed.
+- Prop + grip are kept per clip; "Use this prop + grip on every clip" copies them across the pack. The export bakes the
+  gripping arm into the clip; the prop itself is not exported (the game mounts its own).
+- Tested headless: old Zap, rifle_run, launcher on `weapon_root_right` (unit 1.000 -- identity, as in the game); grip on moved
+  his left hand to the launcher's tip marker. Side view checked: launcher in his right hand, no page errors.
+
 ## m930 -- THE FORGE, step 3: the FK layer -- POSE tab, rotate a bone with rings, keyed at the playhead, eased between keys
 *"clearly this rotation-based application, his arm is not over his shoulder. So you use the FK layer to pull his arm up"*.
 - **POSE tab**: dots on his joints (fingers 2-4 and end bones left out so a thumb can hit them); tap one or pick from the list;
