@@ -5,6 +5,27 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m923 -- ZAP 2 IS THE HERO: the feet fixed in the bake, his real texture, the weapons fitted, the tail on the player
+*"This is going to be the new character -- make him playable. Every run or anything leg related... their legs look very close
+together and they intersect each other. And his texture is dark -- reddish, orange, dark."*
+- LEGS, MEASURED (feet apart / hip width; < 0 = crossed). Old Zap: idle 2.11, walk 1.70, run 1.25. Zap 2 after m922's rotation
+  bake: .75 / .34 / **-.11**. The transfer copies the donor's leg ANGLES; on other proportions they put the feet elsewhere.
+  `bake.py` now has a FOOT PASS (BAKE_FEET, default on): per frame each foot goes where the donor's is, relative to the hips
+  in the hips' own (rest-delta) frame -- sideways x hip-width ratio (1.483), forward/up x leg-length ratio (1.346) -- the knee
+  aims where the donor's does, a two-bone solve, the foot keeps its world rotation. After: 2.11 / 1.70 / 1.25 -- the donor's
+  exactly. Front renders: feet apart in the run and walk. (The DNA disguises still run zap's clips through the raw `retarget`:
+  same fault, needs the same pass at runtime -- next.)
+- TEXTURE: his FBX's embedded diffuse is his JPG to the power 2.2 (corr .998, mean RGB 97,40,27 vs 138,91,69) -- a colour
+  space applied twice somewhere in C4D -> bake -> Blender, his old problem -- and wired into ALPHA too. `retex.py` swaps in
+  `zap_02/textures/zap_02_4k.jpg`, unhooks alpha; doubleSided stripped.
+- HERO: `HERO.files.zap2` first and the default (key `mel.hero2`, so a phone that remembered 'zap' starts on him once);
+  `ZAP (OLD)` still in the carousel. 25/26 clips bind (the one is an empty hook).
+- WEAPONS (`mountWeapon`, pipeline rigs only -- old Zap is untouched): ROLL from `gun_tip_*` matched to old Zap's finger direction
+  in his mount frame (`MOUNT_FING`, measured off zap.glb at rest), and SIZE = old Zap's file unit (.01 x RIG.height / .9087) over
+  the mount's world scale -- the tip-length ratio made them a quarter size (a pipeline tip is a 5 cm stub). Renders: blaster,
+  launcher, hammer in the fist at old Zap's proportions.
+- TAIL on the player: `playerTail` after his mixer, re-found when the drawn model changes.
+
 ## m922 -- ZAP 2 in the arena (his new Zap: better proportions + a TAIL), the old Zap's clips ported, the tail sways
 *"A second version of my Zap -- better proportions, closer to a normal humanoid, and a tail. Run him through the Auto-Rig Pro
 procedure, rig the tail as well, port the animations from the old Zap... he'll be our first test for the new animations."*
