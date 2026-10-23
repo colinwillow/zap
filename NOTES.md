@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m913 -- HIS OWN TRANSFORM ON THE PROXY MORPH (Zap <-> hick)
+*"We have the ability to transform my own hero character into the hick, but it uses the old transform -- try the new one."*
+- `morphGo` -> `pmGo`: when BOTH the body he is in and the target have a proxy (`tmKeyOf`: `ARENA.morph.files` matched by the
+  KIND's FILE, so the DNA kind and the arena's copy agree; his base body is `RIG.file` -> `proxy_zap`), `mphSt` is `tm` and
+  `pmStep` runs instead of the blob: frozen in place (pos pinned, vel 0 -- the proxies are WORLD positions), his proxy taken in
+  his live pose, the new skin posed at its idle on his root for one frame and taken, the arena's `tmMat` (wave from the feet),
+  then `mphWear` + `mphArm` (the m123 / m271 "what he holds after" block, factored out of `stepMorph`). Anything without a proxy
+  (hobo, the warrior, her...) still takes the blob. A failed load or pose falls back to the blob (`PROXY MORPH FELL BACK`).
+- `tmPose` needs `d.root` -- the fake body passes `rig.root` (first headless run threw on it and fell back, as designed).
+- Headless, arena: `mel.dna('hick')` -> tm:run 0..2 s -> hick, model visible; `mel.dna()` -> back to zap, the wave mid-way
+  shows zap's legs under the hick's torso. `ARENA.morph.self = 0` is the A/B.
+
 ## m912 -- his arena feedback: shield on the OUTSIDE of the arm, varied reactions, bosses out of lockstep, the shield that grew, armour you can see fly
 *"The shield... goes through their arm... needs to be out on the outer part. Every time I would shoot them they would have the
 exact same reaction. They both have the exact same movement towards you at the exact same time. When I killed them it's like
