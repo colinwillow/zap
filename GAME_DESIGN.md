@@ -275,6 +275,19 @@ that NPCs use, and the full roster with what stands in for each role until its m
 
 Existing characters stand in for all of these until they arrive.
 
+## Hints: the screen first, then the drone, then the townsfolk (Colin, Oct 23 2026)
+
+*"If we had a little AI drone that follows you -- kind of your Cortana -- it gives you hints. Say a person is just shooting the
+guy and it's not doing anything: after a period of time the drone says 'looks like it's not taking any damage, maybe we need to
+try another weapon'. And village people, like Zelda, say stupid little obvious things: 'I heard there's a man up in the mountains
+with a new technology that busts through steel like butter.'"*
+- Three layers, in order: **the screen** (a useless weapon LOOKS useless: sparks off, a clang, no flinch -- DUEL.md), **the drone**
+  (speaks only when the player has plainly not read the screen: built in the arena at m907, `ARENA.hint`, 6 wasted blows in
+  12 s, then quiet for 20 s; no drone model yet, just its bubble), **the townsfolk** (the world's rumours point at the weapon or
+  the place that answers the wall you are stuck at -- "weapons as keys", DUEL.md).
+- **Clancy, open:** keep him as the little companion, or make him the one the aliens keep stealing (Princess Peach; a tiny
+  powerful thing like Stitch) and let a DRONE be the companion who talks. His call.
+
 ## Open questions (his call)
 
 - Is the third alien race neutral, a merchant, or another enemy?

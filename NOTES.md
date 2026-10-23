@@ -5,6 +5,12 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m907 -- THE DRONE'S HINT (arena)
+*"A little AI drone... after a period of time... 'looks like it's not taking any damage, maybe we need to try another weapon'."*
+`ARENA.hint`, `arenaWaste`, `hintSay`: a WASTED blow is a shot into a raised shield (`arenaShieldHit`) or one his `resist`
+zeroes; `need` 6 inside `win` 12 s says the matching line (`say.shield` / `say.resist`, alternating), then `cool` 20 s of quiet.
+A cyan DRONE bubble above the pads, `show` 5.5 s. No drone model. GAME_DESIGN.md: the three hint layers, and the Clancy question.
+
 ## m906 -- WEIGHT: big bodies barely move, the biggest are never thrown; a rocket blows plates off
 *"The bigger you are, the less a big hit affects you... the biggest guys probably never fly... a medium guy you could send in the
 air if the hit is big enough... small guys fly pretty easily... rockets, explosions, grenades probably blow off their armour."*
