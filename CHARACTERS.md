@@ -23,6 +23,21 @@ every body.
   that is transforming.
 - **Until the rig exists, the current per-character files keep working.** Nothing waits on it.
 
+## How a character is BUILT from now on (Colin, Oct 23 2026)
+
+*"Objects should never be part of the characters. They should be accessory assets."* And: *"remake the characters as just their
+skin, with the clothes separate -- then you morph from one skin suit to another and the armour pops out."*
+1. **The body is a SKIN SUIT.** Bare body (shorts / underwear at most, like the Brutes' bare bodies), nothing else fused on. That is
+   what gets wrapped onto the universal base, so a morph goes skin -> skin and stays clean.
+2. **Everything else is an ACCESSORY**, its own object: hats, hair cards, glasses, the cigarette, cans, belts, bags, weapons,
+   armour. Each rides a bone (or a mount bone like `weapon_root` / `cigarette_tip`), so it can be shown, hidden, knocked off
+   or swapped -- and in a transformation, the human's accessories drop away while the alien's ARMOUR pushes out of the body
+   piece by piece (the `armor_<bone>` pieces armorfit.py already makes).
+3. **The universal base** is his Character Creator neutral body with the eyelashes stripped: **13,460 vertices**, one layout for
+   every character (blender-addons `pipeline/wrap.py`). No eyelashes, no eyes, teeth or tongue in it.
+4. Characters made BEFORE this rule (the hick's cap and cigarette, the hobo's coat...) still wrap -- the base just wraps over the
+   fused bits -- but new ones are made the new way.
+
 ## The animation library — what we have, what we need
 
 Today's clips are mostly locomotion, combat, hit reactions and a few idles. An everyday city needs
