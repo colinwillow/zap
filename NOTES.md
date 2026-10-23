@@ -5,6 +5,29 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m912 -- his arena feedback: shield on the OUTSIDE of the arm, varied reactions, bosses out of lockstep, the shield that grew, armour you can see fly
+*"The shield... goes through their arm... needs to be out on the outer part. Every time I would shoot them they would have the
+exact same reaction. They both have the exact same movement towards you at the exact same time. When I killed them it's like
+the shield grew. When their armour blasted off you don't really see it. The morph goes top to bottom -- it should go bottom to top."*
+- SHIELD: m897 typed `.07` off the forearm BONE, and a brute's forearm (bracer included) is MEASURED at .14-.36 m from the bone
+  depending on the side -- the shield sat inside the arm. `arenaArmR` measures it on spawn (skin weighted >= .5 to the forearm,
+  plus `armor_*` meshes riding it, middle 15-90% of the bone, 95th percentile along the shield's face axis): Warboss/Skullback
+  ~.27. Grip at that + `duel.shieldOut` .09 x size (the strap reaches -.11 behind the grip). Only `armor_` meshes count -- a
+  first probe included the shield itself and read .6.
+- REACTIONS: `bodyReact(d, dirH, big)` -- the heavy stagger and `arenaStagger` always played `big[0]`. Side blows take
+  `from_left`/`from_right` (75%), big draws from big + `large` clips, never the same clip twice running, rate +-12%.
+  Headless 8 shots: gut, from_right, Big_Hit, gut, from_right, from_left, Big_Hit, from_right. `REACT.sideK` -1 if sides read backwards.
+- LOCKSTEP: every arena timing was the LEVEL's. `arenaJit` rolls per-body multipliers (`ARENA.jit.k` .7-1.35) for react,
+  rush, recover (re-rolled each swing), combo, and each wind-up; `arenaCircle` -- now and then (`circle` .45 every .8-2.4 s)
+  he strafes round you on `standing_walk_left/right` facing you, spiralling in, for .7-1.8 s; opening fire sends him back to the shield.
+- SHIELD GREW: `arenaExpose` copied the WORLD matrix into the local one, then `attach` applied the bone's world again. Now
+  decomposes the local. Headless: 1.150 on the arm, 1.150 on the floor.
+- ARMOUR OFF: it flew along the blow -- away from you, behind his own body. Now out from his centre through the plate plus
+  a third toward the camera, up `flyUp` 7.5, orange-hot glow cooling over 1.6 s, a 35% size pop, a spark trail, bigger
+  burst, `.07` hitstop. No rigid-body collider (bounce on the floor and the wall as before).
+- MORPH WAVE climbs from the feet (`uF`, height over `uH`), not out from the chest.
+- CEO: also listed under WARBOSS (`both: 1`). He was under PEOPLE.
+
 ## m907 -- THE DRONE'S HINT (arena)
 *"A little AI drone... after a period of time... 'looks like it's not taking any damage, maybe we need to try another weapon'."*
 `ARENA.hint`, `arenaWaste`, `hintSay`: a WASTED blow is a shot into a raised shield (`arenaShieldHit`) or one his `resist`
