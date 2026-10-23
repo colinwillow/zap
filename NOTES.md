@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m922 -- ZAP 2 in the arena (his new Zap: better proportions + a TAIL), the old Zap's clips ported, the tail sways
+*"A second version of my Zap -- better proportions, closer to a normal humanoid, and a tail. Run him through the Auto-Rig Pro
+procedure, rig the tail as well, port the animations from the old Zap... he'll be our first test for the new animations."*
+- Source `models/characters/zap_02/` (his FBX, 5,540 v, Z-up, 1.0 m, already facing -Y: orient 0). Pipeline: `run_rig.sh
+  --tail 8` (ARP: rig, fingers, tail chain hips -> bulb, `c_tail_00..07`, bound in 2 min) -> `posecheck` clean -> `bake.py`
+  the old `zap.glb`'s 61 clips (rotation from rest) -> `rootfix` -> `mounts.py` (weapon bones both hands, Icosphere dropped)
+  -> 2048 webp + draco: `models/characters/zap_02.glb` 4.35 MB, 67 joints. animcheck: idle / walk / run / melee read.
+- Arena: SPAWN > PEOPLE > Zap 2 (`ZAP2K` on ZAPK's clip table, h 1.35). `tailSway`: any `*tail*` bone, reset to rest each
+  frame, then a wave about WORLD UP down the chain (later and wider per bone), livelier when he moves, thrown opposite a turn.
+  `TAIL.amp` 0 = still. The old clips carry no tail keys -- the library clips will not either; sway stays procedural.
+- NOT the player yet: the player rig, its measured mounts and the blaster/hammer fit are Zap 1's. That swap is its own build.
+- The bpy 5.2 module now dies in `read_factory_settings` (`InitGoogleLogging() twice`) because of the ARP add-on in its user
+  config: pipeline scripts that do not need ARP run with `BLENDER_USER_CONFIG` / `BLENDER_USER_SCRIPTS` pointed at an empty dir.
+
 ## m921 -- NOISE by default, the stretch only on the way IN, he ROARS, the x-ray keeps his armour and sees through his skin
 *"The noise transformer is definitely better. When he transforms back he does the stretch -- only on the way from normal guy to
 alien. Isn't there a noise he's supposed to make? I haven't heard him roar. ... the stun on the boss: what if the armour stayed
