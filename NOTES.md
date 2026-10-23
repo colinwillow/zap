@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m932 -- THE FORGE, step 5: PACKS as files, and his own animations in the library for good
+*"call it zap set basic... add the rocket launcher pack... my own animations, upload them and add them to my library"*.
+- **Packs** (PACK tab): a pack is roles + where each comes from (a library stem, or a donor file + clip) -- nothing about a body,
+  so it loads onto anyone. Built in (`forge/packs/`): **Zap Set Basic** (all 61 of old Zap's clips, donor `zap.glb`) and **Zap
+  Set Library** (29 roles from the Mixamo library, matched to his clips by data; in_air = Floating). "Add this pack" skips roles
+  he already has unless "Replace" is ticked. "Save his clips as a pack" keeps it in the browser AND, with the library
+  connected, writes `library/packs/<name>.json` to the repo -- every device sees it.
+- **His own animation files** (LIBRARY -> A character's clips): an upload stays in the browser; "Add this file to the library"
+  writes it to `library/mine/` in the repo through the GitHub API, re-points his clips at it, and from then on it is listed
+  "(library)" on every device. **Writing needs the token to have Contents: Read AND write** on retarget-anims (it says so if not).
+- Tested headless: the hick + Zap Set Basic (61) + Zap Set Library (29, all already there -> skipped): all 61 clips carried,
+  none failed, no page errors. The repo-write path cannot be tested here (no token) -- shipped unverified.
+
 ## m931 -- THE FORGE, step 4: a PROP in his hand and the OTHER HAND on it (POSE tab)
 *"when he holds the rocket launcher, the gun is cutting through his body. His hands aren't even in the right positions"*.
 - **Prop in his hand** (POSE): the eight Zap weapons, or upload a GLB (kept in the browser). A prop built around a

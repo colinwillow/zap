@@ -99,6 +99,20 @@ async function libGet(name, as = 'buf') {
   if (!r.ok) throw new Error(r.status + ' for ' + name);
   return as === 'json' ? r.json() : r.arrayBuffer();
 }
+// the repo itself, for what lives beside the clips: library/mine (his own animation files) and library/packs. Writing needs the
+// token to have Contents: Read AND write on this one repo.
+const ghRoot = () => LIB.gh.path.replace(/\/[^/]*$/, '');
+async function ghReq(method, path, body, raw) {
+  const r = await fetch(`https://api.github.com/repos/${LIB.gh.repo}/contents/${path}`, { method, headers: { Authorization: 'Bearer ' + LIB.gh.tok, Accept: raw ? 'application/vnd.github.raw' : 'application/vnd.github+json' }, body: body ? JSON.stringify(body) : undefined });
+  if (!r.ok) { const t = await r.text(); throw new Error(r.status === 403 || r.status === 404 && method === 'PUT' ? 'the token cannot write: give it Contents "Read and write" on ' + LIB.gh.repo : r.status + ' ' + t.slice(0, 120)); }
+  return raw ? r.arrayBuffer() : r.json();
+}
+async function ghList(dir) { if (LIB.kind !== 'gh') return []; try { const j = await ghReq('GET', ghRoot() + '/' + dir); return Array.isArray(j) ? j.filter(x => x.type === 'file').map(x => x.name) : []; } catch (e) { return []; } }
+const b64 = buf => { const u = new Uint8Array(buf); let s = ''; for (let i = 0; i < u.length; i += 32768) s += String.fromCharCode.apply(null, u.subarray(i, i + 32768)); return btoa(s); };
+async function ghPut(path, buf, msg) {
+  let sha; try { const j = await ghReq('GET', path); sha = j.sha; } catch (e) {}
+  return ghReq('PUT', path, { message: msg, content: b64(buf), sha });
+}
 async function libConnect(kind, opt) {
   LIB.kind = kind; Object.assign(LIB, opt);
   $('libNote').textContent = 'connecting…';
@@ -107,6 +121,7 @@ async function libConnect(kind, opt) {
     $('libNote').innerHTML = `<span class="ok">${LIB.index.length} motions</span> · ` + (kind === 'gh' ? LIB.gh.repo + '/' + LIB.gh.path : kind === 'dir' ? 'local folder' : LIB.base);
     $('libSetup').hidden = true; $('libBrowse').hidden = false; buildTags(); search();
     if (kind === 'gh') localStorage.setItem('forge.gh', JSON.stringify(LIB.gh));
+    donorMenu(); packMenu();
     return true;
   } catch (e) { $('libNote').innerHTML = '<span class="bad">' + e.message + '</span>'; LIB.kind = ''; return false; }
 }
@@ -149,6 +164,7 @@ async function donor(name) {
   if (DON.list.has(name)) return DON.list.get(name);
   let buf, file = name;
   if (name.startsWith('idb:')) { buf = await idbGet(name); file = name.slice(4); if (!buf) throw new Error(file + ' is no longer in this browser'); }
+  else if (name.startsWith('gh:')) { if (LIB.kind !== 'gh') throw new Error('connect the library to use ' + name.slice(3)); buf = await ghReq('GET', ghRoot() + '/' + name.slice(3), null, true); file = name.slice(3); }
   else buf = await (await fetch(name)).arrayBuffer();
   const g = await loadCharBuf(buf, file);
   const clips = (g.animations || []).filter(c => c.tracks.length && !/CINEMA_4D|^Take 001$|mixamo\.com$/.test(c.name) || (g.animations || []).length === 1);
@@ -158,18 +174,25 @@ async function donor(name) {
   DON.list.set(name, srcs); return srcs;
 }
 async function donorMenu() {
-  const up = (await idbKeys()).filter(k => String(k).startsWith('idb:'));
-  $('donSel').innerHTML = '<option value="">— pick a character to take clips from —</option>' + CHARS.map(([f, n]) => `<option value="models/characters/${f}.glb">${n}</option>`).join('') + up.map(k => `<option value="${k}">${k.slice(4)} (uploaded)</option>`).join('');
+  const up = (await idbKeys()).filter(k => String(k).startsWith('idb:') && !String(k).startsWith('idb:prop:')), mine = (await ghList('mine')).filter(n => /\.(glb|gltf|fbx)$/i.test(n));
+  $('donSel').innerHTML = '<option value="">— pick a character to take clips from —</option>' + CHARS.map(([f, n]) => `<option value="models/characters/${f}.glb">${n}</option>`).join('') + up.map(k => `<option value="${k}">${k.slice(4)} (this browser)</option>`).join('') + mine.map(n => `<option value="gh:mine/${n}">${n} (library)</option>`).join('');
+  if (DON.cur) $('donSel').value = DON.cur;
 }
 async function showDonor(name) {
   DON.cur = name; $('donNote').textContent = 'loading…'; $('donList').innerHTML = ''; $('donAll').hidden = true;
   try { const srcs = await donor(name);
     $('donNote').textContent = srcs.length + ' clips';
     $('donList').innerHTML = srcs.map((s, i) => `<div class="item" data-i="${i}"><div class="nm">${s.clip.name} <small>${s.clip.duration.toFixed(2)} s</small></div><button class="btn" data-add="${i}">+</button></div>`).join('');
-    $('donAll').hidden = false;
+    $('donAll').hidden = false; $('donPush').hidden = !(name.startsWith('idb:') && LIB.kind === 'gh');
   } catch (e) { $('donNote').innerHTML = '<span class="bad">' + e.message + '</span>'; }
 }
 function addEntry(en) { let r = en.role; while (ST.P.clips.some(c => c.role === r)) r += '_2'; en.role = r; ST.P.clips.push(en); }
+$('donPush').onclick = async () => {
+  const k = DON.cur; if (!k.startsWith('idb:')) return; const f = k.slice(4); $('donNote').textContent = 'sending ' + f + ' to the library…';
+  try { await ghPut(ghRoot() + '/mine/' + f, await idbGet(k), 'forge: add ' + f + ' to the library');
+    const g = 'gh:mine/' + f; for (const c of ST.P.clips) if (c.donor === k) c.donor = g; saveProf(); DON.list.set(g, DON.list.get(k)); DON.cur = g; await donorMenu(); $('donSel').value = g;
+    $('donNote').innerHTML = '<span class="ok">' + f + ' is in the library: every device sees it</span>'; $('donPush').hidden = true;
+  } catch (e) { $('donNote').innerHTML = '<span class="bad">' + e.message + '</span>'; } };
 $('donSel').onchange = () => { if ($('donSel').value) showDonor($('donSel').value); };
 $('donFileBtn').onclick = () => $('donFile').click();
 $('donFile').onchange = async () => { const f = $('donFile').files[0]; if (!f) return; const k = 'idb:' + f.name; await idbPut(k, await f.arrayBuffer()); DON.list.delete(k); await donorMenu(); $('donSel').value = k; showDonor(k); };
@@ -264,6 +287,34 @@ $('profSave').onclick = () => dl(new Blob([JSON.stringify(ST.P, null, 1)], { typ
 $('profLoadBtn').onclick = () => $('profLoad').click();
 $('profLoad').onchange = async () => { const f = $('profLoad').files[0]; if (!f) return; ST.P = JSON.parse(await f.text()); saveProf(); await reprep(); renderPack(); };
 async function reprep() { if (!ST.tg) return; const m = ST.tg.model; ST.tg.restore(); ST.tg = F.prepTarget(m, { exclude: ST.P.exclude }); syncSliders(); dotsBuild(); }
+
+// ---------------------------------------------------------------- packs: roles and where each comes from, nothing about a body
+const packKey = 'forge.packs';
+async function packMenu() {
+  let built = []; try { built = (await (await fetch('forge/packs/index.json')).json()).packs; } catch (e) {}
+  const repo = (await ghList('packs')).filter(n => n.endsWith('.json')), here = Object.keys(JSON.parse(localStorage.getItem(packKey) || '{}'));
+  $('packSel').innerHTML = '<option value="">— pick a pack —</option>' + built.map(p => `<option value="b:${p.file}">${p.name}</option>`).join('') +
+    repo.map(n => `<option value="g:${n}">${n.replace(/\.json$/, '')} (library)</option>`).join('') + here.map(n => `<option value="l:${n}">${n} (this browser)</option>`).join('');
+}
+async function packGet(v) {
+  if (v.startsWith('b:')) return (await fetch('forge/packs/' + v.slice(2))).json();
+  if (v.startsWith('g:')) return JSON.parse(new TextDecoder().decode(await ghReq('GET', ghRoot() + '/packs/' + v.slice(2), null, true)));
+  return JSON.parse(localStorage.getItem(packKey) || '{}')[v.slice(2)];
+}
+$('packLoad').onclick = async () => { const v = $('packSel').value; if (!v || !ST.tg) return;
+  try { const pk = await packGet(v); let n = 0;
+    const rep = $('packRep').checked;
+    for (const c of pk.clips) { const en = Object.assign({ name: c.donor ? stemOf(c.donor) + ': ' + c.clip : c.stem }, c), i = ST.P.clips.findIndex(x => x.role === c.role);
+      if (i < 0) { ST.P.clips.push(en); n++; } else if (rep) { ST.P.clips[i] = en; n++; } }
+    saveProf(); renderPack(); $('packNote').innerHTML = `<span class="ok">${pk.name}: ${n} added</span>` + (pk.clips.length > n ? ` (${pk.clips.length - n} roles he already had were left as they are)` : rep ? ' (replacing what he had)' : '') + ' -- flip through them with ◀ ▶';
+  } catch (e) { $('packNote').innerHTML = '<span class="bad">' + e.message + '</span>'; } };
+$('packSave').onclick = async () => { const name = $('packName').value.trim(); if (!name || !ST.P.clips.length) { $('packNote').textContent = 'give it a name, and put clips in his pack first'; return; }
+  const pk = { name, clips: ST.P.clips.map(c => c.donor ? { role: c.role, donor: c.donor, clip: c.clip } : { role: c.role, stem: c.stem }) };
+  const all = JSON.parse(localStorage.getItem(packKey) || '{}'); all[name] = pk; localStorage.setItem(packKey, JSON.stringify(all));
+  let where = 'this browser';
+  if (LIB.kind === 'gh') try { await ghPut(ghRoot() + '/packs/' + name.replace(/[^\w\- ]+/g, '').replace(/ +/g, '_') + '.json', new TextEncoder().encode(JSON.stringify(pk, null, 1)), 'forge: pack ' + name); where = 'the library (every device)'; } catch (e) { where += ' only -- ' + e.message; }
+  if (pk.clips.some(c => c.donor && c.donor.startsWith('idb:'))) where += '. Some clips come from a file only this browser has: add it to the library (LIBRARY tab) so other devices can use the pack';
+  $('packNote').innerHTML = `<span class="ok">saved "${name}"</span> to ${where}`; packMenu(); };
 
 // ---------------------------------------------------------------- layers and his sliders
 const relayer = () => { saveProf(); if (ST.cur) previewEntry(ST.cur); };
@@ -507,7 +558,7 @@ renderer.setAnimationLoop(() => {
 
 // ---------------------------------------------------------------- start
 (async () => {
-  donorMenu(); propMenu();
+  donorMenu(); propMenu(); packMenu();
   if (Q.get('lib')) await libConnect('url', { base: Q.get('lib').replace(/\/?$/, '/') });
   else { const g = localStorage.getItem('forge.gh'); if (g) { const o = JSON.parse(g); $('ghRepo').value = o.repo; $('ghPath').value = o.path; $('ghTok').value = o.tok; await libConnect('gh', { gh: o }); } }
   const c = Q.get('char'); if (c) { $('charSel').value = c; const r = await fetch(c); await setCharacter(await r.arrayBuffer(), c); }
