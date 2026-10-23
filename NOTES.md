@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m920 -- he eases into the stretch instead of snapping to its first frame
+`act.ease` .4 s: `tmActOn` keeps the clips he is in (frozen, weights normalised to 1) and `tmActEase` hands them over to the stretch
+every morph frame (stretch e, the rest w(1-e), smoothstepped). **First try flashed toward the T-POSE at t .1**: `skinWeights` runs
+on an arena body every frame from `stepDummies`, and its rule for a clip whose target weight is 0 is `setEffectiveWeight(0);
+a.stop()` -- so the held clips were STOPPED under the crossfade and only 16% of the stretch was holding the bones. While a morph is
+driving his weights (`st 'morph'` + `actPrev`) it is skipped. Strip at t 0 .1 .2 .3 .4: walk -> hunch, no flash, no snap.
+
 ## m919 -- the CEO stretches through his morph (Clancy's `idle_02_stretch`, carried onto both bodies)
 *"There's an idle in the mutant pack -- he stretches with both arms out -- the perfect animation to play during the transform,
 it looks like the werewolf stretch."* Found by clip name across every GLB: `idle_02_stretch` (3.04 s) is in CLANCY's file with the
