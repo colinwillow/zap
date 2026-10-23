@@ -590,6 +590,72 @@ window.forge = {
   adjust(a) { ST.P.adjust = Object.assign(ST.P.adjust || {}, a); syncSliders(); },
   async export(withMesh) { const b = await exportGLB(withMesh); let s = ''; const u = new Uint8Array(b); for (let i = 0; i < u.length; i += 32768) s += String.fromCharCode.apply(null, u.subarray(i, i + 32768)); return btoa(s); },
   chip: () => $('chip').textContent,
+  // ---- the agent's verbs (tools/../retarget-anims/mcp drives these): each one is what a button does, said as a call
+  state() {
+    return { character: ST.file, hipH: ST.tg && +ST.tg.hipH.toFixed(3), excluded: ST.tg && ST.tg.info.excluded, layers: ST.P.layers, adjust: ST.P.adjust,
+      current: ST.cur && ST.cur.role, library: LIB.index ? LIB.index.length : 0,
+      clips: ST.P.clips.map(c => ({ role: c.role, from: c.donor ? stemOf(c.donor) + ': ' + c.clip : c.stem, keys: c.fk ? Object.values(c.fk).reduce((n, k) => n + k.length, 0) : 0, prop: c.prop ? stemOf(c.prop.file) : null, grip: !!(c.grip && c.grip.on), edit: c.edit || null })) };
+  },
+  characters: () => CHARS.map(([f, n]) => ({ path: 'models/characters/' + f + '.glb', name: n })),
+  props: () => PROPS.map(([f, n]) => ({ path: 'models/weapons/' + f + '.glb', name: n })),
+  search(q, tag, limit = 30) {
+    if (!LIB.index) return [];
+    const w = String(q || '').toLowerCase().split(/\s+/).filter(Boolean);
+    return LIB.index.filter(m => (!tag || (m.tags || []).includes(tag)) && w.every(x => (m.name + ' ' + (m.description || '') + ' ' + (m.tags || []).join(' ') + ' ' + (m.props || []).join(' ')).toLowerCase().includes(x)))
+      .slice(0, limit).map(m => ({ stem: m.stem, name: m.name, description: m.description, seconds: +(+m.duration).toFixed(2), loops: m.loopDiff < 15, tags: m.tags }));
+  },
+  async packs() { await packMenu(); return [...$('packSel').options].filter(o => o.value).map(o => ({ id: o.value, name: o.textContent })); },
+  async applyPack(id, replace) { $('packSel').value = id; $('packRep').checked = !!replace; await $('packLoad').onclick(); return $('packNote').textContent; },
+  addClip(en) { const e = Object.assign({}, en); if (!e.role) e.role = e.clip || e.stem; e.name = e.donor ? stemOf(e.donor) + ': ' + e.clip : e.stem; addEntry(e); saveProf(); renderPack(); return e.role; },
+  removeClip(role) { const i = ST.P.clips.findIndex(c => c.role === role); if (i >= 0) { ST.P.clips.splice(i, 1); saveProf(); renderPack(); } return i >= 0; },
+  async play(role) { const en = ST.P.clips.find(c => c.role === role); if (!en) throw new Error('no clip "' + role + '" in his pack'); await previewEntry(en); return { chip: $('chip').textContent, seconds: ST.act ? +ST.act.getClip().duration.toFixed(3) : 0 }; },
+  setLayers(l) { Object.assign(ST.P.layers, l); $('lFeet').checked = !!ST.P.layers.feet; $('lGround').value = ST.P.layers.ground; saveProf(); },
+  // turn a bone about an axis said in HIS frame (+X his left, +Y up, +Z the way he faces), at a clip time (source seconds);
+  // added on top of any key already there. Returns the key list for that bone.
+  async keyBone(role, bone, t, axis, deg) {
+    const en = ST.P.clips.find(c => c.role === role); if (!en) throw new Error('no clip "' + role + '"');
+    const bn = /^mixamorig_/.test(bone) ? bone : 'mixamorig_' + bone; if (!ST.tg.rig.bones[bn]) throw new Error('no bone ' + bn);
+    if (ST.cur !== en) await previewEntry(en);
+    const E = en.edit || {}, disp = Math.max(0, (t - ((E.trim && +E.trim[0]) || 0)) / (+E.speed || 1));
+    ST.playing = false; ST.act.time = Math.min(disp, ST.act.getClip().duration); ST.tg.mixer.update(0); ST.tg.model.updateMatrixWorld(true);
+    const A = { left: [1, 0, 0], right: [-1, 0, 0], up: [0, 1, 0], down: [0, -1, 0], forward: [0, 0, 1], back: [0, 0, -1] }[axis] || axis;
+    const ax = new THREE.Vector3().fromArray(A).normalize().applyQuaternion(ST.tg.model.getWorldQuaternion(new THREE.Quaternion()));
+    const P = ST.tg.rig.bones[bn].parent.getWorldQuaternion(new THREE.Quaternion()), R = new THREE.Quaternion().setFromAxisAngle(ax, deg * Math.PI / 180);
+    en.fk = en.fk || {}; const keys = en.fk[bn] = en.fk[bn] || [];
+    const D = P.clone().invert().multiply(R).multiply(P).multiply(F.fkAt(keys, t));
+    const k = keys.find(x => Math.abs(x.t - t) < 1 / 60), q = [D.x, D.y, D.z, D.w].map(v => +v.toFixed(5));
+    if (k) k.q = q; else { keys.push({ t: +(+t).toFixed(3), q }); keys.sort((a, b) => a.t - b.t); }
+    saveProf(); await previewEntry(en, disp); return keys;
+  },
+  clearKeys(role, bone) { const en = ST.P.clips.find(c => c.role === role); if (!en || !en.fk) return; if (bone) delete en.fk[/^mixamorig_/.test(bone) ? bone : 'mixamorig_' + bone]; else delete en.fk; saveProf(); return previewEntry(en, ST.act ? ST.act.time : 0); },
+  // a prop on one clip (role) or all ('*'): { prop: path or '' to remove, hand, size, move: [x,y,z] metres in his frame, turn: [x,y,z] degrees }
+  async setProp(role, o) {
+    const list = role === '*' ? ST.P.clips : ST.P.clips.filter(c => c.role === role); if (!list.length) throw new Error('no clip "' + role + '"');
+    const first = list[0]; await previewEntry(first);
+    if (o.prop !== undefined) { if (!o.prop) { delete first.prop; delete first.grip; } else { const hand = o.hand || 'Right'; first.prop = { file: o.prop, hand, bone: mountName(hand) }; delete first.grip; } await propShow(first); }
+    if (first.prop && PR.holder) {
+      if (o.size) { first.prop.size = +o.size; PR.holder.scale.setScalar(first.prop.unit * first.prop.size); }
+      if (o.move || o.turn) { const par = PR.holder.parent, wq = par.getWorldQuaternion(new THREE.Quaternion()), ws = par.getWorldScale(new THREE.Vector3()).x;
+        if (o.move) PR.holder.position.add(new THREE.Vector3().fromArray(o.move).applyQuaternion(wq.clone().invert()).multiplyScalar(1 / ws));
+        if (o.turn) { const e = new THREE.Euler(...o.turn.map(d => d * Math.PI / 180)), Rw = new THREE.Quaternion().setFromEuler(e); PR.holder.quaternion.premultiply(wq.clone().invert().multiply(Rw).multiply(wq)); }
+        first.prop.pos = PR.holder.position.toArray(); first.prop.quat = PR.holder.quaternion.toArray(); }
+    }
+    for (const c of list) if (c !== first) { c.prop = first.prop ? JSON.parse(JSON.stringify(first.prop)) : undefined; c.grip = first.grip ? JSON.parse(JSON.stringify(first.grip)) : undefined; }
+    saveProf(); await previewEntry(first); return first.prop || null;
+  },
+  async setGrip(role, o) {
+    const list = role === '*' ? ST.P.clips : ST.P.clips.filter(c => c.role === role); if (!list.length) throw new Error('no clip "' + role + '"');
+    for (const c of list) { if (!c.prop) continue; c.grip = c.grip || { on: false, reach: 1, off: [0, 0, 0] }; if (o.on !== undefined) c.grip.on = !!o.on; if (o.reach !== undefined) c.grip.reach = +o.reach; if (o.offset) c.grip.off = o.offset; }
+    saveProf(); await previewEntry(list[0]); return list[0].grip || null;
+  },
+  // where the lens is: 'front' (his face), 'back', 'left' / 'right' (HIS sides), 'three' (three-quarter), 'top'; ghost off for a clean look
+  view(name, ghost) {
+    const H = ST.tg.hipH * 2.2, V = { front: [0, .5, 1.7], back: [0, .5, -1.7], left: [1.7, .5, 0], right: [-1.7, .5, 0], three: [1.1, .6, 1.3], top: [0, 2.2, .01] }[name] || [1.7, .7, 2];
+    orbit.target.set(0, H * .45, 0); cam.position.set(V[0] * H, V[1] * H, V[2] * H); orbit.update();
+    if (ST.ghost) { ST.ghost.root.visible = !!ghost; if (!ghost) ST.ghost.help.visible = false; }
+  },
+  setTime(t) { if (!ST.act) return; const E = (ST.cur && ST.cur.edit) || {}; ST.playing = false; ST.act.time = Math.max(0, Math.min(ST.act.getClip().duration, (t - ((E.trim && +E.trim[0]) || 0)) / (+E.speed || 1))); ST.tg.mixer.update(0); if (ST.ghost) { const ga = ST.ghost.mix._actions[0]; if (ga) { ga.time = ST.ghost.a + ST.act.time * ST.ghost.sp; ST.ghost.mix.update(0); } } },
+  profile_get: () => JSON.parse(JSON.stringify(ST.P)),
   seek(t) { ST.playing = false; if (ST.act) { ST.act.time = t; ST.tg.mixer.update(0); } },
   set(k, v) { ST.P.layers[k] = v; },
 };

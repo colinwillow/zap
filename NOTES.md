@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m934 -- THE FORGE FOR AGENTS: `window.forge`'s verbs, driven by an MCP server (retarget-anims/mcp)
+*"everybody's using agents -- designing tools that have MCP, that the agent can run, is crucial"*.
+- `forge/app.js` gains the agent's verbs on `window.forge`: `state`, `characters`, `props`, `search`, `packs`/`applyPack`,
+  `addClip`/`removeClip`, `play`, `setLayers`, `keyBone` (turn a bone N degrees about an axis in HIS frame -- left/right/up/
+  down/forward/back or [x,y,z] -- keyed at a source time, added on top of a key already there), `clearKeys`, `setProp` (prop,
+  hand, size, move in metres / turn in degrees in his frame; one clip or '*'), `setGrip`, `view` (front/back/left/right/three/
+  top), `setTime`, `profile_get`. Each is what a button does.
+- **retarget-anims/mcp/server.mjs**: 17 MCP tools over the SAME forge.html run headless (no second engine). `render` returns a
+  PNG so the agent LOOKS at its work. Profiles read/written in library/profiles -- where the app's button puts them -- so
+  `tools/forgebake.cjs` bakes an agent's work into the game too. `.mcp.json` wires it into any Claude Code session in that repo.
+- Tested as an agent over stdio (selftest.mjs): load the hick, apply Zap Set Basic (59 + 2 kept), launcher in his right hand,
+  RightArm -40 deg about forward keyed, grip on, sliders, three renders, save, export (5.26 MB) -- every call answered, the
+  renders show the launcher in his hand.
+
 ## m933 -- THE FORGE, step 6: the GAME plays the Forge's fixes when Zap is worn as that body
 *"apply all the animations to anybody that's ever going to be my hero character, and then adjust them for the character so it
 always looks perfect"* -- and the disguises were where the bugs compounded.
