@@ -164,7 +164,10 @@ async function donor(name) {
   if (DON.list.has(name)) return DON.list.get(name);
   let buf, file = name;
   if (name.startsWith('idb:')) { buf = await idbGet(name); file = name.slice(4); if (!buf) throw new Error(file + ' is no longer in this browser'); }
-  else if (name.startsWith('gh:')) { if (LIB.kind !== 'gh') throw new Error('connect the library to use ' + name.slice(3)); buf = await ghReq('GET', ghRoot() + '/' + name.slice(3), null, true); file = name.slice(3); }
+  else if (name.startsWith('gh:')) { file = name.slice(3);
+    if (LIB.kind === 'url') buf = await (await fetch(new URL('../' + file, location.origin + LIB.base))).arrayBuffer();
+    else if (LIB.kind === 'gh') buf = await ghReq('GET', ghRoot() + '/' + file, null, true);
+    else throw new Error('connect the library to use ' + file); }
   else buf = await (await fetch(name)).arrayBuffer();
   const g = await loadCharBuf(buf, file);
   const clips = (g.animations || []).filter(c => c.tracks.length && !/CINEMA_4D|^Take 001$|mixamo\.com$/.test(c.name) || (g.animations || []).length === 1);
@@ -285,6 +288,15 @@ const dl = (blob, name) => { const a = document.createElement('a'); a.href = URL
 const stemOf = f => f.split('/').pop().replace(/\.(glb|gltf|fbx)$/i, '');
 $('profSave').onclick = () => dl(new Blob([JSON.stringify(ST.P, null, 1)], { type: 'application/json' }), stemOf(ST.file) + '.profile.json');
 $('profLoadBtn').onclick = () => $('profLoad').click();
+// THE GAME'S ROUTE (step 6): the profile goes to library/profiles/<his file>.json; `node tools/forgebake.cjs` (Claude) bakes it
+// into models/characters/forged/ in zap, and when Zap is worn as this body the game plays those clips.
+$('profPush').onclick = async () => {
+  if (LIB.kind !== 'gh') { $('profNote').textContent = 'connect the library (LIBRARY tab) first'; return; }
+  const local = ST.P.clips.filter(c => c.donor && c.donor.startsWith('idb:'));
+  if (local.length) { $('profNote').innerHTML = '<span class="bad">' + local.length + ' clips come from a file only this browser has -- add it to the library first (LIBRARY tab)</span>'; return; }
+  try { ST.P.character = ST.file; await ghPut(ghRoot() + '/profiles/' + stemOf(ST.file) + '.json', new TextEncoder().encode(JSON.stringify(ST.P, null, 1)), 'forge: profile ' + stemOf(ST.file));
+    $('profNote').innerHTML = '<span class="ok">saved to the library as profiles/' + stemOf(ST.file) + '.json</span> -- tell Claude "bake ' + stemOf(ST.file) + '" and it goes into the game';
+  } catch (e) { $('profNote').innerHTML = '<span class="bad">' + e.message + '</span>'; } };
 $('profLoad').onchange = async () => { const f = $('profLoad').files[0]; if (!f) return; ST.P = JSON.parse(await f.text()); saveProf(); await reprep(); renderPack(); };
 async function reprep() { if (!ST.tg) return; const m = ST.tg.model; ST.tg.restore(); ST.tg = F.prepTarget(m, { exclude: ST.P.exclude }); syncSliders(); dotsBuild(); }
 

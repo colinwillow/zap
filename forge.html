@@ -62,7 +62,7 @@ label.sw { display:flex; gap:8px; align-items:center; }
 </head>
 <body>
 <div id="app">
-  <div id="top"><b>FORGE</b><span class="bld">f5</span><span class="who" id="who">no character</span></div>
+  <div id="top"><b>FORGE</b><span class="bld">f6</span><span class="who" id="who">no character</span></div>
   <div id="view"><div id="chip"></div><div id="busy">working…</div></div>
   <div id="time">
     <button class="btn" id="prev">◀</button><button class="btn" id="play">❚❚</button><button class="btn" id="next">▶</button>
@@ -145,6 +145,8 @@ label.sw { display:flex; gap:8px; align-items:center; }
       <div class="note" id="packNote"></div>
       <h3>Profile</h3>
       <div class="note">Everything about this character: his pack, his layers. Saved in this browser per character; download it to keep it in the repo.</div>
+      <div class="row"><button class="btn ac" id="profPush">Save profile to the library (for the game)</button></div>
+      <div class="note" id="profNote"></div>
       <div class="row"><button class="btn" id="profSave">Download profile</button><button class="btn" id="profLoadBtn">Load profile…</button></div>
       <input type="file" id="profLoad" accept=".json" hidden>
     </div>
@@ -180,6 +182,6 @@ label.sw { display:flex; gap:8px; align-items:center; }
     </div>
   </div>
 </div>
-<script type="module" src="./forge/app.js?v=f5"></script>
+<script type="module" src="./forge/app.js?v=f6"></script>
 </body>
 </html>

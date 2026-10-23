@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m933 -- THE FORGE, step 6: the GAME plays the Forge's fixes when Zap is worn as that body
+*"apply all the animations to anybody that's ever going to be my hero character, and then adjust them for the character so it
+always looks perfect"* -- and the disguises were where the bugs compounded.
+- **The route**: Forge (PACK) "Save profile to the library" -> `library/profiles/<stem>.json` in the private repo -> he says "bake
+  <stem>" -> `node tools/forgebake.cjs [stem]` (`--lib` defaults to ../retarget-anims/library/clips) runs `tools/forge.cjs` per
+  profile into **`models/characters/forged/<stem>.glb`** (his skeleton + clips named by role) and rewrites `forged/index.json`
+  -> bump + push. The game never touches the private library: what ships is the BAKE (clips inside game assets, like every
+  other clip in the game).
+- **The game (`FORGED`, `forgedLoad`, `mphBorrow`)**: `forged/index.json` is read at boot off the boot path, each listed bake is
+  loaded; when a disguise skin is built, the forged clips REPLACE the live carry for every role they have, the rest are carried
+  as before. The chip notes `FORGED <KIND> <n>` the moment it is used. `mel.FORGED.on = 0` is the A/B (before the skin is built).
+- `models/characters/forged` added to bump's DIRS (the twelfth folder that would otherwise have gone stale silently).
+- A donor file he added to the library (`gh:mine/...`) bakes too: forge.cjs serves `<lib>/../mine/`.
+- **Tested end to end headless**: a hick profile (stance 1.2, arms 5, run_fwd from the library, walk_fwd from old Zap) -> baked
+  (0.17 MB) -> the game booted, loaded it, and `mphSkin(HICK)` played both forged clips (identity-checked), 144 clips on the skin,
+  no page errors. The test bake was REMOVED before shipping: forged/index.json ships empty until he saves a real profile.
+
 ## m932 -- THE FORGE, step 5: PACKS as files, and his own animations in the library for good
 *"call it zap set basic... add the rocket launcher pack... my own animations, upload them and add them to my library"*.
 - **Packs** (PACK tab): a pack is roles + where each comes from (a library stem, or a donor file + clip) -- nothing about a body,

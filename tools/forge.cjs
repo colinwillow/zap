@@ -12,8 +12,9 @@ const ROOT = path.resolve(__dirname, '..'), LIB = path.resolve(lib);
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.glb': 'model/gltf-binary', '.wasm': 'application/wasm' };
 const srv = http.createServer((q, r) => {
   const u = decodeURIComponent(q.url.split('?')[0]);
-  const f = u.startsWith('/lib/') ? path.join(LIB, u.slice(5)) : path.join(ROOT, u);
-  if (!f.startsWith(ROOT) && !f.startsWith(LIB)) { r.writeHead(403); return r.end(); }
+  const MINE = path.join(LIB, '..', 'mine');
+  const f = u.startsWith('/lib/') ? path.join(LIB, u.slice(5)) : u.startsWith('/mine/') ? path.join(MINE, u.slice(6)) : path.join(ROOT, u);
+  if (!f.startsWith(ROOT) && !f.startsWith(LIB) && !f.startsWith(MINE)) { r.writeHead(403); return r.end(); }
   fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } r.writeHead(200, { 'Content-Type': TYPES[path.extname(f)] || 'application/octet-stream' }); r.end(b); });
 }).listen(0, async () => {
   const port = srv.address().port, b = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
