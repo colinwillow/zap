@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m914 -- THE CEO MORPH: no T-pose, no 180 flip, no walking during it
+*"When he transforms he goes ghost stiff, into T-pose, transforms into the other T-pose and goes back. Also he flips 180 -- he
+transforms facing away and then all of a sudden he's facing me. There's also some walks going on."*
+- THE FLIP AND THE WALKING: `tmGo`'s `b.st = 'morph'` sat at the END OF A `//` COMMENT (m909), so the new body never froze: a
+  boss in `idle` with aggro, turning toward you and walking on the spot (pinned) behind the frozen proxies. The proxy was taken
+  at the old heading; the real body appeared at the swap already facing you. Headless, CEO set to h 1.57: before, b.h drifted
+  1.57 -> 1.41 -> 1.00 during the morph; after, 1.57 throughout. **Third mid-line-comment bug in this file (m904, m909).**
+- THE T-POSE: the new body is two frames old at the snapshot and `skinWeights` damps in over .06 s -- on a phone ~40% weight,
+  the rest BIND pose. `tmSettle` puts the new body fully on its idle (and scales the old body's weights to sum 1) and runs
+  `mixer.update(0)` before `tmPose`. (Headless at ~2 fps never showed it: each frame there is half a second.)
+
 ## m913 -- HIS OWN TRANSFORM ON THE PROXY MORPH (Zap <-> hick)
 *"We have the ability to transform my own hero character into the hick, but it uses the old transform -- try the new one."*
 - `morphGo` -> `pmGo`: when BOTH the body he is in and the target have a proxy (`tmKeyOf`: `ARENA.morph.files` matched by the
