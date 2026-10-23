@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m919 -- the CEO stretches through his morph (Clancy's `idle_02_stretch`, carried onto both bodies)
+*"There's an idle in the mutant pack -- he stretches with both arms out -- the perfect animation to play during the transform,
+it looks like the werewolf stretch."* Found by clip name across every GLB: `idle_02_stretch` (3.04 s) is in CLANCY's file with the
+rest of the mutant pack (`mutant_flexing_muscles`, `mutant_roaring`...); the bosses were baked from the warrior donor and never had it.
+- `clipXfer(S, clip, K)`: WORLD-DELTA retarget, sampled at 30 fps -- per target bone Wt(t) = Ws(t) Ws0^-1 Wt0, made local down the
+  TARGET's own chain; hips travel x (target hip height / source hip height). Bones the source lacks (fingers, `root`) keep their
+  rest. Clancy (27 joints, no fingers) -> the CEO and the CEO alien (53 / 59). Cached per kind (`K.tmAct`). This is the narrow
+  first cut of the motion transfer tool (ROADMAP ASSETS) -- `retarget`'s raw local copy would not survive his re-oriented bones.
+- Both bodies on it at `from`, frozen; each frame the morph sets both actions' time, `mixer.update(0)`, and RE-SKINS both proxies
+  from the live skeletons (`tmSkin`: premultiplied bone matrices, a flat loop -- 4.0 ms/frame for both on headless swiftshader);
+  normals every `nEvery` 3 frames. The morph runs the clip's length / `speed` 1.15 = 2.64 s. `ARENA.morph.act.on = 0` is the A/B.
+- Strip (LIMBS): hunched, arms rising, flung wide overhead, the limbs turning in order. Known: a pop from his walk into the
+  stretch's first frame at the start.
+- `tmStep(dt, force)` + `ARENA.morph.hold`: step a morph by hand (headless strips).
+
 ## m918 -- the wave's SHAPE: LIMBS (directed) and NOISE; m917 had swallowed `ARENA.morph.simple`
 *"A spherical falloff with a growing noise pattern, so parts of his body grow at different rates -- or a vertex map, really
 directed: one arm, then the opposite leg, then the other arm, the other leg, then the middle."*

@@ -836,10 +836,10 @@ body.desk.free #deskHint { display: block; }
   <h1>WEIRDPORT</h1>
   <div class="msg" id="bootMsg">loading</div>
   <div class="bar"><i id="bootBar"></i></div>
-  <div class="bld">BUILD <span id="bootBuild">m918</span></div>
+  <div class="bld">BUILD <span id="bootBuild">m919</span></div>
 </div>
 
-<div class="chip" id="build"><b id="buildN">m918</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
+<div class="chip" id="build"><b id="buildN">m919</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
 <div id="splash" aria-label="tap to start"><img class="blur" alt=""><img class="main" alt="Zap and Clancy"><div class="glow"></div><div class="bn"></div></div>
 <script>
 // m879 (STEER 02:22): THE SPLASH, before the module (so it shows on the first paint, while the boot carries on behind it). The image's
@@ -945,7 +945,7 @@ import { KTX2Loader } from './vendor/KTX2Loader.js';
 import { clone as skeletonClone } from './vendor/SkeletonUtils.js';
 import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
 
-const BUILD = 'm918';
+const BUILD = 'm919';
 /* ASSETS:START */
 const ASSETS = {"models/alien_lizard.glb":"faffcf4c","models/alien_lizard_ktx2.glb":"05da2a20","models/skate.glb":"0c612d5e","models/skateboard.glb":"5ba93796","models/characters/alien_antenna_game.glb":"f3ccf328","models/characters/alien_antenna_game_ktx2.glb":"28afac8c","models/characters/alien_female_purple.glb":"1c73eef1","models/characters/alien_female_purple_ktx2.glb":"fc914afb","models/characters/alien_grey_medium.glb":"5a779e8e","models/characters/alien_grey_medium_ktx2.glb":"61600c3e","models/characters/alien_rollerskate_blue.glb":"6e98dd0a","models/characters/alien_rollerskate_blue_ktx2.glb":"a66d5697","models/characters/alien_warrior.glb":"f5cc9c49","models/characters/alien_warrior_ktx2.glb":"a13fb7b6","models/characters/beautiful_asian.glb":"910f6565","models/characters/beautiful_asian_ktx2.glb":"35281eef","models/characters/beautiful_blonde.glb":"edddc421","models/characters/beautiful_blonde_ktx2.glb":"89cf3899","models/characters/brute_warboss_armor.glb":"cc5c7936","models/characters/ceo_alien.glb":"844dc3a7","models/characters/ceo_human.glb":"ec289865","models/characters/clancy.glb":"b1ef602b","models/characters/clancy_ktx2.glb":"84625cdc","models/characters/colin.glb":"99d38b7d","models/characters/colin_ktx2.glb":"35040f87","models/characters/contruction_worker.glb":"8bd3d7ce","models/characters/contruction_worker_ktx2.glb":"3df8c344","models/characters/dummy_officer.glb":"724965ac","models/characters/dummy_officer_ktx2.glb":"db640cda","models/characters/fat_activist_01.glb":"3c566fee","models/characters/fat_activist_01_ktx2.glb":"b9328df4","models/characters/fat_biker_01.glb":"576b7cf5","models/characters/fat_biker_01_ktx2.glb":"7142cfad","models/characters/fat_biker_02.glb":"ab5d7ec7","models/characters/fat_biker_02_ktx2.glb":"28cec6cc","models/characters/fat_hippie.glb":"f09a260d","models/characters/fat_hippie_ktx2.glb":"0be745a4","models/characters/fat_hipster.glb":"3a8abc31","models/characters/fat_hipster_ktx2.glb":"fd8b3318","models/characters/fat_secret_service.glb":"6d546fb0","models/characters/fat_secret_service_ktx2.glb":"a23a304e","models/characters/fat_trump.glb":"5de6bc56","models/characters/fat_trump_ktx2.glb":"a0ddaf4d","models/characters/firefighter.glb":"ebde005d","models/characters/firefighter_ktx2.glb":"ccf93c96","models/characters/hick_skinny.glb":"1ebe78e8","models/characters/hick_skinny_ktx2.glb":"1e93f0ed","models/characters/hobo_01.glb":"34e80b1d","models/characters/hobo_01_ktx2.glb":"69497677","models/characters/jack.glb":"ab009b9b","models/characters/jack_ktx2.glb":"1f4c9f7f","models/characters/moussa.glb":"6d80b1cf","models/characters/moussa_ktx2.glb":"66e040f8","models/characters/proxy_ceo.bin":"6eca0c34","models/characters/proxy_ceo.jpg":"fadc9d0a","models/characters/proxy_ceo.json":"e62a7975","models/characters/proxy_ceo_alien.bin":"be247ecc","models/characters/proxy_ceo_alien.jpg":"8f8bf8fc","models/characters/proxy_ceo_alien.json":"eb23e28f","models/characters/proxy_hick.bin":"4485560e","models/characters/proxy_hick.jpg":"8c331965","models/characters/proxy_hick.json":"d85a0d36","models/characters/proxy_zap.bin":"dd7b300e","models/characters/proxy_zap.jpg":"2e7330ae","models/characters/proxy_zap.json":"b3b42754","models/characters/rept_heavy_armor.glb":"934661c7","models/characters/xray_skeleton.glb":"46480317","models/characters/zap.glb":"5e5cca54","models/characters/zap_ktx2.glb":"4b29d886","models/vehicles/dump_truck.glb":"d870dc18","models/vehicles/dump_truck_ktx2.glb":"21ee7059","models/vehicles/motorcycle_fatboy.glb":"9ed9be28","models/weapons/alien_antenna_blaster_game.glb":"54083b44","models/weapons/alien_antenna_hammer_game.glb":"707b8a27","models/weapons/alien_launcher.glb":"ba8ab96a","models/weapons/hammer.glb":"3335fdf2","models/weapons/shield_brute.glb":"c6e5593f","models/weapons/spikey_mace.glb":"dcd43acd","models/weapons/w_brute_cleaver.glb":"07a97580","models/weapons/w_rept_maul.glb":"84c3a1a4","models/buildings/alien_base_01.glb":"d9b9fd7f","models/buildings/alien_base_01_ktx2.glb":"6cbbfef2","models/towers/alien_tower_01.glb":"98d23375","models/towers/alien_tower_01_ktx2.glb":"47597651","models/streets/modular_streets_kit.glb":"6a4bcaa5","models/toon_city/impact_marks.json":"2b616620","models/toon_city/impact_marks_atlas.ktx2":"efe0840e","models/toon_city/impact_marks_atlas.png":"490ed049","models/toon_city/toon_city_breakables.glb":"29bddbc8","models/toon_city/toon_city_collision.glb":"fb3a693f","models/toon_city/toon_city_obb.json":"81c18a47","models/toon_city/toon_city_visual.glb":"5df62285","models/toon_city/toon_city_visual_ktx2.glb":"cf080531","models/toon_city/weirdkit_tint.js":"f6e9d802","models/toon_city_kit/toon_city_collision.glb":"5540a364","models/toon_city_kit/toon_city_kit_buildings.glb":"590e53f0","models/toon_city_kit/toon_city_kit_buildings_ktx2.glb":"e6dff3a3","models/toon_city_kit/toon_city_kit_pieces.glb":"8232bd6f","models/toon_city_kit/toon_city_kit_twins.glb":"fcc9fdfc","models/toon_city_kit/toon_city_visual.glb":"45cf2957","models/toon_city_kit/toon_city_visual_ktx2.glb":"f26a6984","models/toon_city_kit/weirdkit_detile.js":"dd05bd70","models/characters/morph/shapes.bin":"4e680384","models/characters/morph/shapes.json":"abfc949d","images/crack_sprite_01.ktx2":"4aa55fde","images/crack_sprite_01.png":"16b52e8c","images/fire_sprites_01.ktx2":"922e1191","images/fire_sprites_01.png":"f87e2696","images/fire_sprites_02.ktx2":"e0cbfe1d","images/fire_sprites_02.png":"b373a6fd","images/fire_sprites_03.ktx2":"4fbbb985","images/fire_sprites_03.png":"7eece336","images/geyser_sprites_01.png":"b6325470","images/hdri_game.ktx2":"0feb5c79","images/hdri_game.png":"dac55f41","images/splash_zap_n_clancy.webp":"52a9d8a4","images/water_sprites_01.ktx2":"326924c5","images/water_sprites_01.png":"31e12659","audio/blaster_sound_01.mp3":"40d99583","audio/blaster_sound_02.mp3":"4bd7bb7c","audio/box_break_01.mp3":"e4127980","audio/electricity_beam_01.mp3":"986db8c9","audio/explosion_small.mp3":"f154a537","audio/metal_clang_01.mp3":"a333bd27","audio/metal_clang_02.mp3":"1e3ebbd6","audio/metal_clang_03.mp3":"afe44812","audio/metal_ping_01.mp3":"8ffca1a0","audio/plasma_canon.mp3":"e32c324d","audio/powerup_01.mp3":"48fbbe08","audio/swoosh_01.mp3":"193db185","audio/swoosh_02.mp3":"19145e70","audio/swoosh_03.mp3":"544fdffb","audio/swoosh_04.mp3":"843bee5d","audio/plasma_sounds/plasma_01.mp3":"e71c010f","audio/plasma_sounds/plasma_02.mp3":"ac3b1c75","audio/plasma_sounds/plasma_03.mp3":"eaa59355","audio/plasma_sounds/plasma_04.mp3":"bc7865e0","audio/plasma_sounds/plasma_05.mp3":"1d821cd0","audio/plasma_sounds/plasma_06.mp3":"cb979fbe","audio/plasma_sounds/plasma_hit.mp3":"30e5af5c","audio/alien_orc_grunt_sounds/alien_orc_grunt_01.mp3":"d6f4b343","audio/alien_orc_grunt_sounds/alien_orc_grunt_02.mp3":"78afc603","audio/alien_orc_grunt_sounds/alien_orc_grunt_03.mp3":"972c524a","audio/alien_orc_grunt_sounds/alien_orc_grunt_04.mp3":"b0ce76eb","audio/alien_orc_grunt_sounds/alien_orc_grunt_05.mp3":"1f0ba1f4","audio/alien_orc_grunt_sounds/alien_orc_grunt_06.mp3":"4f749866","audio/alien_orc_grunt_sounds/alien_orc_grunt_07.mp3":"dcf75925","audio/hit_sounds/hit_sound_01.mp3":"befaa2be","audio/hit_sounds/hit_sound_02.mp3":"73bc4433","audio/hit_sounds/hit_sound_03.mp3":"24b181e4","audio/hit_sounds/hit_sound_gound_01.mp3":"86ee2674","audio/hit_sounds/hit_sound_ground_02.mp3":"8a7cac73","audio/hit_sounds/hit_sound_plasma_01.mp3":"9abc0202","audio/hit_sounds/hit_sound_plasma_02.mp3":"6aaf0fe5","audio/creature_noises/creature_noise_01.mp3":"cbcc6ee7","audio/creature_noises/creature_noise_02.mp3":"201a8247","audio/creature_noises/creature_noise_03.mp3":"97680811","audio/creature_noises/creature_noise_04.mp3":"6f734df2","audio/creature_noises/creature_noise_05.mp3":"6f736441","audio/creature_noises/creature_noise_06.mp3":"992712e9","audio/creature_noises/creature_noise_07.mp3":"d9ad04b3","audio/footsteps/footstep_2_l.mp3":"abeabfbe","audio/footsteps/footstep_2_r.mp3":"7dd16046","audio/footsteps/footstep_l.mp3":"b66e579b","audio/footsteps/footstep_r.mp3":"96e13433","models/props/prop_hydrant.glb":"f157fee9","models/props/prop_hydrant_collision.glb":"0bbfc4d2"};
 /* ASSETS:END */
@@ -8126,7 +8126,7 @@ function tmBuild(A, B, rA, rB, R, hA, hB, look, srcA) {
   const chest = new THREE.Vector3(R.x, R.y + hA * .6, R.z), Hs = Math.max(hA, hB);
   const meshes = (M.mode === 'BLEND' ? [0] : [1, 2]).map(k => { const mt = tmMat(A, B, chest, Hs, k, R.y), U = mt.uniforms; U.uWave.value = look.wave === 'CHEST' ? 1 : 0; U.uMap.value = map ? 1 : 0; U.uSpread.value = W.s; U.uWin.value = W.w;
     const m = new THREE.Mesh(geo, mt); m.frustumCulled = false; scene.add(m); return m; });
-  return { geo, meshes, K, t: 0, tot: (cine ? M.cine.in + M.cine.out : 0) + M.dur, phase: -1 };
+  return { geo, meshes, K, t: 0, dur: M.dur, tot: (cine ? M.cine.in + M.cine.out : 0) + M.dur, phase: -1 };
 }
 const tmLerp = (out, a, b, e) => { for (let i = 0; i < out.length; i++) out[i] = a[i] + (b[i] - a[i]) * e; };
 // one frame of a morph; true when it has finished (and its meshes are gone)
@@ -8137,17 +8137,89 @@ function tmRun(T, dt) {
   if (K && T.t < ti) {     // beat 1: he goes stiff
     const e = smooth(0, 1, T.t / ti); tmLerp(g.position.array, K.a0, K.a1, e); tmLerp(g.normal.array, K.na0, K.na1, e);
     g.position.needsUpdate = g.normal.needsUpdate = true; u = 0;
-  } else if (T.t < ti + M.dur) {     // beat 2: the morph
+  } else if (T.t < ti + T.dur) {     // beat 2: the morph
     if (K && T.phase < 1) { g.position.array.set(K.a1); g.normal.array.set(K.na1); g.position.needsUpdate = g.normal.needsUpdate = true; T.phase = 1; }
-    u = (T.t - ti) / M.dur;
+    u = (T.t - ti) / T.dur;
   } else {     // beat 3: the new body comes alive
-    if (K) { const e = smooth(0, 1, (T.t - ti - M.dur) / M.cine.out); tmLerp(g.pB.array, K.b0, K.b1, e); tmLerp(g.nB.array, K.nb0, K.nb1, e); g.pB.needsUpdate = g.nB.needsUpdate = true; }
+    if (K) { const e = smooth(0, 1, (T.t - ti - T.dur) / M.cine.out); tmLerp(g.pB.array, K.b0, K.b1, e); tmLerp(g.nB.array, K.nb0, K.nb1, e); g.pB.needsUpdate = g.nB.needsUpdate = true; }
     u = 1;
   }
   for (const m of T.meshes) m.material.uniforms.uU.value = u;
   if (T.t < T.tot) return false;
   for (const m of T.meshes) { scene.remove(m); m.material.dispose(); }
-  T.geo.dispose(); return true;
+  T.geo.dispose(); if (T.ng) T.ng.dispose(); return true;
+}
+// ---- m919: HIS STRETCH DURING THE MORPH. *"There's an idle in the mutant pack -- he stretches with both arms out -- it would be
+// the perfect animation to play during the transform, it looks like the werewolf stretch."* It is `idle_02_stretch`, in CLANCY's
+// file (the bosses were baked from the warrior donor and never had it). `clipXfer` carries it onto any Mixamo-named rig: per
+// bone, the source's WORLD rotation relative to its own rest is applied to the target's rest (Wt = Ws(t) Ws0^-1 Wt0), then made
+// local down the target's own chain -- so bones oriented differently in the two exports still agree (the raw local copy
+// `retarget` does would not; CLAUDE.md: Blender and ARP re-orient bones). Hips travel scaled by hip height. Bones the source
+// lacks (fingers, `root`) keep their rest. Both bodies play it in step through the morph and the proxies are re-skinned from
+// their live skeletons every frame (`tmSkin`, a flat loop over premultiplied bone matrices -- not 13k `getVertexPosition`s).
+ARENA.morph.act = { on: 1, file: 'models/characters/clancy.glb', clip: 'idle_02_stretch', from: 0, speed: 1.15, nEvery: 3 };
+function tmActSrc() {
+  const A = ARENA.morph.act;
+  if (!A.src) A.src = loadGLB(A.file, 'loading the stretch').then(g => { const c = g.animations.find(x => x.name === A.clip); if (!c) throw new Error('no ' + A.clip + ' in ' + A.file); return { scene: g.scene, clip: c }; });
+  return A.src;
+}
+function clipXfer(S, clip, K) {
+  const Q = () => new THREE.Quaternion(), V = () => new THREE.Vector3();
+  const src = skeletonClone(S.scene), dst = skeletonClone(K.P.proto);
+  src.updateMatrixWorld(true); dst.updateMatrixWorld(true);
+  const sb = {}, db = []; src.traverse(o => { if (o.isBone) sb[o.name] = o; }); dst.traverse(o => { if (o.isBone) db.push(o); });
+  const restS = {}, restT = db.map(b => b.getWorldQuaternion(Q())), restL = db.map(b => b.quaternion.clone());
+  for (const n in sb) restS[n] = sb[n].getWorldQuaternion(Q()).invert();
+  const hipS = sb[MHIPS], hi = db.findIndex(b => b.name === MHIPS), hipT = db[hi];
+  if (!hipS || !hipT) throw new Error('no hips to carry the stretch');
+  const hS0 = hipS.getWorldPosition(V()), hT0 = hipT.getWorldPosition(V()), k = hT0.y / (hS0.y || 1);
+  const parInv = hipT.parent.matrixWorld.clone().invert();
+  const mixer = new THREE.AnimationMixer(src); mixer.clipAction(clip).play();
+  const fps = 30, nf = Math.max(2, Math.round(clip.duration * fps) + 1), times = new Float32Array(nf);
+  const use = db.map(b => !!sb[b.name] && b.name !== 'root'), qv = db.map(() => new Float32Array(nf * 4)), pv = new Float32Array(nf * 3);
+  const W = new Map(), idx = new Map(db.map((b, i) => [b, i])), ws = Q(), loc = Q();
+  for (let f = 0; f < nf; f++) {
+    const t = Math.min(clip.duration, f / fps); times[f] = t; mixer.setTime(t); src.updateMatrixWorld(true);
+    W.clear();
+    db.forEach((b, i) => {
+      const par = b.parent, P = par && W.has(par) ? W.get(par) : (par ? par.getWorldQuaternion(Q()) : Q());
+      const w = use[i] ? sb[b.name].getWorldQuaternion(ws).clone().multiply(restS[b.name]).multiply(restT[i]) : P.clone().multiply(restL[i]);
+      W.set(b, w); loc.copy(P).invert().multiply(w); qv[i].set([loc.x, loc.y, loc.z, loc.w], f * 4);
+    });
+    const hp = hipS.getWorldPosition(V()).sub(hS0).multiplyScalar(k).add(hT0).applyMatrix4(parInv); pv.set([hp.x, hp.y, hp.z], f * 3);
+  }
+  const tracks = [];
+  db.forEach((b, i) => { if (use[i]) tracks.push(new THREE.QuaternionKeyframeTrack(b.name + '.quaternion', times, qv[i])); });
+  tracks.push(new THREE.VectorKeyframeTrack(MHIPS + '.position', times, pv));
+  return new THREE.AnimationClip(clip.name + '@' + (K.arena || 'x'), clip.duration, tracks);
+}
+// put a body on the carried stretch at `from`, full weight, frozen (the morph drives its time)
+function tmActOn(d, c) {
+  const ac = d.mixer.clipAction(c); d.actions[c.name] = ac;
+  for (const k in d.actions) d.actions[k].setEffectiveWeight(0);
+  d.cw = d.cw || {}; for (const k in d.cw) d.cw[k] = 0; d.cw[c.name] = 1;
+  ac.reset(); ac.play(); ac.setEffectiveWeight(1); ac.setEffectiveTimeScale(0); ac.time = ARENA.morph.act.from;
+  d.cur = c.name; d.mixer.update(0); d.actC = c.name;
+}
+// the proxy re-skinned from his live skeleton into `out` (world positions) -- `tmPose`'s answer, in a flat loop
+function tmSkin(d, src, out) {
+  const vm = xrMain(d.model), si = d.K.tmGeo.attributes.skinIndex.array, B = vm.skeleton.bones, I = vm.skeleton.boneInverses;
+  const F = d.tmF || (d.tmF = B.map(() => new THREE.Matrix4())), pre = _tsM.multiplyMatrices(vm.matrixWorld, vm.bindMatrixInverse);
+  for (let b = 0; b < B.length; b++) F[b].multiplyMatrices(pre, B[b].matrixWorld).multiply(I[b]).multiply(vm.bindMatrix);
+  const P = src.pos, w = src.wt, n = src.J.v;
+  for (let i = 0; i < n; i++) {
+    const x = P[i * 3], y = P[i * 3 + 1], z = P[i * 3 + 2]; let ox = 0, oy = 0, oz = 0;
+    for (let k = 0; k < 4; k++) { const q = w[i * 4 + k]; if (!q) continue; const e = F[si[i * 4 + k]].elements;
+      ox += q * (e[0] * x + e[4] * y + e[8] * z + e[12]); oy += q * (e[1] * x + e[5] * y + e[9] * z + e[13]); oz += q * (e[2] * x + e[6] * y + e[10] * z + e[14]); }
+    out[i * 3] = ox; out[i * 3 + 1] = oy; out[i * 3 + 2] = oz;
+  }
+}
+const _tsM = new THREE.Matrix4();
+function tmNormInto(T, which, P) {     // normals of a live position set, into the morph's `normal` / `nB`
+  const g = T.ng || (T.ng = new THREE.BufferGeometry()), idx = T.geo.index;
+  if (!g.attributes.position || g.attributes.position.array.length !== P.length) { g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(P.length), 3)); if (idx) g.setIndex(idx); }
+  g.attributes.position.array.set(P); g.computeVertexNormals();
+  const a = T.geo.attributes[which]; a.array.set(g.attributes.normal.array); a.needsUpdate = true;
 }
 function tmSettle(d, fresh) {
   const idle = d.K.clips.idle; let sum = 0;
@@ -8202,7 +8274,9 @@ async function tmGo() {
   const toKey = M.into[a.K.arena];
   M.live = { st: 'load' };
   try {
-    const [sA, sB, KB] = await Promise.all([tmSrc(a.K.arena), tmSrc(toKey), arenaLoad(toKey)]);
+    const [sA, sB, KB, AS] = await Promise.all([tmSrc(a.K.arena), tmSrc(toKey), arenaLoad(toKey), M.act.on ? tmActSrc().catch(e => { console.warn('[melee] stretch', e); return null; }) : null]);
+    if (AS) for (const K of [a.K, KB]) if (!K.tmAct) { try { K.tmAct = clipXfer(AS, AS.clip, K); } catch (e) { console.warn('[melee] stretch xfer', e); } }
+    const act = AS && a.K.tmAct && KB.tmAct;
     const P = a.root.position, b = bodySpawn(KB.P, KB, P.x, P.z, P.y);
     if (!ARENA.kinds[toKey].civ) { arenaArm(b); arenaArmour(b); }     // a boss arrives with his weapon and his plates
     // the MODEL, not the root: `bodyCull` sets a near body's root visible every frame.
@@ -8212,27 +8286,36 @@ async function tmGo() {
     b.st = 'morph'; b.t = 0; foeBar(b); if (b.bar) b.bar.g.visible = false;
     ARENA.live.push(b);
     a.st = 'morph'; a.t = 0;
-    M.live = { st: 'prep', a, b, sA, sB, t: 0, fr: 0, at: P.clone() };
+    M.live = { st: 'prep', a, b, sA, sB, t: 0, fr: 0, at: P.clone(), act };
   } catch (e) { console.warn('[melee] morph', e); note('MORPH FAILED'); M.live = null; }
 }
-function tmStep(dt) {
+function tmStep(dt, force) {
   const M = ARENA.morph, L = M.live; if (!L || L.st === 'load') return;
+  if (M.hold && !force) return;     // `mel.ARENA.morph.hold = 1` + `mel.tmStep(dt, 1)`: step it by hand (headless frame strips)
   const { a, b } = L;
   // PINNED to the spot: `bodySep` pushes two bodies apart, and the new one is standing exactly inside the old one
   a.root.position.copy(L.at); b.root.position.copy(L.at); a.vx = a.vz = b.vx = b.vz = 0;
   if (L.st === 'prep') {   // one frame for the new body's mixer to pose him, then both freeze and both proxies are taken
     if (++L.fr < 2) return;
     for (const d of [a, b]) for (const k in d.actions) d.actions[k].setEffectiveTimeScale(0);
-    tmSettle(a, 0); tmSettle(b, 1);     // m914: full weight before the snapshot (see `tmSettle`)
+    if (L.act) { tmActOn(a, a.K.tmAct); tmActOn(b, b.K.tmAct); a.root.updateMatrixWorld(true); b.root.updateMatrixWorld(true); }     // m919: both on his stretch, frame `from`
+    else { tmSettle(a, 0); tmSettle(b, 1); }     // m914: full weight before the snapshot (see `tmSettle`)
     const A = tmPose(a, L.sA), B = tmPose(b, L.sB), R = a.root.position;
     const look = (ARENA.kinds[a.K.arena].civ && ARENA.kinds[b.K.arena].civ) ? M.simple : M.boss;     // the CEO is the boss tier
     L.run = tmBuild(A, B, tmRest(a, L.sA), tmRest(b, L.sB), R, a.K.h, b.K.h, look, L.sA);
+    if (L.act && !L.run.K) { const c = a.K.tmAct; L.run.dur = L.run.tot = Math.max(.5, (c.duration - M.act.from) / M.act.speed); L.run.live = 1; }
     a.model.visible = false; if (a.bar) a.bar.g.visible = false;
     tmFlash(R, 1); L.st = 'run'; L.t = 0; M.stat.morphs++;
     return;
   }
   if (L.st === 'run') {
     if (Math.random() < dt * 30) { const R = a.root.position; spk(R.x + (Math.random() - .5) * .8, R.y + Math.random() * a.K.h, R.z + (Math.random() - .5) * .8, 0, 1 + Math.random() * 2, 0, .14, .5, M.glow); }
+    if (L.run.live) {     // m919: both bodies one frame further into the stretch, and the proxies re-skinned from them
+      const tc = Math.min(M.act.from + (L.run.t + dt) * M.act.speed, a.K.tmAct.duration - 1e-3);
+      for (const d of [a, b]) { const ac = d.actions[d.actC]; if (ac) ac.time = tc; d.mixer.update(0); d.root.updateMatrixWorld(true); }
+      const g = L.run.geo.attributes; tmSkin(a, L.sA, g.position.array); tmSkin(b, L.sB, g.pB.array); g.position.needsUpdate = g.pB.needsUpdate = true;
+      if ((L.fr = (L.fr || 0) + 1) % M.act.nEvery === 0) { tmNormInto(L.run, 'normal', g.position.array); tmNormInto(L.run, 'nB', g.pB.array); }
+    }
     if (tmRun(L.run, dt)) {
       b.root.visible = true; b.model.visible = true; b.st = 'idle'; b.t = 0;
       for (const k in b.actions) b.actions[k].setEffectiveTimeScale(1);
@@ -52344,7 +52427,7 @@ window.melee = window.mel = { TXD, txDress, txGo: f => { const B = turfAt(player
     player.pos.set(L.x0, L.y0 + .2, L.z0); return 'at lane ' + i + ' of ' + LANES.length; },
   // THE WARRIOR, LIVE. `mel.FOE.notice = 0` parks them all; `mel.hurt(20)` fakes a blow so the
   // flash and the bar can be looked at without standing in front of a mace.
-  ARENA, arenaSpawn, arenaArmR, arenaShieldMake, tmSrc, tmPose, xrMain, tmRun, arenaClear, tmGo, hintSay, arenaWaste, arenaSwing, arenaStun, xrayLoad, renderer, scene, camera, THREE, arenaShot: (d, h, p) => { BLOW_SRC = 'shot'; dummyBlow(d, h, p, FOE.dmg.bolt); BLOW_SRC = ''; }, FOE, HICK, HOBO, SKATER, CIVIL, CIVILS, SMOKE, BLOCK, HEALTH, HURT, foeAI, foePlan, foeWander, foeRoll, bodySep, bodyFly, boltHome, playerHurt, buildFoes,
+  ARENA, arenaSpawn, arenaArmR, arenaShieldMake, tmSrc, tmPose, xrMain, tmRun, tmStep, arenaClear, tmGo, hintSay, arenaWaste, arenaSwing, arenaStun, xrayLoad, renderer, scene, camera, THREE, arenaShot: (d, h, p) => { BLOW_SRC = 'shot'; dummyBlow(d, h, p, FOE.dmg.bolt); BLOW_SRC = ''; }, FOE, HICK, HOBO, SKATER, CIVIL, CIVILS, SMOKE, BLOCK, HEALTH, HURT, foeAI, foePlan, foeWander, foeRoll, bodySep, bodyFly, boltHome, playerHurt, buildFoes,
   smoke: (x, y, z) => { smokeAt(x, y, z); return 'puff'; },
   hurt: (d, k) => playerHurt(d || 12, player.faceH + Math.PI, FOE.push, FOE.pushUp, FOE.stun, k == null ? 1 : k),
   heal: () => { player.hp = HEALTH.max; return 'full'; },
