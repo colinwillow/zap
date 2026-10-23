@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m905 -- NOBODY LANDS ON HIS FEET; rockets do not stun; a knockdown no longer heals a boss; weapons-as-keys hook
+*"The rocket launcher is also stunning... a character should never fly through the air and land on his feet... if it's not
+powerful enough to launch him off his feet, we have hit animations for that."*
+- KNOCKDOWN (`dummyBlow`, every body, not just the arena): a shove at or over `KNOCKDOWN.at` 3.2 m/s is now a `bodyLaunch` --
+  the fall clip, landing lying, the get-up; weaker shoves keep his feet on the ground (`knockUp`'s little hop is GONE: that hop
+  was the "lands on his feet"). Hick (knock 4.6): power .3 -> hit, vy 0; power 1 -> down.
+- `BLOW_SRC` is `rocket` for a rocket: no stun, and a raised shield is knocked wide by it whatever the power.
+- `bodyLaunch` reset `d.hp` to full on EVERY knockdown -- so knocking a boss down healed him. Arena bodies keep their damage now.
+- `K.resist[source]` scales damage per weapon (DUEL.md "Weapons as keys"); all 1 for now.
+
 ## m904 -- THE SKELETON WAS NEVER DRAWN ON HIS PHONE: a // comment ate two numbers (and the sound ran on)
 *"The electric sound effect is way too long... I really just want the zap when I hit him... I haven't seen the skeleton yet: he
 flashes and disappears, but there's no skeleton."*

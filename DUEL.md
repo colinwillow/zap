@@ -48,6 +48,18 @@ comes later (*"not initially, but later"*), and when it does it is the same tabl
    hits now go straight through. **Knock him down and finish him**: a charged hammer on a downed boss launches him, the
    slow-motion KO, the beam out (built at m893).
 
+## Weapons as keys (his, m905)
+
+*"Somebody will try to fight the boss with only the blaster. The blaster doesn't actually hurt the boss -- they try over and over
+and never beat him, and it turns out they have to go on a mission to get the weapon that beats the boss. Maybe that's the
+rocket launcher. A ton of this kind of tic-tac-toe, capability unlocked."*
+- Every blow carries its SOURCE (`BLOW_SRC`: `shot`, `rocket`, melee when empty), and a kind's `resist` table scales the
+  damage per source: `resist: { shot: 0 }` is a boss the blaster cannot hurt; `{ rocket: 2 }` one a rocket wrecks.
+  Hooked in at m905, every boss at 1 for now -- which boss needs which weapon is a design call.
+- The rule this needs: **a weapon that does nothing must LOOK like it does nothing** (sparks off, a clang, no flinch), so the
+  player learns "not this" from the screen, never from a health bar that will not move.
+- Already true: a raised shield stops the blaster and a ROCKET knocks it wide (m905).
+
 ## Size and weight
 
 Lifted from the culture_war arena (`sizeK`, B227), and true in both directions:
