@@ -7,7 +7,7 @@
     "check:syntax": "node tools/syntax.mjs index.html",
     "check:boot": "node tools/boot.mjs",
     "check:sim": "node tools/sim.mjs",
-    "check": "npm run check:syntax && npm run check:boot",
+    "check": "npm run check:syntax && npm run check:boot && node tools/forgesync.mjs",
     "clips": "node tools/clips.mjs",
     "gait": "node tools/gait.mjs",
     "rig": "node tools/rig.mjs",
@@ -27,7 +27,8 @@
     "play": "node tools/play.mjs",
     "shot": "node tools/shot.mjs",
     "worlds": "node tools/worlds.mjs",
-    "worlds:boot": "node tools/worlds.mjs --boot"
+    "worlds:boot": "node tools/worlds.mjs --boot",
+    "forge": "node tools/forge.cjs"
   },
   "type": "module",
   "devDependencies": {

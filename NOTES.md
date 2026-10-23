@@ -5,6 +5,33 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m928 -- THE FORGE, step 1: `forge.html` -- a body, the motion library, his pack, his PROFILE, export (app + command line)
+*"upload the character... tick little boxes of which animations you're adding to his pack... preview live... adjust... export"*.
+Design: `retarget-anims/DESIGN.md`. The idea it hangs on: a per-character PROFILE (pack + layers + later his FK keys), so a fix
+is made once and re-applies to every clip and every re-bake, instead of being baked into one GLB and lost on the next body.
+- **`forge.html` + `forge/app.js`** (desktop and phone): BODY (pick one of the cast or load a GLB/FBX; the measured hip height;
+  which bones never count), LIBRARY (2,288 motions: search + tag chips; a shared name is told apart by Mixamo's description
+  and length on the row; tap = preview on him, + = into the pack), PACK (role names the game asks for, editable), EXPORT
+  (clips-only GLB for me to merge, or character + clips). The library body plays beside him as a stick figure.
+- **`forge/core.js`**: `bindPose` and `retargetW` are the GAME's text, lifted verbatim (`tools/forgesync.mjs`, now part of
+  `npm run check` -- it fails if the two drift). New: `rigOf` (one spelling for every Mixamo rig: `mixamorig:`, `mixamorigHips`,
+  `mixamorig1:`), `skinInfo` (each sampled vertex's strongest bone; a non-Mixamo bone -- his TAIL, a marker -- never counts as
+  his body), and **LAYER 3, GROUND CONTACT**: per frame, his lowest skin point is put where the library body's lowest joint is
+  above its own rest low point, scaled by hip height. Keeps a jump a jump (the library body is off the ground too).
+- **`tools/forge.cjs`** (`npm run forge`): the same page headless -- `node tools/forge.cjs <char.glb> <profile.json> <out.glb>
+  --lib <folder>`. Zap 2 + 3 clips: 0.21 MB in seconds.
+- Measured on Zap 2 (tail: 8 bones, 161 sampled vertices excluded): Standard Run ground moves him up to 5 cm (mean 3), Jog Strafe
+  4 cm, Falling Back Death 23 cm (mean 13). **Seen, not fixed: lying on his back the TAIL goes through the floor** -- it holds its
+  rest angle out of his back. A tail layer (bend away from the floor) is the next thing for the "lands on his back" report.
+- Bug found and fixed on the way: the clip already on screen blended into the ground measurement (`stopAllAction` first).
+- Vendored three r180 addons: OrbitControls, TransformControls (for step 3's FK gizmo), GLTFExporter, FBXLoader (+ fflate,
+  NURBSCurve, NURBSUtils).
+- **The library is not online yet**: LIBRARY connects to a GitHub repo with a token kept in the browser (meant for the private
+  retarget-anims repo, `library/clips`), a local folder, or `?lib=<url>`. Pushing the Mixamo clips into the private repo waits on
+  his OK. Until then: desktop, "Use a local folder" on the extracted library.
+- Not built yet (DESIGN.md order): character sliders (stance width, arm space) + trim/speed/mirror (2), FK layer with the gizmo
+  (3), props + two-hand grip (4), packs as files + his own Y Bot clips (5), the game reading profiles at runtime (6).
+
 ## m927 -- ZAP 2 ON THE MOTION LIBRARY: an A/B hero, "ZAP (LIBRARY)", beside "ZAP"
 *"yeah lets do it"* -- step 3 of the library plan: re-animate Zap 2 from the Mixamo library (Y Bot), keeping his custom set.
 - **28 of his 61 clips come from the library**, picked BY DATA (`retarget-anims/tools/identify.cjs`, sure + the likely ones
