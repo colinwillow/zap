@@ -27,7 +27,7 @@ levels later. **Each sandbox is tuned until it feels great on its own before any
   - [ ] f. tune on his phone until he signs it off.
 - [ ] **WHITE BOX HUB**: the arena is the one sandbox world; a MODE switch on its menu (DUEL / TRANSFORM / ...), so
       every sandbox lives in one place. (Small; can ride with the DUEL's first build.)
-- [ ] **TRANSFORMATION** : `TRANSFORM.md` -- a civilian turns into his alien region by
+- [ ] **TRANSFORMATION -- OPEN** (m910: the wrapped proxies + the MORPH test in the arena, hick <-> Zap, BLEND / GROW) : `TRANSFORM.md` -- a civilian turns into his alien region by
       region from the wound (veins, bulge, green, armour bursts out, the cry); triggers: drink, alien syringe/beacon, Zap's
       stab/dart, debug toggle; a speed slider.
 - [ ] **STUN ZAP -- OPEN** (m901: STUN toggle, x-ray strobe + daze, fitted skeleton on any rig; next: the DNA CLAW): `STUN.md` -- Zap's stun shot strobes the victim between his body and an x-ray
