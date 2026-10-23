@@ -26,6 +26,30 @@ Spreads outward **from where he was stuck** (the wound, or the mouth for the dri
 3. **The cry.** At the end he throws his head back and roars (the werewolf howl), and the full alien stands there.
 4. **And back again**, the reverse (Zap's cure, later the story).
 
+## The layered transformation (his, Oct 23 2026)
+
+*"The armour splitting -- two versions of the hybrid alien civilian -- is additive with the morph. The spikes, if they're separate,
+shoot from the inside of the mesh to the outside a split second after the morph... secondary, tertiary, staggered: the morph, a
+bulge of one arm, the other arm, the werewolf roar, and then the spikes shoot out."*
+Four layers, each its own system and its own timing (all live dials):
+1. **The morph** -- the proxy wave (m910): human proxy -> alien BARE-body proxy, out from the sting.
+2. **The bulges** -- region by region (arm, other arm, chest...), a normal-push pulse a beat AHEAD of the wave.
+3. **The roar** -- his roar / taunt clip as the morph lands.
+4. **The armour and the spikes** -- the `armor_<bone>` pieces (armorfit.py), each on its bone: they start scaled down INSIDE the
+   body and fire out along the normals with an overshoot spring, a spark and a clang, in the wave's region order. Spikes are their
+   own pieces (Tripo segmentation, or cut from the plates), last and fastest.
+
+| t (s) | beat |
+|---|---|
+| 0.0 | the sting / the drink: veins light from the wound |
+| 0.2-1.2 | the wave: each region bulges, then turns |
+| 1.2 | the roar |
+| 1.3-1.7 | the plates shoot out, region by region; the spikes punch through last |
+| 1.8 | the real alien |
+
+Needs: every alien form built as BARE BODY + separate armour (the Warboss way); spikes separate where possible. The pop-out can be
+prototyped NOW on the Warboss's 19 pieces (an "armour up" beam-in).
+
 ## How it can be built (the plan, before the wrap pipeline exists)
 
 Both bodies are **Mixamo rigs**, so it works without shared topology:
