@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m929 -- THE FORGE, step 2: clips from ANY character (old Zap's whole set onto a new body), his sliders, trim/speed, flip through
+*"extract all of [old Zap's] animations... upload a completely different proportion character... transfer all the animations...
+flip through one by one... adjust the parts that need adjustments and then export -- that's the golden workflow"*.
+- **LIBRARY -> "A character's clips"**: pick anyone in the cast, or upload a GLB/FBX (kept in the browser, IndexedDB). EVERY take
+  in the file becomes a clip -- an FBX of many takes included. "Add all to his pack" takes the lot. Old Zap: 61 clips, his
+  single-frame poses (rocket_launcher) included. `prepDonor` reads the donor's bind pose ONCE at load, before any mixer.
+- **◀ ▶** beside play steps through his pack.
+- **His sliders (BODY), every clip, before ground contact**: stance width (feet out from his centre line, legs re-solved, knee
+  kept in its plane), arms out (both upper arms about his forward axis -- the penguin fix), lean (spine about his left axis).
+  Measured on the fat biker, old Zap's run_fwd at 0.2 s: stance 1.4 = feet 34.3 -> 43.1 cm apart, arms 20 = hands 32.1 -> 39.9,
+  lean 10 = head 4 cm forward. (+X is his left; the hands moved to +X on the left, as they should.)
+- **This clip (PACK)**: trim start/end and speed, kept per clip in his profile. `editLayer` runs last.
+- Tested headless: old Zap's set onto the fat biker and the CEO, no page errors. Shipped unverified on a phone.
+
 ## m928 -- THE FORGE, step 1: `forge.html` -- a body, the motion library, his pack, his PROFILE, export (app + command line)
 *"upload the character... tick little boxes of which animations you're adding to his pack... preview live... adjust... export"*.
 Design: `retarget-anims/DESIGN.md`. The idea it hangs on: a per-character PROFILE (pack + layers + later his FK keys), so a fix

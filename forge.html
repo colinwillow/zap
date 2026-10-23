@@ -62,10 +62,10 @@ label.sw { display:flex; gap:8px; align-items:center; }
 </head>
 <body>
 <div id="app">
-  <div id="top"><b>FORGE</b><span class="bld">f1</span><span class="who" id="who">no character</span></div>
+  <div id="top"><b>FORGE</b><span class="bld">f2</span><span class="who" id="who">no character</span></div>
   <div id="view"><div id="chip"></div><div id="busy">working…</div></div>
   <div id="time">
-    <button class="btn" id="play">❚❚</button>
+    <button class="btn" id="prev">◀</button><button class="btn" id="play">❚❚</button><button class="btn" id="next">▶</button>
     <input type="range" id="scrub" min="0" max="1000" value="0">
     <span id="tlab" style="font:12px ui-monospace,monospace;color:var(--dim);min-width:84px;text-align:right">0.00 / 0.00</span>
     <select id="speed" style="width:70px"><option>0.25</option><option>0.5</option><option selected>1</option><option>2</option></select>
@@ -83,12 +83,28 @@ label.sw { display:flex; gap:8px; align-items:center; }
       <label class="sw"><input type="checkbox" id="lFeet" checked> Feet (hip width / leg length, knees aimed)</label>
       <div class="slider"><span>Ground contact</span><input type="range" id="lGround" min="0" max="1" step="0.05" value="1"><span id="lGroundV">1.00</span></div>
       <div class="note">Puts his lowest skin point where the library body's lowest point is (scaled), every frame. Tail and markers never count.</div>
-      <label class="sw"><input type="checkbox" id="ghost" checked> Show the library body beside him</label>
+      <label class="sw"><input type="checkbox" id="ghost" checked> Show the source body beside him</label>
+      <h3>His sliders (every clip)</h3>
+      <div class="slider"><span>Stance width</span><input type="range" id="aStance" min="0.6" max="1.8" step="0.02" value="1"><span id="aStanceV">1.00</span></div>
+      <div class="slider"><span>Arms out °</span><input type="range" id="aArms" min="-20" max="40" step="1" value="0"><span id="aArmsV">0</span></div>
+      <div class="slider"><span>Lean °</span><input type="range" id="aLean" min="-20" max="30" step="1" value="0"><span id="aLeanV">0</span></div>
+      <div class="note">Stance moves both feet out from his centre line and re-solves the legs. Arms opens both upper arms (the penguin fix). Lean tips the spine. Ground contact runs after them.</div>
       <h3>Never counts as his body</h3>
       <div class="note" id="exNote"></div>
     </div>
 
     <div class="pane" id="p-lib">
+      <div class="row" id="srcSw"><button class="btn ac" data-s="lib">Mixamo library</button><button class="btn" data-s="don">A character's clips</button></div>
+      <div id="donPane" hidden>
+        <h3>Take clips from a character</h3>
+        <div class="row"><select id="donSel"></select></div>
+        <div class="row"><button class="btn" id="donFileBtn">Upload GLB / FBX (one or many takes)…</button><input type="file" id="donFile" accept=".glb,.gltf,.fbx" hidden></div>
+        <div class="note">An upload is kept in this browser. Every take in it becomes a clip.</div>
+        <div class="row"><button class="btn ac" id="donAll" hidden>Add all to his pack</button></div>
+        <div class="note" id="donNote"></div>
+        <div class="list" id="donList"></div>
+      </div>
+      <div id="libPane">
       <h3>Library</h3>
       <div class="note" id="libNote">not connected</div>
       <div id="libSetup">
@@ -106,12 +122,19 @@ label.sw { display:flex; gap:8px; align-items:center; }
         <div class="list" id="libList"></div>
         <div class="row" style="margin-top:8px"><button class="btn" id="libReset">Change library</button></div>
       </div>
+      </div>
     </div>
 
     <div class="pane" id="p-pack">
       <h3>His pack</h3>
       <div class="note">The name on the left is the ROLE the game asks for (walk_fwd, run_fwd…). Tap a clip to preview it.</div>
       <div class="list" id="packList"></div>
+      <div id="edit" hidden>
+        <h3 id="editH">This clip</h3>
+        <div class="slider"><span>Start s</span><input type="range" id="eA" min="0" max="1" step="0.01" value="0"><span id="eAV">0</span></div>
+        <div class="slider"><span>End s</span><input type="range" id="eB" min="0" max="1" step="0.01" value="1"><span id="eBV">1</span></div>
+        <div class="slider"><span>Speed ×</span><input type="range" id="eS" min="0.25" max="2" step="0.05" value="1"><span id="eSV">1</span></div>
+      </div>
       <h3>Profile</h3>
       <div class="note">Everything about this character: his pack, his layers. Saved in this browser per character; download it to keep it in the repo.</div>
       <div class="row"><button class="btn" id="profSave">Download profile</button><button class="btn" id="profLoadBtn">Load profile…</button></div>
@@ -129,6 +152,6 @@ label.sw { display:flex; gap:8px; align-items:center; }
     </div>
   </div>
 </div>
-<script type="module" src="./forge/app.js?v=f1"></script>
+<script type="module" src="./forge/app.js?v=f2"></script>
 </body>
 </html>

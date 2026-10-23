@@ -165,14 +165,91 @@ export function prepTarget(model, opts = {}) {
   const mixer = new THREE.AnimationMixer(model);
   return { model, rig, T, info, hipH: hp.y - restLow, restLow, up, mixer };
 }
-// ---- a source: one library clip (skeleton only)
-export function prepSource(scene, clip) {
+// ---- a source: one library clip (skeleton only), or a DONOR -- any character with clips of his own (old Zap, an FBX of takes).
+// A donor's bind pose is read ONCE, at load, before any mixer has touched him; every clip of his then shares it.
+export function prepSource(scene, clip) { return prepDonor(scene, [clip])[0]; }
+export function prepDonor(scene, clips) {
   scene.updateMatrixWorld(true);
   const rig = rigOf(scene); scene.updateMatrixWorld(true);
   const S = bindPose(rig.bones, scene);
-  if (!S) throw new Error('library clip has no mixamorig_Hips');
+  if (!S) throw new Error('no mixamorig_Hips in that file');
   const hp = rig.bones[MHIPS].getWorldPosition(new THREE.Vector3()), restLow = lowestJoint(rig.bones);
-  return { scene, rig, S, clip, hipH: hp.y - restLow, restLow, mixer: new THREE.AnimationMixer(scene) };
+  const mixer = new THREE.AnimationMixer(scene);
+  for (const c of clips) for (const t of c.tracks) { const d = t.name.lastIndexOf('.'), c2 = canonName(t.name.slice(0, d)); t.name = c2 + t.name.slice(d); }
+  return clips.map(clip => ({ scene, rig, S, clip, hipH: hp.y - restLow, restLow, mixer }));
+}
+
+// ---- LAYER 4, HIS SLIDERS -- whole character, every clip, before the ground (so contact is still right after them).
+//   stance  x hip width: each foot moved sideways from the hips' centre line, the leg re-solved (two bones, knee kept in its plane)
+//   arms    degrees: both upper arms opened out about his forward axis -- the penguin fix
+//   lean    degrees: the spine tipped forward (+) or back about his left axis
+// Done on the POSED body frame by frame, so it is the same adjustment whatever the clip is doing. +X is his left: forward is
+// left x up.
+const _q = new THREE.Quaternion(), _q2 = new THREE.Quaternion(), _a = new THREE.Vector3(), _b = new THREE.Vector3();
+function setWorldQ(bone, wq) { bone.parent.getWorldQuaternion(_q2); bone.quaternion.copy(_q2.invert().multiply(wq)); bone.updateMatrixWorld(true); }
+function legTo(B, up, kn, ft, target) {
+  const H = B[up].getWorldPosition(new THREE.Vector3()), K = B[kn].getWorldPosition(new THREE.Vector3()), F = B[ft].getWorldPosition(new THREE.Vector3());
+  const footW = B[ft].getWorldQuaternion(new THREE.Quaternion());
+  const a = K.distanceTo(H), b = F.distanceTo(K), d = target.clone().sub(H), dl = Math.max(1e-6, Math.min(d.length(), (a + b) * .999)), n = d.normalize();
+  const x = (a * a - b * b + dl * dl) / (2 * dl), h = Math.sqrt(Math.max(0, a * a - x * x));
+  const pole = K.clone().sub(H); pole.addScaledVector(n, -pole.dot(n)); if (pole.lengthSq() < 1e-12) return;
+  const K2 = H.clone().addScaledVector(n, x).addScaledVector(pole.normalize(), h), F2 = H.clone().addScaledVector(n, dl);
+  const uw = B[up].getWorldQuaternion(new THREE.Quaternion());
+  setWorldQ(B[up], _q.setFromUnitVectors(K.clone().sub(H).normalize(), K2.clone().sub(H).normalize()).multiply(uw));
+  const Kn = B[kn].getWorldPosition(new THREE.Vector3()), Fn = B[ft].getWorldPosition(new THREE.Vector3()), kw = B[kn].getWorldQuaternion(new THREE.Quaternion());
+  setWorldQ(B[kn], _q.setFromUnitVectors(Fn.sub(Kn).normalize(), F2.clone().sub(Kn).normalize()).multiply(kw));
+  setWorldQ(B[ft], footW);
+}
+export function adjustLayer(tg, clip, A) {
+  const st = +A.stance || 1, arms = (+A.arms || 0) * Math.PI / 180, lean = (+A.lean || 0) * Math.PI / 180;
+  if (st === 1 && !arms && !lean) return clip;
+  const B = tg.rig.bones, M = 'mixamorig_', has = n => !!B[M + n];
+  const touched = [];
+  if (st !== 1 && ['LeftUpLeg', 'LeftLeg', 'LeftFoot', 'RightUpLeg', 'RightLeg', 'RightFoot'].every(has)) touched.push('LeftUpLeg', 'LeftLeg', 'LeftFoot', 'RightUpLeg', 'RightLeg', 'RightFoot');
+  if (arms && has('LeftArm') && has('RightArm')) touched.push('LeftArm', 'RightArm');
+  const spine = has('Spine') ? 'Spine' : null; if (lean && spine) touched.push(spine);
+  if (!touched.length) return clip;
+  const hipTr = clip.tracks.find(t => t.name === MHIPS + '.position') || clip.tracks[0], times = hipTr.times, n = times.length;
+  const out = {}; for (const b of new Set(touched)) out[b] = new Float32Array(n * 4);
+  tg.mixer.stopAllAction(); const ta = tg.mixer.clipAction(clip); ta.play();
+  const UP = new THREE.Vector3(0, 1, 0);
+  for (let f = 0; f < n; f++) {
+    ta.time = times[f]; tg.mixer.update(0); tg.model.updateMatrixWorld(true);
+    const lh = B[M + 'LeftUpLeg'].getWorldPosition(new THREE.Vector3()), rh = B[M + 'RightUpLeg'].getWorldPosition(new THREE.Vector3());
+    const L = lh.clone().sub(rh); L.y = 0; const hw = L.length(); L.normalize(); const fwd = L.clone().cross(UP).normalize();
+    if (lean && spine) { const w = B[M + spine].getWorldQuaternion(new THREE.Quaternion()); setWorldQ(B[M + spine], _q.setFromAxisAngle(L, lean).multiply(w)); }
+    if (arms) for (const [side, sg] of [['Left', 1], ['Right', -1]]) { const bn = B[M + side + 'Arm'], w = bn.getWorldQuaternion(new THREE.Quaternion()); setWorldQ(bn, _q.setFromAxisAngle(fwd, sg * arms).multiply(w)); }
+    if (st !== 1 && out.LeftUpLeg) {
+      const d = (st - 1) * hw / 2;
+      for (const [side, sg] of [['Left', 1], ['Right', -1]]) {
+        const F = B[M + side + 'Foot'].getWorldPosition(new THREE.Vector3()).addScaledVector(L, sg * d);
+        legTo(B, M + side + 'UpLeg', M + side + 'Leg', M + side + 'Foot', F);
+      }
+    }
+    for (const b in out) { const q = B[M + b].quaternion; out[b].set([q.x, q.y, q.z, q.w], f * 4); }
+  }
+  ta.stop(); tg.mixer.uncacheClip(clip);
+  const names = new Set(Object.keys(out).map(b => M + b + '.quaternion'));
+  const tracks = clip.tracks.filter(t => !names.has(t.name)).concat(Object.keys(out).map(b => new THREE.QuaternionKeyframeTrack(M + b + '.quaternion', times, out[b])));
+  return new THREE.AnimationClip(clip.name, clip.duration, tracks);
+}
+
+// ---- LAYER 7, CLIP EDITS: trim (seconds in the source) and speed
+export function editLayer(clip, E) {
+  if (!E) return clip;
+  let c = clip; const a = Math.max(0, +(E.trim && E.trim[0]) || 0), b = Math.min(c.duration, E.trim && E.trim[1] > 0 ? +E.trim[1] : c.duration);
+  if (a > 0 || b < c.duration) {
+    const tracks = c.tracks.map(t => { const ts = t.times, sz = t.getValueSize(), keep = [];
+      for (let i = 0; i < ts.length; i++) if (ts[i] >= a - 1e-4 && ts[i] <= b + 1e-4) keep.push(i);
+      if (!keep.length) keep.push(0);
+      const nt = new Float32Array(keep.length), nv = new Float32Array(keep.length * sz);
+      keep.forEach((i, j) => { nt[j] = ts[i] - a; for (let k = 0; k < sz; k++) nv[j * sz + k] = t.values[i * sz + k]; });
+      return new t.constructor(t.name, nt, nv); });
+    c = new THREE.AnimationClip(c.name, b - a, tracks);
+  }
+  const sp = +E.speed || 1;
+  if (sp !== 1) c = new THREE.AnimationClip(c.name, c.duration / sp, c.tracks.map(t => new t.constructor(t.name, t.times.map(x => x / sp), t.values)));
+  return c;
 }
 
 // ---- LAYER 3, GROUND CONTACT. Per frame: how far the library body's lowest joint is above where it is standing at rest, scaled
@@ -207,11 +284,12 @@ export function carry(tg, src, role, P) {
   const r = retargetW(src.S, tg.T, { [role]: src.clip }, tg.rig.bones);
   if (!r || !r.clips[role]) throw new Error('nothing carried for ' + role);
   let clip = r.clips[role]; const rep = { hipW: RTW.hr, leg: RTW.lr, ms: RTW.ms };
+  if (P.adjust) clip = adjustLayer(tg, clip, P.adjust);
   if (P.layers.ground) { const g = groundLayer(tg, src, clip, P.layers.ground); clip = g.clip; rep.groundMax = g.max; rep.groundMean = g.mean; }
   return { clip, rep };
 }
 
 // ---- a profile, empty
 export function newProfile(file) {
-  return { v: 1, character: file || '', exclude: [], layers: { feet: 1, ground: 1 }, clips: [] };
+  return { v: 1, character: file || '', exclude: [], layers: { feet: 1, ground: 1 }, adjust: { stance: 1, arms: 0, lean: 0 }, clips: [] };
 }
