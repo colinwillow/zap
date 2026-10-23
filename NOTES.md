@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m917 -- the morph is ONE body: BLEND, live pose (m915 misread him)
+*"You put it back so that he goes into a T-pose for the transform -- that's not what I wanted. And in the middle step you can see
+both models. We want a perfect blend, we don't want to see two of the same model at the same time."* m915 read "when it was
+T-pose it was really cinematic" as a request; it was not. Defaults now: `ARENA.morph.mode` 'BLEND' (one mesh: shape mix(A, B, w),
+skin mix(mapA, mapB, w), the bulge on the wave front) and `boss.pose` 'LIVE'. GROW (two meshes, old sinking, new swelling) and
+the T-pose beats stay on the arena bar as switches, off. **Ask before reading a remark as a request.**
+
 ## m916 -- the Skullback held his maul upside down
 *"The lizard boss -- his weapon is facing the wrong pole... he's holding it upside down."* Both weapon files carry the head at
 +Z with the grip at the origin (width by z-bin: maul head at z 1.0-1.75, cleaver blade 0-.85). The difference is the RIG: on
