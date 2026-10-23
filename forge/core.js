@@ -110,7 +110,45 @@ function retargetW(S, T, srcClips, bones) {
   return { clips, shared, k: k0, worst: 0, worstN: '', hips: 2 * Math.acos(Math.min(1, Math.abs(D0.w))) * 180 / Math.PI };
 }
 // /SHIPPED:retargetW
-export { bindPose, retargetW };
+
+// SHIPPED:ZAP_MOUNT
+const ZAP_MOUNT = {
+  weapon_root_right: { side: 'Right', q: [.1361, .98742, -.04709, .06534], o: [1.12363, -.13667, -.37014], tip: 'weapon_tip_2', dir: [-1, 0, 0], k: 1.8955 },
+  weapon_root_left: { side: 'Left', q: [-.04708, -.06533, .13611, -.98741], o: [.98914, -.30095, .27493], tip: 'weapon_tip', dir: [1, 0, 0], k: 2.5069 } };
+// /SHIPPED:ZAP_MOUNT
+
+// SHIPPED:handFrame
+function handFrame(hand, side) {
+  const ch = nm => hand.children.find(c => c.isBone && c.name.endsWith(side + 'Hand' + nm));
+  const m = ch('Middle1'), i = ch('Index1'), p = ch('Pinky1'); if (!m || !i || !p) return null;
+  const len = m.position.length(), f = m.position.clone().normalize(), t = i.position.clone().sub(p.position);
+  t.addScaledVector(f, -t.dot(f)).normalize();
+  return { q: new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(f, t, new THREE.Vector3().crossVectors(f, t))), len };
+}
+// /SHIPPED:handFrame
+
+// SHIPPED:mountPlace
+function mountPlace(hand, name, m) {
+  const Z = ZAP_MOUNT[name], F = Z && hand && handFrame(hand, Z.side); if (!F) return false;
+  m.quaternion.copy(F.q).multiply(new THREE.Quaternion(...Z.q)); m.position.set(...Z.o).multiplyScalar(F.len).applyQuaternion(F.q); m.scale.set(1, 1, 1);
+  let tip = m.children.find(c => c.name === Z.tip); if (!tip) { tip = new THREE.Object3D(); tip.name = Z.tip; m.add(tip); }
+  tip.position.set(...Z.dir).multiplyScalar(Z.k * F.len); tip.quaternion.identity(); m.userData.zapConf = 1;
+  return true;
+}
+// /SHIPPED:mountPlace
+
+// SHIPPED:SOCKET_BASIS
+const SOCKET_BASIS = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(new THREE.Vector3(0, 0, 1), new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0)));
+// /SHIPPED:SOCKET_BASIS
+
+// SHIPPED:socketAuto
+function socketAuto(hand, side) {
+  const F = hand && handFrame(hand, side), Z = ZAP_MOUNT['weapon_root_' + side.toLowerCase()]; if (!F || !Z) return null;
+  return { p: new THREE.Vector3(...Z.o).multiplyScalar(F.len).applyQuaternion(F.q), q: F.q.clone().multiply(SOCKET_BASIS), len: F.len };
+}
+// /SHIPPED:socketAuto
+
+export { bindPose, retargetW, ZAP_MOUNT, handFrame, mountPlace, SOCKET_BASIS, socketAuto };
 
 // ---- names: one spelling for every Mixamo rig. FBX gives `mixamorig:Hips`, GLTFLoader's sanitiser `mixamorigHips`, Blender's
 // glTF `mixamorig_Hips`; a second rig in a scene can be `mixamorig1:`. All become `mixamorig_Hips`, written ON the node, so the
@@ -165,10 +203,30 @@ export function prepTarget(model, opts = {}) {
   const mixer = new THREE.AnimationMixer(model);
   // his rest pose, every node, as LOCAL transforms -- `skeleton.pose()` cannot give it back: it treats a root bone's world matrix
   // as its local one, which collapses any rig whose armature carries a scale (the 0.01 most of the cast has)
-  const snap = []; model.traverse(o => snap.push([o, o.position.clone(), o.quaternion.clone(), o.scale.clone()]));
+  // (not what the Forge hangs on him itself -- sockets, mounts, a prop: those keep whatever they were last set to)
+  const mine = o => { for (let x = o; x; x = x.parent) if (x.userData.forgeMade || /^forge_/.test(x.name)) return true; return false; };
+  const snap = []; model.traverse(o => { if (!mine(o)) snap.push([o, o.position.clone(), o.quaternion.clone(), o.scale.clone()]); });
   const restore = () => { mixer.stopAllAction(); for (const [o, p, q, sc] of snap) { o.position.copy(p); o.quaternion.copy(q); o.scale.copy(sc); } model.updateMatrixWorld(true); };
   return { model, rig, T, info, hipH: hp.y - restLow, restLow, up, mixer, restore, snap };
 }
+// ---- SOCKETS on his hands (`socket_hand_r` / `_l`, the game's convention -- see `socketAuto`). A rig that already carries one
+// keeps it; otherwise it is placed by his hand's own frame, or where his profile says (an adjusted one is marked `forged`, which
+// is what the game reads back out of a bake). Made AFTER the rest snapshot, so `restore` never moves them.
+export const SOCKETS = { Right: 'socket_hand_r', Left: 'socket_hand_l' };
+export function socketsOf(tg, saved) {
+  const out = {};
+  for (const sd of ['Right', 'Left']) {
+    const hand = tg.rig.bones['mixamorig_' + sd + 'Hand']; if (!hand) continue;
+    let s = tg.model.getObjectByName(SOCKETS[sd]); const own = !!s && !s.userData.forgeMade;
+    if (!s) { s = new THREE.Object3D(); s.name = SOCKETS[sd]; s.userData.forgeMade = 1; hand.add(s); }
+    const A = socketAuto(hand, sd), sv = saved && saved[sd];
+    if (sv) { s.position.fromArray(sv.p); s.quaternion.fromArray(sv.q); s.userData.forged = 1; }
+    else if (!own && A) { s.position.copy(A.p); s.quaternion.copy(A.q); s.userData.forged = 0; }
+    out[sd] = { node: s, hand, auto: A, own };
+  }
+  return out;
+}
+
 // ---- a source: one library clip (skeleton only), or a DONOR -- any character with clips of his own (old Zap, an FBX of takes).
 // A donor's bind pose is read ONCE, at load, before any mixer has touched him; every clip of his then shares it.
 export function prepSource(scene, clip) { return prepDonor(scene, [clip])[0]; }

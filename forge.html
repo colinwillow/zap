@@ -62,7 +62,7 @@ label.sw { display:flex; gap:8px; align-items:center; }
 </head>
 <body>
 <div id="app">
-  <div id="top"><b>FORGE</b><span class="bld">f6</span><span class="who" id="who">no character</span></div>
+  <div id="top"><b>FORGE</b><span class="bld">f7</span><span class="who" id="who">no character</span></div>
   <div id="view"><div id="chip"></div><div id="busy">working…</div></div>
   <div id="time">
     <button class="btn" id="prev">◀</button><button class="btn" id="play">❚❚</button><button class="btn" id="next">▶</button>
@@ -161,10 +161,12 @@ label.sw { display:flex; gap:8px; align-items:center; }
       <div class="row"><select id="propSel"></select><select id="propHand" style="flex:none;width:90px"><option value="Right">Right</option><option value="Left">Left</option></select></div>
       <div class="row"><button class="btn" id="propFileBtn">Upload a prop GLB…</button><input type="file" id="propFile" accept=".glb,.gltf" hidden></div>
       <div class="row" id="gzMode"><button class="btn ac" data-m="bone">Bone</button><button class="btn" data-m="move">Move prop</button><button class="btn" data-m="turn">Turn prop</button><button class="btn" data-m="grip">Grip point</button></div>
+      <div class="row" id="gzMode2"><button class="btn" data-m="smove">Move socket</button><button class="btn" data-m="sturn">Turn socket</button><button class="btn" id="sockReset">Reset socket</button></div>
       <div class="slider"><span>Prop size ×</span><input type="range" id="pSize" min="0.25" max="3" step="0.05" value="1"><span id="pSizeV">1.00</span></div>
       <label class="sw"><input type="checkbox" id="gripOn"> The other hand grips it</label>
       <div class="slider"><span>Reach</span><input type="range" id="gReach" min="0" max="1" step="0.05" value="1"><span id="gReachV">1.00</span></div>
-      <div class="note">A prop built around a <code>weapon_root</code> joint sits in the hand with no adjusting. Move / Turn / Size fit it to this body; the yellow ball is where the other hand holds it. Kept per clip.</div>
+      <div class="note" id="sockNote"></div>
+      <div class="note">SOCKETS (<code>socket_hand_r</code> / <code>_l</code>) are where a hand holds a thing: origin in the grip, blue (+Z) along the handle out of the thumb side, green (+Y) the way the fingers point. Placed from his hand automatically; fix one once and every prop on that hand follows -- in the game too, through his bake. A prop with a <code>socket</code> node drops straight in. A Zap weapon (<code>weapon_root</code>) sits where it sat in old Zap's hand. Move / Turn / Size fit it to this body; the yellow ball is where the other hand holds it. Kept per clip.</div>
       <div class="row"><button class="btn" id="propAll">Use this prop + grip on every clip</button></div>
       <h3>Keys in this clip</h3>
       <div class="list" id="keyList"></div>
@@ -182,6 +184,6 @@ label.sw { display:flex; gap:8px; align-items:center; }
     </div>
   </div>
 </div>
-<script type="module" src="./forge/app.js?v=f6"></script>
+<script type="module" src="./forge/app.js?v=f7"></script>
 </body>
 </html>

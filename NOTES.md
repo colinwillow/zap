@@ -5,6 +5,27 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m935 -- SOCKETS: `socket_hand_r` / `socket_hand_l`, where a hand holds a thing -- in the Forge AND the game
+*"Mixamo doesn't add a weapon joint... make it so we have the ability to add the weapon joints and adjust them... maybe they're
+hand item position joints -- a soda, a gun, a pole, a cat"*. The standard: Unreal calls them sockets (hand_r -> weapon_r), Unity
+a hand attach, Godot a BoneAttachment3D -- one idea, a named point on the hand with a position and an orientation.
+- **The convention** (`SOCKET_BASIS`, `socketAuto` in the game; lifted verbatim into forge/core.js by forgesync, now with consts):
+  origin in the grip (old Zap's weapon point, `ZAP_MOUNT.o`), **+Z along the handle out of the thumb side, +Y the way the fingers
+  point**, +X = Y x Z. Placed from the hand's own frame (`handFrame`: hand->Middle1 and the Pinky1->Index1 knuckle line), so any
+  rig with fingers gets both, however its bones are oriented. A rig that already carries a socket keeps it.
+- **Forge**: sockets made on load (after the rest snapshot), drawn as axis triads in POSE; Move / Turn / Reset socket. An
+  adjusted one is saved in the profile and marked `forged` (exported as glTF extras). Props now mount by what they are built
+  around: a `socket` node -> his socket, identity; a `weapon_root*` -> his own joint of that name (identity, old Zap) else where
+  old Zap held it in a hand like his (`mountPlace`), sized by hand length (old Zap's hand is 7.55 cm in his file) and moved by his
+  socket's adjustment; nothing -> his socket at the file's units (the cleaver and the maul are bare meshes: fit by hand).
+- **Game** (`forgedSocket` in `mphMounts`, `FORGED.sockets` from a bake's `forged` sockets): a disguise's weapon mount on that
+  hand moves by the same hand-local delta (user x auto^-1).
+- **Fixed on the way**: the rest snapshot captured the Forge's own nodes, so `restore` (every export) put an adjusted socket back
+  to auto. The snapshot now skips anything the Forge hangs on him (`forgeMade` / `forge_*`).
+- Tested headless: the launcher on old Zap (his own weapon_root_right), the hick and the fat biker (old Zap's grip from their own
+  hands) -- the same grip on all three by eye. A hick profile with the right socket moved 3 cm and turned 30 deg -> baked -> the
+  game read the socket back exactly and the weapon mount moved with it. Test bake removed. MCP: `set_socket`.
+
 ## m934 -- THE FORGE FOR AGENTS: `window.forge`'s verbs, driven by an MCP server (retarget-anims/mcp)
 *"everybody's using agents -- designing tools that have MCP, that the agent can run, is crucial"*.
 - `forge/app.js` gains the agent's verbs on `window.forge`: `state`, `characters`, `props`, `search`, `packs`/`applyPack`,

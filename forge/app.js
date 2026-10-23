@@ -69,7 +69,7 @@ async function setCharacter(buf, name) {
     ST.file = name;
     const saved = localStorage.getItem(profKey(name));
     ST.P = saved ? JSON.parse(saved) : F.newProfile(name);
-    ST.tg = F.prepTarget(model, { exclude: ST.P.exclude });
+    ST.tg = F.prepTarget(model, { exclude: ST.P.exclude }); ST.sock = F.socketsOf(ST.tg, ST.P.sockets); sockAxes();
     ST.own = g.animations || [];
     scene.add(model);
     const H = ST.tg.hipH * 2.2; orbit.target.set(-H * .45, H * .45, 0); cam.position.set(H * .6, H * .6, H * 3.1);
@@ -298,7 +298,7 @@ $('profPush').onclick = async () => {
     $('profNote').innerHTML = '<span class="ok">saved to the library as profiles/' + stemOf(ST.file) + '.json</span> -- tell Claude "bake ' + stemOf(ST.file) + '" and it goes into the game';
   } catch (e) { $('profNote').innerHTML = '<span class="bad">' + e.message + '</span>'; } };
 $('profLoad').onchange = async () => { const f = $('profLoad').files[0]; if (!f) return; ST.P = JSON.parse(await f.text()); saveProf(); await reprep(); renderPack(); };
-async function reprep() { if (!ST.tg) return; const m = ST.tg.model; ST.tg.restore(); ST.tg = F.prepTarget(m, { exclude: ST.P.exclude }); syncSliders(); dotsBuild(); }
+async function reprep() { if (!ST.tg) return; const m = ST.tg.model; ST.tg.restore(); ST.tg = F.prepTarget(m, { exclude: ST.P.exclude }); ST.sock = F.socketsOf(ST.tg, ST.P.sockets); sockAxes(); syncSliders(); dotsBuild(); }
 
 // ---------------------------------------------------------------- packs: roles and where each comes from, nothing about a body
 const packKey = 'forge.packs';
@@ -428,7 +428,7 @@ renderer.domElement.addEventListener('pointerup', e => {
   dotBones.forEach((b, i) => { b.getWorldPosition(pr); pr.project(cam); const d = Math.hypot((pr.x - v.x) * r.width / 2, (pr.y - v.y) * r.height / 2); if (d < bd) { bd = d; best = i; } });
   if (best >= 0 && bd < 28) selectBone(dotBones[best].name);
 });
-function poseMode(on) { POSE.on = on; if (dots) dots.visible = on; if (on) { boneMenu(); showPose(); } else gizmo.detach(); }
+function poseMode(on) { POSE.on = on; if (dots) dots.visible = on; sockAxes(); if (on) { boneMenu(); showPose(); } else gizmo.detach(); }
 for (const id of ['spL', 'spW']) $(id).addEventListener('click', () => { if (POSE.mode === 'bone') gizmo.setSpace(POSE.space); });
 
 // ---------------------------------------------------------------- PROPS: a weapon in his hand, the other hand on it
@@ -453,35 +453,68 @@ function gripOf(en) {
   return { bone: P.bone, M: M.toArray(), off: G.off, side: P.hand === 'Right' ? 'Left' : 'Right', reach: +G.reach };
 }
 const PR = { holder: null, marker: null };
+const ZAP_HAND = .0755;   // old Zap's hand (wrist -> middle knuckle) in his file, metres: a Zap weapon is sized to THAT hand
+// where a prop hangs, by what the prop is built around:
+//   a `socket` node      -> his socket, identity (the prop's socket frame ON his)
+//   a `weapon_root*`     -> his own joint of that name if he has one (identity, as in the game), else where old Zap held it in a
+//                           hand like his (`mountPlace`), moved by however far his socket has been adjusted
+//   nothing              -> his socket, sized by the file's units
+function propMount(en, sc) {
+  const P = en.prop, sd = P.hand, S = ST.sock && ST.sock[sd]; if (!S) return null;
+  let root = null, sock = null; sc.traverse(o => { if (!root && /^weapon_root/.test(o.name)) root = o; if (!sock && /^socket/.test(o.name)) sock = o; });
+  const hlen = S.hand.getWorldPosition(new THREE.Vector3()).distanceTo(S.hand.children.find(c => c.isBone && /Middle1$/.test(c.name)) ? S.hand.children.find(c => c.isBone && /Middle1$/.test(c.name)).getWorldPosition(new THREE.Vector3()) : S.hand.getWorldPosition(new THREE.Vector3()));
+  if (sock) { const ws = sock.getWorldScale(new THREE.Vector3()).x; return { mount: S.node, ref: sock, worldUnit: ws, kind: 'socket' }; }
+  if (root) {
+    const own = ST.tg.model.getObjectByName(root.name);
+    if (own && !own.userData.forgeMade) return { mount: own, ref: root, worldUnit: root.getWorldScale(new THREE.Vector3()).x, kind: 'own ' + root.name };
+    const nm = 'forge_' + root.name.replace(/_(right|left)$/, '') + '_' + sd.toLowerCase();
+    let m = ST.tg.model.getObjectByName(nm); if (!m) { m = new THREE.Object3D(); m.name = nm; m.userData.forgeMade = 1; S.hand.add(m); }
+    if (!F.mountPlace(S.hand, 'weapon_root_' + sd.toLowerCase(), m)) return null;
+    m.children.filter(c => /^weapon_tip/.test(c.name)).forEach(c => m.remove(c));
+    if (S.auto && S.node.userData.forged) { const D = S.node.matrix.clone(), A = new THREE.Matrix4().compose(S.auto.p, S.auto.q, new THREE.Vector3(1, 1, 1));
+      S.node.updateMatrix(); D.copy(S.node.matrix).multiply(A.invert()); m.updateMatrix(); m.matrix.premultiply(D); m.matrix.decompose(m.position, m.quaternion, m.scale); }
+    return { mount: m, ref: root, worldUnit: .01 * hlen / ZAP_HAND, kind: 'old Zap\'s grip' };
+  }
+  const b = new THREE.Box3().setFromObject(sc), d = b.getSize(new THREE.Vector3());
+  return { mount: S.node, ref: null, worldUnit: Math.max(d.x, d.y, d.z) > 5 ? .01 : 1, kind: 'socket (no joint in the prop)' };
+}
 async function propShow(en) {
   if (PR.holder) { PR.holder.removeFromParent(); PR.holder = PR.marker = null; }
   syncProp(en); if (!en || !en.prop || !ST.tg) return;
   const P = en.prop; let sc;
   try { sc = await propScene(P.file); } catch (e) { chip('could not load the prop: ' + e.message); return; }
-  const mount = ST.tg.model.getObjectByName(P.bone); if (!mount) return;
   sc.updateMatrixWorld(true);
-  const root = (() => { let r = null; sc.traverse(o => { if (!r && /^weapon_root/.test(o.name)) r = o; }); return r; })();
-  const content = (root || sc).clone(true); content.position.set(0, 0, 0); content.quaternion.identity(); content.scale.set(1, 1, 1);
-  content.traverse(o => { if (o.isMesh) { o.frustumCulled = false; } });
-  const holder = new THREE.Group(); holder.add(content); mount.add(holder);
-  const mws = mount.getWorldScale(new THREE.Vector3()).x;
-  if (P.unit === undefined) {      // first placement: the prop's own units, said in the mount's
-    let u = root ? root.getWorldScale(new THREE.Vector3()).x : 1;
-    if (!root) { const b = new THREE.Box3().setFromObject(sc), d = b.getSize(new THREE.Vector3()); if (Math.max(d.x, d.y, d.z) > 5) u = .01; }
-    P.unit = u / mws; P.pos = [0, 0, 0]; P.quat = [0, 0, 0, 1]; P.size = 1;
-    const tip = content.getObjectByName(content.children.find(c => /^weapon_tip/.test(c.name)) ? content.children.find(c => /^weapon_tip/.test(c.name)).name : '__');
-    let off = tip ? tip.position.clone() : null;
-    if (!off) { const b = new THREE.Box3().setFromObject(content), c = b.getCenter(new THREE.Vector3()), d = b.getSize(new THREE.Vector3()); off = c; const ax = d.x > d.y ? (d.x > d.z ? 'x' : 'z') : (d.y > d.z ? 'y' : 'z'); off[ax] = b.min[ax] + d[ax] * .2; }
-    en.grip = en.grip || { on: false, reach: 1, off: off.toArray().map(v => +v.toFixed(4)) };
-    saveProf();
+  const M = propMount(en, sc); if (!M) return;
+  const content = sc.clone(true);
+  // the prop's own reference frame (its socket / weapon_root) becomes the holder's origin: content placed by the inverse of it
+  if (M.ref) { content.matrixAutoUpdate = false; content.matrix.copy(M.ref.matrixWorld).invert(); }     // the frame in the ref's own units
+  content.traverse(o => { if (o.isMesh) o.frustumCulled = false; });
+  const holder = new THREE.Group(); holder.name = 'forge_prop'; holder.add(content); M.mount.add(holder);
+  const mws = M.mount.getWorldScale(new THREE.Vector3()).x;
+  P.unit = M.worldUnit / (mws || 1); P.bone = M.mount.name;
+  if (!P.pos) { P.pos = [0, 0, 0]; P.quat = [0, 0, 0, 1]; P.size = 1; }
+  if (!en.grip) {     // the default grip point: the prop's weapon tip, else a fifth of the way along its long axis
+    let tip = null; content.traverse(o => { if (!tip && /^weapon_tip|^grip/.test(o.name)) tip = o; });
+    holder.updateMatrixWorld(true); let off;
+    if (tip) off = holder.worldToLocal(tip.getWorldPosition(new THREE.Vector3()));
+    else { const b = new THREE.Box3().setFromObject(content), c = b.getCenter(new THREE.Vector3()), d = b.getSize(new THREE.Vector3()); const ax = d.x > d.y ? (d.x > d.z ? 'x' : 'z') : (d.y > d.z ? 'y' : 'z'); c[ax] = b.min[ax] + d[ax] * .2; off = holder.worldToLocal(content.localToWorld(c)); }
+    en.grip = { on: false, reach: 1, off: off.toArray().map(v => +v.toFixed(4)) };
   }
+  saveProf();
   holder.position.fromArray(P.pos); holder.quaternion.fromArray(P.quat); holder.scale.setScalar(P.unit * (P.size || 1));
   holder.updateMatrixWorld(true);
   const hws = holder.getWorldScale(new THREE.Vector3()).x, r = ST.tg.hipH * .035 / (hws || 1);
   const marker = new THREE.Mesh(new THREE.SphereGeometry(r, 12, 10), new THREE.MeshBasicMaterial({ color: 0xffd04a, depthTest: false, transparent: true, opacity: .9 }));
-  marker.renderOrder = 11; marker.position.fromArray((en.grip && en.grip.off) || [0, 0, 0]); holder.add(marker);
-  PR.holder = holder; PR.marker = marker;
+  marker.renderOrder = 11; marker.position.fromArray(en.grip.off); holder.add(marker);
+  PR.holder = holder; PR.marker = marker; $('sockNote').textContent = 'prop on ' + M.kind + ' (' + P.hand + ' hand)';
   if (POSE.on) gizmoTarget();
+}
+// the sockets drawn: a small axis triad on each (red X, green Y = fingers, blue Z = along the handle)
+function sockAxes() {
+  if (!ST.sock) return;
+  for (const sd in ST.sock) { const n = ST.sock[sd].node; let ax = n.children.find(c => c.name === 'forge_axes');
+    if (!ax) { ax = new THREE.AxesHelper(1); ax.name = 'forge_axes'; ax.material.depthTest = false; ax.renderOrder = 12; n.add(ax); }
+    n.updateMatrixWorld(true); ax.scale.setScalar(ST.tg.hipH * .22 / (n.getWorldScale(new THREE.Vector3()).x || 1)); ax.visible = POSE.on; }
 }
 function syncProp(en) {
   const P = en && en.prop, G = en && en.grip;
@@ -491,7 +524,7 @@ function syncProp(en) {
 }
 const inPack = () => ST.cur && ST.P.clips.includes(ST.cur);
 $('propSel').onchange = async () => { if (!inPack()) return; const f = $('propSel').value, en = ST.cur;
-  if (!f) { delete en.prop; delete en.grip; } else { const hand = $('propHand').value; en.prop = { file: f, hand, bone: mountName(hand) }; delete en.grip; }
+  if (!f) { delete en.prop; delete en.grip; } else { const hand = $('propHand').value; en.prop = { file: f, hand }; delete en.grip; }
   saveProf(); await propShow(en); if (en.grip && en.grip.on) previewEntry(en, ST.act.time); };
 $('propHand').onchange = () => { if (!inPack() || !ST.cur.prop) return; $('propSel').onchange(); };
 $('propFileBtn').onclick = () => $('propFile').click();
@@ -505,13 +538,20 @@ $('propAll').onclick = () => { const en = ST.cur; if (!inPack() || !en.prop) ret
 function gizmoTarget() {
   const m = POSE.mode;
   if (m === 'bone') { gizmo.setMode('rotate'); gizmo.setSpace(POSE.space); if (POSE.bone && inPack()) gizmo.attach(ST.tg.rig.bones[POSE.bone]); else gizmo.detach(); return; }
+  if (m === 'smove' || m === 'sturn') { const S = ST.sock && ST.sock[$('propHand').value]; if (!S) { gizmo.detach(); return; } gizmo.setMode(m === 'smove' ? 'translate' : 'rotate'); gizmo.setSpace('local'); gizmo.attach(S.node); return; }
   if (!PR.holder) { gizmo.detach(); return; }
   if (m === 'move') { gizmo.setMode('translate'); gizmo.setSpace('local'); gizmo.attach(PR.holder); }
   else if (m === 'turn') { gizmo.setMode('rotate'); gizmo.setSpace('local'); gizmo.attach(PR.holder); }
   else if (m === 'grip') { gizmo.setMode('translate'); gizmo.setSpace('world'); gizmo.attach(PR.marker); }
 }
-$('gzMode').onclick = e => { const m = e.target.dataset.m; if (!m) return; POSE.mode = m; [...$('gzMode').children].forEach(b => b.classList.toggle('ac', b === e.target)); gizmoTarget(); };
+const gzPick = e => { const m = e.target.dataset.m; if (!m) return; POSE.mode = m; [...$('gzMode').children, ...$('gzMode2').children].forEach(b => b.classList.toggle('ac', b === e.target)); gizmoTarget(); };
+$('gzMode').onclick = gzPick; $('gzMode2').onclick = gzPick;
+$('sockReset').onclick = () => { const sd = $('propHand').value; if (!ST.sock || !ST.sock[sd]) return; if (ST.P.sockets) delete ST.P.sockets[sd]; const S = ST.sock[sd];
+  if (S.auto) { S.node.position.copy(S.auto.p); S.node.quaternion.copy(S.auto.q); } S.node.userData.forged = 0; saveProf(); if (ST.cur) propShow(ST.cur).then(() => { if (ST.cur.grip && ST.cur.grip.on) previewEntry(ST.cur, ST.act.time); }); };
 function propCommit() {
+  if (POSE.mode === 'smove' || POSE.mode === 'sturn') { const sd = $('propHand').value, S = ST.sock[sd];
+    ST.P.sockets = ST.P.sockets || {}; ST.P.sockets[sd] = { p: S.node.position.toArray().map(v => +v.toFixed(5)), q: S.node.quaternion.toArray().map(v => +v.toFixed(5)) }; S.node.userData.forged = 1; saveProf();
+    if (ST.cur && ST.cur.prop) propShow(ST.cur).then(() => { if (ST.cur.grip && ST.cur.grip.on) previewEntry(ST.cur, ST.act.time); }); return; }
   const en = ST.cur; if (!inPack() || !en.prop || !PR.holder) return;
   if (POSE.mode === 'grip') { en.grip.off = PR.marker.position.toArray().map(v => +v.toFixed(4)); saveProf(); if (en.grip.on) previewEntry(en, ST.act.time); return; }
   en.prop.pos = PR.holder.position.toArray().map(v => +v.toFixed(5)); en.prop.quat = PR.holder.quaternion.toArray().map(v => +v.toFixed(5));
@@ -531,6 +571,7 @@ async function exportGLB(withMesh) {
   const m = ST.tg.model, hid = [];
   m.traverse(o => { o.updateMatrix(); });
   ST.tg.restore();
+  m.traverse(o => { if ((o.name === 'forge_axes' || o.name === 'forge_prop' || o.isLine) && o.visible) { o.visible = false; hid.push(o); } });
   if (!withMesh) m.traverse(o => { if (o.isMesh && o.visible) { o.visible = false; hid.push(o); } });
   const out = await new GLTFExporter().parseAsync(m, { binary: true, animations: clips, onlyVisible: true });
   hid.forEach(o => { o.visible = true; });
@@ -593,7 +634,7 @@ window.forge = {
   // ---- the agent's verbs (tools/../retarget-anims/mcp drives these): each one is what a button does, said as a call
   state() {
     return { character: ST.file, hipH: ST.tg && +ST.tg.hipH.toFixed(3), excluded: ST.tg && ST.tg.info.excluded, layers: ST.P.layers, adjust: ST.P.adjust,
-      current: ST.cur && ST.cur.role, library: LIB.index ? LIB.index.length : 0,
+      current: ST.cur && ST.cur.role, library: LIB.index ? LIB.index.length : 0, sockets: ST.sock ? Object.fromEntries(Object.entries(ST.sock).map(([k, v]) => [k, v.own ? 'his own' : v.node.userData.forged ? 'adjusted' : v.auto ? 'auto' : 'none'])) : {},
       clips: ST.P.clips.map(c => ({ role: c.role, from: c.donor ? stemOf(c.donor) + ': ' + c.clip : c.stem, keys: c.fk ? Object.values(c.fk).reduce((n, k) => n + k.length, 0) : 0, prop: c.prop ? stemOf(c.prop.file) : null, grip: !!(c.grip && c.grip.on), edit: c.edit || null })) };
   },
   characters: () => CHARS.map(([f, n]) => ({ path: 'models/characters/' + f + '.glb', name: n })),
@@ -632,7 +673,7 @@ window.forge = {
   async setProp(role, o) {
     const list = role === '*' ? ST.P.clips : ST.P.clips.filter(c => c.role === role); if (!list.length) throw new Error('no clip "' + role + '"');
     const first = list[0]; await previewEntry(first);
-    if (o.prop !== undefined) { if (!o.prop) { delete first.prop; delete first.grip; } else { const hand = o.hand || 'Right'; first.prop = { file: o.prop, hand, bone: mountName(hand) }; delete first.grip; } await propShow(first); }
+    if (o.prop !== undefined) { if (!o.prop) { delete first.prop; delete first.grip; } else { const hand = o.hand || 'Right'; first.prop = { file: o.prop, hand }; delete first.grip; } await propShow(first); }
     if (first.prop && PR.holder) {
       if (o.size) { first.prop.size = +o.size; PR.holder.scale.setScalar(first.prop.unit * first.prop.size); }
       if (o.move || o.turn) { const par = PR.holder.parent, wq = par.getWorldQuaternion(new THREE.Quaternion()), ws = par.getWorldScale(new THREE.Vector3()).x;
@@ -656,6 +697,17 @@ window.forge = {
   },
   setTime(t) { if (!ST.act) return; const E = (ST.cur && ST.cur.edit) || {}; ST.playing = false; ST.act.time = Math.max(0, Math.min(ST.act.getClip().duration, (t - ((E.trim && +E.trim[0]) || 0)) / (+E.speed || 1))); ST.tg.mixer.update(0); if (ST.ghost) { const ga = ST.ghost.mix._actions[0]; if (ga) { ga.time = ST.ghost.a + ST.act.time * ST.ghost.sp; ST.ghost.mix.update(0); } } },
   profile_get: () => JSON.parse(JSON.stringify(ST.P)),
+  // a socket: { move: [x,y,z] metres in his frame, turn: [x,y,z] degrees about his axes, reset: true }
+  async setSocket(side, o) {
+    const S = ST.sock && ST.sock[side]; if (!S) throw new Error('no ' + side + ' hand socket');
+    if (o.reset) { if (ST.P.sockets) delete ST.P.sockets[side]; if (S.auto) { S.node.position.copy(S.auto.p); S.node.quaternion.copy(S.auto.q); } S.node.userData.forged = 0; }
+    else { const par = S.node.parent, wq = par.getWorldQuaternion(new THREE.Quaternion()), ws = par.getWorldScale(new THREE.Vector3()).x;
+      if (o.move) S.node.position.add(new THREE.Vector3().fromArray(o.move).applyQuaternion(wq.clone().invert()).multiplyScalar(1 / ws));
+      if (o.turn) { const Rw = new THREE.Quaternion().setFromEuler(new THREE.Euler(...o.turn.map(d => d * Math.PI / 180))); S.node.quaternion.premultiply(wq.clone().invert().multiply(Rw).multiply(wq)); }
+      ST.P.sockets = ST.P.sockets || {}; ST.P.sockets[side] = { p: S.node.position.toArray(), q: S.node.quaternion.toArray() }; S.node.userData.forged = 1; }
+    saveProf(); if (ST.cur && ST.cur.prop) { await propShow(ST.cur); if (ST.cur.grip && ST.cur.grip.on) await previewEntry(ST.cur, ST.act.time); }
+    return ST.P.sockets ? ST.P.sockets[side] || 'auto' : 'auto';
+  },
   seek(t) { ST.playing = false; if (ST.act) { ST.act.time = t; ST.tg.mixer.update(0); } },
   set(k, v) { ST.P.layers[k] = v; },
 };
