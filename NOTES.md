@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m904 -- THE SKELETON WAS NEVER DRAWN ON HIS PHONE: a // comment ate two numbers (and the sound ran on)
+*"The electric sound effect is way too long... I really just want the zap when I hit him... I haven't seen the skeleton yet: he
+flashes and disappears, but there's no skeleton."*
+- THE CAUSE (measured, not guessed): m903 wrote `hz: 12,     // m903: ...` and then the REST OF THE OBJECT on the same line --
+  `jitter` and `twitch` were inside the comment. `jitter` undefined -> the model's position NaN -> every bone NaN -> the body
+  AND the skeleton (same bones) gone for the whole zap. Headless probe: `d.model.position` {x: NaN, z: NaN}. The m902 screens
+  were taken BEFORE m903, which is why they showed it. **A comment on a line that carries more than one field is a mine.**
+- SOUND: one short `zap` per hit (`dur` .3), no `plasma`, no random buzz while the current runs.
+- READABILITY: strobe 12 -> 8 Hz, zap .6 -> .7 s, the bubble steps BACK (x.45) on skeleton frames, the bones glow (emissive 1.6).
+- The STUN button says `skeleton ready` / `loading skeleton` / `NO SKELETON` -- the number that tells the cases apart.
+- `mel.renderer`, `mel.scene`, `mel.camera`, `mel.THREE` exported for probes.
+
 ## m903 -- A ZAP ELECTROCUTES; ENOUGH ZAPS STUN (stars, the drunk idle, awake in 5 s)
 *"One shot from the zap gun doesn't stun... the electrocution is just a quick little 1-2-3-4-5, under a second. The stun state is
 an animation... the drunk idle on the redneck, with the stars around his head... they wake up in five seconds... a Warboss,
