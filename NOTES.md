@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m918 -- the wave's SHAPE: LIMBS (directed) and NOISE; m917 had swallowed `ARENA.morph.simple`
+*"A spherical falloff with a growing noise pattern, so parts of his body grow at different rates -- or a vertex map, really
+directed: one arm, then the opposite leg, then the other arm, the other leg, then the middle."*
+- `tmDelay(src, wave)` builds a per-vertex DELAY map (`aDly`) once per morph from the proxy itself -- its REST positions and its
+  dominant joint -- so it will not shift as his limbs move. LIMBS: regions by joint name (`waves.LIMBS.order` LA, RL, RA, LL, T),
+  each turning from its TIP inward (hand / foot), the trunk from the chest out. NOISE: a sphere out of his chest (.55) plus two
+  octaves of value noise (`f` 5.5 cells per height). Each wave has its own spread `s` and turn width `w` (LIMBS 1.5 / .38: one
+  part after another; FEET .55 / .6: one sweep). Default LIMBS; the WAVE button cycles LIMBS, NOISE, FEET, CHEST.
+  Strips of the CEO: LIMBS -- left arm, right leg, right arm, left leg, head last; NOISE -- patches.
+- **m917 PUT A COMMENT MID-LINE AGAIN** and it swallowed `ARENA.morph.simple = ...` -- his own DNA turn threw and fell back to
+  the blob for one build. Fourth time (m904, m909, m917). Split.
+- NEXT (m919): his stretch (`idle_02_stretch`, Clancy's file, the mutant pack) retargeted onto both CEO bodies and played
+  DURING the morph, the proxies re-posed every frame.
+
 ## m917 -- the morph is ONE body: BLEND, live pose (m915 misread him)
 *"You put it back so that he goes into a T-pose for the transform -- that's not what I wanted. And in the middle step you can see
 both models. We want a perfect blend, we don't want to see two of the same model at the same time."* m915 read "when it was

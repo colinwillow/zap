@@ -836,10 +836,10 @@ body.desk.free #deskHint { display: block; }
   <h1>WEIRDPORT</h1>
   <div class="msg" id="bootMsg">loading</div>
   <div class="bar"><i id="bootBar"></i></div>
-  <div class="bld">BUILD <span id="bootBuild">m917</span></div>
+  <div class="bld">BUILD <span id="bootBuild">m918</span></div>
 </div>
 
-<div class="chip" id="build"><b id="buildN">m917</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
+<div class="chip" id="build"><b id="buildN">m918</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
 <div id="splash" aria-label="tap to start"><img class="blur" alt=""><img class="main" alt="Zap and Clancy"><div class="glow"></div><div class="bn"></div></div>
 <script>
 // m879 (STEER 02:22): THE SPLASH, before the module (so it shows on the first paint, while the boot carries on behind it). The image's
@@ -945,7 +945,7 @@ import { KTX2Loader } from './vendor/KTX2Loader.js';
 import { clone as skeletonClone } from './vendor/SkeletonUtils.js';
 import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
 
-const BUILD = 'm917';
+const BUILD = 'm918';
 /* ASSETS:START */
 const ASSETS = {"models/alien_lizard.glb":"faffcf4c","models/alien_lizard_ktx2.glb":"05da2a20","models/skate.glb":"0c612d5e","models/skateboard.glb":"5ba93796","models/characters/alien_antenna_game.glb":"f3ccf328","models/characters/alien_antenna_game_ktx2.glb":"28afac8c","models/characters/alien_female_purple.glb":"1c73eef1","models/characters/alien_female_purple_ktx2.glb":"fc914afb","models/characters/alien_grey_medium.glb":"5a779e8e","models/characters/alien_grey_medium_ktx2.glb":"61600c3e","models/characters/alien_rollerskate_blue.glb":"6e98dd0a","models/characters/alien_rollerskate_blue_ktx2.glb":"a66d5697","models/characters/alien_warrior.glb":"f5cc9c49","models/characters/alien_warrior_ktx2.glb":"a13fb7b6","models/characters/beautiful_asian.glb":"910f6565","models/characters/beautiful_asian_ktx2.glb":"35281eef","models/characters/beautiful_blonde.glb":"edddc421","models/characters/beautiful_blonde_ktx2.glb":"89cf3899","models/characters/brute_warboss_armor.glb":"cc5c7936","models/characters/ceo_alien.glb":"844dc3a7","models/characters/ceo_human.glb":"ec289865","models/characters/clancy.glb":"b1ef602b","models/characters/clancy_ktx2.glb":"84625cdc","models/characters/colin.glb":"99d38b7d","models/characters/colin_ktx2.glb":"35040f87","models/characters/contruction_worker.glb":"8bd3d7ce","models/characters/contruction_worker_ktx2.glb":"3df8c344","models/characters/dummy_officer.glb":"724965ac","models/characters/dummy_officer_ktx2.glb":"db640cda","models/characters/fat_activist_01.glb":"3c566fee","models/characters/fat_activist_01_ktx2.glb":"b9328df4","models/characters/fat_biker_01.glb":"576b7cf5","models/characters/fat_biker_01_ktx2.glb":"7142cfad","models/characters/fat_biker_02.glb":"ab5d7ec7","models/characters/fat_biker_02_ktx2.glb":"28cec6cc","models/characters/fat_hippie.glb":"f09a260d","models/characters/fat_hippie_ktx2.glb":"0be745a4","models/characters/fat_hipster.glb":"3a8abc31","models/characters/fat_hipster_ktx2.glb":"fd8b3318","models/characters/fat_secret_service.glb":"6d546fb0","models/characters/fat_secret_service_ktx2.glb":"a23a304e","models/characters/fat_trump.glb":"5de6bc56","models/characters/fat_trump_ktx2.glb":"a0ddaf4d","models/characters/firefighter.glb":"ebde005d","models/characters/firefighter_ktx2.glb":"ccf93c96","models/characters/hick_skinny.glb":"1ebe78e8","models/characters/hick_skinny_ktx2.glb":"1e93f0ed","models/characters/hobo_01.glb":"34e80b1d","models/characters/hobo_01_ktx2.glb":"69497677","models/characters/jack.glb":"ab009b9b","models/characters/jack_ktx2.glb":"1f4c9f7f","models/characters/moussa.glb":"6d80b1cf","models/characters/moussa_ktx2.glb":"66e040f8","models/characters/proxy_ceo.bin":"6eca0c34","models/characters/proxy_ceo.jpg":"fadc9d0a","models/characters/proxy_ceo.json":"e62a7975","models/characters/proxy_ceo_alien.bin":"be247ecc","models/characters/proxy_ceo_alien.jpg":"8f8bf8fc","models/characters/proxy_ceo_alien.json":"eb23e28f","models/characters/proxy_hick.bin":"4485560e","models/characters/proxy_hick.jpg":"8c331965","models/characters/proxy_hick.json":"d85a0d36","models/characters/proxy_zap.bin":"dd7b300e","models/characters/proxy_zap.jpg":"2e7330ae","models/characters/proxy_zap.json":"b3b42754","models/characters/rept_heavy_armor.glb":"934661c7","models/characters/xray_skeleton.glb":"46480317","models/characters/zap.glb":"5e5cca54","models/characters/zap_ktx2.glb":"4b29d886","models/vehicles/dump_truck.glb":"d870dc18","models/vehicles/dump_truck_ktx2.glb":"21ee7059","models/vehicles/motorcycle_fatboy.glb":"9ed9be28","models/weapons/alien_antenna_blaster_game.glb":"54083b44","models/weapons/alien_antenna_hammer_game.glb":"707b8a27","models/weapons/alien_launcher.glb":"ba8ab96a","models/weapons/hammer.glb":"3335fdf2","models/weapons/shield_brute.glb":"c6e5593f","models/weapons/spikey_mace.glb":"dcd43acd","models/weapons/w_brute_cleaver.glb":"07a97580","models/weapons/w_rept_maul.glb":"84c3a1a4","models/buildings/alien_base_01.glb":"d9b9fd7f","models/buildings/alien_base_01_ktx2.glb":"6cbbfef2","models/towers/alien_tower_01.glb":"98d23375","models/towers/alien_tower_01_ktx2.glb":"47597651","models/streets/modular_streets_kit.glb":"6a4bcaa5","models/toon_city/impact_marks.json":"2b616620","models/toon_city/impact_marks_atlas.ktx2":"efe0840e","models/toon_city/impact_marks_atlas.png":"490ed049","models/toon_city/toon_city_breakables.glb":"29bddbc8","models/toon_city/toon_city_collision.glb":"fb3a693f","models/toon_city/toon_city_obb.json":"81c18a47","models/toon_city/toon_city_visual.glb":"5df62285","models/toon_city/toon_city_visual_ktx2.glb":"cf080531","models/toon_city/weirdkit_tint.js":"f6e9d802","models/toon_city_kit/toon_city_collision.glb":"5540a364","models/toon_city_kit/toon_city_kit_buildings.glb":"590e53f0","models/toon_city_kit/toon_city_kit_buildings_ktx2.glb":"e6dff3a3","models/toon_city_kit/toon_city_kit_pieces.glb":"8232bd6f","models/toon_city_kit/toon_city_kit_twins.glb":"fcc9fdfc","models/toon_city_kit/toon_city_visual.glb":"45cf2957","models/toon_city_kit/toon_city_visual_ktx2.glb":"f26a6984","models/toon_city_kit/weirdkit_detile.js":"dd05bd70","models/characters/morph/shapes.bin":"4e680384","models/characters/morph/shapes.json":"abfc949d","images/crack_sprite_01.ktx2":"4aa55fde","images/crack_sprite_01.png":"16b52e8c","images/fire_sprites_01.ktx2":"922e1191","images/fire_sprites_01.png":"f87e2696","images/fire_sprites_02.ktx2":"e0cbfe1d","images/fire_sprites_02.png":"b373a6fd","images/fire_sprites_03.ktx2":"4fbbb985","images/fire_sprites_03.png":"7eece336","images/geyser_sprites_01.png":"b6325470","images/hdri_game.ktx2":"0feb5c79","images/hdri_game.png":"dac55f41","images/splash_zap_n_clancy.webp":"52a9d8a4","images/water_sprites_01.ktx2":"326924c5","images/water_sprites_01.png":"31e12659","audio/blaster_sound_01.mp3":"40d99583","audio/blaster_sound_02.mp3":"4bd7bb7c","audio/box_break_01.mp3":"e4127980","audio/electricity_beam_01.mp3":"986db8c9","audio/explosion_small.mp3":"f154a537","audio/metal_clang_01.mp3":"a333bd27","audio/metal_clang_02.mp3":"1e3ebbd6","audio/metal_clang_03.mp3":"afe44812","audio/metal_ping_01.mp3":"8ffca1a0","audio/plasma_canon.mp3":"e32c324d","audio/powerup_01.mp3":"48fbbe08","audio/swoosh_01.mp3":"193db185","audio/swoosh_02.mp3":"19145e70","audio/swoosh_03.mp3":"544fdffb","audio/swoosh_04.mp3":"843bee5d","audio/plasma_sounds/plasma_01.mp3":"e71c010f","audio/plasma_sounds/plasma_02.mp3":"ac3b1c75","audio/plasma_sounds/plasma_03.mp3":"eaa59355","audio/plasma_sounds/plasma_04.mp3":"bc7865e0","audio/plasma_sounds/plasma_05.mp3":"1d821cd0","audio/plasma_sounds/plasma_06.mp3":"cb979fbe","audio/plasma_sounds/plasma_hit.mp3":"30e5af5c","audio/alien_orc_grunt_sounds/alien_orc_grunt_01.mp3":"d6f4b343","audio/alien_orc_grunt_sounds/alien_orc_grunt_02.mp3":"78afc603","audio/alien_orc_grunt_sounds/alien_orc_grunt_03.mp3":"972c524a","audio/alien_orc_grunt_sounds/alien_orc_grunt_04.mp3":"b0ce76eb","audio/alien_orc_grunt_sounds/alien_orc_grunt_05.mp3":"1f0ba1f4","audio/alien_orc_grunt_sounds/alien_orc_grunt_06.mp3":"4f749866","audio/alien_orc_grunt_sounds/alien_orc_grunt_07.mp3":"dcf75925","audio/hit_sounds/hit_sound_01.mp3":"befaa2be","audio/hit_sounds/hit_sound_02.mp3":"73bc4433","audio/hit_sounds/hit_sound_03.mp3":"24b181e4","audio/hit_sounds/hit_sound_gound_01.mp3":"86ee2674","audio/hit_sounds/hit_sound_ground_02.mp3":"8a7cac73","audio/hit_sounds/hit_sound_plasma_01.mp3":"9abc0202","audio/hit_sounds/hit_sound_plasma_02.mp3":"6aaf0fe5","audio/creature_noises/creature_noise_01.mp3":"cbcc6ee7","audio/creature_noises/creature_noise_02.mp3":"201a8247","audio/creature_noises/creature_noise_03.mp3":"97680811","audio/creature_noises/creature_noise_04.mp3":"6f734df2","audio/creature_noises/creature_noise_05.mp3":"6f736441","audio/creature_noises/creature_noise_06.mp3":"992712e9","audio/creature_noises/creature_noise_07.mp3":"d9ad04b3","audio/footsteps/footstep_2_l.mp3":"abeabfbe","audio/footsteps/footstep_2_r.mp3":"7dd16046","audio/footsteps/footstep_l.mp3":"b66e579b","audio/footsteps/footstep_r.mp3":"96e13433","models/props/prop_hydrant.glb":"f157fee9","models/props/prop_hydrant_collision.glb":"0bbfc4d2"};
 /* ASSETS:END */
@@ -8062,8 +8062,49 @@ function tmPose(d, src) {
 // the morph runs rest to rest, and the new body eases from its rest pose into its idle (`out` s). Each beat is a lerp between
 // two snapshots of the ONE universal proxy layout. Two looks, switchable on the arena bar: `boss` (the CEO) and `simple` (people,
 // and your own DNA turn). pose 'T' | 'LIVE', wave 'FEET' | 'CHEST'.
-ARENA.morph.boss = { pose: 'LIVE', wave: 'FEET' };     // m917: not the T-pose -- he did not want it (m915 misread him) ARENA.morph.simple = { pose: 'LIVE', wave: 'FEET' };
+// m917: not the T-pose -- he did not want it (m915 misread him). m918: m917 put that comment MID-LINE and it swallowed
+// `ARENA.morph.simple`, so his own DNA turn threw and fell back to the blob for one build. Comments on their own lines.
+ARENA.morph.boss = { pose: 'LIVE', wave: 'LIMBS' };
+ARENA.morph.simple = { pose: 'LIVE', wave: 'LIMBS' };
 ARENA.morph.cine = { in: .45, out: .55 };
+// m918: THE WAVE'S SHAPE. *"A spherical falloff with a growing noise pattern, so parts of his body grow at different rates --
+// or a vertex map, really directed: one arm, then the opposite leg, then the other arm, the other leg, then the middle."*
+// FEET and CHEST are worked out in the shader from where each vertex IS; NOISE and LIMBS are a per-vertex DELAY map (`aDly`,
+// 0..1) built once per morph from the proxy itself -- its REST positions and its dominant joint -- so neither moves as his
+// limbs do. `s` is the spread of delays over the beat and `w` the width of each vertex's own turn: LIMBS is a long spread and
+// a short turn (the parts go one after another), FEET a short spread and a long turn (one smooth sweep).
+ARENA.morph.waves = { FEET: { s: .55, w: .6 }, CHEST: { s: .55, w: .6 }, NOISE: { s: .9, w: .4, f: 5.5 }, LIMBS: { s: 1.5, w: .38, order: ['LA', 'RL', 'RA', 'LL', 'T'] } };
+const tmHash = (x, y, z) => { const h = Math.sin(x * 127.1 + y * 311.7 + z * 74.7) * 43758.5453; return h - Math.floor(h); };
+function tmNoise(x, y, z) {     // 3D value noise, smoothstepped
+  const ix = Math.floor(x), iy = Math.floor(y), iz = Math.floor(z); let fx = x - ix, fy = y - iy, fz = z - iz;
+  fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy); fz = fz * fz * (3 - 2 * fz);
+  const L = (a, b, t) => a + (b - a) * t, h = (a, b, c) => tmHash(ix + a, iy + b, iz + c);
+  return L(L(L(h(0, 0, 0), h(1, 0, 0), fx), L(h(0, 1, 0), h(1, 1, 0), fx), fy), L(L(h(0, 0, 1), h(1, 0, 1), fx), L(h(0, 1, 1), h(1, 1, 1), fx), fy), fz);
+}
+function tmDelay(src, wave) {
+  const n = src.J.v, P = src.pos, D = new Float32Array(n), W = ARENA.morph.waves[wave];
+  let y0 = 1e9, y1 = -1e9; for (let i = 0; i < n; i++) { y0 = Math.min(y0, P[i * 3 + 1]); y1 = Math.max(y1, P[i * 3 + 1]); }
+  const H = (y1 - y0) || 1, dom = i => { let bw = -1, bj = 0; for (let k = 0; k < 4; k++) if (src.wt[i * 4 + k] > bw) { bw = src.wt[i * 4 + k]; bj = src.jn[i * 4 + k]; } return src.J.bones[bj] || ''; };
+  const names = new Array(n); for (let i = 0; i < n; i++) names[i] = dom(i);
+  const cen = re => { let x = 0, y = 0, z = 0, c = 0; for (let i = 0; i < n; i++) if (re.test(names[i])) { x += P[i * 3]; y += P[i * 3 + 1]; z += P[i * 3 + 2]; c++; } return c ? [x / c, y / c, z / c] : null; };
+  const chest = cen(/Spine2$/) || cen(/Spine/) || [0, y0 + H * .6, 0];
+  if (wave === 'NOISE') {     // a sphere out of his chest, broken up by noise at `f` cells per body height
+    const f = W.f / H;
+    for (let i = 0; i < n; i++) { const x = P[i * 3], y = P[i * 3 + 1], z = P[i * 3 + 2];
+      const sph = Math.hypot(x - chest[0], y - chest[1], z - chest[2]) / H, nz = .62 * tmNoise(x * f, y * f, z * f) + .38 * tmNoise(x * f * 2.1 + 7.3, y * f * 2.1, z * f * 2.1);
+      D[i] = clamp(sph * .55 + nz * .8 - .2, 0, 1); }
+    return D;
+  }
+  // LIMBS: the regions in his order, each one turning from its TIP inward (hand / foot), the trunk from the chest out
+  const reg = nm => /Left(Shoulder|Arm|ForeArm|Hand)/.test(nm) ? 'LA' : /Right(Shoulder|Arm|ForeArm|Hand)/.test(nm) ? 'RA'
+    : /Left(UpLeg|Leg|Foot|Toe)/.test(nm) ? 'LL' : /Right(UpLeg|Leg|Foot|Toe)/.test(nm) ? 'RL' : 'T';
+  const tip = { LA: cen(/LeftHand/), RA: cen(/RightHand/), LL: cen(/LeftFoot|LeftToe/), RL: cen(/RightFoot|RightToe/), T: chest };
+  const R = new Array(n), far = {};
+  for (let i = 0; i < n; i++) { const r = R[i] = reg(names[i]), t = tip[r] || chest; const q = Math.hypot(P[i * 3] - t[0], P[i * 3 + 1] - t[1], P[i * 3 + 2] - t[2]); D[i] = q; far[r] = Math.max(far[r] || 0, q); }
+  const O = W.order, k = O.length;
+  for (let i = 0; i < n; i++) { const o = Math.max(0, O.indexOf(R[i])); D[i] = clamp((o + .85 * D[i] / (far[R[i]] || 1)) / k, 0, 1); }
+  return D;
+}
 // his proxy in his REST pose, where it stands: the raw positions through his mesh's own world matrix (no skinning)
 function tmRest(d, src) {
   const vm = xrMain(d.model); (d.root || vm).updateMatrixWorld(true);
@@ -8072,7 +8113,7 @@ function tmRest(d, src) {
   return P;
 }
 // the geometry and the materials for one morph; `look` is a tier ({ pose, wave }); returns the live record `tmRun` steps
-function tmBuild(A, B, rA, rB, R, hA, hB, look) {
+function tmBuild(A, B, rA, rB, R, hA, hB, look, srcA) {
   const M = ARENA.morph, cine = look.pose === 'T';
   const nA = tmNormals(A.P, A.index), nB = tmNormals(B.P, B.index);
   const K = cine ? { a0: A.P, a1: rA, b0: rB, b1: B.P, na0: nA, na1: tmNormals(rA, A.index), nb0: tmNormals(rB, B.index), nb1: nB } : null;
@@ -8080,8 +8121,10 @@ function tmBuild(A, B, rA, rB, R, hA, hB, look) {
   geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(A.P), 3)); geo.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(nA), 3));
   geo.setAttribute('pB', new THREE.BufferAttribute(new Float32Array(cine ? rB : B.P), 3)); geo.setAttribute('nB', new THREE.BufferAttribute(new Float32Array(cine ? K.nb0 : nB), 3));
   geo.setAttribute('uv', A.uv); if (A.index) geo.setIndex(A.index);
+  const W = M.waves[look.wave] || M.waves.FEET, map = (look.wave === 'NOISE' || look.wave === 'LIMBS') && srcA;
+  geo.setAttribute('aDly', new THREE.BufferAttribute(map ? tmDelay(srcA, look.wave) : new Float32Array(A.P.length / 3), 1));
   const chest = new THREE.Vector3(R.x, R.y + hA * .6, R.z), Hs = Math.max(hA, hB);
-  const meshes = (M.mode === 'BLEND' ? [0] : [1, 2]).map(k => { const mt = tmMat(A, B, chest, Hs, k, R.y); mt.uniforms.uWave.value = look.wave === 'CHEST' ? 1 : 0;
+  const meshes = (M.mode === 'BLEND' ? [0] : [1, 2]).map(k => { const mt = tmMat(A, B, chest, Hs, k, R.y), U = mt.uniforms; U.uWave.value = look.wave === 'CHEST' ? 1 : 0; U.uMap.value = map ? 1 : 0; U.uSpread.value = W.s; U.uWin.value = W.w;
     const m = new THREE.Mesh(geo, mt); m.frustumCulled = false; scene.add(m); return m; });
   return { geo, meshes, K, t: 0, tot: (cine ? M.cine.in + M.cine.out : 0) + M.dur, phase: -1 };
 }
@@ -8123,12 +8166,12 @@ function tmMat(A, B, chest, Hs, part, floorY) {
   return new THREE.ShaderMaterial({
     uniforms: { uU: { value: 0 }, uMapA: { value: A.map }, uMapB: { value: B.map }, uC: { value: chest }, uH: { value: Hs }, uF: { value: floorY }, uWave: { value: 0 },
       uSpread: { value: ARENA.morph.spread }, uInf: { value: ARENA.morph.inflate * Hs }, uBul: { value: ARENA.morph.bulge * Hs }, uGlow: { value: new THREE.Color(...ARENA.morph.glow) },
-      uPart: { value: part }, uSun: { value: new THREE.Vector3(.4, .8, .45).normalize() } },
-    vertexShader: `attribute vec3 pB; attribute vec3 nB; uniform float uU, uH, uF, uSpread, uInf, uBul, uWave; uniform vec3 uC; uniform int uPart;
+      uPart: { value: part }, uSun: { value: new THREE.Vector3(.4, .8, .45).normalize() }, uWin: { value: .6 }, uMap: { value: 0 } },
+    vertexShader: `attribute vec3 pB; attribute vec3 nB; attribute float aDly; uniform float uU, uH, uF, uSpread, uInf, uBul, uWave, uWin, uMap; uniform vec3 uC; uniform int uPart;
       varying vec2 vUv; varying float vW, vFront; varying vec3 vN;
       void main() {
-        float dly = mix(clamp((position.y - uF) / uH, 0.0, 1.0), clamp(distance(position, uC) / uH, 0.0, 1.0), uWave) * uSpread;   // m912 FEET up, m911 out from the CHEST (m915: a switch)
-        float w = smoothstep(0.0, 1.0, clamp((uU * (uSpread + 0.6) - dly) / 0.6, 0.0, 1.0));     // spread over the whole beat
+        float dly = mix(mix(clamp((position.y - uF) / uH, 0.0, 1.0), clamp(distance(position, uC) / uH, 0.0, 1.0), uWave), aDly, uMap) * uSpread;   // FEET / CHEST, or a per-vertex MAP (m918: NOISE, LIMBS)
+        float w = smoothstep(0.0, 1.0, clamp((uU * (uSpread + uWin) - dly) / uWin, 0.0, 1.0));     // spread over the whole beat, uWin wide
         vec3 p; vec3 n;
         float bul = sin(3.14159 * w) * uBul;                                            // m911: the BULGE rides the wave front
         if (uPart == 0) { n = normalize(mix(normal, nB, w)); p = mix(position, pB, w) + n * bul; }   // BLEND: one shape travels
@@ -8183,7 +8226,7 @@ function tmStep(dt) {
     tmSettle(a, 0); tmSettle(b, 1);     // m914: full weight before the snapshot (see `tmSettle`)
     const A = tmPose(a, L.sA), B = tmPose(b, L.sB), R = a.root.position;
     const look = (ARENA.kinds[a.K.arena].civ && ARENA.kinds[b.K.arena].civ) ? M.simple : M.boss;     // the CEO is the boss tier
-    L.run = tmBuild(A, B, tmRest(a, L.sA), tmRest(b, L.sB), R, a.K.h, b.K.h, look);
+    L.run = tmBuild(A, B, tmRest(a, L.sA), tmRest(b, L.sB), R, a.K.h, b.K.h, look, L.sA);
     a.model.visible = false; if (a.bar) a.bar.g.visible = false;
     tmFlash(R, 1); L.st = 'run'; L.t = 0; M.stat.morphs++;
     return;
@@ -8241,7 +8284,7 @@ function pmStep(dt) {
       try { B = tmPose({ root: rig.root, model: S.model, K: S === rig.base ? TMZAP : S.K }, L.sB); } finally { if (tmp) rig.root.remove(S.model); }
       const R = L.at, hA = p.mphH || RIG.height;
       let rB; if (tmp) rig.root.add(S.model); try { rB = tmRest({ root: rig.root, model: S.model }, L.sB); } finally { if (tmp) rig.root.remove(S.model); }
-      L.run = tmBuild(A, B, tmRest({ root: rig.root, model: rig.model }, L.sA), rB, R, hA, S.h || RIG.height, M.simple);
+      L.run = tmBuild(A, B, tmRest({ root: rig.root, model: rig.model }, L.sA), rB, R, hA, S.h || RIG.height, M.simple, L.sA);
       rig.model.visible = false;
       tmFlash(R, 1); L.st = 'run'; L.t = 0; M.stat.morphs++;
     } catch (e) { console.warn('[melee] proxy morph', e); rig.model.visible = true; pmFall(p); }
@@ -8677,7 +8720,7 @@ function arenaUi() {
       else if (a === 'clear') { ARENA.menu = ''; arenaClear(); }
       else if (a === 'morph') { tmGo(); }
       else if (a === 'mpose') { const T = ARENA.morph.boss; T.pose = T.pose === 'T' ? 'LIVE' : 'T'; }
-      else if (a === 'mwave') { const W = ARENA.morph.boss.wave === 'FEET' ? 'CHEST' : 'FEET'; ARENA.morph.boss.wave = W; ARENA.morph.simple.wave = W; }
+      else if (a === 'mwave') { const L = ['LIMBS', 'NOISE', 'FEET', 'CHEST'], W = L[(L.indexOf(ARENA.morph.boss.wave) + 1) % L.length]; ARENA.morph.boss.wave = W; ARENA.morph.simple.wave = W; }
       else if (a === 'mmode') { ARENA.morph.mode = ARENA.morph.mode === 'GROW' ? 'BLEND' : 'GROW'; }
       else if (a === 'stun') { ARENA.stun.on = ARENA.stun.on ? 0 : 1; if (ARENA.stun.on) xrayLoad(); }     // the human one; a species' own loads on its first zap
       else if (a === 'lvl') { const L = Object.keys(ARENA.duel.levels); ARENA.duel.lvl = L[(L.indexOf(ARENA.duel.lvl) + 1) % L.length]; try { localStorage.setItem('mel.arena.lvl', ARENA.duel.lvl); } catch (err) {} }
