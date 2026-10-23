@@ -5,6 +5,25 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m925 -- THE RIFLE ON ZAP 2: the mount rebuilt in the HAND's frame (old Zap's convention); weapons re-fitted on every re-host
+*"When you're holding the rifle and you press up to shoot, his body faces the right but the rifle faces forward -- as if it's
+pointing 90 degrees toward the left side of his body."*
+- TWO CONVENTIONS: old Zap's `weapon_tip` runs along the BARREL; the pipeline's mounts.py makes `weapon_tip_2` the HANDLE axis and
+  `gun_tip` the finger direction. And five lookups used a bare `/tip/`, taking whichever child came LAST -- `gun_tip` on Zap 2 -- so
+  `barrelH` read his fingers as the barrel and the aim turned his body to point them. MEASURED: barrel minus body heading with the
+  blaster at idle, old Zap -24 deg; Zap 2 +70 (m924).
+- `/^weapon_tip/` everywhere, and `mountConform`: a mount is defined by its HAND -- frame f = hand->Middle1, t = the knuckle line
+  Pinky1->Index1 -- with old Zap's mount measured in it (`ZAP_MOUNT`: right grip 1.12 hand lengths out, barrel -X, tip 1.90 hand
+  lengths; left mirrored). A pipeline rig's mounts (any with `gun_tip`) are rebuilt to it at load; old Zap is the reference and
+  untouched. After: Zap 2 -43 deg (old Zap -25: the rest is his baked hand pose). Renders: same grip as old Zap, same size.
+- DISGUISES: `mphMounts` builds the borrowed mount by the same hand frame (falls back to the copy on a rig with no fingers), and
+  `mphWear` re-fits the weapon to the new mount -- scale and turn from ITS tip, muzzle and axis re-derived -- where it used to carry
+  the hero's numbers over (Zap 2 metres -> hick centimetres would have been a hundredfold). Render: the hick holds it like Zap.
+- TAIL SWAY x min(1, 8 / bones): it was tuned on 8 bones and summed round to the front of a longer tail.
+- THE BOSSES AS DISGUISES, LOOKED AT (his report): the Skullback on his OWN clips already floats spikes and back armour and flattens
+  his tail -- the ARP auto-weights on a Tripo mesh, not the carry (his tail verts ARE on his 6 tail bones). The Warboss's armour is
+  rigid per bone over a skinned body, so it sinks and pokes. Asset work: see his message, not code.
+
 ## m924 -- THE DISGUISE LEGS: the borrowed clips carried in world space with the FOOT PASS; Zap 2's morph proxy
 *"Fix the disguise legs too."* (m923: "when I DNA into the hobo or the redneck and run around doing my Zap animations, their legs
 are very close together and intersect.")
