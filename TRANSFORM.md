@@ -56,6 +56,17 @@ Four layers, each its own system and its own timing (all live dials):
 Needs: every alien form built as BARE BODY + separate armour (the Warboss way); spikes separate where possible. The pop-out can be
 prototyped NOW on the Warboss's 19 pieces (an "armour up" beam-in).
 
+## Future layers (his, Oct 23 2026 -- not scheduled)
+- **ONE GEAR KIT PER FACTION.** *"Every group -- the brutes all have the same outfits: the little cylinders hanging off them, the
+  big utility belt, shoulder pads, kneepads, boots. Generate just one set and we never generate them again -- bend it to fit any
+  character."* One Tripo run per faction kit, segmented into pieces; each piece rides a BONE (like `armor_<bone>`) and is fitted
+  to a body by the same bone-frame fit the wrap's pre-fit uses (turn, stretch, girth) plus a shrink-onto-the-skin pass. Then it
+  marks a team / a species, dresses a new brute for free, and is what pops out of a civilian in a transform.
+- **THE SUIT RIP.** *"Generate the politician in his undies with the suit as a separate mesh -- the suit bulges and rips as his
+  body becomes the alien body."* The human body morphs to the alien body underneath; the suit (its own cloth mesh, skinned to
+  the same bones) is pushed out with it, stretching, then TEARS -- its pieces fly off as debris (the armour-off path). The most
+  literal "breaking out"; a boss-tier upgrade on the super transform.
+
 ## How it can be built (the plan, before the wrap pipeline exists)
 
 Both bodies are **Mixamo rigs**, so it works without shared topology:

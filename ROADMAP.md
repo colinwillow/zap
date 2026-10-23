@@ -44,6 +44,9 @@ levels later. **Each sandbox is tuned until it feels great on its own before any
       Mixamo names + root. NO FINGER BONES (the finger AI found none: rigid hands). Not used in the game yet (STUN sandbox).
 - [ ] a SKELETON PER SPECIES for the stun zap (his: "the Brutes will have a very distinctive skeleton, the Greys, the
       lizards"): Brute, Reptilian, Grey -- each into `ARENA.stun.files` (brute / reptile / grey). Human done (m899).
+- [ ] ONE GEAR KIT PER FACTION (Brutes first: canisters, utility belt, shoulder pads, kneepads, boots) -- generated once,
+      fitted to any body by bone (TRANSFORM.md "Future layers").
+- [ ] the CEO boss (super transform test): human, alien armoured, alien bare -- Tripo, rig, armorfit, wraps, proxies (m911+).
 - [ ] generated shields + weapons, **batched**: stack 3-4 weapon images in one picture and generate them in ONE Tripo task
       (he: "you can change the polygon slider so you can generate like four weapons at once"), then split the pieces
       apart in Blender (loose parts) and give each its mount bones. Saves credits.
