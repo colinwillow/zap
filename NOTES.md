@@ -5,6 +5,25 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m924 -- THE DISGUISE LEGS: the borrowed clips carried in world space with the FOOT PASS; Zap 2's morph proxy
+*"Fix the disguise legs too."* (m923: "when I DNA into the hobo or the redneck and run around doing my Zap animations, their legs
+are very close together and intersect.")
+- MEASURED on the hick wearing Zap's clips (feet apart / hip width; < 0 = crossed): the old LOCAL copy (`retarget`) gave idle .92,
+  walk .51, run **.08 (min -.43)** -- his report exactly. And with Zap 2 as the hero the local copy REFUSED outright
+  (`LeftToeBase 180 deg off zap's bind`): borrowed 0, every disguise had lost the verbs since m923.
+- `retargetW` (in `mphBorrow`, the default; `MORPH.world` 0 = the old copy): bake.py's method at the moment the DNA lands. Per bone
+  the donor's world rotation from its rest onto the target's rest, local down the target's chain; tracks only for bones the source
+  keys (the split halves stay split); then the foot pass (sideways x hip width, forward/up x leg length, knee aimed like the
+  donor's, two-bone solve, foot world rotation kept). `bindPose` now records parent, rest position, rest world rotation, order.
+  After, both heroes: idle 2.11, walk 1.72, run 1.25/1.26 -- the donor's spacing. 121 clips in 466 ms headless (one hitch at the
+  shot, under the morph).
+- ZAP 2's MORPH PROXY (`proxy_zap2.*`): wrap.py onto his un-draco'd export (base->target 0.09% / 0.27%; target->base 2.2% -- the
+  tail, antennae and shoes the human base cannot cover), proxy.py at 1024. `ARENA.morph.files.ZAP2`; HICK <-> ZAP2 in the arena.
+  His own DNA turn takes the proxy morph again (m923 had dropped him to the blob: no proxy for zap_02.glb).
+- `tmPose` matched proxy joints by the RAW name; GLTFLoader sanitises node names (`c_tail_00.x` -> `c_tail_00x`), so 89 tail
+  weights were on no bone. Now by the sanitised name too.
+- KNOWN: the proxy has no tail (the universal base has none) -- the tail is absent mid-morph and arrives with the real body.
+
 ## m923 -- ZAP 2 IS THE HERO: the feet fixed in the bake, his real texture, the weapons fitted, the tail on the player
 *"This is going to be the new character -- make him playable. Every run or anything leg related... their legs look very close
 together and they intersect each other. And his texture is dark -- reddish, orange, dark."*
