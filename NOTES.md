@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m906 -- WEIGHT: big bodies barely move, the biggest are never thrown; a rocket blows plates off
+*"The bigger you are, the less a big hit affects you... the biggest guys probably never fly... a medium guy you could send in the
+air if the hit is big enough... small guys fly pretty easily... rockets, explosions, grenades probably blow off their armour."*
+- `bodyWeightK(K)` = (1.8 / h)^3, capped at 1: people ~1, a 2.0 m body .73, Warboss .42, Skullback .30. `bodyLaunch` scales
+  every launch by it (horizontal x w, up x sqrt w); under `KNOCKDOWN.heavy` .5 nothing is thrown: a blow that would launch him
+  is a big STAGGER (`stagger` 1.4 s, big hit clip, a 1.2 m/s shove), and a KO drops him where he stands (x.12, no lift). A blow
+  on a body already down is scaled the same way. Headless: Warboss at power 1 -> hit, no lift; KO -> down in place.
+- ROCKETS (`BLOW_SRC` 'rocket'): `arenaArmourHit` blows the `rocketPlates` 3 plates nearest the blast side off outright.
+
 ## m905 -- NOBODY LANDS ON HIS FEET; rockets do not stun; a knockdown no longer heals a boss; weapons-as-keys hook
 *"The rocket launcher is also stunning... a character should never fly through the air and land on his feet... if it's not
 powerful enough to launch him off his feet, we have hit animations for that."*

@@ -62,6 +62,10 @@ rocket launcher. A ton of this kind of tic-tac-toe, capability unlocked."*
 
 ## Size and weight
 
+**m906: weight = (1.8 / height)^3.** People fly easily and wear no armour; a medium (~2 m) body flies when the blow is big;
+the biggest (2.4 m+) are never thrown -- a launch is a big stagger, a KO drops him in place. Explosions blow armour off.
+
+
 Lifted from the culture_war arena (`sizeK`, B227), and true in both directions:
 - **Damage and knockback scale with the mass ratio.** A 2.4 m boss sends a 1.25 m Zap flying; Zap's swing barely rocks him
   unless it is a guard break or a full charge.
