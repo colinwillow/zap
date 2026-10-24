@@ -13,6 +13,10 @@ levels later. **Each sandbox is tuned until it feels great on its own before any
   bare body -> rig + weapon bones -> `armorfit.py`). The arena in `colinwillow/culture_war` (`duel.html`) is the fight lab.
 
 ## SANDBOX (several may be open at once; see the WHOLE-PIECE RULE in CLAUDE.md)
+- [ ] **SWORD -- OPEN (spec only).** `SWORD.md`: Zap with sword + shield (the library's Sword and Shield set via the Forge),
+      four directional attacks on the right flick, guard + parry + lock-on on the pull-down hold, charge -> lunge -> spin.
+      Builds a-e in the spec. Waiting on his read of the control proposal.
+- [ ] **GEAR -- OPEN (spec only).** `GEAR.md`: rollerblades / jet blades and a wingsuit any hero can wear. Waiting on his models.
 - [x] **m893 ARENA** (`?w=arena`): the stadium, SPAWN > WARBOSS > Brute Warboss / Skullback beams down, chest thump, armour
       flies off, KO slow-mo, beam out, CLEAR. This is the STAGE for the duel, not the duel.
 - [ ] **DUEL -- OPEN.** Spec and DONE WHEN: `DUEL.md` (the triangle: shield beats shot, melee breaks shield, a shot

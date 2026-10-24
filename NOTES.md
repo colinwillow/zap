@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m975 -- TWO NEW SANDBOX SPECS: SWORD (melee, Zelda-style) and GEAR (skates / wingsuit for everyone). No code.
+*"I wanna start making a little complex sword game... Link's crouched guard... charge it and release a launch-forward attack...
+different sword swings."* And: *"rollerblades... jet blades... the wingsuit... for every character."*
+- `SWORD.md`: who holds it (Zap + sword and shield, the library's full Sword and Shield set via the Forge), a control proposal
+  (right flick L/R/down/up = slash L / slash R / chop / thrust; pull-down hold = guard + lock-on, keep holding = charge, release
+  = lunge, full charge = spin), the sword's rock-paper-scissors, DONE WHEN, builds a-e.
+- `GEAR.md`: skates and wingsuit worn by any hero, waiting on his models.
+- Whole-piece rule: these OPEN two sandboxes; neither builds on an unfinished piece. DUEL stays open alongside.
+
 ## m974 -- BEASTS THROUGH THE DOORS: the three-headed dog, the blue dragon, the mech lightning dragon (`beastStep`, `ARENA.beast`)
 *"Creatures that come in through those gates and you fight them -- one could shoot fireballs, one could fly... they have attacks and
 entrances, could be fun to make things to fight in this game and develop the fight system with."* His robits creatures, from
