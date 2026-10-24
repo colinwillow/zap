@@ -5,6 +5,24 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m951 -- TAP TO PICK IT UP, AND HE CARRIES IT (step 2 of 4; throw and the CEO's interest next)
+
+- **The tap**: in reach of a pickable (the ring is up), the RIGHT pad's tap (keyboard E) is `pickTap` instead of the jump -- the left
+  tap still jumps. He turns to it and stops (`stickWorld` returns nothing while `p.pick`), a drawn weapon is put away
+  (`applySlot(0)`; drawing one while carrying drops the cup, `pickDrop`).
+- **The bend**: original Zap has no pick-up clip, so the Forge made one -- `Unarmed_Grab_Torch_From_Floor` (the library clip that
+  actually reaches the FLOOR: measured on him, left hand down to 0.20 hip heights at 1.73 s; `Picking_Up_Object` never goes below
+  his hips), trimmed 0.6-2.6 s, x1.3, his LEFT hand in a `wrap` round the cup (r .728 = .0756 m cup / his 0.104 m hand). New
+  profile `retarget-anims/library/profiles/zap.json`, baked to `forged/zap.glb`. **The hero now takes his bake** (`forgedHero`:
+  a clip his file lacks becomes one of his actions, ONCE + clamp) -- before this only NPCs and disguises read bakes.
+  The cup leaves the floor at `PICK.grabU` (.56) of the clip, into his left hand where the bake's `hold_hand_l` says.
+- **The carry**: `CLIPS.hold` = his own `hold_item`, in `SPLIT.up` + `upSq` -- the hips-free upper half over the ordinary gait's
+  legs (the override slot after swap and toss). The cup is turned upright every frame (`pickRun`). m96's carry (cut at m99) used
+  the WHOLE clip and stripped his hips; this one touches nothing below his spine and has no button.
+- No bake on this hero (Zap 2): the cup goes straight to his hand, no bend.
+Headless (hero=zap): tap -> pick 1.54 s, grabbed at .56, then carrying; screenshots: bent to it, then holding it upright in front.
+Shipped unverified.
+
 ## m950 -- THE VENDING MACHINE and THE INTERACTION RING (step 1 of 4: machine + ring; then pick-up/carry, throw, the CEO's interest)
 
 *"Instead of the debug button that makes him auto throw the drink... a little vending machine, and when I shoot or melee it the soda
