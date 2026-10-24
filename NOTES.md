@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m970 -- THE LAB, PASS 4: MOTION AND ARCHITECTURE (`arenaLab4`, dials in `ARENA.lab4`)
+*"Do another pass on the arena, more interest."* A still white room is a render; a moving one is a place.
+- **SCAN:** every `scanT` 9 s a thin additive cyan band (open cylinder, r 110) climbs out of the floor to the halo, fading.
+- **PULSE:** in step, a ring of light runs out across the floor from the centre to the horizon (one shader plane).
+- **PORTALS:** four 18 m graphite arches at the quarters past the dais, aluminium inner frame, cyan line, a line on the floor.
+- **OBSERVERS:** three gloss drones with a graphite ring and a cyan eye orbit at 9-18 m, bobbing, with a faint cone under them
+  (cut to .03 opacity and narrower after the first screenshots: up close it washed the view).
+- **CORE:** nested wireframe icosahedra turning inside the halo, a faint beam down to the centre spot.
+- Checked: `npm run check` ok; four headless views, no errors.
+
 ## m969 -- THE LAB, PASS 3: FINISHES, NOT COLOURS (a studio light, five materials, bevelled edges)
 *"It doesn't have to be completely white... Apple has shades of grey, and things have roughness and sheen and highlights... they
 do so much with so little."*
