@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m965 -- THE FIRST SECONDS ARE CHOPPY: the warm-up moved behind the card (bakes, shapes, every shader, every texture)
+
+*"When I boot Weirdport, the first 5 or 10 seconds it's choppy and laggy... once you're in game it's like warming up, then it goes
+away, but it's consistent."* MEASURED headless in the kit city (renderer.info + requests + logs, from `rig.ready` on): the files are
+all in by then, but (1) three.js compiles a shader / uploads a texture the first time something is DRAWN with it -- 132 textures at
+ready, and the fog + small-things culls hide 446 objects that `renderer.compile` (it walks only what is visible) never saw, so they
+compiled as they came into view; (2) the Forge bakes (m933, "off the boot path") and the DNA shapes (0.8 MB, processed 1.4 s in)
+arrived after the card -- their decode landed in the first seconds of play. New in this repo, which is why Weirdport never did it.
+Now, last thing before `rig.ready`: wait for `FORGED.ready` + the shapes (capped `BOOTWARM.wait` 8 s), then `bootWarm` -- every
+hidden object shown for the compile and hidden again, `renderer.compile`, `renderer.initTexture` on every texture a material holds.
+Headless after: "boot warm: 78 programs, 90 textures uploaded, 446 hidden shown", NO request and NO log after the card. The card
+stays up correspondingly longer (2.3 s of it under software rendering; a phone GPU is far quicker). `BOOTWARM.on = 0` is the A/B.
+Not measurable here: whether that was all of what he feels on the phone (no GPU in this container). Shipped unverified.
+
 ## m964 -- heights by the HEAD-TOP bone: Moussa 6'6", Colin = Jack 5'11", Zoar 5'7"
 
 *"Make Zoar a little shorter than Colin. Jack and Colin are the same height, Moussa is the tallest. Colin looks the shortest and
