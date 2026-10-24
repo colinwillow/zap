@@ -80,7 +80,7 @@ async function setCharacter(buf, name) {
     $('charNote').innerHTML = `${nb} Mixamo bones · hips ${ST.tg.hipH.toFixed(2)} m above his soles · ${ST.tg.rig.skinned.length} skinned mesh${ST.tg.rig.skinned.length === 1 ? '' : 'es'}` + (I.kept ? '' : ' · <span class="bad">no skin found: ground contact is off</span>');
     $('exNote').textContent = I.excluded.length ? I.excluded.join(', ') + ` (${I.dropped} sampled vertices)` : 'nothing: every vertex belongs to the body';
     renderPack(); dotsBuild(); boneMenu();
-    ST.handPoses = null; ST.wraps = {}; syncHands();
+    ST.handPoses = null; ST.wraps = {}; ST.wrapAx = {}; syncHands();
     syncSliders(); if (ST.P.clips.length) await previewEntry(ST.P.clips[0]); else chip('pick clips in LIBRARY');
   } catch (e) { console.error(e); chip('could not load ' + name + ': ' + e.message); }
   busy(false);
@@ -231,7 +231,7 @@ async function bake(en) {
   let reach = en.reach; const W = en.wrap || ST.P.wrap, wr = reach && ST.wraps[reach.side || 'Right'];
   if (reach && wr && W && W.tip && hands && hands.H[reach.side || 'Right'] && hands.H[reach.side || 'Right'].pose === 'wrap') {
     const hb = ST.tg.rig.bones['mixamorig_' + (reach.side || 'Right') + 'Hand'], A = F.socketAuto(hb, reach.side || 'Right');
-    if (A) reach = Object.assign({}, reach, { p: new THREE.Vector3(0, 0, 1).applyQuaternion(A.q).multiplyScalar(W.tip * wr.r).add(new THREE.Vector3().fromArray(wr.c)).toArray() }); }
+    if (A) reach = Object.assign({}, reach, { p: (wr.q ? new THREE.Vector3(0, 1, 0).applyQuaternion(new THREE.Quaternion().fromArray(wr.q)) : new THREE.Vector3(0, 0, 1).applyQuaternion(A.q)).multiplyScalar(W.tip * wr.r).add(new THREE.Vector3().fromArray(wr.c)).toArray() }); }
   const src = await source(en), r = F.carry(ST.tg, src, en.role, ST.P, { fk: en.fk, grip: gripOf(en), hands, upper, reach });
   return { src, rep: r.rep, clip: F.editLayer(r.clip, en.edit) };
 }
@@ -275,6 +275,16 @@ function handsFor(en) {
   for (const sd of ['Right', 'Left']) { const pose = E[sd] !== undefined ? E[sd] : D[sd] && D[sd].pose; H[sd] = { pose: pose || '', amt: D.amt === undefined ? 1 : D.amt }; }
   return H;
 }
+// m954: `wrap.up` = { role, u } -- the cup's axis is straight UP in that clip at that moment (his carry), said in his hand's frame.
+// Every clip that wraps that hand uses the same axis, so the cup does not turn in his fingers between the pick-up and the carry.
+async function wrapAxis(W, sd) {
+  if (!W.up || !W.up.role) return null; const key = sd + JSON.stringify(W.up); ST.wrapAx = ST.wrapAx || {}; if (ST.wrapAx[key]) return ST.wrapAx[key];
+  const en = ST.P.clips.find(c => c.role === W.up.role); if (!en) return null;
+  const src = await source(en), r = F.carry(ST.tg, src, en.role, ST.P, { fk: en.fk }), clip = F.editLayer(r.clip, en.edit);
+  const tg = ST.tg; tg.mixer.stopAllAction(); const a = tg.mixer.clipAction(clip); a.play(); a.time = clip.duration * (+W.up.u || 0); tg.mixer.update(0); tg.model.updateMatrixWorld(true);
+  const hb = tg.rig.bones['mixamorig_' + sd + 'Hand'], v = new THREE.Vector3(0, 1, 0).applyQuaternion(hb.getWorldQuaternion(new THREE.Quaternion()).invert());
+  a.stop(); tg.mixer.uncacheClip(clip); return (ST.wrapAx[key] = v.normalize().toArray());
+}
 async function handsOf(en) {
   const H = handsFor(en), need = new Set();
   for (const sd of ['Right', 'Left']) if (H[sd].pose) need.add(H[sd].pose);
@@ -287,8 +297,9 @@ async function handsOf(en) {
     ST.handPoses[nm] = P; }
   // m948: a WRAP is solved on his own hand round the clip's cylinder (`en.wrap`, or his `P.wrap`), not captured -- so it is per clip
   let poses = ST.handPoses;
-  if (need.has('wrap')) { const W = (en && en.wrap) || ST.P.wrap || { r: .6 }, P = {};
-    for (const sd of ['Right', 'Left']) if (H[sd].pose === 'wrap') { const w = F.wrapPose(ST.tg, sd, W, ST.handPoses.fist && ST.handPoses.fist[sd]); if (w) { P[sd] = w.pose; ST.wraps[sd] = { c: w.c, r: w.r }; } }
+  if (need.has('wrap')) { const W0 = (en && en.wrap) || ST.P.wrap || { r: .6 }, P = {};
+    for (const sd of ['Right', 'Left']) if (H[sd].pose === 'wrap') { const W = Object.assign({}, W0), ax = await wrapAxis(W0, sd); if (ax) W.axis = ax;
+      const w = F.wrapPose(ST.tg, sd, W, ST.handPoses.fist && ST.handPoses.fist[sd]); if (w) { P[sd] = w.pose; ST.wraps[sd] = { c: w.c, r: w.r, q: w.q }; } }
     poses = Object.assign({}, ST.handPoses, { wrap: P }); }
   return { H, poses };
 }
@@ -352,7 +363,7 @@ $('profPush').onclick = async () => {
     $('profNote').innerHTML = '<span class="ok">saved to the library as profiles/' + stemOf(ST.file) + '.json</span> -- tell Claude "bake ' + stemOf(ST.file) + '" and it goes into the game';
   } catch (e) { $('profNote').innerHTML = '<span class="bad">' + e.message + '</span>'; } };
 $('profLoad').onchange = async () => { const f = $('profLoad').files[0]; if (!f) return; ST.P = JSON.parse(await f.text()); saveProf(); await reprep(); renderPack(); };
-async function reprep() { if (!ST.tg) return; const m = ST.tg.model; ST.tg.restore(); ST.tg = F.prepTarget(m, { exclude: ST.P.exclude }); ST.sock = F.socketsOf(ST.tg, ST.P.sockets); sockAxes(); ST.handPoses = null; ST.wraps = {}; syncHands(); syncSliders(); dotsBuild(); }
+async function reprep() { if (!ST.tg) return; const m = ST.tg.model; ST.tg.restore(); ST.tg = F.prepTarget(m, { exclude: ST.P.exclude }); ST.sock = F.socketsOf(ST.tg, ST.P.sockets); sockAxes(); ST.handPoses = null; ST.wraps = {}; ST.wrapAx = {}; syncHands(); syncSliders(); dotsBuild(); }
 
 // ---------------------------------------------------------------- packs: roles and where each comes from, nothing about a body
 const packKey = 'forge.packs';
@@ -632,7 +643,7 @@ async function exportGLB(withMesh) {
   ST.tg.restore();
   // m948: where each wrapped hand's cylinder sits (hand-local, his own units) and its radius -- the game puts the cup THERE
   const holds = []; for (const sd in ST.wraps) { const hb = ST.tg.rig.bones['mixamorig_' + sd + 'Hand']; if (!hb) continue;
-    const o = new THREE.Object3D(); o.name = 'hold_hand_' + sd[0].toLowerCase(); o.position.fromArray(ST.wraps[sd].c); o.userData = { hold: 1, r: ST.wraps[sd].r }; hb.add(o); holds.push(o); }
+    const o = new THREE.Object3D(); o.name = 'hold_hand_' + sd[0].toLowerCase(); o.position.fromArray(ST.wraps[sd].c); if (ST.wraps[sd].q) o.quaternion.fromArray(ST.wraps[sd].q); o.userData = { hold: 1, r: ST.wraps[sd].r, ax: ST.wraps[sd].q ? 1 : 0 }; hb.add(o); holds.push(o); }
   m.traverse(o => { if ((o.name === 'forge_axes' || o.name === 'forge_prop' || o.isLine) && o.visible) { o.visible = false; hid.push(o); } });
   if (!withMesh) m.traverse(o => { if (o.isMesh && o.visible) { o.visible = false; hid.push(o); } });
   const out = await new GLTFExporter().parseAsync(m, { binary: true, animations: clips, onlyVisible: true });
@@ -772,7 +783,7 @@ window.forge = {
   },
   handPoses: () => HPOSES,
   async setWrap(role, W) { const en = role ? ST.P.clips.find(c => c.role === role) : null; if (role && !en) throw new Error('no clip "' + role + '"');
-    const tgt = en || ST.P; if (W && +W.r > 0) tgt.wrap = Object.assign({ r: +W.r }, W.tip ? { tip: +W.tip } : {}); else delete tgt.wrap; saveProf(); if (en) await previewEntry(en); return { wrap: tgt.wrap || null, at: ST.wraps }; },
+    const tgt = en || ST.P; ST.wrapAx = {}; if (W && +W.r > 0) tgt.wrap = Object.assign({ r: +W.r }, W.tip ? { tip: +W.tip } : {}, W.up ? { up: W.up } : {}); else delete tgt.wrap; saveProf(); if (en) await previewEntry(en); return { wrap: tgt.wrap || null, at: ST.wraps }; },
   async setReach(role, R) { const en = ST.P.clips.find(c => c.role === role); if (!en) throw new Error('no clip "' + role + '"'); if (R && R.t) en.reach = R; else delete en.reach; saveProf(); await previewEntry(en); return en.reach || null; },
   mouthGap(role, t) { const en = ST.P.clips.find(c => c.role === role); const S = F.socketAuto(ST.tg.rig.bones.mixamorig_RightHand, 'Right'); ST.act.time = t; ST.tg.mixer.update(0); ST.tg.model.updateMatrixWorld(true); const m = F.mouthPoint(ST.tg), s = S.p.clone().applyMatrix4(ST.tg.rig.bones.mixamorig_RightHand.matrixWorld); return +(m.distanceTo(s) / ST.tg.hipH).toFixed(3); },
   async compose(role, upperRole, from) { const en = ST.P.clips.find(c => c.role === role); if (!en) throw new Error('no clip "' + role + '"'); if (upperRole) en.upper = { role: upperRole, from: from || 'Spine1' }; else delete en.upper; saveProf(); await previewEntry(en); return { chip: $('chip').textContent, seconds: +ST.act.getClip().duration.toFixed(2) }; },

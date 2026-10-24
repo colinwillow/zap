@@ -392,7 +392,10 @@ export const WRAP = { palm: .14, back: .15, fr: .1, step: 1.5 };
 export function wrapPose(tg, side, W, fist) {
   const B = tg.rig.bones, M = 'mixamorig_' + side + 'Hand', hand = B['mixamorig_' + side + 'Hand']; if (!hand || !fist) return null;
   const S = socketAuto(hand, side); if (!S) return null;
-  const len = S.len, R = (+W.r || .5) * len, fr = WRAP.fr * len, Si = S.q.clone().invert();
+  // m954: `W.axis` (hand-local) -- the cup's axis, chosen by the app as straight UP in his carry pose -- instead of the socket's Z
+  const Zs = new THREE.Vector3(0, 0, 1).applyQuaternion(S.q), axis = W.axis ? new THREE.Vector3().fromArray(W.axis).normalize() : Zs;
+  const Sq = W.axis ? new THREE.Quaternion().setFromUnitVectors(Zs, axis).multiply(S.q) : S.q.clone();
+  const len = S.len, R = (+W.r || .5) * len, fr = WRAP.fr * len, Si = Sq.clone().invert();
   const toS = v => v.clone().sub(S.p).applyQuaternion(Si);                                    // hand-local -> socket-local
   const rq = bn => new THREE.Quaternion().fromArray(tg.T.rest[bn] || B[bn].quaternion.toArray());
   // the palm side: the middle finger curled to its fist -- where its tip goes, in the socket's X/Y plane, across the fingers
@@ -406,11 +409,15 @@ export function wrapPose(tg, side, W, fist) {
   // (axis x finger: a positive turn about the knuckle's curl axis carries the finger that way -- measured on the knuckle, not on a tip)
   const mb = M + 'Middle1', mD = fist[mb] && new THREE.Quaternion().fromArray(fist[mb]).multiply(rq(mb).invert()); if (!mD) return null; if (mD.w < 0) mD.set(-mD.x, -mD.y, -mD.z, -mD.w);
   const into = new THREE.Vector3(mD.x, mD.y, mD.z).normalize().cross(B[mb].position.clone().normalize());
-  const n = new THREE.Vector3(Math.sign(into.applyQuaternion(Si).x) || 1, 0, 0);
+  const iS = into.clone().applyQuaternion(Si); iS.z = 0;
+  const n = W.axis ? (iS.lengthSq() > 1e-8 ? iS.normalize() : new THREE.Vector3(1, 0, 0)) : new THREE.Vector3(Math.sign(iS.x) || 1, 0, 0);
   const knu = ['Index', 'Middle', 'Ring', 'Pinky'].map(f => chainPts(f, {})[0]).filter(Boolean).map(toS);
-  let s0 = toS(new THREE.Vector3()).dot(n), ky = 0; for (const k of knu) { s0 = Math.max(s0, k.dot(n)); ky += k.y / knu.length; }
-  // the centre, socket-local: off the palm by its radius and `palm`, level with the knuckle line less `back`, on the socket in Z
-  const cS = n.clone().multiplyScalar(s0 + WRAP.palm * len + R).setY(ky - WRAP.back * len);
+  const wr = toS(new THREE.Vector3()), kc = knu.reduce((a, k) => a.add(k), new THREE.Vector3()).multiplyScalar(1 / knu.length);
+  let s0 = wr.dot(n); for (const k of knu) s0 = Math.max(s0, k.dot(n));
+  // the centre, in the cup's frame (Z = its axis): off the palm by its radius and `palm`, level with the knuckle line less `back`
+  // toward the wrist, z 0. (Socket mode: n = +-X, and "along the fingers" is Y -- the m948 arithmetic exactly.)
+  const m = new THREE.Vector3(-n.y, n.x, 0), toWr = Math.sign(wr.clone().sub(kc).dot(m)) || -1;
+  const cS = n.clone().multiplyScalar(s0 + WRAP.palm * len + R).addScaledVector(m, kc.dot(m) + toWr * WRAP.back * len);
   const pose = {};
   for (const f of FINGERS) {
     const Q = {};
@@ -427,8 +434,8 @@ export function wrapPose(tg, side, W, fist) {
     }
     for (const bn in Q) pose[bn] = Q[bn].toArray();
   }
-  const c = cS.clone().applyQuaternion(S.q).add(S.p);
-  return { pose, c: c.toArray(), r: R };
+  const c = cS.clone().applyQuaternion(Sq).add(S.p);
+  return { pose, c: c.toArray(), r: R, q: new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), axis).toArray() };     // q: the cup's +Y onto its axis, hand-local
 }
 
 // ---- LAYER 6, THE FK LAYER -- his hand on a bone. `fk` is { boneName: [{ t, q:[x,y,z,w] }, ...] }: at each key, a rotation ADDED
@@ -610,7 +617,15 @@ export function editLayer(clip, E) {
 // by hip height, is how far THIS body's lowest skin point should be above the floor. The difference lifts or drops the hips.
 // It catches a stride that floats, a back that lies on a tail, a crouch that sinks -- and leaves a jump a jump, because the
 // library body is off the ground too. `amt` 0..1 is the A/B.
+export const GROUND = { stand: .6 };
+export function lowestFeetSource(src) {
+  let lo = Infinity;
+  for (const s of src.soles || []) { s.b.getWorldPosition(_v); const y = _v.y + s.v.clone().applyQuaternion(s.b.getWorldQuaternion(_sq)).y - src.restLow; if (y < lo) lo = y; }
+  for (const sd of ['Left', 'Right']) for (const nm of ['Foot', 'ToeBase', 'Toe_End']) { const b = src.rig.bones['mixamorig_' + sd + nm]; if (b) { const y = b.getWorldPosition(_v).y - src.restLow; if (y < lo) lo = y; } }
+  return lo === Infinity ? lowestSource(src) : lo;
+}
 export function groundLayer(tg, src, clip, amt = 1) {
+  if (tg.info.kept) footVerts(tg);
   const hipTr = clip.tracks.find(t => t.name === MHIPS + '.position');
   if (!hipTr || !tg.info.kept || amt <= 0) return { clip, max: 0, mean: 0 };
   const k = tg.hipH / (src.hipH || 1), times = hipTr.times, n = times.length, off = new Float32Array(n);
@@ -619,9 +634,15 @@ export function groundLayer(tg, src, clip, amt = 1) {
   const ta = tg.mixer.clipAction(clip); ta.play();
   for (let f = 0; f < n; f++) {
     sa.time = Math.min(src.clip.duration, times[f]); src.mixer.update(0); src.scene.updateMatrixWorld(true);
-    const want = tg.restLow + Math.max(0, lowestSource(src)) * k;
+    // m954: STANDING, ONLY HIS FEET COUNT. *"When he bends down to get it his feet lift off the ground for a second."* Bending to
+    // the floor, his HAND was his lowest point -- below his soles -- and this lifted his whole body to put the hand on the floor.
+    // So while the source's hips are above `GROUND.stand` of its hip height, both bodies are measured by their feet alone (the
+    // library body's sole points and foot joints, his feet's skin); lying down, falling, getting up: the whole body as before.
+    const up = src.rig.bones[MHIPS].getWorldPosition(_v).y - src.restLow > GROUND.stand * src.hipH && tg.feetIdx;
+    const want = tg.restLow + Math.max(0, up ? lowestFeetSource(src) : lowestSource(src)) * k;
     ta.time = times[f]; tg.mixer.update(0); tg.model.updateMatrixWorld(true);
-    off[f] = (want - lowestY(tg.info)) * amt;
+    const fl = up ? Math.min(lowestOf(tg.feetIdx.Left || []), lowestOf(tg.feetIdx.Right || [])) : Infinity;
+    off[f] = (want - (isFinite(fl) ? fl : lowestY(tg.info))) * amt;
   }
   sa.stop(); ta.stop(); src.mixer.uncacheClip(src.clip); tg.mixer.uncacheClip(clip);
   // a 3-tap smooth: the lowest point can hop between two vertices from one frame to the next
@@ -640,7 +661,14 @@ export function groundLayer(tg, src, clip, amt = 1) {
 // flat about the ankle, just far enough (bisection) that it is not. 3-tap smoothed. `amt` 0..1; 0 is the A/B.
 export function soleLayer(tg, clip, amt = 1) {
   if (!(amt > 0) || !tg.info.kept) return clip;
-  const B = tg.rig.bones, M = 'mixamorig_';
+  const B = tg.rig.bones, M = 'mixamorig_'; footVerts(tg);
+  const v = new THREE.Vector3(), low = L => lowestOf(L, v);
+  const ref = clip.tracks.find(t => t.name === MHIPS + '.position') || clip.tracks[0], times = ref.times, n = times.length;
+  return soleRun(tg, clip, amt, B, M, low, times, n);
+}
+// his FEET's skin (each vertex's strongest bone a Foot / ToeBase / Toe_End), per side, measured once
+export function footVerts(tg) {
+  const M = 'mixamorig_';
   if (!tg.feetIdx) { tg.feetIdx = {};
     for (const sd of ['Left', 'Right']) { const want = new Set([M + sd + 'Foot', M + sd + 'ToeBase', M + sd + 'Toe_End']), L = [];
       for (const { m, idx } of tg.info.meshes) { const sw = m.geometry.attributes.skinWeight, si = m.geometry.attributes.skinIndex, ids = [];
@@ -648,8 +676,10 @@ export function soleLayer(tg, clip, amt = 1) {
           const b = m.skeleton.bones[bi]; if (b && want.has(b.name)) ids.push(i); }
         if (ids.length) L.push({ m, ids }); }
       tg.feetIdx[sd] = L; } }
-  const v = new THREE.Vector3(), low = L => { let lo = Infinity; for (const { m, ids } of L) { m.skeleton.update(); for (const i of ids) { v.fromBufferAttribute(m.geometry.attributes.position, i); m.applyBoneTransform(i, v); v.applyMatrix4(m.matrixWorld); if (v.y < lo) lo = v.y; } } return lo; };
-  const ref = clip.tracks.find(t => t.name === MHIPS + '.position') || clip.tracks[0], times = ref.times, n = times.length;
+  return tg.feetIdx;
+}
+export function lowestOf(L, v = new THREE.Vector3()) { let lo = Infinity; for (const { m, ids } of L) { m.skeleton.update(); for (const i of ids) { v.fromBufferAttribute(m.geometry.attributes.position, i); m.applyBoneTransform(i, v); v.applyMatrix4(m.matrixWorld); if (v.y < lo) lo = v.y; } } return lo; }
+function soleRun(tg, clip, amt, B, M, low, times, n) {
   tg.mixer.stopAllAction(); const ta = tg.mixer.clipAction(clip); ta.play();
   const tracks = clip.tracks.slice(), a = new THREE.Vector3(), b = new THREE.Vector3(), f = new THREE.Vector3(), g = new THREE.Vector3(), I = new THREE.Quaternion(), qt = new THREE.Quaternion();
   for (const sd of ['Left', 'Right']) {

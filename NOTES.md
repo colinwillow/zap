@@ -5,6 +5,38 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m954 -- he WALKS to the cup before he bends, the cup sits IN his fingers upright, a snappier throw, a charge throw with a new reticle, the CEO's feet stay down, no hints
+
+*"He needs to walk and adjust once you've clicked to pick up, so he turns and walks and bends down to perfectly pick up the cup...
+when he's holding the cup it's kinda floating out in front of his hand... the throw animation is way too slow and the cup flies out
+before he's finished... press and hold should be a charge throw... not loving the dots... [the CEO's] feet lift off the ground
+when he bends down... I don't need the hints, they stay there forever."*
+- **The approach** (`pickSpot` / `pickSteer`): his left hand at the grab, MEASURED on his `pick_up` (Forge, left middle knuckle):
+  0.29 hip heights to his left, 0.80 in front, 0.24 up. The tap picks the spot that puts THAT on the cup (facing the cup) and
+  `stickWorld` returns a thumb toward it (`PICK.walkMag`), so his own gait walks him there; then he turns to face it
+  (`p.tossFace`), then bends. Headless: hand 9 cm from the cup's centre at the grab (cup radius 8.5).
+- **The carry, in his fingers.** `hold_item`'s left palm faces FORWARD with the fingers sideways (both hands clasped), so the cup sat
+  in front of the knuckles held by nothing. Now his Forge `carry` = the floor grab's held-up end (`Unarmed_Grab_Torch_From_Floor`
+  3.1-3.8 s), upper body only (`carry__ups`, made in `forgedHero`), fingers wrapped. And the CUP'S AXIS is no longer the socket's
+  Z (measured: 93-106 deg off vertical in that pose, 38 at the grab -- the cup lay on its side): `wrap.up {role: carry, u: .5}`
+  makes the Forge take straight UP in his hand in the carry as the cylinder's axis for EVERY clip that wraps that hand
+  (`wrapAxis`, `wrapPose`'s new `W.axis`), and the bake's `hold_hand_l` carries that turn (`extras.ax`). At the grab the cup keeps its
+  floor turn and glides into his fingers (`pickSettle`, .22 s); the same into his right hand when a throw starts.
+- **The throw**: draws back at `TOSS.drawRate` 1.7, throws at `throwRate` 2.2 (a flick: `quickRate` 2.2), and the top half lets go
+  `tail` .14 of the clip after the release instead of playing its 2 s recovery.
+- **The charge**: `chargeT` .9 -> .55 s, `vMax` 9 -> 11 m/s, up to 4.8. **The reticle** (was nine dots): a ribbon along the arc,
+  turned across the line of sight each frame (flat, it is edge-on from behind and vanishes), with light running down it toward the
+  landing; at the landing three arcs turning round a disc that FILLS with the charge and flashes white when full, and a 1.6 m column
+  of light standing on the spot -- MEASURED: the aiming lens sits 1.1 m up behind him, so a flat ring 10-12 m off is edge-on and the
+  first version (5 cm ribbon, .37 ring) was on screen and invisible. Ribbon now 9 cm. From that low lens the arc still climbs out of
+  the top of the frame. A first pass -- he is not sure what it should be either.
+- **The CEO's feet**: bending to the floor, his HAND was his lowest skin point and `groundLayer` lifted his whole body to put it on
+  the floor. Now while the source's hips are above `GROUND.stand` (.6) of its hip height, both bodies are measured by their FEET
+  alone (`lowestFeetSource`, `footVerts`); lying / falling / getting up still use the whole body. Measured on his pick-up: the
+  planted foot holds ankle 24 / ball 7 through the bend. Rebaked ceo_human (and zap).
+- **Hints off** (`ARENA.hint.on`; `mel.ARENA.hint.on = 1` brings them back).
+Shipped unverified.
+
 ## m953 -- THE CEO'S SPHERE OF INTEREST, and he shows it (step 4 of 4: the vending-machine drink loop is whole)
 
 *"Within a 10 or 15 foot radius of the CEO he kind of shows... he's interested, which shows it's been within his sphere of
