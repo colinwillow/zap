@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m944 -- THE STRETCH PLAYS THROUGH (m943's hold taken out): no freeze, no T, the plates pop over the end of it
+*"you have him holding the stretch pose -- I don't think he should, it just looks like he freezes. Just do the normal stretch and
+fit the armour coming in shortly overlapped with the end of the transform. If the armour pops out while he's in idle, that's fine.
+I just don't want the T-pose."* (m943 answered two notes with one change: it froze the pose to avoid the T.)
+- The T was only ever the 0.15 s blend from the stretch's arms-up to the idle's arms-down. Now the stretch runs on to its OWN end
+  (LoopOnce, clamped), the plates start .08 s after he lands, and when the stretch is done he eases into the taunt on a slow blend
+  (`snapHL` .3) -- slow enough that the arms come DOWN rather than swing through straight-out. The roar stays at the end of the
+  morph (`act.roarAt` .86).
+- Game frames: armorUp 0.12 s arms up and coming down, 0.94 s lower with plates appearing, then idle. No hold, no T.
+
 ## m943 -- THE BOSS TRANSFORM'S T-POSE: he HOLDS the stretch, roars at the end of it, and the plates punch out over it
 *"he transforms, he stretches and then it snaps T-pose... the armour shoots out on the T-pose. The armour should snap out while
 he's still in his stretch mode and roaring -- clang clang clang -- overlap those things, but never snap to T-pose."*
