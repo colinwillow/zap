@@ -729,7 +729,7 @@ window.forge = {
   },
   // where the lens is: 'front' (his face), 'back', 'left' / 'right' (HIS sides), 'three' (three-quarter), 'top'; ghost off for a clean look
   view(name, ghost) {
-    const H = ST.tg.hipH * 2.2, V = { front: [0, .5, 1.7], back: [0, .5, -1.7], left: [1.7, .5, 0], right: [-1.7, .5, 0], three: [1.1, .6, 1.3], top: [0, 2.2, .01] }[name] || [1.7, .7, 2];
+    const hd = ST.tg.rig.bones.mixamorig_Head, H = hd ? (hd.getWorldPosition(new THREE.Vector3()).y * 1.12) : ST.tg.hipH * 2.2, V = { front: [0, .5, 1.7], back: [0, .5, -1.7], left: [1.7, .5, 0], right: [-1.7, .5, 0], three: [1.1, .6, 1.3], top: [0, 2.2, .01] }[name] || [1.7, .7, 2];
     orbit.target.set(0, H * .45, 0); cam.position.set(V[0] * H, V[1] * H, V[2] * H); orbit.update();
     if (ST.ghost) { ST.ghost.root.visible = !!ghost; if (!ghost) ST.ghost.help.visible = false; }
   },
@@ -747,6 +747,19 @@ window.forge = {
     syncHands(); saveProf(); if (ST.cur) await previewEntry(ST.cur); return D;
   },
   handPoses: () => HPOSES,
+  // the measured reference speed of a locomotion clip on THIS body, the game's way: the planted (slower) foot's speed against the
+  // hips, at its plateau, in the file's metres per second -- times the game's scale for him is his `walkRef` / `runRef`
+  async gait(role) {
+    const en = ST.P.clips.find(c => c.role === role); if (!en) throw new Error('no clip "' + role + '"'); await previewEntry(en);
+    const c = ST.act.getClip(), B = ST.tg.rig.bones, n = Math.max(24, Math.round(c.duration * 60)), sp = [], V = () => new THREE.Vector3();
+    let prev = null;
+    for (let f = 0; f <= n; f++) { ST.act.time = c.duration * f / n; ST.tg.mixer.update(0); ST.tg.model.updateMatrixWorld(true);
+      const h = B.mixamorig_Hips.getWorldPosition(V()), L = B.mixamorig_LeftFoot.getWorldPosition(V()).sub(h), R = B.mixamorig_RightFoot.getWorldPosition(V()).sub(h); L.y = R.y = 0;
+      if (prev) { const dt = c.duration / n; sp.push(Math.min(L.distanceTo(prev[0]), R.distanceTo(prev[1])) / dt); } prev = [L, R]; }
+    sp.sort((a, b) => a - b); const plateau = sp.slice(Math.floor(sp.length * .3), Math.floor(sp.length * .7)), v = plateau.reduce((a, b) => a + b, 0) / plateau.length;
+    let lo = Infinity, hi = -Infinity; ST.tg.restore(); ST.tg.model.traverse(o => { if (o.isSkinnedMesh) { o.skeleton.update(); const p = o.geometry.attributes.position; for (let i = 0; i < p.count; i += 5) { const w = V().fromBufferAttribute(p, i); o.applyBoneTransform(i, w); w.applyMatrix4(o.matrixWorld); lo = Math.min(lo, w.y); hi = Math.max(hi, w.y); } } });
+    await previewEntry(en); return { role, mps: +v.toFixed(4), authoredHeight: +(hi - lo).toFixed(4) };
+  },
   async setSocket(side, o) {
     const S = ST.sock && ST.sock[side]; if (!S) throw new Error('no ' + side + ' hand socket');
     if (o.reset) { if (ST.P.sockets) delete ST.P.sockets[side]; if (S.auto) { S.node.position.copy(S.auto.p); S.node.quaternion.copy(S.auto.q); } S.node.userData.forged = 0; }

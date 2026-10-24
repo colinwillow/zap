@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m937 -- THE CEO, FORGED: the first real use of the tool, done by Claude as the AGENT (forge-mcp), and NPC bodies take bakes
+*"every time I call the CEO he beams in with... the warrior alien's animations, and he looks kinda crappy. He could be an amazing
+first test case."* His file carried the Brutes' baked set under warrior names.
+- **Game: `forgedMerge` (in `bodyProto`)**: a bake for a body that is a KIND -- an NPC, not just a disguise -- replaces his own
+  clips of the same name and adds the rest; a bake that arrives after the kind was built is merged then. The chip notes
+  `FORGED <stem> <n> (npc)`.
+- **The CEO pass, every step through MCP tools** (`retarget-anims/mcp/run.mjs` runs a list of calls): `load_character` ceo_human ->
+  9 `add_clip` under his table's own names, so CEOK.clips needed no edit: standing_idle = Idle_10 ("Standing Idle", 8.4 s),
+  standing_walk_forward = Walking_3 ("Male Standard Walk"), standing_run_forward = Standard_Run, Head_Hit = Head_Hit_2,
+  Hit_To_Body = Hit_To_Body_1, standing_react_large_gut = Standing_React_Large_Gut, Big_Hit_To_Head = Big_Hit_To_Head,
+  Shoulder_Hit_And_Fall = Stunned ("knocked down from a punch", ends on his back), Getting_Up = Getting_Up (from his back);
+  `set_hands` relaxed both, noise 3 deg at 0.5 Hz; `render` front / side / three-quarter of each, looked at: idle and walk read
+  naturally with the arms at his sides (no arms slider needed), fall and get-up agree (back -> back); `save_profile` ->
+  library/profiles/ceo_human.json; `node tools/forgebake.cjs ceo_human` -> forged/ceo_human.glb (9 clips, 0.96 MB).
+- **His gait, measured on his body** (new `forge.gait` / MCP `measure_gait`: planted foot vs hips at the plateau): walk 0.3202,
+  run 0.7918 m/s in the file x (1.75 / 0.7627 authored) -> **walkRef 0.735, runRef / fleeRef 1.817** (were the warrior's 0.86 /
+  1.79 -- the walk would have slid).
+- Forge `view` frames off his head bone now (it cut heads off short-legged bodies).
+- Tested headless: arena, `arenaSpawn('CEO')` -> all 9 forged clips identity-checked in his pool, no page errors.
+
 ## m936 -- HAND POSES: clean hands from the library over the donor's fingers, per side, per clip, with finger noise
 *"my donor character came standard with fucked up fingers and it's just transferred to every other character... you only need a
 handful of hand poses -- neutral, fist for holding, flat for running, a cup, a point -- choose the hand positions per animation,
