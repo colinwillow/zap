@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m979 -- SWORD build b: THE CROUCHED GUARD AND THE PARRY (`guardClip`, `katanaParry`)
+*"Link... this crouched back with the sword in guard position... for a block."* (SWORD.md build b.)
+- **The guard** is the pull-down hold he likes (guard + lock-on, unchanged as input): with the katana it holds `katana_guard`
+  (Great Sword Crouching) -- the whole clip standing still (crouched, blade across), its top half over the strafe legs while he
+  circles the lock. Its halves are split at load via a new optional list (`SPLIT.upRaw`: split when the body has the clip, silent
+  when it does not -- `SPLIT.up` would put NO CLIP in the chip of every other hero).
+- **The parry**: a blow taken square on the guard (`BLOCK.perfect`, 31 deg either side) already cost nothing; with the katana it
+  now STAGGERS the attacker. `playerHurt` is not told who hit him, so it is the nearest body in front within 3.8 m (the one that
+  just swung): a big reaction for `KNOCKDOWN.stagger x 1.3`, his wind-up cancelled, shield down; a creature flinches and banks
+  stun toward dizzy (`beastHurt` + 2). Hitstop .12, a camera kick, a white flash at the blade. A soak (inside the arc, not square)
+  is the old block.
+- Checked headless with REAL touch on the right pad (a mobile context + CDP touch events; the desktop page has no pads):
+  `block 1`, `katana_guard` at weight 1.00, crouched with the blade across him; a blow onto the guard: `Warboss -> hit
+  (standing_react_large_gut), player hp 100 -> 100`, the flash on screen. No errors.
+- SWORD.md moves: box 2 (guard + lock-on blocks from the front; a timed guard parries and opens him) is BUILT, not ticked.
+
 ## m978 -- SWORD build a: THE KATANA, four directional swings (`KATANA`, `katanaScene`, the KATANA slot)
 *"Yeah, start build a with the katana."* (SWORD.md: the four directional attacks first.)
 - **The katana** is built in code (`katanaScene`) to the weapon-bone convention READ OFF THE HAMMER'S FILE: root in the fist, tip
