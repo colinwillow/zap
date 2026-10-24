@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m945 -- the transform twice as fast, the roar with the stretch, armour on the floor drawn both sides
+*"the transform should happen quicker, maybe double time... the roar a little sooner -- the minute you set off the stretch, set off
+the roar... the pieces sitting on the ground look like weird tattered holey cloth -- is that the underside?"* Yes:
+- **Armour debris `DoubleSide`** (`arenaArmourOff`, on the cloned materials only): a plate is a thin ONE-sided shell; on his body
+  only its outside faces you, but lying on the floor you look into it and the inside is back-face culled -- holes. On him it stays
+  single-sided (no fill cost while he is whole).
+- `ARENA.morph.act.speed` 1.15 -> **2.3** (the stretch-driven morph runs in half the time), `ease` .4 -> .25, `ARENA.morph.dur`
+  2.0 -> **1.0** (the plain morph); `act.roarAt` .86 -> **.04**: the roar goes off as the stretch starts.
+
 ## m944 -- THE STRETCH PLAYS THROUGH (m943's hold taken out): no freeze, no T, the plates pop over the end of it
 *"you have him holding the stretch pose -- I don't think he should, it just looks like he freezes. Just do the normal stretch and
 fit the armour coming in shortly overlapped with the end of the transform. If the armour pops out while he's in idle, that's fine.
