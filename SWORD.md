@@ -69,6 +69,17 @@ with the lunge), the mech swoops (roll the swoop, chop it when it lands).
 - Readability: a blade trail on every swing (one ribbon, one draw), a spark + clang on a block, a white flash on a parry, the
   charge glow.
 
+## Later: SMEAR FRAMES (his idea, Oct 24 2026 -- not built)
+
+*"Older arcade games... just have your rest pose, and when you push a button one frame that shows a smear of the guy as if he was
+in motion, and then a rest pose like he just did the lunge. It creates a super cool stylized effect... why not do that in 3D...
+the attacks are so fast."*
+- **Pose to pose**: hold the anticipation pose, one or two SMEAR frames, then SNAP to the follow-through pose and hold it. The
+  katana clips already contain both key poses; the swing samples them as held keys instead of playing smoothly.
+- **The smear**: a vertex-shader stretch of the body and blade along the motion for 1-2 frames, plus a ghost / arc of the blade.
+- **The hit lands on the smear frame** (hitstop on the follow-through pose sells it).
+- After builds b-d (guard, charge, combos) so it can be applied to all of them; a switch (smooth vs smear) so he can compare.
+
 ## DONE WHEN (the whole-piece gate -- every box needs evidence in the NOTES entry that ticks it)
 
 - [ ] Four directional attacks that look and feel different (slash L, slash R, chop, thrust), and the slash chains a 3-hit combo.
