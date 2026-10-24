@@ -714,7 +714,7 @@ const smooth01 = x => { const t = Math.max(0, Math.min(1, x)); return t * t * (3
 
 // ---- LAYER 7, CLIP EDITS: trim (seconds in the source) and speed
 export function editLayer(clip, E) {
-  if (!E) return clip;
+  if (!E) return loopSeam(clip);
   let c = clip;
   // m959: IN PLACE -- a locomotion clip whose hips TRAVEL (the library's `Sprint`: 127 units forward a cycle) runs forward and
   // snaps back every loop in a game that moves the root itself. The hips' straight-line drift from first frame to last is taken
@@ -735,7 +735,21 @@ export function editLayer(clip, E) {
   }
   const sp = +E.speed || 1;
   if (sp !== 1) c = new THREE.AnimationClip(c.name, c.duration / sp, c.tracks.map(t => new t.constructor(t.name, t.times.map(x => x / sp), t.values)));
-  return c;
+  return loopSeam(c);
+}
+// m960: THE DUPLICATE SEAM FRAME. *"Is there a duplicate clip at the end of the run, where the last frame is the same as the first?"*
+// There was: a Mixamo loop ends on its first pose again (`run_std` 0.02 deg, `sprint_std` 0.03, against 18 for the frame before),
+// so a looping clip holds that pose for two frames every cycle -- a hitch. When EVERY rotation's last key is within `SEAM.deg` of
+// its first, the last key goes and the clip is one frame shorter. (A one-shot that ends where it began just loses 1/30 s.)
+export const SEAM = { deg: .5 };
+export function loopSeam(c) {
+  const rot = c.tracks.filter(t => t.name.endsWith('.quaternion') && t.times.length > 2); if (!rot.length) return c;
+  const n = rot[0].times.length; if (rot.some(t => t.times.length !== n)) return c;
+  const lim = Math.cos(SEAM.deg * Math.PI / 360);
+  for (const t of rot) { const v = t.values, L = (n - 1) * 4; if (Math.abs(v[0] * v[L] + v[1] * v[L + 1] + v[2] * v[L + 2] + v[3] * v[L + 3]) < lim) return c; }
+  const T = rot[0].times, end = T[n - 2];
+  return new THREE.AnimationClip(c.name, end, c.tracks.map(t => { if (t.times.length !== n) return t; const sz = t.getValueSize();
+    return new t.constructor(t.name, t.times.slice(0, n - 1), t.values.slice(0, (n - 1) * sz)); }));
 }
 
 // ---- LAYER 3, GROUND CONTACT. Per frame: how far the library body's lowest joint is above where it is standing at rest, scaled

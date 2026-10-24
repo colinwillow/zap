@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m960 -- THE DUPLICATE SEAM FRAME at the end of the run: dropped by the Forge for every clip (`loopSeam`)
+
+*"Check if there's a duplicate at the end of the run sequence, where the last frame is the same as the first."* There was. Per
+rotation track, first key vs last: `run_std` 0.02 deg, `sprint_std` 0.03 (against 18.6 / 18.0 for the frame before last) -- a Mixamo
+loop ends on its first pose again, so a looping clip holds it for two frames each cycle. The CEO's library walk / run were not
+(4.4 / 5.2 deg after his layers). `editLayer` now ends with `loopSeam`: when EVERY rotation's last key is within `SEAM.deg` (.5)
+of its first, the last key goes and the clip is one frame shorter (a one-shot that ends where it began loses 1/30 s). After:
+`run_std` 23 keys to 0.733 s (the source: 23 frames, 0.7333), `sprint_std` 17 to 0.533; seams now one ordinary step apart.
+Rebaked zap, ceo_human, zoar. Shipped unverified.
+
 ## m959 -- THE SPRINT HAD ROOT MOTION: taken in place (Forge `edit.inPlace`), and its true speed kept from that travel
 
 *"You forgot to take off the transform, so he runs forward in the animation and then teleports back... You always need to remove
