@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m972 -- THE ARENA, DETAIL PASS (all into the m971 buckets: vertices, not draws)
+*"Do another pass on the arena, more detail."*
+- AISLES: three stepped aisles down each sector of every tier, a small light every fourth landing.
+- FINS on every fascia every ~4 degrees; a FROSTED balustrade with a rail and posts on every lip (the `frost` bucket, the one
+  transparent mesh, not mirrored: two layers of glass sort badly).
+- CANOPY: 40 ribs, two downlights each, a lit fixture between them round the inner edge. CURTAIN WALL of glass and 64 mullions above
+  the top tier up to the roof, with a light line at its foot.
+- PORTALS: angled buttresses at each pillar foot, a light bar in front. LIGHT BLOCKS along the foot of the first tier and round the
+  dais step. TILES in five close greys with the odd inset strip (4 m tiles, `arenaTileTex`).
+- Draws: building 5 (+4 mirrored). Checked: `npm run check` ok; headless views, no errors.
+
 ## m971 -- THE ARENA FROM HIS REFERENCE: tiers, canopy rings, portals, a reflecting floor, white light (TOOLS > LIGHT)
 He sent a picture with no words after "more interest": a white arena -- curved tiers whose every lip is a continuous WHITE light strip,
 a nested ring canopy on tall pillars, a polished tiled floor reflecting the lights, a raised round dais with glowing edges, a portal
