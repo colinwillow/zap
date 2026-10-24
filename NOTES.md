@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m953 -- THE CEO'S SPHERE OF INTEREST, and he shows it (step 4 of 4: the vending-machine drink loop is whole)
+
+*"Within a 10 or 15 foot radius of the CEO he kind of shows... he's interested, which shows it's been within his sphere of
+interest, and then he goes over and drinks it."* `DRINK.see` 14 m (the whole field) -> **4.6 m**. Inside it, the `see` phase plays
+a Forge reaction while he turns to the cup, then the walk / pick / drink / stagger / transform as before. Two baked onto the CEO
+(profile + `forged/ceo_human.glb`): `notice` = the library's `Reacting` (surprised, a hand to his chest; 0.3-2.6 s x1.3) and
+`notice_look` = `Looking` (shading his eyes; 0.6-3.0 s x1.4). **His taste call: TOOLS -> `CEO: OOH` / `CEO: LOOK`** (`DRINK.notice`).
+Headless: a cup landing ~15 m off is ignored; one 3 m off -> `see` (the reaction) -> `walk`.
+The whole loop now: shoot/melee the machine -> a cup flies out -> the ring -> tap to pick up -> carry -> flick or hold-and-release
+to throw -> it lands near him -> he reacts, walks over, drinks, transforms. Shipped unverified.
+
 ## m952 -- THE THROW: flick = quick toss, hold up = wind up with a reticle, release = throw (step 3 of 4)
 
 *"Swiping on the right stick is a quick toss towards whatever direction you swipe, or press and hold forward... brings his arm
