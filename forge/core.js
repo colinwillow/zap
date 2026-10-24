@@ -680,7 +680,10 @@ export function weapLayer(tg, src, clip, W) {
     if (cd && ct && hd) {
       // 1-2: the donor's weapon in his chest frame -> this body's chest frame
       const cdi = cdQ.clone().invert(), lp = wdP.clone().sub(cdP).applyQuaternion(cdi), lq = cdi.clone().multiply(wdQ);
-      lp.x *= ct.w / cd.w; lp.y *= ct.sp / cd.sp; lp.z *= ct.sp / cd.sp;
+      // m962: `W.x/y/z` multiply the offsets on top of the proportions (*"the space between Zoar's head and his rocket launcher":
+      // the across offset follows shoulder WIDTH, and Zap's are narrow under a big head -- on a man with normal shoulders and a small
+      // head that put the launcher a head-width out)
+      lp.x *= ct.w / cd.w * (W.x ?? 1); lp.y *= ct.sp / cd.sp * (W.y ?? 1); lp.z *= ct.sp / cd.sp * (W.z ?? 1);
       const wtP = lp.applyQuaternion(ctQ).add(ctP), wtQ = ctQ.clone().multiply(lq);
       // the donor's left hand on his weapon (before this body's pose moves), in the weapon's frame
       const lh = S[M + 'LeftHand'], lhP = lh ? lh.getWorldPosition(new THREE.Vector3()) : null, lhQ = lh ? lh.getWorldQuaternion(new THREE.Quaternion()) : null;

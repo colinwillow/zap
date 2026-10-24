@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m962 -- Zoar's launcher in against his head (`weap.x`)
+
+*"Fix the space between Zoar's head and his rocket launcher. Zap had a big head and the spacing looked good, with Zoar it seems
+awkwardly outward."* `weapLayer` scales the weapon's ACROSS offset by shoulder width -- and Zap's shoulders are narrow under a big
+head, so his launcher sits at his cheek; on Zoar (normal shoulders, smaller head) the same proportion put it a head-width out.
+`weap {x, y, z}` now multiplies the chest-frame offsets on top of the proportions (default 1); Zoar's two `rocket_launcher*` clips
+take `x: .6`. Headless, front and back with Zap beside: it sits at the edge of his hair by his cheek, as Zap's does. Shipped unverified.
+
 ## m960 -- THE DUPLICATE SEAM FRAME at the end of the run: dropped by the Forge for every clip (`loopSeam`)
 
 *"Check if there's a duplicate at the end of the run sequence, where the last frame is the same as the first."* There was. Per
