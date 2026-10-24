@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m971 -- THE ARENA FROM HIS REFERENCE: tiers, canopy rings, portals, a reflecting floor, white light (TOOLS > LIGHT)
+He sent a picture with no words after "more interest": a white arena -- curved tiers whose every lip is a continuous WHITE light strip,
+a nested ring canopy on tall pillars, a polished tiled floor reflecting the lights, a raised round dais with glowing edges, a portal
+straight ahead with a ring emblem and a vertical light line. Rebuilt to that (`arenaLab`); the monoliths, halo, shapes, arches, core
+and scan are gone; the drones (no cones now) and the floor pulse stay.
+- **The dais:** the field and track stay at y 0 (nothing about walking changes); the room's floor is now at `ARENA.lab.floorY`
+  -.3, with a step ring at -.15 and a light line on every edge. Colliders untouched.
+- **Tiers:** three rings of seats (r 30-65, up to 26.6 m) in four sectors, a gap at each quarter; fascia, two strips, a lip
+  overhang with its own strip, a concourse behind. **Portals:** a pillar pair flanking each gap, a back wall with a ring emblem and
+  a vertical line, a floor line out to it. **Canopy:** a ring roof at 36 m (r 33-72) on 16 outer pillars, light round its inner
+  edge, a smaller ring hung inside at 31 m.
+- **ONE MESH PER FINISH:** every piece goes into a bucket and is merged (`mergeGeometries`, all converted non-indexed first:
+  ExtrudeGeometry is non-indexed and a mixed bucket returns null). The whole building is 4 draws.
+- **REFLECTION, no extra pass:** a mirrored copy of those 4 meshes (scale.y -1 about the floor) under a floor at .84 opacity
+  (field .93, track .9). The floors are separate rings, so no two translucent floors stack.
+- **The building is MID GREY on purpose** (`ARENA.look.archC` / `glossC`): first try was near-white and under this much light it
+  rendered at 1.0, the same as the strips, which vanished. Fog pushed to 80-280 m, or the stands greyed away.
+- **Light colour is his taste, so a switch:** TOOLS > LIGHT WHITE / CYAN (`arenaGlowSet`, saved in `mel.arena.glow`).
+- Checked: `npm run check` ok; headless views, no errors. Open: whether it reads like his picture is his call.
+
 ## m970 -- THE LAB, PASS 4: MOTION AND ARCHITECTURE (`arenaLab4`, dials in `ARENA.lab4`)
 *"Do another pass on the arena, more interest."* A still white room is a render; a moving one is a place.
 - **SCAN:** every `scanT` 9 s a thin additive cyan band (open cylinder, r 110) climbs out of the floor to the halo, fading.
