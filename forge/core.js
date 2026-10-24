@@ -638,6 +638,80 @@ export function reachLayer(tg, clip, R) {
   return new THREE.AnimationClip(clip.name, clip.duration, clip.tracks.filter(t => !nm.has(t.name)).concat(Object.keys(out).map(b => new THREE.QuaternionKeyframeTrack(b + '.quaternion', times, out[b]))));
 }
 
+// ---- LAYER 5d, THE WEAPON DRIVES THE HANDS (m958). *"When transferring animations from one rig to another... the hand would be the
+// determining position."* Rotations carry the POSE (so a short-armed man still moves like himself); wherever a hand TOUCHES
+// something it must be driven by POSITION. For a weapon clip the thing touched is the weapon, so per frame:
+//   1. the DONOR's weapon (its right-hand mount, `ZAP_MOUNT` on his `handFrame`) is read in his CHEST frame -- anatomical: origin
+//      between the shoulders, X across them to his left, Y up the spine (hips -> neck), Z forward -- so no bone axis is trusted;
+//   2. it is put in the same place in THIS body's chest frame, offsets scaled by his shoulder width (across) and spine (up, fore);
+//   3. his right arm is solved (two bones, the elbow kept in its plane) so his right hand holds that mount, hand turned exactly;
+//   4. his left hand goes where the donor's left hand is ON THE WEAPON (in the weapon's frame, scaled by the weapon's size on each,
+//      which follows hand length -- m794), with a weight that lets go when the donor's left hand leaves it (`WEAPIK.near/far`).
+// `W` = { two: 1 } (left hand too) | { two: 0 }. Needs fingers on both rigs (the mount and the frames are measured off them).
+export const WEAPIK = { near: 2.5, far: 4 };     // donor left hand to his weapon, in his hand lengths: on it / off it
+function chestFrame(B, outP, outQ) {
+  const L = B.mixamorig_LeftArm, R = B.mixamorig_RightArm, H = B.mixamorig_Hips, N = B.mixamorig_Neck; if (!L || !R || !H || !N) return null;
+  const l = L.getWorldPosition(new THREE.Vector3()), r = R.getWorldPosition(new THREE.Vector3()), x = l.clone().sub(r), w = x.length(); x.normalize();
+  const y = N.getWorldPosition(new THREE.Vector3()).sub(H.getWorldPosition(new THREE.Vector3())), sp = y.length(); y.addScaledVector(x, -y.dot(x)).normalize();
+  outP.copy(l).add(r).multiplyScalar(.5); outQ.setFromRotationMatrix(new THREE.Matrix4().makeBasis(x, y, new THREE.Vector3().crossVectors(x, y)));
+  return { w, sp };
+}
+function mountWorld(hand, side, outP, outQ) {     // the weapon mount on this hand, in the world (position, turn); and the hand length
+  const F = handFrame(hand, side), Z = ZAP_MOUNT['weapon_root_' + side.toLowerCase()]; if (!F || !Z) return 0;
+  const hq = hand.getWorldQuaternion(new THREE.Quaternion()), hs = hand.getWorldScale(new THREE.Vector3()).x;
+  const lp = new THREE.Vector3(...Z.o).multiplyScalar(F.len).applyQuaternion(F.q), lq = F.q.clone().multiply(new THREE.Quaternion(...Z.q));
+  outP.copy(lp).multiplyScalar(hs).applyQuaternion(hq).add(hand.getWorldPosition(new THREE.Vector3())); outQ.copy(hq).multiply(lq);
+  return F.len * hs;
+}
+export function weapLayer(tg, src, clip, W) {
+  if (!W) return clip;
+  const B = tg.rig.bones, S = src.rig.bones, M = 'mixamorig_';
+  if (!B[M + 'RightHand'] || !S[M + 'RightHand'] || !handFrame(B[M + 'RightHand'], 'Right') || !handFrame(S[M + 'RightHand'], 'Right')) return clip;
+  const ref = clip.tracks.find(t => t.name === MHIPS + '.position') || clip.tracks[0], times = ref.times, n = times.length;
+  const bones = []; for (const sd of ['Right', 'Left']) for (const b of ['Arm', 'ForeArm', 'Hand']) bones.push(M + sd + b);
+  const out = {}; for (const b of bones) out[b] = new Float32Array(n * 4);
+  src.mixer.stopAllAction(); tg.mixer.stopAllAction(); const sa = src.mixer.clipAction(src.clip); sa.play(); const ta = tg.mixer.clipAction(clip); ta.play();
+  const cdP = new THREE.Vector3(), cdQ = new THREE.Quaternion(), ctP = new THREE.Vector3(), ctQ = new THREE.Quaternion(), wdP = new THREE.Vector3(), wdQ = new THREE.Quaternion();
+  const mtP = new THREE.Vector3(), mtQ = new THREE.Quaternion(), I = new THREE.Quaternion();
+  for (let f = 0; f < n; f++) {
+    sa.time = Math.min(src.clip.duration, times[f]); src.mixer.update(0); src.scene.updateMatrixWorld(true);
+    ta.time = times[f]; tg.mixer.update(0); tg.model.updateMatrixWorld(true);
+    const cd = chestFrame(S, cdP, cdQ), ct = chestFrame(B, ctP, ctQ), hd = mountWorld(S[M + 'RightHand'], 'Right', wdP, wdQ);
+    if (cd && ct && hd) {
+      // 1-2: the donor's weapon in his chest frame -> this body's chest frame
+      const cdi = cdQ.clone().invert(), lp = wdP.clone().sub(cdP).applyQuaternion(cdi), lq = cdi.clone().multiply(wdQ);
+      lp.x *= ct.w / cd.w; lp.y *= ct.sp / cd.sp; lp.z *= ct.sp / cd.sp;
+      const wtP = lp.applyQuaternion(ctQ).add(ctP), wtQ = ctQ.clone().multiply(lq);
+      // the donor's left hand on his weapon (before this body's pose moves), in the weapon's frame
+      const lh = S[M + 'LeftHand'], lhP = lh ? lh.getWorldPosition(new THREE.Vector3()) : null, lhQ = lh ? lh.getWorldQuaternion(new THREE.Quaternion()) : null;
+      // 3: his right hand: where its mount IS now, and the turn that puts it on the weapon
+      const RH = B[M + 'RightHand'], ht = mountWorld(RH, 'Right', mtP, mtQ);
+      if (ht) {
+        const dq = wtQ.clone().multiply(mtQ.clone().invert()), hq = dq.multiply(RH.getWorldQuaternion(new THREE.Quaternion()));
+        setWorldQ(RH, hq); RH.updateMatrixWorld(true); mountWorld(RH, 'Right', mtP, mtQ);
+        const want = RH.getWorldPosition(new THREE.Vector3()).add(wtP.clone().sub(mtP));
+        legTo(B, M + 'RightArm', M + 'RightForeArm', M + 'RightHand', want, true);
+        // 4: the left hand onto the weapon, as the donor's is
+        if (W.two && lhP && B[M + 'LeftHand']) {
+          const k = ht / hd, wdi = wdQ.clone().invert(), rel = lhP.clone().sub(wdP).applyQuaternion(wdi), relQ = wdi.clone().multiply(lhQ);
+          const dist = rel.length() / hd, w = 1 - smooth01((dist - WEAPIK.near) / (WEAPIK.far - WEAPIK.near));
+          if (w > 0) {
+            const tP = rel.multiplyScalar(k).applyQuaternion(wtQ).add(wtP), tQ = wtQ.clone().multiply(relQ), LH = B[M + 'LeftHand'];
+            const here = LH.getWorldPosition(new THREE.Vector3()), hq0 = LH.getWorldQuaternion(new THREE.Quaternion());
+            legTo(B, M + 'LeftArm', M + 'LeftForeArm', M + 'LeftHand', here.lerp(tP, w), false);
+            setWorldQ(LH, hq0.slerp(tQ, w));
+          }
+        }
+      }
+    }
+    for (const b of bones) { const q = B[b] ? B[b].quaternion : I; out[b].set([q.x, q.y, q.z, q.w], f * 4); }
+  }
+  sa.stop(); ta.stop(); src.mixer.uncacheClip(src.clip); tg.mixer.uncacheClip(clip);
+  const have = bones.filter(b => B[b]), nm = new Set(have.map(b => b + '.quaternion'));
+  return new THREE.AnimationClip(clip.name, clip.duration, clip.tracks.filter(t => !nm.has(t.name)).concat(have.map(b => new THREE.QuaternionKeyframeTrack(b + '.quaternion', times, out[b]))));
+}
+const smooth01 = x => { const t = Math.max(0, Math.min(1, x)); return t * t * (3 - 2 * t); };
+
 // ---- LAYER 7, CLIP EDITS: trim (seconds in the source) and speed
 export function editLayer(clip, E) {
   if (!E) return clip;
@@ -759,6 +833,7 @@ export function carry(tg, src, role, P, opt) {
   clip = toesLayer(tg, src, clip, P.layers.toes === undefined ? 1 : +P.layers.toes, (P.adjust && +P.adjust.toeIn) || 0);
   if (P.adjust) clip = adjustLayer(tg, clip, P.adjust);
   if (P.layers.clear !== 0) clip = clearLayer(tg, clip, P.layers.clear === undefined ? 1 : +P.layers.clear);
+  if (opt && opt.weap) clip = weapLayer(tg, src, clip, opt.weap);
   if (opt && opt.hands) clip = handsLayer(tg, clip, opt.hands.H, opt.hands.poses);
   if (opt && opt.fk) clip = fkLayer(tg, clip, opt.fk);
   if (opt && opt.grip) clip = gripLayer(tg, clip, opt.grip);

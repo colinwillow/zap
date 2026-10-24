@@ -5,6 +5,24 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m958 -- THE WEAPON DRIVES THE HANDS (Forge `weapLayer`): position-driven arms on every weapon clip, Zoar holds guns as Zap does
+
+*"I thought when transferring animations from one rig to another... the hand would be the determining position... I want to do it
+the right way."* Where the Forge stood: the BODY is carried by rotation (FK, change from rest) -- right for the pose, so a
+short-armed man still moves like himself -- and only the FEET were position-driven (the foot pass + leg IK). The hands were never,
+which is why a weapon landed somewhere else on a body of other proportions. The right way (Unreal's IK retargeter's): rotations for
+the pose, POSITION + IK wherever a hand touches something. For a weapon clip that is the weapon:
+- the donor's weapon (his right mount, `ZAP_MOUNT` on his `handFrame`) read per frame in his CHEST frame -- anatomical: between
+  the shoulders, X across to his left, Y up the spine, Z forward -- and put in the same place in this body's chest frame (offsets x
+  shoulder-width ratio across, x spine-length ratio up / forward);
+- his right arm solved (`legTo`, elbow kept in its plane) so his right hand's mount sits on it, the hand turned exactly onto it;
+- his left hand where the donor's is ON the weapon (in the weapon's frame, x the weapon's size ratio = hand-length ratio, m794),
+  weighted off when the donor's left hand is `WEAPIK.near/far` (2.5 / 4 hand lengths) from it -- it lets go when Zap's does.
+Profile: `weap {two: 1}` on Zoar's 17 weapon clips (rifle / shoot / rocket_launcher / weapon_*). Headless, idle with launcher and
+blaster, Zap and Zoar from the same two angles: the launcher at the shoulder with the left hand under it, the blaster held out --
+the same placement on both bodies. Moving / firing poses run through the same layer and are not looked at yet.
+Shipped unverified.
+
 ## m957 -- Zoar: feet on the floor, guns held the right way up (hands aligned by ANATOMY in the Forge), his fingers from the hand poses
 
 *"His feet go through the ground despite I put the root joint under his feet... the rocket launcher spun 90 degrees about its

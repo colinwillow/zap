@@ -232,7 +232,7 @@ async function bake(en) {
   if (reach && wr && W && W.tip && hands && hands.H[reach.side || 'Right'] && hands.H[reach.side || 'Right'].pose === 'wrap') {
     const hb = ST.tg.rig.bones['mixamorig_' + (reach.side || 'Right') + 'Hand'], A = F.socketAuto(hb, reach.side || 'Right');
     if (A) reach = Object.assign({}, reach, { p: (wr.q ? new THREE.Vector3(0, 1, 0).applyQuaternion(new THREE.Quaternion().fromArray(wr.q)) : new THREE.Vector3(0, 0, 1).applyQuaternion(A.q)).multiplyScalar(W.tip * wr.r).add(new THREE.Vector3().fromArray(wr.c)).toArray() }); }
-  const src = await source(en), r = F.carry(ST.tg, src, en.role, ST.P, { fk: en.fk, grip: gripOf(en), hands, upper, reach });
+  const src = await source(en), r = F.carry(ST.tg, src, en.role, ST.P, { fk: en.fk, grip: gripOf(en), hands, upper, reach, weap: en.weap });
   return { src, rep: r.rep, clip: F.editLayer(r.clip, en.edit) };
 }
 async function previewEntry(en, keepT) {
