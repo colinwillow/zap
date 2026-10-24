@@ -5,6 +5,28 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m948 -- HIS HAND OPENS ROUND THE CUP (a Forge WRAP, solved on his own fingers), and the cup doubles as he picks it up
+
+*"You could see his fingers through the cup... the placement of the cup in the hand, his fingers intersect it. We need to open his
+fist quite a bit bigger so that it physically goes around the cup. Also make the cup double its size when he picks it up."*
+m947 read "shows through his fingers" as a see-through cup. It was the fingers: his hand was the captured `cup` pose -- nearly a
+fist -- and nothing related that pose to the size of what was in it.
+- **`wrapPose` (forge/core.js), a computed hand pose `wrap`.** A cylinder of radius `r` HAND LENGTHS (wrist -> middle knuckle),
+  axis = the socket's +Z, seated on the palm side: palm normal = the socket's X, its sign from the middle knuckle's own curl axis
+  x the finger (a fingertip's open->fist movement was tried first and is dominated by the tip pulling back toward the wrist --
+  it put the cup BEHIND the hand, then on its BACK); near surface `WRAP.palm` (.14) off the palm, centre level with the knuckles
+  less `WRAP.back` (.15). Then every finger, knuckle outward: each joint curls about its rest->fist axis until its own segment
+  touches the cylinder skin (+ `WRAP.fr` .1 for the finger's half-thickness), capped at the fist. Seen in a headless Forge render:
+  the fingers lie on the cylinder.
+- **The bake carries where it sits**: a `hold_hand_r` node (hand-local centre, `extras.r`). The game reads it (`FORGED.holds`)
+  and `drinkHand` puts the cup THERE at THAT radius -- the hand and the cup are measured against each other, nothing typed twice.
+- **Double**: his hand is 0.136 m in game, so the floor cup x2 (radius .036 x 1.05 x 2 = .076 m) is `r` .555. The cup GROWS from
+  its floor size to that over `DRINK.growT` (.3 s) as it lands in his hand (`drinkGrow`). No bake -> `DRINK.heldK` (2) at the socket.
+- **The straw reaches his mouth, not the socket**: `set_wrap tip` 4.43 radii up the axis (the cup's straw top), and the reach layer
+  lands that point (`R.p`). `drinkPour` now pours from the straw's TOP (it was the lid).
+- Profile: `wrap {r .555, tip 4.43}`, pick_up + drink right hand `wrap`. MCP `set_wrap`; app verb `setWrap`; `wrap` in the hand list.
+Shipped unverified on the phone.
+
 ## m947 -- the cup in his fist, the hand AT his mouth, a green stream and a messy dribble, solid plates, the drink sequence faster
 
 *"The drink kind of shows through his fingers... his hand comes up and misses where his lips would be... an actual liquid...

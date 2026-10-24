@@ -380,6 +380,57 @@ export function handsLayer(tg, clip, H, poses) {
   return new THREE.AnimationClip(clip.name, clip.duration, tracks);
 }
 
+// ---- LAYER 5b', A WRAP (m948): the fingers closed round a CYLINDER the size of the thing held, instead of a captured hand.
+// *"His closed fist... his fingers intersect it, and you can see the cup. Open his fist quite a bit so it goes around the cup."*
+// `W` = { r } -- the cylinder's radius in HAND LENGTHS (wrist -> middle knuckle, `handFrame`'s len); its axis is the socket's +Z
+// (along a handle, out of the thumb side). Where it sits is measured, not typed: on the PALM side of the hand (the side the fist
+// closes to), its near surface `palm` hand lengths off the palm (the hand bone and the four knuckles), at the socket's height
+// along the fingers. Then finger by finger, joint by joint from the knuckle out, each joint curls along the axis it closes a fist
+// on (rest -> `fist`) until ITS segment would touch the cylinder's skin (`fr` hand lengths, a finger's own half-thickness), or
+// until it is as curled as the fist. Returns { pose: {bone: q}, c: [x,y,z] the cylinder's centre in the HAND's local space, r }.
+export const WRAP = { palm: .14, back: .15, fr: .1, step: 1.5 };
+export function wrapPose(tg, side, W, fist) {
+  const B = tg.rig.bones, M = 'mixamorig_' + side + 'Hand', hand = B['mixamorig_' + side + 'Hand']; if (!hand || !fist) return null;
+  const S = socketAuto(hand, side); if (!S) return null;
+  const len = S.len, R = (+W.r || .5) * len, fr = WRAP.fr * len, Si = S.q.clone().invert();
+  const toS = v => v.clone().sub(S.p).applyQuaternion(Si);                                    // hand-local -> socket-local
+  const rq = bn => new THREE.Quaternion().fromArray(tg.T.rest[bn] || B[bn].quaternion.toArray());
+  // the palm side: the middle finger curled to its fist -- where its tip goes, in the socket's X/Y plane, across the fingers
+  const chainPts = (f, Q) => { const pts = [new THREE.Vector3()]; let m = new THREE.Matrix4();
+    for (let k = 1; k <= 4; k++) { const bn = M + f + k, b = B[bn]; if (!b) break;
+      m = m.clone().multiply(new THREE.Matrix4().compose(b.position, k < 4 ? (Q[bn] || rq(bn)) : new THREE.Quaternion(), new THREE.Vector3(1, 1, 1)));
+      pts.push(new THREE.Vector3().setFromMatrixPosition(m)); }
+    if (!B[M + f + 4] && pts.length >= 3) { const a = pts[pts.length - 2], b = pts[pts.length - 1]; pts.push(b.clone().add(b.clone().sub(a).multiplyScalar(.8))); }
+    return pts.slice(1); };                                                                      // [joint1, joint2, joint3, tip], hand-local
+  // the palm normal is the socket's X (Y runs along the fingers, Z along the handle); its SIGN is the way the curled tip went
+  // (axis x finger: a positive turn about the knuckle's curl axis carries the finger that way -- measured on the knuckle, not on a tip)
+  const mb = M + 'Middle1', mD = fist[mb] && new THREE.Quaternion().fromArray(fist[mb]).multiply(rq(mb).invert()); if (!mD) return null; if (mD.w < 0) mD.set(-mD.x, -mD.y, -mD.z, -mD.w);
+  const into = new THREE.Vector3(mD.x, mD.y, mD.z).normalize().cross(B[mb].position.clone().normalize());
+  const n = new THREE.Vector3(Math.sign(into.applyQuaternion(Si).x) || 1, 0, 0);
+  const knu = ['Index', 'Middle', 'Ring', 'Pinky'].map(f => chainPts(f, {})[0]).filter(Boolean).map(toS);
+  let s0 = toS(new THREE.Vector3()).dot(n), ky = 0; for (const k of knu) { s0 = Math.max(s0, k.dot(n)); ky += k.y / knu.length; }
+  // the centre, socket-local: off the palm by its radius and `palm`, level with the knuckle line less `back`, on the socket in Z
+  const cS = n.clone().multiplyScalar(s0 + WRAP.palm * len + R).setY(ky - WRAP.back * len);
+  const pose = {};
+  for (const f of FINGERS) {
+    const Q = {};
+    for (let k = 1; k <= 3; k++) {
+      const bn = M + f + k; if (!B[bn]) break;
+      const r0 = rq(bn), D = fist[bn] ? new THREE.Quaternion().fromArray(fist[bn]).multiply(r0.clone().invert()) : null; if (!D) break;
+      if (D.w < 0) D.set(-D.x, -D.y, -D.z, -D.w);
+      const amax = 2 * Math.acos(Math.min(1, D.w)), ax = new THREE.Vector3(D.x, D.y, D.z); if (ax.lengthSq() < 1e-10) break; ax.normalize();
+      const gap = a => { Q[bn] = new THREE.Quaternion().setFromAxisAngle(ax, a).multiply(r0); const P = chainPts(f, Q), A = toS(P[k - 1]), Bp = toS(P[k]);
+        let g = Infinity; for (let u = .25; u <= 1.001; u += .25) { const x = A.x + (Bp.x - A.x) * u - cS.x, y = A.y + (Bp.y - A.y) * u - cS.y; g = Math.min(g, Math.hypot(x, y) - R - fr); } return g; };
+      let a = 0; const st = WRAP.step * Math.PI / 180;
+      if (gap(0) > 0) { while (a + st <= amax && gap(a + st) > 0) a += st; }
+      gap(a);
+    }
+    for (const bn in Q) pose[bn] = Q[bn].toArray();
+  }
+  const c = cS.clone().applyQuaternion(S.q).add(S.p);
+  return { pose, c: c.toArray(), r: R };
+}
+
 // ---- LAYER 6, THE FK LAYER -- his hand on a bone. `fk` is { boneName: [{ t, q:[x,y,z,w] }, ...] }: at each key, a rotation ADDED
 // on top of the clip, in the bone's PARENT frame (so "lift the arm" stays a lift whatever the shoulder is doing). Between keys it
 // eases (smoothstep + slerp); before the first and after the last it holds. One key is the whole clip.
@@ -500,7 +551,7 @@ export function clearLayer(tg, clip, amt = 1) {
 }
 
 // ---- LAYER 5c, REACH (m947): the hand brings what it holds TO A PLACE ON HIM for a window of the clip -- a drink to his mouth.
-// `R` = { side: 'Right', to: 'mouth', t: [a, b] (clip seconds), ease }. The mouth is measured off his head bone: forward of it and a
+// `R` = { side: 'Right', to: 'mouth', t: [a, b] (clip seconds), ease, p? (the hand-local point that lands; default the socket) }. The mouth is measured off his head bone: forward of it and a
 // little down, scaled by his head's own size (Head -> HeadTop_End); his SOCKET (where the cup sits) is what lands there, so the arm
 // is re-solved for the hand at mouth - (socket - hand). Weight eases in and out over `ease` seconds at the window's edges.
 // *"when he goes to drink it, his hand comes up and misses where his lips would be"* -- the clip's sip was a seated Y Bot's.
@@ -526,7 +577,7 @@ export function reachLayer(tg, clip, R) {
     const t = times[f]; ta.time = t; tg.mixer.update(0); tg.model.updateMatrixWorld(true);
     const w = t <= a || t >= b ? 0 : Math.min(1, (t - a) / E, (b - t) / E);
     if (w > 0 && mouthPoint(tg, mp)) {
-      B[ft].getWorldPosition(hw); sw.copy(S ? S.p : new THREE.Vector3()).applyMatrix4(B[ft].matrixWorld);
+      B[ft].getWorldPosition(hw); sw.copy(R.p ? new THREE.Vector3().fromArray(R.p) : S ? S.p : new THREE.Vector3()).applyMatrix4(B[ft].matrixWorld);
       const want = mp.clone().sub(sw.clone().sub(hw));
       legTo(B, up, kn, ft, hw.clone().lerp(want, w * w * (3 - 2 * w)), false);
     }
