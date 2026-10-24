@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m955 -- ZOAR, a playable hero: every one of old Zap's clips through the Forge (the pipeline's first whole-character run)
+
+His export (`models/characters/zoar.glb`, raw -- kept as the master): Mixamo rig + `root`, 66 joints, body / head / hat, two 1K PNGs,
+no clips, no weapon joints (deliberately -- "should I let you do that part": yes). Measured at load: authored 1.205 m (x1.037 to
+`RIG.height`), faces +Z (toes, shoulders cross-check 1.0000), hips 0.526 m (old Zap 0.772: short-legged and stylized), hand 0.079 m.
+- **The clips**: profile `retarget-anims/library/profiles/zoar.json` = all 61 of `zap.glb`'s clips with Zap as the DONOR (role =
+  clip name) + his `pick_up` / `carry` (left-hand cup wrap, r .96 = .0756 m cup / his 0.079 m hand). `tools/forge.cjs ... --mesh` ->
+  one GLB with his mesh and the 63 clips, then `gltf-transform resample` / `webp` / `draco` (11.9 -> 3.6 MB) ->
+  `models/characters/zoar_game.glb`, which is what the game loads. Hero picker: **ZOAR**.
+- **Weapon mounts made from his hands** (`rig.mounts` empty -> `mountPlace` on each hand for each `ZAP_MOUNT`, the same frame
+  m925 rebuilds pipeline rigs into). His cup marker is read out of his own file (`hold_hand_l`), as `forgedLoad` does for bakes.
+- **The alien accent glow is off for him** (`HERO.glow.zoar` 0): it finds the dominant hue of a hero's texture and lights it --
+  on Zap the alien colour, on a human his skin and khaki, which read as an orange wash in the first headless look.
+- Seen headless: his own textures, idle stands right, the run is old Zap's run (arms out wide) carried faithfully. Every
+  per-character fix from here is a Forge slider / FK / hands change on HIS profile and a re-bake -- that is the test.
+Shipped unverified.
+
 ## m954 -- he WALKS to the cup before he bends, the cup sits IN his fingers upright, a snappier throw, a charge throw with a new reticle, the CEO's feet stay down, no hints
 
 *"He needs to walk and adjust once you've clicked to pick up, so he turns and walks and bends down to perfectly pick up the cup...
