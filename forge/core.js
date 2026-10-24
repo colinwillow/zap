@@ -715,7 +715,15 @@ const smooth01 = x => { const t = Math.max(0, Math.min(1, x)); return t * t * (3
 // ---- LAYER 7, CLIP EDITS: trim (seconds in the source) and speed
 export function editLayer(clip, E) {
   if (!E) return clip;
-  let c = clip; const a = Math.max(0, +(E.trim && E.trim[0]) || 0), b = Math.min(c.duration, E.trim && E.trim[1] > 0 ? +E.trim[1] : c.duration);
+  let c = clip;
+  // m959: IN PLACE -- a locomotion clip whose hips TRAVEL (the library's `Sprint`: 127 units forward a cycle) runs forward and
+  // snaps back every loop in a game that moves the root itself. The hips' straight-line drift from first frame to last is taken
+  // out; the bob and the sway stay.
+  if (E.inPlace) { const tr = c.tracks.find(t => t.name === MHIPS + '.position');
+    if (tr && tr.times.length > 1) { const v = tr.values.slice(), n = tr.times.length, t0 = tr.times[0], T = tr.times[n - 1] - t0 || 1, L = (n - 1) * 3;
+      const d = [v[L] - v[0], v[L + 1] - v[1], v[L + 2] - v[2]];
+      for (let i = 0; i < n; i++) { const u = (tr.times[i] - t0) / T; for (let k = 0; k < 3; k++) v[i * 3 + k] -= d[k] * u; }
+      c = new THREE.AnimationClip(c.name, c.duration, c.tracks.map(t => t === tr ? new THREE.VectorKeyframeTrack(tr.name, tr.times, v) : t)); } } const a = Math.max(0, +(E.trim && E.trim[0]) || 0), b = Math.min(c.duration, E.trim && E.trim[1] > 0 ? +E.trim[1] : c.duration);
   if (a > 0 || b < c.duration) {
     const tracks = c.tracks.map(t => { const ts = t.times, sz = t.getValueSize(), keep = [];
       for (let i = 0; i < ts.length; i++) if (ts[i] >= a - 1e-4 && ts[i] <= b + 1e-4) keep.push(i);

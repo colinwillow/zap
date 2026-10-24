@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m959 -- THE SPRINT HAD ROOT MOTION: taken in place (Forge `edit.inPlace`), and its true speed kept from that travel
+
+*"You forgot to take off the transform, so he runs forward in the animation and then teleports back... You always need to remove
+that if you're doing a locomotion."* Measured on the bake (hips z, first frame -> last): `run_std` (Standard_Run) 1.6 -> 1.6, in
+place; **`sprint_std` (Sprint) 1.6 -> 128.4** -- root motion; the CEO's library walk/run in place. (The library index says
+"travel 0.0" for Sprint -- it is wrong, so travel cannot be trusted from the index; read the clip.)
+- **`editLayer` `inPlace`**: the hips' straight-line drift from first frame to last is subtracted; bob and sway stay. On
+  `sprint_std` in the `zap` and `zoar` profiles. App `edit` and MCP `trim_clip in_place` carry it.
+- **And the travel is its true speed.** The Sprint is mostly air; the foot-contact measure (m956) read old Zap's at 2.3 to 8.1 m/s
+  depending on the threshold (his big feet barely touch in it); Zoar's held at ~3.35 across them. So before stripping, the Forge
+  keeps the travel per hip height (`ST.refs`) and writes it beside the clip (`forge_ref_sprint_std`, extras.ref); the game reads it
+  at load (hero file and forged bakes, before any gait is sized) and uses it x `rig.hipY` -- old Zap 3.08 m/s, Zoar 2.93. The run
+  (in place, no travel) is still the foot measure: Zap 1.95, Zoar 2.75 (stable from 96 to 480 samples).
+- `window.__gm` (test hook): a headless run may set `GAIT.stdN` / `stdEps` before load -- the measure cannot be re-run live,
+  because the gait owns those actions' time once the game runs.
+Shipped unverified.
+
 ## m958 -- THE WEAPON DRIVES THE HANDS (Forge `weapLayer`): position-driven arms on every weapon clip, Zoar holds guns as Zap does
 
 *"I thought when transferring animations from one rig to another... the hand would be the determining position... I want to do it

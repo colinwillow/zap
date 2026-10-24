@@ -233,6 +233,12 @@ async function bake(en) {
     const hb = ST.tg.rig.bones['mixamorig_' + (reach.side || 'Right') + 'Hand'], A = F.socketAuto(hb, reach.side || 'Right');
     if (A) reach = Object.assign({}, reach, { p: (wr.q ? new THREE.Vector3(0, 1, 0).applyQuaternion(new THREE.Quaternion().fromArray(wr.q)) : new THREE.Vector3(0, 0, 1).applyQuaternion(A.q)).multiplyScalar(W.tip * wr.r).add(new THREE.Vector3().fromArray(wr.c)).toArray() }); }
   const src = await source(en), r = F.carry(ST.tg, src, en.role, ST.P, { fk: en.fk, grip: gripOf(en), hands, upper, reach, weap: en.weap });
+  // m959: a clip whose hips travel (root motion) is stripped in place by the edit -- but that travel IS its true speed, so it is
+  // kept first, per hip height, and the export writes it beside the clip (`forge_ref_<role>`): the game sizes the playback by it
+  if (en.edit && en.edit.inPlace) { const pre = F.editLayer(r.clip, Object.assign({}, en.edit, { inPlace: false })), tr = pre.tracks.find(t => t.name === 'mixamorig_Hips.position');
+    if (tr && tr.times.length > 1) { const v = tr.values, L = (tr.times.length - 1) * 3, hp = ST.tg.rig.bones.mixamorig_Hips, ws = hp && hp.parent ? hp.parent.getWorldScale(new THREE.Vector3()).x : 1;
+      const dist = Math.hypot(v[L] - v[0], v[L + 2] - v[2]) * ws, dur = tr.times[tr.times.length - 1] - tr.times[0];
+      ST.refs = ST.refs || {}; if (dur > 0) ST.refs[en.role] = dist / dur / ST.tg.hipH; } }
   return { src, rep: r.rep, clip: F.editLayer(r.clip, en.edit) };
 }
 async function previewEntry(en, keepT) {
@@ -644,6 +650,7 @@ async function exportGLB(withMesh) {
   // m948: where each wrapped hand's cylinder sits (hand-local, his own units) and its radius -- the game puts the cup THERE
   const holds = []; for (const sd in ST.wraps) { const hb = ST.tg.rig.bones['mixamorig_' + sd + 'Hand']; if (!hb) continue;
     const o = new THREE.Object3D(); o.name = 'hold_hand_' + sd[0].toLowerCase(); o.position.fromArray(ST.wraps[sd].c); if (ST.wraps[sd].q) o.quaternion.fromArray(ST.wraps[sd].q); o.userData = { hold: 1, r: ST.wraps[sd].r, ax: ST.wraps[sd].q ? 1 : 0 }; hb.add(o); holds.push(o); }
+  for (const role in (ST.refs || {})) { const o = new THREE.Object3D(); o.name = 'forge_ref_' + role; o.userData = { ref: ST.refs[role] }; m.add(o); holds.push(o); }
   m.traverse(o => { if ((o.name === 'forge_axes' || o.name === 'forge_prop' || o.isLine) && o.visible) { o.visible = false; hid.push(o); } });
   if (!withMesh) m.traverse(o => { if (o.isMesh && o.visible) { o.visible = false; hid.push(o); } });
   const out = await new GLTFExporter().parseAsync(m, { binary: true, animations: clips, onlyVisible: true });
@@ -787,7 +794,7 @@ window.forge = {
   async setReach(role, R) { const en = ST.P.clips.find(c => c.role === role); if (!en) throw new Error('no clip "' + role + '"'); if (R && R.t) en.reach = R; else delete en.reach; saveProf(); await previewEntry(en); return en.reach || null; },
   mouthGap(role, t) { const en = ST.P.clips.find(c => c.role === role); const S = F.socketAuto(ST.tg.rig.bones.mixamorig_RightHand, 'Right'); ST.act.time = t; ST.tg.mixer.update(0); ST.tg.model.updateMatrixWorld(true); const m = F.mouthPoint(ST.tg), s = S.p.clone().applyMatrix4(ST.tg.rig.bones.mixamorig_RightHand.matrixWorld); return +(m.distanceTo(s) / ST.tg.hipH).toFixed(3); },
   async compose(role, upperRole, from) { const en = ST.P.clips.find(c => c.role === role); if (!en) throw new Error('no clip "' + role + '"'); if (upperRole) en.upper = { role: upperRole, from: from || 'Spine1' }; else delete en.upper; saveProf(); await previewEntry(en); return { chip: $('chip').textContent, seconds: +ST.act.getClip().duration.toFixed(2) }; },
-  async edit(role, e) { const en = ST.P.clips.find(c => c.role === role); if (!en) throw new Error('no clip "' + role + '"'); en.edit = e && (e.trim || e.speed) ? { trim: e.trim, speed: e.speed || 1 } : undefined; saveProf(); await previewEntry(en); return en.edit || null; },
+  async edit(role, e) { const en = ST.P.clips.find(c => c.role === role); if (!en) throw new Error('no clip "' + role + '"'); en.edit = e && (e.trim || e.speed || e.inPlace) ? Object.assign({ trim: e.trim, speed: e.speed || 1 }, e.inPlace ? { inPlace: true } : {}) : undefined; saveProf(); await previewEntry(en); return en.edit || null; },
   // the measured reference speed of a locomotion clip on THIS body, the game's way: the planted (slower) foot's speed against the
   // hips, at its plateau, in the file's metres per second -- times the game's scale for him is his `walkRef` / `runRef`
   async gait(role) {
