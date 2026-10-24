@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m966 -- THE STADIUM, WHITE (pass 1 of a few): an Apple-white construct, interest from lines, cyan as the spot colour
+
+*"I don't like the colorful Pokemon stadium look. I want it more like Apple -- white on white, sleek... a cybernetic, digital, almost
+Matrix-white booting test zone... interest with shapes rather than colors; some spot colors, but shapes and lines and design."*
+(His reference: AirPods on white.) `arenaStage`, with the palette in `ARENA.look`:
+- a white floor with a fine grey GRID (1 m cells, every fifth line heavier, repeated 80x) fading into white fog (45-170 m);
+- the field drawn in thin grey: five rings, the halfway line, 72 tick marks round the edge (every sixth long), a cyan ring at the
+  centre spot; the track a shade down; the wall glossy white with a CYAN line on its lip (a thin unlit torus);
+- white tiers, the crowd in four whites / pale greys (was seven loud colours), white floodlight towers;
+- `arenaSky`: the sky gradient (`SKY.src 'gen'`) in whites with NO sun disc and no pano; neutral hemi / sun.
+- **And the city's PINK rim light** (`LIGHTX.rimCol` 0xff7a9e, 1.15) and teal bounce, which on white washed the field pink --
+  found by listing the scene's lights after a pad, the shafts and the dust were each ruled out. Neutral and softer in the arena.
+Kept: the two pads (red = his, cyan = yours) as the spot colours. NEXT passes: panel seams, light strips, frames, holo lines.
+Shipped unverified.
+
 ## m965 -- THE FIRST SECONDS ARE CHOPPY: the warm-up moved behind the card (bakes, shapes, every shader, every texture)
 
 *"When I boot Weirdport, the first 5 or 10 seconds it's choppy and laggy... once you're in game it's like warming up, then it goes
