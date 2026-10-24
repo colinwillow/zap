@@ -241,6 +241,26 @@ export function prepDonor(scene, clips) {
   return clips.map(clip => ({ scene, rig, S, clip, hipH: hp.y - restLow, restLow, mixer }));
 }
 
+// ---- LAYER 1b, COMPOSE: the torso and arms from ANOTHER clip (`up`), the hips and legs from this one. `up` = { src, trim:[a,b],
+// from: 'Spine' | 'Spine1' | 'Spine2' | 'Neck' } -- every bone from `from` upward (shoulders, arms, hands, fingers, neck, head)
+// comes from the second clip's trimmed piece, carried onto him the same way; the clip lasts as long as that piece, and the legs
+// loop under it. A sip from a seated drink over a standing idle; a wave over a walk.
+export function composeUpper(tg, clip, up) {
+  if (!up || !up.src) return clip;
+  const r = retargetW(up.src.S, tg.T, { u: up.src.clip }, tg.rig.bones); if (!r || !r.clips.u) return clip;
+  const uc = r.clips.u, a = Math.max(0, +(up.trim && up.trim[0]) || 0), b = Math.min(uc.duration, up.trim && +up.trim[1] > a ? +up.trim[1] : uc.duration), L = Math.max(.05, b - a);
+  const top = tg.rig.bones['mixamorig_' + (up.from || 'Spine1')] || tg.rig.bones.mixamorig_Spine1; const upper = new Set();
+  if (top) top.traverse(o => { if (o.name) upper.add(o.name); });
+  const n = Math.max(2, Math.round(L * 30) + 1), times = new Float32Array(n); for (let f = 0; f < n; f++) times[f] = Math.min(L, f / 30);
+  const md = clip.duration || 1, tracks = [], seen = new Set();
+  const resample = (tr, t0, loopD) => { const I = tr.createInterpolant(), sz = tr.getValueSize(), v = new Float32Array(n * sz);
+    for (let f = 0; f < n; f++) { let t = t0 + times[f]; if (loopD) t = t % loopD; v.set(I.evaluate(Math.min(t, tr.times[tr.times.length - 1])).slice(0, sz), f * sz); }
+    return new tr.constructor(tr.name, times.slice(), v); };
+  for (const tr of uc.tracks) { const bn = tr.name.slice(0, tr.name.lastIndexOf('.')); if (upper.has(bn) && tr.name.endsWith('.quaternion')) { tracks.push(resample(tr, a, 0)); seen.add(tr.name); } }
+  for (const tr of clip.tracks) if (!seen.has(tr.name)) tracks.push(resample(tr, 0, md));
+  return new THREE.AnimationClip(clip.name, L, tracks);
+}
+
 // ---- LAYER 4, HIS SLIDERS -- whole character, every clip, before the ground (so contact is still right after them).
 //   stance  x hip width: each foot moved sideways from the hips' centre line, the leg re-solved (two bones, knee kept in its plane)
 //   arms    degrees: both upper arms opened out about his forward axis -- the penguin fix
@@ -437,6 +457,7 @@ export function carry(tg, src, role, P, opt) {
   const r = retargetW(src.S, tg.T, { [role]: src.clip }, tg.rig.bones);
   if (!r || !r.clips[role]) throw new Error('nothing carried for ' + role);
   let clip = r.clips[role]; const rep = { hipW: RTW.hr, leg: RTW.lr, ms: RTW.ms };
+  if (opt && opt.upper) clip = composeUpper(tg, clip, opt.upper);
   if (P.adjust) clip = adjustLayer(tg, clip, P.adjust);
   if (opt && opt.hands) clip = handsLayer(tg, clip, opt.hands.H, opt.hands.poses);
   if (opt && opt.fk) clip = fkLayer(tg, clip, opt.fk);

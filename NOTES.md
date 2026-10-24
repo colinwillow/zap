@@ -5,6 +5,27 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m938 -- THE GREEN DRINK: the CEO notices it, walks over, picks it up, looks at it, drinks, staggers, and turns
+*"if the NPC sees the green drink he gets curious, walks over, picks it up off a stool or the ground, looks at it, drinks it --
+and it's the drinking that does it: he staggers back a little and transforms into the alien version of himself"*.
+- **Arena: DRINK** on the bar sets a glowing green can on the floor 2.6 m in front of you (`drinkCan`: a placeholder cylinder,
+  emissive green, a metal top -- his model goes in its place when he makes one). `drinkScan` (every frame while a can is down)
+  gives an unclaimed can to the nearest person who CAN turn (`ARENA.morph.into`) and is standing about, within `see` 14 m.
+- **`drinkStep`** (in `arenaBody`, before the fight): `see` (turns to it, 0.8 s) -> `walk` (at his measured walkRef) -> `pick`
+  (`pick_up`; at `grabAt` 1.0 s the can leaves the floor for a holder at his right hand's SOCKET, `socketAuto`, sized in metres)
+  -> `sip` (`drink`) -> `stagger` (the can drops and falls as debris) -> `tmGo(him)` (now takes a target). A blow interrupts:
+  his state stops being `drink` and he picks it up again when he is standing; knocked out, the can is anyone's again.
+- **His three new clips, made by Claude through forge-mcp** (`trim_clip` / `compose_clip` / `set_hands`, new this build):
+  `pick_up` = Lifting ("pick up object and examine", trimmed 0.5-5.3 s: hips lowest at 1.5 s, held at the chest 2.5-5 s),
+  `drink` = Idle_10's legs with **Sitting_Drinking's torso and arms from Spine1** (trimmed 7.0-12.0 s: the right hand rises at
+  7.25 and is at the mouth 8-11, MEASURED as hand-to-head distance 0.24 m), `stagger` = Drunk_Idle_Variation_1 ("stumble");
+  right hand `cup` on pick_up and drink. Rebaked (forged/ceo_human.glb).
+- **Forge: COMPOSE** (`composeUpper`, LAYER 1b): torso + arms from another clip in his pack (its own trim is the piece used),
+  hips + legs from this one, the legs looping under it; `from` Spine / Spine1 / Spine2 / Neck. PACK "This clip" has it.
+- Tested headless in the arena, the whole thing: CEO beams in -> claims the can -> see 1 s -> walk -> pick (held at ~2 s) ->
+  sip 6 s -> stagger 4 s -> morph -> CEOALIEN alone on the floor. No page errors. Shipped unverified: whether the can reads in
+  his hand at phone distance, and the placeholder's look.
+
 ## m937 -- THE CEO, FORGED: the first real use of the tool, done by Claude as the AGENT (forge-mcp), and NPC bodies take bakes
 *"every time I call the CEO he beams in with... the warrior alien's animations, and he looks kinda crappy. He could be an amazing
 first test case."* His file carried the Brutes' baked set under warrior names.

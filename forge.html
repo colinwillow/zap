@@ -62,7 +62,7 @@ label.sw { display:flex; gap:8px; align-items:center; }
 </head>
 <body>
 <div id="app">
-  <div id="top"><b>FORGE</b><span class="bld">f8</span><span class="who" id="who">no character</span></div>
+  <div id="top"><b>FORGE</b><span class="bld">f9</span><span class="who" id="who">no character</span></div>
   <div id="view"><div id="chip"></div><div id="busy">working…</div></div>
   <div id="time">
     <button class="btn" id="prev">◀</button><button class="btn" id="play">❚❚</button><button class="btn" id="next">▶</button>
@@ -142,6 +142,8 @@ label.sw { display:flex; gap:8px; align-items:center; }
         <div class="slider"><span>End s</span><input type="range" id="eB" min="0" max="1" step="0.01" value="1"><span id="eBV">1</span></div>
         <div class="slider"><span>Speed ×</span><input type="range" id="eS" min="0.25" max="2" step="0.05" value="1"><span id="eSV">1</span></div>
         <div class="row"><select id="ehR"></select><select id="ehL"></select></div>
+        <div class="row"><select id="eUp"></select><select id="eUpFrom" style="flex:none;width:110px"><option value="Spine">from Spine</option><option value="Spine1" selected>from Spine1</option><option value="Spine2">from Spine2</option><option value="Neck">from Neck</option></select></div>
+        <div class="note">Torso and arms from another clip in his pack (its own trim is the piece used), legs from this one: a seated drink's sip over a standing idle.</div>
       </div>
       <h3>Packs</h3>
       <div class="note">A pack is a list of roles and where each one comes from -- nothing about this body. Load one onto any character.</div>
@@ -191,6 +193,6 @@ label.sw { display:flex; gap:8px; align-items:center; }
     </div>
   </div>
 </div>
-<script type="module" src="./forge/app.js?v=f8"></script>
+<script type="module" src="./forge/app.js?v=f9"></script>
 </body>
 </html>

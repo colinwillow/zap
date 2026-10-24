@@ -224,7 +224,9 @@ async function source(en) {
 }
 async function bake(en) {
   const hands = await handsOf(en);
-  const src = await source(en), r = F.carry(ST.tg, src, en.role, ST.P, { fk: en.fk, grip: gripOf(en), hands });
+  let upper = null;
+  if (en.upper && en.upper.role) { const ue = ST.P.clips.find(c => c.role === en.upper.role && c !== en); if (ue) upper = { src: await source(ue), trim: ue.edit && ue.edit.trim, from: en.upper.from || 'Spine1' }; }
+  const src = await source(en), r = F.carry(ST.tg, src, en.role, ST.P, { fk: en.fk, grip: gripOf(en), hands, upper });
   return { src, rep: r.rep, clip: F.editLayer(r.clip, en.edit) };
 }
 async function previewEntry(en, keepT) {
@@ -289,6 +291,7 @@ function syncHands() { const D = ST.P.hands || {}; $('hR').value = (D.Right && D
 function setHands() { const D = ST.P.hands = ST.P.hands || {}; D.Right = { pose: $('hR').value }; D.Left = { pose: $('hL').value }; D.amt = +$('hAmt').value; D.noise = { amt: +$('hNz').value, hz: +$('hHz').value }; relayer(); }
 for (const id of ['hR', 'hL']) $(id).onchange = setHands;
 for (const id of ['hAmt', 'hNz', 'hHz']) { $(id).oninput = () => { $(id + 'V').textContent = (+$(id).value).toFixed(id === 'hNz' ? 1 : 2); }; $(id).onchange = setHands; }
+for (const id of ['eUp', 'eUpFrom']) $(id).onchange = () => { const en = ST.cur; if (!inPack()) return; if ($('eUp').value) en.upper = { role: $('eUp').value, from: $('eUpFrom').value }; else delete en.upper; saveProf(); previewEntry(en); };
 for (const [id, sd] of [['ehR', 'Right'], ['ehL', 'Left']]) $(id).onchange = () => { const en = ST.cur; if (!inPack()) return; en.hands = en.hands || {};
   if ($(id).value === '*') delete en.hands[sd]; else en.hands[sd] = $(id).value; if (!Object.keys(en.hands).length) delete en.hands; saveProf(); previewEntry(en, ST.act ? ST.act.time : 0); };
 
@@ -314,6 +317,8 @@ function showEdit() {
   $('editH').textContent = 'This clip: ' + en.role;
   for (const id of ['eA', 'eB']) $(id).max = d.toFixed(2);
   $('eA').value = (E.trim && E.trim[0]) || 0; $('eB').value = (E.trim && E.trim[1]) || d; $('eS').value = E.speed || 1;
+  $('eUp').innerHTML = '<option value="">torso + arms: this clip</option>' + ST.P.clips.filter(c => c !== en).map(c => `<option value="${c.role}">torso + arms: ${c.role}</option>`).join('');
+  $('eUp').value = (en.upper && en.upper.role) || ''; $('eUpFrom').value = (en.upper && en.upper.from) || 'Spine1';
   const EH = en.hands || {}; $('ehR').value = EH.Right !== undefined ? EH.Right : '*'; $('ehL').value = EH.Left !== undefined ? EH.Left : '*';
   $('eAV').textContent = (+$('eA').value).toFixed(2); $('eBV').textContent = (+$('eB').value).toFixed(2); $('eSV').textContent = (+$('eS').value).toFixed(2);
 }
@@ -747,6 +752,8 @@ window.forge = {
     syncHands(); saveProf(); if (ST.cur) await previewEntry(ST.cur); return D;
   },
   handPoses: () => HPOSES,
+  async compose(role, upperRole, from) { const en = ST.P.clips.find(c => c.role === role); if (!en) throw new Error('no clip "' + role + '"'); if (upperRole) en.upper = { role: upperRole, from: from || 'Spine1' }; else delete en.upper; saveProf(); await previewEntry(en); return { chip: $('chip').textContent, seconds: +ST.act.getClip().duration.toFixed(2) }; },
+  async edit(role, e) { const en = ST.P.clips.find(c => c.role === role); if (!en) throw new Error('no clip "' + role + '"'); en.edit = e && (e.trim || e.speed) ? { trim: e.trim, speed: e.speed || 1 } : undefined; saveProf(); await previewEntry(en); return en.edit || null; },
   // the measured reference speed of a locomotion clip on THIS body, the game's way: the planted (slower) foot's speed against the
   // hips, at its plateau, in the file's metres per second -- times the game's scale for him is his `walkRef` / `runRef`
   async gait(role) {
