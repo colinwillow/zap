@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m980 -- THE MIRROR MATCH: SPAWN > RIVALS > Samurai, the samurai played by the computer (`ARENA.kinds.SAMURAI`, `arenaKatana`)
+*"An AI version of the same character... that the computer plays, that has all the same functionality, so I can fight myself...
+change his color... switch aggression or hardness."*
+- A new arena kind on the samurai's own file, mapped onto the DUEL brain (wind-up + swing, the shield-guard, the rush, circling,
+  recovery): his clips by name (`A.clips`: katana idle/walk/run, guard = `katana_guard`, block-react, hits, fall, get-up, five
+  katana swings) and `A.over` (swing contact .45, stun 2 hits). `arenaKind` now applies a kind's own `clips`/`over`.
+- **His katana** on a mount built from his hand (his file has no weapon bones; `mountPlace` on the mitt, sized by WEAP.unit, as
+  the player's). **His guard** is the duel shield with no board (an empty group), so the shield logic runs as written and his
+  block pose is the crouched katana guard. Walk ref measured off his feet (0.89 m/s); the run clip is mostly air (reads 0), 3.0 kept.
+- **Colour**: a dark-steel shadow of him (0x4d5463 + a faint cold emissive). A hue tint just made mud (orange x blue), and the
+  first try tinted after the katana went on and turned the blade blue.
+- **Hardness** is the duel's EASY / MEDIUM / HARD (TOOLS > the level button): wind-up length, how fast his guard comes up,
+  recovery, combos, damage. RIVALS is its own SPAWN category.
+- Checked headless: spawns, draws (taunt), closes and circles; katana in hand; no errors.
+- Open: he fights with the BOSS brain (shield vs shots, swing vs you); he does not yet parry, roll or use your four directions on
+  purpose -- a true mirror (same verbs, same rules both ways) is the next step if this is fun.
+
 ## m979 -- SWORD build b: THE CROUCHED GUARD AND THE PARRY (`guardClip`, `katanaParry`)
 *"Link... this crouched back with the sword in guard position... for a block."* (SWORD.md build b.)
 - **The guard** is the pull-down hold he likes (guard + lock-on, unchanged as input): with the katana it holds `katana_guard`
