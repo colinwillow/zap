@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m940 -- THE ARENA MENU: smaller buttons, the debug toggles fold behind TOOLS, the spawn list scrolls
+*"all these buttons on screen that are super fat and you can't minimize them... SPAWN > PEOPLE, there's no scroll and the CEO is
+off screen -- I can't even spawn him."*
+- The bar is SPAWN / CLEAR / MORPH / DRINK / **TOOLS**; level, FORGE ON/OFF, BLEND, BOSS pose, WAVE and STUN live under TOOLS
+  (remembered in `mel.arena.tools`), and an open menu folds them away -- the screen is not tall enough for both.
+- Buttons 11 px / 5x9 padding (were 13 / 8x12); menu rows 14 px / 7x10 (were 17 / 11x14).
+- The menu has a max height and SCROLLS (`overflow-y: auto`, `touch-action: pan-y`). Its buttons act on **click**, not
+  pointerdown, so a scroll that starts on a button is not a spawn; touch/pointer events stop at the menu so the pads never see them.
+- Tested headless at 390 x 664 with touch: TOOLS folds and unfolds, SPAWN > PEOPLE shows all five down to THE CEO above the
+  screen's bottom (638 of 664 px), tapping it beams him in, no page errors.
+
 ## m939 -- THE CEO FIXED BY MEASUREMENT: foot clearance, real soles, a neutral idle, a wider walk -- and FORGE ON/OFF in the arena
 *"the idle you chose, his hip is way out, super exaggerated... his walk is horrendous: his feet are too close together, they
 intersect, but they also don't touch the ground"*. All three were real and all three were measured:
