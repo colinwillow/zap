@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m969 -- THE LAB, PASS 3: FINISHES, NOT COLOURS (a studio light, five materials, bevelled edges)
+*"It doesn't have to be completely white... Apple has shades of grey, and things have roughness and sheen and highlights... they
+do so much with so little."*
+- **The light is the trick.** The white sky reflected as flat white, so nothing could shine. `arenaStudio` bakes a little studio
+  once through PMREM: a grey sweep, three long overhead softboxes, a key panel, rim strips, and a DARK band at the horizon (a metal
+  with nothing dark to reflect is just grey). It is `scene.environment` in the arena (`ARENA_ENV`, declared above `skyApply` --
+  ARENA is declared later, so reading it there is a blank page; `skyApply` re-applies it after any sky re-bake). `ARENA.look.env` .9.
+- **Five finishes** (`arenaFinish`): GLOSS white with clearcoat (rim panels, halo pods), SATIN pearl with sheen in five greys plus
+  space-grey (monoliths, per-instance colour), SPACE graphite satin metal (plinth, inlay, the dais ring, some pods/shapes), brushed
+  ALU (halo ring, lip, dais edge, monolith caps), CHROME and FROST on some floating shapes.
+- **Bevelled edges** (`arenaBevelBox`) on panels, monoliths, pods and cubes: a highlight lives on an edge, and a sharp box has none.
+- A graphite DAIS ring (7 m) past the rim gives the white a dark field to sit on; a graphite inlay between the matte field
+  and the satin track. Floor a shade of grey (0xe9ecf0), roughness .3 (no clearcoat: a full-screen clearcoat is too much for a phone).
+- Checked: `npm run check` ok; four headless views, no errors.
+
 ## m968 -- A WEAPON IS THE SAME SIZE IN EVERY HAND (`WEAP.unit`)
 *"I want the rocket launcher to be the exact same size no matter who's using it."* (He turned down a smaller per-hero size.)
 - Before, a pipeline rig's weapon was sized by its tip ratio to the wearer's HAND (`mountPlace` puts the tip at `Z.k * hand
