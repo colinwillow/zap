@@ -5,6 +5,31 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m973 -- BOSSES COME THROUGH THE DOORS, AND THEY RUN HEAVY (`arenaEnter`, `ARENA.door`, `ARENA.heavy`, three new Forge bakes)
+*"Those big doors... opening to reveal monsters and beasts... they walk through the doors, beat their chest, then come at you."*
+*"The charge is dinky... a walk sped up, it makes them look light... we need a better run, like an ogre... make bigger characters
+feel heavy and clunky."*
+- **THE DOORS:** each portal gets a light-grey blast door (10 m) that RISES into the panel above it, and a dark tunnel behind, lit red
+  from the back (gradient: bright at the floor, black at the top), so a boss is a silhouette first. A boss spawns in the tunnel of the
+  free portal nearest where the camera looks (`arenaDoorPick`), the door rises (`openT` 1.8, a thud and a shake), he walks out with
+  `enter_walk`, stops at r 27.5 and plays his chest-thump taunt, then LEAPS onto the dais with `enter_leap` (Mutant Jump Attack,
+  trimmed .3-2.9 s; airborne .3-1.33 s of it) -- the game moves him horizontally across that window, the clip carries the height.
+  Landing: shake, thud + clang, dust, hitstop, a knock-back if you stand within 4 m. `dummyBlow` ignores him while `d.entering`
+  (a blow outside the ring would strand him: the ring's colliders keep bodies out too). TOOLS > ENTRY DOORS / BEAM.
+- **THE HEAVY RUN:** the rush plays `charge_mutant` (Mutant Run) by default; TOOLS > CHARGE cycles MUTANT / ZOMBIE (Zombie Running)
+  / SWORD (Great Sword Run) / OLD (the warrior's run sped up to 2.6x, which was the "dinky" one). Pace is the CLIP's: speed =
+  its measured stride x a time-scale capped at `tsMax` 1.5 (Mutant Run measures **2.30 m/s** on the Warboss, so the rush is ~3.5
+  m/s, not the old 5-7 -- slower and heavier; `rushV` is now only an upper bound). Every footfall is a stomp (`arenaStomp`: thud,
+  dust, a shake that fades out by 22 m).
+- **THE SPEEDS ARE FOOT-MEASURED, NOT ROOT MOTION.** The Forge's `forge_ref_*` came back ~4e-5 for these: the library clips are
+  authored in place, there is no root travel to read. `arenaRef` measures the planted foot on the live body (gaitMeasure's method),
+  once per kind and clip. It read 0 at first because a skin's actions are not all PLAYING the way the hero's are -- the measure
+  now plays the clip for the sample and stops it after. enter_walk measures 1.45 m/s.
+- **Forge profiles** (private repo, retarget-anims/library/profiles): `brute_warboss_armor`, `ceo_alien`, `rept_heavy_armor`, 5
+  clips each; bakes in models/characters/forged/ (0.16-0.38 MB each), merged into the kinds by `forgedMerge` at `bodyProto`.
+- Checked: `npm run check` ok; headless: the whole sequence runs (door 0->1, walk -36.5 -> -27.5, taunt, leap to -9, door closes),
+  rush runs on charge_mutant. Open: whether it FEELS heavy is his; the door/tunnel size and the walk length are dials.
+
 ## m972 -- THE ARENA, DETAIL PASS (all into the m971 buckets: vertices, not draws)
 *"Do another pass on the arena, more detail."*
 - AISLES: three stepped aisles down each sector of every tier, a small light every fourth landing.
