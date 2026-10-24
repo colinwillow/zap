@@ -5,6 +5,25 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m936 -- HAND POSES: clean hands from the library over the donor's fingers, per side, per clip, with finger noise
+*"my donor character came standard with fucked up fingers and it's just transferred to every other character... you only need a
+handful of hand poses -- neutral, fist for holding, flat for running, a cup, a point -- choose the hand positions per animation,
+override... maybe some noise, so an idle hand has a little finger motion"*.
+- **The poses come from the library, chosen by MEASUREMENT** (`forge/hands.json`): 925 candidate clips (idle / punch / point /
+  rifle / drink / run ...) sampled at 6 fps, 12,491 frames, each hand's per-finger curl (summed joint angles) and spread
+  (index vs pinky). Picked per side: relaxed (Happy Idle / Situp To Idle, curls ~80 each, spread ~20), fist (Boxing / Jab To
+  Elbow Punch, ~320), grip (Rifle Put Away / Rifle Rubbing Eyes, ~245), cup (~112, fingers together), flat (~10, spread 0),
+  open (curl < 30, spread >= 40), point (Pointing: index 27, the rest ~300).
+- **`handsLayer` (core)**: each pose is CARRIED onto this body like any clip (`poseCapture` = `retargetW` of that frame, the
+  finger bones' local rotations read off), so it is hand-relative and lands on any rig. Per side: slerp from the clip's fingers
+  to the pose by `amt`. **Noise**: each finger curls in and out about its own rest->fist axis, two sines on its own phase,
+  degrees + Hz. Order: carry -> sliders -> HANDS -> FK -> grip -> ground -> trim/speed, so a bone key can still move a finger.
+- **Forge**: BODY "His hands" (right, left, amount, noise, speed) is his default for every clip; PACK "This clip" can choose its
+  own per side ("his default" / "as the source" / a pose). In his profile, so it bakes into the game with everything else.
+- MCP: `set_hands`.
+- Tested headless: old Zap's idle_01 on the hick, right hand close up in all eight states (source + seven poses) -- seven visibly
+  different hands, ~0.7 s each to carry; no page errors.
+
 ## m935 -- SOCKETS: `socket_hand_r` / `socket_hand_l`, where a hand holds a thing -- in the Forge AND the game
 *"Mixamo doesn't add a weapon joint... make it so we have the ability to add the weapon joints and adjust them... maybe they're
 hand item position joints -- a soda, a gun, a pole, a cat"*. The standard: Unreal calls them sockets (hand_r -> weapon_r), Unity

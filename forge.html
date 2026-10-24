@@ -62,7 +62,7 @@ label.sw { display:flex; gap:8px; align-items:center; }
 </head>
 <body>
 <div id="app">
-  <div id="top"><b>FORGE</b><span class="bld">f7</span><span class="who" id="who">no character</span></div>
+  <div id="top"><b>FORGE</b><span class="bld">f8</span><span class="who" id="who">no character</span></div>
   <div id="view"><div id="chip"></div><div id="busy">working…</div></div>
   <div id="time">
     <button class="btn" id="prev">◀</button><button class="btn" id="play">❚❚</button><button class="btn" id="next">▶</button>
@@ -89,6 +89,12 @@ label.sw { display:flex; gap:8px; align-items:center; }
       <div class="slider"><span>Arms out °</span><input type="range" id="aArms" min="-20" max="40" step="1" value="0"><span id="aArmsV">0</span></div>
       <div class="slider"><span>Lean °</span><input type="range" id="aLean" min="-20" max="30" step="1" value="0"><span id="aLeanV">0</span></div>
       <div class="note">Stance moves both feet out from his centre line and re-solves the legs. Arms opens both upper arms (the penguin fix). Lean tips the spine. Ground contact runs after them.</div>
+      <h3>His hands (every clip)</h3>
+      <div class="row"><select id="hR"></select><select id="hL"></select></div>
+      <div class="slider"><span>Pose amount</span><input type="range" id="hAmt" min="0" max="1" step="0.05" value="1"><span id="hAmtV">1.00</span></div>
+      <div class="slider"><span>Finger noise °</span><input type="range" id="hNz" min="0" max="12" step="0.5" value="0"><span id="hNzV">0</span></div>
+      <div class="slider"><span>Noise speed</span><input type="range" id="hHz" min="0.1" max="3" step="0.1" value="0.6"><span id="hHzV">0.6</span></div>
+      <div class="note">Overrides whatever the source's fingers do with a clean hand from the library (right, left). A clip can choose its own in PACK. Noise curls each finger in and out a little, so an idle hand is never frozen.</div>
       <h3>Never counts as his body</h3>
       <div class="note" id="exNote"></div>
     </div>
@@ -135,6 +141,7 @@ label.sw { display:flex; gap:8px; align-items:center; }
         <div class="slider"><span>Start s</span><input type="range" id="eA" min="0" max="1" step="0.01" value="0"><span id="eAV">0</span></div>
         <div class="slider"><span>End s</span><input type="range" id="eB" min="0" max="1" step="0.01" value="1"><span id="eBV">1</span></div>
         <div class="slider"><span>Speed ×</span><input type="range" id="eS" min="0.25" max="2" step="0.05" value="1"><span id="eSV">1</span></div>
+        <div class="row"><select id="ehR"></select><select id="ehL"></select></div>
       </div>
       <h3>Packs</h3>
       <div class="note">A pack is a list of roles and where each one comes from -- nothing about this body. Load one onto any character.</div>
@@ -184,6 +191,6 @@ label.sw { display:flex; gap:8px; align-items:center; }
     </div>
   </div>
 </div>
-<script type="module" src="./forge/app.js?v=f7"></script>
+<script type="module" src="./forge/app.js?v=f8"></script>
 </body>
 </html>

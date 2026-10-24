@@ -296,6 +296,47 @@ export function adjustLayer(tg, clip, A) {
   return new THREE.AnimationClip(clip.name, clip.duration, tracks);
 }
 
+// ---- LAYER 5b, HAND POSES -- his fingers from a small set of good hands (relaxed / fist / grip / cup / flat / open / point),
+// each taken from a frame of the motion library where that hand is clean (forge/hands.json, chosen by measured finger curl),
+// carried onto THIS body like any clip -- so a donor's odd fingers (old Zap's palm-forward hands) never reach him.
+// `H` = { Right: { pose, amt }, Left: { pose, amt }, noise: { amt: degrees, hz } }; `poses` = { name: { Right: { bone: q } } }.
+// Noise curls each finger in and out about the axis it closes a fist on, every finger on its own phase.
+export const FINGERS = ['Thumb', 'Index', 'Middle', 'Ring', 'Pinky'];
+export function fingerBones(tg, side) { const out = []; for (const f of FINGERS) for (let k = 1; k <= 3; k++) { const n = 'mixamorig_' + side + 'Hand' + f + k; if (tg.rig.bones[n]) out.push(n); } return out; }
+export function poseCapture(tg, src, t, side) {
+  const r = retargetW(src.S, tg.T, { p: src.clip }, tg.rig.bones); if (!r || !r.clips.p) return null;
+  const c = r.clips.p, out = {};
+  for (const bn of fingerBones(tg, side)) { const tr = c.tracks.find(x => x.name === bn + '.quaternion'); if (tr) out[bn] = Array.from(tr.createInterpolant().evaluate(Math.min(t, c.duration))); }
+  return out;
+}
+export function handsLayer(tg, clip, H, poses) {
+  if (!H || !poses) return clip;
+  const ref = clip.tracks.find(t => t.name === MHIPS + '.position') || clip.tracks[0], times = ref.times;
+  const nz = H.noise || {}, namp = (+nz.amt || 0) * Math.PI / 180, hz = +nz.hz || .6;
+  let tracks = clip.tracks.slice(); const A = new THREE.Quaternion(), B = new THREE.Quaternion(), N = new THREE.Quaternion(), ax = new THREE.Vector3();
+  for (const sd of ['Right', 'Left']) {
+    const h = H[sd] || {}, pose = h.pose && poses[h.pose] && poses[h.pose][sd], amt = h.amt === undefined ? 1 : +h.amt;
+    if (!(pose && amt > 0) && !(namp > 0)) continue;
+    const fist = poses.fist && poses.fist[sd];
+    fingerBones(tg, sd).forEach((bn, i) => {
+      const nm = bn + '.quaternion', old = tracks.find(t => t.name === nm), rest = tg.T.rest[bn] || [0, 0, 0, 1];
+      const tt = old ? old.times : times, vals = new Float32Array(tt.length * 4);
+      // the curl axis, in the bone's parent frame: rest -> fist
+      if (fist && fist[bn]) { const D = new THREE.Quaternion().fromArray(fist[bn]).multiply(new THREE.Quaternion().fromArray(rest).invert());
+        const sn = Math.sqrt(1 - Math.min(1, D.w * D.w)); ax.set(D.x, D.y, D.z); if (sn > 1e-4) ax.divideScalar(sn); else ax.set(1, 0, 0); if (D.w < 0) ax.negate(); } else ax.set(1, 0, 0);
+      const ph = i * 1.7 + (sd === 'Left' ? 2.1 : 0);
+      for (let f = 0; f < tt.length; f++) {
+        if (old) A.fromArray(old.values, f * 4); else A.fromArray(rest);
+        if (pose && pose[bn] && amt > 0) A.slerp(B.fromArray(pose[bn]), Math.min(1, amt));
+        if (namp > 0) { const w = Math.sin(6.2832 * hz * tt[f] + ph) * .7 + Math.sin(6.2832 * hz * 2.3 * tt[f] + ph * 1.3) * .3; A.premultiply(N.setFromAxisAngle(ax, namp * w)); }
+        vals.set([A.x, A.y, A.z, A.w], f * 4);
+      }
+      tracks = tracks.filter(t => t !== old); tracks.push(new THREE.QuaternionKeyframeTrack(nm, tt, vals));
+    });
+  }
+  return new THREE.AnimationClip(clip.name, clip.duration, tracks);
+}
+
 // ---- LAYER 6, THE FK LAYER -- his hand on a bone. `fk` is { boneName: [{ t, q:[x,y,z,w] }, ...] }: at each key, a rotation ADDED
 // on top of the clip, in the bone's PARENT frame (so "lift the arm" stays a lift whatever the shoulder is doing). Between keys it
 // eases (smoothstep + slerp); before the first and after the last it holds. One key is the whole clip.
@@ -397,6 +438,7 @@ export function carry(tg, src, role, P, opt) {
   if (!r || !r.clips[role]) throw new Error('nothing carried for ' + role);
   let clip = r.clips[role]; const rep = { hipW: RTW.hr, leg: RTW.lr, ms: RTW.ms };
   if (P.adjust) clip = adjustLayer(tg, clip, P.adjust);
+  if (opt && opt.hands) clip = handsLayer(tg, clip, opt.hands.H, opt.hands.poses);
   if (opt && opt.fk) clip = fkLayer(tg, clip, opt.fk);
   if (opt && opt.grip) clip = gripLayer(tg, clip, opt.grip);
   if (P.layers.ground) { const g = groundLayer(tg, src, clip, P.layers.ground); clip = g.clip; rep.groundMax = g.max; rep.groundMean = g.mean; }

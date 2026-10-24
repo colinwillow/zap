@@ -79,6 +79,7 @@ async function setCharacter(buf, name) {
     $('charNote').innerHTML = `${nb} Mixamo bones · hips ${ST.tg.hipH.toFixed(2)} m above his soles · ${ST.tg.rig.skinned.length} skinned mesh${ST.tg.rig.skinned.length === 1 ? '' : 'es'}` + (I.kept ? '' : ' · <span class="bad">no skin found: ground contact is off</span>');
     $('exNote').textContent = I.excluded.length ? I.excluded.join(', ') + ` (${I.dropped} sampled vertices)` : 'nothing: every vertex belongs to the body';
     renderPack(); dotsBuild(); boneMenu();
+    ST.handPoses = null; syncHands();
     syncSliders(); if (ST.P.clips.length) await previewEntry(ST.P.clips[0]); else chip('pick clips in LIBRARY');
   } catch (e) { console.error(e); chip('could not load ' + name + ': ' + e.message); }
   busy(false);
@@ -222,7 +223,8 @@ async function source(en) {
   return s;
 }
 async function bake(en) {
-  const src = await source(en), r = F.carry(ST.tg, src, en.role, ST.P, { fk: en.fk, grip: gripOf(en) });
+  const hands = await handsOf(en);
+  const src = await source(en), r = F.carry(ST.tg, src, en.role, ST.P, { fk: en.fk, grip: gripOf(en), hands });
   return { src, rep: r.rep, clip: F.editLayer(r.clip, en.edit) };
 }
 async function previewEntry(en, keepT) {
@@ -255,6 +257,41 @@ function play(clip, src, edit) {
   }
 }
 
+// ---------------------------------------------------------------- HANDS: clean poses from the library, per side, plus noise
+const HPOSES = ['relaxed', 'fist', 'grip', 'cup', 'flat', 'open', 'point'];
+let HANDS_DEF = null;
+async function handsDef() { if (!HANDS_DEF) HANDS_DEF = await (await fetch('forge/hands.json')).json(); return HANDS_DEF; }
+// what this clip's hands are: his default (`ST.P.hands`) with the clip's own choice over it
+function handsFor(en) {
+  const D = ST.P.hands || {}, E = (en && en.hands) || {}, H = { noise: D.noise };
+  for (const sd of ['Right', 'Left']) { const pose = E[sd] !== undefined ? E[sd] : D[sd] && D[sd].pose; H[sd] = { pose: pose || '', amt: D.amt === undefined ? 1 : D.amt }; }
+  return H;
+}
+async function handsOf(en) {
+  const H = handsFor(en), need = new Set();
+  for (const sd of ['Right', 'Left']) if (H[sd].pose) need.add(H[sd].pose);
+  if (!need.size && !(H.noise && +H.noise.amt > 0)) return null;
+  if (!LIB.index) { chip('hand poses need the library connected'); return null; }
+  need.add('fist');                                             // the curl axis for the noise
+  const def = await handsDef(); ST.handPoses = ST.handPoses || {};
+  for (const nm of need) { if (ST.handPoses[nm]) continue; const P = {};
+    for (const sd of ['Right', 'Left']) { const d = def[nm] && def[nm][sd]; if (!d) continue; const src = await source({ stem: d.stem }); P[sd] = F.poseCapture(ST.tg, src, d.t, sd) || {}; }
+    ST.handPoses[nm] = P; }
+  return { H, poses: ST.handPoses };
+}
+$('hR').innerHTML = '<option value="">right: as the source</option>' + HPOSES.map(p => `<option value="${p}">right: ${p}</option>`).join('');
+$('hL').innerHTML = '<option value="">left: as the source</option>' + HPOSES.map(p => `<option value="${p}">left: ${p}</option>`).join('');
+$('ehR').innerHTML = '<option value="*">right: his default</option><option value="">right: as the source</option>' + HPOSES.map(p => `<option value="${p}">right: ${p}</option>`).join('');
+$('ehL').innerHTML = '<option value="*">left: his default</option><option value="">left: as the source</option>' + HPOSES.map(p => `<option value="${p}">left: ${p}</option>`).join('');
+function syncHands() { const D = ST.P.hands || {}; $('hR').value = (D.Right && D.Right.pose) || ''; $('hL').value = (D.Left && D.Left.pose) || '';
+  $('hAmt').value = D.amt === undefined ? 1 : D.amt; $('hNz').value = (D.noise && D.noise.amt) || 0; $('hHz').value = (D.noise && D.noise.hz) || .6;
+  for (const id of ['hAmt', 'hNz', 'hHz']) $(id + 'V').textContent = (+$(id).value).toFixed(id === 'hNz' ? 1 : 2); }
+function setHands() { const D = ST.P.hands = ST.P.hands || {}; D.Right = { pose: $('hR').value }; D.Left = { pose: $('hL').value }; D.amt = +$('hAmt').value; D.noise = { amt: +$('hNz').value, hz: +$('hHz').value }; relayer(); }
+for (const id of ['hR', 'hL']) $(id).onchange = setHands;
+for (const id of ['hAmt', 'hNz', 'hHz']) { $(id).oninput = () => { $(id + 'V').textContent = (+$(id).value).toFixed(id === 'hNz' ? 1 : 2); }; $(id).onchange = setHands; }
+for (const [id, sd] of [['ehR', 'Right'], ['ehL', 'Left']]) $(id).onchange = () => { const en = ST.cur; if (!inPack()) return; en.hands = en.hands || {};
+  if ($(id).value === '*') delete en.hands[sd]; else en.hands[sd] = $(id).value; if (!Object.keys(en.hands).length) delete en.hands; saveProf(); previewEntry(en, ST.act ? ST.act.time : 0); };
+
 // ---------------------------------------------------------------- the pack
 function saveProf() { if (ST.file) localStorage.setItem(profKey(ST.file), JSON.stringify(ST.P)); }
 function renderPack() {
@@ -277,6 +314,7 @@ function showEdit() {
   $('editH').textContent = 'This clip: ' + en.role;
   for (const id of ['eA', 'eB']) $(id).max = d.toFixed(2);
   $('eA').value = (E.trim && E.trim[0]) || 0; $('eB').value = (E.trim && E.trim[1]) || d; $('eS').value = E.speed || 1;
+  const EH = en.hands || {}; $('ehR').value = EH.Right !== undefined ? EH.Right : '*'; $('ehL').value = EH.Left !== undefined ? EH.Left : '*';
   $('eAV').textContent = (+$('eA').value).toFixed(2); $('eBV').textContent = (+$('eB').value).toFixed(2); $('eSV').textContent = (+$('eS').value).toFixed(2);
 }
 for (const id of ['eA', 'eB', 'eS']) {
@@ -298,7 +336,7 @@ $('profPush').onclick = async () => {
     $('profNote').innerHTML = '<span class="ok">saved to the library as profiles/' + stemOf(ST.file) + '.json</span> -- tell Claude "bake ' + stemOf(ST.file) + '" and it goes into the game';
   } catch (e) { $('profNote').innerHTML = '<span class="bad">' + e.message + '</span>'; } };
 $('profLoad').onchange = async () => { const f = $('profLoad').files[0]; if (!f) return; ST.P = JSON.parse(await f.text()); saveProf(); await reprep(); renderPack(); };
-async function reprep() { if (!ST.tg) return; const m = ST.tg.model; ST.tg.restore(); ST.tg = F.prepTarget(m, { exclude: ST.P.exclude }); ST.sock = F.socketsOf(ST.tg, ST.P.sockets); sockAxes(); syncSliders(); dotsBuild(); }
+async function reprep() { if (!ST.tg) return; const m = ST.tg.model; ST.tg.restore(); ST.tg = F.prepTarget(m, { exclude: ST.P.exclude }); ST.sock = F.socketsOf(ST.tg, ST.P.sockets); sockAxes(); ST.handPoses = null; syncHands(); syncSliders(); dotsBuild(); }
 
 // ---------------------------------------------------------------- packs: roles and where each comes from, nothing about a body
 const packKey = 'forge.packs';
@@ -698,6 +736,17 @@ window.forge = {
   setTime(t) { if (!ST.act) return; const E = (ST.cur && ST.cur.edit) || {}; ST.playing = false; ST.act.time = Math.max(0, Math.min(ST.act.getClip().duration, (t - ((E.trim && +E.trim[0]) || 0)) / (+E.speed || 1))); ST.tg.mixer.update(0); if (ST.ghost) { const ga = ST.ghost.mix._actions[0]; if (ga) { ga.time = ST.ghost.a + ST.act.time * ST.ghost.sp; ST.ghost.mix.update(0); } } },
   profile_get: () => JSON.parse(JSON.stringify(ST.P)),
   // a socket: { move: [x,y,z] metres in his frame, turn: [x,y,z] degrees about his axes, reset: true }
+  // hands: { role (omit = his default), right, left (a pose name, '' = as the source, '*' = his default -- clip only), amount, noise, speed }
+  async setHands(o) {
+    if (o.role) { const en = ST.P.clips.find(c => c.role === o.role); if (!en) throw new Error('no clip "' + o.role + '"'); en.hands = en.hands || {};
+      for (const [k, sd] of [['right', 'Right'], ['left', 'Left']]) if (o[k] !== undefined) { if (o[k] === '*') delete en.hands[sd]; else en.hands[sd] = o[k]; }
+      saveProf(); await previewEntry(en); return en.hands; }
+    const D = ST.P.hands = ST.P.hands || {};
+    if (o.right !== undefined) D.Right = { pose: o.right }; if (o.left !== undefined) D.Left = { pose: o.left };
+    if (o.amount !== undefined) D.amt = +o.amount; if (o.noise !== undefined || o.speed !== undefined) D.noise = { amt: o.noise ?? (D.noise && D.noise.amt) ?? 0, hz: o.speed ?? (D.noise && D.noise.hz) ?? .6 };
+    syncHands(); saveProf(); if (ST.cur) await previewEntry(ST.cur); return D;
+  },
+  handPoses: () => HPOSES,
   async setSocket(side, o) {
     const S = ST.sock && ST.sock[side]; if (!S) throw new Error('no ' + side + ' hand socket');
     if (o.reset) { if (ST.P.sockets) delete ST.P.sockets[side]; if (S.auto) { S.node.position.copy(S.auto.p); S.node.quaternion.copy(S.auto.q); } S.node.userData.forged = 0; }
