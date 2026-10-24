@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m964 -- heights by the HEAD-TOP bone: Moussa 6'6", Colin = Jack 5'11", Zoar 5'7"
+
+*"Make Zoar a little shorter than Colin. Jack and Colin are the same height, Moussa is the tallest. Colin looks the shortest and
+Zoar taller than him... Moussa is about 6'6, Colin and Jack 5'11, Zoar 5'7."* MEASURED (test site, idle, `HeadTop_End` above the
+root): Colin **1.415** (drawn `h` 1.83 -- his bounding box is inflated by something well above his head: solving for his crown
+takes a 2.32 m box), Jack 1.825, Moussa 1.963, Zoar 1.783 (his box includes the cap and the hair). A box is the wrong ruler.
+- `hCrown` (m144's crown solve) on COLIN 1.80, JACK 1.80, MOUSSA 1.98 (5'11", 5'11", 6'6").
+- Heroes: `HERO.crown` -- the head-top bone's height above his soles, solved for at load (`rig.scale` = crown / authored crown);
+  Zoar 1.70 (5'7"). `HERO.height` (1.72) stays his size for `SZ`'s body numbers.
+- After, same measure at idle: Moussa 1.974, Colin 1.791, Jack 1.793, Zoar 1.660 (an idle stands ~2% under the bind crown).
+Shipped unverified.
+
 ## m963 -- Zoar human-sized (1.80, Jack's), weapons in plain Weirdport, and people do not run from a HUMAN hero
 
 *"Zoar is ridiculously small compared to Jack... in the Weirdport kit I can't use any of my weapons -- we pulled the story mode, you
