@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m968 -- A WEAPON IS THE SAME SIZE IN EVERY HAND (`WEAP.unit`)
+*"I want the rocket launcher to be the exact same size no matter who's using it."* (He turned down a smaller per-hero size.)
+- Before, a pipeline rig's weapon was sized by its tip ratio to the wearer's HAND (`mountPlace` puts the tip at `Z.k * hand
+  length`). Measured world scale per file unit: Zap 1.321e-2, Zoar 1.391e-2, so Zoar's launcher was ~5% bigger.
+- Now `mountWeapon` sets `group.scale = WEAP.unit / host world scale`: one file unit is .01321 m on every hero. The turn (tip
+  onto tip, fingers onto fingers) is still the wearer's. Measured after: both 1.321e-2. `WEAP.unit = 0` goes back to per-hand sizing.
+- Open: how far the launcher sits from Zoar's head is a POSE question (Forge `weap` x .6 on his rocket clips), not a size one.
+
 ## m967 -- THE STADIUM BECOMES A SIMULATION LAB (pass 2): no crowd, no stands; panels, light strips, monoliths, a halo
 *"I don't like the organic box crowd... more Tron or patterns... the matrix like when Neo boots into the white space... alien
 future, UFO cyber simulation lab, a lot of interest."*
