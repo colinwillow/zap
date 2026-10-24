@@ -187,6 +187,13 @@ export function lowestY(info) {
 }
 // the lowest JOINT of a skeleton in world space (the library's Y Bot has no skin, only joints)
 export function lowestJoint(bones) { let lo = Infinity; for (const n in bones) { bones[n].getWorldPosition(_v); if (_v.y < lo) lo = _v.y; } return lo; }
+// the library body's lowest point: his soles while they are under him, his joints when he is lying on them (a back, a hand)
+const _sq = new THREE.Quaternion();
+export function lowestSource(src) {
+  let lo = lowestJoint(src.rig.bones) - src.restLow;
+  for (const s of src.soles || []) { s.b.getWorldPosition(_v); const y = _v.y + s.v.clone().applyQuaternion(s.b.getWorldQuaternion(_sq)).y - src.restLow; if (y < lo) lo = y; }
+  return lo;
+}
 
 // ---- a target: the model as loaded, measured BEFORE any mixer touches it (a mixer overwrites the bind pose for good)
 export function prepTarget(model, opts = {}) {
@@ -237,8 +244,16 @@ export function prepDonor(scene, clips) {
   if (!S) throw new Error('no mixamorig_Hips in that file');
   const hp = rig.bones[MHIPS].getWorldPosition(new THREE.Vector3()), restLow = lowestJoint(rig.bones);
   const mixer = new THREE.AnimationMixer(scene);
+  // HIS SOLES (m939). The library body is a skeleton with no heel: when his heel strikes, his lowest JOINT is the ankle, 8 cm up,
+  // and a ground pass that trusted joints lifted the body we carry onto -- *"his feet don't touch the ground"*. So each foot gets
+  // three sole points at rest -- the floor under the ankle (heel), the ball and the toe -- held in that bone's own frame, which
+  // ride the foot as it rolls.
+  const soles = [];
+  for (const sd of ['Left', 'Right']) for (const nm of ['Foot', 'ToeBase', 'Toe_End']) { const b = rig.bones['mixamorig_' + sd + nm]; if (!b) continue;
+    const p = b.getWorldPosition(new THREE.Vector3()), q = b.getWorldQuaternion(new THREE.Quaternion());
+    soles.push({ b, v: new THREE.Vector3(p.x, restLow, p.z).sub(p).applyQuaternion(q.invert()) }); }
   for (const c of clips) for (const t of c.tracks) { const d = t.name.lastIndexOf('.'), c2 = canonName(t.name.slice(0, d)); t.name = c2 + t.name.slice(d); }
-  return clips.map(clip => ({ scene, rig, S, clip, hipH: hp.y - restLow, restLow, mixer }));
+  return clips.map(clip => ({ scene, rig, S, clip, hipH: hp.y - restLow, restLow, mixer, soles }));
 }
 
 // ---- LAYER 1b, COMPOSE: the torso and arms from ANOTHER clip (`up`), the hips and legs from this one. `up` = { src, trim:[a,b],
@@ -407,6 +422,48 @@ export function gripLayer(tg, clip, grip) {
   return new THREE.AnimationClip(clip.name, clip.duration, tracks);
 }
 
+// ---- LAYER 4b, FOOT CLEARANCE (m939). The foot pass keeps the library body's stance in HIP WIDTHS -- and the Y Bot's walk brings
+// his feet within 0.28 hip widths of each other, which is fine on thin legs and is crossing feet on a man with thick legs and big
+// shoes (*"his feet are too close together, they intersect"*). So THIS body's inner leg and shoe widths are measured off his
+// skin at rest (`legWidths`), and whenever the two ankles come closer sideways than the two inner halves plus a margin, both
+// feet are eased apart (a smooth max, so it never pops) and the legs re-solved. `amt` 0..1; 0 is the A/B.
+export function legWidths(tg) {
+  if (tg._legW !== undefined) return tg._legW;
+  const B = tg.rig.bones, lu = B.mixamorig_LeftUpLeg, ru = B.mixamorig_RightUpLeg, la = B.mixamorig_LeftFoot, ra = B.mixamorig_RightFoot;
+  if (!lu || !ru || !la || !ra || !tg.info.kept) return (tg._legW = null);
+  tg.restore(); const L = lu.getWorldPosition(new THREE.Vector3()).sub(ru.getWorldPosition(new THREE.Vector3())); L.y = 0; const hw = L.length(); L.normalize();
+  const ax = { Left: la.getWorldPosition(new THREE.Vector3()).dot(L), Right: ra.getWorldPosition(new THREE.Vector3()).dot(L) };
+  const inner = { Left: 0, Right: 0 }, re = { Left: /Left(Leg|Foot|ToeBase|Toe_End)$/, Right: /Right(Leg|Foot|ToeBase|Toe_End)$/ }, v = new THREE.Vector3();
+  for (const { m, idx } of tg.info.meshes) { m.skeleton.update(); const sw = m.geometry.attributes.skinWeight, si = m.geometry.attributes.skinIndex;
+    for (const i of idx) { let bw = -1, bi = 0; for (let k = 0; k < 4; k++) { const w = sw.getComponent(i, k); if (w > bw) { bw = w; bi = si.getComponent(i, k); } }
+      const nm = (m.skeleton.bones[bi] || {}).name || ''; const sd = re.Left.test(nm) ? 'Left' : re.Right.test(nm) ? 'Right' : null; if (!sd) continue;
+      v.fromBufferAttribute(m.geometry.attributes.position, i); m.applyBoneTransform(i, v); v.applyMatrix4(m.matrixWorld);
+      const lat = v.dot(L), d = sd === 'Left' ? ax.Left - lat : lat - ax.Right; if (d > inner[sd]) inner[sd] = d; } }
+  return (tg._legW = { hw, inner, min: inner.Left + inner.Right + hw * .08 });
+}
+const smax = (x, m, k) => (x + m + Math.sqrt((x - m) * (x - m) + k * k)) / 2;
+export function clearLayer(tg, clip, amt = 1) {
+  const W = amt > 0 && legWidths(tg); if (!W) return clip;
+  const B = tg.rig.bones, M = 'mixamorig_', names = ['LeftUpLeg', 'LeftLeg', 'LeftFoot', 'RightUpLeg', 'RightLeg', 'RightFoot'];
+  if (!names.every(n => B[M + n])) return clip;
+  const ref = clip.tracks.find(t => t.name === MHIPS + '.position') || clip.tracks[0], times = ref.times, n = times.length;
+  const out = {}; for (const b of names) out[b] = new Float32Array(n * 4);
+  tg.mixer.stopAllAction(); const ta = tg.mixer.clipAction(clip); ta.play(); let pushed = 0;
+  for (let f = 0; f < n; f++) {
+    ta.time = times[f]; tg.mixer.update(0); tg.model.updateMatrixWorld(true);
+    const L = B[M + 'LeftUpLeg'].getWorldPosition(new THREE.Vector3()).sub(B[M + 'RightUpLeg'].getWorldPosition(new THREE.Vector3())); L.y = 0; L.normalize();
+    const lf = B[M + 'LeftFoot'].getWorldPosition(new THREE.Vector3()), rf = B[M + 'RightFoot'].getWorldPosition(new THREE.Vector3()), sep = lf.clone().sub(rf).dot(L);
+    const want = sep + (smax(sep, W.min, W.hw * .15) - sep) * amt;
+    if (want - sep > 1e-4) { const d = (want - sep) / 2; pushed++;
+      legTo(B, M + 'LeftUpLeg', M + 'LeftLeg', M + 'LeftFoot', lf.addScaledVector(L, d)); legTo(B, M + 'RightUpLeg', M + 'RightLeg', M + 'RightFoot', rf.addScaledVector(L, -d)); }
+    for (const b of names) { const q = B[M + b].quaternion; out[b].set([q.x, q.y, q.z, q.w], f * 4); }
+  }
+  ta.stop(); tg.mixer.uncacheClip(clip);
+  if (!pushed) return clip;
+  const nm = new Set(names.map(b => M + b + '.quaternion'));
+  return new THREE.AnimationClip(clip.name, clip.duration, clip.tracks.filter(t => !nm.has(t.name)).concat(names.map(b => new THREE.QuaternionKeyframeTrack(M + b + '.quaternion', times, out[b]))));
+}
+
 // ---- LAYER 7, CLIP EDITS: trim (seconds in the source) and speed
 export function editLayer(clip, E) {
   if (!E) return clip;
@@ -438,7 +495,7 @@ export function groundLayer(tg, src, clip, amt = 1) {
   const ta = tg.mixer.clipAction(clip); ta.play();
   for (let f = 0; f < n; f++) {
     sa.time = Math.min(src.clip.duration, times[f]); src.mixer.update(0); src.scene.updateMatrixWorld(true);
-    const want = tg.restLow + Math.max(0, lowestJoint(src.rig.bones) - src.restLow) * k;
+    const want = tg.restLow + Math.max(0, lowestSource(src)) * k;
     ta.time = times[f]; tg.mixer.update(0); tg.model.updateMatrixWorld(true);
     off[f] = (want - lowestY(tg.info)) * amt;
   }
@@ -459,6 +516,7 @@ export function carry(tg, src, role, P, opt) {
   let clip = r.clips[role]; const rep = { hipW: RTW.hr, leg: RTW.lr, ms: RTW.ms };
   if (opt && opt.upper) clip = composeUpper(tg, clip, opt.upper);
   if (P.adjust) clip = adjustLayer(tg, clip, P.adjust);
+  if (P.layers.clear !== 0) clip = clearLayer(tg, clip, P.layers.clear === undefined ? 1 : +P.layers.clear);
   if (opt && opt.hands) clip = handsLayer(tg, clip, opt.hands.H, opt.hands.poses);
   if (opt && opt.fk) clip = fkLayer(tg, clip, opt.fk);
   if (opt && opt.grip) clip = gripLayer(tg, clip, opt.grip);

@@ -75,6 +75,7 @@ async function setCharacter(buf, name) {
     const H = ST.tg.hipH * 2.2; orbit.target.set(-H * .45, H * .45, 0); cam.position.set(H * .6, H * .6, H * 3.1);
     $('who').textContent = name.split('/').pop();
     $('lFeet').checked = !!ST.P.layers.feet; $('lGround').value = ST.P.layers.ground; $('lGroundV').textContent = (+ST.P.layers.ground).toFixed(2);
+    $('lClear').value = ST.P.layers.clear ?? 1; $('lClearV').textContent = (+$('lClear').value).toFixed(2);
     const I = ST.tg.info, nb = Object.keys(ST.tg.rig.bones).length;
     $('charNote').innerHTML = `${nb} Mixamo bones · hips ${ST.tg.hipH.toFixed(2)} m above his soles · ${ST.tg.rig.skinned.length} skinned mesh${ST.tg.rig.skinned.length === 1 ? '' : 'es'}` + (I.kept ? '' : ' · <span class="bad">no skin found: ground contact is off</span>');
     $('exNote').textContent = I.excluded.length ? I.excluded.join(', ') + ` (${I.dropped} sampled vertices)` : 'nothing: every vertex belongs to the body';
@@ -376,6 +377,8 @@ const relayer = () => { saveProf(); if (ST.cur) previewEntry(ST.cur); };
 $('lFeet').onchange = () => { ST.P.layers.feet = $('lFeet').checked ? 1 : 0; relayer(); };
 $('lGround').oninput = () => { $('lGroundV').textContent = (+$('lGround').value).toFixed(2); };
 $('lGround').onchange = () => { ST.P.layers.ground = +$('lGround').value; relayer(); };
+$('lClear').oninput = () => { $('lClearV').textContent = (+$('lClear').value).toFixed(2); };
+$('lClear').onchange = () => { ST.P.layers.clear = +$('lClear').value; relayer(); };
 $('ghost').onchange = () => relayer();
 const SL = { aStance: ['stance', 2], aArms: ['arms', 0], aLean: ['lean', 0] };
 function syncSliders() { ST.P.adjust = Object.assign({ stance: 1, arms: 0, lean: 0 }, ST.P.adjust || {});

@@ -5,6 +5,30 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m939 -- THE CEO FIXED BY MEASUREMENT: foot clearance, real soles, a neutral idle, a wider walk -- and FORGE ON/OFF in the arena
+*"the idle you chose, his hip is way out, super exaggerated... his walk is horrendous: his feet are too close together, they
+intersect, but they also don't touch the ground"*. All three were real and all three were measured:
+- **Feet crossing** -- the foot pass keeps the source's stance in HIP WIDTHS, and Walking_3 ("Male Standard Walk") brings the Y
+  Bot's feet to 0.28 hip widths apart: fine on thin legs, crossing on the CEO's thick legs and shoes. **LAYER 4b `clearLayer`**:
+  his inner leg + shoe half-widths measured off his skin at rest (`legWidths`: the CEO needs 1.02 hip widths, the hick 0.85);
+  closer than that and both feet ease apart (a smooth max) and the legs re-solve. Before / after on Walking_3: min 0.30 -> 1.02.
+  Default on; BODY "Foot clearance" and MCP `set_sliders clear` are the A/B.
+- **Feet floating** -- the Y Bot has no heel: at heel strike his lowest JOINT is the ankle, so the ground pass lifted the body by
+  as much as the ankle's height. **Sole points** (`prepDonor` -> `soles`, `lowestSource`): the floor under the ankle, the ball and
+  the toe at rest, held in each bone's frame, ride the foot as it rolls. His walk's lowest skin point is now within 0.5 cm of the
+  floor on every frame (without the ground layer it sank 2-7 cm; the m937 bake floated).
+- **The hip-out idle** -- 74 plain standing idles RATED (`retarget-anims/library/ratings/idles.json`, tools/rate_idles.cjs): hip
+  offset, weight shift, lean, stance, foot motion, in hip widths. Idle_10 (my m937 pick) had the hip 0.6 out -- among the worst.
+  Now **Bored** (the most neutral: hip 0.07, a small foot shuffle). The drink's legs now stand on **Standard_Idle**.
+- **The walk** -- 34 forward walks rated by how close feet and knees come (`ratings/walks.json`). Walking_3 was nearly the
+  narrowest. Now **Dwarf_Walk** (feet never under 1.07 hip widths, a stocky stride that suits him): gait measured 0.395 m/s ->
+  **walkRef 0.906**; run re-measured 0.7849 -> **runRef 1.801**.
+- **FORGE ON / OFF** (arena bar, `forgedToggle`): swaps every baked kind's clips between the Forge's and his own and rebuilds the
+  live bodies' actions in place (same loop, weight, time) -- the A/B he asked for, no reload. With it OFF he has no drink clips,
+  so he ignores the can.
+- Rebaked through forge-mcp (remove/add clips, compose, hands, save) + forgebake. Tested headless: the toggle swaps both ways,
+  no page errors. Shipped unverified on a phone.
+
 ## m938 -- THE GREEN DRINK: the CEO notices it, walks over, picks it up, looks at it, drinks, staggers, and turns
 *"if the NPC sees the green drink he gets curious, walks over, picks it up off a stool or the ground, looks at it, drinks it --
 and it's the drinking that does it: he staggers back a little and transforms into the alien version of himself"*.
