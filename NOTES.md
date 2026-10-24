@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m952 -- THE THROW: flick = quick toss, hold up = wind up with a reticle, release = throw (step 3 of 4)
+
+*"Swiping on the right stick is a quick toss towards whatever direction you swipe, or press and hold forward... brings his arm
+back into the fully cocked position, a little reticle shows where you're gonna throw it, and you let go and he throws it."*
+- Carrying, the right pad's FLICK is `tossQuick` (before the strike/slam): he snaps round to the flicked bearing (`flickH`) and
+  throws at `TOSS.quickK` power, the clip at `quickRate` 1.5.
+- Pushed UP and held (`padUp` + `WEAP.armT`, the trigger's own gesture; keyboard Q) is `tossWind`: `throw_item` plays to its
+  COCKED frame and holds there (`tossScale(0)`), he faces the lens and slows like aiming (`p.tossFace` in `stepPlayer`'s
+  `aiming`/`faceTgt`), power climbs 0..1 over `TOSS.chargeT` .9 s, and an amber reticle -- nine dots along the arc and a ring where
+  it lands -- is solved from the same `tossVel` the throw uses. Release: the clip runs on and lets go at `DRINK.throwAt`.
+- MEASURED (`throw_item`, his right hand along his facing, hip-relative): furthest back at 0.87 s (u .42 = `DRINK.cockU`),
+  forward through his hips at ~1.10 s -- so `throwAt` .42 -> .53. The old .42 let the cup go before the arm came forward.
+- The cup moves to his RIGHT hand when the throw starts (the clip throws right-handed; he picks up left). `tossRelease` flies it
+  (`DRINK.flying`: clangs, settles) and it is a pickable / drinkable cup again.
+Headless: wound 0.86 s and held, power to 1, reticle up; release -> cup leaves from head height and lands ~9 m off.
+Shipped unverified. NEXT (step 4): the CEO only takes an interest inside a sphere round him, and shows it.
+
 ## m951 -- TAP TO PICK IT UP, AND HE CARRIES IT (step 2 of 4; throw and the CEO's interest next)
 
 - **The tap**: in reach of a pickable (the ring is up), the RIGHT pad's tap (keyboard E) is `pickTap` instead of the jump -- the left

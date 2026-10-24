@@ -845,10 +845,10 @@ body.desk.free #deskHint { display: block; }
   <h1>WEIRDPORT</h1>
   <div class="msg" id="bootMsg">loading</div>
   <div class="bar"><i id="bootBar"></i></div>
-  <div class="bld">BUILD <span id="bootBuild">m951</span></div>
+  <div class="bld">BUILD <span id="bootBuild">m952</span></div>
 </div>
 
-<div class="chip" id="build"><b id="buildN">m951</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
+<div class="chip" id="build"><b id="buildN">m952</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
 <div id="splash" aria-label="tap to start"><img class="blur" alt=""><img class="main" alt="Zap and Clancy"><div class="glow"></div><div class="bn"></div></div>
 <script>
 // m879 (STEER 02:22): THE SPLASH, before the module (so it shows on the first paint, while the boot carries on behind it). The image's
@@ -954,7 +954,7 @@ import { KTX2Loader } from './vendor/KTX2Loader.js';
 import { clone as skeletonClone } from './vendor/SkeletonUtils.js';
 import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
 
-const BUILD = 'm951';
+const BUILD = 'm952';
 /* ASSETS:START */
 const ASSETS = {"models/alien_lizard.glb":"faffcf4c","models/alien_lizard_ktx2.glb":"05da2a20","models/skate.glb":"0c612d5e","models/skateboard.glb":"5ba93796","models/characters/alien_antenna_game.glb":"f3ccf328","models/characters/alien_antenna_game_ktx2.glb":"28afac8c","models/characters/alien_female_purple.glb":"1c73eef1","models/characters/alien_female_purple_ktx2.glb":"fc914afb","models/characters/alien_grey_medium.glb":"5a779e8e","models/characters/alien_grey_medium_ktx2.glb":"61600c3e","models/characters/alien_rollerskate_blue.glb":"6e98dd0a","models/characters/alien_rollerskate_blue_ktx2.glb":"a66d5697","models/characters/alien_warrior.glb":"f5cc9c49","models/characters/alien_warrior_ktx2.glb":"a13fb7b6","models/characters/beautiful_asian.glb":"910f6565","models/characters/beautiful_asian_ktx2.glb":"35281eef","models/characters/beautiful_blonde.glb":"edddc421","models/characters/beautiful_blonde_ktx2.glb":"89cf3899","models/characters/brute_warboss_armor.glb":"cc5c7936","models/characters/ceo_alien.glb":"844dc3a7","models/characters/ceo_human.glb":"ec289865","models/characters/clancy.glb":"b1ef602b","models/characters/clancy_ktx2.glb":"84625cdc","models/characters/colin.glb":"99d38b7d","models/characters/colin_ktx2.glb":"35040f87","models/characters/contruction_worker.glb":"8bd3d7ce","models/characters/contruction_worker_ktx2.glb":"3df8c344","models/characters/dummy_officer.glb":"724965ac","models/characters/dummy_officer_ktx2.glb":"db640cda","models/characters/fat_activist_01.glb":"3c566fee","models/characters/fat_activist_01_ktx2.glb":"b9328df4","models/characters/fat_biker_01.glb":"576b7cf5","models/characters/fat_biker_01_ktx2.glb":"7142cfad","models/characters/fat_biker_02.glb":"ab5d7ec7","models/characters/fat_biker_02_ktx2.glb":"28cec6cc","models/characters/fat_hippie.glb":"f09a260d","models/characters/fat_hippie_ktx2.glb":"0be745a4","models/characters/fat_hipster.glb":"3a8abc31","models/characters/fat_hipster_ktx2.glb":"fd8b3318","models/characters/fat_secret_service.glb":"6d546fb0","models/characters/fat_secret_service_ktx2.glb":"a23a304e","models/characters/fat_trump.glb":"5de6bc56","models/characters/fat_trump_ktx2.glb":"a0ddaf4d","models/characters/firefighter.glb":"ebde005d","models/characters/firefighter_ktx2.glb":"ccf93c96","models/characters/hick_skinny.glb":"1ebe78e8","models/characters/hick_skinny_ktx2.glb":"1e93f0ed","models/characters/hobo_01.glb":"34e80b1d","models/characters/hobo_01_ktx2.glb":"69497677","models/characters/jack.glb":"ab009b9b","models/characters/jack_ktx2.glb":"1f4c9f7f","models/characters/moussa.glb":"6d80b1cf","models/characters/moussa_ktx2.glb":"66e040f8","models/characters/proxy_ceo.bin":"6eca0c34","models/characters/proxy_ceo.jpg":"fadc9d0a","models/characters/proxy_ceo.json":"e62a7975","models/characters/proxy_ceo_alien.bin":"be247ecc","models/characters/proxy_ceo_alien.jpg":"8f8bf8fc","models/characters/proxy_ceo_alien.json":"eb23e28f","models/characters/proxy_hick.bin":"4485560e","models/characters/proxy_hick.jpg":"8c331965","models/characters/proxy_hick.json":"d85a0d36","models/characters/proxy_zap.bin":"dd7b300e","models/characters/proxy_zap.jpg":"2e7330ae","models/characters/proxy_zap.json":"b3b42754","models/characters/proxy_zap2.bin":"91f4bb5f","models/characters/proxy_zap2.jpg":"a954a815","models/characters/proxy_zap2.json":"5c50abb7","models/characters/rept_heavy_armor.glb":"934661c7","models/characters/xray_skeleton.glb":"46480317","models/characters/zap.glb":"5e5cca54","models/characters/zap_02.glb":"d6ab7a56","models/characters/zap_02_lib.glb":"8a5e20e7","models/characters/zap_ktx2.glb":"4b29d886","models/vehicles/dump_truck.glb":"d870dc18","models/vehicles/dump_truck_ktx2.glb":"21ee7059","models/vehicles/motorcycle_fatboy.glb":"9ed9be28","models/weapons/alien_antenna_blaster_game.glb":"54083b44","models/weapons/alien_antenna_hammer_game.glb":"707b8a27","models/weapons/alien_launcher.glb":"ba8ab96a","models/weapons/hammer.glb":"3335fdf2","models/weapons/shield_brute.glb":"c6e5593f","models/weapons/spikey_mace.glb":"dcd43acd","models/weapons/w_brute_cleaver.glb":"07a97580","models/weapons/w_rept_maul.glb":"84c3a1a4","models/buildings/alien_base_01.glb":"d9b9fd7f","models/buildings/alien_base_01_ktx2.glb":"6cbbfef2","models/towers/alien_tower_01.glb":"98d23375","models/towers/alien_tower_01_ktx2.glb":"47597651","models/streets/modular_streets_kit.glb":"6a4bcaa5","models/toon_city/impact_marks.json":"2b616620","models/toon_city/impact_marks_atlas.ktx2":"efe0840e","models/toon_city/impact_marks_atlas.png":"490ed049","models/toon_city/toon_city_breakables.glb":"29bddbc8","models/toon_city/toon_city_collision.glb":"fb3a693f","models/toon_city/toon_city_obb.json":"81c18a47","models/toon_city/toon_city_visual.glb":"5df62285","models/toon_city/toon_city_visual_ktx2.glb":"cf080531","models/toon_city/weirdkit_tint.js":"f6e9d802","models/toon_city_kit/toon_city_collision.glb":"5540a364","models/toon_city_kit/toon_city_kit_buildings.glb":"590e53f0","models/toon_city_kit/toon_city_kit_buildings_ktx2.glb":"e6dff3a3","models/toon_city_kit/toon_city_kit_pieces.glb":"8232bd6f","models/toon_city_kit/toon_city_kit_twins.glb":"fcc9fdfc","models/toon_city_kit/toon_city_visual.glb":"45cf2957","models/toon_city_kit/toon_city_visual_ktx2.glb":"f26a6984","models/toon_city_kit/weirdkit_detile.js":"dd05bd70","models/characters/morph/shapes.bin":"4e680384","models/characters/morph/shapes.json":"abfc949d","models/characters/forged/ceo_human.glb":"9c8a3cdd","models/characters/forged/index.json":"11dd975d","models/characters/forged/zap.glb":"f9a538ba","images/crack_sprite_01.ktx2":"4aa55fde","images/crack_sprite_01.png":"16b52e8c","images/fire_sprites_01.ktx2":"922e1191","images/fire_sprites_01.png":"f87e2696","images/fire_sprites_02.ktx2":"e0cbfe1d","images/fire_sprites_02.png":"b373a6fd","images/fire_sprites_03.ktx2":"4fbbb985","images/fire_sprites_03.png":"7eece336","images/geyser_sprites_01.png":"b6325470","images/hdri_game.ktx2":"0feb5c79","images/hdri_game.png":"dac55f41","images/splash_zap_n_clancy.webp":"52a9d8a4","images/water_sprites_01.ktx2":"326924c5","images/water_sprites_01.png":"31e12659","audio/blaster_sound_01.mp3":"40d99583","audio/blaster_sound_02.mp3":"4bd7bb7c","audio/box_break_01.mp3":"e4127980","audio/electricity_beam_01.mp3":"986db8c9","audio/explosion_small.mp3":"f154a537","audio/metal_clang_01.mp3":"a333bd27","audio/metal_clang_02.mp3":"1e3ebbd6","audio/metal_clang_03.mp3":"afe44812","audio/metal_ping_01.mp3":"8ffca1a0","audio/plasma_canon.mp3":"e32c324d","audio/powerup_01.mp3":"48fbbe08","audio/swoosh_01.mp3":"193db185","audio/swoosh_02.mp3":"19145e70","audio/swoosh_03.mp3":"544fdffb","audio/swoosh_04.mp3":"843bee5d","audio/plasma_sounds/plasma_01.mp3":"e71c010f","audio/plasma_sounds/plasma_02.mp3":"ac3b1c75","audio/plasma_sounds/plasma_03.mp3":"eaa59355","audio/plasma_sounds/plasma_04.mp3":"bc7865e0","audio/plasma_sounds/plasma_05.mp3":"1d821cd0","audio/plasma_sounds/plasma_06.mp3":"cb979fbe","audio/plasma_sounds/plasma_hit.mp3":"30e5af5c","audio/alien_orc_grunt_sounds/alien_orc_grunt_01.mp3":"d6f4b343","audio/alien_orc_grunt_sounds/alien_orc_grunt_02.mp3":"78afc603","audio/alien_orc_grunt_sounds/alien_orc_grunt_03.mp3":"972c524a","audio/alien_orc_grunt_sounds/alien_orc_grunt_04.mp3":"b0ce76eb","audio/alien_orc_grunt_sounds/alien_orc_grunt_05.mp3":"1f0ba1f4","audio/alien_orc_grunt_sounds/alien_orc_grunt_06.mp3":"4f749866","audio/alien_orc_grunt_sounds/alien_orc_grunt_07.mp3":"dcf75925","audio/hit_sounds/hit_sound_01.mp3":"befaa2be","audio/hit_sounds/hit_sound_02.mp3":"73bc4433","audio/hit_sounds/hit_sound_03.mp3":"24b181e4","audio/hit_sounds/hit_sound_gound_01.mp3":"86ee2674","audio/hit_sounds/hit_sound_ground_02.mp3":"8a7cac73","audio/hit_sounds/hit_sound_plasma_01.mp3":"9abc0202","audio/hit_sounds/hit_sound_plasma_02.mp3":"6aaf0fe5","audio/creature_noises/creature_noise_01.mp3":"cbcc6ee7","audio/creature_noises/creature_noise_02.mp3":"201a8247","audio/creature_noises/creature_noise_03.mp3":"97680811","audio/creature_noises/creature_noise_04.mp3":"6f734df2","audio/creature_noises/creature_noise_05.mp3":"6f736441","audio/creature_noises/creature_noise_06.mp3":"992712e9","audio/creature_noises/creature_noise_07.mp3":"d9ad04b3","audio/footsteps/footstep_2_l.mp3":"abeabfbe","audio/footsteps/footstep_2_r.mp3":"7dd16046","audio/footsteps/footstep_l.mp3":"b66e579b","audio/footsteps/footstep_r.mp3":"96e13433","models/props/prop_hydrant.glb":"f157fee9","models/props/prop_hydrant_collision.glb":"0bbfc4d2"};
 /* ASSETS:END */
@@ -8358,7 +8358,10 @@ function drinkCan() {
 }
 // DRINK: Zap THROWS it (his `throw_item`, upper body only -- the legs carry on), and at the release the cup leaves his right hand on
 // an arc, bounces and settles upright; only then can anyone notice it. No throw clip on whoever he is: it lands in front of him.
-Object.assign(DRINK, { throwAt: .42, v: 3.6, up: 3.2, g: 9.8, flying: [] });
+// m952: `throwAt` .42 -> .53 and `cockU` .42, MEASURED on his `throw_item` (right hand along his facing, hip-relative): back to
+// -0.53 hip heights by 0.47 s, furthest back -0.86 at 0.87 s (u .42, the cocked pose a held wind-up stops on), and through his
+// hips going forward at ~1.10 s (u .53) -- .42 let the cup go before the arm had even started forward.
+Object.assign(DRINK, { throwAt: .53, cockU: .42, v: 3.6, up: 3.2, g: 9.8, flying: [] });
 function drinkPlace() {
   const p = player;
   if (CLIPS.toss && rig.actions[CLIPS.toss] && !p.toss && !p.swap) { p.toss = 1; p.tossT = 0; p.tossOut = 0; const r = 1; playOnce(CLIPS.toss, r); playOnce(CLIPS.toss + UP, r); return; }
@@ -8369,13 +8372,16 @@ function drinkPlace() {
 function drinkThrowStep(dt) {
   const p = player;
   if (p.toss) {
-    p.tossT += dt; const len = clipLen(CLIPS.toss) || 1;
+    const len = clipLen(CLIPS.toss) || 1, cock = len * DRINK.cockU;
+    if (p.wind) { p.tossT = Math.min(cock, p.tossT + dt); if (p.tossT >= cock) tossScale(0); }     // m952: held at the cocked frame
+    else p.tossT += dt * (p.tossRate || 1);
+    if (!p.tossOut && p.tossT >= len * DRINK.throwAt && p.carry) { p.tossOut = 1; tossRelease(); }
     if (!p.tossOut && p.tossT >= len * DRINK.throwAt) { p.tossOut = 1;
       const hand = rig.model && rig.model.getObjectByName('mixamorig_RightHand'), at = hand ? hand.getWorldPosition(new THREE.Vector3()) : p.pos.clone().add(new THREE.Vector3(0, 1.1, 0));
       const h = p.faceH || 0, can = drinkCan(); can.position.copy(at); scene.add(can);
       DRINK.flying.push({ can, v: new THREE.Vector3(Math.sin(h) * DRINK.v, DRINK.up, Math.cos(h) * DRINK.v), w: new THREE.Vector3(6 + Math.random() * 4, Math.random() * 3, Math.random() * 3), bounces: 0 });
       snd('swoosh', { g: .5, r: 1.2 }); }
-    if (p.tossT >= len) p.toss = 0;
+    if (p.tossT >= len) { p.toss = 0; p.tossFace = null; }
   }
   for (let i = DRINK.flying.length - 1; i >= 0; i--) { const F = DRINK.flying[i], c = F.can;
     F.v.y -= DRINK.g * dt; c.position.addScaledVector(F.v, dt); c.rotation.x += F.w.x * dt; c.rotation.y += F.w.y * dt; c.rotation.z += F.w.z * dt;
@@ -8577,10 +8583,58 @@ function pickRun(dt) {
   if (P) { P.t += dt;
     if (!P.got && P.t >= P.grab) { P.got = 1; const h = pickHolder(); if (h) { P.h = h; h.add(P.o); P.o.position.set(0, 0, 0); P.o.rotation.set(0, 0, 0); } }
     if (P.t >= P.dur) { p.pick = null; if (P.h) p.carry = { o: P.o, h: P.h }; else { P.o.userData.claimed = 0; DRINK.cans.push(P.o); } } }
+  tossWind(dt);
   const C = p.carry;
   if (C) { if (!C.o.parent || C.o.parent !== C.h) { p.carry = null; return; }
     // upright in the world, turned with him: the holder's turn undoes his hand's
     C.h.parent.getWorldQuaternion(_pkQ); _pkY.setFromAxisAngle(_pkU, p.faceH || 0); C.h.quaternion.copy(_pkQ.invert().multiply(_pkY)); }
+}
+// m952: THE THROW. Carrying it, the right pad is the throw: a FLICK is a quick toss the way you flicked (`tossQuick`); pushed UP
+// and held (the trigger's own gesture, `padUp`, and `WEAP.armT`) he draws his arm back to the cocked frame of `throw_item` and
+// holds it, facing where the lens looks, while a reticle on the floor shows where it will land -- further the longer he holds
+// (`TOSS.chargeT`); let go and he throws. The cup moves to his RIGHT hand for it (the clip throws right-handed).
+const TOSS = { vMin: 3.5, vMax: 9, up0: 2.6, up1: 4.2, chargeT: .9, quickK: .45, quickRate: 1.5, relY: 1.35, dots: 9 };
+function tossScale(k) { for (const n of [CLIPS.toss, CLIPS.toss + UP, CLIPS.toss + UPS]) setScale(n, k); }
+function tossBegin(rate) {
+  const p = player, C = p.carry; if (!C || p.toss || !CLIPS.toss || !rig.actions[CLIPS.toss]) return false;
+  p.toss = 1; p.tossT = 0; p.tossOut = 0; p.tossRate = rate; playOnce(CLIPS.toss, rate); playOnce(CLIPS.toss + UP, rate); if (rig.actions[CLIPS.toss + UPS]) playOnce(CLIPS.toss + UPS, rate);
+  const hand = rig.bones.mixamorig_RightHand, A = hand && socketAuto(hand, 'Right');     // into the throwing hand
+  if (hand && A) { hand.add(C.h); C.h.position.copy(A.p); }
+  return true;
+}
+function tossQuick(dx, dy) {
+  const p = player; if (!p.carry || p.toss) return false;
+  const H = flickH(dx, dy); p.heading = p.faceH = H; p.tossH = H; p.tossFace = H; p.tossK = TOSS.quickK;
+  return tossBegin(TOSS.quickRate);
+}
+function tossVel(k, H, out) { const v = TOSS.vMin + (TOSS.vMax - TOSS.vMin) * k; return out.set(Math.sin(H) * v, TOSS.up0 + (TOSS.up1 - TOSS.up0) * k, Math.cos(H) * v); }
+function tossRelease() {
+  const p = player, C = p.carry; if (!C) return; p.carry = null;
+  const at = C.o.getWorldPosition(new THREE.Vector3()), q = C.o.getWorldQuaternion(new THREE.Quaternion()); scene.attach(C.o); C.o.position.copy(at); C.o.quaternion.copy(q); C.o.scale.setScalar(1); C.h.removeFromParent();
+  C.o.userData.claimed = 0;
+  DRINK.flying.push({ can: C.o, v: tossVel(p.tossK || .5, p.tossH != null ? p.tossH : p.faceH, new THREE.Vector3()), w: new THREE.Vector3(6 + Math.random() * 4, Math.random() * 3, Math.random() * 3), bounces: 0 });
+  snd('swoosh', { g: .5, r: 1.2 });
+}
+const _tsV = new THREE.Vector3(), _tsP = new THREE.Vector3();
+function tossWind(dt) {
+  const p = player;
+  if (!p.carry || (p.toss && !p.wind)) { p.windT = 0; if (TOSS.ret) TOSS.ret.visible = false; return; }
+  if (padUp(!!p.wind) || keys.q) {
+    p.windT = (p.windT || 0) + dt;
+    if (!p.wind && p.windT >= WEAP.armT && tossBegin(1)) p.wind = 1;
+  } else if (p.wind) { p.wind = 0; p.tossH = cam.az; p.tossFace = cam.az; tossScale(1); }
+  else p.windT = 0;
+  if (p.wind) { p.tossFace = cam.az; p.tossK = clamp((p.windT - WEAP.armT) / TOSS.chargeT, 0, 1); }
+  // the reticle: the arc it will fly, a few dots, and a ring where it lands
+  if (!TOSS.ret) { const g = new THREE.Group(), m = new THREE.MeshBasicMaterial({ color: 0xffb13b, transparent: true, opacity: .9, depthWrite: false, toneMapped: false });
+    const ring = new THREE.Mesh(new THREE.RingGeometry(.28, .36, 32), m); ring.rotation.x = -Math.PI / 2; g.add(ring); g.userData.ring = ring; g.userData.dots = [];
+    for (let i = 0; i < TOSS.dots; i++) { const d = new THREE.Mesh(new THREE.SphereGeometry(.045, 6, 4), m); g.add(d); g.userData.dots.push(d); }
+    TOSS.ret = g; scene.add(g); }
+  const R = TOSS.ret; R.visible = !!p.wind; if (!p.wind) return;
+  const H = cam.az, s = (RIG.height || 1.25) / 1.25; tossVel(p.tossK, H, _tsV); _tsP.set(p.pos.x + Math.sin(H) * .3, p.pos.y + TOSS.relY * s, p.pos.z + Math.cos(H) * .3);
+  const a = DRINK.g / 2, tl = (_tsV.y + Math.sqrt(_tsV.y * _tsV.y + 4 * a * Math.max(0, _tsP.y - DRINK.h / 2))) / (2 * a);
+  R.userData.dots.forEach((d, i) => { const t = tl * (i + 1) / (TOSS.dots + 1); d.position.set(_tsP.x + _tsV.x * t, _tsP.y + _tsV.y * t - a * t * t, _tsP.z + _tsV.z * t); });
+  R.userData.ring.position.set(_tsP.x + _tsV.x * tl, .04, _tsP.z + _tsV.z * tl);
 }
 function pickDrop() {     // let go of it where he stands (a weapon drawn, the arena cleared)
   const p = player, C = p.carry; if (!C) return; p.carry = null;
@@ -15892,7 +15946,7 @@ PADS.R = bindStick(padR, stick.R,
   // ...unless someone in reach has something to say: then it is TALK (m277), and the left tap still jumps
   () => { if (talkTap()) return; if (pickTap()) return; if (portalTap()) return; if (wingTapR()) return; player.jump = 1; },
   // flick: a SLAM if he is in the air and it went down, otherwise a strike in that direction
-  (dx, dy) => { if (player.wing) return; if (boardFlick(dx, dy, 0)) return; if (!slamGo(dx, dy)) meleeGo(flickH(dx, dy)); },
+  (dx, dy) => { if (player.wing) return; if (tossQuick(dx, dy)) return; if (boardFlick(dx, dy, 0)) return; if (!slamGo(dx, dy)) meleeGo(flickH(dx, dy)); },
   null,
   // THE RELEASE IS THE SHOT, so this must NOT clear `p.aim` -- `stepKit` sees the pad is no
   // longer held and fires on that edge. Clearing it here would eat every shot in the game.
@@ -17737,7 +17791,7 @@ function stepPlayer(dt) {
   // is why `plant` has to go to zero here. `plant` swings the velocity onto his facing as he
   // speeds up, which is right for running and exactly wrong while aiming, since it would drag
   // every step round to point down the barrel.
-  const aiming = committed() || p.block || p.center || !!p.lock;
+  const aiming = committed() || p.block || p.center || !!p.lock || p.tossFace != null;     // m952: winding up a throw aims like the trigger
   let wantSp = MOVE.max * s.mag;
   if (aiming) wantSp = Math.min(wantSp, GAIT.aimRunRef);
   if (p.land && !p.knock) wantSp *= .35;
@@ -17775,7 +17829,7 @@ function stepPlayer(dt) {
 
   // aiming, he faces where the camera looks; otherwise he faces where he is going
   // LOCKED, HE FACES THE TARGET -- not the lens. That is what makes the strafes read.
-  const faceTgt = p.lock ? lockH(p.lock) : aiming ? cam.az : p.heading;
+  const faceTgt = p.tossFace != null ? p.tossFace : p.lock ? lockH(p.lock) : aiming ? cam.az : p.heading;
   const fRate = (p.lock ? LOCK.face : aiming ? MOVE.face0 : lerp(MOVE.face0, MOVE.face1, clamp(p.speed / MOVE.max, 0, 1))) * dt;
   const turned = clamp(wrapAngle(faceTgt - p.faceH), -fRate, fRate);
   p.faceH += turned;
@@ -52843,7 +52897,7 @@ async function init() {
 
 // the console handle. Every tuning object is live, so a number can be moved on the phone
 // without a rebuild and without a push.
-window.melee = window.mel = { FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
+window.melee = window.mel = { FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
   // PROGRESS (m276): `mel.SAVE` is the save; the setters write it through; `mel.progReset()` is a new game
   // TALK (m277): `mel.TALK` live; `mel.TALKS` the scripts by kind; `mel.talk` the state
   TALK, TALKS, talk,
