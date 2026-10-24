@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m949 -- one cup size everywhere, the dropped cup clatters, and the CEO's toe-off no longer lifts his planted foot (Forge `soleLayer`)
+
+*"The drink needs to be consistent in its size... best size so far is when the CEO is holding it."* `DRINK.r/h` doubled to the held
+size (.072 / .30); the bake's wrap radius (.555 hand lengths x 0.136 m = .0756 = .072 x 1.05) already IS that size, so the cup no
+longer grows -- `heldK` 1. Same cup in Zap's throw, on the floor, in the CEO's hand.
+*"After he drinks it, he drops it and it bounces around and doesn't make a noise."* `drinkDrop` used ARENA debris (silent). It now
+goes through the thrown-cup flight (`DRINK.flying`, `empty: 1`): clangs on the bounces, a tap when it settles, lies on its side, and
+goes in `DRINK.empties` (nobody claims it; 6 kept; cleared with the arena). The thrown cup also taps when it settles.
+*"Heel, and then when it goes to toe, it lifts his heel up to the height of his toe... then drops that down again."* MEASURED from the
+side (tools: a headless Forge run printing ankle / ball height per frame, % of hip height): during his RIGHT toe-off (frames 10-16
+of Dwarf_Walk) his PLANTED left foot rose from ankle 24 / ball 7 to 37 / 20. Cause: the library body's toes BEND at toe-off and its
+tip stays down; the CEO's long shoe is stiff, so the same foot pitch drove its tip through the floor, and `groundLayer` (lowest skin
+point on the floor) lifted his whole body out -- the planted foot with it. New Forge layer `soleLayer` (before ground): a foot pitched
+further forward than at rest whose own skin is under his rest floor is turned back toward flat about the ankle, just far enough
+(bisection, 3-tap smoothed). After: the planted foot holds 24 / 7 through the whole toe-off; the toe-off heel peaks 35 (was 48).
+`layers.sole` 0..1 (default 1; 0 = the A/B); MCP `set_sliders sole`. Rebaked ceo_human. Shipped unverified.
+
 ## m948 -- HIS HAND OPENS ROUND THE CUP (a Forge WRAP, solved on his own fingers), and the cup doubles as he picks it up
 
 *"You could see his fingers through the cup... the placement of the cup in the hand, his fingers intersect it. We need to open his

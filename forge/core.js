@@ -632,6 +632,49 @@ export function groundLayer(tg, src, clip, amt = 1) {
   return { clip: new THREE.AnimationClip(clip.name, clip.duration, tracks), max, mean: sum / n };
 }
 
+// ---- LAYER 4c, THE SOLE (m949): a stiff shoe does not dig into the floor. *"Heel, and then when it goes to toe, it lifts his heel up
+// to the height of his toe... then drops that down again."* Measured from the side (ankle / ball height per frame, % of hip height):
+// in the library walk the toes BEND at toe-off and the tip stays down; the CEO's long shoe is stiff, so the same foot pitch drove
+// its tip up to 15% of his hip height through the floor, and the GROUND layer lifted his whole body out of it -- the planted foot
+// with it. So per frame, a foot pitched further forward than at rest whose own skin is below his rest floor is turned back toward
+// flat about the ankle, just far enough (bisection) that it is not. 3-tap smoothed. `amt` 0..1; 0 is the A/B.
+export function soleLayer(tg, clip, amt = 1) {
+  if (!(amt > 0) || !tg.info.kept) return clip;
+  const B = tg.rig.bones, M = 'mixamorig_';
+  if (!tg.feetIdx) { tg.feetIdx = {};
+    for (const sd of ['Left', 'Right']) { const want = new Set([M + sd + 'Foot', M + sd + 'ToeBase', M + sd + 'Toe_End']), L = [];
+      for (const { m, idx } of tg.info.meshes) { const sw = m.geometry.attributes.skinWeight, si = m.geometry.attributes.skinIndex, ids = [];
+        for (const i of idx) { let bw = -1, bi = 0; for (let k = 0; k < 4; k++) { const w = sw.getComponent(i, k); if (w > bw) { bw = w; bi = si.getComponent(i, k); } }
+          const b = m.skeleton.bones[bi]; if (b && want.has(b.name)) ids.push(i); }
+        if (ids.length) L.push({ m, ids }); }
+      tg.feetIdx[sd] = L; } }
+  const v = new THREE.Vector3(), low = L => { let lo = Infinity; for (const { m, ids } of L) { m.skeleton.update(); for (const i of ids) { v.fromBufferAttribute(m.geometry.attributes.position, i); m.applyBoneTransform(i, v); v.applyMatrix4(m.matrixWorld); if (v.y < lo) lo = v.y; } } return lo; };
+  const ref = clip.tracks.find(t => t.name === MHIPS + '.position') || clip.tracks[0], times = ref.times, n = times.length;
+  tg.mixer.stopAllAction(); const ta = tg.mixer.clipAction(clip); ta.play();
+  const tracks = clip.tracks.slice(), a = new THREE.Vector3(), b = new THREE.Vector3(), f = new THREE.Vector3(), g = new THREE.Vector3(), I = new THREE.Quaternion(), qt = new THREE.Quaternion();
+  for (const sd of ['Left', 'Right']) {
+    const ft = B[M + sd + 'Foot'], tb = B[M + sd + 'ToeBase'], L = tg.feetIdx[sd], nm = M + sd + 'Foot.quaternion', old = tracks.find(t => t.name === nm);
+    if (!ft || !tb || !L.length || !tg.T.wq[ft.name] || !old || old.times.length !== n) continue;
+    const rs = tb.position.clone().applyQuaternion(tg.T.wq[ft.name]).normalize().y, hz = Math.sqrt(Math.max(0, 1 - rs * rs));     // his foot's slope at rest
+    const fix = new Float32Array(n), W = [], Pi = [], QF = [];
+    for (let k = 0; k < n; k++) {
+      ta.time = times[k]; tg.mixer.update(0); tg.model.updateMatrixWorld(true);
+      ft.getWorldPosition(a); tb.getWorldPosition(b); f.copy(b).sub(a).normalize();
+      const h = Math.hypot(f.x, f.z) || 1; g.set(f.x / h * hz, rs, f.z / h * hz);
+      W[k] = ft.getWorldQuaternion(new THREE.Quaternion()); Pi[k] = ft.parent.getWorldQuaternion(new THREE.Quaternion()).invert(); QF[k] = new THREE.Quaternion().setFromUnitVectors(f, g);
+      if (f.y >= rs - .02 || low(L) >= tg.restLow - 1e-4) continue;                 // not pitched forward, or not under the floor
+      const ok = t => { qt.copy(I).slerp(QF[k], t).multiply(W[k]); ft.quaternion.copy(Pi[k]).multiply(qt); ft.updateMatrixWorld(true); return low(L) >= tg.restLow - 1e-4; };
+      let lo = 0, hi = 1; if (ok(1)) { for (let it = 0; it < 9; it++) { const m = (lo + hi) / 2; if (ok(m)) hi = m; else lo = m; } } fix[k] = hi;
+    }
+    const vals = old.values.slice();
+    for (let k = 0; k < n; k++) { const t = Math.max(fix[k], (fix[Math.max(0, k - 1)] + 2 * fix[k] + fix[Math.min(n - 1, k + 1)]) / 4) * amt; if (!(t > 0)) continue;
+      qt.copy(I).slerp(QF[k], Math.min(1, t)).multiply(W[k]); const ql = Pi[k].clone().multiply(qt); vals.set([ql.x, ql.y, ql.z, ql.w], k * 4); }
+    tracks[tracks.indexOf(old)] = new THREE.QuaternionKeyframeTrack(nm, old.times, vals);
+  }
+  ta.stop(); tg.mixer.uncacheClip(clip);
+  return new THREE.AnimationClip(clip.name, clip.duration, tracks);
+}
+
 // ---- one clip through every layer. `P` is the profile (see forge.html); returns the clip and what each layer did.
 export function carry(tg, src, role, P, opt) {
   RTW.feet = P.layers.feet ? 1 : 0;
@@ -646,6 +689,7 @@ export function carry(tg, src, role, P, opt) {
   if (opt && opt.fk) clip = fkLayer(tg, clip, opt.fk);
   if (opt && opt.grip) clip = gripLayer(tg, clip, opt.grip);
   if (opt && opt.reach) clip = reachLayer(tg, clip, opt.reach);
+  if (P.layers.sole !== 0) clip = soleLayer(tg, clip, P.layers.sole === undefined ? 1 : +P.layers.sole);
   if (P.layers.ground) { const g = groundLayer(tg, src, clip, P.layers.ground); clip = g.clip; rep.groundMax = g.max; rep.groundMean = g.mean; }
   return { clip, rep };
 }
