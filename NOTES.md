@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m976 -- THE ROBOT SAMURAI, a new hero (`?hero=samurai`): his drawing -> Tripo -> Auto-Rig Pro -> the Forge, 84 clips
+*"Generate the four images of this samurai character and run it through Tripo and the whole pipeline... our ninja robot samurai
+character that we play with sort of attacks with."*
+- Tripo: one image -> four views (10 cr) -> mesh + 4K texture (120 cr); balance 650 -> 400 (the first mesh, 120 cr, was wasted:
+  see below). Orient -90 (Tripo faces +X), grounded (API meshes come centred on the origin; `orient.py` now grounds them).
+- **I DROPPED HIS SIDE VIEWS ON THE FIRST TRY, AND HE WAS RIGHT.** I read the backpack's tall unit as a raised arm and built the
+  mesh from front + back only, which invented a wrong backpack. *"You were hallucinating... you have to use the side views."*
+  Redone with all four: it matches his views. **Use every view Tripo gives; judge a view against the others before dropping it.**
+- **Tripo models CAST SHADOWS from the views** (his side views have long shadows on the ground): a flat sheet on the floor, invisible
+  from the front, that rigging weighted to an arm and a leg -- the grey sheet in the pose check. `deshadow.py` deletes loose parts
+  that are flat, wide and low (from the UNWELDED mesh: a welded export would not bind at all).
+- Rig: ARP bound by heat maps (the voxel binds came back empty on this mesh; the heat-map fallback had a typo, `HEAT_MAPS`, fixed).
+  No finger bones (thin robot claws, the finger AI failed twice). `rigid.py`: every small loose part (sheath, strips, cord) follows
+  one bone. `arp2mix.py`: ARP -> mixamorig_* names.
+- Forge (`retarget-anims` profile `samurai`): Zoar's 65 (Zap's whole set) + 19 two-handed katana clips from the library's Great
+  Sword set (`katana_*`: idle, walk, run, slash 1-4, attack, spin, jump attack, slide, block, guard, hit, charge, kick, combo,
+  draw, sheath). Nothing in the game plays the katana clips yet: that is SWORD build a.
+- `HERO.samurai`: 1.8 m. Checked headless: loads, soles at 0.000, no errors, every weapon slot poses. No katana in his hands yet
+  (the one at his hip is body mesh).
+
 ## m975 -- TWO NEW SANDBOX SPECS: SWORD (melee, Zelda-style) and GEAR (skates / wingsuit for everyone). No code.
 *"I wanna start making a little complex sword game... Link's crouched guard... charge it and release a launch-forward attack...
 different sword swings."* And: *"rollerblades... jet blades... the wingsuit... for every character."*
