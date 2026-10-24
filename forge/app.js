@@ -227,7 +227,7 @@ async function bake(en) {
   const hands = await handsOf(en);
   let upper = null;
   if (en.upper && en.upper.role) { const ue = ST.P.clips.find(c => c.role === en.upper.role && c !== en); if (ue) upper = { src: await source(ue), trim: ue.edit && ue.edit.trim, from: en.upper.from || 'Spine1' }; }
-  const src = await source(en), r = F.carry(ST.tg, src, en.role, ST.P, { fk: en.fk, grip: gripOf(en), hands, upper });
+  const src = await source(en), r = F.carry(ST.tg, src, en.role, ST.P, { fk: en.fk, grip: gripOf(en), hands, upper, reach: en.reach });
   return { src, rep: r.rep, clip: F.editLayer(r.clip, en.edit) };
 }
 async function previewEntry(en, keepT) {
@@ -758,6 +758,8 @@ window.forge = {
     syncHands(); saveProf(); if (ST.cur) await previewEntry(ST.cur); return D;
   },
   handPoses: () => HPOSES,
+  async setReach(role, R) { const en = ST.P.clips.find(c => c.role === role); if (!en) throw new Error('no clip "' + role + '"'); if (R && R.t) en.reach = R; else delete en.reach; saveProf(); await previewEntry(en); return en.reach || null; },
+  mouthGap(role, t) { const en = ST.P.clips.find(c => c.role === role); const S = F.socketAuto(ST.tg.rig.bones.mixamorig_RightHand, 'Right'); ST.act.time = t; ST.tg.mixer.update(0); ST.tg.model.updateMatrixWorld(true); const m = F.mouthPoint(ST.tg), s = S.p.clone().applyMatrix4(ST.tg.rig.bones.mixamorig_RightHand.matrixWorld); return +(m.distanceTo(s) / ST.tg.hipH).toFixed(3); },
   async compose(role, upperRole, from) { const en = ST.P.clips.find(c => c.role === role); if (!en) throw new Error('no clip "' + role + '"'); if (upperRole) en.upper = { role: upperRole, from: from || 'Spine1' }; else delete en.upper; saveProf(); await previewEntry(en); return { chip: $('chip').textContent, seconds: +ST.act.getClip().duration.toFixed(2) }; },
   async edit(role, e) { const en = ST.P.clips.find(c => c.role === role); if (!en) throw new Error('no clip "' + role + '"'); en.edit = e && (e.trim || e.speed) ? { trim: e.trim, speed: e.speed || 1 } : undefined; saveProf(); await previewEntry(en); return en.edit || null; },
   // the measured reference speed of a locomotion clip on THIS body, the game's way: the planted (slower) foot's speed against the

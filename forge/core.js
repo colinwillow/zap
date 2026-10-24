@@ -499,6 +499,44 @@ export function clearLayer(tg, clip, amt = 1) {
   return new THREE.AnimationClip(clip.name, clip.duration, clip.tracks.filter(t => !nm.has(t.name)).concat(names.map(b => new THREE.QuaternionKeyframeTrack(M + b + '.quaternion', times, out[b]))));
 }
 
+// ---- LAYER 5c, REACH (m947): the hand brings what it holds TO A PLACE ON HIM for a window of the clip -- a drink to his mouth.
+// `R` = { side: 'Right', to: 'mouth', t: [a, b] (clip seconds), ease }. The mouth is measured off his head bone: forward of it and a
+// little down, scaled by his head's own size (Head -> HeadTop_End); his SOCKET (where the cup sits) is what lands there, so the arm
+// is re-solved for the hand at mouth - (socket - hand). Weight eases in and out over `ease` seconds at the window's edges.
+// *"when he goes to drink it, his hand comes up and misses where his lips would be"* -- the clip's sip was a seated Y Bot's.
+export function mouthPoint(tg, out = new THREE.Vector3()) {
+  const B = tg.rig.bones, hd = B.mixamorig_Head, top = B.mixamorig_HeadTop_End, nk = B.mixamorig_Neck; if (!hd) return null;
+  const h = hd.getWorldPosition(new THREE.Vector3()), len = top ? top.getWorldPosition(new THREE.Vector3()).distanceTo(h) : (nk ? h.distanceTo(nk.getWorldPosition(new THREE.Vector3())) * 1.6 : .2);
+  const q = hd.getWorldQuaternion(new THREE.Quaternion()), fwd = new THREE.Vector3(0, 0, 1).applyQuaternion(tg.model.getWorldQuaternion(new THREE.Quaternion()));
+  // forward = the way HE faces (model +Z), turned by how much the head has turned from rest
+  const hr = q.clone().multiply(new THREE.Quaternion().fromArray(tg.T.wq.mixamorig_Head ? tg.T.wq.mixamorig_Head.toArray() : [0, 0, 0, 1]).invert());
+  fwd.applyQuaternion(hr); const up = new THREE.Vector3(0, 1, 0).applyQuaternion(hr);
+  return out.copy(h).addScaledVector(fwd, len * .55).addScaledVector(up, len * .12);
+}
+export function reachLayer(tg, clip, R) {
+  if (!R || !R.t) return clip;
+  const sd = R.side || 'Right', B = tg.rig.bones, M = 'mixamorig_', up = M + sd + 'Arm', kn = M + sd + 'ForeArm', ft = M + sd + 'Hand';
+  if (!B[up] || !B[kn] || !B[ft]) return clip;
+  const S = socketAuto(B[ft], sd), a = +R.t[0], b = +R.t[1], E = +R.ease || .3;
+  const ref = clip.tracks.find(t => t.name === MHIPS + '.position') || clip.tracks[0], times = ref.times, n = times.length;
+  const out = { [up]: new Float32Array(n * 4), [kn]: new Float32Array(n * 4), [ft]: new Float32Array(n * 4) };
+  tg.mixer.stopAllAction(); const ta = tg.mixer.clipAction(clip); ta.play();
+  const mp = new THREE.Vector3(), hw = new THREE.Vector3(), sw = new THREE.Vector3();
+  for (let f = 0; f < n; f++) {
+    const t = times[f]; ta.time = t; tg.mixer.update(0); tg.model.updateMatrixWorld(true);
+    const w = t <= a || t >= b ? 0 : Math.min(1, (t - a) / E, (b - t) / E);
+    if (w > 0 && mouthPoint(tg, mp)) {
+      B[ft].getWorldPosition(hw); sw.copy(S ? S.p : new THREE.Vector3()).applyMatrix4(B[ft].matrixWorld);
+      const want = mp.clone().sub(sw.clone().sub(hw));
+      legTo(B, up, kn, ft, hw.clone().lerp(want, w * w * (3 - 2 * w)), false);
+    }
+    for (const bn in out) { const q = B[bn].quaternion; out[bn].set([q.x, q.y, q.z, q.w], f * 4); }
+  }
+  ta.stop(); tg.mixer.uncacheClip(clip);
+  const nm = new Set(Object.keys(out).map(b => b + '.quaternion'));
+  return new THREE.AnimationClip(clip.name, clip.duration, clip.tracks.filter(t => !nm.has(t.name)).concat(Object.keys(out).map(b => new THREE.QuaternionKeyframeTrack(b + '.quaternion', times, out[b]))));
+}
+
 // ---- LAYER 7, CLIP EDITS: trim (seconds in the source) and speed
 export function editLayer(clip, E) {
   if (!E) return clip;
@@ -556,6 +594,7 @@ export function carry(tg, src, role, P, opt) {
   if (opt && opt.hands) clip = handsLayer(tg, clip, opt.hands.H, opt.hands.poses);
   if (opt && opt.fk) clip = fkLayer(tg, clip, opt.fk);
   if (opt && opt.grip) clip = gripLayer(tg, clip, opt.grip);
+  if (opt && opt.reach) clip = reachLayer(tg, clip, opt.reach);
   if (P.layers.ground) { const g = groundLayer(tg, src, clip, P.layers.ground); clip = g.clip; rep.groundMax = g.max; rep.groundMean = g.mean; }
   return { clip, rep };
 }

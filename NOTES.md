@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m947 -- the cup in his fist, the hand AT his mouth, a green stream and a messy dribble, solid plates, the drink sequence faster
+
+*"The drink kind of shows through his fingers... his hand comes up and misses where his lips would be... an actual liquid...
+pour down his mouth, super messy... still segments that are one-sided... speed up the whole sequence."*
+- **Through the fingers**: the cup was translucent and sized to nothing in particular. It is opaque now and `drinkHand` scales
+  it to his grip -- `DRINK.holdR` (.42) of his hand's length is the cup's radius -- so the fingers close round its outside.
+- **Missing his lips**: a new Forge layer, `reachLayer` (forge/core.js, after the grip layer). Per frame it moves the hand so the
+  SOCKET (the cup) lands on `mouthPoint` (head bone + forward/up off the Head->HeadTop length), arm IK through `legTo`, eased in
+  and out over `t`. On the CEO's `drink`: `set_reach {role: drink, side: Right, t: [0.9, 4.1], ease: .35}` (new MCP tool, app
+  verbs `setReach` / `mouthGap`). Measured socket-to-mouth: ~0.20 hip heights before -> 0.05-0.085 with it. Rebaked
+  `forged/ceo_human.glb`. Headless arena: the cup sits at his mouth through the sip.
+- **The liquid**: `drinkPour` in the sip phase, only while the straw end is within .35 of his size of his mouth -- a green spark
+  stream straw->mouth (`DRINK.stream`/s) and drips off the chin that fall (`DRINK.drip`/s).
+- **One-sided plates**: they were already DoubleSide (16/16 measured at runtime after m945). What read as cloth is the geometry:
+  open sheets cut from his Tripo shell, no thickness (shoulder: 328 tris, 250 open edges). `armorSolid` now gives every armour
+  geometry, once, an inner sheet `ARENA.armor.thick` (.018 m) behind it plus a rim strip on each open edge. 0 = the old sheet.
+  The shoulder pieces' jagged OUTLINE is in the asset (they include suit cloth); thickness cannot change an outline.
+- **Faster**: `DRINK.ts` (walk 1.3, pick 1.35, drink 1.25, stagger 1.3), `turnT` .4, `stagT` 1.6. Headless: throw to alien ~10 s.
+Shipped unverified on the phone. Open: a transform sound (his file or a creature_noise pick).
+
 ## m946 -- ZAP THROWS THE GREEN DRINK: his `throw_item` over his legs, a takeaway cup on an arc, and the CEO goes for it
 *"we were making it so that if an NPC finds a drink -- notices it, goes up, picks it up, drinks, transforms... can we put in a little
 juice box or drink, Starbucks, whatever... I could throw it on the ground, he sees it, shows interest, goes over, picks it up,
