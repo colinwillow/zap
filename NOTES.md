@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m977 -- THE SAMURAI GETS HANDS (mitt + thumb chains) AND A RIGID KATANA
+*"He never comes out with fingers... it's like a mitt... you only need a joint chain for the thumb and one joint chain for all four
+fingers... auto place bones."* And: *"auto weight his sword that's horizontally across his waist entirely to his hip joint."*
+- `blender-addons/pipeline/handrig.py`, after arp2mix: each hand's vertices are cut at the end of the palm (42% of its length);
+  beyond, two connected blobs -- the one off the arm's axis is the THUMB (off-axis .051 / .053 m), the one in line the MITT (.016).
+  A 3-bone chain through each: `mixamorig_<Side>HandThumb1-3` and `...HandIndex1-3` (Index = the whole mitt), weighted along the
+  chain, blending back to the hand. Checked by a curl render: the mitt folds as one block, the thumb bends toward it.
+- Props: a loose part long along X, thin, at the waist -> 100% Hips (the katana + sheath, 261 verts, 0.55 m).
+- The Forge's grip / relaxed hand poses now drive the two chains (Middle/Ring/Pinky absent, skipped). Rebaked 84 clips; 4.1 MB.
+- (His m976 message about the side views crossed with m976 itself: m976 already used all four views.)
+- Checked headless: loads, soles at 0.000, no errors, hands grip in the weapon poses.
+
 ## m976 -- THE ROBOT SAMURAI, a new hero (`?hero=samurai`): his drawing -> Tripo -> Auto-Rig Pro -> the Forge, 84 clips
 *"Generate the four images of this samurai character and run it through Tripo and the whole pipeline... our ninja robot samurai
 character that we play with sort of attacks with."*
