@@ -1,6 +1,6 @@
 # The sword — a melee sandbox
 
-**Status: SPEC, nothing built (Oct 24 2026).** He owns this file. It is a sandbox under the WHOLE-PIECE RULE (`CLAUDE.md`): it
+**Status: build a in (m978): the katana + four directional swings, on the SAMURAI (`?hero=samurai`).** He owns this file. It is a sandbox under the WHOLE-PIECE RULE (`CLAUDE.md`): it
 lives in the arena (`?w=arena`) against the things the arena already spawns (Warboss, Skullback, the dog, the dragons), and it is
 not done until every DONE WHEN box is ticked with evidence and he has signed it off on his phone.
 

@@ -124,7 +124,12 @@ const ZAP_MOUNT = {
 // SHIPPED:handFrame
 function handFrame(hand, side) {
   const ch = nm => hand.children.find(c => c.isBone && c.name.endsWith(side + 'Hand' + nm));
-  const m = ch('Middle1'), i = ch('Index1'), p = ch('Pinky1'); if (!m || !i || !p) return null;
+  const m = ch('Middle1'), i = ch('Index1'), p = ch('Pinky1');
+  // m978: A MITT (the samurai: one Index chain for all four fingers, and a thumb). Along the fingers is wrist -> mitt; across the
+  // knuckles (pinky -> index) is, in the bind T-pose with palms down, the way the body faces (+Z for every rig here).
+  if (!m && i && !p) { hand.updateWorldMatrix(true, false); const f = i.position.clone().normalize(), t = new THREE.Vector3(0, 0, 1).applyQuaternion(hand.getWorldQuaternion(new THREE.Quaternion()).invert());
+    t.addScaledVector(f, -t.dot(f)).normalize(); return { q: new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(f, t, new THREE.Vector3().crossVectors(f, t))), len: i.position.length() }; }
+  if (!m || !i || !p) return null;
   const len = m.position.length(), f = m.position.clone().normalize(), t = i.position.clone().sub(p.position);
   t.addScaledVector(f, -t.dot(f)).normalize();
   return { q: new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(f, t, new THREE.Vector3().crossVectors(f, t))), len };

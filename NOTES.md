@@ -5,6 +5,27 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m978 -- SWORD build a: THE KATANA, four directional swings (`KATANA`, `katanaScene`, the KATANA slot)
+*"Yeah, start build a with the katana."* (SWORD.md: the four directional attacks first.)
+- **The katana** is built in code (`katanaScene`) to the weapon-bone convention READ OFF THE HAMMER'S FILE: root in the fist, tip
+  marker (-14.31, 0, 0), the weapon along +Y (the hammer runs -20 -> +42 there). A 0.29 m wrapped grip, iron guard, gold collar, a
+  0.77 m curved steel blade; mounts at 1.08 m. A GLB of his replaces it as `file:` with no other change (`gen:` is the hook).
+- **The slot:** KATANA on the weapon wheel (`melee: 'katana'`, `blade: true` = weapon damage). The loader and the swap clip
+  learned that a `gen:` slot is armed, not empty.
+- **Direction picks the swing** (Smash-style): the right flick's SCREEN direction -> `KATANA.dirs`, each its own short chain:
+  right `katana_slash_2`, `_1` (rising, left to right); left `_4`, `_3` (right to left); up `katana_attack` (the thrust); down
+  `katana_spin` (the overhead). MEASURED, not guessed: the right hand's path through each clip's fastest stretch on the samurai's
+  rig (slash_2 -0.43 -> +0.28 m; slash_4 +0.2 -> -0.56 m; attack -0.16 -> +0.31 m forward; spin 0.88 m -> the floor), and each
+  clip's contact `at` is that measured fraction (`MELEE.clip`). With the katana out a flick strikes where he FACES (or at what the
+  lock finds there) -- down is the chop, not "turn round". A body with no katana clips swings the hammer's set instead.
+- **A MITT HAND HAS A FRAME NOW** (`handFrame`): the samurai has Index + Thumb only, so NO mount was ever made on him -- every
+  weapon was invisible on him since m976. Along the fingers = wrist -> mitt; across the knuckles = the bind T-pose's facing (+Z).
+  forge/core.js re-lifted (`forgesync --write`).
+- Checked headless: all four directions fire their swings (`right -> katana_slash_1 ... down -> katana_spin`), the katana is in his
+  hand at 1.08 m, no errors. Frozen at each contact frame, the blade runs out of the fist along each arc.
+- **SWORD.md moves:** box 1 (four directional attacks) is BUILT, not ticked -- the 3-hit combo, guard/parry (b), charge/lunge (c),
+  guard break, trails (d) are open. No katana idle/walk stance yet (he holds it in his normal locomotion).
+
 ## m977 -- THE SAMURAI GETS HANDS (mitt + thumb chains) AND A RIGID KATANA
 *"He never comes out with fingers... it's like a mitt... you only need a joint chain for the thumb and one joint chain for all four
 fingers... auto place bones."* And: *"auto weight his sword that's horizontally across his waist entirely to his hip joint."*
