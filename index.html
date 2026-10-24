@@ -453,6 +453,12 @@ body.dyn.desk .zone { display: none; }
 /* TALK (m277): someone in reach has something to say -- the ring lights SKY, not the trigger's
    amber, because a different hue is a different meaning. After `.arm` so it wins. */
 #padR.talk::after { opacity: 1; border-color: var(--sky); }
+/* PICK (m950): something in reach can be picked up -- a white ring that breathes, and a hand on the knob. Small on purpose: m96's
+   pick-up had a big button of its own and he called it horrible. */
+#padR.pick::after { opacity: 1; border-color: #fff; animation: pickPulse 1.1s ease-in-out infinite; }
+@keyframes pickPulse { 50% { transform: scale(1.08); opacity: .55; } }
+#padR .pkico { position: absolute; left: 50%; top: 50%; width: 34px; height: 34px; margin: -17px 0 0 -17px; display: none; pointer-events: none; z-index: 2; }
+#padR.pick .pkico { display: block; }
 #talk {
   position: fixed; left: 50%; top: 40%; z-index: 6; display: none; pointer-events: none;
   transform: translate(-50%, -100%); max-width: min(72vw, 320px); min-width: 150px;
@@ -839,10 +845,10 @@ body.desk.free #deskHint { display: block; }
   <h1>WEIRDPORT</h1>
   <div class="msg" id="bootMsg">loading</div>
   <div class="bar"><i id="bootBar"></i></div>
-  <div class="bld">BUILD <span id="bootBuild">m949</span></div>
+  <div class="bld">BUILD <span id="bootBuild">m950</span></div>
 </div>
 
-<div class="chip" id="build"><b id="buildN">m949</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
+<div class="chip" id="build"><b id="buildN">m950</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
 <div id="splash" aria-label="tap to start"><img class="blur" alt=""><img class="main" alt="Zap and Clancy"><div class="glow"></div><div class="bn"></div></div>
 <script>
 // m879 (STEER 02:22): THE SPLASH, before the module (so it shows on the first paint, while the boot carries on behind it). The image's
@@ -871,7 +877,7 @@ body.desk.free #deskHint { display: block; }
 
 <div class="zone" id="zoneL"></div><div class="zone" id="zoneR"></div>
 <div class="pad" id="padL"><div class="knob"></div><div class="hint">move &middot; tap = jump</div></div>
-<div class="pad" id="padR"><div class="knob"></div><div class="hint">look &middot; tap = jump</div></div>
+<div class="pad" id="padR"><div class="knob"></div><svg class="pkico" viewBox="0 0 24 24" fill="#fff" stroke="#0b0d12" stroke-width="1.2" stroke-linejoin="round"><path d="M8 11V5.5a1.5 1.5 0 0 1 3 0V10V4a1.5 1.5 0 0 1 3 0v6V5a1.5 1.5 0 0 1 3 0v6.5V8a1.5 1.5 0 0 1 3 0v6c0 4.4-3 7.5-7 7.5c-3.2 0-5-1.6-6.6-4.2L3.6 13a1.6 1.6 0 0 1 2.6-1.8L8 13z"/></svg><div class="hint">look &middot; tap = jump</div></div>
 <div id="talk"><span class="nm"></span><span class="tx"></span><span class="go"></span></div>
 <div id="obj" aria-hidden="true"><b></b><i></i></div>
 <div id="wpt" aria-hidden="true"><i>&#9660;</i><span></span></div>
@@ -948,7 +954,7 @@ import { KTX2Loader } from './vendor/KTX2Loader.js';
 import { clone as skeletonClone } from './vendor/SkeletonUtils.js';
 import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
 
-const BUILD = 'm949';
+const BUILD = 'm950';
 /* ASSETS:START */
 const ASSETS = {"models/alien_lizard.glb":"faffcf4c","models/alien_lizard_ktx2.glb":"05da2a20","models/skate.glb":"0c612d5e","models/skateboard.glb":"5ba93796","models/characters/alien_antenna_game.glb":"f3ccf328","models/characters/alien_antenna_game_ktx2.glb":"28afac8c","models/characters/alien_female_purple.glb":"1c73eef1","models/characters/alien_female_purple_ktx2.glb":"fc914afb","models/characters/alien_grey_medium.glb":"5a779e8e","models/characters/alien_grey_medium_ktx2.glb":"61600c3e","models/characters/alien_rollerskate_blue.glb":"6e98dd0a","models/characters/alien_rollerskate_blue_ktx2.glb":"a66d5697","models/characters/alien_warrior.glb":"f5cc9c49","models/characters/alien_warrior_ktx2.glb":"a13fb7b6","models/characters/beautiful_asian.glb":"910f6565","models/characters/beautiful_asian_ktx2.glb":"35281eef","models/characters/beautiful_blonde.glb":"edddc421","models/characters/beautiful_blonde_ktx2.glb":"89cf3899","models/characters/brute_warboss_armor.glb":"cc5c7936","models/characters/ceo_alien.glb":"844dc3a7","models/characters/ceo_human.glb":"ec289865","models/characters/clancy.glb":"b1ef602b","models/characters/clancy_ktx2.glb":"84625cdc","models/characters/colin.glb":"99d38b7d","models/characters/colin_ktx2.glb":"35040f87","models/characters/contruction_worker.glb":"8bd3d7ce","models/characters/contruction_worker_ktx2.glb":"3df8c344","models/characters/dummy_officer.glb":"724965ac","models/characters/dummy_officer_ktx2.glb":"db640cda","models/characters/fat_activist_01.glb":"3c566fee","models/characters/fat_activist_01_ktx2.glb":"b9328df4","models/characters/fat_biker_01.glb":"576b7cf5","models/characters/fat_biker_01_ktx2.glb":"7142cfad","models/characters/fat_biker_02.glb":"ab5d7ec7","models/characters/fat_biker_02_ktx2.glb":"28cec6cc","models/characters/fat_hippie.glb":"f09a260d","models/characters/fat_hippie_ktx2.glb":"0be745a4","models/characters/fat_hipster.glb":"3a8abc31","models/characters/fat_hipster_ktx2.glb":"fd8b3318","models/characters/fat_secret_service.glb":"6d546fb0","models/characters/fat_secret_service_ktx2.glb":"a23a304e","models/characters/fat_trump.glb":"5de6bc56","models/characters/fat_trump_ktx2.glb":"a0ddaf4d","models/characters/firefighter.glb":"ebde005d","models/characters/firefighter_ktx2.glb":"ccf93c96","models/characters/hick_skinny.glb":"1ebe78e8","models/characters/hick_skinny_ktx2.glb":"1e93f0ed","models/characters/hobo_01.glb":"34e80b1d","models/characters/hobo_01_ktx2.glb":"69497677","models/characters/jack.glb":"ab009b9b","models/characters/jack_ktx2.glb":"1f4c9f7f","models/characters/moussa.glb":"6d80b1cf","models/characters/moussa_ktx2.glb":"66e040f8","models/characters/proxy_ceo.bin":"6eca0c34","models/characters/proxy_ceo.jpg":"fadc9d0a","models/characters/proxy_ceo.json":"e62a7975","models/characters/proxy_ceo_alien.bin":"be247ecc","models/characters/proxy_ceo_alien.jpg":"8f8bf8fc","models/characters/proxy_ceo_alien.json":"eb23e28f","models/characters/proxy_hick.bin":"4485560e","models/characters/proxy_hick.jpg":"8c331965","models/characters/proxy_hick.json":"d85a0d36","models/characters/proxy_zap.bin":"dd7b300e","models/characters/proxy_zap.jpg":"2e7330ae","models/characters/proxy_zap.json":"b3b42754","models/characters/proxy_zap2.bin":"91f4bb5f","models/characters/proxy_zap2.jpg":"a954a815","models/characters/proxy_zap2.json":"5c50abb7","models/characters/rept_heavy_armor.glb":"934661c7","models/characters/xray_skeleton.glb":"46480317","models/characters/zap.glb":"5e5cca54","models/characters/zap_02.glb":"d6ab7a56","models/characters/zap_02_lib.glb":"8a5e20e7","models/characters/zap_ktx2.glb":"4b29d886","models/vehicles/dump_truck.glb":"d870dc18","models/vehicles/dump_truck_ktx2.glb":"21ee7059","models/vehicles/motorcycle_fatboy.glb":"9ed9be28","models/weapons/alien_antenna_blaster_game.glb":"54083b44","models/weapons/alien_antenna_hammer_game.glb":"707b8a27","models/weapons/alien_launcher.glb":"ba8ab96a","models/weapons/hammer.glb":"3335fdf2","models/weapons/shield_brute.glb":"c6e5593f","models/weapons/spikey_mace.glb":"dcd43acd","models/weapons/w_brute_cleaver.glb":"07a97580","models/weapons/w_rept_maul.glb":"84c3a1a4","models/buildings/alien_base_01.glb":"d9b9fd7f","models/buildings/alien_base_01_ktx2.glb":"6cbbfef2","models/towers/alien_tower_01.glb":"98d23375","models/towers/alien_tower_01_ktx2.glb":"47597651","models/streets/modular_streets_kit.glb":"6a4bcaa5","models/toon_city/impact_marks.json":"2b616620","models/toon_city/impact_marks_atlas.ktx2":"efe0840e","models/toon_city/impact_marks_atlas.png":"490ed049","models/toon_city/toon_city_breakables.glb":"29bddbc8","models/toon_city/toon_city_collision.glb":"fb3a693f","models/toon_city/toon_city_obb.json":"81c18a47","models/toon_city/toon_city_visual.glb":"5df62285","models/toon_city/toon_city_visual_ktx2.glb":"cf080531","models/toon_city/weirdkit_tint.js":"f6e9d802","models/toon_city_kit/toon_city_collision.glb":"5540a364","models/toon_city_kit/toon_city_kit_buildings.glb":"590e53f0","models/toon_city_kit/toon_city_kit_buildings_ktx2.glb":"e6dff3a3","models/toon_city_kit/toon_city_kit_pieces.glb":"8232bd6f","models/toon_city_kit/toon_city_kit_twins.glb":"fcc9fdfc","models/toon_city_kit/toon_city_visual.glb":"45cf2957","models/toon_city_kit/toon_city_visual_ktx2.glb":"f26a6984","models/toon_city_kit/weirdkit_detile.js":"dd05bd70","models/characters/morph/shapes.bin":"4e680384","models/characters/morph/shapes.json":"abfc949d","models/characters/forged/ceo_human.glb":"9c8a3cdd","models/characters/forged/index.json":"15596211","images/crack_sprite_01.ktx2":"4aa55fde","images/crack_sprite_01.png":"16b52e8c","images/fire_sprites_01.ktx2":"922e1191","images/fire_sprites_01.png":"f87e2696","images/fire_sprites_02.ktx2":"e0cbfe1d","images/fire_sprites_02.png":"b373a6fd","images/fire_sprites_03.ktx2":"4fbbb985","images/fire_sprites_03.png":"7eece336","images/geyser_sprites_01.png":"b6325470","images/hdri_game.ktx2":"0feb5c79","images/hdri_game.png":"dac55f41","images/splash_zap_n_clancy.webp":"52a9d8a4","images/water_sprites_01.ktx2":"326924c5","images/water_sprites_01.png":"31e12659","audio/blaster_sound_01.mp3":"40d99583","audio/blaster_sound_02.mp3":"4bd7bb7c","audio/box_break_01.mp3":"e4127980","audio/electricity_beam_01.mp3":"986db8c9","audio/explosion_small.mp3":"f154a537","audio/metal_clang_01.mp3":"a333bd27","audio/metal_clang_02.mp3":"1e3ebbd6","audio/metal_clang_03.mp3":"afe44812","audio/metal_ping_01.mp3":"8ffca1a0","audio/plasma_canon.mp3":"e32c324d","audio/powerup_01.mp3":"48fbbe08","audio/swoosh_01.mp3":"193db185","audio/swoosh_02.mp3":"19145e70","audio/swoosh_03.mp3":"544fdffb","audio/swoosh_04.mp3":"843bee5d","audio/plasma_sounds/plasma_01.mp3":"e71c010f","audio/plasma_sounds/plasma_02.mp3":"ac3b1c75","audio/plasma_sounds/plasma_03.mp3":"eaa59355","audio/plasma_sounds/plasma_04.mp3":"bc7865e0","audio/plasma_sounds/plasma_05.mp3":"1d821cd0","audio/plasma_sounds/plasma_06.mp3":"cb979fbe","audio/plasma_sounds/plasma_hit.mp3":"30e5af5c","audio/alien_orc_grunt_sounds/alien_orc_grunt_01.mp3":"d6f4b343","audio/alien_orc_grunt_sounds/alien_orc_grunt_02.mp3":"78afc603","audio/alien_orc_grunt_sounds/alien_orc_grunt_03.mp3":"972c524a","audio/alien_orc_grunt_sounds/alien_orc_grunt_04.mp3":"b0ce76eb","audio/alien_orc_grunt_sounds/alien_orc_grunt_05.mp3":"1f0ba1f4","audio/alien_orc_grunt_sounds/alien_orc_grunt_06.mp3":"4f749866","audio/alien_orc_grunt_sounds/alien_orc_grunt_07.mp3":"dcf75925","audio/hit_sounds/hit_sound_01.mp3":"befaa2be","audio/hit_sounds/hit_sound_02.mp3":"73bc4433","audio/hit_sounds/hit_sound_03.mp3":"24b181e4","audio/hit_sounds/hit_sound_gound_01.mp3":"86ee2674","audio/hit_sounds/hit_sound_ground_02.mp3":"8a7cac73","audio/hit_sounds/hit_sound_plasma_01.mp3":"9abc0202","audio/hit_sounds/hit_sound_plasma_02.mp3":"6aaf0fe5","audio/creature_noises/creature_noise_01.mp3":"cbcc6ee7","audio/creature_noises/creature_noise_02.mp3":"201a8247","audio/creature_noises/creature_noise_03.mp3":"97680811","audio/creature_noises/creature_noise_04.mp3":"6f734df2","audio/creature_noises/creature_noise_05.mp3":"6f736441","audio/creature_noises/creature_noise_06.mp3":"992712e9","audio/creature_noises/creature_noise_07.mp3":"d9ad04b3","audio/footsteps/footstep_2_l.mp3":"abeabfbe","audio/footsteps/footstep_2_r.mp3":"7dd16046","audio/footsteps/footstep_l.mp3":"b66e579b","audio/footsteps/footstep_r.mp3":"96e13433","models/props/prop_hydrant.glb":"f157fee9","models/props/prop_hydrant_collision.glb":"0bbfc4d2"};
 /* ASSETS:END */
@@ -8463,6 +8469,83 @@ function drinkDrop(d) {    // the empty cup leaves his hand and falls, bouncing 
   DRINK.flying.push({ can: c, v: new THREE.Vector3(Math.sin(d.h) * .8 + (Math.random() - .5) * .8, 1.4, Math.cos(d.h) * .8 + (Math.random() - .5) * .8), w: new THREE.Vector3(Math.random() * 8, Math.random() * 4, Math.random() * 8), bounces: 0, empty: 1 });
   const i = DRINK.cans.indexOf(c); if (i >= 0) DRINK.cans.splice(i, 1);
 }
+// m950: THE VENDING MACHINE -- where the green drink comes from now (the DRINK button that tossed one for you is gone). *"A little
+// vending machine and when I shoot or hit/melee it the soda rolls out onto the ground."* A proxy: a box, a lit front, cans on
+// shelves, a dark slot at the bottom. Shot or swung at, it shudders and a cup flies out of the slot and lands (the thrown cup's own
+// flight, so it clangs). `VEND.cool` between cups; `VEND.max` on the floor at once. The VEND button puts it in front of you.
+const VEND = { g: null, box: null, x: 0, z: 0, yaw: 0, w: 1.1, d: .8, h: 1.95, cool: 0, coolT: .55, max: 4, shake: 0, out: 2.6, up: 1.6 };
+function vendMake() {
+  const g = new THREE.Group(); g.name = 'vending';
+  const M = (c, e) => new THREE.MeshStandardMaterial({ color: c, roughness: .55, emissive: e || 0x000000 });
+  const body = new THREE.Mesh(new THREE.BoxGeometry(VEND.w, VEND.h, VEND.d), M(0xd8203a)); body.position.y = VEND.h / 2; body.castShadow = body.receiveShadow = true;
+  const glass = new THREE.Mesh(new THREE.PlaneGeometry(VEND.w * .62, VEND.h * .58), M(0x0d1e2e, 0x10324a)); glass.position.set(-VEND.w * .12, VEND.h * .62, VEND.d / 2 + .003);
+  g.add(body, glass);
+  const cols = [0x6dff8e, 0xffd23f, 0x3fa9ff, 0xff7b3f], can = new THREE.CylinderGeometry(.045, .045, .13, 8);
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) { const m = new THREE.Mesh(can, M(cols[(r + c) % 4], cols[(r + c) % 4])); m.material.emissiveIntensity = .35;
+    m.position.set(-VEND.w * .12 + (c - 1.5) * .13, VEND.h * .62 + (r - 1.5) * .25 - .05, VEND.d / 2 - .06); g.add(m); }
+  const panel = new THREE.Mesh(new THREE.BoxGeometry(VEND.w * .2, VEND.h * .4, .03), M(0x22252c)); panel.position.set(VEND.w * .34, VEND.h * .64, VEND.d / 2 + .01);
+  const btn = new THREE.Mesh(new THREE.BoxGeometry(.12, .07, .02), M(0x6dff8e, 0x2bd64f)); btn.position.set(VEND.w * .34, VEND.h * .52, VEND.d / 2 + .03);
+  const slot = new THREE.Mesh(new THREE.BoxGeometry(VEND.w * .6, .2, .06), M(0x050608)); slot.position.set(-VEND.w * .1, .28, VEND.d / 2);
+  const sign = new THREE.Mesh(new THREE.BoxGeometry(VEND.w * .9, .22, .04), M(0xffffff, 0x6dff8e)); sign.material.emissiveIntensity = .6; sign.position.set(0, VEND.h - .2, VEND.d / 2 + .01);
+  g.add(panel, btn, slot, sign);
+  return g;
+}
+function vendPlace() {     // in front of you, its face turned to you (snapped to a quarter turn, so its collider is exact)
+  const p = player, h = p.faceH || 0;
+  vendAt(p.pos.x + Math.sin(h) * 4, p.pos.z + Math.cos(h) * 4, h + Math.PI);     // facing back at you
+  hintSay('Shoot it or hit it.');
+}
+function vendAt(x, z, yaw) {
+  if (!VEND.g) { VEND.g = vendMake(); scene.add(VEND.g); }
+  if (VEND.box) { const i = BOXES.indexOf(VEND.box); if (i >= 0) BOXES.splice(i, 1); }
+  const q = Math.round(yaw / (Math.PI / 2)) * (Math.PI / 2);
+  VEND.x = x; VEND.z = z; VEND.yaw = q;
+  const R = Math.hypot(VEND.x, VEND.z), L = ARENA.r - 1.5; if (R > L) { VEND.x *= L / R; VEND.z *= L / R; }
+  VEND.g.position.set(VEND.x, 0, VEND.z); VEND.g.rotation.set(0, q, 0);
+  const sw = Math.abs(Math.round(Math.sin(q))) ? VEND.d : VEND.w, sd = Math.abs(Math.round(Math.sin(q))) ? VEND.w : VEND.d;
+  VEND.box = { minx: VEND.x - sw / 2, maxx: VEND.x + sw / 2, miny: 0, maxy: VEND.h, minz: VEND.z - sd / 2, maxz: VEND.z + sd / 2, vend: 1 }; BOXES.push(VEND.box);
+}
+function vendHit(x, y, z, r) {     // a bolt or a swing at (x,y,z), reach r: true if it touched the machine
+  const B = VEND.box; if (!B || !VEND.g || !VEND.g.parent) return false;
+  if (x < B.minx - r || x > B.maxx + r || z < B.minz - r || z > B.maxz + r || y > B.maxy + r) return false;
+  VEND.shake = 1; snd('clang', { g: .7, r: .7, x, z });
+  if (VEND.cool > 0 || DRINK.cans.length + DRINK.flying.length >= VEND.max) return true;
+  VEND.cool = VEND.coolT;
+  const fx = Math.sin(VEND.yaw), fz = Math.cos(VEND.yaw), c = drinkCan();
+  c.position.set(VEND.x + fx * (VEND.d / 2 + .1) - Math.cos(VEND.yaw) * VEND.w * -.1, .3, VEND.z + fz * (VEND.d / 2 + .1) + Math.sin(VEND.yaw) * VEND.w * -.1); scene.add(c);
+  const a = (Math.random() - .5) * .5, v = VEND.out * (.85 + Math.random() * .3);
+  DRINK.flying.push({ can: c, v: new THREE.Vector3(Math.sin(VEND.yaw + a) * v, VEND.up, Math.cos(VEND.yaw + a) * v), w: new THREE.Vector3(5 + Math.random() * 5, Math.random() * 3, Math.random() * 3), bounces: 0 });
+  setTimeout(() => snd('thud', { g: .5, r: 1.3, x, z }), 120);
+  return true;
+}
+function vendStep(dt) {
+  if (!VEND.placed) { VEND.placed = 1; vendAt(ARENA.r * .55, 0, -Math.PI / 2); }     // one stands at the side of the field from the start
+  VEND.cool = Math.max(0, VEND.cool - dt);
+  if (VEND.g && VEND.shake > 0) { VEND.shake = Math.max(0, VEND.shake - dt * 4); const k = VEND.shake * VEND.shake;
+    VEND.g.rotation.z = Math.sin(performance.now() * .06) * .05 * k; VEND.g.position.x = VEND.x + Math.sin(performance.now() * .05) * .03 * k; }
+}
+
+// m950: THE INTERACTION RING -- *"When you walk into radius of something you can pick up, there will be a little ring around the
+// object... cut in half by a line through its centre, so when it rotates slowly you can see that it is rotating."* Two half arcs
+// on the floor round the nearest thing in reach, turning; and on the RIGHT PAD a hand and a pulsing ring (`#padR.pick`) that say
+// "tap to interact". Anything that can be picked up is a candidate (`pickItems`) -- the drink now, weapons when they drop.
+const PICK = { r: 1.5, ringR: .42, spin: .9, near: null, ring: null };
+function pickItems() { return DRINK.cans.filter(c => c.parent && !c.userData.claimed); }
+function pickStep(dt) {
+  const p = player; let best = null, bd = PICK.r;
+  if (inArena() && !p.carry) for (const o of pickItems()) { const d = Math.hypot(o.position.x - p.pos.x, o.position.z - p.pos.z); if (d < bd) { bd = d; best = o; } }
+  PICK.near = best;
+  if (!PICK.ring) {
+    const m = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .85, depthWrite: false, side: THREE.DoubleSide, toneMapped: false }), gap = .32;
+    const g = new THREE.Group(); g.name = 'pickRing';
+    for (const a0 of [gap / 2, Math.PI + gap / 2]) { const r = new THREE.Mesh(new THREE.RingGeometry(PICK.ringR * .82, PICK.ringR, 40, 1, a0, Math.PI - gap), m); r.rotation.x = -Math.PI / 2; g.add(r); }
+    g.renderOrder = 3; PICK.ring = g; scene.add(g);
+  }
+  PICK.ring.visible = !!best;
+  if (best) { PICK.ring.position.set(best.position.x, .03, best.position.z); PICK.ring.rotation.y += PICK.spin * dt;
+    const k = 1 + Math.sin(performance.now() * .006) * .05; PICK.ring.scale.set(k, 1, k); }
+  padR.classList.toggle('pick', !!best);
+}
 async function tmGo(target) {
   const M = ARENA.morph; if (M.live) return;
   let a = target && M.into[target.K.arena] && !target.ko ? target : null, ad = 1e9;
@@ -9023,6 +9106,7 @@ function arenaStep(dt) {
   for (const d of ARENA.live) if (!d.ko || d.st === 'down') tailSway(d, dt);
   hintStep(dt);
   tmStep(dt);
+  vendStep(dt); pickStep(dt);
   if (DRINK.cans.length) drinkScan();
   if (player.toss || DRINK.flying.length) drinkThrowStep(dt);
   ARENA.hold = Math.max(0, (ARENA.hold || 0) - dt);     // `mel.ARENA.hold = 5`: pretend you are aiming for 5 s (testing)
@@ -9075,7 +9159,7 @@ function arenaUi() {
       else if (a === 'spawn') { ARENA.menu = ''; arenaSpawn(b.dataset.k); }
       else if (a === 'clear') { ARENA.menu = ''; arenaClear(); }
       else if (a === 'morph') { tmGo(); }
-      else if (a === 'drink') { drinkPlace(); }
+      else if (a === 'vend') { vendPlace(); }
       else if (a === 'forge') { forgedToggle(); }
       else if (a === 'tools') { ARENA.tools = ARENA.tools ? 0 : 1; try { localStorage.setItem('mel.arena.tools', ARENA.tools); } catch (err) {} }
       else if (a === 'mpose') { const T = ARENA.morph.boss; T.pose = T.pose === 'T' ? 'LIVE' : 'T'; }
@@ -9088,7 +9172,7 @@ function arenaUi() {
   const m = ARENA.menu, B = (a, txt, k, cls) => '<button data-a="' + a + '"' + (k ? ' data-k="' + k + '"' : '') + (cls ? ' class="' + cls + '"' : '') + '>' + txt + '</button>';
   if (ARENA.tools === undefined) { try { ARENA.tools = +localStorage.getItem('mel.arena.tools') || 0; } catch (err) { ARENA.tools = 0; } }
   const tools = ARENA.tools && !m;     // a menu open folds the tools away: the screen is not tall enough for both
-  let h = '<div class="ar-bar">' + B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('drink', 'DRINK') + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
+  let h = '<div class="ar-bar">' + B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('vend', 'VEND') + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
     (tools ? '<div class="ar-tools">' + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
   if (m === 'top') h += '<div class="ar-menu">' + B('cat', 'WARBOSS &rsaquo;', 'boss') + B('cat', 'PEOPLE &rsaquo;', 'people') + '<button class="ar-off">GRUNTS<small>soon</small></button><button class="ar-off">GREYS<small>soon</small></button></div>';
   else if (m === 'boss' || m === 'people') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back');
@@ -11917,6 +12001,7 @@ function boltHit(b) {
   fx.add(glowSprite(0x2ec8ff, S * 4.2 * K));
   fx.add(glowSprite(0x7a3cff, S * 6.4 * K));
   fx.position.copy(b.pos);
+  if (inArena()) vendHit(b.pos.x, b.pos.y, b.pos.z, .35);     // m950: the vending machine
   hothCut(b.pos.x, b.pos.y, b.pos.z, big);      // m642: a bolt in a held block cuts the Hothouse back
   hothMother(b.pos.x, b.pos.y, b.pos.z);        // m684: and one into the mother pod bursts her
   // **THE DIAGONAL SLASH ON THE WALL WAS THIS STACK, CUT BY THE WALL (m175).** *"When you shoot a
@@ -28972,6 +29057,7 @@ function strikeSweep(dt, power, live, dmg, body) {
         // fist by construction rather than by a second number. **`p.melFired` does not gate it**
         // -- that is for the SOUND, and a swing through two crates should take out two.
         if (BRK.on && BREAK.length) brkBlast(_sw.x, _sw.y, _sw.z, rad, dmg || FOE.dmg.fist);
+        if (inArena()) vendHit(_sw.x, _sw.y, _sw.z, rad);     // m950
         // AND THE SAME SWING REACHES A WALL CHUNK (m170). A hammer through a brick wall is
         // the whole reason his chunks carry an hp rather than a flag.
         kitBlast(_sw.x, _sw.y, _sw.z, rad, dmg || FOE.dmg.fist);
@@ -52701,7 +52787,7 @@ async function init() {
 
 // the console handle. Every tuning object is live, so a number can be moved on the phone
 // without a rebuild and without a push.
-window.melee = window.mel = { FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
+window.melee = window.mel = { FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
   // PROGRESS (m276): `mel.SAVE` is the save; the setters write it through; `mel.progReset()` is a new game
   // TALK (m277): `mel.TALK` live; `mel.TALKS` the scripts by kind; `mel.talk` the state
   TALK, TALKS, talk,

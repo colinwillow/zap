@@ -5,6 +5,25 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m950 -- THE VENDING MACHINE and THE INTERACTION RING (step 1 of 4: machine + ring; then pick-up/carry, throw, the CEO's interest)
+
+*"Instead of the debug button that makes him auto throw the drink... a little vending machine, and when I shoot or melee it the soda
+rolls out onto the ground. Walk over to it, within radius there's a ring around the object -- for ANY object you can pick up --
+cut in half by a line so you can see it rotating... and the stick shows a little icon and a pulsing ring: you can press to interact."*
+- **`VEND`** (proxy: red box, lit front with cans, panel, green button, dark slot). One stands at the side of the field from the start
+  (`ARENA.r * .55`, facing the centre); the arena bar's **VEND** (was DRINK) moves it in front of you. Its collider is a real box in
+  `BOXES` (yaw snapped to a quarter turn, so the box is exact). `vendHit` is called from `boltHit` (reach .35) and `strikeSweep`
+  (the swing's own limb reach, next to `brkBlast`): it shudders and clangs, and (every `VEND.coolT` .55 s, at most `VEND.max` 4 cups
+  about) a cup flies out of the slot through the thrown cup's flight -- bounces, clangs, settles upright.
+- **`PICK`** -- the nearest pickable within `PICK.r` (1.5 m) of him (`pickItems`: unclaimed cups now; weapons later) gets two white
+  half-arcs on the floor (`RingGeometry` x2 with a .32 rad gap), turning at `PICK.spin`, breathing a little. And `#padR.pick`: the
+  right pad's ring goes white and pulses, and a small hand sits on the knob. Small on purpose -- m96's pick-up had its own big button
+  and he called it horrible (m99 took the whole thing out).
+- NOT YET: the tap does not pick up (step 2 -- tap in reach = pick up instead of jump, original Zap's `hold_item` for the carry over
+  the legs); throw (step 3); the CEO still goes for ANY cup on the floor within 14 m (step 4 makes it a sphere of interest).
+Headless: machine placed, two hits -> one cup (cooldown), cup lands, he walks up: `PICK.near` set, pad class `pick`, ring drawn.
+Shipped unverified.
+
 ## m949 -- one cup size everywhere, the dropped cup clatters, and the CEO's toe-off no longer lifts his planted foot (Forge `soleLayer`)
 
 *"The drink needs to be consistent in its size... best size so far is when the CEO is holding it."* `DRINK.r/h` doubled to the held
