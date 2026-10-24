@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m946 -- ZAP THROWS THE GREEN DRINK: his `throw_item` over his legs, a takeaway cup on an arc, and the CEO goes for it
+*"we were making it so that if an NPC finds a drink -- notices it, goes up, picks it up, drinks, transforms... can we put in a little
+juice box or drink, Starbucks, whatever... I could throw it on the ground, he sees it, shows interest, goes over, picks it up,
+drinks it -- test all of that."* The sequence itself is m938's; this is the throw and the drink.
+- **DRINK = a throw**: `CLIPS.toss = 'throw_item'` (in his export since old Zap; m99 had left it unnamed) joins `SPLIT.up` / `upSq`,
+  so it plays as an UPPER-body overlay (`throw_item__up`) over whatever his legs are doing -- the same machinery as the weapon
+  swap's reach. At `throwAt` .42 of the clip the cup leaves his right hand at v 3.6 forward, 3.2 up, spinning; it bounces twice
+  (a light clink), settles UPRIGHT and only then joins `DRINK.cans` for `drinkScan`. Off the arena wall like the debris. A body
+  with no throw clip: it lands in front of him as before.
+- **The cup** (`drinkCan`, placeholder geometry until he draws one): tapered translucent glowing-green cup, cardboard sleeve,
+  domed white lid with a rim, a green straw. 0.15 m.
+- **Fixed: he could ORBIT the drink.** He stepped along his heading while it was still turning toward the cup, so from an angle he
+  circled it for ever (seen once in a headless run: 30 s of walking). The step now goes straight at the cup; only the body turns.
+- Tested headless twice: DRINK -> Zap's throw (arm swings out in the frames) -> the cup flies, lands 3.7 m ahead -> the CEO sees it,
+  turns, walks straight to it, picks it up (held at ~1 s) -> drinks -> staggers (m938's chain carries on to the morph). No errors.
+
 ## m945 -- the transform twice as fast, the roar with the stretch, armour on the floor drawn both sides
 *"the transform should happen quicker, maybe double time... the roar a little sooner -- the minute you set off the stretch, set off
 the roar... the pieces sitting on the ground look like weird tattered holey cloth -- is that the underside?"* Yes:
