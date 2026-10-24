@@ -743,7 +743,8 @@ export function editLayer(clip, E) {
 // its first, the last key goes and the clip is one frame shorter. (A one-shot that ends where it began just loses 1/30 s.)
 export const SEAM = { deg: .5 };
 export function loopSeam(c) {
-  const rot = c.tracks.filter(t => t.name.endsWith('.quaternion') && t.times.length > 2); if (!rot.length) return c;
+  // the BODY decides (fingers carry the hand layer's noise, which is not periodic, so they never close the loop); every track is cut
+  const rot = c.tracks.filter(t => t.name.endsWith('.quaternion') && t.times.length > 2 && !/Hand(Thumb|Index|Middle|Ring|Pinky)/.test(t.name)); if (!rot.length) return c;
   const n = rot[0].times.length; if (rot.some(t => t.times.length !== n)) return c;
   const lim = Math.cos(SEAM.deg * Math.PI / 360);
   for (const t of rot) { const v = t.values, L = (n - 1) * 4; if (Math.abs(v[0] * v[L] + v[1] * v[L + 1] + v[2] * v[L + 2] + v[3] * v[L + 3]) < lim) return c; }

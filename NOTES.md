@@ -13,7 +13,8 @@ loop ends on its first pose again, so a looping clip holds it for two frames eac
 (4.4 / 5.2 deg after his layers). `editLayer` now ends with `loopSeam`: when EVERY rotation's last key is within `SEAM.deg` (.5)
 of its first, the last key goes and the clip is one frame shorter (a one-shot that ends where it began loses 1/30 s). After:
 `run_std` 23 keys to 0.733 s (the source: 23 frames, 0.7333), `sprint_std` 17 to 0.533; seams now one ordinary step apart.
-Rebaked zap, ceo_human, zoar. Shipped unverified.
+The BODY decides (finger tracks carry the hand layer's noise, which is not periodic -- Zoar's first bake kept the seam because of
+them); every track is cut. Rebaked zap, ceo_human, zoar (Zoar: `run_std` 23 keys / 0.733, `sprint_std` 17 / 0.533). Shipped unverified.
 
 ## m959 -- THE SPRINT HAD ROOT MOTION: taken in place (Forge `edit.inPlace`), and its true speed kept from that travel
 
