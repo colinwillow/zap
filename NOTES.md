@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m967 -- THE STADIUM BECOMES A SIMULATION LAB (pass 2): no crowd, no stands; panels, light strips, monoliths, a halo
+*"I don't like the organic box crowd... more Tron or patterns... the matrix like when Neo boots into the white space... alien
+future, UFO cyber simulation lab, a lot of interest."*
+- **Gone:** the stands, the box crowd, the floodlight masts and the old wall. The collider ring (48 BOXES) is kept, so the edge
+  still stops him exactly where it did.
+- **`arenaLab(g, W)`:** a rim of 32 white panels (instanced, `arenaSeamTex` = recursive panel cuts + vents) with a cyan light strip
+  in every gap; strip tori at the base and lip; 16 radial floor rays in ONE ShaderMaterial with a running light (`ARENA.lab.run`);
+  faint rings at 32/55/85/120 m; 30 instanced monoliths (r 42-92, h 6-32) each with a cyan face strip; a halo hovering at y 24
+  (`ARENA.lab.spin`); 14 slow floating solids. `arenaLabStep` animates halo, rays and solids from `arenaStep`.
+- Draw cost is small: instancing for panels/strips/monoliths, one material for all rays.
+- Checked: `npm run check` ok; headless screenshots from three angles, all parts visible, no errors. Feel is his to judge.
+- **Open:** pass 3 (more pattern on the floor, colour accents) waits on his look.
+
 ## m966 -- THE STADIUM, WHITE (pass 1 of a few): an Apple-white construct, interest from lines, cyan as the spot colour
 
 *"I don't like the colorful Pokemon stadium look. I want it more like Apple -- white on white, sleek... a cybernetic, digital, almost
