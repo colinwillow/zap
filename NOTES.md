@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m943 -- THE BOSS TRANSFORM'S T-POSE: he HOLDS the stretch, roars at the end of it, and the plates punch out over it
+*"he transforms, he stretches and then it snaps T-pose... the armour shoots out on the T-pose. The armour should snap out while
+he's still in his stretch mode and roaring -- clang clang clang -- overlap those things, but never snap to T-pose."*
+- Caught on frames from the real game: the stretch's last frame has his arms UP; at the morph's end he blended straight to his
+  idle (arms down) in ~0.15 s, and a blend from up to down swings through straight-out -- the T, for a few frames, right where the
+  armour began. Not a missing clip: the action weights never dropped (logged).
+- Now (`tmStep` end, `armorUpStart`, `armorUpStep`): the stretch is FROZEN on its last frame (`auHold`), the roar moved to the end of
+  the morph (`act.roarAt` .42 -> .86), the plates start punching out .08 s after he lands (`holdPop`) -- still in the stretch --
+  and .3 s after the last plate (`holdAfter`) he comes DOWN into his taunt on a slow blend (`snapHL` .22 for 1.2 s; arenaBody
+  takes a per-body blend half-life now). A boss with no plates gets the slow way down too.
+- Frames again: armorUp 0.1 / 0.8 / 1.4 / 2.0 s all in the raised stretch with plates appearing, then down to the taunt. No T.
+- Still owed: a transform SOUND ("he's breaking out of his shell") -- the morph has the zap crackle and the roar; a real one
+  wants his file (or a pick from the library's creature sounds).
+
 ## m942 -- THE OUTWARD BEND: a foot's sideways place scales with LEG LENGTH from its own hip (retargetW, game + Forge)
 *"I tried to capture the weird outward bend -- it just looks odd"* (two frames from behind: the trailing leg kicked out sideways,
 the knee bowed out).
