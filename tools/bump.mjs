@@ -35,7 +35,9 @@ const DIRS = ['models', 'models/characters', 'models/vehicles', 'models/weapons'
   // ninth time this tax has been paid across these repos, and the one that bites silently.
   'models/portland/slice_downtown', 'models/portland/textures', 'models/portland/three',
   // m215: his props folder
-  'models/props'];
+  'models/props',
+  // m974: the robits creatures (the dog, the blue dragon, the mech lightning dragon)
+  'models/creatures'];
 // **`.json` AND `.bin` WERE MISSING AND THAT WAS A SILENT STALENESS BUG FOR TWO BUILDS (m164).**
 // `DIRS` is the tax everybody remembers; this is the one underneath it. m159 shipped
 // `toon_city_obb.json` (491 collider boxes) and m160 shipped `impact_marks.json` -- both went

@@ -5,6 +5,37 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m974 -- BEASTS THROUGH THE DOORS: the three-headed dog, the blue dragon, the mech lightning dragon (`beastStep`, `ARENA.beast`)
+*"Creatures that come in through those gates and you fight them -- one could shoot fireballs, one could fly... they have attacks and
+entrances, could be fun to make things to fight in this game and develop the fight system with."* His robits creatures, from
+colinwillow/robits/models, resized to 2048 / webp / draco into **models/creatures/** (a NEW folder: added to `bump.mjs` DIRS).
+SPAWN > BEASTS.
+- **The files** (measured): all three are 3ds Max Biped rigs (`Bip001_*`), armature .01 +90 X, C4D exports, own EMISSIVE maps (kept:
+  `K.keepEmit` skips the character emissive-from-albedo rule) and `KHR_materials_specular`. The blue dragon is `alphaMode: BLEND` and
+  drew INVISIBLE until `opaque: 1`. Geometry is authored at wildly different units (dog 3.53 tall, dragon .039, mech .027) and comes
+  out right through `bodyProto`'s measured scale: world bounds dog 2.3 m tall / ~3.3 m long, dragon 3.4 / 5.4, mech 4.7 with wings up.
+- **EVERY CLIP IS PADDED** to the file's longest (dog 4.40 s, dragon 5.03 s). `beastPrep` trims each to the last frame any bone moves:
+  dog attack_1 1.27, attack_2 1.37, death 2.33, dizzy 1.37, entrance 2.07, hit 0.87, idle_1 4.03, idle_2 1.40, idle_3 4.37, run 0.73;
+  dragon attack_air 1.83, attack_ground 1.53, casual 4.90, death 1.37, dizzy 1.37, entrance 5.00, hit 1.00, idle 1.37, run 0.83,
+  wake_up 4.07; mech entrance / fly_fast / idle_fly_1 / idle_fly_2 1.30 each. `CINEMA_4D_Main` dropped. Loops de-drifted on Bip001.
+  Facing measured off his own bones (head minus pelvis): 0 deg on all three (+Z, like everyone).
+- **Their speeds are foot-measured** (`arenaRef` now falls back to `Bip001_L/R_Toe0`): dog run 6.45 m/s, dragon run 7.89.
+- **Entry:** the m973 doors, their own path (`beastEnter`): out of the tunnel on the run clip slowed, their OWN `entrance` past the
+  door, then a leap onto the dais with the landing slam (the mech flies in from 3 m to its hover height instead).
+- **Brains** (`beastStep`, a small state machine on their own clips, not the humanoid FOE path): idle -> think -> run at you -> bite
+  (attack_1/2, a lunge into the hit window at `hitAt`, `playerHurt` if you are in front and in reach, a roll beats it) -> recover.
+  The DRAGON adds FIREBALLS from range (attack_air): a ball from `Bip001_Head`, led a little, aimed up by what gravity will take, a
+  burst + splash where it lands. The MECH hovers circling you at 5.2 m (`d.fy` is his own height: the body step under this pulls
+  every body to the floor each frame, and the first hover sat at 0.4 m), calls LIGHTNING (a ring where you stand, the strike after
+  `strikeT` .95 s) and SWOOPS through you on a curve; bolts hit him at any height (bolt hits are XZ), melee only when he is low.
+- **Damage:** `dummyBlow` as for any body, then `beastHurt`: a growl (`creature` noises), a flinch (`hit`), a stun meter (`stunAt`)
+  that ends in `dizzy` and sets `d.exposed` (so the m898 FINISHER works on a dizzy beast); stunned, the mech drops to the floor for
+  `dizzyT`. At 0 hp `death` (the mech falls), then he sinks out. All numbers in `ARENA.beast`.
+- Checked headless (`npm run check` ok): each enters through a door, the dog's bite took Zap 100 -> 84, the dragon's fireball 100 ->
+  86, the mech's lightning 100 -> 89 and its swoop 100 -> 86; hits -> hit / dizzy, death plays; no page errors. Open: sizes and
+  speeds are first guesses for him to judge; the dog's three heads bite as one (one hit window), no fire on the mech's lightning
+  ground, no beast-specific hit sparks or sounds beyond the shared growls.
+
 ## m973 -- BOSSES COME THROUGH THE DOORS, AND THEY RUN HEAVY (`arenaEnter`, `ARENA.door`, `ARENA.heavy`, three new Forge bakes)
 *"Those big doors... opening to reveal monsters and beasts... they walk through the doors, beat their chest, then come at you."*
 *"The charge is dinky... a walk sped up, it makes them look light... we need a better run, like an ogre... make bigger characters
