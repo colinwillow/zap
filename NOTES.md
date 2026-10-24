@@ -5,6 +5,27 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m957 -- Zoar: feet on the floor, guns held the right way up (hands aligned by ANATOMY in the Forge), his fingers from the hand poses
+
+*"His feet go through the ground despite I put the root joint under his feet... the rocket launcher spun 90 degrees about its
+length, as if he's holding it sideways like a gangster... his fingers are super f'd up on every pose."*
+- **Feet**: his mesh starts 0.113 BELOW his root (bind geometry min y -0.113; every export before had soles at exactly 0). The game
+  now measures the bind geometry's lowest point at load (`measureSole`) and lifts the model by it -- headless: lowest skin 0.000
+  at idle (was -0.118). Any future export with the root off the soles lands right with no edit.
+- **The quarter-turn roll**: the carry hands each bone the source's change from ITS OWN rest -- and old Zap's rest palms face
+  FORWARD, a Mixamo T-pose's face DOWN, so every pose on Zoar came out rolled 90 deg. New Forge layer `handAlignLayer`
+  (`layers.handAlign`, before compose): per frame the target hand is turned until its ANATOMY matches the donor's -- the frame off
+  the knuckles (fingers = wrist -> middle knuckle, across = pinky -> index, `handFrame`'s own definition), in the world. The twist
+  about the forearm is shared, `HANDALIGN.fore` .5 on the forearm (a pronation) and the rest at the wrist. The weapon mounts are
+  built from the same anatomical frame (m955), so a gun now sits in his hand as it does in Zap's. Headless: the launcher upright.
+- **Fingers**: his profile now has `hands` relaxed (+3 deg / .5 Hz noise) for every clip, `grip` both hands on the gun / hammer
+  clips (rifle, shoot, rocket_launcher, weapon_*), `fist` on the melee and kicks -- the m937 hand poses, which is what they were
+  built for (*"Zap's palm-forward hands breaking every character"*).
+- NOT YET (his "IK solve" point): the clips still put his hands where Zap's ROTATIONS put them; on his proportions (short legs,
+  big head) a shoulder-mounted launcher is not where Zap's is. The next step is a prop-relative pose: the weapon placed against
+  HIS shoulder/chest and both hands reached onto its grips (`gripLayer` + `reachLayer`'s machinery), per weapon clip.
+Shipped unverified.
+
 ## m956 -- THE NORMAL RUN: the library's Standard Run + Sprint, measured on HIS feet at load (STD, the new default)
 
 *"Something I've been meaning to fix for a long time is the freaking run... two runs and I hate both of them... I just want the

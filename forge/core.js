@@ -261,6 +261,49 @@ export function prepDonor(scene, clips) {
   return clips.map(clip => ({ scene, rig, S, clip, hipH: hp.y - restLow, restLow, mixer, soles, toes }));
 }
 
+// ---- LAYER 1c, HANDS BY ANATOMY (m957). The carry hands each bone the source's change FROM ITS OWN REST, so two rigs whose hands
+// rest differently come out differently in every pose -- old Zap's rest palms face FORWARD, a Mixamo T-pose's face DOWN, and Zoar
+// held every gun rolled a quarter turn (*"the rocket launcher spun 90 degrees... as if he's holding it sideways like a gangster"*).
+// So per frame the target hand is turned until its ANATOMY matches the source's: the frame read off the knuckles (fingers = wrist ->
+// middle knuckle, across = pinky knuckle -> index knuckle, `handFrame`'s own definition) in the world. The twist about the forearm
+// is shared -- `HANDALIGN.fore` of it turns the forearm (a pronation), the rest the wrist -- so the wrist does not look broken.
+export const HANDALIGN = { fore: .5 };
+function anatFrame(B, sd, out = new THREE.Quaternion()) {
+  const M = 'mixamorig_' + sd + 'Hand', h = B[M], m = B[M + 'Middle1'], i = B[M + 'Index1'], p = B[M + 'Pinky1']; if (!h || !m || !i || !p) return null;
+  const H = h.getWorldPosition(new THREE.Vector3()), f = m.getWorldPosition(new THREE.Vector3()).sub(H).normalize();
+  const t = i.getWorldPosition(new THREE.Vector3()).sub(p.getWorldPosition(new THREE.Vector3())); t.addScaledVector(f, -t.dot(f)).normalize();
+  return out.setFromRotationMatrix(new THREE.Matrix4().makeBasis(f, t, new THREE.Vector3().crossVectors(f, t)));
+}
+export function handAlignLayer(tg, src, clip, amt = 1) {
+  if (!(amt > 0)) return clip;
+  const B = tg.rig.bones, S = src.rig.bones; if (!anatFrame(B, 'Right') || !anatFrame(S, 'Right')) return clip;
+  const ref = clip.tracks.find(t => t.name === MHIPS + '.position') || clip.tracks[0], times = ref.times, n = times.length;
+  const names = []; for (const sd of ['Right', 'Left']) names.push('mixamorig_' + sd + 'ForeArm', 'mixamorig_' + sd + 'Hand');
+  const out = {}; for (const nm of names) out[nm] = new Float32Array(n * 4);
+  src.mixer.stopAllAction(); tg.mixer.stopAllAction(); const sa = src.mixer.clipAction(src.clip); sa.play(); const ta = tg.mixer.clipAction(clip); ta.play();
+  const Fs = new THREE.Quaternion(), Ft = new THREE.Quaternion(), C = new THREE.Quaternion(), I = new THREE.Quaternion(), W = new THREE.Quaternion(), tw = new THREE.Quaternion(), a = new THREE.Vector3();
+  for (let f = 0; f < n; f++) {
+    sa.time = Math.min(src.clip.duration, times[f]); src.mixer.update(0); src.scene.updateMatrixWorld(true);
+    ta.time = times[f]; tg.mixer.update(0); tg.model.updateMatrixWorld(true);
+    for (const sd of ['Right', 'Left']) {
+      const fa = B['mixamorig_' + sd + 'ForeArm'], hd = B['mixamorig_' + sd + 'Hand'];
+      if (fa && hd && anatFrame(S, sd, Fs) && anatFrame(B, sd, Ft)) {
+        C.copy(Fs).multiply(Ft.invert()); if (amt < 1) C.copy(I).slerp(C, amt);
+        const Hw = hd.getWorldQuaternion(new THREE.Quaternion()), want = C.clone().multiply(Hw);
+        // the twist of C about the forearm, a share of it on the forearm
+        a.copy(hd.getWorldPosition(new THREE.Vector3())).sub(fa.getWorldPosition(new THREE.Vector3())).normalize();
+        const d = C.x * a.x + C.y * a.y + C.z * a.z; tw.set(a.x * d, a.y * d, a.z * d, C.w).normalize();
+        fa.getWorldQuaternion(W); setWorldQ(fa, I.clone().slerp(tw, HANDALIGN.fore).multiply(W));
+        setWorldQ(hd, want);
+      }
+      for (const nm of ['mixamorig_' + sd + 'ForeArm', 'mixamorig_' + sd + 'Hand']) { const q = B[nm] ? B[nm].quaternion : I; out[nm].set([q.x, q.y, q.z, q.w], f * 4); }
+    }
+  }
+  sa.stop(); ta.stop(); src.mixer.uncacheClip(src.clip); tg.mixer.uncacheClip(clip);
+  const nmSet = new Set(Object.keys(out).filter(k => B[k]).map(k => k + '.quaternion'));
+  return new THREE.AnimationClip(clip.name, clip.duration, clip.tracks.filter(t => !nmSet.has(t.name)).concat(Object.keys(out).filter(k => B[k]).map(k => new THREE.QuaternionKeyframeTrack(k + '.quaternion', times, out[k]))));
+}
+
 // ---- LAYER 1b, COMPOSE: the torso and arms from ANOTHER clip (`up`), the hips and legs from this one. `up` = { src, trim:[a,b],
 // from: 'Spine' | 'Spine1' | 'Spine2' | 'Neck' } -- every bone from `from` upward (shoulders, arms, hands, fingers, neck, head)
 // comes from the second clip's trimmed piece, carried onto him the same way; the clip lasts as long as that piece, and the legs
@@ -711,6 +754,7 @@ export function carry(tg, src, role, P, opt) {
   const r = retargetW(src.S, tg.T, { [role]: src.clip }, tg.rig.bones);
   if (!r || !r.clips[role]) throw new Error('nothing carried for ' + role);
   let clip = r.clips[role]; const rep = { hipW: RTW.hr, leg: RTW.lr, ms: RTW.ms };
+  if (P.layers.handAlign) clip = handAlignLayer(tg, src, clip, +P.layers.handAlign);
   if (opt && opt.upper) clip = composeUpper(tg, clip, opt.upper);
   clip = toesLayer(tg, src, clip, P.layers.toes === undefined ? 1 : +P.layers.toes, (P.adjust && +P.adjust.toeIn) || 0);
   if (P.adjust) clip = adjustLayer(tg, clip, P.adjust);
