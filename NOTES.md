@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m942 -- THE OUTWARD BEND: a foot's sideways place scales with LEG LENGTH from its own hip (retargetW, game + Forge)
+*"I tried to capture the weird outward bend -- it just looks odd"* (two frames from behind: the trailing leg kicked out sideways,
+the knee bowed out).
+- Measured layer by layer from behind (carry / +feet / +clearance / +toes): the bow was already in the plain carry and the foot
+  pass amplified it. Cause: the foot pass scaled the WHOLE sideways offset of each foot (from the hips' centre) by HIP WIDTH, the
+  rest by leg length. On a wide-hipped, short-legged body every sideways swing came out x2.84 for his legs (`hr / lr`).
+- **`retargetW`'s foot pass now places each foot sideways relative to ITS OWN HIP**, scaled by leg length; only the hips sit at
+  hip width (`L.hs`: each hip's rest offset from the centre; lateral' = lat x lr + hs x (hr - lr)). Shared text: the GAME's
+  disguise carry gets it too (forgesync re-lifted).
+- CEO Dwarf_Walk: foot separation 1.02-1.37 -> **1.04-1.17** hip widths through the cycle; worst knee bow 2.8 -> **1.0** cm (file).
+  Hick on Walking_3: 0.86-1.37 -> 0.87-1.28.
+- Re-measured gait after it: walk 0.3582, run 0.6885 m/s -> **walkRef .822, runRef/fleeRef 1.58**, move speeds walk .82 / run 1.6
+  / flee 2.1. Rebaked.
+
 ## m941 -- THE CEO, ROUND 3: his feet move as fast as his steps, toes straightened, arms out / elbows in
 *"his physical locomotion doesn't match his stride -- he's making steps and not really moving with them... the image generator
 poses the feet 45 deg out, the Mixamo animations bend them out too, so 45 on top of 45 and super bowlegged... tilt his arms out a

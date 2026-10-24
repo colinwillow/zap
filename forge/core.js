@@ -46,7 +46,11 @@ function retargetW(S, T, srcClips, bones) {
   let hr = 1, lr = 1, Ls = new THREE.Vector3(1, 0, 0);
   if (legsOK) { const SP = restP(S), TP = restP(T);
     const hw = P => P[LEG[0].up].distanceTo(P[LEG[1].up]), ll = P => P[LEG[0].up].distanceTo(P[LEG[0].kn]) + P[LEG[0].kn].distanceTo(P[LEG[0].ft]);
-    hr = hw(TP) / (hw(SP) || 1); lr = ll(TP) / (ll(SP) || 1); Ls = SP[LEG[0].up].clone().sub(SP[LEG[1].up]).normalize(); }
+    hr = hw(TP) / (hw(SP) || 1); lr = ll(TP) / (ll(SP) || 1); Ls = SP[LEG[0].up].clone().sub(SP[LEG[1].up]).normalize();
+    // m942: each leg's own hip, sideways from the hips' centre at rest -- a foot's sideways place RELATIVE TO ITS OWN HIP scales with
+    // LEG LENGTH, and only the hips themselves sit at hip width. Scaling the whole sideways offset by hip width made a short-legged,
+    // wide-hipped body (the CEO: x2.84 for his legs) swing every step out sideways (*"the weird outward bend"*).
+    const Cr = SP[LEG[0].up].clone().add(SP[LEG[1].up]).multiplyScalar(.5); for (const L of LEG) L.hs = SP[L.up].clone().sub(Cr).dot(Ls); }
   const D0 = T.pq.clone().invert().multiply(S.pq), k0 = T.t.length() / (S.t.length() || 1);
   const topS = {}, topT = {}; for (const n of S.order) if (!S.par[n]) topS[n] = top(S, n); for (const n of T.order) if (!T.par[n]) topT[n] = top(T, n);
   const iS = {}; for (const n of S.order) iS[n] = S.wq[n].clone().invert();
@@ -81,9 +85,9 @@ function retargetW(S, T, srcClips, bones) {
       if (feet) {
         const Dq = SW[MHIPS].clone().multiply(iS[MHIPS]), Di = Dq.clone().invert();
         const Cs = SP[LEG[0].up].clone().add(SP[LEG[1].up]).multiplyScalar(.5), Ct = TP[LEG[0].up].clone().add(TP[LEG[1].up]).multiplyScalar(.5);
-        const map = p => { const q = p.clone().sub(Cs).applyQuaternion(Di), lat = Ls.clone().multiplyScalar(q.dot(Ls)); return q.sub(lat).multiplyScalar(lr).add(lat.multiplyScalar(hr)).applyQuaternion(Dq).add(Ct); };
+        const map = (p, hs) => { const q = p.clone().sub(Cs).applyQuaternion(Di), l = q.dot(Ls); q.addScaledVector(Ls, -l); return q.multiplyScalar(lr).addScaledVector(Ls, l * lr + hs * (hr - lr)).applyQuaternion(Dq).add(Ct); };
         for (const L of LEG) {
-          const H = TP[L.up], Tg = map(SP[L.ft]), K0 = map(SP[L.kn]), a = T.pos[L.kn].length(), b = T.pos[L.ft].length();
+          const H = TP[L.up], Tg = map(SP[L.ft], L.hs), K0 = map(SP[L.kn], L.hs), a = T.pos[L.kn].length(), b = T.pos[L.ft].length();
           const d = Tg.clone().sub(H), dl = Math.max(1e-6, Math.min(d.length(), (a + b) * .999)), nn = d.normalize();
           const x = (a * a - b * b + dl * dl) / (2 * dl), h = Math.sqrt(Math.max(0, a * a - x * x));
           let pole = K0.clone().sub(H); pole.addScaledVector(nn, -pole.dot(nn));
