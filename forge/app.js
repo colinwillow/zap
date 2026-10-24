@@ -377,11 +377,14 @@ const relayer = () => { saveProf(); if (ST.cur) previewEntry(ST.cur); };
 $('lFeet').onchange = () => { ST.P.layers.feet = $('lFeet').checked ? 1 : 0; relayer(); };
 $('lGround').oninput = () => { $('lGroundV').textContent = (+$('lGround').value).toFixed(2); };
 $('lGround').onchange = () => { ST.P.layers.ground = +$('lGround').value; relayer(); };
+$('lToes').oninput = () => { $('lToesV').textContent = (+$('lToes').value).toFixed(2); };
+$('lToes').onchange = () => { ST.P.layers.toes = +$('lToes').value; relayer(); };
 $('lClear').oninput = () => { $('lClearV').textContent = (+$('lClear').value).toFixed(2); };
 $('lClear').onchange = () => { ST.P.layers.clear = +$('lClear').value; relayer(); };
 $('ghost').onchange = () => relayer();
-const SL = { aStance: ['stance', 2], aArms: ['arms', 0], aLean: ['lean', 0] };
-function syncSliders() { ST.P.adjust = Object.assign({ stance: 1, arms: 0, lean: 0 }, ST.P.adjust || {});
+const SL = { aStance: ['stance', 2], aArms: ['arms', 0], aElb: ['elbows', 0], aLean: ['lean', 0], aToeIn: ['toeIn', 0] };
+function syncSliders() { ST.P.adjust = Object.assign({ stance: 1, arms: 0, elbows: 0, lean: 0, toeIn: 0 }, ST.P.adjust || {});
+  $('lToes').value = ST.P.layers.toes ?? 1; $('lToesV').textContent = (+$('lToes').value).toFixed(2);
   for (const id in SL) { $(id).value = ST.P.adjust[SL[id][0]]; $(id + 'V').textContent = (+$(id).value).toFixed(SL[id][1]); } }
 for (const id in SL) {
   $(id).oninput = () => { $(id + 'V').textContent = (+$(id).value).toFixed(SL[id][1]); };

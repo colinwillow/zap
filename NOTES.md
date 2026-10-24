@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m941 -- THE CEO, ROUND 3: his feet move as fast as his steps, toes straightened, arms out / elbows in
+*"his physical locomotion doesn't match his stride -- he's making steps and not really moving with them... the image generator
+poses the feet 45 deg out, the Mixamo animations bend them out too, so 45 on top of 45 and super bowlegged... tilt his arms out a
+little at the shoulder and in at the elbow"*.
+- **The sliding was the GAME, not the clip**: in the arena his kind is `Object.assign({}, HICK, CEOK)`, so he inherited the hick's
+  drunk-amble MOVE speed (`walk` .55 m/s) against his walk clip's measured .906 -- .55 / .906 = .61, under `tsLo` .7, so the clip
+  ran faster than he travelled. CEOK now `walk .9, run 1.8, flee 2.4` (flee / fleeRef 1.33, inside `tsHi`).
+- **LAYER 1c `toesLayer`** (Forge, default on, BODY "Toes straight" 0..1 + "Toes in deg"; MCP `set_sliders toes / toeIn`): each foot
+  turned back about the vertical by how much more HIS rest toes point out than the library body's, as a constant in the foot's
+  own frame; then `toeIn` more. Rest toe-out measured: CEO 9.4, hick 22.1, old Zap 18.0, Zap 2 7.3, biker 24.2, warrior 18.0, alien
+  CEO 16.1. Mean toe-out over the clip, biker: walk 51.6 -> 30 (toes 1), CEO: walk 38 -> 30 -> **21** with toeIn 8, idle 26.5 ->
+  **~7**. Dwarf_Walk itself turns the Y Bot's feet ~28 out -- the rest is the clip.
+- **Elbows in** (`adjust.elbows`, the forearm turned back toward the body about the same axis as `arms`). CEO: arms 5, elbows 5.
+- His profile through forge-mcp (`set_sliders`), rebaked. The odd forward knee at the step: probably the toe-out (the knee
+  follows the foot's turn) -- not measured separately; to look at on the phone.
+
 ## m940 -- THE ARENA MENU: smaller buttons, the debug toggles fold behind TOOLS, the spawn list scrolls
 *"all these buttons on screen that are super fat and you can't minimize them... SPAWN > PEOPLE, there's no scroll and the CEO is
 off screen -- I can't even spawn him."*

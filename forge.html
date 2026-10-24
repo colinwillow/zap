@@ -62,7 +62,7 @@ label.sw { display:flex; gap:8px; align-items:center; }
 </head>
 <body>
 <div id="app">
-  <div id="top"><b>FORGE</b><span class="bld">f10</span><span class="who" id="who">no character</span></div>
+  <div id="top"><b>FORGE</b><span class="bld">f11</span><span class="who" id="who">no character</span></div>
   <div id="view"><div id="chip"></div><div id="busy">working…</div></div>
   <div id="time">
     <button class="btn" id="prev">◀</button><button class="btn" id="play">❚❚</button><button class="btn" id="next">▶</button>
@@ -83,12 +83,16 @@ label.sw { display:flex; gap:8px; align-items:center; }
       <label class="sw"><input type="checkbox" id="lFeet" checked> Feet (hip width / leg length, knees aimed)</label>
       <div class="slider"><span>Ground contact</span><input type="range" id="lGround" min="0" max="1" step="0.05" value="1"><span id="lGroundV">1.00</span></div>
       <div class="note">Puts his lowest skin point where the library body's lowest point is (scaled), every frame. Tail and markers never count.</div>
+      <div class="slider"><span>Toes straight</span><input type="range" id="lToes" min="0" max="1" step="0.05" value="1"><span id="lToesV">1.00</span></div>
+      <div class="slider"><span>Toes in °</span><input type="range" id="aToeIn" min="-20" max="30" step="1" value="0"><span id="aToeInV">0</span></div>
+      <div class="note">Takes out the toe-out his REST pose was modelled with (a generated mesh stands with the feet turned out), so the clip's own toe-out is not stacked on top of it.</div>
       <div class="slider"><span>Foot clearance</span><input type="range" id="lClear" min="0" max="1" step="0.05" value="1"><span id="lClearV">1.00</span></div>
       <div class="note">His feet never come closer sideways than his own legs and shoes allow (measured off his skin), however narrow the source walks.</div>
       <label class="sw"><input type="checkbox" id="ghost" checked> Show the source body beside him</label>
       <h3>His sliders (every clip)</h3>
       <div class="slider"><span>Stance width</span><input type="range" id="aStance" min="0.6" max="1.8" step="0.02" value="1"><span id="aStanceV">1.00</span></div>
       <div class="slider"><span>Arms out °</span><input type="range" id="aArms" min="-20" max="40" step="1" value="0"><span id="aArmsV">0</span></div>
+      <div class="slider"><span>Elbows in °</span><input type="range" id="aElb" min="-20" max="40" step="1" value="0"><span id="aElbV">0</span></div>
       <div class="slider"><span>Lean °</span><input type="range" id="aLean" min="-20" max="30" step="1" value="0"><span id="aLeanV">0</span></div>
       <div class="note">Stance moves both feet out from his centre line and re-solves the legs. Arms opens both upper arms (the penguin fix). Lean tips the spine. Ground contact runs after them.</div>
       <h3>His hands (every clip)</h3>
@@ -195,6 +199,6 @@ label.sw { display:flex; gap:8px; align-items:center; }
     </div>
   </div>
 </div>
-<script type="module" src="./forge/app.js?v=f10"></script>
+<script type="module" src="./forge/app.js?v=f11"></script>
 </body>
 </html>

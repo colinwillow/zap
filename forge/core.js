@@ -202,6 +202,7 @@ export function prepTarget(model, opts = {}) {
   const T = bindPose(rig.bones, model);
   if (!T) throw new Error('no mixamorig_Hips on this character');
   const info = skinInfo(rig, opts);
+  const toes = toeAngles(rig.bones, model);
   const hips = rig.bones[MHIPS], hp = hips.getWorldPosition(new THREE.Vector3());
   const restLow = info.kept ? lowestY(info) : 0;
   // one world metre up, said in the hips' parent's space (its scale and turn): how a world lift becomes a hips-track value
@@ -214,7 +215,7 @@ export function prepTarget(model, opts = {}) {
   const mine = o => { for (let x = o; x; x = x.parent) if (x.userData.forgeMade || /^forge_/.test(x.name)) return true; return false; };
   const snap = []; model.traverse(o => { if (!mine(o)) snap.push([o, o.position.clone(), o.quaternion.clone(), o.scale.clone()]); });
   const restore = () => { mixer.stopAllAction(); for (const [o, p, q, sc] of snap) { o.position.copy(p); o.quaternion.copy(q); o.scale.copy(sc); } model.updateMatrixWorld(true); };
-  return { model, rig, T, info, hipH: hp.y - restLow, restLow, up, mixer, restore, snap };
+  return { model, rig, T, info, hipH: hp.y - restLow, restLow, up, mixer, restore, snap, toes };
 }
 // ---- SOCKETS on his hands (`socket_hand_r` / `_l`, the game's convention -- see `socketAuto`). A rig that already carries one
 // keeps it; otherwise it is placed by his hand's own frame, or where his profile says (an adjusted one is marked `forged`, which
@@ -243,7 +244,7 @@ export function prepDonor(scene, clips) {
   const S = bindPose(rig.bones, scene);
   if (!S) throw new Error('no mixamorig_Hips in that file');
   const hp = rig.bones[MHIPS].getWorldPosition(new THREE.Vector3()), restLow = lowestJoint(rig.bones);
-  const mixer = new THREE.AnimationMixer(scene);
+  const mixer = new THREE.AnimationMixer(scene), toes = toeAngles(rig.bones, scene);
   // HIS SOLES (m939). The library body is a skeleton with no heel: when his heel strikes, his lowest JOINT is the ankle, 8 cm up,
   // and a ground pass that trusted joints lifted the body we carry onto -- *"his feet don't touch the ground"*. So each foot gets
   // three sole points at rest -- the floor under the ankle (heel), the ball and the toe -- held in that bone's own frame, which
@@ -253,7 +254,7 @@ export function prepDonor(scene, clips) {
     const p = b.getWorldPosition(new THREE.Vector3()), q = b.getWorldQuaternion(new THREE.Quaternion());
     soles.push({ b, v: new THREE.Vector3(p.x, restLow, p.z).sub(p).applyQuaternion(q.invert()) }); }
   for (const c of clips) for (const t of c.tracks) { const d = t.name.lastIndexOf('.'), c2 = canonName(t.name.slice(0, d)); t.name = c2 + t.name.slice(d); }
-  return clips.map(clip => ({ scene, rig, S, clip, hipH: hp.y - restLow, restLow, mixer, soles }));
+  return clips.map(clip => ({ scene, rig, S, clip, hipH: hp.y - restLow, restLow, mixer, soles, toes }));
 }
 
 // ---- LAYER 1b, COMPOSE: the torso and arms from ANOTHER clip (`up`), the hips and legs from this one. `up` = { src, trim:[a,b],
@@ -298,12 +299,13 @@ function legTo(B, up, kn, ft, target, keepEnd = true) {
   if (keepEnd) setWorldQ(B[ft], footW);
 }
 export function adjustLayer(tg, clip, A) {
-  const st = +A.stance || 1, arms = (+A.arms || 0) * Math.PI / 180, lean = (+A.lean || 0) * Math.PI / 180;
-  if (st === 1 && !arms && !lean) return clip;
+  const st = +A.stance || 1, arms = (+A.arms || 0) * Math.PI / 180, lean = (+A.lean || 0) * Math.PI / 180, elb = (+A.elbows || 0) * Math.PI / 180;
+  if (st === 1 && !arms && !lean && !elb) return clip;
   const B = tg.rig.bones, M = 'mixamorig_', has = n => !!B[M + n];
   const touched = [];
   if (st !== 1 && ['LeftUpLeg', 'LeftLeg', 'LeftFoot', 'RightUpLeg', 'RightLeg', 'RightFoot'].every(has)) touched.push('LeftUpLeg', 'LeftLeg', 'LeftFoot', 'RightUpLeg', 'RightLeg', 'RightFoot');
   if (arms && has('LeftArm') && has('RightArm')) touched.push('LeftArm', 'RightArm');
+  if (elb && has('LeftForeArm') && has('RightForeArm')) touched.push('LeftForeArm', 'RightForeArm');
   const spine = has('Spine') ? 'Spine' : null; if (lean && spine) touched.push(spine);
   if (!touched.length) return clip;
   const hipTr = clip.tracks.find(t => t.name === MHIPS + '.position') || clip.tracks[0], times = hipTr.times, n = times.length;
@@ -316,6 +318,8 @@ export function adjustLayer(tg, clip, A) {
     const L = lh.clone().sub(rh); L.y = 0; const hw = L.length(); L.normalize(); const fwd = L.clone().cross(UP).normalize();
     if (lean && spine) { const w = B[M + spine].getWorldQuaternion(new THREE.Quaternion()); setWorldQ(B[M + spine], _q.setFromAxisAngle(L, lean).multiply(w)); }
     if (arms) for (const [side, sg] of [['Left', 1], ['Right', -1]]) { const bn = B[M + side + 'Arm'], w = bn.getWorldQuaternion(new THREE.Quaternion()); setWorldQ(bn, _q.setFromAxisAngle(fwd, sg * arms).multiply(w)); }
+    // elbows IN: the forearm turned back toward the body about the same axis -- out at the shoulder, in at the elbow
+    if (elb) for (const [side, sg] of [['Left', 1], ['Right', -1]]) { const bn = B[M + side + 'ForeArm'], w = bn.getWorldQuaternion(new THREE.Quaternion()); setWorldQ(bn, _q.setFromAxisAngle(fwd, -sg * elb).multiply(w)); }
     if (st !== 1 && out.LeftUpLeg) {
       const d = (st - 1) * hw / 2;
       for (const [side, sg] of [['Left', 1], ['Right', -1]]) {
@@ -422,6 +426,33 @@ export function gripLayer(tg, clip, grip) {
   return new THREE.AnimationClip(clip.name, clip.duration, tracks);
 }
 
+// ---- LAYER 1c, TOES STRAIGHT (m941). A generated character is modelled with his feet turned out (the CEO 9 deg, the biker 24),
+// the carry keeps HIS rest and the clip turns the feet out again on top -- *"45 degrees on top of 45 degrees, super bowlegged"*.
+// Colin fixed it by hand in the mesh before rigging; this does it to the clips: each foot turned back about the vertical by how
+// much more his rest toes point out than the library body's do (x `amt`), as a constant in the foot's own frame.
+export function toeAngles(bones, model) {
+  const out = {}, up = new THREE.Vector3();
+  for (const sd of ['Left', 'Right']) { const f = bones['mixamorig_' + sd + 'Foot'], t = bones['mixamorig_' + sd + 'ToeBase']; if (!f || !t) continue;
+    const d = t.getWorldPosition(new THREE.Vector3()).sub(f.getWorldPosition(up)); d.y = 0; out[sd] = Math.atan2(d.x, d.z); }
+  return out;
+}
+// `inDeg`: and then both feet turned IN by that many degrees more (a waddling clip -- Dwarf_Walk turns the Y Bot's own feet 28 out)
+export function toesLayer(tg, src, clip, amt = 1, inDeg = 0) {
+  if ((!(amt > 0) && !inDeg) || !tg.toes || !src.toes) return clip;
+  let tracks = clip.tracks.slice();
+  for (const sd of ['Left', 'Right']) {
+    const bn = 'mixamorig_' + sd + 'Foot', a = tg.toes[sd], b = src.toes[sd]; if (a === undefined || b === undefined || !tg.T.wq[bn]) continue;
+    let dA = a - b; dA = Math.atan2(Math.sin(dA), Math.cos(dA));
+    const ang = -dA * (amt || 0) - (sd === 'Left' ? 1 : -1) * inDeg * Math.PI / 180; if (Math.abs(ang) < .002) continue;
+    const W = tg.T.wq[bn], C = W.clone().invert().multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), ang)).multiply(W);
+    const old = tracks.find(t => t.name === bn + '.quaternion'); if (!old) continue;
+    const v = old.values.slice(), q = new THREE.Quaternion();
+    for (let i = 0; i < v.length; i += 4) { q.fromArray(v, i).multiply(C); v[i] = q.x; v[i + 1] = q.y; v[i + 2] = q.z; v[i + 3] = q.w; }
+    tracks = tracks.map(t => t === old ? new THREE.QuaternionKeyframeTrack(old.name, old.times, v) : t);
+  }
+  return new THREE.AnimationClip(clip.name, clip.duration, tracks);
+}
+
 // ---- LAYER 4b, FOOT CLEARANCE (m939). The foot pass keeps the library body's stance in HIP WIDTHS -- and the Y Bot's walk brings
 // his feet within 0.28 hip widths of each other, which is fine on thin legs and is crossing feet on a man with thick legs and big
 // shoes (*"his feet are too close together, they intersect"*). So THIS body's inner leg and shoe widths are measured off his
@@ -515,6 +546,7 @@ export function carry(tg, src, role, P, opt) {
   if (!r || !r.clips[role]) throw new Error('nothing carried for ' + role);
   let clip = r.clips[role]; const rep = { hipW: RTW.hr, leg: RTW.lr, ms: RTW.ms };
   if (opt && opt.upper) clip = composeUpper(tg, clip, opt.upper);
+  clip = toesLayer(tg, src, clip, P.layers.toes === undefined ? 1 : +P.layers.toes, (P.adjust && +P.adjust.toeIn) || 0);
   if (P.adjust) clip = adjustLayer(tg, clip, P.adjust);
   if (P.layers.clear !== 0) clip = clearLayer(tg, clip, P.layers.clear === undefined ? 1 : +P.layers.clear);
   if (opt && opt.hands) clip = handsLayer(tg, clip, opt.hands.H, opt.hands.poses);
