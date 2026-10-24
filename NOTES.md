@@ -5,6 +5,25 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m956 -- THE NORMAL RUN: the library's Standard Run + Sprint, measured on HIS feet at load (STD, the new default)
+
+*"Something I've been meaning to fix for a long time is the freaking run... two runs and I hate both of them... I just want the
+normal basic run."* His two were `run_fwd` (the run band) and the sprint set -- `Running_fast_stride` with m193's two-rate LEAP
+("prancing") or `run_fwd_fast` -- after m190/m191's foot-locked attempt (*"weird clicking"*). Both stay on the RUN key.
+- **STD** (default; remembered under a NEW key, `mel.run2`, so an old STRIDE pick does not stick): the run band = `run_std` (the
+  library's `Standard_Run`), the top band = `sprint_std` (`Sprint`, "Standard Sprint"), both carried by the Forge -- added to the
+  `zap` and `zoar` profiles; Zap's arrive in his bake (`forgedHero`, now LOOPING for these two), Zoar's are in his game file.
+- **Their refs are MEASURED at load on his own rig at his own size** (`gaitMeasure`): the clip alone at weight 1, 96 samples; the
+  foot within `GAIT.stdEps` (3 cm) of the lowest either reaches is ON the floor and travels back at the clip's speed -- median of
+  those = ref; phase = where his left foot is furthest forward. Old Zap: run **1.95 m/s**, sprint **5.06** (so 7.2 plays at 1.4x,
+  where a run alone would need 3.7x). Zoar: run **2.75**; his sprint has too few floor frames to read (0.43 -- nonsense), so it is
+  his run x 2.6, the ratio the two clips measure on Zap (`GAIT.stdSprintK`) -> 7.15. `GAIT.stdHi` 2.0 caps the playback.
+- RUN key now cycles STD / STRIDE / FAST (`fxKeys` packs the set index in two bits; PERF moved up one).
+- `tools/syntax.mjs`' POSE WITHOUT ANIM gate: the measure steps a local alias of the mixer, because it writes the whole weight
+  table itself (one clip at 1, the rest at 0, all put back) -- commented where it does it.
+- Zap 2 has no bake, so it keeps its own runs.
+Shipped unverified.
+
 ## m955 -- ZOAR, a playable hero: every one of old Zap's clips through the Forge (the pipeline's first whole-character run)
 
 His export (`models/characters/zoar.glb`, raw -- kept as the master): Mixamo rig + `root`, 66 joints, body / head / hat, two 1K PNGs,
