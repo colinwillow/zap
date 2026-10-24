@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m963 -- Zoar human-sized (1.80, Jack's), weapons in plain Weirdport, and people do not run from a HUMAN hero
+
+*"Zoar is ridiculously small compared to Jack... in the Weirdport kit I can't use any of my weapons -- we pulled the story mode, you
+started with none, we don't need that anymore... when you choose a human the characters shouldn't run from you."*
+- **Height**: every hero was drawn at `RIG.height` 1.25 (Zap's). `HERO.height` (metres) sets it per hero BEFORE `SZ` is taken, so
+  every body-scaled number follows (speeds, jump, camera, reach); Zoar 1.80 = Jack's `h`. Headless in the kit city: x1.493, soles
+  lifted 0.169, standing at Jack's height beside him.
+- **Weapons**: `gearHas` still asked for the story quests in `tkit`; in `PLAIN` (no story) every slot is had.
+- **Fear**: `fearLooks` said "alien" whenever he was not disguised. `HERO.human` (Zoar: 1) -- an undisguised human hero is not an
+  alien to them (the same test gates talk, so they talk to him too). A disguise still decides as before.
+Shipped unverified.
+
 ## m962 -- Zoar's launcher in against his head (`weap.x`)
 
 *"Fix the space between Zoar's head and his rocket launcher. Zap had a big head and the spacing looked good, with Zoar it seems
