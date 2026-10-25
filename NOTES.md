@@ -5,6 +5,28 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m995 -- THE KATANA RUN'S SLIDE, SWIPES GO WHERE YOU FLICK (camera-relative), THE AIR SLAM CARRIES YOUR MOMENTUM
+*"At the end of every cycle he stutters back... it doesn't happen on the walking cycle... the swipe is not in relation to the camera
+-- I swipe towards the enemy and he goes in relation to the character... in the air, swipe down and he just goes straight down; carry
+his velocity... the original animation jumps up, brings the sword over his head and stabs down -- initiate it by which part of the
+jump you're at."*
+- **THE RUN**: ruled out by measurement -- the loop seams (0.0 cm at every wrap since m992), the hips' surge (katana_run 9.9% of leg vs
+  the library source's 9.2%, Zoar's run 8.4%), the sprint's leap rhythm (not used in the katana stance). Found: **the katana stance has
+  no sprint**. `katana_run` sells 3.53 m/s (`KATANA.refs.run`, planted-foot) x `GAIT.tsHi` 1.6 = 5.6 m/s; at `MOVE.max` 7.2 the clip
+  was capped and the planted foot slid ~27% every stride. With the katana out his top speed is now what the run can show
+  (`KATANA.runK` x that). **If the hitch is still there at a slower top speed, it is in the clip itself** -- next step would be
+  looking at Great_Sword_Run_1's own frames (a skip in the source) or trying Great_Sword_Run's partner clips.
+- **SWIPES ARE CAMERA-RELATIVE AGAIN**: `flickH` (the flick's screen direction through the camera) was being thrown away for the
+  katana (m978: "he strikes where he faces"; m993: where he moves). Now the flick IS the direction: the magnetism cone (60 deg, 3.5 m)
+  centres on it, he turns to it and lashes. The flick's screen direction still picks the chain.
+- **THE AIR SLAM** (`slamGo`, every weapon): `SLAM.keep` .25 -> **1** and the per-frame horizontal bleed 4 -> **.5** /s, so your
+  forward momentum carries. Flicked RISING he rides the jump to its top, then drives; flicked FALLING he drives at once (`hangFall`
+  .04). AIMED: a body within 5 m and 50 deg of where he travels bends his path to land on it (horizontal only, up to 9 m/s).
+  **With the katana it plays `katana_jump_attack`** (Great Sword Jump Attack: up, sword overhead, the strike down), entered at .22
+  of the clip rising / .40 falling and paced so the measured strike (.53, the hand's speed peak) lands as he does.
+  Headless (6 m/s forward): rising carried 3.3 m, falling .9 m (from 1.5 m up), and with a Warboss 4 m ahead and off the line he
+  landed 1.0 m from it (its body's edge). Before: .25 kept then bled at 4/s.
+
 ## m994 -- THE FORGE ANCHORS A HELD WEAPON AT THE SHOULDER, BY ARM LENGTH (the samurai's rocket launcher)
 *"I pulled out the rocket launcher as the samurai and he's holding it like crazy... I was really hoping that once we solve whatever
 the problem is that happens every time we apply the same animations to a new character, it'd be implemented in the Forge, so you
