@@ -1,6 +1,6 @@
 # Slide, cover, vault -- a movement sandbox for the shooting
 
-**Status: spec only (Oct 25 2026, his idea). Nothing built.** It is a sandbox under the WHOLE-PIECE RULE (`CLAUDE.md`): a white
+**Status: PART 1 BUILT (m1008): the pillars, the slide (tackle / into cover), crouched cover with the move along it and the exit. Next: the vault, the pop-up shot, bolts over a crouched body, enemies that use it.** It is a sandbox under the WHOLE-PIECE RULE (`CLAUDE.md`): a white
 obstacle course of half-height blocks, done when every box below is ticked with evidence and he has signed it off on his phone.
 
 ## Why
@@ -28,9 +28,9 @@ over your head; standing (popped up to shoot), they hit you. Cover protects by d
 from cover costs exposure, and the cheap "stand behind it and shoot" does not exist.
 
 ## DONE WHEN
-- [ ] A white course of half-height blocks (cinder-block walls, curbs) in its own sandbox.
-- [ ] Slide tackle on the left flick; slide-into-cover when flicked toward a wall in range; never automatic.
-- [ ] Vault over from cover; leave cover away from it.
+- [x] Half-height cinderblock pillars, in the arena (m1008; TOOLS > BLOCKS). Evidence: NOTES m1008.
+- [x] Slide tackle on the left flick; slide-into-cover when flicked toward a wall in range; never automatic. (m1008, headless; his phone pending)
+- [ ] Vault over from cover; leave cover away from it. (leave: m1008; vault: next)
 - [ ] Pop up and shoot (right pad up) and drop back on release.
 - [ ] Bolts pass over a crouched body behind half cover and hit a standing one -- both ways (him and the enemies).
 - [ ] Enemies that use it too (at least one that ducks and pops).

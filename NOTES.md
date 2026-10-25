@@ -5,6 +5,30 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1008 -- COVER part 1: cinderblock pillars in the arena; the left flick is the SLIDE (a tackle, or INTO crouched cover); move along it, flick away to leave
+
+*"I wanna start working on the slide tackles and slide tackling into cover next, and putting a few cinderblocks in the testing
+ground."* COVER.md's first boxes:
+- **The pillars** (`COVER.blocks`, `coverBlocks`): three half-height (1.05 m) cinderblock walls, 4.2 m long. One across the middle
+  between the two spawns at (0, 1), two along the flanks at (+-8, 2). The canvas cinderblock texture is drawn once. Real colliders,
+  added on the FIRST ARENA FRAME (`COVER.pending`): `arenaStage` runs at LOAD, above `BGRID`'s and (first draft) `COVER`'s own
+  `const`. That was the blank-page landmine, and `check:boot` cannot see it (it boots the test site); `COVER` now sits above `ARENA`.
+  TOOLS > BLOCKS ON/OFF.
+- **The left-pad flick** (`slideGo`, ahead of `rollGo`): at a half-height face down the flick's line within 6 m (`coverSeek`) = a
+  SLIDE INTO COVER. Running (over 3.2 m/s) with nothing there = the SLIDE TACKLE; whoever it reaches goes over (`dummyBlow`, the slide
+  kick's numbers, once each). Standing or walking = the dive roll, as before. In cover, a flick AWAY leaves; toward is held for the
+  vault (next).
+- **Cover = m89's wall machine in a CROUCHED mode** (`p.wallLow`, `wclip`, `lowFind` = `wallFind` with a .5-1.5 m height window).
+  Never entered by walking into anything (`WALL.on` stays 0). Clips from the library, each measured for which way it faces at its
+  start and end (shoulder line): `cover_in` = `Stand_To_Cover_2` (ends turned round, -167 deg: the convention `stepWall` has, root to
+  the wall, the clip turns him out), `cover_idle` = `Idle_5` (-167), `cover_R` = `Crouched_Sneaking_Right` (176) and its MIRROR for
+  left (`clipMirror`), `cover_out` = `Cover_To_Stand_1` (-167 -> -17, stepping away), `slide` = `Running_Slide` (.22-.72 of it).
+  The other cover clips in the library face the opposite way.
+- **Checked headless** (goblin, orc, samurai): from your spawn side a flick at the middle pillar slides 4 m and goes in, `in` then
+  `hold`, `cover_idle`. The stick along it plays `cover_R` one way and the mirror the other; a flick away stands him up; a running
+  flick in the open is the slide (clip on); a standing flick goes to the roll. Renders: crouched, back to the block, head at its top.
+- **Still open (COVER.md):** the vault, the pop-up shot (right pad), bolts passing over a crouched body, enemies that use it, his sign-off.
+
 ## m1007 -- THE NINJA SPRINT: hold the right pad still while moving = her arms-back run, fast, with a wider lens and speed lines; let go and tap = the long jump
 
 *"There's this one run where both of her arms are back... when you hold down the right stick she does this run... you go really

@@ -29,7 +29,7 @@ levels later. **Each sandbox is tuned until it feels great on its own before any
   - [ ] his pick of the two anticlimactic directional swings to swap for bigger ones (which flick directions?).
   - [ ] aerial attacks (right flick in the air) and flips (left flick in the air) -- `SWORD.md` "Later".
   - [ ] e2. his play-through per enemy (what feels wrong is the next tuning); the charge hum; then his sign-off.
-- [ ] **COVER -- OPEN (spec only).** `COVER.md`: slide tackle on the left flick, slide INTO cover only when flicked toward a half
+- [ ] **COVER -- PART 1 SHIPPED m1008 (pillars, slide, crouched cover). Next: vault, pop-up shot, bolts over the crouch, AI.** `COVER.md`: slide tackle on the left flick, slide INTO cover only when flicked toward a half
       wall, vault, pop up to shoot; bolts pass over a crouched body. His idea (Oct 25).
 - [ ] **GEAR -- OPEN (spec only).** `GEAR.md`: rollerblades / jet blades and a wingsuit any hero can wear. Waiting on his models.
 - [x] **m893 ARENA** (`?w=arena`): the stadium, SPAWN > WARBOSS > Brute Warboss / Skullback beams down, chest thump, armour
