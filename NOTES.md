@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1006 -- mirrored clips (`clipMirror`): the left spin and the left air spin kick; the landing roll only from a real fall; the katana slam lands in its own clip; the blade leaned back on the run
+
+- **Mirror.** *"The spin attack only goes one direction despite which direction you flick it... it should be mirrored."* Left was
+  `katana_360l`, a LOW spin the same way round. `clipMirror` builds the mirror at load, on the bind pose. Per frame, each bone's
+  turn from its rest in the model frame (D = Q W^-1) is reflected across x (q -> (x, -y, -z, w)) and given to the opposite bone over
+  ITS rest. That holds whatever way an auto-rig's left and right axes point; the Hips' travel is flipped too. `MIRROR.clips` =
+  `katana_360h`, `hurricane_kick` -> `_m`. Left flick = `katana_360h_m`. Headless: right and left spin, front view, the same
+  moments read as reflections, body intact.
+- **Air left / right = the spin kick** (`MELEE.spinKick`): the library's `hurricane_kick` (in place, 1.87 s), its .12-.78
+  stretch in .65 s; right flick the clip, left the mirror. Up in the air is still the flying kick, down still the slam.
+- **The roll.** *"He does a roll every time he lands... it should only be from a certain distance."* `MOVE.hardLand` 8 -> 11 m/s.
+  An ordinary jump (apex 1.6 m at g 20) lands at exactly 8.0, so 8 rolled him off nearly every jump; 11 is a fall of about 3 m.
+- **The slam.** *"The sword slam gets cut off early because he goes into the roll."* `slamLand` always handed to `landing_hard`.
+  Now a slam with its own clip (the katana's `katana_jump_attack`) plays on from where the fall left it, for what is left of it,
+  as the landing (`p.landClip`). The impact, the shockwave and the mark are unchanged.
+- **The blade on the run** (`katRunTilt`, TOOLS > TILT 0/30/45/60, default 45): the Great Sword run holds the blade straight up by
+  his head. Now it leans back over his shoulder, weighted by `katana_run`'s own mixer weight; the left hand follows the grip.
+  Checked side-on: back, not forward.
+- **His hands question** (re-rigging himself): see the reply. The pipeline takes a rigged file at the `arp2mix` step.
+
 ## m1005 -- the new heroes' hands (a glove that came apart), a faster diving flying kick, and the run measured
 
 - **Hands.** *"Their hands are always really messed up... the big red orc's idle pose, his right hand is super messed up... like
