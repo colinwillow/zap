@@ -20,7 +20,10 @@ levels later. **Each sandbox is tuned until it feels great on its own before any
   - [x] b. **m979** the crouched katana guard (pull-down hold, lock-on) + the PARRY that staggers him.
   - [x] c. **m982** charge in the guard -> release lunge (thrust) / full charge spin (the hammer's charge, re-triggered).
   - [x] d. **m984** the 3-hit combo (finisher), the chop/finisher/charge break a guard (slashes clang), the blade trail.
-  - [ ] e. tuning against each enemy; then his sign-off.
+  - [x] m985 the mirror: the AI samurai guards, parries, breaks your guard, rolls your lunge (EASY/MEDIUM/HARD).
+  - [x] e1. **m986** probed the katana on every arena enemy: a sword no longer reaches a hovering mech (shoot it down, then cut
+        it); the blade has its own damage dial `KATANA.dmgK` 1.6 (a slash was .6 on a beast: 27 cuts for the dog).
+  - [ ] e2. his play-through per enemy (what feels wrong is the next tuning); the charge hum; then his sign-off.
 - [ ] **GEAR -- OPEN (spec only).** `GEAR.md`: rollerblades / jet blades and a wingsuit any hero can wear. Waiting on his models.
 - [x] **m893 ARENA** (`?w=arena`): the stadium, SPAWN > WARBOSS > Brute Warboss / Skullback beams down, chest thump, armour
       flies off, KO slow-mo, beam out, CLEAR. This is the STAGE for the duel, not the duel.

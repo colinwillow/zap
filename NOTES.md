@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m986 -- SWORD e1: THE KATANA ON EVERY ARENA ENEMY (a probe), TWO FIXES
+Headless probe (`kenemy.cjs`): each enemy placed 2 m in front, slash / left slash / spin / thrust / slash, hp and state read.
+- **A SWORD REACHED A MECH HOVERING 5.2 M UP** (hp 14 -> 11.4 off four swings while it circled overhead). `segBody`'s height
+  test ran from the FLOOR (`y > -m`), not from the body's feet, so anything above you was in reach. It takes `hBot` now and
+  `strikeSweep` passes `d.root.position.y`. After: hovering, 0 damage from every swing; brought DOWN (`cDown`, what a stun from
+  bolts does), the first cut took 3.2. So the mech's answer is "shoot it down, then cut it" -- a different one, as DONE WHEN asks.
+  (Any body standing on something above you is out of a ground swing now as well, which is right.)
+- **A SLASH DID .6 TO A BEAST** (FOE.dmg.weap 1.4 x a slash's power): 27 cuts for the dog. The blade has its own dial,
+  `KATANA.dmgK` 1.6 (`mel.KATANA.dmgK`): about 1.0 a slash, the dog about 16. A guess for him to tune.
+- Armour reads as designed: the Warboss / Skullback / CEO plates take .35 of a blow and a chip each, so a slash is .2 until the
+  plates are off (a plate went at the 5th cut). Not changed.
+- Many probe rows read 0: the body's `cool` between back-to-back swings, not a miss.
+SWORD.md: moves "works against every enemy, each a different answer" part-way (the mech); open: his play-through per enemy,
+the charge hum, smear frames, sign-off.
+
 ## m985 -- THE MIRROR: the AI samurai plays by your rules (guards, parries, breaks your guard, rolls your lunge)
 *"Create an AI version of the same character... so I can fight myself... change his color... a switch for aggression or hardness."*
 m982-m984 gave HIM the triangle; the rival SAMURAI only swung. Now he reads you (`arenaMirror`, hooked in `arenaBody` before
