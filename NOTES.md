@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m988 -- EVERY OFF-CENTRE CHARACTER CENTRED: Zap 2 (+lib), Clancy, the rollerskater, the hipster (`tools/hipshift.mjs`)
+*"Fix the tailed Zap too, any character that's not centred properly... anybody that's not centred definitely needs to be centred."*
+Measured AS DRAWN (three.js, the character's own idle, hips vs the origin the game turns him on), before -> after:
+    zap_02 / zap_02_lib     hips z .171 / .184 -> -.014 / -.001   (the tail had dragged the shell's centre back; proxy_zap2 moved too)
+    clancy (+ktx2)          .119 -> .000
+    alien_rollerskate_blue  .117 -> .000
+    fat_hipster (+ktx2)     .055 -> .000
+Body size identical before and after in every one (the skin moved with the hips; nothing stretched).
+- **`hipshift` went general**: the vertices move by d expressed in the SKIN'S BIND SPACE, e = (Hips world x Hips IBM)^-1 d, and
+  the inverse binds by T(-e); the Hips (rest local + every key) by the parent's inverse. **The first general pass used the
+  mesh's world matrix for that space and blew the female, Clancy and the rollerskater up to 15-44 m** (caught by the drawn
+  check, restored from backup, redone). For a plain rig the two agree, which is why the samurai and Zap 2 were fine.
+- **`hipfix` read the BIND, and the bind lies**: it flagged the purple female at 48% -- her bind is off but every one of her
+  clips puts her hips over the origin (as drawn: z -.001). It reads the node chain + the first clip's Hips key now. She is
+  untouched. `forged/rept_heavy_armor` (83%) and `forged/zap` (17%) were the same kind of false alarm: played on their real
+  bodies the forged clips sit within .1 m (charges travel). Untouched.
+- **`proxy_zap2.bin`** (the MORPH proxy: raw positions bound with Zap 2's own binds) moved by the same -.1847, or the morph
+  blob would have stood behind him. `clipXfer` (the Clancy stretch borrowed for the morph) is relative to rest: unaffected.
+- Not run: the x-ray on Clancy/Zap 2 (it reads the binds, which agree with the drawn body now).
+
 ## m987 -- THE SAMURAI TURNED LIKE A BOAT: his origin was at the back of his backpack (`tools/hipfix.mjs`, `tools/hipshift.mjs`)
 *"Whenever a character has a backpack they apply the root joint with the backpack taken into consideration... the centre of
 gravity is behind the character... it's more like right down his hip, because he rotates like a boat."*
