@@ -88,6 +88,20 @@ acrobatics or attacks. Right now we just have the one flying kick on the right s
 - Wants the directional ground swings sorted first (two of them read anticlimactic -- "a weird sword heel-butt thing" -- and get
   swapped for bigger, broader, faster ones once he names which).
 
+## Feel: what the research says to do next (Oct 25 2026, m993) -- starting values, all to tune on the phone
+Done in m993: magnetism (+-60 deg / 3.5 m, the travel spent in the first 30% of the swing), his parry punishing you (shove, .6 s
+stun, instant riposte). Next, in order:
+1. **Hitstop on BOTH bodies**: 70 ms per chain hit, 110 ms on a finisher, 150 ms on a charged release; the victim jitters +-3 cm and
+   flashes white 60 ms. Inputs buffer through it. (Capcom: 8/12/16 frames light/medium/heavy; a 3D-action study: 0.1-0.2 s best.)
+2. **Knockback along the swing**: light .4 m, finisher 1.5 m, charged 3 m; the attacker keeps ~30% of his lunge through contact.
+3. **Your parry**: a guard pulled within ~250 ms before contact (mobile: wider than Sekiro's ~200) is a perfect parry: 800 ms
+   stun on him, .6 m shove, your first cut inside it does 2x with extra hitstop; mashing the guard shrinks the window.
+4. **Chains**: a 180 ms buffer, newest flick wins (now: up to 2 queued); cancel into the next swing from the end of the active
+   frames (~45-55% of the clip); a 4th hit; play anticipation 1.2-1.4x faster so the hit comes sooner.
+5. **Camera**: a 5-10 cm push along the hit, trauma shake decaying over ~150 ms, a 1-2 deg FOV punch on finishers.
+6. **Smears (later)**: the blade-arc ribbon held 2-3 frames; then the lag-transform vertex stretch on blade and arm during the active
+   frames only; optionally the mixer stepped at 12 fps during attacks ("on twos"), smears held at most 2 frames.
+
 ## DONE WHEN (the whole-piece gate -- every box needs evidence in the NOTES entry that ticks it)
 
 - [ ] Four directional attacks that look and feel different (slash L, slash R, chop, thrust), and the slash chains a 3-hit combo.

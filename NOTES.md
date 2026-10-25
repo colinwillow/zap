@@ -5,6 +5,31 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m993 -- THE SAMURAI'S GAIT (from his video), THE RIVAL'S COLOUR, THE KATANA LASHES IN, AND HIS PARRY HURTS
+*"This shows his gait, it's still super weird... the rival is basically dark, almost black, instead of tinted or hue shifted...
+when you flick the swing, games have you lash toward the character... an assist... I was just standing there swinging... if I swing
+and he parries, it should knock me back, as if he really cared -- that's where he gets a counter in."*
+- **THE GAIT** (frames cut from his recording, front view, running at the camera with the katana out: feet far apart, toes out,
+  knees in over them, the swing foot whipping out). Measured against the LIBRARY's own clip on its own skeleton:
+      stance (hip widths)   Great_Sword_Run_1 1.12 | his katana_run **1.98** | Great_Sword_Walk 1.13 | his katana_walk **1.72**
+  The Forge's FOOT CLEARANCE layer (m939, for the CEO's thick legs) read his armour/sheath as leg thickness and spread his feet to
+  ~2 hip widths -- the straddle is what made the knees read inward. `layers.clear` 0 in his profile, and m992's `knees` 12 /
+  `toeIn` 6 come back off (they were compensating for this). After: katana_run 1.07, knees 2 / 25 and toes 6 / 28 -- the source's
+  own 2 / 25 and 1 / 25; run_std 1.15 against Zoar's 1.22. **A body with armour or props at the hips: check `clear` first.**
+- **THE RIVAL**: the tint was a multiply (`material.color` 0x4d5463), which can only darken an orange texture. Now a HUE rotation in
+  the shader (YIQ, brightness kept, `rivalHue`), one shared uniform: TOOLS > RIVAL = BLUE 200 deg (reads teal on him) / GREEN /
+  PURPLE / GOLD, live on a spawned rival. Screenshot: a bright teal samurai beside the orange one.
+- **MAGNETISM** (`KATANA.lock`): the katana aimed where he FACED, inside 34 deg and ~2.7 m, and spread its travel over the whole
+  beat (3 m/s -- a drift). Now he strikes where he is GOING (the left stick's heading when moving, his nose when still), finds a
+  body within 60 deg and 3.5 m of travel, turns to it and LASHES in: the travel spent in the first `front` .3 of the swing (the
+  dash's `dashLand` clock, `p.melFront`), stopping at `MELEE.arrive`. Headless: an enemy 40 deg off at 3.2 m -> turned 40 deg,
+  10.3 m/s for .28 s, 2.1 m, to sword reach; 74 deg off -> not taken (outside the cone). Numbers from the research pass (God of
+  War / Arkham-style soft targeting +-60-70 deg, ~4.5 m dash attacks; front-loaded lunges).
+- **HIS PARRY HURTS** (`KATANA.parried`): your swing is cut off, you are shoved back (~1 m) and stunned .6 s, and his riposte starts
+  NOW with a short wind-up -- For Honor's guaranteed punish (a parried heavy gives the parrier a 600 ms-or-faster punish).
+- The research report (attack magnetism, hitstop 70-150 ms, 180 ms input buffer, cancel windows, parry windows, smears on twos) is
+  summarised into SWORD.md's next steps.
+
 ## m992 -- THE SAMURAI, ROUND TWO: the run's pop (loops must CLOSE), 3-hit chains per direction, the charge = the guard, knees out
 *"Stutter on the run, or he's moving slightly during the run and then pops back... flicking forward his first swing just butts the
 sword... I can only get through two... at least three if not four or five... the charge: you just turned the sword backwards, it
