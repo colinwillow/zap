@@ -37,6 +37,16 @@ from cover costs exposure, and the cheap "stand behind it and shoot" does not ex
 - [ ] No words on screen explain any of it.
 - [ ] **He played it on his phone and signed it off as fun.**
 
+## His additions (Oct 25 2026, m1000)
+*"Once we get all the guns worked out... the left-stick flick as a slide tackle, slide tackle into cover... a whole new set of animations.
+We technically had cover on Zap, but he needs to be in a CROUCH cover, so go back through Mixamo for the crouch-cover directions... a few
+half-height giant cinderblock horizontal pillars to test on... slide into cover, go left, go right, and press-and-hold the right stick
+to pop up and start a shot, let go to shoot -- only with a gun equipped."*
+- Order: after the guns are worked out. Clips to bake (library): crouch cover idle (left- and right-facing), crouch cover move left /
+  right, cover pop-up-aim and the return, slide (into cover), vault. Test geometry: half-height cinderblock pillars in the arena.
+- In cover: left stick = move along the cover left/right; right pad HOLD = pop up and wind the shot, RELEASE = fire and drop back
+  (gun slots only; with no gun the right pad does what it does now).
+
 ## Needs
 Clips (library / Forge): slide, slide-to-cover, cover idle crouched (both sides), cover pop-up shoot, vault. The old wall-cover code
 (disabled) is the place to look first -- `grep -n` NOTES.md for the cover / wall entries before writing any of it.

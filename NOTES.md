@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1000 -- THE KATANA'S FLICK MAP, HIS WAY: up = the katana chain, down = Zap's acrobatics, left / right = the whirlwinds
+*"The direction you flick should dictate which kind of moves he does... I really like the melee options when you're unarmed -- Zap's,
+a handspring, a flip kick -- and you should be able to access them holding the katana. Flick up does what it already does... in the
+direction the character is facing... flick down the unarmed melee... flick left / right a whirlwind, one direction and its mirror."*
+- `KATANA.dirs`: up `katana_spin -> katana_slash_1 -> katana_combo3` (unchanged); DOWN = `CLIPS.fist` (melee_01..05 + extra, dealt
+  the unarmed way, `KATANA.downFist`); LEFT `katana_360l`, RIGHT `katana_360h` (each one spin, repeated per flick). The left/right are
+  both left-to-right spins in the library (axe set); a true mirror for one side is a clip mirror not built yet. He also has
+  `hurricane_kick` (a spinning kick) if a whirlwind should be that instead.
+- **Direction = where he FACES** (his heading when he runs) for every katana flick -- his call, replacing m995's camera-relative
+  flick. The magnetism cone (60 deg, 3.5 m) centres on his facing.
+- Headless, three quick flicks each: right 360h, left 360l, up the katana chain, down melee_02 -> melee_03 -> melee_01.
+- COVER.md gains his cover plan (crouch cover from Mixamo, half-height cinderblock pillars, slide in, move left/right, hold the right pad
+  to pop up and wind a shot, release to fire -- guns only), after the guns are worked out.
+
 ## m999 -- THE LEFT HAND HOLDS THE KATANA TOO (`katLeftGrip`, `ik2`, `KATANA.lgrip`)
 *"Adjust that left hand when he's idle with the katana, it's kind of missing. The left hand is supposed to be holding the blade in
 addition to the right hand... during swings it moves so much you don't notice, but on the idle and walk, line it up."*
