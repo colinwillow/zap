@@ -5,6 +5,24 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m987 -- THE SAMURAI TURNED LIKE A BOAT: his origin was at the back of his backpack (`tools/hipfix.mjs`, `tools/hipshift.mjs`)
+*"Whenever a character has a backpack they apply the root joint with the backpack taken into consideration... the centre of
+gravity is behind the character... it's more like right down his hip, because he rotates like a boat."*
+Measured off the file: his Hips were fine (z .183, over his feet at ~.16); the ORIGIN was wrong -- the body ran z .005..332, so
+(0,0,0) was the back of the pack and the game turned him about a point ~0.35 m (in game) behind him. Tripo centres the whole
+shell, pack included, and nothing downstream re-centred it.
+- **Fixed in the file**, all four together: every vertex, every inverse bind (IBM' = IBM * T(+d)), the Hips node, and all 3,892
+  Hips translation keys in his 84 clips, moved by -0.183 in z (`tools/hipshift.mjs`, gltf-transform + draco; webp and draco
+  kept, 4.11 MB). After: Hips world z 0.000, mesh z -.178...149; in game the Hips sit 3 cm from the root (headless, top-down
+  shot: the turning point is in his middle, the pack behind it).
+- **Not the cheap version**: moving only the Hips node (JSON + keys) moves the drawn body but leaves the bind matrices 0.18 m
+  behind it, and the x-ray, the transform and the Forge all read the bind pose. That first attempt was thrown away.
+- **Fixed at the source**: `pipeline/orient.py` (blender-addons) now centres a new mesh on its LEGS (the bottom 15%: shins and
+  feet carry no pack), not the shell. A re-bake through the Forge from the old rig needs `hipshift` again.
+- `node tools/hipfix.mjs <glb...>` reports every character's Hips off the origin as a % of hip height. Also off: `zap_02` /
+  `zap_02_lib` (39%, the tailed Zap), `alien_female_purple` (48%, the tail), `clancy` (53%), `alien_rollerskate_blue` (20%),
+  `fat_hipster` (17%). Left alone: his hand-made exports and a tail are his call.
+
 ## m986 -- SWORD e1: THE KATANA ON EVERY ARENA ENEMY (a probe), TWO FIXES
 Headless probe (`kenemy.cjs`): each enemy placed 2 m in front, slash / left slash / spin / thrust / slash, hp and state read.
 - **A SWORD REACHED A MECH HOVERING 5.2 M UP** (hp 14 -> 11.4 off four swings while it circled overhead). `segBody`'s height
