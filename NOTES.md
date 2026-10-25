@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1003 -- every strike goes where he faces; the left-hand grip is the stance only; the door walk loops; the samurai leaps out
+
+- **Unarmed (and every) strike by facing (`MELEE.dirBy` 'face').** *"Implement the same technique with the unarmed melee so it follows
+  the orientation of the character locomotion rather than the swipe direction."* m1000's katana rule (the stick's heading when
+  moving, his nose when still), and m1001's flying kick along his velocity, now apply to every slot. `'flick'` brings back the
+  camera-relative way. The flick still picks WHICH chain plays.
+- **The left-hand grip is the idle / walk / run only.** *"I just wanted that one adjusted... the idle, or where he's walking around
+  holding the sword."* m999/m1001 held the hand on the hilt for everything that was not a jump, including the charge wind-up, the
+  roll and the swings. Its weight is now the sum of the mixer's own weights on `katana_idle` / `_walk` / `_run`, whole-body actions
+  only (an upper-body move puts the `__legs` halves in, and those do not count), and it is zero in any melee, roll, slam or charge.
+  So it hands back at the rate the body does.
+- **The CEO froze and slid out of the door.** `enter_walk` was never in `bodyLoops`, so it played once and clamped on its last frame
+  while `arenaEnter` kept moving him. Measured headless: the walk now cycles 0.08 to 0.83 four times on the way to the taunt.
+- **The samurai's door leap was his idle pose.** He has no `enter_leap`, and the fallback was the idle on a parabola. Now the kind
+  has `leap: { clip: 'katana_runjump', w0 .25, w1 .47, arc 3.2, end .62 }`. w0 and w1 are measured off the clip's hips (up at .25,
+  down at .47), and `arc` is the lift the in-place clip does not carry. Headless: runjump plays, peak y 2.6, lands at r 9.
+
 ## m1002 -- THE DRINK CRASH: a cached vector kept on `userData` does not survive a clone (`handFrame`'s mitt forward)
 
 *"I got this when I had the katana out and I tried to pick up a drink to throw at the CEO"* -- FRAME `handFrame` <- `socketAuto`
