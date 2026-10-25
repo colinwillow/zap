@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m984 -- SWORD build d: THE 3-HIT COMBO, THE CHOP BREAKS A GUARD, THE BLADE TRAIL
+*"Sweet, keep going."* (SWORD.md build d.)
+- **Combo**: flicks inside the chain window continue it; with the katana the chain is two of the flicked direction's swings and
+  then the FINISHER (`katana_jump_attack`, measured contact .60), played IN ORDER (the pool roll is skipped) and graded by
+  `melPower` so the third hits hardest. Each flick still picks its direction, so right-right-any or left-right-any both chain.
+  A running flick with the katana is a swing, not the slide-kick opener.
+- **The guard rule is the MOVE, not the power** (`arenaShieldHit`): with the katana only the overhead chop (`katana_spin`), the
+  finisher or a charged release (lunge/spin) breaks a raised guard; every slash clangs off it and bounces you back. That is the
+  spec's paper-scissors (the chop beats the guard, the slash loses to it). Applies to the AI samurai's guard too.
+- **Blade trail** (`bladeTrail`, `BTRAIL`): a ribbon through the katana's last 18 positions (base -> tip), fading with age, one
+  draw, laid while a swing / lunge / spin plays. Cool blue with NORMAL blending -- the first try was additive white, which vanished
+  against the white arena.
+- Checked headless: three flicks right -> `katana_slash_2 -> katana_slash_1 -> katana_jump_attack`; the AI samurai's guard:
+  `slash_2: HELD (clang) | spin: BROKEN`; the trail arcs behind each swing on screen. No errors.
+- SWORD.md: boxes 1-5 now all BUILT (none ticked -- his phone). Left: the charge hum, smear frames, the true-mirror AI, tuning.
+
 ## m983 -- THE KATANA STANCE: idle / walk / run as a swordsman while the katana is out (`katStance`)
 *(His "sounds good" to: build c, then the katana stance alongside it.)*
 - With the katana out the ordinary gait is replaced by `katana_idle` / `katana_walk` / `katana_run` (Great Sword set), blended by
