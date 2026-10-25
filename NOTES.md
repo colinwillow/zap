@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m994 -- THE FORGE ANCHORS A HELD WEAPON AT THE SHOULDER, BY ARM LENGTH (the samurai's rocket launcher)
+*"I pulled out the rocket launcher as the samurai and he's holding it like crazy... I was really hoping that once we solve whatever
+the problem is that happens every time we apply the same animations to a new character, it'd be implemented in the Forge, so you
+don't have to tell your AI to manually solve it."*
+The Forge's `weapLayer` (m794) already drives a held weapon by POSITION: the donor's weapon read in his chest frame, put in the same
+place on the new body, the arms solved to it. What carried the donor's proportions was the SCALING: offsets from between the
+shoulders, across x shoulder width, up/forward x SPINE. Old Zap (the donor) is a short spine under a big head, so on the samurai's
+long robot torso the forward offset blew up -- the launcher a forearm out in front of his face, arms reaching (screenshots). Zoar
+had needed a typed `x: .6` for the same reason.
+- **`WEAPANCHOR.def` 'shoulder'**: offsets from the HOLDING shoulder's joint, every axis x ARM LENGTH (upper arm + forearm) -- the
+  arm is what decides where a hand can be, on any body. `W.anchor: 'chest'` is the old rule; `W.x/y/z` still multiply on top.
+- Zoar's profile pins `anchor: 'chest'` on his tuned launcher clips (his look kept on any re-bake).
+- Re-forged the samurai (100 clips), resize/webp/draco, `hipshift`. Screenshots (before/after, 3/4 and side): the launcher comes back
+  from in front of his face to up by his head and shoulder, arms no longer at full reach. It still sits a little further forward
+  than Zoar's -- his head sits low between big shoulder pads; that is his build, not a per-character number.
+
 ## m993 -- THE SAMURAI'S GAIT (from his video), THE RIVAL'S COLOUR, THE KATANA LASHES IN, AND HIS PARRY HURTS
 *"This shows his gait, it's still super weird... the rival is basically dark, almost black, instead of tinted or hue shifted...
 when you flick the swing, games have you lash toward the character... an assist... I was just standing there swinging... if I swing

@@ -667,6 +667,14 @@ export function reachLayer(tg, clip, R) {
 //      which follows hand length -- m794), with a weight that lets go when the donor's left hand leaves it (`WEAPIK.near/far`).
 // `W` = { two: 1 } (left hand too) | { two: 0 }. Needs fingers on both rigs (the mount and the frames are measured off them).
 export const WEAPIK = { near: 2.5, far: 4 };     // donor left hand to his weapon, in his hand lengths: on it / off it
+// m993: WHERE THE WEAPON IS ANCHORED. `chest` (m794): offsets from between the shoulders, across x shoulder width, up/forward x
+// spine -- which carries the DONOR's proportions: Zap's short spine under a big head pushed the launcher a forearm out in front of
+// the samurai's face, and Zoar needed a hand-typed `x: .6`. `shoulder` (the default now): offsets from the HOLDING shoulder's
+// joint, every axis x ARM LENGTH (upper arm + forearm) -- what decides where a hand can reach is the arm, on any body. `W.anchor`
+// picks per clip; `W.x/y/z` still multiply on top.
+export const WEAPANCHOR = { def: 'shoulder' };
+function armLen(B, side) { const a = B['mixamorig_' + side + 'Arm'], f = B['mixamorig_' + side + 'ForeArm'], h = B['mixamorig_' + side + 'Hand']; if (!a || !f || !h) return 0;
+  return a.getWorldPosition(new THREE.Vector3()).distanceTo(f.getWorldPosition(new THREE.Vector3())) + f.getWorldPosition(new THREE.Vector3()).distanceTo(h.getWorldPosition(new THREE.Vector3())); }
 function chestFrame(B, outP, outQ) {
   const L = B.mixamorig_LeftArm, R = B.mixamorig_RightArm, H = B.mixamorig_Hips, N = B.mixamorig_Neck; if (!L || !R || !H || !N) return null;
   const l = L.getWorldPosition(new THREE.Vector3()), r = R.getWorldPosition(new THREE.Vector3()), x = l.clone().sub(r), w = x.length(); x.normalize();
@@ -697,12 +705,15 @@ export function weapLayer(tg, src, clip, W) {
     const cd = chestFrame(S, cdP, cdQ), ct = chestFrame(B, ctP, ctQ), hd = mountWorld(S[M + 'RightHand'], 'Right', wdP, wdQ);
     if (cd && ct && hd) {
       // 1-2: the donor's weapon in his chest frame -> this body's chest frame
-      const cdi = cdQ.clone().invert(), lp = wdP.clone().sub(cdP).applyQuaternion(cdi), lq = cdi.clone().multiply(wdQ);
+      const sh = (W.anchor || WEAPANCHOR.def) === 'shoulder', aS = sh ? armLen(S, 'Right') : 0, aT = sh ? armLen(B, 'Right') : 0, useSh = sh && aS > 0 && aT > 0;
+      const oS = useSh ? S[M + 'RightArm'].getWorldPosition(new THREE.Vector3()) : cdP, oT = useSh ? B[M + 'RightArm'].getWorldPosition(new THREE.Vector3()) : ctP;
+      const cdi = cdQ.clone().invert(), lp = wdP.clone().sub(oS).applyQuaternion(cdi), lq = cdi.clone().multiply(wdQ);
       // m962: `W.x/y/z` multiply the offsets on top of the proportions (*"the space between Zoar's head and his rocket launcher":
       // the across offset follows shoulder WIDTH, and Zap's are narrow under a big head -- on a man with normal shoulders and a small
       // head that put the launcher a head-width out)
-      lp.x *= ct.w / cd.w * (W.x ?? 1); lp.y *= ct.sp / cd.sp * (W.y ?? 1); lp.z *= ct.sp / cd.sp * (W.z ?? 1);
-      const wtP = lp.applyQuaternion(ctQ).add(ctP), wtQ = ctQ.clone().multiply(lq);
+      if (useSh) { const k = aT / aS; lp.x *= k * (W.x ?? 1); lp.y *= k * (W.y ?? 1); lp.z *= k * (W.z ?? 1); }
+      else { lp.x *= ct.w / cd.w * (W.x ?? 1); lp.y *= ct.sp / cd.sp * (W.y ?? 1); lp.z *= ct.sp / cd.sp * (W.z ?? 1); }
+      const wtP = lp.applyQuaternion(ctQ).add(oT), wtQ = ctQ.clone().multiply(lq);
       // the donor's left hand on his weapon (before this body's pose moves), in the weapon's frame
       const lh = S[M + 'LeftHand'], lhP = lh ? lh.getWorldPosition(new THREE.Vector3()) : null, lhQ = lh ? lh.getWorldQuaternion(new THREE.Quaternion()) : null;
       // 3: his right hand: where its mount IS now, and the turn that puts it on the weapon
