@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1001 -- THE KATANA GRIP: the palm (not the wrist), let go in the air; the flying kick goes where he goes, trimmed of its landing
+*"You locked his left hand to the hilt, but it's his wrist instead of his hand... when he jumps, both hands should go up, now it looks like
+he only has one arm... the flying kick should follow the direction he's going rather than the flick... trim the end of it, he lands on the
+ground in the air."*
+- **The palm**: the hand bone is the wrist, so the wrist is aimed where the PALM lands -- `KATANA.lgrip.palm` .75 of the way from the
+  wrist to the finger root (his mitt chain), as posed that frame. Stepped: palm to grip 3.0 cm on the ground.
+- **Lets go** in the air (and on draw / sheath, a knockdown, a swap), and comes back eased (`lgrip.ease` .08 s, `player.lgW`) -- never a
+  pop. Stepped: airborne, the weight falls 1.00 -> .18 in 12 frames and the arm goes back to the clip's own (the jump's arms up).
+- **The flying kick with the katana** goes along his velocity (his facing when standing), not the flick -- the katana's rule (m1000).
+- **The kick's tail**: `flying_kick` is 1.53 s and its kick is over by ~.5; from .6 on both feet hang straight at standing length (hips to
+  feet .5-.6 m) -- standing on air. Only the first `MELEE.airEnd` .55 of the clip plays over the kick's .85 s now.
+
 ## m1000 -- THE KATANA'S FLICK MAP, HIS WAY: up = the katana chain, down = Zap's acrobatics, left / right = the whirlwinds
 *"The direction you flick should dictate which kind of moves he does... I really like the melee options when you're unarmed -- Zap's,
 a handspring, a flip kick -- and you should be able to access them holding the katana. Flick up does what it already does... in the
