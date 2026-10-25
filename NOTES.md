@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m983 -- THE KATANA STANCE: idle / walk / run as a swordsman while the katana is out (`katStance`)
+*(His "sounds good" to: build c, then the katana stance alongside it.)*
+- With the katana out the ordinary gait is replaced by `katana_idle` / `katana_walk` / `katana_run` (Great Sword set), blended by
+  speed like the gait (idleAt / walkAt / runAt). `KATANA.stance = 0` is the A/B.
+- **Rates off his own stride**: `gaitMeasure` found too few contact frames on these clips (both read 0), so it uses `arenaRef`'s
+  planted-foot measure on the hero's rig: walk **0.89 m/s**; the run is mostly air and reads 0, so it keeps the ordinary run ref.
+- Checked headless, real touch on the left pad: standing `k_idle 0.97`; moving 2.8 and 6.3 m/s `k_run 1.00`, the ordinary gait at
+  0; on screen he holds the blade up and forward in all three. No errors.
+
 ## m982 -- SWORD build c: CHARGE IN THE GUARD, RELEASE = LUNGE, FULL = SPIN (the hammer's charge, re-triggered for the katana)
 *"You can charge that somehow and then you release and it does this launch forward attack."* (SWORD.md build c.)
 - **No new machine**: the hammer's charge already had everything (the wind-up timer, sparks off the weapon's far end, the
