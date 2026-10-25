@@ -5,6 +5,31 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1007 -- THE NINJA SPRINT: hold the right pad still while moving = her arms-back run, fast, with a wider lens and speed lines; let go and tap = the long jump
+
+*"There's this one run where both of her arms are back... when you hold down the right stick she does this run... you go really
+fast... if you're just still and you hold that button he'll do the wind-up for the big tall jump... if you're running and you hold
+down the right stick you move faster... a screen effect... and then let go and quickly tap: a longer, higher, far jump, kinda like
+Mario."*
+- **Her run, found by measuring.** The library's labels did not say "arms back", so every run / sprint / jog / dash clip (193) was
+  played and both hands' position along the body's forward (the head's lean past the hips) averaged over the cycle. Only
+  `Running_Arc` holds both hands behind the hips with a hard forward lean, and its description is *Female Ninja Run Arc Right*.
+  Her straight run is not in the library; the arc is. Her running jump is `Jump_6` (*Female Ninja Running Jump*), arms back too.
+- **`clipStraighten`** (game, at load, `STRAIGHT`): the arc turns 72 deg/s (45 deg a stride). The Hips' yaw drift is fitted with a
+  straight line and taken out, and so is the curve of the travel that remains, so it runs straight.
+- **The gesture** (`stepKit`, beside the backflip's duck): the right pad held still (inside `tapR`, past `tapT`) while the left
+  stick is pushed past `NINJA.minMag` = `p.ninja`. Held still with the left stick idle it is still the backflip's duck. Letting go
+  does nothing and opens `NINJA.win` (.4 s); a tap inside it is the long jump.
+- **Speed** 11 m/s (`NINJA.speed`, past the katana stance's cap). The run's rate comes from its own measured stride (`arenaRef`:
+  2.08 m/s on the goblin) with its own clamp (`tsHi` 3.4, anime legs; the gait's 1.6 would slide the feet). The lens widens by
+  `fov` 9 and SPEED LINES fade in at the screen's edge (`ninjaLines`: one CSS div, no draw call).
+- **The long jump:** `jumpUp` 10.5, `jumpFwd` 13.5, her jump clip over the whole airtime (as the air pose, NOT `flipGo`: a flip
+  state owns the body and bled the speed to 3 m/s), and the speed held to the landing (`p.ljump`).
+- **Checked headless** (goblin and orc, stick state driven directly): sprint on; release opens the window (.32 s left after 5
+  frames); the tap gives apex 2.67 m and 13.7 m of distance at 13.5 m/s in the air; a still hold standing is still the duck
+  (`bkOn` 1). Side renders: the hard forward lean, the arms back.
+- Baked into samurai / orc / goblin (`ninja_run`, `ninja_jump` in their profiles). A hero without the clip still gets the speed.
+
 ## m1006 -- mirrored clips (`clipMirror`): the left spin and the left air spin kick; the landing roll only from a real fall; the katana slam lands in its own clip; the blade leaned back on the run
 
 - **Mirror.** *"The spin attack only goes one direction despite which direction you flick it... it should be mirrored."* Left was
