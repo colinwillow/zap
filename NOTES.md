@@ -5,6 +5,24 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1004 -- THE ORC AND THE GOBLIN: two new heroes through the pipeline; the orc carries a MEGA SWORD
+
+*"He needs to be rigged and animated, same treatment, and then he can be a main playable character. He's a bigger brute style
+character... he needs a big sword! Mega sword."* Plus the goblin warrior zip, *"rigged and given the full treatment like the samurai"*.
+- **Pipeline (both):** his Tripo FBX -> `orient.py` at rotation **0** (they face -X out of Tripo; checked on the renders) ->
+  `run_rig.sh` (the orc with `--tail 6`) -> `arp2mix.py` -> `handrig.py` (the finger AI found no fingers on either: mitt + thumb,
+  as on the samurai) -> the Forge with `orc.json` / `goblin.json` (the samurai's profile: 100 clips, the Great Sword / axe katana
+  set included) -> 2048 webp + draco -> `hipshift.mjs` (orc Hips were 19 cm behind the origin, goblin 4 cm; both 0% after).
+- **`handrig.py` swapped the orc's right thumb and mitt** (the mitt sat further off the arm's axis): now when one blob is 2.5x the
+  other, the smaller one is the thumb. **Two ARP runs at once collide** on ARP's AI temp file (`front1_kp.py`): rig one at a time.
+- **The mega sword (`megaSwordScene`, `SWORDS.orc`):** it sits in the katana's slot, on the katana's frame and mount, so every
+  katana move, the guard, the left-hand grip (same 22-unit grip) and the trail work unchanged. Blade 100 units against 58, broad,
+  thick, notched spine, spiked guard. The hit's reach is the measured blade end, so it reaches further by being longer. `dmgK` 1.35;
+  the trail runs to the blade's end (`base` / `tip`). The slot label says MEGA SWORD.
+- **Heights** (taste, `HERO.height`): orc 2.2 m, goblin 1.35 m, against the samurai's 1.8. The orc's tail sways like Zap 2's
+  (`playerTail`). The goblin keeps the katana.
+- **Checked headless:** both load with 176 actions, sword in hand, idle and a right flick swing drawn. Nothing on the phone yet.
+
 ## m1003 -- every strike goes where he faces; the left-hand grip is the stance only; the door walk loops; the samurai leaps out
 
 - **Unarmed (and every) strike by facing (`MELEE.dirBy` 'face').** *"Implement the same technique with the unarmed melee so it follows
