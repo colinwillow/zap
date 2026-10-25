@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m985 -- THE MIRROR: the AI samurai plays by your rules (guards, parries, breaks your guard, rolls your lunge)
+*"Create an AI version of the same character... so I can fight myself... change his color... a switch for aggression or hardness."*
+m982-m984 gave HIM the triangle; the rival SAMURAI only swung. Now he reads you (`arenaMirror`, hooked in `arenaBody` before
+`arenaFight`, only for kinds with `over.mirror`):
+- **You slash within reach** -> he GUARDS (`mguard`: block clip, shield-less empty-group `d.sh` raised), and a slash into it can
+  be PARRIED (`arenaShieldHit`: you are shoved and he counters next). After the guard he swings back (always after a parry).
+- **You turtle** -> `arenaSwing` picks a BREAKER (`KATANA.breakers`) and his spin breaks YOUR guard: `FOE_CLIP` is set around
+  `foeStrike`, and `playerHurt` drops the guard, full damage, a .9 s stun, `blockT -.6` (a held thumb re-arms late), white burst + clang.
+- **You lunge / spin / finisher** -> he ROLLS sideways (`mroll`, his `roll` clip, 6.5 m/s for .45 s).
+- Each read is once per move (`d.mSeen`), only while he is free and you are facing him.
+- Scaled by the level switch (TOOLS > level): guard / parry / break / dodge = EASY .3/.12/.3/.2, MEDIUM .55/.3/.6/.45, HARD .8/.5/.85/.7.
+Evidence (headless, HARD, real touch for the guard): while you hold guard his picks were spin 34/40; four spins into a held
+guard -> BROKE x3 (hp 100 -> 83 each, guard gone), the fourth landed full too. You slash x6 at 2 m -> he guarded 2 (sampled
+250 ms in at a headless frame rate, so a floor, not the rate). No page errors.
+SWORD.md: moves nothing toward DONE WHEN by itself (the AI is the sparring partner for build e); still open: e (tuning per
+enemy), the charge hum, smear frames, his sign-off. Not built: he never charges/lunges at you himself.
+
 ## m984 -- SWORD build d: THE 3-HIT COMBO, THE CHOP BREAKS A GUARD, THE BLADE TRAIL
 *"Sweet, keep going."* (SWORD.md build d.)
 - **Combo**: flicks inside the chain window continue it; with the katana the chain is two of the flicked direction's swings and
