@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1002 -- THE DRINK CRASH: a cached vector kept on `userData` does not survive a clone (`handFrame`'s mitt forward)
+
+*"I got this when I had the katana out and I tried to pick up a drink to throw at the CEO"* -- FRAME `handFrame` <- `socketAuto`
+<- `pickHolder`. **Reproduced headless before the fix** (arena, samurai, CEO spawned, katana drawn, a can at his feet, `pickTap`):
+`TypeError: mittFwd(...).clone is not a function`, every frame, and the cup never reached his hand.
+- **The cause:** m997 cached the mitt's bind forward as a `Vector3` on `hand.userData._mittT`. three's `Object3D.copy` deep-copies
+  userData **through JSON**, so any rig cloned after the cache was set (the mirror samurai, the disguise, the Forge's copies) has
+  hands carrying a plain `{x, y, z}` with no methods. Any mitt hand going through `socketAuto` after a clone threw.
+- **The fix:** the cache is a `WeakMap` keyed on the bone (`handFrame._mitt`), which a clone cannot copy. And the bind search
+  stops at the top of his own model, never the whole scene, passing over any skin with no usable inverse for this hand.
+  `tools/forgesync.mjs --write` carried it into `forge/core.js`.
+- **Checked after the fix:** the same run ends `carry true`, with no throw. **Never cache a three.js object in `userData`.**
+
 ## m1001 -- THE KATANA GRIP: the palm (not the wrist), let go in the air; the flying kick goes where he goes, trimmed of its landing
 *"You locked his left hand to the hilt, but it's his wrist instead of his hand... when he jumps, both hands should go up, now it looks like
 he only has one arm... the flying kick should follow the direction he's going rather than the flick... trim the end of it, he lands on the

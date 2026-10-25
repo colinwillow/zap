@@ -131,11 +131,15 @@ function handFrame(hand, side) {
   // turned with the world instead of with the hand, the weapon's turn changed as he moved, and the Forge's arm solve chased it -- the
   // samurai's launcher pose came out 58-70 deg apart frame to frame ("perpetually spinning"), his blaster idle 154. So it is read off
   // the BIND (the skin's inverse bind for this bone), cached on the bone.
-  const mittFwd = () => { if (hand.userData._mittT) return hand.userData._mittT; let r = hand; while (r.parent) r = r.parent; let bq = null;
-    r.traverse(o => { if (bq || !o.isSkinnedMesh || !o.skeleton) return; const k = o.skeleton.bones.indexOf(hand); if (k < 0) return;
-      bq = new THREE.Quaternion(); new THREE.Matrix4().copy(o.skeleton.boneInverses[k]).invert().decompose(new THREE.Vector3(), bq, new THREE.Vector3()); });
+  // m1002: THE CACHE IS A WEAKMAP, NOT `userData`. three copies userData through JSON on every clone, so a cloned rig's hand
+  // carried a plain {x,y,z} and `.clone()` threw -- picking a drink up with the katana out crashed the frame. And the search is
+  // his own model (never the whole scene), passing over any skin without a usable inverse for this hand.
+  const MC = handFrame._mitt || (handFrame._mitt = new WeakMap());
+  const mittFwd = () => { if (MC.has(hand)) return MC.get(hand); let r = hand; while (r.parent && !r.parent.isScene) r = r.parent; let bq = null;
+    r.traverse(o => { if (bq || !o.isSkinnedMesh || !o.skeleton || !o.skeleton.bones) return; const k = o.skeleton.bones.indexOf(hand), I = k >= 0 && o.skeleton.boneInverses && o.skeleton.boneInverses[k]; if (!I || !I.elements) return;
+      bq = new THREE.Quaternion(); new THREE.Matrix4().copy(I).invert().decompose(new THREE.Vector3(), bq, new THREE.Vector3()); });
     if (!bq) { hand.updateWorldMatrix(true, false); bq = hand.getWorldQuaternion(new THREE.Quaternion()); }
-    return (hand.userData._mittT = new THREE.Vector3(0, 0, 1).applyQuaternion(bq.invert())); };
+    const v = new THREE.Vector3(0, 0, 1).applyQuaternion(bq.invert()); MC.set(hand, v); return v; };
   if (!m && i && !p) { const f = i.position.clone().normalize(), t = mittFwd().clone();
     t.addScaledVector(f, -t.dot(f)).normalize(); return { q: new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(f, t, new THREE.Vector3().crossVectors(f, t))), len: i.position.length() }; }
   if (!m || !i || !p) return null;
