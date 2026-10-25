@@ -5,6 +5,28 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1005 -- the new heroes' hands (a glove that came apart), a faster diving flying kick, and the run measured
+
+- **Hands.** *"Their hands are always really messed up... the big red orc's idle pose, his right hand is super messed up... like
+  the guy with the really messed up little hand... T-rex."* Two causes, both in the pipeline:
+  1. `handrig.py` took the TWO biggest blobs past the palm as thumb and mitt. The orc's gloves come apart into 9 and 7 pieces, so
+     the other finger lumps stayed on the hand while the chained ones curled, and the glove tore into lumps. Now the thumb is the
+     blob furthest FORWARD of the hand (the body faces -Y in the T-pose), and every other blob is the mitt. The samurai and the
+     goblin pick the same thumb as before.
+  2. The Forge curls a mitt chain like three finger joints, which folds a whole glove-mitt under the palm (the little hand).
+     `hands.amt` .35 on `orc.json` / `goblin.json`. Both re-baked. Front and side renders: hands at his sides, open.
+- **Flying kick.** *"It needs to be faster... a little downward momentum... maybe its distance is too far."* `airDur` .85 -> .5
+  (the clip runs faster with it), `airV` 9.5 -> 11 (about a third shorter, in 60% of the time), and `kickDrop` 2.5 m/s: a steady
+  dive while it lasts instead of flying level (m997's level stays as `kickLevel`; `kickDrop` 0 = level).
+- **The run, measured, not changed.** His report: the same stutter as the samurai's. The baked run clips (`run_std`,
+  `sprint_std`, `katana_run`, `run_fwd`, the walks) read the same on all three heroes: seams closed (gap <= .6% of hip height),
+  no drift, the same first step. At 60 fps headless, the hips relative to the body and the world travel per frame match the
+  samurai's within a centimetre. The game-side fixes (`clipSeam`, `clipInPlace`, `gaitSync`) go by clip name and apply to every
+  hero. So the cause is not the bake, and I am asking him which run, sword or not, and when.
+- **`pipeline/hero.sh`** (blender-addons): his zip -> game GLB in one command, every step and fix above in it, so the next hero
+  is not done by hand. Written from the steps run on these two; not yet run end to end.
+- The mega sword passing through him on rolls: noted, later (his call).
+
 ## m1004 -- THE ORC AND THE GOBLIN: two new heroes through the pipeline; the orc carries a MEGA SWORD
 
 *"He needs to be rigged and animated, same treatment, and then he can be a main playable character. He's a bigger brute style
