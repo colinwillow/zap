@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m999 -- THE LEFT HAND HOLDS THE KATANA TOO (`katLeftGrip`, `ik2`, `KATANA.lgrip`)
+*"Adjust that left hand when he's idle with the katana, it's kind of missing. The left hand is supposed to be holding the blade in
+addition to the right hand... during swings it moves so much you don't notice, but on the idle and walk, line it up."*
+- The library's two-handed clips put the left hand near a sword on THEIR body, not on OUR katana on his: measured at idle, his left hand
+  sat 13.2-13.4 cm off the katana's grip.
+- **In the game, every frame** (after the mixer and the spine fixes): his left arm is solved two-bone (`ik2`, the elbow kept in its
+  plane -- the Forge's `legTo` solve) so the left hand lands on the katana's own grip, `KATANA.lgrip.at` -8 katana units down the handle
+  from the right fist (the pommel is -14.5) -- read off the katana in the WORLD (`WEAP.worn.katana.group`), so no unit or frame is
+  guessed. Off during the draw / sheath (the scabbard hand), a knockdown, or a weapon swap.
+- **The Forge route was tried first and backed out**: its `gripLayer` (prop + grip offset) with the prop on the right hand at his file's
+  `weapon_root_right` offset flung the left arm out sideways in a test bake -- the prop's frame/scale in the Forge's target is not what the
+  game's katana is. The profile entries were removed; nothing baked.
+- Stepped at 60 fps: idle, left hand to grip 13.3 cm -> 0.0; mid-swing 0.0. Close-up: both fists on the handle, the left below the right.
+- Not done: the AI samurai (`arenaKatana`) has no left-hand grip yet.
+
 ## m998 -- WRISTS OUT: the samurai's T-rex hands (Forge `wristLayer`, profile `adjust.wrists` 45)
 *"His hands have this weird almost T-Rex thing... they should rotate outward 45 degrees so they're just neutral rather than bending like a
 T-Rex... when he walks and when he's idle."* (Three screenshots: mitts hanging palms-back, idle and walking.)
