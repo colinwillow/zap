@@ -31,6 +31,9 @@ levels later. **Each sandbox is tuned until it feels great on its own before any
   - [ ] e2. his play-through per enemy (what feels wrong is the next tuning); the charge hum; then his sign-off.
 - [ ] **COVER -- PART 1 SHIPPED m1008 (pillars, slide, crouched cover). Next: vault, pop-up shot, bolts over the crouch, AI.** `COVER.md`: slide tackle on the left flick, slide INTO cover only when flicked toward a half
       wall, vault, pop up to shoot; bolts pass over a crouched body. His idea (Oct 25).
+- [ ] **COURSES -- ON THE DOCKET (not immediate).** `COURSES.md`: a menu in the arena that spawns a test ground ("how you learn to
+      play"): COVER (slide / cover / shoot, `COVER.md`) and GYM (ladders, ledges, monkey bars, the gymnastics HIGH BAR with giant swings
+      and a release into a flip). His idea (Oct 25).
 - [ ] **GEAR -- OPEN (spec only).** `GEAR.md`: rollerblades / jet blades and a wingsuit any hero can wear. Waiting on his models.
 - [x] **m893 ARENA** (`?w=arena`): the stadium, SPAWN > WARBOSS > Brute Warboss / Skullback beams down, chest thump, armour
       flies off, KO slow-mo, beam out, CLEAR. This is the STAGE for the duel, not the duel.
