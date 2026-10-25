@@ -127,7 +127,16 @@ function handFrame(hand, side) {
   const m = ch('Middle1'), i = ch('Index1'), p = ch('Pinky1');
   // m978: A MITT (the samurai: one Index chain for all four fingers, and a thumb). Along the fingers is wrist -> mitt; across the
   // knuckles (pinky -> index) is, in the bind T-pose with palms down, the way the body faces (+Z for every rig here).
-  if (!m && i && !p) { hand.updateWorldMatrix(true, false); const f = i.position.clone().normalize(), t = new THREE.Vector3(0, 0, 1).applyQuaternion(hand.getWorldQuaternion(new THREE.Quaternion()).invert());
+  // m997: AT BIND, ONCE. +Z was taken through the hand's CURRENT world turn, which is only right in the T-pose: animated, the frame
+  // turned with the world instead of with the hand, the weapon's turn changed as he moved, and the Forge's arm solve chased it -- the
+  // samurai's launcher pose came out 58-70 deg apart frame to frame ("perpetually spinning"), his blaster idle 154. So it is read off
+  // the BIND (the skin's inverse bind for this bone), cached on the bone.
+  const mittFwd = () => { if (hand.userData._mittT) return hand.userData._mittT; let r = hand; while (r.parent) r = r.parent; let bq = null;
+    r.traverse(o => { if (bq || !o.isSkinnedMesh || !o.skeleton) return; const k = o.skeleton.bones.indexOf(hand); if (k < 0) return;
+      bq = new THREE.Quaternion(); new THREE.Matrix4().copy(o.skeleton.boneInverses[k]).invert().decompose(new THREE.Vector3(), bq, new THREE.Vector3()); });
+    if (!bq) { hand.updateWorldMatrix(true, false); bq = hand.getWorldQuaternion(new THREE.Quaternion()); }
+    return (hand.userData._mittT = new THREE.Vector3(0, 0, 1).applyQuaternion(bq.invert())); };
+  if (!m && i && !p) { const f = i.position.clone().normalize(), t = mittFwd().clone();
     t.addScaledVector(f, -t.dot(f)).normalize(); return { q: new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(f, t, new THREE.Vector3().crossVectors(f, t))), len: i.position.length() }; }
   if (!m || !i || !p) return null;
   const len = m.position.length(), f = m.position.clone().normalize(), t = i.position.clone().sub(p.position);
@@ -719,10 +728,18 @@ export function weapLayer(tg, src, clip, W) {
       // 3: his right hand: where its mount IS now, and the turn that puts it on the weapon
       const RH = B[M + 'RightHand'], ht = mountWorld(RH, 'Right', mtP, mtQ);
       if (ht) {
-        const dq = wtQ.clone().multiply(mtQ.clone().invert()), hq = dq.multiply(RH.getWorldQuaternion(new THREE.Quaternion()));
-        setWorldQ(RH, hq); RH.updateMatrixWorld(true); mountWorld(RH, 'Right', mtP, mtQ);
-        const want = RH.getWorldPosition(new THREE.Vector3()).add(wtP.clone().sub(mtP));
-        legTo(B, M + 'RightArm', M + 'RightForeArm', M + 'RightHand', want, true);
+        // m997: TURN, REACH, AND TURN AGAIN -- solving the arm swings the hand with it, so the turn set before `legTo` was undone by it:
+        // frame 0 (arm far from the answer) came out 70 deg off, frame 1 (arm already there) nearly right, and the samurai's two-key
+        // launcher pose flickered between them every frame ("perpetually spinning"). Each pass re-takes the hand's turn and re-solves
+        // the reach from where it now is; three passes settle both, and the frames come out the same.
+        for (let it = 0; it < 3; it++) {
+          mountWorld(RH, 'Right', mtP, mtQ);
+          const dq = wtQ.clone().multiply(mtQ.clone().invert()), hq = dq.multiply(RH.getWorldQuaternion(new THREE.Quaternion()));
+          setWorldQ(RH, hq); RH.updateMatrixWorld(true); mountWorld(RH, 'Right', mtP, mtQ);
+          const want = RH.getWorldPosition(new THREE.Vector3()).add(wtP.clone().sub(mtP));
+          legTo(B, M + 'RightArm', M + 'RightForeArm', M + 'RightHand', want, true);
+          setWorldQ(RH, hq); RH.updateMatrixWorld(true);
+        }
         // 4: the left hand onto the weapon, as the donor's is
         if (W.two && lhP && B[M + 'LeftHand']) {
           const k = ht / hd, wdi = wdQ.clone().invert(), rel = lhP.clone().sub(wdP).applyQuaternion(wdi), relQ = wdi.clone().multiply(lhQ);

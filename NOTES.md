@@ -5,6 +5,24 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m997 -- THE SPINNING LAUNCHER (a mitt's hand frame, read through the CURRENT turn), AND THE FLYING KICK FLIES LEVEL
+*"When the samurai holds the rocket launcher, it's just perpetually spinning... maybe fix the spinning first."* And: *"if I'm in the air
+and do a flying kick, he should launch straight forward -- the downward trajectory shouldn't matter. Unrealistic, but more fun."*
+- **FOUND BY STEPPING AT 60 FPS**: the launcher's world turn alternated between two orientations every frame (y -4 / +64 deg); his root
+  was steady; per bone, only `mixamorig_RightHand`'s LOCAL rotation flipped -- 70 deg every frame. In the FILE: his `rocket_launcher` is
+  a two-key pose whose two hand keys differ by 70 deg (and `idle_rifle`'s hand had a 154 deg step, `shoot` 68, `rifle_run` 63).
+- **CAUSE**: `handFrame`'s MITT branch (m978, the samurai has one finger chain) took world +Z through the hand's CURRENT world turn --
+  right only in the T-pose. Animated, the frame turned with the world instead of with the hand, so in the Forge's `weapLayer` the
+  weapon's wanted turn changed with the pose and the arm solve chased it. Now read at BIND (the skin's inverse bind for that bone),
+  cached on the bone (`mittFwd`). Shared text: the game and the Forge (`forgesync --write`).
+- **AND `weapLayer` TURNS, REACHES, AND TURNS AGAIN** (3 passes): solving the arm swings the hand, so the turn set before `legTo` was
+  undone by it (the left hand already re-took its turn; the right did not).
+- Re-forged: every right-hand step in his weapon clips under 4 deg (launcher pose 0.0); in game the hand moves < .5 deg a frame with the
+  launcher out (was 70). Screenshots: the launcher sits on his right shoulder beside his head, as on Zoar.
+- **THE FLYING KICK** (`MELEE.kickLevel` 1): its vertical is held at 0 while it lasts (one frame of gravity pre-paid so `integrate`
+  nets zero), then he falls. Stepped: kicked while falling at 6 m/s from 3 m -> held at 2.53 m, 9.5 m/s forward, for its .85 s
+  (`MELEE.airDur`) -- ~8 m of level flight; `airDur` / `airV` are the dials if that is too far.
+
 ## m996 -- THE SPRINT'S STUTTER, CAUGHT AT 60 FPS: leftover root motion (a sawtooth) and a bad first frame (`clipSeam`)
 *"With the run sequence there's still a duplicate frame and a camera stutter... the last frame is a little farther forward, hips-wise,
 than the first -- a subtle stutter and a duplicate frame at the same time."* (Two screenshots .02 s apart: the same pose, the world moved.)
