@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m991 -- THE RUN STUTTER (two clocks again) AND THE SLIDE ON A TURN (`gaitSync` in the katana stance, `clipSeam`, `MOVE.grip`)
+*"When he runs I can't tell if it's running or walking or both, but I think there's an extra clip member, like we found earlier when
+the run sequence was stuttering... write a note on whatever animation we keep applying it to, or just trim it... and the sliding:
+he's running, you turn, and he keeps sliding in the direction he was going. I want it more responsive."*
+- **THE STUTTER WAS m189's TWO CLOCKS, NOT A SEAM**: measured, his runs have no duplicate seam (katana_run first-vs-last 20.3 deg,
+  one ordinary step). But the katana stance (m983) blended `katana_walk` (1.37 s) and `katana_run` (0.60 s) at their own rates --
+  the ordinary gait has been phase-synced since m189, the stance never was. Now `gaitSync`, each clip placed by its MEASURED
+  left-foot-forward phase, added to `GAIT.phase`: katana_walk .221, katana_run .279, and his ordinary run_std .271, sprint_std .283
+  (those two had none either). Method checked against the typed ones: walk_fwd reads .267 (typed .259), run_fwd .275 (.278).
+- **AND THE SEAMS ARE TRIMMED BY RULE NOW, AS ASKED** (`clipSeam`, in `normaliseClips`, every body, every file): a loop's last key
+  goes when every body rotation is within `SEAM.k` .2 of its own last step of the first pose. The Forge's absolute .5 deg (m960)
+  missed his katana_walk_b (.74 vs a 7.6 deg step) and strafe_l (.53 vs 8.1). Headless: 120 clips trimmed across everything
+  loaded (raw Mixamo loops in the NPC files mostly). Still clips (last step < 1 deg) are left; fingers are ignored. `SEAM.on` 0 = off.
+- **THE SLIDE**: at a run the only thing turning his velocity was `acc` (22 m/s^2) behind a body coming round at 5.2 rad/s, with
+  the legs pushing along the body (`plant`). **`MOVE.grip`**: on the ground the part of his velocity across where he is asked to go
+  dies at `grip` /s (not in a roll, a swing, a charge dash or a knockdown), and `face1` x `faceK`. TOOLS > GRIP: HIGH 18 / x1.7
+  (default), MID 9 / x1.3, OFF = as it was. Every hero, every world (the switch lives in the arena's TOOLS; it is remembered).
+  Evidence (samurai, real touch, run then the stick swung 90 deg): OFF carried 1.63 m on along the old line and had not turned
+  80 deg in 1.5 s; HIGH 0.37 m and turned in ~0.47 s (headless wall clock).
+
 ## m990 -- THE SAMURAI, HIS FIRST-PLAY CORRECTIONS: in-place swings, the run was backwards, charge UP / guard DOWN, katana strafes
 *"You left the forward motion in the animation instead of driving it in code... he jumps forward and teleports back... when you get
 out the katana his footwork is all messed up, I'm moving forward and his feet look like he's walking backwards... up on the right

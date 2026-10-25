@@ -845,10 +845,10 @@ body.desk.free #deskHint { display: block; }
   <h1>WEIRDPORT</h1>
   <div class="msg" id="bootMsg">loading</div>
   <div class="bar"><i id="bootBar"></i></div>
-  <div class="bld">BUILD <span id="bootBuild">m990</span></div>
+  <div class="bld">BUILD <span id="bootBuild">m991</span></div>
 </div>
 
-<div class="chip" id="build"><b id="buildN">m990</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
+<div class="chip" id="build"><b id="buildN">m991</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
 <div id="splash" aria-label="tap to start"><img class="blur" alt=""><img class="main" alt="Zap and Clancy"><div class="glow"></div><div class="bn"></div></div>
 <script>
 // m879 (STEER 02:22): THE SPLASH, before the module (so it shows on the first paint, while the boot carries on behind it). The image's
@@ -954,7 +954,7 @@ import { KTX2Loader } from './vendor/KTX2Loader.js';
 import { clone as skeletonClone } from './vendor/SkeletonUtils.js';
 import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
 
-const BUILD = 'm990';
+const BUILD = 'm991';
 /* ASSETS:START */
 const ASSETS = {"models/alien_lizard.glb":"faffcf4c","models/alien_lizard_ktx2.glb":"05da2a20","models/skate.glb":"0c612d5e","models/skateboard.glb":"5ba93796","models/characters/alien_antenna_game.glb":"f3ccf328","models/characters/alien_antenna_game_ktx2.glb":"28afac8c","models/characters/alien_female_purple.glb":"1c73eef1","models/characters/alien_female_purple_ktx2.glb":"fc914afb","models/characters/alien_grey_medium.glb":"5a779e8e","models/characters/alien_grey_medium_ktx2.glb":"61600c3e","models/characters/alien_rollerskate_blue.glb":"abf0917c","models/characters/alien_rollerskate_blue_ktx2.glb":"e9a7948a","models/characters/alien_warrior.glb":"f5cc9c49","models/characters/alien_warrior_ktx2.glb":"a13fb7b6","models/characters/beautiful_asian.glb":"910f6565","models/characters/beautiful_asian_ktx2.glb":"35281eef","models/characters/beautiful_blonde.glb":"edddc421","models/characters/beautiful_blonde_ktx2.glb":"89cf3899","models/characters/brute_warboss_armor.glb":"cc5c7936","models/characters/ceo_alien.glb":"844dc3a7","models/characters/ceo_human.glb":"ec289865","models/characters/clancy.glb":"4b9d271f","models/characters/clancy_ktx2.glb":"74edbc6e","models/characters/colin.glb":"99d38b7d","models/characters/colin_ktx2.glb":"35040f87","models/characters/contruction_worker.glb":"8bd3d7ce","models/characters/contruction_worker_ktx2.glb":"3df8c344","models/characters/dummy_officer.glb":"724965ac","models/characters/dummy_officer_ktx2.glb":"db640cda","models/characters/fat_activist_01.glb":"3c566fee","models/characters/fat_activist_01_ktx2.glb":"b9328df4","models/characters/fat_biker_01.glb":"576b7cf5","models/characters/fat_biker_01_ktx2.glb":"7142cfad","models/characters/fat_biker_02.glb":"ab5d7ec7","models/characters/fat_biker_02_ktx2.glb":"28cec6cc","models/characters/fat_hippie.glb":"f09a260d","models/characters/fat_hippie_ktx2.glb":"0be745a4","models/characters/fat_hipster.glb":"9cf45ffb","models/characters/fat_hipster_ktx2.glb":"18106ff3","models/characters/fat_secret_service.glb":"6d546fb0","models/characters/fat_secret_service_ktx2.glb":"a23a304e","models/characters/fat_trump.glb":"5de6bc56","models/characters/fat_trump_ktx2.glb":"a0ddaf4d","models/characters/firefighter.glb":"ebde005d","models/characters/firefighter_ktx2.glb":"ccf93c96","models/characters/hick_skinny.glb":"1ebe78e8","models/characters/hick_skinny_ktx2.glb":"1e93f0ed","models/characters/hobo_01.glb":"34e80b1d","models/characters/hobo_01_ktx2.glb":"69497677","models/characters/jack.glb":"ab009b9b","models/characters/jack_ktx2.glb":"1f4c9f7f","models/characters/moussa.glb":"6d80b1cf","models/characters/moussa_ktx2.glb":"66e040f8","models/characters/proxy_ceo.bin":"6eca0c34","models/characters/proxy_ceo.jpg":"fadc9d0a","models/characters/proxy_ceo.json":"e62a7975","models/characters/proxy_ceo_alien.bin":"be247ecc","models/characters/proxy_ceo_alien.jpg":"8f8bf8fc","models/characters/proxy_ceo_alien.json":"eb23e28f","models/characters/proxy_hick.bin":"4485560e","models/characters/proxy_hick.jpg":"8c331965","models/characters/proxy_hick.json":"d85a0d36","models/characters/proxy_zap.bin":"dd7b300e","models/characters/proxy_zap.jpg":"2e7330ae","models/characters/proxy_zap.json":"b3b42754","models/characters/proxy_zap2.bin":"51088f46","models/characters/proxy_zap2.jpg":"a954a815","models/characters/proxy_zap2.json":"5c50abb7","models/characters/rept_heavy_armor.glb":"934661c7","models/characters/samurai_game.glb":"7f0b58dc","models/characters/xray_skeleton.glb":"46480317","models/characters/zap.glb":"5e5cca54","models/characters/zap_02.glb":"4ff12de0","models/characters/zap_02_lib.glb":"e23d91da","models/characters/zap_ktx2.glb":"4b29d886","models/characters/zoar.glb":"423a9de9","models/characters/zoar_game.glb":"d20a3736","models/vehicles/dump_truck.glb":"d870dc18","models/vehicles/dump_truck_ktx2.glb":"21ee7059","models/vehicles/motorcycle_fatboy.glb":"9ed9be28","models/weapons/alien_antenna_blaster_game.glb":"54083b44","models/weapons/alien_antenna_hammer_game.glb":"707b8a27","models/weapons/alien_launcher.glb":"ba8ab96a","models/weapons/hammer.glb":"3335fdf2","models/weapons/shield_brute.glb":"c6e5593f","models/weapons/spikey_mace.glb":"dcd43acd","models/weapons/w_brute_cleaver.glb":"07a97580","models/weapons/w_rept_maul.glb":"84c3a1a4","models/buildings/alien_base_01.glb":"d9b9fd7f","models/buildings/alien_base_01_ktx2.glb":"6cbbfef2","models/towers/alien_tower_01.glb":"98d23375","models/towers/alien_tower_01_ktx2.glb":"47597651","models/streets/modular_streets_kit.glb":"6a4bcaa5","models/toon_city/impact_marks.json":"2b616620","models/toon_city/impact_marks_atlas.ktx2":"efe0840e","models/toon_city/impact_marks_atlas.png":"490ed049","models/toon_city/toon_city_breakables.glb":"29bddbc8","models/toon_city/toon_city_collision.glb":"fb3a693f","models/toon_city/toon_city_obb.json":"81c18a47","models/toon_city/toon_city_visual.glb":"5df62285","models/toon_city/toon_city_visual_ktx2.glb":"cf080531","models/toon_city/weirdkit_tint.js":"f6e9d802","models/toon_city_kit/toon_city_collision.glb":"5540a364","models/toon_city_kit/toon_city_kit_buildings.glb":"590e53f0","models/toon_city_kit/toon_city_kit_buildings_ktx2.glb":"e6dff3a3","models/toon_city_kit/toon_city_kit_pieces.glb":"8232bd6f","models/toon_city_kit/toon_city_kit_twins.glb":"fcc9fdfc","models/toon_city_kit/toon_city_visual.glb":"45cf2957","models/toon_city_kit/toon_city_visual_ktx2.glb":"f26a6984","models/toon_city_kit/weirdkit_detile.js":"dd05bd70","models/characters/morph/shapes.bin":"4e680384","models/characters/morph/shapes.json":"abfc949d","models/characters/forged/brute_warboss_armor.glb":"dc15dc94","models/characters/forged/ceo_alien.glb":"20659ac3","models/characters/forged/ceo_human.glb":"326d9e7e","models/characters/forged/index.json":"34031a77","models/characters/forged/rept_heavy_armor.glb":"01e631b0","models/characters/forged/zap.glb":"10eda718","images/crack_sprite_01.ktx2":"4aa55fde","images/crack_sprite_01.png":"16b52e8c","images/fire_sprites_01.ktx2":"922e1191","images/fire_sprites_01.png":"f87e2696","images/fire_sprites_02.ktx2":"e0cbfe1d","images/fire_sprites_02.png":"b373a6fd","images/fire_sprites_03.ktx2":"4fbbb985","images/fire_sprites_03.png":"7eece336","images/geyser_sprites_01.png":"b6325470","images/hdri_game.ktx2":"0feb5c79","images/hdri_game.png":"dac55f41","images/splash_zap_n_clancy.webp":"52a9d8a4","images/water_sprites_01.ktx2":"326924c5","images/water_sprites_01.png":"31e12659","audio/blaster_sound_01.mp3":"40d99583","audio/blaster_sound_02.mp3":"4bd7bb7c","audio/box_break_01.mp3":"e4127980","audio/electricity_beam_01.mp3":"986db8c9","audio/explosion_small.mp3":"f154a537","audio/metal_clang_01.mp3":"a333bd27","audio/metal_clang_02.mp3":"1e3ebbd6","audio/metal_clang_03.mp3":"afe44812","audio/metal_ping_01.mp3":"8ffca1a0","audio/plasma_canon.mp3":"e32c324d","audio/powerup_01.mp3":"48fbbe08","audio/swoosh_01.mp3":"193db185","audio/swoosh_02.mp3":"19145e70","audio/swoosh_03.mp3":"544fdffb","audio/swoosh_04.mp3":"843bee5d","audio/plasma_sounds/plasma_01.mp3":"e71c010f","audio/plasma_sounds/plasma_02.mp3":"ac3b1c75","audio/plasma_sounds/plasma_03.mp3":"eaa59355","audio/plasma_sounds/plasma_04.mp3":"bc7865e0","audio/plasma_sounds/plasma_05.mp3":"1d821cd0","audio/plasma_sounds/plasma_06.mp3":"cb979fbe","audio/plasma_sounds/plasma_hit.mp3":"30e5af5c","audio/alien_orc_grunt_sounds/alien_orc_grunt_01.mp3":"d6f4b343","audio/alien_orc_grunt_sounds/alien_orc_grunt_02.mp3":"78afc603","audio/alien_orc_grunt_sounds/alien_orc_grunt_03.mp3":"972c524a","audio/alien_orc_grunt_sounds/alien_orc_grunt_04.mp3":"b0ce76eb","audio/alien_orc_grunt_sounds/alien_orc_grunt_05.mp3":"1f0ba1f4","audio/alien_orc_grunt_sounds/alien_orc_grunt_06.mp3":"4f749866","audio/alien_orc_grunt_sounds/alien_orc_grunt_07.mp3":"dcf75925","audio/hit_sounds/hit_sound_01.mp3":"befaa2be","audio/hit_sounds/hit_sound_02.mp3":"73bc4433","audio/hit_sounds/hit_sound_03.mp3":"24b181e4","audio/hit_sounds/hit_sound_gound_01.mp3":"86ee2674","audio/hit_sounds/hit_sound_ground_02.mp3":"8a7cac73","audio/hit_sounds/hit_sound_plasma_01.mp3":"9abc0202","audio/hit_sounds/hit_sound_plasma_02.mp3":"6aaf0fe5","audio/creature_noises/creature_noise_01.mp3":"cbcc6ee7","audio/creature_noises/creature_noise_02.mp3":"201a8247","audio/creature_noises/creature_noise_03.mp3":"97680811","audio/creature_noises/creature_noise_04.mp3":"6f734df2","audio/creature_noises/creature_noise_05.mp3":"6f736441","audio/creature_noises/creature_noise_06.mp3":"992712e9","audio/creature_noises/creature_noise_07.mp3":"d9ad04b3","audio/footsteps/footstep_2_l.mp3":"abeabfbe","audio/footsteps/footstep_2_r.mp3":"7dd16046","audio/footsteps/footstep_l.mp3":"b66e579b","audio/footsteps/footstep_r.mp3":"96e13433","models/props/prop_hydrant.glb":"f157fee9","models/props/prop_hydrant_collision.glb":"0bbfc4d2","models/creatures/3_headed_dog.glb":"9263480a","models/creatures/blue_dragon.glb":"d72f4da7","models/creatures/mech_lightning_dragon.glb":"5935bb67"};
 /* ASSETS:END */
@@ -1063,6 +1063,11 @@ const MOVE = {
   // keeps answering the stick while the body has already turned.
   plantAt: 1.5, plantFull: 4.5,   // moved with `max`, or the plant saturates mid-range
   turnBrake: .40,     // a hard turn costs speed, which is what plants the feet
+  // m991: GRIP. *"He's running and then you turn and he keeps sliding in the direction he was going... I want it more responsive."*
+  // At a run the only thing that turned his velocity was `acc` (22 m/s^2 -- a 90 deg turn at 7.2 m/s took ~.46 s, an arc metres
+  // wide) behind a body coming round at `face1` 5.2 rad/s. Now, on the ground, the part of his velocity NOT along where he is being
+  // asked to go dies at `grip` /s, and the body comes round at `face1` x `faceK`. TOOLS > GRIP: HIGH / MID / OFF (OFF = as it was).
+  grip: 18, faceK: 1.7, gripPick: 'HIGH', grips: { HIGH: [18, 1.7], MID: [9, 1.3], OFF: [0, 1] },
   // A GUARD DOES NOT SPRINT. He shuffles sideways behind it, which is what a guard IS -- and
   // it sits under `GAIT.runAt`, so the strafe clips play near their own reference.
   blockSp: 2.4,
@@ -1547,7 +1552,9 @@ const GAIT = {
   //     walk_fwd .259   run_fwd .278   Running_fast_stride .250   (run_fwd_fast .250)
   // so in any blend both clips put the same foot down at the same moment. `sync: 0` is the old
   // free-running behaviour, for an A/B.
-  sync: 1, phase: { walk_fwd: .259, run_fwd: .278, Running_fast_stride: .250, run_fwd_fast: .250 },
+  sync: 1, phase: { walk_fwd: .259, run_fwd: .278, Running_fast_stride: .250, run_fwd_fast: .250,
+    // m991: measured the same way (left foot furthest forward of the hips; the method reads walk_fwd .267 / run_fwd .275 here)
+    run_std: .271, sprint_std: .283, katana_walk: .221, katana_run: .279 },
   backRef: 2.23, strafeRef: 2.00, aimRunRef: 3.36,
   // **THE BANDS ARE READ AGAINST THE STICK, NOT AGAINST THE SPEED RANGE (m27).** *"I was trying
   // to go really slow to make him do his walk and he was basically doing a slow run -- half
@@ -10033,6 +10040,7 @@ function arenaUi() {
       else if (a === 'vend') { vendPlace(); }
       else if (a === 'forge') { forgedToggle(); }
       else if (a === 'charge') { const L = Object.keys(ARENA.heavy.clips); ARENA.heavy.pick = L[(L.indexOf(ARENA.heavy.pick) + 1) % L.length]; try { localStorage.setItem('mel.arena.charge', ARENA.heavy.pick); } catch (err) {} }
+      else if (a === 'grip') { gripSet({ HIGH: 'MID', MID: 'OFF', OFF: 'HIGH' }[MOVE.gripPick]); try { localStorage.setItem('mel.grip', MOVE.gripPick); } catch (err) {} }
       else if (a === 'kpose') { KATANA.chargePose = { SPIN: 'SLASH', SLASH: 'ATTACK', ATTACK: 'SPIN' }[KATANA.chargePose]; try { localStorage.setItem('mel.kat.pose', KATANA.chargePose); } catch (err) {} }
       else if (a === 'tlie') { TAIL.lie = { FLAT: 'BELLY', BELLY: 'OFF', OFF: 'FLAT' }[TAIL.lie]; try { localStorage.setItem('mel.tail.lie', TAIL.lie); } catch (err) {} }
       else if (a === 'entry') { ARENA.door.entry = ARENA.door.entry === 'DOORS' ? 'BEAM' : 'DOORS'; try { localStorage.setItem('mel.arena.entry', ARENA.door.entry); } catch (err) {} }
@@ -10050,7 +10058,7 @@ function arenaUi() {
   if (ARENA.tools === undefined) { try { ARENA.tools = +localStorage.getItem('mel.arena.tools') || 0; } catch (err) { ARENA.tools = 0; } }
   const tools = ARENA.tools && !m;     // a menu open folds the tools away: the screen is not tall enough for both
   let h = '<div class="ar-bar">' + B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('vend', 'VEND') + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
-    (tools ? '<div class="ar-tools">' + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('tlie', 'TAIL ' + TAIL.lie) + B('kpose', 'CHARGE POSE ' + KATANA.chargePose) + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
+    (tools ? '<div class="ar-tools">' + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('tlie', 'TAIL ' + TAIL.lie) + B('kpose', 'CHARGE POSE ' + KATANA.chargePose) + B('grip', 'GRIP ' + MOVE.gripPick) + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
   if (m === 'top') h += '<div class="ar-menu">' + B('cat', 'WARBOSS &rsaquo;', 'boss') + B('cat', 'PEOPLE &rsaquo;', 'people') + B('cat', 'BEASTS &rsaquo;', 'beasts') + B('cat', 'RIVALS &rsaquo;', 'rival') + '<button class="ar-off">GRUNTS<small>soon</small></button><button class="ar-off">GREYS<small>soon</small></button></div>';
   else if (m === 'boss' || m === 'people' || m === 'beasts' || m === 'rival') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back');
     for (const k in ARENA.kinds) { const A = ARENA.kinds[k]; if (!!A.creature !== (m === 'beasts')) continue; if (!!A.rival !== (m === 'rival')) continue; if (m !== 'beasts' && !A.both && !!A.civ !== (m === 'people')) continue; h += B('spawn', A.t + (A.sub ? '<small>' + A.sub + '</small>' : ''), k); } h += '</div>'; }
@@ -10981,6 +10989,24 @@ function clipFix(clip) {
 // than `INPLACE.at` of its hip height is flattened on that horizontal axis: it plays IN PLACE and the code carries him.
 // "Up" is whichever axis the hips are highest on (a Mixamo armature turns the local axes). `INPLACE.on` 0 = as baked.
 const INPLACE = { on: 1, at: .15, re: /^katana_/, n: 0 };
+// m991: THE DUPLICATE SEAM, RELATIVE. m960's Forge `loopSeam` drops a loop's last key when every rotation is within .5 deg of its
+// first -- an absolute line, and the samurai's katana_walk_b (.74 deg against a 7.6 deg step) and strafe_l (.53 against 8.1) sat
+// just over it: a loop that holds its first pose for two frames every cycle. Here the line is a fraction of the clip's own last
+// step (`SEAM.k`), body rotations only (fingers carry noise that is not periodic), and a still clip (step under `SEAM.min`) is left.
+const SEAM = { on: 1, k: .2, min: 1, n: 0 };
+function clipSeam(clip) {
+  if (!SEAM.on) return;
+  let fl = 0, st = 0, any = 0; const q = (v, i) => [v[i * 4], v[i * 4 + 1], v[i * 4 + 2], v[i * 4 + 3]];
+  const ang = (a, b) => 2 * Math.acos(Math.min(1, Math.abs(a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3]))) * 180 / Math.PI;
+  for (const t of clip.tracks) { if (!/\.quaternion$/.test(t.name) || /Hand[A-Z]|Thumb|Index|Middle|Ring|Pinky/.test(t.name)) continue;
+    const n = t.times.length; if (n < 4) continue; any = 1;
+    fl = Math.max(fl, ang(q(t.values, 0), q(t.values, n - 1))); st = Math.max(st, ang(q(t.values, n - 1), q(t.values, n - 2))); }
+  if (!any || st < SEAM.min || fl > SEAM.k * st) return;
+  let end = 0; for (const t of clip.tracks) end = Math.max(end, t.times[t.times.length - 1]);
+  for (const t of clip.tracks) { const n = t.times.length, sz = t.getValueSize(); if (n < 3 || t.times[n - 1] < end - 1e-4) continue;
+    t.times = t.times.slice(0, n - 1); t.values = t.values.slice(0, (n - 1) * sz); }
+  SEAM.n++;
+}
 function clipInPlace(clip) {
   if (!INPLACE.on || !(INPLACE.re.test(clip.name) || (typeof MELEE !== 'undefined' && MELEE.clip && MELEE.clip[clip.name]))) return;
   const t = clip.tracks.find(t => /Hips\.position$/.test(t.name)); if (!t || t.values.length < 6) return;
@@ -11009,6 +11035,7 @@ function normaliseClips(clips) {
     clip.tracks = keep;
     clipFix(clip);
     clipInPlace(clip);
+    clipSeam(clip);
     let t0 = Infinity;
     for (const t of clip.tracks) if (t.times.length) t0 = Math.min(t0, t.times[0]);
     if (isFinite(t0) && t0 > 0) for (const t of clip.tracks) for (let i = 0; i < t.times.length; i++) t.times[i] -= t0;
@@ -15774,6 +15801,8 @@ function bladeTrail(dt) {
 }
 function katStance() { return KATANA.stance && slotNow().melee === 'katana' && !!rig.actions[KATANA.idle] && !!rig.actions[KATANA.walk] && !!rig.actions[KATANA.run]; }
 try { const v = localStorage.getItem('mel.kat.pose'); if (v === 'SPIN' || v === 'SLASH' || v === 'ATTACK') KATANA.chargePose = v; } catch (e) {}
+function gripSet(k) { const g = MOVE.grips[k]; if (!g) return; MOVE.gripPick = k; MOVE.grip = g[0]; MOVE.faceK = g[1]; }
+try { const v = localStorage.getItem('mel.grip'); if (v) gripSet(v); } catch (e) {}
 function katChargePose() { return 'katana_charge_' + KATANA.chargePose.toLowerCase(); }
 function guardClip() { return slotNow().melee === 'katana' && rig.actions[KATANA.guard] ? KATANA.guard : CLIPS.block; }
 function katanaParry(dirH) {
@@ -17661,6 +17690,12 @@ function integrate(dt, wantX, wantZ, wantSp, ctl) {
         const k = Math.min(1, rate / e);
         p.vel.x += ex * k; p.vel.z += ez * k;
       }
+      // m991: GRIP -- the sideways part of his velocity (across where he is asked to go) dies fast on the ground
+      if (p.grounded && MOVE.grip > 0 && !p.knock && !p.roll && !p.melee && !p.chargeGo) {
+        const wl = Math.hypot(wantX, wantZ) || 1, ux = wantX / wl, uz = wantZ / wl, al = p.vel.x * ux + p.vel.z * uz;
+        const g = 1 - Math.exp(-MOVE.grip * dt), qx = p.vel.x - al * ux, qz = p.vel.z - al * uz;
+        p.vel.x -= qx * g; p.vel.z -= qz * g;
+      }
     } else {
       // A BODY ON THE FLOOR SCRUBS LIKE A BODY, NOT LIKE A MAN BRAKING (m90) -- `MOVE.drag`'s
       // time constant is 2.1 s, which left 13.9 m of slide still to come on his back.
@@ -18792,7 +18827,7 @@ function stepPlayer(dt) {
   // aiming, he faces where the camera looks; otherwise he faces where he is going
   // LOCKED, HE FACES THE TARGET -- not the lens. That is what makes the strafes read.
   const faceTgt = p.tossFace != null ? p.tossFace : p.lock ? lockH(p.lock) : aiming ? cam.az : p.heading;
-  const fRate = (p.lock ? LOCK.face : aiming ? MOVE.face0 : lerp(MOVE.face0, MOVE.face1, clamp(p.speed / MOVE.max, 0, 1))) * dt;
+  const fRate = (p.lock ? LOCK.face : aiming ? MOVE.face0 : lerp(MOVE.face0, MOVE.face1 * (MOVE.faceK || 1), clamp(p.speed / MOVE.max, 0, 1))) * dt;     // m991: faceK -- the body comes round quicker at a run
   const turned = clamp(wrapAngle(faceTgt - p.faceH), -fRate, fRate);
   p.faceH += turned;
   // **AND WHERE HE ENDS UP IS WHERE HE IS (m53).** *"When you release, he goes back to his
@@ -20181,8 +20216,12 @@ function rigAnim(dt) {
     const R = KATANA.refs || (KATANA.refs = { walk: arenaRef(hd, KATANA.walk), run: arenaRef(hd, KATANA.run) });
     const A = smooth(0, GAIT.idleAt, sp), B = smooth(GAIT.walkAt, GAIT.runAt, sp);
     add(L(KATANA.idle), (1 - A) * rest, 0);
-    add(L(KATANA.walk), A * (1 - B) * rest, R.walk > .2 ? R.walk : GAIT.walkRef);
-    add(L(KATANA.run), A * B * rest, R.run > .2 ? R.run : GAIT.runRef);
+    // m991: ONE CLOCK. *"When he runs... I think there's a stutter."* The walk (1.37 s) and the run (0.60 s) were blended at their
+    // own rates -- m189's "two clocks", one clip's feet forward while the other's are back -- and only the ordinary gait was
+    // synced. Now the shared phase (`gaitSync`), each clip placed by its MEASURED left-foot-forward phase (`GAIT.phase`).
+    const rw = R.walk > .2 ? R.walk : GAIT.walkRef, rr = R.run > .2 ? R.run : GAIT.runRef;
+    if (GAIT.sync) gaitSync(dt, sp, L, [[KATANA.walk, A * (1 - B) * rest, rw, GAIT.tsHi], [KATANA.run, A * B * rest, rr, GAIT.tsHi]], t);
+    else { add(L(KATANA.walk), A * (1 - B) * rest, rw); add(L(KATANA.run), A * B * rest, rr); }
     setWeights(t, dt); return;
   }
   // ---- the ordinary gait: four clips weighted by MEASURED speed, never a run flag ----
@@ -54160,7 +54199,7 @@ window.melee = window.mel = { FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VE
     player.pos.set(L.x0, L.y0 + .2, L.z0); return 'at lane ' + i + ' of ' + LANES.length; },
   // THE WARRIOR, LIVE. `mel.FOE.notice = 0` parks them all; `mel.hurt(20)` fakes a blow so the
   // flash and the bar can be looked at without standing in front of a mace.
-  ARENA, MORPH, TAIL, KATANA, meleeGo, loadGLB, retargetW, bindPose, RTW, arenaSpawn, arenaArmR, arenaArmourHit, arenaShieldMake, arenaShieldHit, tmSrc, tmPose, xrMain, tmRun, tmStep, xrayShowX: xrayShow, arenaClear, tmGo, hintSay, arenaWaste, arenaSwing, arenaStun, xrayLoad, renderer, scene, camera, THREE, arenaShot: (d, h, p) => { BLOW_SRC = 'shot'; dummyBlow(d, h, p, FOE.dmg.bolt); BLOW_SRC = ''; }, FOE, HICK, HOBO, SKATER, CIVIL, CIVILS, SMOKE, BLOCK, HEALTH, HURT, foeAI, foePlan, foeWander, foeRoll, bodySep, bodyFly, boltHome, playerHurt, buildFoes,
+  ARENA, MORPH, TAIL, KATANA, INPLACE, SEAM, meleeGo, loadGLB, retargetW, bindPose, RTW, arenaSpawn, arenaArmR, arenaArmourHit, arenaShieldMake, arenaShieldHit, tmSrc, tmPose, xrMain, tmRun, tmStep, xrayShowX: xrayShow, arenaClear, tmGo, hintSay, arenaWaste, arenaSwing, arenaStun, xrayLoad, renderer, scene, camera, THREE, arenaShot: (d, h, p) => { BLOW_SRC = 'shot'; dummyBlow(d, h, p, FOE.dmg.bolt); BLOW_SRC = ''; }, FOE, HICK, HOBO, SKATER, CIVIL, CIVILS, SMOKE, BLOCK, HEALTH, HURT, foeAI, foePlan, foeWander, foeRoll, bodySep, bodyFly, boltHome, playerHurt, buildFoes,
   smoke: (x, y, z) => { smokeAt(x, y, z); return 'puff'; },
   hurt: (d, k) => playerHurt(d || 12, player.faceH + Math.PI, FOE.push, FOE.pushUp, FOE.stun, k == null ? 1 : k),
   heal: () => { player.hp = HEALTH.max; return 'full'; },
