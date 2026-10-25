@@ -635,6 +635,30 @@ function propCommit() {
 }
 
 // ---------------------------------------------------------------- export
+// m981: WEAPON JOINTS IN HIS FILE. *"The Forge is supposed to give him weapon joints... for both hands and their tips... so we can
+// place them for animation"* -- instead of every game working out a mount from his hand on load, slightly differently each time.
+// For each hand without one: `weapon_root_<side>` placed where the game's convention puts it (`mountPlace`: old Zap's mount in the
+// hand's own frame, mitts included), with its tip (`weapon_tip_2` right, `weapon_tip` left, the weapon files' own names). Both are
+// BONES appended to every skin's skeleton (no weights; bind inverse from the bind pose), so a DCC tool and the game see joints that
+// can be keyed, and a weapon file parents to them with identity. The sockets (`socket_hand_*`) are already on him (`socketsOf`).
+function weaponJoints(m) {
+  const add = [];
+  for (const sd of ['Right', 'Left']) {
+    const name = 'weapon_root_' + sd.toLowerCase(), hand = ST.tg.rig.bones['mixamorig_' + sd + 'Hand'];
+    if (!hand || m.getObjectByName(name)) continue;
+    const b = new THREE.Bone(); b.name = name; hand.add(b);
+    if (!F.mountPlace(hand, name, b)) { hand.remove(b); continue; }
+    const t0 = b.children.find(c => /^weapon_tip/.test(c.name)), tip = new THREE.Bone(); tip.name = t0.name; tip.position.copy(t0.position); b.remove(t0); b.add(tip);
+    add.push(b, tip);
+  }
+  if (!add.length) return 0;
+  m.updateMatrixWorld(true);
+  // the bind inverses in the SAME space as the file's own (they came from the file, not from this scene): the offset M is read
+  // off an existing joint at bind (its world x its inverse), and a new joint's inverse is (its world)^-1 x M
+  m.traverse(o => { if (!o.isSkinnedMesh) return; const S = o.skeleton, M = S.bones[0].matrixWorld.clone().multiply(S.boneInverses[0]);
+    o.skeleton = new THREE.Skeleton(S.bones.concat(add), S.boneInverses.concat(add.map(b => b.matrixWorld.clone().invert().multiply(M)))); });
+  return add.length;
+}
 async function bakeAll(onStep) {
   const clips = [];
   for (const [i, c] of ST.P.clips.entries()) { onStep && onStep(i, c); try { const { clip } = await bake(c); clip.name = c.role; clips.push(clip); } catch (e) { console.warn('skipped ' + c.role + ': ' + e.message); } }
@@ -650,6 +674,7 @@ async function exportGLB(withMesh) {
   // m948: where each wrapped hand's cylinder sits (hand-local, his own units) and its radius -- the game puts the cup THERE
   const holds = []; for (const sd in ST.wraps) { const hb = ST.tg.rig.bones['mixamorig_' + sd + 'Hand']; if (!hb) continue;
     const o = new THREE.Object3D(); o.name = 'hold_hand_' + sd[0].toLowerCase(); o.position.fromArray(ST.wraps[sd].c); if (ST.wraps[sd].q) o.quaternion.fromArray(ST.wraps[sd].q); o.userData = { hold: 1, r: ST.wraps[sd].r, ax: ST.wraps[sd].q ? 1 : 0 }; hb.add(o); holds.push(o); }
+  weaponJoints(m);     // m981: real weapon joints on both hands, in the file
   for (const role in (ST.refs || {})) { const o = new THREE.Object3D(); o.name = 'forge_ref_' + role; o.userData = { ref: ST.refs[role] }; m.add(o); holds.push(o); }
   m.traverse(o => { if ((o.name === 'forge_axes' || o.name === 'forge_prop' || o.isLine) && o.visible) { o.visible = false; hid.push(o); } });
   if (!withMesh) m.traverse(o => { if (o.isMesh && o.visible) { o.visible = false; hid.push(o); } });

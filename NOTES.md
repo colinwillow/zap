@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m981 -- WEAPON JOINTS IN THE FILE: the Forge's export puts `weapon_root_*` + tips on both hands as real joints (`weaponJoints`)
+*"The Forge is supposed to give him weapon joints... every character... so we can place them for animation... for both hands and
+their tips."* (The general name, from m935: SOCKETS. Both are now in his file.)
+- `forge/app.js` `weaponJoints`, run by every export: for each hand without one, `weapon_root_right` (+ `weapon_tip_2`) and
+  `weapon_root_left` (+ `weapon_tip`) -- the weapon files' own names -- placed by the game's own `mountPlace` (old Zap's mount in
+  the hand's frame; mitts included since m978), as BONES appended to every skin's skeleton with no weights. Their bind inverses are
+  in the FILE's space (the offset read off an existing joint at bind), so a DCC tool sees keyable joints and nothing deforms.
+  The hand sockets (`socket_hand_r/_l`) were already exported (`socketsOf`).
+- The samurai rebaked: 38 joints (was 34), all four new ones in the skin, tips children of their roots. The game finds
+  `weapon_root*` by name (no "made from his hand" any more); every weapon parents to his joint with identity. The AI samurai's
+  katana uses the same joint (`arenaKatana`, the hand-built mount kept as the fallback).
+- Checked headless: blaster 67 cm, launcher 85, hammer 82, katana 111 cm on his own joint, placement unchanged; all four swings.
+
 ## m980 -- THE MIRROR MATCH: SPAWN > RIVALS > Samurai, the samurai played by the computer (`ARENA.kinds.SAMURAI`, `arenaKatana`)
 *"An AI version of the same character... that the computer plays, that has all the same functionality, so I can fight myself...
 change his color... switch aggression or hardness."*
