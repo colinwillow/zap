@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m989 -- THE SKULLBACK ON HIS BACK WAS 10 FEET UP ON HIS TAIL (`tailLie`, `TAIL.lie`)
+*"Whichever of the bosses that has the tail -- when you fuck him up and he goes on his back he's like 10 feet in the air because
+of his tail... either he goes belly down or the tail curls or something."*
+The Skullback (`rept_heavy_armor`, 6 `c_tail_*` bones). Two causes, both measured:
+- **His own `fall_to_back` is baked propped on the tail**: at the end, hips .533 authored (the Warboss lying flat: .167; his own
+  `fall_to_face_down`: .139), tail root .45 down to tip .13. In game, KO'd from the front: hips **2.0 m** off the floor, and the
+  clip throws them to **2.8 m** mid-fall.
+- **`tailSway` resets the tail to its rest every frame**, and his rest tail comes straight out of his spine -- into the floor
+  when he is on his back. (It also skipped KO'd bodies past the fall, so the tail froze in whatever pose it had.)
+Fix, on a switch (TOOLS > TAIL, remembered): **FLAT** (default) -- over on his back (`down` / `up` with `d.back`), the tail's
+root aims along the floor toward his feet in proportion to how flat his spine is, the sway fades out, and the hips are held
+under a ceiling that eases from `standH` .55 to `lieH` .19 of his height as he tips over (one writer: `model.position.y`, only
+in that state). **BELLY** -- a tailed body always falls face down. **OFF** -- as it was.
+Evidence (headless, KO'd by a shot in the face, side camera): OFF hips 2.0 m lying, 2.8 m peak; FLAT hips 1.5 m mid-fall, then
+0.24 m lying, the tail laid out along the floor (screenshot). Face-down falls are untouched (the tail points up, fine).
+Not built: a real curl; the get-up from his back reads the same rule (eases out as he sits up) but was not filmed.
+
 ## m988 -- EVERY OFF-CENTRE CHARACTER CENTRED: Zap 2 (+lib), Clancy, the rollerskater, the hipster (`tools/hipshift.mjs`)
 *"Fix the tailed Zap too, any character that's not centred properly... anybody that's not centred definitely needs to be centred."*
 Measured AS DRAWN (three.js, the character's own idle, hips vs the origin the game turns him on), before -> after:
