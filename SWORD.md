@@ -1,6 +1,6 @@
 # The sword — a melee sandbox
 
-**Status: build a in (m978): the katana + four directional swings, on the SAMURAI (`?hero=samurai`).** He owns this file. It is a sandbox under the WHOLE-PIECE RULE (`CLAUDE.md`): it
+**Status: builds a-d in (m978-m984), the mirror AI (m985), e1 (m986); m990 his first-play corrections (charge on UP, guard on DOWN, katana strafes, in-place swings).** Earlier: build a in (m978): the katana + four directional swings, on the SAMURAI (`?hero=samurai`).** He owns this file. It is a sandbox under the WHOLE-PIECE RULE (`CLAUDE.md`): it
 lives in the arena (`?w=arena`) against the things the arena already spawns (Warboss, Skullback, the dog, the dragons), and it is
 not done until every DONE WHEN box is ticked with evidence and he has signed it off on his phone.
 
@@ -79,6 +79,14 @@ the attacks are so fast."*
 - **The smear**: a vertex-shader stretch of the body and blade along the motion for 1-2 frames, plus a ghost / arc of the blade.
 - **The hit lands on the smear frame** (hitstop on the follow-through pose sells it).
 - After builds b-d (guard, charge, combos) so it can be applied to all of them; a switch (smooth vs smear) so he can compare.
+
+## Later: AERIAL ATTACKS (his idea, Oct 25 2026 -- not built)
+*"Like in the Rollergirl game, when you jump and flick the left stick she does flips... there's a whole opportunity for aerial
+acrobatics or attacks. Right now we just have the one flying kick on the right stick."*
+- In the air: **right flick = an aerial attack** per direction (the acrobatic melee sets -- big, spinning, cinematic); **left flick =
+  flips** (Rollergirl's, for now).
+- Wants the directional ground swings sorted first (two of them read anticlimactic -- "a weird sword heel-butt thing" -- and get
+  swapped for bigger, broader, faster ones once he names which).
 
 ## DONE WHEN (the whole-piece gate -- every box needs evidence in the NOTES entry that ticks it)
 

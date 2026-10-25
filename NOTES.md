@@ -5,6 +5,37 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m990 -- THE SAMURAI, HIS FIRST-PLAY CORRECTIONS: in-place swings, the run was backwards, charge UP / guard DOWN, katana strafes
+*"You left the forward motion in the animation instead of driving it in code... he jumps forward and teleports back... when you get
+out the katana his footwork is all messed up, I'm moving forward and his feet look like he's walking backwards... up on the right
+stick is the charge... the pose: same stance leg-wise but the sword pointing directly backwards... pulling down still parry, block
+... he needs to walk in both of those modes and always strafe."*
+All measured off his bake before touching anything:
+- **ROOT MOTION**: Hips travel in slash_1 1.49 authored (2.9 m on him), slash_2 .54, spin 1.12, jump_attack 1.53, slide 1.67, combo
+  .89 -- slash_1/_2 are the right flick's pair. Fixed twice: the profile marks them `inPlace` (the Forge removes net travel but
+  leaves a lunge-and-return up to .46), and the game flattens any melee clip that travels > `INPLACE.at` .15 of its hip height
+  on that horizontal axis (`clipInPlace`, in `normaliseClips` -- every body). Checked: hips within .01 m of the root through slash_2.
+- **THE KATANA RUN WAS A BACKWARD RUN**: planted foot +z like `run_bwd` (every forward clip reads -z). The profile had
+  `Great_Sword_Run`, which the catalog calls "Bacward Run"; the forward one is `Great_Sword_Run_1`. (`Great_Sword_Walk` is labelled
+  "Backward Walk" and measures FORWARD -- the catalog is not to be trusted on direction; measure.)
+- **THE GUARD SNAPPED**: `katana_guard` was `Great_Sword_Crouching`, "Crouch To Block", a 0.4 s TRANSITION, looping. Now
+  `Great_Sword_Crouching_4`, the 1.4 s block idle loop (its old self kept as `katana_guard_in`).
+- **Re-forged** (91 clips: + katana_walk_b, run_b, strafe_l/_r, strafe runs, guard_in), resize/webp/draco, then `hipshift` again
+  (the Forge re-bakes from the uncentred rig -- m987's rule). 4.3 MB, 38 joints, weapon joints in.
+- **STRAFES BY MEASUREMENT, NOT NAME**: travel (planted foot) katana_walk -20 deg, walk_b 161, strafe_r **115 (his LEFT)**, strafe_l
+  **-65 (his right)** -- the library's walk strafes are labelled the wrong way round on him (the runs are not). `KATANA.legs`.
+  Every katana clip leans ~20 deg right: the Great Sword stance stands him side-on.
+- **CHARGE = RIGHT PAD UP** (`katC = blade && !block && padUp`; the square-up hold skips the blade). The pose is a FRAME: the
+  swing wind-up where the blade (mount +Y) points most nearly straight back and level -- spin .23 s (.99), slash_3 .30 (.97),
+  attack .50 (.97); all three made in `deriveClips` and split, TOOLS > CHARGE POSE picks (default SPIN). Standing: the pose's top
+  half on the guard's legs; moving: on the katana walks. Release = the lunge / full = the spin, unchanged.
+- **GUARD = RIGHT PAD DOWN**, alone now (no charge in it); moving, the katana walks under it too.
+Evidence (headless, real touch): UP held -> `katana_charge_spin__up` 1.0 + `katana_guard__legs` 1.0; UP + left pad left ->
+`katana_strafe_r__legs` 1.0 (the one that travels left); release -> chargeGo, goClip katana_spin; DOWN held -> `katana_guard` 1.0,
+its time running .17 -> .42 smoothly (no snap); slash_2: hips -.01 m from the root all the way through. No page errors.
+Not done (his to steer): which two directional swings are the anticlimactic ones (he will name them); aerial attacks and flips
+(`SWORD.md` Later); the slide/cover/vault system (`COVER.md`, new spec). SWORD.md DONE WHEN: no box ticked by this.
+
 ## m989 -- THE SKULLBACK ON HIS BACK WAS 10 FEET UP ON HIS TAIL (`tailLie`, `TAIL.lie`)
 *"Whichever of the bosses that has the tail -- when you fuck him up and he goes on his back he's like 10 feet in the air because
 of his tail... either he goes belly down or the tail curls or something."*

@@ -23,7 +23,14 @@ levels later. **Each sandbox is tuned until it feels great on its own before any
   - [x] m985 the mirror: the AI samurai guards, parries, breaks your guard, rolls your lunge (EASY/MEDIUM/HARD).
   - [x] e1. **m986** probed the katana on every arena enemy: a sword no longer reaches a hovering mech (shoot it down, then cut
         it); the blade has its own damage dial `KATANA.dmgK` 1.6 (a slash was .6 on a beast: 27 cuts for the dog).
+  - [x] **m990** his first-play corrections: swings play in place (code carries him), the katana run was a BACKWARD run, the guard
+        was a 0.4 s transition looping (now the held block idle), charge on the right pad UP (a held frame: blade straight back,
+        3 picks on TOOLS > CHARGE POSE), guard on DOWN, both strafe on katana walks.
+  - [ ] his pick of the two anticlimactic directional swings to swap for bigger ones (which flick directions?).
+  - [ ] aerial attacks (right flick in the air) and flips (left flick in the air) -- `SWORD.md` "Later".
   - [ ] e2. his play-through per enemy (what feels wrong is the next tuning); the charge hum; then his sign-off.
+- [ ] **COVER -- OPEN (spec only).** `COVER.md`: slide tackle on the left flick, slide INTO cover only when flicked toward a half
+      wall, vault, pop up to shoot; bolts pass over a crouched body. His idea (Oct 25).
 - [ ] **GEAR -- OPEN (spec only).** `GEAR.md`: rollerblades / jet blades and a wingsuit any hero can wear. Waiting on his models.
 - [x] **m893 ARENA** (`?w=arena`): the stadium, SPAWN > WARBOSS > Brute Warboss / Skullback beams down, chest thump, armour
       flies off, KO slow-mo, beam out, CLEAR. This is the STAGE for the duel, not the duel.
