@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m982 -- SWORD build c: CHARGE IN THE GUARD, RELEASE = LUNGE, FULL = SPIN (the hammer's charge, re-triggered for the katana)
+*"You can charge that somehow and then you release and it does this launch forward attack."* (SWORD.md build c.)
+- **No new machine**: the hammer's charge already had everything (the wind-up timer, sparks off the weapon's far end, the
+  full-charge pop + clang, the ring on the target it will reach, `chargeRelease` solving the dash to him). With the katana its
+  TRIGGER is the guard: hold the pull-down guard past `KATANA.chargeIn` (.35 s) and it winds up, the crouched guard held instead of
+  the hammer's wind-up clip, a parry still possible the whole time. Let the guard go and it releases (needs half a charge, as
+  the hammer does): the dash plays `katana_attack` (the thrust) -- or `katana_spin` at a FULL charge (`p.goClip`).
+- **The bug that hid it**: the guard calls `triggerStop()` every frame it is up (to cancel a wound trigger), and that zeroed the
+  charge -- chargeT stuck at 0.05. With the katana the guard IS the charge, so it no longer cancels it.
+- Checked headless with real touch on the right pad: hold ~1 s -> `chargeT 0.82` -> release `chargeGo 1, katana_attack`; hold
+  past full -> `chargeT 1.00` -> `katana_spin`. On screen: guard crouch + the target ring + the pad's charge ring; the thrust
+  lunge; the spin. No errors.
+- SWORD.md moves: box 3 (the charge reads, the release lunges, full charge spins) BUILT, not ticked. A charge HUM (a rising tone)
+  is not in yet -- the sparks, pop and clang are the hammer's.
+
 ## m981 -- WEAPON JOINTS IN THE FILE: the Forge's export puts `weapon_root_*` + tips on both hands as real joints (`weaponJoints`)
 *"The Forge is supposed to give him weapon joints... every character... so we can place them for animation... for both hands and
 their tips."* (The general name, from m935: SOCKETS. Both are now in his file.)

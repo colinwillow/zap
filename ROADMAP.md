@@ -18,6 +18,7 @@ levels later. **Each sandbox is tuned until it feels great on its own before any
       Builds a-e in the spec.
   - [x] a. **m978** the KATANA slot (built in code) + four directional swings on the samurai (measured clip -> direction).
   - [x] b. **m979** the crouched katana guard (pull-down hold, lock-on) + the PARRY that staggers him.
+  - [x] c. **m982** charge in the guard -> release lunge (thrust) / full charge spin (the hammer's charge, re-triggered).
 - [ ] **GEAR -- OPEN (spec only).** `GEAR.md`: rollerblades / jet blades and a wingsuit any hero can wear. Waiting on his models.
 - [x] **m893 ARENA** (`?w=arena`): the stadium, SPAWN > WARBOSS > Brute Warboss / Skullback beams down, chest thump, armour
       flies off, KO slow-mo, beam out, CLEAR. This is the STAGE for the duel, not the duel.
