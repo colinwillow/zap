@@ -5,6 +5,33 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m992 -- THE SAMURAI, ROUND TWO: the run's pop (loops must CLOSE), 3-hit chains per direction, the charge = the guard, knees out
+*"Stutter on the run, or he's moving slightly during the run and then pops back... flicking forward his first swing just butts the
+sword... I can only get through two... at least three if not four or five... the charge: you just turned the sword backwards, it
+looks messed up -- use the same animation as the parry for now... his knees point inward, knock knees, like the CEO."*
+- **THE POP WAS m960's FIX (and m991's).** three.js wraps a loop's TIME: past the last key it holds it, and at `duration` jumps to
+  the first. With the "duplicate" closing key that jump lands on the same pose; trimmed, the last-to-first step happens in zero
+  time -- a skipped frame of motion every cycle (1/22 of the run). Measured on the game's own clips (scratch mixer, his model):
+  run_std's loop jumped 2.0 cm at the hips and 11.4 cm at the foot in one instant. **`clipSeam` now CLOSES loops**: a loop-shaped
+  clip (per bone: first-vs-last within 2.5 x its own largest step) that is open (some bone's gap > .5 x its own MEAN step) gets its
+  first pose back at last + one key. Per bone, because run_std has one bone with a 98 deg step that made the whole clip look closed.
+  After: run_std, walk_fwd, sprint_std, katana_run, katana_walk all wrap with 0.0 cm. The Forge's `loopSeam` is OFF (`SEAM.on`).
+  **Do not trim a seam again** -- the duplicate frame is not a hitch for an interpolating player.
+- **THE CHAINS**: one flick slot (`p.melQ`) meant flicks 2 and 3 thrown during swing 1 were ONE queued flick -- "only two". It
+  counts now (`MELEE.queue` 2). Each direction is its own 3-hit chain with its own finisher, the hilt butt (`katana_attack` =
+  "Great Sword Hilt Melee") gone: right slash_2 -> horiz -> 360h; left slash_4 -> backhand -> 360l; up spin -> slash_1 -> combo3;
+  down slash_3 -> down -> jump_attack. New, from the library's axe set (`Standing_Melee_Attack_*`, two-handed): right-hand peak
+  speeds (m/s) horizontal 16.8, 360 high 14.7, backhand 12.8, downward 12.4, 360 low 10.3 (the great-sword slashes 4.6-8.9); each
+  clip's `at` is its measured peak. `Bash` measured slow (5.75) and is baked but unused, as are `katana_heavy` and `katana_runjump`.
+  Headless, three flicks 150 ms apart: right/left/up each played all three in order.
+- **THE CHARGE** holds the guard pose (the derived frames are gone); the release is the LEAP and swing (`katana_jump_attack`, his
+  "Marth"), full charge the 360 high spin. His side-on two-handed charge pose is his to make.
+- **KNEES**: run_std's knees pointed 8-13 deg INWARD where Zoar's point 0-5 out (knee off the hip-to-foot line, about that line,
+  + = out). The Forge's adjust layer has **`knees`** now (each thigh turned about its own hip-to-foot line until the knee swings
+  out, the foot's own turn put back; "Knees out" slider in forge.html); his profile `knees` 12, `toeIn` 6. After: run_std L 6 / R 2.
+- Re-forged (100 clips), resize/webp/draco, `hipshift` (5.1 MB). The AI samurai swings the new clips too.
+Not done: his own charge pose; which swings he likes (he will say); four- and five-hit chains (the pools are three).
+
 ## m991 -- THE RUN STUTTER (two clocks again) AND THE SLIDE ON A TURN (`gaitSync` in the katana stance, `clipSeam`, `MOVE.grip`)
 *"When he runs I can't tell if it's running or walking or both, but I think there's an extra clip member, like we found earlier when
 the run sequence was stuttering... write a note on whatever animation we keep applying it to, or just trim it... and the sliding:

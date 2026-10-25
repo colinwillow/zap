@@ -333,6 +333,9 @@ export function composeUpper(tg, clip, up) {
 //   stance  x hip width: each foot moved sideways from the hips' centre line, the leg re-solved (two bones, knee kept in its plane)
 //   arms    degrees: both upper arms opened out about his forward axis -- the penguin fix
 //   lean    degrees: the spine tipped forward (+) or back about his left axis
+//   knees   degrees: each thigh turned about its own hip-to-foot line so the knee swings OUT (+) -- the knock-knee fix (m992,
+//           the samurai's run_std knees pointed 8-13 deg inward where Zoar's point 0-5 out); the foot stays where it was and keeps
+//           its own turn, so only the knee moves
 // Done on the POSED body frame by frame, so it is the same adjustment whatever the clip is doing. +X is his left: forward is
 // left x up.
 const _q = new THREE.Quaternion(), _q2 = new THREE.Quaternion(), _a = new THREE.Vector3(), _b = new THREE.Vector3();
@@ -351,11 +354,12 @@ function legTo(B, up, kn, ft, target, keepEnd = true) {
   if (keepEnd) setWorldQ(B[ft], footW);
 }
 export function adjustLayer(tg, clip, A) {
-  const st = +A.stance || 1, arms = (+A.arms || 0) * Math.PI / 180, lean = (+A.lean || 0) * Math.PI / 180, elb = (+A.elbows || 0) * Math.PI / 180;
-  if (st === 1 && !arms && !lean && !elb) return clip;
+  const st = +A.stance || 1, arms = (+A.arms || 0) * Math.PI / 180, lean = (+A.lean || 0) * Math.PI / 180, elb = (+A.elbows || 0) * Math.PI / 180, kn = (+A.knees || 0) * Math.PI / 180;
+  if (st === 1 && !arms && !lean && !elb && !kn) return clip;
   const B = tg.rig.bones, M = 'mixamorig_', has = n => !!B[M + n];
   const touched = [];
   if (st !== 1 && ['LeftUpLeg', 'LeftLeg', 'LeftFoot', 'RightUpLeg', 'RightLeg', 'RightFoot'].every(has)) touched.push('LeftUpLeg', 'LeftLeg', 'LeftFoot', 'RightUpLeg', 'RightLeg', 'RightFoot');
+  if (kn && ['LeftUpLeg', 'LeftFoot', 'RightUpLeg', 'RightFoot'].every(has)) touched.push('LeftUpLeg', 'LeftFoot', 'RightUpLeg', 'RightFoot');
   if (arms && has('LeftArm') && has('RightArm')) touched.push('LeftArm', 'RightArm');
   if (elb && has('LeftForeArm') && has('RightForeArm')) touched.push('LeftForeArm', 'RightForeArm');
   const spine = has('Spine') ? 'Spine' : null; if (lean && spine) touched.push(spine);
@@ -378,6 +382,15 @@ export function adjustLayer(tg, clip, A) {
         const F = B[M + side + 'Foot'].getWorldPosition(new THREE.Vector3()).addScaledVector(L, sg * d);
         legTo(B, M + side + 'UpLeg', M + side + 'Leg', M + side + 'Foot', F);
       }
+    }
+    if (kn && out.LeftUpLeg) for (const [side, sg] of [['Left', 1], ['Right', -1]]) {
+      const up = B[M + side + 'UpLeg'], kb = B[M + side + 'Leg'], ft = B[M + side + 'Foot'];
+      const H = up.getWorldPosition(new THREE.Vector3()), F = ft.getWorldPosition(new THREE.Vector3()), K0 = kb.getWorldPosition(new THREE.Vector3());
+      const ax = F.clone().sub(H); if (ax.lengthSq() < 1e-10) continue; ax.normalize();
+      const uw = up.getWorldQuaternion(new THREE.Quaternion()), fw = ft.getWorldQuaternion(new THREE.Quaternion()), out0 = L.clone().multiplyScalar(sg);
+      setWorldQ(up, _q.setFromAxisAngle(ax, kn).multiply(uw));
+      if (kb.getWorldPosition(new THREE.Vector3()).sub(K0).dot(out0) < 0) setWorldQ(up, _q.setFromAxisAngle(ax, -kn).multiply(uw));     // whichever way swings it OUT
+      setWorldQ(ft, fw);
     }
     for (const b in out) { const q = B[M + b].quaternion; out[b].set([q.x, q.y, q.z, q.w], f * 4); }
   }
@@ -749,8 +762,12 @@ export function editLayer(clip, E) {
 // There was: a Mixamo loop ends on its first pose again (`run_std` 0.02 deg, `sprint_std` 0.03, against 18 for the frame before),
 // so a looping clip holds that pose for two frames every cycle -- a hitch. When EVERY rotation's last key is within `SEAM.deg` of
 // its first, the last key goes and the clip is one frame shorter. (A one-shot that ends where it began just loses 1/30 s.)
-export const SEAM = { deg: .5 };
+// m992: WRONG, AND OFF. three.js wraps a loop's TIME: with that closing key the wrap lands on the same pose (seamless); cut, the
+// last-to-first step happens in zero time -- a skipped frame every cycle, the pop he saw on the samurai's run. `on` 0 keeps the key;
+// the game now CLOSES any loop that lacks it (`clipSeam`).
+export const SEAM = { deg: .5, on: 0 };
 export function loopSeam(c) {
+  if (!SEAM.on) return c;
   // the BODY decides (fingers carry the hand layer's noise, which is not periodic, so they never close the loop); every track is cut
   const rot = c.tracks.filter(t => t.name.endsWith('.quaternion') && t.times.length > 2 && !/Hand(Thumb|Index|Middle|Ring|Pinky)/.test(t.name)); if (!rot.length) return c;
   const n = rot[0].times.length; if (rot.some(t => t.times.length !== n)) return c;
