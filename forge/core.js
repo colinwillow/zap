@@ -675,6 +675,35 @@ export function reachLayer(tg, clip, R) {
 //   4. his left hand goes where the donor's left hand is ON THE WEAPON (in the weapon's frame, scaled by the weapon's size on each,
 //      which follows hand length -- m794), with a weight that lets go when the donor's left hand leaves it (`WEAPIK.near/far`).
 // `W` = { two: 1 } (left hand too) | { two: 0 }. Needs fingers on both rigs (the mount and the frames are measured off them).
+// ---- m998: WRISTS OUT. *"His hands have this weird T-Rex thing... they should rotate outward 45 degrees so they're just neutral."* Each
+// RELAXED hand (its pose 'relaxed' or none -- never a grip, never a weapon clip) turned about its own forearm-to-hand line, the way
+// that brings the thumb FORWARD (palms toward the thighs), frame by frame, `deg` degrees. Profile `adjust.wrists`, "Wrists out".
+export function wristLayer(tg, clip, deg, H) {
+  const B = tg.rig.bones, M = 'mixamorig_', a = deg * Math.PI / 180;
+  const sides = ['Left', 'Right'].filter(sd => B[M + sd + 'Hand'] && B[M + sd + 'ForeArm'] && (!H || !H[sd] || !H[sd].pose || H[sd].pose === 'relaxed'));
+  if (!sides.length || !a) return clip;
+  const ref = clip.tracks.find(t => t.name === MHIPS + '.position') || clip.tracks[0], times = ref.times, n = times.length;
+  const out = {}; for (const sd of sides) out[sd] = new Float32Array(n * 4);
+  tg.mixer.stopAllAction(); const ta = tg.mixer.clipAction(clip); ta.play();
+  const _f = new THREE.Vector3(), _h = new THREE.Vector3(), _ax = new THREE.Vector3(), _w = new THREE.Quaternion(), _r = new THREE.Quaternion(), fwd = new THREE.Vector3();
+  for (let f = 0; f < n; f++) {
+    ta.time = times[f]; tg.mixer.update(0); tg.model.updateMatrixWorld(true);
+    const lh = B[M + 'LeftUpLeg'] || B[M + 'LeftArm'], rh = B[M + 'RightUpLeg'] || B[M + 'RightArm'];
+    const L = lh.getWorldPosition(new THREE.Vector3()).sub(rh.getWorldPosition(new THREE.Vector3())); L.y = 0; L.normalize(); fwd.crossVectors(L, new THREE.Vector3(0, 1, 0)).normalize();
+    for (const sd of sides) {
+      const hand = B[M + sd + 'Hand'], fa = B[M + sd + 'ForeArm']; fa.getWorldPosition(_f); hand.getWorldPosition(_h); _ax.subVectors(_h, _f).normalize();
+      const th = hand.children.find(c => c.isBone && /Thumb1$/.test(c.name)) || hand.children.find(c => c.isBone && /Index1$/.test(c.name));
+      hand.getWorldQuaternion(_w);
+      const tip = s => { _r.setFromAxisAngle(_ax, s * a); const q = _r.clone().multiply(_w); return th ? th.position.clone().applyQuaternion(q).dot(fwd) : 0; };
+      const sg = tip(1) >= tip(-1) ? 1 : -1;     // whichever turn brings the thumb more FORWARD
+      setWorldQ(hand, _r.setFromAxisAngle(_ax, sg * a).multiply(_w));
+      out[sd].set([hand.quaternion.x, hand.quaternion.y, hand.quaternion.z, hand.quaternion.w], f * 4);
+    }
+  }
+  ta.stop(); tg.mixer.uncacheClip(clip);
+  const nm = new Set(sides.map(sd => M + sd + 'Hand.quaternion'));
+  return new THREE.AnimationClip(clip.name, clip.duration, clip.tracks.filter(t => !nm.has(t.name)).concat(sides.map(sd => new THREE.QuaternionKeyframeTrack(M + sd + 'Hand.quaternion', times, out[sd]))));
+}
 export const WEAPIK = { near: 2.5, far: 4 };     // donor left hand to his weapon, in his hand lengths: on it / off it
 // m993: WHERE THE WEAPON IS ANCHORED. `chest` (m794): offsets from between the shoulders, across x shoulder width, up/forward x
 // spine -- which carries the DONOR's proportions: Zap's short spine under a big head pushed the launcher a forearm out in front of
@@ -908,6 +937,7 @@ export function carry(tg, src, role, P, opt) {
   if (opt && opt.upper) clip = composeUpper(tg, clip, opt.upper);
   clip = toesLayer(tg, src, clip, P.layers.toes === undefined ? 1 : +P.layers.toes, (P.adjust && +P.adjust.toeIn) || 0);
   if (P.adjust) clip = adjustLayer(tg, clip, P.adjust);
+  if (P.adjust && +P.adjust.wrists && !(opt && opt.weap)) clip = wristLayer(tg, clip, +P.adjust.wrists, opt && opt.hands && opt.hands.H);
   if (P.layers.clear !== 0) clip = clearLayer(tg, clip, P.layers.clear === undefined ? 1 : +P.layers.clear);
   if (opt && opt.weap) clip = weapLayer(tg, src, clip, opt.weap);
   if (opt && opt.hands) clip = handsLayer(tg, clip, opt.hands.H, opt.hands.poses);

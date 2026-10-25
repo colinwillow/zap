@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m998 -- WRISTS OUT: the samurai's T-rex hands (Forge `wristLayer`, profile `adjust.wrists` 45)
+*"His hands have this weird almost T-Rex thing... they should rotate outward 45 degrees so they're just neutral rather than bending like a
+T-Rex... when he walks and when he's idle."* (Three screenshots: mitts hanging palms-back, idle and walking.)
+- **Forge `wristLayer`** (after the adjust layer, before the weapon layer): each RELAXED hand -- its pose 'relaxed' or none; never a grip,
+  never a weapon clip -- turned about its own forearm-to-hand line by `deg`, frame by frame, in whichever direction brings the thumb more
+  FORWARD (palms toward the thighs). "Wrists out" slider in forge.html.
+- His profile `wrists` 45. Checked on a test bake: idle_01, walk_fwd, run_std hands turned 45.0 deg each side; katana_idle (hands 'grip' on
+  the sword) 0.0. Close-up front shots before/after: the mitts go from palms-back to facing the thighs.
+- Re-forged (100 clips), resize/webp/draco, `hipshift`.
+- His other note, kept for later: a power-stance idle with one foot slightly back (more action-ready) instead of the dwarf idle.
+
 ## m997 -- THE SPINNING LAUNCHER (a mitt's hand frame, read through the CURRENT turn), AND THE FLYING KICK FLIES LEVEL
 *"When the samurai holds the rocket launcher, it's just perpetually spinning... maybe fix the spinning first."* And: *"if I'm in the air
 and do a flying kick, he should launch straight forward -- the downward trajectory shouldn't matter. Unrealistic, but more fun."*
