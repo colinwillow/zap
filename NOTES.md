@@ -5,6 +5,25 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m996 -- THE SPRINT'S STUTTER, CAUGHT AT 60 FPS: leftover root motion (a sawtooth) and a bad first frame (`clipSeam`)
+*"With the run sequence there's still a duplicate frame and a camera stutter... the last frame is a little farther forward, hips-wise,
+than the first -- a subtle stutter and a duplicate frame at the same time."* (Two screenshots .02 s apart: the same pose, the world moved.)
+- **HOW IT WAS FOUND**: `mel.frameBody` (exported for this) stepped by hand at an exact 60 fps with a mocked clock, unarmed, full stick:
+  the hips' forward offset from his root, every frame. `sprint_std` crept ~16 cm forward across its 0.57 s cycle and snapped back in
+  ONE frame at every wrap (12-16 cm, where every other frame moves 1-2). Headless real-time runs at ~2 fps and could never show it.
+- **CAUSE 1 -- THE SAWTOOTH**: the Forge takes a clip in place by the drift from its FIRST key to its LAST. Since m992 kept the closing
+  key, the last key is a full copy of the first, ROOT INCLUDED -- so the drift read zero and the Sprint's travel stayed in.
+  Now FITTED (least squares over every key but the closing one) on the level axes, taken out, centred on the root, closing key = first.
+- **CAUSE 2 -- A BAD FIRST FRAME**: the same sprint's key 0 sits ~14 cm off the path (its first hips step ~10x the clip's median). On a
+  closed loop that happens, key 0 is dropped and the loop closes on key 1.
+- **SCOPE**: m996's first pass ran both on EVERY clip -- falls, get-ups, attacks, dances -- and moved them (caught in the touched-clip
+  list). Now: only LOOPS (every bone ends near its start, relative to its own steps, and the hips end near where they began), and the
+  hips fixes only for LOCOMOTION cycles (`SEAM.cyc` walk/run/sprint/strafe/stride/skate push/ladder, not turns/jumps/attacks). On the
+  samurai: bad first frame on `sprint_std` alone; drift taken out of 45 locomotion clips.
+- **AFTER**: sprint_std across the wrap -1.0 -> -0.7 -> -0.2 -> +0.4 cm (smooth, centred). katana_run: smooth except a ~2 cm hips hop in
+  its closing interval (.60 -> .633 s) -- the library's Great Sword run does not quite meet itself; not touched (blending the last
+  frames into the first is the fix if he still sees it).
+
 ## m995 -- THE KATANA RUN'S SLIDE, SWIPES GO WHERE YOU FLICK (camera-relative), THE AIR SLAM CARRIES YOUR MOMENTUM
 *"At the end of every cycle he stutters back... it doesn't happen on the walking cycle... the swipe is not in relation to the camera
 -- I swipe towards the enemy and he goes in relation to the character... in the air, swipe down and he just goes straight down; carry
