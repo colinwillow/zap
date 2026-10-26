@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1048 -- the bar always catches into the one hang (a mid-slam catch kept the slam); the grip sits on the palm
+
+*"Twice I get onto the high bar in the wrong pose -- a shorter, funky pose, almost like I tried to pull up -- and then I launch off it all weird...
+no matter what, he should jump up and do the one pose... his hands still are not really on top of it."*
+- **The glitch:** catching the bar during an AIR SLAM (right flick down in the air, or the katana's air attack). `stepBar` runs before the
+  slam's step, so `p.slam` never ended: `rigAnim` drew the slam clip (its branch came before the bar's) and the release dropped straight back
+  into the slam. Now `hbarCatch` ends every air verb (slam, charge, air melee, flip, duck, queued flicks, a previous flight) and refuses while
+  knocked down; and the bar is the FIRST body-owning branch in `rigAnim`.
+- **The grip:** the palm side was read from how the fingers bend -- a straight-fingered hang gives that no sign, so the bar could sit on the back
+  of the hand. Now the grip is the palm (60% wrist -> middle knuckle) with the bar off it toward his FRONT (overhand: palms forward), the
+  front turned with the swing; the finger curl as before.
+- Shipped unverified.
+
 ## m1047 -- the hurdle is the vault clip again with its rise taken off frame by frame (TOOLS > HURDLE); the climb goes UP then OVER; beam toes still
 
 *"When you vault it just looks like he goes into a tuck... I thought you were just taking off the baked-in motion... getting up onto the
