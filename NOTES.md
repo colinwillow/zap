@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1024 -- a right-pad hold that started as a REPAIR stays a repair until the thumb lifts (no high jump out of it)
+
+*"when you're repairing a wall, since it's holding the right stick, he goes into preparation for the really high jump... it should only ever
+be one thing or the other."* `repHold` needs a repair target; the moment the wall was whole (or he drifted out of `repairR`) mid-hold the
+same touch fell through to the high jump's crouch (`bkT` / `bkOn`) or the ninja sprint, and the release launched him. Now `p.rTouch`
+latches on the first repairing frame and holds `bkT` / `bkOn` / `ninja` at zero until the right pad is released. Shipped unverified.
+
 ## m1023 -- the cover arm, again: axes measured off his shoulders, the elbow bent so the weapon is held UP
 
 *"the adjustment for the katana hold or the rocket hold in cover actually made it worse. I was picturing him holding it up a little in the
