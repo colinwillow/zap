@@ -4,6 +4,13 @@
   "ceo_alien",
   "ceo_human",
   "rept_heavy_armor",
-  "zap"
+  "zap",
+  "alien_goblin_game",
+  "goblin_game",
+  "samurai_game",
+  "orc_game",
+  "zoar_game",
+  "zap_02",
+  "zap_02_lib"
  ]
 }

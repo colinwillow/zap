@@ -5,6 +5,32 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1074 -- knocked flying: back-first from a hit in front, belly-first from behind (Colin's poses, Forge-baked); control back when he is up; cover carries across a shot-out gap
+
+*"When he gets hit and flies through the air his direction should always be set... I had in-air poses flying forward and flying backwards
+(Colin's)... hit in the back, you fly belly forward; hit in the stomach, back first... right now he flies sideways sometimes and plays getting
+hit and falling over in the air. And the get-up: he gets up, then stands there for a minute before you regain control."* / *"Break a half wall in
+cover, knock out the middle, and he goes through the hole -- he should go along where the wall was."*
+- **Six of Colin's clips onto every hero, by the FORGE** (`models/characters/forged/<hero file>.glb`, merged by `forgedHero`): `flying_backwards`,
+  `flying_forwards`, `fall_to_back`, `fall_to_face_down`, `get_up_from_back`, `get_up_from_face` -- alien goblin, goblin, samurai, orc, zoar, zap_02,
+  zap_02_lib (0.4-0.7 MB each; `$S/knock_prof.json`: the goblin's profile with only these six, Colin as the donor). Only the hero being played
+  has his fetched (`forgedLoad` skips the other heroes' bakes; `forgedHero` fetches his if he is picked after boot).
+- **First tried at RUNTIME and it was WRONG -- caught by rendering, not by numbers:** a clips-only donor (`colin_knock.glb`) + `retargetW` drew the
+  flying poses UPRIGHT and the fall to his back ending CROUCHED in the air. Half of it was the donor (a glTF's node TRS is not the bind -- his
+  file's rest was up to 90 deg off the inverse bind matrices); with the bind written in, still wrong on the ARP rigs. The Forge is right on them
+  (rendered: jackknifed back-first, belly-first, flat on his back, up). The runtime path and the donor are gone.
+- **The launch (`playerHurt`):** pushed against his nose (hit in front) -> `B`, he FACES the blow and holds `flying_backwards`; pushed along it
+  (hit from behind) -> `F`, he faces the way he flies, `flying_forwards`; a side hit takes the nearer. His facing is held through it (`knockH`).
+  Landing -> the matching fall (`downRate` 1.25) -> the matching get-up (`upRate` 1.35) -> control back the moment his hips reach `stand` .93 of
+  their final height (`knockStand`, measured once per hero: .60 of get_up_from_back, .625 of get_up_from_face), not at the clip's end.
+- **Real loop (`knock.cjs`, GOD on, a turret 7 m off; goblin AND samurai):** chest hit -> B, facing vs travel 180 deg every sample of the flight;
+  back hit -> F, 0 deg; fall ~54 frames; get-up to control 62 (back) / 76 (face) frames. Renders: jackknifed back-first / belly-first, then up.
+- **Cover across a gap (`coverAcross`, m1075's note folded in here):** on a breakable wall (`CWALL`), when the shimmy's next spot finds no face
+  (the middle shot out), he keeps to the line the wall's face stood on while still within its length (less `COVER.gapEnd` .35). Real loop
+  (`gap.cjs`): the middle 6 chunks blown out, shimmied -1.50 -> +1.52 m along a 4.2 m wall, never out of cover, .66-.69 m off its line throughout.
+- **Not built (his other idea):** lean at the edge of the gap with an arrow, tap -> a twirl jump across.
+- Shipped unverified on the phone.
+
 ## m1073 -- THE GUARD CHANGES SIDES: strafe left -> his mirror stance (right foot forward, blade to the other side), right -> his own
 
 *"Right now in guard his left leg is forward, right leg back, crouched, the sword up over his head pointing down to one side. Invert that: right
