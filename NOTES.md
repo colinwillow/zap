@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1025 -- the katana charge release slowed (TOOLS > K-CHARGE, x1.8 default); katana swings reach walls
+
+*"We should slow down the katana charge attack up on the right stick. It's still just too fast... I'm having trouble hitting the wall with
+the katana swings."*
+- **Charge:** with a blade, `chargeRelease`'s `goDur` x `KATANA.chargeSlow` (1 / 1.4 / 1.8 / 2.3, default 1.8, remembered). The clip
+  rate, the dash's spend and its arrival (`dashLand`) are all on that one clock, so the m1017 alignment holds at any speed.
+- **Walls:** `wallMelee` sampled one line straight down `melH` at p.r + 1.0. With a blade: p.r + 1.35, radius .35, a fan of +-.4 / .8
+  rad; a spin (`360|spin|hurricane` in the clip name) samples all eight ways round.
+- **And a real bug:** m1021's `p.melFist` (left-pad strike: no wall damage) was only ever set in `meleeGo0` -- the charge and the air
+  kick never cleared it, so after a left-flick flip the CHARGE could not touch a wall. Both clear it now.
+- Shipped unverified.
+
 ## m1024 -- a right-pad hold that started as a REPAIR stays a repair until the thumb lifts (no high jump out of it)
 
 *"when you're repairing a wall, since it's holding the right stick, he goes into preparation for the really high jump... it should only ever
