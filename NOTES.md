@@ -5,6 +5,12 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1044 -- m1043 shipped a BLANK PAGE (a comment swallowed a brace); fixed
+
+A trailing `// ...` comment was inserted mid-line in `mantleTap`, commenting out the `rig.actions[nm].time = L * t0; }` after it -- "Unexpected
+end of input". `npm run check` caught it, but the push chain read `check | tail -1 && commit`, which passes on tail's exit status, so it
+went out anyway. **The chain now runs `npm run check` on its own and stops on a failure.** Same build otherwise.
+
 ## m1043 -- no auto arrows: climb = push INTO the ledge + tap; the pull-up is driven by his HANDS on the lip; in cover, push forward = a flat arrow over the top + tap to vault; the vault launches you over
 
 *"I'm not really loving any of that... if you're pressing into a block you want to climb up onto with the left stick and then tap the right
