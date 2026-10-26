@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1028 -- TOOLS is a compact, scrolling two-column panel in groups, with RUN at the top
+
+*"the run button is off screen because again you have so many debug buttons on screen and it doesn't allow me to scroll... I can't even
+get to the button."* The RUN key lived in the `#fxKey` gutter row and the arena TOOLS column ran off the bottom. Now `.ar-tools` is a grid
+beside the SPAWN column (not under it -- the pads own the bottom), groups MOVE / KATANA / COVER / ARENA / MORPH, 9.5 px buttons, and
+it scrolls inside `100vh - 196 - 330` px (m940's menu rule). RUN (`runSetUse`, the same cycle as the FX key) is the first button.
+Headless 390x844: panel 230x318 at (74, 196), 433 px of content scrolling, 22 buttons. Shipped unverified.
+
 ## m1027 -- six library runs on the RUN key; a flick UP in cover vaults the block
 
 *"put the five or six likely runs on the switch now. Also, I wanna make it so when you flick up on the left stick if you're in cover, he
