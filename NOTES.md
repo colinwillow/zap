@@ -5,6 +5,29 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1076 -- the samurai rival gets a brain: he runs in, reads you late (by level), spaces, and his chop breaks a turtled guard; difficulty is timing only
+
+*"The samurai AI is stupid... make the difficulty just the timing -- when he swings, when he blocks... a fully functioning player... moderately
+challenging, not so easy."*
+- **What was wrong, measured** (`turtle.cjs`: MEDIUM, you holding the guard 12 s, real loop): **0 swings**, `stateFrames {idle 720}`. The arena
+  gives every boss `notice` 60, and the generic walk-up only RUNS past `notice x V.dash` = **31 m** -- in a 17 m arena he WALKED at 1.1 m/s
+  (trace: 0.38 m per 20 frames) and then circled. With the cover in, he also ground into a half wall at 7.8 m. Not a cover bug alone; no cover
+  he still took 14 s to arrive and never swung.
+- **`mirrorBrain` (samurai only, `K.mirror`)** replaces the generic approach. `mirrorSee` records you every frame; `mirrorSeen` hands him what
+  you were doing `react` s ago. Runs in past `runAt` 4.2 m; stuck (`stuckT` > .35) he DETOURS (a side heading for .8 s, alternating) instead
+  of grinding; outside reach he comes IN or STRAFES at `foot` 1 m outside it (`katana_strafe_l/r`, `katana_walk_b` for a step back); in reach
+  he swings. A guard he has SEEN held `turtle` .45 s gets his chop (`KATANA.breakers`) every time -- was a dice roll on your live state.
+- **`arenaMirror` reads the late picture too**: your slash -> his guard, your finisher/charge -> a roll, every time unless he MISREADS it
+  (`misread`). After the guard he always counters if you are still in reach. A parry needs his guard up `parryLead` .12 s before your blow
+  (then 35%), so a faster read parries more.
+- **Difficulty = timing only** (`RIVALAI.lv`): EASY react .45 / think .55 / misread 30%, MEDIUM .25 / .32 / 15%, HARD .12 / .16 / 5%, plus the
+  level's wind-up and recovery. `ARENA.duel.levels` lost `dmgK` differences (all 1), combo (all .3), rush speed (all 6) and the guard / parry /
+  break / dodge CHANCES -- for every arena body, not just him.
+- **Measured after** (same harness, MEDIUM, cover in): ran in, detoured round the half wall at x -4.5, `katana_down` at 6.0 s @2.0 m -> **guard
+  broken** (`brk` 1, you thrown 8 m), walked back in, second `katana_down` at 11.1 s. EASY / HARD not run (same behaviour, other clocks).
+- Still not him: cover, flips, wall runs, bars, pick-ups -- that is THE PILOT (DUEL.md), the next builds.
+- Shipped unverified on the phone.
+
 ## m1075 -- the kip-up off his back (TOOLS > GET UP); rockets ricochet with a random scatter and a drawn corkscrew (TOOLS > RICOCHET)
 
 *"There's a kip-up in the Mixamo library that could be cool for getting up."* / *"Have the rocket deflect be slightly random directionally -- the
