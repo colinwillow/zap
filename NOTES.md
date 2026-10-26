@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1022 -- one weapon size on every body, held every frame (the launcher shrank after a disguise and back)
+
+*"I am the goblin... I turned into him and then back into a goblin and my rocket launcher was super tiny... It needs to be a
+consistent size no matter what -- a small character, the launcher is huge; a big character, it's small. That's the fun of it."*
+- **Why:** m968's `WEAP.unit` (one weapon-file unit = .01321 m on every hero) was applied ONCE, in `mountWeapon`. The disguise's
+  re-host (the m925 block, `w.group.scale = tip / fileTip`) re-sized the weapons by the BORROWED rig's tip ratio, and the revert did
+  the same on the way back, so the absolute size was lost.
+- **Fix:** `weapUnitKeep` runs after the mixer every frame: each visible worn weapon with `userData.unit` is re-sized to
+  `WEAP.unit / its hand's world scale` (when it is off by more than .5%), and its muzzle (mount space) re-derived from `muzzleFile`
+  with it. Any body, any disguise, any re-host -- the launcher is the same metres long.
+- Shipped unverified.
+
 ## m1021 -- the left flick never breaks a wall (cover, or a slide); repaired bricks arc up off the ground into place; the air slam smashes down through a wall
 
 *"when I'm unarmed and I'm using the left stick flick, instead of covering on the wall he just does the melee stuff and breaks the wall.
