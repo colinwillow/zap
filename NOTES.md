@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1055 -- why the climb / vault looked unchanged on the phone: every "measuring pass" read NOTHING after boot. Fixed; bar grip on a switch
+
+*"In the screenshots you sent, climbing and hurdling looked super good... but in the game it's exactly the same... and the hands on the bar look
+weird, it almost looked better."* **The harness was right and the game was not running what it tested.** Played through the REAL frame loop
+after boot (scratch `game.cjs`: `frameBody`, the left stick pushed into the beam's platform, the right-pad tap): the climb began, held him at
+the floor for the whole pull and popped him up on the last frame. `mantleCurve` measured the hands FLAT (1.25 -> 0.95 everywhere; `rel` 1).
+**Cause:** the measuring passes (`gaitMeasure`'s pattern: zero every action's weight, put one at 1, step the mixer at each time) never ENABLED
+the measured action. Before boot every action is enabled (the harness ran there); in play an action not in use is disabled, so the mixer
+applied nothing and the pass read the bind pose. **Fix:** the measured action is enabled / unpaused / started for the pass, and every action's
+`enabled` / `paused` is saved and put back with its weight and time -- in `mantleCurve`, `vaultHips`, `vaultLift`, `hbarReach`, `beamToeH`
+and `gaitMeasure` (and the save/restore in the arena's measure). **After, in the real loop:** the climb rises 0 -> 1.0 over the pull and
+crosses the edge (no pop); the vault reads its real hand / hip travel (hands .57 -> .67, hips +.83) and carries him over.
+**The lesson:** a harness that runs before boot can pass what play fails -- run the moves through `frameBody` after `rig.ready`.
+- **Bar grip:** he preferred the look before m1052 (which was the wrists, by accident). TOOLS > BAR GRIP WRIST (default) / PALM.
+- Shipped unverified on the phone.
+
 ## m1054 -- the right pad's swipe DOWN strikes where he faces (not behind him)
 
 *"Of the 360 degrees, 270 are directional, but the swipe down we reserve -- a placeholder for something cool later, maybe a grab and throw,
