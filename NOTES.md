@@ -5,6 +5,25 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1013 -- turret rockets are HIS rockets and launch you; a swing knocks its shots back into it; cover from touching distance; swaps in cover; two more Forge hand bugs
+
+- **Turret rockets** (`turretFire`, `turretShotBoom`): his own rocket's body (`rocketBody`) turned onto its flight, and his explosion's
+  colours, bursts and smoke. A hit LAUNCHES you (`push` 13, `up` 8.5, knock): *"when they hit you, you kinda go flying"*.
+- **A swing knocks a shot back** (`turretDeflect`, from `strikeSweep` beside `turretMelee`): a shot the swung limb or blade passes within
+  reach of turns round, at the nearest live turret (else the way he faces), a third faster, and is HIS (`S.mine`): it hurts turrets and
+  bodies it reaches, never him. Headless: deflected a rocket at him, it flew back, the turret 5 -> 1.
+- **Cover from touching distance.** *"If I'm already touching it and I swipe or tap, it doesn't work."* The swipe's line was sampled
+  from .3 m out, which is INSIDE a block he stands against; now the face where he stands is looked for first, and if he is at it he goes
+  straight into cover (no slide). Both the swipe and the tap also cut a LANDING short instead of refusing (that was the other way it failed:
+  `land .62` after a knock-down). Headless: touching the block, swipe -> cover.
+- **Swapping in cover** (*"I can only switch when I'm out of cover"*): `swapTick` ran below cover's early return, so a swap started in
+  cover never finished. Headless: blaster -> launcher, in cover, done, still in cover.
+- **The Forge's left hand on the weapon** (`weapLayer`, his ask from m1012): the donor's hand crossed the whole near/far band in one
+  frame (Zap's `weapon_swap` frame 27: weight 0 -> .965) and the hand snapped 167 deg onto the weapon. The weight now ramps (`WEAPIK.ramp`
+  .2 s). Also `mixNow`: every Forge layer re-writes every binding after its mixer update, because three's PropertyMixer skips a bone whose
+  sampled value did not change and a layer's last answer survived into the next frame (m1012's root cause, now closed for all layers).
+  After: no hand step over 60 deg except two fast katana swings (70, 63). samurai / orc / goblin re-baked.
+
 ## m1012 -- the launcher twitch in cover (a Forge bug, every hero, every clip), the right-pad swipe DOWN slides, a LEFT TAP takes cover, cover in/out 4x faster, the pop-up drops the moment the shot leaves
 
 - **The twitch.** *"Holding the rocket launcher in cover, every round of the animation it twitches, like the hand snaps back."* Measured:

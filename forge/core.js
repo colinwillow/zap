@@ -302,7 +302,7 @@ export function handAlignLayer(tg, src, clip, amt = 1) {
   const Fs = new THREE.Quaternion(), Ft = new THREE.Quaternion(), C = new THREE.Quaternion(), I = new THREE.Quaternion(), W = new THREE.Quaternion(), tw = new THREE.Quaternion(), a = new THREE.Vector3();
   for (let f = 0; f < n; f++) {
     sa.time = Math.min(src.clip.duration, times[f]); src.mixer.update(0); src.scene.updateMatrixWorld(true);
-    ta.time = times[f]; tg.mixer.update(0); tg.model.updateMatrixWorld(true);
+    ta.time = times[f]; mixNow(tg.mixer); tg.model.updateMatrixWorld(true);
     for (const sd of ['Right', 'Left']) {
       const fa = B['mixamorig_' + sd + 'ForeArm'], hd = B['mixamorig_' + sd + 'Hand'];
       if (fa && hd && anatFrame(S, sd, Fs) && anatFrame(B, sd, Ft)) {
@@ -382,7 +382,7 @@ export function adjustLayer(tg, clip, A) {
   tg.mixer.stopAllAction(); const ta = tg.mixer.clipAction(clip); ta.play();
   const UP = new THREE.Vector3(0, 1, 0);
   for (let f = 0; f < n; f++) {
-    ta.time = times[f]; tg.mixer.update(0); tg.model.updateMatrixWorld(true);
+    ta.time = times[f]; mixNow(tg.mixer); tg.model.updateMatrixWorld(true);
     const lh = B[M + 'LeftUpLeg'].getWorldPosition(new THREE.Vector3()), rh = B[M + 'RightUpLeg'].getWorldPosition(new THREE.Vector3());
     const L = lh.clone().sub(rh); L.y = 0; const hw = L.length(); L.normalize(); const fwd = L.clone().cross(UP).normalize();
     if (lean && spine) { const w = B[M + spine].getWorldQuaternion(new THREE.Quaternion()); setWorldQ(B[M + spine], _q.setFromAxisAngle(L, lean).multiply(w)); }
@@ -551,7 +551,7 @@ export function gripLayer(tg, clip, grip) {
   tg.mixer.stopAllAction(); const ta = tg.mixer.clipAction(clip); ta.play();
   const W = new THREE.Matrix4(), tgt = new THREE.Vector3(), cur = new THREE.Vector3();
   for (let f = 0; f < n; f++) {
-    ta.time = times[f]; tg.mixer.update(0); tg.model.updateMatrixWorld(true);
+    ta.time = times[f]; mixNow(tg.mixer); tg.model.updateMatrixWorld(true);
     tgt.copy(off).applyMatrix4(W.multiplyMatrices(mount.matrixWorld, PM));
     B[ft].getWorldPosition(cur); tgt.lerp(cur, 1 - reach);
     legTo(B, up, kn, ft, tgt, false);
@@ -617,7 +617,7 @@ export function clearLayer(tg, clip, amt = 1) {
   const out = {}; for (const b of names) out[b] = new Float32Array(n * 4);
   tg.mixer.stopAllAction(); const ta = tg.mixer.clipAction(clip); ta.play(); let pushed = 0;
   for (let f = 0; f < n; f++) {
-    ta.time = times[f]; tg.mixer.update(0); tg.model.updateMatrixWorld(true);
+    ta.time = times[f]; mixNow(tg.mixer); tg.model.updateMatrixWorld(true);
     const L = B[M + 'LeftUpLeg'].getWorldPosition(new THREE.Vector3()).sub(B[M + 'RightUpLeg'].getWorldPosition(new THREE.Vector3())); L.y = 0; L.normalize();
     const lf = B[M + 'LeftFoot'].getWorldPosition(new THREE.Vector3()), rf = B[M + 'RightFoot'].getWorldPosition(new THREE.Vector3()), sep = lf.clone().sub(rf).dot(L);
     const want = sep + (smax(sep, W.min, W.hw * .15) - sep) * amt;
@@ -655,7 +655,7 @@ export function reachLayer(tg, clip, R) {
   tg.mixer.stopAllAction(); const ta = tg.mixer.clipAction(clip); ta.play();
   const mp = new THREE.Vector3(), hw = new THREE.Vector3(), sw = new THREE.Vector3();
   for (let f = 0; f < n; f++) {
-    const t = times[f]; ta.time = t; tg.mixer.update(0); tg.model.updateMatrixWorld(true);
+    const t = times[f]; ta.time = t; mixNow(tg.mixer); tg.model.updateMatrixWorld(true);
     const w = t <= a || t >= b ? 0 : Math.min(1, (t - a) / E, (b - t) / E);
     if (w > 0 && mouthPoint(tg, mp)) {
       B[ft].getWorldPosition(hw); sw.copy(R.p ? new THREE.Vector3().fromArray(R.p) : S ? S.p : new THREE.Vector3()).applyMatrix4(B[ft].matrixWorld);
@@ -679,6 +679,21 @@ export function reachLayer(tg, clip, R) {
 //   4. his left hand goes where the donor's left hand is ON THE WEAPON (in the weapon's frame, scaled by the weapon's size on each,
 //      which follows hand length -- m794), with a weight that lets go when the donor's left hand leaves it (`WEAPIK.near/far`).
 // `W` = { two: 1 } (left hand too) | { two: 0 }. Needs fingers on both rigs (the mount and the frames are measured off them).
+// the OTHER way round from q0 to q1 (three's slerp always takes the short one)
+function slerpLong(q0, q1, t) {
+  const rel = q0.clone().invert().multiply(q1); if (rel.w > 0) { rel.x = -rel.x; rel.y = -rel.y; rel.z = -rel.z; rel.w = -rel.w; }
+  const ang = 2 * Math.acos(Math.max(-1, Math.min(1, rel.w))), sn = Math.sqrt(Math.max(1e-12, 1 - rel.w * rel.w));
+  const ax = new THREE.Vector3(rel.x / sn, rel.y / sn, rel.z / sn);
+  return q0.clone().multiply(new THREE.Quaternion().setFromAxisAngle(ax, ang * t));
+}
+// m1013: EVERY LAYER POSES THE TARGET FROM THE CLIP, FRESH. three's PropertyMixer only calls `setValue` when a bone's sampled value CHANGED since
+// the last update -- so anything a layer wrote onto a bone (an IK, a turn) SURVIVED into the next frame's read wherever the clip held still,
+// and the layer then worked on its own previous answer: key 1 of every hand 45 deg off (the wrist layer, m1012), the left hand flipping
+// 150-166 deg on the weapon (the weapon layer). After the update, every binding is written again from the value just computed.
+function mixNow(mx) {
+  mx.update(0); const k = mx._accuIndex;
+  for (const b of mx._bindings || []) if (b && b.binding) b.binding.setValue(b.buffer, k * b.valueSize + b.valueSize);
+}
 // ---- m998: WRISTS OUT. *"His hands have this weird T-Rex thing... they should rotate outward 45 degrees so they're just neutral."* Each
 // RELAXED hand (its pose 'relaxed' or none -- never a grip, never a weapon clip) turned about its own forearm-to-hand line, the way
 // that brings the thumb FORWARD (palms toward the thighs), frame by frame, `deg` degrees. Profile `adjust.wrists`, "Wrists out".
@@ -695,7 +710,7 @@ export function wristLayer(tg, clip, deg, H) {
   // twitched every cycle (*"every round of the animation the rocket launcher twitches"*). Pass 1 sums the preference over the clip.
   const pref = {}; for (const sd of sides) pref[sd] = 0;
   for (let pass = 0; pass < 2; pass++) for (let f = 0; f < n; f++) {
-    ta.time = times[f]; tg.mixer.update(0); tg.model.updateMatrixWorld(true);
+    ta.time = times[f]; mixNow(tg.mixer); tg.model.updateMatrixWorld(true);
     const lh = B[M + 'LeftUpLeg'] || B[M + 'LeftArm'], rh = B[M + 'RightUpLeg'] || B[M + 'RightArm'];
     const L = lh.getWorldPosition(new THREE.Vector3()).sub(rh.getWorldPosition(new THREE.Vector3())); L.y = 0; L.normalize(); fwd.crossVectors(L, new THREE.Vector3(0, 1, 0)).normalize();
     for (const sd of sides) {
@@ -718,7 +733,7 @@ export function wristLayer(tg, clip, deg, H) {
   const nm = new Set(sides.map(sd => M + sd + 'Hand.quaternion'));
   return new THREE.AnimationClip(clip.name, clip.duration, clip.tracks.filter(t => !nm.has(t.name)).concat(sides.map(sd => new THREE.QuaternionKeyframeTrack(M + sd + 'Hand.quaternion', times, out[sd]))));
 }
-export const WEAPIK = { near: 2.5, far: 4 };     // donor left hand to his weapon, in his hand lengths: on it / off it
+export const WEAPIK = { near: 2.5, far: 4, ramp: .2 };     // donor left hand to his weapon, in his hand lengths: on it / off it
 // m993: WHERE THE WEAPON IS ANCHORED. `chest` (m794): offsets from between the shoulders, across x shoulder width, up/forward x
 // spine -- which carries the DONOR's proportions: Zap's short spine under a big head pushed the launcher a forearm out in front of
 // the samurai's face, and Zoar needed a hand-typed `x: .6`. `shoulder` (the default now): offsets from the HOLDING shoulder's
@@ -743,6 +758,7 @@ function mountWorld(hand, side, outP, outQ) {     // the weapon mount on this ha
 }
 export function weapLayer(tg, src, clip, W) {
   if (!W) return clip;
+  let lhPrev = null, wPrev = 0;     // m1013: the left hand's last answer and weight, for continuity
   const B = tg.rig.bones, S = src.rig.bones, M = 'mixamorig_';
   if (!B[M + 'RightHand'] || !S[M + 'RightHand'] || !handFrame(B[M + 'RightHand'], 'Right') || !handFrame(S[M + 'RightHand'], 'Right')) return clip;
   const ref = clip.tracks.find(t => t.name === MHIPS + '.position') || clip.tracks[0], times = ref.times, n = times.length;
@@ -753,7 +769,7 @@ export function weapLayer(tg, src, clip, W) {
   const mtP = new THREE.Vector3(), mtQ = new THREE.Quaternion(), I = new THREE.Quaternion();
   for (let f = 0; f < n; f++) {
     sa.time = Math.min(src.clip.duration, times[f]); src.mixer.update(0); src.scene.updateMatrixWorld(true);
-    ta.time = times[f]; tg.mixer.update(0); tg.model.updateMatrixWorld(true);
+    ta.time = times[f]; mixNow(tg.mixer); tg.model.updateMatrixWorld(true);
     const cd = chestFrame(S, cdP, cdQ), ct = chestFrame(B, ctP, ctQ), hd = mountWorld(S[M + 'RightHand'], 'Right', wdP, wdQ);
     if (cd && ct && hd) {
       // 1-2: the donor's weapon in his chest frame -> this body's chest frame
@@ -786,12 +802,19 @@ export function weapLayer(tg, src, clip, W) {
         // 4: the left hand onto the weapon, as the donor's is
         if (W.two && lhP && B[M + 'LeftHand']) {
           const k = ht / hd, wdi = wdQ.clone().invert(), rel = lhP.clone().sub(wdP).applyQuaternion(wdi), relQ = wdi.clone().multiply(lhQ);
-          const dist = rel.length() / hd, w = 1 - smooth01((dist - WEAPIK.near) / (WEAPIK.far - WEAPIK.near));
+          const dist = rel.length() / hd, w0 = 1 - smooth01((dist - WEAPIK.near) / (WEAPIK.far - WEAPIK.near));
+          // m1013: THE WEIGHT MAY ONLY MOVE SO FAST. The donor's hand reached the weapon across the whole near/far band in ONE frame
+          // (Zap's `weapon_swap` frame 27: w 0 -> .965), and his left hand snapped 167 deg onto it. Now it takes `WEAPIK.ramp` s on / off.
+          const dtk = f ? Math.max(1e-3, times[f] - times[f - 1]) : 1, dw = dtk / WEAPIK.ramp, w = f ? Math.max(wPrev - dw, Math.min(wPrev + dw, w0)) : w0; wPrev = w;
           if (w > 0) {
             const tP = rel.multiplyScalar(k).applyQuaternion(wtQ).add(wtP), tQ = wtQ.clone().multiply(relQ), LH = B[M + 'LeftHand'];
             const here = LH.getWorldPosition(new THREE.Vector3()), hq0 = LH.getWorldQuaternion(new THREE.Quaternion());
             legTo(B, M + 'LeftArm', M + 'LeftForeArm', M + 'LeftHand', here.lerp(tP, w), false);
-            setWorldQ(LH, hq0.slerp(tQ, w));
+            // m1013: NEAR 180 DEG APART THE SHORT WAY ROUND CHANGES SIDES between two frames and the hand flipped (166 deg in one frame on
+            // `weapon_swap`, 150 on `weapon_melee_01`). Kept continuous: if the short arc lands far from last frame's hand, the long arc.
+            let rq = hq0.clone().slerp(tQ, w);
+            if (lhPrev && rq.angleTo(lhPrev) > 1.2) { const lq = slerpLong(hq0, tQ, w); if (lq.angleTo(lhPrev) < rq.angleTo(lhPrev)) rq = lq; }
+            setWorldQ(LH, rq); lhPrev = rq.clone();
           }
         }
       }
@@ -876,7 +899,7 @@ export function groundLayer(tg, src, clip, amt = 1) {
     // library body's sole points and foot joints, his feet's skin); lying down, falling, getting up: the whole body as before.
     const up = src.rig.bones[MHIPS].getWorldPosition(_v).y - src.restLow > GROUND.stand * src.hipH && tg.feetIdx;
     const want = tg.restLow + Math.max(0, up ? lowestFeetSource(src) : lowestSource(src)) * k;
-    ta.time = times[f]; tg.mixer.update(0); tg.model.updateMatrixWorld(true);
+    ta.time = times[f]; mixNow(tg.mixer); tg.model.updateMatrixWorld(true);
     const fl = up ? Math.min(lowestOf(tg.feetIdx.Left || []), lowestOf(tg.feetIdx.Right || [])) : Infinity;
     off[f] = (want - (isFinite(fl) ? fl : lowestY(tg.info))) * amt;
   }
@@ -924,7 +947,7 @@ function soleRun(tg, clip, amt, B, M, low, times, n) {
     const rs = tb.position.clone().applyQuaternion(tg.T.wq[ft.name]).normalize().y, hz = Math.sqrt(Math.max(0, 1 - rs * rs));     // his foot's slope at rest
     const fix = new Float32Array(n), W = [], Pi = [], QF = [];
     for (let k = 0; k < n; k++) {
-      ta.time = times[k]; tg.mixer.update(0); tg.model.updateMatrixWorld(true);
+      ta.time = times[k]; mixNow(tg.mixer); tg.model.updateMatrixWorld(true);
       ft.getWorldPosition(a); tb.getWorldPosition(b); f.copy(b).sub(a).normalize();
       const h = Math.hypot(f.x, f.z) || 1; g.set(f.x / h * hz, rs, f.z / h * hz);
       W[k] = ft.getWorldQuaternion(new THREE.Quaternion()); Pi[k] = ft.parent.getWorldQuaternion(new THREE.Quaternion()).invert(); QF[k] = new THREE.Quaternion().setFromUnitVectors(f, g);
