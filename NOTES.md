@@ -5,6 +5,25 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1015 -- swings chain: one strike per swipe (the katana's clips cut into single strikes), a queued swipe cuts the recovery, and the SMEAR
+
+*"Make it so you can interrupt animations, or speed them up, or chop the ends off... there's a stutter step at the end of every one, he lands and
+adjusts his feet back... one attack per swing so you're button-smashing swipe swipe swipe... cut them up, play different ones every time... and
+we never did the smear technique."*
+- **One strike per swipe** (`strikeSplit`, at load): each katana clip in the direction pools is played on the bind-ready rig and its RIGHT
+  HAND's speed (relative to the hips) sampled at 30 fps. Every separate peak over 45% of the clip's fastest is a strike; each is cut out
+  (`clipCut`) from .42 s before its peak to .3 s after, never past the quiet before the next one, as `<clip>#<k>`, with its own `at` (the
+  peak). A single-strike clip is cut too, which is what takes the foot re-set off its end. Measured on the goblin: `360h` 1, its mirror 2,
+  `spin` 2, `slash_1` 4, `combo3` 3, `slash_3` 2, `down` 1, `jump_attack` 4. The pools are rebuilt from the pieces and dealt ROUND (no two
+  in a row the same); left / right now hold three clips each (`360h`, `horiz`, `backhand` and their mirrors). The finishers / guard breakers
+  read the base name (`baseNm`).
+- **A queued swipe cuts the recovery** (`MELEE.cancel` .14): past the blow (`at` + .14 of the strike), a flick that is waiting takes
+  over at once. Headless: a spin piece cut into the next strike at 19 frames (30 alone).
+- **The SMEAR** (`smearMat` / `smearStep`, TOOLS > SMEAR): the weapon's vertex shader knows each vertex's world position last frame; the
+  trailing ones (normal facing away from the motion) are pulled back along it by 2.2 frames' worth, broken up with noise, at most 1.1 m.
+  Only while a strike, the charge or the slam plays. Checked: all 5 katana meshes carry it, it compiles, `uSmear` 2.08 mid-swing with the
+  blade moving .14 m a frame. Whether it LOOKS right is his call on the phone.
+
 ## m1014 -- the katana's charged release is the hammer's slam, dramatic; breakable blocks; the right pad is melee by direction again (camera-relative); the left flick is Zap's acrobatics (or the slide into cover)
 
 - **Katana full charge** (*"he does this weird fast thing... use the club's jump-slam, very dramatic, until we find something better"*):
