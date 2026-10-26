@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1033 -- both arms swung out from his sides while he runs (TOOLS > RUN ARMS)
+
+*"add the arm push outward during runs"* (after: *"maybe bend his arms out a little bit more... it looks like he has little arms"*). `runArm`,
+after the mixer beside `coverArm`: each upper arm swung toward its own side (axes measured off his shoulders, `caSwing`, undone before the
+next mixer pass with the cover arm's list) by `RUNARM.out` (0 / 8 / 14 / 20 deg, default 14, remembered `mel.runarm`) x the walk->run band of
+his speed, eased. Off whenever the arms are doing something: a swing, roll, charge, slam, cover, slide, vault, guard, aim, swap, carry,
+knockdown, ledge, board, a gun out, or the katana stance. Shipped unverified.
+
 ## m1032 -- only the FIRST katana link is trimmed; the second plays whole again
 
 *"how we trimmed the first animation of the katana swing series works well, but the second one is kind of lame -- put back the second one and
