@@ -5,6 +5,25 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1043 -- no auto arrows: climb = push INTO the ledge + tap; the pull-up is driven by his HANDS on the lip; in cover, push forward = a flat arrow over the top + tap to vault; the vault launches you over
+
+*"I'm not really loving any of that... if you're pressing into a block you want to climb up onto with the left stick and then tap the right
+stick, that should climb... the physical locomotion should not just go linearly upward -- grab the ledge first, then move himself up timed with
+the way he pulls himself up... the hurdle: I don't like that it auto pops up... in cover, push up on the left stick, a flat arrow on top of
+the half-height cover shows you can go over, only when you're pressing; the right stick lights up... and the hurdle is very up-over-down, I
+wish it just launched you over without setting you down... get rid of the green arrows."*
+- **Offered only on a push:** standing, a CLIMB is offered only while the left stick pushes into the face (`MANTLE.into` .45); standing hurdles
+  are gone; no arrows standing. In crouched cover, the stick toward the wall (or straight up the pad) shows a flat green arrow on the top of
+  the cover pointing over; either way the right pad pulses green and a tap acts. (The cover flick-up vault stays.)
+- **The pull-up (`mantleCurve`, measured once per rig):** the climb-up clip is fully in place -- its hips never move; only the hands travel,
+  1.25 m over his soles (gripping the lip) to .45 (pushing on the top). So the body is driven by the hands: root = lip - hands(t) while they
+  are coming down; across from his hang spot onto the top over the clip's .32-.72; never lower than his feet on the top (`feet(t)` +
+  `toeH`); after the hands let go, eased onto the top. A ledge above the clip's first reach gets a GRAB (.2 s hop up to hang, the first frame
+  held); a low one starts the clip at the frame whose hands are at the lip with his feet on the floor. Pull .85 s.
+- **The vault:** the driven arc now ends just past the far face (`beyond` .12) still airborne, its apex at .62 of the way, and hands him to
+  the ordinary air step with the arc's own downward speed and 6.5 m/s forward -- he flies on and lands, not set down (`dur` .42).
+- Shipped unverified.
+
 ## m1042 -- the climb helper actually finds the beam's platforms; low short blocks get a HURDLE arc instead (tap = vault over)
 
 *"I still don't see the ability to get up onto the ledge -- no indicator and he doesn't climb... if the block is something he could hurdle,
