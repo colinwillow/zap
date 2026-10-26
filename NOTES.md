@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1068 -- running + a right-pad swipe = a slide tackle that way; at half cover it slides INTO cover (never breaks it)
+
+*"When you're running and you swipe on the right stick it does a slide tackle in that direction, and if you slide tackle towards something that
+can be covered on, you'll cover on it instead of breaking through it... and then basically we would make"* (his message ended there)
+- `runSwipe`, first on the right flick after the board / toss: on the ground at `RUNSWIPE.at` 3.5 m/s or more, not in a guard, cover, a strike,
+  a roll or a slide -> `slideGo` along the flick (any direction). Half cover down that line -> the slide steers onto it and he is IN COVER, `soft`
+  (it never breaks the block); nothing there -> the tackle. Walking (or standing) the swipe is the strike as before.
+- TOOLS > RUN SWIPE: SLIDE (default) / STRIKE (the running strikes as before), remembered (`mel.runswipe`).
+- **Real loop (`rswipe.cjs`, goblin, katana):** running at the .75 m half wall from 4 m, swipe at it -> slid, headed for cover, in cover after
+  34 frames, 0 chunks broken. Running +z in the open, swipe right -> slide heading 1.57 (exactly the flick), 3.46 m sideways. Walking 1.5 m/s
+  -> no slide. STRIKE mode -> no slide.
+- Shipped unverified on the phone.
+
 ## m1067 -- rockets launch you (even in GOD), you land and get up (no juggling); guard turn un-inverted; rockets reflect off the blade; steel flash
 
 *"Have the turret actually launch my character through the air when the rockets hit him and explode. He lands on the ground and you can get up.
