@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1027 -- six library runs on the RUN key; a flick UP in cover vaults the block
+
+*"put the five or six likely runs on the switch now. Also, I wanna make it so when you flick up on the left stick if you're in cover, he
+hurdles over the cover."*
+- **Runs:** the goblin, samurai and orc re-baked (`forged20`, 114 clips) with six in-place library runs -- `run_r6` (Mixamo "Running (6)"),
+  `run_r8`, `run_r10`, `run_fast` ("Fast Run"), `run_med` ("Medium Run"), `run_r1` ("Run (1)") -- picked as the loopable in-place ones
+  (loopDiff 0, distinct files by hash; "Running" / "Running (1)" are run-starts with travel, not loops). `RUNPICK` adds each to
+  `GAIT.runSets` after STD with its ref MEASURED on him (`gaitMeasure`; goblin: 2.64 / 2.08 / 2.55 / 3.31 / 2.72 / 2.01 m/s), as the run
+  band AND the top. RUN key labels: RUNNING6 / RUNNING8 / RUNNING10 / FASTRUN / MEDIUM / RUN1. Zap and other bodies without the bake do
+  not list them. `fxKeys` packed the run index into 2 bits; masked, and the click repaints.
+- **Vault:** in crouched cover a left flick screen-UP (or at the wall) -> `vaultGo`: driven, not simulated -- from his spot across the
+  block's depth + his radius + .55 m, on a sine arc clearing the column top (`wallColTop`) by .3, collider not asked; hands back at
+  4.5 m/s away from the wall. Plays "Vault Over Box" (`vault`, baked in place), window [.10, .46] MEASURED on the goblin (feet leave .13,
+  land .43) over .55 s; the clip's own hip rise in that window (+.53 m on the goblin, `vaultLift`, measured once per rig) is taken off the
+  driven arc so the two do not stack.
+- Shipped unverified.
+
 ## m1026 -- the right-pad sprint is the ORDINARY run, faster; letting go of it IS the long jump (TOOLS > SPRINT RUN / NINJA)
 
 *"I don't really like the ninja run when you hold down the right stick... get rid of it for now and instead just have the regular run but a
