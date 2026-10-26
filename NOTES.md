@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1035 -- landscape: a tighter lens so he is about the size he is in portrait (TOOLS > LAND FOV); the debug buttons go in a row up top
+
+*"I always play vertically but switched to horizontal and it's very widescreen and far away... change the camera FOV so they resemble more
+or less the same distance and size of character, but obviously the widescreen has more on the left and the right... in horizontal mode the
+debug buttons overlap the stick."*
+- **Lens:** three's fov is VERTICAL, so sideways he kept the same share of a screen less than half as tall. With `camera.aspect > 1.05` the
+  base is `CAM.landFov` (38 deg; 58 / 46 / 38 / 32 on TOOLS > LAND FOV, remembered) instead of 58: 1.6x bigger on screen than before
+  (tan 29 / tan 19), and still ~70 deg across at 2.16:1 against portrait's ~29. Rush / boost / sprint add on top as before.
+- **Buttons:** `@media (orientation: landscape) and (max-height: 560px)`: SPAWN / CLEAR / MORPH / VEND / TOOLS in a ROW along the top, left
+  of the radar; TOOLS (three columns) and the menus open under it, capped to stay above the pads. Headless 844x390: row at the top, panel
+  under it ending ~200 px from the top.
+- Also: the m1034 high-bar headless test never finished booting under software GL (`bootWarm`); the swing is unverified.
+- Shipped unverified.
+
 ## m1034 -- THE HIGH BAR (scaffold): SPAWN > HIGH BAR; jump to catch, HOLD the right pad to pump into giant swings, let go to fly off
 
 *"Jump up onto a bar... press and hold, and as you press and hold he pumps once, pumps twice, and the third one goes around until he's looping,
