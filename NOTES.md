@@ -5,6 +5,25 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1072 -- spawn buttons toggle (a second tap removes it); the wall run's torso upright, legs slanted, feet on the wall; PARKOUR.md
+
+*"If I go to the debug menu and re-click something that's already been spawned it should destroy it -- I put the walls in and then had to restart
+the game."* / *"His feet could make better contact with the wall, and his whole body is straight, just at an angle -- from the torso up he should
+rotate back (a little less than 45 deg) so he's pointed more straight up, the legs do the slant -- and a mirror of that."*
+- **SPAWN toggles:** TURRET, HIGH BAR, BALANCE BEAM and WALL RUN each remove what they spawned when tapped again (`turretClear` / `hbarClear` /
+  `beamClear` / `wrunClear`), the button lit (`ar-on`) and reading "tap to remove" while it is out.
+- **Wall-run pose (`wrunPose`):** the roll pivots at his feet, which the run holds `p.r + gap` off the face -- the drawn body now slides in to
+  `footIn` .06 of it; and the spine is turned back `WRUN.torso` .75 rad (43 deg) about the same forward axis, so the legs carry the slant and the
+  chest comes up. The side sign mirrors both.
+- **Real loop (`wpose.cjs`, goblin, both walls, run frames 12-36), m1064 pose -> now:** toes to the wall avg .44 / closest .21 m -> .18 / .00
+  (left), .41 / .21 -> .14 / .01 (right); torso tilt 59 -> 30 deg (left), 58 -> 27 (right); legs 51-59 deg either way. Renders: chest up, legs
+  slanted onto the wall, mirrored on the right wall.
+- **PARKOUR.md (new, design only):** the momentum sandbox -- the spin-up (run in place, rings meet, launch), `p.mom`, the quarter-pipe, the loop,
+  the course -- with its DONE WHEN and his open questions. Not built.
+- **Next (his idea, not built):** the guard that changes sides -- blend the guard with its mirror by strafe direction so the blade angle varies
+  (the rocket's ricochet with it), then flicks from the guard as counters.
+- Shipped unverified on the phone.
+
 ## m1071 -- the katana's charge HOLDS until the thumb lifts, and the thumb's height AIMS it: up = the flat launch, lower = a higher leap + slam
 
 *"I charge it up, it locks, and I slowly move my thumb back down to neutral or all the way to the bottom and it releases -- it shouldn't, I'm still
