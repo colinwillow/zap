@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1056 -- the beam and the bar through the REAL loop; the finger curl wraps round the bar (and why it barely shows on these rigs)
+
+*"Run the beam and high bar through the real game loop too... I don't think the characters' hands were ever rigged very well... I'm making a
+second version of the rig and rigging it myself... see if you can make those fingers really wrap around the bar."*
+- **Beam (real loop, goblin, scratch `gbeam.cjs`):** on from the platform, along at 1.6 m/s, the lower toe 1.040 against the beam's 1.0 top (its
+  own height over the sole) -- no float; uncorrected, the lean grows 0 -> 1 in ~2.6 s and he slips off that side, lands, stands. Works.
+- **Bar (real loop, `gbar.cjs`, close-ups):** the catch, the hold, the swing and the release all run. The old curl swung each finger joint onto the
+  circle's TANGENT at its own base -- a straight finger along a tangent points AWAY from the bar (the index joint 7 cm off the bar's axis every
+  frame) -- and the leaf joint (Index3: no child on these rigs) never bent. **Now** each joint is aimed at the next point ROUND the bar (a step
+  of its own length on a circle `barR + wrapR` about the bar's axis, the way the finger already goes; a leaf by its parent's line): the index's
+  last joint now sits ON that circle (.057 = .035 + .022).
+- **And why it barely shows -- his diagnosis, measured:** drawing the bones as dots in the close-ups, the wrist and all three index joints sit
+  within ~3 cm, inside the palm; the mesh's fingers run ~5 cm past the last joint. The bones curl round the bar; most of the visible finger is
+  not on them. **His re-rig (finger bones out to the fingertips) is the real fix**; the wrap will follow those bones with no change here.
+- Bar grip default back to PALM (the wrist was the m1052 bug, not his preference); a fresh key so a phone holding WRIST from m1055 resets.
+- Shipped unverified on the phone.
+
 ## m1055 -- why the climb / vault looked unchanged on the phone: every "measuring pass" read NOTHING after boot. Fixed; bar grip on a switch
 
 *"In the screenshots you sent, climbing and hurdling looked super good... but in the game it's exactly the same... and the hands on the bar look
