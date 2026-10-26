@@ -124,7 +124,7 @@ const ZAP_MOUNT = {
 // SHIPPED:handFrame
 function handFrame(hand, side) {
   const ch = nm => hand.children.find(c => c.isBone && c.name.endsWith(side + 'Hand' + nm));
-  const m = ch('Middle1'), i = ch('Index1'), p = ch('Pinky1');
+  const m = ch('Middle1'), i = ch('Index1') || (ch('Pinky1') ? m : null), p = ch('Pinky1');     // m1058: no index finger (thumb, middle, pinky -- the alien goblin): the knuckle line is pinky -> middle
   // m978: A MITT (the samurai: one Index chain for all four fingers, and a thumb). Along the fingers is wrist -> mitt; across the
   // knuckles (pinky -> index) is, in the bind T-pose with palms down, the way the body faces (+Z for every rig here).
   // m997: AT BIND, ONCE. +Z was taken through the hand's CURRENT world turn, which is only right in the T-pose: animated, the frame
@@ -287,7 +287,7 @@ export function prepDonor(scene, clips) {
 // is shared -- `HANDALIGN.fore` of it turns the forearm (a pronation), the rest the wrist -- so the wrist does not look broken.
 export const HANDALIGN = { fore: .5 };
 function anatFrame(B, sd, out = new THREE.Quaternion()) {
-  const M = 'mixamorig_' + sd + 'Hand', h = B[M], m = B[M + 'Middle1'], i = B[M + 'Index1'], p = B[M + 'Pinky1']; if (!h || !m || !i || !p) return null;
+  const M = 'mixamorig_' + sd + 'Hand', h = B[M], m = B[M + 'Middle1'], i = B[M + 'Index1'] || B[M + 'Middle1'], p = B[M + 'Pinky1']; if (!h || !m || !i || !p) return null;     // m1058: no index -> pinky -> middle
   const H = h.getWorldPosition(new THREE.Vector3()), f = m.getWorldPosition(new THREE.Vector3()).sub(H).normalize();
   const t = i.getWorldPosition(new THREE.Vector3()).sub(p.getWorldPosition(new THREE.Vector3())); t.addScaledVector(f, -t.dot(f)).normalize();
   return out.setFromRotationMatrix(new THREE.Matrix4().makeBasis(f, t, new THREE.Vector3().crossVectors(f, t)));

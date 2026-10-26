@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1058 -- the ALIEN GOBLIN is a playable hero (his own rig): baked, weapons from his hands, hair + cape on springs
+
+*"We're gonna need to run him through the process. I didn't add the weapons or the sockets -- you'll have to do those. He does have a root."*
+- **Hands with no index finger:** his rig has thumb / middle / pinky. `handFrame` (game + its Forge copy) and the Forge's `anatFrame` needed
+  Index1 for the knuckle line; now pinky -> middle stands in. The weapon mounts are BUILT from his hands (no sockets needed): blaster 55 cm,
+  launcher 71, hammer 67, katana 91 -- the sizes every hero gets.
+- **Bake:** the goblin's profile (123 clips, Rollergirl's tuck as a donor) onto `alien_goblin_chains.glb` -> resize / webp / draco / hipshift ->
+  `models/characters/alien_goblin_game.glb` (8.7 MB; 137 joints: 51 + 82 chain + 4 mounts). HERO `agoblin` 'ALIEN GOBLIN', height 1.4.
+- **Springs (`SPRINGS`, `springsStep`, after the final root placement):** every `hair_*` / `cape_*` chain on verlet springs (the creature's
+  `springs()`): momentum (`drag`), a pull back to the pose (`stiff`), gravity, fixed length, a bend limit. Hair light (head sphere); cape heavy
+  and loose, kept out of nine body spheres (hips, spine, thighs, shins) -- each sphere shrunk at load so it can never reach the cape where it
+  hangs at rest. A teleport resets them. `mel.SPRINGS` live.
+- **Real loop (after boot, `agame.cjs`):** loads, 61 spring segments; idle: cape 1-23 deg off its rest (gravity), hair 4-23; running: cape
+  7-85 (streams back), settles when he stops; jump / fall / blaster all draw. Renders checked.
+- Shipped unverified on the phone. HERO menu: ALIEN GOBLIN.
+
 ## m1057 -- the alien goblin's hair and cape get spring chains (rig file only; not in the game yet)
 
 His new rig (`models/characters/alien_goblin.glb`, C4D -> Mixamo, 51 joints WITH fingers -- thumb / middle / pinky -- draco, 2K webp) with three
