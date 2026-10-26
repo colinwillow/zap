@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1039 -- the CLIMB-UP helper: by a ledge about his height a green L-arrow lies on it, the right pad pulses green, a tap climbs him up
+
+*"When we have things that are about the character height, like this ledge, we should have a way of getting him up over it... if you're
+close enough and you tap the right stick, he should climb up onto the ledge rather than having to jump... a green arrow that rests on the
+two planes -- up the vertical, then a 90 degree turn -- and the button pulses green: interact."*
+- `mantleFind` (every frame, any world, standing and not busy): the nearest solid box face within .75 m of his surface whose top is .9-2.35 m
+  above his feet (a wall chunk: its column top), not a pole, deep enough to stand on, with headroom and a floor where he would land.
+- `mantleHelp`: a green L-arrow (one strip up the face, one over the top, a head pointing in; pulsing) placed on that face; `padR.act` -- the
+  pad's ring green and breathing. `mantleTap` (the right pad's tap, after talk / pick / portal / wings, before the jump): `stepMantle` -- up
+  first (and in to the face), then over onto the top `inset` .42 m in (never through the lip), `dur` .55 + .22 s per metre, the ledge
+  climb-up clip played over it from a start point that skips the hang for a low ledge. The left tap still jumps.
+- Shipped unverified.
+
 ## m1038 -- high bar: hands GRIP the bar (fingers wrap it); a much bigger launch; continuous TUCKED flips (Rollergirl's tuck) until he opens to land; circle the stick to spin further
 
 *"his hands don't quite go over the bar... make his hands actually grip the bar... I want to launch farther, everything about this game is big
