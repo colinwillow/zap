@@ -863,10 +863,10 @@ body.desk.free #deskHint { display: block; }
   <h1>WEIRDPORT</h1>
   <div class="msg" id="bootMsg">loading</div>
   <div class="bar"><i id="bootBar"></i></div>
-  <div class="bld">BUILD <span id="bootBuild">m1076</span></div>
+  <div class="bld">BUILD <span id="bootBuild">m1077</span></div>
 </div>
 
-<div class="chip" id="build"><b id="buildN">m1076</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
+<div class="chip" id="build"><b id="buildN">m1077</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
 <div id="splash" aria-label="tap to start"><img class="blur" alt=""><img class="main" alt="Zap and Clancy"><div class="glow"></div><div class="bn"></div></div>
 <script>
 // m879 (STEER 02:22): THE SPLASH, before the module (so it shows on the first paint, while the boot carries on behind it). The image's
@@ -972,7 +972,7 @@ import { KTX2Loader } from './vendor/KTX2Loader.js';
 import { clone as skeletonClone } from './vendor/SkeletonUtils.js';
 import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
 
-const BUILD = 'm1076';
+const BUILD = 'm1077';
 /* ASSETS:START */
 const ASSETS = {"models/alien_lizard.glb":"faffcf4c","models/alien_lizard_ktx2.glb":"05da2a20","models/skate.glb":"0c612d5e","models/skateboard.glb":"5ba93796","models/characters/alien_antenna_game.glb":"f3ccf328","models/characters/alien_antenna_game_ktx2.glb":"28afac8c","models/characters/alien_female_purple.glb":"1c73eef1","models/characters/alien_female_purple_ktx2.glb":"fc914afb","models/characters/alien_goblin.glb":"3e91bffb","models/characters/alien_goblin_chains.glb":"e72d1550","models/characters/alien_goblin_game.glb":"cfabd926","models/characters/alien_grey_medium.glb":"5a779e8e","models/characters/alien_grey_medium_ktx2.glb":"61600c3e","models/characters/alien_rollerskate_blue.glb":"abf0917c","models/characters/alien_rollerskate_blue_ktx2.glb":"e9a7948a","models/characters/alien_warrior.glb":"f5cc9c49","models/characters/alien_warrior_ktx2.glb":"a13fb7b6","models/characters/beautiful_asian.glb":"910f6565","models/characters/beautiful_asian_ktx2.glb":"35281eef","models/characters/beautiful_blonde.glb":"edddc421","models/characters/beautiful_blonde_ktx2.glb":"89cf3899","models/characters/brute_warboss_armor.glb":"cc5c7936","models/characters/ceo_alien.glb":"844dc3a7","models/characters/ceo_human.glb":"ec289865","models/characters/clancy.glb":"4b9d271f","models/characters/clancy_ktx2.glb":"74edbc6e","models/characters/colin.glb":"99d38b7d","models/characters/colin_ktx2.glb":"35040f87","models/characters/contruction_worker.glb":"8bd3d7ce","models/characters/contruction_worker_ktx2.glb":"3df8c344","models/characters/dummy_officer.glb":"724965ac","models/characters/dummy_officer_ktx2.glb":"db640cda","models/characters/fat_activist_01.glb":"3c566fee","models/characters/fat_activist_01_ktx2.glb":"b9328df4","models/characters/fat_biker_01.glb":"576b7cf5","models/characters/fat_biker_01_ktx2.glb":"7142cfad","models/characters/fat_biker_02.glb":"ab5d7ec7","models/characters/fat_biker_02_ktx2.glb":"28cec6cc","models/characters/fat_hippie.glb":"f09a260d","models/characters/fat_hippie_ktx2.glb":"0be745a4","models/characters/fat_hipster.glb":"9cf45ffb","models/characters/fat_hipster_ktx2.glb":"18106ff3","models/characters/fat_secret_service.glb":"6d546fb0","models/characters/fat_secret_service_ktx2.glb":"a23a304e","models/characters/fat_trump.glb":"5de6bc56","models/characters/fat_trump_ktx2.glb":"a0ddaf4d","models/characters/firefighter.glb":"ebde005d","models/characters/firefighter_ktx2.glb":"ccf93c96","models/characters/goblin_game.glb":"db1cf0e0","models/characters/hick_skinny.glb":"1ebe78e8","models/characters/hick_skinny_ktx2.glb":"1e93f0ed","models/characters/hobo_01.glb":"34e80b1d","models/characters/hobo_01_ktx2.glb":"69497677","models/characters/jack.glb":"ab009b9b","models/characters/jack_ktx2.glb":"1f4c9f7f","models/characters/moussa.glb":"6d80b1cf","models/characters/moussa_ktx2.glb":"66e040f8","models/characters/orc_game.glb":"d9aa816d","models/characters/proxy_ceo.bin":"6eca0c34","models/characters/proxy_ceo.jpg":"fadc9d0a","models/characters/proxy_ceo.json":"e62a7975","models/characters/proxy_ceo_alien.bin":"be247ecc","models/characters/proxy_ceo_alien.jpg":"8f8bf8fc","models/characters/proxy_ceo_alien.json":"eb23e28f","models/characters/proxy_hick.bin":"4485560e","models/characters/proxy_hick.jpg":"8c331965","models/characters/proxy_hick.json":"d85a0d36","models/characters/proxy_zap.bin":"dd7b300e","models/characters/proxy_zap.jpg":"2e7330ae","models/characters/proxy_zap.json":"b3b42754","models/characters/proxy_zap2.bin":"51088f46","models/characters/proxy_zap2.jpg":"a954a815","models/characters/proxy_zap2.json":"5c50abb7","models/characters/rept_heavy_armor.glb":"934661c7","models/characters/samurai_game.glb":"c7940015","models/characters/xray_skeleton.glb":"46480317","models/characters/zap.glb":"5e5cca54","models/characters/zap_02.glb":"4ff12de0","models/characters/zap_02_lib.glb":"e23d91da","models/characters/zap_ktx2.glb":"4b29d886","models/characters/zoar.glb":"423a9de9","models/characters/zoar_game.glb":"d20a3736","models/vehicles/dump_truck.glb":"d870dc18","models/vehicles/dump_truck_ktx2.glb":"21ee7059","models/vehicles/motorcycle_fatboy.glb":"9ed9be28","models/weapons/alien_antenna_blaster_game.glb":"54083b44","models/weapons/alien_antenna_hammer_game.glb":"707b8a27","models/weapons/alien_launcher.glb":"ba8ab96a","models/weapons/hammer.glb":"3335fdf2","models/weapons/shield_brute.glb":"c6e5593f","models/weapons/spikey_mace.glb":"dcd43acd","models/weapons/w_brute_cleaver.glb":"07a97580","models/weapons/w_rept_maul.glb":"84c3a1a4","models/buildings/alien_base_01.glb":"d9b9fd7f","models/buildings/alien_base_01_ktx2.glb":"6cbbfef2","models/towers/alien_tower_01.glb":"98d23375","models/towers/alien_tower_01_ktx2.glb":"47597651","models/streets/modular_streets_kit.glb":"6a4bcaa5","models/toon_city/impact_marks.json":"2b616620","models/toon_city/impact_marks_atlas.ktx2":"efe0840e","models/toon_city/impact_marks_atlas.png":"490ed049","models/toon_city/toon_city_breakables.glb":"29bddbc8","models/toon_city/toon_city_collision.glb":"fb3a693f","models/toon_city/toon_city_obb.json":"81c18a47","models/toon_city/toon_city_visual.glb":"5df62285","models/toon_city/toon_city_visual_ktx2.glb":"cf080531","models/toon_city/weirdkit_tint.js":"f6e9d802","models/toon_city_kit/toon_city_collision.glb":"5540a364","models/toon_city_kit/toon_city_kit_buildings.glb":"590e53f0","models/toon_city_kit/toon_city_kit_buildings_ktx2.glb":"e6dff3a3","models/toon_city_kit/toon_city_kit_pieces.glb":"8232bd6f","models/toon_city_kit/toon_city_kit_twins.glb":"fcc9fdfc","models/toon_city_kit/toon_city_visual.glb":"45cf2957","models/toon_city_kit/toon_city_visual_ktx2.glb":"f26a6984","models/toon_city_kit/weirdkit_detile.js":"dd05bd70","models/characters/morph/shapes.bin":"4e680384","models/characters/morph/shapes.json":"abfc949d","models/characters/forged/alien_goblin_game.glb":"4925f5a6","models/characters/forged/brute_warboss_armor.glb":"dc15dc94","models/characters/forged/ceo_alien.glb":"20659ac3","models/characters/forged/ceo_human.glb":"326d9e7e","models/characters/forged/goblin_game.glb":"3c813462","models/characters/forged/index.json":"ea063e12","models/characters/forged/orc_game.glb":"7bf3c227","models/characters/forged/rept_heavy_armor.glb":"01e631b0","models/characters/forged/samurai_game.glb":"a946c148","models/characters/forged/zap.glb":"10eda718","models/characters/forged/zap_02.glb":"fd513cea","models/characters/forged/zap_02_lib.glb":"fd513cea","models/characters/forged/zoar_game.glb":"b032a28e","images/crack_sprite_01.ktx2":"4aa55fde","images/crack_sprite_01.png":"16b52e8c","images/fire_sprites_01.ktx2":"922e1191","images/fire_sprites_01.png":"f87e2696","images/fire_sprites_02.ktx2":"e0cbfe1d","images/fire_sprites_02.png":"b373a6fd","images/fire_sprites_03.ktx2":"4fbbb985","images/fire_sprites_03.png":"7eece336","images/geyser_sprites_01.png":"b6325470","images/hdri_game.ktx2":"0feb5c79","images/hdri_game.png":"dac55f41","images/splash_zap_n_clancy.webp":"52a9d8a4","images/water_sprites_01.ktx2":"326924c5","images/water_sprites_01.png":"31e12659","audio/blaster_sound_01.mp3":"40d99583","audio/blaster_sound_02.mp3":"4bd7bb7c","audio/box_break_01.mp3":"e4127980","audio/electricity_beam_01.mp3":"986db8c9","audio/explosion_small.mp3":"f154a537","audio/metal_clang_01.mp3":"a333bd27","audio/metal_clang_02.mp3":"1e3ebbd6","audio/metal_clang_03.mp3":"afe44812","audio/metal_ping_01.mp3":"8ffca1a0","audio/plasma_canon.mp3":"e32c324d","audio/powerup_01.mp3":"48fbbe08","audio/swoosh_01.mp3":"193db185","audio/swoosh_02.mp3":"19145e70","audio/swoosh_03.mp3":"544fdffb","audio/swoosh_04.mp3":"843bee5d","audio/plasma_sounds/plasma_01.mp3":"e71c010f","audio/plasma_sounds/plasma_02.mp3":"ac3b1c75","audio/plasma_sounds/plasma_03.mp3":"eaa59355","audio/plasma_sounds/plasma_04.mp3":"bc7865e0","audio/plasma_sounds/plasma_05.mp3":"1d821cd0","audio/plasma_sounds/plasma_06.mp3":"cb979fbe","audio/plasma_sounds/plasma_hit.mp3":"30e5af5c","audio/alien_orc_grunt_sounds/alien_orc_grunt_01.mp3":"d6f4b343","audio/alien_orc_grunt_sounds/alien_orc_grunt_02.mp3":"78afc603","audio/alien_orc_grunt_sounds/alien_orc_grunt_03.mp3":"972c524a","audio/alien_orc_grunt_sounds/alien_orc_grunt_04.mp3":"b0ce76eb","audio/alien_orc_grunt_sounds/alien_orc_grunt_05.mp3":"1f0ba1f4","audio/alien_orc_grunt_sounds/alien_orc_grunt_06.mp3":"4f749866","audio/alien_orc_grunt_sounds/alien_orc_grunt_07.mp3":"dcf75925","audio/hit_sounds/hit_sound_01.mp3":"befaa2be","audio/hit_sounds/hit_sound_02.mp3":"73bc4433","audio/hit_sounds/hit_sound_03.mp3":"24b181e4","audio/hit_sounds/hit_sound_gound_01.mp3":"86ee2674","audio/hit_sounds/hit_sound_ground_02.mp3":"8a7cac73","audio/hit_sounds/hit_sound_plasma_01.mp3":"9abc0202","audio/hit_sounds/hit_sound_plasma_02.mp3":"6aaf0fe5","audio/creature_noises/creature_noise_01.mp3":"cbcc6ee7","audio/creature_noises/creature_noise_02.mp3":"201a8247","audio/creature_noises/creature_noise_03.mp3":"97680811","audio/creature_noises/creature_noise_04.mp3":"6f734df2","audio/creature_noises/creature_noise_05.mp3":"6f736441","audio/creature_noises/creature_noise_06.mp3":"992712e9","audio/creature_noises/creature_noise_07.mp3":"d9ad04b3","audio/footsteps/footstep_2_l.mp3":"abeabfbe","audio/footsteps/footstep_2_r.mp3":"7dd16046","audio/footsteps/footstep_l.mp3":"b66e579b","audio/footsteps/footstep_r.mp3":"96e13433","models/props/prop_hydrant.glb":"f157fee9","models/props/prop_hydrant_collision.glb":"0bbfc4d2","models/creatures/3_headed_dog.glb":"9263480a","models/creatures/blue_dragon.glb":"d72f4da7","models/creatures/mech_lightning_dragon.glb":"5935bb67"};
 /* ASSETS:END */
@@ -10179,21 +10179,72 @@ function arenaTime(raw) {
   const u = ARENA.slow / ARENA.slowT;
   return ARENA.slowK + (1 - ARENA.slowK) * (1 - smooth(.25, 1, u));
 }
+// m1077: THE TURRET, RE-MODELLED. *"More like alien samurai -- cyber future, AI, but also retro samurai, and also goblin."* Still all
+// primitives (no file): a black-lacquer octagon plinth on three goblin claws, a neck with two cyan neon rings, and a head that is a
+// KABUTO -- red-lacquer core, a low dome, a flared three-tier neck guard (shikoro) open at the front, a gold crescent crest (maedate),
+// long goblin EARS out of the sides, a grinning menpo face plate with gold teeth, and the red/green visor slit that was the eye. The
+// two launchers are SODE (shoulder plates) with two glowing tubes each, and a sashimono banner on the back sways (`T.flag`).
+// Its footprint, height, muzzle and the parts the brain moves (`head`, `eye`, `pods`, `mats`) are unchanged.
+let TURTEX = null;
+function turretBannerTex() {
+  if (TURTEX) return TURTEX;
+  const c = document.createElement('canvas'); c.width = 64; c.height = 128; const x = c.getContext('2d');
+  x.fillStyle = '#8a1620'; x.fillRect(0, 0, 64, 128);
+  x.fillStyle = '#e8b64a'; x.fillRect(0, 0, 64, 10); x.fillRect(0, 118, 64, 10);
+  x.strokeStyle = '#e8b64a'; x.lineWidth = 6; x.beginPath(); x.arc(32, 52, 18, 0, Math.PI * 2); x.stroke();
+  x.fillStyle = '#39f0ff'; x.beginPath(); x.arc(32, 52, 7, 0, Math.PI * 2); x.fill();     // the AI's eye in the goblin clan's ring
+  x.fillStyle = '#e8b64a'; for (let i = 0; i < 3; i++) x.fillRect(29, 80 + i * 11, 6, 7);
+  TURTEX = new THREE.CanvasTexture(c); TURTEX.colorSpace = THREE.SRGBColorSpace; return TURTEX;
+}
 function turretMake() {
-  const g = new THREE.Group(), M = (c, m, r) => new THREE.MeshStandardMaterial({ color: c, metalness: m, roughness: r });
-  const dark = M(0x2f3236, .7, .45), mid = M(0x5b6068, .6, .4), red = new THREE.MeshBasicMaterial({ color: 0xff3344, toneMapped: false }), hazard = M(0xf2b233, .2, .6);
+  const g = new THREE.Group(), M = (c, m, r, o) => new THREE.MeshStandardMaterial(Object.assign({ color: c, metalness: m, roughness: r }, o || {}));
+  const lac = M(0x6a0e16, .15, .5), black = M(0x120c14, .3, .45), gun = M(0x30343b, .7, .45), gold = M(0xd9a441, .9, .3, { emissive: 0x3a2400 }),
+    skin = M(0x5d8a3a, .05, .7), neon = new THREE.MeshBasicMaterial({ color: 0x39f0ff, toneMapped: false }), hot = new THREE.MeshBasicMaterial({ color: 0xff7a2a, toneMapped: false }),
+    red = new THREE.MeshBasicMaterial({ color: 0xff3344, toneMapped: false });
   const add = (geo, mat, x, y, z, P) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; (P || g).add(m); return m; };
-  add(new THREE.CylinderGeometry(.55, .65, .18, 16), dark, 0, .09, 0);
-  for (let i = 0; i < 3; i++) { const a = i / 3 * Math.PI * 2, l = add(new THREE.BoxGeometry(.12, .1, .7), mid, Math.sin(a) * .5, .06, Math.cos(a) * .5); l.rotation.y = a; }
-  add(new THREE.CylinderGeometry(.16, .2, .75, 10), mid, 0, .55, 0);
-  add(new THREE.CylinderGeometry(.3, .3, .06, 16), hazard, 0, .9, 0);
+  // the plinth and the claws
+  add(new THREE.CylinderGeometry(.5, .62, .2, 8), black, 0, .1, 0);
+  add(new THREE.TorusGeometry(.5, .022, 6, 8), gold, 0, .2, 0).rotation.x = Math.PI / 2;
+  for (let i = 0; i < 3; i++) { const a = i / 3 * Math.PI * 2 + Math.PI / 3, sx = Math.sin(a), cz = Math.cos(a);
+    const leg = add(new THREE.BoxGeometry(.13, .12, .42), gun, sx * .52, .08, cz * .52); leg.rotation.y = a;
+    for (const o of [-.045, .045]) { const cl = add(new THREE.ConeGeometry(.035, .16, 5), gold, sx * .74 + cz * o, .05, cz * .74 - sx * o);
+      cl.rotation.set(Math.PI / 2 + .5, 0, 0); cl.rotation.order = 'YXZ'; cl.rotation.y = a; } }
+  // the neck: gunmetal, two neon rings, a gold collar
+  add(new THREE.CylinderGeometry(.14, .2, .72, 8), gun, 0, .55, 0);
+  for (const y of [.42, .64]) add(new THREE.TorusGeometry(.165, .014, 6, 16), neon, 0, y, 0).rotation.x = Math.PI / 2;
+  add(new THREE.CylinderGeometry(.27, .3, .06, 8), gold, 0, .9, 0);
+  // THE HEAD (local +Z is where it looks)
   const head = new THREE.Group(); head.position.y = TURRET.muzzle - .1; g.add(head);
-  add(new THREE.BoxGeometry(.6, .36, .55), dark, 0, .1, 0, head);
-  add(new THREE.BoxGeometry(.62, .06, .57), hazard, 0, .3, 0, head);
-  const eye = add(new THREE.SphereGeometry(.07, 10, 8), red, 0, .14, .28, head);
+  add(new THREE.BoxGeometry(.48, .3, .46), lac, 0, .08, 0, head);
+  add(new THREE.SphereGeometry(.29, 14, 6, 0, Math.PI * 2, 0, Math.PI / 2), black, 0, .2, -.02, head).scale.set(1, .62, 1.05);
+  add(new THREE.BoxGeometry(.04, .07, .5), gold, 0, .37, -.02, head);     // the dome's ridge
+  for (let i = 0; i < 3; i++)      // the shikoro: three flared tiers, round the back and the sides, open in front
+    add(new THREE.CylinderGeometry(.3 + i * .05, .36 + i * .05, .075, 14, 1, true, Math.PI * .3, Math.PI * 1.4), i === 1 ? gold : lac, 0, .17 - i * .07, -.02, head).material.side = THREE.DoubleSide;
+  const crest = add(new THREE.TorusGeometry(.2, .022, 6, 18, Math.PI), gold, 0, .44, .14, head); crest.rotation.z = Math.PI;     // the crescent, horns up
+  crest.scale.set(1.25, 1, 1); crest.position.y = .5;
+  add(new THREE.SphereGeometry(.045, 8, 6), neon, 0, .31, .2, head);     // its jewel
+  for (const sx of [-1, 1]) {     // goblin ears, long and swept back
+    const ear = add(new THREE.ConeGeometry(.09, .62, 6), skin, sx * .42, .2, -.08, head); ear.rotation.set(-.35, 0, -sx * 1.2); ear.scale.z = .45;     // flat blades
+    add(new THREE.ConeGeometry(.05, .4, 5), lac, sx * .44, .2, -.06, head).rotation.set(-.35, 0, -sx * 1.2);
+  }
+  add(new THREE.BoxGeometry(.4, .15, .05), gun, 0, -.01, .25, head);     // the menpo
+  for (let i = 0; i < 5; i++) add(new THREE.ConeGeometry(.018, .05, 4), gold, -.12 + i * .06, -.06, .28, head).rotation.x = Math.PI;     // its grin
+  const eye = add(new THREE.BoxGeometry(.34, .045, .02), red, 0, .1, .245, head);     // the visor slit (red: sees you; green: sweeping)
+  for (const sx of [-1, 1]) add(new THREE.BoxGeometry(.012, .2, .3), neon, sx * .245, .08, .02, head);     // cyber seams down its cheeks
+  // the sashimono on its back
+  add(new THREE.CylinderGeometry(.012, .012, .95, 5), gold, 0, .6, -.27, head);
+  const flag = new THREE.Group(); flag.position.set(0, 1.0, -.27); head.add(flag);
+  const cloth = new THREE.Mesh(new THREE.PlaneGeometry(.22, .44), new THREE.MeshStandardMaterial({ map: turretBannerTex(), roughness: .8, side: THREE.DoubleSide }));
+  cloth.position.set(.12, -.24, 0); cloth.rotation.y = Math.PI / 2; flag.add(cloth);
+  // the launchers: shoulder plates, two tubes each
   const pods = [];
-  for (const x of [-.24, .24]) { const pod = add(new THREE.BoxGeometry(.16, .18, .42), mid, x, .1, .18, head); add(new THREE.CylinderGeometry(.05, .05, .5, 8), dark, x, .1, .48, head).rotation.x = Math.PI / 2; pods.push(pod); }
-  return { g, head, eye, pods, mats: [dark, mid] };
+  for (const x of [-.31, .31]) { const pod = new THREE.Group(); pod.position.set(x, .06, .18); head.add(pod);
+    add(new THREE.BoxGeometry(.17, .22, .42), lac, 0, 0, 0, pod);
+    add(new THREE.BoxGeometry(.18, .03, .43), gold, 0, .11, 0, pod);
+    for (const ty of [-.05, .05]) { add(new THREE.CylinderGeometry(.04, .04, .5, 8), gun, 0, ty, .12, pod).rotation.x = Math.PI / 2;
+      add(new THREE.TorusGeometry(.04, .01, 5, 10), hot, 0, ty, .37, pod); }
+    pods.push(pod); }
+  return { g, head, eye, pods, flag, mats: [lac, black, gun] };
 }
 // m1034: THE HIGH BAR (COURSES.md, GYM). *"Jump up onto a bar... press and hold, and as you hold he pumps once, pumps twice, and the third one
 // goes around until he's looping; when you let go he flies off directionally based on where you let go... build the scaffolding."* SPAWN >
@@ -10813,7 +10864,7 @@ function turretMelee(x, y, z, rad, dmg) {
 }
 function turretFire(T) {
   const K = TURRET.kinds[TURRET.shot] || TURRET.kinds.ROCKET, h = T.yaw, rocket = TURRET.shot === 'ROCKET';
-  const side = (T.side = -(T.side || 1)), ox = Math.cos(h) * .24 * side, oz = -Math.sin(h) * .24 * side;
+  const side = (T.side = -(T.side || 1)), ox = Math.cos(h) * .31 * side, oz = -Math.sin(h) * .31 * side;
   // m1013: HIS OWN ROCKET'S BODY (`rocketBody`, nose along +Y), turned onto its flight; a bolt is a ball
   const m = rocket ? rocketBody() : new THREE.Mesh(new THREE.SphereGeometry(K.size, 8, 6), new THREE.MeshBasicMaterial({ color: 0xff4466, toneMapped: false }));
   if (rocket) m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(Math.sin(h), 0, Math.cos(h)));
@@ -10938,6 +10989,7 @@ function turretStep(dt) {
     T.yaw += clamp(wrapAngle(want - T.yaw), -TURRET.turn * dt, TURRET.turn * dt);
     T.head.rotation.set(T.tilt, T.yaw, T.tilt * .6, 'YXZ'); T.recoil = Math.max(0, (T.recoil || 0) - dt);
     for (const pd of T.pods) pd.position.z = .18 - (T.recoil || 0) * .8;
+    if (T.flag) T.flag.rotation.y = Math.sin(T.t * 2.6) * .22 + Math.sin(T.t * 6.1) * .06 - wrapAngle(want - T.yaw) * .3;     // m1077: the banner sways and trails its turns
     T.eye.material.color.setHex(T.see > 0 ? 0xff2233 : 0x66ff99);
     T.cool -= dt;
     if (T.see > 0 && los && Math.abs(wrapAngle(toP - T.yaw)) < TURRET.aimTol && T.cool <= 0) { T.cool = (TURRET.kinds[TURRET.shot] || TURRET.kinds.ROCKET).cool; turretFire(T); }
@@ -10947,7 +10999,9 @@ function turretStep(dt) {
   }
   for (const S of TURRET.shots) {
     if (S.dead) continue; S.t += dt; const ox = S.p.x, oy = S.p.y, oz = S.p.z; S.p.addScaledVector(S.v, dt); S.m.position.copy(S.p);
-    if (S.rocket && Math.random() < .6) smokeAt(ox, oy, oz, .45, .6);
+    if (S.rocket) { rocketFlick(S.m); S.tr = (S.tr || 0) + dt; const vl = S.v.length() || 1;     // m1077: the same fire trail as his
+      while (S.tr > ROCKET.smokeEvery * 1.4) { S.tr -= ROCKET.smokeEvery * 1.4; const ux = S.v.x / vl, uy = S.v.y / vl, uz = S.v.z / vl;
+        rocketTrail(S.m.position.x - ux * ROCKET.len * .6, S.m.position.y - uy * ROCKET.len * .6, S.m.position.z - uz * ROCKET.len * .6, ux, uy, uz, .8); } }
     // HIM: a standing body is in the way, a DUCKED one is under it
     const qx = p.pos.x - S.p.x, qz = p.pos.z - S.p.z;
     // m1029: THE KATANA'S GUARD TURNS IT. A perfect block (`SHOTBLOCK.win` s from the guard going up) sends it home; a late one sends it
@@ -12861,7 +12915,7 @@ function stepSparks(dt) {
 // world -- smoke that follows him is a man with a cloud stuck to his face. The spark swarm's
 // `follow` is the opposite case and is right for what it does.
 const SMOKE = {
-  on: 1, n: 160,       // 80 -> 160 (m189): the rocket's exhaust shares the pool with the cigarettes
+  on: 1, n: 280,       // 80 -> 160 (m189): the rocket's exhaust shares the pool with the cigarettes; 280 (m1077): its FIRE is on it now too
   every: [.30, .75],   // seconds between puffs, rolled per puff so the column is not a metronome
   rise: .30,           // m/s up, and it does not slow -- vapour has no gravity worth modelling
   drift: .085,         // sideways, so the column leans and breaks up instead of stacking
@@ -12873,7 +12927,7 @@ const SMOKE = {
   fadeIn: .12,         // of its life -- a puff that starts at full opacity pops
   col: [.80, .79, .76],
 };
-const smoke = { i: 0, live: 0, P: null, v: [], life: [], age: [], s0: [], s1: [] };
+const smoke = { i: 0, live: 0, P: null, v: [], life: [], age: [], s0: [], s1: [], pk: [] };     // pk (m1077): a puff's own peak opacity (fire), else SMOKE.peak
 {
   smoke.P = puffPool(SMOKE.n, THREE.NormalBlending);
   for (let i = 0; i < SMOKE.n; i++) {
@@ -12881,7 +12935,7 @@ const smoke = { i: 0, live: 0, P: null, v: [], life: [], age: [], s0: [], s1: []
     smoke.s0.push(0); smoke.s1.push(0);
   }
 }
-function smokeAt(x, y, z, k, lifeK, col) {
+function smokeAt(x, y, z, k, lifeK, col, peak) {
   if (!SMOKE.on) return;
   k = k || 1;
   const i = smoke.i; smoke.i = (smoke.i + 1) % SMOKE.n;
@@ -12893,7 +12947,7 @@ function smokeAt(x, y, z, k, lifeK, col) {
   smoke.s1[i] = SMOKE.size1 * k * (.7 + Math.random() * .6);
   const C = col || SMOKE.col;
   P.col[i * 3] = C[0]; P.col[i * 3 + 1] = C[1]; P.col[i * 3 + 2] = C[2];
-  P.siz[i] = smoke.s0[i]; P.alp[i] = 0;
+  P.siz[i] = smoke.s0[i]; P.alp[i] = 0; smoke.pk[i] = peak || 0;
 }
 const _sm = new THREE.Vector3();
 function stepSmoke(dt) {
@@ -12924,7 +12978,7 @@ function stepSmoke(dt) {
     P.siz[i] = smoke.s0[i] + (smoke.s1[i] - smoke.s0[i]) * u;
     // IN QUICKLY, OUT SLOWLY. A puff at full opacity on its first frame pops; one that fades
     // linearly all the way out reads as a hard edge leaving.
-    P.alp[i] = SMOKE.peak * Math.min(1, u / SMOKE.fadeIn) * (1 - u) * (1 - u);
+    P.alp[i] = (smoke.pk[i] || SMOKE.peak) * Math.min(1, u / SMOKE.fadeIn) * (1 - u) * (1 - u);
   }
   puffFlush(P, live);
   smoke.live = live;
@@ -13931,24 +13985,61 @@ const ROCKET = {
   arm: [{ k: 'clang', g: .34, r: .52, dur: .18 }, { k: 'lock', g: .2, r: .85 }],
   home: 0,           // 1 = it curves onto bodies like the bolt does (m258: off -- see `boltHome`)
 };
+// m1077: THE ROCKET, RE-MODELLED to match the turret -- a red-lacquer LATHE body (nozzle bell, waist, ogive nose), two gold bands, a
+// cyan neon ring behind the nose, four swept fins, and a real FLAME: two open cones (an orange sheath, a white-yellow core) out of the
+// nozzle, flickered every frame (`rocketFlick`) under the old glow sprites. Still nose along +Y, still `ROCKET.len` long.
+let ROCKGEO = null;
+function rocketGeo() {
+  if (ROCKGEO) return ROCKGEO;
+  const L = ROCKET.len / 2, P = [[0, -L - .02], [.05, -L - .02], [.062, -L + .03], [.045, -L + .06], [.066, -L + .08], [.07, L - .2], [.064, L - .1], [.045, L - .03], [.02, L + .05], [0, L + .08]];
+  const body = new THREE.LatheGeometry(P.map(q => new THREE.Vector2(q[0], q[1])), 14);
+  const sh = new THREE.Shape(); sh.moveTo(0, -L + .08); sh.lineTo(.17, -L - .04); sh.lineTo(.15, -L + .08); sh.lineTo(0, -L + .26);
+  const fin = new THREE.ShapeGeometry(sh);
+  const sheath = new THREE.ConeGeometry(.065, .55, 12, 1, true); sheath.rotateX(Math.PI); sheath.translate(0, -L - .3, 0);
+  const core = new THREE.ConeGeometry(.04, .3, 10, 1, true); core.rotateX(Math.PI); core.translate(0, -L - .17, 0);
+  return (ROCKGEO = { body, fin, sheath, core, L });
+}
 function rocketBody() {
-  const g = new THREE.Group();
+  const g = new THREE.Group(), G = rocketGeo(), L = G.L;
   const hue = new THREE.Color().setHSL(WEAP.hue || .52, .9, .55);
-  const body = new THREE.Mesh(new THREE.CylinderGeometry(.07, .07, ROCKET.len, 10),
-    new THREE.MeshStandardMaterial({ color: 0x3a3f4a, roughness: .5, metalness: .3, emissive: hue, emissiveIntensity: .35 }));
-  const nose = new THREE.Mesh(new THREE.ConeGeometry(.075, .2, 10),
-    new THREE.MeshStandardMaterial({ color: hue, emissive: hue, emissiveIntensity: 1.2 }));
-  nose.position.y = ROCKET.len * .5 + .1;
-  const fin = new THREE.Mesh(new THREE.BoxGeometry(.26, .12, .02), body.material);
-  fin.position.y = -ROCKET.len * .42;
-  const fin2 = fin.clone(); fin2.rotation.y = Math.PI / 2;
+  const lac = new THREE.MeshStandardMaterial({ color: 0x7a121a, roughness: .45, metalness: .2, emissive: 0x200306 });
+  const gold = new THREE.MeshStandardMaterial({ color: 0xd9a441, roughness: .3, metalness: .9, emissive: 0x3a2400 });
+  const dark = new THREE.MeshStandardMaterial({ color: 0x2a2d33, roughness: .45, metalness: .7, side: THREE.DoubleSide });
+  g.add(new THREE.Mesh(G.body, lac));
+  for (const y of [-L + .1, .02]) { const r = new THREE.Mesh(new THREE.CylinderGeometry(.073, .073, .03, 14), gold); r.position.y = y; g.add(r); }
+  const ring = new THREE.Mesh(new THREE.CylinderGeometry(.069, .069, .02, 14), new THREE.MeshBasicMaterial({ color: hue, toneMapped: false })); ring.position.y = L - .14; g.add(ring);
+  for (let i = 0; i < 4; i++) { const f = new THREE.Mesh(G.fin, dark); f.rotation.y = i * Math.PI / 2 + Math.PI / 4; g.add(f); }
+  // NORMAL blending, not additive: the arena is white, and additive fire on white is white (the first render was a white blob)
+  const fm = (c, o) => new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: o, depthWrite: false, toneMapped: false, side: THREE.DoubleSide });
+  const sheath = new THREE.Mesh(G.sheath, fm(0xff5a10, .8)), core = new THREE.Mesh(G.core, fm(0xffd84a, .95));
   // the exhaust glow at the tail, the charge ball's own additive stack
-  const hot = glowSprite(0xffffff, .38), warm = glowSprite(0xff8a2a, .9);
-  hot.position.y = warm.position.y = -ROCKET.len * .55;
-  g.add(body, nose, fin, fin2, hot, warm);
+  const hot = glowSprite(0xffffff, .22), warm = glowSprite(0xff8a2a, .45);
+  hot.position.y = warm.position.y = -L - .05;
+  g.add(sheath, core, hot, warm);
+  g.userData.flame = [sheath, core];
   // the geometry is along +Y; the group is turned onto the flight each frame
   g.userData.noHole = 1;
   return g;
+}
+// m1077: the flame breathes -- each cone's length and girth rolled every frame (about the nozzle: the cones are built hanging from it)
+function rocketFlick(g) {
+  const F = g.userData.flame; if (!F) return;
+  for (let i = 0; i < 2; i++) { const k = .75 + Math.random() * .55, w = .85 + Math.random() * .3; F[i].scale.set(w, k, w); F[i].position.y = (1 - k) * (-ROCKGEO.L) * 1; }
+}
+// m1077: THE TRAIL, one emitter for his rockets and the turret's. Fire that COOLS as it falls behind -- a white-hot fleck at the nozzle,
+// yellow, then orange and a red ember thrown a little wide -- and the smoke after it. `dx..dz` is the flight's unit direction.
+// m1077: the FIRE is alpha-blended puffs on the smoke pool (it reads on the white arena; the spark pool is additive, so on white it
+// only whitens) -- yellow at the nozzle, orange behind, a red-brown that is already turning to smoke -- with a few additive sparks
+// and embers kept small for the sparkle on a dark background.
+const ROCKTRAIL = { yel: [1, .9, .4], org: [1, .55, .12], red: [1, .3, .08], spark: [1, .7, .3], ember: [.9, .25, .05], fireLife: .07, peak: 1.4 };     // peak x (1-u)^2 and the fade-in: ~.9 at its densest
+function rocketTrail(x, y, z, dx, dy, dz, k) {
+  k = k || 1; const T = ROCKTRAIL, j = () => (Math.random() - .5);
+  smokeAt(x, y, z, 3 * k, T.fireLife, T.yel, T.peak);
+  smokeAt(x - dx * .15 + j() * .05, y - dy * .15 + j() * .05, z - dz * .15 + j() * .05, 4 * k, T.fireLife * 1.6, T.org, T.peak);
+  if (Math.random() < .6) smokeAt(x - dx * .3, y - dy * .3, z - dz * .3, 4.5 * k, T.fireLife * 2.4, T.red, T.peak * .8);
+  spk(x, y, z, -dx * 3 + j() * 1.5, -dy * 3 + j() * 1.5 + .3, -dz * 3 + j() * 1.5, .1 * k, .12, T.spark);
+  if (Math.random() < .35) spk(x, y, z, -dx * 3 + j() * 4, j() * 4 + 1, -dz * 3 + j() * 4, .07, .45 + Math.random() * .3, T.ember);
+  smokeAt(x - dx * .45, y - dy * .45, z - dz * .45, ROCKET.smokeK * k, ROCKET.smokeLife * 1.5, ROCKET.smokeCol);
 }
 const _rkY = new THREE.Vector3(0, 1, 0), _rkD = new THREE.Vector3();
 function rocketFace(b) { _rkD.copy(b.vel).normalize(); b.g.quaternion.setFromUnitVectors(_rkY, _rkD); }
@@ -16055,9 +16146,9 @@ function stepBolts(dt) {
       while (b.smokeT > ROCKET.smokeEvery) {
         b.smokeT -= ROCKET.smokeEvery;
         const bx = b.pos.x - _rkD.x * ROCKET.len * .6, by = b.pos.y - _rkD.y * ROCKET.len * .6, bz = b.pos.z - _rkD.z * ROCKET.len * .6;
-        smokeAt(bx, by, bz, ROCKET.smokeK, ROCKET.smokeLife, ROCKET.smokeCol);
-        spk(bx, by, bz, -_rkD.x * 3, -_rkD.y * 3, -_rkD.z * 3, .16 + Math.random() * .1, .14, ROCKET.fire);
+        rocketTrail(bx, by, bz, _rkD.x, _rkD.y, _rkD.z, 1);     // m1077
       }
+      rocketFlick(b.g);
     } else
     // it flickers, which at sixty frames a second is what plasma looks like for the cost of
     // writing a scale

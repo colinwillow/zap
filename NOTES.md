@@ -5,6 +5,25 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1077 -- the turret is a cyber-samurai goblin; the rocket re-modelled with a real flame and a fire trail that reads on white
+
+*"Make the turret more like alien samurai -- cyber future, AI, but also retro samurai, and also goblin... then make the rocket's tail fire
+better, make the rocket itself look cooler, a little modeling pass."*
+- **Turret (`turretMake`, still primitives):** black-lacquer octagon plinth on three gold-clawed feet, gunmetal neck with two cyan neon rings, and
+  a KABUTO head -- red-lacquer core, low black dome with a gold ridge, three-tier shikoro open at the front, gold crescent maedate with a cyan
+  jewel, long green goblin ears, a gunmetal menpo with a gold-toothed grin, the visor slit as the eye (red sees you / green sweeps), cyan
+  cheek seams, two sode launchers with two orange-ringed tubes each, and a sashimono banner (canvas texture: the clan ring round a cyan AI
+  eye) that sways and trails the head's turns (`T.flag`). Footprint, height, muzzle, `head` / `eye` / `pods` / `mats` unchanged; the fire
+  offset follows the pods (.24 -> .31). Rendered from four sides in the real arena (`tlook.cjs`) before the push.
+- **Rocket (`rocketBody`, shared by his and the turret's):** a red-lacquer LATHE body (nozzle bell, waist, ogive nose), two gold bands, a cyan
+  ring behind the nose, four swept fins, and two flame cones (orange sheath, yellow core) that flicker every frame (`rocketFlick`).
+- **The first render was a WHITE BLOB:** every flame and trail effect was ADDITIVE, and additive fire on the white arena is white. The flame
+  cones are normal-blended now, the glow sprites halved, and the fire is alpha-blended puffs on the smoke pool (`rocketTrail`: yellow ->
+  orange -> red, then the grey smoke) with a few small additive sparks and embers left for dark backgrounds. `smokeAt` takes a per-puff
+  `peak` opacity (fire 1.4, smoke stays `SMOKE.peak` .3); `SMOKE.n` 160 -> 280. The turret's rockets use the same trail (they had a smoke
+  puff on 60% of frames). Re-rendered: flame and an orange-to-grey trail visible against the white floor.
+- Shipped unverified on the phone.
+
 ## m1076 -- the samurai rival gets a brain: he runs in, reads you late (by level), spaces, and his chop breaks a turtled guard; difficulty is timing only
 
 *"The samurai AI is stupid... make the difficulty just the timing -- when he swings, when he blocks... a fully functioning player... moderately
