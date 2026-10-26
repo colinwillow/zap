@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1066 -- catching the high bar mid-flip: no more superman pose turning about a point above him
+
+*"If I flip or am flipping and land on the high bar I attach in a weird pose and from a weird spot -- a superman pose, rotating from well above
+my character."* (screen: M1061)
+- **Cause:** `airFlipPose` only asked `!p.grounded`. A catch mid-flip left `p.aflip` running (the bar's step returns before `airFlipStep`, which
+  is what would have cleared it), so every frame the flip re-placed his root about HIS middle (`p.pos`) on top of the bar's hang.
+- m1063 already clears the flip (and the guard flip, the hook) in `hbarCatch`; now the POSE refuses too, while the bar / a ledge / a mantle /
+  a vault / a ladder / a wall run / the hook owns the body (and `wrunPose` on the bar or a ledge) -- a stale flip from any route cannot draw.
+- **Real loop (`fcatch2.cjs`, goblin, katana):** clean catch: hands .09 m from the bar, upright. A flip forced to keep running ON the bar
+  (M1061's state): before -- hands **1.64 m** off the bar, his up-axis **-0.59** (tipped over); after -- .09 m, upright. Caught mid air flip,
+  mid guard flip, mid multi-backflip, and rising into it naturally: all .09 m, upright, flip cleared.
+- Shipped unverified on the phone.
+
 ## m1065 -- the COVER LEAP: in half cover, charge the katana and release -> up high, over the block, slam down on the far side (and the stuck bug)
 
 *"In cover with the katana out, I held the right stick up (the charge), let go and it got stuck in the animation against the wall... Let's make it
