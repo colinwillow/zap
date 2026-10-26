@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1069 -- the slide tackle is the right pad's DOWN swipe (into cover when cover is that way); every other direction is the strike
+
+*"Swiping down can do the slide tackle, and if you slide tackle you'll just slide to cover -- but anything else, swiping up or another direction,
+does a melee that will break the wall. Down is kind of equivalent to guard or cover, and the slide tackle is down."*
+- `runSwipe` (RUNSWIPE.mode DOWN, the default): a DOWN flick on the ground, any weapon, standing or running -> `slideGo` the way he is GOING (his
+  nose when still; down on the pad points at the camera, not where he means to slide). Half cover that way -> into cover, `soft`; nothing ->
+  the tackle. Any other direction falls through to the strike (breaks walls). In the air DOWN is still the slam. This takes m1054's reserved
+  DOWN slot (it was a strike the way he faces).
+- TOOLS > SLIDE: DOWN / RUN (m1068: any direction while running) / OFF -- new key `mel.runswipe2`.
+- **Real loop (`dswipe.cjs`, goblin, katana):** standing 2.5 m off the half wall, facing it, DOWN -> slid into cover, 0 chunks broken; running
+  +z in the open, DOWN -> slide heading 0 (his travel), 3.46 m on; UP at the wall -> no slide (the strike); DOWN in the air -> no slide (slam).
+- Shipped unverified on the phone.
+
 ## m1068 -- running + a right-pad swipe = a slide tackle that way; at half cover it slides INTO cover (never breaks it)
 
 *"When you're running and you swipe on the right stick it does a slide tackle in that direction, and if you slide tackle towards something that
