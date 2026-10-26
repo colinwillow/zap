@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1057 -- the alien goblin's hair and cape get spring chains (rig file only; not in the game yet)
+
+His new rig (`models/characters/alien_goblin.glb`, C4D -> Mixamo, 51 joints WITH fingers -- thumb / middle / pinky -- draco, 2K webp) with three
+materials: `goblin` 10,470 tris, `goblin_cape` 270, `goblin_hair` 1,698. `blender-addons/pipeline/chains.mjs` adds:
+- **18 hair chains** (`hair_<k>_<j>` on the Head): one per strand (connected pieces of the hair material), 2-3 bones by length (10-21 cm).
+- **3 cape chains** (`cape_<k>_<j>` on Spine2), 4 bones each, top -> hem; the top kept on the cape's own shoulder weights.
+- `chaincheck.mjs` (linear-blend skinning, rest and every chain bone bent 45 deg): body **0 of 13,130 vertices move**; cape / hair rest error
+  < 1e-6 m. Renders (rest, bent back / side / front, head close-ups, cape flared): strands bend one by one, the cape swings as cloth.
+- Output: `models/characters/alien_goblin_chains.glb` (uncompressed, 1.5 MB). **Next (not done):** the Forge bake onto this rig (the clips) and
+  a spring sim in the game for `hair_*` / `cape_*` with body colliders for the cape.
+
 ## m1056 -- the beam and the bar through the REAL loop; the finger curl wraps round the bar (and why it barely shows on these rigs)
 
 *"Run the beam and high bar through the real game loop too... I don't think the characters' hands were ever rigged very well... I'm making a
