@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1031 -- the right-pad sprint runs on "Fast Run" (`run_fast`); the ordinary run stays STD
+
+*"No, the one we actually had is the best... the other one that was decent that we could use for the faster run was literally called
+FASTRUN, not to be confused with the other fast run that was called RUN FAST."* The ordinary run is unchanged (RUN key STD: `Standard_Run`
++ `Sprint` -- tap RUN back to STD if a phone was left on another). The hold-to-sprint (`NINJA.look` RUN) now plays the library's "Fast Run"
+(`NINJA.runClip` = `run_fast`, the RUN key's FASTRUN) at its ref measured on him (`GAIT.runSets.fastrun.runRef`, 3.31 m/s on the goblin),
+scaled to the 9 m/s; the katana stance keeps its own run; a carried gun keeps the gun gait. Arms / hands / arm length: his rig, not touched.
+Shipped unverified.
+
 ## m1030 -- the katana's first two swings start at the swing (wind-up spins cut); the guard's nudge turns the other way
 
 *"the first two sequences each have a wind-up -- a pretty little spin and then the swing... cut off the beginning wind-up on both and just
