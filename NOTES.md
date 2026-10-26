@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1040 -- on the beam his planted foot is on the beam (he floated above it)
+
+*"He's doing the balance beam, he's floating above it."* (screens: goblin walking the beam, soles clear of it.) The beam clips (Teeter, the
+catwalk walk) hold his hips higher than his own clips, so a root on the beam's top left his soles in the air. `beamPose` now finds the LOWER
+foot (toe joint, else foot) after the pose and the lean, and moves the root so it sits at the beam's top plus that joint's height over the
+soles -- `beamToeH`, measured once per rig on his ordinary idle. The bar grip's method (m1036), on the feet. Shipped unverified.
+
 ## m1039 -- the CLIMB-UP helper: by a ledge about his height a green L-arrow lies on it, the right pad pulses green, a tap climbs him up
 
 *"When we have things that are about the character height, like this ledge, we should have a way of getting him up over it... if you're
