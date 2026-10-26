@@ -5,6 +5,24 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1021 -- the left flick never breaks a wall (cover, or a slide); repaired bricks arc up off the ground into place; the air slam smashes down through a wall
+
+*"when I'm unarmed and I'm using the left stick flick, instead of covering on the wall he just does the melee stuff and breaks the wall.
+Breaking the wall should be reserved for right stick... make the bricks, when you're repairing, do this arc thing like in Fortnite...
+when you jump in the air and do a slam down on a wall, it doesn't break down through the wall."*
+- **Left flick:** `slideGo` refuses while a swing / roll / landing plays, so a flick thrown mid-acrobatics fell through to MORE
+  acrobatics, which `wallMelee` let break the wall. Now cover found down the flick (`coverSeek`) cuts whatever is playing and slides in;
+  a breakable wall there that is NOT cover (full height, `wallAhead`) gets a slide (or the roll), never a strike; the left pad's slides
+  are `slide.soft` (no `wallHit`) and its strikes `p.melFist` (`wallMelee` returns) -- carried through the queue (`p.melQf`).
+  Breaking is the right pad's: its strikes, its down-flick slide tackle, the charge, the slam.
+- **Repair arc:** `wallRepair` no longer pops the chunk in: `repairFly` starts it on the ground on his side of the wall (up to `REPFLY.out`
+  .9 m out, a little scatter, a puff of dust) and `repairFlyStep` arcs it home over .42 s (`peak` .7 m), tumbling to square and growing
+  from .75 to full; the sparks + clang land with it. Drawn only -- the collider is back the moment the repair is taken. Broken again in
+  flight: dropped.
+- **Slam:** driven down, `wallHit(..., 'blast')` under his soles every frame (radius .55, 99 dmg), grid rebuilt that frame so
+  `integrate` does not stand him on it -- he goes down THROUGH; `slamLand` then hits the walls within 1.1 m (3 dmg).
+- Shipped unverified.
+
 ## m1020 -- the weapon reach plays in cover (its top half over the cover legs); the weapon arm lifts off his side in cover (TOOLS > ARM)
 
 *"make the hybrid take the torso-up animation from the weapon change so you can play it while he's in cover... when he's in cover and
