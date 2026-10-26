@@ -34,6 +34,9 @@ levels later. **Each sandbox is tuned until it feels great on its own before any
 - [ ] **COURSES -- ON THE DOCKET (not immediate).** `COURSES.md`: a menu in the arena that spawns a test ground ("how you learn to
       play"): COVER (slide / cover / shoot, `COVER.md`) and GYM (ladders, ledges, monkey bars, the gymnastics HIGH BAR with giant swings
       and a release into a flip). His idea (Oct 25).
+- [ ] **TESTING GROUND -- SPEC (Oct 26, his).** `COURSES.md` THE TESTING GROUND: the arena is the hub; doors boot MODULES (ACROBATICS
+      first: gap, hurdle, wall run, wall jump, high bar, beam, a new GRIND RAIL, back to the floor), then FIGHT (dummies, ricochet,
+      cover, SPIDER BOTS). Weapon model (katana + one pick-up slot?) is his call. m1077 restyled the turret and the rocket.
 - [ ] **GEAR -- OPEN (spec only).** `GEAR.md`: rollerblades / jet blades and a wingsuit any hero can wear. Waiting on his models.
 - [x] **m893 ARENA** (`?w=arena`): the stadium, SPAWN > WARBOSS > Brute Warboss / Skullback beams down, chest thump, armour
       flies off, KO slow-mo, beam out, CLEAR. This is the STAGE for the duel, not the duel.
