@@ -99,6 +99,33 @@ triangle is:
   bash, a big stagger, a wind-up that can be held. Until a clip exists the state still runs on the nearest clip, and the
   chip says `NO CLIP`.
 
+
+## THE PILOT -- the rival as a full player (planned Oct 26 2026)
+
+*"I want the AI system to be complex. EASY / MEDIUM / HARD should be about TIMING -- did he swing, did he block, delayed or sped up -- not his
+abilities. He should be a fully functioning player: everything I can do. All my covers, flips, picking things up, wall runs, bars. I want it
+fun and moderately challenging -- not something people whiz through."*
+
+Today's rival (`K.mirror`, m985) is an NPC with its own state machine: it only REACTS to your moves by dice (guard / parry / roll), circles when
+idle, and difficulty scales its chances. It has none of the player's body: no cover, flips, cartwheels, guard sides, the charge's aim, bars,
+wall runs. Patching it can make it less stupid; it can never make it a player.
+
+**The pilot:** the rival is a second PLAYER BODY, stepped by the same code as yours (`stepPlayer`, the anim chooser, every pose pass), driven by
+a brain that only ever moves VIRTUAL THUMBS (the same `stick.L` / `stick.R` gestures you use: flicks, holds, taps). So anything you can do he
+can do, now and with every move added later, and the difficulty is ONLY his perception and his hands: reaction time, read accuracy, thumb
+error, patience. The stages, one or more builds each:
+1. **Two bodies.** `player` / `rig` / `stick` / `RIG` become swappable (module `let`s swapped around a second step), the per-body systems keyed
+   on them (weapon mounts, springs, the guard side, the duck, the knock) made per body; a second rig built from the hero file; he stands and
+   walks on scripted thumbs. Proof: both bodies independent in the real loop, nothing of his leaks into yours (camera, HUD, sounds).
+2. **Two-way combat.** Your strikes, charges, slams and shots reach him through the same sweep they reach a dummy by; his reach you through
+   `playerHurt` -- with your guard, your parry, your knock-down. The rocket turret and the walls treat him as a player.
+3. **The brain.** Perception (what you are doing, with a reaction delay and a misread chance by difficulty), a utility choice each beat
+   (pressure, bait, punish your recovery, break a turtle, guard and counter, cover against a gun, dodge a charge, use the arena), and hands
+   (the gestures, with timing error by difficulty).
+4. **The arena.** Cover, the high bar, wall runs, vaults, pick-ups -- he uses what is spawned, because his body already can.
+Difficulty: EASY .45 s reaction, 30% misread; MEDIUM .25 s, 15%; HARD .12 s, 5% -- tuned on the phone. The DONE WHEN box *"He can beat you"*
+is the bar.
+
 ## DONE WHEN (the whole-piece gate -- every box needs evidence in the NOTES entry that ticks it)
 
 - [ ] Every verb has a counter and is countered, both ways (the table above holds on the phone, not just in code).
