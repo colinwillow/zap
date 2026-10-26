@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1036 -- the high bar pivots on his HANDS (the grip is put on the bar every frame)
+
+*"Not bad at all, although he is rotating around his hips -- can we make him rotate around his palms?"* (screen: goblin hanging with the bar
+at his waist, hands well above it.) `hbarReach` (the hang clip's hands over his soles, measured once) came out short, so the root went too
+high. Now `hbarPose`, with the frame's pose already applied, finds the GRIP -- the mean of both `HandMiddle1` (else the hands) -- and moves
+the whole root by bar minus grip, so the bar is in his hands at every angle and every clip; the pendulum's radius `S.R` is re-read from that
+(bar to his middle) so the swing and the release match the picture. Shipped unverified.
+
 ## m1035 -- landscape: a tighter lens so he is about the size he is in portrait (TOOLS > LAND FOV); the debug buttons go in a row up top
 
 *"I always play vertically but switched to horizontal and it's very widescreen and far away... change the camera FOV so they resemble more
