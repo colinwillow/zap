@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1041 -- the katana runs as fast as everything else (its speed cap off)
+
+*"Everything except the katana runs at a faster pace, and with the katana you have to hold down on the right stick to run at the normal
+pace... I kinda wanna just make him faster for now."* m995 capped the katana stance at its run clip's measured ref x `tsHi` (no foot
+slide) -- below `MOVE.max`. `KATANA.capRun` 0 (default) skips that cap: the ordinary top speed with the blade; the katana run's rate still
+follows speed / its ref up to `tsHi`, so at the top the feet may slide a touch. `capRun: 1` is the old cap. Shipped unverified.
+
 ## m1040 -- on the beam his planted foot is on the beam (he floated above it)
 
 *"He's doing the balance beam, he's floating above it."* (screens: goblin walking the beam, soles clear of it.) The beam clips (Teeter, the
