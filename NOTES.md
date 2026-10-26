@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1018 -- rockets sound like rockets; the repair ring sits AROUND the right pad; weapons switch in cover; only a gesture leaves cover
+
+*"when the Rockets hit stuff, it makes us like wooden box breaking noise... I want the ring to go around the right stick... I
+still can't switch weapons when I'm in cover... if you swipe away, you will slide tackle away from the wall fairly quick."*
+- **Sound:** turret rocket impacts and the turret's death use `snd('boom')`; `wallHit` plays `boom` for a blast and a low
+  `hit` for a chip (it was the crate-break `thud` for everything).
+- **Weapons in cover:** m1013 let a swap FINISH in cover but `kitPick` / `cycleKit` still refused on `p.wall`, so the wheel
+  never started one. The guard is gone from both.
+- **Leaving cover:** the hold-away release in `stepWall` is gone (`p.wallOff = 0`). Out is a TAP (as before) or a SWIPE AWAY,
+  which clears cover and goes straight into `slideGo(h, 1)` -- a slide tackle away from the wall. Swipe toward a wall enters.
+- **Repair prompt:** `#repPrompt` is laid over `padR`'s own rect (+10 px): a pulsing amber ring, a conic progress ring while
+  held, and `HOLD · REPAIR` / `REPAIRING` under the pad.
+- Shipped unverified. Open: the vault from cover, enemies using cover, COURSES.
+
 ## m1017 -- repair by HOLDING THE RIGHT PAD at a broken wall, with matching indicators in the world and on the HUD; the charge's swing lands when he does; the smear is gone; the katana is the Great Sword set again
 
 - **Repair** (*"walk up to it, hold down the right stick and it repairs the wall... indicators on the HUD, rings, pulsing, colours, a word --
