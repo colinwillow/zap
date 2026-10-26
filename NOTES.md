@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1070 -- the COVER DUCK: in half cover, hold the right pad DOWN and he crouches below the top (idle and the shuffle both ways), procedural
+
+*"In cover he's still poking up above the block a little. While you're in cover, if you pull down on the right stick -- it doesn't do anything
+in cover -- maybe he ducks down a bit... you'd have to make the idle lower and the cover walk both directions crouched."* (*"if procedural is
+easier to try first, try it out"* -- the library's Crouch Cover clips are the other road, not baked.)
+- `duckPose` (after every other pose, before the springs): his feet are taken where the cover clip puts them, the root lowered `DUCK.drop` .2 x
+  his height, both legs re-solved onto the same spots (`ik2` -- the knees take the drop; the feet's world angle kept), the spine curled `curl`
+  .35 rad FORWARD (about his measured right) with the head given back half. On top of whatever cover clip plays, so the idle and the shuffle
+  both ways crouch with no new animation. Eased in / out (`rate` 9). Wanted when the right pad is pulled down as the guard reads it, in HALF
+  cover. TOOLS > DUCK: .15 / .2 / .25 / OFF.
+- **Measured the curl's way rather than argued it:** `DUCK.sign` +1 put his head 9 cm TOWARD the wall; -1 puts it 8 cm forward.
+- **Real loop (`duck.cjs`, goblin, .75 m half wall):** standing in cover his head is +.15 m over the top; ducked -.17 m (hands) / -.17 (katana),
+  hips .42 -> .14, feet unmoved (.151 / .172); shuffling ducked both ways -> .93 m each, head -.18 under the top, feet on the floor;
+  released -> back to +.15 exactly. Renders: crouched below the block, katana held out in front.
+- Shipped unverified on the phone.
+
 ## m1069 -- the slide tackle is the right pad's DOWN swipe (into cover when cover is that way); every other direction is the strike
 
 *"Swiping down can do the slide tackle, and if you slide tackle you'll just slide to cover -- but anything else, swiping up or another direction,
