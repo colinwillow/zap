@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1046 -- the climb-up is slower and continuous; the flat arrow shows on the top for a climb too
+
+*"When I go up to the side of the ledge to get up on it, I do want the arrow -- just a flat arrow on the top of the block... but now he's
+just down and then he's up, so split-second there's no transition -- the opposite extreme; find an in-between."* m1043 started a low ledge's
+clip partway in (skipping the reach), ran it in .68 s, and switched the floor under his feet onto the top with a hard `max` (~.4 m in a frame).
+Now: the whole clip from its reach (hands up to the lip while his feet stay on the floor -- the body is never below the floor he left), `pull`
+1.05 s, the top's floor eased in across `acrossAt` .36-.86 instead of switched, the release eased over .3 of the clip. And the flat green arrow
+(the cover one) lies on the top of the block while the stick pushes into a climbable face. Shipped unverified.
+
 ## m1045 -- the hurdle is his TUCK over the arc (the vault clip fought the arc)
 
 *"This is me hurdling over something... this hurdle animation is insane, it's just not lined up correctly."* (six frames: crouched in cover,
