@@ -5,6 +5,28 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1059 -- alien goblin: the belly on the HEAD bone, the floating belt piece, hair/cape drawn behind the background, and the leaping run
+
+*"There's a piece floating out in front of him... the background is on top of his hair and on top of the Cape... why is he doing the weird
+run... instead of all the stuff we had curated."*
+- **Floating piece = his BELT PIECE (59 verts, front of the waist), weighted 100% to ARP's `neutral_bone`**, which never animates, so it stayed
+  put while his body moved. (Not the cape: that had a 6-vert chip on the shoulder too, now also left on its own weights -- only the
+  cape's LARGEST piece is cloth.) `chains.mjs` (blender-addons) now moves every neutral-only piece WHOLE onto the bone nearest its centre
+  (nearest BONE, not vertex -- the nearest vertex is his beard); the top third of a thigh counts as pelvis -> Hips. Him: 132 verts -> Hips.
+  chaincheck: body 0 verts on chain bones, rest error 1.7e-4 m.
+- **Z-order:** `goblin_cape` / `goblin_hair` were `BLEND` (exporter default for a texture with alpha) -> transparent sort against the
+  background. `chains.mjs` sets them OPAQUE.
+- **The run:** `gaitMeasure('run_std')` found < 4 frames with a foot inside 3 cm of the floor on him -> null -> STD never built -> left on
+  the stride (the leap). The contact window now widens (x1..x4) until it holds 4. Real loop: STD run 2.68 m/s (63 contact frames), sprint
+  3.63 (root motion), all six RUN picks listed, `runSet` std. The samurai still measures at x1 (3.80, 23 frames) -- unchanged.
+- **The fat / skinny belly (his second message):** the auto-rig put HEAD weight on his belly -- his chin hangs over his chest, so the Head's
+  volume reached down (belly front 80-96% Head; 889 torso verts > .3; the chest trinkets 100%). Head pitched forward in the run -> belly
+  out; tipped back in a jump -> belly in. `chains.mjs` now moves any Head share below the Neck joint (faded over 4 cm) onto the spine,
+  by height between the bones' mid-points. Measured (`headbend`: ONLY the head nods 30 deg): before, 2,481 body verts moved, max 24.8 cm;
+  after, 0. Rest error unchanged (1.7e-4 m). No repaint needed for this one -- but a check of his weights in C4D on the belly is still
+  worth it if anything else looks soft.
+- Re-baked `alien_goblin_game.glb` (same profile). Shipped unverified on the phone.
+
 ## m1058 -- the ALIEN GOBLIN is a playable hero (his own rig): baked, weapons from his hands, hair + cape on springs
 
 *"We're gonna need to run him through the process. I didn't add the weapons or the sockets -- you'll have to do those. He does have a root."*
