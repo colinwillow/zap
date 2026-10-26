@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1080 -- ACROBATICS station 3: the wall run (the course turns at the back of the tunnel and heads home)
+
+*"Go for it."*
+- The course data is general now: platforms `[u0, u1, v0, v1, top]`, run walls, gates and the exit `[u, v, dir]`, lit IN ORDER (only the next
+  gate can light; `dir` says which way along the lane he passes it). Fall-back beams him to the last gate facing on along the course.
+- **The station:** past the hurdles the lane turns onto `T` ([42.8-45] x [1.5-5.4], 1.5 m) and comes back toward the arena along a 13 m
+  graphite RUN WALL (top 6.6, two neon stripes) over a pit to a landing at `top` .3 ([27-35.2]), its gate at 34.2, the exit at 28.5.
+- **Measured, then moved** (`wcourse.cjs`, real loop, the shipped `wrunTap` / `stepWrun`): a right tap off a 7.2 m/s run along the wall runs
+  it 69 frames (`WRUN.T` 1.15 s, 8.6 m) and SINKS ~1.1 m -- with a 9 m pit he landed 1.2 m short, in it. Pit 7.6 m: he lands on the landing
+  (u 34.9, y .30, no fall). A sprint jump with no wall (7.2 m/s, `MOVE.jump`) falls short -- the wall run is the way across. The first wall
+  (5.1) was too low to catch from the top of a jump (`minH` 1.9 over his feet): raised to 6.6. NOT measured: the tap from mid-jump (the
+  harness fired it inside the previous run's `WRUN.cool` on the same wall), and the turn on `T` with thumbs -- his first look.
+- Next: station 4, the wall jump.
+- Shipped unverified on the phone.
+
 ## m1079 -- ACROBATICS station 2: two hurdles in the tunnel
 
 *"Go ahead with the hurdle."*

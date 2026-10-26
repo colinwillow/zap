@@ -60,7 +60,8 @@ play... you go through the doors and there's a whole course... you end up back w
 ### ACROBATICS -- the first module (proposed station order; each one is a build)
 1. **Gap jump** -- two platforms, a pit between: run, jump. (Pieces: run, jump.) **m1078.**
 2. **Hurdle** -- a half block across the lane at a run: push into it + right tap (m1063 `HURDLE`). **m1079: two of them.**
-3. **Wall run** -- a long wall beside a pit; run along it to the far side (m1064 `WRUN`).
+3. **Wall run** -- a long wall beside a pit; run along it to the far side (m1064 `WRUN`). **m1080: the lane turns at the back of the
+   tunnel and comes back out along a 13 m wall over a 7.6 m pit.**
 4. **Wall jump** -- two walls facing across a shaft; kick between them up to a ledge (m1064 wall jump + `ledgeGo`).
 5. **High bar** -- swing, release into a flip, land on the next platform (m1034).
 6. **Balance beam** -- across to the exit (m1037).
