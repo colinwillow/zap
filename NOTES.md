@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1038 -- high bar: hands GRIP the bar (fingers wrap it); a much bigger launch; continuous TUCKED flips (Rollergirl's tuck) until he opens to land; circle the stick to spin further
+
+*"his hands don't quite go over the bar... make his hands actually grip the bar... I want to launch farther, everything about this game is big
+and exaggerated... continuously flipping, a continuous tuck... in Rollergirl I sculpted a tuck animation... what if you were spinning [the
+stick] in the air to try to get further and continue flips... or holding down."*
+- **Grip:** `hbarPalm` -- per hand, between the middle finger's first two joints, pushed to the PALM side by the bar radius + 1.2 cm (the
+  palm side MEASURED from which way the finger already bends: Middle3's offset off the Hand->Middle1 line, against Index1 x Pinky1); both
+  hands averaged and the root moved so that point is the bar. `hbarCurl` then swings every joint of the four fingers (up to 75 deg) onto the
+  tangent of a circle round the bar's axis, the way the finger points -- they wrap it, knuckle to tip. Undone with the arm edits.
+- **Launch:** `boost` 1.12 -> 1.7 and `lift` +2.5 m/s up.
+- **Flight (`hbarFly`):** turns at the release rate, TUCKED, until `settle` .38 s before the predicted landing -- holding the right pad turns
+  him `tuckK` 45% faster -- then opens and is turned to the next upright by touchdown. Circling the LEFT stick adds turn (`spinStick`) and
+  a little carry (`spinCarry`, capped at `flyMax` 22 m/s).
+- **Clips:** Rollergirl's own `tuck` and `flip_pose` (`alien_rollerskate_blue.glb`, a Mixamo skeleton) carried by the Forge as a DONOR onto
+  the three heroes (`forged23`, 123 clips); tucked = `tuck`, opening = `flip_pose`. Zap / un-baked bodies: the air pose.
+- Shipped unverified.
+
 ## m1037 -- THE BALANCE BEAM: SPAWN > BALANCE BEAM; walk along it arms-out, keep the lean up with the left stick, slip off if you don't
 
 *"Now let's build the balance beam next."* (COURSES.md, GYM part 2, with its DONE WHEN.)

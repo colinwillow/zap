@@ -32,6 +32,7 @@ clip in the library), ledges and ladders.
 - [ ] Catch the bar from a jump, every hero.
 - [ ] Hold = pump, pump, over the top, giant swings; let go = fly off the way the swing goes, land upright.
 - [ ] His pump clip in.
+- [ ] The flight: launched big, continuous tucked flips (her tuck), opening to land upright; circling the stick spins him further (m1038).
 - [ ] **He played it on his phone and signed it off.**
 
 ## GYM part 2 -- the BALANCE BEAM (m1037)
