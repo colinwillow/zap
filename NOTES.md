@@ -5,6 +5,28 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1011 -- THE SENTRY TURRET (SPAWN > TURRET): it sweeps, sees you, fires rockets flat over half cover; battered, smoking, exploding
+
+*"Model a little turret, a sentry gun: it rotates around, and if it sees you it shoots at you... put it in the red area so I can test
+how the bullets fly over... make it shoot rockets, maybe I could change what it shoots... it takes damage, after 3-5 hits it starts
+to look messed up, then smoking, then explodes."*
+- **Built in code** (`turretMake`): a tripod base, a post, a head with two rocket pods and an eye (green sweeping, red when it sees
+  you). Spawned ON THE RED RING (`ARENA.spawnAt`, a second one beside it), facing your spawn, with its own collider.
+- **Sees you** (`turretStep`): in range (26 m), inside a .55 rad cone round its head (wider once it has you), and NO FULL WALL between
+  (`boxRay` from just outside its own box; it already flies over half cover, so half cover never hides you). It sweeps +-1.1 rad while
+  it has nothing, turns at 1.8 rad/s onto you, and fires inside .1 rad.
+- **Its shots** (`TURRET.kinds`, TOOLS > TURRET ROCKET/BOLT): ROCKET 13 m/s every 1.6 s, 14 damage, 1.6 m splash, a smoke trail;
+  BOLT 24 m/s every .45 s, 5 damage. Flat at the muzzle height (1.15 m), so: over every half-height block; into a standing body; over
+  a DUCKED one (`coverDucked`, the hit and the splash both); stopped by full walls and the floor.
+- **Damage** (`turretHurt`): your bolts and rockets where they land (`boltHit` -> `turretBlast`: a rocket 4, a bolt 1 + its charge),
+  and your swings (`strikeSweep` -> `turretMelee`). 5 hp. At 3 and below it LEANS a little more each hit and darkens; at 2 it smokes
+  and spits sparks; at 0 it blows apart (head and pods fly on their own arcs, the base squashes, it keeps smoking, 10 damage within
+  2.2 m). CLEAR takes them all away.
+- **Checked headless** (goblin, the middle half block between): standing at your spawn, it saw you over the block and hit (100 -> 86);
+  ducked behind it, it saw you and fired 8 rockets, and every one went over (100 -> 100). Five hits: lean .09 a hit from the third, dead
+  on the fifth. Renders: the model, battered, the blast, the wreck.
+- Next (his): sword deflects small shots (not rockets); the AI gunner version of him.
+
 ## m1010 -- COVER part 2: half-height blocks shots fly over; duck and POP UP to shoot; a swing from cover breaks it (the loop)
 
 - **The loop.** *"I slid to cover with the katana out and swung -- he infinitely loops the attack."* `stepPlayer` returns into

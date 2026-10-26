@@ -845,10 +845,10 @@ body.desk.free #deskHint { display: block; }
   <h1>WEIRDPORT</h1>
   <div class="msg" id="bootMsg">loading</div>
   <div class="bar"><i id="bootBar"></i></div>
-  <div class="bld">BUILD <span id="bootBuild">m1010</span></div>
+  <div class="bld">BUILD <span id="bootBuild">m1011</span></div>
 </div>
 
-<div class="chip" id="build"><b id="buildN">m1010</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
+<div class="chip" id="build"><b id="buildN">m1011</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
 <div id="splash" aria-label="tap to start"><img class="blur" alt=""><img class="main" alt="Zap and Clancy"><div class="glow"></div><div class="bn"></div></div>
 <script>
 // m879 (STEER 02:22): THE SPLASH, before the module (so it shows on the first paint, while the boot carries on behind it). The image's
@@ -954,7 +954,7 @@ import { KTX2Loader } from './vendor/KTX2Loader.js';
 import { clone as skeletonClone } from './vendor/SkeletonUtils.js';
 import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
 
-const BUILD = 'm1010';
+const BUILD = 'm1011';
 /* ASSETS:START */
 const ASSETS = {"models/alien_lizard.glb":"faffcf4c","models/alien_lizard_ktx2.glb":"05da2a20","models/skate.glb":"0c612d5e","models/skateboard.glb":"5ba93796","models/characters/alien_antenna_game.glb":"f3ccf328","models/characters/alien_antenna_game_ktx2.glb":"28afac8c","models/characters/alien_female_purple.glb":"1c73eef1","models/characters/alien_female_purple_ktx2.glb":"fc914afb","models/characters/alien_grey_medium.glb":"5a779e8e","models/characters/alien_grey_medium_ktx2.glb":"61600c3e","models/characters/alien_rollerskate_blue.glb":"abf0917c","models/characters/alien_rollerskate_blue_ktx2.glb":"e9a7948a","models/characters/alien_warrior.glb":"f5cc9c49","models/characters/alien_warrior_ktx2.glb":"a13fb7b6","models/characters/beautiful_asian.glb":"910f6565","models/characters/beautiful_asian_ktx2.glb":"35281eef","models/characters/beautiful_blonde.glb":"edddc421","models/characters/beautiful_blonde_ktx2.glb":"89cf3899","models/characters/brute_warboss_armor.glb":"cc5c7936","models/characters/ceo_alien.glb":"844dc3a7","models/characters/ceo_human.glb":"ec289865","models/characters/clancy.glb":"4b9d271f","models/characters/clancy_ktx2.glb":"74edbc6e","models/characters/colin.glb":"99d38b7d","models/characters/colin_ktx2.glb":"35040f87","models/characters/contruction_worker.glb":"8bd3d7ce","models/characters/contruction_worker_ktx2.glb":"3df8c344","models/characters/dummy_officer.glb":"724965ac","models/characters/dummy_officer_ktx2.glb":"db640cda","models/characters/fat_activist_01.glb":"3c566fee","models/characters/fat_activist_01_ktx2.glb":"b9328df4","models/characters/fat_biker_01.glb":"576b7cf5","models/characters/fat_biker_01_ktx2.glb":"7142cfad","models/characters/fat_biker_02.glb":"ab5d7ec7","models/characters/fat_biker_02_ktx2.glb":"28cec6cc","models/characters/fat_hippie.glb":"f09a260d","models/characters/fat_hippie_ktx2.glb":"0be745a4","models/characters/fat_hipster.glb":"9cf45ffb","models/characters/fat_hipster_ktx2.glb":"18106ff3","models/characters/fat_secret_service.glb":"6d546fb0","models/characters/fat_secret_service_ktx2.glb":"a23a304e","models/characters/fat_trump.glb":"5de6bc56","models/characters/fat_trump_ktx2.glb":"a0ddaf4d","models/characters/firefighter.glb":"ebde005d","models/characters/firefighter_ktx2.glb":"ccf93c96","models/characters/goblin_game.glb":"861046c6","models/characters/hick_skinny.glb":"1ebe78e8","models/characters/hick_skinny_ktx2.glb":"1e93f0ed","models/characters/hobo_01.glb":"34e80b1d","models/characters/hobo_01_ktx2.glb":"69497677","models/characters/jack.glb":"ab009b9b","models/characters/jack_ktx2.glb":"1f4c9f7f","models/characters/moussa.glb":"6d80b1cf","models/characters/moussa_ktx2.glb":"66e040f8","models/characters/orc_game.glb":"5120e975","models/characters/proxy_ceo.bin":"6eca0c34","models/characters/proxy_ceo.jpg":"fadc9d0a","models/characters/proxy_ceo.json":"e62a7975","models/characters/proxy_ceo_alien.bin":"be247ecc","models/characters/proxy_ceo_alien.jpg":"8f8bf8fc","models/characters/proxy_ceo_alien.json":"eb23e28f","models/characters/proxy_hick.bin":"4485560e","models/characters/proxy_hick.jpg":"8c331965","models/characters/proxy_hick.json":"d85a0d36","models/characters/proxy_zap.bin":"dd7b300e","models/characters/proxy_zap.jpg":"2e7330ae","models/characters/proxy_zap.json":"b3b42754","models/characters/proxy_zap2.bin":"51088f46","models/characters/proxy_zap2.jpg":"a954a815","models/characters/proxy_zap2.json":"5c50abb7","models/characters/rept_heavy_armor.glb":"934661c7","models/characters/samurai_game.glb":"0a46f1cc","models/characters/xray_skeleton.glb":"46480317","models/characters/zap.glb":"5e5cca54","models/characters/zap_02.glb":"4ff12de0","models/characters/zap_02_lib.glb":"e23d91da","models/characters/zap_ktx2.glb":"4b29d886","models/characters/zoar.glb":"423a9de9","models/characters/zoar_game.glb":"d20a3736","models/vehicles/dump_truck.glb":"d870dc18","models/vehicles/dump_truck_ktx2.glb":"21ee7059","models/vehicles/motorcycle_fatboy.glb":"9ed9be28","models/weapons/alien_antenna_blaster_game.glb":"54083b44","models/weapons/alien_antenna_hammer_game.glb":"707b8a27","models/weapons/alien_launcher.glb":"ba8ab96a","models/weapons/hammer.glb":"3335fdf2","models/weapons/shield_brute.glb":"c6e5593f","models/weapons/spikey_mace.glb":"dcd43acd","models/weapons/w_brute_cleaver.glb":"07a97580","models/weapons/w_rept_maul.glb":"84c3a1a4","models/buildings/alien_base_01.glb":"d9b9fd7f","models/buildings/alien_base_01_ktx2.glb":"6cbbfef2","models/towers/alien_tower_01.glb":"98d23375","models/towers/alien_tower_01_ktx2.glb":"47597651","models/streets/modular_streets_kit.glb":"6a4bcaa5","models/toon_city/impact_marks.json":"2b616620","models/toon_city/impact_marks_atlas.ktx2":"efe0840e","models/toon_city/impact_marks_atlas.png":"490ed049","models/toon_city/toon_city_breakables.glb":"29bddbc8","models/toon_city/toon_city_collision.glb":"fb3a693f","models/toon_city/toon_city_obb.json":"81c18a47","models/toon_city/toon_city_visual.glb":"5df62285","models/toon_city/toon_city_visual_ktx2.glb":"cf080531","models/toon_city/weirdkit_tint.js":"f6e9d802","models/toon_city_kit/toon_city_collision.glb":"5540a364","models/toon_city_kit/toon_city_kit_buildings.glb":"590e53f0","models/toon_city_kit/toon_city_kit_buildings_ktx2.glb":"e6dff3a3","models/toon_city_kit/toon_city_kit_pieces.glb":"8232bd6f","models/toon_city_kit/toon_city_kit_twins.glb":"fcc9fdfc","models/toon_city_kit/toon_city_visual.glb":"45cf2957","models/toon_city_kit/toon_city_visual_ktx2.glb":"f26a6984","models/toon_city_kit/weirdkit_detile.js":"dd05bd70","models/characters/morph/shapes.bin":"4e680384","models/characters/morph/shapes.json":"abfc949d","models/characters/forged/brute_warboss_armor.glb":"dc15dc94","models/characters/forged/ceo_alien.glb":"20659ac3","models/characters/forged/ceo_human.glb":"326d9e7e","models/characters/forged/index.json":"34031a77","models/characters/forged/rept_heavy_armor.glb":"01e631b0","models/characters/forged/zap.glb":"10eda718","images/crack_sprite_01.ktx2":"4aa55fde","images/crack_sprite_01.png":"16b52e8c","images/fire_sprites_01.ktx2":"922e1191","images/fire_sprites_01.png":"f87e2696","images/fire_sprites_02.ktx2":"e0cbfe1d","images/fire_sprites_02.png":"b373a6fd","images/fire_sprites_03.ktx2":"4fbbb985","images/fire_sprites_03.png":"7eece336","images/geyser_sprites_01.png":"b6325470","images/hdri_game.ktx2":"0feb5c79","images/hdri_game.png":"dac55f41","images/splash_zap_n_clancy.webp":"52a9d8a4","images/water_sprites_01.ktx2":"326924c5","images/water_sprites_01.png":"31e12659","audio/blaster_sound_01.mp3":"40d99583","audio/blaster_sound_02.mp3":"4bd7bb7c","audio/box_break_01.mp3":"e4127980","audio/electricity_beam_01.mp3":"986db8c9","audio/explosion_small.mp3":"f154a537","audio/metal_clang_01.mp3":"a333bd27","audio/metal_clang_02.mp3":"1e3ebbd6","audio/metal_clang_03.mp3":"afe44812","audio/metal_ping_01.mp3":"8ffca1a0","audio/plasma_canon.mp3":"e32c324d","audio/powerup_01.mp3":"48fbbe08","audio/swoosh_01.mp3":"193db185","audio/swoosh_02.mp3":"19145e70","audio/swoosh_03.mp3":"544fdffb","audio/swoosh_04.mp3":"843bee5d","audio/plasma_sounds/plasma_01.mp3":"e71c010f","audio/plasma_sounds/plasma_02.mp3":"ac3b1c75","audio/plasma_sounds/plasma_03.mp3":"eaa59355","audio/plasma_sounds/plasma_04.mp3":"bc7865e0","audio/plasma_sounds/plasma_05.mp3":"1d821cd0","audio/plasma_sounds/plasma_06.mp3":"cb979fbe","audio/plasma_sounds/plasma_hit.mp3":"30e5af5c","audio/alien_orc_grunt_sounds/alien_orc_grunt_01.mp3":"d6f4b343","audio/alien_orc_grunt_sounds/alien_orc_grunt_02.mp3":"78afc603","audio/alien_orc_grunt_sounds/alien_orc_grunt_03.mp3":"972c524a","audio/alien_orc_grunt_sounds/alien_orc_grunt_04.mp3":"b0ce76eb","audio/alien_orc_grunt_sounds/alien_orc_grunt_05.mp3":"1f0ba1f4","audio/alien_orc_grunt_sounds/alien_orc_grunt_06.mp3":"4f749866","audio/alien_orc_grunt_sounds/alien_orc_grunt_07.mp3":"dcf75925","audio/hit_sounds/hit_sound_01.mp3":"befaa2be","audio/hit_sounds/hit_sound_02.mp3":"73bc4433","audio/hit_sounds/hit_sound_03.mp3":"24b181e4","audio/hit_sounds/hit_sound_gound_01.mp3":"86ee2674","audio/hit_sounds/hit_sound_ground_02.mp3":"8a7cac73","audio/hit_sounds/hit_sound_plasma_01.mp3":"9abc0202","audio/hit_sounds/hit_sound_plasma_02.mp3":"6aaf0fe5","audio/creature_noises/creature_noise_01.mp3":"cbcc6ee7","audio/creature_noises/creature_noise_02.mp3":"201a8247","audio/creature_noises/creature_noise_03.mp3":"97680811","audio/creature_noises/creature_noise_04.mp3":"6f734df2","audio/creature_noises/creature_noise_05.mp3":"6f736441","audio/creature_noises/creature_noise_06.mp3":"992712e9","audio/creature_noises/creature_noise_07.mp3":"d9ad04b3","audio/footsteps/footstep_2_l.mp3":"abeabfbe","audio/footsteps/footstep_2_r.mp3":"7dd16046","audio/footsteps/footstep_l.mp3":"b66e579b","audio/footsteps/footstep_r.mp3":"96e13433","models/props/prop_hydrant.glb":"f157fee9","models/props/prop_hydrant_collision.glb":"0bbfc4d2","models/creatures/3_headed_dog.glb":"9263480a","models/creatures/blue_dragon.glb":"d72f4da7","models/creatures/mech_lightning_dragon.glb":"5935bb67"};
 /* ASSETS:END */
@@ -7373,6 +7373,18 @@ if (inTest()) buildStreets();
 // THE DEAD: knocked out at zero (slow motion), he lies there `lie` seconds, then the beam takes him back up -- the reverse of
 // the way he came. HIS ARMOUR STAYS ON THE FLOOR as trophies until CLEAR. Pieces are the `armor_<bone>` meshes his file
 // carries (the pipeline's armorfit.py); a blow near one chips it, and a piece that breaks flies off.
+// m1011: THE SENTRY TURRET (SPAWN > TURRET). *"A turret that rotates around like a sentry gun, and if it sees you it shoots at you...
+// put it in the red area, so I can test how the bullets fly over (cover)... make it shoot rockets... it takes damage, after 3-5
+// hits it starts to look messed up, then smoking, and eventually explodes."* Built in code (no file). It sweeps its head until it
+// SEES you (in range, inside its cone, no FULL wall between -- half cover does not hide you, it only makes the shot go over a
+// DUCKED body), turns onto you and fires from `muzzle` height, flat: over every half-height block, into a standing body, over a
+// ducked one (`coverDucked`). `shot` ROCKET or BOLT (TOOLS > TURRET). Your bolts, rockets and swings hurt it: battered at `hurtAt`,
+// smoking at `smokeAt`, and at 0 it blows apart. Deflecting its shots with the sword is a later build.
+const TURRET = { list: [], shots: [], hp: 5, hurtAt: 3, smokeAt: 2, range: 26, cone: .55, sweep: 1.1, sweepHz: .25, turn: 1.8, aimTol: .1,
+  muzzle: 1.15, r: .55, h: 1.35, shot: 'ROCKET', kinds: {
+    ROCKET: { v: 13, cool: 1.6, dmg: 14, push: 6, up: 3, splash: 1.6, life: 4, size: .11 },
+    BOLT: { v: 24, cool: .45, dmg: 5, push: 2, up: 0, splash: 0, life: 2.5, size: .07 } } };
+try { const v = localStorage.getItem('mel.turret.shot'); if (v === 'ROCKET' || v === 'BOLT') TURRET.shot = v; } catch (e) {}
 // m1008: COVER's numbers (see `slideGo`) -- up here because the arena stage reads them at load
 const COVER = { on: 1, lo: .5, hi: 1.5, seek: 6, cone: .55, slideAt: 3.2, slideV: 9, slideDur: .7, slideDrag: 2.2, slideMin: 3.5,
   clips: { in: 'cover_in', idle: 'cover_idle', R: 'cover_R', L: 'cover_R_m', out: 'cover_out', slide: 'slide' },
@@ -10033,6 +10045,7 @@ function playerTail(dt) {
 function arenaStep(dt) {
   if (!inArena()) return;
   if (COVER.pending) { COVER.pending = 0; coverShow(COVER.show); }     // m1008
+  if (TURRET.list.length || TURRET.shots.length) turretStep(dt);     // m1011
   for (const d of ARENA.live) tailSway(d, dt);     // m989: a KO'd body too -- lying on his back is when the tail matters most
   hintStep(dt);
   tmStep(dt);
@@ -10066,7 +10079,120 @@ function arenaTime(raw) {
   const u = ARENA.slow / ARENA.slowT;
   return ARENA.slowK + (1 - ARENA.slowK) * (1 - smooth(.25, 1, u));
 }
+function turretMake() {
+  const g = new THREE.Group(), M = (c, m, r) => new THREE.MeshStandardMaterial({ color: c, metalness: m, roughness: r });
+  const dark = M(0x2f3236, .7, .45), mid = M(0x5b6068, .6, .4), red = new THREE.MeshBasicMaterial({ color: 0xff3344, toneMapped: false }), hazard = M(0xf2b233, .2, .6);
+  const add = (geo, mat, x, y, z, P) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; (P || g).add(m); return m; };
+  add(new THREE.CylinderGeometry(.55, .65, .18, 16), dark, 0, .09, 0);
+  for (let i = 0; i < 3; i++) { const a = i / 3 * Math.PI * 2, l = add(new THREE.BoxGeometry(.12, .1, .7), mid, Math.sin(a) * .5, .06, Math.cos(a) * .5); l.rotation.y = a; }
+  add(new THREE.CylinderGeometry(.16, .2, .75, 10), mid, 0, .55, 0);
+  add(new THREE.CylinderGeometry(.3, .3, .06, 16), hazard, 0, .9, 0);
+  const head = new THREE.Group(); head.position.y = TURRET.muzzle - .1; g.add(head);
+  add(new THREE.BoxGeometry(.6, .36, .55), dark, 0, .1, 0, head);
+  add(new THREE.BoxGeometry(.62, .06, .57), hazard, 0, .3, 0, head);
+  const eye = add(new THREE.SphereGeometry(.07, 10, 8), red, 0, .14, .28, head);
+  const pods = [];
+  for (const x of [-.24, .24]) { const pod = add(new THREE.BoxGeometry(.16, .18, .42), mid, x, .1, .18, head); add(new THREE.CylinderGeometry(.05, .05, .5, 8), dark, x, .1, .48, head).rotation.x = Math.PI / 2; pods.push(pod); }
+  return { g, head, eye, pods, mats: [dark, mid] };
+}
+function turretSpawn() {
+  const [sx, sz] = ARENA.spawnAt, n = TURRET.list.length, a = n * 2.1, x = sx + (n ? Math.sin(a) * 1.6 : 0), z = sz + (n ? Math.cos(a) * 1.6 : 0);
+  const M = turretMake(), T = { ...M, x, z, hp: TURRET.hp, yaw0: Math.atan2(ARENA.youAt[0] - x, ARENA.youAt[1] - z), yaw: 0, t: Math.random() * 6, cool: 1, see: 0, flash: 0, smokeT: 0, tilt: 0 };
+  T.yaw = T.yaw0; M.g.position.set(x, 0, z); scene.add(M.g);
+  T.box = { minx: x - TURRET.r, maxx: x + TURRET.r, miny: 0, maxy: TURRET.h, minz: z - TURRET.r, maxz: z + TURRET.r, turret: T }; BOXES.push(T.box); boxGrid();
+  TURRET.list.push(T); arenaBeam(x, z, [1, .3, .3], 1); snd('clang', { g: .6, r: .6, x, z });
+}
+function turretHurt(T, dmg, h) {
+  if (T.dead) return; T.hp -= Math.max(.5, dmg || 1); T.flash = .12; camShake(.06);
+  spkBurst(T.x, TURRET.muzzle, T.z, 10, { col: [1, .8, .4], spread: 3, size: .12, life: .4 });
+  snd('clang', { g: .8, r: 1.1 + Math.random() * .2, x: T.x, z: T.z });
+  if (T.hp <= TURRET.hurtAt) { T.tilt = Math.min(.35, T.tilt + .09); for (const m of T.mats) m.color.multiplyScalar(.82); }     // battered: it leans and darkens
+  if (T.hp <= 0) turretBoom(T);
+}
+function turretBoom(T) {
+  T.dead = 1; const P = new THREE.Vector3(T.x, .8, T.z);
+  for (let i = 0; i < 4; i++) spkBurst(P.x, P.y, P.z, 24, { col: i % 2 ? [1, .55, .15] : [.9, .9, .85], spread: 8, size: .3, life: .9 });
+  for (let i = 0; i < 8; i++) smokeAt(P.x + (Math.random() - .5), P.y + Math.random(), P.z + (Math.random() - .5), 2.2, 1.6);
+  camShake(.55); ARENA.stop = Math.max(ARENA.stop, .08); snd('thud', { g: 1.5, r: .5, x: P.x, z: P.z }); snd('clang', { g: .7, r: .45, x: P.x, z: P.z });
+  // the pieces fly: its head and pods leave on their own arcs, the rest drops
+  T.debris = [];
+  for (const m of [T.head, ...T.pods]) { const w = new THREE.Vector3(); m.getWorldPosition(w); const q = new THREE.Quaternion(); m.getWorldQuaternion(q); scene.attach(m);
+    T.debris.push({ m, v: new THREE.Vector3((Math.random() - .5) * 6, 5 + Math.random() * 4, (Math.random() - .5) * 6), w: new THREE.Vector3(Math.random() * 8, Math.random() * 8, Math.random() * 8), t: 0 }); }
+  T.g.scale.y = .45; T.g.rotation.z = .4;
+  const i = BOXES.indexOf(T.box); if (i >= 0) { BOXES.splice(i, 1); boxGrid(); }
+  const dx = player.pos.x - T.x, dz = player.pos.z - T.z; if (Math.hypot(dx, dz) < 2.2 && !player.roll) playerHurt(10, Math.atan2(dx, dz), 7, 3, .4, 1);
+}
+// a bolt / rocket of HIS landing at (x, y, z): the turret it reached takes it
+function turretBlast(x, y, z, rad, dmg) {
+  for (const T of TURRET.list) { if (T.dead) continue; const d = Math.hypot(x - T.x, z - T.z); if (d < TURRET.r + rad + .15 && y < TURRET.h + .3) turretHurt(T, dmg); }
+}
+function turretMelee(x, y, z, rad, dmg) {
+  for (const T of TURRET.list) { if (T.dead || T.mcool > 0) continue; if (Math.hypot(x - T.x, z - T.z) < TURRET.r + rad && y < TURRET.h + .2) { T.mcool = .35; turretHurt(T, (dmg || 1) * .8); } }
+}
+function turretFire(T) {
+  const K = TURRET.kinds[TURRET.shot] || TURRET.kinds.ROCKET, h = T.yaw, rocket = TURRET.shot === 'ROCKET';
+  const side = (T.side = -(T.side || 1)), ox = Math.cos(h) * .24 * side, oz = -Math.sin(h) * .24 * side;
+  const geo = rocket ? new THREE.CylinderGeometry(K.size * .7, K.size, K.size * 5, 8) : new THREE.SphereGeometry(K.size, 8, 6);
+  const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: rocket ? 0xffb347 : 0xff4466, toneMapped: false }));
+  if (rocket) m.rotation.set(Math.PI / 2, 0, 0, 'YXZ'), m.rotation.y = h;
+  const P = new THREE.Vector3(T.x + Math.sin(h) * .7 + ox, TURRET.muzzle, T.z + Math.cos(h) * .7 + oz); m.position.copy(P); scene.add(m);
+  TURRET.shots.push({ m, p: P, v: new THREE.Vector3(Math.sin(h) * K.v, 0, Math.cos(h) * K.v), K, rocket, t: 0 });
+  T.recoil = .12; snd(rocket ? 'swoosh' : 'zap', { g: rocket ? .5 : .35, r: rocket ? .7 : 1.4, x: P.x, z: P.z });
+  spkBurst(P.x, P.y, P.z, 5, { col: [1, .6, .2], spread: 1.5, size: .1, life: .2 });
+}
+function turretShotBoom(S, hitPlayer) {
+  const P = S.p, K = S.K;
+  spkBurst(P.x, P.y, P.z, S.rocket ? 22 : 8, { col: [1, .6, .2], spread: S.rocket ? 5 : 2, size: S.rocket ? .25 : .1, life: .6 });
+  if (S.rocket) { smokeAt(P.x, P.y, P.z, 1.6, 1.2); snd('thud', { g: .9, r: .7, x: P.x, z: P.z }); camShake(.15); }
+  const p = player, dx = p.pos.x - P.x, dz = p.pos.z - P.z, d = Math.hypot(dx, dz);
+  if (!p.roll && !coverDucked() && (hitPlayer || (K.splash && d < K.splash && P.y < p.pos.y + 2))) playerHurt(K.dmg * (hitPlayer ? 1 : .6), Math.atan2(S.v.x, S.v.z), K.push, K.up, .35, S.rocket ? 1 : 0);
+  S.m.removeFromParent(); S.dead = 1;
+}
+const _tuR = { t: 0, x: 0, y: 0, z: 0, nx: 0, ny: 0, nz: 0, box: null };
+function turretStep(dt) {
+  const p = player, H = RIG.height * (typeof bodyK === 'function' ? bodyK() : 1);
+  for (const T of TURRET.list) {
+    if (T.dead) { if (T.debris) for (const D of T.debris) { if (D.t > 2.5) { D.m.visible = false; continue; } D.t += dt; D.v.y -= 20 * dt; D.m.position.addScaledVector(D.v, dt);
+        if (D.m.position.y < .1) { D.m.position.y = .1; D.v.multiplyScalar(.4); D.v.y = Math.abs(D.v.y) * .5; } D.m.rotation.x += D.w.x * dt; D.m.rotation.y += D.w.y * dt; }
+      if ((T.smokeT -= dt) < 0) { T.smokeT = .25; smokeAt(T.x, .6, T.z, 1.3, 1.4, [.2, .2, .2]); } continue; }
+    T.t += dt; if (T.mcool > 0) T.mcool -= dt;
+    const dx = p.pos.x - T.x, dz = p.pos.z - T.z, dist = Math.hypot(dx, dz), toP = Math.atan2(dx, dz);
+    // SEES HIM: in range, inside the cone round where the head points, and no FULL wall between (half cover does not hide him)
+    const inCone = Math.abs(wrapAngle(toP - T.yaw)) < (T.see > 0 ? 1.6 : TURRET.cone);
+    const so = TURRET.r + .15, los = dist < TURRET.range && dist > so && inCone && !boxRay(T.x + dx / dist * so, TURRET.muzzle, T.z + dz / dist * so, p.pos.x, p.pos.y + H * .6, p.pos.z, _tuR);     // from outside its own box
+    T.see = los ? .8 : Math.max(0, T.see - dt);
+    let want = T.yaw0 + Math.sin(T.t * TURRET.sweepHz * Math.PI * 2) * TURRET.sweep;
+    if (T.see > 0) want = toP;
+    T.yaw += clamp(wrapAngle(want - T.yaw), -TURRET.turn * dt, TURRET.turn * dt);
+    T.head.rotation.set(T.tilt, T.yaw, T.tilt * .6, 'YXZ'); T.recoil = Math.max(0, (T.recoil || 0) - dt);
+    for (const pd of T.pods) pd.position.z = .18 - (T.recoil || 0) * .8;
+    T.eye.material.color.setHex(T.see > 0 ? 0xff2233 : 0x66ff99);
+    T.cool -= dt;
+    if (T.see > 0 && los && Math.abs(wrapAngle(toP - T.yaw)) < TURRET.aimTol && T.cool <= 0) { T.cool = (TURRET.kinds[TURRET.shot] || TURRET.kinds.ROCKET).cool; turretFire(T); }
+    if (T.flash > 0) { T.flash -= dt; for (const m of T.mats) m.emissive.setRGB(T.flash > 0 ? .8 : 0, T.flash > 0 ? .8 : 0, T.flash > 0 ? .8 : 0); }
+    if (T.hp <= TURRET.smokeAt && (T.smokeT -= dt) < 0) { T.smokeT = .18 + Math.random() * .2; smokeAt(T.x + (Math.random() - .5) * .3, TURRET.muzzle + .2, T.z + (Math.random() - .5) * .3, 1, 1.2, [.25, .25, .25]);
+      if (Math.random() < .3) spkBurst(T.x, TURRET.muzzle, T.z, 3, { col: [1, .7, .3], spread: 1.5, size: .08, life: .3 }); }
+  }
+  for (const S of TURRET.shots) {
+    if (S.dead) continue; S.t += dt; const ox = S.p.x, oy = S.p.y, oz = S.p.z; S.p.addScaledVector(S.v, dt); S.m.position.copy(S.p);
+    if (S.rocket && Math.random() < .6) smokeAt(ox, oy, oz, .45, .6);
+    // HIM: a standing body is in the way, a DUCKED one is under it
+    const qx = p.pos.x - S.p.x, qz = p.pos.z - S.p.z;
+    if (!coverDucked() && !p.roll && Math.hypot(qx, qz) < (p.r || .3) + S.K.size + .1 && S.p.y > p.pos.y && S.p.y < p.pos.y + H) { turretShotBoom(S, 1); continue; }
+    // the world: full walls stop it (`boxRay` flies over half cover), and so does its own launcher's box -- skipped
+    const hit = boxRay(ox, oy, oz, S.p.x, S.p.y, S.p.z, _tuR);
+    if (hit && !(_tuR.box && _tuR.box.turret)) { turretShotBoom(S, 0); continue; }
+    if (S.p.y < .05 || S.t > S.K.life || Math.hypot(S.p.x, S.p.z) > ARENA.r + 4) turretShotBoom(S, 0);
+  }
+  if (TURRET.shots.length > 24) TURRET.shots = TURRET.shots.filter(S => !S.dead);
+}
+function turretClear() {
+  for (const T of TURRET.list) { T.g.removeFromParent(); if (T.debris) for (const D of T.debris) D.m.removeFromParent(); const i = BOXES.indexOf(T.box); if (i >= 0) BOXES.splice(i, 1); }
+  for (const S of TURRET.shots) S.m.removeFromParent();
+  TURRET.list.length = 0; TURRET.shots.length = 0; boxGrid();
+}
 function arenaClear() {
+  turretClear();     // m1011
   if (player.carry) { player.carry.o.removeFromParent(); player.carry = null; } if (player.pick) { player.pick.o.removeFromParent(); player.pick = null; }
   for (const c of DRINK.cans) c.removeFromParent(); DRINK.cans.length = 0;
   for (const F of DRINK.flying) F.can.removeFromParent(); DRINK.flying.length = 0;
@@ -10089,6 +10215,8 @@ function arenaUi() {
       else if (a === 'back') ARENA.menu = 'top';
       else if (a === 'spawn') { ARENA.menu = ''; arenaSpawn(b.dataset.k); }
       else if (a === 'clear') { ARENA.menu = ''; arenaClear(); }
+      else if (a === 'turret') { ARENA.menu = ''; turretSpawn(); }     // m1011
+      else if (a === 'tshot') { TURRET.shot = TURRET.shot === 'ROCKET' ? 'BOLT' : 'ROCKET'; try { localStorage.setItem('mel.turret.shot', TURRET.shot); } catch (err) {} }
       else if (a === 'morph') { tmGo(); }
       else if (a === 'vend') { vendPlace(); }
       else if (a === 'forge') { forgedToggle(); }
@@ -10113,8 +10241,8 @@ function arenaUi() {
   if (ARENA.tools === undefined) { try { ARENA.tools = +localStorage.getItem('mel.arena.tools') || 0; } catch (err) { ARENA.tools = 0; } }
   const tools = ARENA.tools && !m;     // a menu open folds the tools away: the screen is not tall enough for both
   let h = '<div class="ar-bar">' + B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('vend', 'VEND') + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
-    (tools ? '<div class="ar-tools">' + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + B('grip', 'GRIP ' + MOVE.gripPick) + B('ktilt', 'TILT ' + KATANA.runTilt) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
-  if (m === 'top') h += '<div class="ar-menu">' + B('cat', 'WARBOSS &rsaquo;', 'boss') + B('cat', 'PEOPLE &rsaquo;', 'people') + B('cat', 'BEASTS &rsaquo;', 'beasts') + B('cat', 'RIVALS &rsaquo;', 'rival') + '<button class="ar-off">GRUNTS<small>soon</small></button><button class="ar-off">GREYS<small>soon</small></button></div>';
+    (tools ? '<div class="ar-tools">' + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + B('grip', 'GRIP ' + MOVE.gripPick) + B('ktilt', 'TILT ' + KATANA.runTilt) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
+  if (m === 'top') h += '<div class="ar-menu">' + B('cat', 'WARBOSS &rsaquo;', 'boss') + B('cat', 'PEOPLE &rsaquo;', 'people') + B('cat', 'BEASTS &rsaquo;', 'beasts') + B('cat', 'RIVALS &rsaquo;', 'rival') + B('turret', 'TURRET<small>sentry gun</small>') + '<button class="ar-off">GRUNTS<small>soon</small></button><button class="ar-off">GREYS<small>soon</small></button></div>';
   else if (m === 'boss' || m === 'people' || m === 'beasts' || m === 'rival') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back');
     for (const k in ARENA.kinds) { const A = ARENA.kinds[k]; if (!!A.creature !== (m === 'beasts')) continue; if (!!A.rival !== (m === 'rival')) continue; if (m !== 'beasts' && !A.both && !!A.civ !== (m === 'people')) continue; h += B('spawn', A.t + (A.sub ? '<small>' + A.sub + '</small>' : ''), k); } h += '</div>'; }
   U.innerHTML = h;
@@ -13089,6 +13217,7 @@ const BOLT_COL = [.35, .85, 1], BOLT_HOT = [1, .96, .85], BOLT_VIO = [.62, .38, 
 // come from, so a fumble is a spit and a full charge is an event.
 function boltHit(b) {
   const c = b.chg, big = .35 + c * .65;
+  if (TURRET.list.length) turretBlast(b.pos.x, b.pos.y, b.pos.z, b.rocket ? 1.4 : .25, b.rocket ? 4 : 1 + c);     // m1011: a rocket of his takes most of one; a full charge 2 bolts' worth
   // A ROCKET'S PICTURE IS SIZED AS A BIG BALL, NOT AS ITS OWN THIN BODY (m189)
   const S = b.rocket ? ROCKET.fx : b.size, dk = b.rocket ? ROCKET.dmgK : 1;
   // **`hitK` SCALES THE FOOTPRINT AND NOTHING ELSE.** Every term below that decides how much
@@ -30672,7 +30801,7 @@ function strikeSweep(dt, power, live, dmg, body) {
         // fist by construction rather than by a second number. **`p.melFired` does not gate it**
         // -- that is for the SOUND, and a swing through two crates should take out two.
         if (BRK.on && BREAK.length) brkBlast(_sw.x, _sw.y, _sw.z, rad, dmg || FOE.dmg.fist);
-        if (inArena()) vendHit(_sw.x, _sw.y, _sw.z, rad);     // m950
+        if (inArena()) { vendHit(_sw.x, _sw.y, _sw.z, rad); turretMelee(_sw.x, _sw.y, _sw.z, rad, dmg); }     // m1011: and the turret     // m950
         // AND THE SAME SWING REACHES A WALL CHUNK (m170). A hammer through a brick wall is
         // the whole reason his chunks carry an hp rather than a flag.
         kitBlast(_sw.x, _sw.y, _sw.z, rad, dmg || FOE.dmg.fist);
@@ -54498,7 +54627,7 @@ window.melee = window.mel = { FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VE
   // of a rule measures a game that does not exist -- which is the oldest mistake there is, and
   // the only way not to make it is for `npm run sim` to call exactly these.
   DUMMY, DUMMIES, LOCK, LEDGE, WALL, STRIKE, PADS, DESK, meleeLock, dummyHit, dummyBlow, strikeSweep, stepDummies, bodySeat, SEAT, findLock, SFX, CHARGE, POSE, snd, PUNCH, PLASMA, HITSND, BODYSND, FLYHIT, STEP,
-  stepPlayer, rigAnim, stepKit, frameBody, kickGo, NINJA, MIRROR, COVER, slideGo, coverShow, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
+  stepPlayer, rigAnim, stepKit, frameBody, kickGo, NINJA, MIRROR, COVER, slideGo, coverShow, TURRET, turretSpawn, turretHurt, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
   MFX, camShake, palDive,
   // THE BOARD, LIVE (m159). `mel.SK8.hold` is where the deck sits IN HIS HAND while it is
   // carried, and how a carried board should look is a look-at-it decision -- so it is a dial he
