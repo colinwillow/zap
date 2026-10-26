@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1012 -- the launcher twitch in cover (a Forge bug, every hero, every clip), the right-pad swipe DOWN slides, a LEFT TAP takes cover, cover in/out 4x faster, the pop-up drops the moment the shot leaves
+
+- **The twitch.** *"Holding the rocket launcher in cover, every round of the animation it twitches, like the hand snaps back."* Measured:
+  in every baked clip of every pipeline hero, KEY 1 of each hand was 45 deg off keys 0 and 2. The Forge's `wristLayer` (m998's "wrists
+  out" 45) writes its turn onto the bone, and the mixer does NOT rewrite a bone whose sampled value is unchanged from the last frame
+  (a clip that holds its first frames still), so the next frame turned it AGAIN. Isolated by baking one clip at wrists 0 (steps 0.0)
+  and 45 (45.0 / 44.6). Fix: the bone is put back after each frame's read; also the turn's direction is decided ONCE per clip (it
+  was per frame, and a crouched hand's two turns tie). After: `cover_idle` max hand step 0.3 deg, `idle_01` 2.3. samurai / orc /
+  goblin re-baked. (Left for later: three clips with 120-178 deg left-hand steps -- `weapon_swap`, `weapon_melee_01`/`_finish` --
+  a different layer, not this one.)
+- **The right pad's DOWN flick = the SLIDE** (`downSlide`), standing or running, in the way he is going (his nose when still), into
+  cover if a half block is that way. Unarmed, blaster, launcher; the katana keeps its own down (Zap's acrobatics) for now. In the
+  air down is still the slam.
+- **A LEFT TAP within `COVER.tapR` (1.4 m) of a half block takes cover on it** (`coverTap`), at once; in cover a left tap stands him
+  out. Otherwise the left tap still jumps.
+- **Faster:** cover in .55 -> .22 s, out .75 -> .2 s (*"way, way faster"*).
+- **The pop-up drops the moment the shot leaves** (`p.wallPop` = the trigger HELD; it was `committed()`, which holds on after a shot).
+- **Checked headless** (goblin, blaster): a left tap beside the block -> `hold` in 14 frames; trigger -> popped; released -> down 2 frames
+  later; a right down flick standing -> sliding.
+
 ## m1011 -- THE SENTRY TURRET (SPAWN > TURRET): it sweeps, sees you, fires rockets flat over half cover; battered, smoking, exploding
 
 *"Model a little turret, a sentry gun: it rotates around, and if it sees you it shoots at you... put it in the red area so I can test

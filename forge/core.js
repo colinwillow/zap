@@ -690,7 +690,11 @@ export function wristLayer(tg, clip, deg, H) {
   const out = {}; for (const sd of sides) out[sd] = new Float32Array(n * 4);
   tg.mixer.stopAllAction(); const ta = tg.mixer.clipAction(clip); ta.play();
   const _f = new THREE.Vector3(), _h = new THREE.Vector3(), _ax = new THREE.Vector3(), _w = new THREE.Quaternion(), _r = new THREE.Quaternion(), fwd = new THREE.Vector3();
-  for (let f = 0; f < n; f++) {
+  // m1012: THE TURN'S DIRECTION IS DECIDED ONCE PER CLIP, NOT PER FRAME. Per frame, a hand whose two turns bring the thumb about equally
+  // forward (a crouch: the cover clips) flipped between them -- the hand jumped 45 deg in one frame, mid-loop, and a launcher on it
+  // twitched every cycle (*"every round of the animation the rocket launcher twitches"*). Pass 1 sums the preference over the clip.
+  const pref = {}; for (const sd of sides) pref[sd] = 0;
+  for (let pass = 0; pass < 2; pass++) for (let f = 0; f < n; f++) {
     ta.time = times[f]; tg.mixer.update(0); tg.model.updateMatrixWorld(true);
     const lh = B[M + 'LeftUpLeg'] || B[M + 'LeftArm'], rh = B[M + 'RightUpLeg'] || B[M + 'RightArm'];
     const L = lh.getWorldPosition(new THREE.Vector3()).sub(rh.getWorldPosition(new THREE.Vector3())); L.y = 0; L.normalize(); fwd.crossVectors(L, new THREE.Vector3(0, 1, 0)).normalize();
@@ -699,9 +703,15 @@ export function wristLayer(tg, clip, deg, H) {
       const th = hand.children.find(c => c.isBone && /Thumb1$/.test(c.name)) || hand.children.find(c => c.isBone && /Index1$/.test(c.name));
       hand.getWorldQuaternion(_w);
       const tip = s => { _r.setFromAxisAngle(_ax, s * a); const q = _r.clone().multiply(_w); return th ? th.position.clone().applyQuaternion(q).dot(fwd) : 0; };
-      const sg = tip(1) >= tip(-1) ? 1 : -1;     // whichever turn brings the thumb more FORWARD
+      if (pass === 0) { pref[sd] += tip(1) - tip(-1); continue; }
+      const sg = pref[sd] >= 0 ? 1 : -1;     // whichever turn brings the thumb more FORWARD, over the whole clip
+      // m1012: AND PUT THE BONE BACK. The mixer does not rewrite a bone whose sampled value is unchanged from the last frame (a clip that
+      // holds its first frames still), so the turn written here stayed on it and the next frame turned it AGAIN: key 1 of every clip
+      // came out 45 deg off keys 0 and 2 (a twitch on every loop, his launcher in cover).
+      const q0 = hand.quaternion.clone();
       setWorldQ(hand, _r.setFromAxisAngle(_ax, sg * a).multiply(_w));
       out[sd].set([hand.quaternion.x, hand.quaternion.y, hand.quaternion.z, hand.quaternion.w], f * 4);
+      hand.quaternion.copy(q0);
     }
   }
   ta.stop(); tg.mixer.uncacheClip(clip);
