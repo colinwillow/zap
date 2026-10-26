@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1049 -- the vault clip's baked TRAVEL taken off too (it went "super far forward")
+
+*"Now he's back to doing the animation when he hurdles, and he goes super far forward as if the animation locomotion is baked back in."* It
+was: measured on the goblin, "Vault Over Box" -- baked "in place" -- still moves the hips 1.0 m FORWARD and .35 m sideways (and .53 up) over
+its life; m1047 took off only the rise. `vaultHips` now measures the hips in the ROOT's own frame (x, y, z) over the window and `stepVault`
+takes all three off frame by frame (local -> world by the root's drawn yaw), so the driven arc alone carries him and the clip is only the
+vault's shape. (The Forge's in-place edit evidently misses this clip's travel -- worth a look in the Forge.) Shipped unverified.
+
 ## m1048 -- the bar always catches into the one hang (a mid-slam catch kept the slam); the grip sits on the palm
 
 *"Twice I get onto the high bar in the wrong pose -- a shorter, funky pose, almost like I tried to pull up -- and then I launch off it all weird...
