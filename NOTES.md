@@ -5,6 +5,30 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1051 -- the climb and the vault TESTED and rebuilt from renders; the double jump is the multi-flip tuck
+
+*"Are you able to just test the animation and correct it... he's colliding with the thing and all of a sudden he pops up... the hurdle is doing
+the original problem again, he goes far over it... I love off the high bar how he's indefinitely spinning... make the double jump like that --
+make him a big flipping ninja guy... spin it faster and then do a kick off of it."*
+- **A harness (scratch):** the arena page with the hero loaded, the SHIPPED `mantleTap` / `stepMantle` / `vaultGo` / `stepVault` / `rigAnim`
+  stepped at 30 fps, the root placed, and a side-on render every other frame into a contact sheet, with hand / toe positions logged against
+  the face and the top. (Exports added to `mel`: MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer,
+  camera, scene, LEDGE.)
+- **Climb, as rendered before:** he rose straight up 34 cm OUT from the face with his feet climbing in the air, then snapped onto the top on the
+  last frame (m1047's "feet above the top" gate never opened). **Now:** the hands are pinned to the lip in height AND reach (`H`, `HF`: the
+  clip's hands in his own frame) -- he goes up as his hands come down past his face and forward over the edge as they go back past his hips;
+  his toes are held out of the face while below the top (`TF`; they poked ~10 cm in); after the hands let go, eased onto his spot. Rendered
+  after: grab, pull, over, stand -- toes 2 cm off the face, hands on the edge.
+- **Vault, as rendered:** "Vault Over Box" keeps its HANDS PLANTED on the box while the body swings over -- driving the hips on an arc put the
+  hands in the air and threw the legs out ahead. **Now:** the hands are pinned on the top just in from the edge (the clip's hands in his
+  frame); the body goes where the clip puts it; his POSITION follows his hips over the wall (the clip's hip travel, `bx`/`bz`) while the
+  picture is drawn back by the same amount, so the hand-off is seamless; the residual eases out over `resT` .18 s as the clip fades.
+  Rendered after: plant, swing over side-on, land on the far side, run on.
+- **Double jump:** `AFLIP.dbl` -- the second jump is the tucked FRONT flip that keeps turning (`airFlipGo(0, -1, noPop)`): circle the left stick
+  to spin faster, flick it to change flip, strike out of it (the turn keeps going -- a spinning kick -- and he still lands upright).
+  `AFLIP.dbl = 0` is the old single flip.
+- Shipped unverified on the phone (the two moves verified in renders).
+
 ## m1050 -- in the air: right-pad strikes go the way he is travelling; the LEFT stick's flick is a FLIP (front / back / side), tucked
 
 *"For the in-air swipes, the attack goes in the direction he's already going -- the tornado kick always points him wherever, which doesn't make

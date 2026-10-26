@@ -863,10 +863,10 @@ body.desk.free #deskHint { display: block; }
   <h1>WEIRDPORT</h1>
   <div class="msg" id="bootMsg">loading</div>
   <div class="bar"><i id="bootBar"></i></div>
-  <div class="bld">BUILD <span id="bootBuild">m1050</span></div>
+  <div class="bld">BUILD <span id="bootBuild">m1051</span></div>
 </div>
 
-<div class="chip" id="build"><b id="buildN">m1050</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
+<div class="chip" id="build"><b id="buildN">m1051</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
 <div id="splash" aria-label="tap to start"><img class="blur" alt=""><img class="main" alt="Zap and Clancy"><div class="glow"></div><div class="bn"></div></div>
 <script>
 // m879 (STEER 02:22): THE SPLASH, before the module (so it shows on the first paint, while the boot carries on behind it). The image's
@@ -972,7 +972,7 @@ import { KTX2Loader } from './vendor/KTX2Loader.js';
 import { clone as skeletonClone } from './vendor/SkeletonUtils.js';
 import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
 
-const BUILD = 'm1050';
+const BUILD = 'm1051';
 /* ASSETS:START */
 const ASSETS = {"models/alien_lizard.glb":"faffcf4c","models/alien_lizard_ktx2.glb":"05da2a20","models/skate.glb":"0c612d5e","models/skateboard.glb":"5ba93796","models/characters/alien_antenna_game.glb":"f3ccf328","models/characters/alien_antenna_game_ktx2.glb":"28afac8c","models/characters/alien_female_purple.glb":"1c73eef1","models/characters/alien_female_purple_ktx2.glb":"fc914afb","models/characters/alien_grey_medium.glb":"5a779e8e","models/characters/alien_grey_medium_ktx2.glb":"61600c3e","models/characters/alien_rollerskate_blue.glb":"abf0917c","models/characters/alien_rollerskate_blue_ktx2.glb":"e9a7948a","models/characters/alien_warrior.glb":"f5cc9c49","models/characters/alien_warrior_ktx2.glb":"a13fb7b6","models/characters/beautiful_asian.glb":"910f6565","models/characters/beautiful_asian_ktx2.glb":"35281eef","models/characters/beautiful_blonde.glb":"edddc421","models/characters/beautiful_blonde_ktx2.glb":"89cf3899","models/characters/brute_warboss_armor.glb":"cc5c7936","models/characters/ceo_alien.glb":"844dc3a7","models/characters/ceo_human.glb":"ec289865","models/characters/clancy.glb":"4b9d271f","models/characters/clancy_ktx2.glb":"74edbc6e","models/characters/colin.glb":"99d38b7d","models/characters/colin_ktx2.glb":"35040f87","models/characters/contruction_worker.glb":"8bd3d7ce","models/characters/contruction_worker_ktx2.glb":"3df8c344","models/characters/dummy_officer.glb":"724965ac","models/characters/dummy_officer_ktx2.glb":"db640cda","models/characters/fat_activist_01.glb":"3c566fee","models/characters/fat_activist_01_ktx2.glb":"b9328df4","models/characters/fat_biker_01.glb":"576b7cf5","models/characters/fat_biker_01_ktx2.glb":"7142cfad","models/characters/fat_biker_02.glb":"ab5d7ec7","models/characters/fat_biker_02_ktx2.glb":"28cec6cc","models/characters/fat_hippie.glb":"f09a260d","models/characters/fat_hippie_ktx2.glb":"0be745a4","models/characters/fat_hipster.glb":"9cf45ffb","models/characters/fat_hipster_ktx2.glb":"18106ff3","models/characters/fat_secret_service.glb":"6d546fb0","models/characters/fat_secret_service_ktx2.glb":"a23a304e","models/characters/fat_trump.glb":"5de6bc56","models/characters/fat_trump_ktx2.glb":"a0ddaf4d","models/characters/firefighter.glb":"ebde005d","models/characters/firefighter_ktx2.glb":"ccf93c96","models/characters/goblin_game.glb":"db1cf0e0","models/characters/hick_skinny.glb":"1ebe78e8","models/characters/hick_skinny_ktx2.glb":"1e93f0ed","models/characters/hobo_01.glb":"34e80b1d","models/characters/hobo_01_ktx2.glb":"69497677","models/characters/jack.glb":"ab009b9b","models/characters/jack_ktx2.glb":"1f4c9f7f","models/characters/moussa.glb":"6d80b1cf","models/characters/moussa_ktx2.glb":"66e040f8","models/characters/orc_game.glb":"d9aa816d","models/characters/proxy_ceo.bin":"6eca0c34","models/characters/proxy_ceo.jpg":"fadc9d0a","models/characters/proxy_ceo.json":"e62a7975","models/characters/proxy_ceo_alien.bin":"be247ecc","models/characters/proxy_ceo_alien.jpg":"8f8bf8fc","models/characters/proxy_ceo_alien.json":"eb23e28f","models/characters/proxy_hick.bin":"4485560e","models/characters/proxy_hick.jpg":"8c331965","models/characters/proxy_hick.json":"d85a0d36","models/characters/proxy_zap.bin":"dd7b300e","models/characters/proxy_zap.jpg":"2e7330ae","models/characters/proxy_zap.json":"b3b42754","models/characters/proxy_zap2.bin":"51088f46","models/characters/proxy_zap2.jpg":"a954a815","models/characters/proxy_zap2.json":"5c50abb7","models/characters/rept_heavy_armor.glb":"934661c7","models/characters/samurai_game.glb":"c7940015","models/characters/xray_skeleton.glb":"46480317","models/characters/zap.glb":"5e5cca54","models/characters/zap_02.glb":"4ff12de0","models/characters/zap_02_lib.glb":"e23d91da","models/characters/zap_ktx2.glb":"4b29d886","models/characters/zoar.glb":"423a9de9","models/characters/zoar_game.glb":"d20a3736","models/vehicles/dump_truck.glb":"d870dc18","models/vehicles/dump_truck_ktx2.glb":"21ee7059","models/vehicles/motorcycle_fatboy.glb":"9ed9be28","models/weapons/alien_antenna_blaster_game.glb":"54083b44","models/weapons/alien_antenna_hammer_game.glb":"707b8a27","models/weapons/alien_launcher.glb":"ba8ab96a","models/weapons/hammer.glb":"3335fdf2","models/weapons/shield_brute.glb":"c6e5593f","models/weapons/spikey_mace.glb":"dcd43acd","models/weapons/w_brute_cleaver.glb":"07a97580","models/weapons/w_rept_maul.glb":"84c3a1a4","models/buildings/alien_base_01.glb":"d9b9fd7f","models/buildings/alien_base_01_ktx2.glb":"6cbbfef2","models/towers/alien_tower_01.glb":"98d23375","models/towers/alien_tower_01_ktx2.glb":"47597651","models/streets/modular_streets_kit.glb":"6a4bcaa5","models/toon_city/impact_marks.json":"2b616620","models/toon_city/impact_marks_atlas.ktx2":"efe0840e","models/toon_city/impact_marks_atlas.png":"490ed049","models/toon_city/toon_city_breakables.glb":"29bddbc8","models/toon_city/toon_city_collision.glb":"fb3a693f","models/toon_city/toon_city_obb.json":"81c18a47","models/toon_city/toon_city_visual.glb":"5df62285","models/toon_city/toon_city_visual_ktx2.glb":"cf080531","models/toon_city/weirdkit_tint.js":"f6e9d802","models/toon_city_kit/toon_city_collision.glb":"5540a364","models/toon_city_kit/toon_city_kit_buildings.glb":"590e53f0","models/toon_city_kit/toon_city_kit_buildings_ktx2.glb":"e6dff3a3","models/toon_city_kit/toon_city_kit_pieces.glb":"8232bd6f","models/toon_city_kit/toon_city_kit_twins.glb":"fcc9fdfc","models/toon_city_kit/toon_city_visual.glb":"45cf2957","models/toon_city_kit/toon_city_visual_ktx2.glb":"f26a6984","models/toon_city_kit/weirdkit_detile.js":"dd05bd70","models/characters/morph/shapes.bin":"4e680384","models/characters/morph/shapes.json":"abfc949d","models/characters/forged/brute_warboss_armor.glb":"dc15dc94","models/characters/forged/ceo_alien.glb":"20659ac3","models/characters/forged/ceo_human.glb":"326d9e7e","models/characters/forged/index.json":"34031a77","models/characters/forged/rept_heavy_armor.glb":"01e631b0","models/characters/forged/zap.glb":"10eda718","images/crack_sprite_01.ktx2":"4aa55fde","images/crack_sprite_01.png":"16b52e8c","images/fire_sprites_01.ktx2":"922e1191","images/fire_sprites_01.png":"f87e2696","images/fire_sprites_02.ktx2":"e0cbfe1d","images/fire_sprites_02.png":"b373a6fd","images/fire_sprites_03.ktx2":"4fbbb985","images/fire_sprites_03.png":"7eece336","images/geyser_sprites_01.png":"b6325470","images/hdri_game.ktx2":"0feb5c79","images/hdri_game.png":"dac55f41","images/splash_zap_n_clancy.webp":"52a9d8a4","images/water_sprites_01.ktx2":"326924c5","images/water_sprites_01.png":"31e12659","audio/blaster_sound_01.mp3":"40d99583","audio/blaster_sound_02.mp3":"4bd7bb7c","audio/box_break_01.mp3":"e4127980","audio/electricity_beam_01.mp3":"986db8c9","audio/explosion_small.mp3":"f154a537","audio/metal_clang_01.mp3":"a333bd27","audio/metal_clang_02.mp3":"1e3ebbd6","audio/metal_clang_03.mp3":"afe44812","audio/metal_ping_01.mp3":"8ffca1a0","audio/plasma_canon.mp3":"e32c324d","audio/powerup_01.mp3":"48fbbe08","audio/swoosh_01.mp3":"193db185","audio/swoosh_02.mp3":"19145e70","audio/swoosh_03.mp3":"544fdffb","audio/swoosh_04.mp3":"843bee5d","audio/plasma_sounds/plasma_01.mp3":"e71c010f","audio/plasma_sounds/plasma_02.mp3":"ac3b1c75","audio/plasma_sounds/plasma_03.mp3":"eaa59355","audio/plasma_sounds/plasma_04.mp3":"bc7865e0","audio/plasma_sounds/plasma_05.mp3":"1d821cd0","audio/plasma_sounds/plasma_06.mp3":"cb979fbe","audio/plasma_sounds/plasma_hit.mp3":"30e5af5c","audio/alien_orc_grunt_sounds/alien_orc_grunt_01.mp3":"d6f4b343","audio/alien_orc_grunt_sounds/alien_orc_grunt_02.mp3":"78afc603","audio/alien_orc_grunt_sounds/alien_orc_grunt_03.mp3":"972c524a","audio/alien_orc_grunt_sounds/alien_orc_grunt_04.mp3":"b0ce76eb","audio/alien_orc_grunt_sounds/alien_orc_grunt_05.mp3":"1f0ba1f4","audio/alien_orc_grunt_sounds/alien_orc_grunt_06.mp3":"4f749866","audio/alien_orc_grunt_sounds/alien_orc_grunt_07.mp3":"dcf75925","audio/hit_sounds/hit_sound_01.mp3":"befaa2be","audio/hit_sounds/hit_sound_02.mp3":"73bc4433","audio/hit_sounds/hit_sound_03.mp3":"24b181e4","audio/hit_sounds/hit_sound_gound_01.mp3":"86ee2674","audio/hit_sounds/hit_sound_ground_02.mp3":"8a7cac73","audio/hit_sounds/hit_sound_plasma_01.mp3":"9abc0202","audio/hit_sounds/hit_sound_plasma_02.mp3":"6aaf0fe5","audio/creature_noises/creature_noise_01.mp3":"cbcc6ee7","audio/creature_noises/creature_noise_02.mp3":"201a8247","audio/creature_noises/creature_noise_03.mp3":"97680811","audio/creature_noises/creature_noise_04.mp3":"6f734df2","audio/creature_noises/creature_noise_05.mp3":"6f736441","audio/creature_noises/creature_noise_06.mp3":"992712e9","audio/creature_noises/creature_noise_07.mp3":"d9ad04b3","audio/footsteps/footstep_2_l.mp3":"abeabfbe","audio/footsteps/footstep_2_r.mp3":"7dd16046","audio/footsteps/footstep_l.mp3":"b66e579b","audio/footsteps/footstep_r.mp3":"96e13433","models/props/prop_hydrant.glb":"f157fee9","models/props/prop_hydrant_collision.glb":"0bbfc4d2","models/creatures/3_headed_dog.glb":"9263480a","models/creatures/blue_dragon.glb":"d72f4da7","models/creatures/mech_lightning_dragon.glb":"5935bb67"};
 /* ASSETS:END */
@@ -10259,15 +10259,15 @@ function beamPose() {
 // his forward axis, head going that way). Procedural, his tuck (Rollergirl's pose) while he turns, opening `settle` s before the landing and
 // brought to upright by touchdown -- the high bar's flight (`hbarFly`), any axis. The first flick of an airtime gives a little lift (`pop`) if
 // he is coming down; another flick adds a turn; circling the left stick spins him faster, as off the bar.
-const AFLIP = { rate: 9.5, pop: 5.5, more: 5, spinStick: 1.4, settle: .3 };
-function airFlipGo(dx, dy) {
+const AFLIP = { rate: 9.5, pop: 5.5, more: 5, spinStick: 1.4, settle: .3, dbl: 1 };     // m1051: dbl = the double jump is this
+function airFlipGo(dx, dy, noPop) {
   const p = player, ax = Math.abs(dx), ay = Math.abs(dy); if (ax < 1e-3 && ay < 1e-3) return 0;
   const f = new THREE.Vector3(Math.sin(p.faceH), 0, Math.cos(p.faceH));
   let axis, sg;
   if (ay >= ax) { axis = new THREE.Vector3(f.z, 0, -f.x); sg = dy < 0 ? 1 : -1; }     // k x up = forward: +th tips the head forward (front flip)
   else { axis = f.clone(); sg = dx > 0 ? 1 : -1; }     // k = forward: +th tips the head to his right (+X is his LEFT; right = (-fz, fx))
   if (p.aflip && p.aflip.axis.dot(axis) > .9) { p.aflip.w += sg * AFLIP.more; p.aflip.settle = 0; return 1; }     // another flick the same way: more turn
-  if (!p.aflipPop && p.vel.y < AFLIP.pop) { p.vel.y = AFLIP.pop; p.aflipPop = 1; }
+  if (!noPop && !p.aflipPop && p.vel.y < AFLIP.pop) { p.vel.y = AFLIP.pop; p.aflipPop = 1; }
   p.aflip = { axis, th: 0, w: sg * AFLIP.rate, tuck: 1, settle: 0, la: null };
   p.melee = 0; p.flip = ''; p.slam = 0; p.meleeAir = 0;
   snd('swoosh', { r: 1.2, g: .45 }); return 1;
@@ -16690,6 +16690,7 @@ function meleeLock(h, reachMax, cone) {
 // a second slam rather than a kick thrown across the air he already has.
 function kickGo(h, spinNm) {
   const p = player, SK = MELEE.spinKick, nm = spinNm || MELEE.air;
+  // m1051: a strike out of a flip keeps the turn going -- a spinning kick -- and the flip still lands him upright
   if (h == null) h = p.faceH;
   p.airKick = 1; p.meleeAir = 1; p.flip = ''; p.bkHang = 0; p.melWall = 0; p.melFist = 0;   // the kick owns the body (m1025: no stale left-pad flag)
   p.melFront = 0;     // m993: a kick spends its travel on its own clock, never a katana lash's
@@ -17069,20 +17070,21 @@ function wallAhead(h, d = 2.2) {
 // m1047: *"I thought you were just taking off the baked-in motion."* Back to the vault clip (TOOLS > HURDLE VAULT / TUCK), with its baked rise taken
 // off FRAME BY FRAME (`vaultHips`: the hips' height over the window, measured once) -- so his hips ride the driven arc exactly and the clip
 // shows only the vault itself (the hand plant, the legs swinging over). m1045's tuck is the other setting.
-const VAULT = { clip: 'vault', clips: ['vault', 'tuck'], win: [.10, .40], dur: .42, clear: .3, beyond: .12, out: 6.5, apexAt: .62, hips: null };     // m1043: a launch -- ends past the far face, airborne     // m1043: a launch -- ends past the far face, airborne     // win MEASURED on the goblin's bake: feet leave the floor at .13, land at .43
+const VAULT = { resT: .18, clip: 'vault', clips: ['vault', 'tuck'], win: [.06, .44], dur: .5, clear: .3, beyond: .12, out: 6.5, apexAt: .62, hips: null };     // m1043: a launch -- ends past the far face, airborne     // m1043: a launch -- ends past the far face, airborne     // win MEASURED on the goblin's bake: feet leave the floor at .13, land at .43
 // the clip lifts his hips itself (+.53 m on the goblin, crouch to the top of the hop) -- the driven arc only adds what that does not
 // m1049: *"he goes super far forward, as if the animation locomotion is baked back in."* It IS -- measured: "Vault Over Box", baked in place,
 // still carries the hips 1.0 m FORWARD and .35 m sideways (and .5 up) over its window. So all three are measured in the ROOT's own frame
 // and taken off frame by frame; the driven arc alone moves him, and the clip is only the vault's shape.
 function vaultHips() {
   if (rig.vaultH) return rig.vaultH;
-  const a = rig.actions[VAULT.clip], c = rig.clips[VAULT.clip], Hb = rig.bones.mixamorig_Hips; if (!a || !c || !Hb) return null;
+  const a = rig.actions[VAULT.clip], c = rig.clips[VAULT.clip], Hb = rig.bones.mixamorig_Hips, LH = rig.bones.mixamorig_LeftHand, RH = rig.bones.mixamorig_RightHand; if (!a || !c || !Hb || !LH || !RH) return null;
   const was = []; for (const k in rig.actions) { const x = rig.actions[k]; was.push([x, x.getEffectiveWeight(), x.time]); x.setEffectiveWeight(0); }
-  const mxr = rig.mixer, v = new THREE.Vector3(), o = new THREE.Vector3(), qi = new THREE.Quaternion(), X = [], Y = [], Z = []; a.setEffectiveWeight(1);
-  for (let i = 0; i <= 24; i++) { a.time = c.duration * (VAULT.win[0] + (VAULT.win[1] - VAULT.win[0]) * i / 24); mxr.update(0); rig.root.updateMatrixWorld(true);
-    rig.root.getWorldPosition(o); rig.root.getWorldQuaternion(qi).invert(); Hb.getWorldPosition(v).sub(o).applyQuaternion(qi); X.push(v.x); Y.push(v.y); Z.push(v.z); }
-  for (const [x, w, t] of was) { x.setEffectiveWeight(w); x.time = t; } mxr.update(0);
-  return (rig.vaultH = { x: X.map(q => q - X[0]), y: Y.map(q => q - Y[0]), z: Z.map(q => q - Z[0]), n: 24 });
+  const mxr = rig.mixer, v = new THREE.Vector3(), w = new THREE.Vector3(), o = new THREE.Vector3(), qi = new THREE.Quaternion(), X = [], Y = [], Z = [], BX = [], BZ = [], n = 24; a.setEffectiveWeight(1);
+  for (let i = 0; i <= n; i++) { a.time = c.duration * (VAULT.win[0] + (VAULT.win[1] - VAULT.win[0]) * i / n); mxr.update(0); rig.root.updateMatrixWorld(true);
+    rig.root.getWorldPosition(o); rig.root.getWorldQuaternion(qi).invert(); LH.getWorldPosition(v).add(RH.getWorldPosition(w)).multiplyScalar(.5).sub(o).applyQuaternion(qi); X.push(v.x); Y.push(v.y); Z.push(v.z);
+    Hb.getWorldPosition(v).sub(o).applyQuaternion(qi); BX.push(v.x); BZ.push(v.z); }
+  for (const [x, wt, t] of was) { x.setEffectiveWeight(wt); x.time = t; } mxr.update(0);
+  return (rig.vaultH = { x: X, y: Y, z: Z, bx: BX.map(q => q - BX[0]), bz: BZ.map(q => q - BZ[0]), n });     // + his hips' travel from the first frame     // the HANDS in his own frame over the window (planted on the box the whole way, measured)
 }
 function vaultLift() {
   if (rig.vaultUp != null) return rig.vaultUp;
@@ -17103,7 +17105,8 @@ function vaultGo(W0) {     // m1042: from cover (`p.wall`) or from standing at a
   // now ends just past the far face (`beyond`), still in the air and on the way down, and hands him to the ordinary air step with that speed.
   const d = (Math.hypot(p.pos.x - W.cx, p.pos.z - W.cz)) + depth + p.r + VAULT.beyond;
   p.wall = null; p.wallSt = ''; p.wallLow = 0; p.wallPop = 0; p.wallCool = WALL.cool; swapStop(); triggerStop();
-  p.vault = { t: 0, x0: p.pos.x, z0: p.pos.z, y0: p.pos.y, x1: p.pos.x - nx * d, z1: p.pos.z - nz * d, top: Math.max(top + VAULT.clear - p.pos.y, .15), nx, nz, H: VAULT.clip === 'vault' && rig.actions.vault ? vaultHips() : null };
+  p.vault = { t: 0, x0: p.pos.x, z0: p.pos.z, y0: p.pos.y, x1: p.pos.x - nx * d, z1: p.pos.z - nz * d, top: Math.max(top + VAULT.clear - p.pos.y, .15), nx, nz, H: VAULT.clip === 'vault' && rig.actions.vault ? vaultHips() : null,
+    hx: W.cx - nx * Math.min(.22, depth * .35), hz: W.cz - nz * Math.min(.22, depth * .35), hy: top };     // m1051: where his hands plant: on the top, just in from the edge
   p.heading = p.faceH = Math.atan2(-nx, -nz); p.camWant = p.faceH; p.melee = 0; p.roll = 0; p.land = 0;
   const nm = VAULT.clip; if (rig.actions[nm] && nm === 'vault') { const L = clipLen(nm); playOnce(nm, L * (VAULT.win[1] - VAULT.win[0]) / VAULT.dur); rig.actions[nm].time = L * VAULT.win[0]; }
   snd('swoosh', { r: 1.1, g: .45 });
@@ -17114,11 +17117,17 @@ function stepVault(dt) {
   // straight-ish across (no ease-out: momentum), the height a parabola whose top is `apexAt` of the way -- past it he is already coming down
   const ue = u * (2 - u) * .35 + u * .65, q = u / VAULT.apexAt, k = 2 * q - q * q;     // k: 0 -> 1 at the apex -> < 1 after
   p.pos.x = V.x0 + (V.x1 - V.x0) * ue; p.pos.z = V.z0 + (V.z1 - V.z0) * ue; p.pos.y = V.y0 + k * V.top;
-  if (V.H) {     // the clip's own travel taken off, in his frame (local x, z -> world by the yaw the root is drawn at)
-    const lx = mcAt(V.H.x, V.H.n, u), lz = mcAt(V.H.z, V.H.n, u), yw = rig.root.rotation.y, c = Math.cos(yw), sn = Math.sin(yw);
-    p.pos.x -= lx * c + lz * sn; p.pos.z -= -lx * sn + lz * c; p.pos.y -= mcAt(V.H.y, V.H.n, u); }
+  if (V.H) {     // m1051: TESTED (rendered side-on): the clip keeps its hands PLANTED on the box while the body swings over them -- so they are pinned
+    // to the top here, and the body goes wherever the clip's hands-relative pose puts it (local -> world by the yaw he is drawn at); eased in from
+    // where he started over the first fifth
+    const lx = mcAt(V.H.x, V.H.n, u), ly = mcAt(V.H.y, V.H.n, u), lz = mcAt(V.H.z, V.H.n, u), yw = rig.root.rotation.y, c = Math.cos(yw), sn = Math.sin(yw);
+    const px = V.hx - (lx * c + lz * sn), pz = V.hz - (-lx * sn + lz * c), py = Math.max(V.y0, V.hy - ly), w = smooth(0, .2, u);
+    p.pos.set(lerp(V.x0, px, w), lerp(V.y0, py, w), lerp(V.z0, pz, w));
+    // and HE is where his hips are: the clip carries them over the top while the root stays behind it, so the body's position (the lens, the
+    // hand-off) follows the hips and the picture is drawn back by the same amount (`vaultPose`) -- at the release nothing jumps
+    const bx = mcAt(V.H.bx, V.H.n, u), bz = mcAt(V.H.bz, V.H.n, u); V.ox = bx * c + bz * sn; V.oz = -bx * sn + bz * c; p.pos.x += V.ox; p.pos.z += V.oz; }
   p.vel.set(-V.nx * VAULT.out, 0, -V.nz * VAULT.out); p.grounded = false;
-  if (u >= 1) { p.vault = null; p.airT = 0; p.jumps = 1; p.vel.y = V.top * (2 - 2 / VAULT.apexAt) / (VAULT.apexAt * VAULT.dur); }     // the arc's own downward speed at its end: he flies on and lands
+  if (u >= 1) { if (V.ox != null) p.vaultRes = { ox: V.ox, oz: V.oz, t: 0 }; p.vault = null; p.airT = 0; p.jumps = 1; p.vel.y = V.top * (2 - 2 / VAULT.apexAt) / (VAULT.apexAt * VAULT.dur); }     // the arc's own downward speed at its end: he flies on and lands
 }
 function stepSlide(dt) {
   const p = player, S = p.slide; S.t += dt;
@@ -17505,7 +17514,7 @@ function ledgeDrop(away) {
 // the landing spot. While there is one: the green L-arrow lies on that face and over its top, and the right pad's ring pulses green; a TAP
 // of the right pad climbs (`mantleGo` / `stepMantle`: up first, then in -- never through the lip -- with the ledge climb-up clip over it).
 const MANTLE = { on: 1, reach: .75, lo: .9, hi: 2.35, deep: .45, inset: .42, hurdleLo: .45, hurdleHi: 1.3, hurdleDeep: .85,     // m1042: the hurdle band
-  grab: .2, pull: 1.05, acrossAt: [.36, .76], into: .45, tgt: null, arrow: null, t: 0 };     // m1043: grab / pull s; acrossAt = the clip span he moves over the top in
+  grab: .2, pull: 1.05, grip: .06, acrossAt: [.36, .76], into: .45, tgt: null, arrow: null, t: 0 };     // m1043: grab / pull s; acrossAt = the clip span he moves over the top in
 const _mnB = [], _mnP = { nx: 0, nz: 0, cx: 0, cz: 0 };
 function mantleFind() {
   const p = player, R = p.r + MANTLE.reach; let best = null, bd = 1e9;
@@ -17593,14 +17602,17 @@ function mantleCurve() {
   const nm = LEDGE.clips.up, a = rig.actions[nm], c = rig.clips[nm], bn = rig.bones, LH = bn.mixamorig_LeftHand, RH = bn.mixamorig_RightHand;
   const LT = bn.mixamorig_LeftToeBase || bn.mixamorig_LeftFoot, RT = bn.mixamorig_RightToeBase || bn.mixamorig_RightFoot;
   if (!a || !c || !LH || !RH || !LT || !RT) return (rig.mantleC = null);
-  const N = 30, H = [], F = [], o = new THREE.Vector3(), v = new THREE.Vector3(), w = new THREE.Vector3();
+  const N = 30, H = [], F = [], HF = [], TF = [], o = new THREE.Vector3(), v = new THREE.Vector3(), w = new THREE.Vector3(), qi = new THREE.Quaternion();
   const was = []; for (const k in rig.actions) { const x = rig.actions[k]; was.push([x, x.getEffectiveWeight(), x.time]); x.setEffectiveWeight(0); }
   const mxr = rig.mixer; a.setEffectiveWeight(1);     // a measuring pass, `gaitMeasure`'s pattern
   for (let i = 0; i <= N; i++) { a.time = c.duration * i / N; mxr.update(0); rig.root.updateMatrixWorld(true); rig.root.getWorldPosition(o);
-    H.push((LH.getWorldPosition(v).y + RH.getWorldPosition(w).y) / 2 - o.y); F.push(Math.min(LT.getWorldPosition(v).y, RT.getWorldPosition(w).y) - o.y); }
+    rig.root.getWorldQuaternion(qi).invert(); LH.getWorldPosition(v).add(RH.getWorldPosition(w)).multiplyScalar(.5).sub(o).applyQuaternion(qi);
+    H.push(v.y); HF.push(v.z);     // the hands' height and their reach FORWARD of his root (he faces +Z), in his own frame
+    F.push(Math.min(LT.getWorldPosition(v).y, RT.getWorldPosition(w).y) - o.y);
+    LT.getWorldPosition(v).sub(o).applyQuaternion(qi); RT.getWorldPosition(w).sub(o).applyQuaternion(qi); TF.push(Math.max(v.z, w.z)); }     // the toes' reach forward
   for (const [x, wt, t] of was) { x.setEffectiveWeight(wt); x.time = t; } mxr.update(0);
   let rel = N; for (let i = 1; i <= N; i++) if (H[i] >= H[i - 1] - .002 && H[i] < H[0] * .45) { rel = i; break; }     // the hands stop coming down: let go
-  return (rig.mantleC = { H, F, N, rel: rel / N, toe: beamToeH() });
+  return (rig.mantleC = { H, F, HF, TF, N, rel: rel / N, toe: beamToeH() });
 }
 const mcAt = (A, N, u) => { const x = clamp(u, 0, 1) * N, i = Math.min(N - 1, Math.floor(x)), f = x - i; return A[i] + (A[i + 1] - A[i]) * f; };
 function mantleTap() {
@@ -17614,28 +17626,36 @@ function mantleTap() {
   // hands are at the lip, and the feet's floor on the top is BLENDED in across the move rather than switched to (it was a .4 m jump)
   const t0 = 0;
   const grab = C && lip - p.pos.y > h0 + .05 ? MANTLE.grab : 0;
-  p.mantle = { x0: p.pos.x, y0: p.pos.y, z0: p.pos.z, ex: T.cx + T.nx * (p.r + .08), ez: T.cz + T.nz * (p.r + .08), tx: T.tx, ty: T.ty, tz: T.tz, lip, t: 0, t0, grab, pull: MANTLE.pull * (1 - t0), C };
+  p.mantle = { x0: p.pos.x, y0: p.pos.y, z0: p.pos.z, lx: T.cx - T.nx * MANTLE.grip, lz: T.cz - T.nz * MANTLE.grip, nx: T.nx, nz: T.nz, tx: T.tx, ty: T.ty, tz: T.tz, lip, t: 0, t0, grab, pull: MANTLE.pull * (1 - t0), C };     // m1051: lx/lz = where his hands hold, just over the edge
   p.faceH = p.heading = Math.atan2(-T.nx, -T.nz); p.camWant = p.faceH;
   const nm = LEDGE.clips.up; if (rig.actions[nm]) { const L = clipLen(nm); playOnce(nm, grab ? 1e-4 : L * (1 - t0) / p.mantle.pull); rig.actions[nm].time = L * t0; }     // 1e-4: held on its first frame through the grab (`playOnce` reads 0 as 1)
   snd('foot', { g: .16, r: .9 }); MANTLE.tgt = null; return 1;
 }
+// m1051: TESTED, rendered side-on frame by frame (scratch harness driving this code): m1047 rose straight up 34 cm OUT from the face, feet
+// climbing in the air, and snapped onto the top on the last frame -- its "feet above the top" gate never opened. Now the HANDS are pinned to the
+// lip's edge in BOTH height and reach (the clip's hands, measured in his own frame, `H` and `HF`): his body goes where the pull puts it --
+// up while his hands come down past his face, forward over the edge as they go back past his hips. When the hands let go (`rel`) he is eased
+// from there onto his standing spot over the rest of the clip. A low ledge: never below the floor he left.
 function stepMantle(dt) {
   const p = player, M = p.mantle, C = M.C; M.t += dt;
   p.vel.set(0, 0, 0); p.grounded = false; p.airT = 0;
+  const fx = -M.nx, fz = -M.nz;     // his facing (into the block)
   if (M.t < M.grab) {     // the hop up to the hang: fast out, easing in to the grip
-    const v = M.t / M.grab, e = 1 - (1 - v) * (1 - v); p.pos.x = lerp(M.x0, M.ex, e); p.pos.z = lerp(M.z0, M.ez, e); p.pos.y = lerp(M.y0, M.lip - C.H[0], e); return; }
+    const v = M.t / M.grab, e = 1 - (1 - v) * (1 - v), hx = M.lx - fx * (C ? C.HF[0] : .3), hz = M.lz - fz * (C ? C.HF[0] : .3);
+    p.pos.x = lerp(M.x0, hx, e); p.pos.z = lerp(M.z0, hz, e); p.pos.y = lerp(M.y0, M.lip - C.H[0], e); return; }
   if (M.grab && !M.go) { M.go = 1; const a = rig.actions[LEDGE.clips.up]; if (a) a.setEffectiveTimeScale(clipLen(LEDGE.clips.up) / M.pull); snd('foot', { g: .14, r: .8 }); }
-  const k = clamp((M.t - M.grab) / M.pull, 0, 1), u = M.t0 + (1 - M.t0) * k;     // where we are in the clip
-  let y = C ? Math.max(M.y0, M.lip - mcAt(C.H, C.N, Math.min(u, C.rel))) : lerp(M.y0, M.ty, smooth(0, 1, k));     // never below the floor he left
-  // m1047: *"it's linear diagonally up and forward, so he cuts through the corner of the block -- it should go up, and then forward."* He
-  // moves over the top only once his FEET are above it (the feet's measured height on the clip, `F`), then across over what is left
-  let across = 0;
-  if (M.uA == null && (!C || y + mcAt(C.F, C.N, u) - C.toe >= M.ty - .03 || u > .9)) M.uA = u;
-  if (M.uA != null) across = smooth(0, 1, (u - M.uA) / Math.max(.08, (1 - M.uA) * .85));
-  if (C) { const yf = M.ty - mcAt(C.F, C.N, u) + C.toe; y = lerp(y, Math.max(y, yf), across); }     // the feet's floor on the top, eased in as he comes over
-  if (C && u >= C.rel) y = Math.max(y, lerp(M.lip - mcAt(C.H, C.N, C.rel), M.ty, smooth(C.rel, Math.min(1, C.rel + .3), u)));
-  const sx = M.grab ? M.ex : lerp(M.x0, M.ex, Math.min(1, k * 3)), sz = M.grab ? M.ez : lerp(M.z0, M.ez, Math.min(1, k * 3));
-  p.pos.x = lerp(sx, M.tx, across); p.pos.z = lerp(sz, M.tz, across); p.pos.y = Math.min(y, M.ty + .02);
+  const k = clamp((M.t - M.grab) / M.pull, 0, 1), u = M.t0 + (1 - M.t0) * k;
+  if (!C) { const e = smooth(0, 1, k); p.pos.set(lerp(M.x0, M.tx, e), lerp(M.y0, M.ty, e), lerp(M.z0, M.tz, e)); }
+  else {
+    // where the pinned hands put him at clip time q
+    const at = q => { const hf = mcAt(C.HF, C.N, q); return { x: M.lx - fx * hf, z: M.lz - fz * hf, y: Math.max(M.y0, M.lip - mcAt(C.H, C.N, q)) }; };
+    let P;
+    if (u < C.rel) { P = at(u); if (!M.grab) { const w = smooth(0, .25, u); P.x = lerp(M.x0, P.x, w); P.z = lerp(M.z0, P.z, w); }     // from where he stood into the reach
+      // and his TOES stay out of the face while they are below the top (rendered: they poked ~10 cm in during the pull)
+      if (P.y + mcAt(C.F, C.N, u) < M.lip) { const into = (P.x - M.lx) * fx + (P.z - M.lz) * fz + mcAt(C.TF, C.N, u) + MANTLE.grip + .02; if (into > 0) { P.x -= fx * into; P.z -= fz * into; } } }
+    else { const A = at(C.rel), e = smooth(C.rel, 1, u); P = { x: lerp(A.x, M.tx, e), z: lerp(A.z, M.tz, e), y: lerp(A.y, M.ty, e) }; }
+    p.pos.set(P.x, Math.min(P.y, M.ty + .02), P.z);
+  }
   if (k >= 1) { p.mantle = null; p.pos.set(M.tx, M.ty, M.tz); p.grounded = true; p.jumps = 0; snd('foot', { g: .16, r: 1.0 }); }
 }
 function stepLedge(dt) {
@@ -20411,7 +20431,10 @@ function stepPlayer(dt) {
     if (AIR.dbl && !p.grounded && p.coyote <= 0 && p.jumps === 1 && !p.knock && !p.slam && !p.roll && !p.melee) {
       p.jumps = 2;
       p.vel.y = MOVE.jump * AIR.second;       // SET, never added -- see `AIR.second`
-      flipGo(CLIPS.flipAir, (p.vel.y + Math.sqrt(p.vel.y * p.vel.y +
+      // m1051: *"the double jump is a slow flip, only ever one rotation -- I'm loving the multiple flips off the high bar: make him a big flipping
+      // ninja... you can spin it faster, then kick off of it."* The second jump is the TUCKED front flip that keeps turning (`airFlipGo`): circle
+      // the left stick to spin faster, flick it to change flip, strike out of it with the right pad. `AFLIP.dbl = 0` is the old single flip.
+      if (!(AFLIP.dbl && airFlipGo(0, -1, 1))) flipGo(CLIPS.flipAir, (p.vel.y + Math.sqrt(p.vel.y * p.vel.y +
         2 * MOVE.g * Math.max(0, p.pos.y - groundAt(p.pos.x, p.pos.z, p.pos.y, MOVE.step)))) / MOVE.g);
       snd('swoosh', { r: 1.30, g: .40 });
     }
@@ -53979,6 +54002,8 @@ function frameBody() {
     bladeBody(dt);                     // her hips, flip, lean, swivel, twist and feet, in her order (m271)
     wingFrame(dt);
     hbarPose();                        // m1034: on the high bar / flying off it, turned about the bar
+    if (player.vault && player.vault.ox != null) { rig.root.position.x -= player.vault.ox; rig.root.position.z -= player.vault.oz; }     // m1051: the vault's picture, drawn back to its root
+    else if (player.vaultRes) { const R = player.vaultRes; R.t += dt; const k = 1 - smooth(0, VAULT.resT, R.t); rig.root.position.x -= R.ox * k; rig.root.position.z -= R.oz * k; if (k <= 0) player.vaultRes = null; }     // and eased out as the clip fades
     airFlipPose();                     // m1050: the left stick's air flips, turned about his middle
     beamPose();                        // m1037: on the beam, tilted with the balance, arms out
     // **AFTER THE ROOT IS PLACED, NOT ONLY AFTER THE MIXER.** The pin is a bone's WORLD
@@ -55774,7 +55799,7 @@ window.melee = window.mel = { FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VE
   // of a rule measures a game that does not exist -- which is the oldest mistake there is, and
   // the only way not to make it is for `npm run sim` to call exactly these.
   DUMMY, DUMMIES, LOCK, LEDGE, WALL, STRIKE, PADS, DESK, meleeLock, dummyHit, dummyBlow, strikeSweep, stepDummies, bodySeat, SEAT, findLock, SFX, CHARGE, POSE, snd, PUNCH, PLASMA, HITSND, BODYSND, FLYHIT, STEP,
-  stepPlayer, rigAnim, stepKit, frameBody, kickGo, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, slideGo, coverShow, TURRET, turretSpawn, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
+  stepPlayer, rigAnim, stepKit, frameBody, kickGo, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, slideGo, coverShow, TURRET, turretSpawn, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
   MFX, camShake, palDive,
   // THE BOARD, LIVE (m159). `mel.SK8.hold` is where the deck sits IN HIS HAND while it is
   // carried, and how a carried board should look is a look-at-it decision -- so it is a dial he
