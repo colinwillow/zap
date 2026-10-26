@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1060 -- the katana charge: the launch ends on the frame the blade hits the floor (measured in the real loop)
+
+*"I want the launch forward to be timed so perfectly that the end of the launch lands right when the katana hits the ground."*
+- **Harness (`kchg.cjs`, the real `frameBody` at 60 fps after boot, alien goblin, katana, full charge, open floor):** the dash ran f0-f22 and
+  stopped at f23 (u .427 = `dashLand`), where the slam fired -- with the blade TIP still **1.25 m up**, frozen there by the hit-stop. The tip
+  reached the floor at f35-36 (clip .63-.65): **0.2 s late.** m1017 lined the arrival up with the right hand's FASTEST frame (.54 of the
+  clip), which is mid-downswing, not the impact.
+- **Now `goContact(clip)`**: samples the clip with the worn weapon and finds the first frame after the top of the raise where the weapon's
+  tip (`muzzleWorld`'s point) is within `GOTIP.eps` 4 cm of its lowest -- .629 for `weapon_melee_finish` with the katana. The clip starts that
+  far minus `dashLand` in, cached PER WEAPON (`rig.goPeakK`: the hammer's head lands at its own moment). Falls back to the hand speed.
+- **After:** goblin f23 -- travel ends, tip 0.10 m, slam fires, same frame; samurai f23 -- tip 0.007 m. Renders checked (blade flat on the
+  floor in the shockwave). The downswing now happens while he decelerates (f17-22).
+- Harness note: the first run showed NO travel for 16 frames -- a cover wall in front of the spawn, broken by `wallMelee` at u .32. Not a bug.
+- `muzzleWorld` exported on `mel`. Shipped unverified on the phone.
+
 ## m1059 -- alien goblin: the belly on the HEAD bone, the floating belt piece, hair/cape drawn behind the background, and the leaping run
 
 *"There's a piece floating out in front of him... the background is on top of his hair and on top of the Cape... why is he doing the weird
