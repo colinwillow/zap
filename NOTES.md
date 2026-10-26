@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1050 -- in the air: right-pad strikes go the way he is travelling; the LEFT stick's flick is a FLIP (front / back / side), tucked
+
+*"For the in-air swipes, the attack goes in the direction he's already going -- the tornado kick always points him wherever, which doesn't make
+sense -- but we keep the directional one on the ground... and the left stick in the air is an acrobatic stick: flick up a front flip, down a
+backflip, and side flips... procedural with the tuck, like off the high bar -- you can move the stick around and he really goes for it."*
+- **Air strikes:** `meleeGo0`'s air branch always aims along his travel (his nose when barely moving); the flick's side still picks the spin
+  kick or its mirror. Ground strikes stay camera-relative to the flick.
+- **Air flips (`airFlipGo` / `airFlipStep` / `airFlipPose`):** a left flick in the air -- up = front flip (axis (fz, 0, -fx): k x up =
+  forward), down = back, right / left = side flip about his forward axis (k = f tips the head to his right). Procedural: `rate` 9.5 rad/s,
+  his tuck (Rollergirl's) while turning, opening `settle` .3 s before the predicted landing and turned to the next upright by touchdown; the
+  first flick of an airtime pops him to 5.5 m/s up if he is falling; another flick the same way adds 5 rad/s; circling the left stick
+  spins faster. The root turns about his middle (the bar flight's picture). Replaces the left flick's air kick.
+- Shipped unverified.
+
 ## m1049 -- the vault clip's baked TRAVEL taken off too (it went "super far forward")
 
 *"Now he's back to doing the animation when he hurdles, and he goes super far forward as if the animation locomotion is baked back in."* It
