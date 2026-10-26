@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1075 -- the kip-up off his back (TOOLS > GET UP); rockets ricochet with a random scatter and a drawn corkscrew (TOOLS > RICOCHET)
+
+*"There's a kip-up in the Mixamo library that could be cool for getting up."* / *"Have the rocket deflect be slightly random directionally -- the
+physics is better already, but -- and a spiral as it travels. Leave a toggle."*
+- **Kip-up:** the library's `Kip_Up` Forge-baked onto all seven heroes beside Colin's six (`kip_up`; `knock_prof.json` now 8 clips). Rendered
+  first: it starts flat on his back (how `fall_to_back` ends), kips, lands crouched at .6, stands by .8. It is the get-up off his BACK
+  (`knockUpBack`); off his face it stays Colin's. Control back at its measured standing point (`knockStand`). TOOLS > GET UP: KIP / NORMAL.
+  `Corkscrew_Kip_Up` is baked too (`kip_cork`) but starts STANDING and travels off -- not a get-up, unused.
+- **Ricochet (`RIC`):** after m1067's reflection off the blade, the velocity is turned a random `yaw` (+-.35 rad) and `pitch` (+-.16) about its
+  own line; SPIRAL also corkscrews the DRAWN rocket round its path (`r` .28 m, growing over `grow` .25 s from the blade, `w` 13 rad/s, either
+  hand) -- the path that hits things (`S.p`) is unchanged; its smoke leaves the drawn rocket. TOOLS > RICOCHET: SPIRAL (default) / JITTER / PURE.
+- Real-loop check (`kipric.cjs`: a chest hit -> the get-up clip in use + frames to control; four late blocks -> their directions and the drawn
+  rocket's distance off its path) was still running at the push -- results go in the next entry.
+- Shipped unverified on the phone.
+
 ## m1074 -- knocked flying: back-first from a hit in front, belly-first from behind (Colin's poses, Forge-baked); control back when he is up; cover carries across a shot-out gap
 
 *"When he gets hit and flies through the air his direction should always be set... I had in-air poses flying forward and flying backwards
