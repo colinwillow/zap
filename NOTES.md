@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1062 -- guard flips: up = a FRONT flip forward, down = a BACK flip back; TUCK is the default pose
+
+*"I think tuck should be standard. Also flip down while in guard do a back flip, flick forward a front flip."*
+- `cartGo` picks one of four from the flick's world direction against his facing: sides = the cartwheel (m1061), ahead = FRONT flip travelling
+  forward (`CART.vFB` 4.5 m/s), behind = BACK flip travelling back. Facing held in all four. `leftFlick` sends EVERY flick with the guard
+  held there now (up/down in guard no longer reach the old left-flick moves).
+- TOOLS > CARTWHEEL: TUCK first and default (new key `mel.cart2`, so a saved GUARD from m1061 does not stick).
+- **Real loop (`kcart.cjs`, goblin, katana, guard held):** right 3.48 m right / left 3.48 m left / up 2.85 m FORWARD with his head AHEAD at
+  f8 (+.35) / down 2.85 m BACK with his head BEHIND (-.28); facing drift 0 in all four; 6.09 rad each. Shipped unverified on the phone.
+
 ## m1061 -- the GUARD CARTWHEEL: guard held (right pad down) + a left-pad flick left/right = a sideways aerial cartwheel, facing held
 
 *"When you hold down on the right stick you're in the strafe / guard mode. Flick right or left on the left stick while holding guard and he does
