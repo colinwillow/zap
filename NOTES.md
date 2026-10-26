@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1045 -- the hurdle is his TUCK over the arc (the vault clip fought the arc)
+
+*"This is me hurdling over something... this hurdle animation is insane, it's just not lined up correctly."* (six frames: crouched in cover,
+then STANDING on the top side-on, then flying off backwards-looking.) "Vault Over Box" brings its own climb -- hands on the top, a turn side-on,
+its hips rising ~.5 m -- and none of it agrees with the driven arc (`vaultLift` only took off the hips' rise). `VAULT.clip` is now `tuck`
+(Rollergirl's sculpted pose, m1038: one frame, no motion of its own): the arc alone carries him, knees up clear of the top, and the ordinary
+air step and landing take him from the far side. `VAULT.clip = 'vault'` puts the old clip back. Fallback without the bake: the air pose.
+(He also notes the left-flick acrobatics get him over the cover too; left as is.) Shipped unverified.
+
 ## m1044 -- m1043 shipped a BLANK PAGE (a comment swallowed a brace); fixed
 
 A trailing `// ...` comment was inserted mid-line in `mantleTap`, commenting out the `rig.actions[nm].time = L * t0; }` after it -- "Unexpected
