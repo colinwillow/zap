@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1047 -- the hurdle is the vault clip again with its rise taken off frame by frame (TOOLS > HURDLE); the climb goes UP then OVER; beam toes still
+
+*"When you vault it just looks like he goes into a tuck... I thought you were just taking off the baked-in motion... getting up onto the
+ledge it's linear, diagonally up and forward, so he cuts through the corner of the block rather than up and then forward... the tiptoe
+balance beam animation, his feet do weird little flicks, like the toe flicks we had on the runs."*
+- **Hurdle:** m1045 swapped the clip for the tuck (a choice, said so then). Now `VAULT.clip` 'vault' again and `vaultHips` measures the hips'
+  height over the window (once per rig); `stepVault` takes it off FRAME BY FRAME, so the hips ride the driven arc and the clip shows only the
+  vault (m1027's `vaultLift` only subtracted the peak). TOOLS > HURDLE VAULT / TUCK (remembered `mel.hurdle`).
+- **Climb:** across was a fixed span of the clip (.36-.76) while the body was still rising -> a diagonal through the corner. Now he crosses only
+  once his FEET (the clip's measured foot height `F` on the current body height) are above the top (or past .9 of the clip), then over what is
+  left; the top's floor is eased in with that same weight.
+- **Beam toes:** `beamToes` (at load) copies the beam clips without their `ToeBase` / `Toe_End` tracks (`beam_walk~` ...), so his toes hold
+  their rest on the beam. Headless (goblin): the three `~` clips exist with 0 toe tracks. `BEAM.toes = 1` plays them as baked.
+- Shipped unverified.
+
 ## m1046 -- the climb-up is slower and continuous; the flat arrow shows on the top for a climb too
 
 *"When I go up to the side of the ledge to get up on it, I do want the arrow -- just a flat arrow on the top of the block... but now he's
