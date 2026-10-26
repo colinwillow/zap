@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1053 -- off the high bar, a double jump / air flip no longer spins him about a point far below him
+
+*"When I launch off the high bar and double jump in the air, the rotation is about an origin far away from my guy -- like he's rotating on a
+long invisible pole."* Both the bar's flight (`hbarFly` / `hbarPose`: turned about the bar's axis) and the new air flip (`airFlipPose`) were
+live at once: each placed the root about his middle using only ITS turn, while the root's quaternion carried both -- two turns, two centres.
+Now `airFlipGo` with a bar flight running TAKES IT OVER: the flip continues on the bar's axis from the bar's angle, its spin plus the flick's
+(`AFLIP.more`), and `p.barFly` ends -- one turn, about his middle; it still opens and lands upright. Shipped unverified.
+
 ## m1052 -- the high bar through the harness: the swing works; the grip was on the WRISTS on every pipeline hero (mitten hands)
 
 *"Use the harness to test the high bar swing too."* (scratch `bar.cjs`: the shipped `hbarCatch` / `stepBar` / `hbarFly` / `rigAnim` /
