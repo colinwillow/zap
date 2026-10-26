@@ -5,6 +5,24 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1020 -- the weapon reach plays in cover (its top half over the cover legs); the weapon arm lifts off his side in cover (TOOLS > ARM)
+
+*"make the hybrid take the torso-up animation from the weapon change so you can play it while he's in cover... when he's in cover and
+he's holding a weapon the arm that's holding the gun or the katana is kind of just down... clipped into the body a little."*
+- **The reach in cover:** the cover branch of `rigAnim` returned before the swap override, so a swap in cover swapped silently. Now
+  `weapon_swap__ups` (spine-up, hips-free) plays over a hips-down half of the cover pose (`cover_idle` / the shimmy), cut on first use
+  by `coverLegs` (the `__legh` rule; the cover clips are not in `SPLIT.legsRaw` and the mirrored shimmy is made after the split). Not
+  over a held one-shot frame (a looping half would replay it).
+- **Found on the way:** `swapGo` rewound `weapon_swap__up` but `upKey` draws `weapon_swap__ups` (the square half, m194), which was
+  never rewound -- so the reach could start mid-clip anywhere. `swapGo` starts `__ups` too.
+- **The arm:** `coverArm` turns the right upper arm OUT from his side (`CARM.out`, default 25 deg, about his own forward) and FORWARD
+  12 deg (about his right), after the mixer, eased with crouched cover while something is in the hand, not while popped up or
+  swapping; `coverArmUndo` takes it off before the next mixer pass (`spineUndo`'s pattern -- the mixer does not rewrite an unchanged
+  bone, so an edit left on accumulates). Signs derived: +X is his left, so about +forward a negative turn takes the right arm away.
+  TOOLS > ARM 0 / 15 / 25 / 35 (0 = off), remembered.
+- Headless: boots clean; the harness could not seat him in cover this pass (stale `mel.rig`), so nothing about the pose is checked.
+- Shipped unverified. If the arm goes INTO him instead of out, the sign is the one thing to flip.
+
 ## m1019 -- TOOLS > SWING: the katana's swing set is his pick (ORIG / WHOLE / CUT / FISTS), default ORIG
 
 *"maybe we just go to kind of the original katana attacks before they were chopped up... or we just use like the unarmed attack, but
