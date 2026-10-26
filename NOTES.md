@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1037 -- THE BALANCE BEAM: SPAWN > BALANCE BEAM; walk along it arms-out, keep the lean up with the left stick, slip off if you don't
+
+*"Now let's build the balance beam next."* (COURSES.md, GYM part 2, with its DONE WHEN.)
+- **Beam:** `beamMake` -- 10 cm x 7 m at 1.0 m (visual only, no collider: it is ridden, not stood on), legs, a mat, and a platform box at each
+  end at the beam's height.
+- **On:** `beamFind` -- feet within .32 m across its line, inside its length, at its height (stepping off a platform or landing a jump).
+- **Walk:** `stepBeam` owns him: only the stick's push ALONG the beam moves him (`speed` 1.6 m/s), facing the way he goes; off either end
+  onto the platform; a tap jumps (the ordinary step takes it).
+- **Balance:** `lean` is an inverted pendulum -- `+grow x lean`, a two-sine wobble x (.35 + speed share), damping; the stick's push ACROSS the
+  beam is the counter (`ctl`; leaning to one side, push to the other). Past `fall` 1 he goes off that side with a shove (and `beam_slip`).
+- **Picture:** `beamPose` tilts the root about the beam by lean x `tilt` 22 deg (the sign from the cross product, not argued) and holds both
+  arms out `arms` 68 deg (`caSwing`). Walk = "Catwalk Walk Forward -- Legs Crossing" (`beam_walk`, rate x speed / `walkRef`), stand =
+  "Teeter" (`beam_idle`), a big lean = "Wobbling" (`beam_wobble`); the three heroes re-baked (`forged22`, 121 clips).
+- Shipped unverified.
+
 ## m1036 -- the high bar pivots on his HANDS (the grip is put on the bar every frame)
 
 *"Not bad at all, although he is rotating around his hips -- can we make him rotate around his palms?"* (screen: goblin hanging with the bar

@@ -34,6 +34,17 @@ clip in the library), ledges and ladders.
 - [ ] His pump clip in.
 - [ ] **He played it on his phone and signed it off.**
 
+## GYM part 2 -- the BALANCE BEAM (m1037)
+SPAWN > BALANCE BEAM: a 10 cm beam, 7 m long, 1 m up, a platform at each end. Walk (or jump) onto it: he walks only along it, arms out, and
+**balances** -- the lean grows by itself and wobbles more the faster he goes; push the left stick AGAINST the lean (across the beam) to bring
+it back. Too far and he slips off that side; a tap jumps off; the ends step onto the platforms. Clips: the library's "Catwalk Walk Forward --
+Legs Crossing", "Teeter", "Wobbling" (and "Edge Slip" baked for the fall).
+
+### DONE WHEN (beam)
+- [ ] On from a platform or a jump, along it, off the end / jump off / slip off a side -- every hero.
+- [ ] The balance is fun: readable lean, a correction that feels like his, a fall that is fair.
+- [ ] **He played it on his phone and signed it off.**
+
 ## Later candidates (not asked for yet)
 Parkour (vault, wall run, wall jump), the sword's dummies, shooting range, the skate park.
 
