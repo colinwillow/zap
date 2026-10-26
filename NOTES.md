@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1081 -- ACROBATICS station 4: the wall-jump corridor up to a 5.5 m goal
+
+- From the wall-run landing the lane runs on (toward the arena) into a CORRIDOR: two 7.5 m walls, faces 3.4 m apart (v 2.0 / 5.4), over a pit
+  (u 19.5-27), stripes on both faces now; at its end a goal block at the dais edge ([16.5-19.5] x [2-5.4], top 5.5) with gate 5 (18.9) and
+  the exit (17.4) on it.
+- **Measured** (`wjump.cjs`, real loop, an auto-player calling the shipped `wrunTap`: side-run, kick after .3 s on the wall, re-catch the
+  other wall when airborne): run on the right wall at u 29.5 -> kick @ u 27.0 y 1.2 -> side run on the left wall @ 25.2 y 2.7 -> kick @ 22.6
+  y 3.6 -> side run @ 20.6 y 5.1 -> landed ON the goal (u 16.7, y 5.50), gate 5 lit, no fall. First try (goal 4.5) cleared it and landed
+  on one of the dais wall's INVISIBLE 6 m posts beside it (y 6.0): the course now opens the posts on the goal's side too (offset -.2..+.42
+  rad), and the goal went up to 5.5 since two kicks clear 4.5 easily. A side run alone (no kick) cannot reach it: it sinks into the pit
+  before the goal's face. NOT measured: one kick + a run UP the goal face onto its ledge (the other route), and thumbs.
+- Next: station 5, the high bar.
+- Shipped unverified on the phone.
+
 ## m1080 -- ACROBATICS station 3: the wall run (the course turns at the back of the tunnel and heads home)
 
 *"Go for it."*

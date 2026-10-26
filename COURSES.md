@@ -62,7 +62,8 @@ play... you go through the doors and there's a whole course... you end up back w
 2. **Hurdle** -- a half block across the lane at a run: push into it + right tap (m1063 `HURDLE`). **m1079: two of them.**
 3. **Wall run** -- a long wall beside a pit; run along it to the far side (m1064 `WRUN`). **m1080: the lane turns at the back of the
    tunnel and comes back out along a 13 m wall over a 7.6 m pit.**
-4. **Wall jump** -- two walls facing across a shaft; kick between them up to a ledge (m1064 wall jump + `ledgeGo`).
+4. **Wall jump** -- two walls facing across a shaft; kick between them up to a ledge (m1064 wall jump + `ledgeGo`). **m1081: a corridor
+   over a pit to a 5.5 m goal block at the dais edge.**
 5. **High bar** -- swing, release into a flip, land on the next platform (m1034).
 6. **Balance beam** -- across to the exit (m1037).
 7. **GRIND RAIL (new piece)** -- a rail down from the last platform to the arena floor; land on it and SHOE-grind down it (the
