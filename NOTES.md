@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1079 -- ACROBATICS station 2: two hurdles in the tunnel
+
+*"Go ahead with the hurdle."*
+- The last platform now runs on into the tunnel ([32-45]) with two half blocks across the full lane (`acro.hurdles`: at u 36.8 and 40.2,
+  .7 deep, .8 high -- inside COVER.lo..hi, so `lowFind` finds them on the 1.5 m platform and push + right tap vaults, m1063), an orange line
+  along each one's near top edge, a third gate after them (42.6), the exit moved to 44.
+- **Measured** (`hcourse.cjs`, real loop, the shipped `hurdleTap`): stood .9 m off each one pushing at it -> vaulted, 31 frames, landed past it
+  on the platform (u 37.99 / 41.39, y 1.50), no fall. His ROOT stays at platform height through the vault: the clip pins his hands on the top
+  and carries the body over them (m1051), the same as on the dais floor. Walking into hurdle 2 stops him short of it (u 39.6) -- a jump also
+  clears it (.8 m against a 2.8 m apex); the vault is the quick way.
+- Next: station 3, the wall run.
+- Shipped unverified on the phone.
+
 ## m1078 -- THE TESTING GROUND: a boot pad opens the ACROBATICS course through door 1; station 1 is the gap jump
 
 *"This is the testing ground... you boot different programs from here... go through the doors and there's a whole course... you end up back
