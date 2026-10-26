@@ -5,6 +5,29 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1067 -- rockets launch you (even in GOD), you land and get up (no juggling); guard turn un-inverted; rockets reflect off the blade; steel flash
+
+*"Have the turret actually launch my character through the air when the rockets hit him and explode. He lands on the ground and you can get up.
+Turn the camera back to not inverted in guard with the katana. Make the rockets ricochet better -- a more physically accurate trajectory off
+the blade. Maybe a steel flash on the sword since it's metal hitting metal."*
+- **Why a rocket never launched him:** GOD was on in his screenshots, and `playerHurt` RETURNED under GOD (m298) -- no damage, but no push and
+  no launch either. GOD now zeroes only the damage. The rocket brings its own arc (`TURRET.kinds.ROCKET.launch` hi 2.8 m / back 13, via
+  `HURT.arc`) -- HURT's own is 1.35 m.
+- **Juggling:** a turret firing every 1.6 s re-launched him off the floor for ever (measured: still down 8.5 s later). No knock while he is
+  already down (`!p.knock`), and `HURT.upGrace` .8 s on his feet after the get-up.
+- **Guard camera:** `CAM.guardInv` 1 -> 0 (m1030's inversion off).
+- **Ricochet:** a late (non-perfect) block REFLECTS off the blade -- `bladeSeg` (mount -> tip, world, each hit) as a rod: the velocity's part
+  across the blade turns round, the part along it carries on (it glances down the blade), x `SHOTBLOCK.rest` .8; then ballistic
+  (`S.ric`: gravity `grav` 9.8, the rocket tumbling, smoke). m1029's random side angle and its sine wobble (`S.sput`) are gone from the
+  block. The perfect block still sends it home.
+- **Steel flash (`steelFlash`):** at the point on the blade nearest the shot: a white-hot star (a pooled additive sprite with a cross --
+  no light, a new light recompiles every material) growing and fading over `STEEL.t` .13 s, fast tiny white-yellow sparks, the ping. On
+  every shot block (bigger on a perfect one).
+- **Real loop (`rocket.cjs`, goblin, katana, GOD on, a turret 8 m off):** unguarded: launched, apex 2.47 m, ~1 s in the air, up again 122
+  frames after landing, hp 0 lost. Guard held (late): reflected off a blade along (-.73, -.18, -.65) to (9.99, 2.47, -1.50), rose to 1.48 m
+  and fell (vy 2.47 -> -5.04, monotone), flash live at the hit.
+- Shipped unverified on the phone.
+
 ## m1066 -- catching the high bar mid-flip: no more superman pose turning about a point above him
 
 *"If I flip or am flipping and land on the high bar I attach in a weird pose and from a weird spot -- a superman pose, rotating from well above
