@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1026 -- the right-pad sprint is the ORDINARY run, faster; letting go of it IS the long jump (TOOLS > SPRINT RUN / NINJA)
+
+*"I don't really like the ninja run when you hold down the right stick... get rid of it for now and instead just have the regular run but a
+little bit faster, and if you let go he does the long jump -- don't need a tap."*
+- `NINJA.look` 'RUN' (default): the hold-while-moving sprint keeps the ordinary gait (the katana stance's run with the katana out) at
+  `runSpeed` 9 m/s (the ordinary cap is `MOVE.max` 7.2); the lens push and speed lines at half / a third. 'NINJA' = m1007's arms-back run
+  at 11. TOOLS > SPRINT, remembered (`mel.sprint`).
+- The release: while grounded and sprinting, lifting the right thumb sets `ninjaWin` AND `p.jump`, so the long jump fires on the release
+  (it waited for a tap inside `NINJA.win`).
+- Run survey for his pick (asked, not built): the current run is Zap's own `Running_fast_stride` (TOOLS > RUN also has `run_fwd_fast`
+  and the library's `Standard_Run` as `std`). The library has ~40 forward runs, many sharing Mixamo's names (Running .. Running_12).
+- Shipped unverified.
+
 ## m1025 -- the katana charge release slowed (TOOLS > K-CHARGE, x1.8 default); katana swings reach walls
 
 *"We should slow down the katana charge attack up on the right stick. It's still just too fast... I'm having trouble hitting the wall with
