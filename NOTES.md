@@ -5,6 +5,31 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1016 -- walls break in PIECES on a frame that stays; every strike meets the wall in front of it; repair by holding the left pad still
+
+*"He'll do a crazy flip and the wall does nothing, then an uppercut breaks bricks... I want the wall to take damage before it's gone, pieces
+flying off so you can still cover on it, a frame left like the kit city... a rocket blows it, a pistol takes a few hits... repair like Fortnite,
+hold down on the stick and it rebuilds... half walls: can't be shot, but you can melee through them."*
+- **The wall** (`coverBlocks`, `CWALL`): each block is a grid of CHUNKS (.6 m x ~.3 m, one InstancedMesh per wall) between a FRAME that never
+  breaks: a .2 m sill and an end post each side (3 meshes). Every chunk is its own collider box with 2 hit points; a chunk with nothing under
+  it comes down too (holes go up). Cover reads the COLUMN's standing height (`wallColTop` in `lowFind`), so a full wall with its top shot off
+  is crouch cover, and a half wall with a hole in it is cover either side of the hole.
+- **`wallHit`** is the one entry: 'shot' = the nearest chunk, never a HALF wall (shots fly over those, `b.half`); 'melee' = the nearest two;
+  'blast' = every chunk in the radius. A bolt is 1 + its charge (two bolts to a chunk), a rocket a 1.3 m blast of 3, the katana's charged
+  slam a blast, the turret's shots the same as his.
+- **Every strike meets the wall** (`wallMelee`): from just before the blow, the first chunk within reach in front of him (.65 m, the
+  katana 1 m, at three heights) takes it, once per strike, whatever the move -- the swept-limb test only ever touched a wall with the
+  FASTEST limb inside its window, and a flip's fast foot is over the wall. The slide tackle (when it is a tackle, not a slide into cover)
+  chews through what is in front of it.
+- **REPAIR** (`wallRepair`): the LEFT pad held STILL (its free slot) for .4 s within 2.4 m of a broken wall puts back the nearest missing
+  chunk every .16 s, bottom first, with a blue spark.
+- Old block-at-a-time code (`coverHurt` / `coverBolt` / `coverMelee`) is gone. `WALLS` was already the kit's, so this is `CWALL`, declared
+  above `ARENA` (the arena stage builds it at LOAD: the m1008 blank-page trap, which `check:boot` cannot see).
+- **Checked headless:** 4 walls, 72 boxes; 6 bolts on the full wall -> 25/30, + a rocket -> 6/30 (frame standing); a shot at a half wall ->
+  untouched; Zap's flip (`melee_01`) into a half wall -> 8/10; cover on the damaged wall; holding the left pad 80 frames -> 10/10.
+- **Open (his call):** with the left flick now cover-or-acrobatics and the right pad melee-only, the slide TACKLE is only reachable with
+  TOOLS > LEFT ROLL. A flick at a wall is always the slide INTO cover.
+
 ## m1015 -- swings chain: one strike per swipe (the katana's clips cut into single strikes), a queued swipe cuts the recovery, and the SMEAR
 
 *"Make it so you can interrupt animations, or speed them up, or chop the ends off... there's a stutter step at the end of every one, he lands and
