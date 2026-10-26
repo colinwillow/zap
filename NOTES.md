@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1073 -- THE GUARD CHANGES SIDES: strafe left -> his mirror stance (right foot forward, blade to the other side), right -> his own
+
+*"Right now in guard his left leg is forward, right leg back, crouched, the sword up over his head pointing down to one side. Invert that: right
+foot forward, the sword pointing the other way -- and blend between the two sides. Moving left, his right foot forward; moving right, his left."*
+And the rocket's ricochet follows the blade (m1067's reflection off `bladeSeg`), so it stops going the same way every time.
+- `katana_guard` joins `MIRROR.clips` (`clipMirror` at boot, on the bind pose) -> `katana_guard_m`, with its `__up` / `__ups` / `__legs` halves
+  made in `rigMirrors` as `deriveClips` cuts the guard's. The anim chooser blends the two by `p.gSide` (0 his own .. 1 the mirror): the whole
+  clips standing, the upper halves over the katana strafe legs moving.
+- `gsideStep`: GSIDE.by STRAFE (default) -- going to his LEFT (measured, not argued: in the guard he faces the camera's way, so world +X was his
+  RIGHT in the harness) -> 1, to his right -> 0, still -> holds; THUMB -- the right thumb's sideways lean in the guard; OFF. Eased at `rate` 7.
+  TOOLS > GUARD SIDE.
+- **The mirror's blade (`gsidePose`):** a mirrored right hand takes the LEFT hand's grip, so the katana came out tip-UP (his side's blade
+  (right, up, fwd) (-.72, -.19, .66); the raw mirror's (.74, +.24, .63)). After the pose the right hand is turned about the grip so the blade
+  lies along the exact reflection of his own side's (sampled whenever he guards on it), by `gSide` -> (.72, -.19, .66).
+- **Real loop (`gside.cjs`, goblin, katana, guard held):** own side: left foot forward, blade (-.72, -.19, .66). Strafing to his right: stays.
+  Strafing to his left then stopping: side 1, RIGHT foot forward, blade (.72, -.19, .66) -- the exact mirror. A turret rocket blocked late:
+  side 0 -> (10, 2.6, 1.2) (his right, up, forward), side 1 -> (-10, 2.7, 1.2) -- mirrored. Renders: the two stances mirror each other.
+- **Next (his):** flicks FROM the guard as their own attacks (up / left / right) -- the Tekken samurai's counter stance.
+- Shipped unverified on the phone.
+
 ## m1072 -- spawn buttons toggle (a second tap removes it); the wall run's torso upright, legs slanted, feet on the wall; PARKOUR.md
 
 *"If I go to the debug menu and re-click something that's already been spawned it should destroy it -- I put the walls in and then had to restart
