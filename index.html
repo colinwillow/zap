@@ -11045,9 +11045,12 @@ const COURSE = { on: '', door: 1, padU: 12.5, padR: 1.2, y: 1.5, w: 3, fallY: .1
   // platform so a tap from the top of a jump still finds it (`minH` 1.9 above his feet): right tap at the wall, running along it (m1064). Platforms are now
   // [u0, u1, v0, v1, top]; gates and the exit are [u, v, dir] (dir: which way along u he is going when he passes), lit IN ORDER.
   acro: { stairs: [14, 16.5],
-    plats: [[16.5, 22, -1.5, 1.5, 1.5], [24.5, 28, -1.5, 1.5, 1.5], [32, 45, -1.5, 1.5, 1.5], [42.8, 45, 1.5, 5.4, 1.5], [27, 35.2, 2, 5.4, .3]],
-    walls: [[32, 45, 5.4, 5.8, 6.6]],
-    gates: [[25.4, 0, 1], [32.9, 0, 1], [42.6, 0, 1], [34.2, 3.7, -1]], exit: [28.5, 3.7, -1], hurdles: [[36.8, .7, .8], [40.2, .7, .8]] },
+    plats: [[16.5, 22, -1.5, 1.5, 1.5], [24.5, 28, -1.5, 1.5, 1.5], [32, 45, -1.5, 1.5, 1.5], [42.8, 45, 1.5, 5.4, 1.5], [27, 35.2, 2, 5.4, .3],
+      [16.5, 19.5, 2, 5.4, 5.5]],
+    // m1081: station 4, THE WALL JUMP -- a corridor between two walls over a pit (u 19.5..27, faces 3.4 m apart), climbing to a high goal
+    // platform at its end: side-run a wall, tap to kick across, side-run the other, and up the goal's face onto its ledge
+    walls: [[32, 45, 5.4, 5.8, 6.6], [19.5, 32, 5.4, 5.8, 7.5], [19.5, 27, 1.6, 2, 7.5]],
+    gates: [[25.4, 0, 1], [32.9, 0, 1], [42.6, 0, 1], [34.2, 3.7, -1], [18.9, 3.7, -1]], exit: [17.4, 3.7, -1], hurdles: [[36.8, .7, .8], [40.2, .7, .8]] },
   pad: null, g: null, boxes: [], ringOff: [], gates: [], last: 0, onPad: 0, stat: { boots: 0, runs: 0, falls: 0, gates: 0 } };
 const courseXZ = (u, v) => { const a = COURSE.door * Math.PI / 2, s = Math.sin(a), c = Math.cos(a); return [s * u + c * v, c * u - s * v]; };
 const courseUV = (x, z) => { const a = COURSE.door * Math.PI / 2, s = Math.sin(a), c = Math.cos(a); return [s * x + c * z, c * x - s * z]; };
@@ -11072,9 +11075,10 @@ function courseBuild(name) {
   const C = COURSE, A = C.acro, a = C.door * Math.PI / 2, W = ARENA.r + 2.2, w = C.w, Y = C.y;
   C.on = name || 'ACRO'; C.g = new THREE.Group(); scene.add(C.g); C.stat.boots++;
   const slab = new THREE.MeshStandardMaterial({ color: 0x262a31, roughness: .5, metalness: .3 }), neon = new THREE.MeshBasicMaterial({ color: 0x39f0ff, toneMapped: false });
-  // the dais wall opens on this side (its invisible 6 m posts; the 1.1 m lip is under the first platform)
+  // the dais wall opens on this side (its invisible 6 m posts; the 1.1 m lip is under the first platform) -- and over toward +v, where
+  // the wall-jump goal stands on the ring (m1081: he landed on a post beside it, 6 m up, measured)
   for (let i = BOXES.length - 1; i >= 0; i--) { const b = BOXES[i]; if (b.maxy !== 6) continue; const cx = (b.minx + b.maxx) / 2, cz = (b.minz + b.maxz) / 2;
-    if (Math.abs(Math.hypot(cx, cz) - (W + .2)) < .3 && Math.abs(wrapAngle(Math.atan2(cx, cz) - a)) < .2) { C.ringOff.push(b); BOXES.splice(i, 1); } }
+    if (Math.abs(Math.hypot(cx, cz) - (W + .2)) < .3 && (q => q > -.2 && q < .42)(wrapAngle(Math.atan2(cx, cz) - a))) { C.ringOff.push(b); BOXES.splice(i, 1); } }
   // the stairs (risers .3 m: under his .357 step), then the platforms, solid to the floor, a neon line down each long edge
   const [s0, s1] = A.stairs, n = Math.round(Y / .3), dq = (s1 - s0) / n;
   for (let k = 0; k < n; k++) courseBox(s0 + dq * k, s1, -w / 2, w / 2, 0, .3 * (k + 1), slab, 1);
@@ -11082,8 +11086,7 @@ function courseBuild(name) {
     for (const v of [v0, v1]) courseBox(u0, u1, v - .03, v + .03, top, top + .025, neon, 0); }
   // the run walls: graphite, a neon stripe along them at the height his feet run at
   for (const [u0, u1, v0, v1, top] of A.walls || []) { const wb = courseBox(u0, u1, v0, v1, ARENA.lab.floorY, top, slab, 1); wb.runWall = 1;
-    const vf = Math.abs(v0) < Math.abs(v1) ? v0 : v1, sg = vf === v0 ? -1 : 1;
-    for (const y of [Y + .35, Y + 1.6]) courseBox(u0, u1, vf + sg * .03, vf - sg * .01, y, y + .05, neon, 0); }
+    for (const [vf, sg] of [[v0, -1], [v1, 1]]) for (const y of [Y + .35, Y + 1.6]) courseBox(u0, u1, vf + sg * .01, vf + sg * .03, y, y + .05, neon, 0); }     // both faces
   // the hurdles: graphite with an orange line along the near top edge, the lane's full width
   const warn = new THREE.MeshBasicMaterial({ color: 0xff8a2a, toneMapped: false });
   for (const [u, dpt, hh] of A.hurdles || []) { courseBox(u - dpt / 2, u + dpt / 2, -w / 2, w / 2, Y, Y + hh, slab, 1);
