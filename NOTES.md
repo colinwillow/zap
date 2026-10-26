@@ -5,6 +5,12 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1032 -- only the FIRST katana link is trimmed; the second plays whole again
+
+*"how we trimmed the first animation of the katana swing series works well, but the second one is kind of lame -- put back the second one and
+leave the first."* `KATANA.trimN` 1: `katTrim` cuts link 1 of each ORIG chain only (the left/right spins are one-link chains, so they stay
+cut); links 2 and 3 whole. Shipped unverified.
+
 ## m1031 -- the right-pad sprint runs on "Fast Run" (`run_fast`); the ordinary run stays STD
 
 *"No, the one we actually had is the best... the other one that was decent that we could use for the faster run was literally called
