@@ -5,6 +5,27 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1071 -- the katana's charge HOLDS until the thumb lifts, and the thumb's height AIMS it: up = the flat launch, lower = a higher leap + slam
+
+*"I charge it up, it locks, and I slowly move my thumb back down to neutral or all the way to the bottom and it releases -- it shouldn't, I'm still
+holding. What if as you move your thumb down you're aiming the height... move your thumb to the bottom and he launches really high in the air and
+slams down."* (The rest of his message -- a move panel over the thumb after a charge, Android-unlock-style swipe patterns, unlockable moves --
+is ideas for later, not this build.)
+- `kaimHold`: once the katana's charge would swing (half full), it is HELD wherever the thumb goes on the right pad; only LIFTING it releases.
+  While held, the guard cannot arm (`busy` gains a held katana charge). The high-jump crouch / ninja sprint cannot either (`R.far`).
+- `kaimStep`: `p.kAim` from the thumb's height -- at or above `KAIM.top` .35 (up, where it charged) 0; down to `bot` -.8 -> 1. Over `min` .12,
+  an arc of orange dots shows the leap before he goes.
+- `aimLeap` (in `chargeRelease`, blade, kAim > min): straight up to `h0` 1.4 .. `h1` 5.2 m, the katana's air slam (`slamGo`), the horizontal
+  solved from the slam's clock to land where the flat launch would have (the man in reach, or the hold's distance) -- carried by `p.cLeap`
+  (m1065's) from the first frame. Thumb up -> the flat launch exactly as before.
+- **Real loop (`kaim.cjs`, goblin, katana, charge 0.83 s with the thumb up, then 30 frames at the new height, then lift):** thumb up -> held,
+  aim 0, flat launch 10.68 m. Neutral -> HELD (no release), aim .30, arc shown, leap apex 2.47 m, slam 11.42 m out. Bottom -> HELD, aim 1, arc
+  shown, apex 5.08 m, slam 11.25 m out. Guard never armed. Render: up past 4.7 m, katana overhead.
+- **Two bugs the renders caught before shipping:** (1) the arc stayed in the world after the leap -- `kaimStep` sat in `stepKit`, which returns early
+  in some states; it runs at frame level now (after `stepKit`). (2) Even then it drew: `show` was the NUMBER 0, and three skips an object only
+  when `visible === false` -- `!!` it. Re-rendered: arc false from the release on.
+- Shipped unverified on the phone.
+
 ## m1070 -- the COVER DUCK: in half cover, hold the right pad DOWN and he crouches below the top (idle and the shuffle both ways), procedural
 
 *"In cover he's still poking up above the block a little. While you're in cover, if you pull down on the right stick -- it doesn't do anything
