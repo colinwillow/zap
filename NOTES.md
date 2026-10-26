@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1014 -- the katana's charged release is the hammer's slam, dramatic; breakable blocks; the right pad is melee by direction again (camera-relative); the left flick is Zap's acrobatics (or the slide into cover)
+
+- **Katana full charge** (*"he does this weird fast thing... use the club's jump-slam, very dramatic, until we find something better"*):
+  the blade's release plays the hammer's `CLIPS.chargeGo`, and where it lands (`MELEE.dashLand` of the state) it SLAMS: `slamFx`, the mark,
+  a .6 shake, a .12 s hitstop, and a ring knocks over everything inside `SLAM.r` x1.2 (power scaled by the charge, katana damage), turrets
+  and blocks included. The lunge / spin picks are out of the release.
+- **Breakable blocks** (`coverHurt`): a FULL block takes SHOTS (`coverBolt` from `boltHit`: a bolt 1 + charge, a rocket 4; 6 hp) and at 0 its
+  top breaks off in chunks and it becomes HALF height (shots fly over it from then on). A HALF block takes only MELEE (`coverMelee` from
+  `strikeSweep` and the slam; 4 hp) and at 0 breaks apart (chunks, dust, its collider gone; cover on it drops). CLEAR puts them back
+  (`coverReset`). Headless: 4 bolts -> the 2 m block at .75; a bolt at a half block ignored; 5 swings -> broken; CLEAR -> both back.
+- **The right pad is melee, by direction, camera-relative** (*"from the perspective of the user"*): `MELEE.dirBy` 'flick' (m1002's
+  facing rule off), m1012's down-slide is off the right pad, and the katana's down flick is its own swings again (`downFist` 0).
+- **The left flick** (`leftFlick`): a half block down the flick's line -> the slide into cover; otherwise Zap's unarmed acrobatics
+  (`CLIPS.fist`, dealt as an unarmed chain, toward where you flicked) WHATEVER is in hand -- *"the flips in the normal unarmed melee
+  while holding the samurai sword"*. In cover, a flick away leaves. TOOLS > LEFT FLIPS/ROLL (ROLL = m1008's slide tackle and dive roll).
+  The left tap still takes cover near a block. Headless: katana out, left flick -> `melee_01`.
+
 ## m1013 -- turret rockets are HIS rockets and launch you; a swing knocks its shots back into it; cover from touching distance; swaps in cover; two more Forge hand bugs
 
 - **Turret rockets** (`turretFire`, `turretShotBoom`): his own rocket's body (`rocketBody`) turned onto its flight, and his explosion's
