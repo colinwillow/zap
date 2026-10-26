@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1052 -- the high bar through the harness: the swing works; the grip was on the WRISTS on every pipeline hero (mitten hands)
+
+*"Use the harness to test the high bar swing too."* (scratch `bar.cjs`: the shipped `hbarCatch` / `stepBar` / `hbarFly` / `rigAnim` /
+`hbarPose`, the right pad held through `mel.stick`, rendered along the bar and in close-up on the hands; `coverArmUndo` before each mixer pass.)
+- **The swing, measured (goblin, hold from the catch):** swings build -- th .8, -1.4, then over the top by ~1.9 s (frame 56, th 2.2 ->
+  3.3) and giant swings at 11-12 rad/s; release at 5 s: ~15 m/s along the tangent, ~3 m up, tucked turning, upright for the landing. Works.
+- **The grip:** the goblin, samurai and orc hands are MITTENS -- Thumb and Index only, no Middle finger. `hbarPalm` needed `HandMiddle1`, so
+  it returned false and `hbarGripPt` fell back to the WRIST bones: the bar sat under his hands (measured: wrist 4-7 mm off the bar). Now the
+  knuckle is the middle finger's, else the index's, and the bar sits at `palmAt` .85 (toward the knuckles) off the palm's front; close-ups
+  show it across the palm with the mitten over it.
+- (Harness note: the page's own boot finishes ~4 s into a run and its frame loop then steps him too -- the frames after that are doubled.)
+- Shipped unverified on the phone.
+
 ## m1051 -- the climb and the vault TESTED and rebuilt from renders; the double jump is the multi-flip tuck
 
 *"Are you able to just test the animation and correct it... he's colliding with the thing and all of a sudden he pops up... the hurdle is doing
