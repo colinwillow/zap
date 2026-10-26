@@ -5,6 +5,25 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1017 -- repair by HOLDING THE RIGHT PAD at a broken wall, with matching indicators in the world and on the HUD; the charge's swing lands when he does; the smear is gone; the katana is the Great Sword set again
+
+- **Repair** (*"walk up to it, hold down the right stick and it repairs the wall... indicators on the HUD, rings, pulsing, colours, a word --
+  hold / tap -- and highlighters in the game on the thing it refers to, colour-coordinated"*): in reach of a missing chunk (`repairTarget`,
+  2.4 m) the right pad held STILL is the repair (over the backflip duck and the ninja sprint there). `repairUi`: the missing chunks get
+  pulsing AMBER outlines and the next one an amber floor ring; above the right pad the same amber ring fills while you hold, HOLD / REPAIR
+  -> REPAIRING. Nothing shows when there is nothing to repair. (The left-pad hold still works too.) Headless: 6/10 -> held -> 10/10, prompt
+  shown in reach and gone after.
+- **The charge's swing and its launch** (*"he launches forward before the animation does the swing"*): measured, the hammer finish's
+  swing (its right hand's fastest) peaks at .54 of the clip, the dash arrives at `dashLand` .42 of the move. The clip now starts .12 of
+  itself in (`rig.goPeak`, measured once), so the swing peaks on the arrival frame.
+- **The smear is OFF** (*"it looks bad, messy, remove it"*): `SMEAR.on` 0, its TOOLS key gone. The blade trail stays.
+- **The katana is the GREAT SWORD set again, cut** (*"the axe ones just feel really not big; go back to the sword set and cut that up"*):
+  right `slash_2` / `slash_1` / `combo`, left `slash_4` + the mirrors of `slash_1` / `combo`, up `spin` / `slash_1` / `combo`, down
+  `slash_3` / `jump_attack` / `slide`. `strikeSplit` keeps more of each strike now (.55 s before the peak, .38 after) so the body's swing
+  is in it, not just the forearm. Cut: `slash_2` 3, `slash_1` 4, `combo` 3, `slash_4` 2, `spin` 2, `slash_3` 2, `jump_attack` 4, `slide` 2
+  -- the right pool is 10 strikes. (Note: the sword set's hand peaks are 4-5 m/s against the axe's 12-16 -- slower, bigger-bodied.)
+- His answer on the slide tackle: it already goes through walls for him; left as is.
+
 ## m1016 -- walls break in PIECES on a frame that stays; every strike meets the wall in front of it; repair by holding the left pad still
 
 *"He'll do a crazy flip and the wall does nothing, then an uppercut breaks bricks... I want the wall to take damage before it's gone, pieces
