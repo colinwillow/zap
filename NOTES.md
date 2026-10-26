@@ -5,6 +5,25 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1034 -- THE HIGH BAR (scaffold): SPAWN > HIGH BAR; jump to catch, HOLD the right pad to pump into giant swings, let go to fly off
+
+*"Jump up onto a bar... press and hold, and as you press and hold he pumps once, pumps twice, and the third one goes around until he's looping,
+and when you let go he flies off directionally based on where you let go... at least build a scaffolding... I could go get the animation for
+the pump."* (COURSES.md, GYM part 1, with its DONE WHEN.)
+- **Bar:** `hbarMake` -- two posts (thin colliders) and a bar at `HBAR.h` 2.55 m, `len` 2.6, across the line from you to the spawn.
+- **Catch:** airborne, hands (feet + 1.15 x height) within `grabY` .45 of the bar and `grabR` .5 across it -> `p.bar`; facing = the way he
+  was moving across it.
+- **Swing:** a pendulum about the bar: `th` (0 = hanging), `a = -(g/R) sin th - damp w`, R = bar to his middle (`hbarReach`, MEASURED once
+  per rig: the hang clip's hands over his soles). HOLD the right pad: +`pump` 7.5 rad/s^2 along the way he is swinging (a kick forward to
+  start) -> bigger each swing, over the top, giant swings (`maxW` 12.5). Left stick along his facing pumps too (`pumpL`).
+- **Release:** the hold lifted (after `holdMin` .2 s) or a tap -> the swing's tangent x `boost` 1.12; in the air the body keeps turning
+  (`hbarFly`) and is brought to the next whole turn by the predicted landing; `barCool` .45 s before a re-catch.
+- **Picture:** `hbarPose` writes the root's whole quaternion (turned about the bar axis by `th`; hands on the bar while hanging, about his
+  middle while flying); the normal placement now zeroes `rotation.x` so the pitch cannot outlive it. Clip: `bar_hang` = the library's
+  "Hanging Idle (by hands, gently swaying)", `bar_hang2` "Hanging", `bar_flip` "Swing Backflip To Crouched Land" (baked, not used yet) --
+  the three heroes re-baked (`forged21`, 117 clips). **No pump motion yet: `HBAR.clips.pump` is his slot.**
+- Shipped unverified (a headless swing test was still booting under software GL when this went out).
+
 ## m1033 -- both arms swung out from his sides while he runs (TOOLS > RUN ARMS)
 
 *"add the arm push outward during runs"* (after: *"maybe bend his arms out a little bit more... it looks like he has little arms"*). `runArm`,

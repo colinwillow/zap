@@ -20,6 +20,20 @@ spawns in the certain test ground... this could honestly be how you learn to pla
    high bar are new. Needs: the library's hang / shimmy / monkey-bar / swing clips through the Forge, a pendulum for the swing (the
    body's angle about the bar as the state, gravity and a pump on the stick), the release carrying the swing's speed off the bar.
 
+## GYM part 1 -- the HIGH BAR (m1034, scaffold)
+SPAWN > HIGH BAR puts a bar (2.55 m, 2.6 m wide) between you and the spawn. Jump into it: the hands catch it. **Hold the right pad** and he
+pumps -- each swing bigger -- until he goes over the top into giant swings; **let go** and he flies off along the swing at its speed, turning
+until he is upright for the landing. The left stick pushed along his facing pumps too; a tap drops him. The swing is a pendulum (`HBAR`);
+the pose is the library's "Hanging Idle (gently swaying)" turned about the bar. **The pump motion itself is procedural / absent -- his own
+pump clip goes in `HBAR.clips.pump`.** Later in the GYM: monkey bars (the upside-down ladder), the balance beam (his: there is a beam-walk
+clip in the library), ledges and ladders.
+
+### DONE WHEN (high bar)
+- [ ] Catch the bar from a jump, every hero.
+- [ ] Hold = pump, pump, over the top, giant swings; let go = fly off the way the swing goes, land upright.
+- [ ] His pump clip in.
+- [ ] **He played it on his phone and signed it off.**
+
 ## Later candidates (not asked for yet)
 Parkour (vault, wall run, wall jump), the sword's dummies, shooting range, the skate park.
 
