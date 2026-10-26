@@ -58,7 +58,7 @@ play... you go through the doors and there's a whole course... you end up back w
   spider bots), later PARKOUR momentum (`PARKOUR.md`), COVER, GYM.
 
 ### ACROBATICS -- the first module (proposed station order; each one is a build)
-1. **Gap jump** -- two platforms, a pit between: run, jump. (Pieces: run, jump.)
+1. **Gap jump** -- two platforms, a pit between: run, jump. (Pieces: run, jump.) **m1078.**
 2. **Hurdle** -- a half block across the lane at a run: push into it + right tap (m1063 `HURDLE`).
 3. **Wall run** -- a long wall beside a pit; run along it to the far side (m1064 `WRUN`).
 4. **Wall jump** -- two walls facing across a shaft; kick between them up to a ledge (m1064 wall jump + `ledgeGo`).
@@ -77,8 +77,8 @@ Procedural (no rig needed): a body and six two-segment legs placed by IK on the 
 over anything. A swarm of 4-8: they surround, leap at you, latch, and pop apart in pieces when hit. Same style as the m1077 turret
 (lacquer, gold, a cyan eye). Its own spec + DONE WHEN.
 
-### WEAPONS -- what you carry (open: his call)
-He is not sure; the three ways it could go:
+### WEAPONS -- what you carry -- **DECIDED (Oct 26): A, the katana + one pick-up slot.**
+The three ways it could go:
 - **A. The katana is always yours; ONE pick-up slot on top** (the rocket launcher, later others) with limited ammo -- it goes away when
   empty. Pick-ups sit in the courses and the arena. *Proposed: it is what he described ("you pick it up... a certain amount, then it goes
   away"), it keeps the sword the heart of the game, and it teaches itself.*
@@ -88,7 +88,8 @@ Under A the blaster, the club and the old slots leave the weapon wheel (kept on 
 pick-up.
 
 ### DONE WHEN (the testing ground)
-- [ ] A door on the arena floor boots ACROBATICS; the course builds through it; finishing returns you to the floor.
+- [ ] A door on the arena floor boots ACROBATICS; the course builds through it; finishing returns you to the floor. (m1078: the boot pad
+      in front of door 1 (+X) / SPAWN > ACROBATICS; station 1 the gap jump; gates, fall-back, exit home -- measured, unsigned.)
 - [ ] Each ACROBATICS station in, one per build, every piece in it already signed off.
 - [ ] The grind rail, the spider bots and the weapon model each have their own spec, built and signed off before they go in a course.
 - [ ] **He ran the whole ACROBATICS course on his phone and signed it off.**

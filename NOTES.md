@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1078 -- THE TESTING GROUND: a boot pad opens the ACROBATICS course through door 1; station 1 is the gap jump
+
+*"This is the testing ground... you boot different programs from here... go through the doors and there's a whole course... you end up back
+where you are."* His picks (asked): weapons = the katana + one pick-up slot; next = the ACROBATICS course, one station per build.
+- **`COURSE` / `courseBuild` / `courseStep` / `courseClear`.** A cyan BOOT PAD on the dais 12.5 m out toward door 1 (+X), a flat arrow at the
+  door. Step on it (or SPAWN > ACROBATICS) and the course beams in: the dais's invisible 6 m posts on that side come out (3 of them,
+  restored on clear), the big door rises and stays up (`busy`, so no rival uses it), five .3 m stairs (under his .357 step) climb to a
+  run of graphite platforms at 1.5 m with neon edges -- [16.5-22] gap 2.5 [24.5-28] gap 4 [32-37], the last inside the tunnel. A grey
+  GATE ring on each landing lights cyan as you pass it (sparks, a clang); a fall (grounded under `fallY` .7 in the lane) beams you back to
+  the last gate; the gold EXIT ring beams you home to your spot. Course space is (u along the door, v across), `courseXZ` / `courseUV`.
+- **Measured** (`course.cjs`, real loop): pad -> on, 8 boxes in; door fully up after 2 s; standing on platform A y 1.50 grounded; stairs
+  walkable (y .9 mid-flight); passing u 26 lit gate 1 only; dropped at u 30 -> beamed to u 26, y 1.5 (falls 1); u 36.4 -> home (0, 8);
+  dropped into the first gap -> back on platform A. Rendered from the dais, the side and his eye line. NOT measured: an actual run-and-jump
+  across the 4 m gap with thumb inputs -- that is his first look.
+- Next stations, one per build: hurdle, wall run, wall jump, high bar, beam, grind rail (COURSES.md).
+- Shipped unverified on the phone.
+
 ## m1077 -- the turret is a cyber-samurai goblin; the rocket re-modelled with a real flame and a fire trail that reads on white
 
 *"Make the turret more like alien samurai -- cyber future, AI, but also retro samurai, and also goblin... then make the rocket's tail fire
