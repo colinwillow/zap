@@ -5,6 +5,45 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1064 -- WALL RUNNING (Prince of Persia): side runs, wall jumps wall-to-wall, the run up to the lip, the kick-off back flip; SPAWN > WALL RUN
+
+*"Oh shit!!!! Wall running!!! We need to load in a wall running module. I'm thinking Prince of Persia style!!!"*
+- **The trigger is the right TAP (the jump)**, after the hurdle and the climb in the tap chain (`wrunTap`): a TALL face (`wrunFind`: `minH` 1.9 m
+  over his feet, at least `minLen` 1.2 m long -- a post is not a wall) within `reach` .85 m. Carrying `minSp` 2.5 m/s ALONG it (or running at
+  it shallow) -> a SIDE RUN; running INTO it -> a RUN UP. No wall in reach: the ordinary jump, unchanged.
+- **Side run** (`stepWrun`, body-owning): along the face at `v` 7.5 m/s (or his speed), a low arc (`up` 4.2, `g` 9), up to `T` 1.15 s, held
+  `gap` off the face; the picture is his RUN clip rolled `lean` .95 rad off the wall (`wrunPose`: feet on it, head away). Ends at the wall's
+  end / over its top / out of time (pushed off a little) or on landing.
+- **Wall jump**: a tap ON the wall -> off it (`kick` 6.5) and up (`jumpV` 8.2), keeping `keep` .8 of his run along it, facing the new way. A
+  tap at the opposite wall -> another side run (PoP wall-to-wall). The same face is refused for `cool` .35 s. **Along beats into**: off a wall
+  jump he meets the far wall at ~45 deg (6.5 m/s into it, 6.0 along) and that first read as a run up -- now real speed along the face is a
+  side run whatever the angle.
+- **Run up**: `upV` 7.2 m/s up the face (`gUp` 12), upright; his hands passing the lip -> the LEDGE's own hang (`ledgeGo`) and its climb.
+  A tap mid-run-up kicks him off BACKWARDS into a back flip (`offV` 5, `offUp` 7.5), still facing the wall.
+- **SPAWN > WALL RUN** (`wrunSpawn`): two 12 m x 3.6 m walls 4.6 m apart and an end wall across them; CLEAR removes it.
+- **Real loop (`wrun.cjs`, goblin):** side run 6.87 m along, apex .95 m, held .33 m off the face, 55 frames; wall jump launches (6.5, 8.2, 6.0)
+  and a tap at the right wall starts a SIDE run there going the same way; run up 24 frames, rose 1.88 m, then HANGING on the 3.6 m lip;
+  kick-off -> (0, 7.5, -5) and a back flip, facing still 0; a tap on open floor -> no wall run (the jump). Renders: feet on the wall, head
+  leaning off it.
+- **NOT YET:** the library HAS real clips -- `Wall_Run`, `Wall_Run_1`, `Diagonal_Wall_Run`, `Jump_From_Wall`, `Sprint_To_Wall_Climb`
+  (retarget-anims) -- not baked onto the heroes yet (the run clip, rolled, stands in). Next: bake them through the Forge and play them.
+- Shipped unverified on the phone.
+
+## m1063 -- the charged backflip spins (2-3 tucked turns); an air swipe hooks onto the high bar; push into a half wall + tap = hurdle
+
+- **Backflip** (*"make the back flip the multiple flips now instead of the one slow one"*): `backGo` with `AIR.multi` leaves off the duck at once
+  and turns TUCKED (`airFlipGo`'s back flip) at a rate solved from his airtime so the turns come out whole: `AIR.multiTurns` [2, 3] for a
+  part / full charge. `AIR.multi = 0` is the old clip. Real loop: full 3 turns, apex 6.66 m, 97 frames; part (k .4) 2 turns, 4.65 m.
+- **Bar hook** (*"swipe in the air near the high bar, toward it -- since he already dashes -- it should hook you onto it"*): `barHook` from
+  `meleeGo0`'s air branch (the right pad; a DOWN flick is still the slam): a bar within `HOOK.r` 4.5 m of where his hands would go, within
+  `ang` 1.15 rad of the flick or of his travel, at most `up` 2.6 above / `down` 1.4 below his hands -> a driven dash (the hang pose
+  reaching) to the catch point, then `hbarCatch` with the dash's speed across the bar carried into the swing. Real loop: 3 m toward it -> on
+  the bar in 15 frames, swing w 3.99; 3 m away from it -> no hook; 6 m -> no hook.
+- **Run-up hurdle** (*"running against a half-height ledge, pressing toward it, tap the right stick -> hurdle it"*): `hurdleTap`, first in
+  the right TAP chain: the left stick pushed (`HURDLE.push` .3), a half-height face (`lowFind`) down the stick within `reach` 1.3 m looking
+  back at him -> `vaultGo` (cover's own vault). Real loop: on a .75 m half wall, pushing at it -> vaulted to the far side; not pushing -> no.
+- Shipped unverified on the phone.
+
 ## m1062 -- guard flips: up = a FRONT flip forward, down = a BACK flip back; TUCK is the default pose
 
 *"I think tuck should be standard. Also flip down while in guard do a back flip, flick forward a front flip."*
