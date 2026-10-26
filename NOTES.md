@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1042 -- the climb helper actually finds the beam's platforms; low short blocks get a HURDLE arc instead (tap = vault over)
+
+*"I still don't see the ability to get up onto the ledge -- no indicator and he doesn't climb... if the block is something he could hurdle,
+the indicator shows an arrow growing from short to over, semi-transparent, the trajectory; if it's a block he could climb up onto, an up arrow
+with a 90 degree return... pressing against it, or in the vicinity, and you tap the right stick: he hurdles over it or climbs up onto it."*
+- **Why nothing showed:** `mantleFind` used `thinBox`, whose "pole" test is anything under `PROPFIT.wide` 1.1 m both ways -- the beam's 0.9 m
+  platforms were poles. Now a pole is < .35 m both ways (and the walls' sill / posts, `b.frame`, are skipped).
+- **Two kinds:** HURDLE when the top is .45-1.3 m above his feet, the block is <= .85 m across the face he is at (a wall chunk: the WHOLE wall
+  across that face -- end-on it is its length), and the far side has floor at his level and room; else CLIMB when .9-2.35 m with room to
+  stand on top (as m1039). The hurdle's arrow: a semi-transparent green tube on an arc from his side over the top and down beyond, drawn
+  GROWING along its length on a loop (`drawRange`), its head appearing at the end; the climb keeps the L-arrow. The pad pulses green for both.
+- **Tap:** hurdle -> `vaultGo(W)` (the cover vault, generalised to start standing: across the block's depth on the measured-clip arc); climb ->
+  `stepMantle`.
+- Shipped unverified.
+
 ## m1041 -- the katana runs as fast as everything else (its speed cap off)
 
 *"Everything except the katana runs at a faster pace, and with the katana you have to hold down on the right stick to run at the normal
