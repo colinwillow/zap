@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1019 -- TOOLS > SWING: the katana's swing set is his pick (ORIG / WHOLE / CUT / FISTS), default ORIG
+
+*"maybe we just go to kind of the original katana attacks before they were chopped up... or we just use like the unarmed attack, but
+with the katana for now... the original katana attacks weren't that bad. It's just that they were kind of long."* A taste call, so a switch.
+- **ORIG** (default) = the m1014 chains WHOLE: right/left the big 360 spin and its mirror, up spin -> slash_1 -> combo3, down slash_3 ->
+  down -> jump_attack. **WHOLE** = the Great Sword set (m1017) uncut. **CUT** = that set cut into single strikes (m1015, dealt round).
+  **FISTS** = Zap's unarmed chain with the sword in hand. Remembered (`mel.kat.style`).
+- `KATANA.gs` is the Great Sword set, `KATANA.orig` the m1014 one, `KATANA.cut` what `strikeSplit` makes from `gs` (it no longer
+  overwrites the pools); `katStyle()` sets `KATANA.dirs` / `KATANA.cuts`. The cancel window (`MELEE.cancel`) applies in every style,
+  so a long whole swing can be cut short by a waiting flick past its blow -- that is the "string them / interrupt them" half.
+- Headless: all eight ORIG clips are on the samurai. Not touched: the blade's angle in a swing (his "not swinging in a meaningful way").
+- Shipped unverified.
+
 ## m1018 -- rockets sound like rockets; the repair ring sits AROUND the right pad; weapons switch in cover; only a gesture leaves cover
 
 *"when the Rockets hit stuff, it makes us like wooden box breaking noise... I want the ring to go around the right stick... I
