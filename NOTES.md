@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1023 -- the cover arm, again: axes measured off his shoulders, the elbow bent so the weapon is held UP
+
+*"the adjustment for the katana hold or the rocket hold in cover actually made it worse. I was picturing him holding it up a little in the
+air. Now it's almost disappeared into his body."* (screens: goblin in crouched cover, launcher and katana across his belly.)
+- **What was wrong:** m1020 built its turn axes from the model root's facing and signed them by argument -- the arm crossed his chest
+  instead of lifting out. CLAUDE.md: *"this file gets handedness backwards about half the time when it reasons."*
+- **Now:** his right is MEASURED (left shoulder -> right shoulder, flattened), forward = (rz, -rx). Each change is a SWING of the
+  bone's own direction toward a world target (`caSwing`: from-to quaternion, partial by degrees, into the parent frame), so a sign
+  cannot be wrong: upper arm 22 deg toward his right and 18 toward forward, then the FOREARM 80 deg toward forward-and-up -- the
+  weapon raised off his body. Undone before the next mixer pass, last first (`_caEd`).
+- TOOLS > ARM is now the elbow lift: 0 (off) / 50 / 80 / 110, remembered (`mel.cover.lift`).
+- Shipped unverified.
+
 ## m1022 -- one weapon size on every body, held every frame (the launcher shrank after a disguise and back)
 
 *"I am the goblin... I turned into him and then back into a goblin and my rocket launcher was super tiny... It needs to be a
