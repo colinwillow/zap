@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1029 -- projectiles never touch half cover; the katana guard turns a turret shot (perfect = sent home, late = sputters off)
+
+*"my thought with the half height cover is that it's just low enough that projectiles don't run into it... currently the turret blows up the
+half height cover if I'm not covered on it, but as soon as I cover on it, it goes over... ballistics only mow down things taller than half
+height... and if you're blocking with the sword and the rocket hits you it ricochets, sputtering off in a different direction. If you do it
+right at the perfect time... maybe something shows you the perfect time... then it sends it back at the turret or the player that shot it."*
+- **Half cover:** the shots already flew over half walls (`boxRay` / `boltBox` skip `b.half`); what broke them was the rocket's BLAST
+  (`wallHit(..., 'blast', 1.3 m)`) going off on him standing beside the wall. Projectile blasts are `'rblast'` now (his rockets and the
+  turret's): every chunk in reach like a blast, but `W.half` skipped, as `'shot'` always was. Melee, the slam and the charge still break them.
+- **The guard:** `shotBlock` -- right pad pulled down (`p.block`) with a blade, shot inside `BLOCK.arc`: PERFECT if the guard went up within
+  `SHOTBLOCK.win` .28 s of the hit -> straight back at its turret (`S.src`) x1.5, white burst, clang + ping, .09 s hitstop. Otherwise knocked
+  .7-1.4 rad off straight back to one side at x.55, wobbling and smoking (`S.sput`), 1.6 s life; either way his (`S.mine`). **The cue:** with
+  a blade out, an incoming shot inside .32 s of reaching him grows x1.35 and throws white sparks -- raise the guard then.
+- Shipped unverified.
+
 ## m1028 -- TOOLS is a compact, scrolling two-column panel in groups, with RUN at the top
 
 *"the run button is off screen because again you have so many debug buttons on screen and it doesn't allow me to scroll... I can't even
