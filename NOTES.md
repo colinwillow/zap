@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1054 -- the right pad's swipe DOWN strikes where he faces (not behind him)
+
+*"Of the 360 degrees, 270 are directional, but the swipe down we reserve -- a placeholder for something cool later, maybe a grab and throw,
+maybe a special... right now it can just be melee, but don't make it backwards, he'd turn all the way around -- just whatever direction he's
+facing."* The right pad's flick handler passes `player.faceH` instead of the flick's camera-relative heading when `katanaDir` reads 'down';
+the down chain (or the fists) still plays. Air strikes already follow his travel (m1050). The slot for a grab / throw / special is this
+branch. Shipped unverified.
+
 ## m1053 -- off the high bar, a double jump / air flip no longer spins him about a point far below him
 
 *"When I launch off the high bar and double jump in the air, the rotation is about an origin far away from my guy -- like he's rotating on a
