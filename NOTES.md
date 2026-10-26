@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1030 -- the katana's first two swings start at the swing (wind-up spins cut); the guard's nudge turns the other way
+
+*"the first two sequences each have a wind-up -- a pretty little spin and then the swing... cut off the beginning wind-up on both and just
+play the swing. The third is a decorative combo, leave it... when you pull down on the right stick into guard you can turn him by nudging
+left or right, but I want it inverted."*
+- **Trim:** `katTrim` (after `strikeSplit`, every load): links 1 and 2 of each ORIG chain cut from `trimPre` .3 s before their LAST right-hand
+  speed peak to the end (`<clip>#t`, its `at` re-placed); link 3 whole. A mirror is timed off its source (the hands swap). Measured on the
+  samurai: 360h from .90 of 3.20 s (strike 1.20), 360h_m the same, spin .83 of 1.90, slash_1 2.40 of 3.57, slash_3 .67 of 1.30, down .57
+  of 2.30. `KATANA.trim = 0` is the A/B. Only the ORIG style.
+- **Guard turn:** while `p.block`, the right pad's sideways orbit is negated (`CAM.guardInv` 1).
+- Shipped unverified.
+
 ## m1029 -- projectiles never touch half cover; the katana guard turns a turret shot (perfect = sent home, late = sputters off)
 
 *"my thought with the half height cover is that it's just low enough that projectiles don't run into it... currently the turret blows up the
