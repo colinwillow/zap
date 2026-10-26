@@ -31,8 +31,8 @@ from cover costs exposure, and the cheap "stand behind it and shoot" does not ex
 - [x] Half-height cinderblock pillars, in the arena (m1008; TOOLS > BLOCKS). Evidence: NOTES m1008.
 - [x] Slide tackle on the left flick; slide-into-cover when flicked toward a wall in range; never automatic. (m1008, headless; his phone pending)
 - [ ] Vault over from cover; leave cover away from it. (leave: m1008; vault: next)
-- [ ] Pop up and shoot (right pad up) and drop back on release.
-- [ ] Bolts pass over a crouched body behind half cover and hit a standing one -- both ways (him and the enemies).
+- [x] Pop up and shoot (right pad up) and drop back on release. (m1010, headless)
+- [ ] Bolts pass over a crouched body behind half cover and hit a standing one -- both ways (him and the enemies). (m1010: half blocks never stop a shot; a ducked body is missed by the hitscan enemy; the arena has no flat-shooting enemy yet)
 - [ ] Enemies that use it too (at least one that ducks and pops).
 - [ ] No words on screen explain any of it.
 - [ ] **He played it on his phone and signed it off as fun.**

@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1010 -- COVER part 2: half-height blocks shots fly over; duck and POP UP to shoot; a swing from cover breaks it (the loop)
+
+- **The loop.** *"I slid to cover with the katana out and swung -- he infinitely loops the attack."* `stepPlayer` returns into
+  `stepWall` before the melee is ever stepped, so a swing started in cover never advanced and its clip repeated. Now `meleeGo`
+  takes him out of cover on the spot and swings. Headless: flick in cover -> `katana_360h` once -> `katana_idle` 200 frames on.
+- **Two heights** (`COVER.blocks`, a height per block): HALF (.75 m, three of them) = cover you duck behind; FULL (2.0 m, the left
+  flank) = a wall that stops shots, with no crouched cover. *"Nothing ballistic runs into the half-height cinderblocks; they run into
+  the full-height ones."* Half blocks carry `b.half`, which `boltBox` and `boxRay` skip; walking and the camera still treat them as solid.
+- **Ducked = shots go over him** (`coverDucked`): crouched in half cover and not popped up. Wired into the cops' shot (the hitscan
+  enemy). The dragon's lobbed fireball still lands, since it is not a flat shot. No arena enemy fires flat yet, so this mostly waits
+  for COVER's "enemies that use it".
+- **POP UP** (`p.wallPop`): in crouched cover with a gun out, the trigger held (`committed()`) = he stands, faces the shot (the lens,
+  as any aim does), still latched to the cover, and the ordinary standing aim / shot pose draws him. Release fires and he drops back
+  into the crouch. No moving along the cover while up. Headless: trigger -> `rifle_aim` standing, release -> 1 bolt -> `cover_idle`.
+- **Out of cover:** a LEFT TAP stands him up out of it (new), a flick away (m1008), a right tap jumps out (m89), or a melee flick.
+- Still open: the vault, enemies that duck and pop, his sign-off.
+
 ## m1008 -- COVER part 1: cinderblock pillars in the arena; the left flick is the SLIDE (a tackle, or INTO crouched cover); move along it, flick away to leave
 
 *"I wanna start working on the slide tackles and slide tackling into cover next, and putting a few cinderblocks in the testing
