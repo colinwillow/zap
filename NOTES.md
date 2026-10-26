@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1065 -- the COVER LEAP: in half cover, charge the katana and release -> up high, over the block, slam down on the far side (and the stuck bug)
+
+*"In cover with the katana out, I held the right stick up (the charge), let go and it got stuck in the animation against the wall... Let's make it
+so in cover, charge the katana and release, he jumps up in the air kinda high, clears the block and slams down on the other side."*
+- **The bug:** cover owns the body (`stepWall` returns) so the release (`p.chargeGo`) was started and never stepped -- m1009's swing-in-cover
+  bug, the charge's turn. Now `chargeRelease` in cover: blade + HALF cover -> `coverLeap`; anything else -> he leaves cover first and the
+  release runs as in the open.
+- **`coverLeap`:** straight up to `LEAP.over` 1.7 m over the block's top, his horizontal held at 0 until his feet clear it (`p.cLeap`, so the near
+  face cannot catch him), then the katana's own air slam (`slamGo`: rides the jump to its top, strikes, driven down) with the horizontal solved
+  from the slam's clock (`slamDur` less the climb to the top) to land `beyond` 1.4 m past the far face; the slam's landing breaks what is there.
+- **Real loop (`cleap.cjs`, goblin, the .75 m half wall):** katana in cover -> leap, apex 1.62 m over the top, landed 1.47 m past the far face,
+  41 frames, not stuck. Hammer in cover -> left cover, the dash ran and ended (31 frames), not stuck.
+- Shipped unverified on the phone.
+
 ## m1064 -- WALL RUNNING (Prince of Persia): side runs, wall jumps wall-to-wall, the run up to the lip, the kick-off back flip; SPAWN > WALL RUN
 
 *"Oh shit!!!! Wall running!!! We need to load in a wall running module. I'm thinking Prince of Persia style!!!"*
