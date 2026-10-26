@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1061 -- the GUARD CARTWHEEL: guard held (right pad down) + a left-pad flick left/right = a sideways aerial cartwheel, facing held
+
+*"When you hold down on the right stick you're in the strafe / guard mode. Flick right or left on the left stick while holding guard and he does
+a sideways cartwheel flip -- he maintains the front guard stance but aerial flips to the side."*
+- `cartGo` (from `leftFlick`, when `p.block` and the flick is more sideways than up/down): launched along HIS right or left (which side comes
+  from the flick's world direction against his facing; right = (-fz, fx)), `CART.v` 5.5 m/s out, `up` 6.5; his facing is HELD; one whole
+  turn about his forward axis (`airFlipGo`'s side flip, head leading the travel). `stepCart` owns the body (returns) so nothing steers him round.
+- POSE: GUARD (the guard pose held through the turn -- the katana's, or the unarmed block) or TUCK -- TOOLS > CARTWHEEL, remembered (`mel.cart`).
+- **Real loop (`kcart.cjs`, goblin, katana AND hands, right pad held down):** guard on before the flick; right flick: 3.48 m to his right,
+  0 forward, facing drift 0.000, apex 1.0 m, 38 frames, turned 6.09 rad, head on his right at f8; left flick: the mirror (-3.48, -6.09, head
+  left). The last ~10 deg settles on the landing frame. Renders: side-on at f8, inverted at f12.
+- Up/down flicks in guard are unchanged (they go on to the old left-flick moves). Shipped unverified on the phone.
+
 ## m1060 -- the katana charge: the launch ends on the frame the blade hits the floor (measured in the real loop)
 
 *"I want the launch forward to be timed so perfectly that the end of the launch lands right when the katana hits the ground."*
