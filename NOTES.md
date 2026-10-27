@@ -5,6 +5,12 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1176 -- CLIFF LODGE pass 3 (DONE)
+
+- Wind-bent PINES (layered cones on leaning trunks) on the summit and round the crag's foot: eight trees, two merged meshes.
+- Stone-lamp LANTERNS at the path's three corner landings; a BONSAI in a pot by the lodge door; two cables from the lodge to stakes; a drone.
+`BLDG` cliff `pass: 3`. Next: alternate -- Shrine pass 4. Shipped unverified.
+
 ## m1175 -- MARKET pass 4: a rooftop teahouse, washing, fruit
 
 - A ROOFTOP TEAHOUSE: three low tables (solid) with red cushions on the market roof and a red PARASOL on a pole (solid).
