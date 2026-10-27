@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## BREAKABLE RAILS -- S3b, FIRST IN THE COURTYARD (m1355)
+## BREAKABLE RAILS -- S3b, FIRST IN THE COURTYARD (m1354)
 
 - **`bldPieces(g, mat)` / `pieceAdd(P, geos, box, O)` / `pieceDone(P)`:** thin breakable things (rails, balusters, slats) gathered into ONE merged mesh, a vertex range each. Each piece has its own solid `noCam` collider, kept in `O.boxes` so the builder's mapping and clear see it.
 - **`pieceHit`** (in `bldHit`) breaks a piece in `PIECE.hp` 1.5 hits:
