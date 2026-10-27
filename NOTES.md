@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1112 -- the Refuge: his legs read wet when he wades; low mist over the lake
+
+- **HIS BODY through `rwPatch`** (chained onto whatever his materials already do; 10 materials on the goblin), so below the surface his
+  legs get the lake's colour and caustics like everything else. (Only at the refuge.)
+- **LOW MIST (`homeMist`, `HOME.mistN` 16):** soft warm sprites a metre over the water round the island, drifting slowly, never written to depth.
+- Render (`wade.cjs`): from the lake, the sun's glint across the water to the island, the torii, the dock and boat, the bamboo, the pine, the
+  mountains behind; his body still draws right through the patch.
+
 ## m1111 -- the Refuge rebuilt on colinwillow/water's water: a mountain lake, a pebble shore, and Japanese pieces
 
 **What he said:** *"Another repo to take example from could be /water -- simple low poly, a hut on an island... very tropical, but the water
