@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1241 -- Lantern Festival Street pass 1 (Building Forge loop, Set 3 #27)
+
+`FEST`, in BLDG.list as `fest`. A paved street at (72, 30) runs north-south (z 16 to 44, 6.4 m wide).
+- **The stalls.** Two rows of four festival stalls line it. Each stall has:
+  - a breakable back wall
+  - solid side posts and partitions
+  - a counter with goods on it
+  - a striped canopy over the counter (red, blue, green and yellow sets)
+  - a flat solid roof at 3 m you can stand on
+- **The gates.** Red gate frames stand at both ends, each with a black cap, a tie beam and a lantern.
+- **Lantern strings** criss-cross over the street from roof to roof (`bldCable`, five lanterns each, eight strings).
+- **Two bars** hang across the street under the gates' tie beams: a way up onto the roofs.
+
+Next: alternate -- an extra pass (6) on the Rampart. Pass 2 brings the robot DRAGON DANCE.
+
 ## m1240 -- Shrine pass 6: omikuji (Building Forge loop, extra pass)
 
 A hexagonal OMIKUJI fortune box now stands on the Shrine's terrace (front left, clear of the stone lanterns), with a rack of red
