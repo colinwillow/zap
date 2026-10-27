@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1247 -- Sky Wreck pass 1: stands and playable (Building Forge loop, Set 3 #28)
+
+At (30, -72): `SWRK`, `swrkBuild` / `swrkStep` / `swrkClear`.
+- **The wreck.** The broken hull of a flying junk come down on rock spires.
+- **The deck.** A TILTED deck, 20 m long and 6 m wide, rising from 3 m at the stern to 7 m at the bow. It is walkable triangles; the
+  lacquered hull, ribs, keel and neon trim are drawn pitched with it.
+- **The way up.** A fallen mast laid as a ramp from the ground to the stern.
+- **The hold.** Below the deck, with breakable hull planks (`cwallBuild`) along both sides and the bow end. There is a torn hole on the
+  +z side and an open breach at the stern. Inside are six crates and jars to smash (`smashAdd`) and two support spires to climb on.
+- **The spire.** A rock spire is speared up through the bow to a flat top at 13 m.
+- **The mast.** The broken main mast carries a crow's nest at 12.5 m and a torn red sail. Two bars climb to it from the deck (8.2 and
+  10.6 m), and grapple rings sit above the nest and the spire.
+
+It clears the Dragon Bell Tower spot (0, -74) by 18 m. Registry `pass: 1`. SHIPPED UNVERIFIED.
+Next: alternate -- an extra pass (6) on the Flying Ship House, then Sky Wreck pass 2 (the sparking Jin engine that blasts you up).
+
 ## m1246 -- Zeppelins pass 6: the bomb bay (Building Forge loop, extra pass)
 
 Each gondola now has a bomb bay (`zepBombs`, `zepLever`, `ZEP.bomb`):
