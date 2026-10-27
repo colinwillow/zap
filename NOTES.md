@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1184 -- ROBOT SAMURAI BARRACKS pass 1 (Set 2 #17, at (30, -42))
+
+`BARR`, `robotSam` (a code-built robot samurai: red lacquer cuirass, dark limbs, a visor with a cyan eye-slit, a kabuto with a gold crest,
+a katana in the right hand), `barrBuild` / `barrStep` / `barrHit` / `barrClear`. SPAWN > BUILDINGS > Robot Barracks.
+- A long BARRACKS HALL (16 x 6, breakable walls, a door onto the yard, a curved roof, lamps) along the south of a raked-sand DRILL YARD
+  with a low stone kerb.
+- SIX ROBOT SAMURAI in two ranks DRILLING IN STEP on a 2.4 s count: raise (1.2 s), CUT (.15 s -- a stamp and a swish, eyes flaring),
+  hold, return. Killable (`barrHit` through `bldHit`, 3 hits: sparks, they slump in a heap with a boom), reassembled 15 s later.
+- Three straw TRAINING DUMMIES at the yard's west end and an ARCHERY BUTT (rings) at its east end (shared `SMASH`); a WEAPON RACK of
+  blades and staves by the door.
+Shipped unverified.
+
 ## m1183 -- ZEPPELINS pass 4: supply drops
 
 (The alternating order is oldest first: Hall, Watchtower, Gatehouse, Pagoda, Market, Shrine, Rampart, Airship Dock, now the Zeppelins.)
