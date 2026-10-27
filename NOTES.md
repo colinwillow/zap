@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1217 -- Siege Yard pass 3: the polish (Building Forge loop)
+
+- **Spare boulders:** a pyramid of eight beside the trebuchet. It is one merged mesh with a solid box.
+- **Bolt rack:** a rack of spare ballista bolts.
+- **Nobori:** indigo banners with white mon on the four palisade corners.
+- **Braziers:** two either side of the gate, throwing sparks and smoke.
+- **Pull-up bar:** on the firing step.
+- **A drone.**
+
+The Siege Yard is DONE (3 passes). Next: alternate -- an extra pass (5) on the Rampart, then Set 2 #23 Teahouse Garden pass 1.
+
 ## m1216 -- Shrine pass 5: the fox gate (Building Forge loop, extra pass)
 
 A little vermilion TORII (2.4 m, solid posts) stands east of the Shrine's steps with a Jin VEIL hung in it.
