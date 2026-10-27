@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1127 -- GATEHOUSE pass 2: the ballista, the drawbridge, banners
+
+- THE BALLISTA on the deck: bronze turntable, timber stock, two bow arms, a string, a spear-size bolt. Inside `GHOUSE.balR` (34 m) it
+  turns to track him (1.6 rad/s), winds `balWind` s (red eye throbs, bolt pulls back), looses a bolt at `balV` 30 m/s with a little lead,
+  every `balCool` 4.2 s. The bolt is an ARROWS projectile at 2.4x scale (`from: null`), so the katana blocks it, glances it, and a PARRY
+  sends it back (`deflectThreat` already handled no-archer arrows). Solid base box on the deck.
+- THE DRAWBRIDGE across the passage mouth: a 4.7 x 5.2 m span with black straps, hinged at the towers' front, chained to the upper
+  storeys (chains follow it). Cycles down 9 s -> rises 2.6 s -> up 6 s -> lowers 2.6 s, a clank at each change. More than half up it
+  puts a box across the mouth (the passage is SHUT: go round, or up the ramp and over). `ghouseStep`; the box comes out in `ghouseClear`.
+- BANNERS: a long red diamond-spiral on each tower's outer face.
+Pass 3 (polish) next. Shipped unverified.
+
 ## m1126 -- GATEHOUSE pass 1 (BUILDINGS.md #3, at (16, -8))
 
 `GHOUSE`, `ghouseBuild` / `ghouseClear` / `ghouseStep` (not `gate*`: `gateStep` is an old world's mend and was taken -- the first
