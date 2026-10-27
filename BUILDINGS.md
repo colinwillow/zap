@@ -22,7 +22,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - slower hands
   - every new ladder carries a `mark` on the floor it leads to, so its front is decided.
 - **THE QUEUE, FIRST:**
-  - **S1 -- X4 the Octagonal Block Pagoda: x1.5 and climbable stairs** (his test building; Worker A's if Worker A has his go, else this loop's)
+  - **S1 -- X4 the Octagonal Block Pagoda: x1.5 and climbable stairs** (WORKER A has it, with his go -- the main loop leaves OPAG alone)
   - **S2 -- the other done buildings, x1.5, one per build:** X1 pagoda, C1 courtyard, X2 castle, R1 ramp tower, and the older forge rows.
     One build each, with stairs re-cut to .30 risers.
   - **then** the queue below (R2 Four Fires on), built at the new scale.
