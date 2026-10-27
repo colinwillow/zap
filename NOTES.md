@@ -5,6 +5,12 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1119 -- Dojo Hall, pass 3 (polish) -- DONE, in SPAWN > BUILDINGS
+
+A tiled roof (a canvas of ridged courses, channels down the slope), bracket stacks on the eave posts, vermilion lacquer on the door posts, the
+door lanterns sway, and THE GONG RINGS (`hallStep`): a strike that reaches it, once a swing, gives a deep clang, a warm glow off the bronze
+and a wobble that dies away. `BLDG` pass 3. Shipped unverified.
+
 ## m1118 -- Dojo Hall, pass 2 (inside, outside, a roof to run on)
 
 INSIDE: a tatami floor (12 mats, dark edges), a raised dais at the back (solid, step onto it), a glowing Jin panel on the back wall, a
