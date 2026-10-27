@@ -18757,7 +18757,7 @@ function slamLand() {
     const sh = q > 1e-3 ? Math.atan2(dx, dz) : p.faceH;
     dummyBlow(d, sh, SLAM.power, SLAM.dmg);
     // m1088: the shockwave sends him UP (not out) -- into the juggle
-    if (JUGGLE.on && d.st === 'down' && bodyWeightK(d.K) >= KNOCKDOWN.heavy) { d.vy = JUGGLE.slamUp * (.85 + Math.random() * .3); d.vx = Math.sin(sh) * JUGGLE.slamOut; d.vz = Math.cos(sh) * JUGGLE.slamOut; d.t = 0; jugMark(d); JUGGLE.stat.slams++; }
+    if (JUGGLE.on && d.st === 'down' && bodyWeightK(d.K) >= KNOCKDOWN.heavy) { d.vy = JUGGLE.slamUp * (.85 + Math.random() * .3); d.vx = Math.sin(sh) * JUGGLE.slamOut; d.vz = Math.cos(sh) * JUGGLE.slamOut; d.t = 0; jugMark(d); JUGGLE.stat.slams++; p.flowUntil = flowNow() + FLOW.window + .4; }     // the slam STARTS the juggle: the flow is open
     hitRing(d.K, 1, d.root.position.x, d.root.position.z);
     // the chip's `!` -- "it never fired", "it fired and reached nobody" and "it landed" are
     // three bugs with one picture on a phone, and the sweep cannot answer it here (it is not
