@@ -5,6 +5,41 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## White Heron Castle pass 11: ROOM TO FIGHT, DOORS AND CHAOS (X2, WORKER B)
+
+His two new rules (BUILDINGS.md), brought to the castle after its ten passes, at the main loop's request.
+
+**Room to fight**
+- **The lookout.** The balcony is 2.4 m (it was 1.2), and its posts run down to roof 3 and carry the deck. The top roof's eave is pushed
+  out 1.1 m so it reaches past the rail: the roof edge is 2.9 m out, about 2.4 m over the deck.
+- **The rooms.** Every room is now at least 6 x 6 m inside:
+  - the keep is .4 m deeper (`hz0` 6.4), so the top hall is about 7.7 x 6.5;
+  - the corner tower is bigger (`thx0` 4.6, `thz0` 4.3, stepping .5), so its watch room is about 6.6 x 6.
+  - Everything hung off those sizes follows: the gallery, the corridor cut, the stairs, the windows.
+- **Already compliant:** the approach legs (2.5 and 2.2 m), the gallery corridors (5.4 m), the drawbridge (2.35 m), the doors (1.8 m),
+  and the eave lips (pass 10 left them 2.2 m clear over the terrace).
+- **noCam (a new `box` argument).** On the eave lips, the stone handholds, the balcony rail, the gate posts, the stone lanterns and the
+  gong frames.
+
+**Doors and gates (`bgateMake` / `bgateStep` / `bgateHit`)**
+- Real leaves on five openings:
+  - the entrance gate;
+  - the stair's sentry gate;
+  - the gate on the stone behind the drawbridge;
+  - the keep's front door;
+  - the tower's outer door.
+- Each opens for him, or for a guard who has seen him, and shuts behind. Four blows break it (splinters and smoke), and it is rehung
+  after 40 s.
+- The posted archers are always alert, so they do not count, or the keep door would never shut.
+- The helper hangs leaves at y 0, so the doors up on the stone hang in a group lifted to the stone's height, and their box is lifted
+  with them.
+
+**The drawbridge is a machine now**
+- No timer. A bronze GONG on the approach's top landing and another on the stone inside the gate each raise or lower it.
+- A heavy blow (3+ damage: a rocket, a big swing) on the raised bridge drops it with a crash, three times as fast.
+
+SHIPPED UNVERIFIED.
+
 ## THE COURTYARD, PASS 9: FIXES FROM READING THE ROUTES (m1312)
 
 COURTYARD.md pass 9 is "playtest-driven fixes from his notes". He has not walked the court yet, so this pass walked the four routes in the code and fixed what blocks them. Shipped unverified.
