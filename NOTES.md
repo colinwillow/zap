@@ -5,6 +5,33 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## White Heron Castle x1.5 -- STEER S2 (X2, WORKER B)
+
+His STEER after walking X4: *"increase the scale... start with 1.5... we need room to play... we're gonna go for SIZE"*, and the stairs must
+stay climbable.
+- **How it is scaled.** The castle is still designed in the old numbers, but the whole group is BUILT x`HERON.scale` (1.5) about its
+  centre. Every collider, walkable triangle and world position is mapped design -> world in one place (`MX`/`MZ`): gates, gongs, the
+  ballista, archer posts, guards. One knob, and nothing drifts apart.
+  - **The exception:** the storehouse's breakable walls are built straight in world space, in an unscaled group, because the chunk
+    logic reads their numbers.
+- **The storeys** also went 3.6 -> 4 (design), so the world sizes are:
+  - storeys 6 m;
+  - the keep's top about 41 m;
+  - the top hall about 11.5 x 9.8 m inside, the tower's watch room about 9.9 x 9;
+  - corridors 8 m, the lookout balcony 3.6 m;
+  - approach legs 3.75 and 3.3 m, doors 2.7 m, the stone 9 m.
+- **What is sized to HIS BODY, in world metres:**
+  - **Stairs (the riser numbers):** the keep and tower stairs are 20 risers of 0.30 m a storey (a 6 m rise). The runs are longer too
+    (4.8 and 4.6 design): about 40 degrees, where they were 47. The east stair up the stone is 30 risers of 0.30 m (9 m, 28.6 degrees).
+    The approach ramps keep their gentle slopes.
+  - **Handholds** at 2.9 and 5.8 m: each one jump from the last, and the 9 m lip one jump from the upper.
+  - **The lookout rail** at waist height (about 1 m).
+- **Moved** to (-125, 50). The footprint is about x -145..-94, z 5..83: clear of the mill spot (-72, 40), X3 (-60, 100) and everything
+  else, all east of x -80.
+- **Lost at this scale:** the first eave lip is now about 4.4 m over the stone terrace, beyond a jump, so the outside roof-to-roof climb
+  starts from the inside stairs and doors, not from the terrace.
+
+SHIPPED UNVERIFIED.
 ## THE BOOT CARD NAMES THE GAME, AND KORAJIN GETS ITS OWN (m1320)
 
 *"We need to refactor the loading screen. It still says Weirdport and we're not even on that game. We could stylize the loading screen way better."* (his screenshot: WEIRDPORT / LOADING THE DECK / BUILD M1315)
