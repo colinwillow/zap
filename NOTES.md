@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1191 -- Spider-Bot Hangar pass 4: the spiders pounce (Building Forge loop, extra pass)
+
+Until now the spider bots climbed every building but never touched him. They hunt now.
+
+**The pounce.** A spider that finds him within `SPHANG.pounceR` 4.5 m (and within 6 m of height) LEAPS at him. It can start
+from its patrol loop, halfway up a wall or from a rooftop.
+- The arc is ballistic, timed to land on him in `leapT` .55 s.
+- A bite on the way does `bite` 9 and a shove.
+- Where it lands (`groundAt`) it perches a moment, drops to the street and goes home.
+- Each spider waits `pounceCool` 3.5 s between leaps.
+
+**The hatch.** A dead spider respawns out of one of the glowing PODS inside the hangar, with sparks and smoke, instead of
+appearing at the door.
+
+Pass 4 is an extra on a done building, so it moves no sandbox box. Next: alternate -- Jin Lighthouse pass 2.
+
 ## m1190 -- Jin Lighthouse pass 1 (Building Forge loop, Set 2 #18)
 
 The lighthouse stands at (-46, 30), `LHOUSE`, in BLDG.list as `lhouse`:
