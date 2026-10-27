@@ -27,6 +27,17 @@ clear of the hatches and the doors:
 A paper lantern hangs in the first five rooms.
 
 SHIPPED UNVERIFIED. Next: pass 6, guardians (archers on the walks, two stone lions at the gate, a monk).
+## Great Red Pagoda pass 10 of 10: the polish -- DONE (X1)
+
+- **Draw calls.** EVERY plain box in the tower (walls, posts, floors, rails, furniture, the fence, the pavilion) now goes into the
+  per-material merge buckets, the same as the pass-2 detail. One flush at the very end of the build leaves the whole pagoda at roughly a
+  dozen draws plus its moving parts (the bell, the gong, the doors, streamers, birds, chimes, the halos Points). Solid boxes still become
+  colliders exactly as before.
+- **The eave corners lift higher.** `GPAG.lift` .7 -> 1.0, nearer the reference's upswept tips. It is ONE number now, read by the drawn
+  roof, the walkable roof triangles and the corner finials, so they cannot drift apart.
+
+**The 10-pass experiment, X1, is complete:** m1262, 1266, 1267, 1269, 1270, 1271, 1272, 1273, 1275 and this one. His verdict on whether ten
+passes made a meaningful difference decides the rest. SHIPPED UNVERIFIED.
 
 ## White Heron Castle pass 4 of 10: the stone base is a climb (X2, WORKER B)
 

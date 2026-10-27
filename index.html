@@ -22677,14 +22677,17 @@ function zrampClear() { const Z = ZRAMP.on; if (!Z) return; const i = ZIPS.index
 // roofs stepping in as it rises, a spire of gold rings on top. *"Much more visually interesting and much more functional"* -- so it is HOLLOW:
 // a room on every storey, a ladder inside each up through a hatch in the next floor (the corners turn as you climb), a door out onto every
 // balcony, and the ground storey's walls breakable. Pass 1 = the stack, the rooms, the ladders, the balconies, the roofs, the spire.
-const GPAG = { showT: 30, at: [90, 0], n: 5, hb0: 4.2, shrink: .5, sh: 3.8, balc: 2.2, eave: 2.7, t: .3, door: 1.6, doorH: 2.5, on: null };
+const GPAG = { lift: 1.0, showT: 30, at: [90, 0], n: 5, hb0: 4.2, shrink: .5, sh: 3.8, balc: 2.2, eave: 2.7, t: .3, door: 1.6, doorH: 2.5, on: null };
 function gpagBuild() {
   if (GPAG.on) return; const A = GPAG, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [];
   const lac = new THREE.MeshStandardMaterial({ color: 0xb3261c, roughness: .42 }), lacD = new THREE.MeshStandardMaterial({ color: 0x7e1913, roughness: .5 }), floorM = new THREE.MeshStandardMaterial({ color: 0x4a3324, roughness: .8 });
   const gold = new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .85, roughness: .3 }), stone = new THREE.MeshStandardMaterial({ color: 0x9a948c, roughness: .95 }), plaster = new THREE.MeshStandardMaterial({ color: 0xece4d4, roughness: .9 });
   const lamp = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false });
   const paperLit = new THREE.MeshStandardMaterial({ color: 0xf4e6c8, emissive: 0xffa050, emissiveIntensity: .55, roughness: .9 });     // m1272: the windows glow from inside
-  const box = (x0, x1, y0, y1, z0, z1, m, solid) => { if (x1 - x0 < .01 || z1 - z0 < .01 || y1 - y0 < .01) return null; const o = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), m); o.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); o.castShadow = o.receiveShadow = true; g.add(o);
+  let flushed = 0;     // pass 10: every plain box goes into the per-material buckets too -- the whole tower is a handful of draws
+  const box = (x0, x1, y0, y1, z0, z1, m, solid) => { if (x1 - x0 < .01 || z1 - z0 < .01 || y1 - y0 < .01) return null;
+    if (!flushed) { mbox(x0, x1, y0, y1, z0, z1, m); if (solid) O.boxes.push({ minx: x0, maxx: x1, miny: y0, maxy: y1, minz: z0, maxz: z1 }); return null; }
+    const o = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), m); o.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); o.castShadow = o.receiveShadow = true; g.add(o);
     if (solid) O.boxes.push({ minx: x0, maxx: x1, miny: y0, maxy: y1, minz: z0, maxz: z1 }); return o; };
   const hbOf = k => A.hb0 - A.shrink * k, yOf = k => k * A.sh, N = A.n, t = A.t;
   // m1263 (pass 2): the DETAIL is hundreds of small pieces, so they go into per-material BUCKETS and are merged once at the end (one draw each)
@@ -22732,14 +22735,14 @@ function gpagBuild() {
     else box(x0, x1, -.05, .05, z0, z1, floorM, 0);
     // THE ROOF of this storey: a deep flared hip in grey-green tile, its fascia gold; under the next floor (its ridge is hidden by the slab)
     const top = k === N - 1, EX = hb + A.eave + (top ? .3 : 0);
-    bldRoof(g, cx, cz, EX, EX, 0, top ? y1 + 1.8 : y1 - .3, y1 - 1.05 - (top ? 0 : .1), .7, gold, 0x6f7f78);
+    bldRoof(g, cx, cz, EX, EX, 0, top ? y1 + 1.8 : y1 - .3, y1 - 1.05 - (top ? 0 : .1), A.lift, gold, 0x6f7f78);
     // ---- PASS 2 (m1263): the reference's DETAIL ----
     // BRACKET CLUSTERS (tokyo) under the eave, every ~.9 m along every side: two stepped blocks, a gold cap on the outer one
     { const yb = y1 - 1.3; for (const [ax, sg] of [[1, -1], [1, 1], [0, -1], [0, 1]]) for (let u = -hb + .45; u <= hb - .44; u += .9) {
         const P = (r, w, h, d, y, m) => ax ? mbox(cx + sg * r - d / 2, cx + sg * r + d / 2, y, y + h, cz + u - w / 2, cz + u + w / 2, m) : mbox(cx + u - w / 2, cx + u + w / 2, y, y + h, cz + sg * r - d / 2, cz + sg * r + d / 2, m);
         P(hb + .2, .3, .22, .4, yb, lacD); P(hb + .5, .32, .2, .45, yb + .22, lacD); P(hb + .78, .2, .08, .14, yb + .42, gold); } }
     // the roof's HIP RIBS (dark tile ridges from each corner up to the wall) and the UPTURNED CORNER TIPS (gold flames)
-    { const eY = y1 - 1.05 - (top ? 0 : .1), rY = top ? y1 + 1.8 : y1 - .3, cY = eY + .7 * 1.6, wY = rY - .88 * (rY - eY);
+    { const eY = y1 - 1.05 - (top ? 0 : .1), rY = top ? y1 + 1.8 : y1 - .3, cY = eY + A.lift * 1.6, wY = rY - .88 * (rY - eY);
       for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { mrod([cx + sx * (EX - .05), cY + .06, cz + sz * (EX - .05)], [cx + sx * hb * (top ? .15 : .95), (top ? rY : wY) + .12, cz + sz * hb * (top ? .15 : .95)], .09, tileD);
         const f = new THREE.ConeGeometry(.12, .55, 6); mg(f, gold, _m4.compose(new THREE.Vector3(cx + sx * (EX + .05), cY + .3, cz + sz * (EX + .05)), _q.setFromEuler(new THREE.Euler(sz * .5, 0, -sx * .5)), new THREE.Vector3(1, 1, 1))); }
       // tile RIBS down every face: thin dark lines from near the wall out to the eave, every .45 m
@@ -22755,7 +22758,7 @@ function gpagBuild() {
     // room never lands in its ceiling); every eave has a LIP to catch (a timber fascia box along the middle of each side, `LEDGE`'s kind
     // of edge), so from the ground you can go eave, roof, balcony, eave, roof... all the way up the outside; and a BAR juts off every balcony
     // under the eave above (swing up to that eave's lip) ----
-    { const eY = y1 - 1.05 - (top ? 0 : .1), rY = top ? y1 + 1.8 : y1 - .3, lift = .7, hR = (x, z) => { const cor = Math.pow(Math.abs(x) / EX, 6) * Math.pow(Math.abs(z) / EX, 2) + Math.pow(Math.abs(z) / EX, 6) * Math.pow(Math.abs(x) / EX, 2) * .6, tt = clamp(Math.max(Math.abs(z), Math.abs(x)) / EX, 0, 1); return rY - (rY - eY) * (1 - (1 - tt) * (1 - tt)) + lift * cor + .04; };
+    { const eY = y1 - 1.05 - (top ? 0 : .1), rY = top ? y1 + 1.8 : y1 - .3, lift = A.lift, hR = (x, z) => { const cor = Math.pow(Math.abs(x) / EX, 6) * Math.pow(Math.abs(z) / EX, 2) + Math.pow(Math.abs(z) / EX, 6) * Math.pow(Math.abs(x) / EX, 2) * .6, tt = clamp(Math.max(Math.abs(z), Math.abs(x)) / EX, 0, 1); return rY - (rY - eY) * (1 - (1 - tt) * (1 - tt)) + lift * cor + .04; };
       const NG = 18; for (let i = 0; i < NG; i++) for (let j = 0; j < NG; j++) { const xa = -EX + 2 * EX * i / NG, xb = -EX + 2 * EX * (i + 1) / NG, za = -EX + 2 * EX * j / NG, zb = -EX + 2 * EX * (j + 1) / NG, mx = (xa + xb) / 2, mz = (za + zb) / 2;
         if (Math.abs(mx) < hb + .15 && Math.abs(mz) < hb + .15) continue;
         tris.push(cx + xa, hR(xa, za), cz + za, cx + xb, hR(xb, za), cz + za, cx + xb, hR(xb, zb), cz + zb, cx + xa, hR(xa, za), cz + za, cx + xb, hR(xb, zb), cz + zb, cx + xa, hR(xa, zb), cz + zb); }
@@ -22822,7 +22825,6 @@ function gpagBuild() {
     for (const sz of [-1, 1]) { const hg = new THREE.Group(); hg.position.set(fx0, 0, cz + sz * gw); g.add(hg); const dp = new THREE.Mesh(new THREE.BoxGeometry(.12, 2.7, gw - .05), lac); dp.position.set(0, 1.4, -sz * (gw / 2)); dp.castShadow = true; hg.add(dp);
       for (const yy of [.6, 1.4, 2.2]) { const st = new THREE.Mesh(new THREE.BoxGeometry(.16, .08, gw - .2), gold); st.position.set(0, yy, -sz * (gw / 2)); hg.add(st); } gate.doors.push({ g: hg, sz }); }
     O.boxes.push(gate.box); }
-  for (const [m, list] of MG) { const geo = mergeGeometries(list); const o = new THREE.Mesh(geo, m); o.castShadow = true; o.receiveShadow = true; g.add(o); }     // m1263: the buckets, one draw each
   // THE SPIRE (sorin): a gold mast with nine rings and a flame finial
   const sy = yOf(N) + 1.6; box(cx - .12, cx + .12, sy - .4, sy + 5.2, cz - .12, cz + .12, gold, 0);
   for (let i = 0; i < 9; i++) { const r = new THREE.Mesh(new THREE.TorusGeometry(.42 - i * .025, .06, 6, 18), gold); r.rotation.x = Math.PI / 2; r.position.set(cx, sy + .5 + i * .42, cz); g.add(r); }
@@ -22875,6 +22877,7 @@ function gpagBuild() {
     (async () => { try { const K0 = await arenaLoad('SAMURAI'), AK = ARENA.kinds.SAMURAI, K = HORDE.KS || (HORDE.KS = Object.assign(Object.create(K0), { notice: HORDE.notice, lose: 90, limbs: 1 }));
       for (const sz of [-1, 1]) { if (GPAG.on !== G0) return; const x = cx - 10.6, z = cz + sz * 2.6, d = bodySpawn(K.P, K, x, z, 0); arenaKatana(d, AK); d.horde = 1; d.aggro = 0; d.hp = d.hpMax = 40; d.gap = 1; d.h = -Math.PI / 2;
         HORDE.list.push(d); G0.guards.push(d); } } catch (e) { console.error('[melee] pagoda guards', e); } })(); }
+  for (const [m, list] of MG) { const geo = mergeGeometries(list); const o = new THREE.Mesh(geo, m); o.castShadow = true; o.receiveShadow = true; g.add(o); } flushed = 1;     // the buckets, one draw each (pass 10: at the very end, every box in them)
   arenaBeam(cx, cz, [1, .45, .3], 1); snd('clang', { g: .7, r: .6 });
 }
 function gpagStep(dt) { const G = GPAG.on; if (!G) return; G.t += dt; G.core.position.y = 1.3 + Math.sin(G.t * 1.7) * .08;
@@ -22940,7 +22943,7 @@ const BLDG = { list: [
   { key: 'obs', t: 'Jin Observatory', sub: 'a clockwork tower: a spiral stair inside past great gears to a balcony under a copper dome whose telescope marks you in the open for a volley of arrows (blind its lens), a clock face', pass: 3, build: () => obsBuild(), clear: () => obsClear(), on: () => !!OBS.on, step: dt => obsStep(dt) },
   { key: 'fest', t: 'Lantern Festival Street', sub: 'a street of festival stalls (roofs to stand on, breakable backs) under strings of paper lanterns, red gates at both ends, bars across, a robot dragon dance to cut apart (strike the taiko to make it wild)', pass: 3, build: () => festBuild(), clear: () => festClear(), on: () => !!FEST.on, step: dt => festStep(dt) },
   { key: 'heron', t: 'White Heron Castle', sub: 'a Himeji-style castle on a battered stone base: a five-storey white keep under layered grey roofs (every roof walkable, a room on every storey, ladders up through the hatches), a gallery wing to a corner tower, a stair up the stone, a storehouse at the foot whose walls break', pass: 4, build: () => heronBuild(), clear: () => heronClear(), on: () => !!HERON.on, step: dt => heronStep(dt) },
-  { key: 'gpag', t: 'Great Red Pagoda', sub: 'five storeys of red lacquer: a room on every floor, ladders up through the hatches, a balcony round every storey, a spire; a pavilion whose roof you can climb; a red fence; climb the outside eave to eave, bars, a zipline off the spire; an armoury, a library, a bell room (the alarm), a lookout; archers, a sentry gun, gate guards; glowing windows, lantern halos, a beacon on the spire; streamers, chimes, birds; strike the gong at the top and the tower lights up and the gate opens', pass: 9, build: () => gpagBuild(), clear: () => gpagClear(), on: () => !!GPAG.on, step: dt => gpagStep(dt) },
+  { key: 'gpag', t: 'Great Red Pagoda', sub: 'five storeys of red lacquer: a room on every floor, ladders up through the hatches, a balcony round every storey, a spire; a pavilion whose roof you can climb; a red fence; climb the outside eave to eave, bars, a zipline off the spire; an armoury, a library, a bell room (the alarm), a lookout; archers, a sentry gun, gate guards; glowing windows, lantern halos, a beacon on the spire; streamers, chimes, birds; strike the gong at the top and the tower lights up and the gate opens', pass: 10, build: () => gpagBuild(), clear: () => gpagClear(), on: () => !!GPAG.on, step: dt => gpagStep(dt) },
   { key: 'zramp', t: 'Zoom Ramp Tower', sub: 'zoom from the red gate (full hold), up the ramp and straight up the face -- only a full zoom reaches the gold lip; your mark shows how close; or zigzag up the chimney', pass: 3, build: () => zrampBuild(), clear: () => zrampClear(), on: () => !!ZRAMP.on, step: dt => zrampStep(dt) },
   { key: 'swrk', t: 'Sky Wreck', sub: 'a flying junk come down on rock spires: a tilted deck up a fallen mast, a hold of cargo behind breakable planks, a crow\'s nest up two bars', pass: 1, build: () => swrkBuild(), clear: () => swrkClear(), on: () => !!SWRK.on, step: dt => swrkStep(dt) },
   { key: 'opag', t: 'Octagonal Block Pagoda', sub: 'seven eight-sided storeys of blocks: stepped slab eaves you can walk and climb eave to eave, cream panels that break block by block, a ladder up through every floor, a door onto every roof, a red fence, a stepped spire; lattice windows, bracket clusters under every eave, tile ribs, a balustrade round every roof walk, gold corner caps; every block breaks -- posts, bands, eave courses -- and flies back in; walks 2.2 m wide, rooms 6 m; a bar off every roof walk, a chain up a corner of every storey, a zipline off the top walk; a block stair up from the shrine hall, then an armoury, a scroll room, a tea room, a garden, a dragon shrine and a bell room at the top', pass: 5, build: () => opagBuild(), clear: () => opagClear(), on: () => !!OPAG.on, step: dt => opagStep(dt) },
