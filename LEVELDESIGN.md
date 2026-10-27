@@ -84,6 +84,48 @@ the research adds is **a layer zero (the numbers), a shape inside each layer, an
 - **Loop-back shortcuts:** they make the puzzle layer pay for itself.
 - **Zones:** leash, line of sight, never unavoidable.
 
+## OMAKASE: you experience only what we serve, and it feels like free will (his, after m1379)
+
+> *"[A guy on a podcast] builds dead-end things on purpose -- you can only get here from here -- because he's driving a narrative. I have a tendency to
+> make it so you can do everything all at once: every game I add that, add that, and now I have the exact same video game. I need to think the
+> opposite. There is an art to only allowing you to experience what I want you to experience at that given time -- that's what all these great games
+> are like. Omakase: only experience what I allow you to experience, while feeling like you have the illusion of free will and free choice."*
+
+This is the strongest note on the list, because it names the habit that made Weirdport: every system everywhere at once. The research agrees on all four points below.
+
+- **Omakase in software:** DHH's "Rails is omakase". The chef picks the ingredients and the ORDER. Opinionated design trades à-la-carte choice for a curated path: faster to learn, less fatigue, and a vision instead of a jumble.
+- **Games:**
+  - **Uncharted:** cues steer you so the space feels bigger and less linear than it is.
+  - **Half-Life:** linear spaces that read like a film.
+  - **BioShock:** turns the illusion of choice into the story itself.
+  - **Jim Brown (Epic, GDC):** make choice illusory while keeping the player's autonomy.
+- **Restrict, then give back:** strip the game to its barest verbs, then add one mechanic at a time. Each level is a chain of verb/challenge pairs. Breath of the Wild's opening plateau teaches by what you CAN'T do yet (a cliff you can't climb). Celeste starts with jump and climb, then gives you ONE dash. And a constraint has to feel purposeful, never arbitrary.
+
+### What it means for Korajin (the rules we build by from now on)
+1. **A VERB BUDGET PER LEVEL.** Grumbo can do everything in the arena and the forge; those are dev rooms. In a LEVEL he has only the verbs the level serves.
+   - Level 1 might be: run, jump, double jump, the wall slide. Nothing else, no weapon.
+   - Each later level adds ONE verb (the bar, the zoom, the katana...) as its featured dish. It is taught (kishōtenketsu), mastered, then KEPT for the levels after.
+   - The level's theme (layer 4) is usually its new verb.
+2. **ONE WAY IN, the dead ends on purpose.** A station is reached from where WE choose: a door that is shut until a key, a drop you can't climb back up, a bridge that falls behind you. Shortcuts open BACKWARDS (Dark Souls), after you have earned the place, never forwards past it.
+3. **THE ILLUSION OF CHOICE.**
+   - Branches that rejoin (the string of pearls).
+   - Side pockets that pay out and come back.
+   - Two routes to the same station.
+   - VISTAS of places you can't reach yet: the boss keep seen from the start, the summit across the canyon.
+   - Light, paint and motion that lead the eye, so the right way feels like your idea.
+4. **SERVE IN ORDER.** A level's beats are a menu written in advance: the first taste (safe), the build, the surprise, the finale. Never two new things at once. Never a weapon before the moment it is for.
+5. **NO INFO DUMPS.** The game says nothing it can show instead. A verb is introduced by a space that needs it (CLAUDE.md for Culture Wars: "show, don't label"), not by a card.
+6. **THE MENU OF THE GAME ITSELF IS OMAKASE.** The player sees a level select that opens one level at a time. GOD, SPAWN and TOOLS are the kitchen: they stay for development and are hidden from the guest.
+
+### The blueprint gets two new fields
+```
+verbs:   [run, jump, double, wallslide]        <- all he can do in this level; the rest are locked here
+serves:  wallslide                              <- the ONE new verb, taught -> developed -> twisted -> concluded
+```
+The solver only uses chunks whose moves are in `verbs`, and the move table (`tools/moves.json`) sizes them from those verbs alone. A level without the double jump never asks for 5 m.
+
+Sources: [Rails is omakase via Opinionated Software](https://concepts.dsebastien.net/concept/opinionated-software/), [best products are opinionated](https://summify.io/discover/best-products-are-opinionated/), [Jim Brown: The Illusion of Choice (Game Developer)](https://gamedeveloper.com/design/jim-brown-s-level-design-workshop-the-illusion-of-choice), [GMTK: Why Nathan Drake Doesn't Need a Compass](https://amara.org/subtitles/xwcncEJkgSYU/en/2/download/Why%20Nathan%20Drake%20Doesnt%20Need%20a%20Compass%20%20Game%20Makers%20Toolkit.en.txt), [BioShock and the Illusion of Choice](https://the-artifice.com/bioshock-and-the-illusion-of-choice-in-gaming/), [Cornell CS3152: restrict then add mechanics](https://www.cs.cornell.edu/courses/cs3152/2026sp/lectures/lecture2/slides-2.pdf), [Automaton on Breath of the Wild's opening](https://automaton-media.com/en/?p=50929), [Less is More: limiting player abilities](https://www.wayline.io/blog/less-is-more-limiting-player-abilities)
+
 ## THE BLUEPRINT: three scales of dynamics, designed and then GENERATED (his, after m1372)
 
 > *"Primary markers in the level, secondary between them, and tertiary between those -- little dynamics inside medium dynamics inside big

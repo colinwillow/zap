@@ -46,6 +46,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 > blueprints that we can scaffold and build around."*
 
 - **The method:** LEVELDESIGN.md, "THE BLUEPRINT". Three scales (stations, runs, texture), a planned height profile, a measured MOVE TABLE, a parametric CHUNK LIBRARY, a seeded SOLVER, a reachability CHECK, and a PREVIEW page for him to pick from.
+- **OMAKASE (LEVELDESIGN.md):** a level serves a VERB BUDGET (one new verb per level, taught and then kept), one way in, dead ends on purpose, the illusion of choice by branches that rejoin and vistas, and no info dumps. The blueprint gains `verbs:` and `serves:`.
 - **The loop STOPS adding passes to the transcribed Level 1.** Its work, in order:
   1. the move table
   2. the chunk library
