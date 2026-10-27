@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE SHIP, PASS 3: FOAM AND WAKE, BOW SPRAY, THE SUN ON THE WATER, GULLS, THE ISLAND (m@X4@, WORKER A)
+
+- **Foam round the hull and a wake**, in the sea shader. A band of broken, drifting foam hugs the hull's waterline (an ellipse round its
+  footprint). A WAKE trails aft from the stern: widening, streaked and flowing away, and fading out 95 m back.
+- **The sun on the water**: a sparkling path of glints toward the sun (noise-gated, with the reflection's sun term) on top of pass 1's
+  specular.
+- **Bow spray**: when the bow drives down into the swell (its height relative to the ship, from `shipWave`, falling fast), a burst of spray
+  comes off the stem and both bows, with a swoosh if he is forward.
+- **Gulls**: eleven white block gulls with grey wings, in two InstancedMeshes (three draws) (`shipGulls`).
+  - Eight wheel round the masts on their own circles and heights, flapping and gliding by turns.
+  - Three sit on the main yard. They burst up when he comes within 5 m and settle again 14 s later once he is 9 m off.
+- **THE ISLAND** on the horizon off the port bow (about 380 m): a low-poly grey rock and two green hills, a ring of pale sand with a white surf
+  line, 46 block pines up the flanks, and a red three-storey pagoda on the high hill's crown.
+  - It sits in the sea's group, so it rides with the swell, and the haze softens it.
+  - The first render had the pagoda hanging above the hill and the grey rock hiding the green; both are fixed (measured off the hills'
+    shapes).
+- **Checked headless**: the zone boots, the ship builds, no page errors; renders from astern, toward the island and up at the gulls.
+
+SHIPPED UNVERIFIED. The queue's passes 2 and 3 are done. Next is his call: more looks, swimming, or the airship transform (his design first).
+
 ## THE SHIP, PASS 2: IT RIDES THE SWELL; THE HOLD; CLIMBABLE SAILS; ROPE SWINGS (m1374, WORKER A)
 
 - **The ship rides the swell, by holding the SHIP still and moving the WORLD.** `shipWave` is a JS twin of the sea shader's five waves (the
