@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1189 -- Forge-Workshop pass 4: the furnace breathes fire (Building Forge loop, extra pass)
+
+Strike the leather BELLOWS beside the furnace with a blade, an arrow or a parried shot (through `bldHit`). The furnace's mouth
+then roars a jet of flame out of the open front:
+- It lasts `FWORK.jet.t` 1.6 s and reaches `len` 6 m, widening as it goes.
+- It burns him for 8 every .4 s and shoves him back.
+- Bodies caught in it get a `dummyBlow` (8 damage).
+- The bellows pump hard while it lasts. The cooldown is 4 s.
+
+The anvil stands inside the jet, so luring a crowd onto it and stoking the fire is the play. Pass 4 is an extra on a done
+building, so it moves no sandbox box. Next: alternate -- Set 2 #18 Jin Lighthouse pass 1.
+
 ## m1188 -- Robot Barracks pass 3: the polish (Building Forge loop)
 
 Added to the barracks at (30, -42):
