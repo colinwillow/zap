@@ -15,6 +15,19 @@ the research adds is **a layer zero (the numbers), a shape inside each layer, an
   - how far the camera sees
 
   Every gap and ledge is then sized FROM them, never eyeballed. Glowtide already did this (route checker: jump apex 2.81 m, sprint gap 7.6 m).
+- **For us, measure the COMBOS, not just the single moves (his note):** the distance comes from chaining. The rows to measure, each as height and as distance:
+  - the jump, then the double jump
+  - the high jump (backflip)
+  - jump + swipe-swipe-swipe (the air dashes)
+  - double jump + swipes
+  - high jump + swipes
+  - the HIGH BAR launch (super high and far)
+  - the zoom, then zoom + jump
+  - the wall run up (by run-up speed)
+  - the side wall run, then wall run + kick
+  - the WALL SLIDE + wall jump chain between two walls (m1372: per wall, how much height a jump gains)
+
+  The level is built from that table. A gap that needs "double jump + two swipes" is a different beat from one that needs a plain jump, and the table is what lets a gap be built on purpose.
 - **For us:** measure Grumbo's jump, double jump, wall run, zoom and hover once. Write them into LEVELGRID.md, and size the grid cells (7 m, 4.5 m levels) against them.
 
 ## Layer 1: THE RUN (ninja parkour centre)

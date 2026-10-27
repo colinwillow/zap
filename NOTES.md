@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE WALL SLIDE AND THE WALL JUMP (m1372)
+
+His: *"If you jump against the wall and you're not holding a direction, either up or to the side, he purchases against the wall -- a brief moment before he slides down it, a little bit of friction -- so you can jump, purchase on the wall, wall jump to the opposing wall, jump, jump, back and forth, Prince of Persia. That gets us more height and verticality."* And: *"for distance he can high jump then swipe swipe swipe, or double jump then swipe swipe swipe; a high bar launches you super high and super far -- use these pieces to make levels."*
+
+- **A new wall kind, `'slide'`, in the WRUN machinery:**
+  - **The catch:** in the air with the LEFT STICK AT REST (under .3), a tall face (`minH` 1.9) within `slideReach` .35 m catches him, while he is not falling faster than `slideMaxFall` 9 m/s. This runs before the head-on run-up in `wrunAuto`, so a neutral stick clings and a stick held into the wall still runs UP it. Sideways still side-runs (on the tap).
+  - **Holding on:** he faces the wall and holds (`hold` .28 s, his vertical speed eased to 0). Then he slides at up to `slideV` 3.2 m/s (`slideG` 7) for up to `slideT` 2.2 s. A push on the stick (over .6) lets go.
+  - **The wall jump:** either pad's tap kicks him away and up (`wjOut` 6.2, `wjUp` 8.8), facing out. The same wall cannot catch him again for `cool` .35 s, but the facing wall can, so a chimney chains wall to wall.
+- **The picture:** the ledge-hang clip while clinging (greybox; a real wall-slide clip is a slot).
+- **LEVELDESIGN.md layer 0 now lists the COMBOS to measure** (double jump + swipes, high jump + swipes, the bar launch, the wall-jump chain), as he asked.
+- **Live:** `mel.WRUN` (`slide`, `hold`, `slideV`, `wjOut`, `wjUp`). Where to try it: the WALL RUN spawn's two facing walls (4.6 m apart).
+
 ## LEVEL DESIGN RESEARCH: THE RUBRIC (LEVELDESIGN.md, after m1371)
 
 His: *"go out and research what game designers say about levels... if they have a rubric like the one I spitballed, or anything I missed."*
