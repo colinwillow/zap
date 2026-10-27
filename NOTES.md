@@ -156,6 +156,20 @@ SHIPPED UNVERIFIED. The queue's passes 2 and 3 are done. Next is his call: more 
 
 SHIPPED UNVERIFIED. Next: pass 3, foam and wake, bow spray, the sun on the water, gulls, an island.
 
+## THE TEXTURE LIBRARY: GENERATED MAPS, TRIPLANAR ON CODE-BUILT GEOMETRY (m1377)
+
+His: *"start generating texture maps for the endgame assets -- the wood, the marble, the stone, the metal -- so the game starts having a bit more depth"*, and he topped up the OpenAI credits.
+
+- **Generated with his key through the environment's proxy:** `gpt-image-2` (NOT `gpt-image-1`: listed by /v1/models, but generations say "does not exist"), 1024², quality medium, a prompt for a seamless, flat-lit, top-down stylized game texture. Parallel requests fail at the proxy ("upstream request failed"), so generate one at a time.
+- **Made to tile offline** (scratch `seam.py`): it measures the wrap seam against an ordinary pixel step. Over 1.8, it blends in a half-offset copy towards the edges.
+  - wood_planks: 2.91, blended
+  - bronze: 1.54, kept
+  - red_cloth: 1.05, kept
+- **Saved:** WebP q84 in `textures/` (79-427 KB). **`textures` is in `bump.mjs` DIRS** (the landmine).
+- **`triMat(name, { scale, color, rough, metal })`:** a MeshStandardMaterial whose map is sampled by world position on three planes, blended by the normal. That is because our merged code geometry has no UVs (`put` strips them). Use it on anything code-built.
+- **SPAWN > BUILDINGS > Material Swatches** (at 110, -150): a block, a ball and a plank of each map. Rendered headless: wood, bronze and cloth read correctly on all three shapes.
+- **Still generating:** wood_timber, sandstone, stone_blocks, marble and roof_tiles. They join `TEXLIB.names` as they land.
+
 ## THE SHIP, PASS 1: A SAMURAI PIRATE JUNK ON A SUNRISE SEA (m1373)
 
 His: *"a classic retro pirate samurai alien water vessel just floating in an ocean scene, sunrise, really beautiful water shaders, interior and exterior, sails you can climb."*
