@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1123 -- WATCHTOWER pass 3 (polish) -- DONE
+
+BUILDINGS.md queue #2, third pass; `BLDG` entry `pass: 3`, so it shows as done in SPAWN > BUILDINGS.
+- A SHIMENAWA (fat straw rope) slung round the ground floor under the first deck, white paper shide zigzags hanging off it (shrine).
+- Two LONG red diamond-spiral banners down the +x / -x faces, lookout to first deck, on timber rods.
+- A SEARCHLIGHT on the lookout's back corner: an additive cone 20 m long sweeping the forge (`wtowerStep`, `W.sl`).
+- A glowing cyan JIN CORE on the finial, pulsing (`W.core`).
+Plus m1122's bars on the perch tips. Shipped unverified. Next in the queue: the Gatehouse (16, -8).
+
 ## m1122 -- HIGH BARS AT ANY HEIGHT (his: "Why do they only work at ground height?")
 
 **Why:** `HBAR.h` (2.55) was one global number, and every bit of the bar code -- the catch, the swing circle, the hook, the hands' pose,
