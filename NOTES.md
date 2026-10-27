@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## White Heron Castle pass 9 of 10: light and life (X2, WORKER B)
+
+- **Black pines.** Nine of them round the castle, like the reference's foreground: gnarled tube trunks with arms ending in flat cloud
+  pads of needles, after the Refuge's `homePine` but built into the castle's buckets (2 draws for all nine). The trunks are solid.
+- **Lanterns.**
+  - Stone lanterns (toro) in pairs at the entrance gate, the stair's sentry gate and the top gate.
+  - Paper lanterns hang under every corner of the keep's three lower eaves. They glow (emissive) and share the corridors' lantern
+    material.
+- **Flags.** Six NOBORI war flags (the red diamond-spiral, `hwBanner`) on poles: four along the approach's outer wall, two by the top
+  gate. Each sways on its own phase, at 2 draws each.
+- **"The white catching the sun."** The plaster has a little sheen now (roughness .6) and a faint lift (emissive), so the walls flash
+  in the sun and never go grey in the shade.
+- **The herons.** Three white herons wheel round the keep's top at 27 to 32 m: black beaks, legs and wing tips. They beat their wings,
+  then glide by turns, banking into the circle (`heronStep`). 3 draws each.
+
+SHIPPED UNVERIFIED. Next: pass 10, the polish against the reference (proportions, silhouette, colour, draw calls).
+
 ## Shots hit buildings whether or not a turret is standing (Worker A's finding)
 
 `boltHit` only called `turretBlast` (and with it `bldHit`) `if (TURRET.list.length)`. So with no turret anywhere, a bolt or rocket could
