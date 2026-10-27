@@ -14926,7 +14926,7 @@ const BOLT_COL = [.35, .85, 1], BOLT_HOT = [1, .96, .85], BOLT_VIO = [.62, .38, 
 // come from, so a fumble is a spit and a full charge is an event.
 function boltHit(b) {
   const c = b.chg, big = .35 + c * .65;
-  if (TURRET.list.length) turretBlast(b.pos.x, b.pos.y, b.pos.z, b.rocket ? 1.4 : .25, b.rocket ? 4 : 1 + c);
+  turretBlast(b.pos.x, b.pos.y, b.pos.z, b.rocket ? 1.4 : .25, b.rocket ? 4 : 1 + c);     // m1301: ALWAYS -- it ends in `bldHit`, so with no turret standing a shot could not touch a building's blocks, bells or levers (Worker A's finding, m1289)
   if (CWALL.list.length) wallHit(b.pos.x, b.pos.y, b.pos.z, b.rocket ? 1.3 : .35, b.rocket ? 3 : 1 + c, b.rocket ? 'rblast' : 'shot', Math.atan2(b.vel.x, b.vel.z));     // m1016: a bolt chips a chunk, a rocket blows; m1029: never a half wall a hole     // m1011: a rocket of his takes most of one; a full charge 2 bolts' worth
   // A ROCKET'S PICTURE IS SIZED AS A BIG BALL, NOT AS ITS OWN THIN BODY (m189)
   const S = b.rocket ? ROCKET.fx : b.size, dk = b.rocket ? ROCKET.dmgK : 1;

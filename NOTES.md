@@ -5,6 +5,12 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Shots hit buildings whether or not a turret is standing (Worker A's finding)
+
+`boltHit` only called `turretBlast` (and with it `bldHit`) `if (TURRET.list.length)`. So with no turret anywhere, a bolt or rocket could
+not touch any building's blocks, bells, levers, gates or props; buildings with a sentry gun were shootable only by accident. It now always
+calls it. Worker A (X4, all 10 passes done: m1274-m1298) found it at m1289. SHIPPED UNVERIFIED.
+
 ## The Courtyard pass 2 of 10: the Watchtower Gate (C1)
 
 - **The tower.** His reference's tower now stands at the lane's north end, STRADDLING the north wall over the INNER GATE:
