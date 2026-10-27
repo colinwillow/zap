@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1266 -- Great Red Pagoda pass 2 of 10: the reference's detail (X1)
+
+What was added, storey by storey, against `red_pagoda_tower.webp`:
+- **Bracket clusters (tokyo).** They sit under every eave, every .9 m along every side: two stepped dark-lacquer blocks and a gold cap,
+  the band of carving that makes the reference's eaves read as deep.
+- **Hip ribs.** Dark tile ridges run from every roof corner up to the wall (to the spire's foot on the top roof).
+- **Upturned corner tips.** A gold flame finial tilts outward off every corner.
+- **Tile ribs.** Thin dark ridges run down every roof face every .45 m.
+- **Lattice.** A grid of dark slats now covers every paper window of the upper storeys.
+- **Balcony rails.** Every balcony rail gets a gold cap.
+
+All of it, hundreds of small pieces, goes into per-material buckets (`mg`, `mbox`, `mrod`) merged ONCE at the end of the build, so the
+whole of pass 2 is about four extra draw calls. SHIPPED UNVERIFIED. Next: pass 3, the pavilion at its foot and the red fence with
+gold flame finials.
+
 ## m1262 -- THE GREAT RED PAGODA, pass 1 of 10 (his 10-pass experiment, X1)
 
 *"Let me get you an image of a tower I think would be cool to build"* -- the red pagoda (`images/korajin/ref/red_pagoda_tower.webp`).
