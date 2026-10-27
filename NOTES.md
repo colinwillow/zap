@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE BLUEPRINT METHOD (docs, after m1372)
+
+His: three scales of dynamics (primary markers, secondary between them, tertiary between those), and *"figure out how to generate a good grid blockout of these in three dimensions... design really interesting blueprints we can scaffold and build around"*. And: Level 1 was built too literally from his generated test image.
+
+- **Written up:** LEVELDESIGN.md "THE BLUEPRINT" covers:
+  - STATIONS, RUNS and TEXTURE (the three scales)
+  - the web (over and under, sightlines, loop-backs)
+  - the height profile
+  - the generation pipeline (move table → chunk library → seeded solver → reachability check → preview page)
+  - an example blueprint for Level 1 v2
+- **STEER 000 in BUILDINGS.md:** the loop stops adding passes to the transcribed Level 1 and builds the pipeline in order. First: the MOVE TABLE, measured headless from the shipped physics.
+- **No code.** Docs only.
+
 ## THE WALL SLIDE AND THE WALL JUMP (m1372)
 
 His: *"If you jump against the wall and you're not holding a direction, either up or to the side, he purchases against the wall -- a brief moment before he slides down it, a little bit of friction -- so you can jump, purchase on the wall, wall jump to the opposing wall, jump, jump, back and forth, Prince of Persia. That gets us more height and verticality."* And: *"for distance he can high jump then swipe swipe swipe, or double jump then swipe swipe swipe; a high bar launches you super high and super far -- use these pieces to make levels."*

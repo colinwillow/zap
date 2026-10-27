@@ -84,6 +84,69 @@ the research adds is **a layer zero (the numbers), a shape inside each layer, an
 - **Loop-back shortcuts:** they make the puzzle layer pay for itself.
 - **Zones:** leash, line of sight, never unavoidable.
 
+## THE BLUEPRINT: three scales of dynamics, designed and then GENERATED (his, after m1372)
+
+> *"Primary markers in the level, secondary between them, and tertiary between those -- little dynamics inside medium dynamics inside big
+> dynamics -- weaving a web of tension, motion, movement and logic. We need to figure out how to generate a good grid blockout of these in
+> three dimensions. You built my level very literally, the colours and the heights from a test image I had generated. We need to design really
+> interesting blueprints that we can then scaffold and build around."*
+
+**He is right about Level 1:** its path, heights and colours were transcribed from a generated test image, so nothing in it was DESIGNED. From here, a level starts as a blueprint at three scales, and the geometry is GENERATED from the blueprint, never typed cell by cell.
+
+### The three scales
+| scale | what it is | size | what it carries |
+|---|---|---|---|
+| **PRIMARY** (the spine) | 4-6 STATIONS: the start, the key places of the puzzle, the boss arena | a station is a room or plateau, 15-30 m | the layer-2 locks and keys, the landmark views, the rest and checkpoint, the height profile (see below) |
+| **SECONDARY** (the runs) | the route between two stations: 3-6 MOVES in kishōtenketsu order (teach, develop, twist, conclude) | a run is 40-120 m and 30-90 s | ONE featured move per run (wall jumps, bars, zips...), its rest at the end, and its risk-reward side pocket |
+| **TERTIARY** (the texture) | inside each move: small hops, a kerb, a lip to mantle, a duck, a coin line tracing the jump's arc, a moving platform's timing | 1-8 m | the moment-to-moment rhythm: something to do every 2-3 s |
+
+**The web:**
+- **The spine CROSSES ITSELF in 3D** (over and under), so a run passes beneath a station you will stand on later.
+- **Stations SEE each other,** so from every rest you can see where you have been and where you are going.
+- **Keys open LOOP-BACK shortcuts** between stations, so the level folds.
+
+### The height profile (the verticality is planned, like a rollercoaster)
+- Each level gets a profile before anything else: the station heights in order. For example: start 0 → climb to 12 → drop to 4 → the big climb to 30 → a ride down → the finale at 10.
+- Big climbs are where the featured verticality moves live (wall-jump chimneys, bar chains, wall runs up). Drops are rides (zips, slides, falls into water).
+
+### How the blockout is generated
+1. **The MOVE TABLE** (layer 0): each move and COMBO, measured from the shipped physics, as how far and how high it can go (minimum, comfortable, maximum). The table is the contract: a generated gap is never longer than its move's "comfortable".
+2. **The CHUNK LIBRARY:** each move is a parametric piece of geometry with an IN port and an OUT port (position, height, heading). The pieces:
+   - gap jump, double-jump gap, swipe gap
+   - wall-jump chimney
+   - bar chain, the long bar
+   - wall run up / along
+   - ladder, ramp, stairs
+   - movers, a rope, a zip, a ride (the zeppelin)
+   - a rest pad
+   - a station room
+
+   Its size comes from the move table, never from feel.
+3. **The SOLVER:** it lays the stations on a coarse 3D grid (their x, z and profile height). Then, for each run, it chains chunks whose in/out deltas add up to the gap between the stations. It keeps them out of each other's space (1 m voxels, with over/under allowed and clearance kept), and puts tertiary texture inside each one. It is seeded, so one blueprint gives many candidate blockouts.
+4. **THE CHECK:** every chunk is walked by the route checker against the move table. Is every gap makeable, every climb climbable, every drop survivable or caught? A blockout that fails is discarded, not shipped.
+5. **THE PREVIEW:** before building, a page with the plan from above, the side elevation (the height profile with every chunk on it), and the station-to-station graph. He picks a candidate on his phone, and only then is it built and played as layer 1.
+
+### What a blueprint looks like (the authored part: everything else is generated)
+```
+LEVEL 1  "The Climb"      theme: (layer 4, later)
+profile: S 0 | A 9 | B 4 | C 27 | D 31 | BOSS 12
+stations:  S start yard | A lantern tower (key: drop the bridge) | B sunken court (rest, sees C) | C the cliff face (key: the candle)
+           D the summit (sees everything; zip to BOSS) | BOSS the dojo (open, flat, 30 m)
+runs:      S->A  teach: jump, double jump, a low wall run          (featured: double jump + swipe gaps)
+           A->B  ride: zip down, then a slide                       (rest at B)
+           B->C  THE BIG CLIMB: wall-jump chimney x3, a bar chain  (side pocket: a ring + cache off the chimney)
+           C->D  twist: wall runs over a pit, timed movers
+           D->BOSS  the long zip over the whole level
+loops:     the key at A drops a bridge B->S (a shortcut home); the candle at C opens a lift C->B
+```
+
+### The build order for this (it replaces adding passes to the transcribed Level 1)
+1. **The MOVE TABLE:** measure every move and combo from the shipped physics, headless, scripted inputs. Output: a table in LEVELGRID.md, and a JSON the generator reads.
+2. **The CHUNK LIBRARY:** the parametric pieces with ports, each viewable on its own in the forge.
+3. **The BLUEPRINT format + SOLVER + CHECK.**
+4. **The PREVIEW page:** plan, elevation and graph, with candidates to pick from.
+5. **Level 1 v2:** the blueprint above (or his), generated and picked, then played as layer 1. The transcribed Level 1 stays on the menu as "Level 1 (sketch)" for comparison until v2 replaces it.
+
 ## Grid Level 1 against the rubric (now)
 | | state |
 |---|---|

@@ -5,6 +5,21 @@ Every time you complete the third pass on a building, add it to the inventory I 
 run on it, swing on it, blow it up and repair it. Make various TYPES of buildings that are modular and will eventually fit together, with
 different functions: bars and ramps, interior and exterior, turrets, ballistae, beams -- floating flying ship buildings, zeppelins, towers."*
 
+## STEER 000 (his, after m1372) -- BLUEPRINTS FIRST, GENERATED BLOCKOUTS, NOT A TRANSCRIBED IMAGE
+
+> *"Primary markers, secondary between them, tertiary between those -- little dynamics inside medium inside big... figure out how to generate
+> a good grid blockout of these in three dimensions... You built my level very literally from a test image. We need to design really interesting
+> blueprints that we can scaffold and build around."*
+
+- **The method:** LEVELDESIGN.md, "THE BLUEPRINT". Three scales (stations, runs, texture), a planned height profile, a measured MOVE TABLE, a parametric CHUNK LIBRARY, a seeded SOLVER, a reachability CHECK, and a PREVIEW page for him to pick from.
+- **The loop STOPS adding passes to the transcribed Level 1.** Its work, in order:
+  1. the move table
+  2. the chunk library
+  3. the blueprint format, solver and check
+  4. the preview
+  5. Level 1 v2 from a blueprint
+- **Level 1 (the sketch) stays on the menu** to compare against.
+
 ## STEER 00 (his, after m1369) -- BUILD A LEVEL IN LAYERS, AND EACH LAYER HAS TO HOLD UP ON ITS OWN
 
 > *"I spawn in and I'm just getting hammered with cannonballs before I've even moved. I need to be able to walk the level first and foremost.
