@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1190 -- Jin Lighthouse pass 1 (Building Forge loop, Set 2 #18)
+
+The lighthouse stands at (-46, 30), `LHOUSE`, in BLDG.list as `lhouse`:
+- **Keeper's room:** 8 x 8 m with breakable walls on all four sides and a door in the east wall.
+- **Ramp:** walkable triangles up the north side, 12 m long at a .3 slope, from the ground at the east end to a landing onto the
+  roof slab at 3.85 m.
+- **Spiral stair:** from the roof, 48 treads of .3 wind 1.8 turns round a slim stone shaft with bronze bands. Each tread is a thin
+  collider slab, so the turn below keeps about 8 m of headroom.
+- **Gallery:** a walkable triangle ring at 18.25 m with a red rail. The rail is visual only for now.
+- **Lantern room:** a glass drum on bronze posts with a spinning Jin crystal inside and a bronze cap.
+- **Beam:** two long additive cones that sweep the whole forge at .35 rad/s, tilted slightly down.
+- **Grapple ring:** 6.5 m over the gallery.
+
+What wants a look: whether the ramp's landing meets the roof cleanly, and whether every tread can be climbed. The rise is .3
+against his .357 step. Next: alternate -- Spider Hangar pass 4.
+
 ## m1189 -- Forge-Workshop pass 4: the furnace breathes fire (Building Forge loop, extra pass)
 
 Strike the leather BELLOWS beside the furnace with a blade, an arrow or a parried shot (through `bldHit`). The furnace's mouth
