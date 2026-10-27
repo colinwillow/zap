@@ -200,7 +200,11 @@ His: *"start generating texture maps for the endgame assets -- the wood, the mar
 - **Saved:** WebP q84 in `textures/` (79-427 KB). **`textures` is in `bump.mjs` DIRS** (the landmine).
 - **`triMat(name, { scale, color, rough, metal })`:** a MeshStandardMaterial whose map is sampled by world position on three planes, blended by the normal. That is because our merged code geometry has no UVs (`put` strips them). Use it on anything code-built.
 - **SPAWN > BUILDINGS > Material Swatches** (at 110, -150): a block, a ball and a plank of each map. Rendered headless: wood, bronze and cloth read correctly on all three shapes.
-- **Still generating:** wood_timber, sandstone, stone_blocks, marble and roof_tiles. They join `TEXLIB.names` as they land.
+- **m1381 + this build: ALL EIGHT are in.**
+  - **Streaming fixed the proxy failures.** A plain request failed as "upstream request failed" about half the time; streamed (`"stream": true`, `partial_images: 1`, the way `blender-addons/pipeline/imagegen.py` does it), all three remaining maps came through first time.
+  - **The roof tiles** (seam 4.6x, the worst) are healed by INPAINTING (scratch `heal.py`): roll the map half a tile so the wrap seams cross in the middle, mask a band along the cross, `/v1/images/edits` repaints just the band, and the original pixels are kept outside it. It tiles because its edges are the untouched interior. A plain blend had left a smeared column. **Use heal for any structured map; blend only for organic ones.**
+  - **The sandstone** is cream with lavender spots, made to match Grumbo's home.
+
 
 ## THE SHIP, PASS 1: A SAMURAI PIRATE JUNK ON A SUNRISE SEA (m1373)
 

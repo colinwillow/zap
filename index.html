@@ -9903,7 +9903,7 @@ function shipSea(g) {
 // depth"*). Tileable 1024 maps generated with his OpenAI key (gpt-image-2), made seamless offline, in `textures/`. Our code-built geometry is MERGED
 // with its UVs stripped (`put` keeps position + normal, or mergeGeometries returns null), so a map is laid on by TRIPLANAR projection from the
 // world position: three samples (x, y and z planes), blended by the normal. `triMat(name, { scale: metres per tile, color, rough, metal })`.
-const TEXLIB = { names: ['wood_planks', 'stone_blocks', 'bronze', 'red_cloth', 'roof_tiles'], cache: {}, aniso: 8 };     /* the generated set so far; the rest join as they arrive */
+const TEXLIB = { names: ['wood_planks', 'wood_timber', 'sandstone', 'stone_blocks', 'marble', 'bronze', 'red_cloth', 'roof_tiles'], cache: {}, aniso: 8 };
 function texGet(name) { const C = TEXLIB.cache; if (C[name]) return C[name];
   const t = new THREE.TextureLoader().load(A('textures/' + name + '.webp')); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = TEXLIB.aniso; return (C[name] = t); }
 function triMat(name, o) { o = o || {}; const m = new THREE.MeshStandardMaterial({ color: o.color != null ? o.color : 0xffffff, roughness: o.rough != null ? o.rough : .8, metalness: o.metal || 0, map: texGet(name), side: o.side || THREE.FrontSide });
