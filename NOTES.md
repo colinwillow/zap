@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1209 -- Senbon Torii pass 2: the gates glow, and foxfire (Building Forge loop)
+
+**THE GATES GLOW** (his spec: "at night-ish the gates glow"):
+- A lantern band under every cap. It is one `InstancedMesh` with a colour per gate, so it is still one draw call.
+- Each band warms to a glowing amber as he walks under its gate, with a soft rising chime, flickers while lit and fades over
+  `glowT` 20 s.
+
+**FOXFIRE.** Climb the whole tunnel (all twenty lit) and step to the fox shrine's offering stand. The shrine grants two blue
+KITSUNE-BI:
+- They orbit him for `foxT` 30 s.
+- Each, every 1.4 s, darts at the nearest standing body within `foxR` 7 m and burns it (`dummyBlow`, `foxDmg` 6, a knock),
+  trailing blue sparks.
+- The shrine rests 60 s after granting it.
+
+Next: alternate -- an extra pass (5) on the Gatehouse.
+
 ## m1208 -- Watchtower pass 5: the pulley basket (Building Forge loop, extra pass)
 
 A wicker BASKET now hangs west of the tower at (-21.4, -6.8), outside the ramp:
