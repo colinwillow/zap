@@ -5,6 +5,30 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1111 -- the Refuge rebuilt on colinwillow/water's water: a mountain lake, a pebble shore, and Japanese pieces
+
+**What he said:** *"Another repo to take example from could be /water -- simple low poly, a hut on an island... very tropical, but the water
+shader is simple and looks good."* Then: *"I like all the suggestions... implement the stuff you suggested."* (The open question --
+island at sea, mountainside, or island in a mountain lake -- he left open; this build is the island in a MOUNTAIN LAKE, `HOME`/`RW` hold it.)
+
+- **THE WATER (`RW`, `rwBuild`, `rwPatch`):** water's own technique, ported: ONE height function (`rwHeight`) for the land, the lake bed, the
+  shore foam (a baked 256 height map) and the depth; every opaque thing through `rwPatch` (caustics, the light down and the view back up
+  with per-channel absorption -- the turquoise shallows are the bed seen through the water); the surface ONE alpha-blended draw (Fresnel sky,
+  glint, foam, 32 ripple rings); its sky dome, its fog and its water on the same uniforms. Its golden-hour palette. No render targets, no
+  float textures. The island-at-sea system (`ISLE`) is no longer used here.
+- **THE LAKE'S RULE (`homeStep`):** wading is fine (a ring every .24 s while he moves in the water); past `deepAt` -.95 he is put back where
+  he last stood dry. `groundAt` has no floor at 0 here (the bed is the floor), and the spawn's height is probed from above (the land is ~1.5 m).
+- **THE MOUNTAINS:** 26 low-poly ridges at 320-580 m, snow on their tops, through the same fog.
+- **THE PIECES (`homeDress`, code-built, one draw per material, his models replace them):** a vermilion TORII on the north shore; four stone
+  LANTERNS (toro) on the hut's approach, their windows lit; a DOCK out into the lake (walkable) with a SAMPAN moored at its end, riding the
+  CPU copy of the waves (`rwWaveAt`); a BAMBOO grove behind the hut; a gnarled BLACK PINE with cloud pads and a few glowing alien pods; a
+  small CHERRY. The lanterns still drift. The hut sits on a levelled pad (`HOME.padY`).
+- **Real loop (`home.cjs`, `lake.cjs`):** 25 draw calls, 214k tris. Spawned on the land at y 1.6; walking at the hut he stops at its face;
+  dropped in deep water he is put back on land; walking the shallows: 7 rings in 1.5 s. Renders: the island, the torii, the lanterns, the
+  dock and boat, the bamboo, the pine, the cherry, turquoise shallows, the mountains round the lake.
+
+**Not yet:** his own body is not `rwPatch`ed, so his legs read dry when he wades; low mist; the dusk light from `environment`; sun shafts.
+
 ## m1110 -- THE REFUGE (Korajin's third place) and the splash follows the last game
 
 **What he said:** *"Make the splash change with the last game played."* / *"I added a building, models/buildings korajin_bld_01 -- maybe the

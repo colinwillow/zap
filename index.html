@@ -876,10 +876,10 @@ body.desk.free #deskHint { display: block; }
   <h1>WEIRDPORT</h1>
   <div class="msg" id="bootMsg">loading</div>
   <div class="bar"><i id="bootBar"></i></div>
-  <div class="bld">BUILD <span id="bootBuild">m1110</span></div>
+  <div class="bld">BUILD <span id="bootBuild">m1111</span></div>
 </div>
 
-<div class="chip" id="build"><b id="buildN">m1110</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
+<div class="chip" id="build"><b id="buildN">m1111</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
 <div id="splash" aria-label="tap to start"><img class="blur" alt=""><img class="main" alt="Zap and Clancy"><div class="glow"></div><div class="bn"></div></div>
 <script>
 // m879 (STEER 02:22): THE SPLASH, before the module (so it shows on the first paint, while the boot carries on behind it). The image's
@@ -988,7 +988,7 @@ import { KTX2Loader } from './vendor/KTX2Loader.js';
 import { clone as skeletonClone } from './vendor/SkeletonUtils.js';
 import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
 
-const BUILD = 'm1110';
+const BUILD = 'm1111';
 /* ASSETS:START */
 const ASSETS = {"models/alien_lizard.glb":"faffcf4c","models/alien_lizard_ktx2.glb":"05da2a20","models/skate.glb":"0c612d5e","models/skateboard.glb":"5ba93796","models/characters/alien_antenna_game.glb":"f3ccf328","models/characters/alien_antenna_game_ktx2.glb":"28afac8c","models/characters/alien_female_purple.glb":"1c73eef1","models/characters/alien_female_purple_ktx2.glb":"fc914afb","models/characters/alien_goblin.glb":"3e91bffb","models/characters/alien_goblin_chains.glb":"e72d1550","models/characters/alien_goblin_game.glb":"cfabd926","models/characters/alien_grey_medium.glb":"5a779e8e","models/characters/alien_grey_medium_ktx2.glb":"61600c3e","models/characters/alien_rollerskate_blue.glb":"abf0917c","models/characters/alien_rollerskate_blue_ktx2.glb":"e9a7948a","models/characters/alien_warrior.glb":"f5cc9c49","models/characters/alien_warrior_ktx2.glb":"a13fb7b6","models/characters/beautiful_asian.glb":"910f6565","models/characters/beautiful_asian_ktx2.glb":"35281eef","models/characters/beautiful_blonde.glb":"edddc421","models/characters/beautiful_blonde_ktx2.glb":"89cf3899","models/characters/brute_warboss_armor.glb":"cc5c7936","models/characters/ceo_alien.glb":"844dc3a7","models/characters/ceo_human.glb":"ec289865","models/characters/clancy.glb":"4b9d271f","models/characters/clancy_ktx2.glb":"74edbc6e","models/characters/colin.glb":"99d38b7d","models/characters/colin_ktx2.glb":"35040f87","models/characters/contruction_worker.glb":"8bd3d7ce","models/characters/contruction_worker_ktx2.glb":"3df8c344","models/characters/dummy_officer.glb":"724965ac","models/characters/dummy_officer_ktx2.glb":"db640cda","models/characters/fat_activist_01.glb":"3c566fee","models/characters/fat_activist_01_ktx2.glb":"b9328df4","models/characters/fat_biker_01.glb":"576b7cf5","models/characters/fat_biker_01_ktx2.glb":"7142cfad","models/characters/fat_biker_02.glb":"ab5d7ec7","models/characters/fat_biker_02_ktx2.glb":"28cec6cc","models/characters/fat_hippie.glb":"f09a260d","models/characters/fat_hippie_ktx2.glb":"0be745a4","models/characters/fat_hipster.glb":"9cf45ffb","models/characters/fat_hipster_ktx2.glb":"18106ff3","models/characters/fat_secret_service.glb":"6d546fb0","models/characters/fat_secret_service_ktx2.glb":"a23a304e","models/characters/fat_trump.glb":"5de6bc56","models/characters/fat_trump_ktx2.glb":"a0ddaf4d","models/characters/firefighter.glb":"ebde005d","models/characters/firefighter_ktx2.glb":"ccf93c96","models/characters/goblin_game.glb":"db1cf0e0","models/characters/hick_skinny.glb":"1ebe78e8","models/characters/hick_skinny_ktx2.glb":"1e93f0ed","models/characters/hobo_01.glb":"34e80b1d","models/characters/hobo_01_ktx2.glb":"69497677","models/characters/jack.glb":"ab009b9b","models/characters/jack_ktx2.glb":"1f4c9f7f","models/characters/moussa.glb":"6d80b1cf","models/characters/moussa_ktx2.glb":"66e040f8","models/characters/orc_game.glb":"d9aa816d","models/characters/proxy_ceo.bin":"6eca0c34","models/characters/proxy_ceo.jpg":"fadc9d0a","models/characters/proxy_ceo.json":"e62a7975","models/characters/proxy_ceo_alien.bin":"be247ecc","models/characters/proxy_ceo_alien.jpg":"8f8bf8fc","models/characters/proxy_ceo_alien.json":"eb23e28f","models/characters/proxy_hick.bin":"4485560e","models/characters/proxy_hick.jpg":"8c331965","models/characters/proxy_hick.json":"d85a0d36","models/characters/proxy_zap.bin":"dd7b300e","models/characters/proxy_zap.jpg":"2e7330ae","models/characters/proxy_zap.json":"b3b42754","models/characters/proxy_zap2.bin":"51088f46","models/characters/proxy_zap2.jpg":"a954a815","models/characters/proxy_zap2.json":"5c50abb7","models/characters/rept_heavy_armor.glb":"934661c7","models/characters/samurai_game.glb":"c7940015","models/characters/xray_skeleton.glb":"46480317","models/characters/zap.glb":"5e5cca54","models/characters/zap_02.glb":"4ff12de0","models/characters/zap_02_lib.glb":"e23d91da","models/characters/zap_ktx2.glb":"4b29d886","models/characters/zoar.glb":"423a9de9","models/characters/zoar_game.glb":"d20a3736","models/vehicles/dump_truck.glb":"d870dc18","models/vehicles/dump_truck_ktx2.glb":"21ee7059","models/vehicles/motorcycle_fatboy.glb":"9ed9be28","models/weapons/alien_antenna_blaster_game.glb":"54083b44","models/weapons/alien_antenna_hammer_game.glb":"707b8a27","models/weapons/alien_launcher.glb":"ba8ab96a","models/weapons/hammer.glb":"3335fdf2","models/weapons/shield_brute.glb":"c6e5593f","models/weapons/spikey_mace.glb":"dcd43acd","models/weapons/w_brute_cleaver.glb":"07a97580","models/weapons/w_rept_maul.glb":"84c3a1a4","models/buildings/alien_base_01.glb":"d9b9fd7f","models/buildings/alien_base_01_ktx2.glb":"6cbbfef2","models/buildings/korajin_bld_01.glb":"edf3178e","models/towers/alien_tower_01.glb":"98d23375","models/towers/alien_tower_01_ktx2.glb":"47597651","models/streets/modular_streets_kit.glb":"6a4bcaa5","models/toon_city/impact_marks.json":"2b616620","models/toon_city/impact_marks_atlas.ktx2":"efe0840e","models/toon_city/impact_marks_atlas.png":"490ed049","models/toon_city/toon_city_breakables.glb":"29bddbc8","models/toon_city/toon_city_collision.glb":"fb3a693f","models/toon_city/toon_city_obb.json":"81c18a47","models/toon_city/toon_city_visual.glb":"5df62285","models/toon_city/toon_city_visual_ktx2.glb":"cf080531","models/toon_city/weirdkit_tint.js":"f6e9d802","models/toon_city_kit/toon_city_collision.glb":"5540a364","models/toon_city_kit/toon_city_kit_buildings.glb":"590e53f0","models/toon_city_kit/toon_city_kit_buildings_ktx2.glb":"e6dff3a3","models/toon_city_kit/toon_city_kit_pieces.glb":"8232bd6f","models/toon_city_kit/toon_city_kit_twins.glb":"fcc9fdfc","models/toon_city_kit/toon_city_visual.glb":"45cf2957","models/toon_city_kit/toon_city_visual_ktx2.glb":"f26a6984","models/toon_city_kit/weirdkit_detile.js":"dd05bd70","models/characters/morph/shapes.bin":"4e680384","models/characters/morph/shapes.json":"abfc949d","models/characters/forged/alien_female_purple.glb":"0308860e","models/characters/forged/alien_goblin_game.glb":"4925f5a6","models/characters/forged/alien_rollerskate_blue.glb":"bcccc63f","models/characters/forged/alien_warrior.glb":"a067d5ab","models/characters/forged/beautiful_asian.glb":"f1c7baa5","models/characters/forged/beautiful_blonde.glb":"f83172bd","models/characters/forged/brute_warboss_armor.glb":"dc15dc94","models/characters/forged/ceo_alien.glb":"20659ac3","models/characters/forged/ceo_human.glb":"326d9e7e","models/characters/forged/clancy.glb":"19fabcce","models/characters/forged/contruction_worker.glb":"99fe1a17","models/characters/forged/dummy_officer.glb":"87a11843","models/characters/forged/fat_activist_01.glb":"6546645c","models/characters/forged/fat_biker_01.glb":"943f38ea","models/characters/forged/fat_biker_02.glb":"5d63a0cf","models/characters/forged/fat_hippie.glb":"ff0539ba","models/characters/forged/fat_hipster.glb":"792b92d8","models/characters/forged/fat_secret_service.glb":"7c29d1da","models/characters/forged/firefighter.glb":"20410689","models/characters/forged/goblin_game.glb":"3c813462","models/characters/forged/hick_skinny.glb":"d9232022","models/characters/forged/hobo_01.glb":"37d266c9","models/characters/forged/index.json":"01be89cd","models/characters/forged/jack.glb":"712b6241","models/characters/forged/moussa.glb":"74d19c70","models/characters/forged/orc_game.glb":"7bf3c227","models/characters/forged/rept_heavy_armor.glb":"01e631b0","models/characters/forged/samurai_archer.glb":"04db413e","models/characters/forged/samurai_game.glb":"a946c148","models/characters/forged/zap.glb":"10eda718","models/characters/forged/zap_02.glb":"fd513cea","models/characters/forged/zap_02_lib.glb":"fd513cea","models/characters/forged/zoar_game.glb":"b032a28e","images/crack_sprite_01.ktx2":"4aa55fde","images/crack_sprite_01.png":"16b52e8c","images/fire_sprites_01.ktx2":"922e1191","images/fire_sprites_01.png":"f87e2696","images/fire_sprites_02.ktx2":"e0cbfe1d","images/fire_sprites_02.png":"b373a6fd","images/fire_sprites_03.ktx2":"4fbbb985","images/fire_sprites_03.png":"7eece336","images/geyser_sprites_01.png":"b6325470","images/hdri_game.ktx2":"0feb5c79","images/hdri_game.png":"dac55f41","images/splash_zap_n_clancy.webp":"52a9d8a4","images/water_sprites_01.ktx2":"326924c5","images/water_sprites_01.png":"31e12659","audio/blaster_sound_01.mp3":"40d99583","audio/blaster_sound_02.mp3":"4bd7bb7c","audio/box_break_01.mp3":"e4127980","audio/electricity_beam_01.mp3":"986db8c9","audio/explosion_small.mp3":"f154a537","audio/metal_clang_01.mp3":"a333bd27","audio/metal_clang_02.mp3":"1e3ebbd6","audio/metal_clang_03.mp3":"afe44812","audio/metal_ping_01.mp3":"8ffca1a0","audio/plasma_canon.mp3":"e32c324d","audio/powerup_01.mp3":"48fbbe08","audio/swoosh_01.mp3":"193db185","audio/swoosh_02.mp3":"19145e70","audio/swoosh_03.mp3":"544fdffb","audio/swoosh_04.mp3":"843bee5d","audio/plasma_sounds/plasma_01.mp3":"e71c010f","audio/plasma_sounds/plasma_02.mp3":"ac3b1c75","audio/plasma_sounds/plasma_03.mp3":"eaa59355","audio/plasma_sounds/plasma_04.mp3":"bc7865e0","audio/plasma_sounds/plasma_05.mp3":"1d821cd0","audio/plasma_sounds/plasma_06.mp3":"cb979fbe","audio/plasma_sounds/plasma_hit.mp3":"30e5af5c","audio/alien_orc_grunt_sounds/alien_orc_grunt_01.mp3":"d6f4b343","audio/alien_orc_grunt_sounds/alien_orc_grunt_02.mp3":"78afc603","audio/alien_orc_grunt_sounds/alien_orc_grunt_03.mp3":"972c524a","audio/alien_orc_grunt_sounds/alien_orc_grunt_04.mp3":"b0ce76eb","audio/alien_orc_grunt_sounds/alien_orc_grunt_05.mp3":"1f0ba1f4","audio/alien_orc_grunt_sounds/alien_orc_grunt_06.mp3":"4f749866","audio/alien_orc_grunt_sounds/alien_orc_grunt_07.mp3":"dcf75925","audio/hit_sounds/hit_sound_01.mp3":"befaa2be","audio/hit_sounds/hit_sound_02.mp3":"73bc4433","audio/hit_sounds/hit_sound_03.mp3":"24b181e4","audio/hit_sounds/hit_sound_gound_01.mp3":"86ee2674","audio/hit_sounds/hit_sound_ground_02.mp3":"8a7cac73","audio/hit_sounds/hit_sound_plasma_01.mp3":"9abc0202","audio/hit_sounds/hit_sound_plasma_02.mp3":"6aaf0fe5","audio/creature_noises/creature_noise_01.mp3":"cbcc6ee7","audio/creature_noises/creature_noise_02.mp3":"201a8247","audio/creature_noises/creature_noise_03.mp3":"97680811","audio/creature_noises/creature_noise_04.mp3":"6f734df2","audio/creature_noises/creature_noise_05.mp3":"6f736441","audio/creature_noises/creature_noise_06.mp3":"992712e9","audio/creature_noises/creature_noise_07.mp3":"d9ad04b3","audio/footsteps/footstep_2_l.mp3":"abeabfbe","audio/footsteps/footstep_2_r.mp3":"7dd16046","audio/footsteps/footstep_l.mp3":"b66e579b","audio/footsteps/footstep_r.mp3":"96e13433","models/props/prop_hydrant.glb":"f157fee9","models/props/prop_hydrant_collision.glb":"0bbfc4d2","models/creatures/3_headed_dog.glb":"9263480a","models/creatures/blue_dragon.glb":"d72f4da7","models/creatures/mech_lightning_dragon.glb":"5935bb67"};
 /* ASSETS:END */
@@ -11728,7 +11728,7 @@ const ISLE = {
   rect: null, land: null, water: null, rockM: null, lmat: null, wmat: null,
   safe: null, safeTk: 0, splashes: 0, t: 0, tris: 0, texN: 0, rays: null,
 };
-const isleWorld = () => !!ISLE.on && (inTK() || inTC() || WORLD.now === 'home');     // m1110: the refuge is an island too
+const isleWorld = () => !!ISLE.on && (inTK() || inTC());     // m1111: the refuge has its own lake (`RW`)
 const seaY = () => ISLE.live ? ISLE.sea : 0;
 // the floor at zero, everywhere it still means something
 function gFloor0(x, z) {
@@ -12079,7 +12079,7 @@ const _bnpF = { d: 0, nx: 0, nz: 0, cx: 0, cz: 0 };
 // here" rather than 0 is what leaves the floor at zero doing its job off the edge of the slice.
 function groundAt(x, z, y, step) {
   // outside the city on the island there is no floor at zero -- the sea is not glass (m264)
-  let best = ISLE.live ? gFloor0(x, z) : (WORLD.now === 'alien' || WORLD.now === 'plaza') ? -1e3 : 0;      // m432: the alien terrain dips under 0 (m438: and the plaza's)
+  let best = ISLE.live ? gFloor0(x, z) : (WORLD.now === 'alien' || WORLD.now === 'plaza' || WORLD.now === 'home') ? -1e3 : 0;     // m1111: the refuge's lake bed too      // m432: the alien terrain dips under 0 (m438: and the plaza's)
   // m512: UNDER THE CITY the island's floor is not a floor -- it counts only when it is within reach ABOVE the query, the rule
   // every box already obeys. Without it nothing below the ground could ever be stood on (gFloor0 ignores y). Inside
   // `UNDER.box` only, so no caller above ground sees a change.
@@ -56707,62 +56707,254 @@ async function buildAlienWorld() {
 // a skirt round the base, so it is SOLID -- rasterised into columns -- and the hut is walked round, not into; its glTF lights dropped); a weird
 // tree (`homeTree`: a twisted trunk, puffed magenta-and-teal crowns, glowing pods); and `lanterns` paper lanterns drifting over the land and
 // the sea, one instanced draw. Next passes: the dock and the boats, bamboo, the floating isles in the sky.
-const HOME = { live: 0, ground: 22, hut: { file: 'models/buildings/korajin_bld_01.glb', w: 9, at: [0, -7], yaw: 0 }, spawn: [0, 9], tree: [12, -3],
-  lanterns: 22, lan: null, t: 0, hutObj: null, stat: {},
-  isle: { coast: 9, wobble: 7, minLand: 6, beach: [6, 12], rocks: 26, grassFall: [.16, .4, .17] } };
+const HOME = { live: 0, padY: 1.15, hut: { file: 'models/buildings/korajin_bld_01.glb', w: 9, at: [0, -7], yaw: 0 }, spawn: [0, 9],
+  toriiA: Math.PI * .5, toro: [[-3.2, 3], [3.2, 3], [-3.2, -.5], [3.2, -.5]], dockA: Math.PI * .22, bamboo: [-12, -10], pine: [11, -6], cherry: [-9, 6],
+  ht: { size: 160, n: 256, lo: -8, hi: 8 }, lanterns: 22, lan: null, t: 0, hutObj: null, boat: null, stat: {} };
 const inHome = () => WORLD.now === 'home';
+// m1111: THE REFUGE'S WATER IS colinwillow/water's (his phone-fast island): ONE height function drives the land, the seabed, the shore foam
+// and the depth; every opaque thing goes through `rwPatch` (water's `waterPatch`: below y 0 it gets caustics, the light path down and the
+// view path up with per-channel absorption -- shallow water is turquoise because it is the bed seen through it); the surface is ONE
+// alpha-blended draw (Fresnel sky, the sun's glint, shore foam off a baked height map, 32 ripple rings -- his steps when he wades). Sky dome,
+// fog and water read the same uniforms (`RW.U`) so the horizon cannot seam. No render targets, no float textures. And it is a MOUNTAIN
+// LAKE (his pick, "island in a mountain lake"): a ring of hazy peaks round the water, so it reads less tropical; a pebble beach, not sand.
+const RW = { sea: 0, R: 24, deepAt: -.95, abs: new THREE.Vector3(.30, .075, .058), scat: new THREE.Vector3(.010, .085, .24), caus: .75, fog: .0009,
+  waves: [[1, .25, .085, 11], [.55, .85, .055, 6.3], [-.35, .95, .03, 3.7], [.9, -.45, .018, 2.3]], ripLife: 4.5, ripSpeed: 1.55, ripN: 32,
+  time: { el: 14, az: 230, sun: [1, .80, .55], zen: [.24, .44, .74], hor: [.98, .84, .66] },     // water's GOLDEN
+  U: null, WU: null, rip: null, ripI: 0, safe: null, stepT: 0, stat: { ripples: 0, pushed: 0 } };
+function rwRng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
+function rwPNoise(P, seed) { const r = rwRng(seed), g = new Float32Array(P * P); for (let i = 0; i < g.length; i++) g[i] = r();
+  return (u, v) => { const x = u * P, y = v * P, xi = Math.floor(x), yi = Math.floor(y), fx = x - xi, fy = y - yi, sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy);
+    const at = (i, j) => g[((j % P + P) % P) * P + ((i % P + P) % P)]; const a = at(xi, yi), b = at(xi + 1, yi), c = at(xi, yi + 1), d = at(xi + 1, yi + 1);
+    return a + (b - a) * sx + (c - a) * sy + (a - b - c + d) * sx * sy; }; }
+function rwTex(data, N, clamp) { const t = new THREE.DataTexture(data, N, N, THREE.RGBAFormat); t.wrapS = t.wrapT = clamp ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+  t.magFilter = THREE.LinearFilter; t.minFilter = clamp ? THREE.LinearFilter : THREE.LinearMipmapLinearFilter; t.generateMipmaps = !clamp; t.needsUpdate = true; return t; }
+function rwBakeNoise(N = 256) {     // R: caustic cells, G/B: fbm (clouds, foam)
+  const data = new Uint8Array(N * N * 4), C = 7, r = rwRng(7), pts = [];
+  for (let j = 0; j < C; j++) for (let i = 0; i < C; i++) pts.push([(i + .15 + .7 * r()) / C, (j + .15 + .7 * r()) / C]);
+  const n1 = [4, 8, 16, 32].map((q, k) => rwPNoise(q, 11 + k)), n2 = [3, 6, 12, 24].map((q, k) => rwPNoise(q, 51 + k));
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const u = x / N, v = y / N; let f1 = 9, f2 = 9; const ci = Math.floor(u * C), cj = Math.floor(v * C);
+    for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) { const ii = ci + di, jj = cj + dj, q = pts[((jj % C + C) % C) * C + ((ii % C + C) % C)];
+      const d = Math.hypot(u - (q[0] + Math.floor(ii / C)), v - (q[1] + Math.floor(jj / C))); if (d < f1) { f2 = f1; f1 = d; } else if (d < f2) f2 = d; }
+    let a = 0, b = 0, w = .5, ww = 0; for (let k = 0; k < 4; k++) { a += n1[k](u, v) * w; b += n2[k](u, v) * w; ww += w; w *= .5; }
+    const o = (y * N + x) * 4; data[o] = Math.round(Math.exp(-(f2 - f1) * C * 7) * 255); data[o + 1] = Math.round(a / ww * 255); data[o + 2] = Math.round(b / ww * 255); data[o + 3] = 255; }
+  return rwTex(data, N);
+}
+function rwBakeNormals(N = 256) {     // tileable surface slopes, dh/dx dh/dy in RG
+  const r = rwRng(3), W = []; for (let i = 0; i < 28; i++) { let kx, ky; do { kx = Math.round((r() * 2 - 1) * 9); ky = Math.round((r() * 2 - 1) * 9); } while (kx * kx + ky * ky < 4); W.push([kx, ky, 1 / Math.pow(Math.hypot(kx, ky), 1.6), r() * 6.2832]); }
+  const gx = new Float32Array(N * N), gy = new Float32Array(N * N); let m = 0;
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const u = x / N, v = y / N; let dx = 0, dy = 0;
+    for (const [kx, ky, a, ph] of W) { const c = Math.cos(6.2832 * (kx * u + ky * v) + ph) * a * 6.2832; dx += c * kx; dy += c * ky; }
+    gx[y * N + x] = dx; gy[y * N + x] = dy; m = Math.max(m, Math.abs(dx), Math.abs(dy)); }
+  const data = new Uint8Array(N * N * 4); for (let i = 0; i < N * N; i++) { data[i * 4] = Math.round((gx[i] / m * .5 + .5) * 255); data[i * 4 + 1] = Math.round((gy[i] / m * .5 + .5) * 255); data[i * 4 + 2] = data[i * 4 + 3] = 255; }
+  return rwTex(data, N);
+}
+const _rwN = rwPNoise(64, 99);
+const rwFbm = (x, z) => { let s = 0, a = .5, f = 1; for (let i = 0; i < 4; i++) { s += (_rwN(x * f / 64, z * f / 64) - .5) * a; a *= .5; f *= 2.03; } return s; };
+const rwIslandR = a => RW.R * (1 + .16 * Math.sin(a * 2 + .7) + .1 * Math.sin(a * 3 + 2.1) + .055 * Math.sin(a * 5 + .4));
+// THE height. A plateau ~1 m over the lake, a pebble shore, shallows, the drop-off; the hut's pad levelled; low mounds inland
+function rwHeight(x, z) {
+  const r = Math.hypot(x, z), a = Math.atan2(z, x), d = r / rwIslandR(a);
+  let h = 1.0 + .7 * (1 - Math.min(1, d * d)) + .25 * rwFbm(x * .15, z * .15);
+  const hd = Math.hypot(x - HOME.hut.at[0], z - HOME.hut.at[1]); h = h + (HOME.padY - h) * (1 - smooth(HOME.hut.w * .6, HOME.hut.w * .95, hd));
+  const mix = (A, B, t) => A + (B - A) * t;
+  h = mix(h, -.35, smooth(.74, 1.02, d)); h = mix(h, -2.6, smooth(1, 1.9, d)); h = mix(h, -12, smooth(1.8, 3.6, d)); h = mix(h, -22, smooth(3.6, 10, d));
+  h += smooth(.95, 1.3, d) * (rwFbm(x * 1.6, z * 1.6) * .8 + Math.sin(x * 1.7 + z * .6) * .025);
+  return h;
+}
+function rwBakeHeight() { const S = HOME.ht, data = new Uint8Array(S.n * S.n * 4);
+  for (let j = 0; j < S.n; j++) for (let i = 0; i < S.n; i++) { const x = (i + .5) / S.n * S.size - S.size / 2, z = (j + .5) / S.n * S.size - S.size / 2, v = Math.round(clamp((rwHeight(x, z) - S.lo) / (S.hi - S.lo), 0, 1) * 255), o = (j * S.n + i) * 4;
+    data[o] = data[o + 1] = data[o + 2] = v; data[o + 3] = 255; }
+  return rwTex(data, S.n, 1); }
+const RW_GLSL = `
+uniform float uTime; uniform vec3 uSunDir; uniform vec3 uSunCol; uniform vec3 uZenith; uniform vec3 uHorizon; uniform float uFogD; uniform sampler2D uNoise;
+vec3 skyCol(vec3 d) { float y = max(d.y, 0.0); vec3 c = mix(uHorizon, uZenith, pow(y, 0.5)); float s = max(dot(d, uSunDir), 0.0); c += uSunCol * (pow(s, 6.0) * 0.22 + pow(s, 60.0) * 0.55); return c; }
+float cloudAmt(vec3 d) { if (d.y <= 0.0) return 0.0; vec2 p = d.xz / (d.y + 0.08) * 0.11 + uTime * vec2(0.0016, 0.0009);
+  float n = texture(uNoise, p).g * 0.62 + texture(uNoise, p * 2.9 + 0.31).b * 0.38; return smoothstep(0.50, 0.74, n) * smoothstep(0.0, 0.18, d.y); }
+vec3 skyFull(vec3 d) { vec3 c = skyCol(d); float cl = cloudAmt(d); float s = max(dot(d, uSunDir), 0.0);
+  vec3 cc = mix(uHorizon * 0.85 + uZenith * 0.25, vec3(1.0) * (0.6 + 0.5 * uSunCol), 0.55) + uSunCol * pow(s, 10.0) * 0.6; return mix(c, cc, cl * 0.92); }
+vec3 fogTo(vec3 c, vec3 P) { vec3 v = P - cameraPosition; float dist = length(v); vec3 dir = v / max(dist, 1e-4);
+  vec3 fc = skyCol(normalize(vec3(dir.x, 0.0, dir.z) + vec3(0.0, 1e-4, 0.0))); return mix(c, fc, 1.0 - exp(-dist * uFogD)); }
+`;
+function rwPatch(mat, keepPrev) {
+  const prev = keepPrev ? mat.onBeforeCompile : null;
+  mat.onBeforeCompile = sh => { if (prev) prev(sh); Object.assign(sh.uniforms, RW.U);
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vRwP;').replace('#include <project_vertex>', '#include <project_vertex>\nvRwP = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vRwP;\nuniform vec3 uAbs; uniform vec3 uScat; uniform float uCaus;\n' + RW_GLSL)
+      .replace('#include <opaque_fragment>', `#include <opaque_fragment>
+      { vec3 P = vRwP; float depth = -P.y; vec3 col = gl_FragColor.rgb;
+        if (depth > 0.0) { vec2 cuv = (P.xz + uSunDir.xz / max(uSunDir.y, 0.15) * depth) * 0.085;
+          float c1 = texture(uNoise, cuv + uTime * vec2(0.019, 0.011)).r, c2 = texture(uNoise, cuv * 1.37 + vec2(0.37, 0.11) - uTime * vec2(0.014, 0.022)).r;
+          float caus = min(c1, c2); caus = caus * caus * 4.0; float cm = smoothstep(0.0, 0.35, depth) * exp(-depth * 0.11) * max(uSunDir.y, 0.0);
+          col += diffuseColor.rgb * uSunCol * caus * cm * uCaus; col *= exp(-uAbs * depth * 0.7);
+          vec3 toC = cameraPosition - P; float len = length(toC), up = cameraPosition.y - P.y; float L = up > 0.01 ? len * clamp(depth / up, 0.0, 1.0) : len;
+          vec3 T = exp(-uAbs * L); col = col * T + uScat * (1.0 - T); }
+        gl_FragColor.rgb = fogTo(col, P); }`); };
+  mat.customProgramCacheKey = () => 'rwPatch' + (prev ? 'P' : ''); return mat;
+}
+function rwPolar(rings, segs, rMax, pow) { const pos = [0, 0, 0], idx = [];
+  for (let i = 1; i <= rings; i++) { const r = rMax * Math.pow(i / rings, pow); for (let j = 0; j < segs; j++) { const a = j / segs * 6.2832; pos.push(Math.cos(a) * r, 0, Math.sin(a) * r); } }
+  for (let j = 0; j < segs; j++) idx.push(0, 1 + (j + 1) % segs, 1 + j);
+  for (let i = 1; i < rings; i++) { const a0 = 1 + (i - 1) * segs, b0 = 1 + i * segs; for (let j = 0; j < segs; j++) { const j1 = (j + 1) % segs, a = a0 + j, b = a0 + j1, c = b0 + j, d = b0 + j1; idx.push(a, b, c, b, d, c); } }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); return g; }
+function rwWaveAt(x, z, t) { let h = 0; for (const [dx, dz, A, L] of RW.waves) { const l = Math.hypot(dx, dz), k = 6.2832 / L, w = Math.sqrt(9.8 * k); h += A * Math.sin(k * (dx / l * x + dz / l * z) - w * t); } return h; }
+function rwRipple(x, z, k = 1) { if (!RW.rip) return; RW.rip[RW.ripI].set(x, z, RW.U.uTime.value, k); RW.ripI = (RW.ripI + 1) % RW.ripN; RW.stat.ripples++; }
+function rwBuild() {
+  const T = RW.time, el = T.el * Math.PI / 180, az = T.az * Math.PI / 180;
+  RW.U = { uTime: { value: 0 }, uSunDir: { value: new THREE.Vector3(Math.cos(el) * Math.sin(az), Math.sin(el), Math.cos(el) * Math.cos(az)) }, uSunCol: { value: new THREE.Vector3(...T.sun) },
+    uZenith: { value: new THREE.Vector3(...T.zen) }, uHorizon: { value: new THREE.Vector3(...T.hor) }, uFogD: { value: RW.fog }, uNoise: { value: rwBakeNoise() },
+    uAbs: { value: RW.abs }, uScat: { value: RW.scat }, uCaus: { value: RW.caus } };
+  // the sky dome: the same horizon the water and the fog fade to
+  const sky = new THREE.Mesh(new THREE.SphereGeometry(2500, 32, 16), new THREE.ShaderMaterial({ uniforms: RW.U, side: THREE.BackSide, depthWrite: false, fog: false,
+    vertexShader: 'varying vec3 vDir; void main(){ vDir = position; vec4 p = projectionMatrix * modelViewMatrix * vec4(position, 1.0); gl_Position = p.xyww; }',
+    fragmentShader: RW_GLSL + `varying vec3 vDir; void main(){ vec3 d = normalize(vDir); vec3 c = skyFull(d); float s = max(dot(d, uSunDir), 0.0);
+      c += uSunCol * smoothstep(0.99955, 0.99975, s) * 14.0 * (1.0 - cloudAmt(d)); if (d.y < 0.0) c = skyCol(vec3(d.x, 0.0, d.z) + vec3(0.0, 1e-4, 0.0));
+      gl_FragColor = vec4(c, 1.0);
+      #include <tonemapping_fragment>
+      #include <colorspace_fragment>
+    }` }));
+  sky.renderOrder = -1; sky.frustumCulled = false; scene.add(sky); scene.background = null; if (scene.fog) scene.fog.far = 1e6;
+  // the land and the lake bed: one polar grid, dense at the island, sparse at the horizon
+  const g = rwPolar(170, 240, 1400, 2.4), P = g.attributes.position, col = new Float32Array(P.count * 3), c = new THREE.Color();
+  const moss = new THREE.Color(0x4f7a3e), moss2 = new THREE.Color(0x6d8f4a), soil = new THREE.Color(0x6b5a44), peb = new THREE.Color(0x9b958a), peb2 = new THREE.Color(0x7d7a74), bed = new THREE.Color(0x8d8670), deep = new THREE.Color(0x5d6152), weed = new THREE.Color(0x30503a);
+  for (let i = 0; i < P.count; i++) { const x = P.getX(i), z = P.getZ(i), h = rwHeight(x, z); P.setY(i, h);
+    if (h > .45) { c.copy(moss).lerp(moss2, smooth(-.1, .25, rwFbm(x * .9, z * .9))); c.lerp(soil, smooth(.12, .3, rwFbm(x * 1.3 + 40, z * 1.3)) * .45); }
+    else if (h > -.08) { c.copy(peb2).lerp(peb, smooth(-.3, .3, rwFbm(x * 2.1, z * 2.1))); }
+    else { c.copy(bed).lerp(deep, smooth(-1.5, -10, h)); c.lerp(weed, smooth(.05, .16, rwFbm(x * .8 + 13, z * .8 - 7)) * smooth(-1.2, -3, h) * .85); }
+    col.set([c.r, c.g, c.b], i * 3); }
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3)); g.computeVertexNormals();
+  const land = new THREE.Mesh(g, rwPatch(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .95 }))); land.receiveShadow = true; land.frustumCulled = false; scene.add(land);
+  const idx = g.index.array; let nW = 0;
+  for (let i = 0; i < idx.length; i += 3) { const a = idx[i], b = idx[i + 1], d = idx[i + 2]; if (Math.hypot(P.getX(a), P.getZ(a)) > RW.R * 2.4) continue;
+    nW += triAdd(P.getX(a), P.getY(a), P.getZ(a), P.getX(b), P.getY(b), P.getZ(b), P.getX(d), P.getY(d), P.getZ(d)); surfAdd(P.getX(a), P.getY(a), P.getZ(a), P.getX(b), P.getY(b), P.getZ(b), P.getX(d), P.getY(d), P.getZ(d)); }
+  RW.stat.walkTris = nW;
+  // the surface
+  RW.rip = Array.from({ length: RW.ripN }, () => new THREE.Vector4(0, 0, -99, 0));
+  RW.WU = { uNrm: { value: rwBakeNormals() }, uHgt: { value: rwBakeHeight() }, uRip: { value: RW.rip }, uWind: { value: .8 }, uAmp: { value: .7 },
+    uWaves: { value: RW.waves.map(w => new THREE.Vector4(...w)) }, uRipLife: { value: RW.ripLife }, uRipSpeed: { value: RW.ripSpeed }, uHT: { value: new THREE.Vector4(HOME.ht.size, HOME.ht.lo, HOME.ht.hi, 0) } };
+  const N = RW.ripN, wm = new THREE.ShaderMaterial({ uniforms: Object.assign({}, RW.U, RW.WU), transparent: true, depthWrite: false, fog: false,
+    blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, blendSrcAlpha: THREE.OneFactor, blendDstAlpha: THREE.OneMinusSrcAlphaFactor,
+    vertexShader: `uniform float uTime; uniform vec4 uWaves[4]; uniform float uAmp; varying vec3 vW; varying vec2 vG;
+      vec3 waveAt(vec2 p, float t) { float h = 0.0; vec2 g = vec2(0.0); for (int i = 0; i < 4; i++) { vec2 D = normalize(uWaves[i].xy); float A = uWaves[i].z * uAmp; float k = 6.2831853 / uWaves[i].w;
+        float w = sqrt(9.8 * k); float ph = k * dot(D, p) - w * t; h += A * sin(ph); g += A * k * cos(ph) * D; } return vec3(h, g); }
+      void main() { vec3 p = (modelMatrix * vec4(position, 1.0)).xyz; vec3 w = waveAt(p.xz, uTime); float fade = 1.0 - smoothstep(150.0, 600.0, length(p.xz - cameraPosition.xz));
+        p.y += w.x * fade; vG = w.yz * fade; vW = p; gl_Position = projectionMatrix * viewMatrix * vec4(p, 1.0); }`,
+    fragmentShader: RW_GLSL + `uniform sampler2D uNrm; uniform sampler2D uHgt; uniform vec4 uRip[${N}]; uniform float uWind; uniform float uRipLife; uniform float uRipSpeed; uniform vec4 uHT; uniform vec3 uScat;
+      varying vec3 vW; varying vec2 vG;
+      void main() { vec2 p = vW.xz; vec3 toC = cameraPosition - vW; float dist = length(toC); vec3 V = toC / dist; float far = smoothstep(40.0, 420.0, dist);
+        vec2 d1 = texture(uNrm, p * 0.041 + uTime * vec2(0.011, 0.007)).rg * 2.0 - 1.0, d2 = texture(uNrm, p * 0.113 + uTime * vec2(-0.009, 0.016)).rg * 2.0 - 1.0, d3 = texture(uNrm, p * 0.29 + uTime * vec2(0.021, -0.013)).rg * 2.0 - 1.0;
+        vec2 g = vG + (d1 * 0.16 + d2 * 0.12 + d3 * 0.07 * (1.0 - far)) * uWind * (1.0 - far * 0.65); float rfoam = 0.0;
+        for (int i = 0; i < ${N}; i++) { vec4 r = uRip[i]; float age = uTime - r.z; if (age < 0.0 || age > uRipLife) continue; vec2 dv = p - r.xy; float dd = length(dv);
+          float x = dd - (age * uRipSpeed + 0.15); if (abs(x) > 2.2) continue; float life = 1.0 - age / uRipLife; float env = exp(-x * x * 1.6) * life * life * r.w; float ph = x * 6.0 - age * 2.0;
+          g += dv / max(dd, 1e-3) * cos(ph) * env * 0.55; rfoam += env * smoothstep(0.75, 1.0, sin(ph)) * smoothstep(1.2, 0.1, age) * 0.4; }
+        vec3 n = normalize(vec3(-g.x, 1.0, -g.y)); float ndv = max(dot(n, V), 0.0); float F = 0.02 + 0.98 * pow(1.0 - ndv, 5.0);
+        vec3 R = reflect(-V, n); R.y = abs(R.y); vec3 refl = skyFull(R); vec3 H = normalize(uSunDir + V); float nh = max(dot(n, H), 0.0);
+        vec3 spec = uSunCol * (pow(nh, 900.0) * 60.0 + pow(nh, 120.0) * 0.6) * smoothstep(0.0, 0.08, uSunDir.y);
+        vec2 huv = p / uHT.x + 0.5; float hgt = mix(uHT.y, uHT.z, texture(uHgt, huv).r); float inMap = step(abs(huv.x - 0.5), 0.5) * step(abs(huv.y - 0.5), 0.5);
+        float dep = mix(30.0, -hgt + vW.y, inMap); float fn = texture(uNoise, p * 0.21 + uTime * vec2(0.013, 0.009)).g, fn2 = texture(uNoise, p * 0.63 - uTime * vec2(0.02, 0.011)).b;
+        float band = sin(dep * 9.0 - uTime * 1.6 + fn * 6.0) * 0.5 + 0.5; float shore = 1.0 - smoothstep(0.0, 0.28, dep);
+        float foam = shore * smoothstep(0.55, 0.85, fn2 * 0.55 + band * 0.45 + shore * 0.35) * 0.85; foam = clamp(foam + rfoam * (0.6 + fn2 * 0.6), 0.0, 1.0); float edge = smoothstep(0.0, 0.06, dep);
+        float lit = max(uSunDir.y, 0.0) * 0.8 + 0.25; vec3 foamCol = vec3(0.92) * lit + uSunCol * 0.25 * lit + uScat * 0.6;
+        vec3 rgb = refl * F + spec * (1.0 - foam); float a = F; rgb = rgb * (1.0 - foam) + foamCol * foam; a = a * (1.0 - foam) + foam; rgb *= edge; a *= edge;
+        vec3 fc = skyCol(normalize(vec3(-V.x, 0.0, -V.z) + vec3(0.0, 1e-4, 0.0))); float ff = 1.0 - exp(-dist * uFogD); rgb = mix(rgb, fc, ff); a = mix(a, 1.0, ff);
+        gl_FragColor = vec4(rgb, a);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+      }` });
+  const water = new THREE.Mesh(rwPolar(150, 160, 2400, 2.2), wm); water.frustumCulled = false; water.renderOrder = 2; scene.add(water); RW.water = water;
+  // THE MOUNTAINS round the lake: low-poly ridges, through the same fog
+  const mg = []; const mr = rwRng(21);
+  for (let i = 0; i < 26; i++) { const a = i / 26 * 6.2832 + mr() * .2, r = 320 + mr() * 260, h = 70 + mr() * 150, w = 110 + mr() * 120;
+    const cone = new THREE.ConeGeometry(w, h, 7 + Math.floor(mr() * 4), 3); const cp = cone.attributes.position;
+    for (let k = 0; k < cp.count; k++) { const y = cp.getY(k); if (y < h / 2 - 1) { cp.setX(k, cp.getX(k) * (.8 + mr() * .4)); cp.setZ(k, cp.getZ(k) * (.8 + mr() * .4)); cp.setY(k, y + (mr() - .5) * h * .12); } }
+    cone.translate(Math.cos(a) * r, h / 2 - 8, Math.sin(a) * r); const cc = new THREE.Color().setHSL(.6 + mr() * .05, .18, .32 + mr() * .1), snow = new THREE.Color(0xe8eef5);
+    const cs = new Float32Array(cp.count * 3); for (let k = 0; k < cp.count; k++) { const y = cp.getY(k); const q = y > h * .72 - 8 ? snow : cc; cs.set([q.r, q.g, q.b], k * 3); }
+    cone.setAttribute('color', new THREE.BufferAttribute(cs, 3)); mg.push(cone.toNonIndexed()); }
+  const mm = mergeGeometries(mg, false); mm.computeVertexNormals();
+  const mtn = new THREE.Mesh(mm, rwPatch(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true }))); mtn.frustumCulled = false; scene.add(mtn);
+}
+const rwMat = (hex, o) => rwPatch(new THREE.MeshStandardMaterial(Object.assign({ color: hex, roughness: .85 }, o || {})));
+const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeometries(geos.map(q => q.index ? q.toNonIndexed() : q), false), mat); m.castShadow = shadow; m.receiveShadow = true; scene.add(m); return m; };
 async function buildHome() {
-  const H = HOME, G = H.ground, N = 44, gp = new THREE.PlaneGeometry(G * 2, G * 2, N, N); gp.rotateX(-Math.PI / 2);
-  const P = gp.attributes.position, col = new Float32Array(P.count * 3), cA = new THREE.Color(0x5f9b56), cB = new THREE.Color(0x9fbf5a), cC = new THREE.Color(0x3f8f7a), c = new THREE.Color();
-  for (let i = 0; i < P.count; i++) { const x = P.getX(i), z = P.getZ(i), e = Math.max(Math.abs(x), Math.abs(z)) / G;
-    const y = (Math.sin(x * .21 + 1.3) * Math.cos(z * .17) * .22 + Math.sin(x * .07 - z * .09) * .18) * (1 - smooth(.7, 1, e));     // gentle, and flat at the edge the coast takes over from
-    P.setY(i, Math.hypot(x - H.hut.at[0], z - H.hut.at[1]) < H.hut.w * .75 ? 0 : y);     // the hut stands on the flat
-    const k = .5 + .5 * Math.sin(x * .13 + z * .11); c.copy(cA).lerp(cB, k * .6).lerp(cC, .25 * (1 - k)); col.set([c.r, c.g, c.b], i * 3); }
-  gp.setAttribute('color', new THREE.BufferAttribute(col, 3)); gp.computeVertexNormals();
-  { const sp = new Float32Array(P.count * 3); for (let i = 0; i < P.count; i++) sp[i * 3] = 1; gp.setAttribute('aSplat', new THREE.BufferAttribute(sp, 3)); }     // all grass, for the island's own land shader
-  const ground = new THREE.Mesh(gp, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .95 })); ground.receiveShadow = true; scene.add(ground);
-  const idx = gp.index.array; for (let i = 0; i < idx.length; i += 3) { const a = idx[i], b = idx[i + 1], d = idx[i + 2];
-    triAdd(P.getX(a), P.getY(a), P.getZ(a), P.getX(b), P.getY(b), P.getZ(b), P.getX(d), P.getY(d), P.getZ(d));
-    surfAdd(P.getX(a), P.getY(a), P.getZ(a), P.getX(b), P.getY(b), P.getZ(b), P.getX(d), P.getY(d), P.getZ(d)); }
-  // the hut
+  const H = HOME; H.padY = 1.15; rwBuild();
+  // the hut, on its levelled pad
   try { const g = await loadGLB(H.hut.file, 'loading the refuge');
     const m = g.scene, drop = []; m.traverse(o => { if (o.isLight) drop.push(o); }); for (const o of drop) o.removeFromParent();
     m.updateMatrixWorld(true); const bb = new THREE.Box3(); m.traverse(o => { if (o.isMesh && o.name !== 'collider' && o.geometry) { o.geometry.computeBoundingBox(); bb.union(o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld)); } });
-    const k = H.hut.w / Math.max(.01, bb.max.x - bb.min.x); m.scale.setScalar(k); m.rotation.y = H.hut.yaw; m.position.set(H.hut.at[0], -bb.min.y * k, H.hut.at[1]);
+    const k = H.hut.w / Math.max(.01, bb.max.x - bb.min.x); m.scale.setScalar(k); m.rotation.y = H.hut.yaw; m.position.set(H.hut.at[0], H.padY - bb.min.y * k, H.hut.at[1]);
     scene.add(m); m.updateMatrixWorld(true); H.hutObj = m; H.stat.hutK = +k.toFixed(2);
     let col = null; m.traverse(o => { if (o.isMesh) { if (o.name === 'collider') col = o; else { o.castShadow = o.receiveShadow = true;
       for (const mt of [].concat(o.material)) if (mt && !/paper|glow/i.test(mt.name || '')) mt.side = THREE.FrontSide; } } });
     if (col) col.visible = false;
-    // his collider is a thin skirt round the base (the columns it rasterises to leave gaps), so the hut is one solid block, the base's
-    // measured plan, for now -- walked round, not into, until it has a door and a floor
-    { const r = H.hut.w * .42; BOXES.push({ minx: H.hut.at[0] - r, maxx: H.hut.at[0] + r, miny: 0, maxy: 7, minz: H.hut.at[1] - r, maxz: H.hut.at[1] + r }); H.stat.cols = col ? 'skirt->block' : 'no collider'; }
+    // his collider is a thin skirt round the base, so the hut is one solid block of the base's plan for now -- walked round, not into
+    { const r = H.hut.w * .42; BOXES.push({ minx: H.hut.at[0] - r, maxx: H.hut.at[0] + r, miny: 0, maxy: 8, minz: H.hut.at[1] - r, maxz: H.hut.at[1] + r }); }
   } catch (e) { console.warn('[melee] hut', e); note('NO HUT GLB'); }
-  homeTree(H.tree[0], H.tree[1]);
-  // the walkable store, then the island round it (the coast is built OFF the ground just stored)
+  homeDress();
   triBuild(); surfBuild(); boxGrid();
-  Object.assign(ISLE, H.isle);     // a hut's island, not a city's
-  try { buildIsle(); } catch (e) { ISLE.live = 0; note('ISLE FAIL'); console.warn('[melee] island', e); }
-  if (ISLE.lmat) ground.material = ISLE.lmat;     // the plateau wears the island's own grass, so the two read as one land
   homeLanterns();
-  player.pos.x = H.spawn[0]; player.pos.z = H.spawn[1]; cam.az = player.faceH = player.heading = Math.PI;     // looking at the hut
-  H.live = 1; console.log('[melee] refuge: hut x' + H.stat.hutK + ', ' + (H.stat.cols || 0) + ' columns, isle ' + (ISLE.live ? 'on' : 'OFF'));
+  player.pos.x = H.spawn[0]; player.pos.z = H.spawn[1]; cam.az = player.faceH = player.heading = Math.PI;
+  H.live = 1; console.log('[melee] refuge: hut x' + H.stat.hutK + ', ' + RW.stat.walkTris + ' walkable tris, the lake water on');
 }
-// a twisted trunk, puffed crowns in his palette, glowing pods -- three draws
-function homeTree(x, z) {
-  const g = new THREE.Group(), pts = []; for (let i = 0; i <= 8; i++) { const u = i / 8; pts.push(new THREE.Vector3(Math.sin(u * 3.2) * 1.1 * u, u * 7.5, Math.cos(u * 2.4) * .8 * u - .4 * u)); }
-  const trunkGeo = [new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 40, .5, 9)];
-  for (const [a, h, l] of [[.6, 5.2, 3.2], [2.4, 6.1, 2.6], [4.1, 4.6, 2.8]]) { const e = pts[Math.round(h / 7.5 * 8)].clone(), q = []; for (let i = 0; i <= 5; i++) { const u = i / 5; q.push(e.clone().add(new THREE.Vector3(Math.cos(a) * l * u, Math.sin(u * 2.2) * 1.3, Math.sin(a) * l * u))); }
-    trunkGeo.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(q), 16, .22, 7)); }
-  const trunk = new THREE.Mesh(mergeGeometries(trunkGeo, false), new THREE.MeshStandardMaterial({ color: 0x4a2f3d, roughness: .85 })); trunk.castShadow = true; g.add(trunk);
-  const crowns = [], pods = [];
-  const tips = [pts[8], ...[[.6, 5.2, 3.2], [2.4, 6.1, 2.6], [4.1, 4.6, 2.8]].map(([a, h, l]) => pts[Math.round(h / 7.5 * 8)].clone().add(new THREE.Vector3(Math.cos(a) * l, 1.2, Math.sin(a) * l)))];
-  tips.forEach((t, i) => { for (let j = 0; j < 4; j++) { const s = new THREE.IcosahedronGeometry(1.5 + Math.random() * .9, 1); s.translate(t.x + (Math.random() - .5) * 2.2, t.y + .6 + Math.random() * 1.1, t.z + (Math.random() - .5) * 2.2);
-      const cc = new THREE.Color().setHSL(.88 - (i + j) * .07, .55, .58), cs = new Float32Array(s.attributes.position.count * 3); for (let v = 0; v < cs.length; v += 3) cs.set([cc.r, cc.g, cc.b], v); s.setAttribute('color', new THREE.BufferAttribute(cs, 3)); crowns.push(s); }
-    for (let j = 0; j < 3; j++) { const pd = new THREE.SphereGeometry(.16, 8, 6); pd.translate(t.x + (Math.random() - .5) * 2.4, t.y - .9 - Math.random() * .8, t.z + (Math.random() - .5) * 2.4); pods.push(pd); } });
-  const crown = new THREE.Mesh(mergeGeometries(crowns, false), new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .7, flatShading: true })); crown.castShadow = true; g.add(crown);
-  g.add(new THREE.Mesh(mergeGeometries(pods, false), new THREE.MeshStandardMaterial({ color: 0x9ffcff, emissive: 0x5ff0ff, emissiveIntensity: 1.6 })));
-  g.position.set(x, 0, z); scene.add(g);
-  BOXES.push({ minx: x - .7, maxx: x + .7, miny: 0, maxy: 6, minz: z - .7, maxz: z + .7 });     // the trunk is solid
+// THE JAPANESE PIECES, code-built and merged per material until his models replace them
+function homeDress() {
+  const H = HOME, at = (x, z) => [x, rwHeight(x, z), z], B = (w, h, d, x, y, z, ry = 0, rx = 0) => { const g = new THREE.BoxGeometry(w, h, d); if (rx) g.rotateX(rx); g.rotateY(ry); g.translate(x, y, z); return g; };
+  const Cy = (r0, r1, h, x, y, z, s = 8) => { const g = new THREE.CylinderGeometry(r0, r1, h, s); g.translate(x, y, z); return g; };
+  const solid = (x, z, r, top) => BOXES.push({ minx: x - r, maxx: x + r, miny: -5, maxy: top, minz: z - r, maxz: z + r });
+  // THE TORII, on the shore facing the lake
+  { const a = H.toriiA, R = rwIslandR(a) * .84, x = Math.cos(a) * R, z = Math.sin(a) * R, y = rwHeight(x, z), ry = -a + Math.PI / 2, s = 1.3;
+    const ox = Math.cos(ry) * 2.2 * s, oz = -Math.sin(ry) * 2.2 * s, red = [], blk = [];
+    for (const sg of [-1, 1]) { red.push(Cy(.22 * s, .26 * s, 5 * s, x + ox * sg, y + 2.5 * s, z + oz * sg, 10)); blk.push(Cy(.3 * s, .3 * s, .4 * s, x + ox * sg, y + .2 * s, z + oz * sg, 10)); solid(x + ox * sg, z + oz * sg, .35 * s, y + 5 * s); }
+    red.push(B(6.2 * s, .32 * s, .4 * s, x, y + 4.1 * s, z, ry)); blk.push(B(7.4 * s, .34 * s, .55 * s, x, y + 5.15 * s, z, ry)); red.push(B(.25 * s, 1 * s, .3 * s, x, y + 4.6 * s, z, ry));
+    rwMesh(red, rwMat(0xc0312b, { roughness: .6 })); rwMesh(blk, rwMat(0x1d1b1f, { roughness: .7 })); }
+  // STONE LANTERNS (toro), four, round the hut's approach; a warm light in each window
+  { const st = [], lit = []; for (const [x, z] of H.toro) { const y = rwHeight(x, z);
+      st.push(B(.9, .3, .9, x, y + .15, z), Cy(.16, .2, 1.1, x, y + .85, z, 6), B(.7, .18, .7, x, y + 1.45, z), B(1.05, .2, 1.05, x, y + 2.2, z), Cy(.0, .62, .45, x, y + 2.5, z, 4), Cy(.08, .08, .25, x, y + 2.8, z, 6));
+      lit.push(B(.5, .5, .5, x, y + 1.8, z)); solid(x, z, .45, y + 2.6); }
+    rwMesh(st, rwMat(0x8f8b84, { roughness: .95 })); rwMesh(lit, new THREE.MeshStandardMaterial({ color: 0xffd8a0, emissive: 0xffa040, emissiveIntensity: 2.2 }), false); }
+  // THE DOCK into the lake, and a sampan moored at its end (it rides the waves: `homeStep`)
+  { const a = H.dockA, R0 = rwIslandR(a) * .9, dx = Math.cos(a), dz = Math.sin(a), ry = -a + Math.PI / 2, deck = .55, L = 16, wood = [], post = [];
+    for (let i = 0; i < L / .5; i++) { const r = R0 + i * .5, x = dx * r, z = dz * r; wood.push(B(2.4, .1, .44, x, deck, z, ry)); }
+    for (let i = 0; i <= L / 2; i += 1) { const r = R0 + i * 2; for (const sg of [-1, 1]) { const x = dx * r + dz * 1.15 * sg, z = dz * r - dx * 1.15 * sg; post.push(Cy(.12, .12, 3.4, x, deck - 1.4, z, 6)); } }
+    rwMesh(wood, rwMat(0x7a5a3c)); rwMesh(post, rwMat(0x4a3826));
+    const dock = []; for (let i = 0; i < L / .5; i++) { const r = R0 + i * .5, x = dx * r, z = dz * r, c = Math.cos(ry), s2 = Math.sin(ry);
+      const P4 = [[-1.2, -.22], [1.2, -.22], [1.2, .22], [-1.2, .22]].map(([u, v]) => [x + u * c + v * s2, deck + .05, z - u * s2 + v * c]);
+      triAdd(...P4[0], ...P4[1], ...P4[2]); triAdd(...P4[0], ...P4[2], ...P4[3]); triAdd(...P4[0], ...P4[2], ...P4[1]); triAdd(...P4[0], ...P4[3], ...P4[2]); }     // walkable both windings (the store keeps the up-facing one)
+    // the sampan: a hull (an extruded lens), a curved roof of matting
+    const bx = dx * (R0 + L - 1) + dz * 3, bz = dz * (R0 + L - 1) - dx * 3, boat = new THREE.Group(), sh = new THREE.Shape();
+    sh.moveTo(-3, 0); sh.quadraticCurveTo(0, -1.5, 3, 0); sh.quadraticCurveTo(0, -.9, -3, 0);
+    const hull = new THREE.ExtrudeGeometry(sh, { depth: .7, bevelEnabled: false }); hull.rotateX(Math.PI / 2); hull.translate(0, .5, 0); hull.scale(1, 1, 1.8);
+    const hullM = new THREE.Mesh(hull, rwMat(0x5a3f2a)); hullM.castShadow = true; boat.add(hullM);
+    const roof = new THREE.CylinderGeometry(.9, .9, 2.4, 10, 1, true, 0, Math.PI); roof.rotateZ(Math.PI / 2); roof.translate(0, .6, -.6);
+    boat.add(new THREE.Mesh(roof, rwMat(0xb59a64, { side: THREE.DoubleSide })));
+    boat.rotation.y = ry; boat.position.set(bx, 0, bz); scene.add(boat); H.boat = { o: boat, x: bx, z: bz, ry }; }
+  // BAMBOO, a grove behind the hut: thin stalks with nodes, and leaf tufts
+  { const r = rwRng(5), stalk = [], node = [], leaf = []; const [cx, cz] = H.bamboo;
+    for (let i = 0; i < 42; i++) { const x = cx + (r() - .5) * 7, z = cz + (r() - .5) * 5, y = rwHeight(x, z), h = 6 + r() * 5, lean = (r() - .5) * .12;
+      const sg = new THREE.CylinderGeometry(.07, .09, h, 6); sg.rotateZ(lean); sg.translate(x + Math.sin(lean) * -h / 2, y + h / 2, z); stalk.push(sg);
+      for (let k = 1; k < h / .7; k++) { const nd = new THREE.CylinderGeometry(.1, .1, .05, 6); nd.translate(x - lean * k * .7, y + k * .7, z); node.push(nd); }
+      for (let k = 0; k < 3; k++) { const lf = new THREE.ConeGeometry(.45, 1.1, 4); lf.rotateZ(Math.PI / 2 + (r() - .5)); lf.rotateY(r() * 6.28); lf.translate(x - lean * h + (r() - .5), y + h - k * .8, z + (r() - .5)); leaf.push(lf); } }
+    rwMesh(stalk, rwMat(0x7fa64a, { roughness: .6 })); rwMesh(node, rwMat(0x58773a), false); rwMesh(leaf, rwMat(0x5f9640, { flatShading: true }));
+    BOXES.push({ minx: cx - 3, maxx: cx + 3, miny: -2, maxy: 9, minz: cz - 2, maxz: cz + 2 }); }
+  // THE BLACK PINE: a gnarled trunk and flat cloud pads of needles, with a few glowing alien pods; and a little cherry
+  homePine(H.pine[0], H.pine[1]); homeCherry(H.cherry[0], H.cherry[1]);
+}
+function homePine(x, z) {
+  const y0 = rwHeight(x, z), pts = []; for (let i = 0; i <= 8; i++) { const u = i / 8; pts.push(new THREE.Vector3(x + Math.sin(u * 3.4) * 1.6 * u + u * 1.2, y0 + u * 7.2, z + Math.cos(u * 2.6) * .9 * u)); }
+  const tr = [new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 36, .42, 8)], pads = [], pods = [];
+  const arms = [[.2, 3.4, 3.6], [2.1, 4.8, 3.0], [3.9, 6.0, 2.6], [5.2, 4.0, 3.2], [1.0, 7.0, 1.8]];
+  for (const [a, h, l] of arms) { const e = pts[Math.min(8, Math.round((h - 0) / 7.2 * 8))].clone(), q = []; for (let i = 0; i <= 4; i++) { const u = i / 4; q.push(e.clone().add(new THREE.Vector3(Math.cos(a) * l * u, Math.sin(u * 2) * .9, Math.sin(a) * l * u))); }
+    tr.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(q), 12, .16, 6)); const t = q[4];
+    for (let j = 0; j < 3; j++) { const p = new THREE.SphereGeometry(1.25 - j * .2, 9, 5); p.scale(1.4, .38, 1.15); p.translate(t.x + (j - 1) * .9 * Math.cos(a + 1.5), t.y + .35 + j * .12, t.z + (j - 1) * .9 * Math.sin(a + 1.5)); pads.push(p); }
+    const pd = new THREE.SphereGeometry(.14, 8, 6); pd.translate(t.x, t.y - .45, t.z); pods.push(pd); }
+  rwMesh(tr, rwMat(0x3a2c26, { roughness: .9 })); rwMesh(pads, rwMat(0x2f5a3a, { roughness: .8, flatShading: true }));
+  rwMesh(pods, new THREE.MeshStandardMaterial({ color: 0x9ffcff, emissive: 0x5ff0ff, emissiveIntensity: 1.8 }), false);
+  BOXES.push({ minx: x - .6, maxx: x + .6, miny: -2, maxy: y0 + 6, minz: z - .6, maxz: z + .6 });
+}
+function homeCherry(x, z) {
+  const y0 = rwHeight(x, z), r = rwRng(9), tr = [], bl = [];
+  tr.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(x, y0, z), new THREE.Vector3(x + .4, y0 + 1.8, z + .2), new THREE.Vector3(x - .2, y0 + 3.4, z - .1)]), 16, .22, 7));
+  for (let i = 0; i < 9; i++) { const s = new THREE.IcosahedronGeometry(.9 + r() * .7, 0); s.translate(x + (r() - .5) * 3.2, y0 + 3.2 + r() * 1.6, z + (r() - .5) * 3.2); bl.push(s); }
+  rwMesh(tr, rwMat(0x4a3430)); rwMesh(bl, rwMat(0xf2a7c3, { roughness: .7, flatShading: true }));
+  BOXES.push({ minx: x - .4, maxx: x + .4, miny: -2, maxy: y0 + 3, minz: z - .4, maxz: z + .4 });
 }
 // paper lanterns adrift: one instanced draw, bobbing and turning
 function homeLanterns() {
@@ -56772,7 +56964,14 @@ function homeLanterns() {
   H.lan = { im, L, m: new THREE.Matrix4(), q: new THREE.Quaternion(), e: new THREE.Euler(), s: new THREE.Vector3(1, 1, 1), p: new THREE.Vector3() };
 }
 function homeStep(dt) {
-  const H = HOME; H.t += dt; const Z = H.lan; if (!Z) return;
+  const H = HOME; H.t += dt; if (RW.U) RW.U.uTime.value = H.t;
+  // the boat rides the waves
+  if (H.boat) { const B = H.boat, t = H.t, hh = rwWaveAt(B.x, B.z, t); B.o.position.y = hh * .8 - .05; B.o.rotation.set(Math.sin(t * .9) * .03, B.ry, Math.sin(t * 1.1 + 1) * .04); }
+  // THE LAKE'S RULE: wading is fine; past `deepAt` under the surface he is put back where he last stood dry, and a wading step leaves a ring
+  { const p = player, gy = p.pos.y; if (p.grounded && gy > -.15) RW.safe = [p.pos.x, p.pos.z];
+    if (p.grounded && gy < RW.deepAt && RW.safe) { p.pos.set(RW.safe[0], rwHeight(RW.safe[0], RW.safe[1]) + .2, RW.safe[1]); p.vel.set(0, 0, 0); RW.stat.pushed++; rwRipple(p.pos.x, p.pos.z, 1.2); }
+    if (gy < RW.sea - .05 && p.speed > .5) { RW.stepT -= dt; if (RW.stepT <= 0) { RW.stepT = .24; rwRipple(p.pos.x, p.pos.z, .7); } } }
+  const Z = H.lan; if (!Z) return;
   Z.L.forEach((l, i) => { l.a += dt * .015; const x = Math.cos(l.a) * Math.hypot(l.x, l.z), z = Math.sin(l.a) * Math.hypot(l.x, l.z);
     Z.p.set(x, l.y + Math.sin(H.t * l.w + l.ph) * .4, z); Z.e.set(Math.sin(H.t * .7 + l.ph) * .08, H.t * .2 + l.ph, 0); Z.q.setFromEuler(Z.e); Z.m.compose(Z.p, Z.q, Z.s); Z.im.setMatrixAt(i, Z.m); });
   Z.im.instanceMatrix.needsUpdate = true;
@@ -57596,7 +57795,7 @@ async function init() {
   // **THE SPAWN'S HEIGHT, AFTER EVERY BUILDER.** Its x and z are set in the world branch above,
   // because the crowd is placed relative to them; the y is taken here, where everything that
   // could be underneath him is already in the collider.
-  player.pos.y = groundAt(player.pos.x, player.pos.z, 0, MOVE.step);
+  player.pos.y = groundAt(player.pos.x, player.pos.z, inHome() ? 60 : 0, inHome() ? 80 : MOVE.step);     // m1111: the refuge's land is over 0
   // THE SMALL THINGS (m418): after every builder and the crowd, so the pass sees the finished scene
   try { perfRegSmall(); } catch (e) { console.warn('[melee] small things', e); }
   // and THE FOG CULL for everything else (m428): past the fog, nothing unregistered is drawn either
@@ -57681,7 +57880,7 @@ window.melee = window.mel = { FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VE
   // of a rule measures a game that does not exist -- which is the oldest mistake there is, and
   // the only way not to make it is for `npm run sim` to call exactly these.
   DUMMY, DUMMIES, LOCK, LEDGE, WALL, STRIKE, PADS, DESK, meleeLock, dummyHit, dummyBlow, strikeSweep, stepDummies, bodySeat, SEAT, findLock, SFX, CHARGE, POSE, snd, PUNCH, PLASMA, HITSND, BODYSND, FLYHIT, STEP,
-  stepPlayer, muzzleWorld, RIC, coverAcross, cwallOf, KNOCK, knockHas, GSIDE, KAIM, aimLeap, kaimHold, DUCK, duckPose, RUNSWIPE, runSwipe, SHOTBLOCK, shotBlock, bladeSeg, steelFlash, STEEL, HURT, playerHurt, GOD, LEAP, coverLeap, wallGo, WRUN, wrunTap, wrunFind, wrunSpawn, wrunClear, stepWrun, backGo, HURDLE, hurdleTap, HOOK, barHook, meleeGo0, CART, cartGo, leftFlick, rigAnim, stepKit, frameBody, kickGo, SPRINGS, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, hbarCatch, stepBar, hbarPose, hbarFly, coverArmUndo, slideGo, coverShow, TURRET, beastFire, FIREBALL, RUNSLASH, AFLIP, airPush, DEFL, deflectThreat, threatList, ARCH, ARROWS, archerAdd, archerLoose, SWSEG, swingPeaks, KSET, knockAct, RUNLAND, AIRLEGS, airUpOf, sfxRevive, arenaLoad, BEASTTRIM, GSTRIKE, AIRK, leftFlick, kickGo, CROUCH, LHOLD, TORN, tornGo, LIMB, limbCut, limbPrep, sliceDummy, JUGGLE, TORNADO, FLOW, ZOOM, zoomGo, HORDE, hordeAdd, hordeClear, ACAM, actionCam, acamPip, turretSpawn, COURSE, courseBuild, courseClear, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
+  stepPlayer, muzzleWorld, RIC, coverAcross, cwallOf, KNOCK, knockHas, GSIDE, KAIM, aimLeap, kaimHold, DUCK, duckPose, RUNSWIPE, runSwipe, SHOTBLOCK, shotBlock, bladeSeg, steelFlash, STEEL, HURT, playerHurt, GOD, LEAP, coverLeap, wallGo, WRUN, wrunTap, wrunFind, wrunSpawn, wrunClear, stepWrun, backGo, HURDLE, hurdleTap, HOOK, barHook, meleeGo0, CART, cartGo, leftFlick, rigAnim, stepKit, frameBody, kickGo, SPRINGS, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, hbarCatch, stepBar, hbarPose, hbarFly, coverArmUndo, slideGo, coverShow, TURRET, beastFire, FIREBALL, HOME, RW, rwHeight, RUNSLASH, AFLIP, airPush, DEFL, deflectThreat, threatList, ARCH, ARROWS, archerAdd, archerLoose, SWSEG, swingPeaks, KSET, knockAct, RUNLAND, AIRLEGS, airUpOf, sfxRevive, arenaLoad, BEASTTRIM, GSTRIKE, AIRK, leftFlick, kickGo, CROUCH, LHOLD, TORN, tornGo, LIMB, limbCut, limbPrep, sliceDummy, JUGGLE, TORNADO, FLOW, ZOOM, zoomGo, HORDE, hordeAdd, hordeClear, ACAM, actionCam, acamPip, turretSpawn, COURSE, courseBuild, courseClear, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
   MFX, camShake, palDive,
   // THE BOARD, LIVE (m159). `mel.SK8.hold` is where the deck sits IN HIS HAND while it is
   // carried, and how a carried board should look is a look-at-it decision -- so it is a dial he
