@@ -18130,7 +18130,7 @@ function tornGo() { const p = player; TORN.stat.charges++; p.torn = { n: TORN.sp
 // each restart the body's heading jumps -276 deg to cancel the pose snapping back, so the eye sees one unbroken turn. The first spin starts
 // from the clip's own wind-up (0), the last plays on into the settle (`last`). And it LAUNCHES: `go` m/s along the way he faced, bleeding
 // at `bleed`/s, with the left stick steering on top (`TORN.speed`).
-const WHIRL = { on: 1, idle: .3, spins: [2, 3], R: 3, Rk: 1, dmg: 3, power: 1.1, dur: .42, from: .078, to: .3125, last: .36, turn: 276, go: 8, bleed: 1.1, stat: { whirls: 0, hits: 0 } };
+const WHIRL = { on: 1, idle: .3, spins: [2, 3], R: 3, Rk: 1, dmg: 3, power: 1.1, dur: .21,     /* m1347: *"at least double the speed"* -- .42 -> .21 s a spin */ from: .078, to: .3125, last: .36, turn: 276, go: 8, bleed: 1.1, stat: { whirls: 0, hits: 0 } };
 function whirlGo(k) { const p = player; WHIRL.stat.whirls++; const g = WHIRL.go * (.7 + .3 * k); p.torn = { n: Math.round(lerp(WHIRL.spins[0], WHIRL.spins[1], k)), whirl: 1, k, i: 0, vx: Math.sin(p.faceH) * g, vz: Math.cos(p.faceH) * g }; p.ltHold = 0; p.jump = 0; whirlSpin(); }
 function whirlSpin() {
   const p = player, nm = TORNADO.sword; if (!rig.actions[nm]) { p.torn = null; return; }

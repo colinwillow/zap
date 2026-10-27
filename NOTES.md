@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE WHIRLWIND, TWICE AS FAST (m1347)
+
+*"The whirlwind sword attack is a little better, a little bit more continuous, but I'm still picturing it like at least double the speed."*
+
+- `WHIRL.dur` .42 → .21 s a spin. Each spin is still the clip's measured turning window (276°), so the clip now plays about 3.6× its authored speed through it. Three spins take about 0.65 s.
+- The launch (`go` 8 m/s, bleeding at 1.1/s) is unchanged, so a spin travels about half as far as before.
+- If the clip reads as a blur at this speed, the alternative is more of the turn coming from the heading (`faceH`) than from the clip. That is a separate change; it is not made here.
+
 ## THE PAGODA x1.5 -- STEER S2 (older rows, m1346)
 
 - **From its parameters:**
