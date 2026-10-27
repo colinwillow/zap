@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1084 -- the HORDE probe (HORDE.md stage 1): SPAWN > HORDE adds 25 samurai a tap, to 150, to measure the phone
+
+*"Can the phone handle 100 fully rigged skinned enemies all acting on their own to try to fight me... red vs blue... hit guys and they fly."*
+- `HORDE.md` is the plan: 1 PROBE (this) -> 2 cheap crowd (animate by distance, one material per kind, LOD) -> 3 vertex-animation instancing
+  (a kind = one draw, the nearest 8-12 real skinned bodies) -> 4 red vs blue with a crowd brain. DONE WHEN: his phone's numbers, 100 at 30+
+  fps, the battle, his sign-off.
+- `hordeAdd` (SPAWN > HORDE, a tap = +25, to 150; CLEAR takes them): plain `bodySpawn` samurai in a sunflower spiral 5-14 m round him on the
+  ordinary fighter brain (`foeAI`: chase, swing, block, knocked flying), 3 hp each. The horde has its OWN view of the kind (`Object.create`,
+  `notice` 12): with the arena's `notice` 60 all 100 stood in idle walking (measured -- the m1076 bug again).
+- **Measured here** (`horde.cjs`, real loop, swiftshader -- the CPU ms are meaningless, the counts are not): draw calls 105 at 25 bodies, 142
+  at 50, 175 at 100 (~1 per body past a base of ~80); triangles 552k / 953k / 1,417k -- 1.4 M skinned triangles is the number to beat on a
+  phone. Traced four: they turn to him (facing error < .3 rad), close, swing; he is knocked 7-11 m by the hits (god mode stops damage, not
+  the push). The last 6 m is a walk (K.walk 1 m/s).
+- **His number is the next step:** the chip's FPS / DC / kT / B at 25, 50, 100.
+- Shipped unverified on the phone.
+
 ## m1083 -- the ACTION CAM (the ball cam): an event in the arena swings the lens to frame him and it, with a close-up when it is far
 
 *"Every time we spawn an event... an action camera: your own character is one point, the event the other, and the camera is positioned so

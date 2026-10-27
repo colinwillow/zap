@@ -37,6 +37,8 @@ levels later. **Each sandbox is tuned until it feels great on its own before any
 - [ ] **TESTING GROUND -- SPEC (Oct 26, his).** `COURSES.md` THE TESTING GROUND: the arena is the hub; doors boot MODULES (ACROBATICS
       first: gap, hurdle, wall run, wall jump, high bar, beam, a new GRIND RAIL, back to the floor), then FIGHT (dummies, ricochet,
       cover, SPIDER BOTS). Weapon model (katana + one pick-up slot?) is his call. m1077 restyled the turret and the rocket.
+- [ ] **HORDE -- OPEN (his, Oct 27).** `HORDE.md`: 100 fighters on a phone, red vs blue, hits that launch men. m1084 the probe (SPAWN >
+      HORDE); next: his phone's FPS at 25 / 50 / 100, then the cheap crowd and vertex-animation instancing.
 - [ ] **GEAR -- OPEN (spec only).** `GEAR.md`: rollerblades / jet blades and a wingsuit any hero can wear. Waiting on his models.
 - [x] **m893 ARENA** (`?w=arena`): the stadium, SPAWN > WARBOSS > Brute Warboss / Skullback beams down, chest thump, armour
       flies off, KO slow-mo, beam out, CLEAR. This is the STAGE for the duel, not the duel.
