@@ -39,6 +39,20 @@ His two new rules (BUILDINGS.md), brought to the castle after its ten passes, at
 - A heavy blow (3+ damage: a rocket, a big swing) on the raised bridge drops it with a crash, three times as fast.
 
 SHIPPED UNVERIFIED.
+## THE COURTYARD, PASS 10: POLISH AGAINST THE REFERENCE (m-COURT10)
+
+COURTYARD.md pass 10, the last planned pass. Shipped unverified.
+
+What makes `timber_lane_watchtower.jpg` read is the lane's EDGES and its LIGHT, so that is where this pass went:
+
+- **Stone kerbs** run along both sides of the flags (dark stone, 16 cm: under his .357 step, so you never have to jump them).
+- **A row of eight lanterns** hangs under each hall's lane-side eave at about 6.3-7.6 m, framed in timber. They are spaced off the two paper-lantern strings. They are on the merged `lamp` material, so they breathe and turn Jin-cyan with the rest when the court is won.
+- **Noren:** three red split curtains over each hall's lane door, the middle one with a gold crest. They stir in `courtLife`.
+- **The watchtower:**
+  - a red fascia with a gold edge across deck A's face
+  - a pair of lanterns flanking the inner gate
+- **One warm point light** down the middle of the lane, unshadowed, flickering slightly. It goes cyan with the clear. It is the only real light the court adds.
+- **C1 is at 10 of 10 planned passes.** His walk-through notes become fix passes whenever they come. The loop moves on to the R rows (R2 Four Fires next), which also unblocks the way on behind the inner gate.
 
 ## THE COURTYARD, PASS 9: FIXES FROM READING THE ROUTES (m1312)
 
