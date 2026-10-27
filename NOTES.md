@@ -5,6 +5,25 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1231 -- Oni Gate pass 2: the mouth bites, guard rooms (Building Forge loop)
+
+**THE BITE.** An iron JAW with two rows of ivory fangs hangs in the passage's roof. Its cycle:
+- **Open** 4 s.
+- **RUMBLE** .7 s: it shudders, dust falls and the eyes flare red.
+- **SLAM** .15 s: down to the floor, with a boom, sparks and a camera shake.
+- **Hold** .8 s: it is a solid wall while shut (a `BDYN` box).
+- **Grind** back up over 1.3 s.
+
+Anyone under it when it comes down is crushed for `biteDmg` 30 and thrown out of whichever end of the mouth is nearer. Time
+your dash.
+
+**THE GUARD ROOMS.** A chamber (3.4 x 3.2 m, 3 m high) is now hollowed out of each cheek. The solid blocks were split round it:
+- a 1.2 m door off the passage
+- a tatami floor, a bench and a weapon rack
+- a lamp
+
+Next: alternate -- an extra pass (6) on the Watchtower.
+
 ## m1230 -- Dojo Hall pass 6: sparring ranks (Building Forge loop, extra pass)
 
 The gong's sparring partner (m1206) now has RANKS. Each partner you beat ranks the next one up, through five belts (white,
