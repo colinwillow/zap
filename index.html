@@ -20093,9 +20093,11 @@ function shrineClear() { const S = SHRINE.on; if (!S) return; smashDrop(S.smash)
 // of MERLONS (crenels) on the outer side; a GATEWAY in the middle closed by a breakable timber-and-plaster panel (smash through) under a
 // lintel the walkway runs over; a RAMP up the inner face at each half; and at each end a BASTION 1.5 m higher (steps up from the
 // walkway) with a SENTRY TURRET on top (killable, m1128).
-const RAMP = { raidN: 3, raidCd: 40, at: [0, -36], L: 40, H: 4.2, T: 3, gate: 6, bast: 5, bH: 5.7, slope: .32, senHp: 3, senV: 1.3, senWind: .6, senDmg: 9, senBack: 20, on: null };     // H 4.2: the ramp (slope .32) must land before the bastion steps
+// STEER S2 (x1.5, m1356): its proportions ARE these numbers (they were L 40, H 4.2, T 3, gate 6, bast 5, bH 5.7); `scale` carries the literals inside
+// the builder and tells `skAt` where the sky bridge lands. The ramps keep their SLOPE (.32), so they run 19.7 m; the bastion steps stay .28
+const RAMP = { scale: 1.5, raidN: 3, raidCd: 40, at: [0, -36], L: 60, H: 6.3, T: 4.5, gate: 9, bast: 7.5, bH: 8.55, slope: .32, senHp: 3, senV: 1.3, senWind: .6, senDmg: 9, senBack: 20, on: null };     // H 4.2: the ramp (slope .32) must land before the bastion steps
 function rampBuild() {
-  if (RAMP.on) return; const A = RAMP, [cx, cz] = A.at, H = A.H, hl = A.L / 2, ht = A.T / 2, g2 = A.gate / 2, g = new THREE.Group(); scene.add(g);
+  if (RAMP.on) return; const A = RAMP, k = A.scale || 1, [cx, cz] = A.at, H = A.H, hl = A.L / 2, ht = A.T / 2, g2 = A.gate / 2, g = new THREE.Group(); scene.add(g);
   const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [];
   const stone = new THREE.MeshStandardMaterial({ color: 0x9a948c, roughness: .95 }), stoneD = new THREE.MeshStandardMaterial({ color: 0x77726b, roughness: .95 }), wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 });
   const plank = new THREE.MeshStandardMaterial({ color: 0x6e4a2e, roughness: .85 }), lamp = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false }), neon = new THREE.MeshBasicMaterial({ color: 0x3fe8ff, toneMapped: false });
@@ -20105,10 +20107,10 @@ function rampBuild() {
   for (const sx of [-1, 1]) { const L = hl - g2, x = cx + sx * (g2 + L / 2);
     add(new THREE.BoxGeometry(L, H, A.T), stone, x, H / 2, cz, 1); add(new THREE.BoxGeometry(L, .5, A.T + .4), stoneD, x, .25, cz, 0); add(new THREE.BoxGeometry(L, .15, A.T + .2), stoneD, x, H + .075 - .15, cz, 0); }
   // THE GATEWAY: a lintel the walkway runs over, a breakable panel filling the passage (smash it through), vermilion jambs
-  add(new THREE.BoxGeometry(A.gate + .2, H - 3.4, A.T), stoneD, cx, (H + 3.4) / 2, cz, 1);
-  O.walls.push(cwallBuild(g, T, cx, cz, A.gate, .6, 0, 3.4, O));
-  for (const sx of [-1, 1]) add(new THREE.BoxGeometry(.4, 3.4, A.T + .1), new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .45 }), cx + sx * (g2 - .2), 1.7, cz, 0);
-  add(new THREE.BoxGeometry(A.gate - 1, .06, .04), neon, cx, 3.8, cz + ht + .03, 0);
+  const gH = 3.4 * k; add(new THREE.BoxGeometry(A.gate + .2, H - gH, A.T), stoneD, cx, (H + gH) / 2, cz, 1);
+  O.walls.push(cwallBuild(g, T, cx, cz, A.gate, .6, 0, gH, O));
+  for (const sx of [-1, 1]) add(new THREE.BoxGeometry(.4, gH, A.T + .1), new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .45 }), cx + sx * (g2 - .2), gH / 2, cz, 0);
+  add(new THREE.BoxGeometry(A.gate - 1, .06, .04), neon, cx, gH + .4, cz + ht + .03, 0);
   // MERLONS on the outer side (-z): .9 tall, .8 wide, every 1.6 m, solid
   for (let x = -hl + .8; x <= hl - .8; x += 1.6) add(new THREE.BoxGeometry(.8, .9, .5), stone, cx + x, H + .45, cz - ht + .25, 1);
   // THE BASTIONS at the ends, 1.5 m higher than the walkway, steps up to them from it
@@ -20117,7 +20119,7 @@ function rampBuild() {
     for (const [px, pz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) add(new THREE.BoxGeometry(.7, .9, .7), stone, x + px * (A.bast / 2 - .35), bh + .45, cz + pz * (A.bast / 2 - .35), 1);
     const n = Math.ceil((bh - H) / .3), r = (bh - H) / n; for (let k = 0; k < n; k++) { const top = H + (k + 1) * r, ex = cx + sx * (hl - (n - k) * .5); add(new THREE.BoxGeometry(.5, top - H + .02, A.T - .6), stoneD, ex + sx * .25, H + (top - H) / 2, cz + .3, 1); } }
   // THE RAMPS up the inner face (+z): one each half, from beside the gateway out toward the bastion, slope .3, posts under them
-  { const w = 1.5, z0 = cz + ht, z1 = z0 + w, run = H / A.slope;
+  { const w = 1.5 * k, z0 = cz + ht, z1 = z0 + w, run = H / A.slope;
     for (const sx of [-1, 1]) { const xa = cx + sx * (g2 + .3), xb = xa + sx * run;
       tris.push(xa, 0, z0, xb, H, z0, xb, H, z1, xa, 0, z0, xb, H, z1, xa, 0, z1);
       const L = Math.hypot(run, H), m = new THREE.Mesh(new THREE.BoxGeometry(L, .16, w), plank); m.position.set((xa + xb) / 2, H / 2 - .08, (z0 + z1) / 2); m.rotation.z = Math.atan2(H, xb - xa); m.castShadow = m.receiveShadow = true; g.add(m);
@@ -20134,7 +20136,7 @@ function rampBuild() {
   // ---- PASS 2 (m1144): manned, banners, signal fires, grapple poles, supplies to smash ----
   // BANNERS down the inner face, between the ramps' feet and the bastions
   { const ban = new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 });
-    for (const x of [-15, -9, 9, 15]) { const bm = add(new THREE.PlaneGeometry(1.4, 3.2), ban, cx + x, H - 1.9, cz + ht + .04, 0); bm.castShadow = false; add(new THREE.BoxGeometry(1.7, .1, .1), wood, cx + x, H - .25, cz + ht + .08, 0); } }
+    for (const x0 of [-15, -9, 9, 15]) { const x = x0 * k; const bm = add(new THREE.PlaneGeometry(1.4, 3.2), ban, cx + x, H - 1.9, cz + ht + .04, 0); bm.castShadow = false; add(new THREE.BoxGeometry(1.7, .1, .1), wood, cx + x, H - .25, cz + ht + .08, 0); } }
   // SIGNAL FIRES: a bronze brazier on each bastion's back corner (flames in `rampStep`)
   const fires = []; { const bronze = new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 });
     for (const sx of [-1, 1]) { const fx = cx + sx * (bx + 1.4), fz = cz + 1.4; add(new THREE.CylinderGeometry(.7, .45, .6, 14, 1, true), bronze, fx, bh + .7, fz, 0).material.side = THREE.DoubleSide;
@@ -20143,7 +20145,7 @@ function rampBuild() {
   const rings = []; for (const sx of [-1, 1]) { const px = cx + sx * (bx + 1.8), pz = cz - 1.8; add(new THREE.CylinderGeometry(.09, .12, 4.5, 8), new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .45 }), px, bh + 2.25, pz, 0); rings.push(gringAdd(g, px, bh + 4.1, pz + .3)); }
   // SUPPLIES on the walkway to smash: arrow barrels and crates
   const smash = []; { const cm = new THREE.MeshStandardMaterial({ color: 0xa0784a, roughness: .85 }), bm = new THREE.MeshStandardMaterial({ color: 0x5a4030, roughness: .8 });
-    for (const [x, kind] of [[-12.5, 0], [-11.7, 1], [-5, 0], [6, 1], [11.5, 0], [12.3, 0]]) { const X = cx + x, Z = cz + .5;
+    for (const [x, kind] of [[-12.5, 0], [-11.7, 1], [-5, 0], [6, 1], [11.5, 0], [12.3, 0]]) { const X = cx + x * k, Z = cz + .5;
       const m = kind ? add(new THREE.CylinderGeometry(.35, .35, .8, 10), bm, X, H + .4, Z, 0) : add(new THREE.BoxGeometry(.8, .8, .8), cm, X, H + .4, Z, 0);
       if (kind) for (let k = 0; k < 5; k++) { const ar = new THREE.Mesh(new THREE.CylinderGeometry(.012, .012, .6, 4), wood); ar.position.set((k - 2) * .1, .65, (k % 2) * .1 - .05); m.add(ar); }
       smashAdd(smash, m, { minx: X - .4, maxx: X + .4, miny: H, maxy: H + .8, minz: Z - .4, maxz: Z + .4 }, 2, 15, kind ? [.45, .32, .22] : [.7, .5, .3]); } }
@@ -20161,9 +20163,9 @@ function rampBuild() {
   const drone = bldDrone(g);
   // ---- PASS 4 (m1179): HIGH BARS on the walkway (three, over the wall), the clan banners down the OUTER face too, and the DEFENDERS' ROCKS:
   // walk along the outer foot of the wall and stones are tipped off the walkway onto you (a shadow, then the stone) ----
-  const wbars = []; for (const x of [-15.5, 0, 15.5]) { const B = hbarMake(cx + x, cz + .3, 0, H); HBAR.list.push(B); wbars.push(B); }
+  const wbars = []; for (const x of [-15.5, 0, 15.5]) { const B = hbarMake(cx + x * k, cz + .3, 0, H); HBAR.list.push(B); wbars.push(B); }
   { const ban = new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 });
-    for (const x of [-15, -9, 9, 15]) { const bm = add(new THREE.PlaneGeometry(1.4, 3.2), ban, cx + x, H - 1.9, cz - ht - .04, 0); bm.castShadow = false; bm.rotation.y = Math.PI; } }
+    for (const x of [-15, -9, 9, 15]) { const bm = add(new THREE.PlaneGeometry(1.4, 3.2), ban, cx + x * k, H - 1.9, cz - ht - .04, 0); bm.castShadow = false; bm.rotation.y = Math.PI; } }
   // ---- PASS 5 (m1218): WALL SENTRIES -- two robot samurai patrol the wall walk; when he is up on the walk near one it turns, closes and
   // CUTS (`senWind` s wind-up, red eye); three hits throw it off the wall, and it climbs back `senBack` s later ----
   const sen = []; for (const sx of [-1, 1]) { const R = robotSam(g); R.g.scale.setScalar(1.05); R.x0 = cx + sx * 3; R.dir = sx; R.st = 'walk'; R.t = 0; R.hp = A.senHp; R.g.position.set(R.x0, H + .15, cz + .3); sen.push(R); }
@@ -20173,7 +20175,7 @@ function rampBuild() {
   { const br = new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 }); const st = new THREE.Mesh(new THREE.BoxGeometry(.2, 1, .2), wood); st.position.y = .5; horn.add(st);
     const pts = []; for (let k = 0; k <= 10; k++) { const u = k / 10; pts.push(new THREE.Vector2(.06 + Math.pow(u, 2.4) * .45, u * 1.6)); } const hm = new THREE.Mesh(new THREE.LatheGeometry(pts, 16), br); hm.material.side = THREE.DoubleSide; hm.rotation.z = -Math.PI / 2 - .3; hm.position.set(-.3, 1.15, 0); hm.castShadow = true; horn.add(hm); }
   RAMP.on = { g, O, bars: wbars, turs, t: 0, fires, rings, smash, arch: [], drone, drops: [], dropT: 0, sen, horn, raid: [], raidCd: 0 }; const R0 = RAMP.on;
-  for (const x of [-9, 9]) archerPost(cx + x, H + .05, cz - .4).then(d => { if (RAMP.on === R0) R0.arch.push(d); else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {});
+  for (const x of [-9, 9]) archerPost(cx + x * k, H + .05, cz - .4).then(d => { if (RAMP.on === R0) R0.arch.push(d); else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {});
   arenaBeam(cx, cz, [1, .6, .35], 1); snd('clang', { g: .7, r: .5 });
 }
 function rampSentries(R, dt) { const A = RAMP, [cx, cz] = A.at, p = player, top = A.H + .15, lim = A.L / 2 - A.bast - .8;

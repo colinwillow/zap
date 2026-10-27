@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE RAMPART WALL x1.5 -- STEER S2 (older rows, m1356)
+
+- **Its constants changed:**
+  - length 40 → 60 m, wall 4.2 → 6.3 m high and 3 → 4.5 m thick
+  - the gateway 6 → 9 m wide and 5.1 m high
+  - the bastions 5 → 7.5 m square, 5.7 → 8.55 m tall
+- **`RAMP.scale` carries the literals:** the gate's lintel and jambs, the ramps' width (2.25 m), the banners, the supplies, the bars, the archers' posts.
+- **What keeps its number:**
+  - the ramps' SLOPE (.32): they now run 19.7 m and land just short of the bastion steps
+  - the bastion steps, nine risers of about .25 m
+  - the merlons (.9 m, a crouch's cover)
+- The rampart → gatehouse sky bridge lands on the bastion top at 8.55 via `skAt`.
+
 ## BREAKABLE RAILS -- S3b, FIRST IN THE COURTYARD (m1354)
 
 - **`bldPieces(g, mat)` / `pieceAdd(P, geos, box, O)` / `pieceDone(P)`:** thin breakable things (rails, balusters, slats) gathered into ONE merged mesh, a vertex range each. Each piece has its own solid `noCam` collider, kept in `O.boxes` so the builder's mapping and clear see it.
