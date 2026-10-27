@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1214 -- Market pass 5: the pickpocket (Building Forge loop, extra pass)
+
+Every `thiefEvery` 30 s a little robot PICKPOCKET (a `robotSam` at x0.6) bolts through the market along the stall fronts.
+- **Its run.** It enters from either end at `thiefV` 6.5 m/s, zig-zagging, arms pumping.
+- **In its way.** If he stands in its path it shoves him aside for `thiefDmg` 5.
+- **Catch it.** Cut it down with one hit (`mktThiefHit` in `bldHit`) and it tumbles and drops its stolen POUCH, which glows and
+  bobs. Walk over the pouch for `pouchHeal` 35 health.
+- **If it gets past,** it's gone till the next one.
+
+Next: alternate -- Siege Yard pass 2.
+
 ## m1213 -- Siege Yard pass 1 (Building Forge loop, Set 2 #22)
 
 `SIEGE`, in BLDG.list as `siege`, centred at (-47, -37).
