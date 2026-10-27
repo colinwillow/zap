@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- Octagonal Block Pagoda pass 8 of 10: motion (X4, WORKER A)
+## m1293 -- Octagonal Block Pagoda pass 8 of 10: motion (X4, WORKER A)
 
 - **Wind bells.** A gold bell of blocks hangs off the tip of every kicked-up corner: 56 of them in ONE InstancedMesh.
   - They sway on a slow gusting wind.
