@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1218 -- Rampart pass 5: wall sentries (Building Forge loop, extra pass)
+
+Two robot samurai now PATROL the Rampart's wall walk at `senV` 1.3 m/s, back and forth between the bastions.
+- **When he's on the walk.** If he is on the walk within 7 m of one, it turns, closes at 1.6x speed, raises its blade for
+  `senWind` .6 s (eye going red) and CUTS for `senDmg` 9.
+- **Breaking it.** Striking it during the wind-up breaks it.
+- **Killing it.** Three hits (`rampSenHit` in `bldHit`) throw it off the wall, tumbling outward. It climbs back `senBack` 20 s
+  later.
+
+The wall walk is now a fight, not only a path. Next: alternate -- Set 2 #23 Teahouse Garden pass 1.
+
 ## m1217 -- Siege Yard pass 3: the polish (Building Forge loop)
 
 - **Spare boulders:** a pyramid of eight beside the trebuchet. It is one merged mesh with a solid box.
