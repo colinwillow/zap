@@ -18080,7 +18080,7 @@ function tornStep(dt) {
   T.ring.visible = (p.tornC || 0) > 0; if (T.ring.visible) { const r = .35 + .75 * p.tornC; T.ring.scale.set(r, r, 1); T.ring.position.set(p.pos.x, p.pos.y + .05, p.pos.z); T.ring.material.color.setHex(p.tornC >= 1 ? 0xffc04a : 0xff8a2a); }
 }
 function tornGo() { const p = player; TORN.stat.charges++; p.torn = { n: TORN.spins }; p.tornC = 0; p.ltHold = 0; p.jump = 0; tornSpin(); }
-// m-LAD (his note): *"He does three of them. I was picturing one big powerful spin."* ONE spin, always; the charge now buys REACH and weight
+// m1316 (his note): *"He does three of them. I was picturing one big powerful spin."* ONE spin, always; the charge now buys REACH and weight
 // (R + up to 1.6 m), not more turns.
 const WHIRL = { on: 1, idle: .3, spins: [1, 1], R: 3.4, Rk: 1.6, dmg: 4, power: 1.3, dur: .7, stat: { whirls: 0, hits: 0 } };
 function whirlGo(k) { const p = player; WHIRL.stat.whirls++; p.torn = { n: Math.round(lerp(WHIRL.spins[0], WHIRL.spins[1], k)), whirl: 1, k }; p.ltHold = 0; p.jump = 0; whirlSpin(); }
@@ -31603,14 +31603,14 @@ function buildKit(g) {
 // backwards on one ladder and right on the other, and no extra field is asked of his export.
 const CLIMB = {
   on: 1,
-  speed: 2.3,       // m/s at a full thumb (m-LAD: 3.4 drove the hands at 3.2x -- *"the animation is kind of ridiculous"*)
+  speed: 2.3,       // m/s at a full thumb (m1316: 3.4 drove the hands at 3.2x -- *"the animation is kind of ridiculous"*)
   grab: .30,        // how much thumb INTO the ladder latches one
   off: .55,         // and how far the thumb has to be pulled away to let go
   out: .30,         // how far off the rungs his root hangs
   pad: .35,         // how much bigger than the box the catch volume is
   cool: .35,
   top: .45,         // how far above `climb_top` he is set down
-  lip: .35, overT: .45,   // m-LAD: the step-over starts this far below the top and takes this long
+  lip: .35, overT: .45,   // m1316: the step-over starts this far below the top and takes this long
   rate: 1.9,        // the walk clip, quickened -- there is no climb clip in this export and a
                     // walk cycle facing a wall IS legs on rungs and arms reaching (the grind's
                     // and the hang's own stand-in rule)
@@ -31646,7 +31646,7 @@ function boxHas(b, x, y, z) {
 const _blF = { x: 0, z: 0 }, _bnLF = [];
 function ladderFront(L) {
   if (L.fg !== undefined) return L.fg;
-  // **ONE SIDE ONLY, AND THE LOGICAL ONE (m-LAD).** *"There should only ever be one side allowed of each ladder, logically figured out."*
+  // **ONE SIDE ONLY, AND THE LOGICAL ONE (m1316).** *"There should only ever be one side allowed of each ladder, logically figured out."*
   // A ladder with an exit MARK says where he steps off: over the top, AHEAD of him. So he climbs it from the side AWAY from the mark --
   // which on a ladder against a wall is the outer face, and on a free-standing one is the side facing out of the building.
   if (L.mark) { const d = (L.mark.x - L.cx) * L.nx + (L.mark.z - L.cz) * L.nz; if (Math.abs(d) > .15) { L.fg = d > 0 ? { x: -L.nx, z: -L.nz } : { x: L.nx, z: L.nz }; return L.fg; } }
@@ -31718,7 +31718,7 @@ function climbOff(cool) {
 function stepClimb(dt) {
   const p = player, L = p.climb, s = stickWorld();
   p.climbT += dt;
-  // **AND HE STEPS UP AND OVER (m-LAD).** *"When you get to the top it's hard to transition to the floor... in a perfect world he steps up and
+  // **AND HE STEPS UP AND OVER (m1316).** *"When you get to the top it's hard to transition to the floor... in a perfect world he steps up and
   // over onto the floor."* The top no longer teleports him: `over` carries him from the rungs up past the lip and forward onto the floor in
   // `CLIMB.overT` s, rising first and then moving in (an arc, not a slide), facing the way he goes, with no input needed.
   if (p.climbOver) { const O = p.climbOver; O.t += dt; const u = Math.min(1, O.t / CLIMB.overT), uy = 1 - (1 - Math.min(1, u * 1.6)) ** 2, uh = Math.max(0, (u - .3) / .7), eh = uh * uh * (3 - 2 * uh);

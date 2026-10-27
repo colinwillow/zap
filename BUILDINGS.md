@@ -16,7 +16,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   numbers below are now MINIMUMS x1.5. Size is the point: he is small and powerful in a huge world.
 - **BUT HIS BODY DOES NOT SCALE: STAIRS STAY CLIMBABLE.** His step is .357 m (CLAUDE.md, m368). Every stair riser is **0.30 m or less**:
   a taller storey means MORE steps (or a ramp, or a ladder), never taller ones. Prove a flight by its riser number in the NOTES entry.
-- **LADDERS (shipped in m-LAD, the build after m1315):**
+- **LADDERS (shipped m1316):**
   - one side only: the side away from the exit mark
   - he steps up and over at the top
   - slower hands

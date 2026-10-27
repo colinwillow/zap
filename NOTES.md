@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## LADDERS AND THE WHIRLWIND, FROM HIS X4 WALK (m-LAD)
+## LADDERS AND THE WHIRLWIND, FROM HIS X4 WALK (m1316)
 
 He walked the octagonal pagoda (X4). Three notes on shared systems are fixed here. Scale and stairs went to BUILDINGS.md's new STEER.
 
