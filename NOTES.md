@@ -6,6 +6,31 @@ report, and read the entry before touching that system. New notes go at the TOP 
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
 <<<<<<< HEAD
+## White Heron Castle pass 2 of 10: the roofs (X2, WORKER B)
+
+The reference is all roof lines broken by gables. Everything below goes into the material buckets, so no new draws (two materials
+added: dark tile and gold).
+- **Gables (`gable`).** Built on a roof's own height function, so they sit on it exactly.
+  - **chidori-hafu:** a plain triangle.
+  - **kara-hafu:** bell-curved, flicking up at the ends.
+  - Each has a white plaster face set back under timber barge boards and a gold gegyo at the apex. Its ridge runs back into the storey
+    above. Both slopes are walkable, so a gable is a new little peak to climb.
+- **Where the gables go.**
+  - **The keep:** a kara-hafu low on the front, chidori up the faces. On a side with a door above it, the middle stays clear (a pair
+    either side of it).
+  - **The top roof:** its ridge ends are irimoya gables tucked under the ridge.
+  - **The tower:** chidori, a kara-hafu, and irimoya ends.
+  - **The gallery:** two chidori and a kara-hafu.
+- **Shachi.** Gold tiger-fish (head down, body arching, tail flicked out) on the ends of the keep's ridge, the tower's and the
+  storehouse's.
+- **The roof rhythm.**
+  - White-mortared hip ribs up every corner (the reference's white lines).
+  - A round tile end cap every .5 m along every eave.
+  - A dark block at every kicked-up corner.
+  - A mortared ridge cap on every ridge.
+
+SHIPPED UNVERIFIED. Next: pass 3, the walls (rows of small windows, timber frames, gun and arrow ports).
+
 ## White Heron Castle pass 1 of 10: the mass (X2, WORKER B)
 
 His second 10-pass reference, `images/korajin/ref/white_castle_keep.jpg` (a Himeji-style castle). `HERON`, `heronBuild`, SPAWN > BUILDINGS.
