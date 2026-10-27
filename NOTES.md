@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- Octagonal Block Pagoda pass 9 of 10: the set piece (X4, WORKER A)
+## m1295 -- Octagonal Block Pagoda pass 9 of 10: the set piece (X4, WORKER A)
 
 **Ring the bell at the top and the whole tower answers** (`opagShow`). Strike the bronze bell in storey 6's bell room:
 - **A boom and a shake**, and every wind bell on every corner swings and rings at once.
