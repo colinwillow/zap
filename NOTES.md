@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1164 -- SPIDER-BOT HANGAR pass 3 (DONE) -- the first set is complete
+
+- A spinning red BEACON on the crown sweeping a red cone of light; a bronze RADAR DISH turning back and forth; an antenna mast with a red
+  tip; three glowing SPIDER PODS inside on plinths, breathing; red-lamped cables to stakes; the spiders' eyes pulse.
+`BLDG` sphang `pass: 3`. ALL THIRTEEN of the first set and both extras (grapple hook, horizon) are DONE. Per the rule (m1124/m1125), the
+next pass BRAINSTORMS the next set into BUILDINGS.md, then the loop alternates new buildings with extra passes on the done ones.
+Shipped unverified.
+
 ## m1163 -- SPIDER-BOT HANGAR pass 2: THE SPIDERS CLIMB THE WALLS
 
 His: *"spider robots climbing the walls."* Each spider is now a little state machine (`sphangStep`):
