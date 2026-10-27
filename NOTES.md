@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1104 -- the TITLE PICKER: KORAJIN or ZAP & CLANCY; KORAJIN.md
+
+**What he said:** *"I'm not really making the other game anymore... this character with the Japanese style and the katana is its own game
+and needs to be developed separately... maybe this repo holds multiple games, the first screen a title picker, you pick Zap and Clancy or
+you pick Korajin. Or move it to its own repo, I don't care at this point. Eventually it will be its own."*
+
+**What changed (`startGate`):** after the splash, the start screen opens on PICK A GAME. KORAJIN (red-and-bone title, コラジン · GRUMBO)
+offers The Arena and the White Box and saves the hero as the alien goblin, renamed KORAJIN GRUMBO on the turntable. ZAP & CLANCY is the old
+menu (hero turntable, sandboxes) under a ZAP & CLANCY title. Each page has a back key. Screenshotted headless (the gate faked open): all three
+pages render; the turntable is disposed going back.
+
+**KORAJIN.md:** his pitch, the mythology so far, and his open idea (Korajin is what Jin-bonding makes of ANY creature, not a species), plus
+what in the arena already belongs to it. The repo split is a later copy, the zap-from-weirdport way, when Korajin stops borrowing Zap's code.
+
+**Open:** his two posters reached me only as chat images, not files. Dropping the PNG in the repo puts it on a Korajin splash.
+
 ## m1103 -- the ARCHERS: red samurai with bows who hold the edge of the dais and shoot
 
 **What he said:** *"a bow and arrow version of that samurai... make them red to distinguish, they sit on the periphery and shoot arrows at
