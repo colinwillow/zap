@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home, procedural, pass 7: the shapes, closer (WORKER B)
+
+- **The tower steps in at the balcony.** It is now the refs' stacked blobs: a fat drum up to the balcony, then a narrower TURRET (radius
+  2.5) standing on it with the balcony door and its own dome. The shoulder between them is a walkable ledge all round. The deck and the
+  canopy run from the turret's wall.
+  - `shell()` takes a floor (`b0`) and a zero-height dome, so one shell can stand on another.
+- **The hall is squatter** (walls 6 m, a rounder 3.4 m dome), so the tent cone sits lower over it, as in the refs.
+- **Timber BANDS** with iron studs where each wall meets its dome, and one under the balcony.
+- **Red TASSELS** with brass beads along the front beam.
+- **Counts.** 20 draws.
+
+Checked headless and looked at front and right renders against the refs. Shipped unverified.
+
 ## THE SHIP, PASS 7: THE CORE ROOM, THE CAPTAIN'S CABIN, RATLINES, FLYING FISH (m1391, WORKER A)
 
 His: *"do another detail pass... you're blowing it out of the water, keep going."*
