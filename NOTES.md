@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1147 -- AIRSHIP DOCK pass 2: THE AIRSHIP FLIES (and carries you)
+
+- The airship waits docked `ADOCK.fly.wait` 14 s, sounds a horn, then flies one loop of an ellipse (22 x 26 m half-axes) out from the
+  dock over the courtyard and back in `fly.T` 70 s -- eased from and to a stop, climbing `fly.up` 8 m at the far side, nose along its
+  course (`h` from the ellipse's tangent) -- then docks again. The propeller spins up in flight.
+- **It carries him:** the gondola deck and cabin are now TURNED DYNAMIC boxes in `BDYN` (the trucks' way, m239: tested directly, not in
+  the grid), re-posed every frame (`shipPose`: cs/sn/cx/cz + the AABB of the turned box). Each frame, if he stands on the deck (inside its
+  turned footprint, within .35 m of its top, not jumping up), his deck-local position is carried to the new pose and his facing turns
+  with the ship. Jump off over the courtyard -- or grapple off.
+- Cleared with the tower (both boxes out of BDYN).
+Pass 3 (polish) next. Shipped unverified.
+
 ## m1146 -- AIRSHIP DOCK TOWER pass 1 (BUILDINGS.md #8, at (-30, 0))
 
 `ADOCK`, `adockBuild` / `adockStep` / `adockClear`. SPAWN > BUILDINGS > Airship Dock.
