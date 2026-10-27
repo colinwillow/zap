@@ -18080,7 +18080,9 @@ function tornStep(dt) {
   T.ring.visible = (p.tornC || 0) > 0; if (T.ring.visible) { const r = .35 + .75 * p.tornC; T.ring.scale.set(r, r, 1); T.ring.position.set(p.pos.x, p.pos.y + .05, p.pos.z); T.ring.material.color.setHex(p.tornC >= 1 ? 0xffc04a : 0xff8a2a); }
 }
 function tornGo() { const p = player; TORN.stat.charges++; p.torn = { n: TORN.spins }; p.tornC = 0; p.ltHold = 0; p.jump = 0; tornSpin(); }
-const WHIRL = { on: 1, idle: .3, spins: [1, 3], R: 2.6, dmg: 3, power: .95, dur: .5, stat: { whirls: 0, hits: 0 } };
+// m-LAD (his note): *"He does three of them. I was picturing one big powerful spin."* ONE spin, always; the charge now buys REACH and weight
+// (R + up to 1.6 m), not more turns.
+const WHIRL = { on: 1, idle: .3, spins: [1, 1], R: 3.4, Rk: 1.6, dmg: 4, power: 1.3, dur: .7, stat: { whirls: 0, hits: 0 } };
 function whirlGo(k) { const p = player; WHIRL.stat.whirls++; p.torn = { n: Math.round(lerp(WHIRL.spins[0], WHIRL.spins[1], k)), whirl: 1, k }; p.ltHold = 0; p.jump = 0; whirlSpin(); }
 function whirlSpin() {
   const p = player, nm = TORNADO.sword; if (!rig.actions[nm]) { p.torn = null; return; }
@@ -18089,10 +18091,10 @@ function whirlSpin() {
   playOnce(nm, clipLen(nm) / p.meleeDur); snd('swoosh', { r: .7, g: 1 }); snd('swoosh', { r: 1.1, g: .6 });
   // the RING: everyone within reach, all the way round, takes the blow outward (the clip's own sweep may catch them too -- `tierHit`'s 140 ms
   // debounce keeps that one blow), and machines / walls / props round him take it too
-  const P = p.pos, R = WHIRL.R + .4 * (p.torn ? p.torn.k : 0);
+  const P = p.pos, R = WHIRL.R + WHIRL.Rk * (p.torn ? p.torn.k : 0);
   for (const d of DUMMIES) { if (d.st === 'gone' || !d.root.visible || d === p.carryD) continue; const Q = d.root.position, dd = Math.hypot(Q.x - P.x, Q.z - P.z); if (dd > R || Math.abs(Q.y - P.y) > 1.6) continue;
     WHIRL.stat.hits++; dummyBlow(d, Math.atan2(Q.x - P.x, Q.z - P.z), WHIRL.power, WHIRL.dmg); }
-  for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2, x = P.x + Math.sin(a) * R * .8, z = P.z + Math.cos(a) * R * .8; if (TURRET.list.length) turretMelee(x, P.y + 1, z, .6, 2); else bldHit(x, P.y + 1, z, .6, 2);
+  camShake(.18); for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2, x = P.x + Math.sin(a) * R * .8, z = P.z + Math.cos(a) * R * .8; if (TURRET.list.length) turretMelee(x, P.y + 1, z, .6, 2); else bldHit(x, P.y + 1, z, .6, 2);
     spk(x, P.y + 1, z, Math.sin(a + 1.57) * 4, .5, Math.cos(a + 1.57) * 4, .12, .35, [1, .85, .5]); }
 }
 function tornSpin() {
@@ -31601,13 +31603,14 @@ function buildKit(g) {
 // backwards on one ladder and right on the other, and no extra field is asked of his export.
 const CLIMB = {
   on: 1,
-  speed: 3.4,       // m/s at a full thumb
+  speed: 2.3,       // m/s at a full thumb (m-LAD: 3.4 drove the hands at 3.2x -- *"the animation is kind of ridiculous"*)
   grab: .30,        // how much thumb INTO the ladder latches one
   off: .55,         // and how far the thumb has to be pulled away to let go
   out: .30,         // how far off the rungs his root hangs
   pad: .35,         // how much bigger than the box the catch volume is
   cool: .35,
   top: .45,         // how far above `climb_top` he is set down
+  lip: .35, overT: .45,   // m-LAD: the step-over starts this far below the top and takes this long
   rate: 1.9,        // the walk clip, quickened -- there is no climb clip in this export and a
                     // walk cycle facing a wall IS legs on rungs and arms reaching (the grind's
                     // and the hang's own stand-in rule)
@@ -31617,7 +31620,7 @@ const CLIMB = {
   // at 1x -- the body rises what the holding hand pulls. `CLIMB.speed` 3.4 asks it for ~6x, so
   // `hi` caps the hands at a quick scramble and the last of the speed is bought honestly rather
   // than as a blur; `mel.CLIMB.speed` down is the way to make the hands keep up with the body.
-  ref: .73, hi: 3.2,
+  ref: .73, hi: 2.2,
   // **WHICH SIDE IS THE FRONT (m195).** *"They're all the wrong side -- you can walk up the inside,
   // you can't walk up the outside, which is the opposite of how it should be."* m181 read the front
   // as the piece's local +Z and "measured" it by which side had a wall box within 0.7 m -- which in
@@ -31643,6 +31646,10 @@ function boxHas(b, x, y, z) {
 const _blF = { x: 0, z: 0 }, _bnLF = [];
 function ladderFront(L) {
   if (L.fg !== undefined) return L.fg;
+  // **ONE SIDE ONLY, AND THE LOGICAL ONE (m-LAD).** *"There should only ever be one side allowed of each ladder, logically figured out."*
+  // A ladder with an exit MARK says where he steps off: over the top, AHEAD of him. So he climbs it from the side AWAY from the mark --
+  // which on a ladder against a wall is the outer face, and on a free-standing one is the side facing out of the building.
+  if (L.mark) { const d = (L.mark.x - L.cx) * L.nx + (L.mark.z - L.cz) * L.nz; if (Math.abs(d) > .15) { L.fg = d > 0 ? { x: -L.nx, z: -L.nz } : { x: L.nx, z: L.nz }; return L.fg; } }
   // probe out of the volume along one of its horizontal axes: [hits on +, hits on -]
   const probe = (ax, az, h) => {
     const hit = [0, 0];
@@ -31706,11 +31713,17 @@ function climbGo(L, into) {
 }
 function climbOff(cool) {
   const p = player;
-  p.climb = null; p.climbT = 0; p.climbCool = cool === undefined ? CLIMB.cool : cool;
+  p.climb = null; p.climbOver = null; p.climbT = 0; p.climbCool = cool === undefined ? CLIMB.cool : cool;
 }
 function stepClimb(dt) {
   const p = player, L = p.climb, s = stickWorld();
   p.climbT += dt;
+  // **AND HE STEPS UP AND OVER (m-LAD).** *"When you get to the top it's hard to transition to the floor... in a perfect world he steps up and
+  // over onto the floor."* The top no longer teleports him: `over` carries him from the rungs up past the lip and forward onto the floor in
+  // `CLIMB.overT` s, rising first and then moving in (an arc, not a slide), facing the way he goes, with no input needed.
+  if (p.climbOver) { const O = p.climbOver; O.t += dt; const u = Math.min(1, O.t / CLIMB.overT), uy = 1 - (1 - Math.min(1, u * 1.6)) ** 2, uh = Math.max(0, (u - .3) / .7), eh = uh * uh * (3 - 2 * uh);
+    p.pos.set(lerp(O.a.x, O.b.x, eh), lerp(O.a.y, O.b.y + .25, uy) - .25 * eh, lerp(O.a.z, O.b.z, eh)); p.vel.set(0, 0, 0); p.speed = 1.5; p.grounded = false; p.airT = 0;
+    if (u >= 1) { p.climbOver = null; p.pos.set(O.b.x, O.b.y, O.b.z); p.grounded = true; p.jumps = 0; climbOff(); snd('foot', { g: .2, r: 1 }); } return; }
   // the ladder's SHORT horizontal axis is out of the wall; `climbSide` is which way along it that
   // is, measured where he grabbed it
   const nx = L.nx * p.climbSide, nz = L.nz * p.climbSide;
@@ -31736,12 +31749,9 @@ function stepClimb(dt) {
   // **TOPPING OUT GOES TO HIS OWN MARKER WHEN THERE IS ONE.** `nav_ladder_top__X#` is a real
   // standing point on the roof; without it the fallback is the volume's own top pushed INTO the
   // building, which is a guess and is marked as one.
-  if (p.pos.y >= L.top) {
-    const M = L.mark;
-    if (M) { p.pos.set(M.x, M.y + .05, M.z); }
-    else { p.pos.y = L.top + CLIMB.top; p.pos.x = cx - nx * .8; p.pos.z = cz - nz * .8; }
-    p.grounded = true; p.jumps = 0;
-    climbOff();
+  if (p.pos.y >= L.top - CLIMB.lip) {
+    const M = L.mark, b = M ? { x: M.x, y: M.y + .05, z: M.z } : { x: cx - nx * .8, y: L.top + CLIMB.top, z: cz - nz * .8 };
+    p.climbOver = { t: 0, a: p.pos.clone(), b };
     return;
   }
   // and off the bottom he simply stands up

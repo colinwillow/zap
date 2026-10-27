@@ -5,6 +5,30 @@ Every time you complete the third pass on a building, add it to the inventory I 
 run on it, swing on it, blow it up and repair it. Make various TYPES of buildings that are modular and will eventually fit together, with
 different functions: bars and ramps, interior and exterior, turrets, ballistae, beams -- floating flying ship buildings, zeppelins, towers."*
 
+## STEER (his, after walking X4, Oct 27 2026) -- OUTRANKS THE QUEUE BELOW
+
+> *"We need to increase the scale yet again -- maybe start with 1.5. The stairs on the ground floor are so steep I couldn't climb; I had
+> to jump from one stair to the next... I would make everything bigger. We need room to play. It needs to feel good. Think God of War:
+> everything's huge and you're small but powerful -- the enemies are like 100 times your size. You're a Jin, a powerful deity-spirit-alien.
+> We're gonna go for SIZE."*
+
+- **SCALE x1.5, everything, from now on.** Storeys 6 m+, towers 25-40 m, rooms 9 x 9 m+, walkways 3.3 m+, doors 2.4 m+. ROOM TO FIGHT's
+  numbers below are now MINIMUMS x1.5. Size is the point: he is small and powerful in a huge world.
+- **BUT HIS BODY DOES NOT SCALE: STAIRS STAY CLIMBABLE.** His step is .357 m (CLAUDE.md, m368). Every stair riser is **0.30 m or less**:
+  a taller storey means MORE steps (or a ramp, or a ladder), never taller ones. Prove a flight by its riser number in the NOTES entry.
+- **LADDERS (shipped in m-LAD, the build after m1315):**
+  - one side only: the side away from the exit mark
+  - he steps up and over at the top
+  - slower hands
+  - every new ladder carries a `mark` on the floor it leads to, so its front is decided.
+- **THE QUEUE, FIRST:**
+  - **S1 -- X4 the Octagonal Block Pagoda: x1.5 and climbable stairs** (his test building; Worker A's if Worker A has his go, else this loop's)
+  - **S2 -- the other done buildings, x1.5, one per build:** X1 pagoda, C1 courtyard, X2 castle, R1 ramp tower, and the older forge rows.
+    One build each, with stairs re-cut to .30 risers.
+  - **then** the queue below (R2 Four Fires on), built at the new scale.
+- **GIANTS:** *"Enemies like 100 times your size."* A design note for R7 (the sky dragon) and R8 (boss armour): build the bosses
+  building-sized, things you climb and fight ON.
+
 ## The rules of the loop
 
 - **ONE pass per build.** Pull, read this file, take the first building whose pass count is under 3, do its NEXT pass, `npm run bump`,

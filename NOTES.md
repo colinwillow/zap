@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## LADDERS AND THE WHIRLWIND, FROM HIS X4 WALK (m-LAD)
+
+He walked the octagonal pagoda (X4). Three notes on shared systems are fixed here. Scale and stairs went to BUILDINGS.md's new STEER.
+
+- **"Only ever one side of each ladder, logically figured out."**
+  - `ladderFront` now decides the front from the ladder's exit MARK first. He steps off over the top, ahead of him, so the climbable face is the one AWAY from the mark: the outer face of a ladder against a wall, the court-facing side of a corner ladder, the outside of a free-standing one.
+  - If the mark is not off the ladder's normal by .15 m or more, it falls back to m207's wall probe.
+  - The old fallback ("no wall on either side = climbable from both") is what let him onto the back, where the controls read inverted.
+- **"Hard to transition from the top to the floor... in a perfect world he steps up and over."**
+  - The top no longer teleports him. `p.climbOver` carries him from the rungs up and over onto the mark in `CLIMB.overT` .45 s: an arc that rises first, then moves in. It starts `CLIMB.lip` .35 m below the top, so the hands reach the lip.
+  - `climbOff` clears it.
+- **"The climb animation is ridiculous, really fast."**
+  - `CLIMB.speed` 3.4 → 2.3 m/s, and the clip's cap `hi` 3.2 → 2.2.
+  - The clip is measured at .73 m/s at 1x, so it was running its hands at about 3.2x. Now about 2.2x. `mel.CLIMB.speed` is live.
+- **"He does three spins. I was picturing one big powerful spin."**
+  - `WHIRL.spins` [1,3] → [1,1].
+  - The charge buys REACH now: R 3.4 + up to 1.6 m.
+  - dmg 3 → 4, power .95 → 1.3, the spin .5 → .7 s, 12 hit points round the ring, and a shake.
+- **Scale ×1.5 and climbable stairs:** BUILDINGS.md STEER S1/S2. X4's stairs were too steep to climb; every riser from now on is .30 or less.
+
 ## White Heron Castle pass 11: ROOM TO FIGHT, DOORS AND CHAOS (X2, WORKER B)
 
 His two new rules (BUILDINGS.md), brought to the castle after its ten passes, at the main loop's request.
