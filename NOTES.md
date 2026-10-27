@@ -5,6 +5,54 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The MOVE TABLE, measured (STEER 000 step 1, WORKER B)
+
+His ask (via the main session): *"put worker B on the move table"* -- LEVELDESIGN.md layer 0: every move AND combo, how high and how far,
+measured from the shipped physics, so the level generator sizes every gap from a number instead of an eyeball.
+
+**`npm run moves`** (`tools/moves.mjs` + `tools/moves.page.js`, about 30 s):
+- **Boot.** The `tools/play.mjs` pattern. It boots the shipped `index.html` headless in the Building Forge as Grumbo (`agoblin`, 1.4 m),
+  with a handle spliced beside `mel` and a fake clock. It steps `frameBody()` at 60 fps, with `Math.random` seeded.
+- **Every move goes through the PADS.** Real `PointerEvent`s go into the shipped `bindStick`: tap, flick (centre to rim in a frame), hold,
+  release. The left pad steers by world direction (the inverse of `stickWorld`). So each gesture is read by the game's own code: the
+  sprint is the right pad held while running, the long jump is letting go of it, the backflip is the hold at rest, and so on.
+- **Test geometry** for each row is pushed into `BOXES` on the empty floor and taken out after: 40 m faces, two faces 4.6 m apart, a bar
+  (`hbarMake`), ledges, risers, drop platforms.
+- **Output.**
+  - `tools/moves.json` holds every move's `h` / `d` / `air` / `comfy_h` / `comfy_d` (80%), plus the speeds and the raw rows.
+  - The table between LEVELGRID.md's MOVE TABLE markers is rewritten.
+  - `npm run moves jump bar` runs only those rows and prints them raw.
+
+**The headline numbers (max, comfy):**
+- **Basic jumps.**
+  - jump 2.72 m up.
+  - run jump 7.44 m across.
+  - LONG JUMP (sprint, let go) 13.7 m.
+  - double jump 5.01 m up, 12.5 m at a run.
+- **High jump.** The backflip, at full charge, is **6.66 m** up.
+- **Air kicks.** Each one holds his height and dashes about +4 m.
+  - run + double + 3 kicks: 26.5 m.
+  - zoom + double + 3 kicks: **36.8 m**.
+- **The high bar at a full pump** (giant swings): **14.8 m** up released near the horizontal, **23.9 m** across released just past the
+  bottom.
+- **Wall run UP** (the lip his hands reach):
+  - run, with the tap: 3.3 m.
+  - sprint: 4.5 m.
+  - long-jumping into the face: 10.7 m.
+  - zoom: 11.6 m; zoom-jumping into the face: 13.4 m.
+- **Side wall run.** 6.9 m along the face at a run; the kick off it goes 7.5 m.
+- **Wall-slide chain.** +2.07 m every kick, between faces 4.6 m apart, with no limit found.
+- **Ledge.** The highest top he gets onto is 4.47 m from a jump and 5.86 m from a double.
+- **Step.** .38 m (`MOVE.step` is .40 at his height).
+- **Falls.** No fall damage up to 24 m; over about 3 m it is the hard landing, 1.15 s pinned.
+
+**Found while measuring (not changed):**
+- The right tap at a face is a wall run, not a jump.
+- A jump at a face with the stick at rest is the m1372 wall slide.
+- A kick thrown on the way up throws the rest of the climb away. The kicks are timed at the top.
+
+SHIPPED: tools only; the game is untouched. The numbers are measured headless, not on his phone.
+
 ## THE SHIP, PASS 3: FOAM AND WAKE, BOW SPRAY, THE SUN ON THE WATER, GULLS, THE ISLAND (m1375, WORKER A)
 
 - **Foam round the hull and a wake**, in the sea shader. A band of broken, drifting foam hugs the hull's waterline (an ellipse round its
