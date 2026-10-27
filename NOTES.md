@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1206 -- Dojo Hall pass 5: the sparring partner (Building Forge loop, extra pass)
+
+Ring the hall's gong (a swing near it, as before). A robot samurai (`robotSam`) steps out of the Jin panel on the dais to SPAR.
+- **It closes in** at `sparV` 1.8 m/s and stays inside the hall.
+- **The cut.** It raises its blade for `sparWind` .6 s, its eye turning red, then CUTS for `sparDmg` 9 if you are within 1.7 m.
+  Striking it during the wind-up breaks it.
+- **Beat it.** Three hits (`sparHp`, through `bldHit` / `hallSparHit`) put it down and the hall rewards you: full health and
+  a gold beam.
+- **It bows out** if you leave the hall.
+- One partner at a time; ring again for another.
+
+BLDG.list's hall entry now says pass 5 (it had been left at 3 since m1167). Next: alternate -- Set 2 #21 Senbon Torii pass 1.
+
 ## m1205 -- Ninja Pillars pass 3: the polish (Building Forge loop)
 
 - **SAKURA tree** by the start: merged branches and pink blossom clumps, with a solid trunk. It drops a steady drift of petals
