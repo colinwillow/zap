@@ -18862,7 +18862,7 @@ function hallTex() {
   const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; return (HALL.tex = t);
 }
 function hallBuild() {
-  // STEER S2 (x1.5, m1333): the hall's PROPORTIONS scale (plan, wall height, eave, ridge, the door to 3.2), so the room is 15 x 10.5 and the
+  // STEER S2 (x1.5, m1336): the hall's PROPORTIONS scale (plan, wall height, eave, ridge, the door to 3.2), so the room is 15 x 10.5 and the
   // eave 5.3 m up; what is his size stays (the tatami, the rack, the dummies, the lanterns, the bars' height). The yard and the roof ramp
   // move out with it.
   if (HALL.on) return; const S = HALL.scale || 1, A = Object.assign({}, HALL, { W: HALL.W * S, D: HALL.D * S, H: HALL.H * S, door: S > 1 ? 3.2 : HALL.door, eave: HALL.eave * S, ridgeY: HALL.ridgeY * S, eaveY: HALL.eaveY * S, lift: HALL.lift * S }), [cx, cz] = A.at, g = new THREE.Group(); scene.add(g);

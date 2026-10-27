@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## THE DOJO HALL x1.5 -- STEER S2 (older rows, m-DH15)
+## THE DOJO HALL x1.5 -- STEER S2 (older rows, m1336)
 
 The first of the older forge rows (27 of them), one per build.
 
