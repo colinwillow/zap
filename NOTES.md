@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## GRID LEVEL 1, PASS 5: ARCHERS AND GUNS ACROSS THE GAPS (m1360)
+
+His: *"archers across certain places"*, *"catapults rockets turrets"*.
+
+- **New `posts` list in `LVG1`:** six perches OFF the path, each a pillar with a 2.6 m deck one level above the route it watches, so they shoot across a gap and can't just be walked up to.
+  - archers at (10,8) and (10,9), across the three-part wall run
+  - an archer at (2,6), across the drawbridge gap
+  - an archer at (10,2), looking at the roof spur
+  - rocket guns at (1,3), over the moving platforms, and at (7,8), near the gate; both face the level's middle
+- **What kills them:** archers use `archerPost` (line of sight through `losClear`, so a roof or pillar between you and them is cover). Guns use `turretAt`; a rocket you return homes back to the gun (`turAimHome`).
+- **Teardown:** `lvgClear` drops them (`L.parch`, `L.ptur`). An archer that loads after the level was cleared is dropped on arrival.
+- **Still open:** they are not part of `need` (the boss door). Whether clearing them should matter is his call.
+
 ## GRID LEVEL 1, PASS 4: MOVING PLATFORMS UP TO A ROPE (m1359)
 
 His: *"moving platforms where you jump from one to another to another to get up onto a rope."*

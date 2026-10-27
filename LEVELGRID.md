@@ -97,6 +97,14 @@ This pass adds three new cell kinds to the spec:
 - flying zeppelin platforms
 - swimming (a new mechanic: its own sandbox first, per the whole-piece rule)
 
+## L1 pass 5 (m1360): ARCHERS AND GUNS ACROSS THE GAPS
+
+- **`posts: [[c, r, y, 'archer'|'gun'], ...]`:** a perch (a pillar with a deck on top) at an OFF-path cell, at level y.
+- **The Level 1 posts:**
+  - archers across the wall run (10,8)/(10,9), across the drawbridge gap (2,6), and over the roof spur (10,2)
+  - rocket guns over the movers (1,3) and near the gate (7,8)
+- **Line of sight:** archers need it (roofs and pillars are cover). A rocket you return homes to the gun that fired it.
+
 ## L1 pass 4 (m1359): MOVING PLATFORMS UP TO A ROPE
 
 - **New cell kind `'movers'`:** a pit with four platforms, each 0.9 m higher than the last, sliding back and forth across it (2.2 m either way, each at its own speed). A platform CARRIES him while he stands on it.
