@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1243 -- Lantern Festival Street pass 2: the dragon dance (Building Forge loop)
+
+A robot dragon dance now parades down the street (`FEST`, `festDragon`, `festStep`, `festHit`). It has a gold-horned head and eight
+red-and-gold segments on poles, and it snakes and bobs from gate to gate. The body follows the head's trail at 1.05 m spacing. It
+shoves anyone in its path aside (dmg 5, once a second). Each segment dies to one cut and the head takes 4; killing the head
+collapses the whole dragon, which reassembles at the gate 30 s later. Hooked into `bldHit` before `obsHit`.
+SHIPPED UNVERIFIED. Next: alternate -- an extra pass (6) on the Airship Dock.
+
 ## m1242 -- Rampart pass 6: the war horn (Building Forge loop, extra pass)
 
 A great bronze WAR HORN (a lathe-turned flare on a timber stand) now sits on the Rampart's wall walk. Blow it by striking it
