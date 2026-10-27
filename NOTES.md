@@ -19,7 +19,7 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
   - They stream and ripple on a gusting wind.
 
 SHIPPED UNVERIFIED. Next: pass 3, climbing -- the braces and the base as a jungle gym.
-## THE COURTYARD x1.5 -- STEER S2 (C1, m-CT15)
+## THE COURTYARD x1.5 -- STEER S2 (C1, m1330)
 
 His STEER: *"increase the scale... 1.5... we need room to play"*.
 
