@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1232 -- Watchtower pass 6: the signal beacon, and a zip to the Hall (Building Forge loop, extra pass)
+
+**THE SIGNAL BEACON.** An iron brazier stands on the lookout's south-east corner. Strike it (`wtowerBeacon` in `bldHit`) and
+it BLAZES for `beaconT` 40 s: roaring sparks and a tall smoke column seen across the forge. It also SIGNALS the Airship Dock: a
+docked airship casts off at once, as if its dispatch bell were rung.
+
+**A ZIPLINE** (in `SKYB.zips`, so it appears whenever both stand) runs from the lookout's east side, about 1.3 m over the deck,
+down onto the Dojo Hall's roof west of the ridge. The cable clears the hall's eave by about 4.5 m.
+
+Next: alternate -- Oni Gate pass 3.
+
 ## m1231 -- Oni Gate pass 2: the mouth bites, guard rooms (Building Forge loop)
 
 **THE BITE.** An iron JAW with two rows of ivory fangs hangs in the passage's roof. Its cycle:
