@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1203 -- Floating Islands pass 4: the tengu crow (Building Forge loop, extra pass)
+
+A bronze Jin CROW now circles the islands at 12 m out and about 15 m up, with flapping wings, gold tips and beak, and red eyes.
+- **When it dives.** While he is up on them (above 3.5 m, within 16 m of the group's centre), after `crowRest` 3 s of circling
+  it DIVES at him at `crowV` 9 m/s.
+- **The strike.** `crowDmg` 8 and a big shove angled 50 degrees off its line, meant to knock him off a bridge or a rim. It then
+  climbs back out.
+- **Killable.** Three hits through `bldHit` (`fislHit`), from a blade or arrow. Each hit sends it climbing. On the third it falls
+  in a burst of sparks and smoke and is back `crowBack` 25 s later.
+
+Pass 4 is an extra on a done building, so it moves no sandbox box. Next: alternate -- Ninja Pillars pass 2.
+
 ## m1202 -- Ninja Pillars pass 1 (Building Forge loop, Set 2 #20)
 
 `NPIL`, in BLDG.list as `npil`, centred at (27, 46) inside a raked-sand ring (r 7.6) with a stone kerb.
