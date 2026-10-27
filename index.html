@@ -17361,7 +17361,7 @@ const aimAt = d => {
 // m/s, a little `push` along the blow) and restarts the clock, so a chain keeps it up. The slam drives everyone in `SLAM.r` straight up
 // (`slamUp`), and FLOW (m1086) will chase an airborne man, hopping him up to meet it (`hopMax`).
 // TORNADO: a left / right flick on the ground is the spin kick (`hurricane_kick`, left its mirror) -- it was air only. TOOLS > SIDE FLICK.
-const JUGGLE = { on: 1, hang: 1.8, g: .22, band: 3.2, pop: 6.5, push: 1.6, slamUp: 9.5, slamOut: 1.2, hopMax: 9, stat: { pops: 0, slams: 0, hops: 0 } };
+const JUGGLE = { on: 1, slamHold: .35, rise: 9, hang: 1.8, g: .22, band: 3.2, pop: 6.5, push: 1.6, slamUp: 9.5, slamOut: 1.2, hopMax: 9, stat: { pops: 0, slams: 0, hops: 0 } };
 const TORNADO = { pick: 'TORNADO', picks: ['TORNADO', 'SWING'] };
 try { const v = localStorage.getItem('mel.sideflick'); if (v === 'TORNADO' || v === 'SWING') TORNADO.pick = v; } catch (e) {}
 const bodyAir = d => d.root.position.y > groundAt(d.root.position.x, d.root.position.z, d.root.position.y, .5) + .35;
@@ -17429,12 +17429,16 @@ function kickGo(h, spinNm) {
   // the sweep's own height margin, which `STRIKE.bodyR` widens.
   const spend = p.meleeDur * MELEE.carryAvg;
   const vCap = Math.min(MELEE.maxV, MELEE.airMax / spend);
-  const L = meleeLock(h, MELEE.airMax + MELEE.arrive);
+  const flow = FLOW.on && flowNow() < (p.flowUntil || 0);     // m1088: the FLOW in the air too -- the juggle's chase
+  const L = meleeLock(h, flow ? FLOW.reach : MELEE.airMax + MELEE.arrive, flow ? FLOW.cone : 0, flow);
   if (L) h = L.h;
   p.melTgt = L ? L.d : null;
+  p.kickVy = null;
+  if (flow && L && JUGGLE.on) { FLOW.stat.links++; const dy = L.d.root.position.y + (L.d.K.h || 1.8) * .4 - (p.pos.y + .9);     // his chest at the man's middle
+    p.kickVy = clamp(dy / Math.max(.15, spend), -JUGGLE.rise, JUGGLE.rise); }
   // the floor is its own speed, the lock may only reach FURTHER -- `MELEE.slideFree`'s rule,
   // and doubly so here: a kick that shortens itself lands him on the floor beside the man.
-  p.melV = Math.max(L ? clamp((L.dist - MELEE.arrive) / spend, 0, vCap) : 0,
+  p.melV = Math.max(L ? clamp((L.dist - MELEE.arrive) / spend, 0, flow ? FLOW.maxV : vCap) : 0,
                     Math.min(MELEE.airV, vCap));
   p.melGap = p.melV * spend;
   p.heading = h; p.faceH = h; p.camWant = h; p.melH = h;
@@ -18778,7 +18782,8 @@ function slamLand() {
   // what is left of it, as the landing; the roll is for a slam with no clip of its own.
   const sa = p.slamClip && rig.actions[p.slamClip];
   if (sa) { const left = (sa.getClip().duration - sa.time) / Math.max(.05, Math.abs(sa.getEffectiveTimeScale() || 1));
-    if (left > .12) { p.landHard = 0; p.landClip = p.slamClip; p.land = Math.min(left, 2.5); p.landT = 0; return; } }
+    // m1088: NEVER the roll -- the slam's own clip plays out, or (already over on the drop, measured: it rolled) holds its impact pose `hold` s
+    p.landHard = 0; p.landClip = p.slamClip; p.land = Math.min(Math.max(left, JUGGLE.slamHold), 2.5); p.landT = 0; return; }
   p.landHard = 1; p.landClip = '';
   p.land = MOVE.landHard; p.landT = 0;
   playOnce(CLIPS.landHard, clipLen(CLIPS.landHard) / p.land);
@@ -21268,7 +21273,7 @@ function stepPlayer(dt) {
     // m997: THE FLYING KICK FLIES LEVEL. *"Usually in games, if I'm in the air and do a flying kick, he just goes straight forward --
     // the downward trajectory shouldn't matter. Unrealistic, but more fun."* Its vertical is held at 0 for the kick; gravity takes
     // over when it ends (`KICK.level` 0 = ballistic, as it was).
-    if (p.melee && p.meleeAir && p.airKick && MELEE.kickLevel) p.vel.y = MOVE.g * dt - (MELEE.kickDrop || 0);     // one frame of gravity pre-paid: `integrate` takes it back, net -kickDrop
+    if (p.melee && p.meleeAir && p.airKick && MELEE.kickLevel) p.vel.y = MOVE.g * dt + (p.kickVy != null ? p.kickVy : -(MELEE.kickDrop || 0));     // m1088: a FLOW kick flies at the juggled man's height     // one frame of gravity pre-paid: `integrate` takes it back, net -kickDrop
     // HER STRIKE RIDES (m274): the body faces the blow, the wheels keep rolling -- only their own drag on it
     if (p.melRide && p.melee && !p.roll) { const d = Math.exp(-BLADE.roll * dt); p.vel.x *= d; p.vel.z *= d; p.faceH = h; }
     else {
@@ -33025,7 +33030,7 @@ function dummyBlow(d, dirH, power, dmg, pal) {
   if (d.sh && !pal && arenaShieldHit(d, dirH, power)) return;     // m896: the shield took it
   if (BLOW_SRC === 'shot' && d.arena && ARENA.stun.on && arenaStun(d)) { d.cool = K.cool; return; }     // m901: a stun bolt
   d.cool = K.cool;
-  if (!pal && !BLOW_SRC && player.melee) { player.flowUntil = flowNow() + FLOW.window; d.flowAt = flowNow(); }     // m1086: a swing that LANDED opens the flow
+  if (!pal && !BLOW_SRC && player.melee) { player.flowUntil = flowNow() + FLOW.window; d.flowAt = flowNow(); player.airKick = 0; }     // m1088: and a hit in the air earns the next kick     // m1086: a swing that LANDED opens the flow
   d.aggro = 1; d.seen = 0;     // being shot at is how you get noticed
   // **A MAN TURNS ON THE THING BITING HIM**, and the LATCH is what carries it: the pal is
   // usually not the nearer of the two, so the distance rule below would never have picked him.
