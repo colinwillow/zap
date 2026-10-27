@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1250 -- wall running on breakable walls; the x-ray in the forge's buildings (his report)
+
+*"You should be able to wall run on pretty much any wall, even the destructible ones... [the Observatory] would be a really fun
+exercise -- wall run up the whole thing, wall to wall, in a spiral. Problem is you can't wall run on walls that are destructible."* and
+*"When you're inside the building the camera doesn't see through walls... we need some kind of x-ray vision."*
+
+- **Wall run.** A breakable wall is in `BOXES` as .6 x .3 m chunks plus its posts. `wrunFind` refused every piece on `minLen` 1.2 (the
+  rule that says a post is not a wall). Now any piece of a breakable wall stands for the WHOLE wall: `cwRunBox` gives one turned box
+  along its length, the full height of the wall, cached on the wall (`W.rb`). The side run, the run-up and the wall-to-wall jump all
+  work on it. The run holds across holes already broken in it. A run-up on a breakable wall does not hand over to the ledge hang,
+  because the ledge finds chunks and not this box.
+- **X-ray.** This reuses the kit worlds' x-ray (m181) rather than adding a new one: `kitCutMat` on a material, switched on by
+  `kitXrayStep`. Anything nearer the lens than his chest, above his feet and inside a circle round him is dithered down to `xrayMin`.
+  - Every `BLDG` build is now wrapped so that whatever it adds to the scene is tagged (`bldXrayTag`). Only plain meshes with built-in
+    materials are tagged: no shader materials and no skinned bodies.
+  - The step now also runs when `WORLD.now === 'forge'` (`BLDX.on`), with the indoor circle `xrayWIn` 2.4 m.
+  - Only buildings spawned after this build are tagged, so respawn one to see it.
+
+SHIPPED UNVERIFIED.
+
 ## m1249 -- machines are melee targets: the charge stops ON a turret (his report)
 
 *"I make it up a tower and there's a sentry gun or a turret or the giant crossbow... I charge-attack it and I launch over it or through it,
