@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1121 -- Watchtower, pass 2 (bigger, manned, a fire pit, perches, a katana mask)
+
+His notes folded in (BUILDINGS.md): BIGGER -- 4 m storeys, a 6 m body, the lookout at 12 m; MANNED -- a sentry gun on the second deck
+(`turretAt`: a turret can stand at a height now, `T.y`, and a posted one aims DOWN at him) and a red archer POSTED on the lookout
+(`archerPost`: `d.post` holds his spot and shoots from it); PERCHES -- three timber cross-beams jutting 3.6 m out of the second deck and the
+lookout, walkable, a lamp at each tip; a FIRE PIT -- a big bronze brazier by the door, glowing coals, leaping flames and sparks and a little
+smoke (`wtowerStep`); a KATANA MASK over the door -- a red-lacquer mempo face, black brows and moustache, glowing eye slits, a gold horn,
+two crossed katanas behind. Taking the tower away takes its turret and its archer. Shipped unverified.
+
 ## m1120 -- Watchtower, pass 1 (and the shared building pieces)
 
 Shared now: `bldRoof` (the hall's concave, corner-lifted roof as a function; RH 0 = a pagoda cap), `bldClear`, `bldCable` (a sagging wire
