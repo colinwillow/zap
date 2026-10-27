@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## GRID LEVEL 1 THREW ON SPAWN SINCE m1359 (m1368)
+
+His: *"I tried to spawn Grid Level 1 and it just turned into a black screen. I can faintly see through it."*
+
+- **What was wrong:** pass 4's rope was made with `Object.assign(new THREE.Mesh(...), { position: new THREE.Vector3(...) })`. A three.js `position` is read-only (`Object.defineProperty`), so the assign THREW halfway through `lvgBuild`. Half a level and the dimmed menu were left on screen. Passes 4 to 10 (m1359-m1365) never reached him.
+- **Found by building it, not by reading:** headless Chromium, the forge, `BLDG.list` lvg1 `.build()` inside a try. The stack named `cellBuild`, line 23696. After the fix the same run builds clean and steps 3 s of frames with no page error.
+- **Rule:** never `Object.assign` a `position` / `rotation` / `quaternion` / `scale` onto an Object3D. Use `.set()` / `.copy()`. A grep of `Object.assign(new THREE.Mesh(... { position` finds no other case.
+
 ## AIM BACK TO REGULAR, PLUS A ±20° HEIGHT ASSIST (m1367)
 
 His: *"Reset the regular rocket shooting to regular, it's getting too crazy. Just a slight auto-aim within like 20 degrees up or down: if you've pressed up on the right pad to start a rocket shot and there's a character up or down by 20 degrees, it tilts the camera and the aim slightly up towards them. It doesn't auto-lock left and right, but it reaches the height for you."*

@@ -23693,7 +23693,7 @@ function lvgBuild(spec) {
       const b = dc ? { minx: fx - t / 2, maxx: fx + t / 2, miny: lo, maxy: top, minz: Z(r) - C / 2, maxz: Z(r) + C / 2 } : { minx: X(c) - C / 2, maxx: X(c) + C / 2, miny: lo, maxy: top, minz: fz - t / 2, maxz: fz + t / 2 };
       put(new THREE.BoxGeometry(b.maxx - b.minx, top - lo, b.maxz - b.minz).translate((b.minx + b.maxx) / 2, (lo + top) / 2, (b.minz + b.maxz) / 2), m); O.boxes.push(b); }
     if (prev && prev[3] === 'movers' && dy > 0) { const dc = c - prev[0], dr = r - prev[1], lx = X(c) - dc * (C / 2 + .25), lz = Z(r) - dr * (C / 2 + .25), lo = py * Lv + 3.4;     /* m1359: a ROPE hung from the ledge down to the top platform */
-      g.add(Object.assign(new THREE.Mesh(new THREE.CylinderGeometry(.05, .05, top - lo + .6, 6), new THREE.MeshStandardMaterial({ color: 0xc9b07a, roughness: 1 })), { position: new THREE.Vector3(lx, (top + lo) / 2, lz) }));
+      { const rm = new THREE.Mesh(new THREE.CylinderGeometry(.05, .05, top - lo + .6, 6), new THREE.MeshStandardMaterial({ color: 0xc9b07a, roughness: 1 })); rm.position.set(lx, (top + lo) / 2, lz); g.add(rm); }     /* m1368: was Object.assign({position}) -- read-only, it threw and the level never built */
       const Lr = kitClimbAdd({ minx: lx - .3, maxx: lx + .3, miny: lo, maxy: top, minz: lz - .3, maxz: lz + .3 }, 'lvg_rope', top); Lr.mark = { x: X(c), y: top, z: Z(r) }; climbs.push(Lr); }
     if (prev && Math.abs(dy) >= 2 && dy > 0 && !vw && prev[3] !== 'bars' && prev[3] !== 'movers') { const dc = c - prev[0], dr = r - prev[1], lx = X(c) - dc * (C / 2 + .15), lz = Z(r) - dr * (C / 2 + .15), w = dc ? [.12, .4] : [.4, .12];
       put(new THREE.BoxGeometry(dc ? .1 : .7, top, dc ? .7 : .1).translate(lx, top / 2, lz), pillar);
