@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1128 -- GATEHOUSE pass 3 (DONE) + TURRETS AND THE BALLISTA ARE KILLABLE
+
+His, mid-pass: *"Don't forget to make the turrets and stuff destroyable -- I could kill it."*
+- **The posted turret (Watchtower deck 2) could NOT be hit:** `turretMelee` and `turretBlast` tested `y < TURRET.h + .2` -- an absolute
+  height, so anything over 2.2 m up was out of reach. They test against `(T.y || 0)` now (and its explosion happens at its own height).
+- **The ballista is killable:** `bldHit(x, y, z, rad, dmg)` -- called from `turretMelee` (katana), `turretBlast` (his shots) and
+  `arrowStep` (one of HIS bolts/arrows, i.e. its own bolt PARRIED back, does 3). `GHOUSE.balHp` 6; at 0 it smashes (sparks, smoke, a
+  boom, the stock slumps, the eye goes out), stops shooting, smokes, and is REPAIRED after `balFix` 20 s. BUILDINGS.md now says every
+  shooter is killable, through `bldHit`.
+- Gatehouse polish: an ONI MASK on the drawbridge's underside (red face, glowing eyes, gold horns, teeth) -- it faces you when the bridge
+  is up; a SHIMENAWA with shide on the torii's nuki; two strings of paper lanterns across the passage under the deck.
+`BLDG` gate `pass: 3`. Next in the queue: the Grappling Hook, then the snowy horizon, then the Pagoda. Shipped unverified.
+
 ## m1127 -- GATEHOUSE pass 2: the ballista, the drawbridge, banners
 
 - THE BALLISTA on the deck: bronze turntable, timber stock, two bow arms, a string, a spear-size bolt. Inside `GHOUSE.balR` (34 m) it
