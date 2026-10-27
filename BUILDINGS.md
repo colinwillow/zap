@@ -51,6 +51,14 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 - **Pass meaning**: 1 = the building stands, playable (shell, roof, doors, the main feature). 2 = the details and the function (interior,
   the moving parts, lights, the special feature working). 3 = the polish (proportions, colour, silhouette, one more delight).
 
+## HIS REQUESTS (m1251) -- these go FIRST, ahead of the rest of Set 3
+
+| # | building | function | spot | passes |
+|---|---|---|---|---|
+| R1 | **Zoom Ramp Tower** | his: *"a tower shaped like a really tall ramp -- you do the speed run and it's just tall enough that your whole run gets you to the top, and you hit it perfectly; the very top is a rim of high bars or a ledge you just barely grab, then pull yourself up into a guard tower."* A long run-in, a ramp curving up into a sheer face (the ZOOM at full hold meets the face head-on and the no-tap run-up (m1251) carries him up it -- tuned so a FULL zoom just reaches the lip and anything less falls short), a ledge / ring of bars at the top, a guard tower on the summit. A CHALLENGE: a timer, a mark of how close he got | (-60, -60) | · · |
+| R2 | **The Four Fires** | his: *"maybe four of these, and you extinguish the fire in each of them, and every time some wheel turns, and eventually it opens the drawbridge to the indoor something."* Four ramp towers (R1 again, each a different line up) round a sealed keep; a brazier burns on each summit -- strike it out and a great gear on the keep turns a quarter; all four and the drawbridge falls and the way INTO the chamber (R3) opens | around R1 | · · |
+| R3 | **INTERIOR KIT -- the chamber** | his: *"interior pieces -- modular, so we can build levels where you go inside a giant chamber, like the start of Aladdin, down in the Cave of Wonders, the classic video game underground chamber you move forward through."* A KIT, not one building: a set of interior pieces that snap on the 4 m grid -- corridor (straight, corner, T), a great hall bay (tall, pillared), stairs/ramps down a level, an arch and a door, a pit with a bar across, a ledge run along a wall, a collapsing floor tile, a treasure dais, torches and glowing Jin crystals, a ceiling (the x-ray (m1250) lets the camera see in). Pass 1 = the pieces and one small chamber assembled from them below the forge floor (an entrance going down); pass 2 = the traps and function; pass 3 = the lighting and polish | under the forge | · · |
+
 ## The queue
 
 | # | building | function | spot | passes |

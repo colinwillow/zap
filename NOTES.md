@@ -5,6 +5,31 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1251 -- the wall run-up needs no tap, and its height comes from his speed (his report)
+
+*"I don't think we ever made a wall run where you run straight up the wall. If you jump and hit a wall straight on, his velocity should just
+go straight up... the speed run gets you velocity, so you could really wall run up a wall."*
+
+The run-up did exist, but only on a TAP, and always at a fixed `upV` 7.2 m/s, about 2 m.
+- **No tap (`wrunAuto`, every frame).** It starts by itself on a tall face (`minH`), any wall now including breakable ones (m1250),
+  when he meets it SQUARELY head-on (`autoInto` .9, so the ~45-degree wall-to-wall jump stays a side run):
+  - in the AIR at `autoAir` 3 m/s or more into it
+  - on the GROUND only at a ZOOM's speed (`autoGround` 9; a sprint is 7.2, so running into a wall stays running into a wall)
+- **Speed buys height.** The upward launch is his into-speed x `upK` 1, capped at `upMax` 17, and the run's time scales with it:
+  - a sprint jump climbs about 2 m (as before)
+  - a half zoom about 6 m
+  - a full zoom (17 m/s) about 12 m
+
+  The tapped run-up gets the same speed rule. The lip still hands over to the ledge hang, and a tap still kicks off backwards into the
+  flip.
+
+BUILDINGS.md: his three requests are queued FIRST:
+- R1, the Zoom Ramp Tower, tuned so that a full zoom just makes the lip
+- R2, the Four Fires that open a drawbridge
+- R3, the INTERIOR KIT, modular chamber pieces for an underground level
+
+SHIPPED UNVERIFIED.
+
 ## m1250 -- wall running on breakable walls; the x-ray in the forge's buildings (his report)
 
 *"You should be able to wall run on pretty much any wall, even the destructible ones... [the Observatory] would be a really fun
