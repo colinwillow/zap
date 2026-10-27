@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1234 -- Gatehouse pass 6: the murder hole (Building Forge loop, extra pass)
+
+An iron CAULDRON (glowing oil in it) now sits on a pivot on the first deck, over a dark grated hole above the passage. Strike it
+(`ghouseOilHit` in `bldHit`) and it TIPS.
+- **The pour.** A sheet of glowing Jin-oil pours down through the hole into the passage for `oilT` 2.5 s, with sparks and smoke.
+- **Who it hits.** Every body in the passage is burned and knocked flat (`dummyBlow`, `oilDmg` 10). Him too, if he is under it.
+- **Reset.** It rights itself and refills for `oilCd` 20 s.
+
+It is the gate's defence turned to his use: lure the horde into the passage, then pour. Next: alternate -- Set 3 #26 Jin
+Observatory pass 1.
+
 ## m1233 -- Oni Gate pass 3: the polish (Building Forge loop)
 
 - **A wild mane** of red rope tassels along the brow (one merged mesh, lengths varied).
