@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1115 -- the hut is enterable
+
+*"Make the hut enterable."* His collider is only a skirt round the base, so `hutEnter` builds the hut's collision in its own GLB units
+through its own matrix: solid cells (`HUT.cell` .045 = .4 m) over the plan, except the interior (the measured `hut_interior_shell` bounds,
+x -.24..+.22, z -.24..+.17, floor y .06 = .54 m up) and a doorway corridor out the front (+z, the stairs side, 1.35 m wide); a walkable floor
+over the interior and a ramp from it down the corridor to the ground. The interior is about 4.1 x 3.7 m. Shipped unverified (if the door is
+on another side, `HUT.door` and the corridor's side are the two things to change).
+
 ## m1114 -- paths up to the bridges (pushed as is, at his word)
 
 - `hwPath`: from each end of both bridges a ledge cut along the canyon wall down to the floor at slope .5 (~27 deg), 2.3 m wide, stone treads
