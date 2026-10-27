@@ -5,6 +5,33 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE SHIP, PASS 7: THE CORE ROOM, THE CAPTAIN'S CABIN, RATLINES, FLYING FISH (m@X4@, WORKER A)
+
+His: *"do another detail pass... you're blowing it out of the water, keep going."*
+
+- **THE ANTI-GRAV CORE ROOM**, at the after end of the hold (his reference sheet's "engine / anti-grav core"):
+  - a blue glowing core, 2 m tall, in a brass cage: eight bars, two ring collars, bronze plinth and crown;
+  - bronze pipes run up and out into the hull, and down into the floor;
+  - blue sparks drift up off it;
+  - it stands on a red diamond rug (`red_cloth`).
+
+  It shares the turbines' breathing core material, so the ship's whole drive pulses as one, and it has a collider.
+- **THE CAPTAIN'S CABIN, dressed**:
+  - a red diamond carpet (`red_cloth`) and four diamond banners on the walls;
+  - a chart with two scrolls on the table, and a high-backed chair at its head;
+  - a brass-ringed globe on a stand, and a wall rack of three katanas with red grips.
+- **RATLINES**: rope rungs every .55 m across each mast's three shrouds a side, so every shroud reads as a rope ladder up to the tops
+  (visual; the climbs are the ladders and sails).
+- **A lantern** hung off every crow's nest.
+- **Big STERN LANTERNS** (brass-capped, glowing) off the castle's two after corners, and **a bronze cornice** round the top of the castle.
+- **Life round the ship** (`shipLife`):
+  - blue sparks drift aft off the turbines' cores;
+  - **FLYING FISH**: a pool of four silver darts leaps out of the swell alongside every few seconds, each on its own arc, with a splash going
+    out and coming back in (`shipFishMake`).
+- **Checked headless**: boots, builds, no errors; renders in the core room, the cabin and aloft.
+
+SHIPPED UNVERIFIED.
+
 ## Grumbo's home, procedural, pass 6: life -- the wind and the swinging orb (WORKER B)
 
 - **THE WIND.** The banner and awning materials flutter in the vertex shader. The cloth moves along its own normal: nothing at the edge it
