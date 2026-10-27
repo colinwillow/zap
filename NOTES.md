@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1257 -- Zoom Ramp Tower pass 2: the chimney and the scoreboard (Building Forge loop, R1)
+
+- **The chimney: a second line up.** This is his m1250 idea: *"wall run along one wall, jump to the next, spiral up."* A free-standing
+  sandstone slab stands `gap` 3.2 m off the tower's +x flank, 6 m long and H - 1 m tall. He side-runs one wall, kicks across to the
+  other, and zigzags up, then catches the tower's own top edge (the summit's +x rail is now open there). Neon ticks every 2 m run up
+  both walls.
+- **The scoreboard.** A canvas board faces both ways on the gate. It shows his BEST height on the face as a % of the lip, and catches /
+  tries. A dim gold line also stays on the face at his best ever.
+- **Loop rule.** The loop now takes the R rows first, three passes each, with no alternating extra passes while any R row is open.
+
+SHIPPED UNVERIFIED. Next: R1 pass 3 (polish).
+
 ## m1255 -- the look-up: the lens glances up at a shot coming from above (his request)
 
 *"When there's guards up on towers, or a sentry gun shooting rockets down, or arrows or cannonballs, there's no way to look up, so it's hard
