@@ -33,7 +33,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - the altars REACHABLE: three floating stones from an opening in the rim up to each altar, and the altar disc is a floor
   - the seven drifting platforms are STANDABLE and carry you
   - `npm run check` now boots the arena and forge too (`check:worlds`)
-- [x] **pass 4 (m1404): NO MORE CONES.** Every floating rock is a `floatIsland` (shared, see NOTES):
+- [x] **pass 4 (m1407): NO MORE CONES.** Every floating rock is a `floatIsland` (shared, see NOTES):
   - an irregular, notched outline
   - a grass/dirt top
   - a cliff band, then lobed undersides cracked and banded in strata, with moss at the rim

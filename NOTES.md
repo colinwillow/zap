@@ -494,7 +494,7 @@ SHIPPED UNVERIFIED. The queue's passes 2 and 3 are done. Next is his call: more 
 
 SHIPPED UNVERIFIED. Next: pass 3, foam and wake, bow spray, the sun on the water, gulls, an island.
 
-## FLOATING ISLANDS, NOT CONES (m1404): `floatIsland` AND `islandDress`, SHARED
+## FLOATING ISLANDS, NOT CONES (m1407): `floatIsland` AND `islandDress`, SHARED
 
 His (to this window and the Ship's): *"The upside-down floating islands -- you take a cone, turn it upside down and call it a floating island, and it looks so goddamn geometric. Break up that shape: erode the outer ridges, break up the line with rocks and dirt and boulders and trees and shrubs, inflate and deflate, take chunks away, add chunks... big land masses, small, medium -- art direct."*
 

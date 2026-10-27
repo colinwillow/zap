@@ -10115,7 +10115,7 @@ function snowStep(dt) { const Z = SNOWZ, A = Z.air, p = player; if (!A) return; 
     P[o] += F.vx[i] * dt; P[o + 1] += F.vy[i] * dt; P[o + 2] += F.vz[i] * dt; A.A[i] = Math.max(0, Math.min(.9, F.life[i])); if (F.life[i] <= 0 || P[o + 1] < 0) { A.A[i] = 0; P[o + 1] = -99; F.life[i] = 0; } }
   A.pg.attributes.position.needsUpdate = true; A.pg.attributes.aA.needsUpdate = true; A.pg.attributes.aSize.needsUpdate = true;
   A.pm.uniforms.uPx.value = renderer.domElement.height / (2 * Math.tan(camera.fov * Math.PI / 360)); }
-// m1404: FLOATING ISLANDS, SHARED (his, after m1403: *"the upside-down floating islands -- you take a cone, turn it upside down, and it just looks
+// m1407: FLOATING ISLANDS, SHARED (his, after m1403: *"the upside-down floating islands -- you take a cone, turn it upside down, and it just looks
 // so goddamn geometric. Break up that shape: erode the outer ridges, break up the line with rocks and dirt and boulders and trees and shrubs,
 // inflate and deflate, take chunks away, add chunks, make it rocky... big land masses, small, medium -- art direct."*). `floatIsland(o)` returns
 // { geo, topAt(x, z), rimR(a) }: a unit icosphere pushed into an island -- the TOP flattened to a gentle terrain inside an irregular, NOTCHED
