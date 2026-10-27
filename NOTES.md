@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- Timber Siege Fort pass 7 of 10: the timber gives way (X3, WORKER A)
+## m1337 -- Timber Siege Fort pass 7 of 10: the timber gives way (X3, WORKER A)
 
 **Cut the braces and the bays sag and fall** (`tfortFace`):
 - **Each tier face keeps its own parts**: the X-braces in its bays, its rails, and the outer 2 m of the deck over it. That deck edge is now
