@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1155 -- BATHHOUSE pass 1 (BUILDINGS.md #11, at (-30, 24))
+
+`BATH`, `bathBuild` / `bathStep` / `bathClear`. SPAWN > BUILDINGS > Bathhouse.
+- 12 x 10 m, low (3.4 m walls, roof ridge ~6 -- the zeppelin's trapeze sweeps past at ~6.8): breakable walls on the back and both sides,
+  the courtyard side (+x) OPEN between five posts onto a raised ENGAWA (veranda, .3: one step), a curved roof, lanterns under the eave.
+- Inside on a dark stone floor: a big POOL (6.4 x 5.6) in a low stone rim (.3, he steps over it), blue water a hand deep, three stepping
+  stones, STEAM rising off it all the time; a round wooden cold-plunge tub; benches along both side walls.
+- A tall stone CHIMNEY (8 m) at the back corner with a bronze cap, smoking.
+Pass 2 next: sliding shoji screens across the front, function. Shipped unverified.
+
 ## m1154 -- FLYING SHIP pass 3 (DONE)
 
 - Painted OCULI (the junk's eyes) on both sides of the bow; a gold DRAGON-HEAD figurehead with horns and red eyes on the bow tip.
