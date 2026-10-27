@@ -22153,7 +22153,7 @@ function festClear() { const F = FEST.on; if (!F) return; bldClear(F); FEST.on =
 // above it come down with it); inside, a ladder up through a hatch on every floor; a door onto the roof of every storey; a red octagonal
 // fence with a gate toward the forge's middle; a stepped spire. Faces: face i's outward normal is (cos i*45, sin i*45); a block's mesh
 // yaw is -i*45-90 so its local x runs along the face (cs = cos yaw, sn = -sin yaw: `boxLocal`'s frame).
-const OPAG = { showT: 14, lion: { hp: 8, wake: 8, v: 3.8, leapAt: 3, leapV: 7, leapUp: 6, dmg: 9, cd: 1.4, back: 60 }, fixAfter: 20, fixEvery: .15, fixFly: .4, at: [70, 72], n: 7, a0: 6, shrink: .4, sh: 3.4, base: .6, t: .4, eave: [2.95, 2.6, 2.25, 1.9], eave0: [3.9, 3.3, 2.7, 2.1], blkHp: 2, RF: 13.5, doorW: .95, doorH: 1.85, on: null };
+const OPAG = { showT: 14, lion: { hp: 10, wake: 11, v: 4.2, leapAt: 4.2, leapV: 8, leapUp: 7, dmg: 11, cd: 1.4, back: 60, k: 1.6 }, fixAfter: 20, fixEvery: .15, fixFly: .4, at: [70, 72], n: 7, a0: 9, shrink: .6, sh: 6, base: .6, t: .45, eave: [4.4, 3.95, 3.4, 2.8], eave0: [5.6, 4.8, 4, 3.2], blkHp: 2, RF: 19, doorW: 1.45, doorH: 3, winW: .95, winLo: 1.4, winHi: 3.4, bw: .9, bh: .6, on: null };
 function opagTB(x, z, hx, hz, yaw, y0, y1) {     // a collider box, turned when it is not on the axes
   const cs = Math.cos(yaw), sn = -Math.sin(yaw), ex = Math.abs(cs) * hx + Math.abs(sn) * hz, ez = Math.abs(sn) * hx + Math.abs(cs) * hz;
   const b = { minx: x - ex, maxx: x + ex, miny: y0, maxy: y1, minz: z - ez, maxz: z + ez };
@@ -22190,41 +22190,47 @@ function opagBuild() {
     const a = aOf(k), y0 = yOf(k), y1 = y0 + A.sh, rc = a - t / 2, top = k === N - 1, E = k === 0 ? A.eave0 : A.eave;
     // THE WALLS: a red post at each of the eight corners, a red band under the eave, and between the posts a panel of CREAM BLOCKS that
     // break -- a door in face `doors[k]`, a window in the middle of every other face above the ground
-    for (let i = 0; i < 8; i++) { const va = i * Math.PI / 4 + Math.PI / 8, vr = (a - .3) / C8; stack(cx + Math.cos(va) * vr, cz + Math.sin(va) * vr, y0, y1, .62, -va - Math.PI / 2, red, 4); }
-    for (let i = 0; i < 8; i++) { const [nx, nz] = fN(i), tx = -nz, tz = nx, yaw = fYaw(i), Lh = rc * T8 - .25, cols = Math.max(2, Math.round(2 * Lh / .6)), w = 2 * Lh / cols, yb = y1 - .4, rows = 7, rh = (yb - y0) / rows;
-      { const L2 = rc * T8, nb = Math.max(2, Math.round(2 * L2 / .7)), bw = 2 * L2 / nb; for (let q = 0; q < nb; q++) { const u = -L2 + bw * (q + .5); blk(cx + nx * rc + tx * u, yb, y1, cz + nz * rc + tz * u, bw, t, yaw, red, 0, 1); } }     // m1279: the red band, in blocks
+    for (let i = 0; i < 8; i++) { const va = i * Math.PI / 4 + Math.PI / 8, vr = (a - .45) / C8; stack(cx + Math.cos(va) * vr, cz + Math.sin(va) * vr, y0, y1, .9, -va - Math.PI / 2, red, 6); }
+    for (let i = 0; i < 8; i++) { const [nx, nz] = fN(i), tx = -nz, tz = nx, yaw = fYaw(i), Lh = rc * T8 - .38, cols = Math.max(2, Math.round(2 * Lh / A.bw)), w = 2 * Lh / cols, yb = y1 - A.bh, rows = Math.round((yb - y0) / A.bh), rh = (yb - y0) / rows;
+      { const L2 = rc * T8, nb = Math.max(2, Math.round(2 * L2 / 1.05)), bw = 2 * L2 / nb; for (let q = 0; q < nb; q++) { const u = -L2 + bw * (q + .5); blk(cx + nx * rc + tx * u, yb, y1, cz + nz * rc + tz * u, bw, t, yaw, red, 0, 1); } }     // m1279: the red band, in blocks
       const door = i === doors[k], win = !door && k > 0 && i % 2 === 0, col = [];
       for (let c = 0; c < cols; c++) { const u = -Lh + w * (c + .5); let below = null;
         for (let r = 0; r < rows; r++) { const yc = y0 + rh * (r + .5);
           if (door && Math.abs(u) < A.doorW && yc < y0 + A.doorH) { below = null; continue; }
-          if (win && Math.abs(u) < .5 && yc > y0 + 1 && yc < y0 + 2.3) { below = null; continue; }
+          if (win && Math.abs(u) < A.winW && yc > y0 + A.winLo && yc < y0 + A.winHi) { below = null; continue; }
           const B = blk(cx + nx * rc + tx * u, y0 + rh * r, y0 + rh * (r + 1), cz + nz * rc + tz * u, w, t, yaw, cream, 0, 1); if (below) { below.up = B; B.dn = below; } below = B; } }
       // m1276 (pass 2): a LATTICE in every window (red frame, a grid of dark slats) and a red frame with a gold lintel round every door
       const at = (u, r) => [cx + nx * r + tx * u, cz + nz * r + tz * u];
-      if (win) { const r0 = rc + t / 2 + .02;
-        for (const s of [-1, 1]) { const [x, z] = at(s * .55, r0); blk(x, y0 + .95, y0 + 2.35, z, .1, .1, yaw, red, 0, 0); }
-        for (const yy of [y0 + .95, y0 + 2.3]) { const [x, z] = at(0, r0); blk(x, yy, yy + .07, z, 1.2, .12, yaw, red, 0, 0); }
-        for (let v = -.4; v <= .41; v += .2) { const [x, z] = at(v, rc); blk(x, y0 + 1, y0 + 2.3, z, .04, .08, yaw, dark, 0, 0); }
-        for (let yy = y0 + 1.25; yy < y0 + 2.3; yy += .26) { const [x, z] = at(0, rc); blk(x, yy - .02, yy + .02, z, 1, .08, yaw, dark, 0, 0); }
-        { const [x, z] = at(0, rc - .08); blk(x, y0 + 1, y0 + 2.3, z, 1.04, .03, yaw, paperLit, 0, 0); } }     // m1290: the paper behind it, lit
+      if (win) { const r0 = rc + t / 2 + .02; let ww = 0, wl = 1e9, wh = 0; for (let c = 0; c < cols; c++) { const u = Math.abs(-Lh + w * (c + .5)); if (u < A.winW) ww = Math.max(ww, u + w / 2); }
+        for (let r = 0; r < rows; r++) { const yc = y0 + rh * (r + .5); if (yc > y0 + A.winLo && yc < y0 + A.winHi) { wl = Math.min(wl, y0 + rh * r); wh = Math.max(wh, y0 + rh * (r + 1)); } }
+        for (const s of [-1, 1]) { const [x, z] = at(s * (ww + .06), r0); blk(x, wl - .06, wh + .06, z, .14, .14, yaw, red, 0, 0); }
+        for (const yy of [wl - .06, wh - .04]) { const [x, z] = at(0, r0); blk(x, yy, yy + .1, z, 2 * ww + .3, .16, yaw, red, 0, 0); }
+        for (let v = -ww + .3; v <= ww - .29; v += .3) { const [x, z] = at(v, rc); blk(x, wl, wh, z, .05, .1, yaw, dark, 0, 0); }
+        for (let yy = wl + .4; yy < wh - .1; yy += .4) { const [x, z] = at(0, rc); blk(x, yy - .025, yy + .025, z, 2 * ww, .1, yaw, dark, 0, 0); }
+        { const [x, z] = at(0, rc - .1); blk(x, wl, wh, z, 2 * ww + .04, .03, yaw, paperLit, 0, 0); } }     // m1290: the paper behind it, lit
       if (door) { const r0 = rc + t / 2 + .03, dh = y0 + rh * Math.ceil(A.doorH / rh - .5); let dw = 0; for (let c = 0; c < cols; c++) { const u = Math.abs(-Lh + w * (c + .5)); if (u < A.doorW) dw = Math.max(dw, u + w / 2); }
-        for (const s of [-1, 1]) { const [x, z] = at(s * (dw + .08), r0); blk(x, y0, dh, z, .16, .14, yaw, red, 0, 0); }
-        { const [x, z] = at(0, r0); blk(x, dh, dh + .16, z, 2 * dw + .4, .16, yaw, red, 0, 0); blk(x, dh + .16, dh + .24, z, 1.2, .12, yaw, gold, 0, 0); } } }
-    // THE FLOOR of this storey (the ceiling of the one below): eight sector slabs, the one on the ladder's axis cut round the HATCH
-    if (k > 0) { const hi = hatch[k - 1], [hx, hz] = fN(hi), rh = a - t - .8, hw = .55;
-      ring(0, a, y0 - .25, y0, floorM, 1, i => i === hi);
-      const yaw = fYaw(hi), sub = (r0, r1, u0, u1) => { const rm = (r0 + r1) / 2, um = (u0 + u1) / 2; blk(cx + hx * rm - hz * um, y0 - .25, y0, cz + hz * rm + hx * um, u1 - u0, r1 - r0, yaw, floorM, 1, 0); };
-      const W = a * T8, sr = k === 1 ? .8 : hw, su = k === 1 ? 1.1 : hw;     // m1286: over the ground hall's STAIR the hole is the stairwell (2.2 x 1.6 m; kept to |u| < 1.1, where the next sectors' slabs do not reach)
-      sub(0, rh - sr, -W, W); sub(rh + sr, a, -W, W); sub(rh - sr, rh + sr, -W, -su); sub(rh - sr, rh + sr, su, W);
-      if (k === 1) { const sy0 = yOf(0), rise = A.sh / 12, tr = .26;     // THE STAIR: twelve solid block steps up the hall's +x side, out through the stairwell
-        for (let q = 0; q < 12; q++) { const u0 = su - tr * (12 - q), u1 = u0 + tr, yt = sy0 + rise * (q + 1); blk(cx + hx * rh - hz * (u0 + u1) / 2, sy0, yt, cz + hz * rh + hx * (u0 + u1) / 2, Math.abs(hx) > .5 ? 2 * sr : tr, Math.abs(hx) > .5 ? tr : 2 * sr, 0, q % 2 ? stone : red, 1, 0);
-          blk(cx + hx * rh - hz * (u0 + .04), yt - .05, yt + .02, cz + hz * rh + hx * (u0 + .04), Math.abs(hx) > .5 ? 2 * sr : .08, Math.abs(hx) > .5 ? .08 : 2 * sr, 0, gold, 0, 0); } }
+        for (const s of [-1, 1]) { const [x, z] = at(s * (dw + .1), r0); blk(x, y0, dh, z, .22, .18, yaw, red, 0, 0); }
+        { const [x, z] = at(0, r0); blk(x, dh, dh + .22, z, 2 * dw + .5, .2, yaw, red, 0, 0); blk(x, dh + .22, dh + .34, z, 1.8, .14, yaw, gold, 0, 0); } } }
+    // THE FLOOR of this storey (the ceiling of the one below). m@X4@ (S1): ROW STRIPS (.25 m, axis-aligned, merged where a run repeats) so a
+    // hole can be cut anywhere -- the sector slabs overlapped each other's corners and could only take a hatch near the middle of a face
+    if (k > 0) { const hi = hatch[k - 1], [hx, hz] = fN(hi), rh = a - t - 1, hw = .7, holes = [[hx * rh - hw, hx * rh + hw, hz * rh - hw, hz * rh + hw]];
+      if (k === 1) holes[0] = [4.3, 6.3, -4, -1.2];     // the STAIRWELL over the hall's second flight (sector 0, +x)
+      { const dz = .25, runs = []; for (let z0 = -a; z0 < a - 1e-6; z0 += dz) { const z1 = z0 + dz, hxR = Math.min(a, a * Math.SQRT2 - Math.max(Math.abs(z0), Math.abs(z1)));
+          let seg = [[-hxR, hxR]]; for (const H of holes) if (H[2] < z1 && H[3] > z0) seg = seg.flatMap(([u0, u1]) => [[u0, Math.min(u1, H[0])], [Math.max(u0, H[1]), u1]].filter(q => q[1] - q[0] > .02));
+          const key = seg.map(q => q.map(v => v.toFixed(3)).join(':')).join('|'), R = runs[runs.length - 1]; if (R && R.key === key) R.z1 = z1; else runs.push({ key, seg, z0, z1 }); }
+        for (const R of runs) for (const [u0, u1] of R.seg) blk(cx + (u0 + u1) / 2, y0 - .25, y0, cz + (R.z0 + R.z1) / 2, u1 - u0, R.z1 - R.z0, 0, floorM, 1, 0); }
+      if (k === 1) { const sy0 = yOf(0), rise = A.sh / 20, tr = .4;     // THE STAIR (m@X4@, S1): TWO FLIGHTS of ten, risers .30 (his step is .357), treads .40
+        const step = (x0, x1, z0, z1, yt, q) => { blk(cx + (x0 + x1) / 2, sy0, yt, cz + (z0 + z1) / 2, x1 - x0, z1 - z0, 0, q % 2 ? stone : red, 1, 0); };
+        for (let q = 0; q < 10; q++) { const z0 = -4 + tr * q; step(6.3, 8, z0, z0 + tr, sy0 + rise * (q + 1), q); blk(cx + 7.15, sy0 + rise * (q + 1) - .05, sy0 + rise * (q + 1) + .02, cz + z0 + .04, 1.7, .08, 0, gold, 0, 0); }
+        step(4.4, 8, 0, 1.8, sy0 + rise * 10, 1);     // the landing
+        for (let q = 0; q < 10; q++) { const z1 = -tr * q; step(4.4, 6.2, z1 - tr, z1, sy0 + rise * (11 + q), q + 1); blk(cx + 5.3, sy0 + rise * (11 + q) - .05, sy0 + rise * (11 + q) + .02, cz + z1 - .04, 1.8, .08, 0, gold, 0, 0); }
+        blk(cx + 6.25, sy0 + rise * 10, sy0 + rise * 10 + .9, cz - 1.95, .1, 4.1, 0, red, 0, 0); }     // a rail between the flights
       // the LADDER up from the storey below, on the hatch's outer edge (above the ground: the stair is the way up from the hall)
-      if (k > 1) { const ly0 = yOf(k - 1), lr = rh + .42, lx = cx + hx * lr, lz = cz + hz * lr, ax = Math.abs(hx) > .5;
+      if (k > 1) { const ly0 = yOf(k - 1), lr = rh + .55, lx = cx + hx * lr, lz = cz + hz * lr, ax = Math.abs(hx) > .5;
       for (const o of [-.3, .3]) blk(lx - hz * o, ly0, y0 + .9, lz + hx * o, .06, .06, 0, dark, 0, 0);
       for (let r = ly0 + .3; r < y0 + .8; r += .32) blk(lx, r - .03, r + .03, lz, ax ? .06 : .6, ax ? .6 : .06, 0, red, 0, 0);
       const L = kitClimbAdd(ax ? { minx: lx - .12, maxx: lx + .12, miny: ly0, maxy: y0, minz: lz - .4, maxz: lz + .4 } : { minx: lx - .4, maxx: lx + .4, miny: ly0, maxy: y0, minz: lz - .12, maxz: lz + .12 }, 'opag_ladder_' + k, y0);
-      L.mark = { x: cx + hx * (rh - 1.05), y: y0, z: cz + hz * (rh - 1.05) }; climbs.push(L); } }
+      L.mark = { x: cx + hx * (rh - 1.3), y: y0, z: cz + hz * (rh - 1.3) }; climbs.push(L); } }
     // THE EAVE: a teal bracket band against the wall, then four STEPPED slab courses, each .3 m higher and further in; the top one is flush
     // with the next floor (step out of the next storey's door onto it), the outer one has a light edge and a LIP to catch
     const c0 = y1 - 1.2, aN = top ? 0 : aOf(k + 1);
@@ -22232,36 +22238,36 @@ function opagBuild() {
     // ribs riding on it as ghost pieces (they go when it goes); the teal band in segments, each carrying the bracket clusters under it. The
     // top storey's ceiling course and the cap above it stay whole (a roof over the last room).
     const kid = (B, K) => { if (B && K) (B.kids || (B.kids = [])).push(K); };
-    for (let i = 0; i < 8; i++) { const [nx, nz] = fN(i), tx = -nz, tz = nx, yaw = fYaw(i), L2 = a * T8, nb = Math.max(2, Math.round(2 * L2 / .8)), bw = 2 * L2 / nb, segs = [];
-      for (let q = 0; q < nb; q++) { const u = -L2 + bw * (q + .5); const S = blk(cx + nx * (a + .275) + tx * u, c0 - .35, c0, cz + nz * (a + .275) + tz * u, bw, .55, yaw, teal, 0, 1); S.box.noCam = 1; segs.push([u, S]); }
-      const Lh = a * T8 - .35;
-      for (let u = -Lh; u <= Lh + .01; u += Math.max(.5, 2 * Lh / Math.max(1, Math.round(2 * Lh / .7)))) { if (i === doors[k] && Math.abs(u) < A.doorW + .45) continue; const S = segs.reduce((p, q) => Math.abs(q[0] - u) < Math.abs(p[0] - u) ? q : p)[1];
-        const P = (r0, r1, yy0, yy1, m) => kid(S, blk(cx + nx * (r0 + r1) / 2 + tx * u, yy0, yy1, cz + nz * (r0 + r1) / 2 + tz * u, .22, r1 - r0, yaw, m, 0, 2));
-        P(a, a + .22, c0 - .62, c0 - .35, red); P(a + .5, a + .95, c0 - .25, c0, red); P(a + .85, a + 1.15, c0 - .14, c0, teal); } }
+    for (let i = 0; i < 8; i++) { const [nx, nz] = fN(i), tx = -nz, tz = nx, yaw = fYaw(i), L2 = a * T8, nb = Math.max(2, Math.round(2 * L2 / 1.2)), bw = 2 * L2 / nb, segs = [];
+      for (let q = 0; q < nb; q++) { const u = -L2 + bw * (q + .5); const S = blk(cx + nx * (a + .4) + tx * u, c0 - .5, c0, cz + nz * (a + .4) + tz * u, bw, .8, yaw, teal, 0, 1); S.box.noCam = 1; segs.push([u, S]); }
+      const Lh = a * T8 - .5;
+      for (let u = -Lh; u <= Lh + .01; u += Math.max(.75, 2 * Lh / Math.max(1, Math.round(2 * Lh / 1.05)))) { if (i === doors[k] && Math.abs(u) < A.doorW + .45) continue; const S = segs.reduce((p, q) => Math.abs(q[0] - u) < Math.abs(p[0] - u) ? q : p)[1];
+        const P = (r0, r1, yy0, yy1, m) => kid(S, blk(cx + nx * (r0 + r1) / 2 + tx * u, yy0, yy1, cz + nz * (r0 + r1) / 2 + tz * u, .33, r1 - r0, yaw, m, 0, 2));
+        P(a, a + .33, c0 - .93, c0 - .5, red); P(a + .8, a + 1.45, c0 - .38, c0, red); P(a + 1.35, a + 1.75, c0 - .2, c0, teal); } }
     for (let j = 0; j < 4; j++) { const yb = c0 + .3 * j, rIn = j < 3 ? a : (top ? 0 : aN), r1 = a + E[j], r0 = j < 3 ? a + E[j + 1] : (top ? a - .1 : aN), Lh = r1 * T8, whole = top && j === 3, ew = j ? .12 : .18;
-      for (let i = 0; i < 8; i++) { const [nx, nz] = fN(i), tx = -nz, tz = nx, yaw = fYaw(i), rm = (rIn + r1) / 2, ns = whole ? 1 : Math.max(2, Math.round(2 * Lh / .75)), sw = 2 * Lh / ns, L2 = r0 * T8;
+      for (let i = 0; i < 8; i++) { const [nx, nz] = fN(i), tx = -nz, tz = nx, yaw = fYaw(i), rm = (rIn + r1) / 2, ns = whole ? 1 : Math.max(2, Math.round(2 * Lh / 1.1)), sw = 2 * Lh / ns, L2 = r0 * T8;
         for (let q = 0; q < ns; q++) { const u0 = -Lh + sw * q, um = u0 + sw / 2, gh = whole ? 0 : 2;
           const B = blk(cx + nx * rm + tx * um, yb, yb + .3, cz + nz * rm + tz * um, sw, r1 - rIn, yaw, tile, whole ? 1 : 0, whole ? 0 : 1), K = whole ? null : B;
           kid(K, blk(cx + nx * (r1 - ew / 2 + .02) + tx * um, yb + .3, yb + .35, cz + nz * (r1 - ew / 2 + .02) + tz * um, sw, ew + .04, yaw, edge, 0, gh));
-          for (let u = -Lh + .3; u < Lh - .2; u += .42) { if ((j === 3 && !top) || u < u0 || u >= u0 + sw || Math.abs(u) > L2 + (r1 - r0) * .4) continue;
-            kid(K, blk(cx + nx * (r0 + r1) / 2 + tx * u, yb + .3, yb + .36, cz + nz * (r0 + r1) / 2 + tz * u, .12, Math.max(.05, r1 - r0 - .16), yaw, dark, 0, gh)); } } } }
+          for (let u = -Lh + .4; u < Lh - .3; u += .6) { if ((j === 3 && !top) || u < u0 || u >= u0 + sw || Math.abs(u) > L2 + (r1 - r0) * .4) continue;
+            kid(K, blk(cx + nx * (r0 + r1) / 2 + tx * u, yb + .3, yb + .36, cz + nz * (r0 + r1) / 2 + tz * u, .16, Math.max(.05, r1 - r0 - .2), yaw, dark, 0, gh)); } } } }
     for (let i = 0; i < 8; i++) { const [nx, nz] = fN(i), tx = -nz, tz = nx, yaw = fYaw(i);
       if (!top) { const rb = a + E[3] - .06, Lb = rb * T8; blk(cx + nx * rb, y1 + .27, y1 + .32, cz + nz * rb, 2 * Lb, .1, yaw, red, 0, 0);
-        for (let u = -Lb + .1; u <= Lb - .09; u += Math.max(.4, (2 * Lb - .2) / Math.round((2 * Lb - .2) / .45))) blk(cx + nx * rb + tx * u, y1, y1 + .27, cz + nz * rb + tz * u, .08, .08, yaw, red, 0, 0);
+        for (let u = -Lb + .1; u <= Lb - .09; u += Math.max(.5, (2 * Lb - .2) / Math.round((2 * Lb - .2) / .6))) blk(cx + nx * rb + tx * u, y1, y1 + .27, cz + nz * rb + tz * u, .1, .1, yaw, red, 0, 0);
         O.boxes.push(Object.assign(opagTB(cx + nx * rb, cz + nz * rb, Lb, .07, yaw, y1, y1 + .32), { noCam: 1 })); } }
     for (let i = 0; i < 8; i++) { const [nx, nz] = fN(i), r1 = a + E[0], rm = r1 - .14; O.boxes.push(Object.assign(opagTB(cx + nx * rm, cz + nz * rm, r1 * T8 * .8, .14, fYaw(i), c0 + .3 - .9, c0 + .3), { noCam: 1 })); }     // the LIP to catch on the outer course
     // the eight CORNERS kicked up two blocks
     for (let i = 0; i < 8; i++) { const va = i * Math.PI / 4 + Math.PI / 8, vr = (a + E[0]) / C8, yaw = -va - Math.PI / 2;
-      blk(cx + Math.cos(va) * (vr - .3), c0 + .3, c0 + .6, cz + Math.sin(va) * (vr - .3), .5, .5, yaw, tile, 0, 0);
-      blk(cx + Math.cos(va) * (vr - .02), c0 + .6, c0 + .9, cz + Math.sin(va) * (vr - .02), .34, .34, yaw, edge, 0, 0);
-      { const lr = vr - .55, lx = cx + Math.cos(va) * lr, lz = cz + Math.sin(va) * lr; blk(lx, c0 - .7, c0, lz, .04, .04, 0, dark, 0, 0); blk(lx, c0 - .75, c0 - .7, lz, .36, .36, yaw, red, 0, 0);
-        blk(lx, c0 - 1.15, c0 - .75, lz, .3, .3, yaw, lampM, 0, 0); blk(lx, c0 - 1.2, c0 - 1.15, lz, .2, .2, yaw, red, 0, 0); hv.push(lx, c0 - .95, lz); }     // m1290: a lantern under every corner
-      blk(cx + Math.cos(va) * (vr + .02), c0 + .9, c0 + 1.08, cz + Math.sin(va) * (vr + .02), .2, .2, yaw, gold, 0, 0); }     // m1276: a gold cap
+      blk(cx + Math.cos(va) * (vr - .45), c0 + .3, c0 + .75, cz + Math.sin(va) * (vr - .45), .75, .75, yaw, tile, 0, 0);
+      blk(cx + Math.cos(va) * (vr - .03), c0 + .75, c0 + 1.2, cz + Math.sin(va) * (vr - .03), .5, .5, yaw, edge, 0, 0);
+      { const lr = vr - .8, lx = cx + Math.cos(va) * lr, lz = cz + Math.sin(va) * lr; blk(lx, c0 - 1, c0, lz, .05, .05, 0, dark, 0, 0); blk(lx, c0 - 1.08, c0 - 1, lz, .54, .54, yaw, red, 0, 0);
+        blk(lx, c0 - 1.7, c0 - 1.08, lz, .45, .45, yaw, lampM, 0, 0); blk(lx, c0 - 1.78, c0 - 1.7, lz, .3, .3, yaw, red, 0, 0); hv.push(lx, c0 - 1.4, lz); }     // m1290: a lantern under every corner
+      blk(cx + Math.cos(va) * (vr + .03), c0 + 1.2, c0 + 1.47, cz + Math.sin(va) * (vr + .03), .3, .3, yaw, gold, 0, 0); }     // m1276: a gold cap
     // the TOP storey's roof keeps stepping in to a point
     if (top) { let r = a + E[3] - .45, yb = c0 + 1.2; while (r > .5) { ring(0, r, yb, yb + .3, tile, 1); ring(Math.max(0, r - .1), r + .03, yb + .3, yb + .34, edge, 0); yb += .3; r -= .38; } A.apex = yb; }     // m1298 (pass 10): steeper, a light edge on every step
     // the ground storey's PORCH: red posts carrying the wide first eave
-    if (k === 0) for (let i = 0; i < 8; i++) for (const off of [Math.PI / 8, 0]) { const va = i * Math.PI / 4 + off, vr = (a + 3.2) / (off ? C8 : 1);
-      if (!off && i === doors[0]) continue; stack(cx + Math.cos(va) * vr, cz + Math.sin(va) * vr, A.base, c0, .4, -va - Math.PI / 2, red, 3); }
+    if (k === 0) for (let i = 0; i < 8; i++) for (const off of [Math.PI / 8, 0]) { const va = i * Math.PI / 4 + off, vr = (a + 4.6) / (off ? C8 : 1);
+      if (!off && i === doors[0]) continue; stack(cx + Math.cos(va) * vr, cz + Math.sin(va) * vr, A.base, c0, .6, -va - Math.PI / 2, red, 4); }
   }
   // m1286 (pass 5): A DIFFERENT ROOM ON EVERY STOREY, all of blocks, kept to the middle and to the even sectors the ladders do not use
   // (`free`), clear of the hatches and the doors: 0 the SHRINE (an altar, a hovering Jin core, a seated gold figure), 1 the ARMOURY (spear
@@ -22272,7 +22278,7 @@ function opagBuild() {
   { const lamp = M(0xffd9a8, .5, { emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false }), paper = M(0xf2e8d0, .9), steel = M(0xd8dde4, .25, { metalness: .9 }), green = M(0x4f8a3a, .85), cush = M(0x8a2a5a, .9), mat = M(0xcfc49a, .95), water = M(0x2f6f8a, .2, { metalness: .3 }), bronze = M(0x8a6a2a, .35, { metalness: .85 });
     const P = (i, r, u) => { const [nx, nz] = fN(i); return [cx + nx * r - nz * u, cz + nz * r + nx * u]; };
     for (let k = 0; k < N; k++) { const a = aOf(k), y0 = yOf(k), inn = a - t, inS = k ? hatch[k - 1] : -1, outS = k < N - 1 ? hatch[k] : -1, free = [0, 2, 4, 6].filter(i => i !== inS && i !== outS), fa = free[0], fb = free[1] ?? free[0];
-      if (k < 5) { blk(cx, y0 + 2.5, y0 + A.sh - .25, cz, .05, .05, 0, dark, 0, 0); blk(cx, y0 + 2.1, y0 + 2.5, cz, .4, .4, 0, lamp, 0, 0); blk(cx, y0 + 2.5, y0 + 2.56, cz, .5, .5, 0, red, 0, 0); }
+      if (k < 5) { blk(cx, y0 + 3.9, y0 + A.sh - .25, cz, .06, .06, 0, dark, 0, 0); blk(cx, y0 + 3.3, y0 + 3.9, cz, .6, .6, 0, lamp, 0, 0); blk(cx, y0 + 3.9, y0 + 3.98, cz, .75, .75, 0, red, 0, 0); }
       const W = (i, r, u, ya, yb, w, d, m, sol) => { const [x, z] = P(i, r, u); return blk(x, ya, yb, z, w, d, fYaw(i), m, sol, 0); };
       if (k === 0) { const i = (doors[0] + 4) % 8, r = inn - 1.2; W(i, r, 0, y0, y0 + 1, 2, 1, stone, 1); W(i, r, 0, y0 + 1, y0 + 1.08, 2.2, 1.1, red, 0);
         W(i, r + .3, 0, y0 + 1.08, y0 + 1.45, .8, .5, gold, 0); W(i, r + .3, 0, y0 + 1.45, y0 + 1.85, .55, .4, gold, 0); W(i, r + .3, 0, y0 + 1.85, y0 + 2.15, .32, .3, gold, 0);
@@ -22294,69 +22300,68 @@ function opagBuild() {
       if (k === 5) { blk(cx, y0, y0 + A.sh - .25, cz, .5, .5, 0, red, 1, 0);
         for (let q = 0; q < 22; q++) { const an = q * .55, y = y0 + .3 + q * .12; blk(cx + Math.cos(an) * .55, y, y + .22, cz + Math.sin(an) * .55, .26, .26, -an, q > 19 ? red : teal, 0, 0); }
         blk(cx + Math.cos(21 * .55) * .7, y0 + 3, y0 + 3.08, cz + Math.sin(21 * .55) * .7, .12, .12, 0, gold, 0, 0); }
-      if (k === 6) { const bg = new THREE.Group(); bg.position.set(cx, y0 + A.sh - .55, cz); g.add(bg);
+      if (k === 6) { const bg = new THREE.Group(); bg.position.set(cx, y0 + A.sh - 1.6, cz); bg.scale.setScalar(1.6); g.add(bg); blk(cx, y0 + A.sh - 1.6, y0 + A.sh - .25, cz, .08, .08, 0, dark, 0, 0);
         { const m = new THREE.Mesh(mergeGeometries([[-.25, .5, .25], [-.6, .75, .35], [-1, .95, .4], [-1.35, 1.1, .3], [-1.48, 1.2, .1]].map(([y, w2, h]) => new THREE.BoxGeometry(w2, h, w2).translate(0, y, 0).toNonIndexed())), bronze); m.castShadow = true; bg.add(m); }     // m1298: one draw
         bell = { g: bg, sw: 0, cd: 0 }; W(fa, inn - .9, 0, y0 + 1.1, y0 + 1.3, 1.5, .2, dark, 0); for (const q of [-.6, .6]) W(fa, inn - .9, q, y0, y0 + 1.3, .12, .12, dark, 0); } } }
   // THE SPIRE: a stack of blocks, three flared collars, a gold block, a mast
   const collars = [];
   { let y = A.apex; const st = (w, h, m, spin) => { if (spin) { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, w), m); o.position.set(cx, y + h / 2, cz); o.castShadow = true; g.add(o); collars.push(o); } else blk(cx, y, y + h, cz, w, w, 0, m, 0, 0); y += h; };
-    A.tipY = y + 4.7 + 3.2 + .3;     // (the stack below: 4.7 m of collars and blocks, the mast 3.2, the cap .3)
-    st(.9, .5, tile); st(.6, .6, red); st(1.1, .2, edge, 1); st(.45, 1.2, tile); st(.9, .2, edge, 1); st(.4, 1.2, tile); st(.75, .2, edge, 1); st(.6, .6, gold); st(.18, 3.2, tile); st(.3, .3, gold); }
+    st(1.35, .75, tile); st(.9, .9, red); st(1.65, .3, edge, 1); st(.68, 1.8, tile); st(1.35, .3, edge, 1); st(.6, 1.8, tile); st(1.1, .3, edge, 1); st(.9, .9, gold); st(.27, 4.8, tile); st(.45, .45, gold); A.tipY = y; }     // m@X4@ (S1): x1.5
   // m1290 (pass 7): the HALOS (one additive Points draw, sized in world metres, flickering in the step) and the BEACON at the spire's tip, a
   // flame orb in a big slow-breathing glow you can see across the forge; a lantern on each gate post. No lights: a new light recompiles
   // every material in the scene
-  let halos, beacon; { const [nx, nz] = fN(doors[0]); for (const s2 of [-1, 1]) { const x = cx + nx * A.RF - nz * s2 * 1.75, z = cz + nz * A.RF + nx * s2 * 1.75; blk(x, 3, 3.4, z, .34, .34, fYaw(doors[0]), lampM, 0, 0); hv.push(x, 3.2, z); }
+  let halos, beacon; { const [nx, nz] = fN(doors[0]); for (const s2 of [-1, 1]) { const x = cx + nx * A.RF - nz * s2 * 2.65, z = cz + nz * A.RF + nx * s2 * 2.65; blk(x, 4.5, 5.1, z, .5, .5, fYaw(doors[0]), lampM, 0, 0); hv.push(x, 4.8, z); }
     const cv = document.createElement('canvas'); cv.width = cv.height = 64; const q = cv.getContext('2d'), gr = q.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,200,120,1)'); gr.addColorStop(.35, 'rgba(255,140,60,.45)'); gr.addColorStop(1, 'rgba(255,120,40,0)'); q.fillStyle = gr; q.fillRect(0, 0, 64, 64);
     const tex = new THREE.CanvasTexture(cv), geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(hv, 3)); geo.setAttribute('color', new THREE.Float32BufferAttribute(new Array(hv.length).fill(1), 3));
-    halos = new THREE.Points(geo, new THREE.PointsMaterial({ map: tex, size: 1.5, sizeAttenuation: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false, vertexColors: true })); halos.frustumCulled = false; g.add(halos);
-    beacon = new THREE.Mesh(new THREE.SphereGeometry(.24, 12, 8), new THREE.MeshBasicMaterial({ color: 0xffb050, toneMapped: false })); beacon.position.set(cx, A.tipY + .35, cz); g.add(beacon);
-    const bh = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false })); bh.scale.setScalar(4.5); beacon.add(bh); beacon.userData.halo = bh;
-    const col = new THREE.Mesh(new THREE.CylinderGeometry(.5, .9, 40, 12, 1, true), new THREE.MeshBasicMaterial({ color: 0xffc070, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false, side: THREE.DoubleSide }));     // m1295 (pass 9): the column of light
-    col.position.set(cx, A.tipY + 20, cz); col.visible = false; g.add(col); beacon.userData.col = col; }
+    halos = new THREE.Points(geo, new THREE.PointsMaterial({ map: tex, size: 2.2, sizeAttenuation: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false, vertexColors: true })); halos.frustumCulled = false; g.add(halos);
+    beacon = new THREE.Mesh(new THREE.SphereGeometry(.36, 12, 8), new THREE.MeshBasicMaterial({ color: 0xffb050, toneMapped: false })); beacon.position.set(cx, A.tipY + .35, cz); g.add(beacon);
+    const bh = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false })); bh.scale.setScalar(6.75); beacon.add(bh); beacon.userData.halo = bh;
+    const col = new THREE.Mesh(new THREE.CylinderGeometry(.75, 1.35, 60, 12, 1, true), new THREE.MeshBasicMaterial({ color: 0xffc070, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false, side: THREE.DoubleSide }));     // m1295 (pass 9): the column of light
+    col.position.set(cx, A.tipY + 30, cz); col.visible = false; g.add(col); beacon.userData.col = col; }
   // m1293 (pass 8): MOTION. WIND BELLS off the tip of every kicked-up corner (one InstancedMesh: they sway in the wind and RING and swing
   // hard when he comes within reach); a BANNER on a tall pole in the middle of every fence face, red and cream by turns, flapping; BIRDS
   // of blocks perched along the walks that burst up when he comes near, circle the spire and settle back (two InstancedMeshes, flapping);
   // and the spire's three light collars turning, alternate ways
   const wbell = [], banners = [], birds = [];
-  { for (let k = 0; k < N; k++) { const a = aOf(k), E = k === 0 ? A.eave0 : A.eave, c0 = yOf(k) + A.sh - 1.2; for (let i = 0; i < 8; i++) { const va = i * Math.PI / 4 + Math.PI / 8, vr = (a + E[0]) / C8 + .1; wbell.push({ x: cx + Math.cos(va) * vr, y: c0 + .55, z: cz + Math.sin(va) * vr, va, sw: 0, ph: Math.random() * 6, cd: 0 }); } }
-    const bgeo = mergeGeometries([new THREE.BoxGeometry(.02, .3, .02).translate(0, -.15, 0), new THREE.BoxGeometry(.2, .22, .2).translate(0, -.4, 0), new THREE.BoxGeometry(.06, .2, .02).translate(0, -.6, 0)]);
+  { for (let k = 0; k < N; k++) { const a = aOf(k), E = k === 0 ? A.eave0 : A.eave, c0 = yOf(k) + A.sh - 1.2; for (let i = 0; i < 8; i++) { const va = i * Math.PI / 4 + Math.PI / 8, vr = (a + E[0]) / C8 + .1; wbell.push({ x: cx + Math.cos(va) * vr, y: c0 + .8, z: cz + Math.sin(va) * vr, va, sw: 0, ph: Math.random() * 6, cd: 0 }); } }
+    const bgeo = mergeGeometries([new THREE.BoxGeometry(.03, .45, .03).translate(0, -.22, 0), new THREE.BoxGeometry(.3, .33, .3).translate(0, -.6, 0), new THREE.BoxGeometry(.09, .3, .03).translate(0, -.9, 0)]);
     const bim = new THREE.InstancedMesh(bgeo, gold, wbell.length); bim.frustumCulled = false; g.add(bim); wbell.im = bim;
     const bm = [M(0xc8341f, .85, { side: THREE.DoubleSide }), M(0xefe4c6, .85, { side: THREE.DoubleSide })];
-    for (let i = 0; i < 8; i++) { if (i === doors[0]) continue; const [nx, nz] = fN(i), x = cx + nx * A.RF, z = cz + nz * A.RF; blk(x, 0, 5.2, z, .14, .14, 0, dark, 0, 0); blk(x, 5.2, 5.4, z, .24, .24, 0, gold, 0, 0); blk(x - nz * .5, 4.9, 4.98, z + nx * .5, 1.1, .06, fYaw(i), dark, 0, 0);
-      const pv = new THREE.Group(); pv.position.set(x, 4.9, z); pv.rotation.y = fYaw(i); g.add(pv); const fl = new THREE.Mesh(new THREE.PlaneGeometry(1, 2.6, 1, 6).translate(.55, -1.3, 0), bm[i % 2]); fl.castShadow = true; pv.add(fl); banners.push({ pv, fl, y0: fYaw(i), ph: i * 1.3 }); }
+    for (let i = 0; i < 8; i++) { if (i === doors[0]) continue; const [nx, nz] = fN(i), x = cx + nx * A.RF, z = cz + nz * A.RF; blk(x, 0, 7.8, z, .2, .2, 0, dark, 0, 0); blk(x, 7.8, 8.1, z, .36, .36, 0, gold, 0, 0); blk(x - nz * .75, 7.35, 7.45, z + nx * .75, 1.65, .08, fYaw(i), dark, 0, 0);
+      const pv = new THREE.Group(); pv.position.set(x, 7.35, z); pv.rotation.y = fYaw(i); g.add(pv); const fl = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 3.9, 1, 6).translate(.8, -1.95, 0), bm[i % 2]); fl.castShadow = true; pv.add(fl); banners.push({ pv, fl, y0: fYaw(i), ph: i * 1.3 }); }
     const bodyG = mergeGeometries([new THREE.BoxGeometry(.13, .11, .3), new THREE.BoxGeometry(.1, .1, .1).translate(0, .07, .18), new THREE.BoxGeometry(.04, .03, .07).translate(0, .06, .26)]), wingG = new THREE.BoxGeometry(.3, .02, .15).translate(.15, 0, 0);
     const nB = 12, bodyIM = new THREE.InstancedMesh(bodyG, M(0xeeeeea, .8), nB), wingIM = new THREE.InstancedMesh(wingG, M(0x3a3f48, .8), nB * 2); bodyIM.frustumCulled = wingIM.frustumCulled = false; g.add(bodyIM, wingIM); birds.im = bodyIM; birds.wim = wingIM;
-    for (let b = 0; b < nB; b++) { const k = 1 + b % (N - 1), a = aOf(k - 1), va = b * 2.39 + .4, r = (a + 1.2), x = cx + Math.cos(va) * r, z = cz + Math.sin(va) * r, y = yOf(k);
-      birds.push({ px: x, py: y, pz: z, x, y, z, h: Math.random() * 6, st: 'perch', t: Math.random() * 3, ang: va, rad: 7 + Math.random() * 5, hy: A.apex + 1 + Math.random() * 6, fl: 0 }); } }
+    for (let b = 0; b < nB; b++) { const k = 1 + b % (N - 1), a = aOf(k - 1), va = b * 2.39 + .4, r = (a + 1.5), x = cx + Math.cos(va) * r, z = cz + Math.sin(va) * r, y = yOf(k);
+      birds.push({ px: x, py: y, pz: z, x, y, z, h: Math.random() * 6, st: 'perch', t: Math.random() * 3, ang: va, rad: 10 + Math.random() * 7, hy: A.apex + 1.5 + Math.random() * 8, fl: 0 }); } }
   // m1298 (pass 10): a FLAGSTONE PATH from the gate to the plinth's steps (two rows, stone and light by turns, flush)
-  { const [nx, nz] = fN(doors[0]), tx = -nz, tz = nx, yaw = fYaw(doors[0]); for (let r = A.a0 + A.eave0[0] + .9; r < A.RF + 1.5; r += 1) for (const u of [-.5, .5]) blk(cx + nx * r + tx * u, 0, .03, cz + nz * r + tz * u, .92, .92, yaw, (Math.round(r) + (u > 0 ? 1 : 0)) % 2 ? stone : edge, 0, 0);
+  { const [nx, nz] = fN(doors[0]), tx = -nz, tz = nx, yaw = fYaw(doors[0]); for (let r = A.a0 + A.eave0[0] + 1.3, q = 0; r < A.RF + 2.2; r += 1.5, q++) for (const u of [-.75, .75]) blk(cx + nx * r + tx * u, 0, .03, cz + nz * r + tz * u, 1.4, 1.4, yaw, (q + (u > 0 ? 1 : 0)) % 2 ? stone : edge, 0, 0);
   }
   // THE FENCE: red posts at the eight corners and every ~2 m, a breakable rail of red blocks, a gate toward the forge's middle
-  { const RF = A.RF; for (let i = 0; i < 8; i++) { const [nx, nz] = fN(i), tx = -nz, tz = nx, yaw = fYaw(i), Lh = RF * T8, n = Math.max(2, Math.round(2 * Lh / 2));
-      for (let p = 0; p <= n; p++) { const u = -Lh + 2 * Lh * p / n; if (i === doors[0] && Math.abs(u) < 1.6) continue; stack(cx + nx * RF + tx * u, cz + nz * RF + tz * u, 0, 1.5, .3, yaw, red, 3); }
-      const cols = Math.round(2 * Lh / .6), w = 2 * Lh / cols; for (let c = 0; c < cols; c++) { const u = -Lh + w * (c + .5); if (i === doors[0] && Math.abs(u) < 1.6) continue;
-        const lo = blk(cx + nx * RF + tx * u, .25, .6, cz + nz * RF + tz * u, w, .2, yaw, red, 0, 1); blk(cx + nx * RF + tx * u, .9, 1.15, cz + nz * RF + tz * u, w, .2, yaw, red, 0, 1); } }
-    for (const s of [-1, 1]) { const [nx, nz] = fN(doors[0]), tx = -nz, tz = nx, u = s * 1.75; blk(cx + nx * RF + tx * u, 0, 3, cz + nz * RF + tz * u, .5, .5, fYaw(doors[0]), red, 1, 0); }
-    { const [nx, nz] = fN(doors[0]); blk(cx + nx * RF, 2.7, 3.1, cz + nz * RF, 4.4, .5, fYaw(doors[0]), red, 0, 0); blk(cx + nx * RF, 3.1, 3.3, cz + nz * RF, 5, .7, fYaw(doors[0]), tile, 0, 0); } }
+  { const RF = A.RF; for (let i = 0; i < 8; i++) { const [nx, nz] = fN(i), tx = -nz, tz = nx, yaw = fYaw(i), Lh = RF * T8, n = Math.max(2, Math.round(2 * Lh / 3));
+      for (let p = 0; p <= n; p++) { const u = -Lh + 2 * Lh * p / n; if (i === doors[0] && Math.abs(u) < 2.4) continue; stack(cx + nx * RF + tx * u, cz + nz * RF + tz * u, 0, 2.25, .45, yaw, red, 3); }
+      const cols = Math.round(2 * Lh / .9), w = 2 * Lh / cols; for (let c = 0; c < cols; c++) { const u = -Lh + w * (c + .5); if (i === doors[0] && Math.abs(u) < 2.4) continue;
+        blk(cx + nx * RF + tx * u, .38, .9, cz + nz * RF + tz * u, w, .3, yaw, red, 0, 1); blk(cx + nx * RF + tx * u, 1.35, 1.72, cz + nz * RF + tz * u, w, .3, yaw, red, 0, 1); } }
+    for (const s of [-1, 1]) { const [nx, nz] = fN(doors[0]), tx = -nz, tz = nx, u = s * 2.65; blk(cx + nx * RF + tx * u, 0, 4.5, cz + nz * RF + tz * u, .75, .75, fYaw(doors[0]), red, 1, 0); }
+    { const [nx, nz] = fN(doors[0]); blk(cx + nx * RF, 4.05, 4.65, cz + nz * RF, 6.6, .75, fYaw(doors[0]), red, 0, 0); blk(cx + nx * RF, 4.65, 4.95, cz + nz * RF, 7.5, 1.05, fYaw(doors[0]), tile, 0, 0); } }
   // m1282 (pass 4): THE CLIMB OUTSIDE. Off every roof walk: a BAR hung out past the eave above on two red arms (jump to it off the rail,
   // swing, let go up onto that eave), and a CHAIN at one corner from the walk's lower course up to the eave above (climb it, step off onto
   // the eave); each storey's pair turned three faces round from the last, so the way up spirals. From the spire's foot a ZIPLINE runs down
   // over the fence to beyond the gate, and a ring hangs off the spire
   const bars = [];
   for (let k = 0; k < N - 1; k++) { const a = aOf(k), y1 = yOf(k) + A.sh, aN = aOf(k + 1), eN = aN + A.eave[0], c0N = y1 + A.sh - 1.2;
-    { const i = (2 * k + 3 + (k % 2 ? 4 : 0)) % 8, [nx, nz] = fN(i), tx = -nz, tz = nx, yaw = fYaw(i), rB = a + 3.4, bt = y1 + 2;
+    { const i = (2 * k + 3 + (k % 2 ? 4 : 0)) % 8, [nx, nz] = fN(i), tx = -nz, tz = nx, yaw = fYaw(i), rB = a + 4.2, bt = y1 + 2.4;
       const B = hbarMake(cx + nx * rB, cz + nz * rB, yaw, bt - HBAR.h, 0); HBAR.list.push(B); bars.push(B);
       for (const s of [-1, 1]) { const ex = cx + tx * s * HBAR.len / 2, ez = cz + tz * s * HBAR.len / 2, rm = (eN - .2 + rB) / 2;
         blk(ex + nx * rm, c0N - .12, c0N, ez + nz * rm, .12, rB - eN + .4, yaw, red, 0, 0); blk(ex + nx * rB, bt, c0N - .12, ez + nz * rB, .07, .07, yaw, dark, 0, 0); } }
-    { const v = (3 * k + 1) % 8, va = v * Math.PI / 4 + Math.PI / 8, R = (a + 2.45) / C8, x = cx + Math.cos(va) * R, z = cz + Math.sin(va) * R, yaw = -va - Math.PI / 2, ya = y1 - .6;
+    { const v = (3 * k + 1) % 8, va = v * Math.PI / 4 + Math.PI / 8, R = (a + 3.55) / C8, x = cx + Math.cos(va) * R, z = cz + Math.sin(va) * R, yaw = -va - Math.PI / 2, ya = y1 - .6;
       for (let yy = ya; yy < c0N; yy += .22) blk(x, yy, yy + .16, z, (Math.round(yy / .22) % 2) ? .16 : .05, (Math.round(yy / .22) % 2) ? .05 : .16, yaw, gold, 0, 0);
-      const L = kitClimbAdd(opagTB(x, z, .4, .12, yaw, ya, c0N), 'opag_chain_' + k, c0N + .3); const Rm = (a + 2.38) / C8; L.mark = { x: cx + Math.cos(va) * Rm, y: c0N + .3, z: cz + Math.sin(va) * Rm }; climbs.push(L); } }
+      const L = kitClimbAdd(opagTB(x, z, .4, .12, yaw, ya, c0N), 'opag_chain_' + k, c0N + .3); const Rm = (a + 3.6) / C8; L.mark = { x: cx + Math.cos(va) * Rm, y: c0N + .3, z: cz + Math.sin(va) * Rm }; climbs.push(L); } }
   // (the zipline leaves the top WALK, storey 6's roof, at the rail -- off the spire it would cut through the eaves under it)
-  const zd = [Math.cos(doors[0] * Math.PI / 4), Math.sin(doors[0] * Math.PI / 4)], zy = yOf(N - 1), zr = aOf(N - 2) + 2;
-  const zip = { A: [cx + zd[0] * zr, zy + 1.1, cz + zd[1] * zr], B: [cx + zd[0] * (A.RF + 6), 1.8, cz + zd[1] * (A.RF + 6)] }; ZIPS.push(zip);
+  const zd = [Math.cos(doors[0] * Math.PI / 4), Math.sin(doors[0] * Math.PI / 4)], zy = yOf(N - 1), zr = aOf(N - 2) + 2.9;
+  const zip = { A: [cx + zd[0] * zr, zy + 2.2, cz + zd[1] * zr], B: [cx + zd[0] * (A.RF + 12), 1.8, cz + zd[1] * (A.RF + 12)] }; ZIPS.push(zip);
   { mg(new THREE.TubeGeometry(new THREE.LineCurve3(new THREE.Vector3(...zip.A), new THREE.Vector3(...zip.B)), 12, .04, 5), gold);
-    blk(zip.B[0], 0, zip.B[1] + .3, zip.B[2], .3, .3, 0, red, 1, 0); blk(cx + zd[0] * (zr - .35), zy, zy + 1.4, cz + zd[1] * (zr - .35), .25, .25, 0, red, 0, 0); }
-  const rings = [gringAdd(g, cx - 1.1, A.apex + 3.6, cz)];
+    blk(zip.B[0], 0, zip.B[1] + .3, zip.B[2], .3, .3, 0, red, 1, 0); blk(cx + zd[0] * (zr - .35), zy, zy + 2.5, cz + zd[1] * (zr - .35), .3, .3, 0, red, 0, 0); }
+  const rings = [gringAdd(g, cx - 1.4, A.apex + 5.4, cz)];
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
   // the BREAKABLE blocks: one InstancedMesh per material
   const ims = new Map(); { const by = new Map(); for (const B of blks) { if (!by.has(B.m)) by.set(B.m, []); by.get(B.m).push(B); }
@@ -22369,21 +22374,21 @@ function opagBuild() {
   const lions = [];
   { const lst = M(0xb9b4a8, .9), eyeM = new THREE.MeshStandardMaterial({ color: 0x331111, emissive: 0xff3020, emissiveIntensity: 0, toneMapped: false }), [gx, gz] = fN(doors[0]);
     const parts = [[0, .55, 0, .9, .6, 1.3], [0, 1.05, .55, .75, .65, .65], [0, 1.05, .3, 1, .85, .3], [0, .9, .95, .4, .25, .25], [0, .25, .45, .26, .5, .26, 1], [0, .25, -.45, .26, .5, .26, 1], [0, 1.0, -.75, .14, .14, .5], [0, .78, .5, .82, .1, .2]];
-    for (const s2 of [-1, 1]) { const tx = -gz, tz = gx, R = A.RF - 1.6, hx = cx + gx * R + tx * s2 * 2.6, hz = cz + gz * R + tz * s2 * 2.6, h = Math.atan2(-gx, -gz);
-      blk(hx, 0, .5, hz, 1.4, 1.8, h, stone, 1, 0);
+    for (const s2 of [-1, 1]) { const tx = -gz, tz = gx, R = A.RF - 2.6, hx = cx + gx * R + tx * s2 * 4, hz = cz + gz * R + tz * s2 * 4, h = Math.atan2(-gx, -gz);
+      blk(hx, 0, .8, hz, 2.2, 2.9, h, stone, 1, 0);
       const geos = []; for (const [x, y, z, w, hh, d, legs] of parts) { if (legs) { for (const lx of [-.32, .32]) geos.push(new THREE.BoxGeometry(w, hh, d).translate(x + lx, y, z)); } else geos.push(new THREE.BoxGeometry(w, hh, d).translate(x, y, z)); }
       const lg = new THREE.Group(), body = new THREE.Mesh(mergeGeometries(geos.map(q => q.toNonIndexed())), lst); body.castShadow = true; lg.add(body);
       const red2 = new THREE.Mesh(new THREE.BoxGeometry(.8, .12, .22).translate(0, .8, .5), red); lg.add(red2);
       const eyes = new THREE.Mesh(mergeGeometries([new THREE.BoxGeometry(.12, .1, .05).translate(-.18, 1.15, .885), new THREE.BoxGeometry(.12, .1, .05).translate(.18, 1.15, .885)]), eyeM); lg.add(eyes);
-      lg.position.set(hx, .5, hz); lg.rotation.order = 'YXZ'; lg.rotation.y = h; g.add(lg);
+      lg.position.set(hx, .8, hz); lg.scale.setScalar(A.lion.k); lg.rotation.order = 'YXZ'; lg.rotation.y = h; g.add(lg);
       const box = { minx: 0, maxx: 0, miny: 0, maxy: 0, minz: 0, maxz: 0, _off: 0 }; BDYN.push(box);
-      lions.push({ g: lg, eyeM, mat: lst, x: hx, z: hz, y: .5, h, hx, hz, hh: h, vx: 0, vz: 0, vy: 0, st: 'sleep', t: 0, cd: 0, hp: A.lion.hp, box, flash: 0 }); } }
+      lions.push({ g: lg, eyeM, mat: lst, x: hx, z: hz, y: .8, h, hx, hz, hh: h, vx: 0, vz: 0, vy: 0, st: 'sleep', t: 0, cd: 0, hp: A.lion.hp, box, flash: 0 }); } }
   OPAG.on = { g, O, climbs, blks, ims, bars, rings, zip, core, bell, lions, halos, beacon, lampM, paperLit, wbell, banners, birds, collars, relic, show: -1, arch: [], guards: [], t: 0, deadN: 0, fixT: 0, fly: [] };
   { const G0 = OPAG.on;
-    for (const [k, v] of [[1, 6], [3, 5], [5, 4]]) { const va = v * Math.PI / 4 + Math.PI / 8, R = (aOf(k) + 1.1) / C8;
+    for (const [k, v] of [[1, 6], [3, 5], [5, 4]]) { const va = v * Math.PI / 4 + Math.PI / 8, R = (aOf(k) + 1.4) / C8;
       archerPost(cx + Math.cos(va) * R, yOf(k + 1) + .05, cz + Math.sin(va) * R).then(d => { if (OPAG.on === G0) G0.arch.push(d); else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {}); }
     // and a SENTRY GUN on storey 5's walk (it also keeps `TURRET.list` non-empty, which is what lets a BOLT reach `bldHit` at all -- `boltHit`)
-    { const va = 2 * Math.PI / 4 + Math.PI / 8, R = (aOf(5) + 1.1) / C8; G0.tur = turretAt(cx + Math.cos(va) * R, yOf(6), cz + Math.sin(va) * R, Math.atan2(Math.cos(va), Math.sin(va))); boxGrid(); }
+    { const va = 2 * Math.PI / 4 + Math.PI / 8, R = (aOf(5) + 1.4) / C8; G0.tur = turretAt(cx + Math.cos(va) * R, yOf(6), cz + Math.sin(va) * R, Math.atan2(Math.cos(va), Math.sin(va))); boxGrid(); }
     (async () => { try { const K0 = await arenaLoad('SAMURAI'), AK = ARENA.kinds.SAMURAI, K = HORDE.KS || (HORDE.KS = Object.assign(Object.create(K0), { notice: HORDE.notice, lose: 90, limbs: 1 }));
       if (OPAG.on !== G0) return; const [nx, nz] = fN((doors[0] + 4) % 8), r = A.a0 - t - 3, d = bodySpawn(K.P, K, cx + nx * r, cz + nz * r, A.base); arenaKatana(d, AK);
       d.horde = 1; d.aggro = 0; d.hp = d.hpMax = 40; d.gap = 1; d.h = Math.atan2(-nx, -nz); HORDE.list.push(d); G0.guards.push(d); } catch (e) { console.error('[melee] block pagoda monk', e); } })(); }
@@ -22398,7 +22403,7 @@ function opagStep(dt) { const G = OPAG.on; if (!G) return; G.t += dt; const A = 
       if (S >= 0) { const at = i < 56 ? Math.floor(i / 8) * .5 : 0; if (S > at) f *= 1.4 + 2.2 * Math.exp(-(S - at) * 2.5); }     // m1295: in the set piece the lanterns run UP the tower, storey by storey
       c.setXYZ(i, f, f * .92, f * .8); } c.needsUpdate = true;     // m1290: the lanterns flicker
     G.lampM.emissiveIntensity = 2 + Math.sin(G.t * 9.3) * .15 + Math.sin(G.t * 23) * .08; G.paperLit.emissiveIntensity = (1.05 + Math.sin(G.t * 1.3) * .1) * (G.show >= 0 ? 1.8 : 1);
-    const s2 = 1 + Math.sin(G.t * 1.6) * .18; G.beacon.userData.halo.scale.setScalar(4.5 * s2 * (G.flare || 1)); G.beacon.scale.setScalar(1 + Math.sin(G.t * 11) * .08); }
+    const s2 = 1 + Math.sin(G.t * 1.6) * .18; G.beacon.userData.halo.scale.setScalar(6.75 * s2 * (G.flare || 1)); G.beacon.scale.setScalar(1 + Math.sin(G.t * 11) * .08); }
   opagMotion(G, dt); opagShow(G, dt);
   if (G.bell) { const B = G.bell; B.cd = Math.max(0, B.cd - dt); B.sw *= Math.exp(-.9 * dt); B.g.rotation.z = Math.sin(G.t * 3.4) * B.sw; }
   G.fixT -= dt;
@@ -22431,7 +22436,7 @@ const _opQ = new THREE.Quaternion(), _opE = new THREE.Euler(), _opU = new THREE.
 function opagMotion(G, dt) { const p = player, t = G.t, wind = Math.sin(t * .37) * .5 + .7, [cx, cz] = OPAG.at;
   const W = G.wbell, near = Math.abs(p.pos.y - 12) < 30 && Math.hypot(p.pos.x - cx, p.pos.z - cz) < 30;
   for (let i = 0; i < W.length; i++) { const B = W[i]; B.cd = Math.max(0, B.cd - dt); B.sw *= Math.exp(-1.2 * dt);
-    if (near && B.cd <= 0 && Math.hypot(p.pos.x - B.x, p.pos.y + 1 - B.y, p.pos.z - B.z) < 1.6) { B.sw = .9; B.cd = 1.2; snd('clang', { g: .3, r: 2.2 + (i % 5) * .15, x: B.x, z: B.z }); }
+    if (near && B.cd <= 0 && Math.hypot(p.pos.x - B.x, p.pos.y + 1 - B.y, p.pos.z - B.z) < 2.2) { B.sw = .9; B.cd = 1.2; snd('clang', { g: .3, r: 2.2 + (i % 5) * .15, x: B.x, z: B.z }); }
     const a = Math.sin(t * 2.3 + B.ph) * .12 * wind + Math.sin(t * 7 + B.ph) * B.sw;
     _opE.set(Math.cos(B.va + Math.PI / 2) * a, 0, -Math.sin(B.va + Math.PI / 2) * a); W.im.setMatrixAt(i, _opM.compose(_opV.set(B.x, B.y, B.z), _opQ.setFromEuler(_opE), _opU)); }
   W.im.instanceMatrix.needsUpdate = true;
@@ -22450,7 +22455,7 @@ function opagMotion(G, dt) { const p = player, t = G.t, wind = Math.sin(t * .37)
 // m1289 (pass 6): a stone lion -- sleep on the plinth, wake, hunt round the court ring (between the plinth and the fence), leap, go home
 function opagLion(G, L, dt) { const A = OPAG, C = A.lion, p = player, [cx, cz] = A.at, rIn = A.a0 + A.eave0[0] + 1, rOut = A.RF - .8;
   L.t += dt; L.cd = Math.max(0, L.cd - dt); L.flash = Math.max(0, L.flash - dt); L.mat.emissive.setRGB(L.flash * 2, L.flash * .6, 0);
-  if (L.st === 'dead') { if (L.t > C.back) { L.st = 'sleep'; L.hp = C.hp; L.x = L.hx; L.z = L.hz; L.y = .5; L.h = L.hh; L.g.visible = true; L.box._off = 0; spkBurst(L.x, 1, L.z, 30, { col: [.85, .82, .75], spread: 3, size: .16, life: .6 }); snd('clang', { g: .5, r: .5, x: L.x, z: L.z }); } return; }
+  if (L.st === 'dead') { if (L.t > C.back) { L.st = 'sleep'; L.hp = C.hp; L.x = L.hx; L.z = L.hz; L.y = .8; L.h = L.hh; L.g.visible = true; L.box._off = 0; spkBurst(L.x, 1, L.z, 30, { col: [.85, .82, .75], spread: 3, size: .16, life: .6 }); snd('clang', { g: .5, r: .5, x: L.x, z: L.z }); } return; }
   const dx = p.pos.x - L.x, dz = p.pos.z - L.z, dist = Math.hypot(dx, dz), pc = Math.hypot(p.pos.x - cx, p.pos.z - cz), inCourt = pc < A.RF + 1 && p.pos.y < 3 && !(p.hp <= 0) && G.show < 0;
   // m1295 (pass 9): while the tower answers, the lions walk home and BOW
   if (G.show >= 0 && (L.st === 'hunt' || L.st === 'sleep' || L.st === 'wake')) { L.st = 'home'; L.t = 0; }
@@ -22460,10 +22465,10 @@ function opagLion(G, L, dt) { const A = OPAG, C = A.lion, p = player, [cx, cz] =
   if (L.st === 'sleep') { L.eyeM.emissiveIntensity = 0; if (inCourt && dist < C.wake) { L.st = 'wake'; L.t = 0; snd('thud', { g: .8, r: .5, x: L.x, z: L.z }); camShake(.08); } }
   else if (L.st === 'wake') { L.eyeM.emissiveIntensity = Math.min(3, L.t * 5); L.g.position.y = L.y + Math.sin(Math.min(1, L.t / .7) * Math.PI) * .25; L.h += Math.sin(L.t * 30) * .01; if (L.t > .7) { L.st = 'hunt'; L.t = 0; } }
   else if (L.st === 'hunt') { if (!inCourt) { L.st = 'home'; L.t = 0; } else { tx = p.pos.x; tz = p.pos.z; if (dist < C.leapAt && L.cd <= 0 && L.y < .05) { L.st = 'leap'; L.t = 0; const k = C.leapV / Math.max(.5, dist); L.vx = dx * k * Math.min(1, dist / 2.2); L.vz = dz * k * Math.min(1, dist / 2.2); L.vy = C.leapUp; snd('thud', { g: .6, r: .8, x: L.x, z: L.z }); } } }
-  else if (L.st === 'home') { tx = L.hx; tz = L.hz; if (Math.hypot(L.hx - L.x, L.hz - L.z) < .3) { L.x = L.hx; L.z = L.hz; L.y = .5; L.h = L.hh; L.st = G.show >= 0 ? 'bow' : 'sleep'; L.t = 0; } else if (inCourt && dist < C.wake) { L.st = 'hunt'; } }
+  else if (L.st === 'home') { tx = L.hx; tz = L.hz; if (Math.hypot(L.hx - L.x, L.hz - L.z) < .3) { L.x = L.hx; L.z = L.hz; L.y = .8; L.h = L.hh; L.st = G.show >= 0 ? 'bow' : 'sleep'; L.t = 0; } else if (inCourt && dist < C.wake) { L.st = 'hunt'; } }
   if (L.st === 'leap') { L.x += L.vx * dt; L.z += L.vz * dt; L.vy -= 20 * dt; L.y += L.vy * dt;
     if (L.y <= 0 && L.vy < 0) { L.y = 0; L.st = 'hunt'; L.cd = C.cd; camShake(.12); smokeAt(L.x, .2, L.z, 1.2, 1, [.8, .78, .72]);
-      if (Math.hypot(p.pos.x - L.x, p.pos.z - L.z) < 1.5 && p.pos.y < 1.6 && !p.roll) playerHurt(C.dmg, Math.atan2(p.pos.x - L.x, p.pos.z - L.z), 7, 3, .35, 1); } }
+      if (Math.hypot(p.pos.x - L.x, p.pos.z - L.z) < 2.2 && p.pos.y < 2 && !p.roll) playerHurt(C.dmg, Math.atan2(p.pos.x - L.x, p.pos.z - L.z), 7, 3, .35, 1); } }
   else if (tx !== null) { const ex = tx - L.x, ez = tz - L.z, e = Math.hypot(ex, ez); if (e > .9 || L.st === 'home') { const v = Math.min(sp * dt, e); L.x += ex / e * v; L.z += ez / e * v; }
     L.h += Math.atan2(Math.sin(Math.atan2(ex, ez) - L.h), Math.cos(Math.atan2(ex, ez) - L.h)) * Math.min(1, dt * 8);
     if (L.st !== 'home' || Math.hypot(L.hx - L.x, L.hz - L.z) > 1.2) L.y = Math.max(0, L.y - dt * 3); L.g.position.y = L.y + Math.abs(Math.sin(L.t * 9)) * .06; }
@@ -22471,8 +22476,8 @@ function opagLion(G, L, dt) { const A = OPAG, C = A.lion, p = player, [cx, cz] =
   if (L.st !== 'wake') L.g.position.y = L.st === 'sleep' ? L.y : L.g.position.y;
   if (L.st === 'leap') L.g.position.y = L.y;
   L.g.position.x = L.x; L.g.position.z = L.z; L.g.rotation.y = L.h; if (L.st !== 'sleep') L.eyeM.emissiveIntensity = 3;
-  const B = L.box; B.minx = L.x - .55; B.maxx = L.x + .55; B.minz = L.z - .55; B.maxz = L.z + .55; B.miny = L.g.position.y; B.maxy = L.g.position.y + 1.4; }
-function opagLionHit(G, x, y, z, rad, dmg) { for (const L of G.lions) { if (L.st === 'dead') continue; if (Math.hypot(x - L.x, z - L.z) > 1 + rad || y < L.g.position.y - .3 - rad || y > L.g.position.y + 1.7 + rad) continue;
+  const B = L.box, hk = .55 * C.k; B.minx = L.x - hk; B.maxx = L.x + hk; B.minz = L.z - hk; B.maxz = L.z + hk; B.miny = L.g.position.y; B.maxy = L.g.position.y + 1.4 * C.k; }
+function opagLionHit(G, x, y, z, rad, dmg) { for (const L of G.lions) { if (L.st === 'dead') continue; if (Math.hypot(x - L.x, z - L.z) > 1.6 + rad || y < L.g.position.y - .3 - rad || y > L.g.position.y + 2.6 + rad) continue;
     L.hp -= dmg || 1; L.flash = .25; if (L.st === 'sleep') { L.st = 'wake'; L.t = 0; } snd('hit', { g: .7, r: .45, x: L.x, z: L.z }); spkBurst(x, y, z, 8, { col: [.9, .88, .8], spread: 2, size: .12, life: .35 });
     if (L.hp <= 0) { L.st = 'dead'; L.t = 0; L.g.visible = false; L.box._off = 1; camShake(.2); snd('boom', { g: .6, r: .9, x: L.x, z: L.z });
       for (let j = 0; j < 12; j++) { const sz = .15 + Math.random() * .25, c = new THREE.Mesh(new THREE.BoxGeometry(sz, sz, sz), L.mat); c.position.set(L.x + (Math.random() - .5) * .8, L.g.position.y + .3 + Math.random() * 1.1, L.z + (Math.random() - .5) * 1.1); c.castShadow = true; scene.add(c);
@@ -22495,9 +22500,9 @@ function opagDist(b, x, y, z) { let dx, dz;
   else { dx = Math.max(b.minx - x, 0, x - b.maxx); dz = Math.max(b.minz - z, 0, z - b.maxz); }
   return Math.hypot(dx, Math.max(b.miny - y, 0, y - b.maxy), dz); }
 // a shot, a swing or a blast landing at (x, y, z): the nearest block (or two, or all in a blast) takes it
-function opagHit(x, y, z, rad, dmg) { const G = OPAG.on; if (!G) return 0; const [cx, cz] = OPAG.at; if (Math.hypot(x - cx, z - cz) > 16 + rad) return 0;
+function opagHit(x, y, z, rad, dmg) { const G = OPAG.on; if (!G) return 0; const [cx, cz] = OPAG.at; if (Math.hypot(x - cx, z - cz) > 23 + rad) return 0;
   if (opagLionHit(G, x, y, z, rad, dmg)) return 1;
-  if (G.bell && G.bell.cd <= 0) { const B = G.bell, P = B.g.position; if (Math.hypot(x - P.x, z - P.z) < .7 + rad && y < P.y + rad && y > P.y - 1.6 - rad) {     // m1286: strike the top room's bell (m1295: and the tower ANSWERS, `opagShow`)
+  if (G.bell && G.bell.cd <= 0) { const B = G.bell, P = B.g.position; if (Math.hypot(x - P.x, z - P.z) < 1.1 + rad && y < P.y + rad && y > P.y - 2.5 - rad) {     // m1286: strike the top room's bell (m1295: and the tower ANSWERS, `opagShow`)
     B.cd = .5; B.sw = Math.min(.5, B.sw + .3); snd('clang', { g: 1.2, r: .5, x: P.x, z: P.z }); if (G.show < 0) { G.show = 0; if (G.relic) G.relic.taken = 0; } snd('boom', { g: .45, r: .4, x: P.x, z: P.z }); camShake(.12); spkBurst(x, y, z, 14, { col: [1, .85, .4], spread: 3, size: .1, life: .4 }); return 1; } }
   const hits = []; for (const B of G.blks) { if (!B.alive || B.ghost) continue; const d = opagDist(B.box, x, y, z); if (d <= rad + .08) hits.push([d, B]); }
   if (!hits.length) return 0; hits.sort((p, q) => p[0] - q[0]);
@@ -23705,7 +23710,7 @@ const BLDG = { list: [
   { key: 'court', t: 'The Courtyard', sub: 'a walled court far north (0, 150): a wall-walk all round, the south gate, a stone lane between two timber halls with balconies and walkable roofs, a koi pond and a moon bridge; the two-roofed watchtower over the inner gate; the high road: a lane bridge, a rope bridge, the bell house; the Great Red Pagoda in its corner, ziplines, the maple; archers, a sentry gun, gate guards and a patrol, woken by the bell; koi, pigeons, a fox, fairy dust, sun shafts and paper lanterns; swaying grass, moss, puddles, smashable barrels, a cart and a rack; silence the watchtower (its gun and two archers) and the inner gate opens on a glowing way on', pass: 10, build: () => courtBuild(), clear: () => courtClear(), on: () => !!COURT.on, step: dt => courtStep(dt) },
   { key: 'zramp', t: 'Zoom Ramp Tower', sub: 'zoom from the red gate (full hold), up the ramp and straight up the face -- only a full zoom reaches the gold lip; your mark shows how close; or zigzag up the chimney', pass: 3, build: () => zrampBuild(), clear: () => zrampClear(), on: () => !!ZRAMP.on, step: dt => zrampStep(dt) },
   { key: 'swrk', t: 'Sky Wreck', sub: 'a flying junk come down on rock spires: a tilted deck up a fallen mast, a hold of cargo behind breakable planks, a crow\'s nest up two bars', pass: 1, build: () => swrkBuild(), clear: () => swrkClear(), on: () => !!SWRK.on, step: dt => swrkStep(dt) },
-  { key: 'opag', t: 'Octagonal Block Pagoda', sub: 'seven eight-sided storeys of blocks: stepped slab eaves you can walk and climb eave to eave, cream panels that break block by block, a ladder up through every floor, a door onto every roof, a red fence, a stepped spire; lattice windows, bracket clusters under every eave, tile ribs, a balustrade round every roof walk, gold corner caps; every block breaks -- posts, bands, eave courses -- and flies back in; walks 2.2 m wide, rooms 6 m; a bar off every roof walk, a chain up a corner of every storey, a zipline off the top walk; a block stair up from the shrine hall, then an armoury, a scroll room, a tea room, a garden, a dragon shrine and a bell room at the top; two stone lions wake at the gate and hunt you round the court, archers on the walks, a sentry gun, a monk in the shrine -- all killable; a lantern under every corner, the windows lit, a beacon on the spire; wind bells that ring as you pass, banners on the fence, birds off the walks, the spire collars turning; ring the bell at the top and the tower answers -- lanterns run up it, a column of light, the lions bow, the altar opens on a reliquary', pass: 10, build: () => opagBuild(), clear: () => opagClear(), on: () => !!OPAG.on, step: dt => opagStep(dt) },
+  { key: 'opag', t: 'Octagonal Block Pagoda', sub: 'x1.5 (his STEER): seven eight-sided storeys of 6 m, 9 m apothem, a 20-step stair of .30 risers; stepped slab eaves you can walk and climb eave to eave, cream panels that break block by block, a ladder up through every floor, a door onto every roof, a red fence, a stepped spire; lattice windows, bracket clusters under every eave, tile ribs, a balustrade round every roof walk, gold corner caps; every block breaks -- posts, bands, eave courses -- and flies back in; walks 2.2 m wide, rooms 6 m; a bar off every roof walk, a chain up a corner of every storey, a zipline off the top walk; a block stair up from the shrine hall, then an armoury, a scroll room, a tea room, a garden, a dragon shrine and a bell room at the top; two stone lions wake at the gate and hunt you round the court, archers on the walks, a sentry gun, a monk in the shrine -- all killable; a lantern under every corner, the windows lit, a beacon on the spire; wind bells that ring as you pass, banners on the fence, birds off the walks, the spire collars turning; ring the bell at the top and the tower answers -- lanterns run up it, a column of light, the lions bow, the altar opens on a reliquary', pass: 10, build: () => opagBuild(), clear: () => opagClear(), on: () => !!OPAG.on, step: dt => opagStep(dt) },
 ] };
 // m1250: THE X-RAY IN THE FORGE. *"When you're inside the building the camera doesn't see through walls -- we need x-ray vision."* The kit
 // worlds' x-ray (m181: anything between the lens and him, above his feet, inside a circle round him, dithered thin) is `kitCutMat` on a

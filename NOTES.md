@@ -5,6 +5,44 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- STEER S1: the Octagonal Block Pagoda x1.5, and a stair he can climb (X4, WORKER A)
+
+His notes from walking it: *"increase the scale... maybe 1.5. The stairs on the ground floor are so steep I couldn't climb; I had to jump
+from one stair to the next."*
+
+**The STAIR, proved by its numbers.** The old flight was twelve steps of .283 m rise on .26 m treads: the rise was legal, but the treads were
+shorter than his foot needs, so he hopped. Now the ground hall's +x side has **two flights of ten**:
+- risers **.30 m** (6.0 m / 20; his step is .357);
+- treads **.40 m**;
+- 1.6-1.8 m wide, with a 3.6 x 1.8 m landing at 3.0 m between the flights and a red rail between them;
+- the second flight rises into a 2.0 x 2.8 m stairwell. Every step under the floor above has 1.25 m of head room plus 30 cm, or the hole
+  over it.
+
+**Everything else is x1.5** (`OPAG`): apothem 6 -> **9 m**, stepping in .4 -> .6 a storey, storeys 3.4 -> **6 m**. That gives:
+- rooms **17 m across at the ground and 9.9 m at the top** (his 9 m minimum);
+- the walk round every storey **3.34 m** clear;
+- doors **2.7-3.6 m wide and 3 m tall**, windows about 2.4 m tall;
+- eaves reaching 4.4 m (5.6 m at the porch), still past the rail of the walk below;
+- the blocks themselves bigger (wall blocks .9 x .6, eave segments 1.1 m, posts .9), so the BLOCK COUNT stays about the same.
+
+**What did NOT scale, on purpose:**
+- every eave course is still **.30 m thick**, because you walk up them;
+- the walk rails are still .32 m, so you step over them.
+
+Also scaled:
+- the spire, the lanterns and their halos, the bells, the banners, the fence (19 m out, a 4.8 m gate), the path;
+- the bars and chains, refitted to the bigger eaves;
+- the zipline, now longer, and starting 2.2 m up so it clears the stepped roof below it;
+- the lions, **1.6x**: plinths, reach, leap.
+
+The tower stands about 42 m to the top storey and about 55 m to the beacon. That is past the 25-40 m band, because it keeps the
+reference's seven storeys.
+
+**FLOORS are now ROW STRIPS** (.25 m, axis-aligned, merged where a run repeats). The eight sector slabs overlapped each other's corners and
+could only take a hatch near the middle of a face, which is what kept the old stairwell to 2.2 m.
+
+SHIPPED UNVERIFIED. Next (his go): X4's gates get real leaves (`bgateMake`), then X3.
+
 ## GREAT RED PAGODA x1.5 -- STEER S2 (X1, m1323)
 
 His STEER after walking X4: *"increase the scale... 1.5... we need room to play... we're gonna go for SIZE"*.
