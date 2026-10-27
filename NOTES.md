@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1167 -- DOJO HALL pass 4 (the first extra pass): a training yard
+
+Alternating per the rule: Set 2 pass (m1166), then an extra pass on the oldest done building.
+- Four straw PRACTICE DUMMIES on posts out front (a straw body, a crossbar, a head, a red band): smash them (shared `SMASH`, 3 hits),
+  back in 10 s.
+- A KOINOBORI pole (10 m, a gold ball on top, solid) with three carp windsocks -- black, red, blue -- streaming and rippling in the wind
+  (`hallStep`).
+- Two stone lanterns either side of the approach, and a path of stepping stones to the door.
+Next: Sky Bridges pass 2. Shipped unverified.
+
 ## m1166 -- SKY BRIDGES pass 1 (Set 2 #14)
 
 `SKYB`, `bridgeSpan(g, A, B, w, sag, tris, mats)` (reusable: a sagging plank bridge with walkable tris, rope rails and hangers, posts and
