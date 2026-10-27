@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1192 -- Jin Lighthouse pass 2: the searchlight (Building Forge loop)
+
+**The beam is a JIN SEARCHLIGHT now.**
+- It sweeps the forge. When its line passes within ~5 degrees of him, and he is 5 to `seeR` 55 m away and below the gallery, it
+  STOPS and tracks him for `lockT` .9 s while it and the crystal turn red.
+- Then the crystal throws a jagged bolt of Jin lightning down to him: a 14-point line, visible .18 s, `zapDmg` 12, a shove.
+- After that it resumes its sweep with a `zapCool` 5 s rest.
+- The lock is the warning: break line by distance, or go and kill it.
+
+**The crystal is killable.** It takes `crysHp` 4 hits through `bldHit` (`lhouseHit`): a blade from the gallery, an arrow, or a
+parried shot. It then goes dark for `crysFix` 25 s with no beam.
+
+**Inside the keeper's room:**
+- a desk with a red log book and a lamp
+- a bunk
+- a bronze gear on the south wall
+- a bronze drive shaft rising from a drum in the middle of the floor
+
+Next: alternate -- Sky Bridges pass 4.
+
 ## m1191 -- Spider-Bot Hangar pass 4: the spiders pounce (Building Forge loop, extra pass)
 
 Until now the spider bots climbed every building but never touched him. They hunt now.
