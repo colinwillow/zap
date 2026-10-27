@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- Octagonal Block Pagoda pass 5 of 10: the rooms, and a stair up from the hall (X4, WORKER A)
+## m1286 -- Octagonal Block Pagoda pass 5 of 10: the rooms, and a stair up from the hall (X4, WORKER A)
 
 **The inside way up starts with a STAIR.** Twelve solid block steps, red and stone with gold nosings, run up the +x side of the ground
 hall and out through a 2.2 x 1.6 m stairwell into storey 1. The rise is .283 m, under his .357 step; the run is 1.6 m wide (ROOM TO FIGHT).
