@@ -63700,7 +63700,7 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 // to the shop front and to the round back door. Built in its OWN frame (local +z = the front, toward the river; `at`/`yaw` are HOME.hut's) and
 // merged per material; every collider a local box turned into the world (the yaw is a quarter turn, so a box stays a box); every walkable
 // surface a triangle. `?hut=glb` (or GHOME.on = 0) puts the GLB back, to compare. Pass 1: the massing and the walkable shell, with the inside.
-const GHOME = { on: 1, pass: 9, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
+const GHOME = { on: 1, pass: 10, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   Rtu: 2.5, door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
@@ -64049,6 +64049,21 @@ function ghomeBuild(at, yaw, y0) {
     const G = bgateMake(wg, wx, wz, A.door - .12, A.doorH - .05, alongX, { boxes: [] }, { r: 3, fix: 30 }); G.box.miny += y0 + P; G.box.maxy += y0 + P; boxes.push(G.box);
     wg.traverse(o => { if (o.isMesh && o.material && o.material.color && o.material.metalness < .5) { o.material = o.material.clone(); o.material.color.setHex(0x5a3a22); } });
     GHOME.gates = [G]; }
+  // ---- PASS 10: THE RIGGING (refs: ropes everywhere) -- sagging ropes from the cone's pole tips down to the front frame, the stacks and the
+  // tower; a line of red and cream PENNANTS from the tower's flagpole to the cone; iron-strapped timber CLADDING over the shop front ----
+  { const ropeM = new THREE.MeshStandardMaterial({ color: 0x6b5236, roughness: .95 }), pr = new THREE.MeshStandardMaterial({ color: 0xb5342a, roughness: .85, side: THREE.DoubleSide }), pc = new THREE.MeshStandardMaterial({ color: 0xeadcbf, roughness: .85, side: THREE.DoubleSide });
+    const sagPt = (a, b, sag, u) => [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u - sag * 4 * u * (1 - u), a[2] + (b[2] - a[2]) * u];
+    const rope = (a, b, sag, r = .025) => { const N = 14; for (let i = 0; i < N; i++) { const p = sagPt(a, b, sag, i / N), q = sagPt(a, b, sag, (i + 1) / N), d = new THREE.Vector3(q[0] - p[0], q[1] - p[1], q[2] - p[2]), L = d.length();
+        _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); put(new THREE.CylinderGeometry(r, r, L, 4), ropeM, _m4.compose(new THREE.Vector3((p[0] + q[0]) / 2, (p[1] + q[1]) / 2, (p[2] + q[2]) / 2), _q, _one)); } };
+    const Rc = 3.6, yb = P + A.Hw + A.Hd * Math.cos(Math.asin(Rc / A.R)) - .2, yd = yb + .9, Hc = 5.2, tip = k => { const q = k / 8 * Math.PI * 2 + Math.PI / 8, u = 1.18; return [Math.sin(q) * Rc * (1 - u), yd + Hc * u, Math.cos(q) * Rc * (1 - u)]; };
+    rope(tip(0), [-2.3, P + 6.6, 4.6], .5); rope(tip(1), [2.3, P + 6.6, 4.6], .5); rope(tip(2), [3.3, P + A.Hw + 6.2, -1.6], .35); rope(tip(6), [-3.1, P + A.Hw + 5.2, -1.9], .35);
+    rope(tip(3), [A.T[0], P + A.Ht + 6.4, A.T[1]], .7); rope(tip(5), [A.Wc[0] - .4, P + A.Hwg + 5.8, A.Wc[1] - .6], .6); rope(tip(7), [-6.2, P + 4.9, 4.6], .7); rope(tip(1), [6.2, P + 4.9, 4.6], .7);
+    // the pennant line: tower flagpole to the cone's top
+    { const a = [A.T[0], P + A.Ht + 5.9, A.T[1]], b = [0, yd + Hc + .9, 0], N = 11; rope(a, b, .8, .018);
+      for (let i = 1; i < N; i++) { const p = sagPt(a, b, .8, i / N), q = sagPt(a, b, .8, (i + .7) / N), geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute([...p, ...q, (p[0] + q[0]) / 2, (p[1] + q[1]) / 2 - .45, (p[2] + q[2]) / 2], 3)); geo.computeVertexNormals(); put(geo, i % 2 ? pr : pc); } }
+    // the cladding over the shop front: vertical planks between the tall posts, iron straps across them
+    { const z = 4.42; for (let x = -2.1; x < 2.1; x += .3) vbox(x + .01, x + .29, P + A.shopH + .35, P + 6.3 - .12, z - .06, z + .06, wood, 0);
+      for (const yy of [P + A.shopH + .7, P + 6.3 - .45]) vbox(-2.15, 2.15, yy - .05, yy + .05, z + .06, z + .1, iron, 0); } }
   // ---- merge, and the world gets the boxes and the floors ----
   let draws = 0; for (const [m, list] of MG) { if (m.map && !m.userData.tri) m.map.wrapS = THREE.RepeatWrapping; const geo = mergeGeometries(list); if (!geo) { console.warn('[melee] ghome: a bucket would not merge', m.name || m.color); continue; } const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; g.add(o); draws++; }
   for (const b of boxes) BOXES.push(b);
