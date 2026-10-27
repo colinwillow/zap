@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m1087 -- FREEFLOW (string swings man to man, leaping), the horde gets swords and goes flying, and you can jump over a crowd
+## m1086 -- FREEFLOW (string swings man to man, leaping), the horde gets swords and goes flying, and you can jump over a crowd
 
 *"None of them had samurai swords. It went between 21 and 50-something FPS. It didn't feel too bogged down. Their collider must be so tall
 -- I can't jump over them, so they just crowd you in. Really need a more stringy melee system so you can keep swiping and string those
