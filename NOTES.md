@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1224 -- Flying Ship pass 5: take the helm (Building Forge loop, extra pass)
+
+Stand at the ship's WHEEL on the deck (within 1.4 m, at the deck's height) and the broadside is YOURS, with a clank and a gold
+beam:
+- **Targets.** Each cannon turns on the nearest standing body on its own side within `canR` 28 m, instead of on him.
+- **Faster.** It fires at x0.6 the interval.
+- **His balls.** Its cannonballs carry `mine`: they strike bodies (`dummyBlow`), not him.
+- **The wheel** spins while he holds it.
+
+Step off and the broadside turns back on him. This is the same pattern as manning the Gatehouse ballista (m1210).
+Next: alternate -- Set 2 #24 Kneeling Colossus pass 1, at a new spot (its listed one clashes with the Barracks).
+
 ## m1223 -- Teahouse Garden pass 3: the polish (Building Forge loop)
 
 - **Lily pads** on the pond (some with pink blossoms), kept clear of the bridge's line.
