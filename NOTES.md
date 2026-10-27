@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## BREAKABLE ROOFS OVER RAFTERS -- S3a, FIRST ON THE DOJO HALL (m1353)
+
+*"The frame of the roof stays, but the pieces that make up the roof are destructible. If rockets are shooting at you, or you're fighting up there, they're shooting pieces of the roof off -- maybe you go back up and rebuild it. I like exposed rafters."* (BUILDINGS.md STEER S3)
+
+- **`bldSkinRoof(g, cx, cz, EX, EZ, hR, mat, rafM, opt)`** cuts a roof surface `hR(x, z)` into PANELS of about `SKIN.pan` 2.4 m.
+  - Each panel is a vertex RANGE of one merged mesh, so the roof is still one draw, plus its own walkable triangles (`bldTris` per panel).
+  - Under them are RAFTERS: a timber beam along every seam of constant x, drawn and WALKABLE (`SKIN.raf` .3 m wide, about 9 cm under the tiles).
+- **`skinHit`** (in `bldHit`, so his rockets, bolts and strikes reach it) takes `hp` 2 off a panel. At zero the panel's vertices collapse to a point (no draw cost) and its triangles leave the walkable store, with debris, dust and a tile clatter.
+  - **Their rockets break panels too** (`turretShotBoom`). That is the point: being shot off the roof.
+  - A strike at his chest never breaks the panel he stands on: the vertical reach is `.5 + rad / 2`, enough for a blast, not for a sword.
+- **Panels come back** after `SKIN.fix` 45 s, never while he stands where one goes. That is the "rebuild" for now; a worker doing it is a later step.
+- **The Dojo Hall's roof is the first skin.** It was one mesh and one set of triangles. The fascia, the ridge and its horns are unchanged.
+- **Next:** S3b (breakable rails, balusters and gates), then S3c (every roof, as S2 reaches it).
+
 ## FIVE FROM HIS COURTYARD WALK (m1352)
 
 His screenshot: a red wall broken into a grey checker. Plus: walking through ground geometry, a launch off the ladder top, stuck on a zipline, archers shooting through roofs.

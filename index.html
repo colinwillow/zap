@@ -11183,6 +11183,7 @@ function turretShotBoom(S, hitPlayer) {
     snd('boom', { g: .8, r: .9 + Math.random() * .12, x: P.x, z: P.z }); camShake(.3); }     // m1018: his rocket's own boom (it was the crate-break `thud`)
   else spkBurst(P.x, P.y, P.z, 8, { col: [1, .6, .2], spread: 2, size: .1, life: .5 });
   const p = player, dx = p.pos.x - P.x, dz = p.pos.z - P.z, d = Math.hypot(dx, dz), dir = Math.atan2(S.v.x, S.v.z);
+  if (S.rocket && SKIN.list.length) skinHit(P.x, P.y, P.z, 1.3, 2);     /* m1353: THEIR rockets take roof panels too -- the point of a breakable roof is being shot off it */
   if (CWALL.list.length) wallHit(P.x, P.y, P.z, S.rocket ? 1.3 : .35, S.rocket ? 3 : 1, S.rocket ? 'rblast' : 'shot', dir);     // m1016; m1029: a projectile's blast never touches half cover
   if (S.mine) {     // m1013: knocked back by his blade, it is HIS now: it hurts what it reaches, never him
     for (const T of TURRET.list) if (!T.dead && turNear(T, P, TURRET.r + (K.splash || .3) + .2)) turretHurt(T, S.rocket ? 4 : 2);
@@ -18926,7 +18927,10 @@ function hallBuild() {
     gr.addColorStop(0, '#2c323c'); gr.addColorStop(.35, '#5a6372'); gr.addColorStop(.6, '#46505e'); gr.addColorStop(1, '#2a2f38'); tc.fillStyle = gr; tc.fillRect(0, 0, 64, 64);
     tc.fillStyle = 'rgba(0,0,0,.35)'; tc.fillRect(0, 0, 64, 3); const ttx = new THREE.CanvasTexture(tcv); ttx.colorSpace = THREE.SRGBColorSpace; ttx.wrapS = ttx.wrapT = THREE.RepeatWrapping; ttx.repeat.set(EX * 2 / .42, EZ * 2 / .7);
     const tiles = new THREE.MeshStandardMaterial({ map: ttx, color: 0xb8c0cc, roughness: .6, metalness: .2, side: THREE.DoubleSide });
-    const roof = new THREE.Mesh(geo, tiles); roof.position.set(cx, 0, cz); roof.castShadow = roof.receiveShadow = true; g.add(roof);
+    /* m1353 (S3a): the roof is a SKIN of breakable tile panels over walkable rafters (was one mesh and one set of triangles) */
+    { const hRf = (x, z) => { const tt = clamp(Math.max(Math.abs(z) / EZ, (Math.abs(x) - RH) / (EX - RH)), 0, 1), cor = Math.pow(Math.abs(x) / EX, 6) * Math.pow(Math.abs(z) / EZ, 2) + Math.pow(Math.abs(z) / EZ, 6) * Math.pow(Math.abs(x) / EX, 2) * .6;
+        return A.ridgeY - drop * (1 - (1 - tt) * (1 - tt)) + A.lift * cor; };
+      HALL.skin = bldSkinRoof(g, cx, cz, EX, EZ, hRf, tiles, wood); }
     // the eave's thick edge (a fascia that follows the lifted rim), the ridge cap and its horns
     const rim = []; const N = 120; for (let k = 0; k <= N; k++) { const u = k / N * 4, s0 = u % 1, e = Math.floor(u) % 4;
       const [x, z] = e === 0 ? [-EX + 2 * EX * s0, EZ] : e === 1 ? [EX, EZ - 2 * EZ * s0] : e === 2 ? [EX - 2 * EX * s0, -EZ] : [-EX, -EZ + 2 * EZ * s0];
@@ -18962,7 +18966,7 @@ function hallBuild() {
     add(new THREE.BoxGeometry(A.door + .4, .16, .8), stone, cx, .08, cz + hd + .55, 1); }
   // THE ROOF IS WALKABLE (its own triangles), and a RAMP up the east side reaches its eave: a timber gangway on posts
   { const RT = []; const rg = HALL.roofGeo, P = rg.attributes.position, ix = rg.index.array;
-    for (let i = 0; i < ix.length; i += 3) for (const v of [ix[i], ix[i + 1], ix[i + 2]]) RT.push(P.getX(v) + cx, P.getY(v), P.getZ(v) + cz);
+    /* m1353: the roof's own triangles are the skin's now (per panel) */
     const r0 = [cx + hw + 1.5 * S + 1.1, .05, cz + hd + 3 + 3.5 * S], r1 = [cx + hw + 1.5 * S + 1.1, A.eaveY + .1, cz + hd - 1.2], w = .75 * S;     // along -z, up to the eave
     RT.push(r0[0] - w, r0[1], r0[2], r0[0] + w, r0[1], r0[2], r1[0] + w, r1[1], r1[2], r0[0] - w, r0[1], r0[2], r1[0] + w, r1[1], r1[2], r1[0] - w, r1[1], r1[2]);
     RT.push(r1[0] - w, r1[1], r1[2], r1[0] + w, r1[1], r1[2], cx + hw + .6, A.eaveY + .1, r1[2] - 1.4 * S, r1[0] - w, r1[1], r1[2], cx + hw + .6, A.eaveY + .1, r1[2] - 1.4 * S, cx + hw + .6, A.eaveY + .1, r1[2]);     // a landing onto the eave
@@ -18998,6 +19002,7 @@ function hallBuild() {
 // m1119: the hall's little life -- the door lanterns sway, and THE GONG RINGS when a strike reaches it (once a swing): a deep clang, a warm
 // glow off the bronze, a wobble that dies away
 function hallStep(dt) {
+  skinStep(dt);
   const H = HALL; if (!H.on) return; H.t = (H.t || 0) + dt;
   if (H.lans) H.lans.forEach((l, i) => { l.rotation.z = Math.sin(H.t * 1.6 + i * 2) * .08; l.rotation.x = Math.sin(H.t * 1.1 + i) * .05; });
   if (H.on.koi) H.on.koi.forEach((f, i) => { f.rotation.y = Math.sin(H.t * .7 + i) * .5 - .3; f.rotation.z = Math.sin(H.t * 3.1 + i * 1.7) * .12; f.children[0].scale.y = 1 + Math.sin(H.t * 5 + i) * .08; });     // m1167: the carp stream
@@ -19041,7 +19046,7 @@ function hallTrophy() { const H = HALL.on; if (!H || H.trophy) return; const [cx
   const cup = new THREE.Mesh(new THREE.CylinderGeometry(.28, .12, .45, 14, 1, true), gold); cup.position.y = .75; cup.material.side = THREE.DoubleSide; t.add(cup); const st = new THREE.Mesh(new THREE.CylinderGeometry(.05, .05, .4, 8), gold); st.position.y = .35; t.add(st);
   const base = new THREE.Mesh(new THREE.BoxGeometry(.4, .14, .4), gold); base.position.y = .07; t.add(base); for (const s2 of [-1, 1]) { const h = new THREE.Mesh(new THREE.TorusGeometry(.12, .025, 6, 12, Math.PI), gold); h.position.set(s2 * .3, .8, 0); h.rotation.z = -s2 * Math.PI / 2; t.add(h); }
   t.position.set(cx + 1.6, .45, cz - (H.A || HALL).D / 2 + 1.1); t.traverse(o => { if (o.isMesh) o.castShadow = true; }); H.g.add(t); H.trophy = t; arenaBeam(t.position.x, t.position.z, [1, .85, .3], 1); snd('clang', { g: 1, r: 1.8 }); spkBurst(t.position.x, 1.2, t.position.z, 30, { col: [1, .85, .3], spread: 4, size: .14, life: .9 }); }
-function hallClear() { if (HALL.spar) { HALL.spar.g.removeFromParent(); HALL.spar = null; } if (HALL.on) { gringDrop(HALL.on.rings); smashDrop(HALL.on.smash); }
+function hallClear() { skinDrop(HALL.skin); HALL.skin = null; if (HALL.spar) { HALL.spar.g.removeFromParent(); HALL.spar = null; } if (HALL.on) { gringDrop(HALL.on.rings); smashDrop(HALL.on.smash); }
   const H = HALL.on; if (!H) return; H.g.removeFromParent(); bldTrisDrop(H.O);
   for (const b of H.O.boxes) { const i = BOXES.indexOf(b); if (i >= 0) BOXES.splice(i, 1); }
   for (const W of H.O.walls) { const i = CWALL.list.indexOf(W); if (i >= 0) CWALL.list.splice(i, 1); }
@@ -19489,6 +19494,7 @@ function bldHit(x, y, z, rad, dmg) {
   if (mktHit(x, y, z, rad, dmg)) return 1;     // m1136: the market's crates smash
   if (heronHit(x, y, z, rad, dmg)) return 1;     // X2: the White Heron Castle's ballista
   if (smashHit(x, y, z, rad, dmg)) return 1;     // m1141: any building's smashables
+  if (skinHit(x, y, z, rad, dmg)) return 1;     // m1353: roof panels over rafters (S3a)
   if (sphangHit(x, y, z, rad, dmg)) return 1;     // m1161: the spider bots
   if (barrHit(x, y, z, rad, dmg)) return 1;     // m1184: the drilling robot samurai
   if (FSHIP.on && FSHIP.on.cans) for (const C of FSHIP.on.cans) { if (C.dead || C.hc > 0) continue; const W = new THREE.Vector3(); C.g.getWorldPosition(W); if (Math.hypot(x - W.x, y - W.y, z - W.z) > 1.1 + rad) continue;
@@ -19847,6 +19853,49 @@ function mktClear() { const M = MKT.on; if (!M) return; smashDrop(M.fruitS); for
 // already in the building's group, its box goes into BOXES; any hit through `bldHit` chips it, at 0 it bursts (chips in `col`, a puff), the
 // box goes, and it is back `fix` s later (not while he stands on it). `smashDrop(list)` on clear. Stepped once a frame from the arena step.
 const SMASH = { list: [] };
+// m1353 (STEER S3a): BREAKABLE SKINS ON A STANDING FRAME. *"Build the frame of the roof, but the pieces that make up the roof are destructible --
+// rockets shooting pieces of the roof off while you're fighting up there; maybe you go back up and rebuild it. I like the idea of exposed rafters."*
+// `bldSkinRoof(g, cx, cz, EX, EZ, hR, mat, rafM, opt)`: a roof surface `hR(x, z)` (LOCAL to cx/cz) over [-EX, EX] x [-EZ, EZ], cut into PANELS of
+// about `SKIN.pan` m. Every panel is a range of ONE merged mesh and its own walkable triangles; a hit takes `hp` off it (`skinHit`, in
+// `bldHit`), and at zero it is knocked out -- its vertices collapse to a point (no draw-call cost), its triangles leave the walkable store,
+// debris and a tile clatter. Under them, the RAFTERS: timber beams along every panel seam, drawn and WALKABLE (a .3 m beam), so a roof with
+// holes in it is a rafter run. A panel comes back after `fix` s (never while he stands where it goes).
+const SKIN = { list: [], hp: 2, fix: 45, pan: 2.4, sub: 4, raf: .3, stat: { broke: 0 } };
+function bldSkinRoof(g, cx, cz, EX, EZ, hR, mat, rafM, opt) {
+  opt = opt || {}; const nx = Math.max(2, Math.round(2 * EX / SKIN.pan)), nz = Math.max(2, Math.round(2 * EZ / SKIN.pan)), sb = SKIN.sub, pos = [], uv = [], panels = [];
+  const R = { panels, mesh: null, base: null, O: { meshes: [], boxes: [], walls: [] } };
+  for (let i = 0; i < nx; i++) for (let j = 0; j < nz; j++) {
+    const x0 = -EX + 2 * EX * i / nx, x1 = -EX + 2 * EX * (i + 1) / nx, z0 = -EZ + 2 * EZ * j / nz, z1 = -EZ + 2 * EZ * (j + 1) / nz, mx = (x0 + x1) / 2, mz = (z0 + z1) / 2;
+    if (opt.skip && opt.skip(mx, mz)) continue;
+    const i0 = pos.length / 3, tris = [], V = (x, z) => [cx + x, hR(x, z) + .03, cz + z];
+    for (let a = 0; a < sb; a++) for (let b = 0; b < sb; b++) { const xa = lerp(x0, x1, a / sb), xb = lerp(x0, x1, (a + 1) / sb), za = lerp(z0, z1, b / sb), zb = lerp(z0, z1, (b + 1) / sb);
+      const q = [V(xa, za), V(xb, za), V(xb, zb), V(xa, zb)]; for (const k of [0, 2, 1, 0, 3, 2]) { pos.push(...q[k]); const X = k === 0 || k === 3 ? xa : xb, Z = k < 2 ? za : zb; uv.push((X + EX) / (2 * EX), (Z + EZ) / (2 * EZ)); }
+      tris.push(...q[0], ...q[1], ...q[2], ...q[0], ...q[2], ...q[3]); }
+    panels.push({ i0, n: pos.length / 3 - i0, cx: cx + mx, cz: cz + mz, cy: hR(mx, mz), hx: (x1 - x0) / 2, hz: (z1 - z0) / 2, hp: SKIN.hp, dead: 0, t: 0, cool: 0, tris, tri: null }); }
+  const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); geo.computeVertexNormals();
+  R.mesh = new THREE.Mesh(geo, mat); R.mesh.castShadow = R.mesh.receiveShadow = true; g.add(R.mesh); R.base = Float32Array.from(pos);
+  for (const P of panels) bldTris(P, P.tris);
+  // THE RAFTERS: along every seam of constant x (ridge-to-eave on the long sides), beams under the panels, walkable
+  { const rg = [], rt = [], w = SKIN.raf / 2, steps = nz * 3; for (let i = 0; i <= nx; i++) { const x = -EX + 2 * EX * i / nx, xi = clamp(x, -EX + w, EX - w);
+      for (let k = 0; k < steps; k++) { const za = -EZ + 2 * EZ * k / steps, zb = -EZ + 2 * EZ * (k + 1) / steps, ya = hR(xi, za) - .09, yb = hR(xi, zb) - .09;
+        const L = Math.hypot(zb - za, yb - ya), bx = new THREE.BoxGeometry(SKIN.raf * .8, .2, L + .02); bx.rotateX(-Math.atan2(yb - ya, zb - za)); bx.translate(cx + xi, (ya + yb) / 2 - .1, cz + (za + zb) / 2); rg.push(bx);
+        rt.push(cx + xi - w, ya, cz + za, cx + xi + w, ya, cz + za, cx + xi + w, yb, cz + zb, cx + xi - w, ya, cz + za, cx + xi + w, yb, cz + zb, cx + xi - w, yb, cz + zb); } }
+    const rm = new THREE.Mesh(mergeGeometries(rg), rafM); rm.castShadow = true; g.add(rm); bldTris(R.O, rt); }
+  SKIN.list.push(R); return R;
+}
+function skinBreak(R, P, quiet) { P.dead = 1; P.t = SKIN.fix; SKIN.stat.broke++; const a = R.mesh.geometry.attributes.position;
+  for (let v = P.i0; v < P.i0 + P.n; v++) a.setXYZ(v, P.cx, P.cy, P.cz); a.needsUpdate = true; bldTrisDrop(P);
+  if (quiet) return; for (let k = 0; k < 3; k++) spkBurst(P.cx, P.cy, P.cz, 16, { col: k ? [.32, .36, .42] : [.5, .38, .26], spread: 5, size: .22, life: .9 });
+  smokeAt(P.cx, P.cy, P.cz, 1.4, 1, [.5, .48, .45]); snd('thud', { g: .9, r: .8, x: P.cx, z: P.cz }); snd('clang', { g: .35, r: 2.2, x: P.cx, z: P.cz }); camShake(.08); }
+function skinFix(R, P) { const a = R.mesh.geometry.attributes.position; for (let v = P.i0; v < P.i0 + P.n; v++) a.setXYZ(v, R.base[v * 3], R.base[v * 3 + 1], R.base[v * 3 + 2]); a.needsUpdate = true;
+  P.dead = 0; P.hp = SKIN.hp; bldTris(P, P.tris); spkBurst(P.cx, P.cy + .2, P.cz, 10, { col: [1, .8, .45], spread: 2, size: .12, life: .5 }); }
+function skinHit(x, y, z, rad, dmg) { let hit = 0;
+  for (const R of SKIN.list) for (const P of R.panels) { if (P.dead || P.cool > 0) continue; if (Math.abs(x - P.cx) > P.hx + rad || Math.abs(z - P.cz) > P.hz + rad || Math.abs(y - P.cy) > .5 + rad * .5) continue;     /* a strike at his chest never breaks the panel he stands on; a blast reaches */
+    P.cool = .2; P.hp -= Math.max(.5, dmg || 1); hit = 1; if (P.hp <= 0) skinBreak(R, P); else spkBurst(x, y, z, 6, { col: [.4, .42, .46], spread: 2, size: .1, life: .3 }); }
+  return hit; }
+function skinStep(dt) { const p = player; for (const R of SKIN.list) for (const P of R.panels) { if (P.cool > 0) P.cool -= dt; if (!P.dead) continue; P.t -= dt; if (P.t > 0) continue;
+  if (Math.abs(p.pos.x - P.cx) < P.hx + .5 && Math.abs(p.pos.z - P.cz) < P.hz + .5 && Math.abs(p.pos.y - P.cy) < 2) { P.t = 1; continue; } skinFix(R, P); } }
+function skinDrop(R) { if (!R) return; for (const P of R.panels) bldTrisDrop(P); bldTrisDrop(R.O); const i = SKIN.list.indexOf(R); if (i >= 0) SKIN.list.splice(i, 1); }
 function smashAdd(list, m, b, hp, fix, col) { BOXES.push(b); const S = { m, b, hp0: hp || 2, hp: hp || 2, fix: fix || 15, col: col || [.7, .5, .3], dead: 0, t: 0, cool: 0 }; list.push(S); SMASH.list.push(S); return S; }
 function smashDrop(list) { for (const S of list || []) { const i = SMASH.list.indexOf(S); if (i >= 0) SMASH.list.splice(i, 1); const j = BOXES.indexOf(S.b); if (j >= 0) BOXES.splice(j, 1); } }
 function smashHit(x, y, z, rad, dmg) {
