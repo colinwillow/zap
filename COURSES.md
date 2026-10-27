@@ -57,19 +57,32 @@ play... you go through the doors and there's a whole course... you end up back w
 - **Modules (his):** ACROBATICS (locomotion, wall running, flips), FIGHT (swing, guard, ricochet the turret's rockets, break cover, the
   spider bots), later PARKOUR momentum (`PARKOUR.md`), COVER, GYM.
 
-### ACROBATICS -- the first module (proposed station order; each one is a build)
-1. **Gap jump** -- two platforms, a pit between: run, jump. (Pieces: run, jump.) **m1078.**
-2. **Hurdle** -- a half block across the lane at a run: push into it + right tap (m1063 `HURDLE`). **m1079: two of them.**
-3. **Wall run** -- a long wall beside a pit; run along it to the far side (m1064 `WRUN`). **m1080: the lane turns at the back of the
-   tunnel and comes back out along a 13 m wall over a 7.6 m pit.**
-4. **Wall jump** -- two walls facing across a shaft; kick between them up to a ledge (m1064 wall jump + `ledgeGo`). **m1081: a corridor
-   over a pit to a 5.5 m goal block at the dais edge.**
-5. **High bar** -- swing, release into a flip, land on the next platform (m1034).
-6. **Balance beam** -- across to the exit (m1037).
-7. **GRIND RAIL (new piece)** -- a rail down from the last platform to the arena floor; land on it and SHOE-grind down it (the
-   skateboard's grind, m153, without the board: a grind pose, slide along the rail's line, jump off; falls off if you lean out). Its own
-   spec + DONE WHEN before it goes in the course.
-8. Back out onto the arena floor, through the door you entered by.
+### ACROBATICS -- REDONE AS BLOCKS (Oct 27, his correction: *"the scale is tiny... the gaps are not far apart at all... it should be
+progressive... use the full length and height of their jump... like Minecraft, just blocks, modular... one piece, then check in"*)
+m1078-81's stations (gaps of 2.5-4 m inside a 7.5 m jump, squeezed through the arena door) are deleted. The course is now a WAREHOUSE far
+off the arena (`COURSE.at`), one long hall per BLOCK, platforms floating 10 m over its floor; a fall to the floor = the last checkpoint.
+Each block teaches ONE ability and asks for nearly ALL of it; the next block assumes the last. One block per build, his look between.
+
+**His reach, measured in the real loop (m1082) -- every block is sized from these, never by eye:**
+| ability | number |
+|---|---|
+| run | 7.2 m/s, reached 4.7 m from standing; a landing drops him to ~2.5 m/s for .3 s -> 9-10 m of runway before a hard jump |
+| jump | apex 2.81 m; 7.5 m on the flat at full speed; ~9.1 m dropping 2.5 m; a 2.2 m rise lands up to ~5.7 m out |
+| double jump | apex 5.19 m, ~12.5 m gap at a sprint (m451) |
+| long jump (let go of the sprint hold) | ~14 m (13.5 m/s along, 10.5 up) |
+| wall run | 8.6 m along, sinks 1.1 m; a wall kick +1.7 m |
+
+**The blocks (in order):**
+1. **JUMP** (m1082, built): gaps 5.5 / 6.5 / 7.0, a step up, a 4.5 m gap rising 2.2, an 8.5 m gap dropping 2.5, a MOVING platform you time.
+2. **DOUBLE JUMP**: gaps 9-12, ledges 4-5 m up, the double used to correct a short jump.
+3. **LONG JUMP**: sprint runways into 12-14 m gaps.
+4. **MOVERS**: lifts, sliders, a platform that carries you past a wall -- timing with everything above.
+5. **WALL RUN**: gaps only a wall run crosses (9+ m), wall run -> double jump chains.
+6. **WALL JUMP**: a chimney 8-10 m up.
+7. **BEAM**: tightrope over the void, then a moving one.
+8. **HIGH BAR**: a swing and release across a 15+ m gap.
+9. **SPEED** (needs building first, `PARKOUR.md`): the charge-up run, a quarter pipe, the loop.
+Finishing a block will open the next one's door (from block 2 on); for now block 1's exit beams you home.
 
 ### FIGHT -- the second module (sketch)
 Swing at a dummy -> guard a dummy's swing -> ricochet a turret's rocket back into it -> break a half wall -> a pack of SPIDER BOTS.

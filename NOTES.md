@@ -5,6 +5,28 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1082 -- the acrobatics course REDONE as measured blocks; BLOCK 1 (JUMP) in a floating warehouse
+
+*"Man the scale is tiny and the gaps are not far apart at all and it's very lame... think about it logically... progressive... you want them
+to have to use the full length and height of their jump ability... floating platforms, when you fall you go back to the last checkpoint...
+platforms that are moving... like Minecraft, it's just blocks... one piece then check in."*
+- **What was wrong:** m1078-81 sized every gap by eye -- 2.5-4 m against a 7.5 m jump -- through a 12 m tunnel, a list of moves not a
+  course. All of it is deleted.
+- **His reach, measured** (`accel.cjs` / `block1t.cjs`, real loop): full speed 7.2 m/s after 4.7 m from standing; a landing drops him to
+  ~2.5 m/s for .3 s (`p.land`) -- a 4 m platform after a landing left him taking off at 5.4 m/s (the first block-1 try fell there); a full
+  jump covers 7.5 m flat (took off 7.71, landed 15.24). Table in COURSES.md.
+- **The block system** (`COURSE.blocks`, `courseBuild` / `courseStep`): a warehouse hall far off the arena (`at` [400, 0, 0]) per block --
+  floor, long walls with a cyan line at platform height, end walls -- with floating platforms (`plats` [u0, u1, v0, v1, top], neon-edged),
+  MOVERS (`movers`: a cosine back-and-forth, the box moved and him carried when he stands on it; gold edges), checkpoints (ring lights when
+  reached; a fall to the floor beams him to the last) and an exit ring (beams home). The dais pad / SPAWN > ACROBATICS beams you to its
+  first checkpoint.
+- **BLOCK 1, JUMP:** 9-10 m runways; gaps 5.5, 6.5, 7.0; a 1.5 m step up; a 4.5 m gap rising 2.2; an 8.5 m gap dropping 2.5; a 5 m mover
+  sliding 10 m (6 s) that comes within 2 m of the last platform and 2.5 m of the next. Auto-run, real loop, the game's own jump (10.6) at
+  each edge: landed every gap -- margins .38 m on the 7.0, .54 on the rising 4.5, .24 on the dropping 8.5 -- timed onto the mover, rode it
+  to 112.6, off to the last platform, exit -> home (0, 8), 0 falls.
+- Next (after his look): block 2, DOUBLE JUMP.
+- Shipped unverified on the phone.
+
 ## m1081 -- ACROBATICS station 4: the wall-jump corridor up to a 5.5 m goal
 
 - From the wall-run landing the lane runs on (toward the arena) into a CORRIDOR: two 7.5 m walls, faces 3.4 m apart (v 2.0 / 5.4), over a pit
