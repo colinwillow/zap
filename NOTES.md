@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1181 -- AIRSHIP DOCK pass 4: dispatch bell, a stern gun, a wind sock
+
+- A DISPATCH BELL on the deck by the arm: strike it and, if the airship is docked, it casts off within .6 s (no 14 s wait).
+- A SENTRY GUN on the airship's stern that RIDES with it (re-posed every frame from the ship's pose; its static box removed; killable):
+  it shoots at you from the air as it flies its loop.
+- An orange WIND SOCK on the mooring mast.
+Next: Set 2 #16 Moated Keep pass 3. Shipped unverified.
+
 ## m1180 -- MOATED KEEP pass 2: a winch inside, archers, wading
 
 - A WINCH WHEEL just inside the keep door: strike it and it spins and works the drawbridge from inside (down / up), like the gong outside.
