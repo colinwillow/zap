@@ -5,6 +5,29 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- Octagonal Block Pagoda pass 5 of 10: the rooms, and a stair up from the hall (X4, WORKER A)
+
+**The inside way up starts with a STAIR.** Twelve solid block steps, red and stone with gold nosings, run up the +x side of the ground
+hall and out through a 2.2 x 1.6 m stairwell into storey 1. The rise is .283 m, under his .357 step; the run is 1.6 m wide (ROOM TO FIGHT).
+- The ground-to-1 ladder is gone; the ladders still carry on above.
+- The stairwell is kept to |u| < 1.1 along its face, because past that the NEIGHBOURING sectors' floor slabs reach over it (each sector slab
+  is as wide as its face at the wall, so it overlaps the next one's inner corner). A hole cut wider would have had floor in it.
+
+**A different room on every storey**, all of blocks. Each room keeps to the middle and to the even sectors its ladders do not use (`free`),
+clear of the hatches and the doors:
+- **0 the SHRINE**: a stone altar facing the door, a seated gold figure of three blocks, two red pillars with lamps, a hovering Jin core.
+- **1 the ARMOURY**: two spear racks of steel rods, and square red shields with gold bosses.
+- **2 the SCROLL ROOM**: two shelves of paper and red block-books, and a low desk with scrolls and a lamp.
+- **3 the TEA ROOM**: nine tatami mats, a low table with a kettle, and four cushions.
+- **4 the GARDEN**: a bonsai of blocks in a stone pot, and a shallow pool.
+- **5 the DRAGON SHRINE**: a teal block dragon coiling up round a red pillar, a red head and a gold pearl.
+- **6 the BELL ROOM**: a bronze bell of stacked blocks under the roof. **Strike it** (`opagHit`) and it booms, shakes and swings. This is
+  the set piece's bell (pass 9).
+
+A paper lantern hangs in the first five rooms.
+
+SHIPPED UNVERIFIED. Next: pass 6, guardians (archers on the walks, two stone lions at the gate, a monk).
+
 ## White Heron Castle pass 4 of 10: the stone base is a climb (X2, WORKER B)
 
 - **The run-up.** The base's collider is one tall solid box face, so the m1251 run-up already goes straight up it: no tap at a zoom's
