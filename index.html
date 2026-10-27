@@ -22225,6 +22225,7 @@ function gpagBuild() {
   const lac = new THREE.MeshStandardMaterial({ color: 0xb3261c, roughness: .42 }), lacD = new THREE.MeshStandardMaterial({ color: 0x7e1913, roughness: .5 }), floorM = new THREE.MeshStandardMaterial({ color: 0x4a3324, roughness: .8 });
   const gold = new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .85, roughness: .3 }), stone = new THREE.MeshStandardMaterial({ color: 0x9a948c, roughness: .95 }), plaster = new THREE.MeshStandardMaterial({ color: 0xece4d4, roughness: .9 });
   const lamp = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false });
+  const paperLit = new THREE.MeshStandardMaterial({ color: 0xf4e6c8, emissive: 0xffa050, emissiveIntensity: .55, roughness: .9 });     // m1272: the windows glow from inside
   const box = (x0, x1, y0, y1, z0, z1, m, solid) => { if (x1 - x0 < .01 || z1 - z0 < .01 || y1 - y0 < .01) return null; const o = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), m); o.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); o.castShadow = o.receiveShadow = true; g.add(o);
     if (solid) O.boxes.push({ minx: x0, maxx: x1, miny: y0, maxy: y1, minz: z0, maxz: z1 }); return o; };
   const hbOf = k => A.hb0 - A.shrink * k, yOf = k => k * A.sh, N = A.n, t = A.t;
@@ -22252,7 +22253,7 @@ function gpagBuild() {
       const lo = ax ? z0 : x0, hi = ax ? z1 : x1, mid = ax ? cz : cx;
       if (S === sd) { run(lo, mid - dw, y0, y1 - .2); run(mid + dw, hi, y0, y1 - .2); run(mid - dw, mid + dw, y0 + A.doorH, y1 - .2); }
       else { run(lo, mid - .9, y0, y1 - .2); run(mid + .9, hi, y0, y1 - .2); run(mid - .9, mid + .9, y0, y0 + 1); run(mid - .9, mid + .9, y0 + 2.3, y1 - .2);
-        const win = ax ? box(c - .05, c + .05, y0 + 1, y0 + 2.3, mid - .9, mid + .9, plaster, 0) : box(mid - .9, mid + .9, y0 + 1, y0 + 2.3, c - .05, c + .05, plaster, 0); } }     // a paper window in every other wall
+        const win = ax ? box(c - .05, c + .05, y0 + 1, y0 + 2.3, mid - .9, mid + .9, paperLit, 0) : box(mid - .9, mid + .9, y0 + 1, y0 + 2.3, c - .05, c + .05, paperLit, 0); } }     // a paper window in every other wall
     // corner posts in dark lacquer, a gold band under the eave
     for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) box(cx + sx * hb - .18, cx + sx * hb + .18, y0, y1 - .2, cz + sz * hb - .18, cz + sz * hb + .18, lacD, 0);
     box(x0 - .05, x1 + .05, y1 - .55, y1 - .4, z0 - .05, z1 + .05, gold, 0);
@@ -22370,7 +22371,16 @@ function gpagBuild() {
   box(cx + 1.6, cx + 3, 0, .9, cz - 1, cz + 1, lacD, 1); const core = new THREE.Mesh(new THREE.SphereGeometry(.3, 14, 10), new THREE.MeshBasicMaterial({ color: 0x5ff2ff, toneMapped: false })); core.position.set(cx + 2.3, 1.3, cz); g.add(core);
   bldTris(O, tris);
   for (const b of O.boxes) if (!BOXES.includes(b)) BOXES.push(b); boxGrid();
-  GPAG.on = { g, O, bars, rings, climbs, core, zip, bell, t: 0, arch: [], guards: [], tur: null };
+  // ---- PASS 7 (m1272): THE LIGHT -- the paper windows glow warm from inside (`paperLit`), every eave lantern gets a soft HALO (one
+  // additive Points draw for all of them, sized in world metres), the lanterns FLICKER, and a BEACON burns at the spire's tip -- a flame
+  // orb and a big slow-breathing glow you can see across the forge. No lights added: a new light recompiles every material in the scene ----
+  let halos, beacon; { const hv = []; for (let k = 0; k < N; k++) { const hb = hbOf(k), EX = hb + A.eave + (k === N - 1 ? .3 : 0), y1 = yOf(k) + A.sh; for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) hv.push(cx + sx * (EX - .35), y1 - 1.58, cz + sz * (EX - .35)); }
+    const cv = document.createElement('canvas'); cv.width = cv.height = 64; const q = cv.getContext('2d'), gr = q.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,200,120,1)'); gr.addColorStop(.35, 'rgba(255,140,60,.45)'); gr.addColorStop(1, 'rgba(255,120,40,0)'); q.fillStyle = gr; q.fillRect(0, 0, 64, 64);
+    const tex = new THREE.CanvasTexture(cv), geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(hv, 3));
+    halos = new THREE.Points(geo, new THREE.PointsMaterial({ map: tex, size: 1.6, sizeAttenuation: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false })); g.add(halos);
+    const by = yOf(N) + 1.6 + 6.1; beacon = new THREE.Mesh(new THREE.SphereGeometry(.22, 12, 8), new THREE.MeshBasicMaterial({ color: 0xffb050, toneMapped: false })); beacon.position.set(cx, by, cz); g.add(beacon);
+    const bh = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false })); bh.scale.setScalar(4); beacon.add(bh); beacon.userData.halo = bh; }
+  GPAG.on = { g, O, bars, rings, climbs, core, zip, bell, t: 0, arch: [], guards: [], tur: null, lamp, paperLit, halos, beacon };
   // ---- PASS 6 (m1271): THE GUARDIANS -- all killable. ARCHERS posted in balcony corners on storeys 2 and 4 (they hold their posts and loose
   // at him), a SENTRY GUN on storey 3's balcony corner looking out over the court, and two robot SAMURAI at the gate who stand their post
   // until they see him. Strike the BELL and the alarm goes up: the gate pair come for him wherever he is ----
@@ -22383,6 +22393,8 @@ function gpagBuild() {
   arenaBeam(cx, cz, [1, .45, .3], 1); snd('clang', { g: .7, r: .6 });
 }
 function gpagStep(dt) { const G = GPAG.on; if (!G) return; G.t += dt; G.core.position.y = 1.3 + Math.sin(G.t * 1.7) * .08;
+  if (G.lamp) { const f = .85 + Math.sin(G.t * 7.3) * .08 + Math.sin(G.t * 17.1) * .05; G.lamp.emissiveIntensity = 2 * f; G.halos.material.size = 1.6 * f; G.paperLit.emissiveIntensity = .5 + Math.sin(G.t * 1.3) * .05;     // m1272
+    const b = 1 + Math.sin(G.t * 1.1) * .2; G.beacon.userData.halo.scale.setScalar(4 * b); G.beacon.scale.setScalar(.9 + Math.sin(G.t * 9) * .08); }
   if (G.bell) { const B = G.bell; B.cd = Math.max(0, B.cd - dt); B.sw *= Math.exp(-.9 * dt); B.g.rotation.z = Math.sin(G.t * 3.4) * B.sw; } }
 // m1270: strike the bell room's great bell
 function gpagBell(x, y, z, rad) { const G = GPAG.on; if (!G || !G.bell || G.bell.cd > 0) return 0; const B = G.bell, P = B.g.position;
@@ -22420,7 +22432,7 @@ const BLDG = { list: [
   { key: 'oni', t: 'Oni Gate', sub: 'a fortress wall carved as a demon face: walk in through its fanged mouth (it BITES on a cycle), guard rooms in its cheeks, sentry guns in its eyes, horns, a stair up the back to a lookout', pass: 3, build: () => oniBuild(), clear: () => oniClear(), on: () => !!ONI.on, step: dt => oniStep(dt) },
   { key: 'obs', t: 'Jin Observatory', sub: 'a clockwork tower: a spiral stair inside past great gears to a balcony under a copper dome whose telescope marks you in the open for a volley of arrows (blind its lens), a clock face', pass: 3, build: () => obsBuild(), clear: () => obsClear(), on: () => !!OBS.on, step: dt => obsStep(dt) },
   { key: 'fest', t: 'Lantern Festival Street', sub: 'a street of festival stalls (roofs to stand on, breakable backs) under strings of paper lanterns, red gates at both ends, bars across, a robot dragon dance to cut apart (strike the taiko to make it wild)', pass: 3, build: () => festBuild(), clear: () => festClear(), on: () => !!FEST.on, step: dt => festStep(dt) },
-  { key: 'gpag', t: 'Great Red Pagoda', sub: 'five storeys of red lacquer: a room on every floor, ladders up through the hatches, a balcony round every storey, a spire; a pavilion whose roof you can climb; a red fence; climb the outside eave to eave, bars, a zipline off the spire; an armoury, a library, a bell room (the alarm), a lookout; archers, a sentry gun, gate guards', pass: 6, build: () => gpagBuild(), clear: () => gpagClear(), on: () => !!GPAG.on, step: dt => gpagStep(dt) },
+  { key: 'gpag', t: 'Great Red Pagoda', sub: 'five storeys of red lacquer: a room on every floor, ladders up through the hatches, a balcony round every storey, a spire; a pavilion whose roof you can climb; a red fence; climb the outside eave to eave, bars, a zipline off the spire; an armoury, a library, a bell room (the alarm), a lookout; archers, a sentry gun, gate guards; glowing windows, lantern halos, a beacon on the spire', pass: 7, build: () => gpagBuild(), clear: () => gpagClear(), on: () => !!GPAG.on, step: dt => gpagStep(dt) },
   { key: 'zramp', t: 'Zoom Ramp Tower', sub: 'zoom from the red gate (full hold), up the ramp and straight up the face -- only a full zoom reaches the gold lip; your mark shows how close; or zigzag up the chimney', pass: 3, build: () => zrampBuild(), clear: () => zrampClear(), on: () => !!ZRAMP.on, step: dt => zrampStep(dt) },
   { key: 'swrk', t: 'Sky Wreck', sub: 'a flying junk come down on rock spires: a tilted deck up a fallen mast, a hold of cargo behind breakable planks, a crow\'s nest up two bars', pass: 1, build: () => swrkBuild(), clear: () => swrkClear(), on: () => !!SWRK.on, step: dt => swrkStep(dt) },
 ] };

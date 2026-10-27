@@ -5,7 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## Great Red Pagoda pass 6 of 10: the guardians (X1)
+## Great Red Pagoda pass 7 of 10: the light (X1)
+
+- **Windows.** The paper windows glow warm from inside (`paperLit`, a faint breathing emissive).
+- **Lantern halos.** Every eave lantern (20 of them) gets a soft halo: ONE additive `Points` draw for all of them, sized in world metres.
+- **Flicker.** The lanterns flicker (emissive and halo size together).
+- **The beacon.** A BEACON burns at the spire's tip: a flame orb with a big, slow-breathing glow sprite, readable across the forge.
+
+No lights were added, because a new light recompiles every material in the scene; it is all emissive and additive. SHIPPED UNVERIFIED.
+Next: pass 8, motion (chimes, streamers, the bell, birds).
+
+## m1271 -- Great Red Pagoda pass 6 of 10: the guardians (X1)
 
 All of them are killable:
 - **Archers.** Posted in balcony corners on storeys 2 and 4 (`archerPost`). They hold their posts and loose at him.
