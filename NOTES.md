@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1095 -- every cut of a multi-cut katana swing connects; the blue dragon's (and the dog's) padded clips trimmed to their real motion
+
+*"A lot of the katana attacks are two strikes... only one of them registers."* / *"There's a bunch of extra frames on every animation in the
+blue dragon, so when it runs it just floats, because the end of its animation finishes and it has all these extra frames baked on."*
+- **Multi-hit:** a strike's hit window closed on its FIRST connect (`!p.melFired`), so a two- or three-cut clip only ever landed its first.
+  It re-opens `STRIKE.rehit` .22 s after the last connect (`p.melHitT`); a man's own `cool` still guards a single cut counting twice.
+  Measured (`multihit.cjs`, real loop, a held dummy): `katana_spin` 2 hits a swing (was 1), single cuts 1.
+- **The padding** (`beastPrep`, `BEASTTRIM`): measured off the files -- every blue dragon clip is 5.03 s (the dog's 4.40); the dragon's RUN
+  moves for .83 s. The old trim ("any change over 1e-4") found motion to the end because (a) the padding drifts a hair and (b) its LAST key
+  snaps a few bones (.03-.045 at 5.03 s after 4 s of nothing). Now: the end is the last frame past 4% of the clip's own 90th-percentile
+  motion, ignoring a blip in the final .07 s. In game: dragon run 5.03 -> .83, attack_air 1.83, attack_ground 1.53, idle 1.37, hit 1.0,
+  dizzy 1.37, entrance 2.03; dog run .73, attack_1 1.23, hit .87. The mech dragon's clips were never padded.
+- Next in his list: the fireball, aim at fliers, bosses that feel heavy (weak spots / armour / the dog's heads), the katana finisher flurry,
+  the air stroke combo.
+- Shipped unverified on the phone.
+
 ## m1094 -- strikes OUT OF THE GUARD (low stab / side slashes); the TORNADO on the left flick DOWN, forward, kept spinning by more flicks; up to 3 AIR KICKS a jump
 
 *"Pulling down on the right stick already has him duck -- that's his guard, he kneels -- so moves out of guard: swipe up, a stab forward low;
