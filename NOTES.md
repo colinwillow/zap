@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1177 -- SHRINE pass 4: fox guardians, an offering box, ema
+
+- Two stone KITSUNE on pedestals at the head of the steps (red bibs, bushy tails, glowing amber eyes); their HEADS TURN to watch him
+  wherever he goes (2 rad/s).
+- An OFFERING BOX before the honden: strike it and gold coins burst out of its slats with a double chime, the box rattles.
+- A board of eight wooden EMA plaques by the terrace's east side, swinging.
+Next: Set 2 #16 Moated Keep. Shipped unverified.
+
 ## m1176 -- CLIFF LODGE pass 3 (DONE)
 
 - Wind-bent PINES (layered cones on leaning trunks) on the summit and round the crag's foot: eight trees, two merged meshes.
