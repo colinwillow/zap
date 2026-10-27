@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE MEGA WALL x1.5 -- STEER S2 (R1, m-MW15)
+
+- **Every SIZE is ×1.5:**
+  - the tower's plan, 8 → 12 m square (the summit guard house, rails and brazier spread with it)
+  - the run-in lane and the face, 6.4 → 9.6 m wide, with the LED strips at its new edges
+  - the chimney, 6 → 9 m long, and its gap 3.2 → 4.8 m
+- **Two things are NOT sizes, so they stay:**
+  - **The lip's height above the bend.** It is solved from his run-up speed (a full zoom's 14.7 m/s → 9.0 m of rise + his reach). ×1.5 of it would be a wall nobody can climb.
+  - **The bend's radius, 3.2.** The run-up has to catch from the bend's walkable top. At R 3.2 / 50° that ends .75 m off the face, inside `WRUN.autoReach` (+ his radius). At R 4.8 it would end 1.12 m off, and he would leave the bend before the wall took him.
+
 ## m1331 -- Timber Siege Fort pass 3 of 10: the jungle gym (X3, WORKER A)
 
 - **Every third bay round every tier is a CLIMBING FACE.**

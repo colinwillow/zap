@@ -23160,7 +23160,10 @@ function heronClear() { const G = HERON.on; if (!G) return; for (const d of (G.a
 // the same ~14.7 m/s), then a QUARTER-PIPE bend of radius `R` at the wall's foot (walkable to `walkA` deg, so his feet ride it up), then the
 // SHEER FACE -- one tall wall, wide like the Mega Wall, with LED strips up both edges and chevrons chasing up the middle. The run-up takes
 // over from the bend (`wrunAuto`); the lip is `lift` above the bend's top, solved as before (14.7^2 / 24 = 9.0 m of rise + the hands' reach).
-const ZRAMP = { at: [-60, -56], hw: 4, hd: 4, run: 24, R: 3.2, walkA: 50, lift: 10.1, rw: 3.2, markT: 8, chim: 3, gap: 3.2, on: null };
+// STEER S2 (x1.5, m1331): everything that is a SIZE is x1.5 -- the tower's plan (12 x 12), the lane and face (9.6 m wide), the chimney and its gap. The BEND stays R 3.2: the
+// run-up must catch from its walkable top, which at R 3.2 / 50 deg ends .75 m off the face (inside `autoReach`); at R 4.8 it would end 1.12 m off. What is NOT a size is the lip's HEIGHT above the bend: that is solved from his run-up speed
+// (a full zoom's 14.7 m/s -> 9.0 m of rise), and x1.5 of it would be a wall nobody can climb. So the lip stays where the speed puts it.
+const ZRAMP = { at: [-60, -56], hw: 6, hd: 6, run: 24, R: 3.2, walkA: 50, lift: 10.1, rw: 4.8, markT: 8, chim: 4.5, gap: 4.8, on: null };
 function zrampBuild() {
   if (ZRAMP.on) return; const A = ZRAMP, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, tris = [];
   const sand = new THREE.MeshStandardMaterial({ color: 0xc9a27a, roughness: .95 }), stone = new THREE.MeshStandardMaterial({ color: 0x8c7f72, roughness: .95 }), wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 });
