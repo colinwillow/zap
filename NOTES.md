@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home, procedural, pass 9: the small blobs, the back door, more light (WORKER B)
+
+- **The refs' smaller BLOBS.** A low swollen dome front-right between the hall and the tower, and one back-left by the back door. Each is
+  solid (`shell` with no openings) and has a round window.
+- **The round BACK DOOR has real leaves.** They are built with `bgateMake` (the doors rule), browned to timber, and swing open as he
+  comes within 3 m from either side, then shut behind him. They are stepped from `homeStep`, with their box in the collider set.
+  - The helper builds in the WORLD, so the leaves hang in a world group lifted to the floor.
+  - Breaking it is not wired: `bldHit` is the forge's.
+- **More light.** Lanterns on brackets either side of the back door, and three on the balcony's posts.
+- **Counts.** 26 draws.
+
+Checked headless and looked at renders of the back (the door, the blob) and the front-right against the refs. Shipped unverified.
+
 ## Grumbo's home, procedural, pass 8: his quarters, lived in (WORKER B)
 
 - **The quarters get room.** The screen wall moved forward (z -1) and stops short of the tower door, so the space behind it is a real room.
