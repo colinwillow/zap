@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE KORAJIN "TAP TO START" WAS OFF CENTRE BY ACCIDENT (m1319)
+
+*"The tap to start button on the Korajin screen is off centre. I think that might've been intentional, but I don't like it."*
+
+It was not intentional. The pill was centred with `left: 50%; transform: translateX(-50%)`, but it also runs the `splashPulse` animation, whose keyframes set `transform: scale(...)`. An animated transform replaces the static one, so the translate was lost and the pill's LEFT edge sat at the middle of the screen.
+
+- It is now centred with `left: 0; right: 0; margin: 0 auto; width: max-content`, which no animation touches.
+- The right padding is trimmed by the trailing letter-spacing, so the words sit in the middle of the pill.
+- **The lesson:** never centre with a transform on an element that also animates a transform.
+
 ## THE LOCK RETICLE IS HIS SUN-WHEEL (m1318)
 
 *"I still don't love the square reticle for the charge attack... we start building with squares and then upgrade. He has that symbol on his clothes -- maybe something closer to this."* (his screenshot of Grumbo's cloak)
