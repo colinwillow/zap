@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- the Octagonal Block Pagoda's gates (X4, WORKER A; his DOORS, GATES -- AND CHAOS rule)
+## m1326 -- the Octagonal Block Pagoda's gates (X4, WORKER A; his DOORS, GATES -- AND CHAOS rule)
 
 Every door in the pagoda and the fence gate now has **real leaves**, from the shared helper (`bgateMake` / `bgateStep` / `bgateHit`):
 - two red leaves with gold straps, hinged at the jambs: 2.7-3.6 m wide and 3 m tall in the seven storey doors, 4.8 x 4 m across the fence gate;
