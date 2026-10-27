@@ -5,6 +5,41 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE SHIP, PASS 4: THE RENDERING BANDS FIXED; REAL SURFACES (m@X4@, WORKER A)
+
+His (from the deck, m1375): *"a bunch of areas are having this weird rendering issue -- I think this happens when two objects overlap... we
+need to texture things with real wood textures and metal textures, concrete textures and fabric textures."*
+
+**The bands were the SUN, not the overlaps (mostly).**
+- The sunrise put the light 7.5 degrees over the horizon. At that grazing angle every shadow-map texel stretches about x7.7 across the deck,
+  which gives the stair-stepped light/dark bands and the sawtooth acne in his screenshot.
+- The DRAWN sun stays low in the sky (`uSun`). The LIGHT now stands at about 27 degrees (its y floored at .5), with `normalBias` .07.
+- **Real overlaps fixed too**, coplanar faces that z-fight:
+  - the deck strips each overlapped the next by 2 cm, top to top; they butt now (as do the hold's floor strips);
+  - the forecastle's deck plate sat exactly on its box's top; it stands 2 cm proud now;
+  - the stern castle's walls ran up INSIDE the quarterdeck slab; they stop under it now.
+
+**Real surfaces.** Six textures authored for the ship (`images/ship_*.jpg`, 17-115 KB each, tileable by construction: periodic noise and
+wrapped joints, made with numpy + PIL):
+- deck planks: honey-brown boards with grain and rings, staggered butt joints, nail holes, tarred seams;
+- hull timber: dark reddish boards with rivet rows (the hull, the castle walls, the masts, and darkened for the beams and battens);
+- brass: brushed riveted plate with green patina (the guns, the gold trim, the finials);
+- red lacquer: crimson with faint grain and worn spots (the band, the rails);
+- slate roof tiles: the pagoda roofs;
+- **the SAIL**: crimson canvas with weave, stitched seams, patches, frayed dark edges and a white square-spiral KEY CREST (his reference's motif).
+
+How they go on:
+- `put` now lays WORLD-SPACE UVs on every piece: the face's dominant axis picks the plane, and the material's `userData.uvS` sets metres per
+  tile. So one texture density runs across every merged box, strip and the lofted hull, and the deck's boards run fore and aft.
+- The sails keep their own 0..1 UVs, so the crest is centred on each.
+- The old dark seam strips across the deck are gone (the texture has its own seams).
+- I tried to generate photo textures through the image API first, but the account has no credits (`credit_balance_exhausted`). If he
+  wants photographic ones, the files can be swapped in place under the same names.
+
+**Checked headless**: boots, builds, no errors; side and deck renders show the textures.
+
+SHIPPED UNVERIFIED. Next: pass 5, the alien-samurai airship look from his reference sheet.
+
 ## The MOVE TABLE, measured (STEER 000 step 1, WORKER B)
 
 His ask (via the main session): *"put worker B on the move table"* -- LEVELDESIGN.md layer 0: every move AND combo, how high and how far,

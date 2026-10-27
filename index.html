@@ -9896,7 +9896,7 @@ function shipSea(g) {
     const pg = new THREE.Group(); pg.position.set(14, 19.4, -6);     /* (on the high hill's crown: its top is 30 * .9 * .75 = 20.25 over the water) */ isl.add(pg); for (let q = 0; q < 3; q++) { const b = new THREE.Mesh(new THREE.BoxGeometry(5 - q * 1.2, 3, 5 - q * 1.2), redM); b.position.y = q * 3.6 + 1.5; pg.add(b); const rf = new THREE.Mesh(new THREE.ConeGeometry(5.6 - q * 1.3, 1.6, 4), roofI); rf.rotation.y = Math.PI / 4; rf.position.y = q * 3.6 + 3.6; pg.add(rf); }
     Z.island = isl; }
   scene.background = new THREE.Color(0xff9a6a); if (scene.fog) { scene.fog.color.setHex(0xe8a07a); scene.fog.near = 300; scene.fog.far = 900; }
-  const L0 = Math.hypot(_sunOff.x, _sunOff.y, _sunOff.z) || 20; _sunOff.copy(sd).multiplyScalar(L0); sun.position.copy(_sunOff); sun.color.setHex(0xffc896); hemi.color.setHex(0xffd6b8); hemi.groundColor.setHex(0x2a3a4a);
+  const L0 = Math.hypot(_sunOff.x, _sunOff.y, _sunOff.z) || 20, ld = new THREE.Vector3(sd.x, Math.max(sd.y, .5), sd.z).normalize(); _sunOff.copy(ld).multiplyScalar(L0); sun.shadow.normalBias = .07;     /* m@X4@ (pass 4): the LIGHT stands ~27 deg up though the drawn sun sits at 7.5 -- at 7.5 every shadow texel stretched x7.7 across the deck, the stair-stepped bands and the acne he saw */ sun.position.copy(_sunOff); sun.color.setHex(0xffc896); hemi.color.setHex(0xffd6b8); hemi.groundColor.setHex(0x2a3a4a);
   camera.far = Math.max(camera.far, 1000); camera.updateProjectionMatrix();
 }
 function forgePeaks(g) {
@@ -23932,9 +23932,17 @@ function lvlBar() { let el = LVL.el; if (!el) { el = LVL.el = document.createEle
 function shipBuild() {
   const Z = SHIPZ; Z.want = 2; if (Z.on) return; const g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, tris = [], MG = new Map(), climbs = [];
   const M = (c, r, x) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: r }, x || {}));
-  const wood = M(0x3a2418, .8), deckM = M(0x8a6a48, .85), red = M(0xb3201c, .6, { side: THREE.DoubleSide }), gold = M(0xd9a441, .3, { metalness: .85 }), dark = M(0x1c1410, .9), bronze = M(0xa0703a, .35, { metalness: .8 }),
-    lamp = M(0xff7a3a, .4, { emissive: 0xff5a1a, emissiveIntensity: 1.6 }), eye = new THREE.MeshBasicMaterial({ color: 0x5affe0, toneMapped: false }), roofM = M(0x2a2f38, .6), rope = M(0xc9b07a, 1);
-  const put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); const q = geo.index ? geo.toNonIndexed() : geo; if (!q.attributes.normal) q.computeVertexNormals(); for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal') q.deleteAttribute(k); MG.get(m).push(q); };     /* no maps here: one attribute set, or the merge returns null */
+  // m@X4@ (pass 4): REAL SURFACES -- tileable textures authored for the ship (`images/ship_*.jpg`: deck planks, hull timber with rivets, brass
+  // plate, red lacquer, slate roof tiles, the sail's canvas with its key crest). `put` lays WORLD-SPACE UVs on every piece (the face's dominant
+  // axis picks the plane; `userData.uvS` metres per tile), so one texture density runs across every merged box, strip and loft
+  const TX = (f, rep) => { const t = new THREE.TextureLoader().load(A('images/' + f)); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; };
+  const MT = (c, r, f, uvS, x) => { const m = M(c, r, Object.assign({ map: TX(f) }, x || {})); m.userData.uvS = uvS; return m; };
+  const wood = MT(0xb08870, .8, 'ship_hull.jpg', 3.2), deckM = MT(0xffffff, .85, 'ship_deck.jpg', 2.6), red = MT(0xffffff, .55, 'ship_lacquer.jpg', 2.2, { side: THREE.DoubleSide }), gold = MT(0xffe0a0, .32, 'ship_brass.jpg', 1.2, { metalness: .85 }), dark = MT(0x6a5444, .85, 'ship_hull.jpg', 2.2), bronze = MT(0xd8a070, .35, 'ship_brass.jpg', 1, { metalness: .8 }),
+    lamp = M(0xff7a3a, .4, { emissive: 0xff5a1a, emissiveIntensity: 1.6 }), eye = new THREE.MeshBasicMaterial({ color: 0x5affe0, toneMapped: false }), roofM = MT(0xffffff, .6, 'ship_roof.jpg', 2), rope = M(0xc9b07a, 1);
+  const sailM = M(0xffffff, .85, { map: TX('ship_sail.jpg'), side: THREE.DoubleSide }), sails = [];     // the sails keep their own 0..1 UVs (the crest is centred on each)
+  const wUV = (q, S) => { const P = q.attributes.position, Nn = q.attributes.normal, uv = new Float32Array(P.count * 2); for (let i = 0; i < P.count; i++) { const ax = Math.abs(Nn.getX(i)), ay = Math.abs(Nn.getY(i)), az = Math.abs(Nn.getZ(i)), x = P.getX(i), y = P.getY(i), z = P.getZ(i);
+      if (ay >= ax && ay >= az) { uv[i * 2] = z / S; uv[i * 2 + 1] = x / S; } else if (ax >= az) { uv[i * 2] = z / S; uv[i * 2 + 1] = y / S; } else { uv[i * 2] = x / S; uv[i * 2 + 1] = y / S; } } q.setAttribute('uv', new THREE.BufferAttribute(uv, 2)); };
+  const put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); const q = geo.index ? geo.toNonIndexed() : geo; if (!q.attributes.normal) q.computeVertexNormals(); for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal') q.deleteAttribute(k); wUV(q, m.userData.uvS || 2); MG.get(m).push(q); };     /* one attribute set (position, normal and the WORLD uv), or the merge returns null */
   const bx = (w, h, d, x, y, z, m, solid) => { put(new THREE.BoxGeometry(w, h, d).translate(x, y, z), m); if (solid) O.boxes.push({ minx: x - w / 2, maxx: x + w / 2, miny: y - h / 2, maxy: y + h / 2, minz: z - d / 2, maxz: z + d / 2 }); };
   const L = Z.L, B = Z.B, D = Z.D, dY = Z.deckY;
   const halfW = u => u >= 0 ? B / 2 * Math.pow(Math.max(0, 1 - u * u), .62) : B / 2 * Math.pow(Math.max(0, 1 - Math.pow(-u, 6)), .45) * (u < -.97 ? .0 : 1) + (u < 0 ? B * .12 * Math.pow(-u, 4) : 0);
@@ -23943,8 +23951,8 @@ function shipBuild() {
   { const NU = 56, NS = 18, pos = [], idx = []; for (let i = 0; i <= NU; i++) { const u = -1 + 2 * i / NU, z = u * L / 2, w = Math.max(.05, halfW(u * .985)), gy = gun(u), ky = Math.min(keel(u), gy - .3);
       for (let j = 0; j <= NS; j++) { const th = Math.PI * j / NS; pos.push(-w * Math.cos(th), gy - (gy - ky) * Math.pow(Math.sin(th), .65), z); } }
     for (let i = 0; i < NU; i++) for (let j = 0; j < NS; j++) { const a = i * (NS + 1) + j, b = a + NS + 1; idx.push(a, b, a + 1, a + 1, b, b + 1); }
-    const hg = new THREE.BufferGeometry(); hg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); hg.setIndex(idx); hg.computeVertexNormals();
-    const hull = new THREE.Mesh(hg, M(0x3a2418, .75, { side: THREE.DoubleSide })); hull.castShadow = hull.receiveShadow = true; g.add(hull);
+    const hg = new THREE.BufferGeometry(); hg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); hg.setIndex(idx); hg.computeVertexNormals(); wUV(hg, 3.2);
+    const hull = new THREE.Mesh(hg, MT(0xc49a80, .75, 'ship_hull.jpg', 3.2, { side: THREE.DoubleSide })); hull.castShadow = hull.receiveShadow = true; g.add(hull);
     // the red band and the gold line just under the gunwale, both sides
     for (const sx of [-1, 1]) for (let i = 0; i < NU; i++) { const u0 = -1 + 2 * i / NU, u1 = u0 + 2 / NU, z0 = u0 * L / 2, z1 = u1 * L / 2, w0 = halfW(u0 * .985), w1 = halfW(u1 * .985); if (w0 < .4 || w1 < .4) continue;
       const y0 = gun(u0), y1 = gun(u1), seg = (dy, h, m, off) => { const geo = new THREE.BufferGeometry(); const P = [sx * (w0 + off), y0 - dy, z0, sx * (w1 + off), y1 - dy, z1, sx * (w1 + off), y1 - dy - h, z1, sx * (w0 + off), y0 - dy - h, z0];
@@ -23952,17 +23960,17 @@ function shipBuild() {
       seg(.25, .9, red, .03); seg(1.15, .12, gold, .035); } }
   // THE MAIN DECK in strips (each as wide as the hull there), and the BULWARKS as boxes along each side
   const z0 = -L / 2 * .9, z1 = L / 2 * .86, NSg = 14; for (let k = 0; k < NSg; k++) { const za = z0 + (z1 - z0) * k / NSg, zb = za + (z1 - z0) / NSg, um = ((za + zb) / 2) / (L / 2), w = Math.max(.6, Math.min(halfW((za / (L / 2)) * .985), halfW((zb / (L / 2)) * .985)) - .15);
-    if (k === Z.hatchK) { for (const sx of [-1, 1]) bx(w - 1.3, .4, zb - za + .02, sx * (1.3 + (w - 1.3) / 2), dY - .2, (za + zb) / 2, deckM, 1); Z.hatch = [za, zb]; }     // m1374: the HATCH to the hold
-    else bx(w * 2, .4, zb - za + .02, 0, dY - .2, (za + zb) / 2, deckM, 1);
+    if (k === Z.hatchK) { for (const sx of [-1, 1]) bx(w - 1.3, .4, zb - za, sx * (1.3 + (w - 1.3) / 2), dY - .2, (za + zb) / 2, deckM, 1); Z.hatch = [za, zb]; }     // m1374: the HATCH to the hold
+    else bx(w * 2, .4, zb - za, 0, dY - .2, (za + zb) / 2, deckM, 1);     /* m@X4@: strips butt, never overlap (overlapping coplanar tops z-fight) */
     for (const sx of [-1, 1]) { const top = Math.max(dY + 1.1, gun(um)); O.boxes.push({ minx: sx > 0 ? w - .05 : -w - .3, maxx: sx > 0 ? w + .3 : -w + .05, miny: dY, maxy: top, minz: za, maxz: zb }); } }
   // planks: dark seams across the deck
-  for (let z = z0 + 1; z < z1 - 1; z += 1.1) { const w = Math.max(.5, halfW((z / (L / 2)) * .985) - .2); bx(w * 2, .02, .05, 0, dY + .01, z, dark); }
+  // (m@X4@: the deck's seams are in its texture now)
   // THE STERN CASTLE: a hollow two-storey block aft -- the CABIN inside (door forward), its roof the quarterdeck at +4.4, ramps up either side of the door
   const cz0 = -L / 2 * .9, cz1 = -L / 2 * .42, cw = Math.min(halfW(-.62), B / 2) - .4, cH = 4.4, cy = dY + cH, cf = cz1;
-  { const t = .4; bx(cw * 2, cH, t, 0, dY + cH / 2, cz0 + t / 2, wood, 1);     // the back wall
-    for (const sx of [-1, 1]) bx(t, cH, cz1 - cz0, sx * (cw - t / 2), dY + cH / 2, (cz0 + cz1) / 2, wood, 1);     // the side walls
-    const dw = 2.6; for (const sx of [-1, 1]) bx(cw - dw / 2, cH, t, sx * (dw / 2 + (cw - dw / 2) / 2), dY + cH / 2, cf - t / 2, wood, 1);     // the front wall, a DOOR in its middle
-    bx(dw, cH - 3, t, 0, dY + 3 + (cH - 3) / 2, cf - t / 2, wood, 1);     // the lintel
+  { const t = .4, wH = cH - .4; bx(cw * 2, wH, t, 0, dY + wH / 2, cz0 + t / 2, wood, 1);     // the back wall (m@X4@: the walls stop under the quarterdeck, not inside it)
+    for (const sx of [-1, 1]) bx(t, wH, cz1 - cz0, sx * (cw - t / 2), dY + wH / 2, (cz0 + cz1) / 2, wood, 1);     // the side walls
+    const dw = 2.6; for (const sx of [-1, 1]) bx(cw - dw / 2, wH, t, sx * (dw / 2 + (cw - dw / 2) / 2), dY + wH / 2, cf - t / 2, wood, 1);     // the front wall, a DOOR in its middle
+    bx(dw, wH - 3, t, 0, dY + 3 + (wH - 3) / 2, cf - t / 2, wood, 1);     // the lintel
     bx(cw * 2 + .6, .4, cz1 - cz0 + .4, 0, cy - .2, (cz0 + cz1) / 2, deckM, 1);     // the quarterdeck (the cabin's ceiling)
     for (const sx of [-1, 1]) bx(.25, 1.1, cz1 - cz0, sx * (cw + .15), cy + .55, (cz0 + cz1) / 2, red, 1);     // its rails
     bx(cw * 2, 1.1, .25, 0, cy + .55, cz0 + .15, red, 1);
@@ -23981,14 +23989,14 @@ function shipBuild() {
     for (const [y, r] of [[cy + 3.3, 4.4], [cy + 4.6, 3]]) { const rf = new THREE.ConeGeometry(r, 1.4, 4).rotateY(Math.PI / 4).translate(0, y, hz); put(rf, roofM); }
     bx(.15, 1.2, .15, 0, cy + 5.8, hz, gold); }
   // THE FORECASTLE: a raised bow deck at +2.2 with a ramp up from the waist
-  const fz0 = L / 2 * .5, fz1 = L / 2 * .84, fy = dY + 2.2; { const fw = halfW(.62) - .4; bx(fw * 2, 2.2, fz1 - fz0, 0, dY + 1.1, (fz0 + fz1) / 2, wood, 1); bx(fw * 2 + .2, .2, fz1 - fz0, 0, fy - .1, (fz0 + fz1) / 2, deckM);
+  const fz0 = L / 2 * .5, fz1 = L / 2 * .84, fy = dY + 2.2; { const fw = halfW(.62) - .4; bx(fw * 2, 2.2, fz1 - fz0, 0, dY + 1.1, (fz0 + fz1) / 2, wood, 1); bx(fw * 2 + .2, .2, fz1 - fz0, 0, fy - .08, (fz0 + fz1) / 2, deckM);     /* (the deck plate stands 2 cm proud of the box it covers) */
     const za = fz0 - 5, zb = fz0; const rg = new THREE.BufferGeometry(); rg.setAttribute('position', new THREE.Float32BufferAttribute([-1.6, dY, za, 1.6, dY, za, 1.6, fy, zb, -1.6, dY, za, 1.6, fy, zb, -1.6, fy, zb], 3)); rg.computeVertexNormals(); put(rg, deckM);
     tris.push(-1.6, dY, za, 1.6, dY, za, 1.6, fy, zb, -1.6, dY, za, 1.6, fy, zb, -1.6, fy, zb); }
   // THE MASTS, each with a JUNK SAIL (crimson, black battens, a gold sun), a CROW'S NEST and a ROPE LADDER up to it
   const masts = [[2, dY, 30, 15, 20], [L / 2 * .62, fy, 23, 11, 14], [(cz0 + cz1) / 2 + 3, cy, 17, 8, 10]];
   for (const [mz, base, H, sw, sh] of masts) { const top = base + H; put(new THREE.CylinderGeometry(.32, .48, H, 10).translate(0, base + H / 2, mz), wood); O.boxes.push({ minx: -.45, maxx: .45, miny: base, maxy: top, minz: mz - .45, maxz: mz + .45 });
     const s0 = base + 4, s1 = s0 + sh, sz = mz + .55; const sg = new THREE.PlaneGeometry(sw, sh, 8, 6); const P = sg.attributes.position; for (let i = 0; i < P.count; i++) { const x = P.getX(i), y = P.getY(i); P.setZ(i, Math.cos(x / sw * Math.PI) * 1.1 + Math.sin((y / sh + .5) * Math.PI) * .4); }
-    sg.computeVertexNormals(); put(sg.translate(0, (s0 + s1) / 2, sz), red);
+    sg.computeVertexNormals(); sails.push(sg.translate(0, (s0 + s1) / 2, sz));
     for (let k = 0; k <= 6; k++) bx(sw + .4, .14, .14, 0, s0 + sh * k / 6, sz + Math.sin((k / 6) * Math.PI) * .4 + 1.15 - 0.05, dark);
     put(new THREE.CircleGeometry(sh * .22, 24).translate(0, (s0 + s1) / 2 + sh * .12, sz + 1.6), gold);
     const ny = top - 3.2; bx(3.4, .3, 3.4, 0, ny - .15, mz, deckM, 1); for (const [ox, oz, w, d] of [[0, 1.6, 3.4, .15], [0, -1.6, 3.4, .15], [1.6, 0, .15, 3.4]]) bx(w, 1, d, ox, ny + .5, mz + oz, red, 1);
@@ -24006,8 +24014,7 @@ function shipBuild() {
   // hung down the middle, cargo stacked, barrels to smash, hammocks slung between the frames
   { const HF = Z.holdY, hz0 = -9, hz1 = 11, half = (z, y) => { const u = z / (L / 2), w = halfW(u * .985), gy = gun(u), ky = Math.min(keel(u), gy - .3), q = Math.min(1, Math.max(0, (gy - y) / (gy - ky))), th = Math.asin(Math.pow(q, 1 / .65)); return w * Math.cos(th); };
     for (let z = hz0; z < hz1 - .01; z += 1) { const za = z, zb = z + 1, hw = Math.min(half(za, HF), half(zb, HF)) - .05, hw2 = Math.min(half(za, dY - .4), half(zb, dY - .4));
-      bx(hw * 2, .3, 1.02, 0, HF - .15, z + .5, deckM, 1); for (const sx of [-1, 1]) O.boxes.push({ minx: sx > 0 ? hw - .05 : -hw2 - .3, maxx: sx > 0 ? hw2 + .3 : -hw + .05, miny: HF, maxy: dY - .2, minz: za, maxz: zb }); }
-    for (let z = hz0 + .7; z < hz1 - .3; z += 1.1) { const hw = half(z, HF) - .1; bx(hw * 2, .02, .05, 0, HF + .01, z, dark); }
+      bx(hw * 2, .3, 1, 0, HF - .15, z + .5, deckM, 1); for (const sx of [-1, 1]) O.boxes.push({ minx: sx > 0 ? hw - .05 : -hw2 - .3, maxx: sx > 0 ? hw2 + .3 : -hw + .05, miny: HF, maxy: dY - .2, minz: za, maxz: zb }); }
     for (const z of [hz0, hz1]) { const hw = half(z, dY - .4); bx(hw * 2, dY - .2 - HF, .3, 0, (HF + dY - .2) / 2, z, wood, 1); }
     for (let z = hz0 + 1.5; z < hz1 - 1; z += 3.2) { const hw = half(z, (HF + dY) / 2); for (const sx of [-1, 1]) bx(.3, dY - .2 - HF, .25, sx * (hw - .1), (HF + dY - .2) / 2, z, dark); bx(hw * 2, .25, .25, 0, dY - .35, z, dark); }     // the frames and deck beams
     for (let z = hz0 + 2; z < hz1 - 1; z += 4) { bx(.04, .5, .04, 0, dY - .45, z, rope); bx(.45, .5, .45, 0, dY - .95, z, lamp); }     // lanterns
@@ -24036,6 +24043,7 @@ function shipBuild() {
   // a banner off the stern
   { const bg = new THREE.PlaneGeometry(2.4, 5); const P = bg.attributes.position; for (let i = 0; i < P.count; i++) P.setZ(i, Math.sin(P.getY(i) * .9) * .25); bg.computeVertexNormals(); put(bg.translate(0, cy + 6, cz0 + 1), red); }
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
+  { const o = new THREE.Mesh(mergeGeometries(sails.map(q => q.index ? q.toNonIndexed() : q)), sailM); o.castShadow = o.receiveShadow = true; g.add(o); }
   bldTris(O, tris); for (const b of O.boxes) BOXES.push(b); boxGrid();
   Z.on = { g, O, climbs, rings, gulls, sprayT: 0, bowH: 0 }; bldXrayTag(g); shipHome(); }
 // m1375 (pass 3): the gulls -- wheel round the masts (circles of their own, a glide in every few seconds); the percher bursts off the yard when he is near and comes back
