@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1089 -- the JUGGLE: the slam is a shockwave that pops them up (no roll), launched men float, air hits keep them up; the TORNADO on side flicks
+
+*"The tornado kick when you melee left or right on the right stick. Also the slam -- he still does the roll; he's slamming the ground and it
+makes a shockwave, sends people up in the air, hang time. I like hitting people up and you keep stringing attacks and it keeps them in the
+air -- not floating, but like slow-mo in the air -- and you're going from one to the next."*
+- **TORNADO** (`TORNADO`, TOOLS > SIDE FLICK): a LEFT / RIGHT flick on the ground plays the spin kick (`hurricane_kick` / `_m`) with the air
+  one's window (`MELEE.spinKick` from .12 to .78 over .65 s) -- it was air only. SWING = the katana's side swings as before.
+- **THE SLAM never rolls:** it plays its own clip (`p.slamClip` is set unarmed too now) and, when that is already over on the drop -- measured,
+  it was, and the code fell through to `landing_hard` (the roll) -- holds its impact pose `slamHold` .35 s. A SHOCKWAVE ring races out to
+  `SLAM.r` (`slamRing`), the camera shakes, and every body it knocks down goes UP (`slamUp` 9.5, `slamOut` 1.2 out) into the juggle.
+- **THE JUGGLE (`JUGGLE`):** a body you launch is juggled for `hang` 1.8 s -- near the top of its arc (|vy| < 3.2) it falls at .22 x gravity
+  (`bodyFly`), the slow-mo float; a blow on it while airborne POPS it back up (`pop` 6.5, `push` 1.6) and restarts the clock. The slam opens
+  the FLOW (m1086); a flow swing can pick an AIRBORNE man (only lying ones are skipped) and hops him up to meet it (`hopMax` 9); the air
+  kick chains in flow too (FLOW reach, flies at the target's height: `kickVy`), and a landed hit gives the air kick back (`p.airKick` 0).
+- **Measured** (`juggle.cjs`, real loop, 10 sworded samurai ringed 2.2 m round him): the slam popped 5 (the rest outside `SLAM.r`) to 2.7 m
+  mean / 3.6 top, 2.16 s mean airtime; landing `weapon_melee_finish`, no roll. Swinging at whoever is up, every .53 s: 9 of 10 swings in
+  flow, 4 hops (him up to 2 m), 4 more pops keeping them at 2.8-4 m. Side flicks: `hurricane_kick` right, `hurricane_kick_m` left. Rendered
+  mid-pop: the ring of them in the air over him.
+- Shipped unverified on the phone.
+
 ## m1088 -- the camera no longer jams in against the arena's invisible wall
 
 *"When I get pushed up against the imaginary wall, the camera gets all tight and I can't see what's going on."* (Screenshot: pinned at the
