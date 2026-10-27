@@ -5,6 +5,12 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home pass 13 (Worker B): shared materials (33 -> 26 draws), the gearbox, the signboard
+- **Draws.** The buckets are keyed by material OBJECT, and five passes each made their own `triMat('bronze')`, two their own glow, and two the same red, so the same look cost seven extra draws. `ghomeBuild` now makes one `bronzeT`, `glowM` and `redW` up front and the passes use those. Measured headless: **26 draws** (was 33), 636 boxes, 5,456 walkable tris.
+- **Gearbox (ref 1).** A dark iron drum along the big wheel's axis, two brass bands and ten studs, with a 12-tooth brass cog above it. Decoration only, no collider (it sits inside the cone's drum ring).
+- **Signboard (ref 1).** Two banded posts, a plank board with iron straps and a small board hung under it, at local (-9.6, 9.4). At (-5.4, 8.6) it was buried in the dressing boulder in front of the left deck, so it was moved out onto the sand. One noCam box.
+- Pass 12's smoke was rendered headless (300 stepped frames): both stacks give a plume that drifts downwind. Confirmed.
+- Whole-piece rule: this is the home sandbox's checklist (BUILDINGS.md, GRUMBO'S HOME, PROCEDURAL). It adds to nothing unsigned. Still open: more passes, then his sign-off on the phone.
 ## THE SHIP, PASS 10: THE SCENERY REBUILT -- NO MORE CONES (m1404, WORKER A)
 
 His: *"I'm not loving the background scenery... it feels very low rent... take a cone, flip it upside down and call it a floating island and
