@@ -5,6 +5,29 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- Octagonal Block Pagoda pass 6 of 10: the guardians (X4, WORKER A)
+
+All of them can be killed:
+- **Two STONE LIONS of blocks** (komainu) sit on stone plinths either side of the gate, inside the fence (`opagLion`).
+  - Come within 8 m and their eyes light red. They drop off their plinths and hunt you round the COURT RING, the strip between the
+    pagoda's plinth and the fence.
+  - Within 3 m they LEAP (a thud, an arc); landing on you hurts for 9 and knocks you back. A roll dodges it.
+  - Leave the court and they walk home and go back to sleep.
+  - Hit them with shots or swings (`opagLionHit`, through `bldHit`): 8 hp. A hit flashes them and wakes a sleeping one. At 0 they SHATTER
+    into a dozen tumbling stone blocks.
+  - They re-form on their plinths 60 s later.
+  - Each has a moving collider (`BDYN`), so bolts stop on them.
+- **Three ARCHERS** (`archerPost`) hold corners of the walks on storeys 1, 3 and 5, clear of the bars and chains.
+- **A SENTRY GUN** on storey 5's walk.
+- **A MONK** (a samurai with his katana) stands his post in front of the shrine altar until he sees you.
+
+**A FINDING FOR MAIN (not changed, it is MAIN's code):** a BOLT only reaches `bldHit` at all when `TURRET.list` is non-empty.
+`boltHit`'s first line is `if (TURRET.list.length) turretBlast(...)`, and `turretBlast` is what calls `bldHit`. So any building's
+shootable things (blocks, bells, levers) are deaf to bolts unless some turret exists somewhere. X1 has a sentry gun, and so does X4 now,
+which is what makes its blocks shootable. Melee does not have the gate.
+
+SHIPPED UNVERIFIED. Next: pass 7, the light.
+
 ## White Heron Castle pass 5 of 10: inside the keep (X2, WORKER B)
 
 - **Steep stairs instead of ladders.** Each stair is twelve dark timber steps, about 47 degrees: one walkable ramp under the steps, a

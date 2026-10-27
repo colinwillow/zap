@@ -22097,7 +22097,7 @@ function festClear() { const F = FEST.on; if (!F) return; bldClear(F); FEST.on =
 // above it come down with it); inside, a ladder up through a hatch on every floor; a door onto the roof of every storey; a red octagonal
 // fence with a gate toward the forge's middle; a stepped spire. Faces: face i's outward normal is (cos i*45, sin i*45); a block's mesh
 // yaw is -i*45-90 so its local x runs along the face (cs = cos yaw, sn = -sin yaw: `boxLocal`'s frame).
-const OPAG = { fixAfter: 20, fixEvery: .15, fixFly: .4, at: [70, 72], n: 7, a0: 6, shrink: .4, sh: 3.4, base: .6, t: .4, eave: [2.95, 2.6, 2.25, 1.9], eave0: [3.9, 3.3, 2.7, 2.1], blkHp: 2, RF: 13.5, doorW: .95, on: null };
+const OPAG = { lion: { hp: 8, wake: 8, v: 3.8, leapAt: 3, leapV: 7, leapUp: 6, dmg: 9, cd: 1.4, back: 60 }, fixAfter: 20, fixEvery: .15, fixFly: .4, at: [70, 72], n: 7, a0: 6, shrink: .4, sh: 3.4, base: .6, t: .4, eave: [2.95, 2.6, 2.25, 1.9], eave0: [3.9, 3.3, 2.7, 2.1], blkHp: 2, RF: 13.5, doorW: .95, on: null };
 function opagTB(x, z, hx, hz, yaw, y0, y1) {     // a collider box, turned when it is not on the axes
   const cs = Math.cos(yaw), sn = -Math.sin(yaw), ex = Math.abs(cs) * hx + Math.abs(sn) * hz, ez = Math.abs(sn) * hx + Math.abs(cs) * hz;
   const b = { minx: x - ex, maxx: x + ex, miny: y0, maxy: y1, minz: z - ez, maxz: z + ez };
@@ -22266,13 +22266,38 @@ function opagBuild() {
   const ims = new Map(); { const by = new Map(); for (const B of blks) { if (!by.has(B.m)) by.set(B.m, []); by.get(B.m).push(B); }
     for (const [m, L] of by) { const im = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), m, L.length); im.castShadow = im.receiveShadow = true; L.forEach((B, k) => { B.k = k; B.im = im; im.setMatrixAt(k, B.mtx); }); im.instanceMatrix.needsUpdate = true; g.add(im); ims.set(m, im); } }
   for (const b of O.boxes) if (!BOXES.includes(b)) BOXES.push(b); boxGrid();
-  OPAG.on = { g, O, climbs, blks, ims, bars, rings, zip, core, bell, t: 0, deadN: 0, fixT: 0, fly: [] };
+  // m@X4@ (pass 6): THE GUARDIANS, all killable. Two STONE LIONS of blocks sit on plinths either side of the gate inside the fence: come
+  // within `lion.wake` m and their eyes light, they drop off their plinths and hunt you round the court, LEAPING when close; break them
+  // (they shatter into blocks) and they re-form on their plinths `lion.back` s later. Three ARCHERS hold corners of the walks on storeys
+  // 1, 3 and 5, and a MONK (a samurai) stands his post in the shrine hall until he sees you.
+  const lions = [];
+  { const lst = M(0xb9b4a8, .9), eyeM = new THREE.MeshStandardMaterial({ color: 0x331111, emissive: 0xff3020, emissiveIntensity: 0, toneMapped: false }), [gx, gz] = fN(doors[0]);
+    const parts = [[0, .55, 0, .9, .6, 1.3], [0, 1.05, .55, .75, .65, .65], [0, 1.05, .3, 1, .85, .3], [0, .9, .95, .4, .25, .25], [0, .25, .45, .26, .5, .26, 1], [0, .25, -.45, .26, .5, .26, 1], [0, 1.0, -.75, .14, .14, .5], [0, .78, .5, .82, .1, .2]];
+    for (const s2 of [-1, 1]) { const tx = -gz, tz = gx, R = A.RF - 1.6, hx = cx + gx * R + tx * s2 * 2.6, hz = cz + gz * R + tz * s2 * 2.6, h = Math.atan2(-gx, -gz);
+      blk(hx, 0, .5, hz, 1.4, 1.8, h, stone, 1, 0);
+      const geos = []; for (const [x, y, z, w, hh, d, legs] of parts) { if (legs) { for (const lx of [-.32, .32]) geos.push(new THREE.BoxGeometry(w, hh, d).translate(x + lx, y, z)); } else geos.push(new THREE.BoxGeometry(w, hh, d).translate(x, y, z)); }
+      const lg = new THREE.Group(), body = new THREE.Mesh(mergeGeometries(geos.map(q => q.toNonIndexed())), lst); body.castShadow = true; lg.add(body);
+      const red2 = new THREE.Mesh(new THREE.BoxGeometry(.8, .12, .22).translate(0, .8, .5), red); lg.add(red2);
+      const eyes = new THREE.Mesh(mergeGeometries([new THREE.BoxGeometry(.12, .1, .05).translate(-.18, 1.15, .885), new THREE.BoxGeometry(.12, .1, .05).translate(.18, 1.15, .885)]), eyeM); lg.add(eyes);
+      lg.position.set(hx, .5, hz); lg.rotation.y = h; g.add(lg);
+      const box = { minx: 0, maxx: 0, miny: 0, maxy: 0, minz: 0, maxz: 0, _off: 0 }; BDYN.push(box);
+      lions.push({ g: lg, eyeM, mat: lst, x: hx, z: hz, y: .5, h, hx, hz, hh: h, vx: 0, vz: 0, vy: 0, st: 'sleep', t: 0, cd: 0, hp: A.lion.hp, box, flash: 0 }); } }
+  OPAG.on = { g, O, climbs, blks, ims, bars, rings, zip, core, bell, lions, arch: [], guards: [], t: 0, deadN: 0, fixT: 0, fly: [] };
+  { const G0 = OPAG.on;
+    for (const [k, v] of [[1, 6], [3, 5], [5, 4]]) { const va = v * Math.PI / 4 + Math.PI / 8, R = (aOf(k) + 1.1) / C8;
+      archerPost(cx + Math.cos(va) * R, yOf(k + 1) + .05, cz + Math.sin(va) * R).then(d => { if (OPAG.on === G0) G0.arch.push(d); else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {}); }
+    // and a SENTRY GUN on storey 5's walk (it also keeps `TURRET.list` non-empty, which is what lets a BOLT reach `bldHit` at all -- `boltHit`)
+    { const va = 2 * Math.PI / 4 + Math.PI / 8, R = (aOf(5) + 1.1) / C8; G0.tur = turretAt(cx + Math.cos(va) * R, yOf(6), cz + Math.sin(va) * R, Math.atan2(Math.cos(va), Math.sin(va))); boxGrid(); }
+    (async () => { try { const K0 = await arenaLoad('SAMURAI'), AK = ARENA.kinds.SAMURAI, K = HORDE.KS || (HORDE.KS = Object.assign(Object.create(K0), { notice: HORDE.notice, lose: 90, limbs: 1 }));
+      if (OPAG.on !== G0) return; const [nx, nz] = fN((doors[0] + 4) % 8), r = A.a0 - t - 3, d = bodySpawn(K.P, K, cx + nx * r, cz + nz * r, A.base); arenaKatana(d, AK);
+      d.horde = 1; d.aggro = 0; d.hp = d.hpMax = 40; d.gap = 1; d.h = Math.atan2(-nx, -nz); HORDE.list.push(d); G0.guards.push(d); } catch (e) { console.error('[melee] block pagoda monk', e); } })(); }
   arenaBeam(cx, cz, [.3, .9, .85], 1); snd('clang', { g: .7, r: .7 });
 }
 // m1279 (pass 3): THE REPAIR. A block dead `fixAfter` s flies back in (one every `fixEvery` s, the LOWEST first and only onto a block that is
 // there, so nothing is put back floating; never into him), its ghost pieces with it
 function opagStep(dt) { const G = OPAG.on; if (!G) return; G.t += dt; const A = OPAG, p = player;
   if (G.core) G.core.position.y = G.core.userData.y + Math.sin(G.t * 1.7) * .08;
+  for (const L of G.lions) opagLion(G, L, dt);
   if (G.bell) { const B = G.bell; B.cd = Math.max(0, B.cd - dt); B.sw *= Math.exp(-.9 * dt); B.g.rotation.z = Math.sin(G.t * 3.4) * B.sw; }
   G.fixT -= dt;
   if (G.fixT <= 0 && G.deadN > 0) { G.fixT = A.fixEvery; let best = null;
@@ -22286,6 +22311,34 @@ function opagStep(dt) { const G = OPAG.on; if (!G) return; G.t += dt; const A = 
     for (const K of B.kids || []) { K.alive = 1; K.im.setMatrixAt(K.k, K.mtx); K.im.instanceMatrix.needsUpdate = true; }
     spkBurst(B.P.x, B.P.y, B.P.z, 5, { col: [.6, .95, .9], spread: 1.2, size: .1, life: .35 }); if (Math.random() < .35) snd('clang', { g: .25, r: 1.5 + Math.random() * .3, x: B.P.x, z: B.P.z }); } }
 const _opM = new THREE.Matrix4(), _opV = new THREE.Vector3(), _opS = new THREE.Vector3();
+// m@X4@ (pass 6): a stone lion -- sleep on the plinth, wake, hunt round the court ring (between the plinth and the fence), leap, go home
+function opagLion(G, L, dt) { const A = OPAG, C = A.lion, p = player, [cx, cz] = A.at, rIn = A.a0 + A.eave0[0] + 1, rOut = A.RF - .8;
+  L.t += dt; L.cd = Math.max(0, L.cd - dt); L.flash = Math.max(0, L.flash - dt); L.mat.emissive.setRGB(L.flash * 2, L.flash * .6, 0);
+  if (L.st === 'dead') { if (L.t > C.back) { L.st = 'sleep'; L.hp = C.hp; L.x = L.hx; L.z = L.hz; L.y = .5; L.h = L.hh; L.g.visible = true; L.box._off = 0; spkBurst(L.x, 1, L.z, 30, { col: [.85, .82, .75], spread: 3, size: .16, life: .6 }); snd('clang', { g: .5, r: .5, x: L.x, z: L.z }); } return; }
+  const dx = p.pos.x - L.x, dz = p.pos.z - L.z, dist = Math.hypot(dx, dz), pc = Math.hypot(p.pos.x - cx, p.pos.z - cz), inCourt = pc < A.RF + 1 && p.pos.y < 3 && !(p.hp <= 0);
+  let tx = null, tz = null, sp = C.v;
+  if (L.st === 'sleep') { L.eyeM.emissiveIntensity = 0; if (inCourt && dist < C.wake) { L.st = 'wake'; L.t = 0; snd('thud', { g: .8, r: .5, x: L.x, z: L.z }); camShake(.08); } }
+  else if (L.st === 'wake') { L.eyeM.emissiveIntensity = Math.min(3, L.t * 5); L.g.position.y = L.y + Math.sin(Math.min(1, L.t / .7) * Math.PI) * .25; L.h += Math.sin(L.t * 30) * .01; if (L.t > .7) { L.st = 'hunt'; L.t = 0; } }
+  else if (L.st === 'hunt') { if (!inCourt) { L.st = 'home'; L.t = 0; } else { tx = p.pos.x; tz = p.pos.z; if (dist < C.leapAt && L.cd <= 0 && L.y < .05) { L.st = 'leap'; L.t = 0; const k = C.leapV / Math.max(.5, dist); L.vx = dx * k * Math.min(1, dist / 2.2); L.vz = dz * k * Math.min(1, dist / 2.2); L.vy = C.leapUp; snd('thud', { g: .6, r: .8, x: L.x, z: L.z }); } } }
+  else if (L.st === 'home') { tx = L.hx; tz = L.hz; if (Math.hypot(L.hx - L.x, L.hz - L.z) < .3) { L.x = L.hx; L.z = L.hz; L.y = .5; L.h = L.hh; L.st = 'sleep'; } else if (inCourt && dist < C.wake) { L.st = 'hunt'; } }
+  if (L.st === 'leap') { L.x += L.vx * dt; L.z += L.vz * dt; L.vy -= 20 * dt; L.y += L.vy * dt;
+    if (L.y <= 0 && L.vy < 0) { L.y = 0; L.st = 'hunt'; L.cd = C.cd; camShake(.12); smokeAt(L.x, .2, L.z, 1.2, 1, [.8, .78, .72]);
+      if (Math.hypot(p.pos.x - L.x, p.pos.z - L.z) < 1.5 && p.pos.y < 1.6 && !p.roll) playerHurt(C.dmg, Math.atan2(p.pos.x - L.x, p.pos.z - L.z), 7, 3, .35, 1); } }
+  else if (tx !== null) { const ex = tx - L.x, ez = tz - L.z, e = Math.hypot(ex, ez); if (e > .9 || L.st === 'home') { const v = Math.min(sp * dt, e); L.x += ex / e * v; L.z += ez / e * v; }
+    L.h += Math.atan2(Math.sin(Math.atan2(ex, ez) - L.h), Math.cos(Math.atan2(ex, ez) - L.h)) * Math.min(1, dt * 8);
+    if (L.st !== 'home' || Math.hypot(L.hx - L.x, L.hz - L.z) > 1.2) L.y = Math.max(0, L.y - dt * 3); L.g.position.y = L.y + Math.abs(Math.sin(L.t * 9)) * .06; }
+  if (L.st !== 'sleep' && L.st !== 'wake') { const rx = L.x - cx, rz = L.z - cz, r = Math.hypot(rx, rz), rc = clamp(r, rIn, rOut); if (r > .01 && rc !== r) { L.x = cx + rx / r * rc; L.z = cz + rz / r * rc; } }     // the court ring
+  if (L.st !== 'wake') L.g.position.y = L.st === 'sleep' ? L.y : L.g.position.y;
+  if (L.st === 'leap') L.g.position.y = L.y;
+  L.g.position.x = L.x; L.g.position.z = L.z; L.g.rotation.y = L.h; if (L.st !== 'sleep') L.eyeM.emissiveIntensity = 3;
+  const B = L.box; B.minx = L.x - .55; B.maxx = L.x + .55; B.minz = L.z - .55; B.maxz = L.z + .55; B.miny = L.g.position.y; B.maxy = L.g.position.y + 1.4; }
+function opagLionHit(G, x, y, z, rad, dmg) { for (const L of G.lions) { if (L.st === 'dead') continue; if (Math.hypot(x - L.x, z - L.z) > 1 + rad || y < L.g.position.y - .3 - rad || y > L.g.position.y + 1.7 + rad) continue;
+    L.hp -= dmg || 1; L.flash = .25; if (L.st === 'sleep') { L.st = 'wake'; L.t = 0; } snd('hit', { g: .7, r: .45, x: L.x, z: L.z }); spkBurst(x, y, z, 8, { col: [.9, .88, .8], spread: 2, size: .12, life: .35 });
+    if (L.hp <= 0) { L.st = 'dead'; L.t = 0; L.g.visible = false; L.box._off = 1; camShake(.2); snd('boom', { g: .6, r: .9, x: L.x, z: L.z });
+      for (let j = 0; j < 12; j++) { const sz = .15 + Math.random() * .25, c = new THREE.Mesh(new THREE.BoxGeometry(sz, sz, sz), L.mat); c.position.set(L.x + (Math.random() - .5) * .8, L.g.position.y + .3 + Math.random() * 1.1, L.z + (Math.random() - .5) * 1.1); c.castShadow = true; scene.add(c);
+        const a = Math.random() * 6.28, v = 1.5 + Math.random() * 4; CWALL.debris.push({ c, v: new THREE.Vector3(Math.sin(a) * v, 2 + Math.random() * 5, Math.cos(a) * v), w: new THREE.Vector3(Math.random() * 9, Math.random() * 9, Math.random() * 9), t: 0 }); }
+      spkBurst(L.x, 1, L.z, 30, { col: [.85, .8, .7], spread: 6, size: .2, life: .8 }); smokeAt(L.x, .8, L.z, 2, 1.4, [.8, .78, .72]); }
+    return 1; } return 0; }
 const _opZ = new THREE.Matrix4().makeScale(0, 0, 0);
 function opagBreak(B, dir, quiet) {
   if (!B.alive || B.flying) return; B.alive = 0; B.im.setMatrixAt(B.k, _opZ); B.im.instanceMatrix.needsUpdate = true; const G = OPAG.on; B.dead = G ? G.t : 0; if (G && !B.ghost) G.deadN++;
@@ -22303,6 +22356,7 @@ function opagDist(b, x, y, z) { let dx, dz;
   return Math.hypot(dx, Math.max(b.miny - y, 0, y - b.maxy), dz); }
 // a shot, a swing or a blast landing at (x, y, z): the nearest block (or two, or all in a blast) takes it
 function opagHit(x, y, z, rad, dmg) { const G = OPAG.on; if (!G) return 0; const [cx, cz] = OPAG.at; if (Math.hypot(x - cx, z - cz) > 16 + rad) return 0;
+  if (opagLionHit(G, x, y, z, rad, dmg)) return 1;
   if (G.bell && G.bell.cd <= 0) { const B = G.bell, P = B.g.position; if (Math.hypot(x - P.x, z - P.z) < .7 + rad && y < P.y + rad && y > P.y - 1.6 - rad) {     // m1286: strike the top room's bell
     B.cd = .5; B.sw = Math.min(.5, B.sw + .3); snd('clang', { g: 1.2, r: .5, x: P.x, z: P.z }); snd('boom', { g: .45, r: .4, x: P.x, z: P.z }); camShake(.12); spkBurst(x, y, z, 14, { col: [1, .85, .4], spread: 3, size: .1, life: .4 }); return 1; } }
   const hits = []; for (const B of G.blks) { if (!B.alive || B.ghost) continue; const d = opagDist(B.box, x, y, z); if (d <= rad + .08) hits.push([d, B]); }
@@ -22310,7 +22364,7 @@ function opagHit(x, y, z, rad, dmg) { const G = OPAG.on; if (!G) return 0; const
   const dir = Math.atan2(x - player.pos.x, z - player.pos.z), take = rad > .9 ? hits : hits.slice(0, rad > .45 ? 2 : 1);
   for (const [, B] of take) { B.hp -= dmg || 1; if (B.hp <= 0) opagBreak(B, dir); else spkBurst(B.P.x, B.P.y, B.P.z, 4, { col: [.9, .88, .8], spread: 1.5, size: .1, life: .3 }); }
   snd('hit', { g: .55, r: .6 + Math.random() * .15, x, z }); return 1; }
-function opagClear() { const G = OPAG.on; if (!G) return; { const i = ZIPS.indexOf(G.zip); if (i >= 0) ZIPS.splice(i, 1); if (player.zip && player.zip.Z === G.zip) player.zip = null; if (player.bar && G.bars.includes(player.bar.B)) player.bar = null; } for (const L of G.climbs) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && G.climbs.includes(player.climb)) climbOff(); bldClear(G); OPAG.on = null; }
+function opagClear() { const G = OPAG.on; if (!G) return; for (const d of G.arch.concat(G.guards)) if (d && HORDE.list.includes(d)) { bowDrop(d); bodyGone(d); HORDE.list.splice(HORDE.list.indexOf(d), 1); } else if (d) { bowDrop(d); bodyGone(d); } for (const L of G.lions) { const i = BDYN.indexOf(L.box); if (i >= 0) BDYN.splice(i, 1); } if (G.tur) turretDrop(G.tur); { const i = ZIPS.indexOf(G.zip); if (i >= 0) ZIPS.splice(i, 1); if (player.zip && player.zip.Z === G.zip) player.zip = null; if (player.bar && G.bars.includes(player.bar.B)) player.bar = null; } for (const L of G.climbs) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && G.climbs.includes(player.climb)) climbOff(); bldClear(G); OPAG.on = null; }
 // m1247: THE SKY WRECK (Set 3 #28, pass 1). The broken hull of a great flying junk come down on rock spires, its deck TILTED (stern 3 m, bow
 // 7 m: walkable triangles), a fallen mast laid as a ramp up to the stern, the HOLD underneath (breakable hull planks, an open breach at the
 // stern, a torn hole on the +z side, cargo crates to smash), a spire speared up through the bow with a flat top, the broken main mast with a
@@ -22969,7 +23023,7 @@ const BLDG = { list: [
   { key: 'gpag', t: 'Great Red Pagoda', sub: 'five storeys of red lacquer: a room on every floor, ladders up through the hatches, a balcony round every storey, a spire; a pavilion whose roof you can climb; a red fence; climb the outside eave to eave, bars, a zipline off the spire; an armoury, a library, a bell room (the alarm), a lookout; archers, a sentry gun, gate guards; glowing windows, lantern halos, a beacon on the spire; streamers, chimes, birds; strike the gong at the top and the tower lights up and the gate opens', pass: 10, build: () => gpagBuild(), clear: () => gpagClear(), on: () => !!GPAG.on, step: dt => gpagStep(dt) },
   { key: 'zramp', t: 'Zoom Ramp Tower', sub: 'zoom from the red gate (full hold), up the ramp and straight up the face -- only a full zoom reaches the gold lip; your mark shows how close; or zigzag up the chimney', pass: 3, build: () => zrampBuild(), clear: () => zrampClear(), on: () => !!ZRAMP.on, step: dt => zrampStep(dt) },
   { key: 'swrk', t: 'Sky Wreck', sub: 'a flying junk come down on rock spires: a tilted deck up a fallen mast, a hold of cargo behind breakable planks, a crow\'s nest up two bars', pass: 1, build: () => swrkBuild(), clear: () => swrkClear(), on: () => !!SWRK.on, step: dt => swrkStep(dt) },
-  { key: 'opag', t: 'Octagonal Block Pagoda', sub: 'seven eight-sided storeys of blocks: stepped slab eaves you can walk and climb eave to eave, cream panels that break block by block, a ladder up through every floor, a door onto every roof, a red fence, a stepped spire; lattice windows, bracket clusters under every eave, tile ribs, a balustrade round every roof walk, gold corner caps; every block breaks -- posts, bands, eave courses -- and flies back in; walks 2.2 m wide, rooms 6 m; a bar off every roof walk, a chain up a corner of every storey, a zipline off the top walk; a block stair up from the shrine hall, then an armoury, a scroll room, a tea room, a garden, a dragon shrine and a bell room at the top', pass: 5, build: () => opagBuild(), clear: () => opagClear(), on: () => !!OPAG.on, step: dt => opagStep(dt) },
+  { key: 'opag', t: 'Octagonal Block Pagoda', sub: 'seven eight-sided storeys of blocks: stepped slab eaves you can walk and climb eave to eave, cream panels that break block by block, a ladder up through every floor, a door onto every roof, a red fence, a stepped spire; lattice windows, bracket clusters under every eave, tile ribs, a balustrade round every roof walk, gold corner caps; every block breaks -- posts, bands, eave courses -- and flies back in; walks 2.2 m wide, rooms 6 m; a bar off every roof walk, a chain up a corner of every storey, a zipline off the top walk; a block stair up from the shrine hall, then an armoury, a scroll room, a tea room, a garden, a dragon shrine and a bell room at the top; two stone lions wake at the gate and hunt you round the court, archers on the walks, a sentry gun, a monk in the shrine -- all killable', pass: 6, build: () => opagBuild(), clear: () => opagClear(), on: () => !!OPAG.on, step: dt => opagStep(dt) },
 ] };
 // m1250: THE X-RAY IN THE FORGE. *"When you're inside the building the camera doesn't see through walls -- we need x-ray vision."* The kit
 // worlds' x-ray (m181: anything between the lens and him, above his feet, inside a circle round him, dithered thin) is `kitCutMat` on a
