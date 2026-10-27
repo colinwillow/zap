@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1216 -- Shrine pass 5: the fox gate (Building Forge loop, extra pass)
+
+A little vermilion TORII (2.4 m, solid posts) stands east of the Shrine's steps with a Jin VEIL hung in it.
+- **The way there.** While the Senbon Torii stands, the veil shimmers cyan. Walk through it and you are carried (sparks out,
+  sparks and a beam in) onto the Senbon Torii's terrace, in front of its fox shrine, facing the honden.
+- **The way back.** Step up to the fox shrine's red door and you come back out just south of the little gate, facing away from it.
+- **Dark veil.** Without the Senbon Torii the veil goes dark grey and does nothing.
+- There is a 1.5 s cooldown so it can't ping-pong.
+
+It is the forge's first link between two buildings that is not a bridge or a zip. Next: alternate -- Siege Yard pass 3.
+
 ## m1215 -- Siege Yard pass 2: the ballista battery and the firing step (Building Forge loop)
 
 **THE BALLISTA BATTERY.** Two bolt-throwers on solid timber platforms (.8 m) by the gate, with a stock, a bow, a bolt and a red eye.
