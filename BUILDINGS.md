@@ -98,7 +98,8 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - [x] **pass 10 (m1397):** the rigging -- sagging ropes from the cone's poles to the frame, the stacks, the tower and the crane; a red-and-cream pennant line from the tower's flagpole to the cone; iron-strapped timber cladding over the shop front
   - [x] **pass 11 (m1398):** the windows -- every round window sunk in a lavender surround, and more of them round the hall, the store, the tower and the turret; the turret's LOOKOUT (a brass telescope at its window, cushions)
   - [x] **pass 12 (m1401):** smoke from both stacks (one point cloud, puffs rising, drifting, dying), the shop and brazier lights flicker
-  - [x] **pass 13 (next tick):** one shared bronze / glow / red across the passes (33 -> 26 draws); the iron GEARBOX under the big wheel with a brass cog above it; the low SIGNBOARD on two posts at the front-left (ref 1)
+  - [x] **pass 13 (m1405):** one shared bronze / glow / red across the passes (33 -> 26 draws); the iron GEARBOX under the big wheel with a brass cog above it; the low SIGNBOARD on two posts at the front-left (ref 1)
+  - [x] **pass 14 (next tick):** blows reach the home (main's m1403 hook): the back door breaks and mends, the orb is knocked swinging (a real pendulum now -- its sway had been inside a comment since pass 9), each stall bell rings
   - [ ] then more passes, each one closer to the four views
 
 ## THE SHIP (his, after m1372) -- its own track, alongside the blueprint work
