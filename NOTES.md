@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- Timber Siege Fort pass 3 of 10: the jungle gym (X3, WORKER A)
+
+- **Every third bay round every tier is a CLIMBING FACE.**
+  - Lashed slats run across its X of braces every .6 m, so it reads as climbable.
+  - The climb (`kitClimbAdd`) goes from the deck or the stone below up to that tier's own deck, with the exit `mark` 1.3 m inside the rail.
+  - The tiers' outsides (and insides) are climbable all round now: about thirty faces, plus the lashed ladders and the hatches.
+- **A BAR off the front of the second and third tiers**, hung on two timber arms from the half-height beam with its top 2.4 m over the
+  terrace. Jump to it, swing, let go up the face.
+- **A ZIPLINE** from a post on the top deck's front edge, out over the terraces, the base and the gate, down to a post on the ground 42 m in
+  front. It was checked clear of every tier's front edge and rail.
+- **The base's courses** are 1.5 m tall, wider than his run-up's minimum (`WRUN`) and taller than a ledge (`LEDGE.tall`). So the stone is
+  runnable and catchable course by course; no change was needed there.
+
+SHIPPED UNVERIFIED. Next: pass 4, the gate tunnel -- a portcullis worked by a lever, and a courtyard behind with a ramp up inside.
+
 ## m1329 -- Timber Siege Fort pass 2 of 10: the lattice detail and the war banners (X3, WORKER A)
 
 - **Rough-cut timber in two tones**, mixed post by post.

@@ -22619,6 +22619,22 @@ function tfortBuild() {
     { const [x0, x1, z0, z1, , y] = tierBoxes[0]; for (const [x, z] of [[x0 + .4, z0 + .4], [x1 - .4, z0 + .4], [x0 + .4, z1 - .4], [x1 - .4, z1 - .4]]) pole(x, z, y, 9, x < cx ? Math.PI : 0); }
     { const [x0, x1, z0, , , y] = tierBoxes[2]; for (const x of [x0 + .4, x1 - .4]) pole(x, z0 + .4, y, 7, x < cx ? Math.PI : 0); }
     { const [wx, wz] = A.house; for (const s2 of [-1, 1]) pole(wx + s2 * 3.2, wz, A.topY - .6, 5, s2 < 0 ? Math.PI : 0); } }
+  // m@X4@ (pass 3): THE JUNGLE GYM. Every third bay round every tier is a CLIMBING FACE -- lashed slats across its X of braces, a climb up
+  // it from the deck (or the stone) below to its own deck, stepping off inside the rail; a BAR hung off the front of the second and third
+  // tiers on two timber arms (swing from it up onto the half-height beam's run of bays); and a ZIPLINE from a post on the top deck's front,
+  // out over the terraces and the gate, down to the ground 40 m off
+  const bars = []; let zip = null;
+  for (let k = 0; k < tierBoxes.length; k++) { const [x0, x1, z0, z1, y0, ytop] = tierBoxes[k], nxB = Math.round((x1 - x0) / A.bay), nzB = Math.round((z1 - z0) / A.bay), bx = (x1 - x0) / nxB, bz = (z1 - z0) / nzB;
+    const face = (ax, c, sg, a0, n, bw) => { for (let i = 1; i < n; i += 3) { const u0 = a0 + i * bw, u1 = u0 + bw, um = (u0 + u1) / 2, off = c + sg * .3;
+        for (let yy = y0 + .45; yy < ytop - .2; yy += .6) ax === 'x' ? blk(um, yy, yy + .08, off, bw - .5, .08, rope, {}) : blk(off, yy, yy + .08, um, .08, bw - .5, rope, {});
+        const box = ax === 'x' ? { minx: u0 + .3, maxx: u1 - .3, miny: y0, maxy: ytop, minz: off - .14, maxz: off + .14 } : { minx: off - .14, maxx: off + .14, miny: y0, maxy: ytop, minz: u0 + .3, maxz: u1 - .3 };
+        const L = kitClimbAdd(box, 'tfort_bay_' + k + '_' + ax + c.toFixed(0) + '_' + i, ytop); L.mark = ax === 'x' ? { x: um, y: ytop, z: c - sg * 1.3 } : { x: c - sg * 1.3, y: ytop, z: um }; climbs.push(L); } };
+    face('x', z0, -1, x0, nxB, bx); face('x', z1, 1, x0, nxB, bx); face('z', x0, -1, z0, nzB, bz); face('z', x1, 1, z0, nzB, bz);
+    if (k > 0) { const zb = z0 - 1.5, bt = y0 + 2.4, B = hbarMake(cx, zb, 0, bt - HBAR.h, 0); HBAR.list.push(B); bars.push(B);
+      for (const s2 of [-1, 1]) { const ex = cx + s2 * HBAR.len / 2; blk(ex, y0 + 2.85, y0 + 3.1, (zb + z0) / 2, .2, z0 - zb + .3, postD, {}); blk(ex, bt, y0 + 2.85, zb, .08, .08, rope, {}); } } }
+  { const [, , z0, , , y3] = tierBoxes[tierBoxes.length - 1]; zip = { A: [cx, y3 + 2.2, z0 + .3], B: [cx, 1.8, cz - 42] }; ZIPS.push(zip);
+    mg(new THREE.TubeGeometry(new THREE.LineCurve3(new THREE.Vector3(...zip.A), new THREE.Vector3(...zip.B)), 16, .05, 5), dark);
+    blk(cx, y3, y3 + 2.5, z0 + .7, .3, .3, postD, { solid: 1 }); blk(cx, 0, 2.2, cz - 42.3, .4, .4, postD, { solid: 1 }); }
   // ---- THE WAY UP THE BASE: two lashed scaffold ladders, front-left and back-right, each with a plank gangway at the top across to the stone ----
   for (const [sx, sz] of [[-1, -1], [1, 1]]) { const lx = cx + sx * 11, z0 = cz + sz * (A.hz + .6), zt = cz + sz * (A.hz - A.bat * (A.nC - 1) - .4);
     for (const o of [-.45, .45]) blk(lx + o, 0, H0 + 1.1, z0, .14, .14, post, {}); for (let r = .3; r < H0 + 1; r += .32) blk(lx, r - .035, r + .035, z0, .9, .08, post, {});
@@ -22632,7 +22648,7 @@ function tfortBuild() {
     for (const [m, L] of by) { const im = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), m, L.length); im.castShadow = im.receiveShadow = true; L.forEach((B, k) => { B.k = k; B.im = im; im.setMatrixAt(k, B.mtx); }); im.instanceMatrix.needsUpdate = true; g.add(im); ims.push(im); } }
   for (const B of blks) if (B.solid && B.box && !O.boxes.includes(B.box)) O.boxes.push(B.box);
   for (const b of O.boxes) if (!BOXES.includes(b)) BOXES.push(b); boxGrid();
-  TFORT.on = { g, O, climbs, blks, ims, gates, flags, tiers: tierBoxes, t: 0 };
+  TFORT.on = { g, O, climbs, blks, ims, gates, flags, bars, zip, tiers: tierBoxes, t: 0 };
   arenaBeam(cx, cz, [.95, .7, .4], 1); snd('clang', { g: .7, r: .55 });
 }
 function tfortStep(dt) { const G = TFORT.on; if (!G) return; G.t += dt; for (const Q of G.gates) bgateStep(Q, dt, []);
@@ -22659,7 +22675,7 @@ function tfortHit(x, y, z, rad, dmg) { const G = TFORT.on; if (!G) return 0; con
   const dir = Math.atan2(x - player.pos.x, z - player.pos.z), take = rad > .9 ? hits : hits.slice(0, rad > .45 ? 2 : 1);
   for (const [, B] of take) { B.hp -= dmg || 1; if (B.hp <= 0) tfortBreak(B, dir); else spkBurst(B.P.x, B.P.y, B.P.z, 4, { col: [.8, .6, .4], spread: 1.5, size: .1, life: .3 }); }
   snd('thud', { g: .6, r: .9 + Math.random() * .2, x, z }); return 1; }
-function tfortClear() { const G = TFORT.on; if (!G) return; for (const L of G.climbs) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && G.climbs.includes(player.climb)) climbOff();
+function tfortClear() { const G = TFORT.on; if (!G) return; { const i = ZIPS.indexOf(G.zip); if (i >= 0) ZIPS.splice(i, 1); if (player.zip && player.zip.Z === G.zip) player.zip = null; if (player.bar && G.bars.includes(player.bar.B)) player.bar = null; } for (const L of G.climbs) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && G.climbs.includes(player.climb)) climbOff();
   for (const Q of G.gates) { const i = BOXES.indexOf(Q.box); if (i >= 0) BOXES.splice(i, 1); } bldClear(G); TFORT.on = null; }
 // m1247: THE SKY WRECK (Set 3 #28, pass 1). The broken hull of a great flying junk come down on rock spires, its deck TILTED (stern 3 m, bow
 // 7 m: walkable triangles), a fallen mast laid as a ramp up to the stern, the HOLD underneath (breakable hull planks, an open breach at the
@@ -23889,7 +23905,7 @@ const BLDG = { list: [
   { key: 'zramp', t: 'Mega Wall', sub: 'the Ninja Warrior wall: zoom from the red gate (full hold), down the lane, up the bend and straight up the face -- only a full zoom reaches the gold lip; your mark shows how close; or zigzag up the chimney', pass: 3, build: () => zrampBuild(), clear: () => zrampClear(), on: () => !!ZRAMP.on, step: dt => zrampStep(dt) },
   { key: 'swrk', t: 'Sky Wreck', sub: 'a flying junk come down on rock spires: a tilted deck up a fallen mast, a hold of cargo behind breakable planks, a crow\'s nest up two bars', pass: 1, build: () => swrkBuild(), clear: () => swrkClear(), on: () => !!SWRK.on, step: dt => swrkStep(dt) },
   { key: 'opag', t: 'Octagonal Block Pagoda', sub: 'x1.5 (his STEER): seven eight-sided storeys of 6 m, 9 m apothem, a 20-step stair of .30 risers; stepped slab eaves you can walk and climb eave to eave, cream panels that break block by block, a ladder up through every floor, a door onto every roof -- red gate leaves in every door and the fence gate that swing open as you come and break under blows, a red fence, a stepped spire; lattice windows, bracket clusters under every eave, tile ribs, a balustrade round every roof walk, gold corner caps; every block breaks -- posts, bands, eave courses -- and flies back in; walks 2.2 m wide, rooms 6 m; a bar off every roof walk, a chain up a corner of every storey, a zipline off the top walk; a block stair up from the shrine hall, then an armoury, a scroll room, a tea room, a garden, a dragon shrine and a bell room at the top; two stone lions wake at the gate and hunt you round the court, archers on the walks, a sentry gun, a monk in the shrine -- all killable; a lantern under every corner, the windows lit, a beacon on the spire; wind bells that ring as you pass, banners on the fence, birds off the walks, the spire collars turning; ring the bell at the top and the tower answers -- lanterns run up it, a column of light, the lions bow, the altar opens on a reliquary', pass: 10, build: () => opagBuild(), clear: () => opagClear(), on: () => !!OPAG.on, step: dt => opagStep(dt) },
-  { key: 'tfort', t: 'Timber Siege Fort', sub: 'a battered base of rough boulders with a gated tunnel straight through it; three open timber lattice tiers stepping back, X-braces that break, plank decks, ladders up through hatches, a watch house under a stepped roof; scaffold ladders up the stone; ladders lashed up the outside of every tier, rope lashings, white war banners with a black crest', pass: 2, build: () => tfortBuild(), clear: () => tfortClear(), on: () => !!TFORT.on, step: dt => tfortStep(dt) },
+  { key: 'tfort', t: 'Timber Siege Fort', sub: 'a battered base of rough boulders with a gated tunnel straight through it; three open timber lattice tiers stepping back, X-braces that break, plank decks, ladders up through hatches, a watch house under a stepped roof; scaffold ladders up the stone; ladders lashed up the outside of every tier, rope lashings, white war banners with a black crest; every third bay a climbing face, bars off the tier fronts, a zipline from the top deck over the gate', pass: 3, build: () => tfortBuild(), clear: () => tfortClear(), on: () => !!TFORT.on, step: dt => tfortStep(dt) },
 ] };
 // m1250: THE X-RAY IN THE FORGE. *"When you're inside the building the camera doesn't see through walls -- we need x-ray vision."* The kit
 // worlds' x-ray (m181: anything between the lens and him, above his feet, inside a circle round him, dithered thin) is `kitCutMat` on a
