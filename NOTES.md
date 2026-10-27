@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1235 -- Jin Observatory pass 1 (Building Forge loop, Set 3 #26)
+
+`OBS`, in BLDG.list as `obs`, at (72, -18). A clockwork tower:
+- **The base room:** 8 x 8 m with breakable walls and a door west toward the forge. Its roof is a solid ring slab round the
+  shaft.
+- **The shaft:** 6 x 6 m of white plaster rising to 16 m, with bronze bands.
+- **The stair.** Inside, a SQUARE SPIRAL STAIR of 53 thin slabs (.3 rise, 2.1 m off the centre, about 11 m of headroom between
+  laps) climbs 1.5 turns from the floor to the wall-heads. Three great bronze GEARS turn on the inside walls.
+- **The top.** The last step is level with the walls' tops, so you step off over the wall-head onto a BALCONY ring (walkable
+  triangles, bronze rail). A copper DOME (with a slit) slowly turns over the top, a bronze telescope with a glowing lens poking out.
+- **A CLOCK FACE** on the west wall, its hands turning.
+
+What wants a look: the turn of the square stair at each corner (the slabs overlap on the diagonal). Next: alternate -- an extra
+pass (6) on the Pagoda.
+
 ## m1234 -- Gatehouse pass 6: the murder hole (Building Forge loop, extra pass)
 
 An iron CAULDRON (glowing oil in it) now sits on a pivot on the first deck, over a dark grated hole above the passage. Strike it
