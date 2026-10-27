@@ -5,6 +5,29 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE SHIP, PASS 1: A SAMURAI PIRATE JUNK ON A SUNRISE SEA (m1373)
+
+His: *"a classic retro pirate samurai alien water vessel just floating in an ocean scene, sunrise, really beautiful water shaders, interior and exterior, sails you can climb."*
+
+- **KORAJIN > The Ship** goes to the forge with `?w=forge&zone=ship`.
+  - **The forge stage (`shipSea`):** instead of the white floor and peaks, it builds:
+    - a SUNRISE DOME (`SKYGLSL`: a warm horizon to a deep zenith, a sun glow and disc)
+    - an OCEAN: a 1.7 km plane with five Gerstner-style waves in the vertex shader (faded with distance), noise ripples, Fresnel sky reflection, sun glitter, a subsurface tint on the crests, foam on the peaks, and a fade to the horizon colour
+  - **The sun moves to the sunrise bearing.** It is warm, with a warm hemi.
+  - **`SHIPZ` is declared ABOVE `arenaStage()`,** which runs at module scope (the TDZ landmine).
+- **The ship (`shipBuild`, first frame):**
+  - a 46 m lofted hull: rings from gunwale to keel, a pointed bow, a blunt transom, the sheer rising fore and aft, a red band and a gold line
+  - the main deck in strips, with bulwark colliders along both sides
+  - the STERN CASTLE: a hollow cabin with a door forward (table, cushions, lantern, scroll rack, glowing stern windows), the quarterdeck on its roof (rails, a pagoda-roofed house), and ramps up either side of the door
+  - a FORECASTLE with a ramp
+  - THREE MASTS (30, 23 and 17 m), each with a curved crimson junk sail (black battens, a gold sun), a CROW'S NEST and a ROPE LADDER up to it (`kitClimbAdd`)
+  - an alien DRAGON prow with cyan eyes
+  - lanterns on posts, bronze guns, and a stern banner
+  - everything merged per material
+- **The sea:** fall in and you are put back aboard. There is no swimming here yet. The ship does not bob yet; that is pass 2, with the decks carrying him.
+- **Bug found on the way:** `mergeGeometries` returns NULL when the pieces' attribute sets differ. Hand-built strips have no `uv` and the boxes do, so the first headless build drew the hull alone. `put` now keeps position and normal only.
+- **Checked headless:** the zone boots, the ship builds, he spawns grounded on the deck at (0, 3.2, 6). Two renders (side and deck) look right.
+
 ## THE BLUEPRINT METHOD (docs, after m1372)
 
 His: three scales of dynamics (primary markers, secondary between them, tertiary between those), and *"figure out how to generate a good grid blockout of these in three dimensions... design really interesting blueprints we can scaffold and build around"*. And: Level 1 was built too literally from his generated test image.

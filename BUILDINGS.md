@@ -5,6 +5,24 @@ Every time you complete the third pass on a building, add it to the inventory I 
 run on it, swing on it, blow it up and repair it. Make various TYPES of buildings that are modular and will eventually fit together, with
 different functions: bars and ramps, interior and exterior, turrets, ballistae, beams -- floating flying ship buildings, zeppelins, towers."*
 
+## THE SHIP (his, after m1372) -- its own track, alongside the blueprint work
+
+> *"A classic retro pirate, samurai, alien water vessel just floating in an ocean scene... the island could just be there... interior, exterior,
+> sails you can climb up on. I'm going to make it transform into an airship -- floating in the water and in the air -- but start it as a literal
+> classic Viking alien pirate ship floating in the water, with sunrise and really beautiful water shaders."*
+
+- **Where:** KORAJIN > **The Ship** (`?w=forge&zone=ship`): the forge as a SEA, an ocean shader to the horizon, a sunrise dome, and the ship.
+- **Passes** (the forge's 1-2-3 and then more; he will want many):
+  - [x] **pass 1 (m1373):** the sea and sunrise, plus the ship standing and playable:
+    - a lofted hull, the deck and bulwarks
+    - the stern castle with its cabin inside and a pagoda house on top
+    - the forecastle and the ramps
+    - three masts with junk sails, crow's nests and rope ladders
+    - the dragon prow, lanterns and bronze guns
+  - [ ] pass 2: the ship RIDES the swell (pitch, roll, heave, with the decks carrying him); the hold below deck (an interior you drop into); sails you can CLIMB (the battens as rungs) and run along the yards; a rope swing between the masts
+  - [ ] pass 3: the water's foam round the hull and a wake; spray off the bow; the sun on the water; gulls; the island on the horizon
+  - [ ] later: swimming here; the AIRSHIP transform (his)
+
 ## STEER 000 (his, after m1372) -- BLUEPRINTS FIRST, GENERATED BLOCKOUTS, NOT A TRANSCRIBED IMAGE
 
 > *"Primary markers, secondary between them, tertiary between those -- little dynamics inside medium inside big... figure out how to generate

@@ -9834,6 +9834,53 @@ function beastEnter(d, dt, t) {     // out of the tunnel, his own entrance past 
 // and a paler one behind at ~330 -- each a jittered cone, rock below the snowline and white above, flat-shaded, ALL ONE MESH (one draw).
 // The fog would erase them at that range, so `fog: false` and the haze is baked into their colours (the far ring paler).
 const PEAKS = { rings: [[380, 22, 70, 120, .35], [470, 28, 90, 150, .6]], wide: [.55, .35],     /* m1366: out past the spread forge (its buildings run to ~200 m); `wide` = a cone's base radius over its height, min + range */ snow: .58, rock: 0x6f7a8a, cap: 0xf7f9fc, haze: 0xdfe6ef, seed: 7 };
+// m1373: THE SHIP (his, after m1372): *"a classic retro pirate, samurai, alien water vessel just floating in an ocean scene... sunrise, really
+// beautiful water shaders... an interior and exterior, sails you can climb up on. I'm going to make it transform into an airship later, but start
+// it as a literal classic Viking alien pirate ship floating in the water."* KORAJIN > The Ship opens the forge as a SEA (`?w=forge&zone=ship`):
+// no white floor, no peaks, an ocean shader to the horizon under a sunrise dome, and the ship built on the first frame. Declared HERE because
+// `arenaStage()` runs at module scope (below) and reads it -- a const read above its declaration is a blank page.
+const SHIPZ = { want: 0, on: null, sea: 0, deckY: 3.2, L: 46, B: 12, D: 5.2, sun: [.55, .13, .82], spawn: [0, 6] };
+try { if (/[?&]zone=ship\b/.test(location.search)) SHIPZ.want = 1; } catch (e) {}
+const SKYGLSL = `vec3 skyAt(vec3 d, vec3 s) { float y = d.y; vec3 zen = vec3(.09, .16, .38), mid = vec3(.55, .42, .55), hor = vec3(1.0, .58, .36), low = vec3(.95, .45, .30);
+  vec3 c = y > 0.0 ? mix(hor, mix(mid, zen, smoothstep(.12, .7, y)), smoothstep(0.0, .16, y)) : mix(low, vec3(.10, .14, .22), smoothstep(0.0, -.25, y));
+  float sd = max(dot(d, s), 0.0); c += vec3(1.0, .62, .32) * pow(sd, 12.0) * .55 + vec3(1.0, .8, .55) * pow(sd, 90.0) * .9 + vec3(1.0, .93, .8) * smoothstep(.9985, .9993, sd) * 3.0;
+  return c; }`;
+function shipSea(g) {
+  const Z = SHIPZ, sd = new THREE.Vector3(...Z.sun).normalize(), U = { uTime: { value: 0 }, uSun: { value: sd } }; Z.U = U;
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(880, 48, 24), new THREE.ShaderMaterial({ uniforms: U, side: THREE.BackSide, depthWrite: false, fog: false,
+    vertexShader: `varying vec3 vD; void main() { vD = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: SKYGLSL + `uniform vec3 uSun; varying vec3 vD; void main() { gl_FragColor = vec4(skyAt(normalize(vD), uSun), 1.0);
+      #include <tonemapping_fragment>
+      #include <colorspace_fragment>
+    }` }));
+  dome.renderOrder = -1; dome.frustumCulled = false; g.add(dome); Z.dome = dome;
+  const sea = new THREE.Mesh(new THREE.PlaneGeometry(1700, 1700, 260, 260).rotateX(-Math.PI / 2), new THREE.ShaderMaterial({ uniforms: U, fog: false,
+    vertexShader: `uniform float uTime; varying vec3 vW; varying vec2 vG; varying float vH;
+      const vec4 WV[5] = vec4[5](vec4(1.0, .35, .42, 34.0), vec4(-.4, 1.0, .26, 19.0), vec4(.7, -.6, .14, 9.0), vec4(-.9, -.2, .08, 5.3), vec4(.2, .95, .05, 3.1));
+      void main() { vec3 p = (modelMatrix * vec4(position, 1.0)).xyz; float fade = 1.0 - smoothstep(120.0, 700.0, length(p.xz - cameraPosition.xz)); float h = 0.0; vec2 gr = vec2(0.0);
+        for (int i = 0; i < 5; i++) { vec2 D = normalize(WV[i].xy); float k = 6.2831853 / WV[i].w, w = sqrt(9.8 * k), ph = k * dot(D, p.xz) - w * uTime; h += WV[i].z * sin(ph); gr += WV[i].z * k * cos(ph) * D; }
+        p.y += h * fade; vG = gr * fade; vH = h * fade; vW = p; gl_Position = projectionMatrix * viewMatrix * vec4(p, 1.0); }`,
+    fragmentShader: SKYGLSL + `uniform float uTime; uniform vec3 uSun; varying vec3 vW; varying vec2 vG; varying float vH;
+      float hsh(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+      float nz(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(hsh(i), hsh(i + vec2(1, 0)), f.x), mix(hsh(i + vec2(0, 1)), hsh(i + vec2(1, 1)), f.x), f.y); }
+      void main() { vec3 toC = cameraPosition - vW; float dist = length(toC); vec3 V = toC / dist; float far = smoothstep(30.0, 500.0, dist);
+        vec2 p = vW.xz; vec2 rip = vec2(nz(p * .35 + uTime * .3) - nz(p * .35 + 7.0 - uTime * .25), nz(p * .35 + 3.0 + uTime * .2) - nz(p * .35 + 11.0 - uTime * .33)) * .35
+          + vec2(nz(p * 1.3 - uTime * .6) - .5, nz(p * 1.3 + 5.0 + uTime * .5) - .5) * .18;
+        vec2 gr = vG + rip * (1.0 - far * .8); vec3 n = normalize(vec3(-gr.x, 1.0, -gr.y)); float ndv = max(dot(n, V), 0.0), F = .02 + .98 * pow(1.0 - ndv, 5.0);
+        vec3 R = reflect(-V, n); R.y = abs(R.y) + .02; vec3 refl = skyAt(normalize(R), uSun); vec3 H = normalize(uSun + V); float nh = max(dot(n, H), 0.0);
+        vec3 spec = vec3(1.0, .78, .5) * (pow(nh, 700.0) * 40.0 + pow(nh, 80.0) * .5);
+        vec3 deep = vec3(.02, .09, .14), sss = vec3(.05, .32, .34) * smoothstep(-.2, .5, vH) * max(dot(normalize(vec3(-uSun.x, .2, -uSun.z)), -V) * .5 + .5, 0.0);
+        float foam = smoothstep(.42, .62, vH + nz(p * 2.2 + uTime * .4) * .25) * (1.0 - far);
+        vec3 c = mix(deep + sss, refl, F) + spec; c = mix(c, vec3(1.0, .9, .82), foam * .7); vec3 hz = skyAt(normalize(vec3(-V.x, .001, -V.z)), uSun); c = mix(c, hz, smoothstep(250.0, 820.0, dist));
+        gl_FragColor = vec4(c, 1.0);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+      }` }));
+  sea.frustumCulled = false; g.add(sea); Z.seaM = sea;
+  scene.background = new THREE.Color(0xff9a6a); if (scene.fog) { scene.fog.color.setHex(0xe8a07a); scene.fog.near = 300; scene.fog.far = 900; }
+  const L0 = Math.hypot(_sunOff.x, _sunOff.y, _sunOff.z) || 20; _sunOff.copy(sd).multiplyScalar(L0); sun.position.copy(_sunOff); sun.color.setHex(0xffc896); hemi.color.setHex(0xffd6b8); hemi.groundColor.setHex(0x2a3a4a);
+  camera.far = Math.max(camera.far, 1000); camera.updateProjectionMatrix();
+}
 function forgePeaks(g) {
   let sd = PEAKS.seed; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
   const geos = [], rock = new THREE.Color(PEAKS.rock), cap = new THREE.Color(PEAKS.cap), haze = new THREE.Color(PEAKS.haze), c = new THREE.Color();
@@ -9853,6 +9900,7 @@ function arenaStage() {
   arenaSky();
   const R = ARENA.r, g = new THREE.Group(), L = ARENA.look; world.add(g);
   // m1117: THE BUILDING FORGE -- a clean white floor under the arena's sky, nothing else: the buildings are spawned into it (SPAWN > BUILDINGS)
+  if (inForge() && SHIPZ.want) { shipSea(g); CWALL.g = g; COVER.meshes = []; COVER.boxes = []; ARENA.r = 60; return; }     // m1373: THE SHIP's sea instead of the white floor
   if (inForge()) { const cv = document.createElement('canvas'); cv.width = cv.height = 512; const c = cv.getContext('2d'); c.fillStyle = '#f2f3f5'; c.fillRect(0, 0, 512, 512);
     c.strokeStyle = 'rgba(120,130,150,.35)'; c.lineWidth = 2; for (let i = 0; i <= 512; i += 64) { c.beginPath(); c.moveTo(i, 0); c.lineTo(i, 512); c.stroke(); c.beginPath(); c.moveTo(0, i); c.lineTo(512, i); c.stroke(); }
     const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(80, 80); t.anisotropy = 8;
@@ -23859,6 +23907,90 @@ function lvlBar() { let el = LVL.el; if (!el) { el = LVL.el = document.createEle
     b.textContent = 'L' + n + ' ' + LVL.names[n]; b.style.cssText = 'border:1px solid ' + (on ? '#4aff6a' : '#556') + ';background:' + (on ? 'rgba(40,120,60,.85)' : 'rgba(10,12,18,.7)') + ';color:' + (on ? '#fff' : '#99a') + ';padding:7px 6px;border-radius:6px';
     if (n > 1) b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); LVL.set[n] = LVL.set[n] ? 0 : 1; try { localStorage.setItem(LVL.key, JSON.stringify(LVL.set)); } catch (e2) {} lvlStart(); });
     el.appendChild(b); } }
+// m1373: THE SHIP, pass 1 -- the hull, the decks, the stern castle with its cabin, three masts with junk sails and rope ladders to crow's nests, an
+// alien dragon prow, lanterns and bronze guns. Bow is +Z. The hull is LOFTED: rings along its length, each a rounded U from gunwale to keel,
+// the beam (`w`) tapering to a point at the bow and to a blunt transom aft, the gunwale rising fore and aft (the sheer). Walking is the decks'
+// boxes and the ramps' triangles; the bulwarks are boxes along each side, so he does not stroll off -- he jumps over them into the sea.
+function shipBuild() {
+  const Z = SHIPZ; Z.want = 2; if (Z.on) return; const g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, tris = [], MG = new Map(), climbs = [];
+  const M = (c, r, x) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: r }, x || {}));
+  const wood = M(0x3a2418, .8), deckM = M(0x8a6a48, .85), red = M(0xb3201c, .6, { side: THREE.DoubleSide }), gold = M(0xd9a441, .3, { metalness: .85 }), dark = M(0x1c1410, .9), bronze = M(0xa0703a, .35, { metalness: .8 }),
+    lamp = M(0xff7a3a, .4, { emissive: 0xff5a1a, emissiveIntensity: 1.6 }), eye = new THREE.MeshBasicMaterial({ color: 0x5affe0, toneMapped: false }), roofM = M(0x2a2f38, .6), rope = M(0xc9b07a, 1);
+  const put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); const q = geo.index ? geo.toNonIndexed() : geo; if (!q.attributes.normal) q.computeVertexNormals(); for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal') q.deleteAttribute(k); MG.get(m).push(q); };     /* no maps here: one attribute set, or the merge returns null */
+  const bx = (w, h, d, x, y, z, m, solid) => { put(new THREE.BoxGeometry(w, h, d).translate(x, y, z), m); if (solid) O.boxes.push({ minx: x - w / 2, maxx: x + w / 2, miny: y - h / 2, maxy: y + h / 2, minz: z - d / 2, maxz: z + d / 2 }); };
+  const L = Z.L, B = Z.B, D = Z.D, dY = Z.deckY;
+  const halfW = u => u >= 0 ? B / 2 * Math.pow(Math.max(0, 1 - u * u), .62) : B / 2 * Math.pow(Math.max(0, 1 - Math.pow(-u, 6)), .45) * (u < -.97 ? .0 : 1) + (u < 0 ? B * .12 * Math.pow(-u, 4) : 0);
+  const gun = u => dY + 1.1 + 3.2 * Math.pow(Math.abs(u), 2.4) * (u > 0 ? 1.15 : .9), keel = u => -D * (1 - Math.pow(Math.abs(u), 3)) * .95 + .3;
+  // THE HULL (lofted, double-sided so the bulwark's inside shows)
+  { const NU = 56, NS = 18, pos = [], idx = []; for (let i = 0; i <= NU; i++) { const u = -1 + 2 * i / NU, z = u * L / 2, w = Math.max(.05, halfW(u * .985)), gy = gun(u), ky = Math.min(keel(u), gy - .3);
+      for (let j = 0; j <= NS; j++) { const th = Math.PI * j / NS; pos.push(-w * Math.cos(th), gy - (gy - ky) * Math.pow(Math.sin(th), .65), z); } }
+    for (let i = 0; i < NU; i++) for (let j = 0; j < NS; j++) { const a = i * (NS + 1) + j, b = a + NS + 1; idx.push(a, b, a + 1, a + 1, b, b + 1); }
+    const hg = new THREE.BufferGeometry(); hg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); hg.setIndex(idx); hg.computeVertexNormals();
+    const hull = new THREE.Mesh(hg, M(0x3a2418, .75, { side: THREE.DoubleSide })); hull.castShadow = hull.receiveShadow = true; g.add(hull);
+    // the red band and the gold line just under the gunwale, both sides
+    for (const sx of [-1, 1]) for (let i = 0; i < NU; i++) { const u0 = -1 + 2 * i / NU, u1 = u0 + 2 / NU, z0 = u0 * L / 2, z1 = u1 * L / 2, w0 = halfW(u0 * .985), w1 = halfW(u1 * .985); if (w0 < .4 || w1 < .4) continue;
+      const y0 = gun(u0), y1 = gun(u1), seg = (dy, h, m, off) => { const geo = new THREE.BufferGeometry(); const P = [sx * (w0 + off), y0 - dy, z0, sx * (w1 + off), y1 - dy, z1, sx * (w1 + off), y1 - dy - h, z1, sx * (w0 + off), y0 - dy - h, z0];
+        geo.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); geo.setIndex(sx > 0 ? [0, 2, 1, 0, 3, 2] : [0, 1, 2, 0, 2, 3]); geo.computeVertexNormals(); put(geo, m); };
+      seg(.25, .9, red, .03); seg(1.15, .12, gold, .035); } }
+  // THE MAIN DECK in strips (each as wide as the hull there), and the BULWARKS as boxes along each side
+  const z0 = -L / 2 * .9, z1 = L / 2 * .86, NSg = 14; for (let k = 0; k < NSg; k++) { const za = z0 + (z1 - z0) * k / NSg, zb = za + (z1 - z0) / NSg, um = ((za + zb) / 2) / (L / 2), w = Math.max(.6, Math.min(halfW((za / (L / 2)) * .985), halfW((zb / (L / 2)) * .985)) - .15);
+    bx(w * 2, .4, zb - za + .02, 0, dY - .2, (za + zb) / 2, deckM, 1);
+    for (const sx of [-1, 1]) { const top = Math.max(dY + 1.1, gun(um)); O.boxes.push({ minx: sx > 0 ? w - .05 : -w - .3, maxx: sx > 0 ? w + .3 : -w + .05, miny: dY, maxy: top, minz: za, maxz: zb }); } }
+  // planks: dark seams across the deck
+  for (let z = z0 + 1; z < z1 - 1; z += 1.1) { const w = Math.max(.5, halfW((z / (L / 2)) * .985) - .2); bx(w * 2, .02, .05, 0, dY + .01, z, dark); }
+  // THE STERN CASTLE: a hollow two-storey block aft -- the CABIN inside (door forward), its roof the quarterdeck at +4.4, ramps up either side of the door
+  const cz0 = -L / 2 * .9, cz1 = -L / 2 * .42, cw = Math.min(halfW(-.62), B / 2) - .4, cH = 4.4, cy = dY + cH, cf = cz1;
+  { const t = .4; bx(cw * 2, cH, t, 0, dY + cH / 2, cz0 + t / 2, wood, 1);     // the back wall
+    for (const sx of [-1, 1]) bx(t, cH, cz1 - cz0, sx * (cw - t / 2), dY + cH / 2, (cz0 + cz1) / 2, wood, 1);     // the side walls
+    const dw = 2.6; for (const sx of [-1, 1]) bx(cw - dw / 2, cH, t, sx * (dw / 2 + (cw - dw / 2) / 2), dY + cH / 2, cf - t / 2, wood, 1);     // the front wall, a DOOR in its middle
+    bx(dw, cH - 3, t, 0, dY + 3 + (cH - 3) / 2, cf - t / 2, wood, 1);     // the lintel
+    bx(cw * 2 + .6, .4, cz1 - cz0 + .4, 0, cy - .2, (cz0 + cz1) / 2, deckM, 1);     // the quarterdeck (the cabin's ceiling)
+    for (const sx of [-1, 1]) bx(.25, 1.1, cz1 - cz0, sx * (cw + .15), cy + .55, (cz0 + cz1) / 2, red, 1);     // its rails
+    bx(cw * 2, 1.1, .25, 0, cy + .55, cz0 + .15, red, 1);
+    // inside: a low table, cushions, a lantern, a rack of scrolls
+    bx(3, .7, 1.6, 0, dY + .35, (cz0 + cz1) / 2, dark, 1); bx(.6, .9, .6, 0, dY + 2.7, (cz0 + cz1) / 2, lamp); for (const sx of [-1, 1]) bx(1.2, .25, 1.2, sx * 2.4, dY + .12, (cz0 + cz1) / 2, red);
+    bx(.4, 2.2, 4, -cw + .6, dY + 1.1, (cz0 + cz1) / 2, dark, 1);
+    // windows: glowing panes in the stern and sides
+    for (const sx of [-1, 0, 1]) bx(1.2, .9, .05, sx * 2.6, dY + 2.4, cz0 - .02, lamp);
+    // the RAMPS up to the quarterdeck, either side of the door: 7 m long, 4.4 up (32 deg)
+    for (const sx of [-1, 1]) { const xa = sx * 1.5, xb = sx * (cw - .2), lo = Math.min(xa, xb), hi = Math.max(xa, xb), za = cf + 7, zb = cf;
+      const rg = new THREE.BufferGeometry(); rg.setAttribute('position', new THREE.Float32BufferAttribute([lo, dY, za, hi, dY, za, hi, cy, zb, lo, dY, za, hi, cy, zb, lo, cy, zb], 3)); rg.computeVertexNormals(); put(rg, deckM);
+      tris.push(lo, dY, za, hi, dY, za, hi, cy, zb, lo, dY, za, hi, cy, zb, lo, cy, zb);
+      bx(.2, 1, 7.2, sx * 1.4, dY + 2.2, cf + 3.5, dark); }
+    // the cabin roof on the quarterdeck: a small house under a two-step pagoda roof
+    const hz = (cz0 + cz1) / 2 - 1; bx(5, 3, 4, 0, cy + 1.5, hz, wood, 1);
+    for (const [y, r] of [[cy + 3.3, 4.4], [cy + 4.6, 3]]) { const rf = new THREE.ConeGeometry(r, 1.4, 4).rotateY(Math.PI / 4).translate(0, y, hz); put(rf, roofM); }
+    bx(.15, 1.2, .15, 0, cy + 5.8, hz, gold); }
+  // THE FORECASTLE: a raised bow deck at +2.2 with a ramp up from the waist
+  const fz0 = L / 2 * .5, fz1 = L / 2 * .84, fy = dY + 2.2; { const fw = halfW(.62) - .4; bx(fw * 2, 2.2, fz1 - fz0, 0, dY + 1.1, (fz0 + fz1) / 2, wood, 1); bx(fw * 2 + .2, .2, fz1 - fz0, 0, fy - .1, (fz0 + fz1) / 2, deckM);
+    const za = fz0 - 5, zb = fz0; const rg = new THREE.BufferGeometry(); rg.setAttribute('position', new THREE.Float32BufferAttribute([-1.6, dY, za, 1.6, dY, za, 1.6, fy, zb, -1.6, dY, za, 1.6, fy, zb, -1.6, fy, zb], 3)); rg.computeVertexNormals(); put(rg, deckM);
+    tris.push(-1.6, dY, za, 1.6, dY, za, 1.6, fy, zb, -1.6, dY, za, 1.6, fy, zb, -1.6, fy, zb); }
+  // THE MASTS, each with a JUNK SAIL (crimson, black battens, a gold sun), a CROW'S NEST and a ROPE LADDER up to it
+  const masts = [[2, dY, 30, 15, 20], [L / 2 * .62, fy, 23, 11, 14], [(cz0 + cz1) / 2 + 3, cy, 17, 8, 10]];
+  for (const [mz, base, H, sw, sh] of masts) { const top = base + H; put(new THREE.CylinderGeometry(.32, .48, H, 10).translate(0, base + H / 2, mz), wood); O.boxes.push({ minx: -.45, maxx: .45, miny: base, maxy: top, minz: mz - .45, maxz: mz + .45 });
+    const s0 = base + 4, s1 = s0 + sh, sz = mz + .55; const sg = new THREE.PlaneGeometry(sw, sh, 8, 6); const P = sg.attributes.position; for (let i = 0; i < P.count; i++) { const x = P.getX(i), y = P.getY(i); P.setZ(i, Math.cos(x / sw * Math.PI) * 1.1 + Math.sin((y / sh + .5) * Math.PI) * .4); }
+    sg.computeVertexNormals(); put(sg.translate(0, (s0 + s1) / 2, sz), red);
+    for (let k = 0; k <= 6; k++) bx(sw + .4, .14, .14, 0, s0 + sh * k / 6, sz + Math.sin((k / 6) * Math.PI) * .4 + 1.15 - 0.05, dark);
+    put(new THREE.CircleGeometry(sh * .22, 24).translate(0, (s0 + s1) / 2 + sh * .12, sz + 1.6), gold);
+    const ny = top - 3.2; bx(3.4, .3, 3.4, 0, ny - .15, mz, deckM, 1); for (const [ox, oz, w, d] of [[0, 1.6, 3.4, .15], [0, -1.6, 3.4, .15], [1.6, 0, .15, 3.4]]) bx(w, 1, d, ox, ny + .5, mz + oz, red, 1);
+    const lx = -1.85, L2 = kitClimbAdd({ minx: lx - .15, maxx: lx + .15, miny: base, maxy: ny, minz: mz - .45, maxz: mz + .45 }, 'ship_ladder', ny); L2.mark = { x: 0, y: ny, z: mz }; climbs.push(L2);
+    for (const oz of [-.4, .4]) put(new THREE.CylinderGeometry(.03, .03, ny - base, 4).translate(lx, (base + ny) / 2, mz + oz), rope); for (let y = base + .4; y < ny; y += .45) bx(.06, .06, .8, lx, y, mz, rope);
+    put(new THREE.ConeGeometry(.5, 1.6, 4).translate(0, top + .8, mz), gold); }
+  // THE PROW: an alien dragon reaching forward off the bow, two cyan eyes
+  { const pz = L / 2 * .98, py = gun(1) - .2; put(new THREE.CylinderGeometry(.35, .9, 6, 8).rotateX(Math.PI / 2 - .5).translate(0, py + 1.3, pz + 2), wood); put(new THREE.BoxGeometry(1.6, 1.3, 2.6).translate(0, py + 2.7, pz + 4.4), wood);
+    put(new THREE.ConeGeometry(.45, 2.2, 6).rotateX(Math.PI / 2).translate(0, py + 2.4, pz + 6.4), gold); for (const sx of [-1, 1]) { put(new THREE.ConeGeometry(.2, 1.6, 5).rotateX(-.5).translate(sx * .5, py + 3.7, pz + 3.8), gold); put(new THREE.SphereGeometry(.2, 8, 6).translate(sx * .62, py + 2.95, pz + 5.2), eye); } }
+  // LANTERNS on posts along the bulwarks, and BRONZE GUNS run out through the sides
+  for (let z = z0 + 3; z < z1 - 2; z += 6) { const u = z / (L / 2), w = halfW(u * .985), y = Math.max(dY + 1.1, gun(u)); for (const sx of [-1, 1]) { bx(.12, 1.2, .12, sx * (w - .1), y + .6, z, dark); bx(.4, .55, .4, sx * (w - .1), y + 1.35, z, lamp); } }
+  for (let z = -6; z <= 10; z += 5.5) { const w = halfW((z / (L / 2)) * .985); for (const sx of [-1, 1]) { put(new THREE.CylinderGeometry(.2, .26, 2.2, 10).rotateZ(Math.PI / 2).translate(sx * (w - .5), dY + .55, z), bronze); bx(1, .5, .9, sx * (w - 1.2), dY + .25, z, dark, 1); } }
+  // a banner off the stern
+  { const bg = new THREE.PlaneGeometry(2.4, 5); const P = bg.attributes.position; for (let i = 0; i < P.count; i++) P.setZ(i, Math.sin(P.getY(i) * .9) * .25); bg.computeVertexNormals(); put(bg.translate(0, cy + 6, cz0 + 1), red); }
+  for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
+  bldTris(O, tris); for (const b of O.boxes) BOXES.push(b); boxGrid();
+  Z.on = { g, O, climbs }; bldXrayTag(g); shipHome(); }
+function shipHome() { const p = player, Z = SHIPZ; p.pos.set(Z.spawn[0], Z.deckY + .05, Z.spawn[1]); p.vel.set(0, 0, 0); p.faceH = p.heading = 0; p.grounded = false; }
+function shipStep(dt) { const Z = SHIPZ; if (Z.U) Z.U.uTime.value += dt; const p = player;
+  if (p.pos.y < Z.sea - 2.5) { spkBurst(p.pos.x, Z.sea + .2, p.pos.z, 30, { col: [.8, .95, 1], spread: 5, up: 1.5, size: .16, life: .7 }); snd('thud', { g: .6, r: .6 }); shipHome(); }     /* in the sea: back aboard (no swimming here yet) */
+  if (Z.dome) Z.dome.position.copy(camera.position); }
 const COURT = { scale: 1.5, at: [0, 150], hw: 28, hd: 32, wallH: 4, walk: 2.6, gate: 6, on: null };
 function courtBuild() {
   // STEER S2 (his, after walking X4: *"increase the scale... 1.5... we need room to play"*): the court is DESIGNED in the old numbers and BUILT
@@ -27764,7 +27896,7 @@ function boardPose(dt) {
 }
 
 function stepPlayer(dt) {
-  if (inArena()) { deflStep(dt); hallStep(dt); if (SKIN.list.length) skinStep(dt); if (PIECE.list.length) pieceStep(dt); if (SMASH.list.length) smashStep(dt); for (const E of BLDG.list) if (E.step && E.on()) E.step(dt); if (LVL.want && inForge()) lvlStart(); if (LVG.on) lvgStep(dt); }     // m1105; m1119; m1120: each building's own life
+  if (inArena()) { deflStep(dt); hallStep(dt); if (SKIN.list.length) skinStep(dt); if (PIECE.list.length) pieceStep(dt); if (SMASH.list.length) smashStep(dt); for (const E of BLDG.list) if (E.step && E.on()) E.step(dt); if (LVL.want && inForge()) lvlStart(); if (LVG.on) lvgStep(dt); if (SHIPZ.want === 1 && inForge()) shipBuild(); if (SHIPZ.on) shipStep(dt); }     // m1105; m1119; m1120: each building's own life
   const p = player;
   stepFeet(dt);
   const hadLock = p.lock;
@@ -64148,7 +64280,7 @@ async function init() {
 
 // the console handle. Every tuning object is live, so a number can be moved on the phone
 // without a rebuild and without a push.
-window.melee = window.mel = { SHIMMY, VAIM, FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, gaitMeasure, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
+window.melee = window.mel = { SHIMMY, VAIM, SHIPZ, shipBuild, FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, gaitMeasure, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
   // PROGRESS (m276): `mel.SAVE` is the save; the setters write it through; `mel.progReset()` is a new game
   // TALK (m277): `mel.TALK` live; `mel.TALKS` the scripts by kind; `mel.talk` the state
   TALK, TALKS, talk,
@@ -64594,6 +64726,7 @@ function startGate() {
       add('h4', '', 'KORAJIN GRUMBO');
       btn(el, 'The Arena', 'The katana, the horde, the archers, the rival. Where the fighting is built.', () => go('arena'), 'main');
       btn(el, 'Level 1 -- The Grid', 'The first level, built in layers: the run first, then the puzzle, the enemies, the theme, the boss. Toggle each layer at the top.', () => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter('forge', '?w=forge&lvl=1'); });
+      btn(el, 'The Ship', 'A samurai pirate ship on a sunrise sea: climb the rigging, the sails, the castle, the cabin. (Being built.)', () => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter('forge', '?w=forge&zone=ship'); });
       btn(el, 'Building Forge', 'An empty white floor: spawn the buildings, run on them, swing on them, blow them up.', () => go('forge'));
       btn(el, 'The Red Hollows', 'His home: the canyon, the river, the hut. (Being built.)', () => go('home'));
       btn(el, 'White Box', 'An empty floor to try a move on.', () => go('test'));
