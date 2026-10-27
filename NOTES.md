@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1175 -- MARKET pass 4: a rooftop teahouse, washing, fruit
+
+- A ROOFTOP TEAHOUSE: three low tables (solid) with red cushions on the market roof and a red PARASOL on a pole (solid).
+- A LAUNDRY LINE strung pole to pole over the roof, ten pieces of washing in five colours flapping (`mktStep`).
+- Three crates of bright FRUIT (oranges, apples, limes) in front of the noodle bar -- shared `SMASH`, one hit, they burst in their own
+  colours.
+Next: Set 2 #15 Cliff Lodge pass 3. Shipped unverified.
+
 ## m1174 -- CLIFF LODGE pass 2: boulders roll down the path
 
 - Every `CLIFF.rockEvery` 9 s a BOULDER is tipped off the summit and rolls the whole path down (corner to corner, the way you came up),
