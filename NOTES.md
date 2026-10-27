@@ -39,7 +39,7 @@ His two new rules (BUILDINGS.md), brought to the castle after its ten passes, at
 - A heavy blow (3+ damage: a rocket, a big swing) on the raised bridge drops it with a crash, three times as fast.
 
 SHIPPED UNVERIFIED.
-## THE COURTYARD, PASS 10: POLISH AGAINST THE REFERENCE (m-COURT10)
+## THE COURTYARD, PASS 10: POLISH AGAINST THE REFERENCE (m1315)
 
 COURTYARD.md pass 10, the last planned pass. Shipped unverified.
 
