@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1170 -- SKY BRIDGES pass 3 (DONE)
+
+- The bridges now REBUILD THEMSELVES: `skybSig` is a string of which spans and ziplines can stand; `skybStep` checks it twice a second
+  and, when a building is spawned or removed after the bridges, clears and rebuilds them (not while he is on a zipline). The spawn order
+  no longer matters.
+- PRAYER FLAGS strung over every bridge, five colours in turn, flapping.
+`BLDG` skyb `pass: 3`. Next: Gatehouse pass 4 (alternating). Shipped unverified.
+
 ## m1169 -- WATCHTOWER pass 4: a war drum, a second archer, kites
 
 - A second red ARCHER posted on deck 2 (cleared with the tower).
