@@ -5,6 +5,28 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home, procedural, pass 3: the tent, the wheels, the stacks, the crane (WORKER B)
+
+The top of the four views:
+- **The TENT CONE** on the hall's dome:
+  - eight panels (a canvas: red with a cream diamond, alternating with cream speckled);
+  - a banded timber drum with iron bolts (its rim is walkable);
+  - eight timber poles crossing past the apex;
+  - a stacked timber-and-iron finial.
+- **Brass ship's wheels.** A big one on the drum, two on the front frame, one out on the right deck: rim, inner ring, hub, eight spokes
+  with their handles.
+- **Two bronze STACKS** either side of the cone, banded, rising off the dome (noCam colliders).
+- **The CRANE** off the store: a banded mast with a winch drum, a boom out over the stalls with iron collars and a strut, the brass orb on
+  a chain with its red tassel, and two hanging weights.
+- **The balcony CANOPY.** Red cloth on four posts at the rail, sloping from the tower wall.
+- **The FLAG.** A chevron flag on a crossbar on the tower's top.
+- **Materials.** Brass and bronze are main's new tileable bronze (`triMat`, triplanar, no uv; `put()` strips uv for it). Each cloth is
+  ONE shared material (`clothM`).
+- **Counts.** 9 draws, 577 boxes, 4080 walkable tris.
+
+Checked headless (it boots, it builds) and looked at front and front-left renders against the refs: the cone, crane, stacks and wheels
+read as his. Shipped unverified. Next: pass 4, the dressing (pots, crates, lanterns, cacti and succulents).
+
 ## Grumbo's home, procedural, pass 2: the scaffold, the awnings, the banners (WORKER B)
 
 From his four views:
