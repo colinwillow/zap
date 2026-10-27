@@ -52,8 +52,8 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
     - the balcony TOWER: a spiral stair inside (.30 risers) up to a railed balcony on a mushroom ledge;
     - the STORE wing;
     - round windows; the sandstone's cream, speckle and purple spots as vertex colour.
-  - [x] **pass 2 (next tick):** the timber scaffold (iron-banded posts, beams, braces), two stall decks under sagging torn awnings (walkable), the big V-hemmed chevron banner and four post banners, a ladder up the store to its dome, the long ramp off the right deck
-  - [ ] pass 3: the tent cone on its frame, the brass ship's wheels, the bronze stacks, the crane with its brass orb and red tassel, the balcony canopy, the flags
+  - [x] **pass 2 (m1383):** the timber scaffold (iron-banded posts, beams, braces), two stall decks under sagging torn awnings (walkable), the big V-hemmed chevron banner and four post banners, a ladder up the store to its dome, the long ramp off the right deck
+  - [x] **pass 3 (next tick):** the tent cone (eight panels on a banded drum, poles crossing past the apex, a stacked finial), four brass ship's wheels, two bronze stacks, the crane with its brass orb, red tassel and weights, the balcony canopy, the tower's flag
   - [ ] pass 4: the dressing -- pots, crates, the lantern-lit stalls, cacti and succulents, more boulders
   - [ ] pass 5: the look -- the domes' bulge (lathed, not cylinders), the stone's texture, the warm interior light
   - [ ] then more passes, each one closer to the four views

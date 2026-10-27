@@ -63431,7 +63431,7 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 // to the shop front and to the round back door. Built in its OWN frame (local +z = the front, toward the river; `at`/`yaw` are HOME.hut's) and
 // merged per material; every collider a local box turned into the world (the yaw is a quarter turn, so a box stays a box); every walkable
 // surface a triangle. `?hut=glb` (or GHOME.on = 0) puts the GLB back, to compare. Pass 1: the massing and the walkable shell, with the inside.
-const GHOME = { on: 1, pass: 2, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 7, Hd: 2.8, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
+const GHOME = { on: 1, pass: 3, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 7, Hd: 2.8, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1.3, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
@@ -63447,6 +63447,13 @@ function ghStone(x, y, z, out) {     // LINEAR colour (vertex colours are not sR
   return out; }
 // pass 2: THE CLOTH, drawn on a canvas -- weathered red with cream chevrons and diamonds, patched and specked, its TORN hem cut into the alpha
 function ghClothTex(kind) { const C = GHOME.tex || (GHOME.tex = {}); if (C[kind]) return C[kind];
+  if (kind === 'cone') { const cv = document.createElement('canvas'); cv.width = 1024; cv.height = 256; const g = cv.getContext('2d'), R = rwRng(13);     // eight panels: red with a cream diamond, cream speckled
+    for (let k = 0; k < 8; k++) { const x = k * 128; g.fillStyle = k % 2 ? '#e8d6b4' : '#b5342a'; g.fillRect(x, 0, 128, 256);
+      if (k % 2) { for (let i = 0; i < 90; i++) { g.fillStyle = R() < .25 ? 'rgba(120,90,170,.5)' : 'rgba(70,40,25,.45)'; g.beginPath(); g.arc(x + R() * 128, R() * 256, 1.5 + R() * 4, 0, 7); g.fill(); } }
+      else { g.strokeStyle = g.fillStyle = '#efe0c4'; g.lineWidth = 9; const cx = x + 64, cy = 150, r = 34; g.beginPath(); g.moveTo(cx, cy - r); g.lineTo(cx + r, cy); g.lineTo(cx, cy + r); g.lineTo(cx - r, cy); g.closePath(); g.stroke();
+        g.fillRect(cx - 9, cy - 9, 18, 18); for (let i = 0; i < 40; i++) { g.fillStyle = 'rgba(50,15,10,.35)'; g.fillRect(x + R() * 128, R() * 256, 2 + R() * 4, 2 + R() * 4); } }
+      g.fillStyle = 'rgba(40,25,15,.6)'; g.fillRect(x, 0, 3, 256); }
+    const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return (C[kind] = t); }
   const aw = kind === 'awning', W = aw ? 512 : 256, H = aw ? 256 : 512, cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d'), R = rwRng(aw ? 5 : 9);
   const dia = (x, y, r) => { g.lineWidth = r * .28; g.beginPath(); g.moveTo(x, y - r); g.lineTo(x + r, y); g.lineTo(x, y + r); g.lineTo(x - r, y); g.closePath(); g.stroke();
     g.beginPath(); g.moveTo(x, y - r * .4); g.lineTo(x + r * .4, y); g.lineTo(x, y + r * .4); g.lineTo(x - r * .4, y); g.closePath(); g.fill(); };
@@ -63471,12 +63478,14 @@ function ghomeBuild(at, yaw, y0) {
   const Wx = (x, z) => at[0] + x * c + z * s, Wz = (x, z) => at[1] - x * s + z * c;
   // ---- the buckets: only position + normal (+ colour on the stone) survive, so every piece merges (mixed attribute sets merge to NULL) ----
   const MG = new Map(), _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _v = new THREE.Vector3(), _one = new THREE.Vector3(1, 1, 1), col = [0, 0, 0];
-  const put = (geo, m, mat4) => { geo = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(geo.attributes)) if (k !== 'position' && k !== 'normal' && !(k === 'uv' && m.map)) geo.deleteAttribute(k);
+  const put = (geo, m, mat4) => { geo = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(geo.attributes)) if (k !== 'position' && k !== 'normal' && !(k === 'uv' && m.map && !m.userData.tri)) geo.deleteAttribute(k);
     if (mat4) geo.applyMatrix4(mat4); if (!geo.attributes.normal) geo.computeVertexNormals();
     if (m.vertexColors) { const p = geo.attributes.position, a = new Float32Array(p.count * 3); for (let i = 0; i < p.count; i++) { ghStone(p.getX(i), p.getY(i), p.getZ(i), col); a[i * 3] = col[0]; a[i * 3 + 1] = col[1]; a[i * 3 + 2] = col[2]; } geo.setAttribute('color', new THREE.BufferAttribute(a, 3)); }
     if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); };
   const at4 = (x, y, z, ry = 0, rx = 0, rz = 0, sx = 1, sy = 1, sz = 1) => _m4.compose(_v.set(x, y, z), _q.setFromEuler(_e.set(rx, ry, rz)), new THREE.Vector3(sx, sy, sz));
   const stoneM = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .92, side: THREE.DoubleSide }), wood = new THREE.MeshStandardMaterial({ color: 0x5a3a22, roughness: .85 });
+  const iron = new THREE.MeshStandardMaterial({ color: 0x2c2724, metalness: .6, roughness: .5 }), CM = {};     // one material per look, so each is one draw
+  const clothM = k => CM[k] || (CM[k] = new THREE.MeshStandardMaterial({ map: ghClothTex(k), alphaTest: k === 'cone' ? 0 : .5, side: THREE.DoubleSide, roughness: .9 }));
   const dark = new THREE.MeshStandardMaterial({ color: 0x1a120c, roughness: 1 }), brass = new THREE.MeshStandardMaterial({ color: 0xc8963c, metalness: .8, roughness: .35 });
   // ---- colliders: local boxes into the world; and solid RUNS (a test over a cell grid, merged along x) for the round shells ----
   const boxes = [], tris = [];
@@ -63577,8 +63586,7 @@ function ghomeBuild(at, yaw, y0) {
   // long ramp off the right side). Posts are square timber with iron bands (noCam: thin things never pull the camera); the decks and the
   // ramp are walkable timber; the awnings are walkable too (a scramble onto the roofs); the cloth is a canvas texture with its torn hem in
   // the alpha ----
-  { const iron = new THREE.MeshStandardMaterial({ color: 0x2c2724, metalness: .6, roughness: .5 });
-    const awnM = new THREE.MeshStandardMaterial({ map: ghClothTex('awning'), alphaTest: .5, side: THREE.DoubleSide, roughness: .9 }), banM = new THREE.MeshStandardMaterial({ map: ghClothTex('banner'), alphaTest: .5, side: THREE.DoubleSide, roughness: .9 });
+  { const awnM = clothM('awning'), banM = clothM('banner');
     const NC = { noCam: 1 }, Zf = 4.6, Zo = 7.4, Yu = P + 4.6, Yt = P + 6.3, Yo = P + 2.85;
     const post = (x, z, ya, yb) => { vbox(x - .13, x + .13, ya, yb, z - .13, z + .13, wood, 1, NC); for (const yy of [ya + .5, (ya + yb) / 2, yb - .35]) vbox(x - .16, x + .16, yy - .05, yy + .05, z - .16, z + .16, iron, 0); };
     const beamX = (x0, x1, y, z, t = .22) => { vbox(x0, x1, y - t / 2, y + t / 2, z - t / 2, z + t / 2, wood, 0); for (let x = x0 + .4; x < x1 - .2; x += 1.6) vbox(x - .04, x + .04, y - t / 2 - .02, y + t / 2 + .02, z - t / 2 - .02, z + t / 2 + .02, iron, 0); };
@@ -63614,8 +63622,58 @@ function ghomeBuild(at, yaw, y0) {
       quad([x0, P + .03, z0], [x0, P + .03, z1], [x1, .05, z1], [x1, .05, z0]);
       for (const z of [z0 + .05, z1 - .05]) { for (const f of [0, .5, 1]) { const x = x0 + (x1 - x0) * f, y = P * (1 - f); vbox(x - .06, x + .06, Math.min(0, y - .5), y + 1, z - .06, z + .06, wood, 1, NC); }
         rodW([x0, P + .95, z], [x1, .95, z], .08, wood); } } }
+  // ---- PASS 3: THE TOP OF HIM (refs): the TENT CONE on the hall's dome -- eight panels, red with a cream diamond and cream speckled, on a
+  // banded timber drum, its poles crossing past the apex, a stacked finial; the BRASS SHIP'S WHEELS (a big one on the drum, two on the front
+  // frame, one out on the right deck); the BRONZE STACKS either side of the cone; the CRANE off the store -- a banded mast and a boom out over
+  // the stalls, a brass orb on a chain with a red tassel under it and a pair of hanging weights; the red CANOPY over the tower balcony; a FLAG
+  // on the tower's top. Brass and bronze are main's tileable bronze (`triMat`, triplanar: no uv) ----
+  { const bronze = triMat('bronze', { scale: 1.2, metal: .75, rough: .35 }); bronze.userData.tri = 1;
+    const coneM = clothM('cone'), awnM = clothM('awning'), banM = clothM('banner');
+    const rodW = (a, b, r, m, round) => { const d = new THREE.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]), L = d.length(); _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize());
+      put(round ? new THREE.CylinderGeometry(r, r, L, 8) : new THREE.BoxGeometry(r, L, r), m, _m4.compose(new THREE.Vector3((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2), _q, _one)); };
+    const cyl = (x, y, z, r0, r1, h, m, seg = 16) => put(new THREE.CylinderGeometry(r1, r0, h, seg), m, at4(x, y + h / 2, z));
+    // a ship's wheel facing along `a` (theta, 0 = +z): rim, hub, eight spokes and their handles
+    const wheel = (x, y, z, a, R) => { const M = (lx, ly, lz) => [x + Math.cos(a) * lx + Math.sin(a) * lz, y + ly, z - Math.sin(a) * lx + Math.cos(a) * lz];
+      put(new THREE.TorusGeometry(R, R * .09, 6, 28), bronze, at4(x, y, z, a)); put(new THREE.TorusGeometry(R * .55, R * .05, 5, 20), bronze, at4(x, y, z, a));
+      put(new THREE.CylinderGeometry(R * .2, R * .2, R * .3, 12), bronze, at4(x, y, z, a, Math.PI / 2));
+      for (let k = 0; k < 8; k++) { const q = k / 8 * Math.PI * 2, cx = Math.cos(q), cy = Math.sin(q); rodW(M(0, 0, 0), M(cx * R * 1.32, cy * R * 1.32, 0), R * .06, bronze, 1); } };
+    // the CONE on its drum
+    const Rc = 3.6, yb = P + A.Hw + A.Hd * Math.cos(Math.asin(Rc / A.R)) - .2, Hc = 5.2, yd = yb + .9;
+    cyl(0, yb, 0, Rc + .15, Rc + .15, .9, wood, 32); for (const yy of [yb + .12, yb + .78]) cyl(0, yy - .05, 0, Rc + .2, Rc + .2, .1, iron, 32);
+    for (let k = 0; k < 16; k++) { const q = k / 16 * Math.PI * 2; put(new THREE.BoxGeometry(.12, .12, .12), iron, at4(Math.sin(q) * (Rc + .22), yb + .45, Math.cos(q) * (Rc + .22))); }
+    put(new THREE.ConeGeometry(Rc, Hc, 8, 4, true), coneM, at4(0, yd + Hc / 2, 0, Math.PI / 8));
+    for (let k = 0; k < 8; k++) { const q = k / 8 * Math.PI * 2 + Math.PI / 8, bx = Math.sin(q) * (Rc + .05), bz = Math.cos(q) * (Rc + .05), u = 1.25; rodW([bx, yd - .1, bz], [bx * (1 - u), yd + Hc * u, bz * (1 - u)], .2, wood); }
+    { let y = yd + Hc - .35; for (const [h, r, m] of [[.6, .42, wood], [.18, .56, iron], [.7, .36, wood], [.16, .5, iron], [.55, .32, wood], [.18, .44, iron], [.35, .2, wood]]) { cyl(0, y, 0, r, r, h, m, 12); y += h; } }
+    // walkable: the drum's rim (a ring you can stand on) and the cone's lower panels
+    { const N = 32, V = (a, r, y) => [Math.sin(a) * r, y, Math.cos(a) * r]; for (let i = 0; i < N; i++) { const a0 = i / N * Math.PI * 2, a1 = (i + 1) / N * Math.PI * 2; quad(V(a0, Rc, yd + .02), V(a0, Rc + .2, yd + .02), V(a1, Rc + .2, yd + .02), V(a1, Rc, yd + .02)); } }
+    // the WHEELS
+    wheel(Math.sin(.95) * (Rc + .5), yb + .5, Math.cos(.95) * (Rc + .5), .95, 1.05);
+    for (const x of [-2.3, 2.3]) wheel(x, P + 5.45, 4.6 + .35, 0, .6);
+    wheel(9.6, P + 2.2, 7.4 + .3, 0, .55);
+    // the STACKS: banded bronze chimneys rising off the hall's dome, either side of the cone
+    for (const [x, z, H] of [[3.3, -1.6, 5.8], [-3.1, -1.9, 4.8]]) { const r0 = Math.hypot(x, z), y0s = P + A.Hw + A.Hd * Math.cos(Math.asin(Math.min(.99, r0 / A.R))) - .3; let y = y0s;
+      for (const [h, r] of [[1.2, .62], [.22, .78], [1.6, .5], [.2, .66], [1.3, .55], [.25, .74], [H - 4.77, .46], [.3, .68]]) { cyl(x, y, z, r, r, h, h < .4 ? iron : bronze, 14); y += h; } box(x - .5, x + .5, y0s, y, z - .5, z + .5, { noCam: 1 }); }
+    // the CRANE off the store: a banded mast, a boom out over the stalls, the brass orb on a chain, its red tassel, two hanging weights
+    { const mx = A.Wc[0] - .4, mz = A.Wc[1] - .6, my0 = P + A.Hwg + 1.2, my1 = my0 + 4.6, tip = [mx - 6.4, my1 + 2.4, mz + 3.6], base = [mx + .9, my1 - 1.6, mz - .5];
+      vbox(mx - .24, mx + .24, my0 - 1, my1 + .4, mz - .24, mz + .24, wood, 1, { noCam: 1 }); for (let y = my0; y < my1; y += 1.1) vbox(mx - .28, mx + .28, y - .06, y + .06, mz - .28, mz + .28, iron, 0);
+      rodW(base, tip, .3, wood); rodW([mx, my0 + .8, mz], [(mx + tip[0]) / 2, (my1 + tip[1]) / 2 - .1, (mz + tip[2]) / 2], .2, wood);
+      for (let f = .15; f < 1; f += .2) { const p = [base[0] + (tip[0] - base[0]) * f, base[1] + (tip[1] - base[1]) * f, base[2] + (tip[2] - base[2]) * f]; put(new THREE.BoxGeometry(.36, .36, .14), iron, _m4.compose(new THREE.Vector3(...p), _q.setFromUnitVectors(new THREE.Vector3(0, 0, 1), new THREE.Vector3(tip[0] - base[0], tip[1] - base[1], tip[2] - base[2]).normalize()), _one)); }
+      cyl(mx, my1 - .2, mz, .45, .45, .7, bronze, 14);     // the winch drum at the head
+      const oy = tip[1] - 2.3; for (let y = tip[1] - .1; y > oy + .75; y -= .22) put(new THREE.TorusGeometry(.09, .025, 4, 8), iron, at4(tip[0], y, tip[2], (y * 7) % 3));
+      put(new THREE.SphereGeometry(.75, 18, 12), bronze, at4(tip[0], oy, tip[2])); for (const a of [0, Math.PI / 2]) put(new THREE.TorusGeometry(.76, .05, 5, 24), iron, at4(tip[0], oy, tip[2], a));
+      banner(tip[0], oy - .7, tip[2], .7, 1.9, banM);
+      for (const dx of [-.16, .16]) { const wx = tip[0] + 1.6 + dx; rodW([tip[0] + 1.6, tip[1] - .3, tip[2]], [wx, tip[1] - 1.5, tip[2]], .03, iron, 1); cyl(wx, tip[1] - 2.3, tip[2], .13, .13, .8, bronze, 10); } }
+    // the BALCONY CANOPY: four posts at the rail, a red roof on them sloping from the tower wall
+    { const [Tx, Tz] = A.T, Yb = P + A.Yb, ro = A.Rt + 2.25, angs = [-.4, .55, 1.5, 2.45];
+      for (const a of angs) { const x = Tx + Math.sin(a) * ro, z = Tz + Math.cos(a) * ro; vbox(x - .08, x + .08, Yb, Yb + 2.7, z - .08, z + .08, wood, 1, { noCam: 1 }); }
+      for (let i = 0; i < angs.length - 1; i++) { const a = angs[i], b = angs[i + 1], P0 = (q, r, y) => [Tx + Math.sin(q) * r, y, Tz + Math.cos(q) * r];
+        awning(P0(a, A.Rt + .05, Yb + 3.3), P0(b, A.Rt + .05, Yb + 3.3), P0(b, ro + .35, Yb + 2.6), P0(a, ro + .35, Yb + 2.6), awnM, .12); } }
+    // the FLAG on the tower's top: a pole, a crossbar, the chevron flag hanging from it
+    { const [Tx, Tz] = A.T, yt = P + A.Ht + 1.6; vbox(Tx - .12, Tx + .12, yt, yt + 5.2, Tz - .12, Tz + .12, wood, 0); vbox(Tx - .16, Tx + .16, yt + 4.85, yt + 5.05, Tz - .9, Tz + 1.3, wood, 0);
+      for (const yy of [yt + .8, yt + 2.4, yt + 4]) vbox(Tx - .16, Tx + .16, yy - .05, yy + .05, Tz - .16, Tz + .16, iron, 0);
+      put(new THREE.PlaneGeometry(2, 2.2, 4, 8), banM, at4(Tx + .05, yt + 3.75, Tz + .25, Math.PI / 2)); } }
   // ---- merge, and the world gets the boxes and the floors ----
-  let draws = 0; for (const [m, list] of MG) { if (m.map) m.map.wrapS = THREE.RepeatWrapping; const geo = mergeGeometries(list); if (!geo) { console.warn('[melee] ghome: a bucket would not merge', m.name || m.color); continue; } const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; g.add(o); draws++; }
+  let draws = 0; for (const [m, list] of MG) { if (m.map && !m.userData.tri) m.map.wrapS = THREE.RepeatWrapping; const geo = mergeGeometries(list); if (!geo) { console.warn('[melee] ghome: a bucket would not merge', m.name || m.color); continue; } const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; g.add(o); draws++; }
   for (const b of boxes) BOXES.push(b);
   for (let i = 0; i < tris.length; i += 9) { const q = tris.slice(i, i + 9); triAdd(...q); triAdd(q[0], q[1], q[2], q[6], q[7], q[8], q[3], q[4], q[5]); }
   A.stat.draws = draws; A.stat.boxes = boxes.length; A.stat.tris = tris.length / 9;
