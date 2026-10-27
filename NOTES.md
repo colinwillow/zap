@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1180 -- MOATED KEEP pass 2: a winch inside, archers, wading
+
+- A WINCH WHEEL just inside the keep door: strike it and it spins and works the drawbridge from inside (down / up), like the gong outside.
+- Two red ARCHERS on the curb's far corners (cleared with the keep).
+- The MOAT WADES you: on its floor his ground speed is damped (`exp(-4 dt)`) and splashes kick up.
+- Three barrels of STORES inside the keep to smash (shared `SMASH`); two clan flags on the roof.
+Next: Shrine... no -- alternating: Airship Dock pass 4. Shipped unverified.
+
 ## m1179 -- RAMPART pass 4: bars on top, banners outside, the defenders' rocks
 
 - Three HIGH BARS standing on the walkway (x -15.5, 0, 15.5), swing out over the wall.
