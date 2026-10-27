@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1168 -- SKY BRIDGES pass 2: ZIPLINES
+
+A new move: `ZIP`, `ZIPS`, `zipCatch`, `stepZip` (hooked into `stepPlayer` beside the grapple, its own hang pose, reset with the rest).
+- In the air, his hands within `ZIP.grab` .7 m of a cable (inside its length) CATCH it; he hangs and slides down, gravity along the slope
+  against a little drag, up to `max` 17 m/s, sparks off the trolley; he drops off the bottom end with his speed; a TAP lets go anywhere.
+- Two ziplines with Sky Bridges (each only if both ends stand): the AIRSHIP DOCK's deck (jump up to it from the deck) -> down under the
+  WATCHTOWER's cap onto its lookout; the PAGODA's belfry -> the MARKET roof (23 m, a long fast one).
+- Bronze cables with a lamp-bead at each end. No collision on the way (the routes were laid clear of the roofs and skirts).
+Shipped unverified.
+
 ## m1167 -- DOJO HALL pass 4 (the first extra pass): a training yard
 
 Alternating per the rule: Set 2 pass (m1166), then an extra pass on the oldest done building.
