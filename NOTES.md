@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1226 -- Kneeling Colossus pass 2: the Jin core wakes it (Building Forge loop)
+
+**THE JIN CORE.** A glowing cyan core is set low in the chest plate (6.3 to 7.3 m), within reach from the left thigh. Strike it
+with a blade, an arrow or a parried shot (`coloHit` in `bldHit`) and the colossus WAKES for 3 s:
+- its eyes flare white
+- the Jin veins on its arms and legs blaze
+- the planted SWORD sends a SHOCKWAVE through the ground: a cyan ring racing out to `waveR` 14 m in .8 s, knocking down every
+  body it passes (`dummyBlow`, `waveDmg` 8). He is unharmed.
+- a boom and a big camera shake
+
+Then the core dims for `wakeCd` 25 s.
+
+**Details:** glowing Jin veins on the shin, forearm, torso and sword arm; vines hanging off the left shoulder pad; a crow's nest
+on the crown.
+
+Next: Kneeling Colossus pass 3 (the polish). Set 2 is then complete, and a Set 3 brainstorm follows (his rule).
+
 ## m1225 -- Kneeling Colossus pass 1 (Building Forge loop, Set 2 #24)
 
 `COLO`, in BLDG.list as `colo`. It is MOVED to (50, -26): the listed (38, -44) is the Robot Barracks.
