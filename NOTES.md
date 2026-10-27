@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1101 -- a lurch into every swing: the katana's multi-swing clips move him once per swing, toward the stick
+
+**What he said:** *"some of them are two hits... he lurches forward once, swings, then he's stationary and does another swing and you can't
+move... we tried breaking them up and I told you to cut off the beginnings, maybe that was wrong... or you put a lurch for each segment, so
+if an animation has two swings he does two lurches, both directable -- you go where you're pointing with the joystick."*
+
+**Measured (`kswings.cjs`, the right hand's speed peaks off the hips, the goblin's bake):** katana_slash_1 4 swings (.27/.77/1.7/2.57 s),
+katana_slash_2 3, katana_slash_3 2, katana_slash_4 3, katana_spin 3, katana_combo 3, katana_combo3 3, katana_jump_attack 4, katana_slide 3,
+katana_attack 2; the big single swings (360h, 360l, horiz, backhand, down, heavy) 1 each. The default ORIG chain (up: spin -> slash_1 ->
+combo3) was 10 swings on 3 lurches.
+
+**What changed (`SWSEG`, `swingPeaks`, `swingSeg`, TOOLS > SWING LURCH):** the clip still plays whole. `lead` .16 s of clip time before
+every swing after the first, a new lurch: toward the LEFT STICK if held (else his nose), magnetised onto a man within .9 rad / 3.6 m
+(`meleeLock`), up to 2.6 m to sword's length (1.1 m at nobody), spent in .2 s, then planted for the cut. No camera turn, so the stick
+keeps meaning the same way through a chain. The first swing keeps the strike's own lunge; kicks, the tornado and air strikes are untouched.
+
+**Real loop (`swseg.cjs`, three flicks up, nobody there):** spin#t (1 swing, its lunge) -> slash_1: 2 lurches -> combo3: 2 lurches, ~1 m
+each; 9.05 m covered. With the stick held to his side: every lurch turned to it (headings 91-168 as the chain went). The last swing of
+slash_1 is cut by the waiting flick (the cancel window), as before.
+
 ## m1100 -- the start-of-world stutters: every disguise skin is built behind the loading card now
 
 **What he said:** *"When you load anything other than the arena, the white box or Weirdport, it does the glitchy load thing for like 10
