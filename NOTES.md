@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1185 -- FLYING SHIP pass 4: broadside cannons
+
+- A bronze CANNON on each beam amidships (on a timber carriage, solid). When he is off its side within `FSHIP.canR` 28 m it trains on
+  him (+-.9 rad) and every `canEvery` 4.5 s fires an iron BALL on a lob -- a boom, smoke, a flash, a little shake. The ball is an ARROWS
+  shot: block it, glance it, or PARRY it back -- a ball sent home smashes the cannon (`bldHit` from `arrowStep`).
+- Each cannon takes `canHp` 4 hits (katana, shots, its own ball) and is out of action, barrel drooping and smoking, for `canFix` 20 s.
+Next: Set 2 #17 Barracks pass 2. Shipped unverified.
+
 ## m1184 -- ROBOT SAMURAI BARRACKS pass 1 (Set 2 #17, at (30, -42))
 
 `BARR`, `robotSam` (a code-built robot samurai: red lacquer cuirass, dark limbs, a visor with a cyan eye-slit, a kabuto with a gold crest,
