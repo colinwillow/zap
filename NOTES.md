@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## 3D AIM OWNS THE WHOLE RIGHT PAD, WITH ITS OWN CIRCLE (m1345)
+
+*"I keep trying to aim it upward and it won't -- it aims down but not up. I touch the right stick in 3D and he jumps, or I push up and it shoots instead of aiming the cursor up, or I push down and he blocks. 3D mode takes over the whole stick. And when you click 3D aim it unfolds into its own circle up there, centred on what used to be the flick-up position."*
+
+- **Why up never worked:** m1327 armed on the 2D trigger (the thumb pushed UP to the rim) and then read pitch from travel beyond that point. There was no room left to go up.
+- **`aim3Stick` now owns the right pad in 3D AIM:**
+  - a touch takes the gun up: no tap-jump, no flick, no guard, no back-step on release
+  - sideways turns the lens (stepCam's ordinary drag)
+  - up/down drives the PITCH at `pRate` 1.2 rad/s, ±`pMax` 35°, with a 12% dead zone
+  - lifting the thumb FIRES if it was held at least `minT` .12 s
+  - the pitch then eases back to level
+- **`#aim3ring`:** a red circle "unfolds" above the right pad (where the flick-up used to point) whenever 3D AIM is on with a gun. It opens fully while you aim, and its dot shows where the shot is pointed: up/down is the pitch, sideways is the thumb.
+- **The 2D aim keeps m1344's walk-backwards tilt.**
+
 ## 2D AIM: WALK BACKWARDS AND THE RETICLE RISES (m1344)
 
 *"The 3D aim thing is not working as it's supposed to. Another idea: in 2D, the normal aiming mode, what if your reticle nudged slightly upward when you walked backwards -- as you're walking backwards it slowly edges upward, and as soon as you stop walking it goes back to level."*
