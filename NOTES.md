@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1132 -- THE FORGE'S HORIZON: snowy white-capped mountains
+
+`PEAKS`, `forgePeaks` (called from `arenaStage`'s forge branch). Two rings of low-poly peaks round the Building Forge: 20 at ~250 m
+(70-120 m tall) and 26 paler ones at ~330 m (90-150 m). Each is a 7-sided cone with its rings jittered (the apex kept), rock blue-grey
+below the snowline (`snow` .58 of the height, ragged) and white above, flat-shaded, seeded (the same range every load). All merged into
+ONE mesh, one draw call. The arena fog (80-280 m) would wipe them, so the material has `fog: false` and the haze is baked into the
+vertex colours instead (the far ring paler). Shipped unverified. Next: the Pagoda.
+
 ## m1131 -- GRAPPLING HOOK pass 3 (DONE): the claw, the sag, climbing
 
 - **The hook is a thing now:** a three-pronged bronze claw flies from his hand to the ring on a small arc over `GRING.throwT` (.16 s),
