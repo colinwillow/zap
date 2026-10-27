@@ -63761,7 +63761,7 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 // to the shop front and to the round back door. Built in its OWN frame (local +z = the front, toward the river; `at`/`yaw` are HOME.hut's) and
 // merged per material; every collider a local box turned into the world (the yaw is a quarter turn, so a box stays a box); every walkable
 // surface a triangle. `?hut=glb` (or GHOME.on = 0) puts the GLB back, to compare. Pass 1: the massing and the walkable shell, with the inside.
-const GHOME = { on: 1, pass: 11, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
+const GHOME = { on: 1, pass: 12, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   Rtu: 2.5, door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
@@ -63802,6 +63802,12 @@ function ghClothTex(kind) { const C = GHOME.tex || (GHOME.tex = {}); if (C[kind]
     for (let i = 0; i < 5; i++) { g.beginPath(); g.arc(R() * W, H * .1 + R() * H * .5, 3 + R() * 6, 0, 7); g.fill(); } }
   g.globalCompositeOperation = 'source-over';
   const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return (C[kind] = t); }
+// pass 12: the stacks' smoke and the fires' flicker, each frame
+function ghomeSmoke(dt, t) { const S = GHOME.smoke; if (S && S.tops.length) { for (let i = 0; i < S.puffs.length; i++) { const p = S.puffs[i]; p.age += dt;
+      if (p.age >= p.life) { const T = S.tops[p.s % S.tops.length]; p.age = 0; p.x = T[0] + (Math.random() - .5) * .3; p.y = T[1] + .2; p.z = T[2] + (Math.random() - .5) * .3; p.vx = .35 + Math.random() * .25; p.vz = (Math.random() - .5) * .25; }
+      p.x += p.vx * dt; p.z += p.vz * dt; p.y += (1.1 - p.age * .12) * dt; S.pos[i * 3] = p.x; S.pos[i * 3 + 1] = p.y; S.pos[i * 3 + 2] = p.z; }
+    S.pts.geometry.attributes.position.needsUpdate = true; S.pts.material.size = 1.4; }
+  for (const [L, k] of GHOME.lights || []) L.intensity = k * (.88 + .08 * Math.sin(t * 9.3 + k) + .04 * Math.sin(t * 23.7)); }
 function ghomeBuild(at, yaw, y0) {
   const A = GHOME, g = new THREE.Group(); g.position.set(at[0], y0, at[1]); g.rotation.y = yaw; scene.add(g); A.g = g;
   const c = Math.round(Math.cos(yaw) * 1e6) / 1e6, s = Math.round(Math.sin(yaw) * 1e6) / 1e6, P = A.P;
@@ -63911,7 +63917,7 @@ function ghomeBuild(at, yaw, y0) {
     vbox(-3.0, -1.9, P, P + .38, -2.6, -1.25, wood, 1); vbox(-2.97, -1.93, P + .38, P + .56, -2.57, -1.28, red, 0); vbox(-2.9, -2.0, P + .56, P + .7, -2.55, -2.15, cream, 0);     // the bed
     put(new THREE.CircleGeometry(1.25, 28), red, at4(0, P + .03, -2.5, 0, -Math.PI / 2, 0, 1, 1, .75)); put(new THREE.RingGeometry(1.05, 1.15, 28), cream, at4(0, P + .035, -2.5, 0, -Math.PI / 2, 0, 1, 1, .75));     // the rug
     { const bx = 2.2, bz = -3.0; put(new THREE.CylinderGeometry(.5, .35, .5, 12), iron, at4(bx, P + .25, bz)); put(new THREE.CylinderGeometry(.42, .42, .06, 12), coal, at4(bx, P + .5, bz)); box(bx - .45, bx + .45, P, P + .55, bz - .45, bz + .45, { noCam: 1 });
-      const L = new THREE.PointLight(0xff8040, 6, 6, 1.6); L.position.set(bx, P + 1.1, bz); g.add(L); }     // the brazier
+      const L = new THREE.PointLight(0xff8040, 6, 6, 1.6); L.position.set(bx, P + 1.1, bz); g.add(L); (A.lights || (A.lights = [])).push([L, 6]); }     // the brazier
     { const kx = -2.1, kz = -3.15; for (const ox of [-.4, .4]) vbox(kx + ox - .04, kx + ox + .04, P, P + 1.3, kz - .04, kz + .04, wood, 0); for (const yy of [.6, 1.05]) vbox(kx - .45, kx + .45, P + yy - .03, P + yy + .03, kz - .05, kz + .05, wood, 0);
       vbox(kx - .55, kx + .45, P + 1.08, P + 1.12, kz + .02, kz + .06, steel, 0); vbox(kx + .45, kx + .7, P + 1.07, P + 1.13, kz + .02, kz + .06, red, 0); vbox(kx - .55, kx + .45, P + .63, P + .67, kz + .02, kz + .06, steel, 0); vbox(kx + .45, kx + .65, P + .62, P + .68, kz + .02, kz + .06, red, 0); }     // his katana rack
     vbox(-1.6, -.9, P, P + .45, -1.65, -1.2, wood, 1); vbox(-1.62, -.88, P + .2, P + .26, -1.67, -1.18, iron, 0);     // the chest
@@ -64018,7 +64024,7 @@ function ghomeBuild(at, yaw, y0) {
     wheel(9.6, P + 2.2, 7.4 + .3, 0, .55);
     // the STACKS: banded bronze chimneys rising off the hall's dome, either side of the cone
     for (const [x, z, H] of [[3.3, -1.6, 5.8], [-3.1, -1.9, 4.8]]) { const r0 = Math.hypot(x, z), y0s = P + A.Hw + A.Hd * Math.cos(Math.asin(Math.min(.99, r0 / A.R))) - .3; let y = y0s;
-      for (const [h, r] of [[1.2, .62], [.22, .78], [1.6, .5], [.2, .66], [1.3, .55], [.25, .74], [H - 4.77, .46], [.3, .68]]) { cyl(x, y, z, r, r, h, h < .4 ? iron : bronze, 14); y += h; } box(x - .5, x + .5, y0s, y, z - .5, z + .5, { noCam: 1 }); }
+      for (const [h, r] of [[1.2, .62], [.22, .78], [1.6, .5], [.2, .66], [1.3, .55], [.25, .74], [H - 4.77, .46], [.3, .68]]) { cyl(x, y, z, r, r, h, h < .4 ? iron : bronze, 14); y += h; } box(x - .5, x + .5, y0s, y, z - .5, z + .5, { noCam: 1 }); (A.tops || (A.tops = [])).push([x, y, z]); }
     // the CRANE off the store: a banded mast, a boom out over the stalls, the brass orb on a chain, its red tassel, two hanging weights
     { const mx = A.Wc[0] - .4, mz = A.Wc[1] - .6, my0 = P + A.Hwg + 1.2, my1 = my0 + 4.6, tip = [mx - 6.4, my1 + 2.4, mz + 3.6], base = [mx + .9, my1 - 1.6, mz - .5];
       vbox(mx - .24, mx + .24, my0 - 1, my1 + .4, mz - .24, mz + .24, wood, 1, { noCam: 1 }); for (let y = my0; y < my1; y += 1.1) vbox(mx - .28, mx + .28, y - .06, y + .06, mz - .28, mz + .28, iron, 0);
@@ -64073,7 +64079,7 @@ function ghomeBuild(at, yaw, y0) {
     { const z = A.part + .32; for (const hh of [.6, 1.3, 2.0, 2.7]) { vbox(-3.6, 3.6, P + hh - .05, P + hh, z - .26, z + .26, wood, 0); for (let x = -3.4; x < 3.4; x += .34 + rnd() * .15) { if (Math.abs(x) < 1.25 && hh < 2.5) continue; const r = .1 + rnd() * .07; pot(x, P + hh, z, r, r * (1.6 + rnd()), (rnd() * 5) | 0); } }
       for (let x = -2; x < 2; x += .5) { const r = .1 + rnd() * .08; pot(x, P + 1.05, 1.95, r, r * 2, (rnd() * 5) | 0); }
       lantern(-1.2, P + 3.4, 1.2); lantern(1.2, P + 3.4, 1.2); lantern(0, P + 3.6, -.2);
-      const L = new THREE.PointLight(0xffa860, 14, 9, 1.6); L.position.set(0, P + 2.8, 1); g.add(L); }
+      const L = new THREE.PointLight(0xffa860, 14, 9, 1.6); L.position.set(0, P + 2.8, 1); g.add(L); (A.lights || (A.lights = [])).push([L, 14]); }
     // CACTI and SUCCULENTS round the mound and in pots on the decks; more BOULDERS half-buried round the foot
     const saguaro = (x, z, h) => { const y = 0; put(new THREE.CapsuleGeometry(.22, h, 4, 10), cact, at4(x, y + h / 2, z));
       for (const sd of [-1, 1]) { if (rnd() < .3) continue; const ah = h * (.35 + rnd() * .25), al = .5 + rnd() * .3, ay = y + ah, ax = x + sd * .2;
@@ -64141,6 +64147,15 @@ function ghomeBuild(at, yaw, y0) {
       for (let k = 0; k < 3; k++) { const q = k / 3 * Math.PI * 2; const fx = x + Math.sin(q) * .3, fz = z + Math.cos(q) * .3, d = new THREE.Vector3(x - fx, 1.1, z - fz), L = d.length(); _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); put(new THREE.CylinderGeometry(.025, .025, L, 5), wood, _m4.compose(new THREE.Vector3((x + fx) / 2, y + .55, (z + fz) / 2), _q, _one)); }
       put(new THREE.CylinderGeometry(.07, .1, 1.1, 10), brassT, at4(x, y + 2.05, z, a, Math.PI / 2 - .12)); put(new THREE.SphereGeometry(.1, 8, 6), brassT, at4(x, y + 1.15, z));
       for (const [dx, dz] of [[.9, .4], [.5, 1.0]]) put(new THREE.CylinderGeometry(.35, .38, .18, 12), cush, at4(Tx + dx * Math.cos(a) - dz * Math.sin(a) * .2, y + .09, Tz + dz * .6)); } }
+  // ---- PASS 12: SMOKE from both stacks -- one point cloud (one draw), each puff rising, drifting downwind and swelling until it is gone;
+  // stepped in `ghomeSmoke` ----
+  { const N = 40, pos = new Float32Array(N * 3), cv = document.createElement('canvas'); cv.width = cv.height = 64; const q = cv.getContext('2d'), gr = q.createRadialGradient(32, 32, 2, 32, 32, 31);
+    gr.addColorStop(0, 'rgba(235,228,218,.9)'); gr.addColorStop(.5, 'rgba(220,212,200,.45)'); gr.addColorStop(1, 'rgba(210,200,190,0)'); q.fillStyle = gr; q.fillRect(0, 0, 64, 64);
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const mat = new THREE.PointsMaterial({ size: 1.4, map: new THREE.CanvasTexture(cv), transparent: true, opacity: .5, depthWrite: false, sizeAttenuation: true });
+    const pts = new THREE.Points(geo, mat); pts.frustumCulled = false; g.add(pts);
+    const puffs = []; for (let i = 0; i < N; i++) puffs.push({ s: i % 2, age: (i / N) * 4.5, life: 4.5, x: 0, y: 0, z: 0, vx: 0, vz: 0 });
+    GHOME.smoke = { pts, pos, puffs, tops: A.tops || [] }; }
   // ---- merge, and the world gets the boxes and the floors ----
   let draws = 0; for (const [m, list] of MG) { if (m.map && !m.userData.tri) m.map.wrapS = THREE.RepeatWrapping; const geo = mergeGeometries(list); if (!geo) { console.warn('[melee] ghome: a bucket would not merge', m.name || m.color); continue; } const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; g.add(o); draws++; }
   for (const b of boxes) BOXES.push(b);
@@ -64379,7 +64394,7 @@ function homeLanterns() {
 }
 function homeStep(dt) {
   const H = HOME; H.t += dt; if (RW.U) RW.U.uTime.value = H.t;
-  if (GHOME.U) GHOME.U.uWind.value = H.t; for (const G of GHOME.gates || []) bgateStep(G, dt);     // pass 9: his back door if (GHOME.orb) { const o = GHOME.orb; o.rotation.z = Math.sin(H.t * .95) * .13; o.rotation.x = Math.sin(H.t * .71 + 1.3) * .07; }     // pass 6: the wind, the orb
+  if (GHOME.U) GHOME.U.uWind.value = H.t; ghomeSmoke(dt, H.t); for (const G of GHOME.gates || []) bgateStep(G, dt);     // pass 9: his back door if (GHOME.orb) { const o = GHOME.orb; o.rotation.z = Math.sin(H.t * .95) * .13; o.rotation.x = Math.sin(H.t * .71 + 1.3) * .07; }     // pass 6: the wind, the orb
   // the boat rides the waves
   if (H.boat) { const B = H.boat, t = H.t, hh = rwWaveAt(B.x, B.z, t); B.o.position.y = hh * .8 - .05; B.o.rotation.set(Math.sin(t * .9) * .03, B.ry, Math.sin(t * 1.1 + 1) * .04); }
   // THE LAKE'S RULE: wading is fine; past `deepAt` under the surface he is put back where he last stood dry, and a wading step leaves a ring
