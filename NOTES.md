@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home, procedural, pass 2: the scaffold, the awnings, the banners (WORKER B)
+
+From his four views:
+- **The front frame.** Square timber posts with iron bands, and a beam across the front at 4.6 m. Two taller posts flank the shop front
+  and carry a top beam at 6.3 m, with diagonal braces. The posts are noCam.
+- **Two stall decks.** One either side of the steps, at the floor's height. They are walkable plank decks on outer posts.
+- **The awnings.** Each deck has a sagging, rippling red awning from under the front beam down to the outer beam. The awnings are walkable
+  too: a scramble onto the roofs.
+- **The banners.** The big V-hemmed chevron banner hangs from the top beam over the shop front, with narrow banners down four posts.
+- **The cloth (`ghClothTex`).** A canvas: weathered red with cream chevrons and diamonds, patched and specked, its torn hem cut into the
+  alpha.
+- **A ladder** (kitClimbAdd, with its mark) up the store's front to its dome roof.
+- **The long ramp** off the right deck down to the ground, railed (ref 3).
+- **Small changes.** The store wing moved .4 m in (it hung off the mound). `put()` now keeps uv on mapped materials.
+- **Counts.** 7 draws, 570 boxes, 2864 walkable tris.
+
+Checked headless: it boots and builds. I looked at renders from the front and the front-left against the refs; the frame, awnings and
+banners read. Shipped unverified. Next: pass 3, the tent cone, the wheels, the stacks and the crane. Main's new texture library
+(`triMat`) is the plan for the look pass.
+
 ## Grumbo's home, procedural, pass 1: the massing and the walkable shell, with an inside (WORKER B)
 
 His: *"building it procedurally is gonna be better so that we can go inside and add stuff to it and it's all in the same game style... a ton
