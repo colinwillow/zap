@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## GRID LEVEL 1, PASS 8: HAND OVER HAND ON A LONG BAR (m1363)
+
+His: *"monkey bars, dynamics, rope, climbing, and swinging"*.
+
+- **New cell kind `'mbar'`:** a pit crossed by ONE LONG BAR running the way you are going (cell + 3 m, so it reaches 1.5 m over each ledge), at ledge + 2.55 m. Jump at the edge to catch it.
+- **The shimmy:** on a long bar (`B.len` > the high bar's 2.6 m), the left stick's SIDEWAYS push moves him along it at `SHIMMY.v` 2.2 m/s. The stick's up/down still pumps a swing, and a tap still lets go.
+- **Where:** Level 1's (5,7), between the second guards (6) and the descent to the gate. Fall in and a ladder takes you back to the ledge.
+- **The engine change:**
+  - `hbarMake` takes an optional `len`, and the bar carries `B.len`
+  - the catch, the hook and the clamp all read `B.len`, so every old bar is unchanged
+- **NOT MEASURED, A DIAL:** which way the stick moves him. His right is computed as `-axis * face`, but the lens is not behind him on a bar. If it goes the wrong way, set `mel.SHIMMY.side = -1` (or tell me and I flip it).
+- **No hand-over-hand clip yet:** he slides in the hang pose. That is greybox. A real monkey-bar clip is a slot for the art pass.
+
 ## GRID LEVEL 1, PASS 7: CATAPULTS UNDER THE ROUTE (m1362)
 
 His: *"catapults rockets turrets"*.

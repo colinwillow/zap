@@ -97,6 +97,11 @@ This pass adds three new cell kinds to the spec:
 - flying zeppelin platforms
 - swimming (a new mechanic: its own sandbox first, per the whole-piece rule)
 
+## L1 pass 8 (m1363): THE LONG BAR
+
+- **`'mbar'`:** a pit crossed by one long bar along the way. Jump to catch it, then push the left stick sideways to shimmy across.
+- **Where:** (5,7), after the second guards.
+
 ## L1 pass 7 (m1362): CATAPULTS
 
 - **`cats: [[c, r], ...]`:** a catapult on the ground at that cell.
