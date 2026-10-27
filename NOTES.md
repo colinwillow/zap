@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1193 -- Sky Bridges pass 4: the lighthouse zipline and a brake (Building Forge loop, extra pass)
+
+- **A third ZIPLINE.** It runs from the Jin Lighthouse's gallery (an anchor 1.3 m over the deck, inside the rail, on the
+  bathhouse side) for 28 m, over the Bathhouse roof (about 10 m above its ridge), down to the street east of the veranda.
+  A post stands at that street end. It appears when the lighthouse stands, like every span (`skybSig` rebuilds it).
+- **The BRAKE.** On any zip, pulling the left pad back sheds `ZIP.brake` 14 m/s per second, down to half of `v0`, with sparks
+  off the trolley. You can creep down a long line, or stop over something and let go.
+
+Pass 4 is an extra on a done building, so it moves no sandbox box. Next: alternate -- Jin Lighthouse pass 3.
+
 ## m1192 -- Jin Lighthouse pass 2: the searchlight (Building Forge loop)
 
 **The beam is a JIN SEARCHLIGHT now.**
