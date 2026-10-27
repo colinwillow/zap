@@ -5,6 +5,28 @@ Every time you complete the third pass on a building, add it to the inventory I 
 run on it, swing on it, blow it up and repair it. Make various TYPES of buildings that are modular and will eventually fit together, with
 different functions: bars and ramps, interior and exterior, turrets, ballistae, beams -- floating flying ship buildings, zeppelins, towers."*
 
+## STEER 00 (his, after m1369) -- BUILD A LEVEL IN LAYERS, AND EACH LAYER HAS TO HOLD UP ON ITS OWN
+
+> *"I spawn in and I'm just getting hammered with cannonballs before I've even moved. I need to be able to walk the level first and foremost.
+> We need to sit and plan how a level layers together."*
+
+The method (written up in LEVELGRID.md, "THE FIVE LAYERS"):
+1. **THE RUN:** a ninja parkour centre. No weapons, no enemies, no puzzle: running, jumping, flipping, swinging, climbing, wall runs, (swimming). It has to be a FUN LEVEL by itself.
+2. **THE PUZZLE:** which pieces of the cookie open the cookie jar. This opens that, that opens the next, and the final one opens the boss gate. Designed, not literal.
+3. **THE ENEMIES:** placed to GUARD the key areas of layer 2 (buttons, doors, abilities, the boss approach). **Each enemy has a ZONE**, a circle round what it guards, and its reach stays inside it. Nothing fires at you from across the map, and nothing hits you at the spawn.
+4. **THE THEME:** what sets this level apart (air world, puzzle world, enemy-heavy, water world, vehicles, co-op...).
+5. **THE BOSS:** the final arena, a big open dojo, and the boss of the level.
+
+**Each layer is built in turn, and each must still play with every layer under it.**
+
+- **In the game:** SPAWN > BUILDINGS has Grid Level 1 four ways:
+  - LAYER 1: RUN (only the traversal; every gate open)
+  - LAYERS 1-2
+  - LAYERS 1-3
+  - ALL LAYERS
+- **The loop works on LAYER 1 of Level 1 until he signs it off.** No new enemies, gates or bosses until then.
+- **Already known about layer 3:** the catapults (55 m reach), the perch archers and the guns have no zones. They get zones before layer 3 is his to judge.
+
 ## STEER 0 (his, after m1356) -- THE GRID LEVEL FIRST, AND AS MANY PASSES AS IT TAKES
 
 > *"We do as many freaking passes on this as we need to. Build one level at a time, scoped fairly moderately, and keep iterating over and over

@@ -8,6 +8,26 @@ His direction, with two blueprint images (a 10 x 10 top-down grid, a coloured pa
 > on the tower, hit this button and it opens a drawbridge; once it's open you go across, beat those guys, go up and light this candle and
 > that allows this; then you zipline back across and finish, and that opens the boss of the level."*
 
+
+## THE FIVE LAYERS (his method, after m1369 -- every grid level is built this way)
+
+| layer | what | the test it has to pass alone |
+|---|---|---|
+| **1 RUN** | the traversal: ramps, ladders, wall runs (up and along), bars, the long bar, ropes, rings, movers, flyers, zips, drops; swimming when it exists | with nothing else in it, is it a fun level to move through? a ninja parkour centre |
+| **2 PUZZLE** | the beats that open things: this opens that, that opens the next, the last opens the boss gate | do the dependencies make you use the WHOLE run, and send you back over it a new way? |
+| **3 ENEMIES** | guards for the layer-2 pieces only, each with a ZONE (a circle round what it guards) that its sight, its shots and its chase stay inside | can you always stand outside every zone and plan? nothing reaches the spawn or the open run |
+| **4 THEME** | the level's one distinctive thing: air, puzzle, enemies, water, vehicles, co-op | would you know which level this is from one screenshot? |
+| **5 BOSS** | the final arena: a big open dojo and the boss | is it the biggest moment in the level, and does it use what the level taught? |
+
+- **In code:** `lvgBuild(spec, lay)` builds layers 1..lay. Below 2, every gate stands open and the boss door is gone. Below 3, the guard beats count as done. The keep is layer 5.
+- **Which layer each thing is in:**
+  - **layer 1:** the path, branches, climbs, bars, movers, flyers, zips and rings
+  - **layer 2:** the button, candle, cache, drawbridge, gate and boss door
+  - **layer 3:** the guards, the tower's archers and gun, the posts and the catapults
+  - **layer 5:** the keep
+- **Order of work:** finish layer 1 to his sign-off, then layer 2, and so on. A pass adds to ONE layer and is checked against every layer below.
+
+
 ## The system
 
 A level is a SPEC: an ordered path of grid cells plus beats. `lvgBuild(spec)` turns it into a playable GREYBOX. There is no art: the logic gets proven first, and the art and the kit go on top only after it plays.

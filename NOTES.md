@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## GRID LEVEL 1 IN LAYERS: THE RUN COMES FIRST (m1370)
+
+His: *"I spawn in and I'm just getting hammered with cannonballs before I've even moved... First and foremost the level should operate like a ninja parkour centre... layer two the puzzle... layer three the enemies, strategically placed to guard key areas, each with a region of influence contained to the thing it is guarding... layer four what sets it apart... layer five the boss arena... each stage needs to hold up and work with the others."*
+
+- **The method is now the rule:** STEER 00 in BUILDINGS.md, and "THE FIVE LAYERS" in LEVELGRID.md.
+- **`lvgBuild(spec, lay)`:** builds layers 1..lay.
+  - **lay 1:** the run only. Drawbridge down, gate open, boss door gone. No guards, archers, guns, catapults or keep. The beat marks are hidden except S and E.
+  - **lay 2:** the puzzle beats are back, and the guard beats count as done.
+  - **lay 3:** the enemies are back.
+  - **lay 9 (all):** adds the boss keep.
+- **SPAWN > BUILDINGS:** four entries for Level 1 (RUN / +PUZZLE / +ENEMIES / ALL LAYERS). Each clears whatever version is up first.
+- **Crash gate:** all four build headless in the forge with no error.
+- **Next:** layer 1 only, from his notes on walking it. Enemy ZONES come before layer 3 is his to judge (the catapults reach 55 m today, which is what hit him at the start).
+
 ## GRID LEVEL 1, PASS 11: THE KEEP FIGHTS BACK (m1369)
 
 - **When the boss door opens (3, 6 and 8 done),** the keep wakes: three samurai spawn at its feet on the side facing the level, with a clang.
