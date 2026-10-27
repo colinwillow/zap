@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- the Octagonal Block Pagoda's gates (X4, WORKER A; his DOORS, GATES -- AND CHAOS rule)
+
+Every door in the pagoda and the fence gate now has **real leaves**, from the shared helper (`bgateMake` / `bgateStep` / `bgateHit`):
+- two red leaves with gold straps, hinged at the jambs: 2.7-3.6 m wide and 3 m tall in the seven storey doors, 4.8 x 4 m across the fence gate;
+- they **swing open** for him, or for an alarmed guard (the monk, an archer), coming within 5 m, and shut behind;
+- they **break under 3 blows** (the fence gate takes 4): splinters, smoke, and the way stands open. They are rehung 45 s later;
+- every X4 door is on a DIAGONAL face, and the helper only lays a gate along x or z. So each gate is built in a group turned onto its face,
+  and its collider is swapped for a TURNED box (`opagTB`), which `bgateStep` adds and removes as before;
+- a gate upstairs ignores blows from the room under it.
+
+SHIPPED UNVERIFIED. Next: X3, the Timber Siege Fort, pass 1.
+
 ## m1324 -- STEER S1: the Octagonal Block Pagoda x1.5, and a stair he can climb (X4, WORKER A)
 
 His notes from walking it: *"increase the scale... maybe 1.5. The stairs on the ground floor are so steep I couldn't climb; I had to jump
