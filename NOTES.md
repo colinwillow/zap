@@ -5,6 +5,31 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1213 -- Siege Yard pass 1 (Building Forge loop, Set 2 #22)
+
+`SIEGE`, in BLDG.list as `siege`, centred at (-47, -37).
+
+**The palisade.** A 16 x 14 m square of breakable timber walls (3 m), with pointed stakes every .45 m along every top (one merged
+mesh) and a 3.2 m gate in the east wall between two tall red-flagged posts.
+
+**The trebuchet** stands on a stone turntable (solid): A-frames, an iron axle at 5 m, an arm 6.5 / 2.4 m with bronze bands, a
+counterweight box that hangs true, and a boulder in the sling. Its cycle:
+- **Wind:** `windT` 4 s, the long arm hauled down behind.
+- **Pick a target:** him (leading his run) if he is 8 to `range` 60 m away, else a random spot 14 to 44 m out.
+- **Aim and telegraph:** it turns on its turntable to aim over `holdT` .9 s while a pulsing RED RING marks the landing spot.
+- **Swing:** `swingT` .45 s, then the boulder lofts on a 2.4 s arc.
+- **Rest:** `restT` 1.4 s.
+
+**Impact.** The boulder lands with a crash: sparks, dust, a boom and a camera shake.
+- `dmg` 22 to him within `blastR` 3.2 m, with a big knock.
+- A knock-down for bodies within the same radius.
+- A `bldHit` on whatever it lands on.
+
+**Killable.** Strike it `hp` 8 times at its base (`siegeHit` in `bldHit`) and it is wrecked: it tilts and smokes for `fix` 30 s.
+
+What wants a look: the arc and timing, and that the swing reads as a throw (arm angle `phi` -.5 to 2.4). Next: alternate -- an
+extra pass (5) on the Market.
+
 ## m1212 -- Pagoda pass 5: shinobi on the roofs (Building Forge loop, extra pass)
 
 Two archers (`archerPost`) now crouch on the Pagoda's tile skirts, on the 2nd and 4th roofs. They sit on the corners the grapple
