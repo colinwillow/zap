@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1244 -- Airship Dock pass 6: sky pirates (Building Forge loop, extra pass)
+
+A raider skiff now joins the airship's flight once a quarter of it is flown (`adockSky`, `adockSkyHit`, `adockSkyDown`, `ADOCK.sky`).
+The skiff has a dark hull, a red sail and a patched gas-bag, and it carries a killable turret on its bow. It comes in from 40 m out,
+circles the airship at 11 m, and slips away when the airship docks. Six cuts to the hull, or killing its gun, sends it down burning to
+a boom on the ground. It comes back 40 s later. The hull hit is hooked into `bldHit` before `festHit`. The turret's box is kept out of
+`BOXES` because it flies (the same handling as the stern gun). Registry `pass: 6`.
+SHIPPED UNVERIFIED. Next: alternate -- Lantern Festival Street pass 3.
+
 ## m1243 -- Lantern Festival Street pass 2: the dragon dance (Building Forge loop)
 
 A robot dragon dance now parades down the street (`FEST`, `festDragon`, `festStep`, `festHit`). It has a gold-horned head and eight
