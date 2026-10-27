@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## THE SHIP, PASS 8: THE SKY OF HIS REFERENCE (m@X4@, WORKER A)
+## THE SHIP, PASS 8: THE SKY OF HIS REFERENCE (m1393, WORKER A)
 
 His: *"Send it."* This pass reaches past the hull into the world on his reference sheet (the airship among floating islands):
 - **SIX FLOATING ISLANDS** hang over the sea round the horizon, 380-600 m off and 70-160 m up.
