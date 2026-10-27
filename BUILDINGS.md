@@ -60,7 +60,7 @@ each pass a real step up in silhouette, material, detail and things to DO), and 
 
 **The image landed (m1262): `images/korajin/ref/red_pagoda_tower.webp`** -- a slender five-storey red pagoda, a railed balcony round
 every storey, deep flared roofs with gold edges stepping in as it rises, a spire of rings, a roofed pavilion at its foot, a red fence with
-gold flame finials. **The loop takes X rows FIRST, before the R rows, a pass per build, to 10. ORDER: X1, then C1 (the courtyard, which uses X1), then X2, then X3.**
+gold flame finials. **The loop takes X rows FIRST, before the R rows, a pass per build, to 10. ORDER (his, after m1268): X1, then X4 (the octagonal block pagoda), then C1 (the courtyard), then X2, then X3.**
 
 **THE BLOCK STYLE (his, after m1267, five Minecraft-style references in `images/korajin/ref/block_*.jpg`):** *"It's very Lego or Minecraft,
 and it shows we can create stuff with blocks while still getting detail, low poly, destructibility and climbing out of these. I like the one
