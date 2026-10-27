@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1126 -- GATEHOUSE pass 1 (BUILDINGS.md #3, at (16, -8))
+
+`GHOUSE`, `ghouseBuild` / `ghouseClear` / `ghouseStep` (not `gate*`: `gateStep` is an old world's mend and was taken -- the first
+check caught the duplicate). SPAWN > BUILDINGS > Gatehouse.
+- Two gate TOWERS either side of a 5 m passage: breakable ground storeys (cwallBuild, 3.6 m) with doors onto the passage, solid white
+  upper storeys banded in dark timber, a neon line on each front.
+- A DECK across both towers and the passage at 7.2 m (16 x 5.8 m), railed, lamps at the corners -- walk the whole top.
+- A switchback RAMP up the back: two flights (slopes .28 / .32) with a landing between, arriving at the deck's back-east corner.
+- A giant vermilion TORII over the front of the passage: pillars to 11 m, nuki, black kasagi with upturned ends, a glowing plaque.
+- A HIGH BAR on the deck's west end (at 7.2 m, m1122), cables from the kasagi to stakes, a drone orb circling.
+Pass 2 next: the ballista on the deck, the drawbridge, banners. Shipped unverified.
+
 ## m1123 -- WATCHTOWER pass 3 (polish) -- DONE
 
 BUILDINGS.md queue #2, third pass; `BLDG` entry `pass: 3`, so it shows as done in SPAWN > BUILDINGS.
