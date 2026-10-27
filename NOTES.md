@@ -5,6 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+<<<<<<< HEAD
 ## White Heron Castle pass 1 of 10: the mass (X2, WORKER B)
 
 His second 10-pass reference, `images/korajin/ref/white_castle_keep.jpg` (a Himeji-style castle). `HERON`, `heronBuild`, SPAWN > BUILDINGS.
@@ -29,6 +30,26 @@ His second 10-pass reference, `images/korajin/ref/white_castle_keep.jpg` (a Hime
 - **Draws.** Everything else is merged per material, about 5 draws plus the storehouse walls.
 
 SHIPPED UNVERIFIED. Next: pass 2, the roofs (chidori and kara gables, shachi on the ridges).
+=======
+## m@X4@ -- Octagonal Block Pagoda pass 3 of 10: everything breaks, and it repairs (X4, WORKER A)
+
+THE BLOCK STYLE's third rule, *"every block can BREAK"*, now covers the whole building:
+- **The eave courses are blocks.** Each face's course is cut into ~.75 m segments, each with its own turned collider.
+  - Its light edge and its tile ribs ride on it as GHOST pieces: instanced, no collider, they go when it goes (`kids`).
+  - Shoot out a run of the eave and the climb route has a gap in it.
+  - The top storey's ceiling course and the stepped cap above it stay whole, so the last room keeps its roof.
+- **The teal band is segments.** Each segment carries the bracket clusters under it as ghost pieces.
+- **The red band under every eave is blocks** (~.7 m each).
+- **Posts are stacks of blocks.** The eight corner posts of every storey are four blocks each, the porch posts three, the fence posts three.
+  Break a low one and the ones on it come down (`up`).
+- **They REPAIR.** A block that has been dead 20 s flies back in from a little way off, scaling up as it lands (`opagStep`).
+  - One every .15 s, the LOWEST first.
+  - Only onto a block that is there (`dn` alive), so nothing is put back floating.
+  - Never into him.
+- **Draws**: the breakables are one InstancedMesh per material (cream, red, teal, tile, edge, dark).
+
+SHIPPED UNVERIFIED. Next: pass 4, the climb outside (bars, handholds, a zipline off the spire).
+>>>>>>> e65b137 (Octagonal Block Pagoda pass 3 of 10: everything breaks and repairs (X4))
 
 ## m1276 -- Octagonal Block Pagoda pass 2 of 10: the block detail (X4, WORKER A)
 
