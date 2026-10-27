@@ -30,6 +30,8 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - L1 pass 8 (m1363): a long bar to shimmy across a pit (monkey-bar greybox)
   - L1 pass 9 (m1364): a zeppelin deck from the roof across the level to a high pad
   - L1 pass 10 (m1365): a 75 m zip from the zeppelin pad to the boss door
+  - (m1368: FIX -- Grid Level 1 threw on spawn since m1359; passes 4-10 reach him only now)
+  - L1 pass 11 (m1369): the keep wakes (3 guards) and drops one per broken leg
   - ...
 
 ## STEER (his, after walking X4, Oct 27 2026) -- OUTRANKS THE QUEUE BELOW
