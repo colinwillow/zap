@@ -20093,7 +20093,7 @@ function shrineClear() { const S = SHRINE.on; if (!S) return; smashDrop(S.smash)
 // of MERLONS (crenels) on the outer side; a GATEWAY in the middle closed by a breakable timber-and-plaster panel (smash through) under a
 // lintel the walkway runs over; a RAMP up the inner face at each half; and at each end a BASTION 1.5 m higher (steps up from the
 // walkway) with a SENTRY TURRET on top (killable, m1128).
-// STEER S2 (x1.5, m1356): its proportions ARE these numbers (they were L 40, H 4.2, T 3, gate 6, bast 5, bH 5.7); `scale` carries the literals inside
+// STEER S2 (x1.5, m1355): its proportions ARE these numbers (they were L 40, H 4.2, T 3, gate 6, bast 5, bH 5.7); `scale` carries the literals inside
 // the builder and tells `skAt` where the sky bridge lands. The ramps keep their SLOPE (.32), so they run 19.7 m; the bastion steps stay .28
 const RAMP = { scale: 1.5, raidN: 3, raidCd: 40, at: [0, -36], L: 60, H: 6.3, T: 4.5, gate: 9, bast: 7.5, bH: 8.55, slope: .32, senHp: 3, senV: 1.3, senWind: .6, senDmg: 9, senBack: 20, on: null };     // H 4.2: the ramp (slope .32) must land before the bastion steps
 function rampBuild() {

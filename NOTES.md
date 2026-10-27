@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## THE RAMPART WALL x1.5 -- STEER S2 (older rows, m1356)
+## THE RAMPART WALL x1.5 -- STEER S2 (older rows, m1355)
 
 - **Its constants changed:**
   - length 40 → 60 m, wall 4.2 → 6.3 m high and 3 → 4.5 m thick
