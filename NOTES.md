@@ -30,7 +30,21 @@ building there (nearest: the Festival at 42 m). `OPAG` / `opagBuild`; its code s
 
 Draws: about ten merged buckets plus two instanced sets. SHIPPED UNVERIFIED. Next: pass 2, the block detail.
 
-## Great Red Pagoda pass 8 of 10: motion (X1)
+## Great Red Pagoda pass 9 of 10: the set piece (X1)
+
+A great bronze GONG now hangs in a dark frame on the lookout's balcony at the top. Strike it and the whole tower answers:
+- **The lanterns.** They light storey by storey from the ground up, .55 s apart. Each eave's halos flare (per-vertex colours on the halo
+  Points), sparks burst off its four corners, and a clang rises in pitch as it climbs.
+- **The windows.** They blaze.
+- **The spire.** The beacon flares into a column of light (`arenaBeam`), with a boom and a shake.
+- **The birds.** They burst up.
+- **The gate.** The court GATE's two new red doors swing OPEN. They are SHUT the rest of the time: a solid box across the gate, which is
+  taken out of `BOXES` once they are open.
+
+It all settles back after `GPAG.showT` 30 s. The gong is caught in `gpagBell` ahead of the bell-room bell. SHIPPED UNVERIFIED. Next: pass 10,
+the polish.
+
+## m1273 -- Great Red Pagoda pass 8 of 10: motion (X1)
 
 - **Streamers.** Long red and white streamers hang off two corners of every balcony, swaying in the wind.
 - **Wind chimes.** Five gold rods hang at each of the top roof's corners. They ring (a high, quiet clang) and swing when he comes within
