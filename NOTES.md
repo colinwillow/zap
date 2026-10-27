@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1106 -- blocked arrows glance off (or go home), finish them on the floor, no DNA ring, robots don't grunt
+
+**What he said:** *"I'm blocking the arrows... I want them to actually zing off in a direction, visibly, like the rockets, and deflect them
+back at the guys."* / *"if I knock a guy down there's a little circle over him -- I don't want that capability... mute it, put it on a flag."*
+/ *"I wanna finish them on the ground -- jump and smash them while they're down, chop their limbs off, blow them up; right now they don't
+break up at all... they make grunts like the warrior aliens... maybe they should get up a little quicker."*
+
+- **ARROWS ON THE GUARD (`arrowBlock`):** the blade up (`p.block`), the arrow inside `BLOCK.arc` and `blockR` 1.3 m of his chest. PERFECT (guard
+  raised inside `SHOTBLOCK.win`) -> straight back at its archer (`deflectThreat`); otherwise it GLANCES off the blade's own line (the rockets'
+  m1067 reflection, `rest`, a random scatter, a kick up) and TUMBLES end over end under full gravity until it sticks. His either way.
+- **THE DNA RING IS OFF (`SAMPLE.on` from TOOLS > DNA SAMPLE, default OFF).** The code is untouched.
+- **ON THE FLOOR (`dummyBlow`):** a downed horde body takes the blow: its life drops (x`floorK` 1.5), a blade (swing, slam or charge) cuts a
+  limb off the slicing kind, and at 0 life it is finished where it lies (`hordeDie`).
+- **Robots** (horde and archers): `voice` '' (no grunts), and they lie `lieK` .45 as long. Robot sounds: when he has them, they go on the kind's
+  `snd` / `voice`.
+- **The archers' red** was PINK in a render (+28 deg x (1, .62, .58)): now +20 deg x (1, .5, .3).
+
+**Real loop (`m1106.cjs`):** guard held at 4 archers, 10 arrows: 6 on the blade (3 glanced and tumbled off, 3 perfect and went back and hit
+archers), 4 elsewhere. A knocked-down robot slammed: 3 slams, 2 limbs, then blown apart. The DNA ring read off.
+
 ## m1105 -- hitting rockets and arrows back: the swipe turns to meet them, a full charge locks on, dashes and sends them home
 
 **What he said:** *"When the turret or the arrows are coming at you, a little directional aim assist if you're swinging the stick, so you
