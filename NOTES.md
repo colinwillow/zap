@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1188 -- Robot Barracks pass 3: the polish (Building Forge loop)
+
+Added to the barracks at (30, -42):
+- Five red NOBORI banners on poles along the yard's far kerb, each with a white mon on both faces and a gold finial.
+- A stone DAIS by the door with the drill master's TAIKO on it. The stick winds up through the raise and strikes on every CUT,
+  so the drum keeps the robots' count.
+- A pull-up BAR at the yard's east corner, beside the archery butt.
+- Lamp cables from both eaves to stakes, and a drone circling the yard.
+
+The Robot Barracks is DONE (3 passes). Next: alternate -- Forge-Workshop pass 4.
+
 ## m1187 -- Bathhouse pass 4: the boiler and the geyser (Building Forge loop, extra pass)
 
 A bronze BOILER now stands at the chimney's foot, with a pipe running under the floor to the pool and a red VALVE WHEEL on its side.
