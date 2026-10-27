@@ -876,10 +876,10 @@ body.desk.free #deskHint { display: block; }
   <h1>WEIRDPORT</h1>
   <div class="msg" id="bootMsg">loading</div>
   <div class="bar"><i id="bootBar"></i></div>
-  <div class="bld">BUILD <span id="bootBuild">m1121</span></div>
+  <div class="bld">BUILD <span id="bootBuild">m1122</span></div>
 </div>
 
-<div class="chip" id="build"><b id="buildN">m1121</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
+<div class="chip" id="build"><b id="buildN">m1122</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
 <div id="splash" aria-label="tap to start"><img class="blur" alt=""><img class="main" alt="Zap and Clancy"><div class="glow"></div><div class="bn"></div></div>
 <script>
 // m879 (STEER 02:22): THE SPLASH, before the module (so it shows on the first paint, while the boot carries on behind it). The image's
@@ -988,7 +988,7 @@ import { KTX2Loader } from './vendor/KTX2Loader.js';
 import { clone as skeletonClone } from './vendor/SkeletonUtils.js';
 import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
 
-const BUILD = 'm1121';
+const BUILD = 'm1122';
 /* ASSETS:START */
 const ASSETS = {"models/alien_lizard.glb":"faffcf4c","models/alien_lizard_ktx2.glb":"05da2a20","models/skate.glb":"0c612d5e","models/skateboard.glb":"5ba93796","models/characters/alien_antenna_game.glb":"f3ccf328","models/characters/alien_antenna_game_ktx2.glb":"28afac8c","models/characters/alien_female_purple.glb":"1c73eef1","models/characters/alien_female_purple_ktx2.glb":"fc914afb","models/characters/alien_goblin.glb":"3e91bffb","models/characters/alien_goblin_chains.glb":"e72d1550","models/characters/alien_goblin_game.glb":"cfabd926","models/characters/alien_grey_medium.glb":"5a779e8e","models/characters/alien_grey_medium_ktx2.glb":"61600c3e","models/characters/alien_rollerskate_blue.glb":"abf0917c","models/characters/alien_rollerskate_blue_ktx2.glb":"e9a7948a","models/characters/alien_warrior.glb":"f5cc9c49","models/characters/alien_warrior_ktx2.glb":"a13fb7b6","models/characters/beautiful_asian.glb":"910f6565","models/characters/beautiful_asian_ktx2.glb":"35281eef","models/characters/beautiful_blonde.glb":"edddc421","models/characters/beautiful_blonde_ktx2.glb":"89cf3899","models/characters/brute_warboss_armor.glb":"cc5c7936","models/characters/ceo_alien.glb":"844dc3a7","models/characters/ceo_human.glb":"ec289865","models/characters/clancy.glb":"4b9d271f","models/characters/clancy_ktx2.glb":"74edbc6e","models/characters/colin.glb":"99d38b7d","models/characters/colin_ktx2.glb":"35040f87","models/characters/contruction_worker.glb":"8bd3d7ce","models/characters/contruction_worker_ktx2.glb":"3df8c344","models/characters/dummy_officer.glb":"724965ac","models/characters/dummy_officer_ktx2.glb":"db640cda","models/characters/fat_activist_01.glb":"3c566fee","models/characters/fat_activist_01_ktx2.glb":"b9328df4","models/characters/fat_biker_01.glb":"576b7cf5","models/characters/fat_biker_01_ktx2.glb":"7142cfad","models/characters/fat_biker_02.glb":"ab5d7ec7","models/characters/fat_biker_02_ktx2.glb":"28cec6cc","models/characters/fat_hippie.glb":"f09a260d","models/characters/fat_hippie_ktx2.glb":"0be745a4","models/characters/fat_hipster.glb":"9cf45ffb","models/characters/fat_hipster_ktx2.glb":"18106ff3","models/characters/fat_secret_service.glb":"6d546fb0","models/characters/fat_secret_service_ktx2.glb":"a23a304e","models/characters/fat_trump.glb":"5de6bc56","models/characters/fat_trump_ktx2.glb":"a0ddaf4d","models/characters/firefighter.glb":"ebde005d","models/characters/firefighter_ktx2.glb":"ccf93c96","models/characters/goblin_game.glb":"db1cf0e0","models/characters/hick_skinny.glb":"1ebe78e8","models/characters/hick_skinny_ktx2.glb":"1e93f0ed","models/characters/hobo_01.glb":"34e80b1d","models/characters/hobo_01_ktx2.glb":"69497677","models/characters/jack.glb":"ab009b9b","models/characters/jack_ktx2.glb":"1f4c9f7f","models/characters/moussa.glb":"6d80b1cf","models/characters/moussa_ktx2.glb":"66e040f8","models/characters/orc_game.glb":"d9aa816d","models/characters/proxy_ceo.bin":"6eca0c34","models/characters/proxy_ceo.jpg":"fadc9d0a","models/characters/proxy_ceo.json":"e62a7975","models/characters/proxy_ceo_alien.bin":"be247ecc","models/characters/proxy_ceo_alien.jpg":"8f8bf8fc","models/characters/proxy_ceo_alien.json":"eb23e28f","models/characters/proxy_hick.bin":"4485560e","models/characters/proxy_hick.jpg":"8c331965","models/characters/proxy_hick.json":"d85a0d36","models/characters/proxy_zap.bin":"dd7b300e","models/characters/proxy_zap.jpg":"2e7330ae","models/characters/proxy_zap.json":"b3b42754","models/characters/proxy_zap2.bin":"51088f46","models/characters/proxy_zap2.jpg":"a954a815","models/characters/proxy_zap2.json":"5c50abb7","models/characters/rept_heavy_armor.glb":"934661c7","models/characters/samurai_game.glb":"c7940015","models/characters/xray_skeleton.glb":"46480317","models/characters/zap.glb":"5e5cca54","models/characters/zap_02.glb":"4ff12de0","models/characters/zap_02_lib.glb":"e23d91da","models/characters/zap_ktx2.glb":"4b29d886","models/characters/zoar.glb":"423a9de9","models/characters/zoar_game.glb":"d20a3736","models/vehicles/dump_truck.glb":"d870dc18","models/vehicles/dump_truck_ktx2.glb":"21ee7059","models/vehicles/motorcycle_fatboy.glb":"9ed9be28","models/weapons/alien_antenna_blaster_game.glb":"54083b44","models/weapons/alien_antenna_hammer_game.glb":"707b8a27","models/weapons/alien_launcher.glb":"ba8ab96a","models/weapons/hammer.glb":"3335fdf2","models/weapons/shield_brute.glb":"c6e5593f","models/weapons/spikey_mace.glb":"dcd43acd","models/weapons/w_brute_cleaver.glb":"07a97580","models/weapons/w_rept_maul.glb":"84c3a1a4","models/buildings/alien_base_01.glb":"d9b9fd7f","models/buildings/alien_base_01_ktx2.glb":"6cbbfef2","models/buildings/korajin_bld_01.glb":"edf3178e","models/towers/alien_tower_01.glb":"98d23375","models/towers/alien_tower_01_ktx2.glb":"47597651","models/streets/modular_streets_kit.glb":"6a4bcaa5","models/toon_city/impact_marks.json":"2b616620","models/toon_city/impact_marks_atlas.ktx2":"efe0840e","models/toon_city/impact_marks_atlas.png":"490ed049","models/toon_city/toon_city_breakables.glb":"29bddbc8","models/toon_city/toon_city_collision.glb":"fb3a693f","models/toon_city/toon_city_obb.json":"81c18a47","models/toon_city/toon_city_visual.glb":"5df62285","models/toon_city/toon_city_visual_ktx2.glb":"cf080531","models/toon_city/weirdkit_tint.js":"f6e9d802","models/toon_city_kit/toon_city_collision.glb":"5540a364","models/toon_city_kit/toon_city_kit_buildings.glb":"590e53f0","models/toon_city_kit/toon_city_kit_buildings_ktx2.glb":"e6dff3a3","models/toon_city_kit/toon_city_kit_pieces.glb":"8232bd6f","models/toon_city_kit/toon_city_kit_twins.glb":"fcc9fdfc","models/toon_city_kit/toon_city_visual.glb":"45cf2957","models/toon_city_kit/toon_city_visual_ktx2.glb":"f26a6984","models/toon_city_kit/weirdkit_detile.js":"dd05bd70","models/characters/morph/shapes.bin":"4e680384","models/characters/morph/shapes.json":"abfc949d","models/characters/forged/alien_female_purple.glb":"0308860e","models/characters/forged/alien_goblin_game.glb":"4925f5a6","models/characters/forged/alien_rollerskate_blue.glb":"bcccc63f","models/characters/forged/alien_warrior.glb":"a067d5ab","models/characters/forged/beautiful_asian.glb":"f1c7baa5","models/characters/forged/beautiful_blonde.glb":"f83172bd","models/characters/forged/brute_warboss_armor.glb":"dc15dc94","models/characters/forged/ceo_alien.glb":"20659ac3","models/characters/forged/ceo_human.glb":"326d9e7e","models/characters/forged/clancy.glb":"19fabcce","models/characters/forged/contruction_worker.glb":"99fe1a17","models/characters/forged/dummy_officer.glb":"87a11843","models/characters/forged/fat_activist_01.glb":"6546645c","models/characters/forged/fat_biker_01.glb":"943f38ea","models/characters/forged/fat_biker_02.glb":"5d63a0cf","models/characters/forged/fat_hippie.glb":"ff0539ba","models/characters/forged/fat_hipster.glb":"792b92d8","models/characters/forged/fat_secret_service.glb":"7c29d1da","models/characters/forged/firefighter.glb":"20410689","models/characters/forged/goblin_game.glb":"3c813462","models/characters/forged/hick_skinny.glb":"d9232022","models/characters/forged/hobo_01.glb":"37d266c9","models/characters/forged/index.json":"01be89cd","models/characters/forged/jack.glb":"712b6241","models/characters/forged/moussa.glb":"74d19c70","models/characters/forged/orc_game.glb":"7bf3c227","models/characters/forged/rept_heavy_armor.glb":"01e631b0","models/characters/forged/samurai_archer.glb":"04db413e","models/characters/forged/samurai_game.glb":"a946c148","models/characters/forged/zap.glb":"10eda718","models/characters/forged/zap_02.glb":"fd513cea","models/characters/forged/zap_02_lib.glb":"fd513cea","models/characters/forged/zoar_game.glb":"b032a28e","images/crack_sprite_01.ktx2":"4aa55fde","images/crack_sprite_01.png":"16b52e8c","images/fire_sprites_01.ktx2":"922e1191","images/fire_sprites_01.png":"f87e2696","images/fire_sprites_02.ktx2":"e0cbfe1d","images/fire_sprites_02.png":"b373a6fd","images/fire_sprites_03.ktx2":"4fbbb985","images/fire_sprites_03.png":"7eece336","images/geyser_sprites_01.png":"b6325470","images/hdri_game.ktx2":"0feb5c79","images/hdri_game.png":"dac55f41","images/splash_zap_n_clancy.webp":"52a9d8a4","images/water_sprites_01.ktx2":"326924c5","images/water_sprites_01.png":"31e12659","audio/blaster_sound_01.mp3":"40d99583","audio/blaster_sound_02.mp3":"4bd7bb7c","audio/box_break_01.mp3":"e4127980","audio/electricity_beam_01.mp3":"986db8c9","audio/explosion_small.mp3":"f154a537","audio/metal_clang_01.mp3":"a333bd27","audio/metal_clang_02.mp3":"1e3ebbd6","audio/metal_clang_03.mp3":"afe44812","audio/metal_ping_01.mp3":"8ffca1a0","audio/plasma_canon.mp3":"e32c324d","audio/powerup_01.mp3":"48fbbe08","audio/swoosh_01.mp3":"193db185","audio/swoosh_02.mp3":"19145e70","audio/swoosh_03.mp3":"544fdffb","audio/swoosh_04.mp3":"843bee5d","audio/plasma_sounds/plasma_01.mp3":"e71c010f","audio/plasma_sounds/plasma_02.mp3":"ac3b1c75","audio/plasma_sounds/plasma_03.mp3":"eaa59355","audio/plasma_sounds/plasma_04.mp3":"bc7865e0","audio/plasma_sounds/plasma_05.mp3":"1d821cd0","audio/plasma_sounds/plasma_06.mp3":"cb979fbe","audio/plasma_sounds/plasma_hit.mp3":"30e5af5c","audio/alien_orc_grunt_sounds/alien_orc_grunt_01.mp3":"d6f4b343","audio/alien_orc_grunt_sounds/alien_orc_grunt_02.mp3":"78afc603","audio/alien_orc_grunt_sounds/alien_orc_grunt_03.mp3":"972c524a","audio/alien_orc_grunt_sounds/alien_orc_grunt_04.mp3":"b0ce76eb","audio/alien_orc_grunt_sounds/alien_orc_grunt_05.mp3":"1f0ba1f4","audio/alien_orc_grunt_sounds/alien_orc_grunt_06.mp3":"4f749866","audio/alien_orc_grunt_sounds/alien_orc_grunt_07.mp3":"dcf75925","audio/hit_sounds/hit_sound_01.mp3":"befaa2be","audio/hit_sounds/hit_sound_02.mp3":"73bc4433","audio/hit_sounds/hit_sound_03.mp3":"24b181e4","audio/hit_sounds/hit_sound_gound_01.mp3":"86ee2674","audio/hit_sounds/hit_sound_ground_02.mp3":"8a7cac73","audio/hit_sounds/hit_sound_plasma_01.mp3":"9abc0202","audio/hit_sounds/hit_sound_plasma_02.mp3":"6aaf0fe5","audio/creature_noises/creature_noise_01.mp3":"cbcc6ee7","audio/creature_noises/creature_noise_02.mp3":"201a8247","audio/creature_noises/creature_noise_03.mp3":"97680811","audio/creature_noises/creature_noise_04.mp3":"6f734df2","audio/creature_noises/creature_noise_05.mp3":"6f736441","audio/creature_noises/creature_noise_06.mp3":"992712e9","audio/creature_noises/creature_noise_07.mp3":"d9ad04b3","audio/footsteps/footstep_2_l.mp3":"abeabfbe","audio/footsteps/footstep_2_r.mp3":"7dd16046","audio/footsteps/footstep_l.mp3":"b66e579b","audio/footsteps/footstep_r.mp3":"96e13433","models/props/prop_hydrant.glb":"f157fee9","models/props/prop_hydrant_collision.glb":"0bbfc4d2","models/creatures/3_headed_dog.glb":"9263480a","models/creatures/blue_dragon.glb":"d72f4da7","models/creatures/mech_lightning_dragon.glb":"5935bb67"};
 /* ASSETS:END */
@@ -10351,16 +10351,16 @@ const HBAR = { list: [], h: 2.55, len: 2.6, grabR: .5, grabY: .45, g: 22, damp: 
   settle: .38, tuckK: .45, spinStick: 1.6, spinCarry: .05, flyMax: 22,
   palmAt: .85, skin: .02, wrapR: .022, front: new THREE.Vector3(), grip: 'PALM', grips: ['PALM', 'WRIST'],     // m1056: wrapR = the finger's half-thickness over the bar     // m1048: the grip -- the palm, the bar off it toward his front
   holdMin: .2, cool: .45, legK: .5, clips: { hang: ['bar_hang', 'bar_hang2'], pump: '', tuck: 'tuck', open: 'flip_pose' } };
-function hbarMake(x, z, yaw) {
+function hbarMake(x, z, yaw, y = 0, posts = 1) {     // m1122: `y` = the floor it stands on (a deck, a roof), `posts` 0 = the bar alone between two things
   const g = new THREE.Group(), M = (c, m, r) => new THREE.MeshStandardMaterial({ color: c, metalness: m, roughness: r });
   const steel = M(0xd8dde4, .85, .25), dark = M(0x34383e, .6, .5), H = HBAR.h, L = HBAR.len;
   const bar = new THREE.Mesh(new THREE.CylinderGeometry(.035, .035, L + .2, 12), steel); bar.rotation.z = Math.PI / 2; bar.position.y = H; bar.castShadow = true; g.add(bar);
-  for (const sx of [-1, 1]) { const post = new THREE.Mesh(new THREE.CylinderGeometry(.05, .06, H, 10), dark); post.position.set(sx * L / 2, H / 2, 0); post.castShadow = true; g.add(post);
+  if (posts) for (const sx of [-1, 1]) { const post = new THREE.Mesh(new THREE.CylinderGeometry(.05, .06, H, 10), dark); post.position.set(sx * L / 2, H / 2, 0); post.castShadow = true; g.add(post);
     const foot = new THREE.Mesh(new THREE.BoxGeometry(.18, .06, 1.2), dark); foot.position.set(sx * L / 2, .03, 0); g.add(foot); }
-  g.position.set(x, 0, z); g.rotation.y = yaw; scene.add(g);
+  g.position.set(x, y, z); g.rotation.y = yaw; scene.add(g);
   const ax = Math.cos(yaw), az = -Math.sin(yaw);     // the bar's axis (local +X) in world
-  const B = { g, x, z, yaw, ax, az, nx: -az, nz: ax, boxes: [] };     // n = horizontal, across the bar
-  for (const sx of [-1, 1]) { const px = x + ax * sx * L / 2, pz = z + az * sx * L / 2; const b = { minx: px - .07, maxx: px + .07, miny: 0, maxy: H, minz: pz - .07, maxz: pz + .07 }; B.boxes.push(b); BOXES.push(b); }
+  const B = { g, x, z, yaw, ax, az, nx: -az, nz: ax, boxes: [], y, top: y + H };     // m1122: `top` is the bar's height in the world     // n = horizontal, across the bar
+  if (posts) for (const sx of [-1, 1]) { const px = x + ax * sx * L / 2, pz = z + az * sx * L / 2; const b = { minx: px - .07, maxx: px + .07, miny: y, maxy: y + H, minz: pz - .07, maxz: pz + .07 }; B.boxes.push(b); BOXES.push(b); }
   boxGrid(); return B;
 }
 // m1037: THE BALANCE BEAM (COURSES.md, GYM). *"Let's build the balance beam next."* SPAWN > BALANCE BEAM: a 10 cm beam `len` m long at `h`, a
@@ -10758,7 +10758,7 @@ function hbarCatch() {
   const H = hbarH(), hands = p.pos.y + H * 1.15;
   for (const B of HBAR.list) {
     const dx = p.pos.x - B.x, dz = p.pos.z - B.z, u = dx * B.ax + dz * B.az, w = dx * B.nx + dz * B.nz;
-    if (Math.abs(u) > HBAR.len / 2 - .2 || Math.abs(w) > HBAR.grabR || Math.abs(hands - HBAR.h) > HBAR.grabY) continue;
+    if (Math.abs(u) > HBAR.len / 2 - .2 || Math.abs(w) > HBAR.grabR || Math.abs(hands - B.top) > HBAR.grabY) continue;
     const vw = p.vel.x * B.nx + p.vel.z * B.nz, face = Math.abs(vw) > .4 ? Math.sign(vw) : (Math.sin(p.faceH) * B.nx + Math.cos(p.faceH) * B.nz >= 0 ? 1 : -1);
     const R = hbarReach() - H * .5;     // bar -> his middle
     p.bar = { B, u: clamp(u, -HBAR.len / 2 + .3, HBAR.len / 2 - .3), face, R, th: 0, w: clamp(vw * face / Math.max(.5, R), -4, 4), holdT: 0, held: 0, t: 0, pumpT: 0 };
@@ -10784,9 +10784,9 @@ function barHook(hFlick) {
   for (const B of HBAR.list) {
     const dx = p.pos.x - B.x, dz = p.pos.z - B.z, u = clamp(dx * B.ax + dz * B.az, -HBAR.len / 2 + .35, HBAR.len / 2 - .35), w = dx * B.nx + dz * B.nz;
     const side = w >= 0 ? 1 : -1, tx = B.x + B.ax * u + B.nx * side * HOOK.back, tz = B.z + B.az * u + B.nz * side * HOOK.back;
-    const d = Math.hypot(tx - p.pos.x, tz - p.pos.z), dy = HBAR.h - hy; if (d > HOOK.r || dy > HOOK.up || dy < -HOOK.down) continue;
+    const d = Math.hypot(tx - p.pos.x, tz - p.pos.z), dy = B.top - hy; if (d > HOOK.r || dy > HOOK.up || dy < -HOOK.down) continue;
     const hb = Math.atan2(tx - p.pos.x, tz - p.pos.z), ok = d < .4 || Math.abs(wrapAngle(hb - hFlick)) < HOOK.ang || (ht > 1 && Math.abs(wrapAngle(hb - hTr)) < HOOK.ang);
-    if (ok && (!best || d < best.d)) best = { B, tx, tz, ty: HBAR.h - H * 1.15, d, hb, side };
+    if (ok && (!best || d < best.d)) best = { B, tx, tz, ty: B.top - H * 1.15, d, hb, side };
   }
   if (!best) return 0;
   const T = clamp(Math.hypot(best.d, best.ty - p.pos.y) / HOOK.v, HOOK.tMin, HOOK.tMax);
@@ -10815,7 +10815,7 @@ function stepBar(dt) {
   S.w = clamp(S.w + a * dt, -HBAR.maxW, HBAR.maxW); S.th += S.w * dt;
   // where his middle is, on the circle round the bar
   const nx = B.nx * S.face, nz = B.nz * S.face, bx = B.x + B.ax * S.u, bz = B.z + B.az * S.u, H = hbarH();
-  const cx = bx + nx * Math.sin(S.th) * R, cy = HBAR.h - Math.cos(S.th) * R, cz = bz + nz * Math.sin(S.th) * R;
+  const cx = bx + nx * Math.sin(S.th) * R, cy = B.top - Math.cos(S.th) * R, cz = bz + nz * Math.sin(S.th) * R;
   p.pos.set(cx, cy - H * .5, cz);
   const tv = S.w * R; p.vel.set(nx * Math.cos(S.th) * tv, Math.sin(S.th) * tv, nz * Math.cos(S.th) * tv);     // the tangent, for the lens and the release
   // LET GO: the hold lifted after a real hold, or a tap (`p.jump`) -- he leaves on the tangent
@@ -10897,12 +10897,12 @@ function hbarCurl(B, bx, bz) {
     else { if (!Pj) continue; Pj.getWorldPosition(_hcPP); _hcD.copy(_hcP).sub(_hcPP); len = _hcD.length() * .8; }     // a leaf: its line is the last bone's
     if (len < 1e-4) continue;
     // where this joint sits round the bar, pushed onto the wrap circle, and the next point a step of `len` further round, the way it already goes
-    _hcR.set(_hcP.x - bx, _hcP.y - HBAR.h, _hcP.z - bz); _hcR.addScaledVector(_hcK, -_hcR.dot(_hcK)); if (_hcR.lengthSq() < 1e-8) continue;
+    _hcR.set(_hcP.x - bx, _hcP.y - B.top, _hcP.z - bz); _hcR.addScaledVector(_hcK, -_hcR.dot(_hcK)); if (_hcR.lengthSq() < 1e-8) continue;
     const along = (_hcP.x - bx) * _hcK.x + (_hcP.z - bz) * _hcK.z;
     _hcU.copy(_hcR).normalize().multiplyScalar(R);
     _hcT.crossVectors(_hcK, _hcR); const sg = _hcT.dot(_hcD) >= 0 ? 1 : -1;
     _hcQ.setFromAxisAngle(_hcK, sg * len / R); _hcN.copy(_hcU).applyQuaternion(_hcQ);
-    _hcN.set(bx + _hcN.x + _hcK.x * along, HBAR.h + _hcN.y, bz + _hcN.z + _hcK.z * along).sub(_hcP).normalize();
+    _hcN.set(bx + _hcN.x + _hcK.x * along, B.top + _hcN.y, bz + _hcN.z + _hcK.z * along).sub(_hcP).normalize();
     caSwingFrom(Bj, _hcD, _hcN, 100);
   }
 }
@@ -10914,15 +10914,15 @@ function hbarPose() {
   _hbA.set(-nz, 0, nx);     // down x n: turning about it by +th takes his feet toward n (forward)
   _hbQ.setFromAxisAngle(_hbA, S.th); _hbY.setFromAxisAngle(_hbV.set(0, 1, 0), rig.root.rotation.y);
   rig.root.quaternion.copy(_hbQ).multiply(_hbY);
-  if (p.bar) { const bx = B.x + B.ax * S.u, bz = B.z + B.az * S.u; _hbV.set(0, -hbarReach(), 0).applyQuaternion(_hbQ); rig.root.position.set(bx + _hbV.x, HBAR.h + _hbV.y, bz + _hbV.z);
+  if (p.bar) { const bx = B.x + B.ax * S.u, bz = B.z + B.az * S.u; _hbV.set(0, -hbarReach(), 0).applyQuaternion(_hbQ); rig.root.position.set(bx + _hbV.x, B.top + _hbV.y, bz + _hbV.z);
     // m1036: *"he rotates around his hips -- can we make him rotate around his palms?"* The measured reach put the bar at his waist. Now, with
     // this frame's pose already on him, the GRIP (the mean of both hands' middle-finger roots, else the hands) is found and the whole root
     // moved so it sits on the bar: the pivot is his hands, whatever the clip or the rig.
     const bn = rig.bones, GL = bn.mixamorig_LeftHandMiddle1 || bn.mixamorig_LeftHand, GR = bn.mixamorig_RightHandMiddle1 || bn.mixamorig_RightHand;
     if (GL && GR) { rig.root.updateMatrixWorld(true); HBAR.front.set(nx, 0, nz).applyQuaternion(_hbQ); hbarGripPt(_hbG);     // m1038: the bar INSIDE the curled fingers, not through the knuckles
-      rig.root.position.x += bx - _hbG.x; rig.root.position.y += HBAR.h - _hbG.y; rig.root.position.z += bz - _hbG.z;
+      rig.root.position.x += bx - _hbG.x; rig.root.position.y += B.top - _hbG.y; rig.root.position.z += bz - _hbG.z;
       // and the swing's radius is the true bar-to-middle distance from now on (the pendulum and the release read it)
-      const H = hbarH(); _hbV.set(0, H * .5, 0).applyQuaternion(_hbQ).add(rig.root.position); S.R = Math.max(.5, Math.hypot(_hbV.x - bx, _hbV.y - HBAR.h, _hbV.z - bz));
+      const H = hbarH(); _hbV.set(0, H * .5, 0).applyQuaternion(_hbQ).add(rig.root.position); S.R = Math.max(.5, Math.hypot(_hbV.x - bx, _hbV.y - B.top, _hbV.z - bz));
       hbarCurl(B, bx, bz); } }
   else { _hbV.set(0, -H * .5, 0).applyQuaternion(_hbQ); rig.root.position.set(p.pos.x + _hbV.x, p.pos.y + H * .5 + _hbV.y, p.pos.z + _hbV.z); }
 }
@@ -18743,11 +18743,18 @@ function wtowerBuild() {
   const drone = bldDrone(g);
   // ---- PASS 2 (m1121): manned, a fire pit, perches, a katana mask ----
   // PERCHES: timber cross-beams jutting out of the second deck and the lookout (walk out on them, 3.5 m over nothing)
+  const wbars = [];
   { const pt = []; for (const [y, sx, sz] of [[S * 2, 1, 0], [S * 3, -1, 0], [S * 2, 0, -1]]) { const L = 3.6, w2 = .28, x0 = cx + sx * hs, z0 = cz + sz * hs, x1 = x0 + sx * L, z1 = z0 + sz * L;
       const bx = Math.min(x0, x1) - (sx ? 0 : w2), bX = Math.max(x0, x1) + (sx ? 0 : w2), bz = Math.min(z0, z1) - (sz ? 0 : w2), bZ = Math.max(z0, z1) + (sz ? 0 : w2);
       add(new THREE.BoxGeometry(bX - bx, .24, bZ - bz), wood, (bx + bX) / 2, y - .1, (bz + bZ) / 2, 0);
       add(new THREE.BoxGeometry(.3, .3, .3), lamp, x1, y + .2, z1, 0);     // a lamp at its tip
-      pt.push(bx, y + .02, bz, bX, y + .02, bz, bX, y + .02, bZ, bx, y + .02, bz, bX, y + .02, bZ, bx, y + .02, bZ); }
+      pt.push(bx, y + .02, bz, bX, y + .02, bz, bX, y + .02, bZ, bx, y + .02, bz, bX, y + .02, bZ, bx, y + .02, bZ);
+      // m1122: a HIGH BAR across each perch's tip, up in the air (hbarMake's new `y`): walk out, jump, catch it, swing out over the drop
+      const tx = x1 - sx * .35, tz = z1 - sz * .35, yaw = sx ? Math.PI / 2 : 0, fl = HBAR.len + .4;
+      add(new THREE.BoxGeometry(sx ? .26 : fl, .2, sx ? fl : .26), wood, tx, y - .1, tz, 0);     // the footing the posts stand on
+      pt.push(...(sx ? [tx - .13, y + .02, tz - fl / 2, tx + .13, y + .02, tz - fl / 2, tx + .13, y + .02, tz + fl / 2, tx - .13, y + .02, tz - fl / 2, tx + .13, y + .02, tz + fl / 2, tx - .13, y + .02, tz + fl / 2]
+        : [tx - fl / 2, y + .02, tz - .13, tx + fl / 2, y + .02, tz - .13, tx + fl / 2, y + .02, tz + .13, tx - fl / 2, y + .02, tz - .13, tx + fl / 2, y + .02, tz + .13, tx - fl / 2, y + .02, tz + .13]));
+      const Bb = hbarMake(tx, tz, yaw, y); HBAR.list.push(Bb); wbars.push(Bb); }
     bldTris(O, pt); }
   // THE FIRE PIT: a big bronze brazier by the door, coals glowing, flames and smoke (`wtowerStep`)
   const fire = [cx + hs + 2.8, cz + hs + 2.4]; { const bronze = new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 });
@@ -18767,7 +18774,7 @@ function wtowerBuild() {
   for (const b of O.boxes) BOXES.push(b); boxGrid();
   // MANNED: a sentry gun on the second deck, and a red archer posted on the lookout
   const tur = turretAt(cx + hs - .9, S * 2, cz + hs - .9, Math.atan2(ARENA.youAt[0] - cx, ARENA.youAt[1] - cz)); boxGrid();
-  WTOWER.on = { g, O, bars: [], drone, t: 0, tur, fire, arch: null }; const W = WTOWER.on;
+  WTOWER.on = { g, O, bars: wbars, drone, t: 0, tur, fire, arch: null }; const W = WTOWER.on;
   archerPost(cx - hs + 1, S * 3 + .05, cz + hs - 1).then(d => { if (WTOWER.on === W) W.arch = d; else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {});
   arenaBeam(cx, cz, [1, .7, .4], 1); snd('clang', { g: .7, r: .6 });
 }

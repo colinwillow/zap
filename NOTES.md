@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1122 -- HIGH BARS AT ANY HEIGHT (his: "Why do they only work at ground height?")
+
+**Why:** `HBAR.h` (2.55) was one global number, and every bit of the bar code -- the catch, the swing circle, the hook, the hands' pose,
+the finger curl -- measured from it as an absolute world height. So a bar could only exist 2.55 m above y = 0. Nothing deep; it was the
+first thing built on a flat floor.
+**Fix:** `hbarMake(x, z, yaw, y = 0, posts = 1)`; each bar carries `B.top = y + HBAR.h`, and everything between `hbarCatch` and
+`hbarPose` reads `B.top` (all uses had `B` in scope). Old callers pass no `y` and are unchanged.
+**Used:** the Watchtower's three perches each get a bar across the tip (2nd deck x2, lookout x1) on a timber footing that is walkable --
+walk out, jump, catch, swing out over the drop. Removed with the tower (`bldClear` already handled `R.bars`).
+Shipped unverified.
+
 ## m1121 -- Watchtower, pass 2 (bigger, manned, a fire pit, perches, a katana mask)
 
 His notes folded in (BUILDINGS.md): BIGGER -- 4 m storeys, a 6 m body, the lookout at 12 m; MANNED -- a sentry gun on the second deck
