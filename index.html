@@ -63528,7 +63528,7 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 // to the shop front and to the round back door. Built in its OWN frame (local +z = the front, toward the river; `at`/`yaw` are HOME.hut's) and
 // merged per material; every collider a local box turned into the world (the yaw is a quarter turn, so a box stays a box); every walkable
 // surface a triangle. `?hut=glb` (or GHOME.on = 0) puts the GLB back, to compare. Pass 1: the massing and the walkable shell, with the inside.
-const GHOME = { on: 1, pass: 5, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 7, Hd: 2.8, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
+const GHOME = { on: 1, pass: 6, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 7, Hd: 2.8, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1.3, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
@@ -63585,7 +63585,12 @@ function ghomeBuild(at, yaw, y0) {
   const stoneM = triMat('sandstone', { scale: 3.2, rough: .92, side: THREE.DoubleSide }), wood = triMat('wood_timber', { scale: 1.6, rough: .85 }), woodP = triMat('wood_planks', { scale: 2.2, rough: .85 });
   for (const m of [stoneM, wood, woodP]) m.userData.tri = 1;
   const iron = new THREE.MeshStandardMaterial({ color: 0x2c2724, metalness: .6, roughness: .5 }), CM = {};     // one material per look, so each is one draw
-  const clothM = k => CM[k] || (CM[k] = new THREE.MeshStandardMaterial({ map: ghClothTex(k), alphaTest: k === 'cone' ? 0 : .5, side: THREE.DoubleSide, roughness: .9 }));
+  // pass 6: THE WIND -- the cloth flutters in the vertex shader (along its normal, nothing at the edge it hangs from, most at the hem)
+  const U = GHOME.U || (GHOME.U = { uWind: { value: 0 } });
+  const clothM = k => { if (CM[k]) return CM[k]; const m = CM[k] = new THREE.MeshStandardMaterial({ map: ghClothTex(k), alphaTest: k === 'cone' ? 0 : .5, side: THREE.DoubleSide, roughness: .9 }), amp = { banner: .16, awning: .05 }[k];
+    if (amp) { m.onBeforeCompile = sh => { sh.uniforms.uWind = U.uWind; sh.vertexShader = 'uniform float uWind;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n  transformed += objectNormal * ' + amp.toFixed(3) + ' * (1.0 - uv.y) * sin(uWind * 2.3 + position.x * 1.7 + position.z * 1.3 + position.y * 2.1) * (0.7 + 0.3 * sin(uWind * .63 + position.x));'); };
+      m.customProgramCacheKey = () => 'ghwind' + k; }
+    return m; };
   const dark = new THREE.MeshStandardMaterial({ color: 0x1a120c, roughness: 1 }), brass = new THREE.MeshStandardMaterial({ color: 0xc8963c, metalness: .8, roughness: .35 });
   // ---- colliders: local boxes into the world; and solid RUNS (a test over a cell grid, merged along x) for the round shells ----
   const boxes = [], tris = [];
@@ -63764,9 +63769,14 @@ function ghomeBuild(at, yaw, y0) {
       rodW(base, tip, .3, wood); rodW([mx, my0 + .8, mz], [(mx + tip[0]) / 2, (my1 + tip[1]) / 2 - .1, (mz + tip[2]) / 2], .2, wood);
       for (let f = .15; f < 1; f += .2) { const p = [base[0] + (tip[0] - base[0]) * f, base[1] + (tip[1] - base[1]) * f, base[2] + (tip[2] - base[2]) * f]; put(new THREE.BoxGeometry(.36, .36, .14), iron, _m4.compose(new THREE.Vector3(...p), _q.setFromUnitVectors(new THREE.Vector3(0, 0, 1), new THREE.Vector3(tip[0] - base[0], tip[1] - base[1], tip[2] - base[2]).normalize()), _one)); }
       cyl(mx, my1 - .2, mz, .45, .45, .7, bronze, 14);     // the winch drum at the head
-      const oy = tip[1] - 2.3; for (let y = tip[1] - .1; y > oy + .75; y -= .22) put(new THREE.TorusGeometry(.09, .025, 4, 8), iron, at4(tip[0], y, tip[2], (y * 7) % 3));
-      put(new THREE.SphereGeometry(.75, 18, 12), bronze, at4(tip[0], oy, tip[2])); for (const a of [0, Math.PI / 2]) put(new THREE.TorusGeometry(.76, .05, 5, 24), iron, at4(tip[0], oy, tip[2], a));
-      banner(tip[0], oy - .7, tip[2], .7, 1.9, banM);
+      // pass 6: the orb SWINGS -- its chain, the orb, its bands and the tassel hang from the boom's tip as one pendulum (`GHOME.orb`)
+      { const pend = new THREE.Group(); pend.position.set(tip[0], tip[1] - .05, tip[2]); g.add(pend); GHOME.orb = pend; const ch = [];
+        for (let y = -.05; y > -1.5; y -= .22) { const q = new THREE.TorusGeometry(.09, .025, 4, 8).toNonIndexed(); q.applyMatrix4(new THREE.Matrix4().compose(new THREE.Vector3(0, y, 0), new THREE.Quaternion().setFromEuler(new THREE.Euler(0, (y * 7) % 3, 0)), _one)); ch.push(q); }
+        for (const a of [0, Math.PI / 2]) { const q = new THREE.TorusGeometry(.76, .05, 5, 24).toNonIndexed(); q.applyMatrix4(new THREE.Matrix4().compose(new THREE.Vector3(0, -2.25, 0), new THREE.Quaternion().setFromEuler(new THREE.Euler(0, a, 0)), _one)); ch.push(q); }
+        for (const q of ch) { q.deleteAttribute('uv'); }
+        const mk = (geo, m) => { const o = new THREE.Mesh(geo, m); o.castShadow = true; pend.add(o); return o; };
+        mk(mergeGeometries(ch), iron); mk(new THREE.SphereGeometry(.75, 18, 12), bronze).position.y = -2.25;
+        const tg = new THREE.PlaneGeometry(.7, 1.9, 2, 6); tg.translate(0, -2.25 - .7 - .95, 0); const tm = mk(tg, banM); tm.material = banM; }
       for (const dx of [-.16, .16]) { const wx = tip[0] + 1.6 + dx; rodW([tip[0] + 1.6, tip[1] - .3, tip[2]], [wx, tip[1] - 1.5, tip[2]], .03, iron, 1); cyl(wx, tip[1] - 2.3, tip[2], .13, .13, .8, bronze, 10); } }
     // the BALCONY CANOPY: four posts at the rail, a red roof on them sloping from the tower wall
     { const [Tx, Tz] = A.T, Yb = P + A.Yb, ro = A.Rt + 2.25, angs = [-.4, .55, 1.5, 2.45];
@@ -64059,6 +64069,7 @@ function homeLanterns() {
 }
 function homeStep(dt) {
   const H = HOME; H.t += dt; if (RW.U) RW.U.uTime.value = H.t;
+  if (GHOME.U) GHOME.U.uWind.value = H.t; if (GHOME.orb) { const o = GHOME.orb; o.rotation.z = Math.sin(H.t * .95) * .13; o.rotation.x = Math.sin(H.t * .71 + 1.3) * .07; }     // pass 6: the wind, the orb
   // the boat rides the waves
   if (H.boat) { const B = H.boat, t = H.t, hh = rwWaveAt(B.x, B.z, t); B.o.position.y = hh * .8 - .05; B.o.rotation.set(Math.sin(t * .9) * .03, B.ry, Math.sin(t * 1.1 + 1) * .04); }
   // THE LAKE'S RULE: wading is fine; past `deepAt` under the surface he is put back where he last stood dry, and a wading step leaves a ring
