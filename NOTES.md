@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1270 -- Great Red Pagoda pass 5 of 10: a different room on every storey (X1)
+
+Each room keeps its furniture to the middle, clear of the hatch corners and the ladder's exit mark. A lantern hangs in every room.
+- **Storey 1, the ARMOURY.** A katana rack (three blades) and a lacquered armour on its stand: helmet, crest, shoulders.
+- **Storey 2, the LIBRARY.** A low desk with scrolls, two shelves of scrolls and books, and a paper lamp.
+- **Storey 3, the BELL ROOM.** A great bronze bell hangs under the ceiling beam, with the striking log beside it.
+  - **Strike it** and it booms: a clang and a low boom, a little shake, and it SWINGS and settles (`gpagBell` in `bldHit`).
+- **Storey 4, the LOOKOUT.** A brass telescope on a tripod aimed out of the door, a map table, and cushions.
+
+SHIPPED UNVERIFIED. Next: pass 6, guardians (archers on the balconies, a sentry in the bell room).
+
 ## m1269 -- Great Red Pagoda pass 4 of 10: the climb OUTSIDE (X1)
 
 - **Every roof is walkable.** Triangles are laid on each roof's own curve (an 18 x 18 grid of `bldRoof`'s height function), and ONLY
