@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- Octagonal Block Pagoda pass 2 of 10: the block detail (X4, WORKER A)
+## m1276 -- Octagonal Block Pagoda pass 2 of 10: the block detail (X4, WORKER A)
 
 The reference's busy-but-blocky look, all of it static blocks merged into the material buckets (no new draws):
 - **Bracket clusters** under every eave, in a rhythm of about .7 m along all eight faces. Each one is a red root under the teal band, a red arm
