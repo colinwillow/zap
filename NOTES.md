@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE BOOT CARD NAMES THE GAME, AND KORAJIN GETS ITS OWN (m1320)
+
+*"We need to refactor the loading screen. It still says Weirdport and we're not even on that game. We could stylize the loading screen way better."* (his screenshot: WEIRDPORT / LOADING THE DECK / BUILD M1315)
+
+- The card picks its game from `mel.game`, the same key the title picker and the splash read. An inline script sets it before the module, so it is right on the first paint.
+- **Korajin:**
+  - the title poster, dimmed under a dark gradient
+  - his cloak's sun-wheel as an inline SVG (the same design as the m1318 lock), turning once every 14 s, with the centre pip breathing and a red glow
+  - KORAJIN in wide-spaced display letters with a red glow
+  - コラジン · the Jin wakes, in gold
+  - a red-to-gold bar
+  - the build number in gold. It stays on the card, per CLAUDE.md.
+- **Zap & Clancy:** the old cyan card with its own name, ZAP & CLANCY, not WEIRDPORT. It wears the sun-wheel too, in cyan.
+- The load messages ("loading the deck" etc.) are untouched. They name what is actually loading, which is boot-diagnostic.
+
 ## THE KORAJIN "TAP TO START" WAS OFF CENTRE BY ACCIDENT (m1319)
 
 *"The tap to start button on the Korajin screen is off centre. I think that might've been intentional, but I don't like it."*
