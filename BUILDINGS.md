@@ -37,6 +37,10 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   a balance beam, a lookout). Code-built and merged per material (draw calls matter on his phone).
 - **MODULAR**: each building stands in its own spot in the forge (`at`), on a grid of 4 m units, its doors on its sides' centres, so
   later they can be set side by side into a courtyard.
+- **WHEN THE QUEUE RUNS OUT (his, after m1123):** *"If you run out of things to make tonight do another brainstorm pass of another set, and
+  then again later if you run out again after that, etc."* So: when every row below is done, spend ONE pass brainstorming the NEXT SET
+  (8-12 new buildings / props / moves in his style notes, each with a function and a spot in the forge), append it as a new table here,
+  and carry on building. Repeat every time a set runs out. The loop never stops for lack of a queue.
 - **Pass meaning**: 1 = the building stands, playable (shell, roof, doors, the main feature). 2 = the details and the function (interior,
   the moving parts, lights, the special feature working). 3 = the polish (proportions, colour, silhouette, one more delight).
 
