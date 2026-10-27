@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1133 -- PAGODA pass 1 (BUILDINGS.md #4, at (-16, 12))
+
+`PAGODA`, `pagodaBuild` / `pagodaStep` / `pagodaClear`. SPAWN > BUILDINGS > Pagoda.
+- FIVE STOREYS of 3.6 m, half-size 4.5 stepping in by .45 to 2.7; ground storey breakable (cwallBuild) with a door on +z, the upper
+  four solid white walls with dark timber bands, vermilion ground posts, a neon line on each upper front.
+- A hip-roof SKIRT at every storey: a four-sided OPEN frustum (`CylinderGeometry(rt, rb, h, 4, 1, true)` turned 45 deg) from the next
+  storey's wall out to 1.9 m past this one -- open in the middle so the inside stays one tall shaft. Lanterns at the skirt corners.
+- A SQUARE SPIRAL RAMP up the inside: 20 flights of .9 m (4 a storey) round the vermilion SHINBASHIRA (central pillar), lane 1.2-2.2 m
+  from the centre, corner landings (same construction as the Watchtower's ramp, turned inward).
+- THE BELFRY at 18 m: open posts, a low rail, a pagoda cap, a bronze SORIN spire of 9 rings to ~30 m with a glowing cyan top, and a great
+  bronze BELL (a lathe) hanging in it, swaying a little. Its floor is laid only over lanes the LAST TWO flights do not run under (the -x
+  and +z lanes stay open), so there is headroom on the way up; the arrival corner joins it.
+- Grapple rings at two corners of storeys 2 and 4.
+Pass 2 next: ring the bell, the inside (shrine, lanterns), function. Shipped unverified.
+
 ## m1132 -- THE FORGE'S HORIZON: snowy white-capped mountains
 
 `PEAKS`, `forgePeaks` (called from `arenaStage`'s forge branch). Two rings of low-poly peaks round the Building Forge: 20 at ~250 m
