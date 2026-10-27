@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Great Red Pagoda pass 6 of 10: the guardians (X1)
+
+All of them are killable:
+- **Archers.** Posted in balcony corners on storeys 2 and 4 (`archerPost`). They hold their posts and loose at him.
+- **A sentry gun.** It sits on storey 3's balcony corner, looking out over the court (`turretAt`; the m1249 charge lock finds it).
+- **The gate pair.** Two robot SAMURAI stand inside the fence at the gate (`bodySpawn`, `arenaKatana`, horde rules). They hold their post
+  (`aggro` 0) until they see him.
+- **The ALARM.** Strike the bell-room bell and they come for him wherever he is.
+
+`gpagClear` removes every one of them. SHIPPED UNVERIFIED. Next: pass 7, the light.
+
 ## m1270 -- Great Red Pagoda pass 5 of 10: a different room on every storey (X1)
 
 Each room keeps its furniture to the middle, clear of the hatch corners and the ladder's exit mark. A lantern hangs in every room.
