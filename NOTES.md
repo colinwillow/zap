@@ -443,7 +443,7 @@ SHIPPED UNVERIFIED. The queue's passes 2 and 3 are done. Next is his call: more 
 
 SHIPPED UNVERIFIED. Next: pass 3, foam and wake, bow spray, the sun on the water, gulls, an island.
 
-## THE DOJO, PASS 3: OFF THE EDGE, THE ROUTES UP TO THE ALTARS, PLATFORMS YOU RIDE (m1401)
+## THE DOJO, PASS 3: OFF THE EDGE, THE ROUTES UP TO THE ALTARS, PLATFORMS YOU RIDE (m1402)
 
 - **OFF THE EDGE (`dojoStep`):** the world has a floor at y 0 everywhere, so past the rim he would stand on the sky. Out past W+2 and down at y 0 he has FALLEN: petals burst where he went, and he is put back at his pad with a beam.
 - **THE ALTAR ROUTES:**

@@ -28,7 +28,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - a MITSUDOMOE crest (red, in a gold ring) inlaid at the centre
   - PINK PETALS drifting on the wind
   - the vending machine no longer stands in the dojo at the start (VEND still places one)
-- [x] **pass 3 (m1401):**
+- [x] **pass 3 (m1402):**
   - OFF THE EDGE: fall off the platform and you're put back at your pad
   - the altars REACHABLE: three floating stones from an opening in the rim up to each altar, and the altar disc is a floor
   - the seven drifting platforms are STANDABLE and carry you
