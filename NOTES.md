@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1150 -- ZEPPELINS pass 2: trapezes and a flying sentry gun
+
+- **A TRAPEZE under each gondola:** a real high bar (`hbarMake`, no posts) on two ropes, `ZEP.trap` 4.2 m below the deck. It RIDES: every
+  frame `zepPose` re-writes the bar's x/z/top and its axes (`ax/az/nx/nz` from the ship's yaw) and moves its mesh, so `hbarCatch` /
+  `stepBar` swing him from wherever the zeppelin is now. Catch it from a tower, swing out over the forge, let go. Zeppelin 1's trapeze is at
+  ~6.8 m, zeppelin 2's at ~9.8.
+- **A SENTRY TURRET on zeppelin 2's stern:** `turretAt`, its static box taken out (it would be a ghost where it was built), its x/y/z and
+  mesh re-posed with the gondola every frame. It shoots down at him as it flies over (posted turrets aim down, m1121); killable (m1128).
+- Cleared with them (turrets dropped, a bar he hangs on released).
+Pass 3 (polish) next. Shipped unverified.
+
 ## m1149 -- ZEPPELINS pass 1 (BUILDINGS.md #9)
 
 `ZEP`, `zepMake` / `zepPose` / `zepBuild` / `zepStep` / `zepClear`. SPAWN > BUILDINGS > Zeppelins.
