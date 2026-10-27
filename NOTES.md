@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1230 -- Dojo Hall pass 6: sparring ranks (Building Forge loop, extra pass)
+
+The gong's sparring partner (m1206) now has RANKS. Each partner you beat ranks the next one up, through five belts (white,
+yellow, green, blue, black), and the belt is on its waist. Each rank:
+- takes one more hit to put down (`sparHp` + rank)
+- moves .3 m/s quicker
+- winds up .07 s shorter (down to .3 s)
+- cuts 2 harder
+
+Beat the black belt and a gold TROPHY appears on the dais, with a beam and sparks. Then the ranks start over. The trophy stays
+till the hall is cleared.
+
+Next: alternate -- Oni Gate pass 2.
+
 ## m1229 -- Oni Gate pass 1 (Building Forge loop, Set 3 #25)
 
 `ONI`, in BLDG.list as `oni`. A fortress wall at (-72, 0), 20 m wide, 12 m high and 6 m deep, faces the forge (+x).
