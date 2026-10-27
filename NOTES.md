@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## BREAKABLE RAILS -- S3b, FIRST IN THE COURTYARD (m1355)
+
+- **`bldPieces(g, mat)` / `pieceAdd(P, geos, box, O)` / `pieceDone(P)`:** thin breakable things (rails, balusters, slats) gathered into ONE merged mesh, a vertex range each. Each piece has its own solid `noCam` collider, kept in `O.boxes` so the builder's mapping and clear see it.
+- **`pieceHit`** (in `bldHit`) breaks a piece in `PIECE.hp` 1.5 hits:
+  - its range collapses to its own centre
+  - its box leaves the world
+  - splinters and a crack
+  - it comes back after `PIECE.fix` 50 s, not while he stands in it
+- `skinStep` and `pieceStep` now run every frame in the forge, not only inside the hall's step.
+- **The Courtyard's rails are runs of breakable sections**, each about 1.2 m with a top rail, a mid rail and a baluster:
+  - both halls' balcony fronts and ends
+  - watchtower deck A
+  - deck B (around its south opening)
+
+  They were solid .95 m slabs with drawn balusters.
+- **Still to do:** the bell deck, the bridges' rope rails, the castle, and every other building as S2 reaches it (S3c).
+
 ## BREAKABLE ROOFS OVER RAFTERS -- S3a, FIRST ON THE DOJO HALL (m1353)
 
 *"The frame of the roof stays, but the pieces that make up the roof are destructible. If rockets are shooting at you, or you're fighting up there, they're shooting pieces of the roof off -- maybe you go back up and rebuild it. I like exposed rafters."* (BUILDINGS.md STEER S3)

@@ -19002,7 +19002,6 @@ function hallBuild() {
 // m1119: the hall's little life -- the door lanterns sway, and THE GONG RINGS when a strike reaches it (once a swing): a deep clang, a warm
 // glow off the bronze, a wobble that dies away
 function hallStep(dt) {
-  skinStep(dt);
   const H = HALL; if (!H.on) return; H.t = (H.t || 0) + dt;
   if (H.lans) H.lans.forEach((l, i) => { l.rotation.z = Math.sin(H.t * 1.6 + i * 2) * .08; l.rotation.x = Math.sin(H.t * 1.1 + i) * .05; });
   if (H.on.koi) H.on.koi.forEach((f, i) => { f.rotation.y = Math.sin(H.t * .7 + i) * .5 - .3; f.rotation.z = Math.sin(H.t * 3.1 + i * 1.7) * .12; f.children[0].scale.y = 1 + Math.sin(H.t * 5 + i) * .08; });     // m1167: the carp stream
@@ -19495,6 +19494,7 @@ function bldHit(x, y, z, rad, dmg) {
   if (heronHit(x, y, z, rad, dmg)) return 1;     // X2: the White Heron Castle's ballista
   if (smashHit(x, y, z, rad, dmg)) return 1;     // m1141: any building's smashables
   if (skinHit(x, y, z, rad, dmg)) return 1;     // m1353: roof panels over rafters (S3a)
+  if (pieceHit(x, y, z, rad, dmg)) return 1;     // m1354: rails, balusters (S3b)
   if (sphangHit(x, y, z, rad, dmg)) return 1;     // m1161: the spider bots
   if (barrHit(x, y, z, rad, dmg)) return 1;     // m1184: the drilling robot samurai
   if (FSHIP.on && FSHIP.on.cans) for (const C of FSHIP.on.cans) { if (C.dead || C.hc > 0) continue; const W = new THREE.Vector3(); C.g.getWorldPosition(W); if (Math.hypot(x - W.x, y - W.y, z - W.z) > 1.1 + rad) continue;
@@ -19896,6 +19896,30 @@ function skinHit(x, y, z, rad, dmg) { let hit = 0;
 function skinStep(dt) { const p = player; for (const R of SKIN.list) for (const P of R.panels) { if (P.cool > 0) P.cool -= dt; if (!P.dead) continue; P.t -= dt; if (P.t > 0) continue;
   if (Math.abs(p.pos.x - P.cx) < P.hx + .5 && Math.abs(p.pos.z - P.cz) < P.hz + .5 && Math.abs(p.pos.y - P.cy) < 2) { P.t = 1; continue; } skinFix(R, P); } }
 function skinDrop(R) { if (!R) return; for (const P of R.panels) bldTrisDrop(P); bldTrisDrop(R.O); const i = SKIN.list.indexOf(R); if (i >= 0) SKIN.list.splice(i, 1); }
+// m1354 (STEER S3b): BREAKABLE PIECES -- rails, balusters, gates' slats: anything thin that should come apart. `bldPieces(g, mat)` gathers them
+// into ONE merged mesh (a vertex range each) and `pieceAdd(P, geo, box, O)` gives each its own solid `noCam` collider (in `O.boxes`, so a
+// builder's own mapping and clear see it). `pieceHit` (in `bldHit`) breaks one in `hp` hits: its range collapses to its own centre, its box
+// leaves the world, splinters fly. It comes back after `fix` s (not while he stands in it).
+const PIECE = { list: [], hp: 1.5, fix: 50 };
+function bldPieces(g, mat) { const P = { g, mat, pos: [], parts: [], mesh: null, base: null }; PIECE.list.push(P); return P; }
+function pieceAdd(P, geos, box, O) { const i0 = P.pos.length / 3; let sx = 0, sy = 0, sz = 0, n = 0;
+  for (let geo of geos) { geo = geo.index ? geo.toNonIndexed() : geo; const a = geo.attributes.position.array; for (let k = 0; k < a.length; k += 3) { P.pos.push(a[k], a[k + 1], a[k + 2]); sx += a[k]; sy += a[k + 1]; sz += a[k + 2]; n++; } }
+  box.noCam = 1; box.piece = 1; if (O) O.boxes.push(box); P.parts.push({ i0, n, lc: [sx / n, sy / n, sz / n], box, hp: PIECE.hp, dead: 0, t: 0, cool: 0 }); }
+function pieceDone(P) { if (!P.pos.length) return; const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(P.pos, 3)); geo.computeVertexNormals();
+  P.mesh = new THREE.Mesh(geo, P.mat); P.mesh.castShadow = P.mesh.receiveShadow = true; P.g.add(P.mesh); P.base = Float32Array.from(P.pos); P.pos = null; }
+function pieceHit(x, y, z, rad, dmg) { let hit = 0;
+  for (const P of PIECE.list) { if (!P.mesh) continue; for (const Q of P.parts) { if (Q.dead || Q.cool > 0) continue; const b = Q.box;
+    if (x < b.minx - rad || x > b.maxx + rad || z < b.minz - rad || z > b.maxz + rad || y < b.miny - rad || y > b.maxy + rad) continue;
+    Q.cool = .2; Q.hp -= Math.max(.5, dmg || 1); hit = 1; const cx = (b.minx + b.maxx) / 2, cy = (b.miny + b.maxy) / 2, cz = (b.minz + b.maxz) / 2;
+    if (Q.hp > 0) { spkBurst(cx, cy, cz, 5, { col: [.55, .4, .28], spread: 2, size: .08, life: .3 }); continue; }
+    Q.dead = 1; Q.t = PIECE.fix; const a = P.mesh.geometry.attributes.position; for (let v = Q.i0; v < Q.i0 + Q.n; v++) a.setXYZ(v, Q.lc[0], Q.lc[1], Q.lc[2]); a.needsUpdate = true;
+    const i = BOXES.indexOf(b); if (i >= 0) { BOXES.splice(i, 1); boxGrid(); }
+    for (let k = 0; k < 2; k++) spkBurst(cx, cy, cz, 14, { col: [.5, .36, .24], spread: 5, size: .14, life: .7 }); snd('thud', { g: .6, r: 1.3, x: cx, z: cz }); snd('clang', { g: .2, r: 2.4, x: cx, z: cz }); } }
+  return hit; }
+function pieceStep(dt) { const p = player; for (const P of PIECE.list) { if (!P.mesh) continue; for (const Q of P.parts) { if (Q.cool > 0) Q.cool -= dt; if (!Q.dead || (Q.t -= dt) > 0) continue; const b = Q.box;
+  if (p.pos.x > b.minx - .5 && p.pos.x < b.maxx + .5 && p.pos.z > b.minz - .5 && p.pos.z < b.maxz + .5 && p.pos.y < b.maxy + .5 && p.pos.y > b.miny - 2) { Q.t = 1; continue; }
+  const a = P.mesh.geometry.attributes.position; for (let v = Q.i0; v < Q.i0 + Q.n; v++) a.setXYZ(v, P.base[v * 3], P.base[v * 3 + 1], P.base[v * 3 + 2]); a.needsUpdate = true; Q.dead = 0; Q.hp = PIECE.hp; BOXES.push(b); boxGrid(); } } }
+function pieceDrop(P) { const i = PIECE.list.indexOf(P); if (i >= 0) PIECE.list.splice(i, 1); }
 function smashAdd(list, m, b, hp, fix, col) { BOXES.push(b); const S = { m, b, hp0: hp || 2, hp: hp || 2, fix: fix || 15, col: col || [.7, .5, .3], dead: 0, t: 0, cool: 0 }; list.push(S); SMASH.list.push(S); return S; }
 function smashDrop(list) { for (const S of list || []) { const i = SMASH.list.indexOf(S); if (i >= 0) SMASH.list.splice(i, 1); const j = BOXES.indexOf(S.b); if (j >= 0) BOXES.splice(j, 1); } }
 function smashHit(x, y, z, rad, dmg) {
@@ -23607,6 +23631,12 @@ function courtBuild() {
   const box = (x0, x1, y0, y1, z0, z1, m, solid, extra) => { if (x1 - x0 < .01 || z1 - z0 < .01 || y1 - y0 < .01) return; if (!solid && lowSolid(x0, x1, y0, y1, z0, z1)) { solid = 1; extra = Object.assign({ noCam: 1 }, extra || {}); } mg(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), m, _m4.makeTranslation((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2));
     if (solid) O.boxes.push(Object.assign({ minx: x0, maxx: x1, miny: y0, maxy: y1, minz: z0, maxz: z1 }, extra || {})); };
   const X0 = cx - A.hw, X1 = cx + A.hw, Z0 = cz - A.hd, Z1 = cz + A.hd, H = A.wallH, W = A.walk;
+  // m1354 (S3b): every RAIL in the court is a run of breakable sections (top rail, mid rail, a baluster each, ~1.2 m), one merged mesh
+  const RP = bldPieces(g, timber), rail = (ax, a0, a1, c, y) => { const L = a1 - a0, n = Math.max(1, Math.round(L / 1.2));
+    for (let i = 0; i < n; i++) { const s0 = a0 + L * i / n, s1 = a0 + L * (i + 1) / n, m = (s0 + s1) / 2, l = s1 - s0, G = [];
+      const bx = (lx, ly, lz, px, py, pz) => { const q = new THREE.BoxGeometry(ax === 'z' ? lx : lz, ly, ax === 'z' ? lz : lx); q.translate(ax === 'z' ? px : pz, py, ax === 'z' ? pz : px); G.push(q); };
+      bx(.1, .1, l, c, y + .9, m); bx(.06, .06, l, c, y + .45, m); bx(.09, .9, .09, c, y + .45, s0 + .05); if (i === n - 1) bx(.09, .9, .09, c, y + .45, s1 - .05);
+      pieceAdd(RP, G, ax === 'z' ? { minx: c - .06, maxx: c + .06, miny: y, maxy: y + .95, minz: s0, maxz: s1 } : { minx: s0, maxx: s1, miny: y, maxy: y + .95, minz: c - .06, maxz: c + .06 }, O); } };
   // THE GROUND: grass over the whole court, the lane of flags up the middle
   const flagL = M(0xa39d93, .9), flagD = M(0x726e67, .92);
   box(X0, X1, 0, .03, Z0, Z1, grass, 0);
@@ -23640,8 +23670,7 @@ function courtBuild() {
     const hcx = xo - sd * 1.2, hcz = zb - 1.4, ha = Math.min(hcx - .65, hcx + .65), hb = Math.max(hcx - .65, hcx + .65);
     box(xa, ha, Y1 - .25, Y1, za, zb, timberL, 1); box(hb, xb, Y1 - .25, Y1, za, zb, timberL, 1); box(ha, hb, Y1 - .25, Y1, za, hcz - .65, timberL, 1); box(ha, hb, Y1 - .25, Y1, hcz + .65, zb, timberL, 1);
     const bx0 = sd < 0 ? xi : xi - 2.4, bx1 = sd < 0 ? xi + 2.4 : xi; box(bx0, bx1, Y1 - .25, Y1, za, zb, timberL, 1);
-    const rx = sd < 0 ? bx1 : bx0; box(rx - .05, rx + .05, Y1, Y1 + .95, za, zm - 1.15, timber, 1, { noCam: 1 }); box(rx - .05, rx + .05, Y1, Y1 + .95, zm + 1.15, zb, timber, 1, { noCam: 1 }); for (const zz of [za, zb]) box(bx0, bx1, Y1, Y1 + .95, zz - .05, zz + .05, timber, 1, { noCam: 1 });     /* m1302: a gap for the lane bridge; pass 9: the balcony's END rails had been commented out by the note in front of them */
-    for (let z = za; z <= zb + .01; z += 1.2) box(rx - .05, rx + .05, Y1, Y1 + .95, z - .05, z + .05, timber, 0);
+    const rx = sd < 0 ? bx1 : bx0; rail('z', za, zm - 1.15, rx, Y1); rail('z', zm + 1.15, zb, rx, Y1); for (const zz of [za, zb]) rail('x', bx0, bx1, zz, Y1);     /* m1354: breakable sections (S3b) */     /* m1302: a gap for the lane bridge; pass 9: the balcony's END rails had been commented out by the note in front of them */
     // the ladder inside, ground -> upper, through the hatch
     { const lx = hcx, lz = hcz + .45; for (const dx of [-.28, .28]) box(lx + dx - .03, lx + dx + .03, 0, Y1 + .9, lz - .03, lz + .03, timber, 0); for (let r = .3; r < Y1 + .8; r += .32) box(lx - .28, lx + .28, r - .02, r + .02, lz - .03, lz + .03, timberL, 0);
       const L = kitClimbAdd({ minx: lx - .4, maxx: lx + .4, miny: 0, maxy: Y1, minz: lz - .12, maxz: lz + .12 }, 'court_hall', Y1); L.mark = { x: hcx - sd * 1.6, y: Y1, z: hcz }; climbs.push(L); }
@@ -23679,7 +23708,7 @@ function courtBuild() {
   const tz = Z1 - W / 2, T0 = 4.5, sh = 2.6, YA = H, YB = 13, roofM = 0x55524c;
   for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) box(cx + sx * T0 - .45, cx + sx * T0 + .45, 0, YB + 3.2, tz + sz * T0 - .45, tz + sz * T0 + .45, timber, 1);
   box(cx - T0, cx + T0, YA - .3, YA, tz - T0, tz + T0, timberL, 1);     // deck A (the walk runs onto it)
-  for (const sz of [-1, 1]) box(cx - T0, cx + T0, YA, YA + .95, tz + sz * T0 - .05, tz + sz * T0 + .05, timber, 1, { noCam: 1 });
+  for (const sz of [-1, 1]) rail('x', cx - T0, cx + T0, tz + sz * T0, YA);
   // the shaft: solid timber walls round a 5.2 m square, a 1.8 m door on its south face; the ladder inside up to deck B
   box(cx - sh, cx + sh, YA, YB, tz + sh - .3, tz + sh, timber, 1); box(cx - sh, cx - sh + .3, YA, YB, tz - sh, tz + sh, timber, 1); box(cx + sh - .3, cx + sh, YA, YB, tz - sh, tz + sh, timber, 1);
   box(cx - sh, cx - .9, YA, YB, tz - sh, tz - sh + .3, timber, 1); box(cx + .9, cx + sh, YA, YB, tz - sh, tz - sh + .3, timber, 1); box(cx - .9, cx + .9, YA + 2.5, YB, tz - sh, tz - sh + .3, timber, 1);
@@ -23692,8 +23721,8 @@ function courtBuild() {
     for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const lx = cx + sx * (EX - .4), lz = tz + sz * (EX - .4); box(lx - .02, lx + .02, eY - .9 + .8, eY + .8, lz - .02, lz + .02, timber, 0); box(lx - .17, lx + .17, eY - 1.3 + .8, eY - .9 + .8, lz - .17, lz + .17, lamp, 0); } }
   // DECK B, the lookout: 9 m square, rails (noCam) with an opening south, the top roof on the four posts, a spire
   box(cx - T0, cx + T0, YB - .3, YB, tz - T0, tz + T0, timberL, 1);
-  for (const sz of [-1, 1]) for (const sx of [-1, 1]) box(cx + (sx < 0 ? -T0 : 1), cx + (sx < 0 ? -1 : T0), YB, YB + .95, tz + sz * T0 - .05, tz + sz * T0 + .05, timber, 1, { noCam: 1 });
-  for (const sx of [-1, 1]) box(cx + sx * T0 - .05, cx + sx * T0 + .05, YB, YB + .95, tz - T0, tz + T0, timber, 1, { noCam: 1 });
+  for (const sz of [-1, 1]) for (const sx of [-1, 1]) rail('x', cx + (sx < 0 ? -T0 : 1), cx + (sx < 0 ? -1 : T0), tz + sz * T0, YB);
+  for (const sx of [-1, 1]) rail('z', tz - T0, tz + T0, cx + sx * T0, YB);
   bldRoof(g, cx, tz, T0 + 1.6, T0 + 1.6, 0, YB + 6.2, YB + 3.2, .9, timberL, roofM);
   box(cx - .1, cx + .1, YB + 6, YB + 9, tz - .1, tz + .1, timber, 0); for (let i = 0; i < 4; i++) box(cx - .25 + i * .03, cx + .25 - i * .03, YB + 6.6 + i * .5, YB + 6.7 + i * .5, tz - .25 + i * .03, tz + .25 - i * .03, timber, 0);
   for (const sx of [-1, 1]) box(cx + sx * 1.6 - .15, cx + sx * 1.6 + .15, YB + 1.6, YB + 2, tz - T0 + .2, tz - T0 + .5, lamp, 0);
@@ -23835,6 +23864,7 @@ function courtBuild() {
     { const pl = new THREE.PointLight(0xffa860, 14 * SC * SC, 26 * SC, 1.6); pl.position.set(cx, 5.2, zmH); g.add(pl); C0.laneL = pl; } }
   // ---- THE ONE PLACE design -> world (S2): merge the buckets (AT THE END now, so the late passes' boxes -- the moss, the kerbs, the eave
   // lanterns -- are in them: before this they were added after the flush and never drawn), then map every world-space record ----
+  pieceDone(RP); COURT.on.rp = RP;
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
   { const mb = b => { const x0 = MX(b.minx), x1 = MX(b.maxx), z0 = MZ(b.minz), z1 = MZ(b.maxz); b.minx = x0; b.maxx = x1; b.miny = MY(b.miny); b.maxy = MY(b.maxy); b.minz = z0; b.maxz = z1; };
     if (SC !== 1) {
@@ -23902,7 +23932,7 @@ function courtStep(dt) { const C = COURT.on; if (!C) return; C.t += dt; courtWin
 function courtHit(x, y, z, rad) { const C = COURT.on; if (!C) return 0;
   if (C.bell && C.bell.cd <= 0) { const P = C.bell.wp || C.bell.g.position, k = C.SC || 1; if (Math.hypot(x - P.x, z - P.z) < k + rad && y < P.y + rad && y > P.y - 1.9 * k - rad) { C.bell.cd = .5; C.bell.sw = Math.min(.5, C.bell.sw + .3); C.alarm = 30; for (const d of C.guards || []) if (d) d.aggro = 1; snd('clang', { g: 1.2, r: .45, x: P.x, z: P.z }); snd('boom', { g: .5, r: .35, x: P.x, z: P.z }); camShake(.15); return 1; } }     /* m1302: the court's alarm bell */
   for (const G of C.gates || []) if (bgateHit(G, x, y, z, rad)) return 1; return 0; }
-function courtClear() { const C = COURT.on; if (!C) return; for (const Z of C.zips || []) { const i = ZIPS.indexOf(Z); if (i >= 0) ZIPS.splice(i, 1); if (player.zip && player.zip.Z === Z) player.zip = null; } if (GPAG.on && GPAG.on.court) gpagClear(); for (const x of C.guards || []) if (x) { bowDrop(x); bodyGone(x); const i = HORDE.list.indexOf(x); if (i >= 0) HORDE.list.splice(i, 1); } if (C.tur) turretDrop(C.tur); smashDrop(C.smash); if (C.gU) C.gU.removeFromParent(); for (const L of C.climbs) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && C.climbs.includes(player.climb)) climbOff(); bldClear(C); COURT.on = null; }
+function courtClear() { const C = COURT.on; if (!C) return; for (const Z of C.zips || []) { const i = ZIPS.indexOf(Z); if (i >= 0) ZIPS.splice(i, 1); if (player.zip && player.zip.Z === Z) player.zip = null; } if (GPAG.on && GPAG.on.court) gpagClear(); for (const x of C.guards || []) if (x) { bowDrop(x); bodyGone(x); const i = HORDE.list.indexOf(x); if (i >= 0) HORDE.list.splice(i, 1); } if (C.tur) turretDrop(C.tur); smashDrop(C.smash); if (C.rp) pieceDrop(C.rp); if (C.gU) C.gU.removeFromParent(); for (const L of C.climbs) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && C.climbs.includes(player.climb)) climbOff(); bldClear(C); COURT.on = null; }
 // m1262: THE GREAT RED PAGODA -- his 10-PASS EXPERIMENT (X1), after his reference `images/korajin/ref/red_pagoda_tower.webp`: a slender
 // five-storey tower in red lacquer, every storey wrapped in a railed BALCONY, every storey under a deep flared tile roof with gold fascia, the
 // roofs stepping in as it rises, a spire of gold rings on top. *"Much more visually interesting and much more functional"* -- so it is HOLLOW:
@@ -27473,7 +27503,7 @@ function boardPose(dt) {
 }
 
 function stepPlayer(dt) {
-  if (inArena()) { deflStep(dt); hallStep(dt); if (SMASH.list.length) smashStep(dt); for (const E of BLDG.list) if (E.step && E.on()) E.step(dt); }     // m1105; m1119; m1120: each building's own life
+  if (inArena()) { deflStep(dt); hallStep(dt); if (SKIN.list.length) skinStep(dt); if (PIECE.list.length) pieceStep(dt); if (SMASH.list.length) smashStep(dt); for (const E of BLDG.list) if (E.step && E.on()) E.step(dt); }     // m1105; m1119; m1120: each building's own life
   const p = player;
   stepFeet(dt);
   const hadLock = p.lock;
