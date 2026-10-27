@@ -63,6 +63,17 @@ THE BLOCK STYLE's third rule, *"every block can BREAK"*, now covers the whole bu
 - **Draws**: the breakables are one InstancedMesh per material (cream, red, teal, tile, edge, dark).
 
 SHIPPED UNVERIFIED. Next: pass 4, the climb outside (bars, handholds, a zipline off the spire).
+## 3D AIM: the LEFT tap fires (his)
+
+*"In 3D AIM make the left stick the fire stick -- tap it to fire -- instead of auto-firing when you let go. The left tap was only an extra
+jump, because jumping and firing with the right stick was hard in my old game."*
+- **Always aiming.** With 3D AIM on and a gun out he is ALWAYS aiming: the over-the-shoulder lens and the reticle are up.
+- **The right thumb only MOVES the cursor** (the m1278 rate). Letting go leaves it where it is. A fast drag never becomes a sword flick.
+- **The LEFT TAP fires** (`aim3Fire`): the launcher's rocket on its cooldown, or the blaster's charge (it charges while he aims).
+- **The RIGHT TAP is the jump again.**
+- **Turning it off.** Switching weapon or toggling 3D AIM off stands the aim down (`triggerStop`, `applySlot`).
+
+SHIPPED UNVERIFIED.
 
 ## White Heron Castle pass 2 of 10: the roofs (X2, WORKER B)
 

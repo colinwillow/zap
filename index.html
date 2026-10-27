@@ -13982,7 +13982,7 @@ function aimPoint() {
 // the unlocked case and disagreeing about the locked one, which is exactly what "by
 // construction" is supposed to rule out. **A mark the gun does not keep is worse than no assist
 // at all** -- and it is worse than it sounds, because the lock is what makes you stop aiming.
-const aim3Live = () => AIM3.on && (player.aim || player.fireT > 0) && !!player.gDir && !player.wing;
+const aim3Live = () => AIM3.on && slotNow().aim && (player.aim || player.fireT > 0) && !!player.gDir && !player.wing;
 function aimRaw() {
   if (aim3Live()) return aimPoint();     // m1259: the thumb's 3D aim is the aim -- no lock, no assist
   const L = player.lock;
@@ -24258,7 +24258,8 @@ PADS.L = bindStick(padL, stick.L,
   // `trav < tapMove` and `held < tapT`, which no steering hold ever is. Weapons moved to the
   // left wheel (`kitPick`).
   // tap: jump -- flying, a double tap is her BOOST (m266); on her skates on the ground, her SWIVEL (m268)
-  () => { if (wingTapL()) return; if (fakieSwivel()) return; if (player.wall && player.wallLow && player.wallSt === 'hold') { wallDrop(0); return; } if (coverTap()) return; player.jump = 1; },     // m1009: in cover, a left tap stands him up out of it; m1012: near a half block, takes it
+  () => { if (aim3Now()) { aim3Fire(); return; }     // m1282: in 3D AIM the LEFT tap is the trigger
+    if (wingTapL()) return; if (fakieSwivel()) return; if (player.wall && player.wallLow && player.wallSt === 'hold') { wallDrop(0); return; } if (coverTap()) return; player.jump = 1; },     // m1009: in cover, a left tap stands him up out of it; m1012: near a half block, takes it
   // flick: a BODY FLIP on the board, otherwise the dodge roll in the flicked direction. The
   // board takes it first and says so, because a dodge roll on a moving deck is nothing.
   // Flying (m266) it is her loop / barrel roll.
@@ -24269,10 +24270,9 @@ PADS.L = bindStick(padL, stick.L,
 PADS.R = bindStick(padR, stick.R,
   // tap: jump -- and as her, a quick SECOND tap opens / folds the wings (m266)
   // ...unless someone in reach has something to say: then it is TALK (m277), and the left tap still jumps
-  () => { if (AIM3.on && slotNow().aim && !player.riding && !player.wing) return;     // m1276: in 3D AIM the right pad is the trigger -- a tap fires, it does not jump (jump is the LEFT tap)
-    if (talkTap()) return; if (pickTap()) return; if (portalTap()) return; if (wingTapR()) return; if (hurdleTap()) return; if (mantleTap()) return; if (wrunTap()) return; player.jump = 1; },     // m1064: a tall face beside / ahead -> wall run     // m1063: pushing into a half block -> hurdle it     // m1039: a ledge in reach -> climb it
+  () => { if (talkTap()) return; if (pickTap()) return; if (portalTap()) return; if (wingTapR()) return; if (hurdleTap()) return; if (mantleTap()) return; if (wrunTap()) return; player.jump = 1; },     // m1064: a tall face beside / ahead -> wall run     // m1063: pushing into a half block -> hurdle it     // m1039: a ledge in reach -> climb it
   // flick: a SLAM if he is in the air and it went down, otherwise a strike in that direction
-  (dx, dy) => { if (player.wing) return; if (tossQuick(dx, dy)) return; if (boardFlick(dx, dy, 0)) return; if (runSwipe(dx, dy)) return; if (!slamGo(dx, dy)) { KATANA.dir = katanaDir(dx, dy); meleeGo(KATANA.dir === 'down' ? player.faceH : flickH(dx, dy)); } },     // m1054: DOWN is not a direction -- the strike goes where he faces (a slot kept for a grab / throw / special)     // m1014: the right pad is MELEE, by direction (m1012's down-slide is off it)
+  (dx, dy) => { if (player.wing || aim3Now()) return; if (tossQuick(dx, dy)) return;     // m1282: in 3D AIM a fast drag moves the cursor, it never swings if (boardFlick(dx, dy, 0)) return; if (runSwipe(dx, dy)) return; if (!slamGo(dx, dy)) { KATANA.dir = katanaDir(dx, dy); meleeGo(KATANA.dir === 'down' ? player.faceH : flickH(dx, dy)); } },     // m1054: DOWN is not a direction -- the strike goes where he faces (a slot kept for a grab / throw / special)     // m1014: the right pad is MELEE, by direction (m1012's down-slide is off it)
   null,
   // THE RELEASE IS THE SHOT, so this must NOT clear `p.aim` -- `stepKit` sees the pad is no
   // longer held and fires on that edge. Clearing it here would eat every shot in the game.
@@ -24718,42 +24718,30 @@ function padUp(on) {
 // and down tilts it up to `pitch`, eased. A thumb that travelled first is a drag and stays one until it lifts.
 // m1259: the 3D aim on foot -- `bladeGunFly`'s gesture, its numbers in `AIM3`, and the launcher's release as well as the blaster's
 function aim3Gun(dt) {
+  // m1282: *"In 3D AIM make the LEFT stick the fire stick -- you tap it to fire -- instead of it auto-firing when you let go."* So in 3D AIM with a
+  // gun out he is ALWAYS aiming (the over-the-shoulder lens, the reticle up): the right thumb only MOVES the cursor (a rate, as m1278) and
+  // letting go leaves it where it is; the LEFT TAP fires (`aim3Fire`); the right tap is the jump again. The blaster (if it comes back)
+  // charges while he aims and fires at what it has.
   const p = player, F = AIM3, R = stick.R, s = slotNow();
   p.block = 0; p.blockT = 0; p.center = 0; p.centerT = 0; p.bkT = 0; p.bkOn = 0;
   if (p.rocketT > 0) p.rocketT -= dt;
-  if (!p.aim) {
-    p.chg = 0;
-    if (R.down && !p.knock && !p.roll && (R.far || 0) < F.far) {
-      if ((p.gHold = (p.gHold || 0) + dt) >= F.holdT) { p.aim = 1; p.chg = 0; p.gYaw = 0; p.gPit = 0;
-        if (!s.rocket) chargeStart(); else for (const a of ROCKET.arm) snd(a.k, { g: a.g, r: a.r, dur: a.dur }); if (p.aimKeep && p.aimKeepT > 0) { p.gYaw = p.aimKeep.y; p.gPit = p.aimKeep.p; } }
-    } else if (!R.down) p.gHold = 0;
-    else p.gHold = .0001;     // travelled first: a camera drag until it lifts
-  }
-  if (p.aim) {
-    if (R.down && !p.knock) {
-      if (!s.rocket) p.chg = Math.min(1, p.chg + dt / WEAP.chargeT);
-      // m1276: *"once it's enabled you move the cursor with the right stick in three dimensions -- touch, it locks in a shot ready to fire;
-      // move your thumb around, it aims; let go, it shoots -- rather than auto-aiming."* The thumb's offset is a RATE: held off-centre the
-      // cursor keeps travelling that way (`rate` rad/s at full, past a `dead` zone), let it rest and the cursor stays where you put it
-      const rx = Math.abs(R.x) > F.dead ? R.x : 0, ry = Math.abs(R.y) > F.dead ? R.y : 0;
-      p.gYaw = clamp((p.gYaw || 0) - rx * F.rate * dt, -F.yaw, F.yaw); p.gPit = clamp((p.gPit || 0) - ry * F.rate * dt, -F.pitch, F.pitch);
-      const a = cam.az + p.gYaw, c = Math.cos(p.gPit);
-      (p.gDir || (p.gDir = new THREE.Vector3())).set(Math.sin(a) * c, Math.sin(p.gPit), Math.cos(a) * c);
-      if (!s.rocket) chargeStep(p.chg);
-    } else {
-      if (!p.knock && s.rocket) { if (!(p.rocketT > 0)) { fireRocket(); p.fireT = 1; p.rocketT = ROCKET.cool; snd('big', { g: .62, r: .62 + Math.random() * .06 });
-          const kh = cam.az + (p.gYaw || 0); p.vel.x -= Math.sin(kh) * ROCKET.kick; p.vel.z -= Math.cos(kh) * ROCKET.kick; } }
-      else if (!p.knock && p.chg >= WEAP.minChg) { fireBolt(p.chg); p.fireT = 1; snd(p.chg > .82 ? 'big' : 'shot', { g: .42 + p.chg * .3, r: 1.12 - p.chg * .3 }); playPair(CLIPS.shoot, clipLen(CLIPS.shoot) / WEAP.shootBeat); }
-      p.aimKeep = { y: p.gYaw || 0, p: p.gPit || 0 }; p.aimKeepT = 1.5;     // m1276: a touch within 1.5 s picks the cursor up where it was
-      p.aim = 0; p.armT = 0; p.chg = 0; p.gHold = 0; chargeStop();
-    }
-  } else if (CHARGE.gain) chargeStop();
-  if (p.aimKeepT > 0) p.aimKeepT -= dt;
+  if (!p.aim) { p.aim = 1; p.chg = 0; if (p.gYaw == null) { p.gYaw = 0; p.gPit = 0; } if (!s.rocket) chargeStart(); else for (const a of ROCKET.arm) snd(a.k, { g: a.g, r: a.r, dur: a.dur }); }
+  if (p.knock) return;
+  if (R.down) { const rx = Math.abs(R.x) > F.dead ? R.x : 0, ry = Math.abs(R.y) > F.dead ? R.y : 0;
+    p.gYaw = clamp((p.gYaw || 0) - rx * F.rate * dt, -F.yaw, F.yaw); p.gPit = clamp((p.gPit || 0) - ry * F.rate * dt, -F.pitch, F.pitch); }
+  const a = cam.az + (p.gYaw || 0), c = Math.cos(p.gPit || 0);
+  (p.gDir || (p.gDir = new THREE.Vector3())).set(Math.sin(a) * c, Math.sin(p.gPit || 0), Math.cos(a) * c);
+  if (!s.rocket) { p.chg = Math.min(1, p.chg + dt / WEAP.chargeT); chargeStep(p.chg); }
   const showBall = p.chg > .02;
   chargeFx.visible = showBall;
   if (showBall) { chargeFx.position.copy(muzzleWorld()); ballSize(chargeFx, (.35 + p.chg * 1.5) * (.92 + Math.random() * .16)); }
   GUNU.k.value = damp(GUNU.k.value, p.chg * WEAP.glow, .06, dt);
 }
+const aim3Now = () => AIM3.on && slotNow().aim && !player.riding && !player.wing && !player.swap;
+function aim3Fire() { const p = player, s = slotNow(); if (!p.aim || p.knock || p.roll) return;
+  if (s.rocket) { if (p.rocketT > 0) return; fireRocket(); p.fireT = 1; p.rocketT = ROCKET.cool; snd('big', { g: .62, r: .62 + Math.random() * .06 });
+    const kh = cam.az + (p.gYaw || 0); p.vel.x -= Math.sin(kh) * ROCKET.kick; p.vel.z -= Math.cos(kh) * ROCKET.kick; return; }
+  if (p.chg >= WEAP.minChg) { fireBolt(p.chg); p.fireT = 1; snd(p.chg > .82 ? 'big' : 'shot', { g: .42 + p.chg * .3, r: 1.12 - p.chg * .3 }); playPair(CLIPS.shoot, clipLen(CLIPS.shoot) / WEAP.shootBeat); p.chg = 0; chargeStop(); chargeStart(); } }
 function bladeGunFly(dt) {
   const p = player, F = BLADE.gun.fly, R = stick.R;
   p.block = 0; p.blockT = 0; p.center = 0; p.centerT = 0; p.bkT = 0; p.bkOn = 0;
@@ -24817,7 +24805,7 @@ function stepKit(dt) {
   // back where it came from once she is down.
   if (p.gTemp && !p.wing && !p.aim) { const n = p.gTemp - 1; p.gTemp = 0; if (p.slot !== n) applySlot(n); }
   if (p.wing && BLADE.gun.fly.on && bladeOn()) { bladeGunFly(dt); return; }
-  if (AIM3.on && slotNow().aim && !p.riding && !p.wing && !p.swap) { aim3Gun(dt); return; }     // m1259: the 3D aim
+  if (aim3Now()) { aim3Gun(dt); return; }     // m1259: the 3D aim
   p.gHold = 0; p.gDir = null;
 
   // ---- DOWN ON THE RIGHT PAD IS A GUARD (m37). *"I want to make it so that down on the right
