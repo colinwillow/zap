@@ -866,10 +866,10 @@ body.desk.free #deskHint { display: block; }
   <h1>WEIRDPORT</h1>
   <div class="msg" id="bootMsg">loading</div>
   <div class="bar"><i id="bootBar"></i></div>
-  <div class="bld">BUILD <span id="bootBuild">m1104</span></div>
+  <div class="bld">BUILD <span id="bootBuild">m1105</span></div>
 </div>
 
-<div class="chip" id="build"><b id="buildN">m1104</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
+<div class="chip" id="build"><b id="buildN">m1105</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
 <div id="splash" aria-label="tap to start"><img class="blur" alt=""><img class="main" alt="Zap and Clancy"><div class="glow"></div><div class="bn"></div></div>
 <script>
 // m879 (STEER 02:22): THE SPLASH, before the module (so it shows on the first paint, while the boot carries on behind it). The image's
@@ -975,7 +975,7 @@ import { KTX2Loader } from './vendor/KTX2Loader.js';
 import { clone as skeletonClone } from './vendor/SkeletonUtils.js';
 import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
 
-const BUILD = 'm1104';
+const BUILD = 'm1105';
 /* ASSETS:START */
 const ASSETS = {"models/alien_lizard.glb":"faffcf4c","models/alien_lizard_ktx2.glb":"05da2a20","models/skate.glb":"0c612d5e","models/skateboard.glb":"5ba93796","models/characters/alien_antenna_game.glb":"f3ccf328","models/characters/alien_antenna_game_ktx2.glb":"28afac8c","models/characters/alien_female_purple.glb":"1c73eef1","models/characters/alien_female_purple_ktx2.glb":"fc914afb","models/characters/alien_goblin.glb":"3e91bffb","models/characters/alien_goblin_chains.glb":"e72d1550","models/characters/alien_goblin_game.glb":"cfabd926","models/characters/alien_grey_medium.glb":"5a779e8e","models/characters/alien_grey_medium_ktx2.glb":"61600c3e","models/characters/alien_rollerskate_blue.glb":"abf0917c","models/characters/alien_rollerskate_blue_ktx2.glb":"e9a7948a","models/characters/alien_warrior.glb":"f5cc9c49","models/characters/alien_warrior_ktx2.glb":"a13fb7b6","models/characters/beautiful_asian.glb":"910f6565","models/characters/beautiful_asian_ktx2.glb":"35281eef","models/characters/beautiful_blonde.glb":"edddc421","models/characters/beautiful_blonde_ktx2.glb":"89cf3899","models/characters/brute_warboss_armor.glb":"cc5c7936","models/characters/ceo_alien.glb":"844dc3a7","models/characters/ceo_human.glb":"ec289865","models/characters/clancy.glb":"4b9d271f","models/characters/clancy_ktx2.glb":"74edbc6e","models/characters/colin.glb":"99d38b7d","models/characters/colin_ktx2.glb":"35040f87","models/characters/contruction_worker.glb":"8bd3d7ce","models/characters/contruction_worker_ktx2.glb":"3df8c344","models/characters/dummy_officer.glb":"724965ac","models/characters/dummy_officer_ktx2.glb":"db640cda","models/characters/fat_activist_01.glb":"3c566fee","models/characters/fat_activist_01_ktx2.glb":"b9328df4","models/characters/fat_biker_01.glb":"576b7cf5","models/characters/fat_biker_01_ktx2.glb":"7142cfad","models/characters/fat_biker_02.glb":"ab5d7ec7","models/characters/fat_biker_02_ktx2.glb":"28cec6cc","models/characters/fat_hippie.glb":"f09a260d","models/characters/fat_hippie_ktx2.glb":"0be745a4","models/characters/fat_hipster.glb":"9cf45ffb","models/characters/fat_hipster_ktx2.glb":"18106ff3","models/characters/fat_secret_service.glb":"6d546fb0","models/characters/fat_secret_service_ktx2.glb":"a23a304e","models/characters/fat_trump.glb":"5de6bc56","models/characters/fat_trump_ktx2.glb":"a0ddaf4d","models/characters/firefighter.glb":"ebde005d","models/characters/firefighter_ktx2.glb":"ccf93c96","models/characters/goblin_game.glb":"db1cf0e0","models/characters/hick_skinny.glb":"1ebe78e8","models/characters/hick_skinny_ktx2.glb":"1e93f0ed","models/characters/hobo_01.glb":"34e80b1d","models/characters/hobo_01_ktx2.glb":"69497677","models/characters/jack.glb":"ab009b9b","models/characters/jack_ktx2.glb":"1f4c9f7f","models/characters/moussa.glb":"6d80b1cf","models/characters/moussa_ktx2.glb":"66e040f8","models/characters/orc_game.glb":"d9aa816d","models/characters/proxy_ceo.bin":"6eca0c34","models/characters/proxy_ceo.jpg":"fadc9d0a","models/characters/proxy_ceo.json":"e62a7975","models/characters/proxy_ceo_alien.bin":"be247ecc","models/characters/proxy_ceo_alien.jpg":"8f8bf8fc","models/characters/proxy_ceo_alien.json":"eb23e28f","models/characters/proxy_hick.bin":"4485560e","models/characters/proxy_hick.jpg":"8c331965","models/characters/proxy_hick.json":"d85a0d36","models/characters/proxy_zap.bin":"dd7b300e","models/characters/proxy_zap.jpg":"2e7330ae","models/characters/proxy_zap.json":"b3b42754","models/characters/proxy_zap2.bin":"51088f46","models/characters/proxy_zap2.jpg":"a954a815","models/characters/proxy_zap2.json":"5c50abb7","models/characters/rept_heavy_armor.glb":"934661c7","models/characters/samurai_game.glb":"c7940015","models/characters/xray_skeleton.glb":"46480317","models/characters/zap.glb":"5e5cca54","models/characters/zap_02.glb":"4ff12de0","models/characters/zap_02_lib.glb":"e23d91da","models/characters/zap_ktx2.glb":"4b29d886","models/characters/zoar.glb":"423a9de9","models/characters/zoar_game.glb":"d20a3736","models/vehicles/dump_truck.glb":"d870dc18","models/vehicles/dump_truck_ktx2.glb":"21ee7059","models/vehicles/motorcycle_fatboy.glb":"9ed9be28","models/weapons/alien_antenna_blaster_game.glb":"54083b44","models/weapons/alien_antenna_hammer_game.glb":"707b8a27","models/weapons/alien_launcher.glb":"ba8ab96a","models/weapons/hammer.glb":"3335fdf2","models/weapons/shield_brute.glb":"c6e5593f","models/weapons/spikey_mace.glb":"dcd43acd","models/weapons/w_brute_cleaver.glb":"07a97580","models/weapons/w_rept_maul.glb":"84c3a1a4","models/buildings/alien_base_01.glb":"d9b9fd7f","models/buildings/alien_base_01_ktx2.glb":"6cbbfef2","models/towers/alien_tower_01.glb":"98d23375","models/towers/alien_tower_01_ktx2.glb":"47597651","models/streets/modular_streets_kit.glb":"6a4bcaa5","models/toon_city/impact_marks.json":"2b616620","models/toon_city/impact_marks_atlas.ktx2":"efe0840e","models/toon_city/impact_marks_atlas.png":"490ed049","models/toon_city/toon_city_breakables.glb":"29bddbc8","models/toon_city/toon_city_collision.glb":"fb3a693f","models/toon_city/toon_city_obb.json":"81c18a47","models/toon_city/toon_city_visual.glb":"5df62285","models/toon_city/toon_city_visual_ktx2.glb":"cf080531","models/toon_city/weirdkit_tint.js":"f6e9d802","models/toon_city_kit/toon_city_collision.glb":"5540a364","models/toon_city_kit/toon_city_kit_buildings.glb":"590e53f0","models/toon_city_kit/toon_city_kit_buildings_ktx2.glb":"e6dff3a3","models/toon_city_kit/toon_city_kit_pieces.glb":"8232bd6f","models/toon_city_kit/toon_city_kit_twins.glb":"fcc9fdfc","models/toon_city_kit/toon_city_visual.glb":"45cf2957","models/toon_city_kit/toon_city_visual_ktx2.glb":"f26a6984","models/toon_city_kit/weirdkit_detile.js":"dd05bd70","models/characters/morph/shapes.bin":"4e680384","models/characters/morph/shapes.json":"abfc949d","models/characters/forged/alien_female_purple.glb":"0308860e","models/characters/forged/alien_goblin_game.glb":"4925f5a6","models/characters/forged/alien_rollerskate_blue.glb":"bcccc63f","models/characters/forged/alien_warrior.glb":"a067d5ab","models/characters/forged/beautiful_asian.glb":"f1c7baa5","models/characters/forged/beautiful_blonde.glb":"f83172bd","models/characters/forged/brute_warboss_armor.glb":"dc15dc94","models/characters/forged/ceo_alien.glb":"20659ac3","models/characters/forged/ceo_human.glb":"326d9e7e","models/characters/forged/clancy.glb":"19fabcce","models/characters/forged/contruction_worker.glb":"99fe1a17","models/characters/forged/dummy_officer.glb":"87a11843","models/characters/forged/fat_activist_01.glb":"6546645c","models/characters/forged/fat_biker_01.glb":"943f38ea","models/characters/forged/fat_biker_02.glb":"5d63a0cf","models/characters/forged/fat_hippie.glb":"ff0539ba","models/characters/forged/fat_hipster.glb":"792b92d8","models/characters/forged/fat_secret_service.glb":"7c29d1da","models/characters/forged/firefighter.glb":"20410689","models/characters/forged/goblin_game.glb":"3c813462","models/characters/forged/hick_skinny.glb":"d9232022","models/characters/forged/hobo_01.glb":"37d266c9","models/characters/forged/index.json":"01be89cd","models/characters/forged/jack.glb":"712b6241","models/characters/forged/moussa.glb":"74d19c70","models/characters/forged/orc_game.glb":"7bf3c227","models/characters/forged/rept_heavy_armor.glb":"01e631b0","models/characters/forged/samurai_archer.glb":"04db413e","models/characters/forged/samurai_game.glb":"a946c148","models/characters/forged/zap.glb":"10eda718","models/characters/forged/zap_02.glb":"fd513cea","models/characters/forged/zap_02_lib.glb":"fd513cea","models/characters/forged/zoar_game.glb":"b032a28e","images/crack_sprite_01.ktx2":"4aa55fde","images/crack_sprite_01.png":"16b52e8c","images/fire_sprites_01.ktx2":"922e1191","images/fire_sprites_01.png":"f87e2696","images/fire_sprites_02.ktx2":"e0cbfe1d","images/fire_sprites_02.png":"b373a6fd","images/fire_sprites_03.ktx2":"4fbbb985","images/fire_sprites_03.png":"7eece336","images/geyser_sprites_01.png":"b6325470","images/hdri_game.ktx2":"0feb5c79","images/hdri_game.png":"dac55f41","images/splash_zap_n_clancy.webp":"52a9d8a4","images/water_sprites_01.ktx2":"326924c5","images/water_sprites_01.png":"31e12659","audio/blaster_sound_01.mp3":"40d99583","audio/blaster_sound_02.mp3":"4bd7bb7c","audio/box_break_01.mp3":"e4127980","audio/electricity_beam_01.mp3":"986db8c9","audio/explosion_small.mp3":"f154a537","audio/metal_clang_01.mp3":"a333bd27","audio/metal_clang_02.mp3":"1e3ebbd6","audio/metal_clang_03.mp3":"afe44812","audio/metal_ping_01.mp3":"8ffca1a0","audio/plasma_canon.mp3":"e32c324d","audio/powerup_01.mp3":"48fbbe08","audio/swoosh_01.mp3":"193db185","audio/swoosh_02.mp3":"19145e70","audio/swoosh_03.mp3":"544fdffb","audio/swoosh_04.mp3":"843bee5d","audio/plasma_sounds/plasma_01.mp3":"e71c010f","audio/plasma_sounds/plasma_02.mp3":"ac3b1c75","audio/plasma_sounds/plasma_03.mp3":"eaa59355","audio/plasma_sounds/plasma_04.mp3":"bc7865e0","audio/plasma_sounds/plasma_05.mp3":"1d821cd0","audio/plasma_sounds/plasma_06.mp3":"cb979fbe","audio/plasma_sounds/plasma_hit.mp3":"30e5af5c","audio/alien_orc_grunt_sounds/alien_orc_grunt_01.mp3":"d6f4b343","audio/alien_orc_grunt_sounds/alien_orc_grunt_02.mp3":"78afc603","audio/alien_orc_grunt_sounds/alien_orc_grunt_03.mp3":"972c524a","audio/alien_orc_grunt_sounds/alien_orc_grunt_04.mp3":"b0ce76eb","audio/alien_orc_grunt_sounds/alien_orc_grunt_05.mp3":"1f0ba1f4","audio/alien_orc_grunt_sounds/alien_orc_grunt_06.mp3":"4f749866","audio/alien_orc_grunt_sounds/alien_orc_grunt_07.mp3":"dcf75925","audio/hit_sounds/hit_sound_01.mp3":"befaa2be","audio/hit_sounds/hit_sound_02.mp3":"73bc4433","audio/hit_sounds/hit_sound_03.mp3":"24b181e4","audio/hit_sounds/hit_sound_gound_01.mp3":"86ee2674","audio/hit_sounds/hit_sound_ground_02.mp3":"8a7cac73","audio/hit_sounds/hit_sound_plasma_01.mp3":"9abc0202","audio/hit_sounds/hit_sound_plasma_02.mp3":"6aaf0fe5","audio/creature_noises/creature_noise_01.mp3":"cbcc6ee7","audio/creature_noises/creature_noise_02.mp3":"201a8247","audio/creature_noises/creature_noise_03.mp3":"97680811","audio/creature_noises/creature_noise_04.mp3":"6f734df2","audio/creature_noises/creature_noise_05.mp3":"6f736441","audio/creature_noises/creature_noise_06.mp3":"992712e9","audio/creature_noises/creature_noise_07.mp3":"d9ad04b3","audio/footsteps/footstep_2_l.mp3":"abeabfbe","audio/footsteps/footstep_2_r.mp3":"7dd16046","audio/footsteps/footstep_l.mp3":"b66e579b","audio/footsteps/footstep_r.mp3":"96e13433","models/props/prop_hydrant.glb":"f157fee9","models/props/prop_hydrant_collision.glb":"0bbfc4d2","models/creatures/3_headed_dog.glb":"9263480a","models/creatures/blue_dragon.glb":"d72f4da7","models/creatures/mech_lightning_dragon.glb":"5935bb67"};
 /* ASSETS:END */
@@ -11417,6 +11417,8 @@ function arrowMesh() {
   const G = _arGeo, g = new THREE.Group(), hd = new THREE.Mesh(G.hd, G.mH.clone());
   g.add(new THREE.Mesh(G.sh, G.mS), hd, new THREE.Mesh(G.f1, G.mF), new THREE.Mesh(G.f2, G.mF)); g.userData.head = hd; return g;
 }
+function arrowDeflect(x, y, z, rad) { for (const A of ARROWS) if (!A.stuck && !A.mine && A.m.position.distanceTo(_adV.set(x, y, z)) < rad + .55) deflectThreat({ p: A.m.position, v: A.v, A }, 0); }
+const _adV = new THREE.Vector3();
 function arrowClear() { for (const A of ARROWS) A.m.removeFromParent(); ARROWS.length = 0; }
 function arrowStep(dt) {
   const p = player, H = (RIG.height || 1.25);
@@ -11430,7 +11432,11 @@ function arrowStep(dt) {
     const sx = P.x - ox, sy = P.y - oy, sz = P.z - oz, L2 = sx * sx + sy * sy + sz * sz || 1;
     const cx = p.pos.x, cy = p.pos.y + H * .55, cz = p.pos.z, u = clamp(((cx - ox) * sx + (cy - oy) * sy + (cz - oz) * sz) / L2, 0, 1);
     const qx = ox + sx * u - cx, qy = oy + sy * u - cy, qz = oz + sz * u - cz;
-    if (Math.abs(qy) < H * .55 && Math.hypot(qx, qz) < .45) {
+    if (A.mine) { let hit = null; for (const d of DUMMIES) { if (d.st === 'gone' || d.st === 'down' || !d.root.visible) continue; const R = d.root.position, hh = (d.K.h || 1.8);
+        if (Math.abs(P.y - (R.y + hh * .5)) < hh * .55 && Math.hypot(P.x - R.x, P.z - R.z) < (d.K.r || .4) + .25) { hit = d; break; } }
+      if (hit) { dummyBlow(hit, Math.atan2(A.v.x, A.v.z), 1, 6); spkBurst(P.x, P.y, P.z, 14, { col: [.6, .85, 1], spread: 4, size: .12, life: .35 }); snd('thud', { g: 1, r: 1, x: P.x, z: P.z }); ARCH.stat.back = (ARCH.stat.back || 0) + 1;
+        A.m.removeFromParent(); ARROWS.splice(i, 1); continue; } }
+    else if (Math.abs(qy) < H * .55 && Math.hypot(qx, qz) < .45) {
       const h = Math.atan2(A.v.x, A.v.z), hp0 = p.hp;
       playerHurt(ARCH.dmg, h, ARCH.push, 1.5, .25, 0); ARCH.stat.hits++;
       if (p.block) { ARCH.stat.blocked++; spkBurst(P.x, P.y, P.z, 14, { col: [1, .9, .6], spread: 4, size: .12, life: .35 }); snd('clang', { g: .7, r: 1.3, x: P.x, z: P.z }); }
@@ -11583,6 +11589,7 @@ function arenaUi() {
       else if (a === 'rhold') { CROUCH.mode = CROUCH.modes[(CROUCH.modes.indexOf(CROUCH.mode) + 1) % CROUCH.modes.length]; try { localStorage.setItem('mel.rhold2', CROUCH.mode); } catch (err) {} }     // m1093
       else if (a === 'lhold') { LHOLD.pick = LHOLD.picks[(LHOLD.picks.indexOf(LHOLD.pick) + 1) % LHOLD.picks.length]; try { localStorage.setItem('mel.lhold', LHOLD.pick); } catch (err) {} }     // m1093
       else if (a === 'prewarm') { BOOTWARM.kinds = BOOTWARM.kinds ? 0 : 1; try { localStorage.setItem('mel.prewarm', BOOTWARM.kinds ? '1' : '0'); } catch (err) {} }     // m1100
+      else if (a === 'defl') { DEFL.on = DEFL.on ? 0 : 1; try { localStorage.setItem('mel.defl', DEFL.on ? '1' : '0'); } catch (err) {} }     // m1105
       else if (a === 'hslice') { HORDE.slice = HORDE.slice ? 0 : 1; try { localStorage.setItem('mel.hslice', HORDE.slice ? '1' : '0'); } catch (err) {} }     // m1102
       else if (a === 'swseg') { SWSEG.on = SWSEG.on ? 0 : 1; try { localStorage.setItem('mel.swseg', SWSEG.on ? '1' : '0'); } catch (err) {} }     // m1101
       else if (a === 'airlegs') { AIRLEGS.on = AIRLEGS.on ? 0 : 1; try { localStorage.setItem('mel.airlegs', AIRLEGS.on ? '1' : '0'); } catch (err) {} }     // m1098
@@ -11613,7 +11620,7 @@ function arenaUi() {
   if (ARENA.tools === undefined) { try { ARENA.tools = +localStorage.getItem('mel.arena.tools') || 0; } catch (err) { ARENA.tools = 0; } }
   const tools = ARENA.tools && !m;     // a menu open folds the tools away: the screen is not tall enough for both
   let h = '<div class="ar-bar">' + B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('vend', 'VEND') + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
-    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
+    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
   if (m === 'top') h += '<div class="ar-menu">' + B('cat', 'WARBOSS &rsaquo;', 'boss') + B('cat', 'PEOPLE &rsaquo;', 'people') + B('cat', 'BEASTS &rsaquo;', 'beasts') + B('cat', 'RIVALS &rsaquo;', 'rival') + B('turret', 'TURRET<small>' + (TURRET.list.length ? 'tap to remove' : 'sentry gun') + '</small>', '', TURRET.list.length ? 'ar-on' : '') + B('hbar', 'HIGH BAR<small>' + (HBAR.list.length ? 'tap to remove' : 'swing on it') + '</small>', '', HBAR.list.length ? 'ar-on' : '') + B('beam', 'BALANCE BEAM<small>' + (BEAM.list.length ? 'tap to remove' : 'walk it') + '</small>', '', BEAM.list.length ? 'ar-on' : '') + B('wrun', 'WALL RUN<small>' + ((WRUN.boxes || []).length ? 'tap to remove' : 'run along it') + '</small>', '', (WRUN.boxes || []).length ? 'ar-on' : '') + B('course', 'ACROBATICS<small>' + (COURSE.on ? 'tap to remove' : 'the course') + '</small>', '', COURSE.on ? 'ar-on' : '') + B('slice', 'SLICE DUMMY<small>' + (LIMB.stat.cuts ? LIMB.stat.cuts + ' cut, ' + LIMB.stat.booms + ' blown' : 'cut him up') + '</small>') + B('horde', 'HORDE<small>' + (HORDE.busy ? 'loading...' : HORDE.list.length ? HORDE.list.length + ' left, ' + HORDE.stat.kills + ' down -- +' + HORDE.per : '+' + HORDE.per + (HORDE.slice ? ' (slice)' : ' samurai')) + '</small>', '', HORDE.list.length ? 'ar-on' : '') + B('archers', 'ARCHERS<small>' + (HORDE.busy ? 'loading...' : '+' + ARCH.per + ' red bowmen') + '</small>') + '<button class="ar-off">GRUNTS<small>soon</small></button><button class="ar-off">GREYS<small>soon</small></button></div>';
   else if (m === 'boss' || m === 'people' || m === 'beasts' || m === 'rival') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back');
     for (const k in ARENA.kinds) { const A = ARENA.kinds[k]; if (!!A.creature !== (m === 'beasts')) continue; if (!!A.rival !== (m === 'rival')) continue; if (m !== 'beasts' && !A.both && !!A.civ !== (m === 'people')) continue; h += B('spawn', A.t + (A.sub ? '<small>' + A.sub + '</small>' : ''), k); } h += '</div>'; }
@@ -17970,6 +17977,9 @@ function meleeGo0(h) {
   // screen direction still picks the chain (`KATANA.dir`); the magnetism cone is centred on the flick.
   // m1002: *"the same technique with the unarmed melee"* -- every strike, not just the katana's (`MELEE.dirBy` 'flick' = the old way)
   if (MELEE.dirBy === 'face') h = p.speed > KATANA.lock.moving ? p.heading : p.faceH;     // m1000: where he FACES (his call, over m995's camera-relative)
+  p.defl = null;
+  if (DEFL.on && h != null) { const T = threatFind(h, DEFL.cone, DEFL.reach, DEFL.tta);     // m1105: a rocket or arrow coming -- swing AT it
+    if (T) { p.defl = T; DEFL.stat.swipes++; const lt = Math.min(threatTTA(T), .25); h = Math.atan2(T.p.x + T.v.x * lt - p.pos.x, T.p.z + T.v.z * lt - p.pos.z); } }
   const links = Math.max(1, Math.min(MELEE.links, pool.length));
   // A CHAIN, NOT A BUTTON. Inside the window (or during a strike, which buffers) the next
   // flick takes the NEXT link; let it lapse and the next flick opens at the first again. Past
@@ -18022,7 +18032,7 @@ function meleeGo0(h) {
   const reachMax = Math.min(MELEE.maxV * p.meleeDur * MELEE.carryAvg,
                             (katL ? Math.max(maxD, katL.reach) : maxD) + (tackle ? 0 : MELEE.arrive));
   const flow = FLOW.on && !tackle && flowNow() < (p.flowUntil || 0);     // m1086
-  const L = h != null ? meleeLock(h, flow ? Math.max(reachMax, FLOW.reach) : reachMax, flow ? FLOW.cone : katL ? katL.cone : 0, flow) : null;
+  const L = h != null && !p.defl ? meleeLock(h, flow ? Math.max(reachMax, FLOW.reach) : reachMax, flow ? FLOW.cone : katL ? katL.cone : 0, flow) : null;     // m1105: meeting a shot, he does not lunge at a man
   if (L) h = L.h;
   p.melTgt = L ? L.d : null;
   // SOLVE THE LAUNCH FOR THE GAP. A move covers `v * dur * carryAvg`, and that inverts.
@@ -18041,7 +18051,7 @@ function meleeGo0(h) {
   const vCap = Math.min(MELEE.maxV, (katL && L ? Math.max(maxD, katL.reach) : maxD) / spend);     // m993: a found target may pull him the katana's full reach
   const flowL = flow && L && L.dist > (katL ? katL.reach : maxD);     // m1086: a FLOW link past his ordinary reach -- the long lunge
   const vCapF = flowL ? Math.min(FLOW.maxV, (L.dist + .2) / spend) : vCap;
-  const solved = L ? clamp((L.dist - MELEE.arrive) / spend, 0, vCapF) : Math.min(base, vCap);
+  const solved = p.defl ? 0 : L ? clamp((L.dist - MELEE.arrive) / spend, 0, vCapF) : Math.min(base, vCap);
   // **AND A TACKLE AIMS THROUGH HIM RATHER THAN IGNORING HIM (m97).** *"He's hitting the guys
   // and then all of a sudden he zips past them by a long distance and I can't figure out why."*
   // It is the TACKLE, and it is m93 over-corrected. His m93 complaint was that the solve CUT IT
@@ -19299,6 +19309,76 @@ function rollGo(h) {
 // on one man and the shot at another -- and the fix there was to make it one call.
 // **THE REACH IS THE HOLD'S**, so a man the charge cannot get to is not marked and not taken:
 // the circle can never appear under somebody the dash will fall short of.
+// m1105: HITTING THINGS OUT OF THE AIR. *"When the turret or the arrows are coming at you, a little directional aim assist if you're swinging the
+// stick, so you turn and hit the rocket or the arrow."* And: *"if you charge the swing and you're pointing in the general direction of the rocket,
+// put a highlight around it -- you're locked on -- and when you release he launches at the rocket, perfectly slices it and sends it back. Two
+// ways to ricochet: the perfect timing, or a fully charged lock."*
+// THREATS (`threatList`): the turret's shots and the archers' arrows still coming (not stuck, not already his).
+// THE SWIPE (`meleeGo0`): a flick whose direction is within `cone` of a threat that will reach him inside `tta` s and `reach` m turns to meet
+// it, does not lunge, and any threat inside `catchR` of his chest in front of him while the swing is live is sent back (`deflectThreat`).
+// THE CHARGE (`chargeLockStep`): while the blade charges, the threat nearest his aim (the left stick, else his nose) within `lockCone` /
+// `lockR` gets a pulsing gold ring; released FULL it is the dash's target, and when it comes inside `catchR` it goes home PERFECT -- back
+// at whoever shot it, faster, a white flash, hitstop. A deflected ARROW hits archers (anyone) on its way back. TOOLS > DEFLECT ASSIST.
+const DEFL = { on: 1, missR: 1.6, cone: 1.15, reach: 7, tta: .75, catchR: 1.7, lockCone: .7, lockR: 16, back: 1.45, stat: { swipes: 0, caught: 0, locks: 0, lockHits: 0 }, ring: null };
+try { if (localStorage.getItem('mel.defl') === '0') DEFL.on = 0; } catch (e) {}
+function threatList() {
+  const L = [];
+  for (const S of TURRET.shots) if (!S.dead && !S.mine) L.push({ p: S.p, v: S.v, S });
+  for (const A of ARROWS) if (!A.stuck && !A.mine) L.push({ p: A.m.position, v: A.v, A });
+  return L;
+}
+const threatAlive = T => T && (T.S ? !T.S.dead && !T.S.mine && TURRET.shots.includes(T.S) : !T.A.stuck && !T.A.mine && ARROWS.includes(T.A));
+// time to his middle (closing speed), and the bearing to where it will be in `lead` s
+function threatTTA(T) {
+  const p = player, dx = p.pos.x - T.p.x, dz = p.pos.z - T.p.z, d = Math.hypot(dx, dz) || 1, close = (T.v.x * dx + T.v.z * dz) / d;
+  return close > .5 ? d / close : 1e9;
+}
+function threatFind(h, cone, maxD, maxT) {
+  const p = player; let best = null, bs = 1e9;
+  for (const T of threatList()) {
+    const dx = T.p.x - p.pos.x, dz = T.p.z - p.pos.z, d = Math.hypot(dx, dz); if (d > maxD) continue;
+    const off = Math.abs(wrapAngle(Math.atan2(dx, dz) - h)); if (off > cone) continue;
+    const tta = threatTTA(T); if (maxT && tta > maxT) continue;
+    { const sp = Math.hypot(T.v.x, T.v.z) || 1, miss = Math.abs((-dx) * T.v.z - (-dz) * T.v.x) / sp; if (miss > DEFL.missR) continue; }     // only what is coming AT him
+    const sc = d + off * 3; if (sc < bs) { bs = sc; best = T; } }
+  return best;
+}
+function deflectThreat(T, perfect) {
+  const p = player, P = T.p;
+  if (T.S) { const S = T.S, tg = S.src && !S.src.dead ? S.src : TURRET.list.find(q => !q.dead);
+    const h = tg ? Math.atan2(tg.x - P.x, tg.z - P.z) : p.faceH, v = Math.hypot(S.v.x, S.v.z) * (perfect ? DEFL.back : 1.3);
+    S.v.set(Math.sin(h) * v, 0, Math.cos(h) * v); S.mine = 1; S.t = 0;
+    if (S.rocket) S.m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(Math.sin(h), 0, Math.cos(h))); }
+  else { const A = T.A, d = A.from && DUMMIES.includes(A.from) && A.from.st !== 'gone' ? A.from : null;
+    const tx = d ? d.root.position.x : P.x - A.v.x, tz = d ? d.root.position.z : P.z - A.v.z, ty = d ? d.root.position.y + (d.K.h || 1.8) * .55 : P.y;
+    const sp = Math.hypot(A.v.x, A.v.y, A.v.z) * (perfect ? DEFL.back : 1.25), dx = tx - P.x, dz = tz - P.z, R = Math.hypot(dx, dz) || 1, Tt = R / sp, g = MOVE.g * .55;
+    A.v.set(dx / Tt, (ty - P.y) / Tt + .5 * g * Tt, dz / Tt); A.mine = 1; A.t = 0; A.m.userData.head.material.emissive.setRGB(.4, .8, 1); }
+  steelFlash(P.x, P.y, P.z, perfect ? 1.6 : 1); spkBurst(P.x, P.y, P.z, perfect ? 26 : 14, { col: [1, 1, .8], spread: perfect ? 5 : 3, size: .14, life: .4 });
+  snd('clang', { g: perfect ? 1.2 : .9, r: perfect ? 1.1 : 1.3, x: P.x, z: P.z }); camShake(perfect ? .25 : .08);
+  if (inArena()) ARENA.stop = Math.max(ARENA.stop, perfect ? .14 : .05);
+  DEFL.stat.caught++;
+}
+// every frame: a live swipe or charge dash catches what reaches him in front; the charge's lock is chosen and ringed
+function deflStep(dt) {
+  const p = player; if (!DEFL.on) { if (DEFL.ring) DEFL.ring.visible = false; return; }
+  const live = (p.melee && p.defl) || (p.chargeGo && p.chLock);
+  if (live) { const T = p.melee ? p.defl : p.chLock;
+    if (threatAlive(T)) { const dx = T.p.x - p.pos.x, dz = T.p.z - p.pos.z, dy = T.p.y - (p.pos.y + .9);
+      if (Math.hypot(dx, dz, dy * .6) < DEFL.catchR && Math.cos(Math.atan2(dx, dz) - p.faceH) > -.2) { deflectThreat(T, !!p.chargeGo); if (p.chargeGo) DEFL.stat.lockHits++; p.defl = null; p.chLock = null; } }
+    else { p.defl = null; if (!p.chargeGo) p.chLock = null; } }
+  // the charge's lock
+  const charging = p.charge && slotNow().blade && p.chargeT >= MELEE.charge * .3;
+  if (charging) { const S = stickWorld(), h = S.mag > .3 ? Math.atan2(S.x, S.z) : p.faceH, T = threatFind(h, DEFL.lockCone, DEFL.lockR, 0);
+    if (T && (!p.chLock || p.chLock.S !== T.S || p.chLock.A !== T.A)) DEFL.stat.locks++;
+    p.chLock = T; }
+  else if (!p.chargeGo) p.chLock = null;
+  if (!DEFL.ring) { DEFL.ring = new THREE.Mesh(new THREE.RingGeometry(.42, .55, 32), new THREE.MeshBasicMaterial({ color: 0xffc04a, transparent: true, opacity: .9, depthTest: false, toneMapped: false, side: THREE.DoubleSide }));
+    DEFL.ring.renderOrder = 60; scene.add(DEFL.ring); }
+  const R = DEFL.ring, T = p.chLock && threatAlive(p.chLock) ? p.chLock : null; R.visible = !!T;
+  if (T) { const full = p.chargeT >= MELEE.charge || p.chargeGo, t = performance.now() / 1000;
+    R.position.copy(T.p); R.quaternion.copy(camera.quaternion); R.scale.setScalar((full ? 1 : 1.4) * (1 + .12 * Math.sin(t * 14)));
+    R.material.color.setHex(full ? 0xffffff : 0xffc04a); }
+}
 function chargeAim(hold) {
   const p = player;
   const t = hold != null ? hold : p.chargeT;
@@ -19406,7 +19486,9 @@ function chargeRelease() {
   // **AND NOTHING COULD SEE IT**: `npm run sim`'s own dash case has been dead since m52 (see
   // below), so the three rows that measure exactly this have not run for fifty builds.
   const A = chargeAim(t0);
-  const CL = A.t, wantD = A.want;
+  const TL = DEFL.on && slotNow().blade && p.chLock && threatAlive(p.chLock) && t0 >= MELEE.charge ? p.chLock : null;     // m1105: locked on a shot -- the dash goes for IT
+  if (!TL) p.chLock = null;
+  const CL = TL ? { h: Math.atan2(TL.p.x - p.pos.x, TL.p.z - p.pos.z), dist: Math.hypot(TL.p.x - p.pos.x, TL.p.z - p.pos.z) * .6, thr: 1 } : A.t, wantD = A.want;
   if (CL) { p.faceH = p.heading = CL.h; p.melTgt = CL.d; }
   else p.melTgt = null;
 
@@ -19414,7 +19496,7 @@ function chargeRelease() {
   const k = p.chargeGoK, reach = MELEE.finishReach * k;
   // the gap is to his SURFACE at arm's length, not to his centre -- the leap has to land him
   // where the swept fist can reach, not inside him
-  const gap = (CL && p.melTgt) ? clamp(CL.dist - MELEE.arrive, 0, reach) : MELEE.finishFree * k;
+  const gap = (CL && (p.melTgt || CL.thr)) ? clamp(CL.dist - MELEE.arrive, 0, reach) : MELEE.finishFree * k;
   const f = reach > .01 ? clamp(gap / reach, 0, 1) : 0;
   // **FLAT, AND THE HOLD IS WHAT DECIDES HOW FAR (m36).** *"Make it so that jump attack doesn't
   // go high up in the air any more -- it's just a straightforward launch, and how far you go is
@@ -21529,6 +21611,7 @@ function boardPose(dt) {
 }
 
 function stepPlayer(dt) {
+  if (inArena()) deflStep(dt);     // m1105
   const p = player;
   stepFeet(dt);
   const hadLock = p.lock;
@@ -33473,7 +33556,7 @@ function strikeSweep(dt, power, live, dmg, body) {
         // fist by construction rather than by a second number. **`p.melFired` does not gate it**
         // -- that is for the SOUND, and a swing through two crates should take out two.
         if (BRK.on && BREAK.length) brkBlast(_sw.x, _sw.y, _sw.z, rad, dmg || FOE.dmg.fist);
-        if (inArena()) { vendHit(_sw.x, _sw.y, _sw.z, rad); turretMelee(_sw.x, _sw.y, _sw.z, rad, dmg); if (TURRET.shots.length) turretDeflect(_sw.x, _sw.y, _sw.z, rad); }     // m1016: walls are hit by `wallMelee`, once per strike     // m1011: and the turret; m1013: and its shots     // m950
+        if (inArena()) { vendHit(_sw.x, _sw.y, _sw.z, rad); turretMelee(_sw.x, _sw.y, _sw.z, rad, dmg); if (TURRET.shots.length) turretDeflect(_sw.x, _sw.y, _sw.z, rad); if (ARROWS.length) arrowDeflect(_sw.x, _sw.y, _sw.z, rad); }     // m1016: walls are hit by `wallMelee`, once per strike     // m1011: and the turret; m1013: and its shots     // m950
         // AND THE SAME SWING REACHES A WALL CHUNK (m170). A hammer through a brick wall is
         // the whole reason his chunks carry an hp rather than a flag.
         kitBlast(_sw.x, _sw.y, _sw.z, rad, dmg || FOE.dmg.fist);
@@ -57450,7 +57533,7 @@ window.melee = window.mel = { FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VE
   // of a rule measures a game that does not exist -- which is the oldest mistake there is, and
   // the only way not to make it is for `npm run sim` to call exactly these.
   DUMMY, DUMMIES, LOCK, LEDGE, WALL, STRIKE, PADS, DESK, meleeLock, dummyHit, dummyBlow, strikeSweep, stepDummies, bodySeat, SEAT, findLock, SFX, CHARGE, POSE, snd, PUNCH, PLASMA, HITSND, BODYSND, FLYHIT, STEP,
-  stepPlayer, muzzleWorld, RIC, coverAcross, cwallOf, KNOCK, knockHas, GSIDE, KAIM, aimLeap, kaimHold, DUCK, duckPose, RUNSWIPE, runSwipe, SHOTBLOCK, shotBlock, bladeSeg, steelFlash, STEEL, HURT, playerHurt, GOD, LEAP, coverLeap, wallGo, WRUN, wrunTap, wrunFind, wrunSpawn, wrunClear, stepWrun, backGo, HURDLE, hurdleTap, HOOK, barHook, meleeGo0, CART, cartGo, leftFlick, rigAnim, stepKit, frameBody, kickGo, SPRINGS, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, hbarCatch, stepBar, hbarPose, hbarFly, coverArmUndo, slideGo, coverShow, TURRET, beastFire, FIREBALL, ARCH, ARROWS, archerAdd, archerLoose, SWSEG, swingPeaks, KSET, knockAct, RUNLAND, AIRLEGS, airUpOf, sfxRevive, arenaLoad, BEASTTRIM, GSTRIKE, AIRK, leftFlick, kickGo, CROUCH, LHOLD, TORN, tornGo, LIMB, limbCut, limbPrep, sliceDummy, JUGGLE, TORNADO, FLOW, ZOOM, zoomGo, HORDE, hordeAdd, hordeClear, ACAM, actionCam, acamPip, turretSpawn, COURSE, courseBuild, courseClear, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
+  stepPlayer, muzzleWorld, RIC, coverAcross, cwallOf, KNOCK, knockHas, GSIDE, KAIM, aimLeap, kaimHold, DUCK, duckPose, RUNSWIPE, runSwipe, SHOTBLOCK, shotBlock, bladeSeg, steelFlash, STEEL, HURT, playerHurt, GOD, LEAP, coverLeap, wallGo, WRUN, wrunTap, wrunFind, wrunSpawn, wrunClear, stepWrun, backGo, HURDLE, hurdleTap, HOOK, barHook, meleeGo0, CART, cartGo, leftFlick, rigAnim, stepKit, frameBody, kickGo, SPRINGS, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, hbarCatch, stepBar, hbarPose, hbarFly, coverArmUndo, slideGo, coverShow, TURRET, beastFire, FIREBALL, DEFL, deflectThreat, threatList, ARCH, ARROWS, archerAdd, archerLoose, SWSEG, swingPeaks, KSET, knockAct, RUNLAND, AIRLEGS, airUpOf, sfxRevive, arenaLoad, BEASTTRIM, GSTRIKE, AIRK, leftFlick, kickGo, CROUCH, LHOLD, TORN, tornGo, LIMB, limbCut, limbPrep, sliceDummy, JUGGLE, TORNADO, FLOW, ZOOM, zoomGo, HORDE, hordeAdd, hordeClear, ACAM, actionCam, acamPip, turretSpawn, COURSE, courseBuild, courseClear, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
   MFX, camShake, palDive,
   // THE BOARD, LIVE (m159). `mel.SK8.hold` is where the deck sits IN HIS HAND while it is
   // carried, and how a carried board should look is a look-at-it decision -- so it is a dial he

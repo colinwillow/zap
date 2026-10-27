@@ -5,6 +5,29 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1105 -- hitting rockets and arrows back: the swipe turns to meet them, a full charge locks on, dashes and sends them home
+
+**What he said:** *"When the turret or the arrows are coming at you, a little directional aim assist if you're swinging the stick, so you
+turn and hit the rocket or the arrow... and if you charge the swing pointing in the general direction of the rocket, put a highlight round
+it -- you're locked on -- and when you release he launches at the rocket, perfectly slices it and sends it back. Two ways to ricochet: the
+perfect timing, or a fully charged lock."* (The charged 360 spin: back burner, his words.)
+
+**What changed (`DEFL`, `threatList`, `threatFind`, `deflectThreat`, `deflStep`, `arrowDeflect`, TOOLS > DEFLECT ASSIST):**
+- **Threats** are the turret's shots and the archers' arrows that are still coming: not stuck, not already sent back, and passing within
+  `missR` 1.6 m of him (a shot that will miss is not a target).
+- **The swipe** (`meleeGo0`): a flick within `cone` 1.15 rad of a threat that reaches him inside `tta` .75 s / `reach` 7 m turns to where it
+  will be, does NOT lunge at a man, and anything inside `catchR` 1.7 m of his chest in front while the swing is live goes back
+  (`deflectThreat`: rockets to their turret, arrows to their archer, a little faster). The swing's own sweep catches arrows now too.
+- **The charge lock** (`deflStep`): while the blade charges, the threat nearest his aim (left stick, else his nose, `lockCone` .7 /
+  `lockR` 16 m) wears a pulsing gold ring that turns WHITE when the charge is full. Released FULL, the dash goes for it, and when it is inside
+  `catchR` it goes home PERFECT: back at its shooter at x1.45, a white flash, hitstop.
+- **A returned arrow** hits any body it reaches (6 damage, a launch); it never hurts him.
+
+**Real loop:** rockets (`defl.cjs`): 3 swipes thrown 40 deg off the rocket, 3 turned to it, 2 sent back. Arrows (`defla.cjs`): one swipe
+caught an arrow and it went back into an archer; the other test arrows were misses that passed 1.1-2.2 m wide, which is why `missR` exists.
+Charge (`deflc.cjs`, the right pad really held): locked and ringed while charging; full, released at a rocket 4-12 m out: the dash met it 12
+frames later, PERFECT, and it went back and destroyed the turret.
+
 ## m1104 -- the TITLE PICKER: KORAJIN or ZAP & CLANCY; KORAJIN.md
 
 **What he said:** *"I'm not really making the other game anymore... this character with the Japanese style and the katana is its own game
