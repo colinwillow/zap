@@ -5,6 +5,26 @@ Every time you complete the third pass on a building, add it to the inventory I 
 run on it, swing on it, blow it up and repair it. Make various TYPES of buildings that are modular and will eventually fit together, with
 different functions: bars and ramps, interior and exterior, turrets, ballistae, beams -- floating flying ship buildings, zeppelins, towers."*
 
+## STEER 0 (his, after m1356) -- THE GRID LEVEL FIRST, AND AS MANY PASSES AS IT TAKES
+
+> *"We do as many freaking passes on this as we need to. Build one level at a time, scoped fairly moderately, and keep iterating over and over
+> until the game logic feels amazing -- then we embellish with the stuff we've built. And we want a lot of verticality. A LOT of verticality."*
+
+- **The loop works on GRID LEVEL 1 (LEVELGRID.md, `LVG1`) every pass, until he says it plays amazingly.** S2 (rescaling) and S3 (breakable skins) wait behind it.
+- **Logic before art:** each pass makes the ROUTE better (the order of beats, the reasons to go up and down, the reveals, the shortcuts, the risk), not the looks. No kit pieces, no dressing, until he signs off the logic.
+- **VERTICALITY:**
+  - heights to Y 6 (27 m)
+  - the path crosses OVER and UNDER itself (pads on pillars, open beneath)
+  - climbs of every kind: ramps, ladders, wall-run faces, grapple rings, bars
+  - drops and ziplines down
+  - a view from the top of where you have been and where you are going
+- **Each pass: one clear change to the level, a NOTES entry saying what it changes and why, and LEVELGRID.md kept as the plan.** His notes become the next pass.
+- **The pass log** (tick here):
+  - L1 pass 1 (m1356): the greybox system and his blueprint's path
+  - L1 pass 2: verticality
+  - L1 pass 3
+  - ...
+
 ## STEER (his, after walking X4, Oct 27 2026) -- OUTRANKS THE QUEUE BELOW
 
 > *"We need to increase the scale yet again -- maybe start with 1.5. The stairs on the ground floor are so steep I couldn't climb; I had
