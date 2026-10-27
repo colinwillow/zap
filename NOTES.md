@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## THE SHIP, PASS 7: THE CORE ROOM, THE CAPTAIN'S CABIN, RATLINES, FLYING FISH (m@X4@, WORKER A)
+## THE SHIP, PASS 7: THE CORE ROOM, THE CAPTAIN'S CABIN, RATLINES, FLYING FISH (m1391, WORKER A)
 
 His: *"do another detail pass... you're blowing it out of the water, keep going."*
 
