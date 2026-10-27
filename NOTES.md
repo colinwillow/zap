@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home, procedural, pass 5: the look (WORKER B)
+
+- **Main's texture library (m1382), triplanar (`triMat`).** No uv is needed, so every merged piece takes it:
+  - his SANDSTONE (cream, pores, lavender spots: made for this house) on every shell, the mound and the boulders, replacing pass 1's
+    vertex colour;
+  - `wood_timber` on the frame, the crane and the furniture;
+  - `wood_planks` on the decks, the steps, the ramp and new timber FLOORS in the hall, the tower and the store.
+- **The walls BULGE.** Each wall's outer face is lathed, swelling 7.5% at mid-height into its dome, so the shells read as the refs'
+  swollen domes, not silos. The door jambs are widened to meet the swell. The colliders and doors are unchanged (the swell is outward).
+- **The tower's flag** turned to face the front (it was edge-on).
+- **Counts.** 18 draws.
+
+Checked headless and looked at front and close renders against the refs. Shipped unverified. The five planned passes are done; next, more
+passes toward the four views (life: the orb swinging, the flags and banners moving; and closer shapes).
+
 ## Grumbo's home, procedural, pass 4: the dressing (WORKER B)
 
 From the refs:
