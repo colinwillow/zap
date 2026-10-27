@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1239 -- Jin Observatory pass 3: the polish (Building Forge loop)
+
+- **Armillary sphere:** bronze rings turning round a glowing core, on the base roof's corner.
+- **Star-chart banners:** indigo with gold stars and a constellation line, down the shaft's south face.
+- **Weathervane:** a bronze crane riding on the dome's crown.
+- **Door lamps** by the base door.
+- **Brass pipes** running up the shaft's sides.
+- **A pull-up bar** on the balcony's south side.
+- **A drone** circling high.
+
+The Jin Observatory is DONE (3 passes). Next: alternate -- an extra pass (6) on the Shrine, then Set 3 #27 Lantern Festival
+Street pass 1.
+
 ## m1238 -- Market pass 6: the fireworks stall (Building Forge loop, extra pass)
 
 A FIREWORKS STALL now stands at the market's east end: a booth with a red roof and a rack of eight paper rockets in four colours.
