@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE FORGE'S PEAKS WERE INSIDE THE FORT (m1366)
+
+His (with two screenshots at the Timber Siege Fort): *"it's interfering with the background, like grey box stuff that you don't even know what this stuff is. I don't think it's intentional?"*
+
+- **What was wrong:** the grey shards were the forge's backdrop mountains (`forgePeaks`, m1132), not grey box.
+  - The rings were at 250 and 330 m, but each peak is a cone whose BASE radius was 0.9-1.5x its height (70-150 m). So a 120 m peak on the 250 m ring reached in to ~50 m from the centre.
+  - That was fine while the forge was small. The x1.5 spread put the fort at (-70, 100), and its front yard runs to z 50, right inside them.
+- **Measured, not guessed:** I built the fort in headless Chromium and rendered it from above and from the side. The peaks cut straight through the fort's yard and tiers. After the fix, the same shot shows the fort clear on the white floor with the peaks on the horizon.
+- **The fix:**
+  - the rings move out to 380 and 470 m
+  - a cone's base is 0.55-0.9x its height (`PEAKS.wide`), so the nearest rock is ~250 m out
+  - the forge floor goes from 400 to 640 m square (the buildings run to ~200 m)
+  - the camera's far plane is 900 in the forge, so the peaks are not clipped
+- **Landmine, again:** a mid-line `//` swallowed the rest of the `PEAKS` line, and the syntax gate caught it. Use `/* */`.
+
 ## GRID LEVEL 1, PASS 10: THE HIGH ROAD PAYS OFF (m1365)
 
 - **New `zips: [[a, b]]` in `LVG1`:** extra ziplines beside the beat-11 zip, each from a 4.5 m post on cell a down to cell b. `lvgClear` drops them all.

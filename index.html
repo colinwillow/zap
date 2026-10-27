@@ -9833,12 +9833,12 @@ function beastEnter(d, dt, t) {     // out of the tunnel, his own entrance past 
 // m1132: THE FORGE'S HORIZON (BUILDINGS.md; his: *"snowy white-capped mountains"*). Two rings of low-poly peaks -- a nearer one at ~250 m
 // and a paler one behind at ~330 -- each a jittered cone, rock below the snowline and white above, flat-shaded, ALL ONE MESH (one draw).
 // The fog would erase them at that range, so `fog: false` and the haze is baked into their colours (the far ring paler).
-const PEAKS = { rings: [[250, 20, 70, 120, .35], [330, 26, 90, 150, .6]], snow: .58, rock: 0x6f7a8a, cap: 0xf7f9fc, haze: 0xdfe6ef, seed: 7 };
+const PEAKS = { rings: [[380, 22, 70, 120, .35], [470, 28, 90, 150, .6]], wide: [.55, .35],     /* m1366: out past the spread forge (its buildings run to ~200 m); `wide` = a cone's base radius over its height, min + range */ snow: .58, rock: 0x6f7a8a, cap: 0xf7f9fc, haze: 0xdfe6ef, seed: 7 };
 function forgePeaks(g) {
   let sd = PEAKS.seed; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
   const geos = [], rock = new THREE.Color(PEAKS.rock), cap = new THREE.Color(PEAKS.cap), haze = new THREE.Color(PEAKS.haze), c = new THREE.Color();
   for (const [R, n, h0, h1, hz] of PEAKS.rings) for (let i = 0; i < n; i++) {
-    const a = (i + rnd() * .6) / n * Math.PI * 2, H = h0 + rnd() * (h1 - h0), W = H * (.9 + rnd() * .6), r = R + (rnd() - .5) * 40;
+    const a = (i + rnd() * .6) / n * Math.PI * 2, H = h0 + rnd() * (h1 - h0), W = H * (PEAKS.wide[0] + rnd() * PEAKS.wide[1]), r = R + (rnd() - .5) * 40;
     const geo = new THREE.ConeGeometry(W, H, 7, 4).toNonIndexed(), P = geo.attributes.position, col = new Float32Array(P.count * 3);
     const jit = new Map(); for (let k = 0; k < P.count; k++) { const x = P.getX(k), y = P.getY(k), z = P.getZ(k), key = x.toFixed(2) + ',' + y.toFixed(2) + ',' + z.toFixed(2);
       if (!jit.has(key)) jit.set(key, y > H / 2 - .01 ? [0, 0, 0] : [(rnd() - .5) * W * .35, (rnd() - .5) * H * .12, (rnd() - .5) * W * .35]);
@@ -9855,9 +9855,10 @@ function arenaStage() {
   // m1117: THE BUILDING FORGE -- a clean white floor under the arena's sky, nothing else: the buildings are spawned into it (SPAWN > BUILDINGS)
   if (inForge()) { const cv = document.createElement('canvas'); cv.width = cv.height = 512; const c = cv.getContext('2d'); c.fillStyle = '#f2f3f5'; c.fillRect(0, 0, 512, 512);
     c.strokeStyle = 'rgba(120,130,150,.35)'; c.lineWidth = 2; for (let i = 0; i <= 512; i += 64) { c.beginPath(); c.moveTo(i, 0); c.lineTo(i, 512); c.stroke(); c.beginPath(); c.moveTo(0, i); c.lineTo(512, i); c.stroke(); }
-    const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(50, 50); t.anisotropy = 8;
-    const f = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.MeshStandardMaterial({ map: t, roughness: .6 })); f.rotation.x = -Math.PI / 2; f.receiveShadow = true; g.add(f);
+    const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(80, 80); t.anisotropy = 8;
+    const f = new THREE.Mesh(new THREE.PlaneGeometry(640, 640), new THREE.MeshStandardMaterial({ map: t, roughness: .6 })); f.rotation.x = -Math.PI / 2; f.receiveShadow = true; g.add(f);
     forgePeaks(g);     // m1132: the snowy white-capped mountains round the forge
+    camera.far = Math.max(camera.far, 900); camera.updateProjectionMatrix();     // m1366: the peaks moved out to 380-470 m
     CWALL.g = g; COVER.meshes = []; COVER.boxes = []; ARENA.r = 60; return; }
   // m971: the room's floor, a ring from the dais step outward, polished tiles, a little translucent over the mirrored room
   const ft = arenaTileTex(); ft.repeat.set(25, 25);
