@@ -25,6 +25,22 @@ I re-read the whole build against the reference and fixed what reading it turned
   - On top of that: the storehouse's breakable walls, the ballista, the drawbridge, the six flags and the herons.
 
 **THE 10 PASSES OF X2 ARE DONE** (m1277 to this build). The DONE WHEN box that is left is his look on the phone. SHIPPED UNVERIFIED.
+## The Courtyard pass 3 of 10: the high road (C1)
+
+- **The lane bridge.** A PLANK BRIDGE crosses the lane between the two halls' balconies at 4 m: 2.2 m wide, rope rails. The balcony
+  rails now have a gap where it lands.
+- **The BELL HOUSE** in the north-east:
+  - a 7.8 m deck at 8 m on four posts with cross ties, a ladder up from the court, a ladder from the east wall-walk, rails (`noCam`),
+    and its own roof
+  - a GREAT BELL. Strike it and it booms and swings. It is the court's ALARM (`C.alarm`, sets the court's guards on him, ready for pass 5).
+- **The ROPE BRIDGE.** A long sagging span (1.1 m of sag, 20 planks, rope rails) from the north end of the east hall's roof up to the
+  bell deck's south rail-gap.
+- **The route.** The court can now be crossed without touching the ground: gate lintel, wall-walk, the hall's ladder or roof, the lane
+  bridge, the rope bridge, the bell house, the walk, the watchtower's deck.
+- **Reusable.** `bridgeDeck(A, B, halfWidth, sag, planks, rails)` is a helper for any building: walkable triangles on the sag curve,
+  planks, posts and rope rails.
+
+SHIPPED UNVERIFIED. Next: pass 4, the pagoda placed in the court's north-west, the ziplines and the centrepiece tree.
 
 ## White Heron Castle pass 9 of 10: light and life (X2, WORKER B)
 
