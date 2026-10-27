@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1157 -- BATHHOUSE pass 3 (DONE)
+
+- An indigo NOREN in three panels across the top of the front, a white wave crest on each (canvas).
+- A BAMBOO FENCE (solid) round a little side garden on the +z side, a stone lantern in it, mossy rocks.
+- Two cables from the front corners to stakes (lamps); a drone orb over the roof.
+`BLDG` bath `pass: 3`. Next: the Forge-Workshop (#12, (30, 24)). Shipped unverified.
+
 ## m1156 -- BATHHOUSE pass 2: shoji, a healing pool, buckets
 
 - SHOJI SCREENS across the four open bays of the front: paper on a dark lattice (a canvas texture, lit a little from inside). Each SLIDES
