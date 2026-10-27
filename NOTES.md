@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## AIM BACK TO REGULAR, PLUS A ±20° HEIGHT ASSIST (m1367)
+
+His: *"Reset the regular rocket shooting to regular, it's getting too crazy. Just a slight auto-aim within like 20 degrees up or down: if you've pressed up on the right pad to start a rocket shot and there's a character up or down by 20 degrees, it tilts the camera and the aim slightly up towards them. It doesn't auto-lock left and right, but it reaches the height for you."*
+
+- **What is off:**
+  - **3D AIM:** its saved setting moved to a new key (`mel.aim3b`), so his saved ON is reset. The toggle still exists.
+  - **The walk-backwards reticle tilt** (`BACKAIM.on = 0`, m1344).
+- **New `VAIM` (`aimVert`):** runs while he aims any aiming weapon (rocket and blaster).
+  - **Target:** the nearest body or live turret within ±9° of the lens's bearing (`yaw`), ±20° above or below the muzzle (`pitch`) and 1.5-60 m out. Pals are skipped.
+  - **The tilt:** the shot's pitch eases to that height (`ease` .12 s) and back to level when there is nothing, or after the shot (`back` .25 s). The camera tilts with it (back-aim's `cam` x 1.2).
+  - **Never steered:** the bearing. Left/right is all his.
+- **The plumbing:** the old back-aim's. `p.gDir` carries the pitch into `aimPoint`, so the reticle and the rocket follow the tilted line. The m1344 code stays, switched off.
+- **Live dials:** `mel.VAIM` (`pitch`, `yaw`, `range`, `ease`, `on`).
+
 ## THE FORGE'S PEAKS WERE INSIDE THE FORT (m1366)
 
 His (with two screenshots at the Timber Siege Fort): *"it's interfering with the background, like grey box stuff that you don't even know what this stuff is. I don't think it's intentional?"*
