@@ -5,6 +5,31 @@ Every time you complete the third pass on a building, add it to the inventory I 
 run on it, swing on it, blow it up and repair it. Make various TYPES of buildings that are modular and will eventually fit together, with
 different functions: bars and ramps, interior and exterior, turrets, ballistae, beams -- floating flying ship buildings, zeppelins, towers."*
 
+## THE DOJO (his, after m1390) -- the arena becomes the floating samurai dojo; many passes
+
+> *"Start making the arena the dojo, more in line with the game aesthetic: our texture maps, our architecture -- take reference from his home and the
+> flying ship. More Japanese, more samurai, more flying: flags, hovering platforms, without obstructing. Clear the space entirely (stuff available to
+> spawn in); little altars on the sides up high -- the triple-sword altars -- flags on the other corners, 90 degrees round the circle; instead of a
+> stadium, big decorative architecture, the Japanese roofs with that layering."*
+
+- **Where:** KORAJIN > The Arena (`?w=arena`). `?arena=lab` brings the old stadium back.
+- [x] **pass 1 (m1391):**
+  - a floating timber disc ringed in red lacquer on a stone dais, with a red-post rail and a rock root below
+  - a sea of cloud under the Ship's sunrise sky
+  - TWO SWORD ALTARS hovering high (N/S: three katanas on a rack under a two-tier roof, lanterns) and TWO BANNER MASTS (E/W: waving red chevron cloth)
+  - FOUR PAGODAS on floating rocks on the diagonals (three tiers, upturned eaves, red fascias)
+  - seven drifting stone platforms
+  - the middle CLEARED (no cover walls); everything still spawns from SPAWN
+  - a boss enters by the beam
+- [ ] pass 2:
+  - THE GATES: four great torii/gatehouses on the rim where the stadium's doors were, so bosses walk in again (the DOORS entry)
+  - roofs with body (a soffit under the eaves, ridge tiles, hanging lanterns at the corners)
+  - the altars reachable (a hovering platform route up to each)
+- [ ] pass 3:
+  - life: petals or embers on the wind, birds, lanterns lit at dusk, the clouds moving, light shafts
+  - the floor's inlaid crest, and tatami/training marks
+- [ ] later: the training-dojo function (racks you take weapons from, targets that pop up, a sparring master), the music
+
 ## THE ELEMENTS (his, after m1382) -- sandboxes for water, snow and air
 
 > *"Half of a video game is the visual. One thing that would be super fun is a convincingly good snow simulation: you're trudging through the snow, the

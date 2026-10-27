@@ -361,6 +361,24 @@ SHIPPED UNVERIFIED. The queue's passes 2 and 3 are done. Next is his call: more 
 
 SHIPPED UNVERIFIED. Next: pass 3, foam and wake, bow spray, the sun on the water, gulls, an island.
 
+## THE DOJO, PASS 1: THE ARENA FLOATS -- ALTARS, BANNERS, PAGODAS, CLOUDS (m1391)
+
+His: *"Start making the arena the dojo... more Japanese, more samurai, more flying... clear the space entirely... triple-sword altars up high on the sides, flags on the other corners 90 degrees round, instead of a stadium big decorative architecture, the Japanese roofs with that layering."*
+
+- **`DOJO.want`** (default; `?arena=lab` is the old stadium). `arenaStage` builds `dojoBuild(g, W)` INSTEAD of the floor ring, field, track, `arenaLab` (stadium, doors, drones) and the cover walls (`COVER.blocks = []`). The invisible 6 m rim wall stays.
+- **Built from the shared library** (`triMat`): timber floor (tinted warm), stone dais, sandstone rock, bronze trim, roof tiles. All merged per material.
+- **The floor and the platform:** a red lacquer inlay ring at R, a bronze band at the rim, red posts with a timber rail, and a jagged rock cone beneath (the platform floats).
+- **The sky:** the Ship's `SKYGLSL` sunrise dome. A CLOUD SEA at y -46 (fbm noise, drifting, fading into the horizon colour). The sun is warm and low.
+- **SWORD ALTARS** (N and S, r 24, y 7): a stone disc on a rock root, a red rack of three katanas (blade, handle, tsuba), lanterns, and a two-tier roof.
+- **BANNER MASTS** (E and W): 22 m timber masts, each with a 15 m red chevron banner (the red_cloth map) that WAVES in its vertex shader.
+- **PAGODAS** (the diagonals, r 74) on floating rocks:
+  - a stone base, red pillars, white walls
+  - three roof tiers from `dojoRoof` (a 32-segment cone squared off, the eave ring lifted toward the corners), each with a red fascia ring
+  - a bronze finial
+- **Platforms:** seven drifting stone platforms circle and bob outside the rim (decor; not standable yet).
+- **Bosses:** `ARENA.door.entry = 'BEAM'` here, because the stadium's doors are not built. Pass 2 gives the dojo gates for them to walk through.
+- **Checked headless:** it boots into the arena, with three renders (wide, a pagoda, the floor). The first render's pagoda roofs read as thin sails, so they got fascias and taller storeys. The plank map was too dark over a disc that big, so the floor is timber.
+
 ## THE CHUNK LIBRARY: THE PIECES A LEVEL IS BUILT FROM, SIZED FROM THE MOVE TABLE (m1389)
 
 Step 2 of the blueprint pipeline (LEVELDESIGN.md "THE BLUEPRINT", BUILDINGS STEER 000), after Worker B's move table (m1376).
