@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- Timber Siege Fort pass 8 of 10: the camp (X3, WORKER A)
+
+- **A PALISADE** of sharpened logs, each a two-block stack that breaks: across the front 46 m out, and down both sides 38 m out to the stone,
+  roped at two heights. Inside it stand the ramps, the crane, the log stacks and the zipline's foot.
+- **A GATE** in it (`bgateMake`, 6.4 x 3.8 m, four blows) between **two small GATE TOWERS**. Each is a post frame with a plank platform at
+  4.5 m, a breakable rail, a stepped tile cap and a ladder up, with **an archer on each**.
+- **Four cloth TENTS**: a cream ridge (a box turned 45 degrees about its length, half sunk), a red band, a ridge pole, each with a collider.
+- **Two WEAPON RACKS** of steel spears and red shields with gold bosses.
+- **A CAMPFIRE**: a ring of stones, crossed logs, and a flame that flickers and throws sparks.
+- **War banners lining the approach**: the fort's white nobori on poles every 6 m down both sides of the path from the palisade gate to the
+  tunnel, streaming on the wind.
+- The rock hoppers' zone now reaches the palisade.
+
+SHIPPED UNVERIFIED. Next: pass 9, the set piece (fire the watch house and the lattice burns tier by tier, or hold it).
+
 ## m1337 -- Timber Siege Fort pass 7 of 10: the timber gives way (X3, WORKER A)
 
 **Cut the braces and the bays sag and fall** (`tfortFace`):
