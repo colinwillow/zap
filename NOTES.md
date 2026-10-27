@@ -5,6 +5,25 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- Timber Siege Fort pass 9 of 10: the set piece -- fire the watch house (X3, WORKER A)
+
+**Two OIL JARS** stand on the top deck either side of the watch house. Hit one, or put a rocket into the house, and it goes up
+(`tfortIgnite` / `tfortBurn`):
+- **The jars burst** in a fireball, with a boom and a big shake.
+- **The fire runs DOWN the lattice, a tier every 7 s**: the top tier and the watch house, then the second, then the first.
+  - On every burning tier a brace burns through every .22 s (the house walls too). Pass 7's collapse takes the faces down as their braces
+    go: decks sag, then whole faces fall.
+  - 28 flames (additive cones, one shared material) leap over the burning tiers' faces, with sparks rising and black smoke rolling off
+    the decks.
+  - **It burns him**: 4 every .6 s while he stands in a burning tier.
+- **It burns out** after about 30 s per tier. What fell is built back a minute after it broke (pass 7's rebuild), and the jars are refilled
+  90 s after the blast, so it can be done again.
+- "Or hold it": stay out of the fire, keep the defenders off the top deck, and the house and jars stay whole. No timer forces it.
+
+Also: three camp props sat on the crane and the log stacks (two tents and a weapon rack); they have moved clear.
+
+SHIPPED UNVERIFIED. Next: pass 10, the polish.
+
 ## m1338 -- Timber Siege Fort pass 8 of 10: the camp (X3, WORKER A)
 
 - **A PALISADE** of sharpened logs, each a two-block stack that breaks: across the front 46 m out, and down both sides 38 m out to the stone,
