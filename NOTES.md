@@ -5,6 +5,24 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1098 -- air blade strikes wear the air's legs; the slow juggle float is off
+
+**What he said:** *"when you're stringing the katana swings and he launches into the air to meet a guy... his feet are flat on the ground
+even though he's in the air... his feet need to be doing the in-air or falling animation, at least just on the legs."* / *"I'm not super
+sold on the floating, the slow-mo... I like the distance they go up in the air, but not the slow speed."*
+
+**1. AIR LEGS (`AIRLEGS`, `airUpOf`, TOOLS > AIR LEGS).** In the air (`airT` > .1 s) a blade strike (name matches `AIRLEGS.re`, never a
+kick: the kick IS the legs) plays as its own upper half (`<clip>__up`, made from the clip the first time it is needed and kept) over
+`in_air`'s `__legs`. The whole clip stays at .01 weight so it keeps the clock, and the upper half is synced to it every frame. The Hips
+ROTATION rides with the upper half (`isUpper`), so a 360 still spins. Real loop (goblin, `katana_360h` lifted to 3 m): air legs .92,
+upper half .92, 12/12 frames. Picture: the old pose stood in a stride in mid-air, the new one has the legs tucked.
+
+**2. THE JUGGLE FLOAT IS OFF (`JUGGLE.float` 0, TOOLS > JUGGLE FLOAT).** A juggled body no longer drops to .22 gravity at the top of its
+arc. The launch height is unchanged (`rise`, `pop`, `slamUp`). A slow-mo moment for a real finisher is a later, separate thing.
+
+**OPEN (next build):** the NPCs' directional in-air hit, fall and get-up, the way his own knock-down works. The orange thing in the White
+Box: a fresh load there shows only his tower and the orange base, so I need a wider picture of it.
+
 ## m1097 -- a running landing, sound that survives leaving the app, and the course pad off
 
 **What he said:** *"the landing that we play is a stationary landing and if you're running... it just looks weird... there should be a
