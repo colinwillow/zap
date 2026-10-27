@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1169 -- WATCHTOWER pass 4: a war drum, a second archer, kites
+
+- A second red ARCHER posted on deck 2 (cleared with the tower).
+- THE WAR DRUM: a big red taiko on a stand on deck 1 (solid). Strike it (`bldHit`: katana, a shot, a parried bolt) -- a deep boom, the
+  drum shudders -- and it RAISES THE ALARM: every posted archer in the forge looses at once (`arCool` 0) and every sentry gun wakes and
+  fires (`cool` 0, `see` 1). `wtowerDrum`.
+- Two carp KITES (red, blue) flying high off the lookout on long lines, swooping and rolling.
+Next: Sky Bridges pass 3. Shipped unverified.
+
 ## m1168 -- SKY BRIDGES pass 2: ZIPLINES
 
 A new move: `ZIP`, `ZIPS`, `zipCatch`, `stepZip` (hooked into `stepPlayer` beside the grapple, its own hang pose, reset with the rest).
