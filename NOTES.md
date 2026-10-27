@@ -50,7 +50,7 @@ SHIPPED UNVERIFIED. Next: pass 10, the polish.
 - The rock hoppers' zone now reaches the palisade.
 
 SHIPPED UNVERIFIED. Next: pass 9, the set piece (fire the watch house and the lattice burns tier by tier, or hold it).
-## THE FORGE'S LAYOUT SPREAD x1.5 (STEER S2, m-SPR)
+## THE FORGE'S LAYOUT SPREAD x1.5 (STEER S2, m1341)
 
 His answer to *"growing each old building 1.5× in place makes them overlap -- how to make room?"*: **spread the layout.**
 

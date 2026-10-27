@@ -20281,7 +20281,7 @@ function adockClear() { const D = ADOCK.on; if (!D) return; if (D.kite) D.kite.r
 // round the Pagoda and passes 3-4 m off the Watchtower's lookout a metre below it (a running jump across); the second loops the east side
 // over the Gatehouse and the Market.
 const ZEP = { trap: 4.2, dropEvery: 22, hp: 10, downT: 30, bomb: { cd: 4, r: 4.5, dmg: 6, g: 14 }, list: [
-  { c: [-24, 22.5], rx: 39, rz: 21, y: 16.5, T: 140, ph: 0 },     /* m1337: the forge's layout spread x1.5 (STEER S2) -- the circuits with it */
+  { c: [-24, 22.5], rx: 39, rz: 21, y: 16.5, T: 140, ph: 0 },     /* m1341: the forge's layout spread x1.5 (STEER S2) -- the circuits with it */
   { c: [36, -6], rx: 15, rz: 27, y: 21, T: 115, ph: .5 } ], on: null };
 function zepMake(g) {
   const ship = new THREE.Group(); g.add(ship);
@@ -20843,7 +20843,7 @@ function sphangClear() { const H = SPHANG.on; if (!H) return; bldClear(H); SPHAN
 // standing when you spawn them (spawn the buildings first): a rope bridge from the Watchtower's lookout across over the Hall to the
 // Gatehouse deck; a plank bridge from the Gatehouse deck down between the torii's pillars to the Market roof; a short bridge from the
 // Rampart's east bastion up to the Gatehouse's back landing. Walkable (sagging plank tris), rope rails, lanterns at the posts.
-// m1337 (STEER S2, the forge spread x1.5): every end of a bridge or zipline belongs to a BUILDING, written at that building's OLD spot and size
+// m1341 (STEER S2, the forge spread x1.5): every end of a bridge or zipline belongs to a BUILDING, written at that building's OLD spot and size
 // (`AT0`); `skAt` puts it where the building stands NOW (its `at`) at the size it is built (its `scale`, 1 until it is rescaled), so the spans
 // follow each building as the S2 passes reach it. A street end (`null`) just spreads with the layout.
 const SKAT0 = { WTOWER: [-16, -8], GHOUSE: [16, -8], MKT: [16, 12], RAMP: [0, -24], ADOCK: [-30, 0], PAGODA: [-16, 12], LHOUSE: [-46, 30], HALL: [0, -7.5] };
@@ -20879,7 +20879,7 @@ function skybBuild() {
   if (SKYB.on) return; const g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, tris = [];
   const mats = { plank: new THREE.MeshStandardMaterial({ color: 0x7a5434, roughness: .85 }), rope: new THREE.MeshStandardMaterial({ color: 0xc9b07a, roughness: 1 }), wood: new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 }),
     lamp: new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false }) };
-  for (const S of SKYB.spans.concat(SKYB.zips)) { S.A = skAt(S.a[0], S.a[1]); S.B = skAt(S.b[0], S.b[1]); }     // m1337: where the buildings stand now
+  for (const S of SKYB.spans.concat(SKYB.zips)) { S.A = skAt(S.a[0], S.a[1]); S.B = skAt(S.b[0], S.b[1]); }     // m1341: where the buildings stand now
   mats.flapList = [];   let n = 0; for (const S of SKYB.spans) if (S.need()) { bridgeSpan(g, S.A, S.B, S.w, S.sag, tris, mats); n++; }
   // m1168: ZIPLINES -- a bronze cable from a high anchor down to a low one, a post with a lamp at each end
   const zips = []; for (const Z of SKYB.zips) if (Z.need()) { const A = Z.A, B = Z.B, c = new THREE.Mesh(new THREE.TubeGeometry(new THREE.LineCurve3(new THREE.Vector3(...A), new THREE.Vector3(...B)), 8, .04, 5), new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 })); g.add(c);
@@ -21332,7 +21332,7 @@ function lhouseClear() { const L = LHOUSE.on; if (!L) return; bldClear(L); LHOUS
 // a jagged rock cone under each, a flat grassy top (walkable triangles, a slab collider under them), a waterfall off each one's edge. Rope
 // bridges (the Sky Bridges' own `bridgeSpan`) climb from the lowest to the middle to the highest, which carries a little SHRINE. You get up
 // by GRAPPLE: a ring hangs off the low island's outer edge, in reach from the street, and one over the shrine.
-const FISL = { crowHp: 3, crowBack: 25, crowRest: 3, crowV: 9, crowDmg: 8, isl: [ { at: [115, 80], top: 5, r: 3.5 }, { at: [130, 95], top: 7, r: 4 }, { at: [115, 110], top: 9, r: 3.5 } ]     /* m1337: moved out to clear the Octagonal Pagoda (they were (42,22), (52,32), (42,42)) */, on: null };
+const FISL = { crowHp: 3, crowBack: 25, crowRest: 3, crowV: 9, crowDmg: 8, isl: [ { at: [115, 80], top: 5, r: 3.5 }, { at: [130, 95], top: 7, r: 4 }, { at: [115, 110], top: 9, r: 3.5 } ]     /* m1341: moved out to clear the Octagonal Pagoda (they were (42,22), (52,32), (42,42)) */, on: null };
 function fislBuild() {
   if (FISL.on) return; const g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, tris = [];
   const rock = new THREE.MeshStandardMaterial({ color: 0x7a6a5c, roughness: 1, flatShading: true }), grass = new THREE.MeshStandardMaterial({ color: 0x5a8a4a, roughness: .95 }), iron = new THREE.MeshStandardMaterial({ color: 0x34383e, metalness: .6, roughness: .5 });
@@ -22569,7 +22569,7 @@ function tfortBuild() {
   for (const sg of [-1, 1]) { const z = cz + sg * (A.hz - .1); blk(cx, A.tunH, A.tunH + .6, z, A.tunW + 1.6, .7, dark, {}); for (const s2 of [-1, 1]) blk(cx + s2 * (tw + .3), 0, A.tunH, z, .6, .7, dark, {}); }     // timber frames at the two mouths
   // ---- THE LATTICE: three tiers of posts on a `bay` grid round the edge (and a 6 m grid inside), a beam round the top and one at half height,
   // an X of braces in every half-bay, a plank deck on top (a hatch cut for the ladder from below), a rail round what the next tier leaves open ----
-  const faces = {};     // m1337 (pass 7): every tier face's braces, deck edge and rails, so cutting enough of it brings it down
+  const faces = {};     // m1341 (pass 7): every tier face's braces, deck edge and rails, so cutting enough of it brings it down
   let yb = H0; const T = A.tiers.map(([w, d, ox, oz]) => [w, d, ox, oz]); let px = cx, pz = cz, prev = null; const tierBoxes = [];
   for (let k = 0; k < T.length; k++) { const [w, d] = T[k]; let x0, z0; if (!prev) { x0 = cx - w / 2; z0 = cz - d / 2; } else { const [pw, pd, px0, pz0] = prev; x0 = px0 + (pw - w) / 2; z0 = pz0 + (pd - d) * (k === 1 ? .7 : .66); }
     const x1 = x0 + w, z1 = z0 + d, H = A.tierH, ytop = yb + H; tierBoxes.push([x0, x1, z0, z1, yb, ytop]); prev = [w, d, x0, z0];
@@ -22587,7 +22587,7 @@ function tfortBuild() {
       for (const B of R2) if (B) { B.face = F; F.braces.push(B); } }
     // the deck on top: planks along x in strips, a hatch cut at the back-left for the next ladder (none on the top tier)
     const hx0 = x0 + 1.2, hx1 = hx0 + 1.4, hz1 = z1 - 1.2, hz0 = hz1 - 1.4;     // (the top tier's hatch opens beside the watch house)
-    // m1337 (pass 7): the deck's outer 2 m round each face is BREAKABLE plank pieces that belong to that face (they sag and fall with it); the
+    // m1341 (pass 7): the deck's outer 2 m round each face is BREAKABLE plank pieces that belong to that face (they sag and fall with it); the
     // middle stays whole (and the top tier's back, where the watch house stands)
     for (let z = z0; z < z1 - .01; z += .5) { const za = z, zb = Math.min(z1, z + .5), zm = (za + zb) / 2, hole = zb > hz0 && za < hz1, segs = hole ? [[x0, hx0], [hx1, x1]] : [[x0, x1]];
       for (const [sa, sb] of segs) for (const [pa, pb] of [[sa, Math.min(sb, x0 + 2)], [Math.max(sa, x0 + 2), Math.min(sb, x1 - 2)], [Math.max(sa, x1 - 2), sb]]) { if (pb - pa < .05) continue;
@@ -22844,7 +22844,7 @@ function tfortBreak(B, dir, quiet) {
     spkBurst(B.P.x, B.P.y, B.P.z, 8, { col: [.75, .55, .35], spread: 2.5, size: .14, life: .5 }); smokeAt(B.P.x, B.P.y, B.P.z, .8, 1, [.6, .5, .4]); }
   if (B.up) tfortBreak(B.up, dir, 1);
   if (B.face && G && !B.face.down && B.face.braces.includes(B)) tfortFace(G, B.face, dir); }
-// m1337 (pass 7): A FACE GIVES WAY. Its strength is the share of its braces still standing: under .7 the deck edge over it SAGS (the planks
+// m1341 (pass 7): A FACE GIVES WAY. Its strength is the share of its braces still standing: under .7 the deck edge over it SAGS (the planks
 // droop toward the edge, a creak), under .35 the whole face COLLAPSES -- every brace, rail and edge plank on it comes down, the long planks
 // tumbling off as debris, a boom and dust along the face. A minute later it is built back.
 function tfortFace(G, F, dir) { const n = F.braces.length, s = F.braces.filter(B => B.alive).length / Math.max(1, n);
