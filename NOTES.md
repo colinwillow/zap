@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1248 -- Flying Ship House pass 6: climb her (Building Forge loop, extra pass)
+
+The ship gets its first LADDERS in the forge. They use the kit worlds' climbing (`kitClimbAdd` into `KCLIMB`): walk into one and climb,
+and the exit point is set by an explicit `mark`.
+- **The cargo net.** A rope net hangs over the port side from the ground to the deck, through a new gap in the port bulwark
+  (x cx-4.6..cx-3.4).
+- **The crow's nest.** A rope ladder runs up the main mast's -x face to a crow's nest at deck + 12.6 m, above the sail. The nest has a
+  hatch in its floor where the ladder comes through, a rail, a lantern, and a grapple ring 3.6 m above.
+
+`fshipClear` splices both ladders out of `KCLIMB` (and lets go of one he is on). The pass's late boxes are swept into `BOXES`.
+Registry `pass: 6`. SHIPPED UNVERIFIED. Next: Sky Wreck pass 2 (the sparking Jin engine).
+
 ## m1247 -- Sky Wreck pass 1: stands and playable (Building Forge loop, Set 3 #28)
 
 At (30, -72): `SWRK`, `swrkBuild` / `swrkStep` / `swrkClear`.
