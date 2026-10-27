@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1227 -- Kneeling Colossus pass 3: the polish (Building Forge loop)
+
+- **Cracks:** dark seams across the stone (chest, shin, shoulder, thigh).
+- **War-banner:** a torn red banner hanging from the sword's guard, its tail ragged.
+- **Votive candles** with flickering flames at the planted foot, and paper charms on the shin.
+- **Shimenawa** round the sword's blade.
+- **Rubble:** broken bronze armour plates lying in it.
+- **A drone** circling high.
+
+The Kneeling Colossus is DONE, and with it ALL OF SET 2 (14-24). Next, by his rule: brainstorm SET 3 into BUILDINGS.md, then keep
+building and alternating with extra passes (6) on the oldest buildings.
+
 ## m1226 -- Kneeling Colossus pass 2: the Jin core wakes it (Building Forge loop)
 
 **THE JIN CORE.** A glowing cyan core is set low in the chest plate (6.3 to 7.3 m), within reach from the left thigh. Strike it
