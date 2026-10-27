@@ -10968,7 +10968,7 @@ function stepRope(dt) {
 // m1168: ZIPLINES (Sky Bridges pass 2). A cable from a high point to a low one (`ZIPS`: {A, B}). In the air, his hands within `grab` m of
 // the cable (and inside its length) CATCH it: he hangs and slides down it, gravity along the slope against a little drag, up to `max`
 // m/s, and drops off at the bottom end with the speed he has. TAP to let go anywhere on the way.
-const ZIP = { brake: 14, grab: .7, max: 17, drag: .25, v0: 3, up: 1.6 }, ZIPS = [];
+const ZIP = { brake: 14, grab: .7, max: 17, drag: .25, v0: 3, up: 2.6, dropT: .45 }, ZIPS = [];
 function zipCatch() {
   const p = player, H = hbarH(), hx = p.pos.x, hy = p.pos.y + H * 1.15, hz = p.pos.z;
   for (const Z of ZIPS) { const A = Z.A, B = Z.B, dx = B[0] - A[0], dy = B[1] - A[1], dz = B[2] - A[2], L2 = dx * dx + dy * dy + dz * dz, u = ((hx - A[0]) * dx + (hy - A[1]) * dy + (hz - A[2]) * dz) / L2;
@@ -10984,6 +10984,9 @@ function stepZip(dt) {
   if (stick.L.down && stick.L.y > .35) { K.v = Math.max(ZIP.v0 * .5, K.v - ZIP.brake * dt); if (Math.random() < .6) spk(p.pos.x, p.pos.y + H * 1.15, p.pos.z, (Math.random() - .5) * 2, 1, (Math.random() - .5) * 2, .07, .3, [1, .9, .5]); }     // m1193: pull back to BRAKE
   // m1293: SHIMMY UP -- the left stick pushed FORWARD climbs hand over hand toward the high end (`ZIP.up` m/s), whatever the slope
   if (stick.L.down && stick.L.y < -.35) K.v = sn > 0 ? -ZIP.up : ZIP.up;
+  // m1352: *"I got onto a zipline by accident and couldn't get off, he was moving really slow."* A tap (either pad) still lets go; now so does the
+  // left stick held hard DOWN for `dropT` s (the obvious "get me off this" gesture), and the shimmy is quicker (`up` 1.6 -> 2.6)
+  K.dn = stick.L.down && stick.L.y > .85 ? (K.dn || 0) + dt : 0; if (K.dn > ZIP.dropT) p.jump = 1;
   K.u += K.v / K.L * dt; p.grounded = false;     // m1293: THIS LINE WAS INSIDE THE COMMENT ABOVE SINCE m1193 -- every zipline froze where you caught it
   if (K.u < 0) K.u = 0;
   const u = Math.min(1, K.u), dx = (B[0] - A[0]) / K.L, dy = (B[1] - A[1]) / K.L, dz = (B[2] - A[2]) / K.L;
@@ -11743,6 +11746,19 @@ function archerBow(d) {
     B.nock.userData.head.material.emissive.setRGB(d.ar === 'aim' ? 1 : 0, d.ar === 'aim' ? .1 : 0, d.ar === 'aim' ? .05 : 0); B.nock.userData.head.material.emissiveIntensity = d.ar === 'aim' ? 2 + Math.sin(d.arT * 30) : 0; }
 }
 const _abL = new THREE.Vector3(), _abR = new THREE.Vector3(), _abA = new THREE.Vector3(), _abB = new THREE.Vector3(), _abM = new THREE.Vector3(), _abD = new THREE.Vector3();
+// m1352: *"The archers shoot me through the bottom of the roof I'm standing on. They can't see you if their view is obstructed by a roof; if they've
+// seen you they know you're there, but they definitely can't shoot you through walls and roofs."* `losClear` walks the straight line from his
+// eye to his chest in `step` m hops and calls it blocked at a solid box (`camHit`) or a walkable surface it passes through (`groundAt`: a
+// floor between the hop's point and a little above it -- roofs, decks and bridges are triangles, not boxes). An archer only DRAWS with a
+// clear line, and if the line closes while he aims he holds the shot (stays aimed, the arrow nocked) instead of loosing it into the roof.
+// m1352: *"When the workers put geometry on the ground I just go through it -- my feet disappear, it isn't a collider."* Ground clutter (kerbs,
+// rim stones, plinths, moss, step blocks) was drawn with `solid` 0. Any box standing ON the ground (`y0` under 5 cm), at least 12 cm and at most
+// 1.2 m tall, with a real footprint, is solid now (and `noCam`, so it never pulls the lens). Taller visual-only pieces stay visual.
+const lowSolid = (x0, x1, y0, y1, z0, z1) => y0 <= .05 && y1 - y0 >= .12 && y1 <= 1.2 && (x1 - x0) * (z1 - z0) > .05 && Math.min(x1 - x0, z1 - z0) > .1;
+function losClear(ax, ay, az, bx, by, bz) { const dx = bx - ax, dy = by - ay, dz = bz - az, L = Math.hypot(dx, dy, dz); if (L < 1.2) return true;
+  const n = Math.ceil(L / .45); for (let i = 2; i < n - 1; i++) { const u = i / n, x = ax + dx * u, y = ay + dy * u, z = az + dz * u;
+    if (camHit(x, y, z, 0)) return false; const gy = groundAt(x, z, y + .3, .3); if (gy > y - .05 && gy < y + .3) return false; } return true; }
+const archerSees = d => { const now = performance.now(); if (d._losT > now) return d._los; d._losT = now + 250; const P = d.root.position, p = player; return d._los = losClear(P.x, P.y + 1.5, P.z, p.pos.x, p.pos.y + (RIG.height || 1.25) * .55, p.pos.z); };
 function archerLoose(d) {
   const B = d.bow, p = player, o = (B && B.nock.visible ? B.nock.position.clone() : d.root.position.clone().setY(d.root.position.y + 1.4));
   const tx = p.pos.x + p.vel.x * ARCH.lead * .5, tz = p.pos.z + p.vel.z * ARCH.lead * .5, ty = p.pos.y + (RIG.height || 1.25) * .55;
@@ -11758,7 +11774,7 @@ function archerAI(d, dt, t) {
   d.arT += dt;
   faceTo(d, d.ar === 'move' ? toP : toP - (K.aimOff || 0), dt * 2);     // drawing, he turns so the LEFT ARM points at you
   if (d.ar === 'draw') { t.bow_draw = 1; if (d.arT >= ARCH.draw) { d.ar = 'aim'; d.arT = 0; d.aimFor = rnd(ARCH.aim); } return; }
-  if (d.ar === 'aim') { t.bow_overdraw = 1; if (d.arT >= d.aimFor) { d.ar = 'loose'; d.arT = 0; archerLoose(d); skinPlay(d, 'bow_recoil', 1); } return; }
+  if (d.ar === 'aim') { t.bow_overdraw = 1; if (d.arT >= d.aimFor && !archerSees(d)) { d.arT = d.aimFor * .7; return; } if (d.arT >= d.aimFor) { d.ar = 'loose'; d.arT = 0; archerLoose(d); skinPlay(d, 'bow_recoil', 1); } return; }
   if (d.ar === 'loose') { t.bow_recoil = 1; if (d.arT >= ARCH.loose) { d.ar = 'move'; d.arT = 0; d.arCool = rnd(ARCH.cool); } return; }
   // moving: keep the band, side-step now and then, and draw when the cool is up and he is in the band
   d.arCool -= dt; d.sideT -= dt; if (d.sideT <= 0) { d.sideT = 1.2 + Math.random() * 2; d.side = Math.random() < .35 ? 0 : (Math.random() < .5 ? -1 : 1); }
@@ -11770,7 +11786,7 @@ function archerAI(d, dt, t) {
   if (d.post) { sp = 0; clip = 'bow_aim'; }     // m1121: a POSTED archer (a lookout) holds his spot
   if (sp > 0) { foeMove(d, mh, sp, dt); setSkinScale(d, clip, ARCH.rate); }
   t[d.actions[clip] ? clip : K.clips.idle] = 1;
-  if (d.arCool <= 0 && dd > 3 && dd < ARCH.far + 6) { d.ar = 'draw'; d.arT = 0; skinPlay(d, 'bow_draw', 1); }
+  if (d.arCool <= 0 && dd > 3 && dd < ARCH.far + 6 && archerSees(d)) { d.ar = 'draw'; d.arT = 0; skinPlay(d, 'bow_draw', 1); }
 }
 // m1121: ONE archer POSTED at a spot (a tower's lookout), holding it, shooting from it; a horde body (life, dies)
 async function archerPost(x, y, z) {
@@ -22995,7 +23011,7 @@ function heronBuild() {
       const [u, v] = ay >= ax && ay >= az ? [x, z] : ax >= az ? [z, y] : [x, y]; uv[i * 2] = u / 4; uv[i * 2 + 1] = v / 4; }
     geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2)); return geo; };
   const mg = (geo, m, mat4, keepUv) => { geo = geo.index ? geo.toNonIndexed() : geo; if (mat4) geo.applyMatrix4(mat4); if (!keepUv) uvW(geo); if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); };
-  const box = (x0, x1, y0, y1, z0, z1, m, solid, ex) => { if (x1 - x0 < .01 || z1 - z0 < .01 || y1 - y0 < .01) return; mg(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), m, _m4.makeTranslation((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2));
+  const box = (x0, x1, y0, y1, z0, z1, m, solid, ex) => { if (x1 - x0 < .01 || z1 - z0 < .01 || y1 - y0 < .01) return; if (!solid && lowSolid(x0, x1, y0, y1, z0, z1)) { solid = 1; ex = Object.assign({ noCam: 1 }, ex || {}); } mg(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), m, _m4.makeTranslation((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2));
     if (solid) O.boxes.push(Object.assign({ minx: x0, maxx: x1, miny: y0, maxy: y1, minz: z0, maxz: z1 }, ex)); };
   const NC = { noCam: 1 };     // pass 11 (ROOM TO FIGHT): thin things beside a walkway never pull the camera in
   const rod = (A0, B0, r, m) => { const a = new THREE.Vector3(...A0), b = new THREE.Vector3(...B0), d = b.clone().sub(a), L = d.length(); if (L < .01) return; _q.setFromUnitVectors(_up, d.normalize());
@@ -23539,7 +23555,7 @@ function courtBuild() {
   const lamp = M(0xffd9a8, .5, { emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false }), paper = M(0xf2e6c8, .9, { emissive: 0xffa050, emissiveIntensity: .35 }), red = M(0xb3261c, .45);
   const MG = new Map(), _m4 = new THREE.Matrix4();
   const mg = (geo, m, mat4) => { geo = geo.index ? geo.toNonIndexed() : geo; if (mat4) geo.applyMatrix4(mat4); if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); };
-  const box = (x0, x1, y0, y1, z0, z1, m, solid, extra) => { if (x1 - x0 < .01 || z1 - z0 < .01 || y1 - y0 < .01) return; mg(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), m, _m4.makeTranslation((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2));
+  const box = (x0, x1, y0, y1, z0, z1, m, solid, extra) => { if (x1 - x0 < .01 || z1 - z0 < .01 || y1 - y0 < .01) return; if (!solid && lowSolid(x0, x1, y0, y1, z0, z1)) { solid = 1; extra = Object.assign({ noCam: 1 }, extra || {}); } mg(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), m, _m4.makeTranslation((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2));
     if (solid) O.boxes.push(Object.assign({ minx: x0, maxx: x1, miny: y0, maxy: y1, minz: z0, maxz: z1 }, extra || {})); };
   const X0 = cx - A.hw, X1 = cx + A.hw, Z0 = cz - A.hd, Z1 = cz + A.hd, H = A.wallH, W = A.walk;
   // THE GROUND: grass over the whole court, the lane of flags up the middle
@@ -31443,7 +31459,8 @@ function kitCutMat(m) {
       '  return (float(((a & 1) << 3) | ((q.y & 1) << 2) | (((a >> 1) & 1) << 1) | ((q.y >> 1) & 1)) + .5) / 16.0; }\n' +
       sh.fragmentShader.replace('void main() {', 'void main() {\n' +
         '  if (uKXOn > .5 && vKCutW.y > uKXFeet && distance(vKCutW, cameraPosition) < distance(uKXP, cameraPosition) - .35) {\n' +
-        '    float kxa = mix(uKXMin, 1.0, smoothstep(.45, 1.0, length(gl_FragCoord.xy - uKXS.xy) / uKXS.z));\n' +
+        '    vec3 kxd = uKXP - cameraPosition; float kxt = clamp(dot(vKCutW - cameraPosition, kxd) / dot(kxd, kxd), 0.0, 1.0);\n' +
+        '    float kxa = mix(uKXMin, 1.0, smoothstep(.55, 1.0, distance(vKCutW, cameraPosition + kxd * kxt) / 1.6));\n' +     /* m1352: a world CAPSULE round the lens->him line, not a screen circle -- a side wall beside him was dithered into a grey checker */
         '    if (kxa < .999 && kxa <= kxBayer(gl_FragCoord.xy)) discard;\n  }\n' +
         '  if (uKCutOn > .5 && vKCutW.y > uKCutY) {\n' +
         '    vec2 kd = vKCutW.xz - uKCutXf.xy;\n' +
@@ -32142,7 +32159,7 @@ const CLIMB = {
   pad: .35,         // how much bigger than the box the catch volume is
   cool: .35,
   top: .45,         // how far above `climb_top` he is set down
-  lip: .35, overT: .45,   // m1316: the step-over starts this far below the top and takes this long
+  lip: .35, overT: .32, overD: .9, overUp: .12,   // m1316: the step-over starts this far below the top and takes this long; m1352: it carries him `overD` in, rising `overUp`
   rate: 1.9,        // the walk clip, quickened -- there is no climb clip in this export and a
                     // walk cycle facing a wall IS legs on rungs and arms reaching (the grind's
                     // and the hang's own stand-in rule)
@@ -32254,7 +32271,7 @@ function stepClimb(dt) {
   // over onto the floor."* The top no longer teleports him: `over` carries him from the rungs up past the lip and forward onto the floor in
   // `CLIMB.overT` s, rising first and then moving in (an arc, not a slide), facing the way he goes, with no input needed.
   if (p.climbOver) { const O = p.climbOver; O.t += dt; const u = Math.min(1, O.t / CLIMB.overT), uy = 1 - (1 - Math.min(1, u * 1.6)) ** 2, uh = Math.max(0, (u - .3) / .7), eh = uh * uh * (3 - 2 * uh);
-    p.pos.set(lerp(O.a.x, O.b.x, eh), lerp(O.a.y, O.b.y + .25, uy) - .25 * eh, lerp(O.a.z, O.b.z, eh)); p.vel.set(0, 0, 0); p.speed = 1.5; p.grounded = false; p.airT = 0;
+    p.pos.set(lerp(O.a.x, O.b.x, eh), lerp(O.a.y, O.b.y + CLIMB.overUp, uy) - CLIMB.overUp * eh, lerp(O.a.z, O.b.z, eh)); p.vel.set(0, 0, 0); p.speed = 1.5; p.grounded = false; p.airT = 0;
     if (u >= 1) { p.climbOver = null; p.pos.set(O.b.x, O.b.y, O.b.z); p.grounded = true; p.jumps = 0; climbOff(); snd('foot', { g: .2, r: 1 }); } return; }
   // the ladder's SHORT horizontal axis is out of the wall; `climbSide` is which way along it that
   // is, measured where he grabbed it
@@ -32282,7 +32299,10 @@ function stepClimb(dt) {
   // standing point on the roof; without it the fallback is the volume's own top pushed INTO the
   // building, which is a guess and is marked as one.
   if (p.pos.y >= L.top - CLIMB.lip) {
-    const M = L.mark, b = M ? { x: M.x, y: M.y + .05, z: M.z } : { x: cx - nx * .8, y: L.top + CLIMB.top, z: cz - nz * .8 };
+    const M = L.mark, b0 = M ? { x: M.x, y: M.y + .05, z: M.z } : { x: cx - nx * .8, y: L.top + CLIMB.top, z: cz - nz * .8 };
+    /* m1352: *"the push forward at the top of the ladder is a really dramatic launch -- four times too much"*: a mark can sit metres in (more at
+       x1.5), and the step-over flew him all the way to it. Now it carries him only `CLIMB.overD` past the rungs toward the mark */
+    const ddx = b0.x - p.pos.x, ddz = b0.z - p.pos.z, dd = Math.hypot(ddx, ddz) || 1, kk = Math.min(1, CLIMB.overD / dd), b = { x: p.pos.x + ddx * kk, y: b0.y, z: p.pos.z + ddz * kk };
     p.climbOver = { t: 0, a: p.pos.clone(), b };
     return;
   }

@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## FIVE FROM HIS COURTYARD WALK (m1352)
+
+His screenshot: a red wall broken into a grey checker. Plus: walking through ground geometry, a launch off the ladder top, stuck on a zipline, archers shooting through roofs.
+
+- **The grey checker was the X-RAY, dithering a wall that was not in the way.** The m181 dither thinned any surface nearer the lens than him inside a SCREEN circle round him, so a side wall beside him became a checker. It is now a world CAPSULE round the lens→him line (1.6 m): only what actually stands between the camera and him thins.
+- **Walking through ground geometry.** The court and the castle drew their kerbs, rim stones, moss, plinths and lantern bases with `solid` 0.
+  - `lowSolid`: any box standing on the ground (y0 < 5 cm), 12 cm to 1.2 m tall, with a real footprint, is now solid and `noCam`.
+  - It is applied in `courtBuild`'s and `heronBuild`'s `box`. The other builders have their own helpers. **Tell me which buildings still let your feet sink**, and I'll add the rule there.
+- **The ladder's step-over launch.** It carried him all the way to the exit mark, which can be metres in (more at ×1.5). It now carries him only `CLIMB.overD` .9 m in from the rungs, rising `overUp` .12, in `overT` .32 s. If it's still too much, `mel.CLIMB.overD` can go lower, or 0 for a plain stand-up.
+- **The zipline.** A tap on either pad already let go, but there was no obvious gesture.
+  - Holding the left stick hard DOWN for `ZIP.dropT` .45 s now lets go too.
+  - The shimmy is quicker: `up` 1.6 → 2.6 m/s.
+  - There is still no hang animation.
+- **Archers through roofs.** `losClear` walks the eye→chest line in .45 m hops and calls it blocked at a solid box OR a walkable surface it passes through. That second check matters because roofs, decks and bridges are triangles, not boxes.
+  - An archer only starts a draw with a clear line (cached every .25 s).
+  - If the line closes while he aims, he holds the shot instead of loosing. He "knows you're there", but cannot shoot through the roof.
+
 ## THE SHRINE x1.5 -- STEER S2 (older rows, m1351)
 
 - **The terrace** 14 x 12 x 3.2 → 21 x 18 x 4.8 m.
