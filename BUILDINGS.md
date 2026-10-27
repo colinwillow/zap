@@ -56,7 +56,8 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - [x] **pass 3 (m1385):** the tent cone (eight panels on a banded drum, poles crossing past the apex, a stacked finial), four brass ship's wheels, two bronze stacks, the crane with its brass orb, red tassel and weights, the balcony canopy, the tower's flag
   - [x] **pass 4 (m1387):** the dressing -- pot-heaped stall racks and crates, rows of glowing lanterns and brass bells under the beams, the shop's lit shelves and a warm light, saguaros, prickly pears and agaves round the mound, more boulders
   - [x] **pass 5 (m1388):** the look -- main's tileable sandstone (triplanar) on every shell and boulder, timber and planks, the walls lathed to BULGE, timber floors inside, the flag turned to the front
-  - [x] **pass 6 (next tick):** life -- the banners, flag and awnings flutter in the wind (vertex shader, most at the hem), the crane's orb swings on its chain
+  - [x] **pass 6 (m1390):** life -- the banners, flag and awnings flutter in the wind (vertex shader, most at the hem), the crane's orb swings on its chain
+  - [x] **pass 7 (next tick):** the shapes -- the tower steps in to a turret at the balcony (a walkable shoulder), a squatter hall under the cone, timber bands at the domes, red tassels
   - [ ] then more passes, each one closer to the four views
 
 ## THE SHIP (his, after m1372) -- its own track, alongside the blueprint work

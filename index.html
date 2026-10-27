@@ -63568,8 +63568,8 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 // to the shop front and to the round back door. Built in its OWN frame (local +z = the front, toward the river; `at`/`yaw` are HOME.hut's) and
 // merged per material; every collider a local box turned into the world (the yaw is a quarter turn, so a box stays a box); every walkable
 // surface a triangle. `?hut=glb` (or GHOME.on = 0) puts the GLB back, to compare. Pass 1: the massing and the walkable shell, with the inside.
-const GHOME = { on: 1, pass: 6, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 7, Hd: 2.8, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
-  door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1.3, rise: .3, g: null, stat: {} };
+const GHOME = { on: 1, pass: 7, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
+  Rtu: 2.5, door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1.3, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
 function ghNoise3(x, y, z) { const h = (i, j, k) => { let n = (i * 374761393 + j * 668265263 + k * 1274126177) | 0; n = Math.imul(n ^ (n >>> 13), 1274126177); return ((n ^ (n >>> 16)) >>> 0) / 4294967296; };
@@ -63667,26 +63667,26 @@ function ghomeBuild(at, yaw, y0) {
   steps(1); steps(-1);
   // ---- a ROUND SHELL: a wall ring (outer + inner faces, the gaps cut for doors and the shop front) and a dome on it; solid by RUNS ----
   const TAU = Math.PI * 2;
-  const shell = (cx, cz, R, H, Hdome, gaps) => {     // gaps: [theta (0 = +z, PI/2 = +x), half-width m, top m, bottom m (0 = the floor)]
+  const shell = (cx, cz, R, H, Hdome, gaps, b0 = P) => {     // pass 7: `b0` = its floor (a shell can stand on another)     // gaps: [theta (0 = +z, PI/2 = +x), half-width m, top m, bottom m (0 = the floor)]
     const t = A.t, gs = gaps.map(([th, hw, hh, lo]) => ({ th, ha: Math.asin(Math.min(.99, hw / R)), hh, lo: lo || 0 })).sort((a, b) => a.th - b.th);
-    const B = R * .075, rOut = y => R + B * Math.pow(Math.sin(Math.PI * clamp((y - P) / H, 0, 1)), .8);     // pass 5: the walls BULGE (the refs' domes are swollen, not silos)
+    const B = R * .075, rOut = y => R + B * Math.pow(Math.sin(Math.PI * clamp((y - b0) / H, 0, 1)), .8);     // pass 5: the walls BULGE (the refs' domes are swollen, not silos)
     const arc = (a0, a1, ya, yb) => { if (a1 - a0 < .01 || yb - ya < .01) return; const seg = Math.max(2, Math.ceil((a1 - a0) / TAU * 128)), n = Math.max(2, Math.round((yb - ya) / .35)), pts = [];
       for (let i = n; i >= 0; i--) { const y = ya + (yb - ya) * i / n; pts.push(new THREE.Vector2(rOut(y), y)); }
       put(new THREE.LatheGeometry(pts, seg, a0, a1 - a0), stoneM, at4(cx, 0, cz));
       put(new THREE.CylinderGeometry(R - t, R - t, yb - ya, seg, 1, true, a0, a1 - a0), stoneM, at4(cx, (ya + yb) / 2, cz)); };
     const jamb = (a, ya, yb) => put(new THREE.BoxGeometry(.04, yb - ya, t + B * 2), stoneM, at4(cx + Math.sin(a) * (R - t / 2 + B / 2), (ya + yb) / 2, cz + Math.cos(a) * (R - t / 2 + B / 2), a));
-    if (!gs.length) arc(0, TAU, P, P + H);
-    else { for (let i = 0; i < gs.length; i++) { const G = gs[i], N = gs[(i + 1) % gs.length], a0 = G.th + G.ha, a1 = N.th - N.ha + (i === gs.length - 1 ? TAU : 0); arc(a0, a1, P, P + H);
-        arc(G.th - G.ha, G.th + G.ha, P + G.hh, P + H); arc(G.th - G.ha, G.th + G.ha, P, P + G.lo); jamb(G.th - G.ha, P + G.lo, P + G.hh); jamb(G.th + G.ha, P + G.lo, P + G.hh); } }
-    put(new THREE.SphereGeometry(R, 112, 28, 0, TAU, 0, Math.PI / 2), stoneM, at4(cx, P + H, cz, 0, 0, 0, 1, Hdome / R, 1));
+    if (!gs.length) arc(0, TAU, b0, b0 + H);
+    else { for (let i = 0; i < gs.length; i++) { const G = gs[i], N = gs[(i + 1) % gs.length], a0 = G.th + G.ha, a1 = N.th - N.ha + (i === gs.length - 1 ? TAU : 0); arc(a0, a1, b0, b0 + H);
+        arc(G.th - G.ha, G.th + G.ha, b0 + G.hh, b0 + H); arc(G.th - G.ha, G.th + G.ha, b0, b0 + G.lo); jamb(G.th - G.ha, b0 + G.lo, b0 + G.hh); jamb(G.th + G.ha, b0 + G.lo, b0 + G.hh); } }
+    if (Hdome > 0) put(new THREE.SphereGeometry(R, 112, 28, 0, TAU, 0, Math.PI / 2), stoneM, at4(cx, b0 + H, cz, 0, 0, 0, 1, Hdome / R, 1));
     // the solid: by layers between the gaps' heights, each gap open only in the layers it spans
     const ys = [...new Set([0, ...gs.map(G => G.hh), ...gs.map(G => G.lo), H])].sort((a, b) => a - b); let nb = 0;
     for (let k = 0; k < ys.length - 1; k++) { const open = gs.filter(G => G.lo <= ys[k] + .01 && G.hh >= ys[k + 1] - .01);
       nb += runs((x, z) => { const dx = x - cx, dz = z - cz, r = Math.hypot(dx, dz); if (r < R - t || r > R) return false; const th = Math.atan2(dx, dz);
-        return !open.some(G => Math.abs(wrapAngle(th - G.th)) < G.ha); }, cx - R, cx + R, cz - R, cz + R, P + ys[k], P + ys[k + 1], .25); }
+        return !open.some(G => Math.abs(wrapAngle(th - G.th)) < G.ha); }, cx - R, cx + R, cz - R, cz + R, b0 + ys[k], b0 + ys[k + 1], .25); }
     // the dome's outside is walkable where it is not too steep
-    const NA = 40, NP = 8, pmax = 1.1, Y = (p) => P + H + Hdome * Math.cos(p), Rr = p => R * Math.sin(p);
-    for (let i = 0; i < NA; i++) for (let j = 0; j < NP; j++) { const a0 = i / NA * TAU, a1 = (i + 1) / NA * TAU, p0 = j / NP * pmax, p1 = (j + 1) / NP * pmax, V = (a, p) => [cx + Math.sin(a) * Rr(p), Y(p) + .04, cz + Math.cos(a) * Rr(p)];
+    const NA = 40, NP = 8, pmax = 1.1, Y = (p) => b0 + H + Hdome * Math.cos(p), Rr = p => R * Math.sin(p);
+    if (Hdome > 0) for (let i = 0; i < NA; i++) for (let j = 0; j < NP; j++) { const a0 = i / NA * TAU, a1 = (i + 1) / NA * TAU, p0 = j / NP * pmax, p1 = (j + 1) / NP * pmax, V = (a, p) => [cx + Math.sin(a) * Rr(p), Y(p) + .04, cz + Math.cos(a) * Rr(p)];
       quad(V(a0, p0), V(a1, p0), V(a1, p1), V(a0, p1)); }
     return nb; };
   const th = (fx, fz, tx, tz) => Math.atan2(tx - fx, tz - fz);
@@ -63695,7 +63695,12 @@ function ghomeBuild(at, yaw, y0) {
   A.stat.hall = shell(0, 0, A.R, A.Hw, A.Hd, [[0, A.shopW / 2, A.shopH], [Math.PI, A.door / 2, A.doorH], [th(0, 0, Tx, Tz), A.door / 2, A.doorH], [th(0, 0, Gx, Gz), A.door / 2, A.doorH]]);
   // the TOWER: its door from the hall, and the balcony door at the top of its stair
   const balTh = .5;     // the balcony door faces front-right
-  A.stat.tower = shell(Tx, Tz, A.Rt, A.Ht, 2, [[th(Tx, Tz, 0, 0), A.door / 2, A.doorH], [balTh, A.door / 2, A.Yb + A.doorH, A.Yb]]);
+  // pass 7: the tower STEPS IN at the balcony (the refs' stacked blobs): a fat drum up to the balcony, a narrower TURRET standing on it with
+  // the balcony door and its own dome; the shoulder between them is a ledge all round, the deck on one side
+  A.stat.tower = shell(Tx, Tz, A.Rt, A.Yb, 0, [[th(Tx, Tz, 0, 0), A.door / 2, A.doorH]]) + shell(Tx, Tz, A.Rtu, A.Ht - A.Yb, 2.2, [[balTh, A.door / 2, A.doorH, 0]], P + A.Yb);
+  { const N = 48, V = (q, r) => [Tx + Math.sin(q) * r, P + A.Yb + .04, Tz + Math.cos(q) * r];
+    put(new THREE.RingGeometry(A.Rtu - .05, A.Rt + A.Rt * .075, 48), stoneM, at4(Tx, P + A.Yb + .01, Tz, 0, -Math.PI / 2));
+    for (let i = 0; i < N; i++) { const q0 = i / N * TAU, q1 = (i + 1) / N * TAU; quad(V(q0, A.Rtu), V(q0, A.Rt), V(q1, A.Rt), V(q1, A.Rtu)); } }
   // the STORE wing
   A.stat.store = shell(Gx, Gz, A.Rw, A.Hwg, 2.2, [[th(Gx, Gz, 0, 0), A.door / 2, A.doorH]]);
   // pass 5: TIMBER FLOORS in the three rooms
@@ -63717,7 +63722,7 @@ function ghomeBuild(at, yaw, y0) {
     const V = (a, rr) => [Tx + Math.sin(a) * rr, P + A.Yb + .05, Tz + Math.cos(a) * rr]; for (let k = 0; k < 4; k++) { const b0 = a1 + k * .12 - .2, b1 = b0 + .12; quad(V(b0, ri), V(b0, A.Rt + .2), V(b1, A.Rt + .2), V(b1, ri)); }
     A.stat.stair = n + ' risers of ' + r.toFixed(3); }
   // ---- THE BALCONY on its MUSHROOM LEDGE round the tower's outer side, railed (noCam) ----
-  { const b0 = -.7, b1 = 2.9, ri = A.Rt - .05, ro = A.Rt + 2.4, Y = P + A.Yb;
+  { const b0 = -.7, b1 = 2.9, ri = A.Rtu - .05, ro = A.Rt + 2.4, Y = P + A.Yb;
     const prof = [[ri, Y - 1.9], [ri + 1.2, Y - 1.1], [ro - .2, Y - .45], [ro, Y - .2], [ro, Y], [ri, Y]].map(([r, y]) => new THREE.Vector2(r, y));
     put(new THREE.LatheGeometry(prof, 40, b0, b1 - b0), stoneM, at4(Tx, 0, Tz));
     const N = 24, V = (a, rr) => [Tx + Math.sin(a) * rr, Y + .04, Tz + Math.cos(a) * rr]; for (let i = 0; i < N; i++) { const a = b0 + (b1 - b0) * i / N, e = b0 + (b1 - b0) * (i + 1) / N; quad(V(a, ri), V(a, ro), V(e, ro), V(e, ri)); }
@@ -63728,7 +63733,7 @@ function ghomeBuild(at, yaw, y0) {
   { const win = (cx, cz, R, a, y, r) => { const x = cx + Math.sin(a) * (R + .02), z = cz + Math.cos(a) * (R + .02);
       put(new THREE.CircleGeometry(r, 20), dark, at4(x, y, z, a)); put(new THREE.TorusGeometry(r, .07, 6, 20), wood, at4(x, y, z, a));
       put(new THREE.BoxGeometry(r * 2, .05, .05), wood, at4(x, y, z, a)); put(new THREE.BoxGeometry(.05, r * 2, .05), wood, at4(x, y, z, a)); };
-    win(0, 0, A.R, .85, P + 4.6, .42); win(0, 0, A.R, -.85, P + 4.6, .42); win(0, 0, A.R, 2.4, P + 2, .38); win(Tx, Tz, A.Rt, 1.2, P + 2.2, .36); win(Tx, Tz, A.Rt, .2, P + 7.4, .4); win(Tx, Tz, A.Rt, 1.0, P + 7.6, .36);
+    win(0, 0, A.R, .85, P + 4.6, .42); win(0, 0, A.R, -.85, P + 4.6, .42); win(0, 0, A.R, 2.4, P + 2, .38); win(Tx, Tz, A.Rt, 1.2, P + 2.2, .36); win(Tx, Tz, A.Rtu, -.6, P + 7.4, .4); win(Tx, Tz, A.Rtu, 1.6, P + 7.6, .36);
     win(Gx, Gz, A.Rw, -.6, P + 1.9, .38); win(Gx, Gz, A.Rw, -1.8, P + 1.9, .34);
     put(new THREE.TorusGeometry(A.door / 2, .12, 6, 16, Math.PI), wood, at4(0, P + A.doorH - A.door / 2 + .02, -A.R - .03, Math.PI)); }
   // ---- PASS 2: THE TIMBER SCAFFOLD, THE TORN AWNINGS, THE CHEVRON BANNERS (refs: the frame across the front, a stall deck either side of the
@@ -63822,7 +63827,7 @@ function ghomeBuild(at, yaw, y0) {
     { const [Tx, Tz] = A.T, Yb = P + A.Yb, ro = A.Rt + 2.25, angs = [-.4, .55, 1.5, 2.45];
       for (const a of angs) { const x = Tx + Math.sin(a) * ro, z = Tz + Math.cos(a) * ro; vbox(x - .08, x + .08, Yb, Yb + 2.7, z - .08, z + .08, wood, 1, { noCam: 1 }); }
       for (let i = 0; i < angs.length - 1; i++) { const a = angs[i], b = angs[i + 1], P0 = (q, r, y) => [Tx + Math.sin(q) * r, y, Tz + Math.cos(q) * r];
-        awning(P0(a, A.Rt + .05, Yb + 3.3), P0(b, A.Rt + .05, Yb + 3.3), P0(b, ro + .35, Yb + 2.6), P0(a, ro + .35, Yb + 2.6), awnM, .12); } }
+        awning(P0(a, A.Rtu + .05, Yb + 3.3), P0(b, A.Rtu + .05, Yb + 3.3), P0(b, ro + .35, Yb + 2.6), P0(a, ro + .35, Yb + 2.6), awnM, .12); } }
     // the FLAG on the tower's top: a pole, a crossbar, the chevron flag hanging from it
     { const [Tx, Tz] = A.T, yt = P + A.Ht + 1.6; vbox(Tx - .12, Tx + .12, yt, yt + 5.2, Tz - .12, Tz + .12, wood, 0); vbox(Tx - .9, Tx + 1.3, yt + 4.85, yt + 5.05, Tz - .16, Tz + .16, wood, 0);
       for (const yy of [yt + .8, yt + 2.4, yt + 4]) vbox(Tx - .16, Tx + .16, yy - .05, yy + .05, Tz - .16, Tz + .16, iron, 0);
@@ -63871,6 +63876,13 @@ function ghomeBuild(at, yaw, y0) {
     for (const [x, z] of [[-8, 6.6], [-3.6, 6.8], [3.4, 6.9], [8.6, 6.4]]) { pot(x, P, z, .32, .55, 2, clayD); agave(x, P + .5, z, x > 0); }
     for (let i = 0; i < 12; i++) { const a = rnd() * Math.PI * 2, rr = 1.2 + rnd() * .3, x = Math.sin(a) * A.rx * rr, z = Math.cos(a) * A.rz * rr; if (z > A.rz * .7 && Math.abs(x) < 3) continue; if (x > 9 && z > 3.6 && z < 7.4) continue;
       const k = .6 + rnd() * 1.1; put(new THREE.IcosahedronGeometry(1, 3), stoneM, at4(x, k * .2, z, rnd() * 6, 0, 0, k * 1.5, k * .75, k * 1.2)); box(x - k * 1.1, x + k * 1.1, 0, k * .7, z - k * .9, z + k * .9); } }
+  // ---- PASS 7: timber BANDS where each wall meets its dome (iron studs round them), and red TASSELS with brass beads along the front beam ----
+  { const brassT = triMat('bronze', { scale: 1.2, metal: .75, rough: .35 }); brassT.userData.tri = 1; const red = new THREE.MeshStandardMaterial({ color: 0xb02a22, roughness: .8 });
+    for (const [x, z, R, y] of [[0, 0, A.R, P + A.Hw], [A.Wc[0], A.Wc[1], A.Rw, P + A.Hwg], [A.T[0], A.T[1], A.Rtu, P + A.Ht], [A.T[0], A.T[1], A.Rt, P + A.Yb - .3]]) {
+      put(new THREE.CylinderGeometry(R + .07, R + .07, .42, 64, 1, true), wood, at4(x, y - .21, z)); for (let k = 0; k < Math.round(R * 4); k++) { const q = k / Math.round(R * 4) * TAU; put(new THREE.BoxGeometry(.1, .1, .1), iron, at4(x + Math.sin(q) * (R + .1), y - .21, z + Math.cos(q) * (R + .1), q)); } }
+    for (let x = -6.1; x <= 6.1; x += .8) { if (Math.abs(x) < 2.6 && Math.abs(x) > 2) continue; const y = P + 4.6 - .1, z = 4.6 + .16;
+      put(new THREE.CylinderGeometry(.008, .008, .5, 3), iron, at4(x, y - .25, z)); put(new THREE.SphereGeometry(.06, 8, 6), brassT, at4(x, y - .52, z));
+      put(new THREE.CylinderGeometry(.04, .03, .12, 8), red, at4(x, y - .64, z)); put(new THREE.ConeGeometry(.07, .32, 8), red, at4(x, y - .86, z, 0, Math.PI)); } }
   // ---- merge, and the world gets the boxes and the floors ----
   let draws = 0; for (const [m, list] of MG) { if (m.map && !m.userData.tri) m.map.wrapS = THREE.RepeatWrapping; const geo = mergeGeometries(list); if (!geo) { console.warn('[melee] ghome: a bucket would not merge', m.name || m.color); continue; } const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; g.add(o); draws++; }
   for (const b of boxes) BOXES.push(b);
