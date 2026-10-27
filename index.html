@@ -2056,7 +2056,8 @@ const MELEE = {
 // everything it runs past and we are straight back to a range check wearing a sweep's clothes.
 const STRIKE = {
   // both hands, both feet. The weapon's own far end is added when one is out.
-  bones: ['mixamorig_RightHand', 'mixamorig_LeftHand', 'mixamorig_RightFoot', 'mixamorig_LeftFoot'],
+  bones: ['mixamorig_RightHand', 'mixamorig_LeftHand', 'mixamorig_RightFoot', 'mixamorig_LeftFoot', 'mixamorig_RightToeBase', 'mixamorig_LeftToeBase'],     // m1091: + the toes
+  limbR: .44 * SZ,   // m1091: a fist or boot of a KICK / PUNCH (not a katana cut) is swept this fat -- they missed what the blade hit
   r: .26 * SZ,       // the fist/boot, as a sphere swept along its own path -- HIS fist, so it
                      // scales with him
   from: .55,         // the window opens at this fraction of the clip's authored contact frame
@@ -17473,6 +17474,28 @@ const aimAt = d => {
 // AND THE ACQUIRE RANGE IS WHAT THE MOVE CAN COVER, NOT A TYPED NUMBER. A flat range locks a
 // JAB onto a man six metres off and then cannot get him there -- and a lock that turns him
 // toward somebody he cannot reach is worse than no lock at all.
+// m1091: THE TORNADO ON THE LEFT PAD'S HOLD (the slot CLAUDE.md kept free). *"Press and hold the middle of the left stick and it charges to do
+// the tornado, like the charge on the right stick... after the charge it does two full animation sequences in a row, and you can move while
+// it's spinning to control it."* Thumb down on the LEFT pad and kept inside the tap radius past the tap time (`MOVE.tapR` / `tapT`): `p.tornC`
+// fills 0..1 over `T` s (an orange ring under him, a click at full). Lift past `min` -> `spins` hurricane kicks back to back; the stick
+// steers him at `speed` m/s the whole time, and every spin catches everyone round him (`p.multi`).
+const TORN = { on: 1, T: .8, min: .3, spins: 2, speed: 4.2, ring: null, stat: { charges: 0, spins: 0 } };
+function tornStep(dt) {
+  const p = player, L = stick.L, T = TORN;
+  const ok = T.on && p.grounded && !p.melee && !p.roll && !p.knock && !p.slam && !p.riding && !p.wall && !mphBare() && !p.torn;
+  if (L.down && (L.far || 0) < MOVE.tapR && ok) { p.lHold = (p.lHold || 0) + dt; if (p.lHold > MOVE.tapT) { const was = p.tornC || 0; p.tornC = Math.min(1, was + dt / T.T); if (was < 1 && p.tornC >= 1) { snd(HCHG.snd, HCHG.play); spkBurst(p.pos.x, p.pos.y + .3, p.pos.z, 18, { col: [1, .6, .2], spread: 3, size: .14, life: .4 }); } } }
+  else { if (!L.down && (p.tornC || 0) >= T.min && ok) tornGo(); if (!L.down || (L.far || 0) >= MOVE.tapR) { p.lHold = 0; p.tornC = 0; } }
+  if (!T.ring) { const m = new THREE.Mesh(new THREE.RingGeometry(.86, 1, 40), new THREE.MeshBasicMaterial({ color: 0xff8a2a, transparent: true, opacity: .85, toneMapped: false, depthWrite: false })); m.rotation.x = -Math.PI / 2; m.visible = false; scene.add(m); T.ring = m; }
+  T.ring.visible = (p.tornC || 0) > 0; if (T.ring.visible) { const r = .35 + .75 * p.tornC; T.ring.scale.set(r, r, 1); T.ring.position.set(p.pos.x, p.pos.y + .05, p.pos.z); T.ring.material.color.setHex(p.tornC >= 1 ? 0xffc04a : 0xff8a2a); }
+}
+function tornGo() { const p = player; TORN.stat.charges++; p.torn = { n: TORN.spins }; p.tornC = 0; p.lHold = 0; p.jump = 0; tornSpin(); }
+function tornSpin() {
+  const p = player, SK = MELEE.spinKick, nm = SK.clip; if (!rig.actions[nm]) { p.torn = null; return; }
+  TORN.stat.spins++; p.melee = 1; p.meleeIx = 0; p.meleeT = 0; p.meleeName = nm; p.meleeAir = 0; p.meleeBody = 0; p.melWall = 0; p.melFist = 0; p.melFront = 0; p.multi = 1;
+  p.meleeDur = SK.dur; p.meleeChain = 0; p.melFired = 0; p.melU = 0; p.swPrev = null; p.swRootX = null; p.swRootZ = null; p.melV = 0; p.melTgt = null; p.melH = p.faceH;
+  const L0 = clipLen(nm); playOnce(nm, L0 * (SK.to - SK.from) / p.meleeDur); rig.actions[nm].time = L0 * SK.from;
+  snd('swoosh', { r: .85, g: .8 });
+}
 // m1088: THE JUGGLE. *"The slam -- he wouldn't roll, he's slamming the ground and it makes a shockwave, sends people up in the air, hang time.
 // I like hitting people up in the air and you keep stringing attacks and it keeps them in the air... not floating, but like slow-mo in the
 // air, and you're going from one to the next."* A body YOU launch (or the slam pops) is JUGGLED for `hang` s: near the top of its arc
@@ -17481,8 +17504,11 @@ const aimAt = d => {
 // (`slamUp`), and FLOW (m1086) will chase an airborne man, hopping him up to meet it (`hopMax`).
 // TORNADO: a left / right flick on the ground is the spin kick (`hurricane_kick`, left its mirror) -- it was air only. TOOLS > SIDE FLICK.
 const JUGGLE = { on: 1, slamHold: .35, rise: 9, hang: 1.8, g: .22, band: 3.2, pop: 6.5, push: 1.6, slamUp: 9.5, slamOut: 1.2, hopMax: 9, stat: { pops: 0, slams: 0, hops: 0 } };
-const TORNADO = { pick: 'TORNADO', picks: ['TORNADO', 'SWING'] };
-try { const v = localStorage.getItem('mel.sideflick'); if (v === 'TORNADO' || v === 'SWING') TORNADO.pick = v; } catch (e) {}
+// m1091: *"Swipe left and right on the right stick should be just a single sword spin -- Link in Smash Bros, the full 360 -- rather than that kick."*
+// With the blade a side flick is ONE `katana_360h` (left its mirror); bare-handed it is still the tornado kick. SPIN / SWING (the katana's
+// side swings) on TOOLS > SIDE FLICK. The TORNADO kick itself moved to the LEFT pad's press-and-hold (`TORN`).
+const TORNADO = { pick: 'SPIN', picks: ['SPIN', 'SWING'], sword: 'katana_360h', swordDur: .62 };
+try { let v = localStorage.getItem('mel.sideflick'); if (v === 'TORNADO') v = 'SPIN'; if (v === 'SPIN' || v === 'SWING') TORNADO.pick = v; } catch (e) {}
 const bodyAir = d => d.root.position.y > groundAt(d.root.position.x, d.root.position.z, d.root.position.y, .5) + .35;
 function jugMark(d) { if (JUGGLE.on) d.jugT = performance.now() / 1000 + JUGGLE.hang; }
 let SLAMRINGS = [];
@@ -17648,14 +17674,16 @@ function meleeGo0(h) {
   const tackle = !kat && !cont && MELEE.slide && rig.actions[MELEE.slide] && p.runT >= MELEE.slideT;     // m984: a running flick with the katana is a swing, not a slide kick
   const j = ((p.meleeRoll + ix) % pool.length + pool.length) % pool.length;
   const katInOrder = kat && pool !== CLIPS.fist && !KATANA.cuts;     // m1014: the fist chain is dealt the unarmed way; m1015: so are the cut strikes (round the pool, no repeats)     // m1000: the unarmed chain is dealt the unarmed way
-  const SKt = MELEE.spinKick, sideF = (KATANA.dir === 'left' || KATANA.dir === 'right') && TORNADO.pick === 'TORNADO' && !tackle && SKt;
-  const tornado = sideF ? SKt.clip + (KATANA.dir === 'left' ? MIRROR.suffix : '') : '';
-  const name = tornado && rig.actions[tornado] ? tornado : tackle ? MELEE.slide : pool[katInOrder ? Math.min(ix, pool.length - 1) : j];     // m984: the katana's combo plays IN ORDER (link 3 = the finisher); m1088: a side flick is the TORNADO
+  const SKt = MELEE.spinKick, sideF = (KATANA.dir === 'left' || KATANA.dir === 'right') && TORNADO.pick === 'SPIN' && !tackle && SKt;
+  const sfx = KATANA.dir === 'left' ? MIRROR.suffix : '', kat360 = sideF && slotNow().blade ? TORNADO.sword + sfx : '';     // m1091: the sword's 360
+  const tornado = sideF && !kat360 ? SKt.clip + sfx : '';
+  const name = kat360 && rig.actions[kat360] ? kat360 : tornado && rig.actions[tornado] ? tornado : tackle ? MELEE.slide : pool[katInOrder ? Math.min(ix, pool.length - 1) : j];     // m984: the katana's combo plays IN ORDER (link 3 = the finisher); m1088: a side flick is the TORNADO
   if (!rig.actions[name]) { note('NO CLIP ' + name); return; }
   p.melee = 1; p.meleeIx = ix; p.meleeLinks = links; p.meleeT = 0; p.meleeName = name; p.meleeAir = 0; p.melWall = 0; p.melFist = p.fistNow ? 1 : 0;     // m1021: a left-pad strike never breaks a wall
   p.meleeBody = tackle ? 1 : 0;   // see `STRIKE.bodyAt` -- the blow is him arriving
   const CL = clipOf(name);
-  p.meleeDur = tackle ? MELEE.slideDur : name === tornado ? SKt.dur : melBeat(name, ix);
+  p.meleeDur = tackle ? MELEE.slideDur : name === tornado ? SKt.dur : name === kat360 ? TORNADO.swordDur : melBeat(name, ix);
+  p.multi = name === kat360 || name === tornado ? 1 : 0;     // m1091: a spin catches everyone round him
   p.meleeChain = 0; p.melFired = 0; p.melU = 0; p.swPrev = null; p.swRootX = null; p.swRootZ = null;
   const base = tackle ? MELEE.slideV
              : (CL && CL.lunge) || MELEE.lunge[Math.min(ix, MELEE.lunge.length - 1)];
@@ -19911,6 +19939,7 @@ function stepKit(dt) {
       if (p.centerT >= WEAP.armT) p.center = 1;
     } else { p.center = 0; p.centerT = 0; }
   }
+  tornStep(dt);     // m1091: the left pad's hold -> the tornado
   // m1085: THE ZOOM's charge and release (see `ZOOM`) -- the same up hold, unarmed, from standing with the left stick idle
   {
     const Z = ZOOM, free = Z.on && !s.aim && !s.charge && !s.blade && !p.riding && !mphBare();
@@ -21395,6 +21424,7 @@ function stepPlayer(dt) {
     if (p.melee && p.meleeAir && p.airKick && MELEE.kickLevel) p.vel.y = MOVE.g * dt + (p.kickVy != null ? p.kickVy : -(MELEE.kickDrop || 0));     // m1088: a FLOW kick flies at the juggled man's height     // one frame of gravity pre-paid: `integrate` takes it back, net -kickDrop
     // HER STRIKE RIDES (m274): the body faces the blow, the wheels keep rolling -- only their own drag on it
     if (p.melRide && p.melee && !p.roll) { const d = Math.exp(-BLADE.roll * dt); p.vel.x *= d; p.vel.z *= d; p.faceH = h; }
+    else if (p.torn && p.melee) { const S = stickWorld(); p.vel.x = S.x * S.mag * TORN.speed; p.vel.z = S.z * S.mag * TORN.speed; }     // m1091: the stick steers the tornado
     else {
     p.vel.x = Math.sin(h) * v0 * kk; p.vel.z = Math.cos(h) * v0 * kk;
     p.faceH = h; p.heading = h;
@@ -21419,7 +21449,8 @@ function stepPlayer(dt) {
     if (out) {
       if (p.roll) p.roll = 0;
       else if (p.melee) {
-        p.melee = 0; p.meleeAir = 0; p.meleeChain = MELEE.window; p.melRide = 0;
+        p.melee = 0; p.meleeAir = 0; p.meleeChain = MELEE.window; p.melRide = 0; p.multi = 0;
+        if (p.torn) { if (--p.torn.n > 0) { tornSpin(); return; } p.torn = null; }     // m1091: the tornado's next spin
         // and the flick that arrived mid-strike is taken NOW, so a chain thrown as fast as the
         // thumb can move still lands every link
         if (p.melQ != null) { const q = p.melQ; p.melQn = Math.max(0, (p.melQn || 1) - 1); if (!p.melQn) p.melQ = null; p.fistNow = p.melQf || 0; try { meleeGo(q); } finally { p.fistNow = 0; } }
@@ -33031,10 +33062,13 @@ function strikeSweep(dt, power, live, dmg, body) {
     // ordinary strike to one connect, which is right for a swing and wrong for a six-metre
     // slide through a line of men -- and `d.cool` already stops any one of them being hit
     // twice, so the window can simply stay live for the whole travel.
-    if (live && (body || !hit)) {
-      const rad = body ? STRIKE.bodyR : STRIKE.r;
-      const fast = body ? Math.hypot(dpx, dpz) / Math.max(1e-4, dt) > STRIKE.bodyAt
-                        : lv > STRIKE.swing;
+    if (live && (body || p.multi || !hit)) {
+      // m1091: *"The tornado kick, the handspring kick, the flying jump punch... don't really hit guys as well as the sword does."* Two reasons:
+      // a body move (the flying kick) counted ONLY his travel, so a kick spun in place never hit; and a boot was the fist's .26 sphere on the
+      // ANKLE. Now a limb fast enough counts on a body move too, a kick / punch's limbs sweep `limbR` (toes included), and a spin hits everyone.
+      const unarmed = !wep && !/^katana_/.test(p.meleeName || '');
+      const rad = body ? Math.max(STRIKE.bodyR, unarmed ? STRIKE.limbR : 0) : unarmed ? STRIKE.limbR : STRIKE.r;
+      const fast = (body && Math.hypot(dpx, dpz) / Math.max(1e-4, dt) > STRIKE.bodyAt) || lv > STRIKE.swing;
       if (fast) {
         // **AND THE SWING BREAKS THINGS, ON THE SAME FRAME AND OFF THE SAME LIMB (m160).** A
         // crate that a plasma bolt takes out and a hammer does not is a crate that answers one
@@ -57003,7 +57037,7 @@ window.melee = window.mel = { FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VE
   // of a rule measures a game that does not exist -- which is the oldest mistake there is, and
   // the only way not to make it is for `npm run sim` to call exactly these.
   DUMMY, DUMMIES, LOCK, LEDGE, WALL, STRIKE, PADS, DESK, meleeLock, dummyHit, dummyBlow, strikeSweep, stepDummies, bodySeat, SEAT, findLock, SFX, CHARGE, POSE, snd, PUNCH, PLASMA, HITSND, BODYSND, FLYHIT, STEP,
-  stepPlayer, muzzleWorld, RIC, coverAcross, cwallOf, KNOCK, knockHas, GSIDE, KAIM, aimLeap, kaimHold, DUCK, duckPose, RUNSWIPE, runSwipe, SHOTBLOCK, shotBlock, bladeSeg, steelFlash, STEEL, HURT, playerHurt, GOD, LEAP, coverLeap, wallGo, WRUN, wrunTap, wrunFind, wrunSpawn, wrunClear, stepWrun, backGo, HURDLE, hurdleTap, HOOK, barHook, meleeGo0, CART, cartGo, leftFlick, rigAnim, stepKit, frameBody, kickGo, SPRINGS, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, hbarCatch, stepBar, hbarPose, hbarFly, coverArmUndo, slideGo, coverShow, TURRET, LIMB, limbCut, limbPrep, sliceDummy, JUGGLE, TORNADO, FLOW, ZOOM, zoomGo, HORDE, hordeAdd, hordeClear, ACAM, actionCam, acamPip, turretSpawn, COURSE, courseBuild, courseClear, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
+  stepPlayer, muzzleWorld, RIC, coverAcross, cwallOf, KNOCK, knockHas, GSIDE, KAIM, aimLeap, kaimHold, DUCK, duckPose, RUNSWIPE, runSwipe, SHOTBLOCK, shotBlock, bladeSeg, steelFlash, STEEL, HURT, playerHurt, GOD, LEAP, coverLeap, wallGo, WRUN, wrunTap, wrunFind, wrunSpawn, wrunClear, stepWrun, backGo, HURDLE, hurdleTap, HOOK, barHook, meleeGo0, CART, cartGo, leftFlick, rigAnim, stepKit, frameBody, kickGo, SPRINGS, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, hbarCatch, stepBar, hbarPose, hbarFly, coverArmUndo, slideGo, coverShow, TURRET, TORN, tornGo, LIMB, limbCut, limbPrep, sliceDummy, JUGGLE, TORNADO, FLOW, ZOOM, zoomGo, HORDE, hordeAdd, hordeClear, ACAM, actionCam, acamPip, turretSpawn, COURSE, courseBuild, courseClear, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
   MFX, camShake, palDive,
   // THE BOARD, LIVE (m159). `mel.SK8.hold` is where the deck sits IN HIS HAND while it is
   // carried, and how a carried board should look is a look-at-it decision -- so it is a dial he
