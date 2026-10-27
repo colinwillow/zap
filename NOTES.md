@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- Timber Siege Fort pass 3 of 10: the jungle gym (X3, WORKER A)
+## m1331 -- Timber Siege Fort pass 3 of 10: the jungle gym (X3, WORKER A)
 
 - **Every third bay round every tier is a CLIMBING FACE.**
   - Lashed slats run across its X of braces every .6 m, so it reads as climbable.
