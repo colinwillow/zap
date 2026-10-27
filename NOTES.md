@@ -5,6 +5,11 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home pass 14 (Worker B): blows reach the home -- the back door, the orb, the bells
+- **The orb had not swung since pass 9.** Pass 9 put `bgateStep` and its `// pass 9: his back door` comment on the same line as the orb's sway, so the sway sat inside the comment. That is the landmine about a behaviour that lives only in a comment. It is its own call now (`ghomeOrb`).
+- **The orb is a pendulum.** A damped spring at omega^2 = g / L (2.25 m of chain) toward the wind's sway. A blow pushes it away from the striker, in the home's own frame. Measured headless: a hit from 3 m on +x took it to 0.79 rad, and it settled back into the wind inside 4 s. Clamped at 1.1 rad.
+- **`ghomeHit` is first in `bldHit`** (main's m1403 made the katana sweep call `bldHit` in the Red Hollows). It is guarded by `inHome()`. The back door goes through `bgateHit`, so it breaks and mends the way the arena's gates do. The orb takes a knock with a clang and sparks. Each of the 24 stall bells rings at its own pitch (a high `clang`, cooldown .15 s). The bells are merged geometry, so they do not move.
+- Draws unchanged (26). `MEL_WORLD=home node tools/boot.mjs` is ok.
 ## Grumbo's home pass 13 (Worker B): shared materials (33 -> 26 draws), the gearbox, the signboard
 - **Draws.** The buckets are keyed by material OBJECT, and five passes each made their own `triMat('bronze')`, two their own glow, and two the same red, so the same look cost seven extra draws. `ghomeBuild` now makes one `bronzeT`, `glowM` and `redW` up front and the passes use those. Measured headless: **26 draws** (was 33), 636 boxes, 5,456 walkable tris.
 - **Gearbox (ref 1).** A dark iron drum along the big wheel's axis, two brass bands and ten studs, with a 12-tooth brass cog above it. Decoration only, no collider (it sits inside the cone's drum ring).
