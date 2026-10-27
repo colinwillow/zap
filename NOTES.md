@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1187 -- Bathhouse pass 4: the boiler and the geyser (Building Forge loop, extra pass)
+
+A bronze BOILER now stands at the chimney's foot, with a pipe running under the floor to the pool and a red VALVE WHEEL on its side.
+Strike the wheel with a blade, an arrow or a parried shot (through `bldHit`). It spins, the pool rumbles for a second, and then the
+pool ERUPTS in a steam column. Whoever is in the water is thrown upward: `BATH.geyH` 7.5 m, which is past the 3.6 m eaves and the
+6 m ridge. Bodies in the pool get a `dummyBlow` launch (6 damage). The wheel's cooldown is 3.4 s. The pool still heals, so you can
+heal and then launch onto the roof.
+
+Pass 4 is an extra on a done building, so it moves no sandbox box. The launch height and drift want a look on the phone.
+Next: alternate -- Robot Barracks pass 3.
+
 ## m1186 -- ROBOT BARRACKS pass 2: the drill breaks ranks
 
 - While he is in the YARD (or for `BARR.fightT` 10 s after one of them is struck) the robots BREAK RANKS and come for him at `rbV` 1.7 m/s,
