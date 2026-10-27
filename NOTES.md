@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1100 -- the start-of-world stutters: every disguise skin is built behind the loading card now
+
+**What he said:** *"When you load anything other than the arena, the white box or Weirdport, it does the glitchy load thing for like 10
+glitches... why are those not warmed up, why didn't they load when the loading bar said loading?"*
+
+**What was wrong (measured, `hitch.cjs`: every frame for 20 s after the card, with the renderer's program / texture / geometry counts):**
+m965's warm-up already compiled the scene and uploaded every texture behind the card. What it did NOT cover was `WARM`: the DNA gun's
+disguise skins, built in the BACKGROUND after boot, one kind per tick (`warmStep`). Each is a retarget of 135 clips (290-390 ms here) plus
+the morph's measures, and they compiled 11 new shader programs as they went. One stutter per kind on the street, which is his "like 10".
+
+**What changed (`warmBoot`, before `bootWarm`):** the whole queue runs BEHIND THE CARD, a kind per tick so the bar moves ("warming up
+<name>"); the lazy knock bakes (m1099) are awaited there too. After: 0 skins built and +1 program in the 20 s after the card (was 11).
+**The price is a longer load**: 19 kinds took 21 s on this container's software GPU. The phone should be much faster but that is his to
+see. TOOLS > PRELOAD: ALL (no stutter) / FAST (the old background build, with the stutters).
+
 ## m1099 -- every NPC gets the directional knock-down: fly back- or belly-first, the matching fall, the matching get-up
 
 **What he said:** *"these guys when you hit them are still playing the OG arm hit and fall animation, so in the air it looks like they're
