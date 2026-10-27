@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## GRID LEVEL 1, PASS 9: A ZEPPELIN ACROSS THE LEVEL (m1364)
+
+His: *"flying Zepplin... platforms"*.
+
+- **New `flyers: [[a, b], ...]` in `LVG1`:** a 5 x 5 m deck under a red zeppelin envelope. It docks beside cell a, waits 3 s, sails 9 s to dock beside cell b (rising 5 m in the middle), waits, and sails back.
+- **The deck:** a `BDYN` box, and it CARRIES him in x, y and z while he stands on it (the movers' rule, now with height).
+- **Level 1's flyer:** from the roof spur (2,2) at Y7 (31.5 m, where the ring is) right across the level to a new high pad at (9,3) Y6 (27 m). The ride crosses the whole map in the archers' and guns' view. From the far pad you DROP to the route (the gate side), a shortcut past the middle.
+- **Still open:**
+  - nothing up there is worth having yet (no beat on the high pad)
+  - no rail on the deck
+  - the flight is a fixed shuttle, not his to steer
+
 ## GRID LEVEL 1, PASS 8: HAND OVER HAND ON A LONG BAR (m1363)
 
 His: *"monkey bars, dynamics, rope, climbing, and swinging"*.

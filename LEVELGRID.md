@@ -97,6 +97,11 @@ This pass adds three new cell kinds to the spec:
 - flying zeppelin platforms
 - swimming (a new mechanic: its own sandbox first, per the whole-piece rule)
 
+## L1 pass 9 (m1364): THE ZEPPELIN
+
+- **`flyers: [[a, b]]`:** a deck under a zeppelin, shuttling between two docks and carrying you.
+- **Level 1's ride:** the roof (2,2,Y7) to a high pad at (9,3,Y6), across the whole level. From the high pad, drop to the gate side.
+
 ## L1 pass 8 (m1363): THE LONG BAR
 
 - **`'mbar'`:** a pit crossed by one long bar along the way. Jump to catch it, then push the left stick sideways to shimmy across.
