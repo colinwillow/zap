@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1246 -- Zeppelins pass 6: the bomb bay (Building Forge loop, extra pass)
+
+Each gondola now has a bomb bay (`zepBombs`, `zepLever`, `ZEP.bomb`):
+- **The lever.** A bronze release lever with a red knob sits at the bow. Strike it and one black Jin bomb drops from the rack of three
+  under the keel. The bomb falls straight while the ship sails on, trailing cyan sparks.
+- **The blast.** It goes off where it lands, out to 4.5 m: bodies are knocked flat (`dummyBlow`), and turrets and breakable walls are
+  hit (`turretBlast`, which goes on to `bldHit`). His own bomb never hurts him.
+- **Re-arm.** It takes 4 s; the lever stays thrown and the middle bomb is missing until then.
+- **The target ring.** While he rides a gondola, a red ring pulses on the ground below the ship to show where a bomb would land.
+
+`zepLever` is hooked into `bldHit` before `zepHit`. Registry `pass: 6`.
+SHIPPED UNVERIFIED. Next: Set 3 #28 Sky Wreck, pass 1.
+
 ## m1245 -- Lantern Festival Street pass 3: the taiko and the fireworks (Building Forge loop) -- DONE
 
 Polish pass (`festPolish`). A taiko stand by the far gate keeps the dragon's time with a beat; the drum pulses, and you hear it within
