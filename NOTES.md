@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1173 -- PAGODA pass 4: climb the outside
+
+His: *"lots of things that are climbable... verticality."* The Pagoda can now be climbed on the OUTSIDE with the ledge grab (`LEDGE`, the
+stick pushed into the face):
+- A dark timber GUTTER rim (solid boxes, .6 wide, .3 deep) along the foot of each of the four skirts, just outside the tiles: lips at
+  2.75, 6.35, 9.95, 13.55 m, each .45 m in from the one below.
+- A BALCONY (1.9 m wide) round the top storey at 15.9 m with lamps at its corners -- 2.35 above the last gutter -- and from it the top
+  of the storey wall at 18 is a 2.1 m grab onto the belfry.
+Ground to belfry by six grabs. Shipped unverified (whether each lip catches depends on `LEDGE.clear` headroom: the skirts are pictures,
+not boxes, so they should not block it).
+
 ## m1172 -- CLIFF LODGE pass 1 (Set 2 #15, at (0, 47))
 
 `CLIFF`, `cliffBuild` / `cliffStep` / `cliffClear`. SPAWN > BUILDINGS > Cliff Lodge.
