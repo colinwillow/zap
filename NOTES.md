@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home, procedural, pass 12: smoke from the stacks, the fires flicker (WORKER B)
+
+- **SMOKE from both bronze stacks.** One point cloud (1 draw) of 40 soft puffs. Each puff rises from a stack's top, drifts downwind and
+  slows, and is reborn at the stack when it dies (`ghomeSmoke`, from `homeStep`).
+- **The fires FLICKER.** The shop's warm light and the brazier's waver on two sines.
+- **Counts.** 33 draws (budget: about 40).
+
+Checked headless: it boots and the builder runs. The plume itself is not yet seen rendered (a stepped render under software GL is slow); it is in the next pass's look. Shipped unverified.
+
 ## THE SHIP, PASS 9: FLAGS THAT FLOW (m1399, WORKER A)
 
 His: *"are they actually flowing in the wind, are they rigged like actual flags?"* They were not. Each was a flat plane swinging whole,
