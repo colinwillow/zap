@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE MARKET STALLS x1.5 -- STEER S2 (older rows, m1349)
+
+- **From its parameters:**
+  - stall width 4.5 → 6.75 m (four stalls, 27 m long)
+  - depth 4 → 6 m
+  - height 3.6 → 5.4 m: the walkable roof at 5.5, its ramp the same 0.3 slope (~17°), longer
+  - the awnings
+- **The yard's spacing moves out with it:** the crates, the nobori, the roof tables, the parasol.
+- **What stays his size:** counters, goods, the noodle bar, stools, crates, fruit, the robot merchant, the thief.
+- The sky bridge from the gatehouse and the pagoda's zip follow it via `skAt`.
+
 ## A KNOCKED-BACK SHOT GOES HOME IN 3D (m1348)
 
 *"There's a turret launching rockets at you, I countered one and it sends it back on the 2D plane. It doesn't go back up at the turret, but it still thinks it hits the turret even though it's 50 feet below it."*

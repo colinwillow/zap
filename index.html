@@ -19655,9 +19655,11 @@ function pagodaClear() { const P = PAGODA.on; if (!P) return; for (const d of P.
 // courtyard (-z): a breakable back wall and partitions (cwallBuild), counters with goods, striped AWNINGS on two stalls and a HIGH BAR hung in
 // the front frame of the other two (no posts: m1122's `y`), a flat ROOF you can walk the length of (a bar on it too), a ramp up the back,
 // and CRATES out front that SMASH (any hit through `bldHit`: chips fly, the box goes) and are back `crateFix` s later.
-const MKT = { fwCd: 25, fwR: 26, fwDmg: 6, at: [24, 18], n: 4, w: 4.5, D: 4, H: 3.6, crateHp: 2, crateFix: 15, thiefEvery: 30, thiefV: 6.5, thiefDmg: 5, pouchHeal: 35, on: null };
+const MKT = { scale: 1.5, fwCd: 25, fwR: 26, fwDmg: 6, at: [24, 18], n: 4, w: 4.5, D: 4, H: 3.6, crateHp: 2, crateFix: 15, thiefEvery: 30, thiefV: 6.5, thiefDmg: 5, pouchHeal: 35, on: null };
 function mktBuild() {
-  if (MKT.on) return; const A = MKT, [cx, cz] = A.at, W = A.n * A.w, x0 = cx - W / 2, zf = cz - A.D / 2, zb = cz + A.D / 2, H = A.H, g = new THREE.Group(); scene.add(g);
+  // STEER S2 (x1.5, m1349): stall width 4.5 -> 6.75, depth 4 -> 6, height 3.6 -> 5.4 (the roof walk at 5.5, its ramp the same 17 deg, longer);
+  // the yard's spacing (crates, nobori, the roof tables) moves out with it; the goods, counters, crates and stools stay his size
+  if (MKT.on) return; const k = MKT.scale || 1, A = Object.assign({}, MKT, { w: MKT.w * k, D: MKT.D * k, H: MKT.H * k }), [cx, cz] = A.at, W = A.n * A.w, x0 = cx - W / 2, zf = cz - A.D / 2, zb = cz + A.D / 2, H = A.H, g = new THREE.Group(); scene.add(g);
   const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [], bars = [];
   const wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 }), plank = new THREE.MeshStandardMaterial({ color: 0x6e4a2e, roughness: .85 }), stone = new THREE.MeshStandardMaterial({ color: 0x8a8580, roughness: .95 });
   const verm = new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .45 }), lamp = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false });
@@ -19687,7 +19689,7 @@ function mktBuild() {
     add(new THREE.BoxGeometry(A.w - 1, 1, .7), wood, sx, .5, zf + .7, 1); add(new THREE.BoxGeometry(A.w - .9, .08, .85), plank, sx, 1.04, zf + .7, 0);
     for (let k = 0; k < 5; k++) add(new THREE.BoxGeometry(.3, .25 + (k % 3) * .1, .3), new THREE.MeshStandardMaterial({ color: goods[(i + k) % 5], roughness: .7 }), sx - 1.2 + k * .6, 1.2 + (k % 3) * .05, zf + .7, 0);
     add(new THREE.BoxGeometry(A.w - 1, .08, .5), plank, sx, 2.1, zb - .45, 0);     // a shelf on the back wall
-    if (i % 2 === 0) { const L = 2, aw = new THREE.Mesh(new THREE.PlaneGeometry(A.w - .3, L), i ? canvas2 : canvas); aw.position.set(sx, H - .55, zf - L / 2 * Math.cos(.45)); aw.rotation.x = -Math.PI / 2 - .45; aw.castShadow = true; g.add(aw);
+    if (i % 2 === 0) { const L = 2 * k, aw = new THREE.Mesh(new THREE.PlaneGeometry(A.w - .3, L), i ? canvas2 : canvas); aw.position.set(sx, H - .55, zf - L / 2 * Math.cos(.45)); aw.rotation.x = -Math.PI / 2 - .45; aw.castShadow = true; g.add(aw);
       for (const e of [-1, 1]) add(new THREE.CylinderGeometry(.04, .04, 1.4, 6), wood, sx + e * (A.w / 2 - .3), H - 1.6, zf - L * Math.cos(.45), 0); }
     else { const B = hbarMake(sx, zf, 0, H - .4 - HBAR.h, 0); HBAR.list.push(B); bars.push(B); } }
   // the roof, walkable, and a ramp up the back: along +x from the west end (z behind the back wall), a landing onto the roof
@@ -19702,7 +19704,7 @@ function mktBuild() {
   // CRATES out front, some stacked: each its own box, smashable
   const crates = [], cm = new THREE.MeshStandardMaterial({ color: 0xa0784a, roughness: .85 }), cgeo = new THREE.BoxGeometry(.9, .9, .9);
   for (const [dx, dz, y] of [[-7, -3.6, 0], [-6.1, -3.9, 0], [-6.6, -3.75, .9], [-1.5, -4.2, 0], [3.4, -3.6, 0], [4.3, -3.8, 0], [7.2, -4.1, 0], [7.4, -4.1, .9]]) {
-    const x = cx + dx, z = cz + dz, m = new THREE.Mesh(cgeo, cm); m.position.set(x, y + .45, z); m.rotation.y = (dx * 1.7) % .5; m.castShadow = m.receiveShadow = true; g.add(m);
+    const x = cx + dx * k, z = cz + dz * k, m = new THREE.Mesh(cgeo, cm); m.position.set(x, y + .45, z); m.rotation.y = (dx * 1.7) % .5; m.castShadow = m.receiveShadow = true; g.add(m);
     const b = { minx: x - .45, maxx: x + .45, miny: y, maxy: y + .9, minz: z - .45, maxz: z + .45 }; BOXES.push(b);
     const below = y > 0 ? crates.filter(q => !q.y0).sort((p, q) => Math.hypot(p.m.position.x - x, p.m.position.z - z) - Math.hypot(q.m.position.x - x, q.m.position.z - z))[0] : null;
     crates.push({ m, b, hp: A.crateHp, dead: 0, t: 0, y0: y, below, fall: null }); }
@@ -19727,7 +19729,7 @@ function mktBuild() {
   // ---- PASS 3 (m1138): the polish -- nobori flags, a robot merchant, tall poles with grapple rings, cables and a drone ----
   // NOBORI: tall vertical banners on poles out front, between the crates
   { const ban = new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 });
-    for (const dx of [-4.5, 0, 4.5, 9]) { const x = cx + dx - 2.25, z = zf - 2.8; add(new THREE.CylinderGeometry(.05, .06, 4.6, 6), wood, x, 2.3, z, 0); add(new THREE.BoxGeometry(.7, .05, .05), wood, x + .35, 4.5, z, 0);
+    for (const dx of [-4.5, 0, 4.5, 9]) { const x = cx + (dx - 2.25) * k, z = zf - 2.8 * k; add(new THREE.CylinderGeometry(.05, .06, 4.6, 6), wood, x, 2.3, z, 0); add(new THREE.BoxGeometry(.7, .05, .05), wood, x + .35, 4.5, z, 0);
       const f = add(new THREE.PlaneGeometry(.7, 2.8), ban, x + .35, 3.1, z, 0); f.castShadow = false; } }
   // THE ROBOT MERCHANT behind the counter of stall 4: a bronze box body, a round head with one cyan eye that follows him, little arms
   const robot = new THREE.Group(); robot.position.set(x0 + 3.5 * A.w, 0, zf + 1.6); g.add(robot);
@@ -19746,9 +19748,9 @@ function mktBuild() {
   const drone = bldDrone(g);
   // ---- PASS 4 (m1175): a ROOFTOP TEAHOUSE and a FRUIT STAND -- low tables and cushions on the roof under a red parasol, a LAUNDRY LINE
   // strung pole to pole with washing flapping, three crates of bright FRUIT by the noodle bar that burst in their own colours ----
-  { const RTp = RT; for (const [dx, dz] of [[-5.5, .4], [-2.3, .9], [1.2, .3]]) { const X = cx + dx, Z = cz + dz;
+  { const RTp = RT; for (const [dx, dz] of [[-5.5, .4], [-2.3, .9], [1.2, .3]]) { const X = cx + dx * k, Z = cz + dz * k;
       add(new THREE.BoxGeometry(1.1, .35, .8), wood, X, RTp + .18, Z, 1); for (const sx of [-1, 1]) add(new THREE.BoxGeometry(.5, .12, .5), new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .9 }), X + sx * .85, RTp + .06, Z, 0); }
-    const pz = cz + 1.6; add(new THREE.CylinderGeometry(.05, .05, 2.6, 6), wood, cx - 2.3, RTp + 1.3, pz, 1); const par = add(new THREE.ConeGeometry(1.8, .7, 16, 1, true), new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .8, side: THREE.DoubleSide }), cx - 2.3, RTp + 2.6, pz, 0); par.castShadow = true;
+    const pz = cz + 1.6 * k; add(new THREE.CylinderGeometry(.05, .05, 2.6, 6), wood, cx - 2.3 * k, RTp + 1.3, pz, 1); const par = add(new THREE.ConeGeometry(1.8, .7, 16, 1, true), new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .8, side: THREE.DoubleSide }), cx - 2.3 * k, RTp + 2.6, pz, 0); par.castShadow = true;
     const lp = []; for (let k = 0; k <= 20; k++) { const u = k / 20; lp.push(new THREE.Vector3(x0 - .1 + (W + .2) * u, RT + 4.2 - Math.sin(u * Math.PI) * 1.2, zb)); }
     g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(lp), 40, .015, 3), wood));
     const cc = [0xf2ece0, 0x2a6ac8, 0xc8341f, 0xe8c23a, 0x3aa84a]; var wash = []; for (let k = 1; k < 20; k += 2) { const q = lp[k], w = new THREE.Mesh(new THREE.PlaneGeometry(.6 + (k % 3) * .2, .7 + (k % 2) * .3), new THREE.MeshStandardMaterial({ color: cc[k % 5], roughness: .9, side: THREE.DoubleSide })); w.position.set(q.x, q.y - .45, q.z); g.add(w); wash.push(w); } }
@@ -19763,7 +19765,7 @@ function mktBuild() {
   const fw = { x: x0 + W + 1.6, z: cz, cd: 0, rk: [] }; { const pole = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 }), red = new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .5 }), paper = [0xe8c23a, 0x2a6ac8, 0x3aa84a, 0xc8341f].map(c => new THREE.MeshStandardMaterial({ color: c, roughness: .6 }));
     add(new THREE.BoxGeometry(1.4, .9, 1.6), pole, fw.x, .45, fw.z, 1); BOXES.push(O.boxes[O.boxes.length - 1]); boxGrid(); for (const sx of [-1, 1]) add(new THREE.BoxGeometry(.1, 2.6, .1), pole, fw.x + sx * .65, 1.3, fw.z - .75, 0); add(new THREE.BoxGeometry(1.6, .08, 1.9), red, fw.x, 2.6, fw.z, 0);
     fw.tubes = []; for (let k = 0; k < 8; k++) { const t2 = add(new THREE.CylinderGeometry(.07, .07, .7, 6), paper[k % 4], fw.x - .5 + (k % 4) * .33, 1.25, fw.z - .4 + Math.floor(k / 4) * .6, 0); t2.rotation.x = -.25; fw.tubes.push(t2); } }
-  MKT.on = { g, O, bars, crates, t: 0, pot, chochin, robot, rings, drone, wash, fruitS, thief: null, thT: 8, lane: [x0 - 4, x0 + W + 4, zf - 1.6], pouch: null, fw };
+  MKT.on = { A, g, O, bars, crates, t: 0, pot, chochin, robot, rings, drone, wash, fruitS, thief: null, thT: 8, lane: [x0 - 4, x0 + W + 4, zf - 1.6], pouch: null, fw };
   arenaBeam(cx, cz, [1, .7, .4], 1); snd('clang', { g: .7, r: .7 });
 }
 function mktHit(x, y, z, rad, dmg) {
@@ -19823,7 +19825,7 @@ function mktStep(dt) { const M = MKT.on; if (!M) return; M.t += dt; mktThief(M, 
   if (M.wash) for (let i = 0; i < M.wash.length; i++) { M.wash[i].rotation.x = Math.sin(M.t * 3 + i) * .4; M.wash[i].rotation.y = Math.sin(M.t * 1.7 + i * 2) * .3; }
   if (M.robot) { const R = M.robot, p = player, P = R.position; R.position.y = Math.sin(M.t * 2.2) * .04;     // the merchant bobs and watches him
     R.userData.head.rotation.y = clamp(wrapAngle(Math.atan2(p.pos.x - P.x, p.pos.z - P.z) - Math.PI), -1.2, 1.2); }
-  if (M.drone) { const [cx, cz] = MKT.at, a = M.t * .3; M.drone.position.set(cx + Math.cos(a) * 12, MKT.H + 7 + Math.sin(M.t * 1.3) * .4, cz + Math.sin(a) * 5); M.drone.rotation.y = -a; M.drone.children[1].rotation.z = M.t * .6; } }
+  if (M.drone) { const [cx, cz] = MKT.at, a = M.t * .3; M.drone.position.set(cx + Math.cos(a) * 12, M.A.H + 7 + Math.sin(M.t * 1.3) * .4, cz + Math.sin(a) * 5); M.drone.rotation.y = -a; M.drone.children[1].rotation.z = M.t * .6; } }
 function mktClear() { const M = MKT.on; if (!M) return; smashDrop(M.fruitS); for (const C of M.crates) { const i = BOXES.indexOf(C.b); if (i >= 0) BOXES.splice(i, 1); } bldClear(M); MKT.on = null; }
 // m1141: SMASHABLES -- any building's breakable props (pots, barrels, offering boxes). `smashAdd(list, mesh, box, hp, fix, col)`: the mesh is
 // already in the building's group, its box goes into BOXES; any hit through `bldHit` chips it, at 0 it bursts (chips in `col`, a puff), the
