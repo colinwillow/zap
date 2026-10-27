@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## A KNOCKED-BACK SHOT GOES HOME IN 3D (m1348)
+
+*"There's a turret launching rockets at you, I countered one and it sends it back on the 2D plane. It doesn't go back up at the turret, but it still thinks it hits the turret even though it's 50 feet below it."*
+
+- **Both ways of sending a shot back** (the guard's perfect block in `shotBlock`, and the swung blade's `turretDeflect`) now aim it in 3D at the turret's middle (`turAimHome`). The old code set `v.y = 0` and aimed by bearing only. A rocket also turns to face its new line.
+- **The hit tests were 2D too, which is the "thinks it hits" bug.** A returned shot's blast hurt any turret within its plan radius at ANY height, and the bodies were the same. `turNear` / `bodyNear` now require the blast to be inside the turret's (or the body's) height band as well.
+
 ## THE WHIRLWIND, TWICE AS FAST (m1347)
 
 *"The whirlwind sword attack is a little better, a little bit more continuous, but I'm still picturing it like at least double the speed."*

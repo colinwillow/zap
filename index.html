@@ -11182,21 +11182,27 @@ function turretShotBoom(S, hitPlayer) {
   const p = player, dx = p.pos.x - P.x, dz = p.pos.z - P.z, d = Math.hypot(dx, dz), dir = Math.atan2(S.v.x, S.v.z);
   if (CWALL.list.length) wallHit(P.x, P.y, P.z, S.rocket ? 1.3 : .35, S.rocket ? 3 : 1, S.rocket ? 'rblast' : 'shot', dir);     // m1016; m1029: a projectile's blast never touches half cover
   if (S.mine) {     // m1013: knocked back by his blade, it is HIS now: it hurts what it reaches, never him
-    for (const T of TURRET.list) if (!T.dead && Math.hypot(T.x - P.x, T.z - P.z) < TURRET.r + (K.splash || .3) + .2) turretHurt(T, S.rocket ? 4 : 2);
-    for (const D of DUMMIES) { if (!D.root || D.cool > 0) continue; const q = Math.hypot(D.root.position.x - P.x, D.root.position.z - P.z); if (q < (D.K.r || .4) + (K.splash || .4)) dummyBlow(D, dir, S.rocket ? 1 : .6, S.rocket ? 3 : 1.2); }
+    for (const T of TURRET.list) if (!T.dead && turNear(T, P, TURRET.r + (K.splash || .3) + .2)) turretHurt(T, S.rocket ? 4 : 2);
+    for (const D of DUMMIES) { if (!D.root || D.cool > 0) continue; if (bodyNear(D, P, (D.K.r || .4) + (K.splash || .4))) dummyBlow(D, dir, S.rocket ? 1 : .6, S.rocket ? 3 : 1.2); }
   } else if (!p.roll && !coverDucked() && (hitPlayer || (K.splash && d < K.splash && P.y < p.pos.y + 2)) && ((HURT.arc = K.launch || null), 1)) playerHurt(K.dmg * (hitPlayer ? 1 : .6), hitPlayer ? dir : Math.atan2(dx, dz), K.push * (hitPlayer ? 1 : .7), K.up * (hitPlayer ? 1 : .7), .45, S.rocket ? 1 : 0);
   S.m.removeFromParent(); S.dead = 1;
 }
 // m1013: A SWING KNOCKS A SHOT BACK. *"If I swing and hit them, maybe they ricochet off and go hit something else."* A turret shot the swung
 // limb or blade passes within reach of turns round: at the nearest live turret if there is one, else the way he faces, a third faster.
+// m1348: *"I countered one and it sends it back on the 2D plane -- it doesn't go back up at the turret, and it still thinks it hits the turret
+// even though it's 50 feet below it."* A knocked-back shot flies in 3D at the turret's middle, and only a blast that reaches the turret in 3D
+// (or a body in 3D) counts.
+function turAimHome(S, T, v) { _sbV.set(T.x - S.p.x, (T.y || 0) + TURRET.h * .5 - S.p.y, T.z - S.p.z); if (_sbV.lengthSq() < 1e-6) _sbV.set(0, 0, 1); _sbV.normalize(); S.v.copy(_sbV).multiplyScalar(v); if (S.rocket) S.m.quaternion.setFromUnitVectors(_sbY, _sbV); }
+const turNear = (T, P, r) => Math.hypot(T.x - P.x, T.z - P.z) < r && P.y > (T.y || 0) - r * .5 && P.y < (T.y || 0) + TURRET.h + r * .5;
+const bodyNear = (D, P, r) => Math.hypot(D.root.position.x - P.x, D.root.position.z - P.z) < r && P.y > D.root.position.y - .3 && P.y < D.root.position.y + (D.K.h || 1.8) + .3;
 function turretDeflect(x, y, z, rad) {
   for (const S of TURRET.shots) {
     if (S.dead || S.mine) continue;
     if (Math.hypot(S.p.x - x, S.p.y - y, S.p.z - z) > rad + .55) continue;
     let tgt = null, bd = 1e9; for (const T of TURRET.list) { if (T.dead) continue; const d = Math.hypot(T.x - S.p.x, T.z - S.p.z); if (d < bd) { bd = d; tgt = T; } }
-    const h = tgt ? Math.atan2(tgt.x - S.p.x, tgt.z - S.p.z) : player.faceH, v = Math.hypot(S.v.x, S.v.z) * 1.35;
-    S.v.set(Math.sin(h) * v, 0, Math.cos(h) * v); S.mine = 1; S.t = 0;
-    if (S.rocket) S.m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(Math.sin(h), 0, Math.cos(h)));
+    const h = player.faceH, v = Math.hypot(S.v.x, S.v.z) * 1.35;
+    if (tgt) turAimHome(S, tgt, v); else S.v.set(Math.sin(h) * v, 0, Math.cos(h) * v); S.mine = 1; S.t = 0;
+    if (S.rocket) S.m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), _sbV.copy(S.v).normalize());
     spkBurst(S.p.x, S.p.y, S.p.z, 14, { col: [1, 1, .8], spread: 3, size: .14, life: .35 }); snd('clang', { g: .9, r: 1.3, x: S.p.x, z: S.p.z }); camShake(.08); ARENA.stop = Math.max(ARENA.stop, .05);
   }
 }
@@ -11245,8 +11251,8 @@ function shotBlock(S) {
   const dirH = Math.atan2(S.v.x, S.v.z), off = Math.abs(wrapAngle(dirH - Math.PI - p.faceH)); if (off > BLOCK.arc) return 0;
   const perfect = (p.blockT - WEAP.blockT) < SHOTBLOCK.win, sp = Math.hypot(S.v.x, S.v.z);
   S.mine = 1; S.t = 0; S.m.scale.setScalar(1);
-  if (perfect && S.src && !S.src.dead) { const T = S.src, h = Math.atan2(T.x - S.p.x, T.z - S.p.z), v = sp * SHOTBLOCK.back;
-    S.v.set(Math.sin(h) * v, 0, Math.cos(h) * v);
+  if (perfect && S.src && !S.src.dead) { const T = S.src, v = sp * SHOTBLOCK.back;
+    turAimHome(S, T, v);     /* m1348: straight back AT the turret, up the tower and all (it went home level, 15 m under a tower-top gun) */
     spkBurst(S.p.x, S.p.y, S.p.z, 30, { col: [1, 1, 1], spread: 6, size: .2, life: .4 }); snd('clang', { g: 1.1, r: 1.5, x: S.p.x, z: S.p.z });
     if (BLOCK.ping) snd(BLOCK.ping.key, { g: BLOCK.ping.g, r: BLOCK.ping.r, x: S.p.x, z: S.p.z }); camShake(.15); ARENA.stop = Math.max(ARENA.stop || 0, .09);
   } else { const B = bladeSeg();
@@ -11315,7 +11321,7 @@ function turretStep(dt) {
       if (Math.random() < .8) smokeAt(S.m.position.x, S.m.position.y, S.m.position.z, .5, .7, [.3, .3, .3]); }
     if (S.sput) { const k = S.t * 9 + S.sput; const c = Math.cos(.9 * Math.sin(k) * dt * 6), sn = Math.sin(.9 * Math.sin(k) * dt * 6), vx = S.v.x * c - S.v.z * sn, vz = S.v.x * sn + S.v.z * c;
       S.v.x = vx; S.v.z = vz; S.v.y = Math.sin(k * 1.3) * 1.5 - .4; if (S.rocket) S.m.quaternion.setFromUnitVectors(_sbY, _sbV.copy(S.v).normalize()); if (Math.random() < .8) smokeAt(S.p.x, S.p.y, S.p.z, .5, .7, [.3, .3, .3]); }
-    if (S.mine) { let hitB = 0; for (const D of DUMMIES) if (D.root && Math.hypot(D.root.position.x - S.p.x, D.root.position.z - S.p.z) < (D.K.r || .4) + .2) hitB = 1; if (hitB) { turretShotBoom(S, 0); continue; } }
+    if (S.mine) { let hitB = 0; for (const D of DUMMIES) if (D.root && bodyNear(D, S.p, (D.K.r || .4) + .2)) hitB = 1; if (hitB) { turretShotBoom(S, 0); continue; } }
     // the world: full walls stop it (`boxRay` flies over half cover), and so does its own launcher's box -- skipped
     const hit = boxRay(ox, oy, oz, S.p.x, S.p.y, S.p.z, _tuR);
     if (hit && !(_tuR.box && _tuR.box.turret && !S.mine)) { turretShotBoom(S, 0); continue; }     // its own launcher's box is skipped -- unless it is coming BACK
