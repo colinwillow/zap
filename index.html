@@ -18080,15 +18080,23 @@ function tornStep(dt) {
   T.ring.visible = (p.tornC || 0) > 0; if (T.ring.visible) { const r = .35 + .75 * p.tornC; T.ring.scale.set(r, r, 1); T.ring.position.set(p.pos.x, p.pos.y + .05, p.pos.z); T.ring.material.color.setHex(p.tornC >= 1 ? 0xffc04a : 0xff8a2a); }
 }
 function tornGo() { const p = player; TORN.stat.charges++; p.torn = { n: TORN.spins }; p.tornC = 0; p.ltHold = 0; p.jump = 0; tornSpin(); }
-// m1316 (his note): *"He does three of them. I was picturing one big powerful spin."* ONE spin, always; the charge now buys REACH and weight
-// (R + up to 1.6 m), not more turns.
-const WHIRL = { on: 1, idle: .3, spins: [1, 1], R: 3.4, Rk: 1.6, dmg: 4, power: 1.3, dur: .7, stat: { whirls: 0, hits: 0 } };
-function whirlGo(k) { const p = player; WHIRL.stat.whirls++; p.torn = { n: Math.round(lerp(WHIRL.spins[0], WHIRL.spins[1], k)), whirl: 1, k }; p.ltHold = 0; p.jump = 0; whirlSpin(); }
+// m1317 (his note, taking back m1316): *"Link probably does three. The problem is ours does one, then he STOPS, does another, STOPS... they need to be
+// CONTINUOUS. And I want to control it -- launch forward with it, like a tornado, moving around."* MEASURED: `katana_360h` is 3.2 s and its
+// hips turn -15 deg at 0.2 s, -301 at 1.0 s, then crawl to -360 over the remaining 2.2 s -- so playing the WHOLE clip per spin was a
+// spin and then a 70% settle, three times. Now each spin plays only the turning window (`from`..`to`, -25 -> -301 = `turn` 276 deg); at
+// each restart the body's heading jumps -276 deg to cancel the pose snapping back, so the eye sees one unbroken turn. The first spin starts
+// from the clip's own wind-up (0), the last plays on into the settle (`last`). And it LAUNCHES: `go` m/s along the way he faced, bleeding
+// at `bleed`/s, with the left stick steering on top (`TORN.speed`).
+const WHIRL = { on: 1, idle: .3, spins: [2, 3], R: 3, Rk: 1, dmg: 3, power: 1.1, dur: .42, from: .078, to: .3125, last: .36, turn: 276, go: 8, bleed: 1.1, stat: { whirls: 0, hits: 0 } };
+function whirlGo(k) { const p = player; WHIRL.stat.whirls++; const g = WHIRL.go * (.7 + .3 * k); p.torn = { n: Math.round(lerp(WHIRL.spins[0], WHIRL.spins[1], k)), whirl: 1, k, i: 0, vx: Math.sin(p.faceH) * g, vz: Math.cos(p.faceH) * g }; p.ltHold = 0; p.jump = 0; whirlSpin(); }
 function whirlSpin() {
   const p = player, nm = TORNADO.sword; if (!rig.actions[nm]) { p.torn = null; return; }
   p.melee = 1; p.meleeIx = 0; p.meleeT = 0; p.meleeName = nm; p.meleeAir = 0; p.meleeBody = 0; p.melWall = 0; p.melFist = 0; p.melFront = 0; p.multi = 1;
   p.meleeDur = WHIRL.dur; p.meleeChain = 0; p.melFired = 0; p.melU = 0; p.swPrev = null; p.swRootX = null; p.swRootZ = null; p.melV = 0; p.melTgt = null; p.melH = p.faceH;
-  playOnce(nm, clipLen(nm) / p.meleeDur); snd('swoosh', { r: .7, g: 1 }); snd('swoosh', { r: 1.1, g: .6 });
+  { const W = WHIRL, T = p.torn || { i: 0, n: 1 }, first = !T.i, lastS = T.n <= 1, a0 = first ? 0 : W.from, a1 = lastS ? W.last : W.to, L0 = clipLen(nm);
+    if (!first) { p.faceH -= W.turn * Math.PI / 180; p.heading = p.faceH; p.melH = p.faceH; }     /* cancel the pose's snap-back: one unbroken turn */
+    p.meleeDur = W.dur * (a1 - a0) / (W.to - W.from); playOnce(nm, L0 * (a1 - a0) / p.meleeDur); rig.actions[nm].time = L0 * a0; T.i = (T.i || 0) + 1; }
+  snd('swoosh', { r: .7 + Math.random() * .2, g: 1 }); if (!p.torn || p.torn.i <= 1) snd('swoosh', { r: 1.1, g: .6 });
   // the RING: everyone within reach, all the way round, takes the blow outward (the clip's own sweep may catch them too -- `tierHit`'s 140 ms
   // debounce keeps that one blow), and machines / walls / props round him take it too
   const P = p.pos, R = WHIRL.R + WHIRL.Rk * (p.torn ? p.torn.k : 0);
@@ -27126,7 +27134,7 @@ function stepPlayer(dt) {
     if (p.melee && p.meleeAir && p.airKick && MELEE.kickLevel) p.vel.y = MOVE.g * dt + (p.kickVy != null ? p.kickVy : -(MELEE.kickDrop || 0));     // m1088: a FLOW kick flies at the juggled man's height     // one frame of gravity pre-paid: `integrate` takes it back, net -kickDrop
     // HER STRIKE RIDES (m274): the body faces the blow, the wheels keep rolling -- only their own drag on it
     if (p.melRide && p.melee && !p.roll) { const d = Math.exp(-BLADE.roll * dt); p.vel.x *= d; p.vel.z *= d; p.faceH = h; }
-    else if (p.torn && p.melee) { const S = stickWorld(); p.vel.x = S.x * S.mag * TORN.speed; p.vel.z = S.z * S.mag * TORN.speed; }     // m1091: the stick steers the tornado
+    else if (p.torn && p.melee) { const S = stickWorld(), T = p.torn; let bx = 0, bz = 0; if (T.whirl && T.vx != null) { const e = Math.exp(-WHIRL.bleed * dt); T.vx *= e; T.vz *= e; bx = T.vx; bz = T.vz; } p.vel.x = bx + S.x * S.mag * TORN.speed; p.vel.z = bz + S.z * S.mag * TORN.speed; }     // m1091: the stick steers the tornado (m1317: on top of the whirlwind's launch)     // m1091: the stick steers the tornado
     else if (p.segT > 0) { p.segT -= dt; const sk = p.segT > p.segDur * (1 - MELEE.carry) ? 1 : clamp(p.segT / (p.segDur * (1 - MELEE.carry)), 0, 1);
       p.vel.x = Math.sin(h) * p.segV * sk; p.vel.z = Math.cos(h) * p.segV * sk; p.heading = h; }     // m1101: the swing's own lurch
     else {

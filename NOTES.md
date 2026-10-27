@@ -5,6 +5,27 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE WHIRLWIND, CONTINUOUS AND STEERED (m1317)
+
+He took back m1316's "one spin": *"Link probably does three. The problem is ours does one, then he stops, does another, stops... they need to be continuous. And I want to control it -- launch forward with it, like a tornado, moving around."*
+
+- **What was actually wrong, MEASURED** (the hips' yaw track of `katana_360h`, read straight off `samurai_game.glb`):
+  - the clip is 3.2 s
+  - the hips turn -15° by 0.2 s and -301° by 1.0 s
+  - then they crawl to -360° over the remaining 2.2 s
+  - Each spin played the WHOLE clip in .5 s, so it was a turn followed by 70% settle, three times. That is the stop he saw.
+- **Fix: only the turning window per spin.**
+  - Each spin plays `from` .078 to `to` .3125 of the clip (-25° to -301°, i.e. `turn` 276°). The first spin starts at 0, so it keeps the wind-up; the last plays on to `last` .36, a short settle.
+  - At each restart the body's heading (`p.faceH`, its one writer here) drops by 276°. That exactly cancels the pose snapping back, so the eye sees one unbroken rotation.
+  - Each spin is .42 s.
+- **2-3 spins again** (`spins` [2,3] by charge).
+- **It LAUNCHES:**
+  - `WHIRL.go` 8 m/s (70-100% by charge) along the way he faced at release
+  - it bleeds off at 1.1/s
+  - the left stick steers on top at `TORN.speed`, so it travels and can be driven round
+- R 3 + 1 by charge, dmg 3, power 1.1.
+- **If the spin reads backwards or jerks at each join**, `WHIRL.turn` is the number. It is live on `mel.WHIRL`.
+
 ## LADDERS AND THE WHIRLWIND, FROM HIS X4 WALK (m1316)
 
 He walked the octagonal pagoda (X4). Three notes on shared systems are fixed here. Scale and stairs went to BUILDINGS.md's new STEER.
