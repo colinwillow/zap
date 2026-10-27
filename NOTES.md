@@ -5,6 +5,24 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE COURTYARD, PASS 5: THE GUARDS (m-COURT5)
+
+COURTYARD.md pass 5. Shipped unverified.
+
+- **Archers hold posts:** watchtower deck B (south-west), deck A (south-west), and one on each hall's lane balcony. The pagoda's two archers are already there from pass 4.
+- **The sentry gun** is on deck B's south-east corner, facing the court (`C.tur`).
+- **Ground guards:**
+  - a pair at the south gate (`tierLook` warrior, 3 hits)
+  - a brute under the bell house (5 hits)
+  - **two on their ROUNDS**
+- **The rounds are a new, small, general hook:** `d.patrol = { pts, i, wait, sp }` on any idle body. `patrolWalk` runs in the non-aggro branch of the fight AI, before the idle look-about.
+  - It walks waypoint to waypoint with `faceTo` / `foeMove` and the walk clip, and pauses 1.5-3.5 s at each corner.
+  - The loop: lane, path to the pond, round its north side, the west strip behind the west hall, back along the south wall.
+  - Two men start half a loop apart.
+- **The bell calls them all:** every guard and archer is in `C.guards`, which `courtHit` already sets aggro and `bgateStep` already reads (the gates open for them).
+- `courtClear` drops every guard and archer and the gun.
+- **Which box this moves:** C1 pass 5 of 10. Still open: the life, the ground, the clear condition and the watchtower gate, the playtest fixes and the polish.
+
 ## The Courtyard pass 4 of 10: the pagoda placed, the ziplines, the maple (C1)
 
 - **The GREAT RED PAGODA** now stands in the court's NORTH-WEST corner. It is the SAME builder, taking options (`gpagBuild(opt)`):
