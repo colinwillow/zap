@@ -5,6 +5,31 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1262 -- THE GREAT RED PAGODA, pass 1 of 10 (his 10-pass experiment, X1)
+
+*"Let me get you an image of a tower I think would be cool to build"* -- the red pagoda (`images/korajin/ref/red_pagoda_tower.webp`).
+`GPAG`, `gpagBuild` / `gpagStep` / `gpagClear`, at (90, 0); SPAWN > BUILDINGS > Great Red Pagoda.
+
+**The stack.** Five storeys of red lacquer, 3.8 m each, stepping in .45 m a side per storey.
+
+**The rooms.** It is HOLLOW: a room on every storey.
+- **Ground storey.** Breakable plaster-and-timber walls (`cwallBuild`), a door toward the forge's middle, and a shrine altar with a
+  floating Jin core.
+- **Upper storeys.** Solid lacquer walls with a DOOR onto that storey's balcony (the side turns every storey) and paper windows in the
+  other walls. You can jump out of a window onto the balcony.
+- **Inside the walls.** Dark corner posts and a gold band under every eave.
+
+**The climb.** A LADDER in each storey goes up through a HATCH in the next floor (`kitClimbAdd`, each with its exit `mark`). The ladder's
+corner turns as you climb, so every storey you cross the room.
+
+**The balconies.** Every storey above the ground has a railed balcony 1.25 m deep: a solid rail at .9 m with posts and a mid-rail.
+
+**The roofs.** Every storey has a deep flared hip roof (`bldRoof`): grey-green tile, gold fascia, the corners lifted, and lanterns hung
+at the four eave corners. Each storey's roof ridge sits under the next floor's slab. The top roof peaks into the SPIRE: a gold mast, nine
+rings, a flame finial, and a grapple ring.
+
+**The plan for passes 2-10** is in BUILDINGS.md (X1). SHIPPED UNVERIFIED.
+
 ## m1261 -- the air-swipe hook chases a MOVING bar (the zeppelin "imaginary collider")
 
 *"With the zeppelins flying around, I'd high-jump and swipe and just be grabbing onto an imaginary floating nothing... a weird collider of

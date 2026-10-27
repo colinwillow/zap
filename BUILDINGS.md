@@ -58,6 +58,14 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 much more functional."* He is sending a reference image of a tower. When it lands, it becomes the first 10-pass building (a pass per build,
 each pass a real step up in silhouette, material, detail and things to DO), and that result decides whether the rest get the same.
 
+**The image landed (m1262): `images/korajin/ref/red_pagoda_tower.webp`** -- a slender five-storey red pagoda, a railed balcony round
+every storey, deep flared roofs with gold edges stepping in as it rises, a spire of rings, a roofed pavilion at its foot, a red fence with
+gold flame finials. **The loop takes X rows FIRST, before the R rows, a pass per build, to 10.**
+
+| # | building | the plan, pass by pass | spot | passes |
+|---|---|---|---|---|
+| X1 | **Great Red Pagoda** | 1 the stack: 5 hollow storeys, a room each, ladders up through hatches (corners turning), a door onto every balcony, deep flared roofs, the spire · 2 the reference's detail: bracket clusters under every eave, lattice panels and railings in the right rhythm, the upturned corner tips, tile ribs · 3 the PAVILION at its foot (the side hall with its own roof) and the red FENCE with gold flame finials round the court · 4 function: the climb OUTSIDE -- eave tips you can catch, bars between balconies, a rope from the spire · 5 the rooms: a different room every storey (shrine, armoury, library, bell room, the lookout) · 6 guardians: archers on the balconies, a sentry in the bell room, killable · 7 the light: lanterns that glow at dusk, a beacon in the spire, the windows lit · 8 motion: wind chimes, streamers, the bell, birds off the roofs · 9 a set piece: ring the bell at the top and the whole tower answers (lanterns run up, the spire flares, a gate opens) · 10 the polish: proportions against the reference, colour, silhouette, draw calls | (90, 0) | 1 (m1262) · 2 · 3 · 4 · 5 · 6 · 7 · 8 · 9 · 10 |
+
 ## HIS REQUESTS (m1251) -- these go FIRST, ahead of the rest of Set 3
 
 **The loop takes these rows first, in order, three passes each, and does NOT alternate with extra passes while any R row is open** (his, after m1256: *"start the loop again with this new stuff"*). A kit row (R3, R4, R9) is a set of pieces plus a showcase; its pass 1 is the pieces and the showcase.
