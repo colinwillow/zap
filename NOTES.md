@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1210 -- Gatehouse pass 5: man the ballista (Building Forge loop, extra pass)
+
+Stand at the ballista's breech on the deck (within `manR` 1.5 m, at the deck's height) and it is YOURS:
+- **Gold eye.** Its eye turns gold, with a clank.
+- **It hunts.** It turns on the nearest standing body within `balR` 34 m instead of on him.
+- **Faster.** It winds up faster (`balCool` x .55).
+- **His bolts.** Its bolts carry `mine`: they strike bodies (`dummyBlow`) and pass him by.
+
+Step away and it turns back on him. A dead ballista stays dead either way (`balDead`). Next: alternate -- Senbon Torii pass 3.
+
 ## m1209 -- Senbon Torii pass 2: the gates glow, and foxfire (Building Forge loop)
 
 **THE GATES GLOW** (his spec: "at night-ish the gates glow"):
