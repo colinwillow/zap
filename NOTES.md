@@ -5,6 +5,27 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE COURTYARD, PASS 6: THE LIFE (m-COURT6)
+
+COURTYARD.md pass 6 (`courtLife`, stepped by `courtStep`). Shipped unverified.
+
+- **Koi:** 8 circle the pond. Wading in (inside the rim, below 1.2 m) scatters them: faster, and pushed outward from you for 3 s.
+- **Pigeons:**
+  - 13 in one instanced pair, perched 5 on each hall ridge and 3 on the watchtower's top deck corners. This is the block pagoda's perch / flee / circle / home cycle.
+  - They lift off when you come within 6 m, or when the bell rings.
+  - If they float above or sink into the ridge, the number is the `11.25` perch height. The hip roof's ridge is `rY` 11.2 plus a `lift` I did not measure.
+- **A fox:**
+  - a blocky one with leg swing and tail swish, trotting a loop of the west grass strip
+  - within 7 m of you (on the ground) it bolts for the west hall's lane door and vanishes
+  - it is back 10 s later once you are 12 m off
+- **Fairy dust:** about 6 motes a second from the pooled sparks (`spk`), gold or pale cyan, rising slowly over the pond and the west grass.
+- **Sun shafts:** 4 additive open cones on one material: two raking down the lane, one through the tower, one over the pond. Their opacity breathes.
+- **Lanterns:**
+  - two sagging cords of 7 red paper lanterns strung across the lane at about 6.5 m; they sway
+  - the court's merged `lamp` material breathes with a slight flicker
+- `C.alarm` now counts down.
+- **Which box this moves:** C1 pass 6 of 10. Still open: the ground, the clear condition, the playtest fixes and the polish.
+
 ## THE COURTYARD, PASS 5: THE GUARDS (m1308)
 
 COURTYARD.md pass 5. Shipped unverified.
