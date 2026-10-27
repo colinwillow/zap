@@ -23,6 +23,7 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 SHIPPED UNVERIFIED. Next: pass 5, the work site (leaning poles and scaffolding as ramps, timber stacks, a crane, a half-built bay).
 
 ## THE MEGA WALL x1.5 -- STEER S2 (R1, m-MW15)
+## THE MEGA WALL x1.5 -- STEER S2 (R1, m1332)
 
 - **Every SIZE is ×1.5:**
   - the tower's plan, 8 → 12 m square (the summit guard house, rails and brazier spread with it)
