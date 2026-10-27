@@ -11154,18 +11154,20 @@ function courseStep(dt) {
 // me?"* -- measured before anything is optimised. SPAWN > HORDE adds `per` samurai a tap (to `max`) in rings on the dais round him, each a
 // plain `bodySpawn` clone on the ordinary fighter brain (`foeAI`: chase, swing, knocked flying by your hits) -- NOT the arena rival's
 // brain. The chip already reads FPS / DC (draw calls) / kT (triangles) / B (bodies): that is the baseline on his phone.
-const HORDE = { kind: 'SAMURAI', per: 25, max: 150, list: [], busy: 0, hp: 3, notice: 12 };
+const HORDE = { kind: 'SAMURAI', per: 25, max: 150, list: [], busy: 0, hp: 3, notice: 12, fling: .25, fly: 1.7 };
 async function hordeAdd() {
   if (HORDE.busy || HORDE.list.length >= HORDE.max) return; HORDE.busy = 1; arenaUi();
   try {
     const K0 = await arenaLoad(HORDE.kind), p = player, n = Math.min(HORDE.per, HORDE.max - HORDE.list.length);
     // their own view of the kind: the arena gives every boss `notice` 60, and the walk-up only RUNS past `notice x dash` -- measured, all
     // 100 stood walking in idle (the samurai's m1076 bug again). `Object.create`: everything else is the kind's own.
-    const K = HORDE.K || (HORDE.K = Object.assign(Object.create(K0), { notice: HORDE.notice, lose: 90 }));
+    // m1086: and THROWABLE -- any blow past `fling` that is not blocked LAUNCHES him, `fly` x higher and further than a boss (the musou crowd)
+    const K = HORDE.K || (HORDE.K = Object.assign(Object.create(K0), { notice: HORDE.notice, lose: 90, fling: HORDE.fling, flyV: K0.flyV * HORDE.fly, flyUp: K0.flyUp * HORDE.fly, fly0: .75 })), A = ARENA.kinds[HORDE.kind];
     for (let i = 0; i < n; i++) {
       const k = HORDE.list.length, ring = 5 + (k % 50) / 50 * 9, a = k * 2.399963;     // a sunflower spiral, 5..14 m out
       const x = clamp(p.pos.x + Math.sin(a) * ring, -ARENA.r + 1, ARENA.r - 1), z = clamp(p.pos.z + Math.cos(a) * ring, -ARENA.r + 1, ARENA.r - 1);
-      const d = bodySpawn(K.P, K, x, z, 0); d.horde = 1; d.aggro = 1; d.hp = d.hpMax = HORDE.hp; d.gap = Math.random() * 2;
+      const d = bodySpawn(K.P, K, x, z, 0); if (A.katana) arenaKatana(d, A); d.horde = 1;     // m1086: his sword (*"none of them had samurai swords"*)
+      d.aggro = 1; d.hp = d.hpMax = HORDE.hp; d.gap = Math.random() * 2;
       d.h = Math.atan2(p.pos.x - x, p.pos.z - z); HORDE.list.push(d);
     }
     arenaBeam(p.pos.x, p.pos.z, [.9, .3, .3], 1); snd('clang', { g: .6, r: .5 });
@@ -11846,6 +11848,7 @@ function pushBodies(pos, r, skip) {
     // `PACK.seat.back` in front of your own chest, shoving you backwards every frame -- which
     // reads as walking into an invisible box, and is the same thing m96's carry had to skip.
     if (d.st === 'ride' || d.st === 'leap') continue;
+    if (pos.y > d.root.position.y + (d.K.h || 1.8) * .72) continue;     // m1086: over his shoulders -- jump over a crowd (*"I can't jump over them"*)
     const dx = pos.x - d.root.position.x, dz = pos.z - d.root.position.z;
     const rr = r + d.K.r;
     const l2 = dx * dx + dz * dz;
@@ -17345,9 +17348,26 @@ const aimAt = d => {
 // AND THE ACQUIRE RANGE IS WHAT THE MOVE CAN COVER, NOT A TYPED NUMBER. A flat range locks a
 // JAB onto a man six metres off and then cannot get him there -- and a lock that turns him
 // toward somebody he cannot reach is worse than no lock at all.
-function meleeLock(h, reachMax, cone) {
+// m1086: FREEFLOW. *"Develop a more stringy melee system so you can keep swiping and string those attacks from one guy to the next guy to the
+// next guy, with launch, leap, leap, launch, and send them flying if they're not blocking."* (The crowd in the horde boxed him in: one swing,
+// then nothing in reach.) A swing that LANDS on a body opens `window` s of FLOW; a swing thrown inside it reaches `reach` m (the katana's
+// own lock is 3.5) across a wider `cone`, prefers a body you have NOT hit in the last `recent` s and never one already knocked down, lunges
+// as fast as `maxV`, and past `leapAt` m the lunge is drawn as a LEAP (`leapH` m at its top, `flowArc`). Chained, every swing is a new
+// man. `FLOW.on = 0` is the A/B.
+const FLOW = { on: 1, window: 1.1, reach: 7.5, cone: 1.45, recent: .9, maxV: 60, leapAt: 3.2, leapH: 1.4, stat: { links: 0, leaps: 0 } };
+const flowNow = () => performance.now() / 1000;
+function flowArc(dt) {
+  const L = player.flowLeap; if (!L) return 0;
+  L.t += dt; const u = L.t / L.dur; if (u >= 1 || !player.melee) { player.flowLeap = null; return 0; }
+  return L.h * Math.sin(Math.PI * u);
+}
+function meleeLock(h, reachMax, cone, flow) {
   let best = null, bestS = Infinity;
+  const now = flowNow();
+  for (let pass = flow ? 0 : 1; pass < 2 && !best; pass++)     // m1086: flowing, a fresh man first (pass 0); anybody standing if none (pass 1)
   for (const d of DUMMIES) {
+    if (flow && (d.st === 'down' || d.st === 'up' || d.gone)) continue;
+    if (pass === 0 && now - (d.flowAt || -9) < FLOW.recent) continue;
     const a = aimAt(d);
     if (a.dist > reachMax || a.dist < .3) continue;
     const off = Math.abs(wrapAngle(a.h - h));
@@ -17502,7 +17522,8 @@ function meleeGo0(h) {
   const katL = slotNow().melee === 'katana' && !tackle ? KATANA.lock : null;     // m993: the katana's wider, longer magnetism
   const reachMax = Math.min(MELEE.maxV * p.meleeDur * MELEE.carryAvg,
                             (katL ? Math.max(maxD, katL.reach) : maxD) + (tackle ? 0 : MELEE.arrive));
-  const L = h != null ? meleeLock(h, reachMax, katL ? katL.cone : 0) : null;
+  const flow = FLOW.on && !tackle && flowNow() < (p.flowUntil || 0);     // m1086
+  const L = h != null ? meleeLock(h, flow ? Math.max(reachMax, FLOW.reach) : reachMax, flow ? FLOW.cone : katL ? katL.cone : 0, flow) : null;
   if (L) h = L.h;
   p.melTgt = L ? L.d : null;
   // SOLVE THE LAUNCH FOR THE GAP. A move covers `v * dur * carryAvg`, and that inverts.
@@ -17519,7 +17540,9 @@ function meleeGo0(h) {
   // how far a strike carries whether or not it found anybody.
   const spend = p.meleeDur * MELEE.carryAvg;
   const vCap = Math.min(MELEE.maxV, (katL && L ? Math.max(maxD, katL.reach) : maxD) / spend);     // m993: a found target may pull him the katana's full reach
-  const solved = L ? clamp((L.dist - MELEE.arrive) / spend, 0, vCap) : Math.min(base, vCap);
+  const flowL = flow && L && L.dist > (katL ? katL.reach : maxD);     // m1086: a FLOW link past his ordinary reach -- the long lunge
+  const vCapF = flowL ? Math.min(FLOW.maxV, (L.dist + .2) / spend) : vCap;
+  const solved = L ? clamp((L.dist - MELEE.arrive) / spend, 0, vCapF) : Math.min(base, vCap);
   // **AND A TACKLE AIMS THROUGH HIM RATHER THAN IGNORING HIM (m97).** *"He's hitting the guys
   // and then all of a sudden he zips past them by a long distance and I can't figure out why."*
   // It is the TACKLE, and it is m93 over-corrected. His m93 complaint was that the solve CUT IT
@@ -17543,7 +17566,8 @@ function meleeGo0(h) {
   p.melV = tackle && MELEE.slideFree ? clamp(thru / spend, 0, vCap) : solved;
   // m993: THE KATANA LASHES IN. The same travel, spent in the first `front` of the swing (the dash's `dashLand` clock) -- in fast,
   // then planted for the cut -- rather than drifted across the whole beat. *"I was just standing there swinging my sword."*
-  p.melFront = katL ? KATANA.lock.front : 0; if (katL) p.melV = Math.min(MELEE.maxV, p.melV / KATANA.lock.front);
+  p.melFront = katL ? KATANA.lock.front : 0; if (katL) p.melV = Math.min(flowL ? FLOW.maxV / KATANA.lock.front : MELEE.maxV, p.melV / KATANA.lock.front);
+  if (flow && L) { FLOW.stat.links++; if (L.dist > FLOW.leapAt) { FLOW.stat.leaps++; p.flowLeap = { t: 0, dur: Math.max(.12, p.meleeDur * (katL ? KATANA.lock.front : .5)), h: FLOW.leapH * Math.min(1, L.dist / FLOW.reach) }; } }
   if (katL) p.melGap = p.melV * spend * KATANA.lock.front;     // the chip's travel: the same metres, spent early
   p.melGap = p.melV * spend;          // how far this strike will actually carry him, for the chip
   // **AND THE LENS COMES ROUND WITH HIM (m81).** `h` here is the direction he ACTUALLY strikes
@@ -32964,6 +32988,7 @@ function dummyBlow(d, dirH, power, dmg, pal) {
   if (d.sh && !pal && arenaShieldHit(d, dirH, power)) return;     // m896: the shield took it
   if (BLOW_SRC === 'shot' && d.arena && ARENA.stun.on && arenaStun(d)) { d.cool = K.cool; return; }     // m901: a stun bolt
   d.cool = K.cool;
+  if (!pal && !BLOW_SRC && player.melee) { player.flowUntil = flowNow() + FLOW.window; d.flowAt = flowNow(); }     // m1086: a swing that LANDED opens the flow
   d.aggro = 1; d.seen = 0;     // being shot at is how you get noticed
   // **A MAN TURNS ON THE THING BITING HIM**, and the LATCH is what carries it: the pal is
   // usually not the nearer of the two, so the distance rule below would never have picked him.
@@ -33030,7 +33055,7 @@ function dummyBlow(d, dirH, power, dmg, pal) {
   // **AND A BIG ENOUGH BLOW LAUNCHES HIM WHATEVER HIS HEALTH SAYS.** `hard` is unreachable on
   // the warrior so DAMAGE is what puts him down -- right for a fist, wrong for the biggest shot
   // in the game. *"If you do a full charge it'll actually send them flying."*
-  const down = d.hp <= 0 || power >= K.hard || (K.fling !== undefined && power >= K.fling);
+  const down = d.hp <= 0 || power >= K.hard || (K.fling !== undefined && power >= K.fling && !guard);     // m1086: a blocked blow does not fling him
   if (down && d.hp > 0 && bodyWeightK(K) < KNOCKDOWN.heavy) {     // m906: too heavy to be thrown -- a big stagger
     d.st = 'hit'; d.t = 0; d.beat = KNOCKDOWN.stagger; d.wind = 0;
     d.cur = bodyReact(d, dirH, 1); skinPlay(d, d.cur, skinLen(d, d.cur) / d.beat * (.88 + Math.random() * .24));
@@ -54977,6 +55002,7 @@ function frameBody() {
     // THE LEAP'S LIFT (m193), eased so a gait change cannot pop him down
     player.leapYd = damp(player.leapYd || 0, player.leapY || 0, .03, dt);
     rig.root.position.y += player.leapYd;
+    rig.root.position.y += flowArc(dt);     // m1086: a FLOW lunge past `leapAt` is a leap
     // HE STANDS ON THE DECK, so he is lifted by its measured height -- his COLLIDER stays on
     // the ground, which is right: the board is a picture and the man is the body.
     if (player.board && player.bike) rig.root.position.y += bikeSeatLift();      // m374: on the seat
@@ -56802,7 +56828,7 @@ window.melee = window.mel = { FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VE
   // of a rule measures a game that does not exist -- which is the oldest mistake there is, and
   // the only way not to make it is for `npm run sim` to call exactly these.
   DUMMY, DUMMIES, LOCK, LEDGE, WALL, STRIKE, PADS, DESK, meleeLock, dummyHit, dummyBlow, strikeSweep, stepDummies, bodySeat, SEAT, findLock, SFX, CHARGE, POSE, snd, PUNCH, PLASMA, HITSND, BODYSND, FLYHIT, STEP,
-  stepPlayer, muzzleWorld, RIC, coverAcross, cwallOf, KNOCK, knockHas, GSIDE, KAIM, aimLeap, kaimHold, DUCK, duckPose, RUNSWIPE, runSwipe, SHOTBLOCK, shotBlock, bladeSeg, steelFlash, STEEL, HURT, playerHurt, GOD, LEAP, coverLeap, wallGo, WRUN, wrunTap, wrunFind, wrunSpawn, wrunClear, stepWrun, backGo, HURDLE, hurdleTap, HOOK, barHook, meleeGo0, CART, cartGo, leftFlick, rigAnim, stepKit, frameBody, kickGo, SPRINGS, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, hbarCatch, stepBar, hbarPose, hbarFly, coverArmUndo, slideGo, coverShow, TURRET, ZOOM, zoomGo, HORDE, hordeAdd, hordeClear, ACAM, actionCam, acamPip, turretSpawn, COURSE, courseBuild, courseClear, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
+  stepPlayer, muzzleWorld, RIC, coverAcross, cwallOf, KNOCK, knockHas, GSIDE, KAIM, aimLeap, kaimHold, DUCK, duckPose, RUNSWIPE, runSwipe, SHOTBLOCK, shotBlock, bladeSeg, steelFlash, STEEL, HURT, playerHurt, GOD, LEAP, coverLeap, wallGo, WRUN, wrunTap, wrunFind, wrunSpawn, wrunClear, stepWrun, backGo, HURDLE, hurdleTap, HOOK, barHook, meleeGo0, CART, cartGo, leftFlick, rigAnim, stepKit, frameBody, kickGo, SPRINGS, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, hbarCatch, stepBar, hbarPose, hbarFly, coverArmUndo, slideGo, coverShow, TURRET, FLOW, ZOOM, zoomGo, HORDE, hordeAdd, hordeClear, ACAM, actionCam, acamPip, turretSpawn, COURSE, courseBuild, courseClear, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
   MFX, camShake, palDive,
   // THE BOARD, LIVE (m159). `mel.SK8.hold` is where the deck sits IN HIS HAND while it is
   // carried, and how a carried board should look is a look-at-it decision -- so it is a dial he
