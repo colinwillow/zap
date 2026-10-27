@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- Timber Siege Fort pass 2 of 10: the lattice detail and the war banners (X3, WORKER A)
+## m1329 -- Timber Siege Fort pass 2 of 10: the lattice detail and the war banners (X3, WORKER A)
 
 - **Rough-cut timber in two tones**, mixed post by post.
 - **Rope LASHINGS** at every post's joints: a pale rope band under and over the half-height beam, and one under the deck beam.
