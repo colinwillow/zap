@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1137 -- MARKET pass 2: the noodle bar, signs, lanterns, falling crates
+
+- **Stacked crates fall:** each crate knows the one under it (`below`); smash the bottom and the top one DROPS (gravity, a thud and a
+  puff where it lands, its box follows it down). When the bottom one is back, the top goes back on it; a top crate that respawns while
+  the bottom is still gone lands on the ground.
+- **THE NOODLE BAR** (stall 3): a steaming pot on the counter (steam every .22 s in `mktStep`), three bowls, three red stools out front, a
+  short blue noren curtain under the awning.
+- A NEON SIGN on the roof's front edge over every stall (cyan / pink / gold / green bars on black boards).
+- A string of nine lanterns along the front, and a red CHOCHIN at each partition post, swaying.
+Pass 3 (polish) next. Shipped unverified.
+
 ## m1136 -- MARKET STALL ROW pass 1 (BUILDINGS.md #5, at (16, 12))
 
 `MKT`, `mktBuild` / `mktStep` / `mktClear` / `mktHit`. SPAWN > BUILDINGS > Market Stalls.
