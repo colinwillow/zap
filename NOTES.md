@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1245 -- Lantern Festival Street pass 3: the taiko and the fireworks (Building Forge loop) -- DONE
+
+Polish pass (`festPolish`). A taiko stand by the far gate keeps the dragon's time with a beat; the drum pulses, and you hear it within
+24 m. STRIKE the drum and the dragon goes wild for 6 s (`FEST.rage`): it parades at double pace with red sparks and the beat
+quickens. A neon 祭 sign hangs over each gate. Two grapple rings sit above the stall roofs, and a drone circles the street. When the
+dragon's head falls, four fireworks rise and burst in colour. Registry `pass: 3`, so Lantern Street is DONE.
+SHIPPED UNVERIFIED. Next: alternate -- the Zeppelins' extra pass, then Set 3 #28 Sky Wreck.
+
 ## m1244 -- Airship Dock pass 6: sky pirates (Building Forge loop, extra pass)
 
 A raider skiff now joins the airship's flight once a quarter of it is flown (`adockSky`, `adockSkyHit`, `adockSkyDown`, `ADOCK.sky`).
