@@ -40441,7 +40441,8 @@ function strikeSweep(dt, power, live, dmg, body) {
         // fist by construction rather than by a second number. **`p.melFired` does not gate it**
         // -- that is for the SOUND, and a swing through two crates should take out two.
         if (BRK.on && BREAK.length) brkBlast(_sw.x, _sw.y, _sw.z, rad, dmg || FOE.dmg.fist);
-        if (inArena()) { vendHit(_sw.x, _sw.y, _sw.z, rad); turretMelee(_sw.x, _sw.y, _sw.z, rad, dmg); if (TURRET.shots.length) turretDeflect(_sw.x, _sw.y, _sw.z, rad); if (ARROWS.length) arrowDeflect(_sw.x, _sw.y, _sw.z, rad); }     // m1016: walls are hit by `wallMelee`, once per strike     // m1011: and the turret; m1013: and its shots     // m950
+        if (inArena()) { vendHit(_sw.x, _sw.y, _sw.z, rad); turretMelee(_sw.x, _sw.y, _sw.z, rad, dmg); if (TURRET.shots.length) turretDeflect(_sw.x, _sw.y, _sw.z, rad); if (ARROWS.length) arrowDeflect(_sw.x, _sw.y, _sw.z, rad); }
+        else if (inHome()) bldHit(_sw.x, _sw.y, _sw.z, rad, dmg);     /* m1403: the Red Hollows take blows too (Worker B: his home's door, bells, orb hook into bldHit) */     // m1016: walls are hit by `wallMelee`, once per strike     // m1011: and the turret; m1013: and its shots     // m950
         // AND THE SAME SWING REACHES A WALL CHUNK (m170). A hammer through a brick wall is
         // the whole reason his chunks carry an hp rather than a flag.
         kitBlast(_sw.x, _sw.y, _sw.z, rad, dmg || FOE.dmg.fist);
