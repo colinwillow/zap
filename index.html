@@ -10049,7 +10049,7 @@ function forgePeaks(g) {
   const m = new THREE.Mesh(mergeGeometries(geos), new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1, fog: false }));
   m.geometry.computeVertexNormals(); g.add(m); return m;
 }
-// m1391: THE DOJO (his, after m1390): *"Start making the arena the dojo... in line with the game aesthetic: our texture maps, our architecture -- take
+// m1394: THE DOJO (his, after m1390): *"Start making the arena the dojo... in line with the game aesthetic: our texture maps, our architecture -- take
 // reference from his home and the flying ship. More Japanese, more samurai, more flying: flags, hovering platforms, without obstructing. Clear the
 // space entirely (stuff stays available to spawn in), little altars on the sides up high -- the triple sword altars -- flags on the other corners, 90
 // degrees round the circle; instead of a stadium, big decorative architecture -- the Japanese roofs with that layering."* The fighting floor (R)
@@ -10163,7 +10163,7 @@ function arenaStage() {
   if (DOJO.want) { const W = R + 2.2; for (let i = 0; i < 48; i++) { const a = i / 48 * Math.PI * 2, x = Math.sin(a) * (W + .2), z = Math.cos(a) * (W + .2), s = 1.4; BOXES.push({ minx: x - s, maxx: x + s, miny: 0, maxy: 6, minz: z - s, maxz: z + s, noCam: 1 }); }
     dojoBuild(g, W); COVER.blocks = []; coverBlocks(g);
     const pad = (x, z, r, hex) => { const m = new THREE.Mesh(new THREE.RingGeometry(r * .78, r, 48), new THREE.MeshBasicMaterial({ color: hex, transparent: true, opacity: .7, toneMapped: false })); m.rotation.x = -Math.PI / 2; m.position.set(x, .03, z); g.add(m); return m; };
-    ARENA.pad = pad(ARENA.spawnAt[0], ARENA.spawnAt[1], 2.2, 0xff4d6d); return; }     // m1391: THE DOJO instead of the stadium
+    ARENA.pad = pad(ARENA.spawnAt[0], ARENA.spawnAt[1], 2.2, 0xff4d6d); return; }     // m1394: THE DOJO instead of the stadium
   // m971: the room's floor, a ring from the dais step outward, polished tiles, a little translucent over the mirrored room
   const ft = arenaTileTex(); ft.repeat.set(25, 25);
   const floor = new THREE.Mesh(new THREE.RingGeometry(R + 2.2 + 1.4, 200, 128, 1), new THREE.MeshStandardMaterial({ map: ft, roughness: .12, transparent: true, opacity: .84, depthWrite: false }));

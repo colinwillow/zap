@@ -13,7 +13,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 > stadium, big decorative architecture, the Japanese roofs with that layering."*
 
 - **Where:** KORAJIN > The Arena (`?w=arena`). `?arena=lab` brings the old stadium back.
-- [x] **pass 1 (m1391):**
+- [x] **pass 1 (m1394):**
   - a floating timber disc ringed in red lacquer on a stone dais, with a red-post rail and a rock root below
   - a sea of cloud under the Ship's sunrise sky
   - TWO SWORD ALTARS hovering high (N/S: three katanas on a rack under a two-tier roof, lanterns) and TWO BANNER MASTS (E/W: waving red chevron cloth)

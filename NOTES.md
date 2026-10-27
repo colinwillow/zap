@@ -361,7 +361,7 @@ SHIPPED UNVERIFIED. The queue's passes 2 and 3 are done. Next is his call: more 
 
 SHIPPED UNVERIFIED. Next: pass 3, foam and wake, bow spray, the sun on the water, gulls, an island.
 
-## THE DOJO, PASS 1: THE ARENA FLOATS -- ALTARS, BANNERS, PAGODAS, CLOUDS (m1391)
+## THE DOJO, PASS 1: THE ARENA FLOATS -- ALTARS, BANNERS, PAGODAS, CLOUDS (m1394)
 
 His: *"Start making the arena the dojo... more Japanese, more samurai, more flying... clear the space entirely... triple-sword altars up high on the sides, flags on the other corners 90 degrees round, instead of a stadium big decorative architecture, the Japanese roofs with that layering."*
 
