@@ -5,6 +5,28 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1260 -- the charge locks onto ANYTHING it is aimed at, and SHOWS the lock (his report, with a screenshot at m1253)
+
+*"The charge up on the right stick doesn't really lock onto things. If I'm trying to hit this box and I'm clearly targeted on it, it should
+indicate that I'm indicating it with some sort of lock, and when I let go my guy should launch and hit it -- not launch directly through it.
+Whatever he's indicating: a turret, a human target, a box, a wall."*
+
+- **Found: the KATANA's charge never drew its target at all.** `markStep` only showed the floor ring for `s.charge`, which is the
+  hammer's flag. The blade has no `charge`, so with the sword out the lock was invisible even when it existed, and that reads as "it
+  doesn't lock". It now draws for `s.charge || s.blade`.
+- **A lock ON the target (`lockMk`).** A diamond bracket now sits at the target's middle, facing the lens and drawn over everything. It
+  spins and closes in as the hold fills, then goes hot and steady at full, the same reading as the floor ring (which stays).
+- **The charge locks onto more (`meleeLock(..., wide)`, `mechTargets(0, wide)`).** As well as people and machines (m1249), it now locks
+  onto:
+  - every standing SMASHABLE (crates, pots, barrels, landed supply drops), aimed at its middle
+  - every breakable WALL, at the point on it nearest him
+
+  The release is solved to stop at arm's length from its surface, so he launches TO it, not through it. Only the CHARGE gets crates and
+  walls; an ordinary swipe still lunges at people and machines only.
+
+Known gap: the parachute crate in his screenshot is still FALLING, and a falling crate is not a smashable until it lands. Above
+`MECH.dy` 2.2 m nothing is a charge target, because the dash is flat. SHIPPED UNVERIFIED.
+
 ## m1259 -- three big buttons, the gun's row, the 3D AIM, and ROBITS' vertical (his request)
 
 *"We definitely don't need the skateboard... we can get rid of the club. I want these things big, convenient and simple: one button switches
