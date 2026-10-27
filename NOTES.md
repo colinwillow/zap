@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1085 -- THE ZOOM (PARKOUR.md piece 1): unarmed, hold the right pad up from standing -> run in place, charge, click, let go -> launch
+
+*"I said a while ago... a zoom run thing, like Sonic: unarmed, press and hold up on the right stick, he starts running in place, it reaches
+capacity and clicks like the katana charge, you let go and he ninja-runs forward... a velocity thing so you can run up curved walls, tall
+half-pipe ramps, loops... I don't see it in game at all."* It was in `PARKOUR.md` as a design and never built -- not lost, just not done.
+- `ZOOM` / `zoomGo`: unarmed (`!s.aim && !s.charge && !s.blade`), grounded, under 1.2 m/s, left stick idle, the right pad held UP (`padUp`
+  -- the unarmed up hold was only `p.center`; it still is while you move). `p.zoomC` fills 0..1 over 1.1 s: he runs in place (`rigAnim`:
+  the sprint clip, rate .7 -> 2.6), scuffing dust; an inner ring grows to a fixed outer one under him; at full the hammer's charge ping and
+  a spark ring, both rings gold. Let go past .25 -> launched along his facing at 10-17 m/s (`v0`..`v1`), held .7 s, bled 3.2 m/s^2 to a run;
+  the stick steers it, no thumb = straight on, a landing does not cut it (`p.land` skipped), running into something ends it.
+- **Measured** (`zoom.cjs`, real loop): full at frame 70 (1.17 s), one click; launch 17.0 m/s, 17 still at .67 s, 13.8 at 1.67 s, 27 m
+  covered before the arena's ring wall stopped him -- where `p.zoomV` went on bleeding unseen at speed 0: a zoom held to under 45% of its
+  speed after .25 s now ends. Rendered mid-charge: mid-stride in place, the inner ring growing under him.
+- Next: the tall curved ramps (quarter pipe) and the loop that spend it, then grind poles.
+- Shipped unverified on the phone.
+
 ## m1084 -- the HORDE probe (HORDE.md stage 1): SPAWN > HORDE adds 25 samurai a tap, to 150, to measure the phone
 
 *"Can the phone handle 100 fully rigged skinned enemies all acting on their own to try to fight me... red vs blue... hit guys and they fly."*

@@ -1,4 +1,4 @@
-# PARKOUR -- the momentum sandbox (design, not built)
+# PARKOUR -- the momentum sandbox (piece 1 built m1085; the ramps, loops and grind poles next)
 
 *"Hard-core parkour!"* -- Colin, Oct 26 2026. One sandbox: momentum you BUILD, then SPEND on walls that curve up out of the floor.
 It sits on the wall run (m1064, `WRUN`) and the white-box arena. Nothing here is built yet.
@@ -25,13 +25,18 @@ It sits on the wall run (m1064, `WRUN`) and the white-box arena. Nothing here is
 
 ## DONE WHEN (each ticked with evidence in a NOTES entry; the last box is his, on his phone)
 - [ ] Spin-up: still + the gesture runs him in place, the rings meet at full, the release launches him; measured: launch speed, bleed time.
+      (m1085: UNARMED, right pad held UP from standing -- his pick of gesture, Oct 27. Full in 1.1 s, 17 m/s, .7 s held, back to a run
+      ~3 s later, 27 m covered. Unsigned.)
 - [ ] `p.mom`: measured gain down a ramp, loss up one, bleed on the flat.
 - [ ] Quarter-pipe: with the full spin-up he reaches its lip; from a walk he does not (measured heights).
 - [ ] Loop: full spin-up goes round; a walk-in falls off the top (measured).
 - [ ] A short course of three, completed in the real loop by the harness with the inputs a thumb would give.
 - [ ] **His sign-off on the phone.**
 
+## Next (his, Oct 27): really tall, long half-pipe ramps you can only run up with the zoom (a ledge at the top to grab, or launch off
+## them); grind poles on foot; loops; running on walls and buildings at speed -- all spending `p.zoomV`.
+
 ## Open questions for him
 - The spin-up's gesture (see 1).
-- Does the spin-up work armed (katana out) -- a different gesture, or only unarmed?
+- Does the spin-up work armed (katana out) -- a different gesture, or only unarmed? (m1085: unarmed only, as he said.)
 - Pits: a fall = respawn at the start of the piece, or just a long climb back?
