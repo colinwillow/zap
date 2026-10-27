@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1258 -- Zoom Ramp Tower pass 3: the polish (Building Forge loop, R1) -- DONE
+
+- **Chevrons.** Eight neon chevrons lie on the ramp, and a pulse chases up them toward the face, three times faster while he is zooming.
+- **The lip.** The gold lip breathes.
+- **Sparks.** Sparks fly off his feet while he runs up the face.
+- **The back.** A red ONI MASK with gold horns and glowing eyes sits on the tower's back, 4.5 m under the top.
+- **Around it.** Two lantern cables run from the summit's back corners to ground posts. Grapple rings hang over the summit and over the
+  chimney, and a drone circles the tower.
+
+Registry `pass: 3`, so R1 is DONE. SHIPPED UNVERIFIED. Next: R2 The Four Fires, pass 1.
+
 ## m1257 -- Zoom Ramp Tower pass 2: the chimney and the scoreboard (Building Forge loop, R1)
 
 - **The chimney: a second line up.** This is his m1250 idea: *"wall run along one wall, jump to the next, spiral up."* A free-standing
