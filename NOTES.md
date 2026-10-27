@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1134 -- PAGODA pass 2: the bell TOLLS, the shrine, lanterns, chimes
+
+- **THE BELL TOLLS:** `pagodaBell`, reached through `bldHit` (so the katana, his shots and a parried bolt all ring it). A deep boom + clang,
+  a camera shake, sparks; the bell is now a damped PENDULUM (`bw`/`bv`) kicked by each toll; and a RING OF FORCE spreads from the belfry
+  (an additive torus growing to `PAGODA.tollR` 14 m over `tollT` 1.1 s) -- every body standing within 14 m of the Pagoda is KNOCKED
+  DOWN (`dummyBlow`, away from the tower). Climb to the top, ring it, flatten the courtyard. .6 s between tolls.
+- **THE SHRINE** inside the ground floor (-z side, clear of the spiral): a stone altar, two candles, a red hanging, a floating cyan JIN
+  CORE that bobs and turns.
+- **Red paper LANTERNS** down the central shaft, one a storey, round the pillar's faces in turn.
+- **WIND CHIMES**: a little bronze bell under every skirt corner (16), swaying; they shiver when the big bell tolls.
+- First check caught nothing; I caught `Object.assign(mesh, { position })` myself before pushing (three's `position` is not writable).
+Pass 3 (polish) next. Shipped unverified.
+
 ## m1133 -- PAGODA pass 1 (BUILDINGS.md #4, at (-16, 12))
 
 `PAGODA`, `pagodaBuild` / `pagodaStep` / `pagodaClear`. SPAWN > BUILDINGS > Pagoda.
