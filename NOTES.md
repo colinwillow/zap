@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE COURTYARD, PASS 8: THE CLEAR AND THE WAY ON (m-COURT8)
+
+COURTYARD.md pass 8 (`courtWin`, stepped first in `courtStep`). Shipped unverified.
+
+- **The clear condition**, per the plan: the watchtower falls silent. That means its sentry gun is dead and its two archers (deck B and deck A) are gone.
+  - Those archers are tagged at spawn (`C.tw`), and "gone" means out of `HORDE.list`.
+  - The check waits until both have loaded, so an async spawn cannot read as a win.
+  - The other guards do not have to die. The tower is the objective, which keeps the court a puzzle of routes, not a body count.
+- **The set piece:**
+  - a boom and a shake
+  - the bell swings and tolls by itself
+  - a pillar of cyan light climbs the tower and fades over 6 s
+  - 3 s of sparks burst off deck B, cyan and gold
+  - every lamp and paper lantern in the court turns from amber to Jin-cyan (the merged `lamp` and `paper` emissives), so you can see it is won from anywhere
+  - every perched pigeon lifts off
+  - the ground guards stand down (aggro off, patrol dropped). They will still notice you if you crowd them.
+- **The inner gate under the tower** is forced open (`G.force`) and can no longer be broken shut. Behind it a glowing cyan doorway fades in, with motes rising off it. That is the way on; the Four Fires go there later.
+- **Re-spawning the court resets it.**
+- **Which box this moves:** C1 pass 8 of 10. Still open: the playtest fixes (9) and the polish against the reference (10).
+
 ## THE COURTYARD, PASS 7: THE GROUND (m1310)
 
 COURTYARD.md pass 7. Shipped unverified.
