@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home, procedural, pass 10: the rigging (WORKER B)
+
+The refs are strung with rope.
+- **Ropes.** Eight sagging ropes run from the tent cone's pole tips down to the front frame's posts, both stacks, the tower's flagpole and
+  the crane's mast (merged rope segments).
+- **Pennants.** A line of red and cream pennants from the tower's flagpole to the top of the cone.
+- **Cladding.** Iron-strapped vertical timber planks over the shop front, between the tall posts and under the big banner.
+- **Counts.** 29 draws.
+
+Checked headless and looked at the front and front-left renders against the refs. Shipped unverified.
+
 ## Grumbo's home, procedural, pass 9: the small blobs, the back door, more light (WORKER B)
 
 - **The refs' smaller BLOBS.** A low swollen dome front-right between the hall and the tower, and one back-left by the back door. Each is
