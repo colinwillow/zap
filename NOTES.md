@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1141 -- SHRINE pass 2 + SMASHABLES (a shared system)
+
+- **`SMASH` / `smashAdd` / `smashHit` / `smashStep` / `smashDrop`:** breakable props for ANY building. The mesh lives in the building's
+  group, its box in BOXES; every hit through `bldHit` (katana, shots, parried bolts) chips it, at 0 it bursts (chips in its own colour, a
+  puff), its box goes, and it is back `fix` s later (not while he stands on it). Stepped from the arena step line. Future buildings use
+  this instead of writing their own (the Market's crates stay on `mktHit`, they also fall when stacked).
+- **The Shrine's smashables:** six straw-wrapped SAKE BARRELS with a red band (two pyramids by the honden, 2 hits) and four clay
+  OFFERING POTS at the terrace's front corners (1 hit).
+- **THE CORE HEALS:** stand at the Jin core's basin (within 2.8 m, up on the terrace) and health flows back at `SHRINE.heal` 30/s, cyan
+  motes streaming from the crystal into him.
+- **THE STONE BEAM:** 30 cm wide, level at 3.2 m, 9 m out from the terrace's east edge to a stone pillar with a lantern on it.
+- **THE KOI POND** west of the steps: a stone rim, dark water, four stepping stones, five koi (orange / white / red) circling.
+Pass 3 (polish) next. Shipped unverified.
+
 ## m1140 -- HOTFIX: m1139 was a BLANK PAGE
 
 A `//` comment inserted MID-LINE (the Market cable stake change) commented out the rest of that line, the file stopped parsing. The check
