@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1130 -- GRAPPLING HOOK pass 2: walls, and which ring
+
+- **Swinging collides now:** `stepRope` runs `resolveBoxes` (the walking resolver) after the rope constraint. A wall takes the speed into
+  it (x1.3, a little bounce; a thud and a shake over 6 m/s); a box TOP under his feet lets go of the rope (he has landed on the roof /
+  deck); a box over his head stops him rising.
+- **The ring he would catch glows:** `ropeHint` -- while airborne (not roped, not on a bar), the nearest ring in reach (13 m, above his
+  hands) gets a pulsing cyan halo facing the lens. Flick at it.
+Pass 3 (polish) next: hook throw arc / clink, rope sag, maybe a climb-up-the-rope. Shipped unverified.
+
 ## m1129 -- THE NINJA GRAPPLING HOOK (first pass)
 
 His: *"ninja grappling hooks to swing between buildings."* `GRING`, `gringAdd`, `ropeThrow`, `stepRope`.
