@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1255 -- the look-up: the lens glances up at a shot coming from above (his request)
+
+*"When there's guards up on towers, or a sentry gun shooting rockets down, or arrows or cannonballs, there's no way to look up, so it's hard
+to melee or block. What if, when somebody shoots something at you from above, your camera slightly pitches up to show you, while still keeping
+its normal position -- it would also alert you that you need to counter it."*
+
+`upLookW()` (UPLOOK) picks out the shots that should cause it:
+- **Which shots.** Every live incoming shot from `threatList`: turret rockets and bolts, plus ARROWS, which covers archers, ballista
+  bolts and cannonballs.
+- **Above and soon.** It counts if it is more than `dy` 2 m above his chest and due to reach him (`threatTTA`) within `tta` 2.2 s.
+- **Strength.** The weight grows with how far above it is and how soon it lands.
+
+The weight is eased into `cam.up`: in fast (`in` .07) and back out slowly (`out` .6), so it reads as a glance. It acts in `stepCam`
+alone, and only in the arena and the forge:
+- the elevation drops by `el` .24 x the weight (the lens sinks a little)
+- the look point lifts by `lift` 1.4 m x the weight
+
+The azimuth is never touched, so `cam.az` keeps one writer and the camera stays where he put it. `mel.UPLOOK` is live, and
+`mel.UPLOOK.on = 0` is the A/B. Not covered: the trebuchet's boulder, which has its own red ring. SHIPPED UNVERIFIED.
+
 ## m1254 -- Zoom Ramp Tower pass 1 (his request R1)
 
 *"A tower shaped like a really tall ramp -- you do the speed run and it's just tall enough that your whole run gets you to the top, and you hit
