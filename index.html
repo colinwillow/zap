@@ -19412,6 +19412,7 @@ function bldHit(x, y, z, rad, dmg) {
     C.hc = .25; C.hp -= Math.max(.5, dmg || 1); spkBurst(W.x, W.y + .4, W.z, 12, { col: [1, .8, .4], spread: 3, size: .1, life: .35 }); snd('clang', { g: .8, r: .8, x: W.x, z: W.z });
     if (C.hp <= 0) { C.dead = 1; C.t = FSHIP.canFix; C.bar.rotation.x = .5; for (let k = 0; k < 3; k++) spkBurst(W.x, W.y + .4, W.z, 20, { col: k ? [1, .55, .15] : [.9, .9, .85], spread: 6, size: .2, life: .7 }); snd('boom', { g: .8, r: .9, x: W.x, z: W.z }); camShake(.2); } return 1; }     // m1185: the ship's cannons
   if (adockSkyHit(x, y, z, rad)) return 1;     // m1244: the sky pirates' skiff
+  if (courtHit(x, y, z, rad)) return 1;     // m1298: the courtyard's gates
   if (gpagBell(x, y, z, rad)) return 1;     // m1270: the pagoda's bell room
   if (festHit(x, y, z, rad)) return 1;     // m1243: the festival dragon
   if (obsHit(x, y, z, rad)) return 1;     // m1237: the observatory's lens
@@ -22963,6 +22964,28 @@ function zrampClear() { const Z = ZRAMP.on; if (!Z) return; const i = ZIPS.index
 // through a hatch, an upper room, a 2.4 m BALCONY over the lane, a deep hip roof you can walk on), and the koi POND with a walkable MOON
 // BRIDGE. Its own corner of the forge, (0, 150), clear of every building (the floor runs to 200, the peaks start at 250). ROOM TO FIGHT
 // throughout: walk 2.6, balconies 2.4, bridge 2.2, rooms 9 x 17.
+// m1298: A GATE ANYBODY CAN USE (the DOORS AND CHAOS rule as a helper). `bgateMake(g, x, z, w, h, alongX, O)` hangs two red leaves across an
+// opening (hinged at its ends, gold straps), a box across it while shut; `bgateStep(G, dt, who)` opens it for anyone in `who` (him, and any
+// alarmed body) within `r`, and shuts it behind; `bgateHit` takes blows -- `hp` of them BREAK it (splinters, smoke, the way stands open) and it
+// is rehung `fix` s later. The pagoda's own gate (m1297) is the same idea, written before this
+function bgateMake(g, x, z, w, h, alongX, O, opt) { const red = new THREE.MeshStandardMaterial({ color: 0xa8241a, roughness: .5 }), gold = new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .85, roughness: .3 });
+  const G = Object.assign({ x, z, w, h, alongX, leaves: [], open: 0, hp: 3, hp0: 3, fix: 45, r: 4.5, broken: 0, hc: 0, t: 0 }, opt || {}), hw = w / 2;
+  G.box = alongX ? { minx: x - hw, maxx: x + hw, miny: 0, maxy: h, minz: z - .15, maxz: z + .15 } : { minx: x - .15, maxx: x + .15, miny: 0, maxy: h, minz: z - hw, maxz: z + hw };
+  for (const sd of [-1, 1]) { const hg = new THREE.Group(); hg.position.set(alongX ? x + sd * hw : x, 0, alongX ? z : z + sd * hw); g.add(hg);
+    const L = new THREE.Mesh(new THREE.BoxGeometry(alongX ? hw - .04 : .14, h, alongX ? .14 : hw - .04), red); L.position.set(alongX ? -sd * hw / 2 : 0, h / 2, alongX ? 0 : -sd * hw / 2); L.castShadow = true; hg.add(L);
+    for (const yy of [.6, h / 2, h - .6]) { const st = new THREE.Mesh(new THREE.BoxGeometry(alongX ? hw - .2 : .18, .1, alongX ? .18 : hw - .2), gold); st.position.set(alongX ? -sd * hw / 2 : 0, yy, alongX ? 0 : -sd * hw / 2); hg.add(st); }
+    G.leaves.push({ g: hg, sd }); }
+  O.boxes.push(G.box); return G; }
+function bgateStep(G, dt, who) { G.t += dt;
+  if (G.broken > 0) { G.broken -= dt; if (G.broken <= 0) { G.hp = G.hp0; for (const L of G.leaves) L.g.visible = true; arenaBeam(G.x, G.z, [1, .6, .3], .5); } }
+  const near = q => Math.hypot(q.x - G.x, q.z - G.z) < G.r, want = G.force || G.broken > 0 || near(player.pos) || (who || []).some(d => d && d.root && d.root.visible && d.aggro && near(d.root.position)) ? 1 : 0;
+  G.open += (want - G.open) * Math.min(1, dt * 1.6); for (const L of G.leaves) L.g.rotation.y = L.sd * G.open * 1.5 * (G.alongX ? 1 : -1);
+  const solid = G.open < .3 && !(G.broken > 0), i = BOXES.indexOf(G.box); if (solid && i < 0) { BOXES.push(G.box); boxGrid(); } else if (!solid && i >= 0) { BOXES.splice(i, 1); boxGrid(); } }
+function bgateHit(G, x, y, z, rad) { if (!G || G.broken > 0 || G.hc > G.t) return 0; const b = G.box;
+  if (x < b.minx - rad - .3 || x > b.maxx + rad + .3 || z < b.minz - rad - .3 || z > b.maxz + rad + .3 || y > b.maxy + rad) return 0;
+  G.hc = G.t + .2; G.hp--; spkBurst(x, y, z, 14, { col: [.8, .5, .3], spread: 4, size: .14, life: .5 }); snd('thud', { g: .8, r: .8, x, z }); camShake(.08);
+  if (G.hp <= 0) { G.broken = G.fix; for (const L of G.leaves) L.g.visible = false; for (let k = 0; k < 4; k++) spkBurst(G.x, 1.4, G.z, 26, { col: k % 2 ? [.55, .2, .15] : [.9, .7, .4], spread: 7, size: .22, life: .9 });
+    for (let k = 0; k < 5; k++) smokeAt(G.x + (Math.random() - .5) * 2, 1 + Math.random() * 1.5, G.z + (Math.random() - .5) * 2, 1.6, 1.4); snd('boom', { g: .9, r: .9, x: G.x, z: G.z }); camShake(.3); } return 1; }
 const COURT = { at: [0, 150], hw: 28, hd: 32, wallH: 4, walk: 2.6, gate: 6, on: null };
 function courtBuild() {
   if (COURT.on) return; const A = COURT, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [], climbs = [];
@@ -22979,7 +23002,7 @@ function courtBuild() {
   for (let z = Z0 + .1; z < Z1 - 6; z += 1.05) for (let i = -2; i < 2; i++) { const o = (Math.floor(z) % 2) * .5; box(cx + i * 1.02 + o - .02, cx + i * 1.02 + o + .98, .03, .07, z, z + 1, flag, 0); }
   // THE WALLS: solid, `W` thick, their tops the wall-walk; a crenellated outer parapet (merlons solid, noCam); the south gate's gap bridged by its lintel
   const gw = A.gate / 2;
-  box(X0, X1, 0, H, Z1 - W, Z1, stone, 1); box(X0, X0 + W, 0, H, Z0, Z1 - W, stone, 1); box(X1 - W, X1, 0, H, Z0, Z1 - W, stone, 1);
+  box(X0, cx - 2.6, 0, H, Z1 - W, Z1, stone, 1); box(cx + 2.6, X1, 0, H, Z1 - W, Z1, stone, 1); box(cx - 2.6, cx + 2.6, H - .9, H, Z1 - W, Z1, stone, 1); box(X0, X0 + W, 0, H, Z0, Z1 - W, stone, 1); box(X1 - W, X1, 0, H, Z0, Z1 - W, stone, 1);
   box(X0 + W, cx - gw, 0, H, Z0, Z0 + W, stone, 1); box(cx + gw, X1 - W, 0, H, Z0, Z0 + W, stone, 1); box(cx - gw, cx + gw, H - .9, H, Z0, Z0 + W, stone, 1);
   for (let x = X0 + .4; x < X1; x += 1.6) { box(x, x + .8, H, H + .9, Z1 - .5, Z1, stoneD, 1, { noCam: 1 }); box(x, x + .8, H, H + .9, Z0, Z0 + .5, stoneD, 1, { noCam: 1 }); }
   for (let z = Z0 + .4; z < Z1; z += 1.6) { box(X0, X0 + .5, H, H + .9, z, z + .8, stoneD, 1, { noCam: 1 }); box(X1 - .5, X1, H, H + .9, z, z + .8, stoneD, 1, { noCam: 1 }); }
@@ -23035,13 +23058,41 @@ function courtBuild() {
       for (const sz2 of [-1, 1]) rail(x0, x1, y0, y1, pz + sz2 * bw); if (i % 2 === 0) for (const sz2 of [-1, 1]) box(x0 - .04, x0 + .04, y0, y0 + .95, pz + sz2 * bw - .04, pz + sz2 * bw + .04, red, 0); } }
   // two STONE LANTERNS where the bridge meets the lane
   for (const dz of [-2.4, 2.4]) { const x = cx - 2.6, z = cz + 6 + dz; box(x - .35, x + .35, 0, .3, z - .35, z + .35, stone, 1); box(x - .12, x + .12, .3, 1.1, z - .12, z + .12, stone, 0); box(x - .3, x + .3, 1.1, 1.5, z - .3, z + .3, lamp, 0); box(x - .45, x + .45, 1.5, 1.7, z - .45, z + .45, stone, 0); }
+  // ---- PASS 2 (m1298): THE WATCHTOWER GATE (his reference's tower at the end of the lane): it STRADDLES the north wall over an INNER GATE
+  // (red doors that open for whoever comes and break -- `gateMake`), four great posts, DECK A at the wall-walk's height (so the walk runs
+  // straight onto it), a deep SKIRT ROOF round a SHAFT (walkable), a ladder up the shaft to DECK B, the open LOOKOUT at 13 m under the TOP
+  // ROOF at 16-19 m with its spire. ROOM TO FIGHT: both decks 8-9 m square ----
+  const tz = Z1 - W / 2, T0 = 4.5, sh = 2.6, YA = H, YB = 13, roofM = 0x55524c;
+  for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) box(cx + sx * T0 - .45, cx + sx * T0 + .45, 0, YB + 3.2, tz + sz * T0 - .45, tz + sz * T0 + .45, timber, 1);
+  box(cx - T0, cx + T0, YA - .3, YA, tz - T0, tz + T0, timberL, 1);     // deck A (the walk runs onto it)
+  for (const sz of [-1, 1]) box(cx - T0, cx + T0, YA, YA + .95, tz + sz * T0 - .05, tz + sz * T0 + .05, timber, 1, { noCam: 1 });
+  // the shaft: solid timber walls round a 5.2 m square, a 1.8 m door on its south face; the ladder inside up to deck B
+  box(cx - sh, cx + sh, YA, YB, tz + sh - .3, tz + sh, timber, 1); box(cx - sh, cx - sh + .3, YA, YB, tz - sh, tz + sh, timber, 1); box(cx + sh - .3, cx + sh, YA, YB, tz - sh, tz + sh, timber, 1);
+  box(cx - sh, cx - .9, YA, YB, tz - sh, tz - sh + .3, timber, 1); box(cx + .9, cx + sh, YA, YB, tz - sh, tz - sh + .3, timber, 1); box(cx - .9, cx + .9, YA + 2.5, YB, tz - sh, tz - sh + .3, timber, 1);
+  for (let y = YA + .6; y < YB; y += .6) box(cx - sh - .02, cx + sh + .02, y - .03, y + .03, tz - sh - .02, tz - sh, timberL, 0);
+  { const lx = cx + 1.6, lz = tz + sh - .55; for (const dx of [-.28, .28]) box(lx + dx - .03, lx + dx + .03, YA, YB + .9, lz - .03, lz + .03, timber, 0); for (let r = YA + .3; r < YB + .8; r += .32) box(lx - .28, lx + .28, r - .02, r + .02, lz - .03, lz + .03, timberL, 0);
+    const L = kitClimbAdd({ minx: lx - .4, maxx: lx + .4, miny: YA, maxy: YB, minz: lz - .12, maxz: lz + .12 }, 'court_tower', YB); L.mark = { x: cx, y: YB, z: tz - 1.5 }; climbs.push(L); }
+  // the skirt roof round the shaft (walkable outside the shaft), lanterns at its corners
+  { const EX = T0 + 1.8, rY = YA + 3.6, eY = YA + 2.2; bldRoof(g, cx, tz, EX, EX, 0, rY, eY, .8, timberL, roofM);
+    hipTris(cx, tz, EX, EX, 0, rY, eY, .8, 0, (x, z) => Math.abs(x - cx) < sh + .2 && Math.abs(z - tz) < sh + .2);
+    for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const lx = cx + sx * (EX - .4), lz = tz + sz * (EX - .4); box(lx - .02, lx + .02, eY - .9 + .8, eY + .8, lz - .02, lz + .02, timber, 0); box(lx - .17, lx + .17, eY - 1.3 + .8, eY - .9 + .8, lz - .17, lz + .17, lamp, 0); } }
+  // DECK B, the lookout: 9 m square, rails (noCam) with an opening south, the top roof on the four posts, a spire
+  box(cx - T0, cx + T0, YB - .3, YB, tz - T0, tz + T0, timberL, 1);
+  for (const sz of [-1, 1]) for (const sx of [-1, 1]) box(cx + (sx < 0 ? -T0 : 1), cx + (sx < 0 ? -1 : T0), YB, YB + .95, tz + sz * T0 - .05, tz + sz * T0 + .05, timber, 1, { noCam: 1 });
+  for (const sx of [-1, 1]) box(cx + sx * T0 - .05, cx + sx * T0 + .05, YB, YB + .95, tz - T0, tz + T0, timber, 1, { noCam: 1 });
+  bldRoof(g, cx, tz, T0 + 1.6, T0 + 1.6, 0, YB + 6.2, YB + 3.2, .9, timberL, roofM);
+  box(cx - .1, cx + .1, YB + 6, YB + 9, tz - .1, tz + .1, timber, 0); for (let i = 0; i < 4; i++) box(cx - .25 + i * .03, cx + .25 - i * .03, YB + 6.6 + i * .5, YB + 6.7 + i * .5, tz - .25 + i * .03, tz + .25 - i * .03, timber, 0);
+  for (const sx of [-1, 1]) box(cx + sx * 1.6 - .15, cx + sx * 1.6 + .15, YB + 1.6, YB + 2, tz - T0 + .2, tz - T0 + .5, lamp, 0);
+  // the inner gate under the tower
+  const gates = [bgateMake(g, cx, Z1 - W / 2, 5.2, 3.1, true, O)];
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
   bldTris(O, tris);
   for (const b of O.boxes) if (!BOXES.includes(b)) BOXES.push(b); boxGrid();
-  COURT.on = { g, O, bars: [], rings: [], climbs, t: 0 };
+  COURT.on = { g, O, bars: [], rings: [], climbs, gates, t: 0 };
   bldXrayTag(g); arenaBeam(cx, Z0, [1, .7, .35], 1); snd('clang', { g: .7, r: .6 });
 }
-function courtStep(dt) { const C = COURT.on; if (!C) return; C.t += dt; }
+function courtStep(dt) { const C = COURT.on; if (!C) return; C.t += dt; for (const G of C.gates || []) bgateStep(G, dt, C.guards); }
+function courtHit(x, y, z, rad) { const C = COURT.on; if (!C) return 0; for (const G of C.gates || []) if (bgateHit(G, x, y, z, rad)) return 1; return 0; }
 function courtClear() { const C = COURT.on; if (!C) return; for (const L of C.climbs) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && C.climbs.includes(player.climb)) climbOff(); bldClear(C); COURT.on = null; }
 // m1262: THE GREAT RED PAGODA -- his 10-PASS EXPERIMENT (X1), after his reference `images/korajin/ref/red_pagoda_tower.webp`: a slender
 // five-storey tower in red lacquer, every storey wrapped in a railed BALCONY, every storey under a deep flared tile roof with gold fascia, the
@@ -23328,7 +23379,7 @@ const BLDG = { list: [
   { key: 'obs', t: 'Jin Observatory', sub: 'a clockwork tower: a spiral stair inside past great gears to a balcony under a copper dome whose telescope marks you in the open for a volley of arrows (blind its lens), a clock face', pass: 3, build: () => obsBuild(), clear: () => obsClear(), on: () => !!OBS.on, step: dt => obsStep(dt) },
   { key: 'fest', t: 'Lantern Festival Street', sub: 'a street of festival stalls (roofs to stand on, breakable backs) under strings of paper lanterns, red gates at both ends, bars across, a robot dragon dance to cut apart (strike the taiko to make it wild)', pass: 3, build: () => festBuild(), clear: () => festClear(), on: () => !!FEST.on, step: dt => festStep(dt) },
   { key: 'heron', t: 'White Heron Castle', sub: 'a Himeji-style castle on a battered stone base: a five-storey white keep under layered grey roofs (every roof walkable, a hall on every storey, steep stairs up, the great pillars, a lookout balcony at the top), a gallery wing of two corridors to a hollow corner tower (a loop: keep up, across, tower down, back), its roof a path; a ballista on the gallery ridge, archers in the doorways and the lookout, a sentry gate held by two samurai; the approach: a walled ramp that doubles back to a drawbridge over a dry moat and a gate on the stone; a stair up the stone, a storehouse at the foot whose walls break', pass: 8, build: () => heronBuild(), clear: () => heronClear(), on: () => !!HERON.on, step: dt => heronStep(dt) },
-  { key: 'court', t: 'The Courtyard', sub: 'a walled court far north (0, 150): a wall-walk all round, the south gate, a stone lane between two timber halls with balconies and walkable roofs, a koi pond and a moon bridge', pass: 1, build: () => courtBuild(), clear: () => courtClear(), on: () => !!COURT.on, step: dt => courtStep(dt) },
+  { key: 'court', t: 'The Courtyard', sub: 'a walled court far north (0, 150): a wall-walk all round, the south gate, a stone lane between two timber halls with balconies and walkable roofs, a koi pond and a moon bridge; the two-roofed watchtower over the inner gate', pass: 2, build: () => courtBuild(), clear: () => courtClear(), on: () => !!COURT.on, step: dt => courtStep(dt) },
   { key: 'gpag', t: 'Great Red Pagoda', sub: 'five storeys of red lacquer: a room on every floor, ladders up through the hatches, a balcony round every storey, a spire; a pavilion whose roof you can climb; a red fence; climb the outside eave to eave, bars, a zipline off the spire; an armoury, a library, a bell room (the alarm), a lookout; archers, a sentry gun, gate guards; glowing windows, lantern halos, a beacon on the spire; streamers, chimes, birds; strike the gong at the top and the tower lights up and the gate opens', pass: 10, build: () => gpagBuild(), clear: () => gpagClear(), on: () => !!GPAG.on, step: dt => gpagStep(dt) },
   { key: 'zramp', t: 'Zoom Ramp Tower', sub: 'zoom from the red gate (full hold), up the ramp and straight up the face -- only a full zoom reaches the gold lip; your mark shows how close; or zigzag up the chimney', pass: 3, build: () => zrampBuild(), clear: () => zrampClear(), on: () => !!ZRAMP.on, step: dt => zrampStep(dt) },
   { key: 'swrk', t: 'Sky Wreck', sub: 'a flying junk come down on rock spires: a tilted deck up a fallen mast, a hold of cargo behind breakable planks, a crow\'s nest up two bars', pass: 1, build: () => swrkBuild(), clear: () => swrkClear(), on: () => !!SWRK.on, step: dt => swrkStep(dt) },

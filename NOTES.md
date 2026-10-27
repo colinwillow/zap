@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The Courtyard pass 2 of 10: the Watchtower Gate (C1)
+
+- **The tower.** His reference's tower now stands at the lane's north end, STRADDLING the north wall over the INNER GATE:
+  - four great posts
+  - **DECK A** at the wall-walk's height, so the walk runs straight onto it
+  - a deep **SKIRT ROOF** round a timber **SHAFT**, walkable outside the shaft, with lanterns at its corners
+  - a 1.8 m door into the shaft and a **LADDER** inside up to **DECK B**, the open 9 m lookout at 13 m (`noCam` rails, open on the south)
+  - the **TOP ROOF** at 16-19 m with a little spire
+- **The inner gate.** Two red leaves that OPEN for whoever comes near and BREAK under 3 blows, rehung after 45 s.
+- **The helper.** This is a new reusable helper, `bgateMake` / `bgateStep` / `bgateHit`: the DOORS AND CHAOS rule as code (`gateStep`
+  was already taken by another system, hence the `b`). The north wall now has the gate's gap under a lintel.
+
+SHIPPED UNVERIFIED. Next: pass 3, the bell house, the rope bridges and the high road.
+
 ## White Heron Castle pass 8 of 10: the approach, the castle's maze (X2, WORKER B)
 
 - **The ramp.** A walled ramp runs along the south of the stone.
