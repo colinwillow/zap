@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- Octagonal Block Pagoda pass 7 of 10: the light (X4, WORKER A)
+## m1290 -- Octagonal Block Pagoda pass 7 of 10: the light (X4, WORKER A)
 
 No lights are added, because a new light recompiles every material in the scene. Everything is emissive blocks plus one additive draw:
 - **A lantern under every kicked-up corner** of every eave: 56 of them, each a red cap, a glowing block and a red foot on a cord.
