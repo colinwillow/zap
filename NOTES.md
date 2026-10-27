@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1223 -- Teahouse Garden pass 3: the polish (Building Forge loop)
+
+- **Lily pads** on the pond (some with pink blossoms), kept clear of the bridge's line.
+- **A weeping willow** on the west shore: a solid trunk, a crown, and fourteen hanging fronds that sway.
+- **Stone lanterns:** three along the paths, clear of the bridge ends.
+- **A bamboo screen** behind the gravel garden (one merged mesh, solid).
+- **Fireflies:** twelve drifting low over the water, blinking.
+- **A pull-up bar** by the bridge's east foot.
+- **A drone.**
+
+The Teahouse Garden is DONE (3 passes). Next: alternate -- an extra pass (5) on the Flying Ship, then Set 2 #24 Kneeling Colossus
+pass 1 (its listed spot clashes with the Barracks, so it needs a new one).
+
 ## m1222 -- Zeppelins pass 5: bring one down (Building Forge loop, extra pass)
 
 A zeppelin's ENVELOPE now takes hits (`zepHit` in `bldHit`, an ellipsoid test in the ship's own frame): a blade from the deck or
