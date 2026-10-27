@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE GRID LEVEL: A LEVEL PLANNED AS LOGIC FIRST (m1356)
+
+His two blueprint images, and: *"start with the game logic of the level first -- the path, the beats, the gates and buttons -- and add the towers and streams and archers later."*
+
+- **LEVELGRID.md is the system and the plan.** `lvgBuild(spec)` turns a spec (an ordered path of `[col, row, Y, tag]` cells on a 10 x 10 grid of 7 m cells, heights Y 0-3 at 4.5 m, plus branches and beats) into a playable GREYBOX:
+  - pads coloured along the path
+  - one-level steps as ramps, two-level climbs as ladders
+  - numbered beat markers
+  - the mechanisms: guards, a tower (2 archers + a gun), a BUTTON → DRAWBRIDGE over a gap, a CANDLE → GATE, a ZIP to the end, and a BOSS DOOR that opens when `spec.need` (3, 6, 8) is done
+- **Grid Level 1** is his first image's path with heights given (LEVELGRID.md walks it). It is at (-45, -185) in the forge; spawning it puts him at S.
+- **Greybox only, on purpose.** The art goes on when the logic plays. The beats' order, the gap and the gate are the first things to tune from his notes.
+
 ## THE RAMPART WALL x1.5 -- STEER S2 (older rows, m1355)
 
 - **Its constants changed:**

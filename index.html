@@ -19494,6 +19494,7 @@ function bldHit(x, y, z, rad, dmg) {
   if (heronHit(x, y, z, rad, dmg)) return 1;     // X2: the White Heron Castle's ballista
   if (smashHit(x, y, z, rad, dmg)) return 1;     // m1141: any building's smashables
   if (skinHit(x, y, z, rad, dmg)) return 1;     // m1353: roof panels over rafters (S3a)
+  if (lvgHit(x, y, z, rad)) return 1;     // m1356: the grid level's button and candle
   if (pieceHit(x, y, z, rad, dmg)) return 1;     // m1354: rails, balusters (S3b)
   if (sphangHit(x, y, z, rad, dmg)) return 1;     // m1161: the spider bots
   if (barrHit(x, y, z, rad, dmg)) return 1;     // m1184: the drilling robot samurai
@@ -23618,6 +23619,105 @@ function bgateHit(G, x, y, z, rad) { if (!G || G.broken > 0 || G.hc > G.t) retur
   G.hc = G.t + .2; G.hp--; spkBurst(x, y, z, 14, { col: [.8, .5, .3], spread: 4, size: .14, life: .5 }); snd('thud', { g: .8, r: .8, x, z }); camShake(.08);
   if (G.hp <= 0) { G.broken = G.fix; for (const L of G.leaves) L.g.visible = false; for (let k = 0; k < 4; k++) spkBurst(G.x, 1.4, G.z, 26, { col: k % 2 ? [.55, .2, .15] : [.9, .7, .4], spread: 7, size: .22, life: .9 });
     for (let k = 0; k < 5; k++) smokeAt(G.x + (Math.random() - .5) * 2, 1 + Math.random() * 1.5, G.z + (Math.random() - .5) * 2, 1.6, 1.4); snd('boom', { g: .9, r: .9, x: G.x, z: G.z }); camShake(.3); } return 1; }
+// m1356: THE GRID LEVEL -- a level planned as LOGIC before art (his, with two blueprint images: a 10 x 10 top-down grid, an interesting path
+// lit through it in colours, numbered beats, and heights Y 0-3). *"This is usually where we go wrong: I build the kit and set you off to build a
+// level, and the scope is too large and the logic isn't interesting. Start with the game logic of the level first -- the path the player
+// takes, this plane, then up, around, down, climb, kill these guys on the tower, hit this button and it opens a drawbridge, beat those guys,
+// go up and light this candle, zipline back, finish, and that opens the boss."* LEVELGRID.md is the plan and the spec format.
+// A GREYBOX built from a spec (`LVG1`): each path cell is a `cell` m square pad at height Y x `lev` m, coloured along the path (S green ->
+// E magenta, his images' rainbow). A step of one level between neighbours makes the later cell a RAMP (walkable, about 33 deg); two or more is
+// a LADDER on its face. Beats are numbered markers and the mechanisms the plan names: guards, a tower's archers and gun, the BUTTON that drops
+// the DRAWBRIDGE over a gap, the CANDLE whose flame opens the GATE, the ZIPLINE down to the end, and the BOSS DOOR that opens when the
+// plan's required beats are done (the boss itself comes later).
+const LVG = { at: [-45, -185], cell: 7, lev: 4.5, on: null };
+const LVG1 = { path: [[1, 1, 1, 'S'], [2, 1, 1], [3, 1, 1], [4, 1, 1, 1], [4, 2, 1], [4, 3, 1], [5, 3, 2, 2], [6, 3, 2], [7, 3, 2], [7, 4, 3, 3], [8, 4, 3], [9, 4, 3],
+    [9, 5, 2, 5], [9, 6, 2, 'gap'], [9, 7, 2], [8, 7, 1, 6], [7, 7, 1], [7, 6, 1], [6, 6, 1], [5, 6, 1, 7], [5, 5, 2], [4, 5, 2], [4, 4, 2, 8], [3, 4, 1], [2, 4, 1], [2, 5, 1],
+    [2, 6, 0], [3, 6, 0], [3, 7, 1, 10], [3, 8, 1], [4, 8, 1], [5, 8, 1], [6, 8, 1], [6, 9, 2], [7, 9, 2], [8, 9, 2], [9, 9, 2], [9, 10, 1, 11], [10, 10, 1, 'E']],
+  branches: [[[9, 4, 3], [10, 4, 3], [10, 3, 3], [10, 2, 3], [10, 1, 3], [9, 1, 3], [8, 1, 3, 4], [8, 2, 3]], [[2, 6, 0], [1, 6, 0, 9], [1, 7, 0], [1, 8, 0]]],
+  beats: { 1: 'guards', 3: 'tower', 5: 'button', 6: 'guards', 8: 'candle', 10: 'gate', 11: 'zip', 4: 'ring', 9: 'cache' }, need: [3, 6, 8] };
+function lvgBuild(spec) {
+  if (LVG.on) return; spec = spec || LVG1; const A = LVG, C = A.cell, Lv = A.lev, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, tris = [], climbs = [];
+  const X = c => A.at[0] + (c - .5) * C, Z = r => A.at[1] + (r - .5) * C, N = spec.path.length, MG = new Map(), mats = [];
+  const mat = i => { const k = Math.round(i / (N - 1) * 11); return mats[k] || (mats[k] = new THREE.MeshStandardMaterial({ color: new THREE.Color().setHSL(.33 - k / 11 * .45 + (k > 6 ? 1 : 0), .7, .5), roughness: .6, emissive: new THREE.Color().setHSL(.33 - k / 11 * .45 + (k > 6 ? 1 : 0), .8, .12) })); };
+  const put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo.index ? geo.toNonIndexed() : geo); };
+  const pillar = new THREE.MeshStandardMaterial({ color: 0x3a3f4a, roughness: .8 }), seen = new Set(), at = {};
+  // a cell: a pad (flat) or a ramp from the neighbour it is entered from
+  const cellBuild = (q, prev, i) => { const [c, r, y, tag] = q, key = c + ',' + r; if (seen.has(key)) return; seen.add(key); at[key] = { c, r, y, tag, x: X(c), z: Z(r) };
+    if (tag === 'gap') return; const x0 = X(c) - C / 2, x1 = X(c) + C / 2, z0 = Z(r) - C / 2, z1 = Z(r) + C / 2, top = y * Lv, m = mat(i);
+    const py = prev ? prev[2] : (tag === 'S' ? 0 : y), dy = y - py;
+    if (Math.abs(dy) === 1 && prev) { // RAMP: from the edge shared with `prev` at py to the far edge at y
+      const dc = c - prev[0], dr = r - prev[1], lo = Math.min(py, y) * Lv, hi = Math.max(py, y) * Lv, h = (u, w) => { const t = dc ? (dc > 0 ? (u - x0) / C : (x1 - u) / C) : (dr > 0 ? (w - z0) / C : (z1 - w) / C); return (py + (y - py) * t) * Lv; };
+      if (lo > .05) { put(new THREE.BoxGeometry(C, lo, C).translate(X(c), lo / 2, Z(r)), pillar); O.boxes.push({ minx: x0, maxx: x1, miny: 0, maxy: lo, minz: z0, maxz: z1 }); }
+      const wg = new THREE.BoxGeometry(C, 1, C, 1, 1, 1); const P = wg.attributes.position; for (let v = 0; v < P.count; v++) { const u = X(c) + P.getX(v), w = Z(r) + P.getZ(v); P.setXYZ(v, u, P.getY(v) > 0 ? h(u, w) : lo, w); } wg.computeVertexNormals(); put(wg, m);
+      tris.push(x0, h(x0, z0), z0, x1, h(x1, z0), z0, x1, h(x1, z1), z1, x0, h(x0, z0), z0, x1, h(x1, z1), z1, x0, h(x0, z1), z1); return; }
+    if (tag === 'S' && !prev) { const lo = 0; // the start: a ramp up from the ground, west to east
+      const wg = new THREE.BoxGeometry(C, 1, C); const P = wg.attributes.position; for (let v = 0; v < P.count; v++) { const u = X(c) + P.getX(v), w = Z(r) + P.getZ(v); P.setXYZ(v, u, P.getY(v) > 0 ? (u - x0) / C * top : lo, w); } wg.computeVertexNormals(); put(wg, m);
+      tris.push(x0, 0, z0, x1, top, z0, x1, top, z1, x0, 0, z0, x1, top, z1, x0, 0, z1); return; }
+    put(new THREE.BoxGeometry(C, Math.max(.3, top), C).translate(X(c), Math.max(.3, top) / 2, Z(r)), top > .05 ? pillar : m);
+    put(new THREE.BoxGeometry(C - .1, .12, C - .1).translate(X(c), Math.max(.3, top) + .06, Z(r)), m);
+    O.boxes.push({ minx: x0, maxx: x1, miny: 0, maxy: Math.max(.3, top) + .12, minz: z0, maxz: z1 });
+    if (prev && Math.abs(dy) >= 2 && dy > 0) { const dc = c - prev[0], dr = r - prev[1], lx = X(c) - dc * (C / 2 + .15), lz = Z(r) - dr * (C / 2 + .15), w = dc ? [.12, .4] : [.4, .12];
+      put(new THREE.BoxGeometry(dc ? .1 : .7, top, dc ? .7 : .1).translate(lx, top / 2, lz), pillar);
+      const L = kitClimbAdd({ minx: lx - w[0], maxx: lx + w[0], miny: py * Lv, maxy: top, minz: lz - w[1], maxz: lz + w[1] }, 'lvg_ladder', top); L.mark = { x: X(c), y: top, z: Z(r) }; climbs.push(L); } };
+  spec.path.forEach((q, i) => cellBuild(q, spec.path[i - 1], i));
+  for (const B of spec.branches || []) B.forEach((q, i) => { if (i) cellBuild(q, B[i - 1], N - 1); });
+  for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
+  // the beats: a numbered marker over each, and its mechanism
+  const num = (n, x, y, z, col) => { const cv = document.createElement('canvas'); cv.width = cv.height = 128; const q = cv.getContext('2d'); q.fillStyle = '#0b0d12'; q.beginPath(); q.arc(64, 64, 58, 0, 6.29); q.fill();
+    q.strokeStyle = col || '#ffffff'; q.lineWidth = 8; q.stroke(); q.fillStyle = '#fff'; q.font = 'bold 64px sans-serif'; q.textAlign = 'center'; q.textBaseline = 'middle'; q.fillText(String(n), 64, 68);
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(cv), depthWrite: false })); sp.scale.setScalar(1.6); sp.position.set(x, y, z); g.add(sp); return sp; };
+  const L = { g, O, climbs, bars: [], rings: [], at, guards: [], arch: [], tur: [], marks: {}, done: {}, t: 0, db: null, gate: null, candle: null, boss: null, zip: null };
+  const C0 = L, top = q => q.y * Lv + .15, spawnSam = (x, z, n) => { (async () => { try { const K0 = await arenaLoad('SAMURAI'), AK = ARENA.kinds.SAMURAI, K = HORDE.KS || (HORDE.KS = Object.assign(Object.create(K0), { notice: HORDE.notice, lose: 90, limbs: 1 }));
+      for (let k = 0; k < n; k++) { if (LVG.on !== C0) return; const d = bodySpawn(K.P, K, x + (k - (n - 1) / 2) * 1.6, z, 0); arenaKatana(d, AK); d.horde = 1; d.aggro = 0; d.hp = d.hpMax = 40; d.gap = 1; HORDE.list.push(d); C0.guards.push(d); (d.lvgBeat = n); } } catch (e) {} })(); };
+  for (const q of spec.path.concat(...(spec.branches || []))) { const [c, r, y, tag] = q; if (tag === undefined || tag === 'gap') continue; const k = c + ',' + r, P = at[k]; if (L.marks[tag]) continue;
+    L.marks[tag] = num(tag, P.x, top(P) + 3.2, P.z, tag === 'E' ? '#ff3aa0' : tag === 'S' ? '#4aff6a' : '#ffffff'); const kind = spec.beats[tag];
+    if (kind === 'guards') { const before = C0.guards.length; spawnSam(P.x, P.z, tag === 6 ? 3 : 2); L['g' + tag] = { from: before, n: tag === 6 ? 3 : 2 }; }
+    if (kind === 'tower') { const tx = P.x + C * .25, tz = P.z + C * .25, th = 5; put; const tw = new THREE.Mesh(new THREE.BoxGeometry(3, th, 3), pillar); tw.position.set(tx, top(P) + th / 2, tz); tw.castShadow = true; g.add(tw);
+      O.boxes.push({ minx: tx - 1.5, maxx: tx + 1.5, miny: 0, maxy: top(P) + th, minz: tz - 1.5, maxz: tz + 1.5 });
+      for (const s2 of [-1, 1]) archerPost(tx + s2 * .9, top(P) + th + .05, tz - .9).then(d => { if (LVG.on === C0 && d) C0.arch.push(d); else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {});
+      L.tur.push(turretAt(tx + .9, top(P) + th, tz + .9, Math.PI)); }
+    if (kind === 'button') { const b = new THREE.Mesh(new THREE.CylinderGeometry(.6, .7, .5, 16), new THREE.MeshStandardMaterial({ color: 0xff3030, emissive: 0x801010, roughness: .4 })); b.position.set(P.x + C * .3, top(P) + .25, P.z); g.add(b); L.button = b; }
+    if (kind === 'candle') { const bz = new THREE.Group(); bz.position.set(P.x, top(P), P.z - C * .25); g.add(bz); const bowl = new THREE.Mesh(new THREE.CylinderGeometry(.7, .4, .6, 14, 1, true), new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35, side: THREE.DoubleSide })); bowl.position.y = 1.2; bz.add(bowl);
+      const leg = new THREE.Mesh(new THREE.CylinderGeometry(.12, .2, 1, 8), bowl.material); leg.position.y = .5; bz.add(leg); const fire = new THREE.Mesh(new THREE.ConeGeometry(.45, 1.2, 10), new THREE.MeshBasicMaterial({ color: 0xff7a2a, toneMapped: false })); fire.position.y = 2; fire.visible = false; bz.add(fire); L.candle = { g: bz, fire, lit: 0 }; }
+    if (kind === 'ring') L.rings.push(gringAdd(g, P.x, top(P) + 4, P.z));
+    if (kind === 'cache') { const sm = []; L.smash = sm; for (let k = 0; k < 3; k++) { const m = new THREE.Mesh(new THREE.BoxGeometry(.8, .8, .8), new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .6, roughness: .4 })); const x = P.x - 1 + k, z = P.z; m.position.set(x, top(P) + .4, z); g.add(m); smashAdd(sm, m, { minx: x - .4, maxx: x + .4, miny: top(P), maxy: top(P) + .8, minz: z - .4, maxz: z + .4 }, 1, 60, [1, .85, .3]); } } }
+  // the GAP and its DRAWBRIDGE (a span hinged on the button's side, standing up until the button is struck)
+  for (const q of spec.path) if (q[3] === 'gap') { const i = spec.path.indexOf(q), a = spec.path[i - 1], P = at[q[0] + ',' + q[1]], y = q[2] * Lv, dc = q[0] - a[0], dr = q[1] - a[1];
+    const hg = new THREE.Group(); hg.position.set(P.x - dc * C / 2, y, P.z - dr * C / 2); g.add(hg); const span = new THREE.Mesh(new THREE.BoxGeometry(dc ? C : 4, .3, dc ? 4 : C), new THREE.MeshStandardMaterial({ color: 0x6e4a2e, roughness: .85 }));
+    span.position.set(dc * C / 2, -.15, dr * C / 2); span.castShadow = true; hg.add(span); L.db = { hg, dc, dr, k: 0, box: { minx: P.x - (dc ? C / 2 : 2), maxx: P.x + (dc ? C / 2 : 2), miny: y - .3, maxy: y, minz: P.z - (dr ? C / 2 : 2), maxz: P.z + (dr ? C / 2 : 2), _off: 1 } }; BDYN.push(L.db.box); }
+  // the GATE at beat 10 (on the edge it is entered by), shut and unbreakable until the candle burns
+  { const i = spec.path.findIndex(q => q[3] === 10); if (i > 0) { const q = spec.path[i], a = spec.path[i - 1], dc = q[0] - a[0], dr = q[1] - a[1], gx = (X(q[0]) + X(a[0])) / 2, gz = (Z(q[1]) + Z(a[1])) / 2;
+      L.gate = bgateMake(g, gx, gz, C - .4, 4, !!dr, O, { hp: 1e9, hp0: 1e9, r: 0 }); L.gate.r = -1; } }
+  // the ZIP from beat 11's neighbour high post down to the end
+  { const i = spec.path.findIndex(q => q[3] === 11), e = spec.path[N - 1]; if (i > 0) { const a = spec.path[i - 1], A0 = [X(a[0]), a[2] * Lv + 4.5, Z(a[1])], B0 = [X(e[0]), e[2] * Lv + 2, Z(e[1])];
+      put; const post = new THREE.Mesh(new THREE.BoxGeometry(.3, 4.5, .3), pillar); post.position.set(A0[0] + .4, a[2] * Lv + 2.25, A0[2]); g.add(post); L.zip = { A: A0, B: B0 }; ZIPS.push(L.zip);
+      g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.LineCurve3(new THREE.Vector3(...A0), new THREE.Vector3(...B0)), 8, .04, 5), new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 }))); } }
+  // the BOSS DOOR at E: a sealed portal that opens when the plan's `need` beats are done
+  { const e = at[spec.path[N - 1][0] + ',' + spec.path[N - 1][1]], dm = new THREE.MeshBasicMaterial({ color: 0xff3aa0, transparent: true, opacity: .25, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, toneMapped: false });
+    const door = new THREE.Mesh(new THREE.PlaneGeometry(4, 5), dm); door.position.set(e.x, top(e) + 2.5, e.z + C / 2 - .3); g.add(door); L.boss = { door, dm, open: 0 }; }
+  bldTris(O, tris); for (const b of O.boxes) BOXES.push(b); boxGrid();
+  L.spec = spec; LVG.on = L; bldXrayTag(g); { const p = player; p.pos.set(X(1) - C * .9, 0, Z(1)); p.vel.set(0, 0, 0); p.faceH = p.heading = Math.PI / 2; }     /* it is 190 m out: he starts at S */ arenaBeam(X(1), Z(1), [.4, 1, .5], 1); snd('clang', { g: .7, r: .6 });
+}
+function lvgDone(L, n) { if (L.done[n]) return; L.done[n] = 1; const M = L.marks[n]; if (M) M.material.color.setRGB(.4, 1, .5); snd('clang', { g: .8, r: 1.4 }); spkBurst(M ? M.position.x : 0, M ? M.position.y : 0, M ? M.position.z : 0, 24, { col: [.5, 1, .6], spread: 4, size: .15, life: .6 }); }
+function lvgStep(dt) { const L = LVG.on; if (!L) return; L.t += dt;
+  for (const k in L.marks) { const M = L.marks[k]; M.position.y += Math.sin(L.t * 2 + +k || 0) * .002; }
+  const alive = d => d && HORDE.list.includes(d);
+  for (const n of [1, 6]) { const G = L['g' + n]; if (G && L.guards.length >= G.from + G.n && !L.guards.slice(G.from, G.from + G.n).some(alive)) lvgDone(L, n); }
+  if (L.arch.length >= 2 && !L.arch.some(alive) && L.tur.every(T => T.dead)) lvgDone(L, 3);
+  if (L.db) { const D = L.db, want = L.done[5] ? 1 : 0; D.k += (want - D.k) * Math.min(1, dt * 1.5); const a = (1 - D.k) * Math.PI / 2; D.hg.rotation.set(D.dr ? -a * Math.sign(D.dr) : 0, 0, D.dc ? a * Math.sign(D.dc) : 0); D.box._off = D.k > .95 ? 0 : 1; }
+  if (L.gate) { L.gate.force = L.done[8] ? 1 : 0; bgateStep(L.gate, dt, []); if (L.done[8] && !L.done[10]) lvgDone(L, 10); }
+  if (L.candle && L.candle.lit) { const f = L.candle.fire; f.scale.set(1 + Math.sin(L.t * 9) * .1, 1 + Math.sin(L.t * 13) * .2, 1); }
+  if (L.boss && !L.boss.open && (L.spec.need || []).every(n => L.done[n])) { L.boss.open = 1; L.boss.dm.opacity = .6; arenaBeam(L.boss.door.position.x, L.boss.door.position.z, [1, .3, .7], 2); camShake(.3); snd('boom', { g: 1, r: .5 }); }
+  if (L.boss) L.boss.dm.opacity = (L.boss.open ? .55 : .2) + Math.sin(L.t * 2) * .05;
+  if (L.zip && player.zip && player.zip.Z === L.zip) lvgDone(L, 11); }
+function lvgHit(x, y, z, rad) { const L = LVG.on; if (!L) return 0;
+  if (L.button && !L.done[5]) { const P = L.button.position; if (Math.hypot(x - P.x, z - P.z) < 1 + rad && Math.abs(y - P.y) < 1.4 + rad) { L.button.position.y -= .3; lvgDone(L, 5); camShake(.2); snd('boom', { g: .6, r: .7 }); return 1; } }
+  if (L.candle && !L.candle.lit) { const P = L.candle.g.position; if (Math.hypot(x - P.x, z - P.z) < 1.1 + rad && y > P.y - .5 && y < P.y + 2.6 + rad) { L.candle.lit = 1; L.candle.fire.visible = true; lvgDone(L, 8); spkBurst(P.x, P.y + 2, P.z, 30, { col: [1, .6, .2], spread: 4, size: .16, life: .7 }); return 1; } }
+  return 0; }
+function lvgClear() { const L = LVG.on; if (!L) return; for (const d of L.guards.concat(L.arch)) if (d) { bowDrop(d); bodyGone(d); const i = HORDE.list.indexOf(d); if (i >= 0) HORDE.list.splice(i, 1); }
+  for (const T of L.tur) turretDrop(T); if (L.zip) { const i = ZIPS.indexOf(L.zip); if (i >= 0) ZIPS.splice(i, 1); if (player.zip && player.zip.Z === L.zip) player.zip = null; }
+  if (L.db) { const i = BDYN.indexOf(L.db.box); if (i >= 0) BDYN.splice(i, 1); } if (L.smash) smashDrop(L.smash); gringDrop(L.rings);
+  for (const C of L.climbs) { const i = KCLIMB.indexOf(C); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && L.climbs.includes(player.climb)) climbOff(); bldClear(L); LVG.on = null; }
 const COURT = { scale: 1.5, at: [0, 150], hw: 28, hd: 32, wallH: 4, walk: 2.6, gate: 6, on: null };
 function courtBuild() {
   // STEER S2 (his, after walking X4: *"increase the scale... 1.5... we need room to play"*): the court is DESIGNED in the old numbers and BUILT
@@ -24227,6 +24327,7 @@ const BLDG = { list: [
   { key: 'fest', t: 'Lantern Festival Street', sub: 'a street of festival stalls (roofs to stand on, breakable backs) under strings of paper lanterns, red gates at both ends, bars across, a robot dragon dance to cut apart (strike the taiko to make it wild)', pass: 3, build: () => festBuild(), clear: () => festClear(), on: () => !!FEST.on, step: dt => festStep(dt) },
   { key: 'heron', t: 'White Heron Castle', sub: 'a Himeji-style castle on a battered stone base: a five-storey white keep under layered grey roofs (every roof walkable, a hall on every storey, steep stairs up, the great pillars, a 2.4 m lookout balcony at the top; every gate and outer door opens, breaks and is rehung), a gallery wing of two corridors to a hollow corner tower (a loop: keep up, across, tower down, back), its roof a path; a ballista on the gallery ridge, archers in the doorways and the lookout, a sentry gate held by two samurai; the approach: a walled ramp that doubles back to a drawbridge over a dry moat (strike a gong to raise or lower it, or knock it down) and a gate on the stone; black pines, stone and paper lanterns, war flags and three white herons wheeling round the keep; a stair up the stone, a storehouse at the foot whose walls break', pass: 12, build: () => heronBuild(), clear: () => heronClear(), on: () => !!HERON.on, step: dt => heronStep(dt) },
   { key: 'gpag', t: 'Great Red Pagoda', sub: 'five storeys of red lacquer: a room on every floor, ladders up through the hatches, a balcony round every storey, a spire; a pavilion whose roof you can climb; a red fence; climb the outside eave to eave, bars, a zipline off the spire; an armoury, a library, a bell room (the alarm), a lookout; archers, a sentry gun, gate guards; glowing windows, lantern halos, a beacon on the spire; streamers, chimes, birds; strike the gong at the top and the tower lights up and the gate opens', pass: 10, build: () => gpagBuild(), clear: () => gpagClear(), on: () => !!GPAG.on, step: dt => gpagStep(dt) },
+  { key: 'lvg1', t: 'Grid Level 1', sub: 'a level planned as logic first: a 10 x 10 grid of 7 m cells, a coloured path at four heights, numbered beats -- clear the guards (1), the tower (3), strike the button to drop the drawbridge (5), beat the guards (6), light the candle (8) to open the gate (10), ride the zip (11); the boss door at E opens when 3, 6 and 8 are done', pass: 1, build: () => lvgBuild(LVG1), clear: () => lvgClear(), on: () => !!LVG.on, step: dt => lvgStep(dt) },
   { key: 'court', t: 'The Courtyard', sub: 'a walled court far north (0, 150): a wall-walk all round, the south gate, a stone lane between two timber halls with balconies and walkable roofs, a koi pond and a moon bridge; the two-roofed watchtower over the inner gate; the high road: a lane bridge, a rope bridge, the bell house; the Great Red Pagoda in its corner, ziplines, the maple; archers, a sentry gun, gate guards and a patrol, woken by the bell; koi, pigeons, a fox, fairy dust, sun shafts and paper lanterns; swaying grass, moss, puddles, smashable barrels, a cart and a rack; silence the watchtower (its gun and two archers) and the inner gate opens on a glowing way on', pass: 10, build: () => courtBuild(), clear: () => courtClear(), on: () => !!COURT.on, step: dt => courtStep(dt) },
   { key: 'zramp', t: 'Mega Wall', sub: 'the Ninja Warrior wall: zoom from the red gate (full hold), down the lane, up the bend and straight up the face -- only a full zoom reaches the gold lip; your mark shows how close; or zigzag up the chimney', pass: 3, build: () => zrampBuild(), clear: () => zrampClear(), on: () => !!ZRAMP.on, step: dt => zrampStep(dt) },
   { key: 'swrk', t: 'Sky Wreck', sub: 'a flying junk come down on rock spires: a tilted deck up a fallen mast, a hold of cargo behind breakable planks, a crow\'s nest up two bars', pass: 1, build: () => swrkBuild(), clear: () => swrkClear(), on: () => !!SWRK.on, step: dt => swrkStep(dt) },
