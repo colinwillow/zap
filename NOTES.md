@@ -5,6 +5,28 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## White Heron Castle pass 6 of 10: the gallery wing and the corner tower, hollow (X2, WORKER B)
+
+- **The corner tower.** Its storeys now match the keep's at 3.6 m (they were 3.2), so floors line up across the castle. It is hollow
+  now:
+  - plaster walls with doors: one out onto the stone (east), one into each gallery corridor (south), and the watch room's door onto its
+    own roof (west);
+  - a steep stair up each storey, laid so the two never cross (the generic `stair` and `slab` helpers);
+  - a lantern in every room.
+- **The gallery.** Two CORRIDORS:
+  - the lower runs from the keep's ground hall to the tower's;
+  - the upper runs from keep storey 1 to tower storey 1, on its own floor at the keep's level.
+  - The keep got doors in its north walls on storeys 0 and 1.
+  - Lanterns hang down both corridors. Its windows (pass 3) now light real rooms.
+- **The loop.** Keep up a stair, across the upper corridor, down the tower, back along the lower corridor. Or out of the tower's east
+  door onto the stone.
+- **The roof path.** The gallery's roof is a path from the keep's roofs to the tower's.
+- **`roof`'s cut.** Roof cells, eave caps and eave lips are left out where they would hang inside a corridor (the keep's roofs 0 and 1,
+  the tower's 0 and 1). Without it a lip box at head height would block the corridor. The gallery roof keeps its cells and loses only
+  its end lips. Roof 1's north gable came off (it sat in the gallery roof).
+
+SHIPPED UNVERIFIED. Next: pass 7, defenders (archers at the windows, a ballista on the gallery roof, a sentry gate in the stone).
+
 ## m1290 -- Octagonal Block Pagoda pass 7 of 10: the light (X4, WORKER A)
 
 No lights are added, because a new light recompiles every material in the scene. Everything is emissive blocks plus one additive draw:
