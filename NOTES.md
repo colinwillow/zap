@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1222 -- Zeppelins pass 5: bring one down (Building Forge loop, extra pass)
+
+A zeppelin's ENVELOPE now takes hits (`zepHit` in `bldHit`, an ellipsoid test in the ship's own frame): a blade from the deck or
+trapeze, an arrow, a parried shot.
+
+After `ZEP.hp` 10 hits it is HOLED:
+- **Down.** It sinks at 1.6 m/s, listing and trailing smoke from the envelope, its prop slowing, down to 3.5 m off the ground.
+- **Limping.** It limps round its loop low for `downT` 30 s.
+- **Back up.** Then it patches itself and climbs back to cruise.
+
+While it is down its gondola, trapeze and gun ride low, within reach from the street. Its carry and its turret ride along
+unchanged.
+
+Next: alternate -- Teahouse Garden pass 3.
+
 ## m1221 -- Teahouse Garden pass 2: the tea master (Building Forge loop)
 
 **THE TEA MASTER.** A robot (no blade) kneels behind the tea table in the teahouse.
