@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1136 -- MARKET STALL ROW pass 1 (BUILDINGS.md #5, at (16, 12))
+
+`MKT`, `mktBuild` / `mktStep` / `mktClear` / `mktHit`. SPAWN > BUILDINGS > Market Stalls.
+- FOUR open-front stalls (4.5 m each, 18 m) facing the courtyard (-z): a breakable back wall and five breakable partitions (cwallBuild),
+  vermilion front posts, a beam, counters with goods, a shelf on each back wall.
+- Striped AWNINGS (red/cream, blue/cream canvas textures) on stalls 1 and 3, sloping down and out on two poles; a HIGH BAR hung in the
+  front frame of stalls 2 and 4 (no posts, top 3.2 m -- m1122's `y`).
+- A walkable flat ROOF the length of the row (3.7 m, railed on the front) with a third bar on it, and a RAMP up the back (slope .3) from
+  the west end to a landing onto the roof.
+- EIGHT CRATES out front (two stacked) that SMASH: `mktHit`, reached through `bldHit` (katana, shots, parried bolts), 2 hits, chips and a
+  puff, the box goes; back after `crateFix` 15 s (not while he stands on the spot). A stacked crate does NOT fall when the one under it
+  breaks yet -- pass 2.
+Shipped unverified.
+
 ## m1135 -- PAGODA pass 3 (DONE)
 
 - Every skirt corner sweeps UP into a curled timber TIP (16) -- without them the open frustums read as lampshades.
