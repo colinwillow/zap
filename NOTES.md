@@ -5,6 +5,35 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1254 -- Zoom Ramp Tower pass 1 (his request R1)
+
+*"A tower shaped like a really tall ramp -- you do the speed run and it's just tall enough that your whole run gets you to the top, and you hit
+it perfectly; the very top is a ledge you just barely grab, then pull yourself up into a guard tower."*
+
+`ZRAMP`, `zrampBuild` / `zrampStep` / `zrampClear`, at (-60, -56); SPAWN > BUILDINGS > Zoom Ramp Tower.
+
+**The course.** In the order he runs it:
+- a red torii start gate on a stone slab
+- a flat run-in of `run` 8 m
+- a ramp rising `Hr` 5 m over `ramp` 16 m (walkable triangles, with bronze and neon edge rails)
+- the SHEER FACE of a sandstone tower: ONE solid box, so the ledge hang takes his hands at its lip, and the run-up (m1251) starts on it
+  by itself
+
+**The solve.** A full zoom launches at 17 m/s, holds .7 s and bleeds 3.2 m/s^2. Over the 24 m that is about 1.43 s, arriving at about
+14.7 m/s. The run-up climbs u^2/(2 x 12), about 9.0 m. His hands catch within `LEDGE.band` .55 of `LEDGE.hang` x his height. So the gold
+lip at Hr + `lift` 10.1 = 15.1 m is made by a FULL zoom with about .3 m to spare, and missed by a 90% zoom (about 13.9 m/s, 8.1 m up).
+
+**The caveat.** The arrival speed is a PREDICTION, because the ramp's effect on a zoom is not measured. So `mel.ZRAMP.lift` is the dial.
+Respawn the tower after changing it: the geometry is built from it.
+
+**How close he got.** Neon ticks mark every 2 m up the face. Every try leaves a MARK on the face for 8 s at the height his hands reached:
+red for a miss, gold for a catch, and a catch also gets a beam and sparks.
+
+**The summit.** A guard house with a door and a roof, a burning brazier (R2 will put it out), and rails on three sides only (the lip is
+left clear). A ZIPLINE runs from the back corner down to the gate (pushed into `ZIPS`, taken out on clear).
+
+`mel` also exports `MECH` (m1249). SHIPPED UNVERIFIED. Next for it: pass 2 (a timer and best mark, bars round the rim, a second line up).
+
 ## m1251 -- the wall run-up needs no tap, and its height comes from his speed (his report)
 
 *"I don't think we ever made a wall run where you run straight up the wall. If you jump and hit a wall straight on, his velocity should just
