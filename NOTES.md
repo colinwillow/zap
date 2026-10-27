@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home, procedural, pass 11: the windows and the lookout (WORKER B)
+
+- **The windows.** In the refs every round window is sunk in a soft lavender surround. Now each one is: a lavender disc behind the dark
+  glass and its timber ring and cross, placed on the walls' swell.
+  - The pass-1 windows are replaced by these.
+  - More are added round the hall (6), the store (3), the tower's drum (3) and the turret (3).
+- **The turret's LOOKOUT.** The small room at the top of the spiral stair gets a brass telescope on a tripod at its window, and red
+  cushions.
+- **Counts.** 32 draws.
+
+Checked headless (one throw found and fixed before the push) and looked at the front, the side and the lookout. Shipped unverified.
+
 ## Grumbo's home, procedural, pass 10: the rigging (WORKER B)
 
 The refs are strung with rope.
