@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The pagoda's gate opens and breaks; DOORS AND CHAOS is a rule (his)
+
+*"There are doors in the red pagoda I can't break down or go through... the guys are behind them and can't get out... I like the idea of
+everything being destructible, chaos."*
+- **The gate opens by itself.** It opens for anyone within `GPAG.gateR` 4.5 m: him from either side, or an alarmed guard on his way out.
+  The gong still opens it too.
+- **The gate breaks.** `gateHp` 3 blows (a blade, a rocket, the whirlwind) BREAK it (`gpagGateHit`): the doors vanish in splinters and
+  smoke, the way stands open, and the doors are rehung `gateFix` 45 s later.
+- **The rule.** **DOORS, GATES, BRIDGES -- AND CHAOS** is now a hard rule in BUILDINGS.md for every building and both workers.
+
+SHIPPED UNVERIFIED.
+
 ## m1295 -- Octagonal Block Pagoda pass 9 of 10: the set piece (X4, WORKER A)
 
 **Ring the bell at the top and the whole tower answers** (`opagShow`). Strike the bronze bell in storey 6's bell room:

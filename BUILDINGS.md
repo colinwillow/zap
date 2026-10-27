@@ -64,6 +64,20 @@ the quarters to feel so narrow, in buildings, on walkways."* So:
 - **Anything thin near a walkway is `noCam: 1`** (rails, posts, lips, lattice), so it never pulls the lens into his back. Only real
   walls stop the camera.
 
+## DOORS, GATES, BRIDGES -- AND CHAOS (his, after m1296, a hard rule for every building and both workers)
+
+*"There are doors I can't break down or go through -- the guys are behind them and can't get out and I have to jump over the wall. We need
+functionality with drawbridges and opening doors, or at least breaking the doors down. I kind of like the idea of everything being
+destructible -- it's just chaos."* So, from here:
+- **Doors and gates OPEN** for whoever comes near (him from either side, a guard on his way out), and close behind. No door is ever a dead
+  wall.
+- **Every door and gate BREAKS.** A few blows (blade, rocket, whirlwind) splinter it in a burst of sparks and smoke, the way stands open,
+  and it is REHUNG later. The Great Red Pagoda's gate (`gpagGateHit`) is the pattern.
+- **Drawbridges, portcullises and lifts are MACHINES you work.** A lever, a gong or a bell raises or lowers them, and a big enough blow
+  can drop them.
+- **Lean destructible.** Walls breakable (`cwallBuild`), props smashable (`smashAdd`), timber that splinters, plus anything else that
+  can break in the frame budget. Make it chaos you can fight through.
+
 ## PARALLEL WORKERS (his, after m1270: *"spin up one or two extra context windows... one on one building, one on another"*)
 
 Three sessions build at once, each OWNING its rows; nobody touches a row (or its code) it does not own:
