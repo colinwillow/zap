@@ -63860,7 +63860,7 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 // to the shop front and to the round back door. Built in its OWN frame (local +z = the front, toward the river; `at`/`yaw` are HOME.hut's) and
 // merged per material; every collider a local box turned into the world (the yaw is a quarter turn, so a box stays a box); every walkable
 // surface a triangle. `?hut=glb` (or GHOME.on = 0) puts the GLB back, to compare. Pass 1: the massing and the walkable shell, with the inside.
-const GHOME = { on: 1, pass: 12, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
+const GHOME = { on: 1, pass: 13, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   Rtu: 2.5, door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
@@ -63929,6 +63929,8 @@ function ghomeBuild(at, yaw, y0) {
     if (amp) { m.onBeforeCompile = sh => { sh.uniforms.uWind = U.uWind; sh.vertexShader = 'uniform float uWind;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n  transformed += objectNormal * ' + amp.toFixed(3) + ' * (1.0 - uv.y) * sin(uWind * 2.3 + position.x * 1.7 + position.z * 1.3 + position.y * 2.1) * (0.7 + 0.3 * sin(uWind * .63 + position.x));'); };
       m.customProgramCacheKey = () => 'ghwind' + k; }
     return m; };
+  // pass 13: ONE of each shared look (five passes each made their own bronze, two their own glow: a draw apiece for the same picture)
+  const bronzeT = triMat('bronze', { scale: 1.2, metal: .75, rough: .35 }); bronzeT.userData.tri = 1; const glowM = new THREE.MeshStandardMaterial({ color: 0xffd9a0, emissive: 0xffa040, emissiveIntensity: 2.2, toneMapped: false }), redW = new THREE.MeshStandardMaterial({ color: 0x9a2c22, roughness: .9 });
   const dark = new THREE.MeshStandardMaterial({ color: 0x1a120c, roughness: 1 }), brass = new THREE.MeshStandardMaterial({ color: 0xc8963c, metalness: .8, roughness: .35 });
   // ---- colliders: local boxes into the world; and solid RUNS (a test over a cell grid, merged along x) for the round shells ----
   const boxes = [], tris = [];
@@ -64011,7 +64013,7 @@ function ghomeBuild(at, yaw, y0) {
   // ---- PASS 8: HIS QUARTERS, LIVED IN (behind the screen): his bed (a timber frame, a red blanket, a cream pillow), a woven rug, a brazier of
   // glowing coals with its own warm light, his KATANA on a rack by the bed, a chest at its foot, a table with two stools and a lantern over it;
   // and the STORE stacked with barrels, sacks and crates ----
-  { const red = new THREE.MeshStandardMaterial({ color: 0x9a2c22, roughness: .9 }), cream = new THREE.MeshStandardMaterial({ color: 0xe8d8b8, roughness: .9 }), coal = new THREE.MeshStandardMaterial({ color: 0xff7a30, emissive: 0xff5a10, emissiveIntensity: 2.4, toneMapped: false });
+  { const red = redW, cream = new THREE.MeshStandardMaterial({ color: 0xe8d8b8, roughness: .9 }), coal = new THREE.MeshStandardMaterial({ color: 0xff7a30, emissive: 0xff5a10, emissiveIntensity: 2.4, toneMapped: false });
     const steel = new THREE.MeshStandardMaterial({ color: 0xd8dde2, metalness: .9, roughness: .25 }), sack = new THREE.MeshStandardMaterial({ color: 0xb59a6a, roughness: 1 }), rnd = rwRng(91);
     vbox(-3.0, -1.9, P, P + .38, -2.6, -1.25, wood, 1); vbox(-2.97, -1.93, P + .38, P + .56, -2.57, -1.28, red, 0); vbox(-2.9, -2.0, P + .56, P + .7, -2.55, -2.15, cream, 0);     // the bed
     put(new THREE.CircleGeometry(1.25, 28), red, at4(0, P + .03, -2.5, 0, -Math.PI / 2, 0, 1, 1, .75)); put(new THREE.RingGeometry(1.05, 1.15, 28), cream, at4(0, P + .035, -2.5, 0, -Math.PI / 2, 0, 1, 1, .75));     // the rug
@@ -64098,7 +64100,7 @@ function ghomeBuild(at, yaw, y0) {
   // frame, one out on the right deck); the BRONZE STACKS either side of the cone; the CRANE off the store -- a banded mast and a boom out over
   // the stalls, a brass orb on a chain with a red tassel under it and a pair of hanging weights; the red CANOPY over the tower balcony; a FLAG
   // on the tower's top. Brass and bronze are main's tileable bronze (`triMat`, triplanar: no uv) ----
-  { const bronze = triMat('bronze', { scale: 1.2, metal: .75, rough: .35 }); bronze.userData.tri = 1;
+  { const bronze = bronzeT;
     const coneM = clothM('cone'), awnM = clothM('awning'), banM = clothM('banner');
     const rodW = (a, b, r, m, round) => { const d = new THREE.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]), L = d.length(); _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize());
       put(round ? new THREE.CylinderGeometry(r, r, L, 8) : new THREE.BoxGeometry(r, L, r), m, _m4.compose(new THREE.Vector3((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2), _q, _one)); };
@@ -64152,9 +64154,9 @@ function ghomeBuild(at, yaw, y0) {
   // the shop's lit shelves of pots, cacti and succulents all round the mound, boulders). Pots are lathed (five shapes, clay or brass), crates
   // are timber with iron straps (solid), the lanterns glow (emissive) and one warm light sits in the shop; plants are code-built cacti
   // (saguaro, prickly pear) and agave rosettes, green and red ----
-  { const bronze = triMat('bronze', { scale: 1.2, metal: .75, rough: .35 }); bronze.userData.tri = 1;
+  { const bronze = bronzeT;
     const clay = new THREE.MeshStandardMaterial({ color: 0xb4623a, roughness: .8 }), clayD = new THREE.MeshStandardMaterial({ color: 0x7a3c24, roughness: .85 }), glaze = new THREE.MeshStandardMaterial({ color: 0x8a6a9a, roughness: .45 });
-    const glow = new THREE.MeshStandardMaterial({ color: 0xffd9a0, emissive: 0xffa040, emissiveIntensity: 2.2, toneMapped: false }), cact = new THREE.MeshStandardMaterial({ color: 0x5f8f45, roughness: .75 }), cactD = new THREE.MeshStandardMaterial({ color: 0x3f6a34, roughness: .8 }), agR = new THREE.MeshStandardMaterial({ color: 0xc0402c, roughness: .7 });
+    const glow = glowM, cact = new THREE.MeshStandardMaterial({ color: 0x5f8f45, roughness: .75 }), cactD = new THREE.MeshStandardMaterial({ color: 0x3f6a34, roughness: .8 }), agR = new THREE.MeshStandardMaterial({ color: 0xc0402c, roughness: .7 });
     const rnd = rwRng(77), mats = [clay, clay, clayD, glaze, bronze];
     const SH = [[[0, 0], [.55, .05], [.95, .35], [1, .6], [.7, .85], [.45, .95], [.5, 1]], [[0, 0], [.6, .03], [.8, .3], [.55, .62], [.3, .75], [.32, 1]], [[0, 0], [.8, .02], [1, .3], [.95, .6], [.9, .8], [1, .85]], [[0, 0], [.4, .02], [.9, .25], [1, .5], [.6, .8], [.3, .88], [.35, 1]], [[0, 0], [.7, .05], [.75, .5], [.6, .9], [.72, 1]]];
     const pot = (x, y, z, r, h, kind, m) => { const pts = SH[kind % SH.length].map(([a, b]) => new THREE.Vector2(a * r, b * h)); put(new THREE.LatheGeometry(pts, 12), m || mats[(rnd() * mats.length) | 0], at4(x, y, z, rnd() * 6)); if (r > .32) box(x - r * .8, x + r * .8, y, y + h, z - r * .8, z + r * .8, { noCam: 1 }); };
@@ -64193,7 +64195,7 @@ function ghomeBuild(at, yaw, y0) {
     for (let i = 0; i < 12; i++) { const a = rnd() * Math.PI * 2, rr = 1.2 + rnd() * .3, x = Math.sin(a) * A.rx * rr, z = Math.cos(a) * A.rz * rr; if (z > A.rz * .7 && Math.abs(x) < 3) continue; if (x > 9 && z > 3.6 && z < 7.4) continue;
       const k = .6 + rnd() * 1.1; put(new THREE.IcosahedronGeometry(1, 3), stoneM, at4(x, k * .2, z, rnd() * 6, 0, 0, k * 1.5, k * .75, k * 1.2)); box(x - k * 1.1, x + k * 1.1, 0, k * .7, z - k * .9, z + k * .9); } }
   // ---- PASS 7: timber BANDS where each wall meets its dome (iron studs round them), and red TASSELS with brass beads along the front beam ----
-  { const brassT = triMat('bronze', { scale: 1.2, metal: .75, rough: .35 }); brassT.userData.tri = 1; const red = new THREE.MeshStandardMaterial({ color: 0xb02a22, roughness: .8 });
+  { const brassT = bronzeT; const red = new THREE.MeshStandardMaterial({ color: 0xb02a22, roughness: .8 });
     for (const [x, z, R, y] of [[0, 0, A.R, P + A.Hw], [A.Wc[0], A.Wc[1], A.Rw, P + A.Hwg], [A.T[0], A.T[1], A.Rtu, P + A.Ht], [A.T[0], A.T[1], A.Rt, P + A.Yb - .3]]) {
       put(new THREE.CylinderGeometry(R + .07, R + .07, .42, 64, 1, true), wood, at4(x, y - .21, z)); for (let k = 0; k < Math.round(R * 4); k++) { const q = k / Math.round(R * 4) * TAU; put(new THREE.BoxGeometry(.1, .1, .1), iron, at4(x + Math.sin(q) * (R + .1), y - .21, z + Math.cos(q) * (R + .1), q)); } }
     for (let x = -6.1; x <= 6.1; x += .8) { if (Math.abs(x) < 2.6 && Math.abs(x) > 2) continue; const y = P + 4.6 - .1, z = 4.6 + .16;
@@ -64205,7 +64207,7 @@ function ghomeBuild(at, yaw, y0) {
   { A.stat.blobs = shell(5.6, 1.85, 1.5, 1.6, 1.4, []) + shell(-4.2, -3.8, 1.6, 1.8, 1.5, []);
     const win = (cx, cz, R, a, y, r) => { const x = cx + Math.sin(a) * (R + .14), z = cz + Math.cos(a) * (R + .14); put(new THREE.CircleGeometry(r, 20), dark, at4(x, y, z, a)); put(new THREE.TorusGeometry(r, .07, 6, 20), wood, at4(x, y, z, a)); };
     win(5.6, 1.85, 1.5, .5, P + 1.1, .3); win(-4.2, -3.8, 1.6, -2.4, P + 1.15, .32);
-    const glow = new THREE.MeshStandardMaterial({ color: 0xffd9a0, emissive: 0xffa040, emissiveIntensity: 2.2, toneMapped: false }), brassT = triMat('bronze', { scale: 1.2, metal: .75, rough: .35 }); brassT.userData.tri = 1;
+    const glow = glowM, brassT = bronzeT;
     const lamp = (x, y, z) => { put(new THREE.CylinderGeometry(.012, .012, .4, 4), iron, at4(x, y + .2, z)); put(new THREE.ConeGeometry(.17, .15, 6), brassT, at4(x, y - .02, z)); put(new THREE.CylinderGeometry(.12, .12, .28, 6), glow, at4(x, y - .24, z)); put(new THREE.CylinderGeometry(.14, .11, .05, 6), brassT, at4(x, y - .4, z)); };
     for (const sx of [-1.25, 1.25]) { vbox(sx - .04, sx + .04, P + 2.4, P + 2.9, -A.R - .25, -A.R - .17, wood, 0); lamp(sx, P + 2.55, -A.R - .45); }
     { const [Tx, Tz] = A.T, ro = A.Rt + 2.25; for (const a of [.07, 1.0, 2.0]) lamp(Tx + Math.sin(a) * (ro - .1), P + A.Yb + 2.55, Tz + Math.cos(a) * (ro - .1)); }
@@ -64231,7 +64233,7 @@ function ghomeBuild(at, yaw, y0) {
       for (const yy of [P + A.shopH + .7, P + 6.3 - .45]) vbox(-2.15, 2.15, yy - .05, yy + .05, z + .06, z + .1, iron, 0); } }
   // ---- PASS 11: THE WINDOWS (refs: round windows everywhere, each sunk in a soft LAVENDER surround) and the TURRET'S LOOKOUT (a brass
   // telescope at its window, cushions) ----
-  { const lav = new THREE.MeshStandardMaterial({ color: 0x9a82b8, roughness: .85 }), brassT = triMat('bronze', { scale: 1.2, metal: .75, rough: .35 }); brassT.userData.tri = 1; const cush = new THREE.MeshStandardMaterial({ color: 0x9a2c22, roughness: .9 });
+  { const lav = new THREE.MeshStandardMaterial({ color: 0x9a82b8, roughness: .85 }), brassT = bronzeT; const cush = redW;
     const W2 = (cx, cz, R, a, y, r, bulge = 0) => { const x = cx + Math.sin(a) * (R + bulge + .03), z = cz + Math.cos(a) * (R + bulge + .03);
       put(new THREE.CircleGeometry(r * 1.55, 24), lav, at4(x - Math.sin(a) * .01, y, z - Math.cos(a) * .01, a)); put(new THREE.CircleGeometry(r, 20), dark, at4(x + Math.sin(a) * .01, y, z + Math.cos(a) * .01, a));
       put(new THREE.TorusGeometry(r, .07, 6, 20), wood, at4(x + Math.sin(a) * .02, y, z + Math.cos(a) * .02, a)); put(new THREE.BoxGeometry(r * 2, .05, .05), wood, at4(x + Math.sin(a) * .03, y, z + Math.cos(a) * .03, a)); put(new THREE.BoxGeometry(.05, r * 2, .05), wood, at4(x + Math.sin(a) * .03, y, z + Math.cos(a) * .03, a)); };
@@ -64246,6 +64248,20 @@ function ghomeBuild(at, yaw, y0) {
       for (let k = 0; k < 3; k++) { const q = k / 3 * Math.PI * 2; const fx = x + Math.sin(q) * .3, fz = z + Math.cos(q) * .3, d = new THREE.Vector3(x - fx, 1.1, z - fz), L = d.length(); _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); put(new THREE.CylinderGeometry(.025, .025, L, 5), wood, _m4.compose(new THREE.Vector3((x + fx) / 2, y + .55, (z + fz) / 2), _q, _one)); }
       put(new THREE.CylinderGeometry(.07, .1, 1.1, 10), brassT, at4(x, y + 2.05, z, a, Math.PI / 2 - .12)); put(new THREE.SphereGeometry(.1, 8, 6), brassT, at4(x, y + 1.15, z));
       for (const [dx, dz] of [[.9, .4], [.5, 1.0]]) put(new THREE.CylinderGeometry(.35, .38, .18, 12), cush, at4(Tx + dx * Math.cos(a) - dz * Math.sin(a) * .2, y + .09, Tz + dz * .6)); } }
+  // ---- PASS 13 (ref 1): the GEARBOX the big wheel sits on -- a dark iron drum lying along the wheel's axis, brass-banded and studded, a
+  // brass cog meshing above it -- and the low SIGNBOARD on two posts at the front-left of the mound ----
+  { const Rc = 3.6, a = .95, yb = P + A.Hw + A.Hd * Math.cos(Math.asin(Rc / A.R)) - .2, ax = new THREE.Vector3(Math.sin(a), 0, Math.cos(a)), tg = new THREE.Vector3(Math.cos(a), 0, -Math.sin(a));
+    const along = (geo, m, r, y, dt = 0, dy = 0) => put(geo, m, _m4.compose(new THREE.Vector3(ax.x * r + tg.x * dt, y + dy, ax.z * r + tg.z * dt), _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), ax), _one));
+    along(new THREE.CylinderGeometry(.95, .95, .85, 20), iron, Rc + .05, yb + .5);
+    for (const f of [-.36, .36]) along(new THREE.CylinderGeometry(1.01, 1.01, .1, 20), bronzeT, Rc + .05 + f, yb + .5);
+    for (let k = 0; k < 10; k++) { const q = k / 10 * Math.PI * 2; along(new THREE.SphereGeometry(.06, 6, 4), bronzeT, Rc + .43, yb + .5, Math.cos(q) * .8, Math.sin(q) * .8); }
+    const cy = yb + 1.75, ct = -.55; along(new THREE.CylinderGeometry(.5, .5, .14, 16), bronzeT, Rc + .25, cy, ct); along(new THREE.CylinderGeometry(.14, .14, .3, 8), iron, Rc + .25, cy, ct);
+    for (let k = 0; k < 12; k++) { const q = k / 12 * Math.PI * 2; put(new THREE.BoxGeometry(.16, .16, .14), bronzeT, _m4.compose(new THREE.Vector3(ax.x * (Rc + .25) + tg.x * (ct + Math.cos(q) * .56), cy + Math.sin(q) * .56, ax.z * (Rc + .25) + tg.z * (ct + Math.cos(q) * .56)), _q.setFromUnitVectors(new THREE.Vector3(0, 0, 1), ax).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), q)), _one)); }
+    // the SIGNBOARD: two banded posts, a plank board with iron straps, a little hung board under it
+    const sx = -9.6, sz = 9.4; for (const dx of [-.85, .85]) { vbox(sx + dx - .07, sx + dx + .07, 0, 1.35, sz - .07, sz + .07, wood, 0); vbox(sx + dx - .09, sx + dx + .09, .95, 1.0, sz - .09, sz + .09, iron, 0); }
+    vbox(sx - 1, sx + 1, .62, 1.22, sz - .05, sz + .05, woodP, 0); for (const dx of [-.6, .6]) vbox(sx + dx - .05, sx + dx + .05, .6, 1.24, sz - .07, sz + .07, iron, 0);
+    for (const dx of [-.3, .3]) vbox(sx + dx - .01, sx + dx + .01, .32, .62, sz + .02, sz + .03, iron, 0); vbox(sx - .42, sx + .42, .12, .36, sz - .04, sz + .04, woodP, 0);
+    box(sx - 1, sx + 1, 0, 1.3, sz - .12, sz + .12, { noCam: 1 }); }
   // ---- PASS 12: SMOKE from both stacks -- one point cloud (one draw), each puff rising, drifting downwind and swelling until it is gone;
   // stepped in `ghomeSmoke` ----
   { const N = 40, pos = new Float32Array(N * 3), cv = document.createElement('canvas'); cv.width = cv.height = 64; const q = cv.getContext('2d'), gr = q.createRadialGradient(32, 32, 2, 32, 32, 31);
