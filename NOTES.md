@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## THE SHIP, PASS 2: IT RIDES THE SWELL; THE HOLD; CLIMBABLE SAILS; ROPE SWINGS (m@X4@, WORKER A)
+## THE SHIP, PASS 2: IT RIDES THE SWELL; THE HOLD; CLIMBABLE SAILS; ROPE SWINGS (m1374, WORKER A)
 
 - **The ship rides the swell, by holding the SHIP still and moving the WORLD.** `shipWave` is a JS twin of the sea shader's five waves (the
   same numbers, `SHIPZ.WV`). Each frame it is sampled at the bow, the stern, both sides and the middle, giving the pitch, roll and heave a
