@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1156 -- BATHHOUSE pass 2: shoji, a healing pool, buckets
+
+- SHOJI SCREENS across the four open bays of the front: paper on a dark lattice (a canvas texture, lit a little from inside). Each SLIDES
+  ASIDE as he comes within `BATH.shojiR` 2.6 m (a soft swish) and slides back when he leaves; closed, it blocks the bay (a `BDYN` box
+  toggled with `_off`, no grid rebuild). A blade or a shot through a closed one TEARS it (`bldHit`: paper scraps fly, the lattice stays,
+  the bay is open) until it is re-papered `shojiFix` 20 s later.
+- THE POOL HEALS: standing in the water inside the rim brings health back at `BATH.heal` 12/s.
+- Three wooden BUCKETS stacked by the last bay (shared `SMASH`, one hit).
+Pass 3 (polish) next. Shipped unverified.
+
 ## m1155 -- BATHHOUSE pass 1 (BUILDINGS.md #11, at (-30, 24))
 
 `BATH`, `bathBuild` / `bathStep` / `bathClear`. SPAWN > BUILDINGS > Bathhouse.
