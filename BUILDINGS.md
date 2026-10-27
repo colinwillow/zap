@@ -22,7 +22,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 - **The pass log** (tick here):
   - L1 pass 1 (m1356): the greybox system and his blueprint's path
   - L1 pass 2 (m1357): verticality
-  - L1 pass 3
+  - L1 pass 3 (m1358): wall runs (vertical, three-part horizontal over a pit), high bars
   - ...
 
 ## STEER (his, after walking X4, Oct 27 2026) -- OUTRANKS THE QUEUE BELOW
