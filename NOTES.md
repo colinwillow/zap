@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1093 -- the CROUCH (right hold while moving) and its LOW swing for legs; the ZOOM back on a hold (the left pad, any weapon); the one-legged samurai HOPS
+
+*"Holding down the right stick he winds up the big backflip -- instead he could be crouched, move around crouched, and a flick from the crouch
+is a low swing, so you could cut the dummy's legs off. That's no longer how you run really fast, but we have the charge... how do you
+initiate the speed run? If I got rid of it, put it back -- I'm not loving the charge tornado. And the samurai with one leg walks on a phantom
+leg -- what if he hopped?"*
+- **CROUCH** (`CROUCH`, TOOLS > RIGHT HOLD: CROUCH / SPRINT): the right pad held at rest WHILE the left stick moves him -> `p.crouchS`: the
+  cover duck's pose (`duckPose`, legs IK'd, spine curled) at `drop` .26 x his height over his walk, capped at 2.4 m/s. Held standing still it
+  is still the backflip's wind-up. A flick within .35 s of either is the LOW 360 (`katana_360l`, round him, `p.lowSwing`), and a low swing
+  takes a LEG (`limbPick`). SPRINT = m1026's held run and long jump, which the crouch replaces by default.
+- **The speed run was never removed** -- the ZOOM is unarmed + the right pad held UP from standing (m1085). Now ALSO the LEFT pad held in place,
+  with ANY weapon (`LHOLD`, TOOLS > LEFT HOLD: ZOOM / TORNADO), on its own clock (`p.lzHold`) -- m1091's tornado shared `p.lHold` with the
+  wall repair's hold and charged at double speed in the arena.
+- **The hop** (`limbHide`): one leg off, he plays his stance (not his walk) and BOUNCES on the remaining leg while he travels (`hopHz` 2.4,
+  `hopH` .28 m, a lean onto it, a footfall each landing), at `limp` .5 (was .35).
+- **Measured** (`crouch.cjs`, real loop, katana): held + moving -> crouchS 1, 7.2 -> 2.4 m/s, hips down .36 m, the duck at full; a flick from it
+  -> `katana_360l`, the dummy beside him lost `legR`; left pad held with the katana -> zoom charge 1.0, release 17 m/s; a one-legged dummy
+  chasing -> bounce top .28 m (moved .83 m in 2 s at the old .35, hence .5). Rendered: the crouch, sword out.
+- Shipped unverified on the phone.
+
 ## m1092 -- the top speed is the medium run's own clip, sped up (TOOLS > TOP SPEED)
 
 *"At medium speed his arms do a nice gait, hands near his hips. As soon as he goes faster his arms come up, elbows at a very tight angle...

@@ -526,7 +526,7 @@ means anything you can carry from one situation to the next.
 | inner wheel | **the WEAPONS, one segment each (m173)** | the blaster's CHARGE / AUTO / **DNA** (m112) |
 | outer wheel | **Clancy: ROAM / PACK**, or **REVERT** while disguised (m121) | — |
 | tap | **jump (m173)** — so a thumb holding the trigger can still jump | jump |
-| hold in place | **charge the TORNADO (m1091)** — release: two steerable spinning kicks | — |
+| hold in place | **charge the ZOOM (m1093; any weapon)** — release: launched (TOOLS > LEFT HOLD: TORNADO) | at rest: backflip wind-up; **while moving: CROUCH, flick = low swing (m1093)** |
 | flick | dodge roll, in the flicked direction | strike, in the flicked direction |
 | drag | — | orbit the camera |
 
