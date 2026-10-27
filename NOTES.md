@@ -5,6 +5,12 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1140 -- HOTFIX: m1139 was a BLANK PAGE
+
+A `//` comment inserted MID-LINE (the Market cable stake change) commented out the rest of that line, the file stopped parsing. The check
+said exit 1 and the push went anyway, because the check and the push were in separate commands -- from here the push is chained on the
+check's exit (`npm run check && git push`). Comment moved to the end of the line. (The same mistake as the cave's `ry`, once before.)
+
 ## m1139 -- SHRINE pass 1 (BUILDINGS.md #6, at (0, 25))
 
 `SHRINE`, `shrineBuild` / `shrineStep` / `shrineClear`. SPAWN > BUILDINGS > Shrine.
