@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The Courtyard pass 4 of 10: the pagoda placed, the ziplines, the maple (C1)
+
+- **The GREAT RED PAGODA** now stands in the court's NORTH-WEST corner. It is the SAME builder, taking options (`gpagBuild(opt)`):
+  - `at`, the place
+  - `court`, which skips its own fence, pavilion, gate and gate guards (the court has its own)
+  - `door: '+x'`, so its door faces the lane
+  - `zipTo`, so its spire's zipline lands in the POND
+
+  The court builds it, and clearing the court takes it away. A free-standing pagoda already up is cleared first, because it is one
+  instance. Its step reads its own centre (`G.at`).
+- **The WATCHTOWER's zipline** runs from the lookout's south opening over the whole court down to the south gate's walk: the fast exit.
+- **The CENTREPIECE.** A great RED MAPLE west of the pond, with a branch you can stand on at 4 m and a grapple ring above it.
+
+SHIPPED UNVERIFIED. Next: pass 5, the guards.
+
 ## Turret shots no longer die beyond 64 m in the forge (Worker B's finding)
 
 `turretStep` blew up every turret shot past `ARENA.r + 4` from the middle, and the forge sets `ARENA.r` to 60. So any sentry gun placed

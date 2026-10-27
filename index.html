@@ -23129,7 +23129,7 @@ function courtBuild() {
   // court's ALARM); a long ROPE BRIDGE, sagging, from the east hall's roof to the bell deck; a ladder from the bell deck down to the east
   // wall-walk. Now the court can be crossed without touching the ground: gate lintel, walk, hall ladder or roof, bridges, bell house, walk,
   // the watchtower's deck ----
-  const zaH = Z0 + W + 2.5, zmH = zaH + 8.5, bridgeDeck = (A0, B0, w, sag, n, rails) => { for (let i = 0; i < n; i++) { const u0 = i / n, u1 = (i + 1) / n, P = u => [lerp(A0[0], B0[0], u), lerp(A0[1], B0[1], u) - sag * 4 * u * (1 - u), lerp(A0[2], B0[2], u)];
+  const courtRings = [], zaH = Z0 + W + 2.5, zmH = zaH + 8.5, bridgeDeck = (A0, B0, w, sag, n, rails) => { for (let i = 0; i < n; i++) { const u0 = i / n, u1 = (i + 1) / n, P = u => [lerp(A0[0], B0[0], u), lerp(A0[1], B0[1], u) - sag * 4 * u * (1 - u), lerp(A0[2], B0[2], u)];
       const a = P(u0), b = P(u1), dx = b[0] - a[0], dz = b[2] - a[2], L = Math.hypot(dx, dz) || 1, nx = -dz / L * w, nz = dx / L * w;
       tris.push(a[0] - nx, a[1], a[2] - nz, b[0] - nx, b[1], b[2] - nz, b[0] + nx, b[1], b[2] + nz, a[0] - nx, a[1], a[2] - nz, b[0] + nx, b[1], b[2] + nz, a[0] + nx, a[1], a[2] + nz);
       const pl = new THREE.Mesh(new THREE.BoxGeometry(w * 2, .12, Math.hypot(L, b[1] - a[1]) * .92), timberL); pl.position.set((a[0] + b[0]) / 2, (a[1] + b[1]) / 2 - .06, (a[2] + b[2]) / 2); pl.rotation.y = Math.atan2(dx, dz); pl.rotateX(-Math.atan2(b[1] - a[1], L)); pl.castShadow = pl.receiveShadow = true; g.add(pl);
@@ -23155,12 +23155,24 @@ function courtBuild() {
     const L = kitClimbAdd({ minx: lx - .12, maxx: lx + .12, miny: H, maxy: BH, minz: lz - .4, maxz: lz + .4 }, 'court_bell_walk', BH); L.mark = { x: bhx + bh - 1, y: BH, z: lz }; climbs.push(L); }
   // the long rope bridge: the east hall's roof (its north end) up to the bell deck's south rail-gap
   bridgeDeck([cx + 9.5, 7.8, zaH + 17 + 2.2], [bhx, BH, bhz - bh - .4], 1.1, 1.1, 20, 1);
+  // ---- PASS 4 (m1307): the GREAT RED PAGODA in the court's north-west (the same builder, `opt.court`: no fence, pavilion or gate of its own,
+  // its door to the lane, its spire's zipline down to the POND); the watchtower's ZIPLINE out over the court to the south gate; the
+  // CENTREPIECE tree -- a great red maple west of the pond, a branch you can stand on at 4 m, a ring above it ----
+  const zips = [{ A: [cx + .6, YB + 2.2, tz - T0 - .2], B: [cx + 3.2, H + .9, Z0 + W + .3] }];
+  { const c = new THREE.Mesh(new THREE.TubeGeometry(new THREE.LineCurve3(new THREE.Vector3(...zips[0].A), new THREE.Vector3(...zips[0].B)), 16, .04, 5), timber); g.add(c); }
+  { const tx = cx - 21, tzz = cz + 4; const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.45, .75, 6, 9), M(0x4a3426, .9)); trunk.position.set(tx, 3, tzz); trunk.rotation.z = .08; trunk.castShadow = true; g.add(trunk);
+    box(tx - .5, tx + .5, 0, 5.6, tzz - .5, tzz + .5, timber, 1, { noCam: 1 });
+    const br = new THREE.Mesh(new THREE.CylinderGeometry(.22, .32, 4.4, 7), M(0x4a3426, .9)); br.position.set(tx + 1.8, 4.1, tzz); br.rotation.z = -1.25; g.add(br); box(tx + .4, tx + 4, 3.95, 4.2, tzz - .35, tzz + .35, timber, 1, { noCam: 1 });
+    const leafM = M(0xb8322a, .8), leafM2 = M(0xd8542e, .8); for (let i = 0; i < 14; i++) { const a = i * 2.3, r = 1.2 + (i % 4) * .8, l = new THREE.Mesh(new THREE.IcosahedronGeometry(1.3 + (i % 3) * .4, 0), i % 2 ? leafM : leafM2); l.position.set(tx + Math.cos(a) * r, 6.2 + (i % 5) * .5, tzz + Math.sin(a) * r); l.castShadow = true; g.add(l); }
+    courtRings.push(gringAdd(g, tx + 2.6, 7.6, tzz)); }
   // the inner gate under the tower
   const gates = [bgateMake(g, cx, Z1 - W / 2, 5.2, 3.1, true, O)];
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
   bldTris(O, tris);
   for (const b of O.boxes) if (!BOXES.includes(b)) BOXES.push(b); boxGrid();
-  COURT.on = { g, O, bars: [], rings: [], climbs, gates, bell: { g: bellG, sw: 0, cd: 0 }, t: 0 };
+  for (const Z of zips) ZIPS.push(Z);
+  COURT.on = { g, O, bars: [], rings: courtRings, climbs, gates, zips, bell: { g: bellG, sw: 0, cd: 0 }, t: 0 };
+  if (GPAG.on && !GPAG.on.court) gpagClear(); if (!GPAG.on) { gpagBuild({ at: [cx - 18, cz + 21], court: 1, door: '+x', zipTo: [cx - 12, 1.2, cz + 6] }); if (GPAG.on) bldXrayTag(GPAG.on.g); }
   bldXrayTag(g); arenaBeam(cx, Z0, [1, .7, .35], 1); snd('clang', { g: .7, r: .6 });
 }
 function courtStep(dt) { const C = COURT.on; if (!C) return; C.t += dt; for (const G of C.gates || []) bgateStep(G, dt, C.guards);
@@ -23168,7 +23180,7 @@ function courtStep(dt) { const C = COURT.on; if (!C) return; C.t += dt; for (con
 function courtHit(x, y, z, rad) { const C = COURT.on; if (!C) return 0;
   if (C.bell && C.bell.cd <= 0) { const P = C.bell.g.position; if (Math.hypot(x - P.x, z - P.z) < 1 + rad && y < P.y + rad && y > P.y - 1.9 - rad) { C.bell.cd = .5; C.bell.sw = Math.min(.5, C.bell.sw + .3); C.alarm = 30; for (const d of C.guards || []) if (d) d.aggro = 1; snd('clang', { g: 1.2, r: .45, x: P.x, z: P.z }); snd('boom', { g: .5, r: .35, x: P.x, z: P.z }); camShake(.15); return 1; } }     /* m1302: the court's alarm bell */
   for (const G of C.gates || []) if (bgateHit(G, x, y, z, rad)) return 1; return 0; }
-function courtClear() { const C = COURT.on; if (!C) return; for (const L of C.climbs) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && C.climbs.includes(player.climb)) climbOff(); bldClear(C); COURT.on = null; }
+function courtClear() { const C = COURT.on; if (!C) return; for (const Z of C.zips || []) { const i = ZIPS.indexOf(Z); if (i >= 0) ZIPS.splice(i, 1); if (player.zip && player.zip.Z === Z) player.zip = null; } if (GPAG.on && GPAG.on.court) gpagClear(); for (const L of C.climbs) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && C.climbs.includes(player.climb)) climbOff(); bldClear(C); COURT.on = null; }
 // m1262: THE GREAT RED PAGODA -- his 10-PASS EXPERIMENT (X1), after his reference `images/korajin/ref/red_pagoda_tower.webp`: a slender
 // five-storey tower in red lacquer, every storey wrapped in a railed BALCONY, every storey under a deep flared tile roof with gold fascia, the
 // roofs stepping in as it rises, a spire of gold rings on top. *"Much more visually interesting and much more functional"* -- so it is HOLLOW:
@@ -23176,8 +23188,8 @@ function courtClear() { const C = COURT.on; if (!C) return; for (const L of C.cl
 // balcony, and the ground storey's walls breakable. Pass 1 = the stack, the rooms, the ladders, the balconies, the roofs, the spire.
 const GPAG = { gateR: 4.5, gateHp: 3, gateFix: 45, bars: 0, lift: 1.0,     // m1293: bars 0 -- *"I keep getting caught on the high bars climbing the outside"*
   showT: 30, at: [90, 0], n: 5, hb0: 4.2, shrink: .5, sh: 3.8, balc: 2.2, eave: 2.7, t: .3, door: 1.6, doorH: 2.5, on: null };
-function gpagBuild() {
-  if (GPAG.on) return; const A = GPAG, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [];
+function gpagBuild(opt) {     // m1307: `opt.at` / `opt.court` -- the courtyard places it in its north-west corner, with no fence, pavilion or gate of its own
+  opt = opt || {}; if (GPAG.on) return; const A = GPAG, [cx, cz] = opt.at || A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [];
   const lac = new THREE.MeshStandardMaterial({ color: 0xb3261c, roughness: .42 }), lacD = new THREE.MeshStandardMaterial({ color: 0x7e1913, roughness: .5 }), floorM = new THREE.MeshStandardMaterial({ color: 0x4a3324, roughness: .8 });
   const gold = new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .85, roughness: .3 }), stone = new THREE.MeshStandardMaterial({ color: 0x9a948c, roughness: .95 }), plaster = new THREE.MeshStandardMaterial({ color: 0xece4d4, roughness: .9 });
   const lamp = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false });
@@ -23195,7 +23207,7 @@ function gpagBuild() {
   const mrod = (A0, B0, r, m) => { const a = new THREE.Vector3(...A0), b = new THREE.Vector3(...B0), d = b.clone().sub(a), L = d.length(); _q.setFromUnitVectors(_up, d.normalize());
     mg(new THREE.CylinderGeometry(r, r, L, 6), m, _m4.compose(a.add(b).multiplyScalar(.5), _q, new THREE.Vector3(1, 1, 1))); };
   const tileD = new THREE.MeshStandardMaterial({ color: 0x46524e, roughness: .6, metalness: .2 });
-  const sides = ['-x', '+x', '-z', '+z', '+x'];     // the door of each storey (ground: toward the forge's middle)
+  const sides = [opt.door || '-x', '+x', '-z', '+z', '+x'];     // the door of each storey (ground: toward the forge's middle)
   const corners = [[1, 1], [-1, 1], [-1, -1], [1, -1], [1, 1]];     // each storey's ladder corner (turning as it climbs)
   // the stone plinth and two steps
   box(cx - A.hb0 - 2.2, cx + A.hb0 + 2.2, 0, .12, cz - A.hb0 - 2.2, cz + A.hb0 + 2.2, stone, 0);
@@ -23292,6 +23304,7 @@ function gpagBuild() {
         for (const a of [0, 2.1, 4.2]) mbox(cx + .6 + Math.cos(a) * .25 - .03, cx + .6 + Math.cos(a) * .25 + .03, y0, y0 + 1.15, cz + Math.sin(a) * .25 - .03, cz + Math.sin(a) * .25 + .03, lacD);
         box(cx - 1, cx - .2, y0, y0 + .5, cz - .5, cz + .5, lacD, 1); mbox(cx - .95, cx - .25, y0 + .5, y0 + .52, cz - .45, cz + .45, paper);
         for (const [dx, dz] of [[-.6, .9], [.3, .9], [-.6, -.9]]) mbox(cx + dx - .3, cx + dx + .3, y0, y0 + .15, cz + dz - .3, cz + dz + .3, cush); } } }
+  if (!opt.court) {
   // ---- PASS 3 (m1267): the PAVILION at its foot (the reference's side hall: an open hall on a raised floor under its own deep hip roof --
   // and its roof is WALKABLE, triangles laid on the roof's own curve, so it is the first step up to the first balcony) and the red FENCE
   // round the court, gold flame finials on the gate posts and on every third post ----
@@ -23323,13 +23336,14 @@ function gpagBuild() {
     for (const sz of [-1, 1]) { const hg = new THREE.Group(); hg.position.set(fx0, 0, cz + sz * gw); g.add(hg); const dp = new THREE.Mesh(new THREE.BoxGeometry(.12, 2.7, gw - .05), lac); dp.position.set(0, 1.4, -sz * (gw / 2)); dp.castShadow = true; hg.add(dp);
       for (const yy of [.6, 1.4, 2.2]) { const st = new THREE.Mesh(new THREE.BoxGeometry(.16, .08, gw - .2), gold); st.position.set(0, yy, -sz * (gw / 2)); hg.add(st); } gate.doors.push({ g: hg, sz }); }
     O.boxes.push(gate.box); }
+  }
   // THE SPIRE (sorin): a gold mast with nine rings and a flame finial
   const sy = yOf(N) + 1.6; box(cx - .12, cx + .12, sy - .4, sy + 5.2, cz - .12, cz + .12, gold, 0);
   for (let i = 0; i < 9; i++) { const r = new THREE.Mesh(new THREE.TorusGeometry(.42 - i * .025, .06, 6, 18), gold); r.rotation.x = Math.PI / 2; r.position.set(cx, sy + .5 + i * .42, cz); g.add(r); }
   { const f = new THREE.Mesh(new THREE.ConeGeometry(.22, .8, 8), gold); f.position.set(cx, sy + 5.6, cz); g.add(f); }
   const rings = [gringAdd(g, cx + 1.2, sy + 3, cz)];
   // m1269: the ROPE FROM THE SPIRE -- a zipline off the spire's foot, over the court, down to the gate
-  const zip = { A: [cx - .6, sy + .2, cz], B: [cx - 11.5, 2, cz + 3.4] }; ZIPS.push(zip);
+  const zip = { A: [cx - .6, sy + .2, cz], B: opt.zipTo || [cx - 11.5, 2, cz + 3.4] }; ZIPS.push(zip);
   { const c = new THREE.Mesh(new THREE.TubeGeometry(new THREE.LineCurve3(new THREE.Vector3(...zip.A), new THREE.Vector3(...zip.B)), 10, .04, 5), gold); g.add(c); }
   // the GROUND SHRINE inside: an altar with a glowing Jin core
   box(cx + 1.6, cx + 3, 0, .9, cz - 1, cz + 1, lacD, 1); const core = new THREE.Mesh(new THREE.SphereGeometry(.3, 14, 10), new THREE.MeshBasicMaterial({ color: 0x5ff2ff, toneMapped: false })); core.position.set(cx + 2.3, 1.3, cz); g.add(core);
@@ -23365,7 +23379,7 @@ function gpagBuild() {
   // spire's beacon flares into a column of light, the birds burst up, and the court GATE swings open. It settles back after `showT` s ----
   let gong; { const k = N - 1, B = hbOf(k) + A.balc, y0 = yOf(k), gx = cx + B - .45, gz = cz + 1.7; for (const dz of [-.6, .6]) box(gx - .06, gx + .06, y0, y0 + 2.2, gz + dz - .06, gz + dz + .06, lacD, 0); box(gx - .06, gx + .06, y0 + 2.1, y0 + 2.25, gz - .7, gz + .7, lacD, 0);
     gong = new THREE.Mesh(new THREE.CylinderGeometry(.5, .5, .06, 24), new THREE.MeshStandardMaterial({ color: 0xc08a40, metalness: .9, roughness: .3 })); gong.rotation.z = Math.PI / 2; gong.position.set(gx, y0 + 1.4, gz); gong.castShadow = true; g.add(gong); }
-  GPAG.on = { g, O, bars, rings, climbs, core, zip, bell, t: 0, arch: [], guards: [], tur: null, lamp, paperLit, halos, beacon, streamers, chimes, birds, gate, gong, show: -1, gsw: 0 };
+  GPAG.on = { at: [cx, cz], court: !!opt.court, g, O, bars, rings, climbs, core, zip, bell, t: 0, arch: [], guards: [], tur: null, lamp, paperLit, halos, beacon, streamers, chimes, birds, gate, gong, show: -1, gsw: 0 };
   // ---- PASS 6 (m1271): THE GUARDIANS -- all killable. ARCHERS posted in balcony corners on storeys 2 and 4 (they hold their posts and loose
   // at him), a SENTRY GUN on storey 3's balcony corner looking out over the court, and two robot SAMURAI at the gate who stand their post
   // until they see him. Strike the BELL and the alarm goes up: the gate pair come for him wherever he is ----
@@ -23373,7 +23387,7 @@ function gpagBuild() {
     for (const [k, sx, sz] of [[2, -1, 1], [4, 1, -1]]) { const [x, y, z] = cor(k, sx, sz); archerPost(x, y, z).then(d => { if (GPAG.on === G0) G0.arch.push(d); else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {}); }
     { const [x, y, z] = cor(3, 1, 1); G0.tur = turretAt(x, y, z, Math.PI / 4); }
     (async () => { try { const K0 = await arenaLoad('SAMURAI'), AK = ARENA.kinds.SAMURAI, K = HORDE.KS || (HORDE.KS = Object.assign(Object.create(K0), { notice: HORDE.notice, lose: 90, limbs: 1 }));
-      for (const sz of [-1, 1]) { if (GPAG.on !== G0) return; const x = cx - 10.6, z = cz + sz * 2.6, d = bodySpawn(K.P, K, x, z, 0); arenaKatana(d, AK); d.horde = 1; d.aggro = 0; d.hp = d.hpMax = 40; d.gap = 1; d.h = -Math.PI / 2;
+      for (const sz of [-1, 1]) { if (GPAG.on !== G0 || opt.court) return; const x = cx - 10.6, z = cz + sz * 2.6, d = bodySpawn(K.P, K, x, z, 0); arenaKatana(d, AK); d.horde = 1; d.aggro = 0; d.hp = d.hpMax = 40; d.gap = 1; d.h = -Math.PI / 2;
         HORDE.list.push(d); G0.guards.push(d); } } catch (e) { console.error('[melee] pagoda guards', e); } })(); }
   for (const [m, list] of MG) { const geo = mergeGeometries(list); const o = new THREE.Mesh(geo, m); o.castShadow = true; o.receiveShadow = true; g.add(o); } flushed = 1;     // the buckets, one draw each (pass 10: at the very end, every box in them)
   arenaBeam(cx, cz, [1, .45, .3], 1); snd('clang', { g: .7, r: .6 });
@@ -23390,14 +23404,14 @@ function gpagStep(dt) { const G = GPAG.on; if (!G) return; G.t += dt; G.core.pos
   if (G.gong) { G.gsw *= Math.exp(-1.5 * dt); G.gong.rotation.x = Math.sin(G.t * 5) * G.gsw; }
   if (G.show >= 0) { const S = G.show += dt, per = .55, N = GPAG.n, col = G.halos.geometry.attributes.color;
     for (let k = 0; k < N; k++) { const on = S > k * per ? Math.max(0, 1 - (S - k * per - 2) * .15) : 0, v = 1 + 2.5 * on; for (let c = 0; c < 4; c++) col.setXYZ(k * 4 + c, v, v * .9, v * .7);
-      if (S - dt <= k * per && S > k * per) { const [cx, cz] = GPAG.at, y = (k + 1) * GPAG.sh - 1.4, EX = GPAG.hb0 - GPAG.shrink * k + GPAG.eave; for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) spkBurst(cx + sx * EX, y, cz + sz * EX, 14, { col: [1, .75, .3], spread: 4, size: .14, life: .7 }); snd('clang', { g: .5, r: 1.6 - k * .15, x: cx, z: cz }); } }
+      if (S - dt <= k * per && S > k * per) { const [cx, cz] = G.at, y = (k + 1) * GPAG.sh - 1.4, EX = GPAG.hb0 - GPAG.shrink * k + GPAG.eave; for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) spkBurst(cx + sx * EX, y, cz + sz * EX, 14, { col: [1, .75, .3], spread: 4, size: .14, life: .7 }); snd('clang', { g: .5, r: 1.6 - k * .15, x: cx, z: cz }); } }
     col.needsUpdate = true; const fl = S > N * per ? Math.max(0, 1 - (S - N * per) * .12) : 0; G.paperLit.emissiveIntensity = .5 + 1.6 * Math.min(1, S / (N * per)) * Math.max(0, 1 - (S - N * per - 4) * .2);
-    if (S - dt <= N * per && S > N * per) { const [cx, cz] = GPAG.at; arenaBeam(cx, cz, [1, .7, .3], 2); camShake(.3); snd('boom', { g: 1, r: .5, x: cx, z: cz }); for (const B of G.birds) if (B.st === 'perch') { B.st = 'fly'; B.t = 0; } }
+    if (S - dt <= N * per && S > N * per) { const [cx, cz] = G.at; arenaBeam(cx, cz, [1, .7, .3], 2); camShake(.3); snd('boom', { g: 1, r: .5, x: cx, z: cz }); for (const B of G.birds) if (B.st === 'perch') { B.st = 'fly'; B.t = 0; } }
     G.beacon.userData.halo.material.opacity = 1; G.beacon.userData.halo.scale.setScalar(4 + 14 * fl);
     if (S > GPAG.showT) { G.show = -1; for (let i = 0; i < col.count; i++) col.setXYZ(i, 1, 1, 1); col.needsUpdate = true; } }
   if (G.lamp) { const f = .85 + Math.sin(G.t * 7.3) * .08 + Math.sin(G.t * 17.1) * .05; G.lamp.emissiveIntensity = 2 * f; G.halos.material.size = 1.6 * f; if (G.show < 0) G.paperLit.emissiveIntensity = .5 + Math.sin(G.t * 1.3) * .05;     // m1272
     const b = 1 + Math.sin(G.t * 1.1) * .2; if (G.show < 0) G.beacon.userData.halo.scale.setScalar(4 * b); G.beacon.scale.setScalar(.9 + Math.sin(G.t * 9) * .08); }
-  if (G.streamers) { const p = player, [cx, cz] = GPAG.at, top = GPAG.n * GPAG.sh;
+  if (G.streamers) { const p = player, [cx, cz] = G.at, top = GPAG.n * GPAG.sh;
     for (let i = 0; i < G.streamers.length; i++) { const S = G.streamers[i]; S.rotation.x = Math.sin(G.t * 1.7 + i) * .25; S.rotation.z = Math.sin(G.t * 1.3 + i * 1.7) * .18; }
     for (const C of G.chimes) { C.cd = Math.max(0, C.cd - dt); const P = C.g.position; if (C.cd <= 0 && Math.hypot(p.pos.x - P.x, p.pos.y - P.y, p.pos.z - P.z) < 2.2) { C.cd = 1.2; C.sw = .4; snd('clang', { g: .25, r: 2.4 + Math.random() * .4, x: P.x, z: P.z }); }
       C.sw *= Math.exp(-1.2 * dt); C.g.rotation.z = Math.sin(G.t * 6) * C.sw + Math.sin(G.t * 1.1) * .05; }
@@ -23455,7 +23469,7 @@ const BLDG = { list: [
   { key: 'fest', t: 'Lantern Festival Street', sub: 'a street of festival stalls (roofs to stand on, breakable backs) under strings of paper lanterns, red gates at both ends, bars across, a robot dragon dance to cut apart (strike the taiko to make it wild)', pass: 3, build: () => festBuild(), clear: () => festClear(), on: () => !!FEST.on, step: dt => festStep(dt) },
   { key: 'heron', t: 'White Heron Castle', sub: 'a Himeji-style castle on a battered stone base: a five-storey white keep under layered grey roofs (every roof walkable, a hall on every storey, steep stairs up, the great pillars, a lookout balcony at the top), a gallery wing of two corridors to a hollow corner tower (a loop: keep up, across, tower down, back), its roof a path; a ballista on the gallery ridge, archers in the doorways and the lookout, a sentry gate held by two samurai; the approach: a walled ramp that doubles back to a drawbridge over a dry moat and a gate on the stone; black pines, stone and paper lanterns, war flags and three white herons wheeling round the keep; a stair up the stone, a storehouse at the foot whose walls break', pass: 10, build: () => heronBuild(), clear: () => heronClear(), on: () => !!HERON.on, step: dt => heronStep(dt) },
   { key: 'gpag', t: 'Great Red Pagoda', sub: 'five storeys of red lacquer: a room on every floor, ladders up through the hatches, a balcony round every storey, a spire; a pavilion whose roof you can climb; a red fence; climb the outside eave to eave, bars, a zipline off the spire; an armoury, a library, a bell room (the alarm), a lookout; archers, a sentry gun, gate guards; glowing windows, lantern halos, a beacon on the spire; streamers, chimes, birds; strike the gong at the top and the tower lights up and the gate opens', pass: 10, build: () => gpagBuild(), clear: () => gpagClear(), on: () => !!GPAG.on, step: dt => gpagStep(dt) },
-  { key: 'court', t: 'The Courtyard', sub: 'a walled court far north (0, 150): a wall-walk all round, the south gate, a stone lane between two timber halls with balconies and walkable roofs, a koi pond and a moon bridge; the two-roofed watchtower over the inner gate; the high road: a lane bridge, a rope bridge, the bell house', pass: 3, build: () => courtBuild(), clear: () => courtClear(), on: () => !!COURT.on, step: dt => courtStep(dt) },
+  { key: 'court', t: 'The Courtyard', sub: 'a walled court far north (0, 150): a wall-walk all round, the south gate, a stone lane between two timber halls with balconies and walkable roofs, a koi pond and a moon bridge; the two-roofed watchtower over the inner gate; the high road: a lane bridge, a rope bridge, the bell house; the Great Red Pagoda in its corner, ziplines, the maple', pass: 4, build: () => courtBuild(), clear: () => courtClear(), on: () => !!COURT.on, step: dt => courtStep(dt) },
   { key: 'zramp', t: 'Zoom Ramp Tower', sub: 'zoom from the red gate (full hold), up the ramp and straight up the face -- only a full zoom reaches the gold lip; your mark shows how close; or zigzag up the chimney', pass: 3, build: () => zrampBuild(), clear: () => zrampClear(), on: () => !!ZRAMP.on, step: dt => zrampStep(dt) },
   { key: 'swrk', t: 'Sky Wreck', sub: 'a flying junk come down on rock spires: a tilted deck up a fallen mast, a hold of cargo behind breakable planks, a crow\'s nest up two bars', pass: 1, build: () => swrkBuild(), clear: () => swrkClear(), on: () => !!SWRK.on, step: dt => swrkStep(dt) },
   { key: 'opag', t: 'Octagonal Block Pagoda', sub: 'seven eight-sided storeys of blocks: stepped slab eaves you can walk and climb eave to eave, cream panels that break block by block, a ladder up through every floor, a door onto every roof, a red fence, a stepped spire; lattice windows, bracket clusters under every eave, tile ribs, a balustrade round every roof walk, gold corner caps; every block breaks -- posts, bands, eave courses -- and flies back in; walks 2.2 m wide, rooms 6 m; a bar off every roof walk, a chain up a corner of every storey, a zipline off the top walk; a block stair up from the shrine hall, then an armoury, a scroll room, a tea room, a garden, a dragon shrine and a bell room at the top; two stone lions wake at the gate and hunt you round the court, archers on the walks, a sentry gun, a monk in the shrine -- all killable; a lantern under every corner, the windows lit, a beacon on the spire; wind bells that ring as you pass, banners on the fence, birds off the walks, the spire collars turning; ring the bell at the top and the tower answers -- lanterns run up it, a column of light, the lions bow, the altar opens on a reliquary', pass: 10, build: () => opagBuild(), clear: () => opagClear(), on: () => !!OPAG.on, step: dt => opagStep(dt) },
