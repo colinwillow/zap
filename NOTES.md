@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1237 -- Jin Observatory pass 2: the dome hunts (Building Forge loop)
+
+**THE DOME HUNTS** (his spec: "the dome turns to track whoever is in the open").
+- **In the open.** While he is in the open (no solid box over his head, checked four times a second) within `seeR` 55 m, the
+  copper dome turns at 1.3 rad/s to bring its telescope onto him, and a red SIGHTING BEAM reaches from the lens to him.
+- **Marked.** Held on him for `lockT` 1.6 s, it MARKS him: a pulsing red ring blooms where he is heading.
+- **The volley.** About half a second later a volley of `volN` 7 Jin arrows falls on the ring from the sky. They are ordinary
+  arrows, so they can be parried.
+- **Rest.** It rests `cool` 6 s between volleys.
+- **Hiding.** Under a roof, a deck or a bridge it loses him.
+
+**Blind it.** Strike the telescope's glowing lens (`obsHit` in `bldHit`): from the balcony, or with an arrow or a parried shot.
+It is then blind for `blindT` 20 s.
+
+Next: alternate -- an extra pass (6) on the Market.
+
 ## m1236 -- Pagoda pass 6: the spire's chain lightning (Building Forge loop, extra pass)
 
 Strike the Jin CORE floating over the ground-floor altar (`pagodaChain` in `bldHit`) and the spire answers:
