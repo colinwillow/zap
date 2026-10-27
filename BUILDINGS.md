@@ -5,6 +5,20 @@ Every time you complete the third pass on a building, add it to the inventory I 
 run on it, swing on it, blow it up and repair it. Make various TYPES of buildings that are modular and will eventually fit together, with
 different functions: bars and ramps, interior and exterior, turrets, ballistae, beams -- floating flying ship buildings, zeppelins, towers."*
 
+## GRUMBO'S HOME, PROCEDURAL (his, after m1376) -- its own track, many passes
+
+> *"These are the images I used to make the Tripo model of his home, but building it procedurally is going to be better, so we can go inside and add
+> stuff and it's all in the same game style. Dedicate one of the context windows to it; a ton of passes to make it really cool, as true to the design
+> as we can be."*
+
+- **References:** `images/korajin/ref/grumbo_home_1..4.jpg` (four views).
+  - **The shape:** a cluster of rounded cream sandstone domes and towers with purple spots and round windows, on a boulder mound with cacti and succulents.
+  - **On top:** a red-and-cream tent cone on a timber frame with brass ship's wheels; a bronze stack/chimney on either side; a balcony tower with a red canopy (one side); a timber crane with a hanging brass orb and red tassel (the other side).
+  - **Round the base:** timber scaffold frames with red chevron/diamond banners and torn awnings; lantern-lit market stalls of pots and crates; wooden steps up to an open shop front and a round door; a ladder; a ramp.
+- **Where:** it replaces the GLB hut in THE RED HOLLOWS (`HOME.hut`, `models/buildings/korajin_bld_01.glb`, at [0, -7]), with a switch to compare against the GLB.
+- **Passes:** the massing and walkable shell first, with an INSIDE (a room with the shop front and his quarters, stairs up to the balcony); then the timber frame, awnings and banners; then the crane, tent, wheels and stacks; then the dressing (pots, lanterns, cacti); then the look (materials, and textures when the texture maps exist).
+- **Textures:** OpenAI image generation is reachable (the key is the environment's), but the account is OUT OF CREDITS (`credit_balance_exhausted`, m1376). When he tops it up: tileable wood, sandstone, stone, marble, metal and red cloth.
+
 ## THE SHIP (his, after m1372) -- its own track, alongside the blueprint work
 
 > *"A classic retro pirate, samurai, alien water vessel just floating in an ocean scene... the island could just be there... interior, exterior,
