@@ -50,6 +50,24 @@ SHIPPED UNVERIFIED. Next: pass 10, the polish.
 - The rock hoppers' zone now reaches the palisade.
 
 SHIPPED UNVERIFIED. Next: pass 9, the set piece (fire the watch house and the lattice burns tier by tier, or hold it).
+## THE FORGE'S LAYOUT SPREAD x1.5 (STEER S2, m-SPR)
+
+His answer to *"growing each old building 1.5× in place makes them overlap -- how to make room?"*: **spread the layout.**
+
+- **Every older row's centre is ×1.5 from the forge's origin, so the gaps grow with the buildings.** One build each still scales the building itself (S2). The gaps are wider than they need to be until each one catches up.
+  - hall (0, -11.25), watchtower (-24, -12), gatehouse (24, -12), pagoda (-24, 18), market (24, 18), shrine (0, 37.5)
+  - rampart (0, -36), airship dock (-45, 0), flying ship house (0, -60), bathhouse (-45, 36), forge-workshop (46.5, 37.5), spider hangar (-48, -36)
+  - cliff lodge (0, 70.5), moated keep (69, 0), barracks (45, -63), lighthouse (-69, 45), ninja pillars (40.5, 69), siege yard (-70.5, -55.5)
+  - teahouse (-70.5, 12), colossus (75, -39), observatory (108, -27), festival street (108, 45), sky wreck (45, -108)
+  - the senbon torii now runs x -24.75 to -57.75 at z 69
+  - the zeppelins' circuits spread with it: centres, radii, heights
+- **Moved further, because the spread would have run them into the new big ones:**
+  - Oni Gate to (-110, -25), clear of the White Heron Castle's z 5..83
+  - Floating Islands to (115..130, 80..110), clear of the Octagonal Pagoda at (70, 72); the gaps between islands are ×1.5 too
+  - Mega Wall to (-100, -95), clear of the siege yard
+  - Great Red Pagoda to (155, -5), clear of the observatory
+- **Sky bridges and ziplines between buildings are ANCHORED now.** Each end is written at its building's old spot and size (`SKAT0`), and `skAt` places it where that building stands now (`at`) at the size it is built (`scale`, 1 until rescaled). The spans follow each building as S2 reaches it. The lighthouse zip's street end just spreads.
+- **Not touched:** OPOLT / ORELAY / FTRUCK / ISUIT / HOME belong to other worlds, not the forge.
 
 ## m1337 -- Timber Siege Fort pass 7 of 10: the timber gives way (X3, WORKER A)
 

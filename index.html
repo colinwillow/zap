@@ -18852,7 +18852,7 @@ function cwallBuild(g, tex, x, z, L, D, yaw, H, O) {
 // over), timber posts at the corners and the door, a low stone plinth to stand it on, a hipped roof with CONCAVE slopes and UPTURNED
 // corners (one surface: a height over the eave rectangle -- steep at the ridge, flattening to the eave, lifted at the corners), a ridge cap
 // with end horns, two paper lanterns at the door, and two high bars under the front eave. SPAWN > HALL puts it up / takes it away.
-const HALL = { scale: 1.5, at: [0, -7.5], W: 10, D: 7, H: 3.1, door: 2.6, thick: .5, eave: 1.5, ridgeY: 6.6, eaveY: 3.55, lift: .7, sparHp: 3, sparV: 1.8, sparWind: .6, sparDmg: 9, on: null };
+const HALL = { scale: 1.5, at: [0, -11.25], W: 10, D: 7, H: 3.1, door: 2.6, thick: .5, eave: 1.5, ridgeY: 6.6, eaveY: 3.55, lift: .7, sparHp: 3, sparV: 1.8, sparWind: .6, sparDmg: 9, on: null };
 function hallTex() {
   if (HALL.tex) return HALL.tex;
   const cv = document.createElement('canvas'); cv.width = 256; cv.height = 128; const c = cv.getContext('2d');
@@ -19080,7 +19080,7 @@ function bldDrone(g) {
 // lifted). A plank RAMP wraps the OUTSIDE, one side at a time, 1.6 m up each side, a landing at each corner: two sides to the first deck,
 // four to the second, six to the lookout (walkable surfaces, `bldTris`). A drone orb circles the cap; cables run from the eaves down to
 // stakes in the ground, lamps hung on them; lanterns at the deck corners.
-const WTOWER = { at: [-16, -8], hs: 3, storey: 4, ro: 3.95, rw: .65, beaconT: 40, on: null };     // m1121: bigger (his: *"large scale, everything is big"*)
+const WTOWER = { at: [-24, -12], hs: 3, storey: 4, ro: 3.95, rw: .65, beaconT: 40, on: null };     // m1121: bigger (his: *"large scale, everything is big"*)
 function wtowerBuild() {
   if (WTOWER.on) return; const A = WTOWER, [cx, cz] = A.at, hs = A.hs, S = A.storey, g = new THREE.Group(); scene.add(g);
   const O = { meshes: [], boxes: [], walls: [] }, T = hallTex();
@@ -19254,7 +19254,7 @@ function wtowerClear() { const W = WTOWER.on; if (!W) return; bldClear(W); turre
 // (cwallBuild) with doors onto the passage, a DECK across the top of both at 7.2 m you can walk the length of, a switchback ramp up the
 // back, a giant vermilion TORII over the front of the passage (pillars to 11 m, the black kasagi with upturned ends), a high bar on the
 // deck, cables and a drone. Pass 2: the ballista on the deck, the drawbridge, banners. Pass 3: polish.
-const GHOUSE = { at: [16, -8], portUp: 10, pw: 5, th: 2.6, s1: 3.6, s2: 7.2, on: null, balR: 34, balHp: 6, balFix: 20, balWind: 1.1, balCool: 4.2, balV: 30, manR: 1.5, oilT: 2.5, oilCd: 20, oilDmg: 10, dbDown: 9, dbUp: 6, dbMove: 2.6 };
+const GHOUSE = { at: [24, -12], portUp: 10, pw: 5, th: 2.6, s1: 3.6, s2: 7.2, on: null, balR: 34, balHp: 6, balFix: 20, balWind: 1.1, balCool: 4.2, balV: 30, manR: 1.5, oilT: 2.5, oilCd: 20, oilDmg: 10, dbDown: 9, dbUp: 6, dbMove: 2.6 };
 function ghouseBuild() {
   if (GHOUSE.on) return; const A = GHOUSE, [cx, cz] = A.at, th = A.th, pw = A.pw, S1 = A.s1, S2 = A.s2, g = new THREE.Group(); scene.add(g);
   const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [];
@@ -19489,7 +19489,7 @@ function ghouseClear() { const G = GHOUSE.on; if (!G) return; { const i = BDYN.i
 // SPIRAL RAMP up the inside round a central pillar (shinbashira) -- 20 flights of .9 m, corner landings -- arriving at an open BELFRY at
 // 18 m under a pagoda cap with a bronze spire (sorin) to 30 m, and a great bronze BELL hanging in it. Ground storey breakable, a door on +z.
 // The belfry floor is laid only over the lane the last two flights do NOT run under (headroom). Grapple rings on storeys 2 and 4.
-const PAGODA = { chainR: 30, chainHop: 9, chainN: 5, chainDmg: 10, chainCd: 18, at: [-16, 12], tollR: 14, tollT: 1.1, S: 5, h: 3.6, hs0: 4.5, dhs: .45, ro: 1.7, rw: .5, on: null };
+const PAGODA = { chainR: 30, chainHop: 9, chainN: 5, chainDmg: 10, chainCd: 18, at: [-24, 18], tollR: 14, tollT: 1.1, S: 5, h: 3.6, hs0: 4.5, dhs: .45, ro: 1.7, rw: .5, on: null };
 function pagodaBuild() {
   if (PAGODA.on) return; const A = PAGODA, [cx, cz] = A.at, S = A.S, Hh = A.h, top = S * Hh, g = new THREE.Group(); scene.add(g);
   const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [];
@@ -19636,7 +19636,7 @@ function pagodaClear() { const P = PAGODA.on; if (!P) return; for (const d of P.
 // courtyard (-z): a breakable back wall and partitions (cwallBuild), counters with goods, striped AWNINGS on two stalls and a HIGH BAR hung in
 // the front frame of the other two (no posts: m1122's `y`), a flat ROOF you can walk the length of (a bar on it too), a ramp up the back,
 // and CRATES out front that SMASH (any hit through `bldHit`: chips fly, the box goes) and are back `crateFix` s later.
-const MKT = { fwCd: 25, fwR: 26, fwDmg: 6, at: [16, 12], n: 4, w: 4.5, D: 4, H: 3.6, crateHp: 2, crateFix: 15, thiefEvery: 30, thiefV: 6.5, thiefDmg: 5, pouchHeal: 35, on: null };
+const MKT = { fwCd: 25, fwR: 26, fwDmg: 6, at: [24, 18], n: 4, w: 4.5, D: 4, H: 3.6, crateHp: 2, crateFix: 15, thiefEvery: 30, thiefV: 6.5, thiefDmg: 5, pouchHeal: 35, on: null };
 function mktBuild() {
   if (MKT.on) return; const A = MKT, [cx, cz] = A.at, W = A.n * A.w, x0 = cx - W / 2, zf = cz - A.D / 2, zb = cz + A.D / 2, H = A.H, g = new THREE.Group(); scene.add(g);
   const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [], bars = [];
@@ -19828,7 +19828,7 @@ function smashStep(dt) { const p = player;
 // .32 m steps on the courtyard side, a vermilion TORII at their foot, STONE LANTERNS (toro) at the top and bottom, a HONDEN (the sanctuary)
 // at the back with a door and a curved roof, and in the middle of the terrace the JIN CORE: a great glowing crystal floating over a stone
 // basin, turning and breathing, with stones orbiting it. Grapple rings at the honden's eaves.
-const SHRINE = { kujiCd: 20, at: [0, 25], heal: 30, W: 14, D: 12, H: 3.2, steps: 10, on: null };
+const SHRINE = { kujiCd: 20, at: [0, 37.5], heal: 30, W: 14, D: 12, H: 3.2, steps: 10, on: null };
 function shrineBuild() {
   if (SHRINE.on) return; const A = SHRINE, [cx, cz] = A.at, H = A.H, hw = A.W / 2, hd = A.D / 2, g = new THREE.Group(); scene.add(g);
   const O = { meshes: [], boxes: [], walls: [] };
@@ -19980,7 +19980,7 @@ function shrineClear() { const S = SHRINE.on; if (!S) return; smashDrop(S.smash)
 // of MERLONS (crenels) on the outer side; a GATEWAY in the middle closed by a breakable timber-and-plaster panel (smash through) under a
 // lintel the walkway runs over; a RAMP up the inner face at each half; and at each end a BASTION 1.5 m higher (steps up from the
 // walkway) with a SENTRY TURRET on top (killable, m1128).
-const RAMP = { raidN: 3, raidCd: 40, at: [0, -24], L: 40, H: 4.2, T: 3, gate: 6, bast: 5, bH: 5.7, slope: .32, senHp: 3, senV: 1.3, senWind: .6, senDmg: 9, senBack: 20, on: null };     // H 4.2: the ramp (slope .32) must land before the bastion steps
+const RAMP = { raidN: 3, raidCd: 40, at: [0, -36], L: 40, H: 4.2, T: 3, gate: 6, bast: 5, bH: 5.7, slope: .32, senHp: 3, senV: 1.3, senWind: .6, senDmg: 9, senBack: 20, on: null };     // H 4.2: the ramp (slope .32) must land before the bastion steps
 function rampBuild() {
   if (RAMP.on) return; const A = RAMP, [cx, cz] = A.at, H = A.H, hl = A.L / 2, ht = A.T / 2, g2 = A.gate / 2, g = new THREE.Group(); scene.add(g);
   const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [];
@@ -20107,7 +20107,7 @@ function rampClear() { const R = RAMP.on; if (!R) return; for (const T of R.turs
 // shaft above banded in timber, a railed TOP DECK (10 x 10 m), and a LIFT -- an open bronze cage on the courtyard face (+x) that rides
 // ground -> deck -> ground on a cycle; stand on it and it carries you (a moving box: the resolver lifts his feet). From the deck a LANDING
 // ARM runs 14 m out (+z) to a DOCKED AIRSHIP: a gondola deck level with the arm (walk onto it), a cabin, and the great balloon overhead.
-const ADOCK = { at: [-30, 0], hs: 2.6, H: 20, deck: 5, kite: { sink: 2.2, v: 7 }, arm: 14, lift: { wait: 3.5, v: 2.6 }, fly: { wait: 14, T: 70, rx: 22, rz: 26, up: 8 }, sky: { hp: 6, r: 11, w: .35, at: .25, cd: 40 }, on: null };
+const ADOCK = { at: [-45, 0], hs: 2.6, H: 20, deck: 5, kite: { sink: 2.2, v: 7 }, arm: 14, lift: { wait: 3.5, v: 2.6 }, fly: { wait: 14, T: 70, rx: 22, rz: 26, up: 8 }, sky: { hp: 6, r: 11, w: .35, at: .25, cd: 40 }, on: null };
 function adockBuild() {
   if (ADOCK.on) return; const A = ADOCK, [cx, cz] = A.at, hs = A.hs, H = A.H, g = new THREE.Group(); scene.add(g);
   const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [];
@@ -20281,8 +20281,8 @@ function adockClear() { const D = ADOCK.on; if (!D) return; if (D.kite) D.kite.r
 // round the Pagoda and passes 3-4 m off the Watchtower's lookout a metre below it (a running jump across); the second loops the east side
 // over the Gatehouse and the Market.
 const ZEP = { trap: 4.2, dropEvery: 22, hp: 10, downT: 30, bomb: { cd: 4, r: 4.5, dmg: 6, g: 14 }, list: [
-  { c: [-16, 15], rx: 26, rz: 14, y: 11, T: 110, ph: 0 },
-  { c: [24, -4], rx: 10, rz: 18, y: 14, T: 90, ph: .5 } ], on: null };
+  { c: [-24, 22.5], rx: 39, rz: 21, y: 16.5, T: 140, ph: 0 },     /* m1337: the forge's layout spread x1.5 (STEER S2) -- the circuits with it */
+  { c: [36, -6], rx: 15, rz: 27, y: 21, T: 115, ph: .5 } ], on: null };
 function zepMake(g) {
   const ship = new THREE.Group(); g.add(ship);
   const plank = new THREE.MeshStandardMaterial({ color: 0x6e4a2e, roughness: .85 }), wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 }), lq = new THREE.MeshStandardMaterial({ color: 0xa8231e, roughness: .4 });
@@ -20399,7 +20399,7 @@ function zepClear() { const Q = ZEP.on; if (!Q) return; smashDrop(Q.landed); for
 // m1152: THE FLYING SHIP HOUSE (BUILDINGS.md #10, pass 1) at (0, -40), floating. A junk-ship hull 21 m long hanging 3 m off the ground on three
 // glowing Jin engines, its deck at 6 m, a two-masted junk rig with battened sails, a DECKHOUSE at the stern (a door on its bow side, a curved
 // roof), and a long GANGPLANK up the starboard side from the ground. The hull bobs gently (picture only; the deck you stand on holds still).
-const FSHIP = { at: [0, -40], canR: 28, canEvery: 4.5, canHp: 4, canFix: 20, deck: 6, len: 9.2, hw: 3.2, on: null };
+const FSHIP = { at: [0, -60], canR: 28, canEvery: 4.5, canHp: 4, canFix: 20, deck: 6, len: 9.2, hw: 3.2, on: null };
 function fshipBuild() {
   if (FSHIP.on) return; const A = FSHIP, [cx, cz] = A.at, Y = A.deck, L = A.len, W = A.hw, g = new THREE.Group(), vis = new THREE.Group(); scene.add(g); g.add(vis);
   const O = { meshes: [], boxes: [], walls: [] }, tris = [];
@@ -20532,7 +20532,7 @@ function fshipClear() { const F = FSHIP.on; if (!F) return; for (const L of F.cl
 // m1155: THE BATHHOUSE (BUILDINGS.md #11, pass 1) at (-30, 24). A low timber-and-plaster bathhouse, 12 x 10 m: breakable walls on three
 // sides (cwallBuild), the courtyard side (+x) open between posts onto a raised ENGAWA (veranda), a curved roof, and inside a big steaming
 // POOL in a low stone rim (step over it, wade in), a cold plunge tub, benches; a tall stone CHIMNEY smoking at the back corner.
-const BATH = { at: [-30, 24], hw: 6, hd: 5, H: 3.4, shojiR: 2.6, shojiFix: 20, heal: 12, geyH: 7.5, on: null };
+const BATH = { at: [-45, 36], hw: 6, hd: 5, H: 3.4, shojiR: 2.6, shojiFix: 20, heal: 12, geyH: 7.5, on: null };
 function bathBuild() {
   if (BATH.on) return; const A = BATH, [cx, cz] = A.at, hw = A.hw, hd = A.hd, H = A.H, g = new THREE.Group(); scene.add(g);
   const O = { meshes: [], boxes: [], walls: [] }, T = hallTex();
@@ -20637,7 +20637,7 @@ function bathClear() { const B = BATH.on; if (!B) return; for (const S of B.shoj
 // and side walls (cwallBuild), a high curved roof; inside a great bronze FURNACE with a glowing mouth, its flue up through the roof (sparks
 // and smoke), an anvil and a quench trough, two GEARS turning on the back wall; and outside a slewing JIB CRANE whose hook carries a HIGH
 // BAR round in a slow circle (m1150's riding bar): jump for it as it comes past.
-const FWORK = { at: [31, 25], hammer: { lift: 1.3, drop: .14, rest: .5, up: .55, dmg: 18 }, hw: 6, hd: 5, H: 4.6, crane: { at: [-8.5, 6.5], h: 7.5, arm: 6, top: 4, w: .18 }, jet: { t: 1.6, len: 6, v: 9, dmg: 8, cool: 4 }, on: null };
+const FWORK = { at: [46.5, 37.5], hammer: { lift: 1.3, drop: .14, rest: .5, up: .55, dmg: 18 }, hw: 6, hd: 5, H: 4.6, crane: { at: [-8.5, 6.5], h: 7.5, arm: 6, top: 4, w: .18 }, jet: { t: 1.6, len: 6, v: 9, dmg: 8, cool: 4 }, on: null };
 function gearMesh(r, th, n, mat) { const parts = [new THREE.CylinderGeometry(r, r, th, 24)]; for (let k = 0; k < n; k++) { const t = new THREE.BoxGeometry(r * .28, th, r * .3); t.translate(0, 0, r + r * .1); t.rotateY(k / n * Math.PI * 2); parts.push(t); }
   const geo = mergeGeometries(parts.map(p => p.toNonIndexed())); geo.rotateX(Math.PI / 2); const m = new THREE.Mesh(geo, mat); m.castShadow = true; return m; }
 function fworkBuild() {
@@ -20743,7 +20743,7 @@ function fworkClear() { const W = FWORK.on; if (!W) return; smashDrop(W.smash); 
 // a flat walkable crown, warning stripes and red lamps -- and the SPIDER BOTS: three six-legged bronze crawlers (`spiderMake`: a body, a
 // head with a red eye, six two-segment legs walking a procedural tripod gait) that come out of the door and patrol round the bunker.
 // Any hit through `bldHit` damages one; `spHp` hits and it bursts; a new one walks out of the door `spBack` s later.
-const SPHANG = { at: [-32, -24], loop: 6.8, raidR: 40, climbV: 1.6, hw: 4.5, hd: 6, R: 3.6, n: 3, spHp: 3, spBack: 10, spV: 2.4, pounceR: 4.5, leapT: .55, bite: 9, pounceCool: 3.5, on: null };
+const SPHANG = { at: [-48, -36], loop: 6.8, raidR: 40, climbV: 1.6, hw: 4.5, hd: 6, R: 3.6, n: 3, spHp: 3, spBack: 10, spV: 2.4, pounceR: 4.5, leapT: .55, bite: 9, pounceCool: 3.5, on: null };
 function spiderMake(g) {
   const s = new THREE.Group(); g.add(s); const br = new THREE.MeshStandardMaterial({ color: 0xa8743a, metalness: .8, roughness: .35 }), dk = new THREE.MeshStandardMaterial({ color: 0x2a2c30, metalness: .6, roughness: .5 });
   const body = new THREE.Mesh(new THREE.SphereGeometry(.5, 14, 10), br); body.scale.set(1, .55, 1.25); body.castShadow = true; s.add(body);
@@ -20843,14 +20843,20 @@ function sphangClear() { const H = SPHANG.on; if (!H) return; bldClear(H); SPHAN
 // standing when you spawn them (spawn the buildings first): a rope bridge from the Watchtower's lookout across over the Hall to the
 // Gatehouse deck; a plank bridge from the Gatehouse deck down between the torii's pillars to the Market roof; a short bridge from the
 // Rampart's east bastion up to the Gatehouse's back landing. Walkable (sagging plank tris), rope rails, lanterns at the posts.
+// m1337 (STEER S2, the forge spread x1.5): every end of a bridge or zipline belongs to a BUILDING, written at that building's OLD spot and size
+// (`AT0`); `skAt` puts it where the building stands NOW (its `at`) at the size it is built (its `scale`, 1 until it is rescaled), so the spans
+// follow each building as the S2 passes reach it. A street end (`null`) just spreads with the layout.
+const SKAT0 = { WTOWER: [-16, -8], GHOUSE: [16, -8], MKT: [16, 12], RAMP: [0, -24], ADOCK: [-30, 0], PAGODA: [-16, 12], LHOUSE: [-46, 30], HALL: [0, -7.5] };
+function skAt(K, p) { const B = K ? ({ WTOWER, GHOUSE, MKT, RAMP, ADOCK, PAGODA, LHOUSE, HALL })[K] : null;
+  if (!B) return [p[0] * 1.5, p[1], p[2] * 1.5]; const a0 = SKAT0[K], k = B.scale || 1; return [B.at[0] + (p[0] - a0[0]) * k, p[1] * k, B.at[1] + (p[2] - a0[1]) * k]; }
 const SKYB = { on: null, spans: [
-  { need: () => WTOWER.on && GHOUSE.on, A: [-12.6, 12, -8], B: [8.2, 7.2, -8], w: .8, sag: .5 },
-  { need: () => GHOUSE.on && MKT.on, A: [16, 7.2, -5.2], B: [16, 4.25, 10.6], w: .8, sag: .35 },
-  { need: () => RAMP.on && GHOUSE.on, A: [22.6, 5.7, -21.6], B: [22.6, 7.2, -14.2], w: .8, sag: .2 } ],
-  zips: [ { need: () => ADOCK.on && WTOWER.on, A: [-25.8, 22.3, -4.4], B: [-18.2, 13.6, -8] },     // Airship Dock deck -> under the Watchtower's cap
-    { need: () => PAGODA.on && MKT.on, A: [-14.6, 19.7, 12], B: [9, 5.4, 12] },     // the Pagoda's belfry -> the Market roof
-    { need: () => LHOUSE.on, A: [-42.35, 19.55, 28.63], B: [-20, 2.6, 27], foot: 1 },     // m1193
-    { need: () => WTOWER.on && HALL.on, A: [-13.4, 13.3, -6.2], B: [-4, 6.2, -7.5] } ] };     // m1232: the Watchtower lookout -> down onto the Dojo Hall's roof     // m1193: the Lighthouse gallery -> over the Bathhouse roof to the street
+  { need: () => WTOWER.on && GHOUSE.on, a: ['WTOWER', [-12.6, 12, -8]], b: ['GHOUSE', [8.2, 7.2, -8]], w: .8, sag: .5 },
+  { need: () => GHOUSE.on && MKT.on, a: ['GHOUSE', [16, 7.2, -5.2]], b: ['MKT', [16, 4.25, 10.6]], w: .8, sag: .35 },
+  { need: () => RAMP.on && GHOUSE.on, a: ['RAMP', [22.6, 5.7, -21.6]], b: ['GHOUSE', [22.6, 7.2, -14.2]], w: .8, sag: .2 } ],
+  zips: [ { need: () => ADOCK.on && WTOWER.on, a: ['ADOCK', [-25.8, 22.3, -4.4]], b: ['WTOWER', [-18.2, 13.6, -8]] },     // Airship Dock deck -> under the Watchtower's cap
+    { need: () => PAGODA.on && MKT.on, a: ['PAGODA', [-14.6, 19.7, 12]], b: ['MKT', [9, 5.4, 12]] },     // the Pagoda's belfry -> the Market roof
+    { need: () => LHOUSE.on, a: ['LHOUSE', [-42.35, 19.55, 28.63]], b: [null, [-20, 2.6, 27]], foot: 1 },     // m1193
+    { need: () => WTOWER.on && HALL.on, a: ['WTOWER', [-13.4, 13.3, -6.2]], b: ['HALL', [-4, 6.2, -7.5]] } ] };     // m1232: the Watchtower lookout -> down onto the Dojo Hall's roof     // m1193: the Lighthouse gallery -> over the Bathhouse roof to the street
 function bridgeSpan(g, A, B, w, sag, tris, mats) {
   const N = Math.max(8, Math.ceil(Math.hypot(B[0] - A[0], B[2] - A[2]) / .5)), dx = B[0] - A[0], dz = B[2] - A[2], L = Math.hypot(dx, dz), nx = -dz / L, nz = dx / L;
   const P = k => { const u = k / N; return [A[0] + dx * u, A[1] + (B[1] - A[1]) * u - Math.sin(u * Math.PI) * sag, A[2] + dz * u]; };
@@ -20873,6 +20879,7 @@ function skybBuild() {
   if (SKYB.on) return; const g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, tris = [];
   const mats = { plank: new THREE.MeshStandardMaterial({ color: 0x7a5434, roughness: .85 }), rope: new THREE.MeshStandardMaterial({ color: 0xc9b07a, roughness: 1 }), wood: new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 }),
     lamp: new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false }) };
+  for (const S of SKYB.spans.concat(SKYB.zips)) { S.A = skAt(S.a[0], S.a[1]); S.B = skAt(S.b[0], S.b[1]); }     // m1337: where the buildings stand now
   mats.flapList = [];   let n = 0; for (const S of SKYB.spans) if (S.need()) { bridgeSpan(g, S.A, S.B, S.w, S.sag, tris, mats); n++; }
   // m1168: ZIPLINES -- a bronze cable from a high anchor down to a low one, a post with a lamp at each end
   const zips = []; for (const Z of SKYB.zips) if (Z.need()) { const A = Z.A, B = Z.B, c = new THREE.Mesh(new THREE.TubeGeometry(new THREE.LineCurve3(new THREE.Vector3(...A), new THREE.Vector3(...B)), 8, .04, 5), new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 })); g.add(c);
@@ -20894,7 +20901,7 @@ function skybClear() { const S = SKYB.on; if (!S) return; for (const z of S.zips
 // PATH cut round its four faces climbing 3 m a face to the top (one lap, landings at the corners), a timber LODGE with deep eaves on the
 // summit, a WATERFALL pouring off the east face (you walk through it on the path) into a pool at its foot, and a PERCH beam out over the
 // courtyard side with a grapple ring.
-const CLIFF = { at: [0, 47], rockEvery: 9, rockHp: 3, rockDmg: 22, hx: 6, hz: 5, H: 12, lane: 1.6, on: null };
+const CLIFF = { at: [0, 70.5], rockEvery: 9, rockHp: 3, rockDmg: 22, hx: 6, hz: 5, H: 12, lane: 1.6, on: null };
 function cliffBuild() {
   if (CLIFF.on) return; const A = CLIFF, [cx, cz] = A.at, hx = A.hx, hz = A.hz, H = A.H, g = new THREE.Group(); scene.add(g);
   const O = { meshes: [], boxes: [], walls: [] }, tris = [];
@@ -20992,7 +20999,7 @@ function cliffClear() { const C = CLIFF.on; if (!C) return; for (const R of C.ro
 // a flight of steps on the courtyard side. A DRAWBRIDGE spans the moat from the curb to the island: it starts RAISED -- strike the GONG
 // on the curb beside it and it comes down (strike again and it goes up). Or don't: drop into the moat and climb the island (a ledge grab).
 // The keep: thick solid walls, a door facing the bridge, a stair up the inside to a crenellated ROOF through a hatch, a sentry gun on it.
-const KEEP = { at: [46, 0], isl: 6, cin: 10, cout: 12, ch: 2.8, ih: 3, kh: 4, kH: 4.5, eelHp: 5, eelDmg: 10, eelV: 2.4, eelBack: 20, on: null };
+const KEEP = { at: [69, 0], isl: 6, cin: 10, cout: 12, ch: 2.8, ih: 3, kh: 4, kH: 4.5, eelHp: 5, eelDmg: 10, eelV: 2.4, eelBack: 20, on: null };
 function keepBuild() {
   if (KEEP.on) return; const A = KEEP, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] };
   const stone = new THREE.MeshStandardMaterial({ color: 0x8e8880, roughness: .95 }), stoneD = new THREE.MeshStandardMaterial({ color: 0x66605a, roughness: .95 }), wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 });
@@ -21112,7 +21119,7 @@ function keepClear() { const K = KEEP.on; if (!K) return; smashDrop(K.smash); fo
 // roof) along the south of a DRILL YARD where six ROBOT SAMURAI drill in step -- raise, cut, return, all together, a stamp on the cut --
 // straw TRAINING DUMMIES and an ARCHERY BUTT at the yard's ends, a WEAPON RACK by the door. The robots are killable (`bldHit`, `rbHp` hits:
 // sparks, they slump in a heap) and reassemble `rbBack` s later.
-const BARR = { at: [30, -42], rbV: 1.7, rbReach: 1.7, rbDmg: 10, fightT: 10, hw: 8, hd: 3, H: 3.6, rbHp: 3, rbBack: 15, bossHp: 9, bossK: 1.45, haltT: 20, on: null };
+const BARR = { at: [45, -63], rbV: 1.7, rbReach: 1.7, rbDmg: 10, fightT: 10, hw: 8, hd: 3, H: 3.6, rbHp: 3, rbBack: 15, bossHp: 9, bossK: 1.45, haltT: 20, on: null };
 function robotSam(g) {
   const r = new THREE.Group(); g.add(r); const red = new THREE.MeshStandardMaterial({ color: 0xa8231e, roughness: .4, metalness: .2 }), dk = new THREE.MeshStandardMaterial({ color: 0x2a2c30, metalness: .6, roughness: .45 });
   const steel = new THREE.MeshStandardMaterial({ color: 0xd4dae0, metalness: .9, roughness: .2 }), eyeM = new THREE.MeshBasicMaterial({ color: 0x5ff2ff, toneMapped: false }), gold = new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .9, roughness: .3 });
@@ -21207,7 +21214,7 @@ function barrClear() { const B = BARR.on; if (!B) return; smashDrop(B.smash); bl
 // m1190: THE JIN LIGHTHOUSE (BUILDINGS.md #18, pass 1) at (-46, 30). A square stone KEEPER'S ROOM (breakable walls, a door east) whose flat
 // roof is reached by a RAMP up the north side; from the roof a SPIRAL STAIR of .3 steps winds 1.8 turns round a slim bronze-banded shaft to a
 // GALLERY at 18 m you can walk round; above it the LANTERN ROOM, whose Jin BEAM sweeps the whole forge, and a grapple RING over the cap.
-const LHOUSE = { at: [-46, 30], hw: 4, H: 3.6, shR: 2, stR: 2.8, rise: .3, steps: 48, galR: 4.2, beamRate: .35, seeR: 55, lockT: .9, zapDmg: 12, zapCool: 5, crysHp: 4, crysFix: 25, ownT: 30, on: null };
+const LHOUSE = { at: [-69, 45], hw: 4, H: 3.6, shR: 2, stR: 2.8, rise: .3, steps: 48, galR: 4.2, beamRate: .35, seeR: 55, lockT: .9, zapDmg: 12, zapCool: 5, crysHp: 4, crysFix: 25, ownT: 30, on: null };
 function lhouseBuild() {
   if (LHOUSE.on) return; const A = LHOUSE, [cx, cz] = A.at, hw = A.hw, H = A.H, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex();
   const wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 }), stone = new THREE.MeshStandardMaterial({ color: 0x8a8580, roughness: .95 }), stoneD = new THREE.MeshStandardMaterial({ color: 0x5a5550, roughness: .95 });
@@ -21325,7 +21332,7 @@ function lhouseClear() { const L = LHOUSE.on; if (!L) return; bldClear(L); LHOUS
 // a jagged rock cone under each, a flat grassy top (walkable triangles, a slab collider under them), a waterfall off each one's edge. Rope
 // bridges (the Sky Bridges' own `bridgeSpan`) climb from the lowest to the middle to the highest, which carries a little SHRINE. You get up
 // by GRAPPLE: a ring hangs off the low island's outer edge, in reach from the street, and one over the shrine.
-const FISL = { crowHp: 3, crowBack: 25, crowRest: 3, crowV: 9, crowDmg: 8, isl: [ { at: [42, 22], top: 5, r: 3.5 }, { at: [52, 32], top: 7, r: 4 }, { at: [42, 42], top: 9, r: 3.5 } ], on: null };
+const FISL = { crowHp: 3, crowBack: 25, crowRest: 3, crowV: 9, crowDmg: 8, isl: [ { at: [115, 80], top: 5, r: 3.5 }, { at: [130, 95], top: 7, r: 4 }, { at: [115, 110], top: 9, r: 3.5 } ]     /* m1337: moved out to clear the Octagonal Pagoda (they were (42,22), (52,32), (42,42)) */, on: null };
 function fislBuild() {
   if (FISL.on) return; const g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, tris = [];
   const rock = new THREE.MeshStandardMaterial({ color: 0x7a6a5c, roughness: 1, flatShading: true }), grass = new THREE.MeshStandardMaterial({ color: 0x5a8a4a, roughness: .95 }), iron = new THREE.MeshStandardMaterial({ color: 0x34383e, metalness: .6, roughness: .5 });
@@ -21435,7 +21442,7 @@ function fislClear() { const F = FISL.on; if (!F) return; bldClear(F); FISL.on =
 // m1202: THE NINJA PILLARS (BUILDINGS.md #20, pass 1) at (30, 46). A spiral of narrow stone pillars round a raked-sand ring, each one a
 // step higher (1 m to 8 m, `rise` apart, `gap` centre to centre) to leap between; a couple of low strays to start from; two high BARS
 // strung on chains between the tallest; a BELL on a little frame on top of the last. Pillar bodies and caps are one mesh each.
-const NPIL = { at: [27, 46], R: 5.2, n: 10, h0: 1, h1: 8, step: .44, a0: -Math.PI * .55, w: .5, on: null };
+const NPIL = { at: [40.5, 69], R: 5.2, n: 10, h0: 1, h1: 8, step: .44, a0: -Math.PI * .55, w: .5, on: null };
 function npilBuild() {
   if (NPIL.on) return; const A = NPIL, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] };
   const stone = new THREE.MeshStandardMaterial({ color: 0x8a8580, roughness: .95 }), bronze = new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 }), sand = new THREE.MeshStandardMaterial({ color: 0xd8cdb4, roughness: 1 });
@@ -21516,7 +21523,7 @@ function npilClear() { const N = NPIL.on; if (!N) return; bldClear(N); NPIL.on =
 // m1207: THE SENBON TORII (BUILDINGS.md #21, pass 1) at (-30, 46). Twenty vermilion torii in a tunnel up a long gentle slope (a stone
 // embankment, walkable triangles, 1:6) from a little gate-hall on the street (breakable side walls) to a raised terrace with a small FOX
 // SHRINE and two kitsune on plinths. Every gate is merged per material: vermilion posts and ties, black caps.
-const STORII = { x0: -16.5, x1: -38.5, z: 46, top: 3.6, n: 20, half: 1.3, H: 3, glowT: 20, foxT: 30, foxR: 7, foxDmg: 6, on: null };
+const STORII = { x0: -24.75, x1: -57.75, z: 69, top: 3.6, n: 20, half: 1.3, H: 3, glowT: 20, foxT: 30, foxR: 7, foxDmg: 6, on: null };
 function storiiBuild() {
   if (STORII.on) return; const A = STORII, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex();
   const red = new THREE.MeshStandardMaterial({ color: 0xd8401f, roughness: .55 }), blk = new THREE.MeshStandardMaterial({ color: 0x1a1614, roughness: .6 }), stone = new THREE.MeshStandardMaterial({ color: 0x8a8580, roughness: .95 });
@@ -21601,7 +21608,7 @@ function storiiClear() { const S = STORII.on; if (!S) return; bldClear(S); STORI
 // a gate gap on the east) round a big TREBUCHET on a turntable. It WINDS (the long arm hauled down behind, `windT`), turns to aim, holds
 // a beat while a red ring marks where it will land, then SWINGS and lobs a boulder across the forge (at him if he is within `range`, else
 // at a random spot): it lands with a crash that knocks down anyone within `blastR` -- dodge it. Strike the trebuchet `hp` times to wreck it.
-const SIEGE = { at: [-47, -37], hw: 8, hd: 7, H: 3, range: 60, blastR: 3.2, dmg: 22, windT: 4, holdT: .9, swingT: .45, restT: 1.4, flyT: 2.4, hp: 8, fix: 30, balR: 30, balCool: 3.6, balV: 28, balHp: 4, balFix: 20, on: null };
+const SIEGE = { at: [-70.5, -55.5], hw: 8, hd: 7, H: 3, range: 60, blastR: 3.2, dmg: 22, windT: 4, holdT: .9, swingT: .45, restT: 1.4, flyT: 2.4, hp: 8, fix: 30, balR: 30, balCool: 3.6, balV: 28, balHp: 4, balFix: 20, on: null };
 function siegeBuild() {
   if (SIEGE.on) return; const A = SIEGE, [cx, cz] = A.at, hw = A.hw, hd = A.hd, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex();
   const wood = new THREE.MeshStandardMaterial({ color: 0x5a3e28, roughness: .85 }), dark = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 }), iron = new THREE.MeshStandardMaterial({ color: 0x34383e, metalness: .6, roughness: .5 });
@@ -21706,7 +21713,7 @@ function siegeClear() { const S = SIEGE.on; if (!S) return; if (S.rock) S.rock.m
 // stilts over its north half (a deck at .9 m up three .3 steps, shoji walls, a tatami room, a deep roof), a high arched MOON BRIDGE across
 // its south half (walkable triangles, 2.2 m at the crown), stepping stones across the middle, a RAKED-GRAVEL garden with three rocks to
 // the east, a stone basin by the steps, and a little tool SHED (breakable walls) by the west path.
-const TEAG = { at: [-47, 8], rx: 6.5, rz: 5, deckY: .9, teaHeal: 50, teaCd: 45, on: null };
+const TEAG = { at: [-70.5, 12], rx: 6.5, rz: 5, deckY: .9, teaHeal: 50, teaCd: 45, on: null };
 function teagBuild() {
   if (TEAG.on) return; const A = TEAG, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [];
   const wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 }), plank = new THREE.MeshStandardMaterial({ color: 0x6e4a2e, roughness: .85 }), stone = new THREE.MeshStandardMaterial({ color: 0x8a8580, roughness: .95 });
@@ -21802,7 +21809,7 @@ function teagClear() { const T = TEAG.on; if (!T) return; bldClear(T); TEAG.on =
 // the left foot planted with STAIRS carved up the shin, the left forearm resting on the knee with steps up it to the elbow, steps up the
 // upper arm to the shoulder pad, and an OPEN HEAD you can stand in (a lookout). Its right hand rests on a planted SWORD whose blade carries
 // a ladder of BARS. Broken offering walls (breakable) lie in front of it.
-const COLO = { at: [50, -26], waveR: 14, waveTime: .8, waveDmg: 8, wakeCd: 25, on: null };
+const COLO = { at: [75, -39], waveR: 14, waveTime: .8, waveDmg: 8, wakeCd: 25, on: null };
 function coloBuild() {
   if (COLO.on) return; const A = COLO, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex();
   const stone = new THREE.MeshStandardMaterial({ color: 0x7c766e, roughness: 1, flatShading: true }), stoneD = new THREE.MeshStandardMaterial({ color: 0x5e5a54, roughness: 1, flatShading: true });
@@ -21885,7 +21892,7 @@ function coloClear() { const C = COLO.on; if (!C) return; bldClear(C); COLO.on =
 // face looking at the forge (+x): you go in through its MOUTH (a 5 m passage, fangs above and below), its two EYES are sentry turrets on
 // ledges (killable), bronze HORNS rise from its brow, a stone STAIR climbs the back to the top walk and a lookout between the horns, and
 // two guard huts (breakable walls) flank the gate.
-const ONI = { at: [-72, 0], w: 10, H: 12, D: 6, mouthW: 5, mouthH: 4.5, biteDmg: 30, on: null };
+const ONI = { at: [-110, -25], w: 10, H: 12, D: 6, mouthW: 5, mouthH: 4.5, biteDmg: 30, on: null };
 function oniBuild() {
   if (ONI.on) return; const A = ONI, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex();
   const stone = new THREE.MeshStandardMaterial({ color: 0x6e6a64, roughness: 1, flatShading: true }), stoneD = new THREE.MeshStandardMaterial({ color: 0x4e4a46, roughness: 1, flatShading: true });
@@ -21979,7 +21986,7 @@ function oniClear() { const N = ONI.on; if (!N) return; { const i = BDYN.indexOf
 // door west toward the forge) under a 6 m tower shaft rising to 16 m; inside, a SQUARE SPIRAL STAIR of thin slabs climbs the walls 1.5
 // turns past great bronze GEARS; at the top it steps off over the wall-head onto a BALCONY ring, under a rotating copper DOME with a
 // telescope poking out of its slit; a CLOCK FACE on the west wall with hands that turn.
-const OBS = { at: [72, -18], bw: 4, H0: 4, tw: 3, top: 16, seeR: 55, lockT: 1.6, volN: 7, cool: 6, blindT: 20, on: null };
+const OBS = { at: [108, -27], bw: 4, H0: 4, tw: 3, top: 16, seeR: 55, lockT: 1.6, volN: 7, cool: 6, blindT: 20, on: null };
 function obsBuild() {
   if (OBS.on) return; const A = OBS, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex();
   const stone = new THREE.MeshStandardMaterial({ color: 0x8a8580, roughness: .95 }), stoneD = new THREE.MeshStandardMaterial({ color: 0x5e5a54, roughness: .95 }), plaster = new THREE.MeshStandardMaterial({ color: 0xe6e0d2, roughness: .9 });
@@ -22063,7 +22070,7 @@ function obsClear() { const B = OBS.on; if (!B) return; B.beam.removeFromParent(
 // m1241: THE LANTERN FESTIVAL STREET (BUILDINGS.md #27, pass 1) at (72, 30). A paved street running north-south (z 16..44) between two
 // rows of four festival stalls (a counter, a breakable back wall, a striped canopy, a flat roof you can stand on), red gate frames at
 // both ends, and strings of paper LANTERNS criss-crossing over the street from roof to roof; two bars hung across the street at the gates.
-const FEST = { at: [72, 30], len: 28, sw: 3.2, n: 4, segN: 8, headHp: 4, v: 2.2, dmg: 5, back: 30, rage: 6, on: null };
+const FEST = { at: [108, 45], len: 28, sw: 3.2, n: 4, segN: 8, headHp: 4, v: 2.2, dmg: 5, back: 30, rage: 6, on: null };
 function festBuild() {
   if (FEST.on) return; const A = FEST, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex();
   const stone = new THREE.MeshStandardMaterial({ color: 0x9a948c, roughness: .95 }), wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 }), plank = new THREE.MeshStandardMaterial({ color: 0x6e4a2e, roughness: .85 });
@@ -22876,7 +22883,7 @@ function tfortClear() { const G = TFORT.on; if (!G) return; for (const d of G.ar
 // 7 m: walkable triangles), a fallen mast laid as a ramp up to the stern, the HOLD underneath (breakable hull planks, an open breach at the
 // stern, a torn hole on the +z side, cargo crates to smash), a spire speared up through the bow with a flat top, the broken main mast with a
 // crow's nest, two bars between them to climb, grapple rings above both
-const SWRK = { at: [30, -72], len: 20, w: 3, y0: 3, y1: 7, on: null };
+const SWRK = { at: [45, -108], len: 20, w: 3, y0: 3, y1: 7, on: null };
 function swrkBuild() {
   if (SWRK.on) return; const A = SWRK, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [], smash = [];
   const stone = new THREE.MeshStandardMaterial({ color: 0x8c7f72, roughness: .95 }), wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 }), plank = new THREE.MeshStandardMaterial({ color: 0x6e4a2e, roughness: .85 });
@@ -23358,7 +23365,7 @@ function heronClear() { const G = HERON.on; if (!G) return; for (const d of (G.a
 // STEER S2 (x1.5, m1332): everything that is a SIZE is x1.5 -- the tower's plan (12 x 12), the lane and face (9.6 m wide), the chimney and its gap. The BEND stays R 3.2: the
 // run-up must catch from its walkable top, which at R 3.2 / 50 deg ends .75 m off the face (inside `autoReach`); at R 4.8 it would end 1.12 m off. What is NOT a size is the lip's HEIGHT above the bend: that is solved from his run-up speed
 // (a full zoom's 14.7 m/s -> 9.0 m of rise), and x1.5 of it would be a wall nobody can climb. So the lip stays where the speed puts it.
-const ZRAMP = { at: [-60, -56], hw: 6, hd: 6, run: 24, R: 3.2, walkA: 50, lift: 10.1, rw: 4.8, markT: 8, chim: 4.5, gap: 4.8, on: null };
+const ZRAMP = { at: [-100, -95], hw: 6, hd: 6, run: 24, R: 3.2, walkA: 50, lift: 10.1, rw: 4.8, markT: 8, chim: 4.5, gap: 4.8, on: null };
 function zrampBuild() {
   if (ZRAMP.on) return; const A = ZRAMP, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, tris = [];
   const sand = new THREE.MeshStandardMaterial({ color: 0xc9a27a, roughness: .95 }), stone = new THREE.MeshStandardMaterial({ color: 0x8c7f72, roughness: .95 }), wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 });
@@ -23813,7 +23820,7 @@ function courtClear() { const C = COURT.on; if (!C) return; for (const Z of C.zi
 // a room on every storey, a ladder inside each up through a hatch in the next floor (the corners turn as you climb), a door out onto every
 // balcony, and the ground storey's walls breakable. Pass 1 = the stack, the rooms, the ladders, the balconies, the roofs, the spire.
 const GPAG = { gateR: 4.5, gateHp: 3, gateFix: 45, bars: 0, lift: 1.0,     // m1293: bars 0 -- *"I keep getting caught on the high bars climbing the outside"*
-  showT: 30, at: [140, -5], scale: 1.5, n: 5, hb0: 4.2, shrink: .5, sh: 3.8, balc: 2.2, eave: 2.7, t: .3, door: 1.6, doorH: 2.5, on: null };
+  showT: 30, at: [155, -5], scale: 1.5, n: 5, hb0: 4.2, shrink: .5, sh: 3.8, balc: 2.2, eave: 2.7, t: .3, door: 1.6, doorH: 2.5, on: null };
 function gpagBuild(opt) {     // m1307: `opt.at` / `opt.court` -- the courtyard places it in its north-west corner, with no fence, pavilion or gate of its own
   // STEER S2 (his, after walking X4): *"increase the scale... 1.5... we need room to play"*. The tower's PROPORTIONS scale by `GPAG.scale`
   // (storey, plan, shrink, balcony, eave, door, lift), while everything sized to HIS BODY stays: rails at the waist, windows, the rooms'
