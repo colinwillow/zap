@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1152 -- FLYING SHIP HOUSE pass 1 (BUILDINGS.md #10, at (0, -40))
+
+`FSHIP`, `fshipBuild` / `fshipStep` / `fshipClear`. SPAWN > BUILDINGS > Flying Ship House.
+- A JUNK HULL 21 m long: an extruded side profile (flat deck line at 6 m, upswept bow, a taller stern), vermilion frames down its sides,
+  hanging 3 m off the ground on THREE glowing JIN ENGINES (cyan orbs in spinning bronze rings, faint cones of lift).
+- The deck is the hull's solid box top; bulwarks round it with a gap on the starboard side.
+- A two-masted JUNK RIG: cream sails between dark battens, red pennants; grapple RINGS at both mastheads (~16.7 and 18.7 m).
+- A DECKHOUSE at the stern: plaster on a dark frame, a door on its bow side, a curved roof, a lantern inside.
+- A GANGPLANK up the starboard side from the ground (slope .3, 20 m, posts and rope rails) aboard through the gap.
+- The hull BOBS (picture only -- colliders hold still, so standing on it is solid).
+Pass 2 next: function (cannons / a helm / the bars). Shipped unverified.
+
 ## m1151 -- ZEPPELINS pass 3 (DONE)
 
 - The clan BANNER (red diamond-spiral) on both flanks of each hull.
