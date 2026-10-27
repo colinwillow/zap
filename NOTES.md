@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1108 -- the arrow PARRY: guard at the right moment and it goes back at the archer, from any side
+
+**What he said:** *"I want to send the arrows back by parrying at the right time -- guard at the right time... The charged slice works, but
+it's a super far lunge. If you press down at the right time it should send it back to them."*
+
+**What changed (`arrowBlock`, `ARCH.parryWin` .4, `parryR` 2):** a guard raised inside `parryWin` s of an arrow's arrival is a PARRY whatever way
+he faces (he turns to meet it), and it reaches `parryR` 2 m (the ordinary block 1.3). It goes straight back at its archer. Later than that it is
+m1106's block: front only, a glance. (m1106's perfect window was the rockets' .28 s and needed him FACING the arrow.)
+
+**Real loop (`parry.cjs`, 4 archers, his facing turned 90 deg each try):** the guard pressed with each arrow 4-6 m out: 5 of 5 parried, 6 arrows
+back into archers. The 2 that hit him were other archers' arrows during the press.
+
 ## m1107 -- the running jump-slash; flips that carry you where you flick
 
 **What he said:** *"When I'm running and flick up on the right stick he just stops and hits with his sword... a lurch forward and down to
