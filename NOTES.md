@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1153 -- FLYING SHIP pass 2: bowsprit, bar, cargo, helm, a sentry gun
+
+- A BOWSPRIT: a 34 cm beam angled up off the bow, 6 m out, walkable (its tris), a grapple ring hung 2.4 m over its tip.
+- A HIGH BAR amidships (at deck height, m1122), across the ship.
+- CARGO to smash (shared `SMASH`): three crates and two barrels on deck.
+- The HELM: a spoked wheel on a post before the deckhouse door, swinging back and forth.
+- A SENTRY TURRET on the bow (killable), facing out past the bowsprit.
+Pass 3 (polish) next. Shipped unverified.
+
 ## m1152 -- FLYING SHIP HOUSE pass 1 (BUILDINGS.md #10, at (0, -40))
 
 `FSHIP`, `fshipBuild` / `fshipStep` / `fshipClear`. SPAWN > BUILDINGS > Flying Ship House.
