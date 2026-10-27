@@ -5,6 +5,24 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1198 -- Floating Islands pass 2: the Jin lift stone and the shrine bell (Building Forge loop)
+
+**The JIN LIFT STONE.** A rock disc with a glowing cyan face stands in the street 1 m off the low island's east rim, inside a
+column of faint light.
+- Stand in its glow (within .9 m) and you rise at 4.5 m/s up to 1.4 m over the island's top.
+- At the top you are drifted onto the grass.
+- The grapple is no longer the only way up. The column brightens while you ride it.
+
+**The SHRINE BELL.** A bronze bell now hangs under the high island's torii. Strike it with a blade, an arrow or a parried shot
+(`fislHit` in `bldHit`):
+- It always rings.
+- Once a minute it BLESSES you: full health, with a green beam.
+
+**Details.** Two stone lanterns and a little layered pine on each island, placed off the bridge ends, the waterfalls and the
+shrine.
+
+Next: alternate -- Barracks pass 4.
+
 ## m1197 -- Moated Keep pass 4: the moat eel (Building Forge loop, extra pass)
 
 A bronze Jin SERPENT now swims the moat: a head with lantern eyes and a jaw, and seven finned plates that trail it at .48 m.
