@@ -476,8 +476,9 @@ rule that has to be in front of me *before* I know which system I am in.
 
 ### The ones that must be in front of me every time
 
-- **A `const` OR `let` READ ABOVE ITS OWN DECLARATION IS A BLANK PAGE.** Nine times. `npm run
-  check:boot` exists for exactly this and it is the reason it is not optional.
+- **A `const` OR `let` READ ABOVE ITS OWN DECLARATION IS A BLANK PAGE.** Ten times. `npm run
+  check:boot` exists for exactly this and it is the reason it is not optional. **It boots the default world only; `check:worlds` (m1401) boots
+  the ARENA and the FORGE too** -- their stages build at MODULE SCOPE (`arenaStage`), and the dojo read `BDYN` above its declaration there.
 - **NEVER SCRUB A VELOCITY WITH A BARE `*= k` PER FRAME** — `Math.exp(-k*dt)` or `damp`, always.
 - **NEVER ASK `action.isRunning()` WHETHER A CLIP STILL MATTERS — ASK ITS WEIGHT.** And
   re-entering a `ONCE` clip has to rewind it, on the STATE, never on the damped weight.

@@ -443,6 +443,21 @@ SHIPPED UNVERIFIED. The queue's passes 2 and 3 are done. Next is his call: more 
 
 SHIPPED UNVERIFIED. Next: pass 3, foam and wake, bow spray, the sun on the water, gulls, an island.
 
+## THE DOJO, PASS 3: OFF THE EDGE, THE ROUTES UP TO THE ALTARS, PLATFORMS YOU RIDE (m1401)
+
+- **OFF THE EDGE (`dojoStep`):** the world has a floor at y 0 everywhere, so past the rim he would stand on the sky. Out past W+2 and down at y 0 he has FALLEN: petals burst where he went, and he is put back at his pad with a beam.
+- **THE ALTAR ROUTES:**
+  - the rim's invisible wall leaves an opening by each altar (`DOJO.gap`: boxes 0 and 1 by the north altar, 23 and 24 by the south; the south route curves the other way)
+  - three floating stepping stones per altar: +1.9, +3.9 and +5.9 m, about 3 m apart. That is inside his jump (2.7, comfy 2.2), with the ledge catch as a backstop.
+  - a 1.1 m hop onto the altar disc, which is a floor now (a box)
+- **THE DRIFTING PLATFORMS ARE STANDABLE:** each is a BDYN box that moves with it and carries him (the Level 1 movers' rule, with height).
+- **LANDMINE, the tenth blank page, caught BEFORE the push:**
+  - `dojoBuild` runs at MODULE SCOPE (`arenaStage` is called at load) and pushed to `BDYN` there, above its declaration: "Cannot access 'BDYN' before initialization", so the ARENA is a blank page.
+  - `npm run check` passed, because `check:boot` boots the DEFAULT world only. The headless render hung on it.
+  - The fix: the boxes go into BDYN on the dojo's first frame.
+  - **`npm run check` now also runs `check:worlds`, which boots `MEL_WORLD=arena` and `MEL_WORLD=forge`.** Proved by putting the bad line back: BOOT FAIL with the BDYN error. CLAUDE.md's landmine line says so.
+- **Checked headless:** two renders (the route, wide).
+
 ## THE DOJO, PASS 2: TORII, LANTERN STRINGS, SOFFITS, THE CREST, PETALS (m1400)
 
 - **TORII:** four, on the diagonals just outside the rim (r W+2.6), each framing a pagoda behind it from the floor. Red pillars on stone feet with gold collars, a black KASAGI with upswept ends, a red shimaki under it, the NUKI crossbeam, and a gold plaque.

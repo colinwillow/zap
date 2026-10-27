@@ -10058,7 +10058,8 @@ function forgePeaks(g) {
 // MASTS (red chevron cloth that waves). On the diagonals, far out on floating rocks, four PAVILIONS with stacked roofs whose eaves turn up at the
 // corners. Small stone platforms drift round. Nothing in the middle (the cover walls are gone here; SPAWN still has everything).
 // `?arena=lab` brings the old stadium back. A boss enters by the BEAM here (the stadium's doors are not built).
-const DOJO = { on: null, sun: [-.45, .2, .87], cloudY: -46, altarR: 24, altarY: 7, mastR: 21, mastH: 22, pavR: 74, plat: 7, t: 0 };
+const DOJO = { gap: [0, 1, 23, 24], on: null,     /* m1401: `gap` = rim-wall boxes left out where the altar routes start (index of 48: 0 and 1 by the north altar, 23 and 24 by the south -- its route curves the other way) */
+  sun: [-.45, .2, .87], cloudY: -46, altarR: 24, altarY: 7, mastR: 21, mastH: 22, pavR: 74, plat: 7, t: 0 };
 try { DOJO.want = !/[?&]arena=lab\b/.test(location.search); } catch (e) { DOJO.want = true; }
 // a hip roof whose eaves turn UP at the corners: a 4-sided cone squared off, the base ring lifted toward each corner
 function dojoRoof(w, h, lift, overhang) { const seg = 32, geo = new THREE.ConeGeometry(1, 1, seg, 3, true); const P = geo.attributes.position;
@@ -10108,7 +10109,7 @@ function dojoBuild(g, W) {
   for (let i = 0; i < 48; i++) { const a = i / 48 * Math.PI * 2, [x, z] = at(a, W + 1.15); put(new THREE.BoxGeometry(.22, 1.1, .22).translate(x, .55, z), M.red); if (i % 6 === 0) put(new THREE.BoxGeometry(.32, .14, .32).translate(x, 1.17, z), M.gold); }
   { const rg = new THREE.TorusGeometry(W + 1.15, .08, 6, 128).rotateX(Math.PI / 2).translate(0, 1.08, 0); put(rg, M.timber); }
   // THE SWORD ALTARS (N and S), hovering high over the rim: a stone disc, a red rack with three katanas, a two-tier roof, lanterns
-  D.altars = [];
+  D.altars = []; D.boxes = []; D.W = W;
   for (const a of [0, Math.PI]) { const [x, z] = at(a, D.altarR), y = D.altarY, face = a + Math.PI;
     put(new THREE.CylinderGeometry(3.2, 2.2, 1.2, 24).translate(x, y - .6, z), M.stone); put(new THREE.ConeGeometry(2.2, 4, 16).rotateX(Math.PI).translate(x, y - 3.2, z), M.rock);
     put(new THREE.CylinderGeometry(3.3, 3.3, .2, 24, 1, true).translate(x, y - .1, z), M.gold);
@@ -10122,7 +10123,13 @@ function dojoBuild(g, W) {
     put(dojoRoof(5.4, .35, .9, .9).rotateY(face).translate(x, y + 2.8, z), M.timber); put(dojoRoof(3.2, .3, .6, .5).rotateY(face).translate(x, y + 4.12, z), M.timber);     /* m1399: soffits */
     put(new THREE.ConeGeometry(.18, 1, 8).translate(x, y + 5.5, z), M.gold);
     for (const s of [-1, 1]) { const p = L(s * 2.3, -1.9, y + .5); put(new THREE.BoxGeometry(.5, .7, .5).translate(...p), M.lamp); }
-    D.altars.push({ x, y, z }); }
+    D.altars.push({ x, y, z });
+    // m1401: THE ROUTE UP: three floating stepping stones from the rim (where the rim wall is left open) up to the altar, each +2 m (his jump is
+    // 2.7, comfy 2.2) and ~3 m apart (a run jump is 5.95 comfy), the last a 1 m hop onto the altar's disc -- which is now a floor (a box)
+    const sg = a === 0 ? 1 : -1; [[20.6, .06, 1.9], [22.4, .2, 3.9], [22.6, .36, 5.9]].forEach(([r2, da, sy], k) => { const [sx, sz] = at(a + sg * da, r2);
+      put(new THREE.CylinderGeometry(1.35, 1.1, .5, 14).translate(sx, sy - .25, sz), M.stone); put(new THREE.ConeGeometry(1.1, 2.2, 8).rotateX(Math.PI).translate(sx, sy - 1.6, sz), M.rock); put(new THREE.CylinderGeometry(1.38, 1.38, .1, 14, 1, true).translate(sx, sy - .05, sz), M.gold);
+      D.boxes.push({ minx: sx - .95, maxx: sx + .95, miny: sy - .5, maxy: sy, minz: sz - .95, maxz: sz + .95 }); });
+    D.boxes.push({ minx: x - 2.3, maxx: x + 2.3, miny: y - 1.2, maxy: y, minz: z - 2.3, maxz: z + 2.3 }); }
   // THE BANNER MASTS (E and W): a tall timber mast on a stone foot at the rim, a crossbar, and a long red chevron banner that WAVES
   D.flags = []; const fm = new THREE.MeshStandardMaterial({ map: texGet('red_cloth'), side: THREE.DoubleSide, roughness: .85 }); fm.map = fm.map.clone(); fm.map.repeat.set(1, 3.5); fm.map.needsUpdate = true;
   fm.onBeforeCompile = sh => { sh.uniforms.uTime = U.uTime; sh.vertexShader = 'uniform float uTime;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n float fk = (1.0 - uv.y); transformed.z += sin(uTime * 2.4 + uv.y * 5.0 + position.x * .6) * .45 * fk + sin(uTime * 4.1 + uv.y * 9.0) * .12 * fk;'); };
@@ -10173,7 +10180,7 @@ function dojoBuild(g, W) {
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o !== null; o.receiveShadow = true; g.add(o); }
   // THE DRIFTING PLATFORMS: small stone discs on rock roots, slowly bobbing and circling outside the rim (decor for now)
   D.plats = []; const pgeo = mergeGeometries([new THREE.CylinderGeometry(2.4, 2, .7, 16).toNonIndexed(), new THREE.ConeGeometry(2, 3.6, 10).rotateX(Math.PI).translate(0, -2.1, 0).toNonIndexed()].map(q => { for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal') q.deleteAttribute(k); return q; }));
-  for (let i = 0; i < D.plat; i++) { const m = new THREE.Mesh(pgeo, M.stone); m.castShadow = true; g.add(m); D.plats.push({ m, r: W + 9 + (i % 3) * 7, a: i / D.plat * Math.PI * 2 + .3, y: 3 + (i * 37 % 9), w: (i % 2 ? 1 : -1) * (.03 + i * .004), ph: i * 1.3 }); }
+  for (let i = 0; i < D.plat; i++) { const m = new THREE.Mesh(pgeo, M.stone); m.castShadow = true; g.add(m); const box = { minx: 0, maxx: 0, miny: 0, maxy: 0, minz: 0, maxz: 0 }; D.plats.push({ m, box, r: W + 9 + (i % 3) * 7, a: i / D.plat * Math.PI * 2 + .3, y: 3 + (i * 37 % 9), w: (i % 2 ? 1 : -1) * (.03 + i * .004), ph: i * 1.3, lx: null }); }     /* m1401: standable -- a BDYN box that carries him (pushed on the first dojo FRAME: this builder runs at module scope, above BDYN's declaration -- the TDZ landmine) */
   // m1399: PETALS -- pink cherry petals drifting across the dojo on the wind, tumbling (their size flickers as they turn)
   { const N = 700, P = new Float32Array(N * 3), S = new Float32Array(N), Ph = new Float32Array(N); for (let i = 0; i < N; i++) { P[i * 3] = (Math.random() - .5) * 60; P[i * 3 + 1] = Math.random() * 16; P[i * 3 + 2] = (Math.random() - .5) * 60; S[i] = .09 + Math.random() * .08; Ph[i] = Math.random() * 100; }
     const pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(P, 3)); pg.setAttribute('aSize', new THREE.BufferAttribute(S, 1)); pg.setAttribute('aPh', new THREE.BufferAttribute(Ph, 1));
@@ -10181,13 +10188,23 @@ function dojoBuild(g, W) {
       vertexShader: 'attribute float aSize; attribute float aPh; uniform float uPx; uniform float uTime; varying float vT; void main() { vec4 mv = modelViewMatrix * vec4(position, 1.0); vT = aPh; float flip = abs(sin(uTime * 2.3 + aPh)); gl_PointSize = aSize * uPx / max(.1, -mv.z) * (.45 + .55 * flip); gl_Position = projectionMatrix * mv; }',
       fragmentShader: 'varying float vT; void main() { vec2 d = gl_PointCoord - .5; d.x *= 1.6; float r = dot(d, d) * 4.0; if (r > 1.0) discard; vec3 c = mix(vec3(1.0, .72, .82), vec3(1.0, .9, .93), fract(vT)); gl_FragColor = vec4(c, .9 * (1.0 - r * r)); }' });
     const pts = new THREE.Points(pg, pm); pts.frustumCulled = false; g.add(pts); D.petals = { P, Ph, pg, pm, N }; }
+  for (const b of D.boxes) BOXES.push(b);     /* m1401 */
   D.on = { g }; ARENA.door.entry = 'BEAM'; }
 function dojoStep(dt) { const D = DOJO; if (!D.on) return; D.t += dt; D.U.uTime.value = D.t; D.dome.position.copy(camera.position);
+  // m1401: OFF THE EDGE. The world has a floor at y 0 everywhere, so past the rim he would stand on the sky. Out there and down at y 0, he has
+  // FALLEN: a gust of petals where he went, and he is put back on the floor at his pad, with a beam.
+  { const p = player, r = Math.hypot(p.pos.x, p.pos.z); if (r > D.W + 2 && p.pos.y < .35 && !p.climb) { spkBurst(p.pos.x, .5, p.pos.z, 30, { col: [1, .75, .85], spread: 5, up: 2, size: .14, life: .8 }); const [yx, yz] = ARENA.youAt;
+      p.pos.set(yx, .05, yz); p.vel.set(0, 0, 0); arenaBeam(yx, yz, [1, .55, .7], 1); snd('swoosh', { g: .5, r: .7 }); } }
   if (D.petals) { const Q = D.petals, P2 = Q.P, t = D.t, cx = camera.position.x, cz = camera.position.z, wx = 1.6 + Math.sin(t * .2) * .8, wz = .5 + Math.sin(t * .13) * .5;
     for (let i = 0; i < Q.N; i++) { const o = i * 3, ph = Q.Ph[i]; let x = P2[o] + (wx + Math.sin(t * 1.1 + ph) * .7) * dt, y = P2[o + 1] + (-.55 + Math.sin(t * 1.7 + ph) * .35) * dt, z = P2[o + 2] + (wz + Math.cos(t * .9 + ph * 1.3) * .7) * dt;
       if (x - cx > 30) x -= 60; else if (x - cx < -30) x += 60; if (z - cz > 30) z -= 60; else if (z - cz < -30) z += 60; if (y < -1) y = 14 + Math.random() * 4; P2[o] = x; P2[o + 1] = y; P2[o + 2] = z; }
     Q.pg.attributes.position.needsUpdate = true; Q.pm.uniforms.uPx.value = renderer.domElement.height / (2 * Math.tan(camera.fov * Math.PI / 360)); }
-  for (const P of D.plats) { P.a += P.w * dt; P.m.position.set(Math.sin(P.a) * P.r, P.y + Math.sin(D.t * .6 + P.ph) * .5, Math.cos(P.a) * P.r); P.m.rotation.y += P.w * dt * 2; } }
+  if (!D.dyn) { D.dyn = 1; for (const P of D.plats) BDYN.push(P.box); }
+  for (const P of D.plats) { P.a += P.w * dt; const x = Math.sin(P.a) * P.r, y = P.y + Math.sin(D.t * .6 + P.ph) * .5, z = Math.cos(P.a) * P.r, b = P.box, p = player;
+    const on = P.lx !== null && p.grounded && p.pos.x > b.minx - .05 && p.pos.x < b.maxx + .05 && p.pos.z > b.minz - .05 && p.pos.z < b.maxz + .05 && Math.abs(p.pos.y - b.maxy) < .3;
+    if (on) { p.pos.x += x - P.lx; p.pos.y += y - P.ly; p.pos.z += z - P.lz; }
+    b.minx = x - 1.7; b.maxx = x + 1.7; b.minz = z - 1.7; b.maxz = z + 1.7; b.miny = y - .4; b.maxy = y + .35; P.lx = x; P.ly = y; P.lz = z;
+    P.m.position.set(x, y, z); P.m.rotation.y += P.w * dt * 2; } }
 function arenaStage() {
   arenaSky();
   const R = ARENA.r, g = new THREE.Group(), L = ARENA.look; world.add(g);
@@ -10201,7 +10218,7 @@ function arenaStage() {
     forgePeaks(g);     // m1132: the snowy white-capped mountains round the forge
     camera.far = Math.max(camera.far, 900); camera.updateProjectionMatrix();     // m1366: the peaks moved out to 380-470 m
     CWALL.g = g; COVER.meshes = []; COVER.boxes = []; ARENA.r = 60; return; }
-  if (DOJO.want) { const W = R + 2.2; for (let i = 0; i < 48; i++) { const a = i / 48 * Math.PI * 2, x = Math.sin(a) * (W + .2), z = Math.cos(a) * (W + .2), s = 1.4; BOXES.push({ minx: x - s, maxx: x + s, miny: 0, maxy: 6, minz: z - s, maxz: z + s, noCam: 1 }); }
+  if (DOJO.want) { const W = R + 2.2; for (let i = 0; i < 48; i++) { if (DOJO.gap.includes(i)) continue; const a = i / 48 * Math.PI * 2, x = Math.sin(a) * (W + .2), z = Math.cos(a) * (W + .2), s = 1.4; BOXES.push({ minx: x - s, maxx: x + s, miny: 0, maxy: 6, minz: z - s, maxz: z + s, noCam: 1 }); }
     dojoBuild(g, W); COVER.blocks = []; coverBlocks(g);
     const pad = (x, z, r, hex) => { const m = new THREE.Mesh(new THREE.RingGeometry(r * .78, r, 48), new THREE.MeshBasicMaterial({ color: hex, transparent: true, opacity: .7, toneMapped: false })); m.rotation.x = -Math.PI / 2; m.position.set(x, .03, z); g.add(m); return m; };
     ARENA.pad = pad(ARENA.spawnAt[0], ARENA.spawnAt[1], 2.2, 0xff4d6d); return; }     // m1394: THE DOJO instead of the stadium

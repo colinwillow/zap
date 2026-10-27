@@ -28,11 +28,15 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - a MITSUDOMOE crest (red, in a gold ring) inlaid at the centre
   - PINK PETALS drifting on the wind
   - the vending machine no longer stands in the dojo at the start (VEND still places one)
-- [ ] pass 3:
-  - the gates as ENTRANCES: bosses walk in through a torii again (a DOORS entry for the dojo)
-  - the altars REACHABLE: needs a fall-off-the-world rule first (the sky has an invisible floor at y 0)
+- [x] **pass 3 (m1401):**
+  - OFF THE EDGE: fall off the platform and you're put back at your pad
+  - the altars REACHABLE: three floating stones from an opening in the rim up to each altar, and the altar disc is a floor
+  - the seven drifting platforms are STANDABLE and carry you
+  - `npm run check` now boots the arena and forge too (`check:worlds`)
+- [ ] pass 4:
+  - the gates as ENTRANCES: bosses walk in through a torii (a DOORS entry for the dojo)
+  - something AT the altars: take a katana from the rack, a chime, a glint on the blade
   - lit lanterns at dusk
-  - the drifting platforms standable
 - [ ] pass 4: life: birds, light shafts, the clouds moving under you, training marks on the floor
 - [ ] later: the training-dojo function (racks you take weapons from, targets that pop up, a sparring master), the music
 
