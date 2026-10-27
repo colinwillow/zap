@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1116 -- THE HALL, pass 1 (one building at a time)
+
+**His rule (Oct 27):** *"Work on ONE thing at a time... one room or one area at a time turns out interesting; scoping up gets messy. The
+stadium is a good example of an area that looks intentional. Design buildings that look Japanese out of the destructible blocks, some bars
+to swing on, and those cool slant roofs. A few passes on ONE building; once I've played it inside and out we move on. One building at a
+time, then a courtyard of them, then fill in the rest."* And back to SHIPPED UNVERIFIED: change, `npm run check`, push.
+
+**What changed:** `cwallBuild` (m1016's breakable wall, lifted out of `coverBlocks` so a building can make its own). `HALL` / `hallBuild` /
+`hallClear` (SPAWN > HALL): a 10 x 7 m hall at (0, -7.5) on the dais -- four breakable plaster walls 3.1 m high (front split for a 2.6 m
+door, a beam over it), timber posts at the corners, the door and out under the eaves, a top plate, a low stone plinth, a hipped roof whose
+slopes are CONCAVE (steep at the ridge, flat to the eave) with UPTURNED corners and a timber fascia round the lifted rim, a ridge cap with
+end horns, two paper lanterns at the door, two high bars in front. Its walls are its own lists, so TOOLS > BLOCKS does not hide it.
+Shipped unverified.
+
 ## m1115 -- the hut is enterable
 
 *"Make the hut enterable."* His collider is only a skirt round the base, so `hutEnter` builds the hut's collision in its own GLB units
