@@ -5,6 +5,31 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1103 -- the ARCHERS: red samurai with bows who hold the edge of the dais and shoot
+
+**What he said:** *"a bow and arrow version of that samurai... make them red to distinguish, they sit on the periphery and shoot arrows at
+you... we're gonna need to make the bow, make the arrow... Mixamo has some animations like that, right?"*
+
+**The clips:** the private library has Mixamo's longbow pack. Forge-baked onto the samurai's file as `samurai_archer` (1.15 MB, Colin's
+knock six + `bow_draw` 1.07 s (Standing Draw Arrow), `bow_overdraw` 3.8, `bow_recoil` .73, `bow_aim` 3.8, the four aim-walks, `bow_idle`,
+`bow_equip`, `bow_shoot`), left hand on the grip. The kind (`ARENA.kinds.ARCHER`) names its own bake (`K.forged`, new: `forgedMerge` /
+`knockAct` read it before the file's stem).
+
+**What he does (`ARCH`, `archerAI`, `archerBow`, `ARROWS`, `arrowStep`, SPAWN > ARCHERS):** 4 a tap, on the dais edge across from you. He
+keeps 7-13 m off: backs away facing you (aim-walk back), walks in when far, side-steps now and then, turns off the edge. The loop is DRAW ->
+AIM (held .55-1.1 s, the arrowhead glows red: the tell) -> LOOSE (the arrow leaves on recoil's first frame) -> .9-2.2 s. The arrow lobs at
+26 m/s, solved to arrive at your middle with a little lead; it goes through `playerHurt` (your guard takes it) and sticks in the floor or
+a block for 7 s. The BOW is built in code: a curved limb and a red-wrapped grip at his left fist, turned along the draw line (right fist ->
+left fist, measured each frame), the string pulled to his right fist while he draws, an arrow nocked on it. Horde life: they die, and with
+HORDE: SLICE they come apart. RED: the rival's YIQ hue turn at +28 deg on its own uniform, plus a multiply. The first try (-15, then -40)
+came out YELLOW. The direction was settled offline through the shader's own matrices: orange hue 34 -> +28 deg ~5.
+
+**Real loop (`archer.cjs`, 4 archers, you standing in the middle):** all four held 13 m; 10 s: 8 arrows, 5-6 hit, the rest stuck in the
+floor. The aim offset off his nose measured 1 deg (the stance aims along his nose). Renders: the bow in his left fist, strung to his right
+hand, the glowing nocked arrow, an arrow in flight.
+
+**Not built:** a bow for YOU; the sword-and-bow switcher. The arrows have no sound of their own yet (swoosh / thud).
+
 ## m1102 -- the horde can die, and it is the slicing samurai by default
 
 **What he said:** *"I don't think the horde has any health, they're just infinite... I wanna try them as the guys that can be broken into
