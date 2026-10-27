@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- Timber Siege Fort pass 5 of 10: the work site (X3, WORKER A)
+
+The reference's half-built siege works, all round the fort:
+- **Two LEANING-POLE RAMPS** up to the stone, one up the front-left and one up the left side. Each is a plank deck between two long poles,
+  propped every 3 m, with cleats across it. 1.8 m wide (a crossing, 1.6+), about 19 m long, a slope of about .47, and walkable (its own
+  triangles, `bldTris`): you run straight up onto the base.
+- **A SCAFFOLD TOWER** up the right side: three plank levels at 3, 6 and 9 m on a post frame with braces that break. A ladder outside
+  each level's edge climbs to the next, and the top level reaches across onto the stone.
+- **Log stacks** at the front-right: three layers, and every log breaks.
+- **A TREADWHEEL CRANE** at the front-left: a timber tower, a big wheel turning, a 10 m boom swinging slowly back and forth, a rope and a
+  bundle of logs swaying on it.
+- **A HALF-BUILT BAY** on the first deck's front terrace: two bare posts, a beam waiting on trestles, and a stack of planks that break.
+- **Barrels and crates** by the gate and in the courtyard, to smash (`smashAdd`, back 30 s later).
+
+SHIPPED UNVERIFIED. Next: pass 6, the defenders.
+
 ## m1333 -- Timber Siege Fort pass 4 of 10: the portcullis, the courtyard behind, the ramp up (X3, WORKER A)
 
 - **A PORTCULLIS** (his rule: a MACHINE you work), a grid of timber bars with spiked feet just inside the front mouth, behind the gate leaves.
