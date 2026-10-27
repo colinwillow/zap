@@ -19396,6 +19396,7 @@ function bldHit(x, y, z, rad, dmg) {
   if (mktFireHit(x, y, z, rad)) return 1;     // m1238: the fireworks stall
   if (mktThiefHit(x, y, z, rad)) return 1;     // m1214: the market thief
   if (mktHit(x, y, z, rad, dmg)) return 1;     // m1136: the market's crates smash
+  if (heronHit(x, y, z, rad, dmg)) return 1;     // X2: the White Heron Castle's ballista
   if (smashHit(x, y, z, rad, dmg)) return 1;     // m1141: any building's smashables
   if (sphangHit(x, y, z, rad, dmg)) return 1;     // m1161: the spider bots
   if (barrHit(x, y, z, rad, dmg)) return 1;     // m1184: the drilling robot samurai
@@ -22483,7 +22484,7 @@ function swrkClear() { const W = SWRK.on; if (!W) return; smashDrop(W.smash); bl
 // function lays the tiles and the triangles), every storey hollow with a door out onto the roof below and a ladder up through a hatch --
 // the gallery and the tower (solid for now; pass 6 hollows them), a stone stair up the east face, and a small white STOREHOUSE at the
 // foot whose walls break and repair.
-const HERON = { at: [-108, 45], H: 6, bat: 1, bx: 12, bz: 16, n: 5, sh: 3.6, hx0: 7, hz0: 6, shrink: .7, eave: 1.8, t: .35, door: 1.8, doorH: 2.6, on: null };
+const HERON = { at: [-108, 45], H: 6, bat: 1, bx: 12, bz: 16, n: 5, sh: 3.6, hx0: 7, hz0: 6, shrink: .7, eave: 1.8, t: .35, door: 1.8, doorH: 2.6, balR: 40, balHp: 6, balFix: 20, balWind: 1.1, balCool: 4.5, balV: 30, on: null };
 function heronStoneTex() { const cv = document.createElement('canvas'); cv.width = cv.height = 256; const c = cv.getContext('2d'); c.fillStyle = '#8f8676'; c.fillRect(0, 0, 256, 256);
   // dressed stone: eight courses to the 4 m tile, blocks of random length, each its own shade, a dark joint round it (wrapped at the edge)
   for (let r = 0; r < 8; r++) { let x = (r * 37) % 64; while (x < 256 + 64) { const w = 38 + Math.random() * 52, s = 150 + Math.random() * 40 | 0, b = Math.random() * 14 | 0;
@@ -22613,6 +22614,7 @@ function heronBuild() {
     tris.push(x0, .15, zb, x1, .15, zb, x1, A.H + .15, zt, x0, .15, zb, x1, A.H + .15, zt, x0, A.H + .15, zt); }
   // ---- THE MAIN KEEP: five hollow storeys stepping in, a door on alternate sides out onto the roof below, a ladder up through a hatch ----
   const kx = cx - 1, kz = cz - 7, hxOf = k => A.hx0 - A.shrink * k, hzOf = k => A.hz0 - A.shrink * k, yOf = k => A.H + A.sh * k, N = A.n, t = A.t, run = A.shrink + A.eave;
+  let galDeck = null;     // pass 7: the gallery ridge, where the ballista stands
   const doors = ['+x', '-x', '+x', '-x', '+x'], GCUT = { x0: cx - 6, x1: cx, z0: kz + hzOf(1), z1: cz + 8.1 };     // GCUT: the gallery's corridors (pass 6)
   for (let k = 0; k < N; k++) {
     const hx = hxOf(k), hz = hzOf(k), y0 = yOf(k), y1 = y0 + A.sh, wt = y1 - .45, x0 = kx - hx, x1 = kx + hx, z0 = kz - hz, z1 = kz + hz, dw = A.door / 2, sd = doors[k];
@@ -22699,7 +22701,8 @@ function heronBuild() {
     for (const sg of [-1, 1]) { winRow(1, sg, gx + sg * gw, zL0, zL1, A.H + 1.45, 1.4, null, 1); winRow(1, sg, gx + sg * gw, zU0, zU1, yU + .9, 1.4, null, 0); }
     box(gx - gw - .04, gx + gw + .04, A.H, A.H + .3, zL0, zL1, timber, 0); box(gx - gw - .04, gx + gw + .04, yU - .25, yU, zU0, zU1, timber, 0);
     for (const f of [.2, .5, .8]) { const z = zL0 + (zL1 - zL0) * f; for (const [yy, top] of [[A.H, yU - .25], [yU, wt]]) { rod([gx, top - .05, z], [gx, top - .5, z], .02, timber); box(gx - .18, gx + .18, top - .9, top - .5, z - .18, z + .18, lampG, 0); } }
-    roof(gx, gzc, 0, (ez1 - ez0) / 2 - rr, rr, wt + drop * (1 - (1 - u) * (1 - u)), drop, .4, 0, [['+x', -1.6, 2.6, 'chidori'], ['+x', 2.2, 2.2, 'kara'], ['-x', 0, 2.8, 'chidori']], 0, Object.assign({ lipOnly: 1 }, GCUT)); }
+    roof(gx, gzc, 0, (ez1 - ez0) / 2 - rr, rr, wt + drop * (1 - (1 - u) * (1 - u)), drop, .4, 0, [['+x', -1.6, 2.6, 'chidori'], ['+x', 2.2, 2.2, 'kara'], ['-x', 0, 2.8, 'chidori']], 0, Object.assign({ lipOnly: 1 }, GCUT));
+    galDeck = [gx, wt + drop * (1 - (1 - u) * (1 - u)), gzc]; }
   // ---- THE STOREHOUSE at the foot (the reference's low white building in front of the stone): breakable walls, a door to the east ----
   { const T = hallTex(), sx0 = cx + A.bx + 2.5, sx1 = sx0 + 6, sz0 = cz - 14, sz1 = cz - 6, sxc = (sx0 + sx1) / 2, szc = (sz0 + sz1) / 2, H = 3, dw = 1, tt = .3;
     const wall = (x, z, L, yaw) => O.walls.push(cwallBuild(g, T, x, z, L, tt, yaw, H, O));
@@ -22707,14 +22710,62 @@ function heronBuild() {
     const seg = (sz1 - sz0 - tt * 2 - dw * 2) / 2; wall(sx1 - tt / 2, szc - dw - seg / 2, seg, Math.PI / 2); wall(sx1 - tt / 2, szc + dw + seg / 2, seg, Math.PI / 2);
     box(sx1 - tt, sx1, 2.3, H, szc - dw, szc + dw, timber, 1);
     const rr = 3 + 1, u = 3 / rr, drop = 1.6; roof(sxc, szc, 0, 4 + 1 - rr, rr, H + drop * (1 - (1 - u) * (1 - u)), drop, .35, 0, null, .6); }
+  // ---- PASS 7: THE DEFENDERS, all killable. A BALLISTA on a timber deck astride the gallery ridge (it tracks him inside `balR`, winds,
+  // looses a real ARROWS bolt -- blocked, glanced, PARRIED home -- `balHp` hits wreck it, back in `balFix` s; `heronHit`); ARCHERS in
+  // the keep's doorways on storeys 2 and 3 and at two corners of the lookout; and a SENTRY GATE at the stair's foot -- two posts, a beam,
+  // its own little roof -- held by two robot SAMURAI who stand their post until they see him. (No sentry gun: a turret's shot is cut at
+  // `ARENA.r` + 4 from the forge's middle, and the castle stands ~117 m out.) ----
+  let bal = null;
+  { const [bx, by, bz] = galDeck, bronze = new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 }), dk = by + .05;
+    box(bx - 1.5, bx + 1.5, dk - .2, dk, bz - 1.5, bz + 1.5, floorM, 1); for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) box(bx + sx * 1.3 - .1, bx + sx * 1.3 + .1, dk - 1.6, dk - .2, bz + sz * 1.3 - .1, bz + sz * 1.3 + .1, timber, 0);
+    const B = new THREE.Group(); B.position.set(bx, dk, bz); g.add(B); const mk = (geo, m, x, y, z) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = true; return o; };
+    B.add(mk(new THREE.CylinderGeometry(.85, 1, .4, 18), bronze, 0, .2, 0), mk(new THREE.CylinderGeometry(.18, .22, .9, 10), timber, 0, .85, 0));
+    const Y = new THREE.Group(); Y.position.y = 1.3; B.add(Y); Y.add(mk(new THREE.BoxGeometry(.32, .26, 2.6), timber, 0, 0, .2), mk(new THREE.BoxGeometry(.5, .5, .5), bronze, 0, 0, 1.25));
+    for (const sx of [-1, 1]) { const arm = mk(new THREE.BoxGeometry(1.6, .14, .14), timber, sx * .85, 0, 1.15); arm.rotation.y = sx * -.3; Y.add(arm); Y.add(mk(new THREE.SphereGeometry(.1, 8, 6), bronze, sx * 1.6, 0, .9)); }
+    Y.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-1.6, 0, .9), new THREE.Vector3(0, 0, -.6), new THREE.Vector3(1.6, 0, .9)]), new THREE.LineBasicMaterial({ color: 0x1a1a1a })));
+    const bolt = arrowMesh(); bolt.scale.setScalar(2.4); bolt.position.set(0, .2, .4); Y.add(bolt); const eye = mk(new THREE.SphereGeometry(.09, 10, 8), new THREE.MeshBasicMaterial({ color: 0xff3a2a, toneMapped: false }), 0, .12, 1.52); Y.add(eye);
+    Y.rotation.y = Math.PI / 2; O.boxes.push({ minx: bx - .9, maxx: bx + .9, miny: dk, maxy: dk + 1.6, minz: bz - .9, maxz: bz + .9 });
+    bal = { B, Y, bolt, eye, x: bx, y: dk, z: bz, hp: A.balHp, dead: 0, deadT: 0, hc: 0, t: 2 }; }
+  { const x0 = cx + A.bx + .4, x1 = x0 + 3, z = cz + A.bz - 1 + .6, gxc = (x0 + x1) / 2;     // the sentry gate over the stair's foot
+    for (const x of [x0 - .2, x1 + .2]) box(x - .18, x + .18, 0, 3.5, z - .18, z + .18, timber, 1);
+    box(x0 - .5, x1 + .5, 3.1, 3.4, z - .22, z + .22, timber, 0); box(x0 - .3, x1 + .3, 2.55, 2.7, z - .12, z + .12, timber, 0);
+    roof(gxc, z, 1.6, 0, .9, 4.15, .75, .25, 0, null, .35); }
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
   bldTris(O, tris);
   for (const b of O.boxes) if (!BOXES.includes(b)) BOXES.push(b); boxGrid();
-  HERON.on = { g, O, bars: [], rings: [], climbs, t: 0 };
+  HERON.on = { g, O, bars: [], rings: [], climbs, t: 0, bal, arch: [], guards: [] };
+  { const G0 = HERON.on, post = (x, y, z) => archerPost(x, y, z).then(d => { if (HERON.on === G0) G0.arch.push(d); else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {});
+    for (const k of [2, 3]) { const sg = doors[k][0] === '-' ? -1 : 1; post(kx + sg * (hxOf(k) - t - .55), yOf(k) + .05, kz); }
+    { const k = N - 1, bx = hxOf(k) + .6, bz = hzOf(k) + .6; post(kx + bx, yOf(k) + .3, kz - bz); post(kx - bx, yOf(k) + .3, kz + bz); }
+    (async () => { try { const K0 = await arenaLoad('SAMURAI'), AK = ARENA.kinds.SAMURAI, K = HORDE.KS || (HORDE.KS = Object.assign(Object.create(K0), { notice: HORDE.notice, lose: 90, limbs: 1 }));
+      for (const x of [cx + A.bx + .2, cx + A.bx + 3.8]) { if (HERON.on !== G0) return; const d = bodySpawn(K.P, K, x, cz + A.bz + 1.6, 0); arenaKatana(d, AK); d.horde = 1; d.aggro = 0; d.hp = d.hpMax = 40; d.gap = 1; d.h = 0;
+        HORDE.list.push(d); G0.guards.push(d); } } catch (e) { console.error('[melee] castle guards', e); } })(); }
   arenaBeam(cx, cz, [1, 1, 1], 1); snd('clang', { g: .7, r: .5 });
 }
-function heronStep(dt) { const G = HERON.on; if (!G) return; G.t += dt; }
-function heronClear() { const G = HERON.on; if (!G) return; for (const L of G.climbs) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && G.climbs.includes(player.climb)) climbOff(); bldClear(G); HERON.on = null; }
+function heronStep(dt) { const G = HERON.on; if (!G) return; G.t += dt; const A = HERON, L = G.bal; if (!L) return;
+  // pass 7: the ballista -- track him, wind (the eye flickers, the bolt draws back), loose, reload; wrecked, it smokes until repaired
+  if (L.hc > 0) L.hc -= dt;
+  if (L.dead) { L.deadT -= dt; if (Math.random() < dt * 3) smokeAt(L.x + (Math.random() - .5) * .6, L.y + 1.2, L.z + (Math.random() - .5) * .6, 1.2, 1.4, [.25, .24, .23]);
+    if (L.deadT <= 0) { L.dead = 0; L.hp = A.balHp; L.t = 2; L.Y.rotation.z = 0; L.Y.position.y = 1.3; L.eye.visible = true; arenaBeam(L.x, L.z, [.6, .9, 1], .6); snd('clang', { g: .6, r: 1.2, x: L.x, z: L.z }); } return; }
+  const p = player, dx = p.pos.x - L.x, dz = p.pos.z - L.z, d = Math.hypot(dx, dz), live = d < A.balR && d > 3;
+  if (live) L.Y.rotation.y = wrapAngle(L.Y.rotation.y + clamp(wrapAngle(Math.atan2(dx, dz) - L.Y.rotation.y), -1.6 * dt, 1.6 * dt));
+  L.t -= dt; const wind = live && L.t < A.balWind; L.bolt.position.z = wind ? .4 - (1 - L.t / A.balWind) * .5 : .4; L.bolt.visible = L.t < A.balCool - .4 || !live; L.eye.scale.setScalar(wind ? 1.6 + Math.sin(G.t * 40) * .4 : 1);
+  if (live && L.t <= 0 && Math.abs(wrapAngle(Math.atan2(dx, dz) - L.Y.rotation.y)) < .25) { L.t = A.balCool; const h = L.Y.rotation.y, o = new THREE.Vector3(L.x + Math.sin(h) * 1.8, L.y + 1.5, L.z + Math.cos(h) * 1.8);
+    const tx = p.pos.x + p.vel.x * .3, tz = p.pos.z + p.vel.z * .3, ty = p.pos.y + (RIG.height || 1.25) * .55, R = Math.hypot(tx - o.x, tz - o.z) || 1, T = R / A.balV, gr = MOVE.g * .55;
+    const m = arrowMesh(); m.scale.setScalar(2.4); m.position.copy(o); scene.add(m);
+    ARROWS.push({ m, v: new THREE.Vector3((tx - o.x) / T, (ty - o.y) / T + .5 * gr * T, (tz - o.z) / T), t: 0, stuck: 0, from: null, mine: 0 });
+    snd('clang', { g: .8, r: .5, x: o.x, z: o.z }); snd('swoosh', { g: .9, r: .7, x: o.x, z: o.z }); spkBurst(o.x, o.y, o.z, 10, { col: [1, .8, .5], spread: 2, size: .1, life: .3 }); }
+  else if (!live && L.t < 0) L.t = 0; }
+// pass 7: a blow, a shot or its own bolt sent home on the castle's ballista
+function heronHit(x, y, z, rad, dmg) { const G = HERON.on, L = G && G.bal; if (!L || L.dead || L.hc > 0) return 0;
+  if (Math.hypot(x - L.x, z - L.z) > 1.2 + rad || y < L.y - .4 || y > L.y + 2.4) return 0;
+  L.hc = .3; L.hp -= Math.max(.5, dmg || 1); spkBurst(L.x, L.y + 1.3, L.z, 12, { col: [1, .8, .4], spread: 3, size: .12, life: .4 }); snd('clang', { g: .8, r: .8 + Math.random() * .2, x: L.x, z: L.z }); camShake(.06);
+  if (L.hp <= 0) { L.dead = 1; L.deadT = HERON.balFix; L.Y.rotation.z = .55; L.Y.position.y = .75; L.eye.visible = false; L.bolt.visible = false;
+    for (let i = 0; i < 4; i++) spkBurst(L.x, L.y + 1.2, L.z, 22, { col: i % 2 ? [1, .55, .15] : [.9, .9, .85], spread: 7, size: .28, life: .9 });
+    for (let i = 0; i < 6; i++) smokeAt(L.x + (Math.random() - .5), L.y + 1 + Math.random(), L.z + (Math.random() - .5), 2, 1.6);
+    snd('boom', { g: 1, r: .85, x: L.x, z: L.z }); camShake(.45); ARENA.stop = Math.max(ARENA.stop, .08); }
+  return 1; }
+function heronClear() { const G = HERON.on; if (!G) return; for (const d of (G.arch || []).concat(G.guards || [])) if (d) { bowDrop(d); bodyGone(d); const i = HORDE.list.indexOf(d); if (i >= 0) HORDE.list.splice(i, 1); } for (const L of G.climbs) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && G.climbs.includes(player.climb)) climbOff(); bldClear(G); HERON.on = null; }
 // m1254: THE ZOOM RAMP TOWER (his request R1, pass 1). *"A tower shaped like a really tall ramp -- you do the speed run and it's just tall
 // enough that your whole run gets you to the top, and you hit it perfectly; the very top is a ledge you just barely grab, then pull yourself
 // up into a guard tower."* A start gate on the ground, a flat run-in of `run` m, a ramp rising `Hr` m over `ramp` m into the SHEER FACE of a
@@ -23186,7 +23237,7 @@ const BLDG = { list: [
   { key: 'oni', t: 'Oni Gate', sub: 'a fortress wall carved as a demon face: walk in through its fanged mouth (it BITES on a cycle), guard rooms in its cheeks, sentry guns in its eyes, horns, a stair up the back to a lookout', pass: 3, build: () => oniBuild(), clear: () => oniClear(), on: () => !!ONI.on, step: dt => oniStep(dt) },
   { key: 'obs', t: 'Jin Observatory', sub: 'a clockwork tower: a spiral stair inside past great gears to a balcony under a copper dome whose telescope marks you in the open for a volley of arrows (blind its lens), a clock face', pass: 3, build: () => obsBuild(), clear: () => obsClear(), on: () => !!OBS.on, step: dt => obsStep(dt) },
   { key: 'fest', t: 'Lantern Festival Street', sub: 'a street of festival stalls (roofs to stand on, breakable backs) under strings of paper lanterns, red gates at both ends, bars across, a robot dragon dance to cut apart (strike the taiko to make it wild)', pass: 3, build: () => festBuild(), clear: () => festClear(), on: () => !!FEST.on, step: dt => festStep(dt) },
-  { key: 'heron', t: 'White Heron Castle', sub: 'a Himeji-style castle on a battered stone base: a five-storey white keep under layered grey roofs (every roof walkable, a hall on every storey, steep stairs up, the great pillars, a lookout balcony at the top), a gallery wing of two corridors to a hollow corner tower (a loop: keep up, across, tower down, back), its roof a path, a stair up the stone, a storehouse at the foot whose walls break', pass: 6, build: () => heronBuild(), clear: () => heronClear(), on: () => !!HERON.on, step: dt => heronStep(dt) },
+  { key: 'heron', t: 'White Heron Castle', sub: 'a Himeji-style castle on a battered stone base: a five-storey white keep under layered grey roofs (every roof walkable, a hall on every storey, steep stairs up, the great pillars, a lookout balcony at the top), a gallery wing of two corridors to a hollow corner tower (a loop: keep up, across, tower down, back), its roof a path; a ballista on the gallery ridge, archers in the doorways and the lookout, a sentry gate held by two samurai; a stair up the stone, a storehouse at the foot whose walls break', pass: 7, build: () => heronBuild(), clear: () => heronClear(), on: () => !!HERON.on, step: dt => heronStep(dt) },
   { key: 'court', t: 'The Courtyard', sub: 'a walled court far north (0, 150): a wall-walk all round, the south gate, a stone lane between two timber halls with balconies and walkable roofs, a koi pond and a moon bridge', pass: 1, build: () => courtBuild(), clear: () => courtClear(), on: () => !!COURT.on, step: dt => courtStep(dt) },
   { key: 'gpag', t: 'Great Red Pagoda', sub: 'five storeys of red lacquer: a room on every floor, ladders up through the hatches, a balcony round every storey, a spire; a pavilion whose roof you can climb; a red fence; climb the outside eave to eave, bars, a zipline off the spire; an armoury, a library, a bell room (the alarm), a lookout; archers, a sentry gun, gate guards; glowing windows, lantern halos, a beacon on the spire; streamers, chimes, birds; strike the gong at the top and the tower lights up and the gate opens', pass: 10, build: () => gpagBuild(), clear: () => gpagClear(), on: () => !!GPAG.on, step: dt => gpagStep(dt) },
   { key: 'zramp', t: 'Zoom Ramp Tower', sub: 'zoom from the red gate (full hold), up the ramp and straight up the face -- only a full zoom reaches the gold lip; your mark shows how close; or zigzag up the chimney', pass: 3, build: () => zrampBuild(), clear: () => zrampClear(), on: () => !!ZRAMP.on, step: dt => zrampStep(dt) },
