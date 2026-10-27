@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1088 -- the camera no longer jams in against the arena's invisible wall
+
+*"When I get pushed up against the imaginary wall, the camera gets all tight and I can't see what's going on."* (Screenshot: pinned at the
+dais edge, the lens on his back, the horde a blur.) The dais's ring of INVISIBLE 6 m posts (m898, so a bash cannot throw him over a 1.1 m
+lip) was a box like any other to the camera boom, so with the lens outside the ring `camFree` snapped it in to him. Those posts are
+`noCam` now: they stop bodies and bolts as before, and the lens passes through (`CAMQ.on` marks the box test as the camera's -- `camHit`
+is shared with the bolt's flight). Measured (`edgecam.cjs`, real loop, the lens outside looking in): middle 5.00 m, AT THE EDGE 5.00 m
+(the lens at x 20.6, out over the lower floor). Shipped unverified on the phone.
+
 ## m1087 -- the katana's air flick-down is the unarmed SLAM now (TOOLS > AIR SLAM)
 
 *"The slam he does when you flick down unarmed is the slam I want him doing with a katana in the air. I've been wondering why it looks
