@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- Timber Siege Fort pass 2 of 10: the lattice detail and the war banners (X3, WORKER A)
+
+- **Rough-cut timber in two tones**, mixed post by post.
+- **Rope LASHINGS** at every post's joints: a pale rope band under and over the half-height beam, and one under the deck beam.
+- **Ladders lashed up the OUTSIDE of every tier.** Each runs up the right-hand face from the deck (or the stone) below, to a gap left in the
+  rail at its head, roped to the frame at three heights, with its exit mark on the deck. So the fort can now be climbed tier by tier from
+  the outside as well as through the hatches.
+- **The WAR BANNERS** (the reference's nobori): tall white banners with a black crest (a ring round three commas) under a black head band,
+  with a ragged hem (`tfortBanner`).
+  - They fly on dark poles with gold caps: at the four corners of the first deck (9 m), the two front corners of the top deck (7 m), and
+    either side of the watch house roof.
+  - They stream and ripple on a gusting wind.
+
+SHIPPED UNVERIFIED. Next: pass 3, climbing -- the braces and the base as a jungle gym.
+
 ## m1328 -- Timber Siege Fort pass 1 of 10: the mass (X3, WORKER A)
 
 His third reference (`timber_siege_fort.webp`): a scaffold fortress on a cyclopean stone base. Built at the STEER's x1.5, at (-70, 100),
