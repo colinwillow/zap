@@ -22551,6 +22551,7 @@ function heronBuild() {
     mg(new THREE.CylinderGeometry(r, r, L, 6), m, _m4.compose(a.add(b).multiplyScalar(.5), _q, new THREE.Vector3(1, 1, 1))); };
   const stone = new THREE.MeshStandardMaterial({ map: heronStoneTex(), roughness: .95 }), plaster = new THREE.MeshStandardMaterial({ map: heronPlasterTex(), roughness: .6, emissive: 0x0b0b0a });     // pass 9: the white CATCHES the sun (a little sheen) and never sinks to grey in the shade
   const tile = new THREE.MeshStandardMaterial({ map: heronTileTex(), color: 0xb4bcc4, roughness: .6, metalness: .15, side: THREE.DoubleSide });
+  const lampG = new THREE.MeshStandardMaterial({ color: 0xffe2b8, emissive: 0xff9a40, emissiveIntensity: 1.8, toneMapped: false });     // pass 10: one lantern material for every lamp
   const timber = new THREE.MeshStandardMaterial({ color: 0x2e2620, roughness: .8 }), floorM = new THREE.MeshStandardMaterial({ color: 0x5a4430, roughness: .85 });
   // PASS 3 (the reference's walls): ROWS OF SMALL WINDOWS -- a dark opening in a dark timber frame, three white bars across it, every
   // `sp` along a face (skipping doors and where another mass covers the wall) -- and under the lowest row the SAMA, the gun and arrow
@@ -22611,8 +22612,8 @@ function heronBuild() {
     for (let k = 0; k < 48; k++) { const [x0, z0] = rim[k], [x1, z1] = rim[(k + 1) % 48]; rod([rx + x0, h(x0, z0), rz + z0], [rx + x1, h(x1, z1), rz + z1], .09, timber); }
     const eY = top - drop; for (const [ax, sg] of [[1, -1], [1, 1], [0, -1], [0, 1]]) { const L = (ax ? EZ : EX) * .6;
       if (cut && (ax ? rx + sg * (EX - .14) > cut.x0 && rx + sg * (EX - .14) < cut.x1 && rz + L > cut.z0 && rz - L < cut.z1 : rz + sg * (EZ - .14) > cut.z0 && rz + sg * (EZ - .14) < cut.z1 && rx + L > cut.x0 && rx - L < cut.x1)) continue;
-      O.boxes.push(ax ? { minx: sg < 0 ? rx - EX : rx + EX - .28, maxx: sg < 0 ? rx - EX + .28 : rx + EX, miny: eY - .9, maxy: eY + .05, minz: rz - L, maxz: rz + L }
-                      : { minx: rx - L, maxx: rx + L, miny: eY - .9, maxy: eY + .05, minz: sg < 0 ? rz - EZ : rz + EZ - .28, maxz: sg < 0 ? rz - EZ + .28 : rz + EZ }); }
+      O.boxes.push(ax ? { minx: sg < 0 ? rx - EX : rx + EX - .28, maxx: sg < 0 ? rx - EX + .28 : rx + EX, miny: eY - .3, maxy: eY + .05, minz: rz - L, maxz: rz + L }
+                      : { minx: rx - L, maxx: rx + L, miny: eY - .3, maxy: eY + .05, minz: sg < 0 ? rz - EZ : rz + EZ - .28, maxz: sg < 0 ? rz - EZ + .28 : rz + EZ }); }
     // PASS 2: the roof's RHYTHM -- white-mortared HIP RIBS up every corner (the reference's white lines), a round tile END CAP every .5 m
     // along the eave, a dark corner block where the eave kicks up, and on a ridge roof a mortared RIDGE CAP with a shachi at each end
     for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { let pv = null; for (let i = 0; i <= 7; i++) { const f = i / 7, x = sx * (hx + run * f), z = sz * (hz + run * f), v = [rx + x, h(x, z) + .07, rz + z]; if (pv) rod(pv, v, .085, plaster); pv = v; }
@@ -22668,7 +22669,9 @@ function heronBuild() {
     for (const S of ['-x', '+x', '-z', '+z']) { const ax = S[1] === 'x', sg = S[0] === '-' ? -1 : 1, c = (ax ? kx : kz) + sg * (ax ? hx : hz), mid = ax ? kz : kx, skip = [];
       if (S === sd) skip.push([mid - dw - .7, mid + dw + .7]); if (S === '+z' && k < 2) skip.push([cx - 6.4, cx + .4]);
       winRow(ax, sg, c, ax ? z0 : x0, ax ? z1 : x1, y0 + (k ? 1.35 : 1.5), k ? 1.5 : 1.8, skip, k === 0); }     // pass 3
-    if (k === 0) box(x0 + t, x1 - t, y0, y0 + .04, z0 + t, z1 - t, floorM, 0);
+    if (k === 0) { box(x0 + t, x1 - t, y0, y0 + .04, z0 + t, z1 - t, floorM, 0);
+      const sk = (a, b, c, ax, sg) => ax ? box(Math.min(c, c + sg * .18), Math.max(c, c + sg * .18), y0, y0 + .75, a, b, stone, 0) : box(a, b, y0, y0 + .75, Math.min(c, c + sg * .18), Math.max(c, c + sg * .18), stone, 0);     // pass 10: the stone skirt
+      sk(z0 - .18, kz - dw, x1, 1, 1); sk(kz + dw, z1 + .18, x1, 1, 1); sk(z0 - .18, z1 + .18, x0, 1, -1); sk(x0, x1, z0, 0, -1); sk(x0, cx - 6.2, z1, 0, 1); sk(cx + .2, x1, z1, 0, 1); }
     else { // PASS 5: a STEEP STAIR up from the storey below instead of the old ladder -- against the -z wall on odd storeys and the +z wall
       // on even ones, so a stair never stands over the well of the one below -- its well open in this floor, a handrail on its open side
       const sz = k % 2 ? -1 : 1, sx = k % 2 ? 1 : -1, zi = kz + sz * (hz - t - .05), za = Math.min(zi, zi - sz * 1.1), zb = Math.max(zi, zi - sz * 1.1), xb = kx - sx * 1.7, xt = kx + sx * 1.7, ylo = yOf(k - 1);
@@ -22691,7 +22694,7 @@ function heronBuild() {
   // band at each floor), a paper lantern glowing in every hall, TATAMI halls on storeys 2 and 3 (the mats in the middle, clear of the
   // stairs), a weapon rack of spears on storey 1 (its east wall, clear of the west door), and at the top the LOOKOUT: wide openings on every side, a railed balcony round it,
   // a bronze telescope at the door ----
-  { const lamp = new THREE.MeshStandardMaterial({ color: 0xffe2b8, emissive: 0xff9a40, emissiveIntensity: 1.8, toneMapped: false }), mat = new THREE.MeshStandardMaterial({ color: 0xbaa86e, roughness: .9 });
+  { const lamp = lampG, mat = new THREE.MeshStandardMaterial({ color: 0xbaa86e, roughness: .9 });
     for (let k = 0; k < N; k++) { const y0 = yOf(k), wt = y0 + A.sh - .45, hx = hxOf(k), hz = hzOf(k);
       for (const e of [-1, 1]) { box(kx + e * 1.4 - .32, kx + e * 1.4 + .32, y0, k === N - 1 ? wt : y0 + A.sh - .25, kz - .32, kz + .32, timber, 1); box(kx + e * 1.4 - .36, kx + e * 1.4 + .36, y0 + 2.6, y0 + 2.75, kz - .36, kz + .36, gold, 0); }
       rod([kx, wt - .1, kz], [kx, wt - .7, kz], .02, timber); box(kx - .2, kx + .2, wt - 1.15, wt - .7, kz - .2, kz + .2, lamp, 0);
@@ -22717,7 +22720,6 @@ function heronBuild() {
     tris.push(...P(b, c0, ylo + .12), ...P(e, c0, yhi + .05), ...P(e, c1, yhi + .05), ...P(b, c0, ylo + .12), ...P(e, c1, yhi + .05), ...P(b, c1, ylo + .12));
     for (const f of [0, .5, 1]) { const [x, y, z] = P(b + (e - b) * f, rail, ylo + (yhi - ylo) * f); box(x - .04, x + .04, y, y + 1, z - .04, z + .04, timber, 0); }
     rod(P(b, rail, ylo + 1), P(e, rail, yhi + 1), .04, timber); };
-  const lampG = new THREE.MeshStandardMaterial({ color: 0xffe2b8, emissive: 0xff9a40, emissiveIntensity: 1.8, toneMapped: false });
   { const tx = cx - 3, tz = cz + 11, sh = A.sh, sk = .6, ev = 1.5, rn2 = sk + ev, thx = k => 4 - sk * k, thz = k => 3.5 - sk * k, tt = .3, dw = A.door / 2, TD = [[['-z', tx], ['+x', tz]], [['-z', tx]], [['-x', tz]]];
     for (let k = 0; k < 3; k++) { const y0 = A.H + sh * k, wt = y0 + sh - .45, hx = thx(k), hz = thz(k), x0 = tx - hx, x1 = tx + hx, z0 = tz - hz, z1 = tz + hz;
       for (const S of ['-x', '+x', '-z', '+z']) { const ax = S[1] === 'x', sg = S[0] === '-' ? -1 : 1, c = (ax ? tx : tz) + sg * ((ax ? hx : hz) - tt / 2), lo = ax ? z0 : x0, hi = ax ? z1 : x1, d = TD[k].find(q => q[0] === S);
@@ -22773,8 +22775,8 @@ function heronBuild() {
     for (const x of [gx0, gx1]) box(x - .2, x + .2, A.H, A.H + 3.4, gzc - .2, gzc + .2, timber, 1);
     box(gx0 - .4, gx1 + .4, A.H + 3, A.H + 3.35, gzc - .25, gzc + .25, timber, 0); roof(gm, gzc, 1.4, 0, 1, A.H + 4.15, .75, .3, 0, null, .4);
     const zh = cz - A.bz - .4, L = zh - (zN + .3), w = gx1 - gx0 - .45, bg = new THREE.Group(); bg.position.set(gm, A.H, zh); g.add(bg);
-    { const pl = new THREE.Mesh(new THREE.BoxGeometry(w, .16, L), floorM); pl.position.set(0, -.08, -L / 2); pl.castShadow = pl.receiveShadow = true; bg.add(pl);
-      for (let k = 0; k < 4; k++) { const st = new THREE.Mesh(new THREE.BoxGeometry(w + .08, .08, .16), timber); st.position.set(0, .02, -.3 - k * (L - .5) / 3); bg.add(st); } }
+    { const parts = [new THREE.BoxGeometry(w, .16, L).translate(0, -.08, -L / 2)]; for (let k = 0; k < 4; k++) parts.push(new THREE.BoxGeometry(w + .08, .08, .16).translate(0, .02, -.3 - k * (L - .5) / 3));
+      const pl = new THREE.Mesh(mergeGeometries(parts.map(q => q.toNonIndexed())), floorM); pl.castShadow = pl.receiveShadow = true; bg.add(pl); }
     const deck = { minx: gm - w / 2, maxx: gm + w / 2, miny: A.H - .16, maxy: A.H, minz: zh - L, maxz: zh }, shut = { minx: gm - w / 2, maxx: gm + w / 2, miny: A.H, maxy: A.H + L, minz: zh - .2, maxz: zh + .05 };
     O.boxes.push(deck, shut); db = { g: bg, deck, shut, st: 'down', t: A.dbDown, a: 0 }; }
   // ---- PASS 9: LIGHT AND LIFE. BLACK PINES round the castle (gnarled trunks, flat cloud pads of needles -- the reference's foreground,
@@ -22798,17 +22800,18 @@ function heronBuild() {
       for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const x = kx + sx * ex, z = kz + sz * ez; rod([x, eY + .25, z], [x, eY - .3, z], .015, timber); box(x - .16, x + .16, eY - .72, eY - .3, z - .16, z + .16, lampG, 0); } }
     const ban = new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 });
     const nobori = (x, yb, z, h) => { rod([x, yb, z], [x, yb + h, z], .05, timber); const fg = new THREE.Group(); fg.position.set(x, yb + h - .15, z); g.add(fg);
-      const f = new THREE.Mesh(new THREE.PlaneGeometry(.8, 2.6), ban); f.position.set(.45, -1.4, 0); f.castShadow = false; fg.add(f); const bar = new THREE.Mesh(new THREE.BoxGeometry(.9, .05, .05), timber); bar.position.set(.45, -.08, 0); fg.add(bar);
+      const f = new THREE.Mesh(new THREE.PlaneGeometry(.8, 2.6), ban); f.position.set(.45, -1.4, 0); f.castShadow = false; fg.add(f);
       flags.push({ g: fg, ph: rnd() * 6.28 }); };
     for (const x of [cx + 13, cx + 6, cx - 1, cx - 7]) nobori(x, (x >= cx - 6 ? 3 * (cx + 16 - x) / 22 : 3) + 1.5, cz - 24.15, 4);
     nobori(cx + 7.6, A.H, cz - A.bz + 1.8, 4.5); nobori(cx + 11.4, A.H, cz - A.bz + 1.8, 4.5);
-    const white = new THREE.MeshStandardMaterial({ color: 0xf6f6f2, roughness: .7 }), dark = new THREE.MeshStandardMaterial({ color: 0x24201c, roughness: .6 });
-    for (let i = 0; i < 3; i++) { const bg = new THREE.Group(); g.add(bg); const body = new THREE.Mesh(new THREE.SphereGeometry(.32, 10, 7), white); body.scale.set(.55, .55, 1.4); bg.add(body);
-      const neck = new THREE.Mesh(new THREE.CylinderGeometry(.05, .08, .6, 6), white); neck.position.set(0, .25, .5); neck.rotation.x = .9; bg.add(neck);
-      const bk = new THREE.Mesh(new THREE.ConeGeometry(.04, .32, 5), dark); bk.position.set(0, .45, .95); bk.rotation.x = Math.PI / 2; bg.add(bk);
-      const legs = new THREE.Mesh(new THREE.CylinderGeometry(.02, .02, .7, 4), dark); legs.position.set(0, -.05, -.75); legs.rotation.x = Math.PI / 2; bg.add(legs);
-      const W2 = []; for (const sx of [-1, 1]) { const wp = new THREE.Group(); wp.position.set(sx * .12, .05, .05); bg.add(wp); const w = new THREE.Mesh(new THREE.BoxGeometry(1.5, .03, .55), white); w.position.x = sx * .75; wp.add(w);
-        const tip = new THREE.Mesh(new THREE.BoxGeometry(.5, .035, .4), dark); tip.position.x = sx * 1.4; wp.add(tip); W2.push(wp); }
+    const bm = new THREE.MeshStandardMaterial({ roughness: .7, vertexColors: true }), WH = [.96, .96, .94], BK = [.14, .12, .11];
+    const tint = (geo, c, M4) => { geo = geo.toNonIndexed(); if (M4) geo.applyMatrix4(M4); const n = geo.attributes.position.count, a = new Float32Array(n * 3); for (let i = 0; i < n; i++) a.set(c, i * 3); geo.setAttribute('color', new THREE.BufferAttribute(a, 3)); geo.deleteAttribute('uv'); return geo; };
+    const TR = (x, y, z, rx) => new THREE.Matrix4().compose(new THREE.Vector3(x, y, z), new THREE.Quaternion().setFromEuler(new THREE.Euler(rx, 0, 0)), new THREE.Vector3(1, 1, 1));
+    for (let i = 0; i < 3; i++) { const bg = new THREE.Group(); g.add(bg);
+      const bd = mergeGeometries([tint(new THREE.SphereGeometry(.32, 10, 7).scale(.55, .55, 1.4), WH), tint(new THREE.CylinderGeometry(.05, .08, .6, 6), WH, TR(0, .25, .5, .9)), tint(new THREE.ConeGeometry(.04, .32, 5), BK, TR(0, .45, .95, Math.PI / 2)), tint(new THREE.CylinderGeometry(.02, .02, .7, 4), BK, TR(0, -.05, -.75, Math.PI / 2))]);
+      bg.add(new THREE.Mesh(bd, bm));
+      const W2 = []; for (const sx of [-1, 1]) { const wp = new THREE.Group(); wp.position.set(sx * .12, .05, .05); bg.add(wp);
+        wp.add(new THREE.Mesh(mergeGeometries([tint(new THREE.BoxGeometry(1.5, .03, .55), WH, new THREE.Matrix4().makeTranslation(sx * .75, 0, 0)), tint(new THREE.BoxGeometry(.5, .035, .4), BK, new THREE.Matrix4().makeTranslation(sx * 1.4, 0, 0))]), bm)); W2.push(wp); }
       birds.push({ g: bg, wl: W2[0], wr: W2[1], r: 15 + i * 4, y: 27 + i * 2.5, w: (.18 + i * .05) * (i % 2 ? -1 : 1), a: i * 2.1, ph: i * 1.7 }); } }
   // ---- PASS 7: THE DEFENDERS, all killable. A BALLISTA on a timber deck astride the gallery ridge (it tracks him inside `balR`, winds,
   // looses a real ARROWS bolt -- blocked, glanced, PARRIED home -- `balHp` hits wreck it, back in `balFix` s; `heronHit`); ARCHERS in
@@ -23416,7 +23419,7 @@ const BLDG = { list: [
   { key: 'oni', t: 'Oni Gate', sub: 'a fortress wall carved as a demon face: walk in through its fanged mouth (it BITES on a cycle), guard rooms in its cheeks, sentry guns in its eyes, horns, a stair up the back to a lookout', pass: 3, build: () => oniBuild(), clear: () => oniClear(), on: () => !!ONI.on, step: dt => oniStep(dt) },
   { key: 'obs', t: 'Jin Observatory', sub: 'a clockwork tower: a spiral stair inside past great gears to a balcony under a copper dome whose telescope marks you in the open for a volley of arrows (blind its lens), a clock face', pass: 3, build: () => obsBuild(), clear: () => obsClear(), on: () => !!OBS.on, step: dt => obsStep(dt) },
   { key: 'fest', t: 'Lantern Festival Street', sub: 'a street of festival stalls (roofs to stand on, breakable backs) under strings of paper lanterns, red gates at both ends, bars across, a robot dragon dance to cut apart (strike the taiko to make it wild)', pass: 3, build: () => festBuild(), clear: () => festClear(), on: () => !!FEST.on, step: dt => festStep(dt) },
-  { key: 'heron', t: 'White Heron Castle', sub: 'a Himeji-style castle on a battered stone base: a five-storey white keep under layered grey roofs (every roof walkable, a hall on every storey, steep stairs up, the great pillars, a lookout balcony at the top), a gallery wing of two corridors to a hollow corner tower (a loop: keep up, across, tower down, back), its roof a path; a ballista on the gallery ridge, archers in the doorways and the lookout, a sentry gate held by two samurai; the approach: a walled ramp that doubles back to a drawbridge over a dry moat and a gate on the stone; black pines, stone and paper lanterns, war flags and three white herons wheeling round the keep; a stair up the stone, a storehouse at the foot whose walls break', pass: 9, build: () => heronBuild(), clear: () => heronClear(), on: () => !!HERON.on, step: dt => heronStep(dt) },
+  { key: 'heron', t: 'White Heron Castle', sub: 'a Himeji-style castle on a battered stone base: a five-storey white keep under layered grey roofs (every roof walkable, a hall on every storey, steep stairs up, the great pillars, a lookout balcony at the top), a gallery wing of two corridors to a hollow corner tower (a loop: keep up, across, tower down, back), its roof a path; a ballista on the gallery ridge, archers in the doorways and the lookout, a sentry gate held by two samurai; the approach: a walled ramp that doubles back to a drawbridge over a dry moat and a gate on the stone; black pines, stone and paper lanterns, war flags and three white herons wheeling round the keep; a stair up the stone, a storehouse at the foot whose walls break', pass: 10, build: () => heronBuild(), clear: () => heronClear(), on: () => !!HERON.on, step: dt => heronStep(dt) },
   { key: 'court', t: 'The Courtyard', sub: 'a walled court far north (0, 150): a wall-walk all round, the south gate, a stone lane between two timber halls with balconies and walkable roofs, a koi pond and a moon bridge; the two-roofed watchtower over the inner gate', pass: 2, build: () => courtBuild(), clear: () => courtClear(), on: () => !!COURT.on, step: dt => courtStep(dt) },
   { key: 'gpag', t: 'Great Red Pagoda', sub: 'five storeys of red lacquer: a room on every floor, ladders up through the hatches, a balcony round every storey, a spire; a pavilion whose roof you can climb; a red fence; climb the outside eave to eave, bars, a zipline off the spire; an armoury, a library, a bell room (the alarm), a lookout; archers, a sentry gun, gate guards; glowing windows, lantern halos, a beacon on the spire; streamers, chimes, birds; strike the gong at the top and the tower lights up and the gate opens', pass: 10, build: () => gpagBuild(), clear: () => gpagClear(), on: () => !!GPAG.on, step: dt => gpagStep(dt) },
   { key: 'zramp', t: 'Zoom Ramp Tower', sub: 'zoom from the red gate (full hold), up the ramp and straight up the face -- only a full zoom reaches the gold lip; your mark shows how close; or zigzag up the chimney', pass: 3, build: () => zrampBuild(), clear: () => zrampClear(), on: () => !!ZRAMP.on, step: dt => zrampStep(dt) },
