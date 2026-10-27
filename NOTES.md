@@ -5,6 +5,32 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1099 -- every NPC gets the directional knock-down: fly back- or belly-first, the matching fall, the matching get-up
+
+**What he said:** *"these guys when you hit them are still playing the OG arm hit and fall animation, so in the air it looks like they're
+standing... Remember the whole treatment when I get hit -- the specific directional in-air animation, fall on the ground, get up -- that
+needs to happen for NPCs and the warrior aliens and basically everybody."*
+
+**What was wrong:** a launched body played its kind's `downF`/`downB` (the warrior's is `Shoulder_Hit_And_Fall`, a STANDING hit-and-fall)
+from the blow, through the whole flight, with a random tumble spin. Only the heroes had Colin's six (m1074).
+
+**What changed (`KSET`, `knockAct`, `knockSetOf`, `bodyLaunch`, the `down` / `up` branches of `stepDummies`):**
+- **The Forge baked Colin's six onto 18 NPC files** (`tools/forge.cjs`, the m1074 knock profile minus the kips, Colin as donor, 3-4 s each,
+  0.3-0.7 MB): alien_warrior, hick_skinny, hobo_01, the six fat_*, contruction_worker, firefighter, dummy_officer, clancy, beautiful_blonde,
+  beautiful_asian, moussa, alien_female_purple, alien_rollerskate_blue, jack. Into `models/characters/forged/`; `index.json` lists 31.
+- **LAZY:** an NPC bake is fetched the first time its KIND is built (`forgedMerge`), so a level downloads only its own cast. Only the old
+  eager five (brute, the two CEOs, rept, zap) and the played hero's load at boot. Another HERO's bake on an NPC (the horde samurai) lends
+  only the six, via `knockAct`, and never replaces its other clips.
+- **The flight:** hit in front -> he FACES the blow and holds `flying_backwards`; from behind -> faces the way he flies, `flying_forwards`.
+  No tumble. Landing -> `fall_to_back` / `fall_to_face_down` (x1.25), the lie, then `get_up_from_back` / `get_up_from_face` (x1.35). Popped
+  back into the air (juggle) -> the flying pose again. A body without the set keeps the old fall. `mel.KSET.on = 0` is the A/B.
+- **Real loop (`npcknock.cjs`, White Box, a warrior):** front blow -> facing vs travel 180 deg, `flying_backwards` -> `fall_to_back` at
+  frame 41 -> `get_up_from_back` -> a battlecry. Back blow -> 0 deg, `flying_forwards` -> `fall_to_face_down` at 44 -> `get_up_from_face`.
+  Renders: back-first jackknife, on his back, sitting up; belly-first, face down, pushing up. The Forge retarget reads right on his rig.
+
+**Still open:** the hit REACTIONS on the ground (not launched) are still each kind's own clips. The big orange thing in the White Box: a fresh
+load shows only his tower and the orange domed base, so I need a wider picture.
+
 ## m1098 -- air blade strikes wear the air's legs; the slow juggle float is off
 
 **What he said:** *"when you're stringing the katana swings and he launches into the air to meet a guy... his feet are flat on the ground
