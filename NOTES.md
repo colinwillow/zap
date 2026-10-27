@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1269 -- Great Red Pagoda pass 4 of 10: the climb OUTSIDE (X1)
+
+- **Every roof is walkable.** Triangles are laid on each roof's own curve (an 18 x 18 grid of `bldRoof`'s height function), and ONLY
+  outside the walls, so a jump inside a room never lands in its ceiling.
+- **Every eave has a LIP to catch.** A .28 m timber fascia box runs along the middle 70% of each side, .9 m deep below the eave line:
+  `LEDGE`'s kind of edge (taller than `LEDGE.tall`).
+- **The route up the outside.** From the ground: jump to the ground eave's lip, pull up onto the roof, walk up to the balcony, hop the rail,
+  then the next eave lip... to the top roof.
+- **A BAR juts off every middle balcony.** It sits on the side opposite its door, under the eave above, so you can swing up to that
+  eave's lip.
+- **The ROPE FROM THE SPIRE.** A gold zipline runs from the spire's foot over the court down to beside the gate (`ZIPS`, removed on clear).
+
+SHIPPED UNVERIFIED. Next: pass 5, a different room on every storey.
+
 ## m1267 -- Great Red Pagoda pass 3 of 10: the pavilion and the fence (X1)
 
 - **The pavilion at its foot** (the reference's side hall). It stands just past the pagoda's ground eave on the +z side:
