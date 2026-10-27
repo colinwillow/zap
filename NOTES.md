@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1151 -- ZEPPELINS pass 3 (DONE)
+
+- The clan BANNER (red diamond-spiral) on both flanks of each hull.
+- A SEARCHLIGHT under each gondola's bow: a 16 m additive cone sweeping the ground below as it flies.
+- A string of seven lanterns along each keel; an escort DRONE orbiting each zeppelin.
+`BLDG` zep `pass: 3`. Next: the Flying Ship House (#10, (0, -40) floating). Shipped unverified.
+
 ## m1150 -- ZEPPELINS pass 2: trapezes and a flying sentry gun
 
 - **A TRAPEZE under each gondola:** a real high bar (`hbarMake`, no posts) on two ropes, `ZEP.trap` 4.2 m below the deck. It RIDES: every
