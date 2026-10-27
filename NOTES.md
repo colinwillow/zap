@@ -31,7 +31,7 @@ His second 10-pass reference, `images/korajin/ref/white_castle_keep.jpg` (a Hime
 
 SHIPPED UNVERIFIED. Next: pass 2, the roofs (chidori and kara gables, shachi on the ridges).
 =======
-## m@X4@ -- Octagonal Block Pagoda pass 3 of 10: everything breaks, and it repairs (X4, WORKER A)
+## m1279 -- Octagonal Block Pagoda pass 3 of 10: everything breaks, and it repairs (X4, WORKER A)
 
 THE BLOCK STYLE's third rule, *"every block can BREAK"*, now covers the whole building:
 - **The eave courses are blocks.** Each face's course is cut into ~.75 m segments, each with its own turned collider.
