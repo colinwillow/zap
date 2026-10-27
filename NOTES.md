@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1219 -- Teahouse Garden pass 1 (Building Forge loop, Set 2 #23)
+
+`TEAG`, in BLDG.list as `teag`, centred at (-47, 8).
+- **The pond.** An ellipse (6.5 x 5) of dark water with a stone rim and rocks round it.
+- **The teahouse.** It stands on stilts over the north half: a deck at .9 m (solid slab) up three .3 stone steps from the east.
+  On the deck, a tatami room with corner posts, shoji walls on three sides (the north and west are solid), a tea table and cup,
+  two hanging lanterns and a roof.
+- **The MOON BRIDGE.** A high vermilion arch across the south half, 15 m long and 2.2 m at the crown, its steepest at about 28
+  degrees. It is walkable triangles under a merged plank deck, with tube rails and posts.
+- **Stepping stones** cross the middle.
+- **A stone basin** stands by the steps.
+- **A RAKED-GRAVEL garden** lies east (a raked canvas, three solid rocks, timber edging).
+- **A tool SHED** with breakable walls stands by the west path.
+
+Next: alternate -- an extra pass (5) on the Airship Dock.
+
 ## m1218 -- Rampart pass 5: wall sentries (Building Forge loop, extra pass)
 
 Two robot samurai now PATROL the Rampart's wall walk at `senV` 1.3 m/s, back and forth between the bastions.
