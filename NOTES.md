@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1159 -- FORGE-WORKSHOP pass 2: the trip-hammer, a loft, ore
+
+- THE TRIP-HAMMER: a timber beam on a post with an iron head over the anvil. It lifts over `FWORK.hammer.lift` 1.3 s and drops in .14 s,
+  SLAMMING the anvil: sparks, a clang and a thud, a little shake nearby. Anyone standing under it (within 1.1 m) is knocked down -- him
+  (`playerHurt` 18, a push away) and any body (`dummyBlow`).
+- THE LOFT: a platform along the +z wall at 2.4 m, up a flight of eight .3 m steps from the front, railed, a WEAPON RACK of six blades.
+- Three crates of glinting ORE by the front to smash (shared `SMASH`).
+Pass 3 (polish) next. Shipped unverified.
+
 ## m1158 -- FORGE-WORKSHOP pass 1 (BUILDINGS.md #12, at (31, 25))
 
 `FWORK`, `fworkBuild` / `fworkStep` / `fworkClear`, `gearMesh` (a merged gear: one mesh). SPAWN > BUILDINGS > Forge-Workshop.
