@@ -5,6 +5,27 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## White Heron Castle pass 5 of 10: inside the keep (X2, WORKER B)
+
+- **Steep stairs instead of ladders.** Each stair is twelve dark timber steps, about 47 degrees: one walkable ramp under the steps, a
+  handrail on its open side, and its well open in the floor above.
+  - The stairs alternate walls (-z on odd storeys, +z on even), so a stair never stands over the well of the one below and the middle of
+    every hall stays open.
+  - The keep's kitClimbAdd ladders and hatches are gone.
+- **The great pillars (the shinbashira).** Two solid timber columns rise through every storey, with a gold band at head height. You can
+  run up them and fight round them.
+- **The halls.**
+  - A paper lantern glows in each one.
+  - Tatami mats on storeys 2 and 3, laid in the middle clear of the stairs.
+  - A rack of spears on storey 1's east wall, clear of its west door.
+- **The lookout (top storey).**
+  - Wide openings on every side but the door.
+  - A railed balcony all round (solid deck and rail), just above roof 3.
+  - A bronze telescope on a tripod by the door.
+  - Roof 3's gables gave way to the balcony.
+
+SHIPPED UNVERIFIED. Next: pass 6, the gallery wing (a corridor to run, its roof a path, the corner tower).
+
 ## m1286 -- Octagonal Block Pagoda pass 5 of 10: the rooms, and a stair up from the hall (X4, WORKER A)
 
 **The inside way up starts with a STAIR.** Twelve solid block steps, red and stone with gold nosings, run up the +x side of the ground
