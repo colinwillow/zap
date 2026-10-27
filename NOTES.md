@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1171 -- GATEHOUSE pass 4: archers, a portcullis, an alarm bell
+
+- Two red ARCHERS posted on the deck's front corners (cleared with it).
+- An iron PORTCULLIS in the middle of the passage (bars with spiked feet, cross rails), normally raised to 2.2 m (walk under it).
+- A bronze ALARM BELL hung in the passage. Strike it (`ghouseBell` through `bldHit`) -- or beat the Watchtower's WAR DRUM -- and the alarm
+  goes up (`ghouseAlarm`): the portcullis CRASHES down (fast, a clang and a thud) and the passage is shut (a `BDYN` box), every archer
+  looses; `GHOUSE.portUp` 10 s later it winds back up slowly.
+Next: Set 2 #15 Cliff Lodge. Shipped unverified.
+
 ## m1170 -- SKY BRIDGES pass 3 (DONE)
 
 - The bridges now REBUILD THEMSELVES: `skybSig` is a string of which spans and ziplines can stand; `skybStep` checks it twice a second
