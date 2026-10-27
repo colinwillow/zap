@@ -26,6 +26,19 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - **S2 -- the other done buildings, x1.5, one per build:** X1 pagoda (DONE m1323), C1 courtyard (DONE m1330), X2 castle (DONE m1321, Worker B), R1 Mega Wall (DONE m1332), and the older forge rows: hall (DONE m1336), wtower (DONE m1342), gate (DONE m1343), pagoda (DONE m1346), market (DONE m1349), shrine (DONE m1351), rampart, adock, zep, fship, bath, fwork, sphang, skyb, cliff, keep, barr, lhouse, fisl, npil, storii, siege, teag, colo, oni, obs, fest, swrk -- in that order.
     One build each, with stairs re-cut to .30 risers.
   - **then** the queue below (R2 Four Fires on), built at the new scale.
+- **S3 -- BREAKABLE SKINS ON A STANDING FRAME (his, after m1352):** *"A lot of stuff I wish was breakable -- balusters, gates, railings, parts of
+  roofs. Like Weirdport: the frame of the building was always there, but every wall, every door could be destroyed. Build the frame of the roof,
+  but the pieces that make up the roof are destructible -- if rockets are shooting at you or you're fighting up there, they're shooting pieces of
+  the roof off; maybe you have to go back up and rebuild it. I like the idea of exposed rafters -- parts of the wall go away but there's
+  scaffolding left."*
+  - **THE RULE from here:**
+    - every roof is a permanent RAFTER FRAME (beams you can stand and run on) under breakable PANELS. A panel is walkable until it is shot or struck away, then the rafters show.
+    - every wall is the same: a timber frame (posts, rails) that stays, with breakable infill (the `cwallBuild` chunks already are this).
+    - railings, balusters and gates are breakable pieces.
+    - panels come back on a slow timer (or a worker rebuilds them).
+  - **S3a (next):** a shared helper (`bldSkinRoof`): a hip/gable roof cut into panels between rafters, each panel its own walkable triangles plus a merged-range mesh. Hits (`bldHit`, rockets, strikes) knock panels out with debris and a tile clatter. The rafters stay walkable beams. First on the Dojo Hall's roof.
+  - **S3b:** railings, balusters and gates as breakable pieces (a shared `bldRail` helper), first on the Courtyard's balconies and bridges.
+  - **S3c:** retrofit the rest, roof by roof, as each building's S2 pass comes up.
 - **GIANTS:** *"Enemies like 100 times your size."* A design note for R7 (the sky dragon) and R8 (boss armour): build the bosses
   building-sized, things you climb and fight ON.
 
