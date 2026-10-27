@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- Octagonal Block Pagoda pass 10 of 10: the polish (X4, WORKER A)
+## m1298 -- Octagonal Block Pagoda pass 10 of 10: the polish (X4, WORKER A)
 
 Read against the reference and the rules, and fixed what was wrong:
 - **The doors were taller than the eave over them.** Since pass 4 every eave's teal band hangs 1.85 m over the floor of the storey it
