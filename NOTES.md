@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1199 -- Robot Barracks pass 4: the drill master (Building Forge loop, extra pass)
+
+**The DRILL MASTER** now stands beside the taiko dais, facing his six ranks. He is a robot samurai at `bossK` x1.45 scale with
+`bossHp` 9.
+
+He joins the fight when the yard does:
+- His cut lands on the drill's beat, like theirs, at 1.5x reach, 1.8x damage (18), with a heavy shove and a camera shake.
+- He stops 1.6 m off.
+
+**Cut him down and the DRILL STOPS for `haltT` 20 s.** The count freezes mid-stroke: no taiko, no cuts, nobody breaks ranks.
+Even a struck robot cannot wake them. Then he stands back up and the count resumes.
+
+Pass 4 is an extra on a done building, so it moves no sandbox box. Next: alternate -- Floating Islands pass 3.
+
 ## m1198 -- Floating Islands pass 2: the Jin lift stone and the shrine bell (Building Forge loop)
 
 **The JIN LIFT STONE.** A rock disc with a glowing cyan face stands in the street 1 m off the low island's east rim, inside a
