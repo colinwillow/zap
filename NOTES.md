@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## THE COURTYARD, PASS 9: FIXES FROM READING THE ROUTES (m-COURT9)
+## THE COURTYARD, PASS 9: FIXES FROM READING THE ROUTES (m1312)
 
 COURTYARD.md pass 9 is "playtest-driven fixes from his notes". He has not walked the court yet, so this pass walked the four routes in the code and fixed what blocks them. Shipped unverified.
 
