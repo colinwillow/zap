@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## THE SHIP, PASS 10: THE SCENERY REBUILT -- NO MORE CONES (m@X4@, WORKER A)
+## THE SHIP, PASS 10: THE SCENERY REBUILT -- NO MORE CONES (m1404, WORKER A)
 
 His: *"I'm not loving the background scenery... it feels very low rent... take a cone, flip it upside down and call it a floating island and
 it looks so goddamn geometric. Break up the flat surfaces, make the rim eroded, differences in ground textures, bushes, trees... the
