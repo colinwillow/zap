@@ -5,6 +5,38 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home, procedural, pass 1: the massing and the walkable shell, with an inside (WORKER B)
+
+His: *"building it procedurally is gonna be better so that we can go inside and add stuff to it and it's all in the same game style... a ton
+of passes, as true to the design as we can be."* The refs are `images/korajin/ref/grumbo_home_1..4.jpg`.
+
+`GHOME` / `ghomeBuild` replaces the Tripo GLB in the Red Hollows (`?w=home`).
+- **The switch.** `?hut=glb` (or `localStorage mel.hut = glb`) brings the GLB back to compare.
+- **Its own frame.** It is built round local +z = the front (toward the river), in `HOME.hut`'s frame. Colliders are local boxes turned
+  into the world (a quarter turn keeps a box a box). Every floor is `triAdd` triangles. The materials go through `put()`, which keeps only
+  position, normal and (on the stone) vertex colour, so every bucket merges. **4 draws.**
+- **The pad.** `HOME.hut.w` is 12 for the bigger pad. The home sits 1 m further from the river. The banner poles, the boulder exclusion and
+  the four lanterns at the door are moved out to clear it (`HOME.hutS`).
+
+What stands:
+- **The mound.** A lathed oval plinth 1.2 m high with 26 boulders round its foot. Steps go up to the shop front and down from the round
+  back door: 4 risers of 0.30 m each, with a walkable ramp under the treads.
+- **The HALL.** A 9.2 m round room, 7 m walls under a dome (the dome's outside is walkable). The walls' solid is RUNS (a cell test merged
+  along x) layered round each opening's height. It has:
+  - the shop front (3.8 m wide), with a timber frame;
+  - the round back door (1.8 m), arched;
+  - a screen wall with a 2.4 m way through: the shop (counter) in front, his quarters (bed, table) behind;
+  - doors into the tower and the store.
+- **The balcony TOWER.** A spiral stair round a solid post, **19 risers of 0.284 m**, about 1.3 turns, from the hall door up to the balcony
+  door. The balcony is a railed deck (noCam) on a mushroom-shaped stone ledge round the tower's outer side.
+- **The STORE wing.** A small domed room off the hall.
+- **The stone.** Cream with the purple spots and the dark speckle, as vertex colour from a 3D value noise (`ghStone`, linear colour), with
+  round windows in timber rings.
+
+**Checked headless:** the world boots and the builder runs (`[melee] grumbo home (procedural): 4 draws, 555 boxes, 2094 walkable tris`).
+I looked at renders from the front, above and inside against the refs; the mass and the colours read. Not played: shipped unverified.
+Next: pass 2, the scaffold, awnings and banners.
+
 ## THE SHIP, PASS 5: THE ALIEN-SAMURAI AIRSHIP LOOK (m1378, WORKER A)
 
 His reference sheet (the flying junk: turbines with blue cores, a horned dragon figurehead, a pagoda stern castle, red diamond banners,
