@@ -27,7 +27,7 @@ knows yet what his phone does with that -- so the first build MEASURES, and ever
    separation, flocking to the front. Your hits LAUNCH them high and far (the knock-flight `bodyFly` already does).
 
 ## DONE WHEN
-- [ ] The probe's numbers from his phone at 25 / 50 / 100 are in NOTES.
+- [x] The probe's numbers from his phone are in NOTES (m1087: 21 to 50-something FPS, "not too bogged down").
 - [ ] 100 fighters at 30 fps or better on his phone, all moving and fighting.
 - [ ] Red vs blue fighting each other, and him in it; hits that send men flying.
 - [ ] **He played it on his phone and signed it off.**

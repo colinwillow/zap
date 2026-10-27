@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1087 -- FREEFLOW (string swings man to man, leaping), the horde gets swords and goes flying, and you can jump over a crowd
+
+*"None of them had samurai swords. It went between 21 and 50-something FPS. It didn't feel too bogged down. Their collider must be so tall
+-- I can't jump over them, so they just crowd you in. Really need a more stringy melee system so you can keep swiping and string those
+attacks from one guy to the next guy to the next, launch leap, leap launch, send them flying if they're not blocking. I couldn't really do
+much."*
+- **His phone, the probe (m1084):** 21 to 50-something FPS with the horde up, "not too bogged down". The baseline for HORDE.md stage 2.
+- **Swords:** `hordeAdd` now mounts the rival's katana (`arenaKatana`) -- which also hue-shifts them (`rivalHue`): reads as a team colour.
+- **Jump over them:** `pushBodies` had no height test -- an infinitely tall cylinder. It skips a body once his feet are over 72% of its
+  height (`d.K.h`). Measured: held 1.2 m over a man's head, pushed 0.00 m.
+- **FREEFLOW (`FLOW`):** a melee blow that LANDS (`dummyBlow`, no `BLOW_SRC`) opens `window` 1.1 s. A swing inside it: `meleeLock` reaches
+  7.5 m (not the katana's 3.5) across a 1.45 rad cone, skips anyone down / getting up, and prefers a man NOT hit in the last .9 s (pass 0;
+  anybody standing if none); the lunge solves past the ordinary cap up to `maxV` 60; past 3.2 m it is drawn as a LEAP (`flowArc`, up to
+  1.4 m). **Blocked blows no longer fling** (`down` needs `!guard`) -- everywhere.
+- **The horde is throwable:** its kind (`HORDE.K`) flings on any unblocked blow past .25 power, `fly` 1.7 x higher and further.
+- **Measured** (`flow.cjs`, real loop, 25 sworded samurai, a swing at the nearest standing man every .5 s for 8 s): 15 of 16 swings
+  chained in flow, onto 12 different men; all 25 launched at some point; 2 leaps (the nearest was rarely past 3.2 m). Rendered: swords
+  in hand, men down round him.
+- Shipped unverified on the phone.
+
 ## m1085 -- THE ZOOM (PARKOUR.md piece 1): unarmed, hold the right pad up from standing -> run in place, charge, click, let go -> launch
 
 *"I said a while ago... a zoom run thing, like Sonic: unarmed, press and hold up on the right stick, he starts running in place, it reaches
