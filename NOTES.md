@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1172 -- CLIFF LODGE pass 1 (Set 2 #15, at (0, 47))
+
+`CLIFF`, `cliffBuild` / `cliffStep` / `cliffClear`. SPAWN > BUILDINGS > Cliff Lodge.
+- A 12 m ROCK CRAG (12 x 10): a box subdivided and jittered INWARD only (so the rock never pokes past its collider), flat on top,
+  flat-shaded; boulders round its foot.
+- THE PATH round its four faces: a 1.6 m lane climbing 3 m a face (slope ~.22-.25), landings at the corners, one full lap to the summit
+  (the watchtower ramp's construction on a rectangle); stone slabs with a low lip.
+- A timber-and-plaster LODGE on the summit with a door on the courtyard side, deep curved eaves, lamps.
+- A PERCH beam 4.5 m out over the courtyard side with a grapple ring above its tip.
+- A WATERFALL off the east face (an animated scrolling canvas sheet) falling across the path -- you walk through it -- into a pool with a
+  stone rim and drifting spray at its foot.
+Shipped unverified.
+
 ## m1171 -- GATEHOUSE pass 4: archers, a portcullis, an alarm bell
 
 - Two red ARCHERS posted on the deck's front corners (cleared with it).
