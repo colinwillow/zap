@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## LEVEL DESIGN RESEARCH: THE RUBRIC (LEVELDESIGN.md, after m1371)
+
+His: *"go out and research what game designers say about levels... if they have a rubric like the one I spitballed, or anything I missed."*
+
+- **What the research found:** his five layers hold, and the sources describe the same order. Added:
+  - **layer 0, the METRICS** (measure the moves, size every gap from them)
+  - **kishōtenketsu per mechanic** (introduce safe, develop, twist, conclude: teach before test)
+  - **a SAWTOOTH rhythm** with rest pads and checkpoints
+  - **wayfinding:** a legible critical path, and landmarks in three tiers
+  - **Boss Keys lock-and-key graphs,** with a choice of locks and abilities as keys
+  - **Dark Souls loop-back shortcuts**
+  - **enemy LEASHES and line of sight;** never unavoidable
+- **Level 1 scored against it** (the table in LEVELDESIGN.md). Biggest gaps:
+  - no numbers measured
+  - no teach-before-test (the first wall run is over a pit)
+  - no rests or checkpoints
+  - a straight-chain puzzle with no loop-back
+  - enemies with no zones
+- **No code in this one.** Docs only, so no build.
+
 ## LEVEL 1 IS ITS OWN MENU ENTRY, WITH LAYER TOGGLES (m1371)
 
 His: *"Level 1 should be its own thing you choose from the menu rather than spawning it in the building spawn, with toggles -- its own debug menu, so you can still spawn all the other stuff, but you can toggle layer one, two, three, four... if there's enemies I can turn them off. Layer one is always there cause it's just the geometry."*
