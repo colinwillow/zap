@@ -54,6 +54,21 @@ The katana and its chains, the swing lurches (m1101), the guard and its strikes,
 dismembering robot samurai (m1090), the slicing horde with real life (m1102), the red archers (m1103), the directional
 knock-downs on everybody (m1099), the rival, the beasts, the dragon fireball (m1096), the tornado, the zoom.
 
+## THE RED HOLLOWS -- Grumbo's homeland (his direction, Oct 27 2026)
+
+*"Grumbo's home territory should be the place that establishes the entire identity of KORAJIN. Not a generic samurai village, and not a
+futuristic alien city. Something that looks ancient, organic, slightly primitive, but has mysterious technology embedded throughout it."*
+
+A secluded settlement built into the remains of an ancient civilization: a sprawling canyon of enormous rounded sandstone formations, natural
+caves, suspended wooden bridges, weathered red banners, and strange bronze machinery that nobody remembers how to manufacture. A place where
+generations of unusual alien creatures have lived, traded, fought, and developed their own customs.
+
+References: `images/korajin/ref/red_hollows_home.webp` (Grumbo lounging at his door: rounded sandstone, red diamond-spiral banners, bronze
+lamps and a ship's-wheel gear, floating islands and waterfalls behind) and `images/korajin/ref/red_hollows_canyon.webp` (a deep canyon,
+rope bridges, painted walls, hanging pennants, misty light from above).
+
+In the game: world `home` (KORAJIN > The Red Hollows), first pass m1113 -- see NOTES.md.
+
 ## Not built yet
 
 A bow for Grumbo; the sword-and-bow enemy who switches; a Korajin place (the bronze town, the floating islands); a Korajin

@@ -5,6 +5,30 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1113 -- THE RED HOLLOWS: Grumbo's homeland is a canyon (the Refuge's lake is `?style=lake`)
+
+**What he said:** *"Grumbo's home territory should establish the entire identity of KORAJIN... ancient, organic, slightly primitive, with
+mysterious technology embedded throughout... The Red Hollows: a sprawling canyon of enormous rounded sandstone formations, natural caves,
+suspended wooden bridges, weathered red banners, strange bronze machinery."* Two reference images, saved as webp in images/korajin/ref/,
+and the text in KORAJIN.md.
+
+**What changed (`HOLLOW`, `hwHeight`, `hwRc`, `hwWallAt`, `hollowDress`, `hwBanner`; `HOME.style` 'hollows' | 'lake'):** the same world, the
+same water (m1111's port), a different land. `hwHeight`: a canyon along z, a river (`hwRc` its winding centre) in a bed 1.7 m under the
+surface, a 24 m floor on the west (the hut, facing the river), 13 m on the east, then rounded LUMPY sandstone walls (two octaves of noise
+moving the wall's start) up to a 30 m rim. A 340 m grid at 2 m. The walls are walls because they are steep: the walkable store keeps only
+the floors. Strata: red, deep red and pale bands by height, moss on the rim. THE PIECES: 34 sandstone boulders and stacked HOODOOS on the
+floor (solid) and lumps on the rim; 5 CAVE MOUTHS in the walls; two ROPE BRIDGES anchored IN the walls at their height (`hwWallAt`), planks
+on a catenary, rope rails; RED BANNERS with his white diamond-spiral (a canvas texture, weathered, a tattered hem) hanging from the bridges
+and from 4 poles, swaying; 5 BRONZE GEARS set in the walls, turning (one draw each); 9 FLOATING ISLANDS over the rim with waterfalls; his
+stone lanterns in front of the door. The mist and the paper lanterns ride the river. A brighter sky.
+
+**Real loop (`hollows.cjs`):** 48 draw calls, 193k tris; spawned on the floor by the river (y .78); walking to the river he wades in.
+A first render had the gears floating on the floor and the bridges' ends hanging in the air (placed by a distance, not by the wall) and
+the stone too pale; all three fixed and re-rendered. A crash in the boot warm-up: chaining the lake patch onto the katana's own shader hook
+lost its `this` -- `prev.call(this, ...)` now.
+
+**Next:** paths and stairs up the walls (to the bridges), more homes in the walls, the hut's own collider, his models over the stand-ins.
+
 ## m1112 -- the Refuge: his legs read wet when he wades; low mist over the lake
 
 - **HIS BODY through `rwPatch`** (chained onto whatever his materials already do; 10 materials on the goblin), so below the surface his

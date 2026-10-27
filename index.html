@@ -876,10 +876,10 @@ body.desk.free #deskHint { display: block; }
   <h1>WEIRDPORT</h1>
   <div class="msg" id="bootMsg">loading</div>
   <div class="bar"><i id="bootBar"></i></div>
-  <div class="bld">BUILD <span id="bootBuild">m1112</span></div>
+  <div class="bld">BUILD <span id="bootBuild">m1113</span></div>
 </div>
 
-<div class="chip" id="build"><b id="buildN">m1112</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
+<div class="chip" id="build"><b id="buildN">m1113</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
 <div id="splash" aria-label="tap to start"><img class="blur" alt=""><img class="main" alt="Zap and Clancy"><div class="glow"></div><div class="bn"></div></div>
 <script>
 // m879 (STEER 02:22): THE SPLASH, before the module (so it shows on the first paint, while the boot carries on behind it). The image's
@@ -988,7 +988,7 @@ import { KTX2Loader } from './vendor/KTX2Loader.js';
 import { clone as skeletonClone } from './vendor/SkeletonUtils.js';
 import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
 
-const BUILD = 'm1112';
+const BUILD = 'm1113';
 /* ASSETS:START */
 const ASSETS = {"models/alien_lizard.glb":"faffcf4c","models/alien_lizard_ktx2.glb":"05da2a20","models/skate.glb":"0c612d5e","models/skateboard.glb":"5ba93796","models/characters/alien_antenna_game.glb":"f3ccf328","models/characters/alien_antenna_game_ktx2.glb":"28afac8c","models/characters/alien_female_purple.glb":"1c73eef1","models/characters/alien_female_purple_ktx2.glb":"fc914afb","models/characters/alien_goblin.glb":"3e91bffb","models/characters/alien_goblin_chains.glb":"e72d1550","models/characters/alien_goblin_game.glb":"cfabd926","models/characters/alien_grey_medium.glb":"5a779e8e","models/characters/alien_grey_medium_ktx2.glb":"61600c3e","models/characters/alien_rollerskate_blue.glb":"abf0917c","models/characters/alien_rollerskate_blue_ktx2.glb":"e9a7948a","models/characters/alien_warrior.glb":"f5cc9c49","models/characters/alien_warrior_ktx2.glb":"a13fb7b6","models/characters/beautiful_asian.glb":"910f6565","models/characters/beautiful_asian_ktx2.glb":"35281eef","models/characters/beautiful_blonde.glb":"edddc421","models/characters/beautiful_blonde_ktx2.glb":"89cf3899","models/characters/brute_warboss_armor.glb":"cc5c7936","models/characters/ceo_alien.glb":"844dc3a7","models/characters/ceo_human.glb":"ec289865","models/characters/clancy.glb":"4b9d271f","models/characters/clancy_ktx2.glb":"74edbc6e","models/characters/colin.glb":"99d38b7d","models/characters/colin_ktx2.glb":"35040f87","models/characters/contruction_worker.glb":"8bd3d7ce","models/characters/contruction_worker_ktx2.glb":"3df8c344","models/characters/dummy_officer.glb":"724965ac","models/characters/dummy_officer_ktx2.glb":"db640cda","models/characters/fat_activist_01.glb":"3c566fee","models/characters/fat_activist_01_ktx2.glb":"b9328df4","models/characters/fat_biker_01.glb":"576b7cf5","models/characters/fat_biker_01_ktx2.glb":"7142cfad","models/characters/fat_biker_02.glb":"ab5d7ec7","models/characters/fat_biker_02_ktx2.glb":"28cec6cc","models/characters/fat_hippie.glb":"f09a260d","models/characters/fat_hippie_ktx2.glb":"0be745a4","models/characters/fat_hipster.glb":"9cf45ffb","models/characters/fat_hipster_ktx2.glb":"18106ff3","models/characters/fat_secret_service.glb":"6d546fb0","models/characters/fat_secret_service_ktx2.glb":"a23a304e","models/characters/fat_trump.glb":"5de6bc56","models/characters/fat_trump_ktx2.glb":"a0ddaf4d","models/characters/firefighter.glb":"ebde005d","models/characters/firefighter_ktx2.glb":"ccf93c96","models/characters/goblin_game.glb":"db1cf0e0","models/characters/hick_skinny.glb":"1ebe78e8","models/characters/hick_skinny_ktx2.glb":"1e93f0ed","models/characters/hobo_01.glb":"34e80b1d","models/characters/hobo_01_ktx2.glb":"69497677","models/characters/jack.glb":"ab009b9b","models/characters/jack_ktx2.glb":"1f4c9f7f","models/characters/moussa.glb":"6d80b1cf","models/characters/moussa_ktx2.glb":"66e040f8","models/characters/orc_game.glb":"d9aa816d","models/characters/proxy_ceo.bin":"6eca0c34","models/characters/proxy_ceo.jpg":"fadc9d0a","models/characters/proxy_ceo.json":"e62a7975","models/characters/proxy_ceo_alien.bin":"be247ecc","models/characters/proxy_ceo_alien.jpg":"8f8bf8fc","models/characters/proxy_ceo_alien.json":"eb23e28f","models/characters/proxy_hick.bin":"4485560e","models/characters/proxy_hick.jpg":"8c331965","models/characters/proxy_hick.json":"d85a0d36","models/characters/proxy_zap.bin":"dd7b300e","models/characters/proxy_zap.jpg":"2e7330ae","models/characters/proxy_zap.json":"b3b42754","models/characters/proxy_zap2.bin":"51088f46","models/characters/proxy_zap2.jpg":"a954a815","models/characters/proxy_zap2.json":"5c50abb7","models/characters/rept_heavy_armor.glb":"934661c7","models/characters/samurai_game.glb":"c7940015","models/characters/xray_skeleton.glb":"46480317","models/characters/zap.glb":"5e5cca54","models/characters/zap_02.glb":"4ff12de0","models/characters/zap_02_lib.glb":"e23d91da","models/characters/zap_ktx2.glb":"4b29d886","models/characters/zoar.glb":"423a9de9","models/characters/zoar_game.glb":"d20a3736","models/vehicles/dump_truck.glb":"d870dc18","models/vehicles/dump_truck_ktx2.glb":"21ee7059","models/vehicles/motorcycle_fatboy.glb":"9ed9be28","models/weapons/alien_antenna_blaster_game.glb":"54083b44","models/weapons/alien_antenna_hammer_game.glb":"707b8a27","models/weapons/alien_launcher.glb":"ba8ab96a","models/weapons/hammer.glb":"3335fdf2","models/weapons/shield_brute.glb":"c6e5593f","models/weapons/spikey_mace.glb":"dcd43acd","models/weapons/w_brute_cleaver.glb":"07a97580","models/weapons/w_rept_maul.glb":"84c3a1a4","models/buildings/alien_base_01.glb":"d9b9fd7f","models/buildings/alien_base_01_ktx2.glb":"6cbbfef2","models/buildings/korajin_bld_01.glb":"edf3178e","models/towers/alien_tower_01.glb":"98d23375","models/towers/alien_tower_01_ktx2.glb":"47597651","models/streets/modular_streets_kit.glb":"6a4bcaa5","models/toon_city/impact_marks.json":"2b616620","models/toon_city/impact_marks_atlas.ktx2":"efe0840e","models/toon_city/impact_marks_atlas.png":"490ed049","models/toon_city/toon_city_breakables.glb":"29bddbc8","models/toon_city/toon_city_collision.glb":"fb3a693f","models/toon_city/toon_city_obb.json":"81c18a47","models/toon_city/toon_city_visual.glb":"5df62285","models/toon_city/toon_city_visual_ktx2.glb":"cf080531","models/toon_city/weirdkit_tint.js":"f6e9d802","models/toon_city_kit/toon_city_collision.glb":"5540a364","models/toon_city_kit/toon_city_kit_buildings.glb":"590e53f0","models/toon_city_kit/toon_city_kit_buildings_ktx2.glb":"e6dff3a3","models/toon_city_kit/toon_city_kit_pieces.glb":"8232bd6f","models/toon_city_kit/toon_city_kit_twins.glb":"fcc9fdfc","models/toon_city_kit/toon_city_visual.glb":"45cf2957","models/toon_city_kit/toon_city_visual_ktx2.glb":"f26a6984","models/toon_city_kit/weirdkit_detile.js":"dd05bd70","models/characters/morph/shapes.bin":"4e680384","models/characters/morph/shapes.json":"abfc949d","models/characters/forged/alien_female_purple.glb":"0308860e","models/characters/forged/alien_goblin_game.glb":"4925f5a6","models/characters/forged/alien_rollerskate_blue.glb":"bcccc63f","models/characters/forged/alien_warrior.glb":"a067d5ab","models/characters/forged/beautiful_asian.glb":"f1c7baa5","models/characters/forged/beautiful_blonde.glb":"f83172bd","models/characters/forged/brute_warboss_armor.glb":"dc15dc94","models/characters/forged/ceo_alien.glb":"20659ac3","models/characters/forged/ceo_human.glb":"326d9e7e","models/characters/forged/clancy.glb":"19fabcce","models/characters/forged/contruction_worker.glb":"99fe1a17","models/characters/forged/dummy_officer.glb":"87a11843","models/characters/forged/fat_activist_01.glb":"6546645c","models/characters/forged/fat_biker_01.glb":"943f38ea","models/characters/forged/fat_biker_02.glb":"5d63a0cf","models/characters/forged/fat_hippie.glb":"ff0539ba","models/characters/forged/fat_hipster.glb":"792b92d8","models/characters/forged/fat_secret_service.glb":"7c29d1da","models/characters/forged/firefighter.glb":"20410689","models/characters/forged/goblin_game.glb":"3c813462","models/characters/forged/hick_skinny.glb":"d9232022","models/characters/forged/hobo_01.glb":"37d266c9","models/characters/forged/index.json":"01be89cd","models/characters/forged/jack.glb":"712b6241","models/characters/forged/moussa.glb":"74d19c70","models/characters/forged/orc_game.glb":"7bf3c227","models/characters/forged/rept_heavy_armor.glb":"01e631b0","models/characters/forged/samurai_archer.glb":"04db413e","models/characters/forged/samurai_game.glb":"a946c148","models/characters/forged/zap.glb":"10eda718","models/characters/forged/zap_02.glb":"fd513cea","models/characters/forged/zap_02_lib.glb":"fd513cea","models/characters/forged/zoar_game.glb":"b032a28e","images/crack_sprite_01.ktx2":"4aa55fde","images/crack_sprite_01.png":"16b52e8c","images/fire_sprites_01.ktx2":"922e1191","images/fire_sprites_01.png":"f87e2696","images/fire_sprites_02.ktx2":"e0cbfe1d","images/fire_sprites_02.png":"b373a6fd","images/fire_sprites_03.ktx2":"4fbbb985","images/fire_sprites_03.png":"7eece336","images/geyser_sprites_01.png":"b6325470","images/hdri_game.ktx2":"0feb5c79","images/hdri_game.png":"dac55f41","images/splash_zap_n_clancy.webp":"52a9d8a4","images/water_sprites_01.ktx2":"326924c5","images/water_sprites_01.png":"31e12659","audio/blaster_sound_01.mp3":"40d99583","audio/blaster_sound_02.mp3":"4bd7bb7c","audio/box_break_01.mp3":"e4127980","audio/electricity_beam_01.mp3":"986db8c9","audio/explosion_small.mp3":"f154a537","audio/metal_clang_01.mp3":"a333bd27","audio/metal_clang_02.mp3":"1e3ebbd6","audio/metal_clang_03.mp3":"afe44812","audio/metal_ping_01.mp3":"8ffca1a0","audio/plasma_canon.mp3":"e32c324d","audio/powerup_01.mp3":"48fbbe08","audio/swoosh_01.mp3":"193db185","audio/swoosh_02.mp3":"19145e70","audio/swoosh_03.mp3":"544fdffb","audio/swoosh_04.mp3":"843bee5d","audio/plasma_sounds/plasma_01.mp3":"e71c010f","audio/plasma_sounds/plasma_02.mp3":"ac3b1c75","audio/plasma_sounds/plasma_03.mp3":"eaa59355","audio/plasma_sounds/plasma_04.mp3":"bc7865e0","audio/plasma_sounds/plasma_05.mp3":"1d821cd0","audio/plasma_sounds/plasma_06.mp3":"cb979fbe","audio/plasma_sounds/plasma_hit.mp3":"30e5af5c","audio/alien_orc_grunt_sounds/alien_orc_grunt_01.mp3":"d6f4b343","audio/alien_orc_grunt_sounds/alien_orc_grunt_02.mp3":"78afc603","audio/alien_orc_grunt_sounds/alien_orc_grunt_03.mp3":"972c524a","audio/alien_orc_grunt_sounds/alien_orc_grunt_04.mp3":"b0ce76eb","audio/alien_orc_grunt_sounds/alien_orc_grunt_05.mp3":"1f0ba1f4","audio/alien_orc_grunt_sounds/alien_orc_grunt_06.mp3":"4f749866","audio/alien_orc_grunt_sounds/alien_orc_grunt_07.mp3":"dcf75925","audio/hit_sounds/hit_sound_01.mp3":"befaa2be","audio/hit_sounds/hit_sound_02.mp3":"73bc4433","audio/hit_sounds/hit_sound_03.mp3":"24b181e4","audio/hit_sounds/hit_sound_gound_01.mp3":"86ee2674","audio/hit_sounds/hit_sound_ground_02.mp3":"8a7cac73","audio/hit_sounds/hit_sound_plasma_01.mp3":"9abc0202","audio/hit_sounds/hit_sound_plasma_02.mp3":"6aaf0fe5","audio/creature_noises/creature_noise_01.mp3":"cbcc6ee7","audio/creature_noises/creature_noise_02.mp3":"201a8247","audio/creature_noises/creature_noise_03.mp3":"97680811","audio/creature_noises/creature_noise_04.mp3":"6f734df2","audio/creature_noises/creature_noise_05.mp3":"6f736441","audio/creature_noises/creature_noise_06.mp3":"992712e9","audio/creature_noises/creature_noise_07.mp3":"d9ad04b3","audio/footsteps/footstep_2_l.mp3":"abeabfbe","audio/footsteps/footstep_2_r.mp3":"7dd16046","audio/footsteps/footstep_l.mp3":"b66e579b","audio/footsteps/footstep_r.mp3":"96e13433","models/props/prop_hydrant.glb":"f157fee9","models/props/prop_hydrant_collision.glb":"0bbfc4d2","models/creatures/3_headed_dog.glb":"9263480a","models/creatures/blue_dragon.glb":"d72f4da7","models/creatures/mech_lightning_dragon.glb":"5935bb67"};
 /* ASSETS:END */
@@ -2474,7 +2474,7 @@ const WORLD = {
   now: 'tkit',
   store: 'mel.world',
   // KIT CITY FIRST, so the key's cycle starts from the main world
-  list: { tkit: 'WEIRDPORT', arena: 'ARENA', test: 'WHITE BOX', home: 'REFUGE' },     // m1110: Grumbo's refuge (KORAJIN)   // ZAP: two worlds -- the plain kit city and the white box   // m438: Level 1, the alien plaza   // m432: his alien planet
+  list: { tkit: 'WEIRDPORT', arena: 'ARENA', test: 'WHITE BOX', home: 'RED HOLLOWS' },     // m1110: Grumbo's refuge (KORAJIN)   // ZAP: two worlds -- the plain kit city and the white box   // m438: Level 1, the alien plaza   // m432: his alien planet
 };
 {
   // **THE STORE IS READ INSIDE A TRY, AT MODULE SCOPE.** A throw up here is `init()` never
@@ -56707,7 +56707,7 @@ async function buildAlienWorld() {
 // a skirt round the base, so it is SOLID -- rasterised into columns -- and the hut is walked round, not into; its glTF lights dropped); a weird
 // tree (`homeTree`: a twisted trunk, puffed magenta-and-teal crowns, glowing pods); and `lanterns` paper lanterns drifting over the land and
 // the sea, one instanced draw. Next passes: the dock and the boats, bamboo, the floating isles in the sky.
-const HOME = { live: 0, padY: 1.15, hut: { file: 'models/buildings/korajin_bld_01.glb', w: 9, at: [0, -7], yaw: 0 }, spawn: [0, 9],
+const HOME = { live: 0, style: 'hollows', padY: 1.15, hut: { file: 'models/buildings/korajin_bld_01.glb', w: 9, at: [0, -7], yaw: 0 }, spawn: [0, 9],
   toriiA: Math.PI * .5, toro: [[-3.2, 3], [3.2, 3], [-3.2, -.5], [3.2, -.5]], dockA: Math.PI * .22, bamboo: [-12, -10], pine: [11, -6], cherry: [-9, 6],
   ht: { size: 160, n: 256, lo: -8, hi: 8 }, mistN: 16, mist: null, lanterns: 22, lan: null, t: 0, hutObj: null, boat: null, stat: {} };
 const inHome = () => WORLD.now === 'home';
@@ -56752,7 +56752,25 @@ const _rwN = rwPNoise(64, 99);
 const rwFbm = (x, z) => { let s = 0, a = .5, f = 1; for (let i = 0; i < 4; i++) { s += (_rwN(x * f / 64, z * f / 64) - .5) * a; a *= .5; f *= 2.03; } return s; };
 const rwIslandR = a => RW.R * (1 + .16 * Math.sin(a * 2 + .7) + .1 * Math.sin(a * 3 + 2.1) + .055 * Math.sin(a * 5 + .4));
 // THE height. A plateau ~1 m over the lake, a pebble shore, shallows, the drop-off; the hut's pad levelled; low mounds inland
-function rwHeight(x, z) {
+// m1113: THE RED HOLLOWS (his direction: *"Grumbo's home territory should establish the entire identity of KORAJIN... ancient, organic,
+// slightly primitive, with mysterious technology embedded throughout... a sprawling canyon of enormous rounded sandstone formations, natural
+// caves, suspended wooden bridges, weathered red banners, strange bronze machinery"*; refs in images/korajin/ref/). A winding canyon along z:
+// a river in its bed (`rc` its centre line), a wide floor on the west where the hut stands, a narrow one on the east, then rounded sandstone
+// walls in lumps (`HOLLOW.wall`) up to a rim plateau. `HOME.style` 'lake' is m1111's mountain lake (`?style=lake`).
+const HOLLOW = { floorW: 24, floorE: 13, bed: -1.7, rim: 30, wall: 9 };
+const hwRc = z => 7 * Math.sin(z * .028) + 3 * Math.sin(z * .071 + 1.3);
+function hwHeight(x, z) {
+  const H = HOLLOW, s = x - hwRc(z), d = Math.abs(s), fw = s < 0 ? H.floorW : H.floorE;
+  const lump = rwFbm(x * .09, z * .09) * 14 + rwFbm(x * .23 + 7, z * .23) * 5;
+  let h = H.bed + (.7 - H.bed) * smooth(3.2, 6.5, d);                               // the river bed up to the bank
+  h += (.6 + .5 * rwFbm(x * .2, z * .2)) * smooth(6.5, 10, d);                    // the floor, gently uneven
+  const wk = smooth(fw - 1, fw + H.wall, d + lump * .35);                          // the wall: rounded, lumpy, by the noise
+  h += (H.rim + lump * .6) * wk * wk * (3 - 2 * wk) * .9 + (H.rim * .1) * smooth(fw + H.wall, fw + H.wall + 30, d);
+  const hd = Math.hypot(x - HOME.hut.at[0], z - HOME.hut.at[1]); h = h + (HOME.padY - h) * (1 - smooth(HOME.hut.w * .6, HOME.hut.w * .95, hd)) * (d < fw - 2 ? 1 : 0);
+  return h;
+}
+function rwHeight(x, z) { return HOME.style === 'lake' ? rwLakeH(x, z) : hwHeight(x, z); }
+function rwLakeH(x, z) {
   const r = Math.hypot(x, z), a = Math.atan2(z, x), d = r / rwIslandR(a);
   let h = 1.0 + .7 * (1 - Math.min(1, d * d)) + .25 * rwFbm(x * .15, z * .15);
   const hd = Math.hypot(x - HOME.hut.at[0], z - HOME.hut.at[1]); h = h + (HOME.padY - h) * (1 - smooth(HOME.hut.w * .6, HOME.hut.w * .95, hd));
@@ -56777,7 +56795,7 @@ vec3 fogTo(vec3 c, vec3 P) { vec3 v = P - cameraPosition; float dist = length(v)
 `;
 function rwPatch(mat, keepPrev) {
   const prev = keepPrev ? mat.onBeforeCompile : null;
-  mat.onBeforeCompile = sh => { if (prev) prev(sh); Object.assign(sh.uniforms, RW.U);
+  mat.onBeforeCompile = function (sh, rr) { if (prev) prev.call(this, sh, rr); Object.assign(sh.uniforms, RW.U);     // a chained hook keeps its `this` (the katana's reads this.userData)
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vRwP;').replace('#include <project_vertex>', '#include <project_vertex>\nvRwP = (modelMatrix * vec4(transformed, 1.0)).xyz;');
     sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vRwP;\nuniform vec3 uAbs; uniform vec3 uScat; uniform float uCaus;\n' + RW_GLSL)
       .replace('#include <opaque_fragment>', `#include <opaque_fragment>
@@ -56814,17 +56832,21 @@ function rwBuild() {
     }` }));
   sky.renderOrder = -1; sky.frustumCulled = false; scene.add(sky); scene.background = null; if (scene.fog) scene.fog.far = 1e6;
   // the land and the lake bed: one polar grid, dense at the island, sparse at the horizon
-  const g = rwPolar(170, 240, 1400, 2.4), P = g.attributes.position, col = new Float32Array(P.count * 3), c = new THREE.Color();
+  const hw = HOME.style !== 'lake', g = hw ? new THREE.PlaneGeometry(340, 340, 170, 170).rotateX(-Math.PI / 2) : rwPolar(170, 240, 1400, 2.4), P = g.attributes.position, col = new Float32Array(P.count * 3), c = new THREE.Color();
+  const sand = new THREE.Color(0xc77a4a), sandR = new THREE.Color(0x9c3a24), sandD = new THREE.Color(0x6e2e1e), sandL = new THREE.Color(0xd8a274);     // m1113: deeper -- the first pass washed out pale pink
   const moss = new THREE.Color(0x4f7a3e), moss2 = new THREE.Color(0x6d8f4a), soil = new THREE.Color(0x6b5a44), peb = new THREE.Color(0x9b958a), peb2 = new THREE.Color(0x7d7a74), bed = new THREE.Color(0x8d8670), deep = new THREE.Color(0x5d6152), weed = new THREE.Color(0x30503a);
   for (let i = 0; i < P.count; i++) { const x = P.getX(i), z = P.getZ(i), h = rwHeight(x, z); P.setY(i, h);
-    if (h > .45) { c.copy(moss).lerp(moss2, smooth(-.1, .25, rwFbm(x * .9, z * .9))); c.lerp(soil, smooth(.12, .3, rwFbm(x * 1.3 + 40, z * 1.3)) * .45); }
+    if (hw && h > 2.2) { const st = .5 + .5 * Math.sin(h * .9 + rwFbm(x * .05, z * .05) * 4); c.copy(sand).lerp(sandR, st * .7).lerp(sandD, smooth(.2, .5, rwFbm(x * .4, z * .4)) * .35).lerp(sandL, smooth(26, 34, h) * .6);
+      c.lerp(moss, smooth(.15, .35, rwFbm(x * .7 + 9, z * .7)) * smooth(25, 30, h) * .7); }     // the strata: red and pale bands by height, moss on the rim
+    else if (hw && h > .45) { c.copy(sandL).lerp(sand, .5).lerp(moss, smooth(.05, .3, rwFbm(x * .6, z * .6)) * .55); c.lerp(soil, smooth(.12, .3, rwFbm(x * 1.3 + 40, z * 1.3)) * .35); }
+    else if (h > .45) { c.copy(moss).lerp(moss2, smooth(-.1, .25, rwFbm(x * .9, z * .9))); c.lerp(soil, smooth(.12, .3, rwFbm(x * 1.3 + 40, z * 1.3)) * .45); }
     else if (h > -.08) { c.copy(peb2).lerp(peb, smooth(-.3, .3, rwFbm(x * 2.1, z * 2.1))); }
     else { c.copy(bed).lerp(deep, smooth(-1.5, -10, h)); c.lerp(weed, smooth(.05, .16, rwFbm(x * .8 + 13, z * .8 - 7)) * smooth(-1.2, -3, h) * .85); }
     col.set([c.r, c.g, c.b], i * 3); }
   g.setAttribute('color', new THREE.BufferAttribute(col, 3)); g.computeVertexNormals();
   const land = new THREE.Mesh(g, rwPatch(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .95 }))); land.receiveShadow = true; land.frustumCulled = false; scene.add(land);
   const idx = g.index.array; let nW = 0;
-  for (let i = 0; i < idx.length; i += 3) { const a = idx[i], b = idx[i + 1], d = idx[i + 2]; if (Math.hypot(P.getX(a), P.getZ(a)) > RW.R * 2.4) continue;
+  for (let i = 0; i < idx.length; i += 3) { const a = idx[i], b = idx[i + 1], d = idx[i + 2]; if (Math.hypot(P.getX(a), P.getZ(a)) > (hw ? 150 : RW.R * 2.4)) continue;
     nW += triAdd(P.getX(a), P.getY(a), P.getZ(a), P.getX(b), P.getY(b), P.getZ(b), P.getX(d), P.getY(d), P.getZ(d)); surfAdd(P.getX(a), P.getY(a), P.getZ(a), P.getX(b), P.getY(b), P.getZ(b), P.getX(d), P.getY(d), P.getZ(d)); }
   RW.stat.walkTris = nW;
   // the surface
@@ -56861,6 +56883,7 @@ function rwBuild() {
         #include <colorspace_fragment>
       }` });
   const water = new THREE.Mesh(rwPolar(150, 160, 2400, 2.2), wm); water.frustumCulled = false; water.renderOrder = 2; scene.add(water); RW.water = water;
+  if (hw) return;
   // THE MOUNTAINS round the lake: low-poly ridges, through the same fog
   const mg = []; const mr = rwRng(21);
   for (let i = 0; i < 26; i++) { const a = i / 26 * 6.2832 + mr() * .2, r = 320 + mr() * 260, h = 70 + mr() * 150, w = 110 + mr() * 120;
@@ -56875,7 +56898,10 @@ function rwBuild() {
 const rwMat = (hex, o) => rwPatch(new THREE.MeshStandardMaterial(Object.assign({ color: hex, roughness: .85 }, o || {})));
 const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeometries(geos.map(q => q.index ? q.toNonIndexed() : q), false), mat); m.castShadow = shadow; m.receiveShadow = true; scene.add(m); return m; };
 async function buildHome() {
-  const H = HOME; H.padY = 1.15; rwBuild();
+  const H = HOME; try { const q = new URLSearchParams(location.search).get('style'); if (q === 'lake' || q === 'hollows') H.style = q; } catch (e) {}
+  if (H.style !== 'lake') { H.padY = 1.3; H.hut.at = [hwRc(-4) - 14, -4]; H.hut.yaw = Math.PI / 2; H.spawn = [hwRc(10) - 7, 10]; RW.time = { el: 18, az: 200, sun: [1, .8, .58], zen: [.28, .46, .78], hor: [1, .86, .7] }; }
+  else H.padY = 1.15;
+  rwBuild();
   // the hut, on its levelled pad
   try { const g = await loadGLB(H.hut.file, 'loading the refuge');
     const m = g.scene, drop = []; m.traverse(o => { if (o.isLight) drop.push(o); }); for (const o of drop) o.removeFromParent();
@@ -56888,7 +56914,7 @@ async function buildHome() {
     // his collider is a thin skirt round the base, so the hut is one solid block of the base's plan for now -- walked round, not into
     { const r = H.hut.w * .42; BOXES.push({ minx: H.hut.at[0] - r, maxx: H.hut.at[0] + r, miny: 0, maxy: 8, minz: H.hut.at[1] - r, maxz: H.hut.at[1] + r }); }
   } catch (e) { console.warn('[melee] hut', e); note('NO HUT GLB'); }
-  homeDress();
+  if (H.style === 'lake') homeDress(); else hollowDress();
   triBuild(); surfBuild(); boxGrid();
   homeLanterns(); homeMist();
   // m1112: HIS OWN BODY through the lake's patch too (chained onto whatever his materials already do), so wading his legs read wet
@@ -56897,6 +56923,76 @@ async function buildHome() {
   H.live = 1; console.log('[melee] refuge: hut x' + H.stat.hutK + ', ' + RW.stat.walkTris + ' walkable tris, the lake water on');
 }
 // THE JAPANESE PIECES, code-built and merged per material until his models replace them
+// THE RED HOLLOWS' PIECES (m1113), code-built and merged per material until his models replace them: rounded sandstone formations and
+// hoodoos on the floor and the rim; dark cave mouths in the walls; two rope bridges strung across the canyon high up; weathered red banners
+// with his white diamond-spiral (a canvas texture) hung from the bridges and from poles by the hut, swaying; bronze gears set in the rock,
+// turning; floating islands over the rim with waterfalls; his four stone lanterns on the hut's approach.
+function hwBanner() {
+  if (HOLLOW.banTex) return HOLLOW.banTex;
+  const cv = document.createElement('canvas'); cv.width = 128; cv.height = 256; const c = cv.getContext('2d');
+  c.fillStyle = '#b3201f'; c.fillRect(0, 0, 128, 256); c.strokeStyle = '#f1e2c8'; c.lineWidth = 9;
+  for (const cy of [80, 176]) { for (let k = 0; k < 3; k++) { const r = 44 - k * 15; c.beginPath(); c.moveTo(64, cy - r); c.lineTo(64 + r, cy); c.lineTo(64, cy + r); c.lineTo(64 - r, cy); c.closePath(); c.stroke(); } }
+  c.fillStyle = 'rgba(40,10,5,.25)'; for (let i = 0; i < 90; i++) c.fillRect(Math.random() * 128, Math.random() * 256, 2 + Math.random() * 5, 2 + Math.random() * 5);     // weathering
+  c.clearRect(0, 236, 128, 20); for (let i = 0; i < 8; i++) { c.fillStyle = '#b3201f'; c.beginPath(); c.moveTo(i * 16, 236); c.lineTo(i * 16 + 16, 236); c.lineTo(i * 16 + 8, 252); c.fill(); }     // the tattered hem
+  const T = new THREE.CanvasTexture(cv); T.colorSpace = THREE.SRGBColorSpace; return (HOLLOW.banTex = T);
+}
+// where the wall face reaches height `y` at this z, on this side (marched out from the river), `off` m back into the open
+function hwWallAt(z, side, y, off = 0) { const c = hwRc(z); for (let d = 4; d < 80; d += .25) { const x = c + side * d; if (hwHeight(x, z) >= y) return x - side * off; } return c + side * 40; }
+function hollowDress() {
+  const H = HOME, r = rwRng(13), wallX = (z, side, inset = 0) => hwWallAt(z, side, 2.5, inset - 2);
+  const B = (w, h, d, x, y, z, ry = 0) => { const g = new THREE.BoxGeometry(w, h, d); g.rotateY(ry); g.translate(x, y, z); return g; };
+  const Cy = (r0, r1, h, x, y, z, sg = 8) => { const g = new THREE.CylinderGeometry(r0, r1, h, sg); g.translate(x, y, z); return g; };
+  // SANDSTONE FORMATIONS: rounded boulders on the floor, stacked hoodoos, lumps on the rim
+  { const rk = [], cs = []; const sCol = (gg, hex) => { const cc = new THREE.Color(hex), a = new Float32Array(gg.attributes.position.count * 3); for (let k = 0; k < a.length; k += 3) a.set([cc.r, cc.g, cc.b], k); gg.setAttribute('color', new THREE.BufferAttribute(a, 3)); return gg; };
+    for (let i = 0; i < 34; i++) { const z = -110 + r() * 220, side = r() < .55 ? -1 : 1, s = hwRc(z) + side * (8 + r() * ((side < 0 ? HOLLOW.floorW : HOLLOW.floorE) - 9));
+      if (Math.hypot(s - H.hut.at[0], z - H.hut.at[1]) < 9 || Math.hypot(s - H.spawn[0], z - H.spawn[1]) < 5) continue;
+      const y = rwHeight(s, z), n = r() < .35 ? 3 : 1;
+      for (let k = 0; k < n; k++) { const R = (n > 1 ? 1.6 - k * .35 : 1.2 + r() * 2.2); const g = new THREE.IcosahedronGeometry(R, 2); g.scale(1.1, n > 1 ? .7 : .55 + r() * .3, 1);
+        g.translate(s + (r() - .5) * .4, y + (n > 1 ? R * .7 + k * R * 1.15 : R * .3), z); rk.push(sCol(g.toNonIndexed(), [0xd09066, 0xc06a45, 0xe0b08a][(i + k) % 3])); }
+      BOXES.push({ minx: s - 1.3, maxx: s + 1.3, miny: -2, maxy: y + (n > 1 ? 5 : 1.2), minz: z - 1.3, maxz: z + 1.3 }); }
+    for (let i = 0; i < 40; i++) { const z = -150 + r() * 300, side = r() < .5 ? -1 : 1, s = hwRc(z) + side * ((side < 0 ? HOLLOW.floorW : HOLLOW.floorE) + HOLLOW.wall + 6 + r() * 20), y = rwHeight(s, z), R = 3 + r() * 5;
+      const g = new THREE.IcosahedronGeometry(R, 2); g.scale(1.2, .6, 1); g.translate(s, y + R * .25, z); rk.push(sCol(g.toNonIndexed(), [0xc87a52, 0xe0b08a, 0xb5603e][i % 3])); }
+    const m = rwMesh(rk, rwMat(0xffffff, { vertexColors: true, roughness: .95 })); m.geometry.computeVertexNormals(); }
+  // CAVE MOUTHS in the walls at the floor: a dark arch with a rim of darker stone
+  { const dark = [], rim = []; for (const [z, side] of [[-30, -1], [18, -1], [-55, 1], [40, 1], [70, -1]]) { const x = wallX(z, side, 1.5), y = rwHeight(x, z) - .3, ry = side < 0 ? Math.PI / 2 : -Math.PI / 2;
+      const a = new THREE.CircleGeometry(3, 18, 0, Math.PI); a.scale(1, 1.3, 1); a.rotateY(ry); a.translate(x - side * .3, y, z); dark.push(a);
+      const t = new THREE.TorusGeometry(3.1, .5, 6, 16, Math.PI); t.scale(1, 1.3, 1); t.rotateY(ry); t.translate(x - side * .2, y, z); rim.push(t); }
+    rwMesh(dark, new THREE.MeshBasicMaterial({ color: 0x120806, side: THREE.DoubleSide }), false); rwMesh(rim, rwMat(0x9a4e34)); }
+  // ROPE BRIDGES across the canyon, high up, sagging; banners hang from them
+  const ban = [], banM = new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 });
+  { const plank = [], rope = []; for (const [z, y0] of [[-24, 15], [32, 21]]) { const xa = hwWallAt(z, -1, y0 + .3, -1.2), xb = hwWallAt(z, 1, y0 + .3, -1.2), N = Math.max(12, Math.round(Math.abs(xb - xa) / .62)), sag = Math.abs(xb - xa) * .07;     // anchored IN the wall at its height
+      const at = u => [xa + (xb - xa) * u, y0 - sag * 4 * u * (1 - u), z];
+      for (let i = 0; i <= N; i++) { const [x, y] = at(i / N); plank.push(B(.42, .08, 2, x, y, z + (r() - .5) * .05, (r() - .5) * .06)); }
+      for (const off of [-1.05, 1.05]) for (const dy of [.1, 1.1]) for (let i = 0; i < N; i++) { const [x0, ya] = at(i / N), [x1, yb] = at((i + 1) / N); rope.push(x0, ya + dy, z + off, x1, yb + dy, z + off); }
+      for (const u of [.3, .5, .7]) { const [x, y] = at(u); const bg = new THREE.PlaneGeometry(1.4, 2.8); bg.translate(0, -1.4, 0); const bm = new THREE.Mesh(bg, banM); bm.position.set(x, y, z + 1.1); scene.add(bm); ban.push({ m: bm, ph: r() * 6 }); } }
+    rwMesh(plank, rwMat(0x6e4a2e)); const rg = new THREE.BufferGeometry(); rg.setAttribute('position', new THREE.Float32BufferAttribute(rope, 3));
+    const rl = new THREE.LineSegments(rg, new THREE.LineBasicMaterial({ color: 0x3a2a1c })); rl.frustumCulled = false; scene.add(rl); }
+  // BANNER POLES by the hut and along the west floor
+  { const pole = []; for (const [x, z] of [[H.hut.at[0] - 6, H.hut.at[1] + 5], [H.hut.at[0] + 6, H.hut.at[1] + 5], [-4, 22], [-12, -26]]) { const y = rwHeight(x, z);
+      pole.push(Cy(.1, .12, 6, x, y + 3, z, 6), B(1.8, .12, .12, x, y + 5.8, z)); const bg = new THREE.PlaneGeometry(1.5, 3.2); bg.translate(0, -1.6, 0); const bm = new THREE.Mesh(bg, banM); bm.position.set(x, y + 5.7, z + .08); scene.add(bm); ban.push({ m: bm, ph: r() * 6 });
+      BOXES.push({ minx: x - .25, maxx: x + .25, miny: -2, maxy: y + 6, minz: z - .25, maxz: z + .25 }); }
+    rwMesh(pole, rwMat(0x4a3424)); }
+  H.banners = ban;
+  // BRONZE GEARS set in the walls, turning
+  { const gm = rwMat(0xb07a3a, { metalness: .75, roughness: .38 }), gears = [];
+    for (const [z, side, y, R] of [[-12, -1, 9, 3.2], [-40, 1, 13, 4.5], [22, 1, 7, 2.6], [55, -1, 16, 5], [-70, -1, 11, 3.6]]) {
+      const parts = [new THREE.TorusGeometry(R, R * .14, 8, 28), new THREE.CylinderGeometry(R * .22, R * .22, R * .3, 12).rotateX(Math.PI / 2)];
+      for (let k = 0; k < 14; k++) { const a = k / 14 * 6.2832, t = new THREE.BoxGeometry(R * .22, R * .3, R * .24); t.rotateZ(a); t.translate(Math.cos(a) * R * 1.12, Math.sin(a) * R * 1.12, 0); parts.push(t); }
+      for (let k = 0; k < 4; k++) { const sp = new THREE.BoxGeometry(R * 2, R * .1, R * .12); sp.rotateZ(k * Math.PI / 4); parts.push(sp); }
+      const g = new THREE.Mesh(mergeGeometries(parts.map(q => q.index ? q.toNonIndexed() : q), false), gm); g.castShadow = true;     // one draw a gear
+      g.position.set(hwWallAt(z, side, y, -R * .35), y, z); g.rotation.y = side < 0 ? Math.PI / 2 : -Math.PI / 2; scene.add(g); gears.push({ g, w: (.12 + r() * .15) * (r() < .5 ? -1 : 1) }); }
+    H.gears = gears; }
+  // FLOATING ISLANDS over the rim, waterfalls off them
+  { const isl = [], top = [], fall = []; for (let i = 0; i < 9; i++) { const a = r() * 6.2832, R = 120 + r() * 160, x = Math.cos(a) * R * .7, z = Math.sin(a) * R, y = 60 + r() * 70, s = 10 + r() * 16;
+      const c = new THREE.ConeGeometry(s, s * 2.2, 7, 2); c.rotateX(Math.PI); c.translate(x, y - s * 1.1, z); isl.push(c); const t = new THREE.CylinderGeometry(s, s * .96, 2, 7); t.translate(x, y + .9, z); top.push(t);
+      if (r() < .7) { const f = new THREE.PlaneGeometry(s * .25, y * 1.1); f.translate(x + s * .7, y - y * .55, z); f.rotateY(0); fall.push(f); } }
+    rwMesh(isl, rwMat(0xb7744e, { flatShading: true })); rwMesh(top, rwMat(0x5f8a45)); if (fall.length) { const fm = rwMesh(fall, new THREE.MeshBasicMaterial({ color: 0xeaf6ff, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false }), false); fm.renderOrder = 3; } }
+  // HIS STONE LANTERNS on the approach
+  { const st = [], lit = []; for (const [dx, dz] of [[9, -3.2], [9, 3.2], [6.2, -3.2], [6.2, 3.2]]) { const x = H.hut.at[0] + dx, z = H.hut.at[1] + dz, y = rwHeight(x, z);     // in front of the door (the hut faces the river, +x)
+      st.push(B(.9, .3, .9, x, y + .15, z), Cy(.16, .2, 1.1, x, y + .85, z, 6), B(.7, .18, .7, x, y + 1.45, z), B(1.05, .2, 1.05, x, y + 2.2, z), Cy(.0, .62, .45, x, y + 2.5, z, 4));
+      lit.push(B(.5, .5, .5, x, y + 1.8, z)); BOXES.push({ minx: x - .45, maxx: x + .45, miny: -2, maxy: y + 2.6, minz: z - .45, maxz: z + .45 }); }
+    rwMesh(st, rwMat(0x9b8b78, { roughness: .95 })); rwMesh(lit, new THREE.MeshStandardMaterial({ color: 0xffd8a0, emissive: 0xffa040, emissiveIntensity: 2.2 }), false); }
+}
 function homeDress() {
   const H = HOME, at = (x, z) => [x, rwHeight(x, z), z], B = (w, h, d, x, y, z, ry = 0, rx = 0) => { const g = new THREE.BoxGeometry(w, h, d); if (rx) g.rotateX(rx); g.rotateY(ry); g.translate(x, y, z); return g; };
   const Cy = (r0, r1, h, x, y, z, s = 8) => { const g = new THREE.CylinderGeometry(r0, r1, h, s); g.translate(x, y, z); return g; };
@@ -56965,7 +57061,7 @@ function homeMist() {
   const T = new THREE.CanvasTexture(cv), M = [], r = rwRng(31);
   for (let i = 0; i < HOME.mistN; i++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: T, color: new THREE.Color().setHSL(.08, .4, .88), transparent: true, opacity: .35 + r() * .25, depthWrite: false, fog: false }));
     const a = r() * 6.2832, R = RW.R * (1.15 + r() * 1.6), w = 18 + r() * 22; s.scale.set(w, w * .28, 1); s.position.set(Math.cos(a) * R, .6 + r() * 1.2, Math.sin(a) * R); s.renderOrder = 3; scene.add(s);
-    M.push({ s, a, R, w: (.006 + r() * .01) * (r() < .5 ? -1 : 1) }); }
+    const zz = -120 + r() * 240; M.push({ s, a, R, w: (.006 + r() * .01) * (r() < .5 ? -1 : 1), z: zz, v: (.3 + r() * .5) * (r() < .5 ? -1 : 1), y: s.position.y }); }     // m1113: in the canyon it rides the river
   HOME.mist = M;
 }
 // paper lanterns adrift: one instanced draw, bobbing and turning
@@ -56983,9 +57079,13 @@ function homeStep(dt) {
   { const p = player, gy = p.pos.y; if (p.grounded && gy > -.15) RW.safe = [p.pos.x, p.pos.z];
     if (p.grounded && gy < RW.deepAt && RW.safe) { p.pos.set(RW.safe[0], rwHeight(RW.safe[0], RW.safe[1]) + .2, RW.safe[1]); p.vel.set(0, 0, 0); RW.stat.pushed++; rwRipple(p.pos.x, p.pos.z, 1.2); }
     if (gy < RW.sea - .05 && p.speed > .5) { RW.stepT -= dt; if (RW.stepT <= 0) { RW.stepT = .24; rwRipple(p.pos.x, p.pos.z, .7); } } }
-  if (H.mist) for (const m of H.mist) { m.a += m.w * dt; m.s.position.x = Math.cos(m.a) * m.R; m.s.position.z = Math.sin(m.a) * m.R; }
+  if (H.banners) for (const b of H.banners) { b.m.rotation.x = Math.sin(H.t * 1.3 + b.ph) * .12; b.m.rotation.y = Math.sin(H.t * .7 + b.ph) * .1; }
+  if (H.gears) for (const g of H.gears) g.g.rotateZ(g.w * dt);
+  if (H.mist) for (const m of H.mist) { if (H.style === 'lake') { m.a += m.w * dt; m.s.position.x = Math.cos(m.a) * m.R; m.s.position.z = Math.sin(m.a) * m.R; }
+    else { m.z += m.v * dt; if (m.z > 130) m.z = -130; if (m.z < -130) m.z = 130; m.s.position.set(hwRc(m.z), m.y, m.z); } }
   const Z = H.lan; if (!Z) return;
-  Z.L.forEach((l, i) => { l.a += dt * .015; const x = Math.cos(l.a) * Math.hypot(l.x, l.z), z = Math.sin(l.a) * Math.hypot(l.x, l.z);
+  Z.L.forEach((l, i) => { l.a += dt * .015; let x = Math.cos(l.a) * Math.hypot(l.x, l.z), z = Math.sin(l.a) * Math.hypot(l.x, l.z);
+    if (H.style !== 'lake') { l.zc = (l.zc == null ? (l.a * 40) % 200 - 100 : l.zc + dt * .4); if (l.zc > 110) l.zc = -110; z = l.zc; x = hwRc(z) + (l.x % 9); }     // m1113: up the canyon, over the river
     Z.p.set(x, l.y + Math.sin(H.t * l.w + l.ph) * .4, z); Z.e.set(Math.sin(H.t * .7 + l.ph) * .08, H.t * .2 + l.ph, 0); Z.q.setFromEuler(Z.e); Z.m.compose(Z.p, Z.q, Z.s); Z.im.setMatrixAt(i, Z.m); });
   Z.im.instanceMatrix.needsUpdate = true;
 }
@@ -58277,7 +58377,7 @@ function startGate() {
       const go = (w, d) => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter(w, w === WORLD.now && HERO.pick !== 'agoblin' ? '?w=' + w : ''); };
       add('h4', '', 'KORAJIN GRUMBO');
       btn(el, 'The Arena', 'The katana, the horde, the archers, the rival. Where the fighting is built.', () => go('arena'), 'main');
-      btn(el, 'The Refuge', 'His home: the hut, the island, the sea. (Being built.)', () => go('home'));
+      btn(el, 'The Red Hollows', 'His home: the canyon, the river, the hut. (Being built.)', () => go('home'));
       btn(el, 'White Box', 'An empty floor to try a move on.', () => go('test'));
       btn(el, '&lsaquo; Titles', '', titles);
       add('div', 'bld', 'BUILD ' + BUILD); };
