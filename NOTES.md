@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1207 -- Senbon Torii pass 1 (Building Forge loop, Set 2 #21)
+
+`STORII`, in BLDG.list as `storii`. A walk along z = 46 rises from x -16.5 (the street) to x -38.5 at 3.6 m:
+- **The embankment.** A stone wedge (an extruded triangle) carries the walk. The walk is walkable triangles at 1:6, 3.6 m wide.
+- **TWENTY vermilion TORII** tunnel the walk, each standing on the slope at its own height. They are merged per material:
+  red posts, ties and second beams; black caps and post bases. Every post is a solid collider, so the tunnel has walls.
+- **Lanterns** stand on posts outside the gates every fifth gate.
+- **The foot.** A little GATE-HALL over the walk's start, with red posts, breakable walls either side and a roof.
+- **The top.** A stone TERRACE (8.5 x 10 m, solid) carries a small FOX SHRINE: a honden with a red door, a roof, an offering
+  stand with a lamp, and two white KITSUNE with red bibs on plinths at its steps.
+
+What wants a look: whether the walk's triangles meet the terrace's top cleanly at x -38.5. Next: alternate -- an extra pass (5)
+on the Watchtower.
+
 ## m1206 -- Dojo Hall pass 5: the sparring partner (Building Forge loop, extra pass)
 
 Ring the hall's gong (a swing near it, as before). A robot samurai (`robotSam`) steps out of the Jin panel on the dais to SPAR.
