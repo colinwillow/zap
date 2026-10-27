@@ -85,7 +85,8 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - [x] **pass 7 (m1392):** the shapes -- the tower steps in to a turret at the balcony (a walkable shoulder), a squatter hall under the cone, timber bands at the domes, red tassels
   - [x] **pass 8 (m1395):** his quarters lived in -- a bed with a red blanket, a woven rug, a brazier of glowing coals with its own light, his katana on a rack, a chest, a table and stools; the store stacked with barrels, sacks and crates; the screen wall moved forward to give the quarters room
   - [x] **pass 9 (m1396):** the refs' two smaller blob domes (front-right, back-left) with round windows; the round back door's real leaves (`bgateMake`: open as he comes near, shut behind); lanterns at the back door and on the balcony
-  - [x] **pass 10 (next tick):** the rigging -- sagging ropes from the cone's poles to the frame, the stacks, the tower and the crane; a red-and-cream pennant line from the tower's flagpole to the cone; iron-strapped timber cladding over the shop front
+  - [x] **pass 10 (m1397):** the rigging -- sagging ropes from the cone's poles to the frame, the stacks, the tower and the crane; a red-and-cream pennant line from the tower's flagpole to the cone; iron-strapped timber cladding over the shop front
+  - [x] **pass 11 (next tick):** the windows -- every round window sunk in a lavender surround, and more of them round the hall, the store, the tower and the turret; the turret's LOOKOUT (a brass telescope at its window, cushions)
   - [ ] then more passes, each one closer to the four views
 
 ## THE SHIP (his, after m1372) -- its own track, alongside the blueprint work

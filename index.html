@@ -63700,7 +63700,7 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 // to the shop front and to the round back door. Built in its OWN frame (local +z = the front, toward the river; `at`/`yaw` are HOME.hut's) and
 // merged per material; every collider a local box turned into the world (the yaw is a quarter turn, so a box stays a box); every walkable
 // surface a triangle. `?hut=glb` (or GHOME.on = 0) puts the GLB back, to compare. Pass 1: the massing and the walkable shell, with the inside.
-const GHOME = { on: 1, pass: 10, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
+const GHOME = { on: 1, pass: 11, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   Rtu: 2.5, door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
@@ -63884,8 +63884,7 @@ function ghomeBuild(at, yaw, y0) {
   { const win = (cx, cz, R, a, y, r) => { const x = cx + Math.sin(a) * (R + .02), z = cz + Math.cos(a) * (R + .02);
       put(new THREE.CircleGeometry(r, 20), dark, at4(x, y, z, a)); put(new THREE.TorusGeometry(r, .07, 6, 20), wood, at4(x, y, z, a));
       put(new THREE.BoxGeometry(r * 2, .05, .05), wood, at4(x, y, z, a)); put(new THREE.BoxGeometry(.05, r * 2, .05), wood, at4(x, y, z, a)); };
-    win(0, 0, A.R, .85, P + 4.6, .42); win(0, 0, A.R, -.85, P + 4.6, .42); win(0, 0, A.R, 2.4, P + 2, .38); win(Tx, Tz, A.Rt, 1.2, P + 2.2, .36); win(Tx, Tz, A.Rtu, -.6, P + 7.4, .4); win(Tx, Tz, A.Rtu, 1.6, P + 7.6, .36);
-    win(Gx, Gz, A.Rw, -.6, P + 1.9, .38); win(Gx, Gz, A.Rw, -1.8, P + 1.9, .34);
+
     put(new THREE.TorusGeometry(A.door / 2, .12, 6, 16, Math.PI), wood, at4(0, P + A.doorH - A.door / 2 + .02, -A.R - .03, Math.PI)); }
   // ---- PASS 2: THE TIMBER SCAFFOLD, THE TORN AWNINGS, THE CHEVRON BANNERS (refs: the frame across the front, a stall deck either side of the
   // steps under a sloping red awning on outer posts, the big V-hemmed banner over the shop front, narrow ones down the posts; a ladder; the
@@ -64064,6 +64063,23 @@ function ghomeBuild(at, yaw, y0) {
     // the cladding over the shop front: vertical planks between the tall posts, iron straps across them
     { const z = 4.42; for (let x = -2.1; x < 2.1; x += .3) vbox(x + .01, x + .29, P + A.shopH + .35, P + 6.3 - .12, z - .06, z + .06, wood, 0);
       for (const yy of [P + A.shopH + .7, P + 6.3 - .45]) vbox(-2.15, 2.15, yy - .05, yy + .05, z + .06, z + .1, iron, 0); } }
+  // ---- PASS 11: THE WINDOWS (refs: round windows everywhere, each sunk in a soft LAVENDER surround) and the TURRET'S LOOKOUT (a brass
+  // telescope at its window, cushions) ----
+  { const lav = new THREE.MeshStandardMaterial({ color: 0x9a82b8, roughness: .85 }), brassT = triMat('bronze', { scale: 1.2, metal: .75, rough: .35 }); brassT.userData.tri = 1; const cush = new THREE.MeshStandardMaterial({ color: 0x9a2c22, roughness: .9 });
+    const W2 = (cx, cz, R, a, y, r, bulge = 0) => { const x = cx + Math.sin(a) * (R + bulge + .03), z = cz + Math.cos(a) * (R + bulge + .03);
+      put(new THREE.CircleGeometry(r * 1.55, 24), lav, at4(x - Math.sin(a) * .01, y, z - Math.cos(a) * .01, a)); put(new THREE.CircleGeometry(r, 20), dark, at4(x + Math.sin(a) * .01, y, z + Math.cos(a) * .01, a));
+      put(new THREE.TorusGeometry(r, .07, 6, 20), wood, at4(x + Math.sin(a) * .02, y, z + Math.cos(a) * .02, a)); put(new THREE.BoxGeometry(r * 2, .05, .05), wood, at4(x + Math.sin(a) * .03, y, z + Math.cos(a) * .03, a)); put(new THREE.BoxGeometry(.05, r * 2, .05), wood, at4(x + Math.sin(a) * .03, y, z + Math.cos(a) * .03, a)); };
+    const bh = R => R * .075 * .9;     // the walls' swell at window height
+    // the old windows get their surround (the same spots), and new ones round the hall, the store, the blobs and the turret
+    for (const [a, y, r] of [[.85, 4.0, .42], [-.85, 4.0, .42], [2.4, 2, .38], [-2.2, 4.2, .36], [Math.PI - .9, 4.4, .34], [Math.PI + .9, 4.4, .34]]) W2(0, 0, A.R, a, P + y, r, bh(A.R));
+    for (const [a, y, r] of [[-.6, 1.9, .38], [-1.8, 1.9, .34], [-2.9, 1.7, .32]]) W2(A.Wc[0], A.Wc[1], A.Rw, a, P + y, r, bh(A.Rw));
+    for (const [a, y, r] of [[1.2, 2.2, .36], [2.4, 3.6, .32], [-.3, 3.2, .3]]) W2(A.T[0], A.T[1], A.Rt, a, P + y, r, bh(A.Rt));
+    for (const [a, y, r] of [[-.6, 2.0, .4], [1.6, 2.2, .36], [2.8, 1.8, .32]]) W2(A.T[0], A.T[1], A.Rtu, a, P + A.Yb + y, r, bh(A.Rtu));
+    // the lookout: a brass telescope on a tripod at the turret's window, cushions on the floor
+    { const [Tx, Tz] = A.T, a = -.6, rr = A.Rtu - A.t - .5, x = Tx + Math.sin(a) * rr, z = Tz + Math.cos(a) * rr, y = P + A.Yb;
+      for (let k = 0; k < 3; k++) { const q = k / 3 * Math.PI * 2; const fx = x + Math.sin(q) * .3, fz = z + Math.cos(q) * .3, d = new THREE.Vector3(x - fx, 1.1, z - fz), L = d.length(); _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); put(new THREE.CylinderGeometry(.025, .025, L, 5), wood, _m4.compose(new THREE.Vector3((x + fx) / 2, y + .55, (z + fz) / 2), _q, _one)); }
+      put(new THREE.CylinderGeometry(.07, .1, 1.1, 10), brassT, at4(x, y + 2.05, z, a, Math.PI / 2 - .12)); put(new THREE.SphereGeometry(.1, 8, 6), brassT, at4(x, y + 1.15, z));
+      for (const [dx, dz] of [[.9, .4], [.5, 1.0]]) put(new THREE.CylinderGeometry(.35, .38, .18, 12), cush, at4(Tx + dx * Math.cos(a) - dz * Math.sin(a) * .2, y + .09, Tz + dz * .6)); } }
   // ---- merge, and the world gets the boxes and the floors ----
   let draws = 0; for (const [m, list] of MG) { if (m.map && !m.userData.tri) m.map.wrapS = THREE.RepeatWrapping; const geo = mergeGeometries(list); if (!geo) { console.warn('[melee] ghome: a bucket would not merge', m.name || m.color); continue; } const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; g.add(o); draws++; }
   for (const b of boxes) BOXES.push(b);
