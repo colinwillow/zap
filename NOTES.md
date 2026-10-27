@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1146 -- AIRSHIP DOCK TOWER pass 1 (BUILDINGS.md #8, at (-30, 0))
+
+`ADOCK`, `adockBuild` / `adockStep` / `adockClear`. SPAWN > BUILDINGS > Airship Dock.
+- A 20 m TOWER: a breakable ground hall (cwallBuild, door on +x), a solid white shaft banded in timber, corner posts, a neon line.
+- A railed TOP DECK, 10 x 10 m at 20 m, lamps, a bronze MOORING MAST with a grapple ring at its top.
+- THE LIFT: an open bronze cage just off the deck's +x edge, on guide rails with a winding drum at the top. Waits 3.5 s at the bottom,
+  rides up at 2.6 m/s, waits at the top, rides down. Its box moves with it; while it rises, anyone standing in its footprint is kept on
+  its floor (`adockStep`), so it carries him. Step off west onto the deck through the gap in the rail.
+- THE LANDING ARM: 2.2 m wide, railed, 14 m out along +z with struts under it.
+- THE DOCKED AIRSHIP at the arm's end: a gondola deck LEVEL with the arm (a box: walk onto it), a white cabin with a red roof, ropes up
+  to a 9 x 8 x 19 m balloon with bronze hoops, red tail fins, a spinning propeller; a very slight bob.
+Pass 2 next: the airship undocks and flies a circuit, carrying whoever is on board. Shipped unverified.
+
 ## m1145 -- RAMPART pass 3 (DONE)
 
 - A great ONI MASK over the gateway on BOTH faces (red lacquer, black brows and moustache, glowing eye slits, gold horns, teeth) with two
