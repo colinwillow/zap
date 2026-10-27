@@ -156,7 +156,7 @@ SHIPPED UNVERIFIED. The queue's passes 2 and 3 are done. Next is his call: more 
 
 SHIPPED UNVERIFIED. Next: pass 3, foam and wake, bow spray, the sun on the water, gulls, an island.
 
-## THE TEXTURE LIBRARY: GENERATED MAPS, TRIPLANAR ON CODE-BUILT GEOMETRY (m1377)
+## THE TEXTURE LIBRARY: GENERATED MAPS, TRIPLANAR ON CODE-BUILT GEOMETRY (m1379)
 
 His: *"start generating texture maps for the endgame assets -- the wood, the marble, the stone, the metal -- so the game starts having a bit more depth"*, and he topped up the OpenAI credits.
 

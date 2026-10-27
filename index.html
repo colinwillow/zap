@@ -9899,7 +9899,7 @@ function shipSea(g) {
   const L0 = Math.hypot(_sunOff.x, _sunOff.y, _sunOff.z) || 20, ld = new THREE.Vector3(sd.x, Math.max(sd.y, .5), sd.z).normalize(); _sunOff.copy(ld).multiplyScalar(L0); sun.shadow.normalBias = .07;     /* m1377 (pass 4): the LIGHT stands ~27 deg up though the drawn sun sits at 7.5 -- at 7.5 every shadow texel stretched x7.7 across the deck, the stair-stepped bands and the acne he saw */ sun.position.copy(_sunOff); sun.color.setHex(0xffc896); hemi.color.setHex(0xffd6b8); hemi.groundColor.setHex(0x2a3a4a);
   camera.far = Math.max(camera.far, 1000); camera.updateProjectionMatrix();
 }
-// m1377: THE TEXTURE LIBRARY (his: *"start generating texture maps for the wood, the marble, the stone, the metal, so the game starts having more
+// m1379: THE TEXTURE LIBRARY (his: *"start generating texture maps for the wood, the marble, the stone, the metal, so the game starts having more
 // depth"*). Tileable 1024 maps generated with his OpenAI key (gpt-image-2), made seamless offline, in `textures/`. Our code-built geometry is MERGED
 // with its UVs stripped (`put` keeps position + normal, or mergeGeometries returns null), so a map is laid on by TRIPLANAR projection from the
 // world position: three samples (x, y and z planes), blended by the normal. `triMat(name, { scale: metres per tile, color, rough, metal })`.
