@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## THE COURTYARD, PASS 5: THE GUARDS (m-COURT5)
+## THE COURTYARD, PASS 5: THE GUARDS (m1308)
 
 COURTYARD.md pass 5. Shipped unverified.
 
