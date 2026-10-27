@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- Octagonal Block Pagoda pass 8 of 10: motion (X4, WORKER A)
+
+- **Wind bells.** A gold bell of blocks hangs off the tip of every kicked-up corner: 56 of them in ONE InstancedMesh.
+  - They sway on a slow gusting wind.
+  - Come within 1.6 m (climbing the chain, walking the eave) and one RINGS, a high quiet clang pitched by its place, and swings hard,
+    then settles.
+- **Banners.** A tall dark pole with a gold cap stands in the middle of every fence face except the gate's. Each flies a 1 x 2.6 m banner,
+  red and cream by turns, swinging and rippling on the same wind.
+- **Birds.** Twelve white block birds with dark wings perch along the walks of storeys 1-6. Two InstancedMeshes, three draws for the lot.
+  - They hop and turn now and then.
+  - Come within 6 m and they BURST up with a swoosh, flapping, rise to circle the spire at its height, then fly home and settle once you
+    are 8 m off.
+- **The spire's three light collars turn**, alternate ways.
+
+SHIPPED UNVERIFIED. Next: pass 9, the set piece (ring the top bell: the tower lights storey by storey, the lions bow, the gate opens).
+
 ## White Heron Castle pass 6 of 10: the gallery wing and the corner tower, hollow (X2, WORKER B)
 
 - **The corner tower.** Its storeys now match the keep's at 3.6 m (they were 3.2), so floors line up across the castle. It is hollow

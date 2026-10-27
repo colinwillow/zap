@@ -22239,9 +22239,10 @@ function opagBuild() {
         for (const [y, w2, h] of [[-.25, .5, .25], [-.6, .75, .35], [-1, .95, .4], [-1.35, 1.1, .3], [-1.48, 1.2, .1]]) { const m = new THREE.Mesh(new THREE.BoxGeometry(w2, h, w2), bronze); m.position.y = y; m.castShadow = true; bg.add(m); }
         bell = { g: bg, sw: 0, cd: 0 }; W(fa, inn - .9, 0, y0 + 1.1, y0 + 1.3, 1.5, .2, dark, 0); for (const q of [-.6, .6]) W(fa, inn - .9, q, y0, y0 + 1.3, .12, .12, dark, 0); } } }
   // THE SPIRE: a stack of blocks, three flared collars, a gold block, a mast
-  { let y = A.apex; const st = (w, h, m) => { blk(cx, y, y + h, cz, w, w, 0, m, 0, 0); y += h; };
+  const collars = [];
+  { let y = A.apex; const st = (w, h, m, spin) => { if (spin) { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, w), m); o.position.set(cx, y + h / 2, cz); o.castShadow = true; g.add(o); collars.push(o); } else blk(cx, y, y + h, cz, w, w, 0, m, 0, 0); y += h; };
     A.tipY = y + 4.7 + 3.2 + .3;     // (the stack below: 4.7 m of collars and blocks, the mast 3.2, the cap .3)
-    st(.9, .5, tile); st(.6, .6, red); st(1.1, .2, edge); st(.45, 1.2, tile); st(.9, .2, edge); st(.4, 1.2, tile); st(.75, .2, edge); st(.6, .6, gold); st(.18, 3.2, tile); st(.3, .3, gold); }
+    st(.9, .5, tile); st(.6, .6, red); st(1.1, .2, edge, 1); st(.45, 1.2, tile); st(.9, .2, edge, 1); st(.4, 1.2, tile); st(.75, .2, edge, 1); st(.6, .6, gold); st(.18, 3.2, tile); st(.3, .3, gold); }
   // m1290 (pass 7): the HALOS (one additive Points draw, sized in world metres, flickering in the step) and the BEACON at the spire's tip, a
   // flame orb in a big slow-breathing glow you can see across the forge; a lantern on each gate post. No lights: a new light recompiles
   // every material in the scene
@@ -22251,6 +22252,21 @@ function opagBuild() {
     halos = new THREE.Points(geo, new THREE.PointsMaterial({ map: tex, size: 1.5, sizeAttenuation: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false, vertexColors: true })); halos.frustumCulled = false; g.add(halos);
     beacon = new THREE.Mesh(new THREE.SphereGeometry(.24, 12, 8), new THREE.MeshBasicMaterial({ color: 0xffb050, toneMapped: false })); beacon.position.set(cx, A.tipY + .35, cz); g.add(beacon);
     const bh = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false })); bh.scale.setScalar(4.5); beacon.add(bh); beacon.userData.halo = bh; }
+  // m@X4@ (pass 8): MOTION. WIND BELLS off the tip of every kicked-up corner (one InstancedMesh: they sway in the wind and RING and swing
+  // hard when he comes within reach); a BANNER on a tall pole in the middle of every fence face, red and cream by turns, flapping; BIRDS
+  // of blocks perched along the walks that burst up when he comes near, circle the spire and settle back (two InstancedMeshes, flapping);
+  // and the spire's three light collars turning, alternate ways
+  const wbell = [], banners = [], birds = [];
+  { for (let k = 0; k < N; k++) { const a = aOf(k), E = k === 0 ? A.eave0 : A.eave, c0 = yOf(k) + A.sh - 1.2; for (let i = 0; i < 8; i++) { const va = i * Math.PI / 4 + Math.PI / 8, vr = (a + E[0]) / C8 + .1; wbell.push({ x: cx + Math.cos(va) * vr, y: c0 + .55, z: cz + Math.sin(va) * vr, va, sw: 0, ph: Math.random() * 6, cd: 0 }); } }
+    const bgeo = mergeGeometries([new THREE.BoxGeometry(.02, .3, .02).translate(0, -.15, 0), new THREE.BoxGeometry(.2, .22, .2).translate(0, -.4, 0), new THREE.BoxGeometry(.06, .2, .02).translate(0, -.6, 0)]);
+    const bim = new THREE.InstancedMesh(bgeo, gold, wbell.length); bim.frustumCulled = false; g.add(bim); wbell.im = bim;
+    const bm = [M(0xc8341f, .85, { side: THREE.DoubleSide }), M(0xefe4c6, .85, { side: THREE.DoubleSide })];
+    for (let i = 0; i < 8; i++) { if (i === doors[0]) continue; const [nx, nz] = fN(i), x = cx + nx * A.RF, z = cz + nz * A.RF; blk(x, 0, 5.2, z, .14, .14, 0, dark, 0, 0); blk(x, 5.2, 5.4, z, .24, .24, 0, gold, 0, 0); blk(x - nz * .5, 4.9, 4.98, z + nx * .5, 1.1, .06, fYaw(i), dark, 0, 0);
+      const pv = new THREE.Group(); pv.position.set(x, 4.9, z); pv.rotation.y = fYaw(i); g.add(pv); const fl = new THREE.Mesh(new THREE.PlaneGeometry(1, 2.6, 1, 6).translate(.55, -1.3, 0), bm[i % 2]); fl.castShadow = true; pv.add(fl); banners.push({ pv, fl, y0: fYaw(i), ph: i * 1.3 }); }
+    const bodyG = mergeGeometries([new THREE.BoxGeometry(.13, .11, .3), new THREE.BoxGeometry(.1, .1, .1).translate(0, .07, .18), new THREE.BoxGeometry(.04, .03, .07).translate(0, .06, .26)]), wingG = new THREE.BoxGeometry(.3, .02, .15).translate(.15, 0, 0);
+    const nB = 12, bodyIM = new THREE.InstancedMesh(bodyG, M(0xeeeeea, .8), nB), wingIM = new THREE.InstancedMesh(wingG, M(0x3a3f48, .8), nB * 2); bodyIM.frustumCulled = wingIM.frustumCulled = false; g.add(bodyIM, wingIM); birds.im = bodyIM; birds.wim = wingIM;
+    for (let b = 0; b < nB; b++) { const k = 1 + b % (N - 1), a = aOf(k - 1), va = b * 2.39 + .4, r = (a + 1.2), x = cx + Math.cos(va) * r, z = cz + Math.sin(va) * r, y = yOf(k);
+      birds.push({ px: x, py: y, pz: z, x, y, z, h: Math.random() * 6, st: 'perch', t: Math.random() * 3, ang: va, rad: 7 + Math.random() * 5, hy: A.apex + 1 + Math.random() * 6, fl: 0 }); } }
   // THE FENCE: red posts at the eight corners and every ~2 m, a breakable rail of red blocks, a gate toward the forge's middle
   { const RF = A.RF; for (let i = 0; i < 8; i++) { const [nx, nz] = fN(i), tx = -nz, tz = nx, yaw = fYaw(i), Lh = RF * T8, n = Math.max(2, Math.round(2 * Lh / 2));
       for (let p = 0; p <= n; p++) { const u = -Lh + 2 * Lh * p / n; if (i === doors[0] && Math.abs(u) < 1.6) continue; stack(cx + nx * RF + tx * u, cz + nz * RF + tz * u, 0, 1.5, .3, yaw, red, 3); }
@@ -22298,7 +22314,7 @@ function opagBuild() {
       lg.position.set(hx, .5, hz); lg.rotation.y = h; g.add(lg);
       const box = { minx: 0, maxx: 0, miny: 0, maxy: 0, minz: 0, maxz: 0, _off: 0 }; BDYN.push(box);
       lions.push({ g: lg, eyeM, mat: lst, x: hx, z: hz, y: .5, h, hx, hz, hh: h, vx: 0, vz: 0, vy: 0, st: 'sleep', t: 0, cd: 0, hp: A.lion.hp, box, flash: 0 }); } }
-  OPAG.on = { g, O, climbs, blks, ims, bars, rings, zip, core, bell, lions, halos, beacon, lampM, paperLit, arch: [], guards: [], t: 0, deadN: 0, fixT: 0, fly: [] };
+  OPAG.on = { g, O, climbs, blks, ims, bars, rings, zip, core, bell, lions, halos, beacon, lampM, paperLit, wbell, banners, birds, collars, arch: [], guards: [], t: 0, deadN: 0, fixT: 0, fly: [] };
   { const G0 = OPAG.on;
     for (const [k, v] of [[1, 6], [3, 5], [5, 4]]) { const va = v * Math.PI / 4 + Math.PI / 8, R = (aOf(k) + 1.1) / C8;
       archerPost(cx + Math.cos(va) * R, yOf(k + 1) + .05, cz + Math.sin(va) * R).then(d => { if (OPAG.on === G0) G0.arch.push(d); else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {}); }
@@ -22317,6 +22333,7 @@ function opagStep(dt) { const G = OPAG.on; if (!G) return; G.t += dt; const A = 
   { const c = G.halos.geometry.attributes.color; for (let i = 0; i < c.count; i++) { const f = .82 + .18 * Math.sin(G.t * (7 + i % 5) + i * 1.7) * Math.sin(G.t * 3.1 + i); c.setXYZ(i, f, f * .92, f * .8); } c.needsUpdate = true;     // m1290: the lanterns flicker
     G.lampM.emissiveIntensity = 2 + Math.sin(G.t * 9.3) * .15 + Math.sin(G.t * 23) * .08; G.paperLit.emissiveIntensity = 1.05 + Math.sin(G.t * 1.3) * .1;
     const s2 = 1 + Math.sin(G.t * 1.6) * .18; G.beacon.userData.halo.scale.setScalar(4.5 * s2 * (G.flare || 1)); G.beacon.scale.setScalar(1 + Math.sin(G.t * 11) * .08); }
+  opagMotion(G, dt);
   if (G.bell) { const B = G.bell; B.cd = Math.max(0, B.cd - dt); B.sw *= Math.exp(-.9 * dt); B.g.rotation.z = Math.sin(G.t * 3.4) * B.sw; }
   G.fixT -= dt;
   if (G.fixT <= 0 && G.deadN > 0) { G.fixT = A.fixEvery; let best = null;
@@ -22330,6 +22347,27 @@ function opagStep(dt) { const G = OPAG.on; if (!G) return; G.t += dt; const A = 
     for (const K of B.kids || []) { K.alive = 1; K.im.setMatrixAt(K.k, K.mtx); K.im.instanceMatrix.needsUpdate = true; }
     spkBurst(B.P.x, B.P.y, B.P.z, 5, { col: [.6, .95, .9], spread: 1.2, size: .1, life: .35 }); if (Math.random() < .35) snd('clang', { g: .25, r: 1.5 + Math.random() * .3, x: B.P.x, z: B.P.z }); } }
 const _opM = new THREE.Matrix4(), _opV = new THREE.Vector3(), _opS = new THREE.Vector3();
+// m@X4@ (pass 8): the bells, the banners, the birds, the collars
+const _opQ = new THREE.Quaternion(), _opE = new THREE.Euler(), _opU = new THREE.Vector3(1, 1, 1);
+function opagMotion(G, dt) { const p = player, t = G.t, wind = Math.sin(t * .37) * .5 + .7, [cx, cz] = OPAG.at;
+  const W = G.wbell, near = Math.abs(p.pos.y - 12) < 30 && Math.hypot(p.pos.x - cx, p.pos.z - cz) < 30;
+  for (let i = 0; i < W.length; i++) { const B = W[i]; B.cd = Math.max(0, B.cd - dt); B.sw *= Math.exp(-1.2 * dt);
+    if (near && B.cd <= 0 && Math.hypot(p.pos.x - B.x, p.pos.y + 1 - B.y, p.pos.z - B.z) < 1.6) { B.sw = .9; B.cd = 1.2; snd('clang', { g: .3, r: 2.2 + (i % 5) * .15, x: B.x, z: B.z }); }
+    const a = Math.sin(t * 2.3 + B.ph) * .12 * wind + Math.sin(t * 7 + B.ph) * B.sw;
+    _opE.set(Math.cos(B.va + Math.PI / 2) * a, 0, -Math.sin(B.va + Math.PI / 2) * a); W.im.setMatrixAt(i, _opM.compose(_opV.set(B.x, B.y, B.z), _opQ.setFromEuler(_opE), _opU)); }
+  W.im.instanceMatrix.needsUpdate = true;
+  for (const F of G.banners) { F.pv.rotation.y = F.y0 + Math.sin(t * 1.7 + F.ph) * .35 * wind; F.fl.rotation.x = Math.sin(t * 3.1 + F.ph) * .08; }
+  G.collars.forEach((c, i) => c.rotation.y = t * (i % 2 ? -.6 : .45));
+  const Bd = G.birds; for (let i = 0; i < Bd.length; i++) { const b = Bd[i]; b.t += dt; const dp = Math.hypot(p.pos.x - b.px, p.pos.y - b.py, p.pos.z - b.pz);
+    if (b.st === 'perch') { b.x = b.px; b.y = b.py; b.z = b.pz; b.fl = 0; if (b.t > 2 + (i % 3)) { b.t = 0; b.h += (Math.random() - .5) * 2; } if (dp < 6) { b.st = 'flee'; b.t = 0; if (i % 3 === 0) snd('swoosh', { g: .25, r: 1.6, x: b.x, z: b.z }); } }
+    else if (b.st === 'flee') { b.fl = 1; b.y += (5 - b.t * 1.5) * dt + 3 * dt; b.ang += dt * .4; const tx = cx + Math.cos(b.ang) * b.rad, tz = cz + Math.sin(b.ang) * b.rad; b.x += (tx - b.x) * Math.min(1, dt * 1.2); b.z += (tz - b.z) * Math.min(1, dt * 1.2); if (b.y > b.hy) { b.st = 'circle'; b.t = 0; } }
+    else if (b.st === 'circle') { b.fl = .6; b.ang += dt * (.5 + (i % 3) * .1); b.x = cx + Math.cos(b.ang) * b.rad; b.z = cz + Math.sin(b.ang) * b.rad; b.y = b.hy + Math.sin(t + i) * .6; if (b.t > 8 + i % 4 && dp > 8) { b.st = 'home'; b.t = 0; } }
+    else if (b.st === 'home') { b.fl = .8; const ex = b.px - b.x, ey = b.py - b.y, ez = b.pz - b.z, e = Math.hypot(ex, ey, ez), v = Math.min(e, 6 * dt); b.x += ex / e * v; b.y += ey / e * v; b.z += ez / e * v; if (e < .1) { b.st = 'perch'; b.t = 0; } if (dp < 5) { b.st = 'flee'; b.t = 0; } }
+    if (b.st !== 'perch') { const vx = b.x - (b.ox ?? b.x), vz = b.z - (b.oz ?? b.z); if (vx * vx + vz * vz > 1e-8) b.h = Math.atan2(vx, vz); } b.ox = b.x; b.oz = b.z;
+    const hop = b.st === 'perch' ? Math.max(0, Math.sin(b.t * 9)) * (b.t < .35 ? .08 : 0) : 0, fa = b.fl ? Math.sin(t * 22 + i) * .9 * b.fl : .15;
+    Bd.im.setMatrixAt(i, _opM.compose(_opV.set(b.x, b.y + .06 + hop, b.z), _opQ.setFromEuler(_opE.set(0, b.h, 0)), _opU));
+    for (const sd of [0, 1]) Bd.wim.setMatrixAt(i * 2 + sd, _opM.compose(_opV.set(b.x, b.y + .1 + hop, b.z), _opQ.setFromEuler(_opE.set(0, b.h + (sd ? Math.PI : 0), fa, 'YXZ')), _opU)); }
+  Bd.im.instanceMatrix.needsUpdate = true; Bd.wim.instanceMatrix.needsUpdate = true; }
 // m1289 (pass 6): a stone lion -- sleep on the plinth, wake, hunt round the court ring (between the plinth and the fence), leap, go home
 function opagLion(G, L, dt) { const A = OPAG, C = A.lion, p = player, [cx, cz] = A.at, rIn = A.a0 + A.eave0[0] + 1, rOut = A.RF - .8;
   L.t += dt; L.cd = Math.max(0, L.cd - dt); L.flash = Math.max(0, L.flash - dt); L.mat.emissive.setRGB(L.flash * 2, L.flash * .6, 0);
@@ -23153,7 +23191,7 @@ const BLDG = { list: [
   { key: 'gpag', t: 'Great Red Pagoda', sub: 'five storeys of red lacquer: a room on every floor, ladders up through the hatches, a balcony round every storey, a spire; a pavilion whose roof you can climb; a red fence; climb the outside eave to eave, bars, a zipline off the spire; an armoury, a library, a bell room (the alarm), a lookout; archers, a sentry gun, gate guards; glowing windows, lantern halos, a beacon on the spire; streamers, chimes, birds; strike the gong at the top and the tower lights up and the gate opens', pass: 10, build: () => gpagBuild(), clear: () => gpagClear(), on: () => !!GPAG.on, step: dt => gpagStep(dt) },
   { key: 'zramp', t: 'Zoom Ramp Tower', sub: 'zoom from the red gate (full hold), up the ramp and straight up the face -- only a full zoom reaches the gold lip; your mark shows how close; or zigzag up the chimney', pass: 3, build: () => zrampBuild(), clear: () => zrampClear(), on: () => !!ZRAMP.on, step: dt => zrampStep(dt) },
   { key: 'swrk', t: 'Sky Wreck', sub: 'a flying junk come down on rock spires: a tilted deck up a fallen mast, a hold of cargo behind breakable planks, a crow\'s nest up two bars', pass: 1, build: () => swrkBuild(), clear: () => swrkClear(), on: () => !!SWRK.on, step: dt => swrkStep(dt) },
-  { key: 'opag', t: 'Octagonal Block Pagoda', sub: 'seven eight-sided storeys of blocks: stepped slab eaves you can walk and climb eave to eave, cream panels that break block by block, a ladder up through every floor, a door onto every roof, a red fence, a stepped spire; lattice windows, bracket clusters under every eave, tile ribs, a balustrade round every roof walk, gold corner caps; every block breaks -- posts, bands, eave courses -- and flies back in; walks 2.2 m wide, rooms 6 m; a bar off every roof walk, a chain up a corner of every storey, a zipline off the top walk; a block stair up from the shrine hall, then an armoury, a scroll room, a tea room, a garden, a dragon shrine and a bell room at the top; two stone lions wake at the gate and hunt you round the court, archers on the walks, a sentry gun, a monk in the shrine -- all killable; a lantern under every corner, the windows lit, a beacon on the spire', pass: 7, build: () => opagBuild(), clear: () => opagClear(), on: () => !!OPAG.on, step: dt => opagStep(dt) },
+  { key: 'opag', t: 'Octagonal Block Pagoda', sub: 'seven eight-sided storeys of blocks: stepped slab eaves you can walk and climb eave to eave, cream panels that break block by block, a ladder up through every floor, a door onto every roof, a red fence, a stepped spire; lattice windows, bracket clusters under every eave, tile ribs, a balustrade round every roof walk, gold corner caps; every block breaks -- posts, bands, eave courses -- and flies back in; walks 2.2 m wide, rooms 6 m; a bar off every roof walk, a chain up a corner of every storey, a zipline off the top walk; a block stair up from the shrine hall, then an armoury, a scroll room, a tea room, a garden, a dragon shrine and a bell room at the top; two stone lions wake at the gate and hunt you round the court, archers on the walks, a sentry gun, a monk in the shrine -- all killable; a lantern under every corner, the windows lit, a beacon on the spire; wind bells that ring as you pass, banners on the fence, birds off the walks, the spire collars turning', pass: 8, build: () => opagBuild(), clear: () => opagClear(), on: () => !!OPAG.on, step: dt => opagStep(dt) },
 ] };
 // m1250: THE X-RAY IN THE FORGE. *"When you're inside the building the camera doesn't see through walls -- we need x-ray vision."* The kit
 // worlds' x-ray (m181: anything between the lens and him, above his feet, inside a circle round him, dithered thin) is `kitCutMat` on a
