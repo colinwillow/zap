@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1087 -- the katana's air flick-down is the unarmed SLAM now (TOOLS > AIR SLAM)
+
+*"The slam he does when you flick down unarmed is the slam I want him doing with a katana in the air. I've been wondering why it looks
+different -- I didn't realize he was doing a different one."* It was: m995 gave the katana its own jump attack (`KATANA.air.clip`, up, the
+sword overhead, the strike down) and unarmed kept `weapon_melee_finish` (`CLIPS.chargeGo`). `slamGo` now plays `CLIPS.chargeGo` with the
+katana too (`p.slamClip` '' -- the ordinary landing, as unarmed); the slam's physics, damage and landing blast were never the clip's and are
+unchanged. TOOLS > AIR SLAM: SLAM (default) / JUMP ATK (m995's), remembered (`mel.aslam`). Shipped unverified on the phone.
+
 ## m1086 -- FREEFLOW (string swings man to man, leaping), the horde gets swords and goes flying, and you can jump over a crowd
 
 *"None of them had samurai swords. It went between 21 and 50-something FPS. It didn't feel too bogged down. Their collider must be so tall
