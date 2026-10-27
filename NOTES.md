@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1143 -- RAMPART WALL pass 1 (BUILDINGS.md #7, at (0, -24))
+
+`RAMP`, `rampBuild` / `rampClear`. SPAWN > BUILDINGS > Rampart Wall.
+- A 40 m stone wall, 4.2 m high, 3 m thick (two solid runs, a footing course and a coping): its TOP is the walkway.
+- MERLONS along the outer (-z) edge: .9 tall, .8 wide, every 1.6 m, solid -- cover from the far side.
+- A GATEWAY in the middle (6 m): a lintel the walkway runs over, vermilion jambs, a neon line, and the passage filled by a BREAKABLE panel
+  (cwallBuild, 3.4 m): smash through.
+- Two RAMPS up the inner face (+z), one each half, from beside the gateway outward, slope .32, landing onto the walkway.
+- BASTIONS at both ends, 5 x 5 m, 1.5 m above the walkway (five .3 steps up from it), corner merlons, and a SENTRY TURRET on each (killable,
+  m1128), facing the courtyard.
+- The wall came down from 5 m to 4.2 so the .32 ramp lands before the bastion steps (at 5 m it ran into the bastion).
+Pass 2 next: banners, a drawbridge or portcullis, rings, function. Shipped unverified.
+
 ## m1142 -- SHRINE pass 3 (DONE)
 
 - A SHIMENAWA with four shide across the honden's front, and a bronze SUZU bell over its door on a red-and-white rope.
