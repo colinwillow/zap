@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1221 -- Teahouse Garden pass 2: the tea master (Building Forge loop)
+
+**THE TEA MASTER.** A robot (no blade) kneels behind the tea table in the teahouse.
+- Stand at the table on the deck. After a moment he BOWS and pours.
+- He serves `teaHeal` 50 health over two seconds, with steam off the cup and a soft chime, once every `teaCd` 45 s.
+
+**KOI.** Six of them (orange, white and red) circle the pond's south half under the moon bridge.
+
+**SHISHI-ODOSHI.** The bamboo deer scarer at the pond's edge fills (tilting slowly), tips and CLACKS on its stone every 6 s.
+
+Next: alternate -- an extra pass (5) on the Zeppelins.
+
 ## m1220 -- Airship Dock pass 5: Jin kites (Building Forge loop, extra pass)
 
 A rack of three red tako-KITES (each with a cyan Jin mon) now stands on the 20 m deck's west rail.
