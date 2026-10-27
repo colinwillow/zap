@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1154 -- FLYING SHIP pass 3 (DONE)
+
+- Painted OCULI (the junk's eyes) on both sides of the bow; a gold DRAGON-HEAD figurehead with horns and red eyes on the bow tip.
+- Lantern lines from both mastheads down to the bow and the stern; the clan banner on the stern.
+- The engines shed glowing cyan MOTES that drift down; an escort drone.
+`BLDG` fship `pass: 3`. Next: the Bathhouse (#11, (-30, 24)). Shipped unverified.
+
 ## m1153 -- FLYING SHIP pass 2: bowsprit, bar, cargo, helm, a sentry gun
 
 - A BOWSPRIT: a 34 cm beam angled up off the bow, 6 m out, walkable (its tris), a grapple ring hung 2.4 m over its tip.
