@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1118 -- Dojo Hall, pass 2 (inside, outside, a roof to run on)
+
+INSIDE: a tatami floor (12 mats, dark edges), a raised dais at the back (solid, step onto it), a glowing Jin panel on the back wall, a
+hanging scroll, a weapon rack with four blades, a bronze gong, and a third high bar along the ridge to swing across the hall. OUTSIDE: red
+diamond-spiral banners either side of the door, a red neon line under the eaves front and back, a stone step at the door. THE ROOF IS
+WALKABLE (its own surface in the walkable store, `bldTris` / `bldTrisDrop` -- new: a building's surfaces come out again when it is removed),
+reached by a timber RAMP on posts up the east side to the eave. Shipped unverified.
+
 ## m1117 -- THE BUILDING FORGE (a new white space) and the buildings' inventory
 
 *"Add a new white space and call it building forge... build retro Japanese inspired alien cyberpunk buildings, each building gets 3 passes...
