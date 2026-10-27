@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1165 -- SET 2 BRAINSTORMED (BUILDINGS.md)
+
+The first set is done (m1164), so per his rule (m1124) this pass brainstorms the next set into BUILDINGS.md: Sky Bridges (linking the
+first set at height), Cliff Lodge, Moated Keep, Robot Samurai Barracks, Jin Lighthouse, Floating Islands, Ninja Pillars, Senbon Torii,
+Siege Yard (a trebuchet), Teahouse Garden (a moon bridge), Kneeling Colossus. From here the loop ALTERNATES a Set 2 pass with an extra
+pass (4-6) on a done building, oldest first (his m1125 rule). No code this build (bump only).
+
 ## m1164 -- SPIDER-BOT HANGAR pass 3 (DONE) -- the first set is complete
 
 - A spinning red BEACON on the crown sweeping a red cone of light; a bronze RADAR DISH turning back and forth; an antenna mast with a red
