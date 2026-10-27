@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1208 -- Watchtower pass 5: the pulley basket (Building Forge loop, extra pass)
+
+A wicker BASKET now hangs west of the tower at (-21.4, -6.8), outside the ramp:
+- **The rigging.** A timber jib runs out from the lookout on a post, with a bronze pulley at its end, the rope down to the
+  basket, and a stone counterweight on the far rope that sinks as the basket rises.
+- **Riding up.** Step in (within .65 m) and it hauls you up at 3.2 m/s to the lookout (12 m). The pulley spins and the ropes
+  shorten.
+- **At the top** it pushes you across onto the deck.
+- **Empty,** it sinks back down at 2.2 m/s.
+
+It is the same velocity-carry as the Floating Islands' lift stone: `p.vel.y` held up while riding, and the basket follows. The
+Airship Dock's zip anchor under the cap was checked, and the zip passes about 3.5 m over the jib.
+
+Next: alternate -- Senbon Torii pass 2.
+
 ## m1207 -- Senbon Torii pass 1 (Building Forge loop, Set 2 #21)
 
 `STORII`, in BLDG.list as `storii`. A walk along z = 46 rises from x -16.5 (the street) to x -38.5 at 3.6 m:
