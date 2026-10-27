@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1197 -- Moated Keep pass 4: the moat eel (Building Forge loop, extra pass)
+
+A bronze Jin SERPENT now swims the moat: a head with lantern eyes and a jaw, and seven finned plates that trail it at .48 m.
+- **Patrol.** It swims the moat's square ring and bobs at the surface. The head is clamped between the island and the curb,
+  so it never leaves the water.
+- **Chase.** Wade in (inside the ring, below 1.2 m) within 14 m of it and it comes for you at 1.6x `eelV`.
+- **Bite.** Within 1 m it bites for `eelDmg` 10 with a shove, at most once every 1.4 s.
+- **Killable.** Any plate takes hits through `bldHit` (`keepEelHit`). At `eelHp` 5 it bursts and sinks, and it surfaces again
+  `eelBack` 20 s later.
+
+Wading was already slow (m1180), so the moat is a real hazard now; the drawbridge is the safe way in. Pass 4 is an extra on a
+done building, so it moves no sandbox box. Next: alternate -- Floating Islands pass 2.
+
 ## m1196 -- Floating Islands pass 1 (Building Forge loop, Set 2 #19)
 
 `FISL`, in BLDG.list as `fisl`. Three rock islands hang in the air round (44, 32):

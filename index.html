@@ -19137,6 +19137,7 @@ function bldHit(x, y, z, rad, dmg) {
   if (wtowerDrum(x, y, z, rad)) return 1;     // m1169: the Watchtower's war drum
   if (ghouseBell(x, y, z, rad)) return 1;     // m1171: the Gatehouse alarm bell
   if (ADOCK.on && ADOCK.on.dbell && !(ADOCK.on.dbT > .4)) { const D = ADOCK.on, B = D.dbell.position; if (Math.hypot(x - B.x, y - B.y, z - B.z) < .8 + rad) { D.dbT = 1; snd('clang', { g: 1, r: 1.3, x: B.x, z: B.z }); if (D.ss === 'docked') D.st = Math.min(D.st, .6); return 1; } }     // m1181: the dispatch bell
+  if (keepEelHit(x, y, z, rad, dmg)) return 1;     // m1197: the moat eel
   if (keepGong(x, y, z, rad)) return 1;     // m1178: the Keep's gong works the drawbridge
   if (SHRINE.on && SHRINE.on.obox && SHRINE.on.obT <= 0) { const S = SHRINE.on, P = S.obox.position; if (Math.hypot(x - P.x, z - P.z) < 1 + rad && Math.abs(y - P.y - .4) < .9 + rad) { S.obT = .6; for (let k = 0; k < 2; k++) spkBurst(P.x, P.y + .9, P.z, 20, { col: [1, .85, .3], spread: 4, size: .1, life: .7 }); snd('clang', { g: .5, r: 2.2, x: P.x, z: P.z }); snd('clang', { g: .4, r: 2.6, x: P.x, z: P.z }); return 1; } }     // m1177: the offering box
   if (CLIFF.on && !(CLIFF.on.lvT > 0)) { const C = CLIFF.on, P = new THREE.Vector3(); C.lever.children[1].getWorldPosition(P); if (Math.hypot(x - P.x, y - P.y, z - P.z) < 1 + rad) { C.lvT = 1.2; C.force = 1; C.rockT = 0; snd('clang', { g: .7, r: .9, x: P.x, z: P.z }); snd('thud', { g: .6, r: .5, x: P.x, z: P.z }); return 1; } }     // m1195: the cradle lever
@@ -20439,7 +20440,7 @@ function cliffClear() { const C = CLIFF.on; if (!C) return; for (const R of C.ro
 // a flight of steps on the courtyard side. A DRAWBRIDGE spans the moat from the curb to the island: it starts RAISED -- strike the GONG
 // on the curb beside it and it comes down (strike again and it goes up). Or don't: drop into the moat and climb the island (a ledge grab).
 // The keep: thick solid walls, a door facing the bridge, a stair up the inside to a crenellated ROOF through a hatch, a sentry gun on it.
-const KEEP = { at: [46, 0], isl: 6, cin: 10, cout: 12, ch: 2.8, ih: 3, kh: 4, kH: 4.5, on: null };
+const KEEP = { at: [46, 0], isl: 6, cin: 10, cout: 12, ch: 2.8, ih: 3, kh: 4, kH: 4.5, eelHp: 5, eelDmg: 10, eelV: 2.4, eelBack: 20, on: null };
 function keepBuild() {
   if (KEEP.on) return; const A = KEEP, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] };
   const stone = new THREE.MeshStandardMaterial({ color: 0x8e8880, roughness: .95 }), stoneD = new THREE.MeshStandardMaterial({ color: 0x66605a, roughness: .95 }), wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 });
@@ -20505,7 +20506,15 @@ function keepBuild() {
   for (let k = 0; k < 8; k++) { const a = k / 8 * 6.283 + .39, r = (A.cin + A.cout) / 2, x = cx + Math.sign(Math.cos(a)) * Math.min(Math.abs(Math.cos(a)) * 1.6, 1) * r, z = cz + Math.sign(Math.sin(a)) * Math.min(Math.abs(Math.sin(a)) * 1.6, 1) * r; add(new THREE.BoxGeometry(.25, .3, .25), lamp, x, A.ch + .3, z, 0); }
   for (const sz of [-1, 1]) { const E = [cx + kh, RY + .8, cz + sz * kh], G2 = [cx + A.cout + 6, .3, cz + sz * (A.cout + 3)]; bldCable(g, E, G2, 1.4, 5, lamp); add(new THREE.CylinderGeometry(.08, .1, .8, 6), wood, G2[0], .4, G2[2], 0); }
   const drone = bldDrone(g);
-  KEEP.on = { g, O, bars: [], db, dbB, gong, down: 0, ang: Math.PI / 2, tur, t: 0, gT: 0, winch, wT: 0, smash, arch: [], chains, koi, drone }; db.rotation.z = Math.PI / 2;
+  // ---- PASS 4 (m1197): THE MOAT EEL -- a bronze Jin serpent, seven plates and a lantern-eyed head, swims the moat's square; wade in and
+  // it comes for you and BITES (`eelDmg`); cut it (`eelHp` hits on any plate) and it sinks, to surface again `eelBack` s later ----
+  const eel = { segs: [], hp: A.eelHp, dead: 0, t: 0, s: 0, bc: 0, hc: 0 };
+  { const bm = new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .85, roughness: .3 }), eyeM = new THREE.MeshBasicMaterial({ color: 0x5ff2ff, toneMapped: false });
+    for (let k = 0; k < 8; k++) { const r = k ? .32 - k * .025 : .38, m = new THREE.Mesh(new THREE.SphereGeometry(r, 10, 8), bm); m.scale.set(1, .7, 1.3); m.castShadow = true; g.add(m);
+      if (!k) { for (const sx of [-1, 1]) { const e = new THREE.Mesh(new THREE.SphereGeometry(.07, 6, 5), eyeM); e.position.set(sx * .2, .14, .25); m.add(e); } const jaw = new THREE.Mesh(new THREE.ConeGeometry(.2, .5, 6), bm); jaw.rotation.x = Math.PI / 2; jaw.position.z = .45; m.add(jaw); }
+      else { const fin = new THREE.Mesh(new THREE.BoxGeometry(.04, .25, .3), bm); fin.position.y = .25; m.add(fin); }
+      m.position.set(cx - (A.isl + A.cin) / 2, .3, cz + k * .5); eel.segs.push(m); } }
+  KEEP.on = { g, O, bars: [], db, dbB, gong, down: 0, ang: Math.PI / 2, tur, t: 0, gT: 0, winch, wT: 0, smash, arch: [], chains, koi, drone, eel }; db.rotation.z = Math.PI / 2;
   { const K0 = KEEP.on; for (const [sx, sz] of [[1, 1], [1, -1]]) archerPost(cx + sx * (A.cout - 1), A.ch + .1, cz + sz * (A.cout - 1)).then(d => { if (KEEP.on === K0) K0.arch.push(d); else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {}); }
   arenaBeam(cx, cz, [1, .6, .35], 1); snd('clang', { g: .7, r: .5 });
 }
@@ -20516,6 +20525,7 @@ function keepStep(dt) { const K = KEEP.on; if (!K) return; K.t += dt;
       const pts = [[-r, -r], [r, -r], [r, r], [-r, r]], A2 = pts[side], B2 = pts[(side + 1) % 4]; f.position.set(cx + A2[0] + (B2[0] - A2[0]) * w, .32, cz + A2[1] + (B2[1] - A2[1]) * w); f.rotation.y = Math.atan2(B2[0] - A2[0], B2[1] - A2[1]) + Math.sin(K.t * 5 + i) * .2; }
     const a = K.t * .26; K.drone.position.set(cx + Math.cos(a) * 14, 13 + Math.sin(K.t * 1.2) * .4, cz + Math.sin(a) * 14); K.drone.rotation.y = -a; K.drone.children[1].rotation.z = K.t * .6; }
   if (K.wT > 0) { K.wT -= dt; K.winch.rotation.z += dt * (K.down ? -6 : 6); }
+  if (K.eel) keepEel(K, dt);
   { const p = player, [cx, cz] = KEEP.at, ax = Math.abs(p.pos.x - cx), az = Math.abs(p.pos.z - cz), m = Math.max(ax, az);     // wading the moat
     if (m > KEEP.isl && m < KEEP.cin && p.pos.y < .7 && p.grounded) { const k = Math.exp(-4 * dt); p.vel.x *= k; p.vel.z *= k; if (Math.random() < dt * 6) smokeAt(p.pos.x, .4, p.pos.z, .4, .5, [.85, .92, 1]); } } const want = K.down ? 0 : Math.PI / 2;
   K.ang += Math.sign(want - K.ang) * Math.min(Math.abs(want - K.ang), dt * .7); K.db.rotation.z = K.ang; K.dbB._off = K.ang > .15 ? 1 : 0;
@@ -20526,6 +20536,25 @@ function keepGong(x, y, z, rad) { const K = KEEP.on; if (!K) return 0;
   if (K.gT > .5) return 0; const P = new THREE.Vector3(); K.gong.userData.disc.getWorldPosition(P);
   if (Math.hypot(x - P.x, y - P.y, z - P.z) > .9 + rad) return 0; K.gT = 1.2; K.down = !K.down;
   snd('clang', { g: 1.1, r: .35, x: P.x, z: P.z }); snd('clang', { g: .7, r: .5, x: P.x, z: P.z }); camShake(.15); spkBurst(P.x, P.y, P.z, 16, { col: [1, .85, .4], spread: 3, size: .1, life: .5 }); return 1; }
+function keepEel(K, dt) { const E = K.eel, A = KEEP, [cx, cz] = A.at, H = E.segs[0].position, p = player, mid = (A.isl + A.cin) / 2, lo = A.isl + .45, hi = A.cin - .45;
+  E.t += dt; if (E.bc > 0) E.bc -= dt; if (E.hc > 0) E.hc -= dt;
+  if (E.dead) { E.dead -= dt; for (const m of E.segs) m.position.y = Math.max(-1.2, m.position.y - dt); if (E.dead <= 0) { E.dead = 0; E.hp = A.eelHp; for (const m of E.segs) m.visible = true; } else return; }
+  const ax = Math.abs(p.pos.x - cx), az = Math.abs(p.pos.z - cz), m = Math.max(ax, az), wading = m > A.isl && m < A.cin && p.pos.y < 1.2;
+  let tx, tz, v = A.eelV;
+  if (wading && Math.hypot(p.pos.x - H.x, p.pos.z - H.z) < 14) { tx = p.pos.x; tz = p.pos.z; v *= 1.6; }
+  else { E.s = (E.s + dt * .35) % 4; const side = Math.floor(E.s), w = E.s - side, pts = [[-mid, -mid], [mid, -mid], [mid, mid], [-mid, mid]], P0 = pts[side], P1 = pts[(side + 1) % 4]; tx = cx + P0[0] + (P1[0] - P0[0]) * w; tz = cz + P0[1] + (P1[1] - P0[1]) * w; }
+  const dx = tx - H.x, dz = tz - H.z, d = Math.hypot(dx, dz); if (d > .05) { const k = Math.min(d, v * dt) / d; let nx = H.x + dx * k, nz = H.z + dz * k;
+    // keep the head IN the moat: the square ring between the island and the curb
+    const rx = nx - cx, rz = nz - cz; if (Math.max(Math.abs(rx), Math.abs(rz)) < lo) { if (Math.abs(rx) > Math.abs(rz)) nx = cx + Math.sign(rx) * lo; else nz = cz + Math.sign(rz) * lo; }
+    nx = cx + clamp(nx - cx, -hi, hi); nz = cz + clamp(nz - cz, -hi, hi); H.x = nx; H.z = nz; E.segs[0].rotation.y = Math.atan2(dx, dz); }
+  H.y = .3 + Math.sin(E.t * 4) * .08;
+  for (let k = 1; k < E.segs.length; k++) { const a = E.segs[k - 1].position, b = E.segs[k].position, ex = b.x - a.x, ez = b.z - a.z, e = Math.hypot(ex, ez) || 1; b.x = a.x + ex / e * .48; b.z = a.z + ez / e * .48; b.y = .28 + Math.sin(E.t * 4 - k * .8) * .1; E.segs[k].rotation.y = Math.atan2(-ex, -ez); }
+  if (wading && E.bc <= 0 && Math.hypot(p.pos.x - H.x, p.pos.z - H.z) < 1) { E.bc = 1.4; playerHurt(A.eelDmg, Math.atan2(p.pos.x - H.x, p.pos.z - H.z), 4, 1.5, .25, 0);
+    spkBurst(H.x, .6, H.z, 14, { col: [.8, .95, 1], spread: 4, size: .12, life: .4 }); snd('clang', { g: .6, r: 1.9, x: H.x, z: H.z }); camShake(.12); } }
+function keepEelHit(x, y, z, rad, dmg) { const K = KEEP.on; if (!K || !K.eel || K.eel.dead || K.eel.hc > 0) return 0; const E = K.eel;
+  for (const m of E.segs) { const P = m.position; if (Math.hypot(x - P.x, y - P.y, z - P.z) > .7 + rad) continue; E.hc = .25; E.hp -= Math.max(.5, dmg || 1); spkBurst(P.x, P.y + .2, P.z, 12, { col: [1, .8, .4], spread: 3, size: .1, life: .35 }); snd('clang', { g: .8, r: 1.3, x: P.x, z: P.z });
+    if (E.hp <= 0) { E.dead = KEEP.eelBack; for (let k = 0; k < 3; k++) spkBurst(P.x, .5, P.z, 20, { col: k ? [1, .55, .15] : [.5, .9, 1], spread: 6, size: .2, life: .7 }); smokeAt(P.x, .5, P.z, 1.5, 1.2, [.85, .9, .95]); snd('boom', { g: .7, r: 1, x: P.x, z: P.z }); }
+    return 1; } return 0; }
 function keepClear() { const K = KEEP.on; if (!K) return; smashDrop(K.smash); for (const d of K.arch || []) if (d && HORDE.list.includes(d)) { bowDrop(d); bodyGone(d); HORDE.list.splice(HORDE.list.indexOf(d), 1); } const i = BDYN.indexOf(K.dbB); if (i >= 0) BDYN.splice(i, 1); turretDrop(K.tur); bldClear(K); KEEP.on = null; boxGrid(); }
 // m1184: THE ROBOT SAMURAI BARRACKS (Set 2 #17, pass 1) at (30, -42). A long BARRACKS HALL (breakable walls, a door onto the yard, a curved
 // roof) along the south of a DRILL YARD where six ROBOT SAMURAI drill in step -- raise, cut, return, all together, a stamp on the cut --
@@ -20797,7 +20826,7 @@ const BLDG = { list: [
   { key: 'sphang', t: 'Spider-Bot Hangar', sub: 'a vaulted bunker, spider bots that climb every building and pounce on you from walls and roofs, hatching from their pods (smash them)', pass: 4, build: () => sphangBuild(), clear: () => sphangClear(), on: () => !!SPHANG.on, step: dt => sphangStep(dt) },
   { key: 'skyb', t: 'Sky Bridges', sub: 'rope bridges and ziplines linking the buildings up high (they appear as the buildings do); pull back on a zip to brake', pass: 4, build: () => skybBuild(), clear: () => skybClear(), on: () => !!SKYB.on, step: dt => skybStep(dt) },
   { key: 'cliff', t: 'Cliff Lodge', sub: 'a rock crag, a path up it with boulders rolling down (strike the cradle lever to tip one yourself), a lodge, a waterfall, pines', pass: 4, build: () => cliffBuild(), clear: () => cliffClear(), on: () => !!CLIFF.on, step: dt => cliffStep(dt) },
-  { key: 'keep', t: 'Moated Keep', sub: 'a keep in a moat, a drawbridge (gong outside, winch inside), archers, a sentry gun', pass: 3, build: () => keepBuild(), clear: () => keepClear(), on: () => !!KEEP.on, step: dt => keepStep(dt) },
+  { key: 'keep', t: 'Moated Keep', sub: 'a keep in a moat with a bronze eel in it, a drawbridge (gong outside, winch inside), archers, a sentry gun', pass: 4, build: () => keepBuild(), clear: () => keepClear(), on: () => !!KEEP.on, step: dt => keepStep(dt) },
   { key: 'barr', t: 'Robot Barracks', sub: 'a barracks, robot samurai drilling in step to the drill master\'s taiko -- step into the yard and they come for you', pass: 3, build: () => barrBuild(), clear: () => barrClear(), on: () => !!BARR.on, step: dt => barrStep(dt) },
   { key: 'lhouse', t: 'Jin Lighthouse', sub: 'a keeper\'s room, a ramp to its roof, a spiral stair 18 m up round a slim shaft, a gallery, a Jin searchlight that locks on and zaps you (shoot its crystal dark), a ring on top', pass: 3, build: () => lhouseBuild(), clear: () => lhouseClear(), on: () => !!LHOUSE.on, step: dt => lhouseStep(dt) },
   { key: 'fisl', t: 'Floating Islands', sub: 'three rock islands hanging on chains, waterfalls off their edges, rope bridges climbing between them, a shrine on the highest -- grapple up', pass: 1, build: () => fislBuild(), clear: () => fislClear(), on: () => !!FISL.on, step: dt => fislStep(dt) },
