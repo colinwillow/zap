@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1131 -- GRAPPLING HOOK pass 3 (DONE): the claw, the sag, climbing
+
+- **The hook is a thing now:** a three-pronged bronze claw flies from his hand to the ring on a small arc over `GRING.throwT` (.16 s),
+  spinning, and bites with a clink and sparks (the clink moved from the throw to the catch).
+- **The rope sags** (14 points) while slack or in flight and runs straight once it takes his weight.
+- **Climb the rope:** HOLD the right pad while swinging and he reels himself up at `GRING.climb` 2.6 m/s (down to `minL` 2.2 m). Tap still
+  lets go.
+Next in the queue: the forge's snowy horizon, then the Pagoda. Shipped unverified.
+
 ## m1130 -- GRAPPLING HOOK pass 2: walls, and which ring
 
 - **Swinging collides now:** `stepRope` runs `resolveBoxes` (the walking resolver) after the rope constraint. A wall takes the speed into
