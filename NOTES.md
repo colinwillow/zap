@@ -294,6 +294,37 @@ SHIPPED UNVERIFIED. The queue's passes 2 and 3 are done. Next is his call: more 
 
 SHIPPED UNVERIFIED. Next: pass 3, foam and wake, bow spray, the sun on the water, gulls, an island.
 
+## THE CHUNK LIBRARY: THE PIECES A LEVEL IS BUILT FROM, SIZED FROM THE MOVE TABLE (m1387)
+
+Step 2 of the blueprint pipeline (LEVELDESIGN.md "THE BLUEPRINT", BUILDINGS STEER 000), after Worker B's move table (m1376).
+
+- **`CHUNKS`:** 18 parametric pieces, each `(inPort, K) -> { out, ask }`. A port is `{ x, y, z, dir }` (dir on an axis), and `chunkFrame` gives local u (along) / v (across) building.
+  - **Sizing:** every gap and rise is sized from `MOVEC` (the move table's COMFY values, 80% of his max), asked at 92% of that.
+  - **The gaps:**
+    - run jump 5.5 m
+    - sprint long jump 10.1
+    - run + double 9.2
+    - run jump + one swipe 8.6
+    - run + double + two swipes 16.1
+  - **Up:**
+    - ledges +3.3 (jump) and +4.3 (double)
+    - wall run up +3.8 (run jump into it) and +7.8 (sprint long jump into it)
+    - a wall-jump CHIMNEY +8 (two faces 4.6 m apart, about 5 kicks)
+    - a bar launch UP (+8.3)
+    - stairs (+4.2 in 14 risers of .30)
+    - a ladder +7
+  - **Across and down:**
+    - a side wall run over a 6 m pit
+    - a bar launch FAR (gap 15.3)
+    - a drop of 6
+    - a zip (34 m, down 8)
+  - **And:** a rest pad.
+  - **Raised landings are SOLID blocks to the ground,** so there is a face to catch or run up.
+- **SPAWN > BUILDINGS > Chunk Library** (at -200, -40): one lane each, 16 m apart, on a 6 m runway with a ladder up. A sign on each says the chunk and what it asks of him, in the move table's terms. **This is for him to walk: which ones feel right, which are too easy or too hard.** His answers adjust `MOVEC.ask` per chunk before the solver uses them.
+- **Re-sync `MOVEC` after `npm run moves`** if the physics change (a copy, by hand, for now).
+- **Checked headless:** builds clean, two renders.
+- **Next (step 3):** the blueprint format (stations, profile, runs, `verbs`, `serves`) and the SOLVER that chains these chunks between stations.
+
 ## THE SNOWFIELD, PASS 1: TRACKS, PILES, FLAKES THAT BOUNCE OFF HIM (m1384)
 
 His: *"a convincingly good snow simulation where you're trudging through the snow, the tracks, the snow piles up, but there's also snow in the air, bouncing off your character, fluttering, super elegant."*
