@@ -63468,7 +63468,7 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 // to the shop front and to the round back door. Built in its OWN frame (local +z = the front, toward the river; `at`/`yaw` are HOME.hut's) and
 // merged per material; every collider a local box turned into the world (the yaw is a quarter turn, so a box stays a box); every walkable
 // surface a triangle. `?hut=glb` (or GHOME.on = 0) puts the GLB back, to compare. Pass 1: the massing and the walkable shell, with the inside.
-const GHOME = { on: 1, pass: 3, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 7, Hd: 2.8, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
+const GHOME = { on: 1, pass: 4, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 7, Hd: 2.8, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1.3, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
@@ -63709,6 +63709,50 @@ function ghomeBuild(at, yaw, y0) {
     { const [Tx, Tz] = A.T, yt = P + A.Ht + 1.6; vbox(Tx - .12, Tx + .12, yt, yt + 5.2, Tz - .12, Tz + .12, wood, 0); vbox(Tx - .16, Tx + .16, yt + 4.85, yt + 5.05, Tz - .9, Tz + 1.3, wood, 0);
       for (const yy of [yt + .8, yt + 2.4, yt + 4]) vbox(Tx - .16, Tx + .16, yy - .05, yy + .05, Tz - .16, Tz + .16, iron, 0);
       put(new THREE.PlaneGeometry(2, 2.2, 4, 8), banM, at4(Tx + .05, yt + 3.75, Tz + .25, Math.PI / 2)); } }
+  // ---- PASS 4: THE DRESSING (refs: the stalls heaped with pots and crates, rows of glowing lanterns and little brass bells under the beams,
+  // the shop's lit shelves of pots, cacti and succulents all round the mound, boulders). Pots are lathed (five shapes, clay or brass), crates
+  // are timber with iron straps (solid), the lanterns glow (emissive) and one warm light sits in the shop; plants are code-built cacti
+  // (saguaro, prickly pear) and agave rosettes, green and red ----
+  { const bronze = triMat('bronze', { scale: 1.2, metal: .75, rough: .35 }); bronze.userData.tri = 1;
+    const clay = new THREE.MeshStandardMaterial({ color: 0xb4623a, roughness: .8 }), clayD = new THREE.MeshStandardMaterial({ color: 0x7a3c24, roughness: .85 }), glaze = new THREE.MeshStandardMaterial({ color: 0x8a6a9a, roughness: .45 });
+    const glow = new THREE.MeshStandardMaterial({ color: 0xffd9a0, emissive: 0xffa040, emissiveIntensity: 2.2, toneMapped: false }), cact = new THREE.MeshStandardMaterial({ color: 0x5f8f45, roughness: .75 }), cactD = new THREE.MeshStandardMaterial({ color: 0x3f6a34, roughness: .8 }), agR = new THREE.MeshStandardMaterial({ color: 0xc0402c, roughness: .7 });
+    const rnd = rwRng(77), mats = [clay, clay, clayD, glaze, bronze];
+    const SH = [[[0, 0], [.55, .05], [.95, .35], [1, .6], [.7, .85], [.45, .95], [.5, 1]], [[0, 0], [.6, .03], [.8, .3], [.55, .62], [.3, .75], [.32, 1]], [[0, 0], [.8, .02], [1, .3], [.95, .6], [.9, .8], [1, .85]], [[0, 0], [.4, .02], [.9, .25], [1, .5], [.6, .8], [.3, .88], [.35, 1]], [[0, 0], [.7, .05], [.75, .5], [.6, .9], [.72, 1]]];
+    const pot = (x, y, z, r, h, kind, m) => { const pts = SH[kind % SH.length].map(([a, b]) => new THREE.Vector2(a * r, b * h)); put(new THREE.LatheGeometry(pts, 12), m || mats[(rnd() * mats.length) | 0], at4(x, y, z, rnd() * 6)); if (r > .32) box(x - r * .8, x + r * .8, y, y + h, z - r * .8, z + r * .8, { noCam: 1 }); };
+    const crate = (x, y, z, w, h, d, solid = 1) => { vbox(x - w / 2, x + w / 2, y, y + h, z - d / 2, z + d / 2, wood, solid, { noCam: 1 });
+      for (const f of [.15, .85]) vbox(x - w / 2 - .02, x + w / 2 + .02, y + h * f - .03, y + h * f + .03, z - d / 2 - .02, z + d / 2 + .02, iron, 0);
+      vbox(x - .04, x + .04, y, y + h, z + d / 2, z + d / 2 + .03, iron, 0); };
+    const lantern = (x, y, z, s = 1) => { put(new THREE.CylinderGeometry(.012, .012, .4, 4), iron, at4(x, y + .2, z)); put(new THREE.ConeGeometry(.16 * s, .14 * s, 6), bronze, at4(x, y - .02, z));
+      put(new THREE.CylinderGeometry(.11 * s, .11 * s, .26 * s, 6), glow, at4(x, y - .22 * s, z)); for (let k = 0; k < 4; k++) { const q = k / 4 * Math.PI * 2 + .4; put(new THREE.BoxGeometry(.025, .3 * s, .025), bronze, at4(x + Math.sin(q) * .12 * s, y - .22 * s, z + Math.cos(q) * .12 * s)); }
+      put(new THREE.CylinderGeometry(.13 * s, .1 * s, .05, 6), bronze, at4(x, y - .38 * s, z)); };
+    const bells = (x, y, z) => { put(new THREE.CylinderGeometry(.01, .01, .5, 3), iron, at4(x, y - .25, z)); for (const [dx, dy] of [[0, -.55], [-.07, -.42], [.07, -.47]]) put(new THREE.CylinderGeometry(.04, .07, .2, 8), bronze, at4(x + dx, y + dy, z)); };
+    // the STALLS: a two-shelf rack along the back of each deck, heaped with pots; crates and big pots on the deck
+    for (const sx of [-1, 1]) { const xa = sx < 0 ? -9.4 : 2.9, xb = sx < 0 ? -2.9 : 9.4, zr = 3.75;
+      vbox(xa, xb, P, P + .05, zr - .3, zr + .3, wood, 0); for (const hh of [.75, 1.45]) vbox(xa, xb, P + hh - .05, P + hh, zr - .3, zr + .3, wood, 0);
+      for (const x of [xa, (xa + xb) / 2, xb]) vbox(x - .05, x + .05, P, P + 1.5, zr - .3, zr + .3, wood, 1, { noCam: 1 });
+      for (const hh of [.05, .75, 1.45]) for (let x = xa + .3; x < xb - .2; x += .38 + rnd() * .2) { const r = .12 + rnd() * .1; pot(x, P + hh, zr + (rnd() - .5) * .2, r, r * (1.6 + rnd()), (rnd() * 5) | 0); }
+      for (let i = 0; i < 5; i++) { const x = xa + .5 + rnd() * (xb - xa - 1), z = 5.4 + rnd() * 1.6; if (rnd() < .5) crate(x, P, z, .7, .6, .6); else { const r = .3 + rnd() * .15; pot(x, P, z, r, r * 2.2, (rnd() * 5) | 0); } }
+      for (const x of sx < 0 ? [-9.6, -6.2, -2.6] : [2.6, 6.2, 9.6]) { lantern(x + .4 * sx, P + 2.65, 7.55); }
+      for (let x = xa + .2; x < xb; x += .55) bells(x, P + 2.72, 7.55);
+      for (let x = xa; x <= xb; x += 1.85) lantern(x, P + 4.6 - .2, 4.75, .9); }
+    // THE SHOP: lit shelves of pots along the screen wall, more on the counter; a warm light in the room
+    { const z = A.part + .32; for (const hh of [.6, 1.3, 2.0, 2.7]) { vbox(-3.6, 3.6, P + hh - .05, P + hh, z - .26, z + .26, wood, 0); for (let x = -3.4; x < 3.4; x += .34 + rnd() * .15) { if (Math.abs(x) < 1.25 && hh < 2.5) continue; const r = .1 + rnd() * .07; pot(x, P + hh, z, r, r * (1.6 + rnd()), (rnd() * 5) | 0); } }
+      for (let x = -2; x < 2; x += .5) { const r = .1 + rnd() * .08; pot(x, P + 1.05, 1.95, r, r * 2, (rnd() * 5) | 0); }
+      lantern(-1.2, P + 3.4, 1.2); lantern(1.2, P + 3.4, 1.2); lantern(0, P + 3.6, -.2);
+      const L = new THREE.PointLight(0xffa860, 14, 9, 1.6); L.position.set(0, P + 2.8, 1); g.add(L); }
+    // CACTI and SUCCULENTS round the mound and in pots on the decks; more BOULDERS half-buried round the foot
+    const saguaro = (x, z, h) => { const y = 0; put(new THREE.CapsuleGeometry(.22, h, 4, 10), cact, at4(x, y + h / 2, z));
+      for (const sd of [-1, 1]) { if (rnd() < .3) continue; const ah = h * (.35 + rnd() * .25), al = .5 + rnd() * .3, ay = y + ah, ax = x + sd * .2;
+        put(new THREE.CapsuleGeometry(.14, al, 4, 8), cact, at4(ax + sd * .25, ay, z, 0, 0, Math.PI / 2)); put(new THREE.CapsuleGeometry(.14, al * 1.1, 4, 8), cact, at4(ax + sd * .5, ay + al * .55, z)); }
+      box(x - .25, x + .25, 0, h, z - .25, z + .25, { noCam: 1 }); };
+    const pear = (x, y, z) => { for (let i = 0; i < 5; i++) { const a = rnd() * 6, t = rnd() * .8 - .4; put(new THREE.SphereGeometry(.22, 8, 6), i % 2 ? cact : cactD, at4(x + Math.sin(a) * .2, y + .25 + i * .12, z + Math.cos(a) * .2, a, t, 0, 1, 1.25, .35)); } };
+    const agave = (x, y, z, red) => { for (let i = 0; i < 11; i++) { const a = i / 11 * Math.PI * 2 + rnd() * .3, tilt = .5 + rnd() * .5; put(new THREE.ConeGeometry(.07, .65, 4), red && i % 2 ? agR : cactD, _m4.compose(new THREE.Vector3(x + Math.sin(a) * .16, y + .25, z + Math.cos(a) * .16), _q.setFromEuler(_e.set(Math.cos(a) * tilt, 0, -Math.sin(a) * tilt)), _one)); } };
+    for (let i = 0; i < 30; i++) { const a = rnd() * Math.PI * 2, rr = 1.12 + rnd() * .28, x = Math.sin(a) * A.rx * rr, z = Math.cos(a) * A.rz * rr;
+      if (z > A.rz * .7 && Math.abs(x) < 2.6) continue; if (x > 9 && z > 3.6 && z < 7.4) continue;     // the steps, the ramp
+      const k = rnd(); if (k < .3) saguaro(x, z, 1.2 + rnd() * 1.4); else if (k < .6) pear(x, 0, z); else agave(x, 0, z, k > .82); }
+    for (const [x, z] of [[-8, 6.6], [-3.6, 6.8], [3.4, 6.9], [8.6, 6.4]]) { pot(x, P, z, .32, .55, 2, clayD); agave(x, P + .5, z, x > 0); }
+    for (let i = 0; i < 12; i++) { const a = rnd() * Math.PI * 2, rr = 1.2 + rnd() * .3, x = Math.sin(a) * A.rx * rr, z = Math.cos(a) * A.rz * rr; if (z > A.rz * .7 && Math.abs(x) < 3) continue; if (x > 9 && z > 3.6 && z < 7.4) continue;
+      const k = .6 + rnd() * 1.1; put(new THREE.IcosahedronGeometry(1, 3), stoneM, at4(x, k * .2, z, rnd() * 6, 0, 0, k * 1.5, k * .75, k * 1.2)); box(x - k * 1.1, x + k * 1.1, 0, k * .7, z - k * .9, z + k * .9); } }
   // ---- merge, and the world gets the boxes and the floors ----
   let draws = 0; for (const [m, list] of MG) { if (m.map && !m.userData.tri) m.map.wrapS = THREE.RepeatWrapping; const geo = mergeGeometries(list); if (!geo) { console.warn('[melee] ghome: a bucket would not merge', m.name || m.color); continue; } const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; g.add(o); draws++; }
   for (const b of boxes) BOXES.push(b);

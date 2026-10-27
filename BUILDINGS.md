@@ -53,8 +53,8 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
     - the STORE wing;
     - round windows; the sandstone's cream, speckle and purple spots as vertex colour.
   - [x] **pass 2 (m1383):** the timber scaffold (iron-banded posts, beams, braces), two stall decks under sagging torn awnings (walkable), the big V-hemmed chevron banner and four post banners, a ladder up the store to its dome, the long ramp off the right deck
-  - [x] **pass 3 (next tick):** the tent cone (eight panels on a banded drum, poles crossing past the apex, a stacked finial), four brass ship's wheels, two bronze stacks, the crane with its brass orb, red tassel and weights, the balcony canopy, the tower's flag
-  - [ ] pass 4: the dressing -- pots, crates, the lantern-lit stalls, cacti and succulents, more boulders
+  - [x] **pass 3 (m1385):** the tent cone (eight panels on a banded drum, poles crossing past the apex, a stacked finial), four brass ship's wheels, two bronze stacks, the crane with its brass orb, red tassel and weights, the balcony canopy, the tower's flag
+  - [x] **pass 4 (next tick):** the dressing -- pot-heaped stall racks and crates, rows of glowing lanterns and brass bells under the beams, the shop's lit shelves and a warm light, saguaros, prickly pears and agaves round the mound, more boulders
   - [ ] pass 5: the look -- the domes' bulge (lathed, not cylinders), the stone's texture, the warm interior light
   - [ ] then more passes, each one closer to the four views
 
