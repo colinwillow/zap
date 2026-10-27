@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home, procedural, pass 8: his quarters, lived in (WORKER B)
+
+- **The quarters get room.** The screen wall moved forward (z -1) and stops short of the tower door, so the space behind it is a real room.
+- **What is in it:**
+  - his BED: a timber frame, a red blanket, a cream pillow;
+  - a woven rug, red with a cream border;
+  - a BRAZIER of glowing coals with its own small warm light;
+  - his KATANA, and a second blade, on a rack by the bed;
+  - a chest at the bed's foot;
+  - a table with two stools and a hanging lantern.
+- **The STORE** is stacked round its wall with barrels (iron hoops, solid), sacks and crates, clear of the way in from the hall.
+- **Counts.** 24 draws.
+
+Checked headless and looked at renders through the shop into the quarters, and into the store. Shipped unverified.
+
 ## THE SHIP, PASS 8: THE SKY OF HIS REFERENCE (m1393, WORKER A)
 
 His: *"Send it."* This pass reaches past the hull into the world on his reference sheet (the airship among floating islands):
