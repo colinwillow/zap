@@ -5,6 +5,27 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## White Heron Castle pass 10 of 10: the polish (X2, WORKER B)
+
+I re-read the whole build against the reference and fixed what reading it turned up.
+- **A real bug from pass 1: the eave lips.** Each ledge lip hung .9 m below its eave. On the keep's and the tower's lowest roofs that put
+  a solid box 1.6 m over the stone terrace, below head height, so walking round the keep on the base would have run into an invisible
+  wall under every eave. A lip only needs its top edge, so it is now .35 deep on every roof. That clears his head everywhere and still
+  catches.
+- **Silhouette and colour.** The reference's keep rises off its own stone, not off the terrace. A dressed-stone SKIRT (.75 m) now runs
+  round the keep's ground storey, clear of its doors and of the gallery.
+- **Draw calls.**
+  - The herons are one body mesh plus two wing meshes each (vertex colours: white, black tips): 24 draws down to 9.
+  - The flags lose their cross-bars: 12 draws down to 6.
+  - The drawbridge's strips are merged into its plank: 5 draws down to 1.
+  - Every lantern in the castle shares one material (pass 5 had its own).
+- **Where it stands.**
+  - The stone, plaster, tile, timber, floor, dark-tile, gold, window, lantern, tatami, bark and needle buckets: about 12 draws for the
+    whole static castle.
+  - On top of that: the storehouse's breakable walls, the ballista, the drawbridge, the six flags and the herons.
+
+**THE 10 PASSES OF X2 ARE DONE** (m1277 to this build). The DONE WHEN box that is left is his look on the phone. SHIPPED UNVERIFIED.
+
 ## White Heron Castle pass 9 of 10: light and life (X2, WORKER B)
 
 - **Black pines.** Nine of them round the castle, like the reference's foreground: gnarled tube trunks with arms ending in flat cloud
