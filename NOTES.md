@@ -5,6 +5,31 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- Octagonal Block Pagoda pass 1 of 10: the stack (X4, WORKER A)
+
+His favourite block reference (`block_pagoda_octagonal.jpg`), built in THE BLOCK STYLE. At (70, 72) in the forge, measured clear of every
+building there (nearest: the Festival at 42 m). `OPAG` / `opagBuild`; its code sits above the Sky Wreck, its hook in `bldHit` (`opagHit`).
+- **Seven EIGHT-sided storeys**: apothem 5 m at the ground stepping in .45 m a storey, 3.4 m each, on a two-step light stone plinth.
+- **Colour bands**: a red post at each of the eight corners, cream block panels between, a red band under every eave, a teal bracket band.
+- **The eaves are STEPPED SLABS**: four dark-grey courses round all eight sides, each .3 m higher and further in, a light edge on the outer
+  one, and the eight corners kicked up two blocks. Each course is a ring of eight boxes, one per face, each as wide as its face at its
+  outer radius, so the eight cover the octagon with no corner gaps.
+- **Turned colliders**: every diagonal block is a turned box (`cs`/`sn`/`hx`/`hz`, `boxLocal`'s frame) made by `opagTB`; the axis ones are
+  plain boxes.
+- **The outside climbs**:
+  - every course is walkable (.3 m risers, under his .357 step);
+  - the top course is flush with the next floor, so a door onto every roof steps straight out onto it;
+  - the outer course has a .9 m lip to catch (`LEDGE.tall`), so it goes eave, roof, eave... up the outside.
+- **The inside way up**: a ladder through a hatch in every floor, turning a quarter each storey.
+- **Every cream panel block BREAKS**: about 1,500 of them in one InstancedMesh, each with its own collider, 2 hits. When one breaks, the
+  blocks resting on it come down with it.
+  - Shots, swings and blasts reach it through `bldHit`.
+  - The red fence rail breaks the same way.
+- **The ground**: a wide porch eave on sixteen red posts, a red octagonal fence with a gate toward the forge's middle, and a stepped
+  spire with flared collars and a gold block.
+
+Draws: about ten merged buckets plus two instanced sets. SHIPPED UNVERIFIED. Next: pass 2, the block detail.
+
 ## Great Red Pagoda pass 8 of 10: motion (X1)
 
 - **Streamers.** Long red and white streamers hang off two corners of every balcony, swaying in the wind.
