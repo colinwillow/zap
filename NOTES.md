@@ -5,6 +5,24 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## White Heron Castle pass 3 of 10: the walls (X2, WORKER B)
+
+- **Rows of small windows (`winRow`).** Each window is:
+  - a dark opening in a dark timber frame;
+  - three white bars across it;
+  - spaced every 1.5 m (1.8 on the keep's ground storey).
+- **Where the windows go.**
+  - Every face of every keep storey and every tower storey.
+  - Two rows down both long sides of the gallery.
+  - Skipped where a door is, and where another mass covers the wall: the gallery against the keep's north face, and against the
+    tower's south face.
+- **The sama: gun and arrow ports.** Under the lowest row of windows (keep, tower, gallery), in the reference's rhythm of square,
+  round and triangle.
+- **The plaster (`heronPlasterTex`).** A real lime plaster now: a faint speckle and faint rain streaks, in world UVs.
+- **Draws.** All flat pieces on the faces go into the buckets: one new material (the dark openings), so +1 draw.
+
+SHIPPED UNVERIFIED. Next: pass 4, the stone base climbable (the batter run up with no tap, handholds in the courses).
+
 ## m1282 -- Octagonal Block Pagoda pass 4 of 10: the climb outside, and ROOM TO FIGHT (X4, WORKER A)
 
 **ROOM TO FIGHT first** (his rule off the red pagoda, now at the top of BUILDINGS.md). The pagoda got bigger:
