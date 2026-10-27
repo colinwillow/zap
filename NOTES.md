@@ -5,6 +5,31 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## White Heron Castle pass 1 of 10: the mass (X2, WORKER B)
+
+His second 10-pass reference, `images/korajin/ref/white_castle_keep.jpg` (a Himeji-style castle). `HERON`, `heronBuild`, SPAWN > BUILDINGS.
+- **The spot, re-measured: (-108, 45).** Footprint x -121..-87, z 28..62 (base with its toe, the stair, the storehouse). The nearest
+  building const is ONI at (-72, 0), about 40 m away; the planned mill at (-72, 40) is 15 m clear even at 12 m half-width. The forge floor
+  is 400 x 400, so this is inside it.
+- **Facing.** The forge's middle is east (+x), so east is the front: the keep is on the south half, and the gallery runs north to the
+  tower (the reference as seen from the forge).
+- **The base.** Dressed stone 6 m tall. Its faces batter out on a concave curve (near vertical at the top, a 1 m toe), one stone texture
+  in world UVs. The collider face is .4 m out, part-way down the batter.
+- **The keep.** Five hollow white storeys stepping in .7 m a storey (14 x 12 m down to 8.4 x 6.4).
+  - A door on alternating sides opens onto the roof below.
+  - A ladder goes up through a hatch, the corners alternating.
+  - A dark sill band runs round each storey.
+- **The roofs.** Every roof is ONE height function (`roof`): steep at the top, flattening to the eave, corners kicked up. It lays both the
+  tiles and the walkable triangles, so what he stands on is what he sees. A timber fascia runs round the rim, and a lip under each side
+  is a ledge to catch. Storey roofs wrap the next storey (a hole). The top is a ridge.
+- **The tower and the gallery.** A three-storey tower and a two-storey gallery joining it to the keep. Both are solid for now (pass 6
+  hollows them) and have walkable roofs.
+- **The stair.** A stone stair of twenty .3 m steps up the east face.
+- **The storehouse.** A small white storehouse at the foot, with `cwallBuild` walls (they break and repair) and a door east.
+- **Draws.** Everything else is merged per material, about 5 draws plus the storehouse walls.
+
+SHIPPED UNVERIFIED. Next: pass 2, the roofs (chidori and kara gables, shachi on the ridges).
+
 ## m1276 -- Octagonal Block Pagoda pass 2 of 10: the block detail (X4, WORKER A)
 
 The reference's busy-but-blocky look, all of it static blocks merged into the material buckets (no new draws):

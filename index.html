@@ -22239,6 +22239,125 @@ function swrkBuild() {
 }
 function swrkStep(dt) { const W = SWRK.on; if (!W) return; W.t += dt; }
 function swrkClear() { const W = SWRK.on; if (!W) return; smashDrop(W.smash); bldClear(W); SWRK.on = null; }
+// X2 (WORKER B): THE WHITE HERON CASTLE -- the 10-pass experiment's second building, after his reference
+// `images/korajin/ref/white_castle_keep.jpg` (a Himeji-style castle). The forge's middle is to its EAST (+x), so that is the front: the
+// keep stands on the south (-z) half of the base, the long white GALLERY wing runs north from it to a smaller TOWER -- the reference
+// seen from the forge. Pass 1 = THE MASS: a battered dressed-stone BASE 6 m tall (its faces lean in on a concave curve, the toe flaring
+// out), the MAIN KEEP on it -- five white-plaster storeys stepping in under layered grey hip roofs, every roof walkable (the same height
+// function lays the tiles and the triangles), every storey hollow with a door out onto the roof below and a ladder up through a hatch --
+// the gallery and the tower (solid for now; pass 6 hollows them), a stone stair up the east face, and a small white STOREHOUSE at the
+// foot whose walls break and repair.
+const HERON = { at: [-108, 45], H: 6, bat: 1, bx: 12, bz: 16, n: 5, sh: 3.6, hx0: 7, hz0: 6, shrink: .7, eave: 1.8, t: .35, door: 1.8, doorH: 2.6, on: null };
+function heronStoneTex() { const cv = document.createElement('canvas'); cv.width = cv.height = 256; const c = cv.getContext('2d'); c.fillStyle = '#8f8676'; c.fillRect(0, 0, 256, 256);
+  // dressed stone: eight courses to the 4 m tile, blocks of random length, each its own shade, a dark joint round it (wrapped at the edge)
+  for (let r = 0; r < 8; r++) { let x = (r * 37) % 64; while (x < 256 + 64) { const w = 38 + Math.random() * 52, s = 150 + Math.random() * 40 | 0, b = Math.random() * 14 | 0;
+      c.fillStyle = `rgb(${s + 22},${s + 14 - b},${s - 6 - b})`; for (const o of [0, -256]) c.fillRect(x + o + 2, r * 32 + 2, w - 4, 28);
+      c.fillStyle = 'rgba(255,255,255,.12)'; for (const o of [0, -256]) c.fillRect(x + o + 2, r * 32 + 2, w - 4, 3); x += w; } }
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8; return t; }
+function heronTileTex() { const cv = document.createElement('canvas'); cv.width = 64; cv.height = 64; const c = cv.getContext('2d'), gr = c.createLinearGradient(0, 0, 64, 0);
+  gr.addColorStop(0, '#3a4048'); gr.addColorStop(.35, '#78808a'); gr.addColorStop(.6, '#5c646e'); gr.addColorStop(1, '#353a42'); c.fillStyle = gr; c.fillRect(0, 0, 64, 64); c.fillStyle = 'rgba(0,0,0,.3)'; c.fillRect(0, 0, 64, 4);
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8; return t; }
+function heronBuild() {
+  if (HERON.on) return; const A = HERON, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, tris = [], climbs = [];
+  // every piece goes into a per-material BUCKET, merged once at the end (one draw each); UVs are projected off the world (4 m a tile) so
+  // pieces of one material share one texture
+  const MG = new Map(), _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _up = new THREE.Vector3(0, 1, 0);
+  const uvW = geo => { const P = geo.attributes.position, Nn = geo.attributes.normal, uv = new Float32Array(P.count * 2);
+    for (let i = 0; i < P.count; i++) { const ax = Math.abs(Nn.getX(i)), ay = Math.abs(Nn.getY(i)), az = Math.abs(Nn.getZ(i)), x = P.getX(i), y = P.getY(i), z = P.getZ(i);
+      const [u, v] = ay >= ax && ay >= az ? [x, z] : ax >= az ? [z, y] : [x, y]; uv[i * 2] = u / 4; uv[i * 2 + 1] = v / 4; }
+    geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2)); return geo; };
+  const mg = (geo, m, mat4, keepUv) => { geo = geo.index ? geo.toNonIndexed() : geo; if (mat4) geo.applyMatrix4(mat4); if (!keepUv) uvW(geo); if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); };
+  const box = (x0, x1, y0, y1, z0, z1, m, solid) => { if (x1 - x0 < .01 || z1 - z0 < .01 || y1 - y0 < .01) return; mg(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), m, _m4.makeTranslation((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2));
+    if (solid) O.boxes.push({ minx: x0, maxx: x1, miny: y0, maxy: y1, minz: z0, maxz: z1 }); };
+  const rod = (A0, B0, r, m) => { const a = new THREE.Vector3(...A0), b = new THREE.Vector3(...B0), d = b.clone().sub(a), L = d.length(); if (L < .01) return; _q.setFromUnitVectors(_up, d.normalize());
+    mg(new THREE.CylinderGeometry(r, r, L, 6), m, _m4.compose(a.add(b).multiplyScalar(.5), _q, new THREE.Vector3(1, 1, 1))); };
+  const stone = new THREE.MeshStandardMaterial({ map: heronStoneTex(), roughness: .95 }), plaster = new THREE.MeshStandardMaterial({ color: 0xf3f1ea, roughness: .85 });
+  const tile = new THREE.MeshStandardMaterial({ map: heronTileTex(), color: 0xb4bcc4, roughness: .6, metalness: .15, side: THREE.DoubleSide });
+  const timber = new THREE.MeshStandardMaterial({ color: 0x2e2620, roughness: .8 }), floorM = new THREE.MeshStandardMaterial({ color: 0x5a4430, roughness: .85 });
+  // A HIP ROOF as one function of (x, z) about (rx, rz): it rises from the eave (`run` out past the rect hx x hz) to that rect -- the next
+  // storey's walls (`hole` 1: no tiles inside it) or the ridge (hz 0) -- steep near the top and flattening to the eave, the four corners
+  // kicked up by `lift`. The SAME function lays the tiles and the walkable triangles, so what he stands on is what he sees; a timber fascia
+  // follows the rim and a lip under the middle of every side is a ledge to catch.
+  const roof = (rx, rz, hx, hz, run, top, drop, lift, hole) => {
+    const EX = hx + run, EZ = hz + run, h = (x, z) => { const ax = Math.abs(x) - hx, az = Math.abs(z) - hz, u = clamp(Math.max(ax, az) / run, 0, 1), cor = Math.pow(clamp(ax / run, 0, 1), 3) * Math.pow(clamp(az / run, 0, 1), 3);
+      return top - drop * (1 - (1 - u) * (1 - u)) + lift * cor; };
+    const bp = (E, hh) => { const a = [], seg = (p, q, n) => { for (let i = 0; i < n; i++) a.push(p + (q - p) * i / n); }; seg(-E, -hh, 6); if (hh > .01) seg(-hh, hh, Math.max(1, Math.round(hh / .8))); seg(hh, E, 6); a.push(E); return a; };
+    const XS = bp(EX, hx), ZS = bp(EZ, hz), pos = [], uv = [];
+    for (let i = 0; i < XS.length - 1; i++) for (let j = 0; j < ZS.length - 1; j++) { const xa = XS[i], xb = XS[i + 1], za = ZS[j], zb = ZS[j + 1], mx = (xa + xb) / 2, mz = (za + zb) / 2;
+      if (hole && Math.abs(mx) < hx && Math.abs(mz) < hz) continue;
+      const onX = Math.abs(mx) - hx > Math.abs(mz) - hz, P = [[xa, za], [xa, zb], [xb, zb], [xa, za], [xb, zb], [xb, za]];
+      for (const [x, z] of P) { const y = h(x, z); pos.push(rx + x, y, rz + z); uv.push((onX ? z : x) / .45, Math.max(Math.abs(x) - hx, Math.abs(z) - hz) / .7); tris.push(rx + x, y + .04, rz + z); } }
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); geo.computeVertexNormals(); mg(geo, tile, null, 1);
+    const rim = []; for (let k = 0; k < 48; k++) { const s = k / 48 * 4, f = s % 1, e = Math.floor(s); rim.push(e === 0 ? [-EX + 2 * EX * f, EZ] : e === 1 ? [EX, EZ - 2 * EZ * f] : e === 2 ? [EX - 2 * EX * f, -EZ] : [-EX, -EZ + 2 * EZ * f]); }
+    for (let k = 0; k < 48; k++) { const [x0, z0] = rim[k], [x1, z1] = rim[(k + 1) % 48]; rod([rx + x0, h(x0, z0), rz + z0], [rx + x1, h(x1, z1), rz + z1], .09, timber); }
+    const eY = top - drop; for (const [ax, sg] of [[1, -1], [1, 1], [0, -1], [0, 1]]) { const L = (ax ? EZ : EX) * .6;
+      O.boxes.push(ax ? { minx: sg < 0 ? rx - EX : rx + EX - .28, maxx: sg < 0 ? rx - EX + .28 : rx + EX, miny: eY - .9, maxy: eY + .05, minz: rz - L, maxz: rz + L }
+                      : { minx: rx - L, maxx: rx + L, miny: eY - .9, maxy: eY + .05, minz: sg < 0 ? rz - EZ : rz + EZ - .28, maxz: sg < 0 ? rz - EZ + .28 : rz + EZ }); } };
+  // ---- THE BASE: one closed solid of dressed stone, its four faces battered out toward the toe on a concave curve (near vertical at the
+  // top, flaring at the foot, the reference's ishigaki); the collider is the face part-way down, so the top lip and the toe both read ----
+  { const H = A.H, B = A.bat, X = A.bx, Z = A.bz, NS = 8, pos = [], off = y => B * Math.pow(1 - y / H, 2);
+    const ring = y => { const o = off(y); return [[cx - X - o, cz - Z - o], [cx + X + o, cz - Z - o], [cx + X + o, cz + Z + o], [cx - X - o, cz + Z + o]]; };
+    for (let s = 0; s < NS; s++) { const ya = H * s / NS, yb = H * (s + 1) / NS, Ra = ring(ya), Rb = ring(yb);
+      for (let e = 0; e < 4; e++) { const a0 = Ra[e], a1 = Ra[(e + 1) % 4], b0 = Rb[e], b1 = Rb[(e + 1) % 4];
+        pos.push(a0[0], ya, a0[1], b1[0], yb, b1[1], a1[0], ya, a1[1], a0[0], ya, a0[1], b0[0], yb, b0[1], b1[0], yb, b1[1]); } }
+    pos.push(cx - X, H, cz - Z, cx - X, H, cz + Z, cx + X, H, cz + Z, cx - X, H, cz - Z, cx + X, H, cz + Z, cx + X, H, cz - Z);
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.computeVertexNormals(); mg(geo, stone);
+    O.boxes.push({ minx: cx - X - .4, maxx: cx + X + .4, miny: 0, maxy: H, minz: cz - Z - .4, maxz: cz + Z + .4 });
+    box(cx - X + .3, cx + X - .3, H, H + .06, cz - Z + .3, cz + Z - .3, stone, 0); }     // a capping course round the top
+  // ---- THE STAIR up the east face (+x): twenty .3 m steps along the face, north to south, landing on a stone block at the top ----
+  { const x0 = cx + A.bx + .4, x1 = x0 + 3, zb = cz + A.bz - 1, n = 20, rise = A.H / n, rn = .55, zt = zb - n * rn;
+    for (let i = 0; i < n; i++) box(x0, x1, 0, (i + 1) * rise, zb - (i + 1) * rn, zb - i * rn, stone, 0);
+    box(x0, x1, 0, A.H, zt - 2, zt, stone, 1);
+    tris.push(x0, .15, zb, x1, .15, zb, x1, A.H + .15, zt, x0, .15, zb, x1, A.H + .15, zt, x0, A.H + .15, zt); }
+  // ---- THE MAIN KEEP: five hollow storeys stepping in, a door on alternate sides out onto the roof below, a ladder up through a hatch ----
+  const kx = cx - 1, kz = cz - 7, hxOf = k => A.hx0 - A.shrink * k, hzOf = k => A.hz0 - A.shrink * k, yOf = k => A.H + A.sh * k, N = A.n, t = A.t, run = A.shrink + A.eave;
+  const doors = ['+x', '-x', '+x', '-x', '+x'];
+  for (let k = 0; k < N; k++) {
+    const hx = hxOf(k), hz = hzOf(k), y0 = yOf(k), y1 = y0 + A.sh, wt = y1 - .45, x0 = kx - hx, x1 = kx + hx, z0 = kz - hz, z1 = kz + hz, dw = A.door / 2, sd = doors[k];
+    for (const S of ['-x', '+x', '-z', '+z']) { const ax = S[1] === 'x', sg = S[0] === '-' ? -1 : 1, c = (ax ? kx : kz) + sg * ((ax ? hx : hz) - t / 2);
+      const wall = (a0, a1, yy0, yy1) => ax ? box(c - t / 2, c + t / 2, yy0, yy1, a0, a1, plaster, 1) : box(a0, a1, yy0, yy1, c - t / 2, c + t / 2, plaster, 1);
+      const lo = ax ? z0 : x0, hi = ax ? z1 : x1, mid = ax ? kz : kx;
+      if (S === sd) { wall(lo, mid - dw, y0, wt); wall(mid + dw, hi, y0, wt); wall(mid - dw, mid + dw, y0 + A.doorH, wt);
+        const f = c + sg * (t / 2 + .04);     // the door's dark timber frame on the outer face
+        for (const e of [-1, 1]) box(f - .06, f + .06, y0, y0 + A.doorH + .15, mid + e * dw - .12 * (e < 0 ? 1 : 0), mid + e * dw + .12 * (e > 0 ? 1 : 0), timber, 0);
+        box(f - .06, f + .06, y0 + A.doorH, y0 + A.doorH + .18, mid - dw - .12, mid + dw + .12, timber, 0); }
+      else wall(lo, hi, y0, wt); }
+    box(x0 - .04, x1 + .04, y0, y0 + .3, z0 - .04, z1 + .04, timber, 0);     // a dark sill band at every storey's foot
+    if (k === 0) box(x0 + t, x1 - t, y0, y0 + .04, z0 + t, z1 - t, floorM, 0);
+    else { // the floor, a hatch over the ladder from the storey below (against this storey's north... its -z wall, alternating corners)
+      const sx = k % 2 ? 1 : -1, lx = kx + sx * (hx - 1.3), lz = z0 + t + .25, ha = lx - .6, hb2 = lx + .6, hza = lz - .25, hzb = lz + .9;
+      box(x0, ha, y0 - .25, y0, z0, z1, floorM, 1); box(hb2, x1, y0 - .25, y0, z0, z1, floorM, 1); box(ha, hb2, y0 - .25, y0, z0, hza, floorM, 1); box(ha, hb2, y0 - .25, y0, hzb, z1, floorM, 1);
+      const ly0 = yOf(k - 1); for (const ox of [-.28, .28]) box(lx + ox - .035, lx + ox + .035, ly0, y0 + .9, lz - .035, lz + .035, timber, 0);
+      for (let r = ly0 + .3; r < y0 + .8; r += .32) box(lx - .28, lx + .28, r - .025, r + .025, lz - .03, lz + .03, timber, 0);
+      const L = kitClimbAdd({ minx: lx - .4, maxx: lx + .4, miny: ly0, maxy: y0, minz: lz - .12, maxz: lz + .12 }, 'heron_ladder_' + k, y0); L.mark = { x: lx - sx * 1.2, y: y0, z: lz + .4 }; climbs.push(L); }
+    // THE ROOF over this storey: round the next storey's walls (a hole), or on the top storey a ridge along x
+    if (k < N - 1) { const u = A.shrink / run, drop = 1.25; roof(kx, kz, hxOf(k + 1), hzOf(k + 1), run, wt + drop * (1 - (1 - u) * (1 - u)), drop, .55, 1); }
+    else { const r2 = hz + A.eave, u = hz / r2, drop = 2.6; roof(kx, kz, hx - hz, 0, r2, wt + drop * (1 - (1 - u) * (1 - u)), drop, .7, 0); }
+  }
+  // ---- THE TOWER (north end, three storeys) and THE GALLERY joining it to the keep: solid white masses for now, their roofs walkable ----
+  { const tx = cx - 3, tz = cz + 11, sh = 3.2, sk = .6, ev = 1.5, rn2 = sk + ev, thx = k => 4 - sk * k, thz = k => 3.5 - sk * k;
+    for (let k = 0; k < 3; k++) { const y0 = A.H + sh * k, wt = y0 + sh - .45, hx = thx(k), hz = thz(k);
+      box(tx - hx, tx + hx, y0, wt, tz - hz, tz + hz, plaster, 1); box(tx - hx - .04, tx + hx + .04, y0, y0 + .3, tz - hz - .04, tz + hz + .04, timber, 0);
+      if (k < 2) { const u = sk / rn2, drop = 1.1; roof(tx, tz, thx(k + 1), thz(k + 1), rn2, wt + drop * (1 - (1 - u) * (1 - u)), drop, .45, 1); }
+      else { const r2 = hz + ev, u = hz / r2, drop = 1.9; roof(tx, tz, hx - hz, 0, r2, wt + drop * (1 - (1 - u) * (1 - u)), drop, .55, 0); } }
+    const gx = cx - 3, gz0 = kz + A.hz0, gz1 = tz - 3.5, gw = 3, wt = A.H + 6.4 - .45, rr = gw + 1.2, u = gw / rr, drop = 2, ez0 = kz + hzOf(1) + .1, ez1 = gz1 + 1.2, gzc = (ez0 + ez1) / 2;
+    box(gx - gw, gx + gw, A.H, wt, gz0, gz1, plaster, 1); box(gx - gw - .04, gx + gw + .04, A.H, A.H + .3, gz0, gz1, timber, 0); box(gx - gw - .04, gx + gw + .04, A.H + 3.2, A.H + 3.45, gz0, gz1, timber, 0);
+    roof(gx, gzc, 0, (ez1 - ez0) / 2 - rr, rr, wt + drop * (1 - (1 - u) * (1 - u)), drop, .4, 0); }
+  // ---- THE STOREHOUSE at the foot (the reference's low white building in front of the stone): breakable walls, a door to the east ----
+  { const T = hallTex(), sx0 = cx + A.bx + 2.5, sx1 = sx0 + 6, sz0 = cz - 14, sz1 = cz - 6, sxc = (sx0 + sx1) / 2, szc = (sz0 + sz1) / 2, H = 3, dw = 1, tt = .3;
+    const wall = (x, z, L, yaw) => O.walls.push(cwallBuild(g, T, x, z, L, tt, yaw, H, O));
+    wall(sxc, sz0 + tt / 2, sx1 - sx0, 0); wall(sxc, sz1 - tt / 2, sx1 - sx0, 0); wall(sx0 + tt / 2, szc, sz1 - sz0 - tt * 2, Math.PI / 2);
+    const seg = (sz1 - sz0 - tt * 2 - dw * 2) / 2; wall(sx1 - tt / 2, szc - dw - seg / 2, seg, Math.PI / 2); wall(sx1 - tt / 2, szc + dw + seg / 2, seg, Math.PI / 2);
+    box(sx1 - tt, sx1, 2.3, H, szc - dw, szc + dw, timber, 1);
+    const rr = 3 + 1, u = 3 / rr, drop = 1.6; roof(sxc, szc, 0, 4 + 1 - rr, rr, H + drop * (1 - (1 - u) * (1 - u)), drop, .35, 0); }
+  for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
+  bldTris(O, tris);
+  for (const b of O.boxes) if (!BOXES.includes(b)) BOXES.push(b); boxGrid();
+  HERON.on = { g, O, bars: [], rings: [], climbs, t: 0 };
+  arenaBeam(cx, cz, [1, 1, 1], 1); snd('clang', { g: .7, r: .5 });
+}
+function heronStep(dt) { const G = HERON.on; if (!G) return; G.t += dt; }
+function heronClear() { const G = HERON.on; if (!G) return; for (const L of G.climbs) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && G.climbs.includes(player.climb)) climbOff(); bldClear(G); HERON.on = null; }
 // m1254: THE ZOOM RAMP TOWER (his request R1, pass 1). *"A tower shaped like a really tall ramp -- you do the speed run and it's just tall
 // enough that your whole run gets you to the top, and you hit it perfectly; the very top is a ledge you just barely grab, then pull yourself
 // up into a guard tower."* A start gate on the ground, a flat run-in of `run` m, a ramp rising `Hr` m over `ramp` m into the SHEER FACE of a
@@ -22620,6 +22739,7 @@ const BLDG = { list: [
   { key: 'oni', t: 'Oni Gate', sub: 'a fortress wall carved as a demon face: walk in through its fanged mouth (it BITES on a cycle), guard rooms in its cheeks, sentry guns in its eyes, horns, a stair up the back to a lookout', pass: 3, build: () => oniBuild(), clear: () => oniClear(), on: () => !!ONI.on, step: dt => oniStep(dt) },
   { key: 'obs', t: 'Jin Observatory', sub: 'a clockwork tower: a spiral stair inside past great gears to a balcony under a copper dome whose telescope marks you in the open for a volley of arrows (blind its lens), a clock face', pass: 3, build: () => obsBuild(), clear: () => obsClear(), on: () => !!OBS.on, step: dt => obsStep(dt) },
   { key: 'fest', t: 'Lantern Festival Street', sub: 'a street of festival stalls (roofs to stand on, breakable backs) under strings of paper lanterns, red gates at both ends, bars across, a robot dragon dance to cut apart (strike the taiko to make it wild)', pass: 3, build: () => festBuild(), clear: () => festClear(), on: () => !!FEST.on, step: dt => festStep(dt) },
+  { key: 'heron', t: 'White Heron Castle', sub: 'a Himeji-style castle on a battered stone base: a five-storey white keep under layered grey roofs (every roof walkable, a room on every storey, ladders up through the hatches), a gallery wing to a corner tower, a stair up the stone, a storehouse at the foot whose walls break', pass: 1, build: () => heronBuild(), clear: () => heronClear(), on: () => !!HERON.on, step: dt => heronStep(dt) },
   { key: 'gpag', t: 'Great Red Pagoda', sub: 'five storeys of red lacquer: a room on every floor, ladders up through the hatches, a balcony round every storey, a spire; a pavilion whose roof you can climb; a red fence; climb the outside eave to eave, bars, a zipline off the spire; an armoury, a library, a bell room (the alarm), a lookout; archers, a sentry gun, gate guards; glowing windows, lantern halos, a beacon on the spire; streamers, chimes, birds; strike the gong at the top and the tower lights up and the gate opens', pass: 9, build: () => gpagBuild(), clear: () => gpagClear(), on: () => !!GPAG.on, step: dt => gpagStep(dt) },
   { key: 'zramp', t: 'Zoom Ramp Tower', sub: 'zoom from the red gate (full hold), up the ramp and straight up the face -- only a full zoom reaches the gold lip; your mark shows how close; or zigzag up the chimney', pass: 3, build: () => zrampBuild(), clear: () => zrampClear(), on: () => !!ZRAMP.on, step: dt => zrampStep(dt) },
   { key: 'swrk', t: 'Sky Wreck', sub: 'a flying junk come down on rock spires: a tilted deck up a fallen mast, a hold of cargo behind breakable planks, a crow\'s nest up two bars', pass: 1, build: () => swrkBuild(), clear: () => swrkClear(), on: () => !!SWRK.on, step: dt => swrkStep(dt) },
