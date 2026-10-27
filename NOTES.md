@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1102 -- the horde can die, and it is the slicing samurai by default
+
+**What he said:** *"I don't think the horde has any health, they're just infinite... I wanna try them as the guys that can be broken into
+pieces... is it gonna bog down the system?"*
+
+**What was wrong:** a horde body is not an arena body, so `bodyLaunch` put `d.hp` back to the kind's on every knock-down and the get-up
+refilled it. Nothing ever ended one.
+
+**What changed (`HORDE.life`, `d.hordeHp`, `hordeDie`, `HORDE.slice`, TOOLS > HORDE):** each body carries `life` 8 of damage in the same
+units as a blow's cost (a katana cut ~2, a punch ~.8), never refilled. At 0 the next blow knocks him down whatever its power, and at the
+end of the lie he does not get up: the slicing kind blows apart (`limbBoom`), the plain kind beams out. By default the horde IS the m1090
+slice dummy (`limbs: 1`), so every katana cut also takes an arm or a leg and the last one blows him up. The HORDE button reads
+`<n> left, <k> down`.
+
+**Measured (`hdie.cjs`, 25 slicing samurai):** 179 draw calls with all 25 standing, the same as the plain horde. A body only costs extra
+once a limb is CUT (each piece is a mesh of its own until it settles). Two 5-damage blows: down, lie, blown apart, 24 left, 1 down.
+
 ## m1101 -- a lurch into every swing: the katana's multi-swing clips move him once per swing, toward the stick
 
 **What he said:** *"some of them are two hits... he lurches forward once, swings, then he's stationary and does another swing and you can't
