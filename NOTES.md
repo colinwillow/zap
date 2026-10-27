@@ -5,6 +5,25 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1083 -- the ACTION CAM (the ball cam): an event in the arena swings the lens to frame him and it, with a close-up when it is far
+
+*"Every time we spawn an event... an action camera: your own character is one point, the event the other, and the camera is positioned so
+you can see both -- like the ball cam in ROBITS... you can still move the camera... ease between... unless it's super far away, then two
+views: a close-up of the thing happening."*
+- `actionCam({ obj | x,z, y, dur | until, after })` -- called by a rival through a DOOR (followed until he has landed on the dais, +1 s), a
+  rival beamed in (the beam's length + 1.4 s), a turret beamed in (1.6 s). `acamStep` (inside `stepCam`, still the one writer of `cam.az`)
+  eases the bearing round to look FROM behind him AT the event, by a weight `w` that eases in and out (`ease` .35 s); `acamFrame` moves the
+  look point toward the event (`look`) and pulls the lens back with their distance (`pull`, max 9 m). A drag pauses it (`cam.idle` <
+  `thumb` .6 s); aiming, a guard, a lock or flying stand it down.
+- **The close-up:** past `pipAt` 16 m a second render (`acamPip`, after the main one, scissored) draws the event top-right, 36% of the width,
+  a lens 4.5 m off it toward him, in a cyan frame (a DOM box). Only while it is up -- otherwise no extra cost.
+- **Measured** (`acam.cjs`, real loop, a samurai through a door with the lens turned 180 deg away first): bearing error 3.13 -> .44 rad in
+  1 s -> .02 by 2 s, `w` .06 -> .95 in 1.5 s, the close-up on from .25 s (he is 44 m off), held on him all the way out of the tunnel.
+  Rendered: the main view frames him and the door, the close-up shows the samurai walking out. The first close-up lens (7 m back) ended up
+  inside the door frame -- 4.5 m now.
+- TOOLS > ACTION CAM ON / OFF (a taste call).
+- Shipped unverified on the phone.
+
 ## m1082 -- the acrobatics course REDONE as measured blocks; BLOCK 1 (JUMP) in a floating warehouse
 
 *"Man the scale is tiny and the gaps are not far apart at all and it's very lame... think about it logically... progressive... you want them
