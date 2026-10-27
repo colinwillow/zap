@@ -56,6 +56,26 @@ SHIPPED UNVERIFIED. Next: pass 8, the approach (a winding walled ramp up to a ga
 - **The spire's three light collars turn**, alternate ways.
 
 SHIPPED UNVERIFIED. Next: pass 9, the set piece (ring the top bell: the tower lights storey by storey, the lions bow, the gate opens).
+## His notes off the pagoda's zipline (m1279 on his phone): the zipline was FROZEN, shimmy, the bars, the 3D aim, the aim assist
+
+- **"I can grab the zipline but I can't move."** That was a REAL bug, and every zipline in the forge had it. At m1193 the brake's comment
+  was written mid-line: `// m1193: pull back to BRAKE K.u += K.v / K.L * dt; p.grounded = false;`. That swallowed the one line that
+  advances you along the wire, so from m1193 on you hung where you caught it. (CLAUDE.md's landmine: *a behaviour asserted only in a
+  comment is not a behaviour.*)
+- **Shimmy up (`ZIP.up` 1.6 m/s).** The left stick pushed FORWARD on a zipline now climbs hand over hand toward its high end, and you let
+  go at the top. Pulling back still brakes; otherwise you slide.
+- **"I keep getting caught on the high bars."** The pagoda's balcony bars (pass 4) are OFF (`GPAG.bars` 0).
+- **Monkey bars.** Queued as R10, the move first and then the pieces.
+- **3D aim, ABSOLUTE** (*"like a drawing tablet's screen mode: the stick is a mini version of the screen"*).
+  - **The mapping.** Where the thumb is on the pad IS where the cursor sits in the view: the pad's rim is `absYaw` 42 degrees across and
+    `absPit` 32 degrees up/down. A .025 s ease only takes the jitter out, and letting go leaves it there.
+  - **No zoom.** The lens stays the ordinary third person (`AIM3.cam.dist` 1, no shoulder offset, a mild pitch tilt).
+- **"In regular shot mode the aim assist rockets it up onto the tower."** A machine now only pulls the 2D aim up or down if it is within
+  `MECHAIM.maxEl` 15 degrees of level.
+- **"If it's going to catch onto a guy it should show you."** While the gun is up and its aim is LOCKED (on a body or a machine), the
+  charge's sight (`lockMk`) sits on the target in red. If the target is above him the lens tips up to it (`upLookW`).
+
+SHIPPED UNVERIFIED.
 
 ## White Heron Castle pass 6 of 10: the gallery wing and the corner tower, hollow (X2, WORKER B)
 

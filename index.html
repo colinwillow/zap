@@ -10934,7 +10934,7 @@ function stepRope(dt) {
 // m1168: ZIPLINES (Sky Bridges pass 2). A cable from a high point to a low one (`ZIPS`: {A, B}). In the air, his hands within `grab` m of
 // the cable (and inside its length) CATCH it: he hangs and slides down it, gravity along the slope against a little drag, up to `max`
 // m/s, and drops off at the bottom end with the speed he has. TAP to let go anywhere on the way.
-const ZIP = { brake: 14, grab: .7, max: 17, drag: .25, v0: 3 }, ZIPS = [];
+const ZIP = { brake: 14, grab: .7, max: 17, drag: .25, v0: 3, up: 1.6 }, ZIPS = [];
 function zipCatch() {
   const p = player, H = hbarH(), hx = p.pos.x, hy = p.pos.y + H * 1.15, hz = p.pos.z;
   for (const Z of ZIPS) { const A = Z.A, B = Z.B, dx = B[0] - A[0], dy = B[1] - A[1], dz = B[2] - A[2], L2 = dx * dx + dy * dy + dz * dz, u = ((hx - A[0]) * dx + (hy - A[1]) * dy + (hz - A[2]) * dz) / L2;
@@ -10947,11 +10947,15 @@ function zipCatch() {
 function stepZip(dt) {
   const p = player, K = p.zip, A = K.Z.A, B = K.Z.B, H = hbarH(), sn = (A[1] - B[1]) / K.L;
   K.v = Math.min(ZIP.max, K.v + (MOVE.g * sn - ZIP.drag * K.v) * dt);
-  if (stick.L.down && stick.L.y > .35) { K.v = Math.max(ZIP.v0 * .5, K.v - ZIP.brake * dt); if (Math.random() < .6) spk(p.pos.x, p.pos.y + H * 1.15, p.pos.z, (Math.random() - .5) * 2, 1, (Math.random() - .5) * 2, .07, .3, [1, .9, .5]); }     // m1193: pull back to BRAKE K.u += K.v / K.L * dt; p.grounded = false;
+  if (stick.L.down && stick.L.y > .35) { K.v = Math.max(ZIP.v0 * .5, K.v - ZIP.brake * dt); if (Math.random() < .6) spk(p.pos.x, p.pos.y + H * 1.15, p.pos.z, (Math.random() - .5) * 2, 1, (Math.random() - .5) * 2, .07, .3, [1, .9, .5]); }     // m1193: pull back to BRAKE
+  // m1293: SHIMMY UP -- the left stick pushed FORWARD climbs hand over hand toward the high end (`ZIP.up` m/s), whatever the slope
+  if (stick.L.down && stick.L.y < -.35) K.v = sn > 0 ? -ZIP.up : ZIP.up;
+  K.u += K.v / K.L * dt; p.grounded = false;     // m1293: THIS LINE WAS INSIDE THE COMMENT ABOVE SINCE m1193 -- every zipline froze where you caught it
+  if (K.u < 0) K.u = 0;
   const u = Math.min(1, K.u), dx = (B[0] - A[0]) / K.L, dy = (B[1] - A[1]) / K.L, dz = (B[2] - A[2]) / K.L;
   p.pos.set(A[0] + (B[0] - A[0]) * u, A[1] + (B[1] - A[1]) * u - H * 1.15, A[2] + (B[2] - A[2]) * u); p.vel.set(dx * K.v, dy * K.v, dz * K.v);
   if (Math.random() < .5) spk(p.pos.x, p.pos.y + H * 1.15, p.pos.z, (Math.random() - .5), .5, (Math.random() - .5), .05, .25, [1, .8, .4]);
-  if (K.u >= 1 || p.jump) { const tap = p.jump; p.zip = null; p.jump = 0; p.airT = 0; p.jumps = 1; if (tap) p.vel.y += 4; snd('swoosh', { g: .5, r: .9 }); }
+  if (K.u >= 1 || (K.u <= 0 && K.v < 0) || p.jump) { const tap = p.jump; p.zip = null; p.jump = 0; p.airT = 0; p.jumps = 1; if (tap) p.vel.y += 4; snd('swoosh', { g: .5, r: .9 }); }
 }
 function stepBar(dt) {
   const p = player, S = p.bar, B = S.B, R = Math.max(.5, S.R); S.t += dt;
@@ -13940,10 +13944,10 @@ function muzzleWorld() {
 // bearing, so the mark is a promise the gun keeps by construction rather than by two places
 // agreeing. A mark the gun does not keep is worse than no mark at all.
 const _ap = new THREE.Vector3();
-const MECHAIM = { cone: .16, up: .9 };
+const MECHAIM = { cone: .16, up: .9, maxEl: 15 * Math.PI / 180 };     // m1293: *"a very subtle aim assist up or down, 10-20 degrees -- it's rocketing it up onto the tower"*
 function mechAim() { const p = player, h = cam.az; let best = null, bs = 1e9;
   for (const d of mechTargets(1e9)) { const P = d.root.position, dx = P.x - p.pos.x, dz = P.z - p.pos.z, dd = Math.hypot(dx, dz); if (dd < 1.5 || dd > WEAP.range) continue;
-    const off = Math.abs(wrapAngle(Math.atan2(dx, dz) - h)); if (off > MECHAIM.cone) continue; const sc = dd * Math.sin(off) + .05 * dd; if (sc < bs) { bs = sc; best = { x: P.x, y: P.y + MECHAIM.up, z: P.z, d: dd }; } }
+    const off = Math.abs(wrapAngle(Math.atan2(dx, dz) - h)); if (off > MECHAIM.cone) continue; if (Math.abs(Math.atan2(P.y + MECHAIM.up - (p.pos.y + 1.1), dd)) > MECHAIM.maxEl) continue; const sc = dd * Math.sin(off) + .05 * dd; if (sc < bs) { bs = sc; best = { x: P.x, y: P.y + MECHAIM.up, z: P.z, d: dd }; } }
   return best; }
 function aimPoint() {
   // FLYING AS HER, THE AIM IS THE 3D DIRECTION HER RIGHT THUMB HOLDS (m271, Rollergirl r146 `p.gDir`), and
@@ -14080,6 +14084,10 @@ markRing.frustumCulled = false;
 scene.add(markRing);
 function markStep(dt, t) {
   lockMk.visible = false; lockGlow.visible = false;
+  // m1293: *"When I press up with the launcher, if it's going to catch onto a guy it should show you -- a reticle on him, the camera tilting
+  // to show you."* The gun's aim, locked (a body or a machine the shot is going for), wears the charge's own sight
+  if (player.aim && aimHas && aimLock && slotNow().aim) { lockMk.position.copy(_aimP); lockMk.material.rotation = 0; lockMk.scale.setScalar(1.05 + Math.sin(t * 6) * .04);
+    lockMk.material.color.setRGB(1, .45, .3); lockMk.material.opacity = .95; lockMk.visible = true; }
   if (!MARK.on) { markRing.visible = false; player.chgTgt = null; return null; }
   const p = player, s = slotNow();
   // ONLY WHILE THE HAMMER IS WINDING. A ring that is always up is a HUD element, and this one
@@ -17549,7 +17557,7 @@ function paintArcRow(el, on, sel) {
 // HER FLIGHT TRIGGER (m271) on foot: a right thumb held still `holdT` arms (a tap is still the jump, a thumb that travels first is still the
 // camera), and from then its offset IS the aim -- across turns it up to `yaw` either side of the lens, up/down tilts it up to `pitch` -- and
 // lifting it fires (the blaster's charged ball, or a ROCKET). The lens comes in over his shoulder (`cam`) and tips with the aim.
-const AIM3 = { on: 0, holdT: 0, far: 9, yaw: 85 * Math.PI / 180, pitch: 65 * Math.PI / 180, rate: 1.7, dead: .12, ease: .05, cam: { dist: .55, side: .75, el: .6, lift: .25 } };     // m1276: armed on touch, the thumb DRIVES the cursor
+const AIM3 = { on: 0, holdT: 0, far: 9, yaw: 85 * Math.PI / 180, pitch: 65 * Math.PI / 180, rate: 1.7, dead: .12, ease: .05, absYaw: 42 * Math.PI / 180, absPit: 32 * Math.PI / 180, absEase: .025, cam: { dist: 1, side: 0, el: .35, lift: 0 } };     // m1293: ABSOLUTE, no zoom     // m1276: armed on touch, the thumb DRIVES the cursor
 try { AIM3.on = localStorage.getItem('mel.aim3') === '1' ? 1 : 0; } catch (e) {}
 const aimRow = (() => { const d = document.createElement('div'); d.id = 'aimRow'; d.setAttribute('aria-hidden', 'true'); document.body.appendChild(d); return d; })();
 const AIMROW = { mid: MODES.mid, r0: MODES.r1 + 6, r1: MODES.r1 + 40, span: 44 };
@@ -22996,7 +23004,8 @@ function courtClear() { const C = COURT.on; if (!C) return; for (const L of C.cl
 // roofs stepping in as it rises, a spire of gold rings on top. *"Much more visually interesting and much more functional"* -- so it is HOLLOW:
 // a room on every storey, a ladder inside each up through a hatch in the next floor (the corners turn as you climb), a door out onto every
 // balcony, and the ground storey's walls breakable. Pass 1 = the stack, the rooms, the ladders, the balconies, the roofs, the spire.
-const GPAG = { lift: 1.0, showT: 30, at: [90, 0], n: 5, hb0: 4.2, shrink: .5, sh: 3.8, balc: 2.2, eave: 2.7, t: .3, door: 1.6, doorH: 2.5, on: null };
+const GPAG = { bars: 0, lift: 1.0,     // m1293: bars 0 -- *"I keep getting caught on the high bars climbing the outside"*
+  showT: 30, at: [90, 0], n: 5, hb0: 4.2, shrink: .5, sh: 3.8, balc: 2.2, eave: 2.7, t: .3, door: 1.6, doorH: 2.5, on: null };
 function gpagBuild() {
   if (GPAG.on) return; const A = GPAG, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [];
   const lac = new THREE.MeshStandardMaterial({ color: 0xb3261c, roughness: .42 }), lacD = new THREE.MeshStandardMaterial({ color: 0x7e1913, roughness: .5 }), floorM = new THREE.MeshStandardMaterial({ color: 0x4a3324, roughness: .8 });
@@ -23084,7 +23093,7 @@ function gpagBuild() {
       const L = EX * .7; for (const [ax, sg] of [[1, -1], [1, 1], [0, -1], [0, 1]]) { const r0 = EX - .28, r1 = EX;
         ax ? O.boxes.push({ minx: sg < 0 ? cx - r1 : cx + r0, maxx: sg < 0 ? cx - r0 : cx + r1, miny: eY - .9, maxy: eY + .05, minz: cz - L, maxz: cz + L, noCam: 1 })
            : O.boxes.push({ minx: cx - L, maxx: cx + L, miny: eY - .9, maxy: eY + .05, minz: sg < 0 ? cz - r1 : cz + r0, maxz: sg < 0 ? cz - r0 : cz + r1, noCam: 1 }); }     // m1276: noCam -- the lip over his balcony was what shoved the lens into his back
-      if (k > 0 && !top) { const B = hb + A.balc, op = sd[1] === 'x' ? (sd[0] === '-' ? '+x' : '-x') : (sd[0] === '-' ? '+z' : '-z'), sg = op[0] === '-' ? -1 : 1, ax = op[1] === 'x', bt = y0 + 2.25;
+      if (GPAG.bars && k > 0 && !top) { const B = hb + A.balc, op = sd[1] === 'x' ? (sd[0] === '-' ? '+x' : '-x') : (sd[0] === '-' ? '+z' : '-z'), sg = op[0] === '-' ? -1 : 1, ax = op[1] === 'x', bt = y0 + 2.25;
         const Bb = ax ? hbarMake(cx + sg * (B + .55), cz, Math.PI / 2, bt - HBAR.h, 0) : hbarMake(cx, cz + sg * (B + .55), 0, bt - HBAR.h, 0); HBAR.list.push(Bb); bars.push(Bb); } }
     // lanterns hung at the four eave corners
     for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { box(cx + sx * (EX - .35) - .02, cx + sx * (EX - .35) + .02, y1 - 1.4, y1 - .6, cz + sz * (EX - .35) - .02, cz + sz * (EX - .35) + .02, lacD, 0);
@@ -25099,8 +25108,10 @@ function aim3Gun(dt) {
   if (p.rocketT > 0) p.rocketT -= dt;
   if (!p.aim) { p.aim = 1; p.chg = 0; if (p.gYaw == null) { p.gYaw = 0; p.gPit = 0; } if (!s.rocket) chargeStart(); else for (const a of ROCKET.arm) snd(a.k, { g: a.g, r: a.r, dur: a.dur }); }
   if (p.knock) return;
-  if (R.down) { const rx = Math.abs(R.x) > F.dead ? R.x : 0, ry = Math.abs(R.y) > F.dead ? R.y : 0;
-    p.gYaw = clamp((p.gYaw || 0) - rx * F.rate * dt, -F.yaw, F.yaw); p.gPit = clamp((p.gPit || 0) - ry * F.rate * dt, -F.pitch, F.pitch); }
+  // m1293: *"Like a drawing tablet's second mode -- the stick is a mini version of the screen: touch top-left, the cursor's top-left."* ABSOLUTE:
+  // where the thumb is on the pad IS where the cursor is in the view (`absYaw` / `absPit` at the pad's rim, about the screen's own reach),
+  // a very short ease only to take the jitter out; let go and it stays
+  if (R.down) { p.gYaw = damp(p.gYaw || 0, -clamp(R.x, -1, 1) * F.absYaw, F.absEase, dt); p.gPit = damp(p.gPit || 0, clamp(-R.y, -1, 1) * F.absPit, F.absEase, dt); }
   const a = cam.az + (p.gYaw || 0), c = Math.cos(p.gPit || 0);
   (p.gDir || (p.gDir = new THREE.Vector3())).set(Math.sin(a) * c, Math.sin(p.gPit || 0), Math.cos(a) * c);
   if (!s.rocket) { p.chg = Math.min(1, p.chg + dt / WEAP.chargeT); chargeStep(p.chg); }
@@ -59598,6 +59609,7 @@ function acamPip() {
 }
 const UPLOOK = { on: 1, dy: 2, tta: 3.4, el: .24, lift: 1.4, in: .32, out: .9 };     // m1276: *"a little earlier, more ease, so it's a warning and not a jerk"*
 function upLookW() { if (!UPLOOK.on || !inArena()) return 0; const p = player, cy = p.pos.y + 1; let w = 0;
+  if (p.aim && aimHas && aimLock) { const dy = _aimP.y - cy; if (dy > 1.2) w = Math.max(w, Math.min(.8, dy / 6)); }     // m1293: the lens tips to a target the gun is locked on above him
   for (const T of threatList()) { const dy = T.p.y - cy; if (dy < UPLOOK.dy) continue; const t = threatTTA(T); if (t > UPLOOK.tta) continue;
     const u = clamp((UPLOOK.tta - t) / UPLOOK.tta, 0, 1); w = Math.max(w, Math.min(1, (dy - UPLOOK.dy) / 6 + .4) * u * u * (3 - 2 * u)); }     // m1276: smoothstep in over the whole lead time
   return Math.min(1, w); }
