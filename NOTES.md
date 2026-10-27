@@ -5,6 +5,30 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1110 -- THE REFUGE (Korajin's third place) and the splash follows the last game
+
+**What he said:** *"Make the splash change with the last game played."* / *"I added a building, models/buildings korajin_bld_01 -- maybe the
+main character's hut, a third zone... a cozy Japanese mountainside or grassland or an island, water, sun god rays, a weird alien Japanese
+island tree, the fisherman docks and boats... cyberpunk but retro samurai, future alien floating flying stuff."* And the `environment` repo
+as a reference.
+
+- **SPLASH:** the title picker writes `mel.game` (korajin / zap); the splash shows Korajin's poster (with its own TAP TO START tag, his
+  poster has no painted button) or Zap n' Clancy's.
+- **`environment` (colinwillow/environment, public: read with no setup, no push):** one 85 KB file, a misty river valley at dusk, all
+  generated: a 512x512 ripple simulation + a planar REFLECTION (the scene drawn twice) -- the likely chug on his phone along with the
+  plant count. Not lifted: this world uses the island system's water (one pass, waves, glints, foam). A reference for later passes.
+- **THE REFUGE (`HOME`, `buildHome`, world `home`, KORAJIN > The Refuge):** a 44 m grass plateau that the island system (`ISLE`, the kit
+  city's: coast, beach, rocks, the water shader, the sea's rule) wraps in a hut-sized coast (`HOME.isle`: coast 9, wobble 7, beach 6-12,
+  a deeper grass tint since there is no city to borrow textures from). HIS HUT, scaled by its measured width to 9 m (x9 off a unit square),
+  its glTF lights dropped, FrontSide except the paper. **Its `collider` is a skirt round the base** (rendered: a ring of walls 0.29 of
+  its height, steps at five heights), so for now the hut is ONE SOLID BLOCK of the base's plan, walked round, not into. A door and a floor
+  in the collider would make it enterable. A weird tree (`homeTree`: twisted trunk, puffed magenta/teal crowns, glowing pods, solid trunk);
+  22 paper lanterns drifting round the island (one instanced draw, `homeStep`).
+- **Real loop (`home.cjs`):** 21 draw calls, 122k tris; walking at the hut he stops at its wall (z -2.95, the block's face); renders: the
+  hut on the green, the tree, the lanterns, a beach and rocks, the sea.
+
+**Next passes:** the dock and boats, bamboo, the floating isles and the sun shafts, and his hut enterable.
+
 ## m1109 -- his KORAJIN posters on the title screen
 
 **What he said:** *"I put them in the repo -- zap/images/korajin."* (`korajin_title_01` / `_02`, png + webp, 941x1672: the splash's own size.)

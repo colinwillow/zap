@@ -179,6 +179,8 @@ canvas { display: block; width: 100%; height: 100%; touch-action: none; }
 #splash img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; pointer-events: none; }
 #splash img.blur { filter: blur(22px) brightness(.4); transform: scale(1.12); display: none; }
 @media (min-aspect-ratio: 3/4) { #splash img.main { object-fit: contain; } #splash img.blur { display: block; } }
+#splash .kjtap { position: absolute; left: 50%; bottom: calc(7% + env(safe-area-inset-bottom)); transform: translateX(-50%); padding: 12px 30px; border-radius: 999px;
+  font: 700 18px var(--disp), sans-serif; letter-spacing: .12em; color: #f4e9d8; background: #8f1d22cc; border: 2px solid #f4e9d8aa; animation: splashPulse 1.6s ease-in-out infinite; pointer-events: none; }
 #splash .glow { position: absolute; border-radius: 999px; pointer-events: none; box-shadow: 0 0 0 2px #ffffffaa, 0 0 26px 6px #8fe8ffaa;
   animation: splashPulse 1.6s ease-in-out infinite; }
 @keyframes splashPulse { 0%, 100% { opacity: .35; transform: scale(.98); } 50% { opacity: 1; transform: scale(1.03); } }
@@ -874,10 +876,10 @@ body.desk.free #deskHint { display: block; }
   <h1>WEIRDPORT</h1>
   <div class="msg" id="bootMsg">loading</div>
   <div class="bar"><i id="bootBar"></i></div>
-  <div class="bld">BUILD <span id="bootBuild">m1109</span></div>
+  <div class="bld">BUILD <span id="bootBuild">m1110</span></div>
 </div>
 
-<div class="chip" id="build"><b id="buildN">m1109</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
+<div class="chip" id="build"><b id="buildN">m1110</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
 <div id="splash" aria-label="tap to start"><img class="blur" alt=""><img class="main" alt="Zap and Clancy"><div class="glow"></div><div class="bn"></div></div>
 <script>
 // m879 (STEER 02:22): THE SPLASH, before the module (so it shows on the first paint, while the boot carries on behind it). The image's
@@ -887,12 +889,15 @@ body.desk.free #deskHint { display: block; }
 (function () {
   const el = document.getElementById('splash'); if (!el) return;
   if (navigator.webdriver || /[?&]splash=0\b/.test(location.search)) { el.remove(); return; }
-  const bn = (document.getElementById('buildN') || {}).textContent || '', src = 'images/splash_zap_n_clancy.webp?b=' + bn;
+  // m1110: the LAST GAME PLAYED's art (`mel.game`, written by the title picker): Korajin's poster has no painted button, so it gets a tag
+  let kj = false; try { kj = localStorage.getItem('mel.game') === 'korajin'; } catch (e) {}
+  const bn = (document.getElementById('buildN') || {}).textContent || '', src = (kj ? 'images/korajin/korajin_title_01.webp' : 'images/splash_zap_n_clancy.webp') + '?b=' + bn;
   const [blur, img] = el.querySelectorAll('img'), glow = el.querySelector('.glow'); blur.src = src; img.src = src; el.querySelector('.bn').textContent = bn;
+  if (kj) { img.alt = 'Korajin'; glow.style.display = 'none'; const t = document.createElement('div'); t.className = 'kjtap'; t.textContent = 'TAP TO START'; el.appendChild(t); }
   const IW = 941, IH = 1672, B = [225, 1495, 715, 1615];   // the painted button, in the art's own pixels
   function fit() { const W = el.clientWidth, H = el.clientHeight, cover = W / H < .75, k = cover ? Math.max(W / IW, H / IH) : Math.min(W / IW, H / IH), ox = (W - IW * k) / 2, oy = (H - IH * k) / 2;
     Object.assign(glow.style, { left: ox + B[0] * k + 'px', top: oy + B[1] * k + 'px', width: (B[2] - B[0]) * k + 'px', height: (B[3] - B[1]) * k + 'px' }); }
-  fit(); addEventListener('resize', fit);
+  if (!kj) { fit(); addEventListener('resize', fit); }
   el.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); el.classList.add('gone'); setTimeout(() => el.remove(), 400); });
 })();
 </script>
@@ -983,9 +988,9 @@ import { KTX2Loader } from './vendor/KTX2Loader.js';
 import { clone as skeletonClone } from './vendor/SkeletonUtils.js';
 import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
 
-const BUILD = 'm1109';
+const BUILD = 'm1110';
 /* ASSETS:START */
-const ASSETS = {"models/alien_lizard.glb":"faffcf4c","models/alien_lizard_ktx2.glb":"05da2a20","models/skate.glb":"0c612d5e","models/skateboard.glb":"5ba93796","models/characters/alien_antenna_game.glb":"f3ccf328","models/characters/alien_antenna_game_ktx2.glb":"28afac8c","models/characters/alien_female_purple.glb":"1c73eef1","models/characters/alien_female_purple_ktx2.glb":"fc914afb","models/characters/alien_goblin.glb":"3e91bffb","models/characters/alien_goblin_chains.glb":"e72d1550","models/characters/alien_goblin_game.glb":"cfabd926","models/characters/alien_grey_medium.glb":"5a779e8e","models/characters/alien_grey_medium_ktx2.glb":"61600c3e","models/characters/alien_rollerskate_blue.glb":"abf0917c","models/characters/alien_rollerskate_blue_ktx2.glb":"e9a7948a","models/characters/alien_warrior.glb":"f5cc9c49","models/characters/alien_warrior_ktx2.glb":"a13fb7b6","models/characters/beautiful_asian.glb":"910f6565","models/characters/beautiful_asian_ktx2.glb":"35281eef","models/characters/beautiful_blonde.glb":"edddc421","models/characters/beautiful_blonde_ktx2.glb":"89cf3899","models/characters/brute_warboss_armor.glb":"cc5c7936","models/characters/ceo_alien.glb":"844dc3a7","models/characters/ceo_human.glb":"ec289865","models/characters/clancy.glb":"4b9d271f","models/characters/clancy_ktx2.glb":"74edbc6e","models/characters/colin.glb":"99d38b7d","models/characters/colin_ktx2.glb":"35040f87","models/characters/contruction_worker.glb":"8bd3d7ce","models/characters/contruction_worker_ktx2.glb":"3df8c344","models/characters/dummy_officer.glb":"724965ac","models/characters/dummy_officer_ktx2.glb":"db640cda","models/characters/fat_activist_01.glb":"3c566fee","models/characters/fat_activist_01_ktx2.glb":"b9328df4","models/characters/fat_biker_01.glb":"576b7cf5","models/characters/fat_biker_01_ktx2.glb":"7142cfad","models/characters/fat_biker_02.glb":"ab5d7ec7","models/characters/fat_biker_02_ktx2.glb":"28cec6cc","models/characters/fat_hippie.glb":"f09a260d","models/characters/fat_hippie_ktx2.glb":"0be745a4","models/characters/fat_hipster.glb":"9cf45ffb","models/characters/fat_hipster_ktx2.glb":"18106ff3","models/characters/fat_secret_service.glb":"6d546fb0","models/characters/fat_secret_service_ktx2.glb":"a23a304e","models/characters/fat_trump.glb":"5de6bc56","models/characters/fat_trump_ktx2.glb":"a0ddaf4d","models/characters/firefighter.glb":"ebde005d","models/characters/firefighter_ktx2.glb":"ccf93c96","models/characters/goblin_game.glb":"db1cf0e0","models/characters/hick_skinny.glb":"1ebe78e8","models/characters/hick_skinny_ktx2.glb":"1e93f0ed","models/characters/hobo_01.glb":"34e80b1d","models/characters/hobo_01_ktx2.glb":"69497677","models/characters/jack.glb":"ab009b9b","models/characters/jack_ktx2.glb":"1f4c9f7f","models/characters/moussa.glb":"6d80b1cf","models/characters/moussa_ktx2.glb":"66e040f8","models/characters/orc_game.glb":"d9aa816d","models/characters/proxy_ceo.bin":"6eca0c34","models/characters/proxy_ceo.jpg":"fadc9d0a","models/characters/proxy_ceo.json":"e62a7975","models/characters/proxy_ceo_alien.bin":"be247ecc","models/characters/proxy_ceo_alien.jpg":"8f8bf8fc","models/characters/proxy_ceo_alien.json":"eb23e28f","models/characters/proxy_hick.bin":"4485560e","models/characters/proxy_hick.jpg":"8c331965","models/characters/proxy_hick.json":"d85a0d36","models/characters/proxy_zap.bin":"dd7b300e","models/characters/proxy_zap.jpg":"2e7330ae","models/characters/proxy_zap.json":"b3b42754","models/characters/proxy_zap2.bin":"51088f46","models/characters/proxy_zap2.jpg":"a954a815","models/characters/proxy_zap2.json":"5c50abb7","models/characters/rept_heavy_armor.glb":"934661c7","models/characters/samurai_game.glb":"c7940015","models/characters/xray_skeleton.glb":"46480317","models/characters/zap.glb":"5e5cca54","models/characters/zap_02.glb":"4ff12de0","models/characters/zap_02_lib.glb":"e23d91da","models/characters/zap_ktx2.glb":"4b29d886","models/characters/zoar.glb":"423a9de9","models/characters/zoar_game.glb":"d20a3736","models/vehicles/dump_truck.glb":"d870dc18","models/vehicles/dump_truck_ktx2.glb":"21ee7059","models/vehicles/motorcycle_fatboy.glb":"9ed9be28","models/weapons/alien_antenna_blaster_game.glb":"54083b44","models/weapons/alien_antenna_hammer_game.glb":"707b8a27","models/weapons/alien_launcher.glb":"ba8ab96a","models/weapons/hammer.glb":"3335fdf2","models/weapons/shield_brute.glb":"c6e5593f","models/weapons/spikey_mace.glb":"dcd43acd","models/weapons/w_brute_cleaver.glb":"07a97580","models/weapons/w_rept_maul.glb":"84c3a1a4","models/buildings/alien_base_01.glb":"d9b9fd7f","models/buildings/alien_base_01_ktx2.glb":"6cbbfef2","models/towers/alien_tower_01.glb":"98d23375","models/towers/alien_tower_01_ktx2.glb":"47597651","models/streets/modular_streets_kit.glb":"6a4bcaa5","models/toon_city/impact_marks.json":"2b616620","models/toon_city/impact_marks_atlas.ktx2":"efe0840e","models/toon_city/impact_marks_atlas.png":"490ed049","models/toon_city/toon_city_breakables.glb":"29bddbc8","models/toon_city/toon_city_collision.glb":"fb3a693f","models/toon_city/toon_city_obb.json":"81c18a47","models/toon_city/toon_city_visual.glb":"5df62285","models/toon_city/toon_city_visual_ktx2.glb":"cf080531","models/toon_city/weirdkit_tint.js":"f6e9d802","models/toon_city_kit/toon_city_collision.glb":"5540a364","models/toon_city_kit/toon_city_kit_buildings.glb":"590e53f0","models/toon_city_kit/toon_city_kit_buildings_ktx2.glb":"e6dff3a3","models/toon_city_kit/toon_city_kit_pieces.glb":"8232bd6f","models/toon_city_kit/toon_city_kit_twins.glb":"fcc9fdfc","models/toon_city_kit/toon_city_visual.glb":"45cf2957","models/toon_city_kit/toon_city_visual_ktx2.glb":"f26a6984","models/toon_city_kit/weirdkit_detile.js":"dd05bd70","models/characters/morph/shapes.bin":"4e680384","models/characters/morph/shapes.json":"abfc949d","models/characters/forged/alien_female_purple.glb":"0308860e","models/characters/forged/alien_goblin_game.glb":"4925f5a6","models/characters/forged/alien_rollerskate_blue.glb":"bcccc63f","models/characters/forged/alien_warrior.glb":"a067d5ab","models/characters/forged/beautiful_asian.glb":"f1c7baa5","models/characters/forged/beautiful_blonde.glb":"f83172bd","models/characters/forged/brute_warboss_armor.glb":"dc15dc94","models/characters/forged/ceo_alien.glb":"20659ac3","models/characters/forged/ceo_human.glb":"326d9e7e","models/characters/forged/clancy.glb":"19fabcce","models/characters/forged/contruction_worker.glb":"99fe1a17","models/characters/forged/dummy_officer.glb":"87a11843","models/characters/forged/fat_activist_01.glb":"6546645c","models/characters/forged/fat_biker_01.glb":"943f38ea","models/characters/forged/fat_biker_02.glb":"5d63a0cf","models/characters/forged/fat_hippie.glb":"ff0539ba","models/characters/forged/fat_hipster.glb":"792b92d8","models/characters/forged/fat_secret_service.glb":"7c29d1da","models/characters/forged/firefighter.glb":"20410689","models/characters/forged/goblin_game.glb":"3c813462","models/characters/forged/hick_skinny.glb":"d9232022","models/characters/forged/hobo_01.glb":"37d266c9","models/characters/forged/index.json":"01be89cd","models/characters/forged/jack.glb":"712b6241","models/characters/forged/moussa.glb":"74d19c70","models/characters/forged/orc_game.glb":"7bf3c227","models/characters/forged/rept_heavy_armor.glb":"01e631b0","models/characters/forged/samurai_archer.glb":"04db413e","models/characters/forged/samurai_game.glb":"a946c148","models/characters/forged/zap.glb":"10eda718","models/characters/forged/zap_02.glb":"fd513cea","models/characters/forged/zap_02_lib.glb":"fd513cea","models/characters/forged/zoar_game.glb":"b032a28e","images/crack_sprite_01.ktx2":"4aa55fde","images/crack_sprite_01.png":"16b52e8c","images/fire_sprites_01.ktx2":"922e1191","images/fire_sprites_01.png":"f87e2696","images/fire_sprites_02.ktx2":"e0cbfe1d","images/fire_sprites_02.png":"b373a6fd","images/fire_sprites_03.ktx2":"4fbbb985","images/fire_sprites_03.png":"7eece336","images/geyser_sprites_01.png":"b6325470","images/hdri_game.ktx2":"0feb5c79","images/hdri_game.png":"dac55f41","images/splash_zap_n_clancy.webp":"52a9d8a4","images/water_sprites_01.ktx2":"326924c5","images/water_sprites_01.png":"31e12659","audio/blaster_sound_01.mp3":"40d99583","audio/blaster_sound_02.mp3":"4bd7bb7c","audio/box_break_01.mp3":"e4127980","audio/electricity_beam_01.mp3":"986db8c9","audio/explosion_small.mp3":"f154a537","audio/metal_clang_01.mp3":"a333bd27","audio/metal_clang_02.mp3":"1e3ebbd6","audio/metal_clang_03.mp3":"afe44812","audio/metal_ping_01.mp3":"8ffca1a0","audio/plasma_canon.mp3":"e32c324d","audio/powerup_01.mp3":"48fbbe08","audio/swoosh_01.mp3":"193db185","audio/swoosh_02.mp3":"19145e70","audio/swoosh_03.mp3":"544fdffb","audio/swoosh_04.mp3":"843bee5d","audio/plasma_sounds/plasma_01.mp3":"e71c010f","audio/plasma_sounds/plasma_02.mp3":"ac3b1c75","audio/plasma_sounds/plasma_03.mp3":"eaa59355","audio/plasma_sounds/plasma_04.mp3":"bc7865e0","audio/plasma_sounds/plasma_05.mp3":"1d821cd0","audio/plasma_sounds/plasma_06.mp3":"cb979fbe","audio/plasma_sounds/plasma_hit.mp3":"30e5af5c","audio/alien_orc_grunt_sounds/alien_orc_grunt_01.mp3":"d6f4b343","audio/alien_orc_grunt_sounds/alien_orc_grunt_02.mp3":"78afc603","audio/alien_orc_grunt_sounds/alien_orc_grunt_03.mp3":"972c524a","audio/alien_orc_grunt_sounds/alien_orc_grunt_04.mp3":"b0ce76eb","audio/alien_orc_grunt_sounds/alien_orc_grunt_05.mp3":"1f0ba1f4","audio/alien_orc_grunt_sounds/alien_orc_grunt_06.mp3":"4f749866","audio/alien_orc_grunt_sounds/alien_orc_grunt_07.mp3":"dcf75925","audio/hit_sounds/hit_sound_01.mp3":"befaa2be","audio/hit_sounds/hit_sound_02.mp3":"73bc4433","audio/hit_sounds/hit_sound_03.mp3":"24b181e4","audio/hit_sounds/hit_sound_gound_01.mp3":"86ee2674","audio/hit_sounds/hit_sound_ground_02.mp3":"8a7cac73","audio/hit_sounds/hit_sound_plasma_01.mp3":"9abc0202","audio/hit_sounds/hit_sound_plasma_02.mp3":"6aaf0fe5","audio/creature_noises/creature_noise_01.mp3":"cbcc6ee7","audio/creature_noises/creature_noise_02.mp3":"201a8247","audio/creature_noises/creature_noise_03.mp3":"97680811","audio/creature_noises/creature_noise_04.mp3":"6f734df2","audio/creature_noises/creature_noise_05.mp3":"6f736441","audio/creature_noises/creature_noise_06.mp3":"992712e9","audio/creature_noises/creature_noise_07.mp3":"d9ad04b3","audio/footsteps/footstep_2_l.mp3":"abeabfbe","audio/footsteps/footstep_2_r.mp3":"7dd16046","audio/footsteps/footstep_l.mp3":"b66e579b","audio/footsteps/footstep_r.mp3":"96e13433","models/props/prop_hydrant.glb":"f157fee9","models/props/prop_hydrant_collision.glb":"0bbfc4d2","models/creatures/3_headed_dog.glb":"9263480a","models/creatures/blue_dragon.glb":"d72f4da7","models/creatures/mech_lightning_dragon.glb":"5935bb67"};
+const ASSETS = {"models/alien_lizard.glb":"faffcf4c","models/alien_lizard_ktx2.glb":"05da2a20","models/skate.glb":"0c612d5e","models/skateboard.glb":"5ba93796","models/characters/alien_antenna_game.glb":"f3ccf328","models/characters/alien_antenna_game_ktx2.glb":"28afac8c","models/characters/alien_female_purple.glb":"1c73eef1","models/characters/alien_female_purple_ktx2.glb":"fc914afb","models/characters/alien_goblin.glb":"3e91bffb","models/characters/alien_goblin_chains.glb":"e72d1550","models/characters/alien_goblin_game.glb":"cfabd926","models/characters/alien_grey_medium.glb":"5a779e8e","models/characters/alien_grey_medium_ktx2.glb":"61600c3e","models/characters/alien_rollerskate_blue.glb":"abf0917c","models/characters/alien_rollerskate_blue_ktx2.glb":"e9a7948a","models/characters/alien_warrior.glb":"f5cc9c49","models/characters/alien_warrior_ktx2.glb":"a13fb7b6","models/characters/beautiful_asian.glb":"910f6565","models/characters/beautiful_asian_ktx2.glb":"35281eef","models/characters/beautiful_blonde.glb":"edddc421","models/characters/beautiful_blonde_ktx2.glb":"89cf3899","models/characters/brute_warboss_armor.glb":"cc5c7936","models/characters/ceo_alien.glb":"844dc3a7","models/characters/ceo_human.glb":"ec289865","models/characters/clancy.glb":"4b9d271f","models/characters/clancy_ktx2.glb":"74edbc6e","models/characters/colin.glb":"99d38b7d","models/characters/colin_ktx2.glb":"35040f87","models/characters/contruction_worker.glb":"8bd3d7ce","models/characters/contruction_worker_ktx2.glb":"3df8c344","models/characters/dummy_officer.glb":"724965ac","models/characters/dummy_officer_ktx2.glb":"db640cda","models/characters/fat_activist_01.glb":"3c566fee","models/characters/fat_activist_01_ktx2.glb":"b9328df4","models/characters/fat_biker_01.glb":"576b7cf5","models/characters/fat_biker_01_ktx2.glb":"7142cfad","models/characters/fat_biker_02.glb":"ab5d7ec7","models/characters/fat_biker_02_ktx2.glb":"28cec6cc","models/characters/fat_hippie.glb":"f09a260d","models/characters/fat_hippie_ktx2.glb":"0be745a4","models/characters/fat_hipster.glb":"9cf45ffb","models/characters/fat_hipster_ktx2.glb":"18106ff3","models/characters/fat_secret_service.glb":"6d546fb0","models/characters/fat_secret_service_ktx2.glb":"a23a304e","models/characters/fat_trump.glb":"5de6bc56","models/characters/fat_trump_ktx2.glb":"a0ddaf4d","models/characters/firefighter.glb":"ebde005d","models/characters/firefighter_ktx2.glb":"ccf93c96","models/characters/goblin_game.glb":"db1cf0e0","models/characters/hick_skinny.glb":"1ebe78e8","models/characters/hick_skinny_ktx2.glb":"1e93f0ed","models/characters/hobo_01.glb":"34e80b1d","models/characters/hobo_01_ktx2.glb":"69497677","models/characters/jack.glb":"ab009b9b","models/characters/jack_ktx2.glb":"1f4c9f7f","models/characters/moussa.glb":"6d80b1cf","models/characters/moussa_ktx2.glb":"66e040f8","models/characters/orc_game.glb":"d9aa816d","models/characters/proxy_ceo.bin":"6eca0c34","models/characters/proxy_ceo.jpg":"fadc9d0a","models/characters/proxy_ceo.json":"e62a7975","models/characters/proxy_ceo_alien.bin":"be247ecc","models/characters/proxy_ceo_alien.jpg":"8f8bf8fc","models/characters/proxy_ceo_alien.json":"eb23e28f","models/characters/proxy_hick.bin":"4485560e","models/characters/proxy_hick.jpg":"8c331965","models/characters/proxy_hick.json":"d85a0d36","models/characters/proxy_zap.bin":"dd7b300e","models/characters/proxy_zap.jpg":"2e7330ae","models/characters/proxy_zap.json":"b3b42754","models/characters/proxy_zap2.bin":"51088f46","models/characters/proxy_zap2.jpg":"a954a815","models/characters/proxy_zap2.json":"5c50abb7","models/characters/rept_heavy_armor.glb":"934661c7","models/characters/samurai_game.glb":"c7940015","models/characters/xray_skeleton.glb":"46480317","models/characters/zap.glb":"5e5cca54","models/characters/zap_02.glb":"4ff12de0","models/characters/zap_02_lib.glb":"e23d91da","models/characters/zap_ktx2.glb":"4b29d886","models/characters/zoar.glb":"423a9de9","models/characters/zoar_game.glb":"d20a3736","models/vehicles/dump_truck.glb":"d870dc18","models/vehicles/dump_truck_ktx2.glb":"21ee7059","models/vehicles/motorcycle_fatboy.glb":"9ed9be28","models/weapons/alien_antenna_blaster_game.glb":"54083b44","models/weapons/alien_antenna_hammer_game.glb":"707b8a27","models/weapons/alien_launcher.glb":"ba8ab96a","models/weapons/hammer.glb":"3335fdf2","models/weapons/shield_brute.glb":"c6e5593f","models/weapons/spikey_mace.glb":"dcd43acd","models/weapons/w_brute_cleaver.glb":"07a97580","models/weapons/w_rept_maul.glb":"84c3a1a4","models/buildings/alien_base_01.glb":"d9b9fd7f","models/buildings/alien_base_01_ktx2.glb":"6cbbfef2","models/buildings/korajin_bld_01.glb":"edf3178e","models/towers/alien_tower_01.glb":"98d23375","models/towers/alien_tower_01_ktx2.glb":"47597651","models/streets/modular_streets_kit.glb":"6a4bcaa5","models/toon_city/impact_marks.json":"2b616620","models/toon_city/impact_marks_atlas.ktx2":"efe0840e","models/toon_city/impact_marks_atlas.png":"490ed049","models/toon_city/toon_city_breakables.glb":"29bddbc8","models/toon_city/toon_city_collision.glb":"fb3a693f","models/toon_city/toon_city_obb.json":"81c18a47","models/toon_city/toon_city_visual.glb":"5df62285","models/toon_city/toon_city_visual_ktx2.glb":"cf080531","models/toon_city/weirdkit_tint.js":"f6e9d802","models/toon_city_kit/toon_city_collision.glb":"5540a364","models/toon_city_kit/toon_city_kit_buildings.glb":"590e53f0","models/toon_city_kit/toon_city_kit_buildings_ktx2.glb":"e6dff3a3","models/toon_city_kit/toon_city_kit_pieces.glb":"8232bd6f","models/toon_city_kit/toon_city_kit_twins.glb":"fcc9fdfc","models/toon_city_kit/toon_city_visual.glb":"45cf2957","models/toon_city_kit/toon_city_visual_ktx2.glb":"f26a6984","models/toon_city_kit/weirdkit_detile.js":"dd05bd70","models/characters/morph/shapes.bin":"4e680384","models/characters/morph/shapes.json":"abfc949d","models/characters/forged/alien_female_purple.glb":"0308860e","models/characters/forged/alien_goblin_game.glb":"4925f5a6","models/characters/forged/alien_rollerskate_blue.glb":"bcccc63f","models/characters/forged/alien_warrior.glb":"a067d5ab","models/characters/forged/beautiful_asian.glb":"f1c7baa5","models/characters/forged/beautiful_blonde.glb":"f83172bd","models/characters/forged/brute_warboss_armor.glb":"dc15dc94","models/characters/forged/ceo_alien.glb":"20659ac3","models/characters/forged/ceo_human.glb":"326d9e7e","models/characters/forged/clancy.glb":"19fabcce","models/characters/forged/contruction_worker.glb":"99fe1a17","models/characters/forged/dummy_officer.glb":"87a11843","models/characters/forged/fat_activist_01.glb":"6546645c","models/characters/forged/fat_biker_01.glb":"943f38ea","models/characters/forged/fat_biker_02.glb":"5d63a0cf","models/characters/forged/fat_hippie.glb":"ff0539ba","models/characters/forged/fat_hipster.glb":"792b92d8","models/characters/forged/fat_secret_service.glb":"7c29d1da","models/characters/forged/firefighter.glb":"20410689","models/characters/forged/goblin_game.glb":"3c813462","models/characters/forged/hick_skinny.glb":"d9232022","models/characters/forged/hobo_01.glb":"37d266c9","models/characters/forged/index.json":"01be89cd","models/characters/forged/jack.glb":"712b6241","models/characters/forged/moussa.glb":"74d19c70","models/characters/forged/orc_game.glb":"7bf3c227","models/characters/forged/rept_heavy_armor.glb":"01e631b0","models/characters/forged/samurai_archer.glb":"04db413e","models/characters/forged/samurai_game.glb":"a946c148","models/characters/forged/zap.glb":"10eda718","models/characters/forged/zap_02.glb":"fd513cea","models/characters/forged/zap_02_lib.glb":"fd513cea","models/characters/forged/zoar_game.glb":"b032a28e","images/crack_sprite_01.ktx2":"4aa55fde","images/crack_sprite_01.png":"16b52e8c","images/fire_sprites_01.ktx2":"922e1191","images/fire_sprites_01.png":"f87e2696","images/fire_sprites_02.ktx2":"e0cbfe1d","images/fire_sprites_02.png":"b373a6fd","images/fire_sprites_03.ktx2":"4fbbb985","images/fire_sprites_03.png":"7eece336","images/geyser_sprites_01.png":"b6325470","images/hdri_game.ktx2":"0feb5c79","images/hdri_game.png":"dac55f41","images/splash_zap_n_clancy.webp":"52a9d8a4","images/water_sprites_01.ktx2":"326924c5","images/water_sprites_01.png":"31e12659","audio/blaster_sound_01.mp3":"40d99583","audio/blaster_sound_02.mp3":"4bd7bb7c","audio/box_break_01.mp3":"e4127980","audio/electricity_beam_01.mp3":"986db8c9","audio/explosion_small.mp3":"f154a537","audio/metal_clang_01.mp3":"a333bd27","audio/metal_clang_02.mp3":"1e3ebbd6","audio/metal_clang_03.mp3":"afe44812","audio/metal_ping_01.mp3":"8ffca1a0","audio/plasma_canon.mp3":"e32c324d","audio/powerup_01.mp3":"48fbbe08","audio/swoosh_01.mp3":"193db185","audio/swoosh_02.mp3":"19145e70","audio/swoosh_03.mp3":"544fdffb","audio/swoosh_04.mp3":"843bee5d","audio/plasma_sounds/plasma_01.mp3":"e71c010f","audio/plasma_sounds/plasma_02.mp3":"ac3b1c75","audio/plasma_sounds/plasma_03.mp3":"eaa59355","audio/plasma_sounds/plasma_04.mp3":"bc7865e0","audio/plasma_sounds/plasma_05.mp3":"1d821cd0","audio/plasma_sounds/plasma_06.mp3":"cb979fbe","audio/plasma_sounds/plasma_hit.mp3":"30e5af5c","audio/alien_orc_grunt_sounds/alien_orc_grunt_01.mp3":"d6f4b343","audio/alien_orc_grunt_sounds/alien_orc_grunt_02.mp3":"78afc603","audio/alien_orc_grunt_sounds/alien_orc_grunt_03.mp3":"972c524a","audio/alien_orc_grunt_sounds/alien_orc_grunt_04.mp3":"b0ce76eb","audio/alien_orc_grunt_sounds/alien_orc_grunt_05.mp3":"1f0ba1f4","audio/alien_orc_grunt_sounds/alien_orc_grunt_06.mp3":"4f749866","audio/alien_orc_grunt_sounds/alien_orc_grunt_07.mp3":"dcf75925","audio/hit_sounds/hit_sound_01.mp3":"befaa2be","audio/hit_sounds/hit_sound_02.mp3":"73bc4433","audio/hit_sounds/hit_sound_03.mp3":"24b181e4","audio/hit_sounds/hit_sound_gound_01.mp3":"86ee2674","audio/hit_sounds/hit_sound_ground_02.mp3":"8a7cac73","audio/hit_sounds/hit_sound_plasma_01.mp3":"9abc0202","audio/hit_sounds/hit_sound_plasma_02.mp3":"6aaf0fe5","audio/creature_noises/creature_noise_01.mp3":"cbcc6ee7","audio/creature_noises/creature_noise_02.mp3":"201a8247","audio/creature_noises/creature_noise_03.mp3":"97680811","audio/creature_noises/creature_noise_04.mp3":"6f734df2","audio/creature_noises/creature_noise_05.mp3":"6f736441","audio/creature_noises/creature_noise_06.mp3":"992712e9","audio/creature_noises/creature_noise_07.mp3":"d9ad04b3","audio/footsteps/footstep_2_l.mp3":"abeabfbe","audio/footsteps/footstep_2_r.mp3":"7dd16046","audio/footsteps/footstep_l.mp3":"b66e579b","audio/footsteps/footstep_r.mp3":"96e13433","models/props/prop_hydrant.glb":"f157fee9","models/props/prop_hydrant_collision.glb":"0bbfc4d2","models/creatures/3_headed_dog.glb":"9263480a","models/creatures/blue_dragon.glb":"d72f4da7","models/creatures/mech_lightning_dragon.glb":"5935bb67"};
 /* ASSETS:END */
 // Every runtime asset URL goes through A(). `npm run bump` writes the sha1 of each file's
 // CONTENTS into ASSETS above, so a file replaced IN PLACE -- same folder, same name, new bytes
@@ -2469,7 +2474,7 @@ const WORLD = {
   now: 'tkit',
   store: 'mel.world',
   // KIT CITY FIRST, so the key's cycle starts from the main world
-  list: { tkit: 'WEIRDPORT', arena: 'ARENA', test: 'WHITE BOX' },   // ZAP: two worlds -- the plain kit city and the white box   // m438: Level 1, the alien plaza   // m432: his alien planet
+  list: { tkit: 'WEIRDPORT', arena: 'ARENA', test: 'WHITE BOX', home: 'REFUGE' },     // m1110: Grumbo's refuge (KORAJIN)   // ZAP: two worlds -- the plain kit city and the white box   // m438: Level 1, the alien plaza   // m432: his alien planet
 };
 {
   // **THE STORE IS READ INSIDE A TRY, AT MODULE SCOPE.** A throw up here is `init()` never
@@ -11723,7 +11728,7 @@ const ISLE = {
   rect: null, land: null, water: null, rockM: null, lmat: null, wmat: null,
   safe: null, safeTk: 0, splashes: 0, t: 0, tris: 0, texN: 0, rays: null,
 };
-const isleWorld = () => !!ISLE.on && (inTK() || inTC());
+const isleWorld = () => !!ISLE.on && (inTK() || inTC() || WORLD.now === 'home');     // m1110: the refuge is an island too
 const seaY = () => ISLE.live ? ISLE.sea : 0;
 // the floor at zero, everywhere it still means something
 function gFloor0(x, z) {
@@ -27987,7 +27992,7 @@ function isleLandMat(opts = {}) {
   if (I.texN < 3) { if (WORLD.now === 'toon' && tg === null && ts && tr) console.log('[melee] ISLE 2/3 TEX (the old toon city has no grass material)'); else note('ISLE ' + I.texN + '/3 TEX'); }
   U = {
     uG: { value: tg || isleWhite() }, uS: { value: ts || isleWhite() }, uR: { value: tr || isleWhite() },
-    uGT: { value: new THREE.Vector3(...(tg ? I.grassT : [.36, .55, .25])) },
+    uGT: { value: new THREE.Vector3(...(tg ? I.grassT : I.grassFall || [.36, .55, .25])) },     // m1110: a world with no city to borrow from names its own
     uST: { value: new THREE.Vector3(...(ts ? I.sandT : [.86, .74, .52])) },
     uRT: { value: new THREE.Vector3(...(tr ? I.rockT : [.42, .43, .45])) },
     uTile: { value: 1 / I.tex }, uSea: { value: I.sea }, uT: { value: 0 },
@@ -55717,6 +55722,7 @@ function frameBody() {
     windStep(dt);         // the islands' wind: him in the air, the dust, the windsock (m393) -- after he moved, before the sea's rule
     thermStep(dt);        // the needle's thermal: him floating in it, the dust rising, the tether, the gulls (m395)
     isleStep(dt);         // the sea's rule, right after he moved (m264)
+    if (HOME.live) homeStep(dt);     // m1110
     awStep(dt);           // the alien world's water and falls (m432)
     _pt = pT('plyr', _pt);
     // AFTER HIM, because the deck is drawn where he ENDED UP -- read before `stepPlayer` it is
@@ -56693,6 +56699,84 @@ async function buildAlienWorld() {
     ' columns, ' + AW.n.climb + ' ladders, grid ' + cells + ' | ' + (AW.n.lod || 0) + ' far-copy cells | ' + AW.n.texDup + ' duplicate textures shared | ' + nP + ' places | ' + AW.bld +
     ' placed buildings, ' + AW.missing.length + ' missing | deck shift ' + (AW.shift ? AW.shift.dx.toFixed(1) + ',' + AW.shift.dz.toFixed(1) + ' off ' + AW.shift.n + ' streets' : 'none') + ' | ' + Math.round(performance.now() - t0) + ' ms');
 }
+// m1110: THE REFUGE -- Grumbo's home, KORAJIN's third place (`?w=home`, KORAJIN > The Refuge). *"Build a nice cozy beautiful scene... his
+// refuge... Japanese mountainside or grassland or an island, water, sun god rays, a weird alien Japanese island tree, the fisherman-hat
+// docks and boats -- cyberpunk but retro samurai and future alien floating flying stuff."* First pass: a grass plateau (`HOME.ground`) that
+// the island system wraps in a coast, a beach and the sea (`ISLE`, the kit city's: its water shader, foam, glints, the sea's rule); HIS HUT
+// (`models/buildings/korajin_bld_01.glb`, authored on a unit square, scaled to `hut.w` m across by its measured width; its `collider` node is
+// a skirt round the base, so it is SOLID -- rasterised into columns -- and the hut is walked round, not into; its glTF lights dropped); a weird
+// tree (`homeTree`: a twisted trunk, puffed magenta-and-teal crowns, glowing pods); and `lanterns` paper lanterns drifting over the land and
+// the sea, one instanced draw. Next passes: the dock and the boats, bamboo, the floating isles in the sky.
+const HOME = { live: 0, ground: 22, hut: { file: 'models/buildings/korajin_bld_01.glb', w: 9, at: [0, -7], yaw: 0 }, spawn: [0, 9], tree: [12, -3],
+  lanterns: 22, lan: null, t: 0, hutObj: null, stat: {},
+  isle: { coast: 9, wobble: 7, minLand: 6, beach: [6, 12], rocks: 26, grassFall: [.16, .4, .17] } };
+const inHome = () => WORLD.now === 'home';
+async function buildHome() {
+  const H = HOME, G = H.ground, N = 44, gp = new THREE.PlaneGeometry(G * 2, G * 2, N, N); gp.rotateX(-Math.PI / 2);
+  const P = gp.attributes.position, col = new Float32Array(P.count * 3), cA = new THREE.Color(0x5f9b56), cB = new THREE.Color(0x9fbf5a), cC = new THREE.Color(0x3f8f7a), c = new THREE.Color();
+  for (let i = 0; i < P.count; i++) { const x = P.getX(i), z = P.getZ(i), e = Math.max(Math.abs(x), Math.abs(z)) / G;
+    const y = (Math.sin(x * .21 + 1.3) * Math.cos(z * .17) * .22 + Math.sin(x * .07 - z * .09) * .18) * (1 - smooth(.7, 1, e));     // gentle, and flat at the edge the coast takes over from
+    P.setY(i, Math.hypot(x - H.hut.at[0], z - H.hut.at[1]) < H.hut.w * .75 ? 0 : y);     // the hut stands on the flat
+    const k = .5 + .5 * Math.sin(x * .13 + z * .11); c.copy(cA).lerp(cB, k * .6).lerp(cC, .25 * (1 - k)); col.set([c.r, c.g, c.b], i * 3); }
+  gp.setAttribute('color', new THREE.BufferAttribute(col, 3)); gp.computeVertexNormals();
+  { const sp = new Float32Array(P.count * 3); for (let i = 0; i < P.count; i++) sp[i * 3] = 1; gp.setAttribute('aSplat', new THREE.BufferAttribute(sp, 3)); }     // all grass, for the island's own land shader
+  const ground = new THREE.Mesh(gp, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .95 })); ground.receiveShadow = true; scene.add(ground);
+  const idx = gp.index.array; for (let i = 0; i < idx.length; i += 3) { const a = idx[i], b = idx[i + 1], d = idx[i + 2];
+    triAdd(P.getX(a), P.getY(a), P.getZ(a), P.getX(b), P.getY(b), P.getZ(b), P.getX(d), P.getY(d), P.getZ(d));
+    surfAdd(P.getX(a), P.getY(a), P.getZ(a), P.getX(b), P.getY(b), P.getZ(b), P.getX(d), P.getY(d), P.getZ(d)); }
+  // the hut
+  try { const g = await loadGLB(H.hut.file, 'loading the refuge');
+    const m = g.scene, drop = []; m.traverse(o => { if (o.isLight) drop.push(o); }); for (const o of drop) o.removeFromParent();
+    m.updateMatrixWorld(true); const bb = new THREE.Box3(); m.traverse(o => { if (o.isMesh && o.name !== 'collider' && o.geometry) { o.geometry.computeBoundingBox(); bb.union(o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld)); } });
+    const k = H.hut.w / Math.max(.01, bb.max.x - bb.min.x); m.scale.setScalar(k); m.rotation.y = H.hut.yaw; m.position.set(H.hut.at[0], -bb.min.y * k, H.hut.at[1]);
+    scene.add(m); m.updateMatrixWorld(true); H.hutObj = m; H.stat.hutK = +k.toFixed(2);
+    let col = null; m.traverse(o => { if (o.isMesh) { if (o.name === 'collider') col = o; else { o.castShadow = o.receiveShadow = true;
+      for (const mt of [].concat(o.material)) if (mt && !/paper|glow/i.test(mt.name || '')) mt.side = THREE.FrontSide; } } });
+    if (col) col.visible = false;
+    // his collider is a thin skirt round the base (the columns it rasterises to leave gaps), so the hut is one solid block, the base's
+    // measured plan, for now -- walked round, not into, until it has a door and a floor
+    { const r = H.hut.w * .42; BOXES.push({ minx: H.hut.at[0] - r, maxx: H.hut.at[0] + r, miny: 0, maxy: 7, minz: H.hut.at[1] - r, maxz: H.hut.at[1] + r }); H.stat.cols = col ? 'skirt->block' : 'no collider'; }
+  } catch (e) { console.warn('[melee] hut', e); note('NO HUT GLB'); }
+  homeTree(H.tree[0], H.tree[1]);
+  // the walkable store, then the island round it (the coast is built OFF the ground just stored)
+  triBuild(); surfBuild(); boxGrid();
+  Object.assign(ISLE, H.isle);     // a hut's island, not a city's
+  try { buildIsle(); } catch (e) { ISLE.live = 0; note('ISLE FAIL'); console.warn('[melee] island', e); }
+  if (ISLE.lmat) ground.material = ISLE.lmat;     // the plateau wears the island's own grass, so the two read as one land
+  homeLanterns();
+  player.pos.x = H.spawn[0]; player.pos.z = H.spawn[1]; cam.az = player.faceH = player.heading = Math.PI;     // looking at the hut
+  H.live = 1; console.log('[melee] refuge: hut x' + H.stat.hutK + ', ' + (H.stat.cols || 0) + ' columns, isle ' + (ISLE.live ? 'on' : 'OFF'));
+}
+// a twisted trunk, puffed crowns in his palette, glowing pods -- three draws
+function homeTree(x, z) {
+  const g = new THREE.Group(), pts = []; for (let i = 0; i <= 8; i++) { const u = i / 8; pts.push(new THREE.Vector3(Math.sin(u * 3.2) * 1.1 * u, u * 7.5, Math.cos(u * 2.4) * .8 * u - .4 * u)); }
+  const trunkGeo = [new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 40, .5, 9)];
+  for (const [a, h, l] of [[.6, 5.2, 3.2], [2.4, 6.1, 2.6], [4.1, 4.6, 2.8]]) { const e = pts[Math.round(h / 7.5 * 8)].clone(), q = []; for (let i = 0; i <= 5; i++) { const u = i / 5; q.push(e.clone().add(new THREE.Vector3(Math.cos(a) * l * u, Math.sin(u * 2.2) * 1.3, Math.sin(a) * l * u))); }
+    trunkGeo.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(q), 16, .22, 7)); }
+  const trunk = new THREE.Mesh(mergeGeometries(trunkGeo, false), new THREE.MeshStandardMaterial({ color: 0x4a2f3d, roughness: .85 })); trunk.castShadow = true; g.add(trunk);
+  const crowns = [], pods = [];
+  const tips = [pts[8], ...[[.6, 5.2, 3.2], [2.4, 6.1, 2.6], [4.1, 4.6, 2.8]].map(([a, h, l]) => pts[Math.round(h / 7.5 * 8)].clone().add(new THREE.Vector3(Math.cos(a) * l, 1.2, Math.sin(a) * l)))];
+  tips.forEach((t, i) => { for (let j = 0; j < 4; j++) { const s = new THREE.IcosahedronGeometry(1.5 + Math.random() * .9, 1); s.translate(t.x + (Math.random() - .5) * 2.2, t.y + .6 + Math.random() * 1.1, t.z + (Math.random() - .5) * 2.2);
+      const cc = new THREE.Color().setHSL(.88 - (i + j) * .07, .55, .58), cs = new Float32Array(s.attributes.position.count * 3); for (let v = 0; v < cs.length; v += 3) cs.set([cc.r, cc.g, cc.b], v); s.setAttribute('color', new THREE.BufferAttribute(cs, 3)); crowns.push(s); }
+    for (let j = 0; j < 3; j++) { const pd = new THREE.SphereGeometry(.16, 8, 6); pd.translate(t.x + (Math.random() - .5) * 2.4, t.y - .9 - Math.random() * .8, t.z + (Math.random() - .5) * 2.4); pods.push(pd); } });
+  const crown = new THREE.Mesh(mergeGeometries(crowns, false), new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .7, flatShading: true })); crown.castShadow = true; g.add(crown);
+  g.add(new THREE.Mesh(mergeGeometries(pods, false), new THREE.MeshStandardMaterial({ color: 0x9ffcff, emissive: 0x5ff0ff, emissiveIntensity: 1.6 })));
+  g.position.set(x, 0, z); scene.add(g);
+  BOXES.push({ minx: x - .7, maxx: x + .7, miny: 0, maxy: 6, minz: z - .7, maxz: z + .7 });     // the trunk is solid
+}
+// paper lanterns adrift: one instanced draw, bobbing and turning
+function homeLanterns() {
+  const H = HOME, n = H.lanterns, geo = new THREE.CylinderGeometry(.22, .28, .55, 8), mat = new THREE.MeshStandardMaterial({ color: 0xffb070, emissive: 0xff7a2a, emissiveIntensity: 1.8, roughness: .6 });
+  const im = new THREE.InstancedMesh(geo, mat, n); im.frustumCulled = false; scene.add(im);
+  const L = []; for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2 + Math.random() * .3, r = 14 + Math.random() * 30; L.push({ x: Math.cos(a) * r, z: Math.sin(a) * r, y: 2.5 + Math.random() * 4, ph: Math.random() * 6.28, w: .2 + Math.random() * .3, a }); }
+  H.lan = { im, L, m: new THREE.Matrix4(), q: new THREE.Quaternion(), e: new THREE.Euler(), s: new THREE.Vector3(1, 1, 1), p: new THREE.Vector3() };
+}
+function homeStep(dt) {
+  const H = HOME; H.t += dt; const Z = H.lan; if (!Z) return;
+  Z.L.forEach((l, i) => { l.a += dt * .015; const x = Math.cos(l.a) * Math.hypot(l.x, l.z), z = Math.sin(l.a) * Math.hypot(l.x, l.z);
+    Z.p.set(x, l.y + Math.sin(H.t * l.w + l.ph) * .4, z); Z.e.set(Math.sin(H.t * .7 + l.ph) * .08, H.t * .2 + l.ph, 0); Z.q.setFromEuler(Z.e); Z.m.compose(Z.p, Z.q, Z.s); Z.im.setMatrixAt(i, Z.m); });
+  Z.im.instanceMatrix.needsUpdate = true;
+}
 async function init() {
   FORGED.ready = forgedLoad();                      // m933: the Forge's bakes, off the boot path; m965: the card waits for them
   // **THE DENOMINATOR IS THE WORLD'S, AND IT IS SET BEFORE THE FIRST FETCH (m127).** It was 4
@@ -57389,6 +57473,8 @@ async function init() {
     // coordinates, and his town has no body placement in it), no test boxes
     decalLoad();
     try { await buildAlienWorld(); } catch (e) { console.error('[melee] alien world', e); note('AW FAILED'); }
+  } else if (inHome()) {
+    try { await buildHome(); } catch (e) { console.error('[melee] refuge', e); note('HOME FAILED'); }     // m1110
   } else if (inArena()) {
     // z1: the arena -- the stadium is built at module scope; nobody in it until the SPAWN menu
     player.pos.x = ARENA.youAt[0]; player.pos.z = ARENA.youAt[1]; cam.az = player.faceH = player.heading = Math.PI;
@@ -57437,8 +57523,8 @@ async function init() {
     PROG.done += 1 + (crowdOn ? 0 : 9 + CIVILS.length);
   }
   if (alienLike()) PROG.done += 1 + 9 + CIVILS.length;     // m432: the crowd is not loaded here (yet)
-  if (inArena()) PROG.done += 1 + 9 + CIVILS.length;     // z1: no crowd in the arena
-  if (!alienLike() && !inArena() && (!kitWorld() || crowdOn)) {
+  if (inArena() || inHome()) PROG.done += 1 + 9 + CIVILS.length;     // z1: no crowd in the arena; m1110: nor at the refuge
+  if (!alienLike() && !inArena() && !inHome() && (!kitWorld() || crowdOn)) {
   if (!kitWorld() && (!inWP() || WP.she)) await side(SHE.file, 'loading the alien girl', { name: 'SHE', build: buildShe });
   else if (!kitWorld()) PROG.done++;
   // THE MACE FIRST, because the warrior mounts it as he is built -- and it is only a weapon he
@@ -57976,13 +58062,14 @@ function startGate() {
     const page = () => { while (el.firstChild) el.removeChild(el.firstChild); };
     const korajin = () => { page(); el.style.backgroundImage = 'linear-gradient(#07080c00, #07080c00 26%, #07080cbb 46%, #07080cee), url(images/korajin/korajin_title_02.webp?b=' + BUILD + ')';
       add('div', 'kjgap');     // the poster's own painted title shows through here
-      const go = (w, d) => { try { localStorage.setItem(HERO.key, 'agoblin'); } catch (e) {} enter(w, w === WORLD.now && HERO.pick !== 'agoblin' ? '?w=' + w : ''); };
+      const go = (w, d) => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter(w, w === WORLD.now && HERO.pick !== 'agoblin' ? '?w=' + w : ''); };
       add('h4', '', 'KORAJIN GRUMBO');
       btn(el, 'The Arena', 'The katana, the horde, the archers, the rival. Where the fighting is built.', () => go('arena'), 'main');
+      btn(el, 'The Refuge', 'His home: the hut, the island, the sea. (Being built.)', () => go('home'));
       btn(el, 'White Box', 'An empty floor to try a move on.', () => go('test'));
       btn(el, '&lsaquo; Titles', '', titles);
       add('div', 'bld', 'BUILD ' + BUILD); };
-    const zapClancy = () => { page(); el.style.backgroundImage = '';
+    const zapClancy = () => { page(); el.style.backgroundImage = ''; try { localStorage.setItem('mel.game', 'zap'); } catch (e) {}
     add('h1', '', 'ZAP &amp; CLANCY'); add('div', 'sub', 'aliens, a city, and whatever happens next');
     // m785: WHO YOU PLAY, saved and read before the rig loads (`HERO`); m882 (STEER 02:28): on a 3D TURNTABLE (`heroStage`), one at a time
     add('h4', '', 'HERO');
