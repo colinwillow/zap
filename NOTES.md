@@ -494,6 +494,26 @@ SHIPPED UNVERIFIED. The queue's passes 2 and 3 are done. Next is his call: more 
 
 SHIPPED UNVERIFIED. Next: pass 3, foam and wake, bow spray, the sun on the water, gulls, an island.
 
+## FLOATING ISLANDS, NOT CONES (m1404): `floatIsland` AND `islandDress`, SHARED
+
+His (to this window and the Ship's): *"The upside-down floating islands -- you take a cone, turn it upside down and call it a floating island, and it looks so goddamn geometric. Break up that shape: erode the outer ridges, break up the line with rocks and dirt and boulders and trees and shrubs, inflate and deflate, take chunks away, add chunks... big land masses, small, medium -- art direct."*
+
+- **`floatIsland({ R, depth, seed, detail, flat, lobes, ...colours })`** returns `{ geo, topAt(x, z), rimR(a), R }`. It starts from an icosphere (detail 3-5), all in VERTEX COLOUR, so every island in a scene is ONE material and one draw.
+  - **THE TOP:** squashed to a gentle terrain (`topAt`) inside an irregular outline (`rimR`: low-frequency wobble plus NOTCHES), with grass in two greens and dirt patches.
+  - **THE RIM:** a dirt band, then a CLIFF band (the first 16% of the underside hangs nearly straight down).
+  - **THE UNDERSIDE:** tapers to `lobes` hanging tips. Each part follows ITS lobe by direction (sharpened weights, `pow 6`, after the first try averaged them back into one cone). It has stepped ledges (terraces), big lumps, deep ridged cracks, banded STRATA in five warm rock colours darkening toward the tips, and MOSS dripping from the rim.
+- **`islandDress(put, I, x, y, z, { cherry, pine, rocks, shrubs, roots, seed, clear })`** adds:
+  - cherry trees (trunk, branch, five pink blossom clusters)
+  - pines (three tiers)
+  - noise-displaced boulders and low shrubs
+  - thin two-segment hanging ROOTS (the first ones read as straight sticks)
+  - `clear` keeps the dressing off a central radius (the dojo's dais, a pagoda's base)
+- **`isl3Mat()`** is the shared vertex-colour material.
+- **In the dojo:** the platform's own island (grass and shrubs round the dais, 26 roots), the altars', the stepping stones', the pagodas' (cherry, pine, boulders), and the seven drifting platforms (still standable). Plus TWELVE art-directed scenery masses: two great ones (R 26 and 30) behind, a chain of medium ones low and high, small rocks, and a near-twin pair.
+- **Checked headless:** three render rounds. Round 1 read as cones with pale rock. Round 2 added terraces and strata, still one cone. Round 3 added sharpened lobes, the cliff band and stronger strata.
+- **Open:** a big island's underside can still read as one dominant point from below. More passes will add carved arches and chunks off the mass, and waterfalls.
+- **For the Ship's worker:** these are global functions; use them for the sea's islands and the sky.
+
 ## THE DOJO, PASS 3: OFF THE EDGE, THE ROUTES UP TO THE ALTARS, PLATFORMS YOU RIDE (m1402)
 
 - **OFF THE EDGE (`dojoStep`):** the world has a floor at y 0 everywhere, so past the rim he would stand on the sky. Out past W+2 and down at y 0 he has FALLEN: petals burst where he went, and he is put back at his pad with a beam.

@@ -10115,6 +10115,60 @@ function snowStep(dt) { const Z = SNOWZ, A = Z.air, p = player; if (!A) return; 
     P[o] += F.vx[i] * dt; P[o + 1] += F.vy[i] * dt; P[o + 2] += F.vz[i] * dt; A.A[i] = Math.max(0, Math.min(.9, F.life[i])); if (F.life[i] <= 0 || P[o + 1] < 0) { A.A[i] = 0; P[o + 1] = -99; F.life[i] = 0; } }
   A.pg.attributes.position.needsUpdate = true; A.pg.attributes.aA.needsUpdate = true; A.pg.attributes.aSize.needsUpdate = true;
   A.pm.uniforms.uPx.value = renderer.domElement.height / (2 * Math.tan(camera.fov * Math.PI / 360)); }
+// m1404: FLOATING ISLANDS, SHARED (his, after m1403: *"the upside-down floating islands -- you take a cone, turn it upside down, and it just looks
+// so goddamn geometric. Break up that shape: erode the outer ridges, break up the line with rocks and dirt and boulders and trees and shrubs,
+// inflate and deflate, take chunks away, add chunks, make it rocky... big land masses, small, medium -- art direct."*). `floatIsland(o)` returns
+// { geo, topAt(x, z), rimR(a) }: a unit icosphere pushed into an island -- the TOP flattened to a gentle terrain inside an irregular, NOTCHED
+// outline; the UNDERSIDE an uneven, LOBED mass hanging to one or more tips, cracked by ridged noise and banded in STRATA -- all in VERTEX
+// COLOUR (grass and dirt patches on top, a dirt band at the rim, layered rock beneath, darker toward the tips), so every island in a scene is
+// one material and merges into one draw. `islandDress(put, I, x, y, z, o)` dresses its top: boulders, cherry and pine trees, shrubs, and
+// roots hanging off the rim. Anything can use them (the dojo, the Ship's sea and sky, the Red Hollows).
+const ISLE3 = { mat: null };
+function isl3Hash(x, y, z) { const s = Math.sin(x * 127.1 + y * 311.7 + z * 74.7) * 43758.5453; return s - Math.floor(s); }
+function isl3Noise(x, y, z) { const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z), xf = x - xi, yf = y - yi, zf = z - zi, u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf), w = zf * zf * (3 - 2 * zf);
+  const L = (a, b, t) => a + (b - a) * t, h = (i, j, k) => isl3Hash(xi + i, yi + j, zi + k);
+  return L(L(L(h(0, 0, 0), h(1, 0, 0), u), L(h(0, 1, 0), h(1, 1, 0), u), v), L(L(h(0, 0, 1), h(1, 0, 1), u), L(h(0, 1, 1), h(1, 1, 1), u), v), w) * 2 - 1; }
+function isl3Fbm(x, y, z, o = 4) { let a = .5, s = 0; for (let i = 0; i < o; i++) { s += a * isl3Noise(x, y, z); x *= 2.03; y *= 2.03; z *= 2.03; a *= .5; } return s; }
+function floatIsland(o) { o = Object.assign({ R: 10, depth: 12, seed: 1, detail: 4, flat: .5, lobes: 2, grass: [.22, .4, .18], grass2: [.34, .5, .2], dirt: [.42, .28, .17], moss: [.26, .38, .16],
+    bands: [[.66, .44, .27], [.36, .25, .19], [.74, .55, .36], [.28, .2, .16], [.55, .37, .25]] }, o);
+  const sd = o.seed * 13.37, g = new THREE.IcosahedronGeometry(1, o.detail).toNonIndexed(), P = g.attributes.position, n = P.count, col = new Float32Array(n * 3), R = o.R;
+  const rimR = a => R * (1 + .2 * isl3Fbm(Math.cos(a) * 1.4 + sd, Math.sin(a) * 1.4, sd, 3) + .07 * isl3Noise(Math.cos(a) * 6 + sd, Math.sin(a) * 6, 1));
+  const topAt = (x, z) => o.flat * (R * .05 * isl3Fbm(x * .09 + sd, 0, z * .09, 3) + R * .025 * Math.max(0, 1 - Math.hypot(x, z) / R));
+  // the tips: `lobes` points under the island the underside hangs toward (not one centred cone)
+  const tips = []; for (let k = 0; k < o.lobes; k++) { const a = sd * 3 + k * (6.283 / o.lobes) + isl3Hash(k, sd, 9) * .8, r = R * (o.lobes > 1 ? .32 + .28 * isl3Hash(k, sd, 2) : .05); tips.push([Math.cos(a) * r, -o.depth * (k ? .45 + .4 * isl3Hash(sd, k, 5) : 1), Math.sin(a) * r]); }
+  const c = new THREE.Color();
+  for (let i = 0; i < n; i++) { const dx = P.getX(i), dy = P.getY(i), dz = P.getZ(i), a = Math.atan2(dz, dx), rh = Math.hypot(dx, dz), rr = rimR(a); let x, y, z;
+    if (dy > -.04) {     // THE TOP: the hemisphere squashed to a gentle terrain inside the notched outline
+      const k = Math.min(1, rh); x = Math.cos(a) * rr * k; z = Math.sin(a) * rr * k; y = topAt(x, z) - (1 - Math.min(1, dy * 6 + .5)) * .35;
+      const gn = isl3Fbm(x * .25 + sd, 7, z * .25, 3), rim = 1 - Math.min(1, dy * 9); c.setRGB(...(gn > .18 ? o.dirt : gn > -.1 ? o.grass2 : o.grass)); if (rim > .3) c.setRGB(...o.dirt).multiplyScalar(1 - rim * .25); }
+    else {     // THE UNDERSIDE (m1404 rev): hanging LOBES chosen smoothly by direction, stepped LEDGES, big lumps and deep cracks, banded STRATA, moss at the rim
+      const s = Math.min(1, -dy / .98); let tx = 0, ty = 0, tz = 0, ws = 0;
+      tips.forEach((T, k) => { const ta = Math.atan2(T[2], T[0]), da = Math.atan2(Math.sin(a - ta), Math.cos(a - ta)), wk = Math.pow(Math.exp(-da * da / .9) * (1 + .6 * isl3Noise(dx * 2 + k, dz * 2, sd)) + .02, 6); tx += T[0] * wk; ty += T[1] * wk; tz += T[2] * wk; ws += wk; });     /* sharpened: each part follows ITS lobe */
+      tx /= ws; ty /= ws; tz /= ws; const C = .16, cl = Math.min(1, s / C), s2 = Math.max(0, (s - C) / (1 - C)), w = Math.pow(s2, 1.1), terr = .09 * Math.sin(s2 * Math.PI * 4 + isl3Noise(dx * 3, dy * 3, sd) * 2) * (1 - s2);
+      const shrink = Math.max(0, (1 - cl * .12) * Math.pow(1 - s2, .75) + terr), bx = Math.cos(a) * rr * Math.min(1, rh + .02), bz = Math.sin(a) * rr * Math.min(1, rh + .02);     /* a CLIFF band under the rim, then the taper */
+      x = bx * shrink + tx * w; z = bz * shrink + tz * w; y = -.35 - cl * o.depth * .14 + (ty + o.depth * .14) * w - Math.abs(Math.sin(s2 * Math.PI * 5)) * s2 * (1 - s2) * o.depth * .12;
+      const big = isl3Fbm(dx * 1.2 + sd, dy * 1.6, dz * 1.2, 3), bulge = isl3Fbm(dx * 3.5 + sd, dy * 3.5, dz * 3.5, 3), crack = 1 - Math.abs(isl3Noise(dx * 4 + sd, dy * 8, dz * 4));
+      const push = (big * .42 + bulge * .12 - Math.pow(crack, 5) * .22) * R * Math.pow(1 - s, .5); const L = Math.hypot(x, z) || 1; x += x / L * push; z += z / L * push; y += big * o.depth * .1;
+      const band = (((y * .32 + big * .9) % 1) + 1) % 1, BC = o.bands; c.setRGB(...BC[(band * BC.length) | 0]).multiplyScalar((1 - s * .42) * (.92 + crack * .08) * (1 - Math.pow(crack, 8) * .35));
+      if (s < .2 && isl3Noise(dx * 6 + sd, dy * 2, dz * 6) > -.15 + s * 5) c.setRGB(...o.moss); if (s < .05) c.setRGB(...o.dirt); }
+    P.setXYZ(i, x, y, z); col.set([c.r, c.g, c.b], i * 3); }
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3)); if (g.attributes.uv) g.deleteAttribute('uv'); g.computeVertexNormals(); return { geo: g, topAt, rimR, R }; }
+function isl3Mat() { return ISLE3.mat || (ISLE3.mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .95, metalness: 0 })); }
+// the dressing: `trees` (cherry/pine), boulders, shrubs, hanging roots -- into the caller's `put` buckets, all vertex-coloured or a shared material
+const ISLE3M = {}; function isl3M() { if (!ISLE3M.trunk) Object.assign(ISLE3M, { trunk: new THREE.MeshStandardMaterial({ color: 0x4a3426, roughness: .9 }), pink: new THREE.MeshStandardMaterial({ color: 0xf2a8c0, roughness: .8, emissive: 0x3a1020, emissiveIntensity: .15 }),
+  pine: new THREE.MeshStandardMaterial({ color: 0x2f5a48, roughness: .9 }), shrub: new THREE.MeshStandardMaterial({ color: 0x4f7a3a, roughness: .9 }), stone: new THREE.MeshStandardMaterial({ color: 0x8c8278, roughness: .95 }), root: new THREE.MeshStandardMaterial({ color: 0x2e2018, roughness: 1 }) }); return ISLE3M; }
+function islandDress(put, I, X, Y, Z, o) { o = Object.assign({ cherry: 2, pine: 2, rocks: 4, shrubs: 6, roots: 10, seed: 1, clear: 0 }, o); const M = isl3M(), sd = o.seed * 7.7;
+  const spot = (k, m) => { for (let t = 0; t < 12; t++) { const a = isl3Hash(k, t, sd) * 6.283, f = Math.sqrt(isl3Hash(t, k, sd + 1)) * .78, r = I.rimR(a) * f; if (r < o.clear) continue; const x = Math.cos(a) * r, z = Math.sin(a) * r; return [x, I.topAt(x, z), z]; } return null; };
+  for (let k = 0; k < o.cherry; k++) { const p = spot(k, 0); if (!p) continue; const h = 2.2 + isl3Hash(k, 1, sd) * 1.6, x = X + p[0], y = Y + p[1], z = Z + p[2];
+    put(new THREE.CylinderGeometry(.14, .26, h, 6).translate(x, y + h / 2, z), M.trunk); put(new THREE.CylinderGeometry(.08, .12, 1.4, 5).rotateZ(.7).translate(x + .45, y + h * .8, z), M.trunk);
+    for (let b = 0; b < 5; b++) { const r = .8 + isl3Hash(k, b, sd) * .7, ox = (isl3Hash(b, k, 2) - .5) * 2.2, oz = (isl3Hash(b, k, 3) - .5) * 2.2, oy = isl3Hash(b, k, 4) * .9; put(new THREE.IcosahedronGeometry(r, 1).translate(x + ox, y + h + oy, z + oz), M.pink); } }
+  for (let k = 0; k < o.pine; k++) { const p = spot(k + 20, 0); if (!p) continue; const h = 3 + isl3Hash(k, 5, sd) * 3, x = X + p[0], y = Y + p[1], z = Z + p[2];
+    put(new THREE.CylinderGeometry(.12, .2, h * .4, 6).translate(x, y + h * .2, z), M.trunk); for (let t = 0; t < 3; t++) put(new THREE.ConeGeometry(h * (.32 - t * .07), h * .42, 7).translate(x, y + h * (.38 + t * .22), z), M.pine); }
+  for (let k = 0; k < o.rocks; k++) { const p = spot(k + 40, 0); if (!p) continue; const s = .5 + isl3Hash(k, 7, sd) * 1.3, rg = new THREE.IcosahedronGeometry(s, 1); const Q = rg.attributes.position;
+    for (let i = 0; i < Q.count; i++) { const f = 1 + isl3Noise(Q.getX(i) * 2 + k, Q.getY(i) * 2, Q.getZ(i) * 2) * .3; Q.setXYZ(i, Q.getX(i) * f, Q.getY(i) * f * .7, Q.getZ(i) * f); } rg.computeVertexNormals(); put(rg.translate(X + p[0], Y + p[1] + s * .3, Z + p[2]), M.stone); }
+  for (let k = 0; k < o.shrubs; k++) { const p = spot(k + 60, 0); if (!p) continue; put(new THREE.IcosahedronGeometry(.45 + isl3Hash(k, 9, sd) * .4, 0).scale(1, .7, 1).translate(X + p[0], Y + p[1] + .25, Z + p[2]), M.shrub); }
+  for (let k = 0; k < o.roots; k++) { const a = isl3Hash(k, 11, sd) * 6.283, r = I.rimR(a) * .9, L = 1.2 + isl3Hash(k, 12, sd) * 3, x = X + Math.cos(a) * r, z = Z + Math.sin(a) * r, lean = (isl3Hash(k, 13, sd) - .5) * .5;     /* two bent segments, thin */
+    put(new THREE.CylinderGeometry(.02, .055, L * .55, 4).rotateZ(lean).translate(x, Y - .45 - L * .27, z), M.root); put(new THREE.CylinderGeometry(.008, .025, L * .5, 4).rotateZ(-lean * 1.6).translate(x + Math.sin(lean) * L * .3, Y - .45 - L * .76, z), M.root); } }
 function forgePeaks(g) {
   let sd = PEAKS.seed; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
   const geos = [], rock = new THREE.Color(PEAKS.rock), cap = new THREE.Color(PEAKS.cap), haze = new THREE.Color(PEAKS.haze), c = new THREE.Color();
@@ -10155,6 +10209,7 @@ function dojoBuild(g, W) {
     red: new THREE.MeshStandardMaterial({ color: 0xa8201a, roughness: .45 }), gold: triMat('bronze', { scale: 1.5, metal: .75, rough: .35 }), roof: triMat('roof_tiles', { scale: 2.2, side: THREE.DoubleSide }), white: new THREE.MeshStandardMaterial({ color: 0xf1ead8, roughness: .9 }),
     blade: new THREE.MeshStandardMaterial({ color: 0xdfe8f2, metalness: .9, roughness: .15, emissive: 0x3a5a7a, emissiveIntensity: .4 }), lamp: new THREE.MeshStandardMaterial({ color: 0xffb46a, emissive: 0xff8a2a, emissiveIntensity: 1.4 }), dark: new THREE.MeshStandardMaterial({ color: 0x1c1614, roughness: .6 }) };
   const at = (a, r) => [Math.sin(a) * r, Math.cos(a) * r];
+  const ISL = [], isl = (o, x, y, z, dress) => { const I = floatIsland(o); ISL.push(I.geo.translate(x, y, z)); if (dress) islandDress(put, I, x, y, z, dress); return I; };     /* m1404: islands, not cones */
   // SKY and CLOUDS: the sunrise dome, and a sea of cloud far below (soft noise, fading to the horizon)
   const sd = new THREE.Vector3(...D.sun).normalize(), U = { uTime: { value: 0 }, uSun: { value: sd } }; D.U = U;
   const dome = new THREE.Mesh(new THREE.SphereGeometry(880, 48, 24), new THREE.ShaderMaterial({ uniforms: U, side: THREE.BackSide, depthWrite: false, fog: false,
@@ -10183,16 +10238,14 @@ function dojoBuild(g, W) {
   put(new THREE.RingGeometry(R + .45, W + 1.4, 96).rotateX(-Math.PI / 2).translate(0, .014, 0), M.stone);
   put(new THREE.CylinderGeometry(W + 1.45, W + 1.45, .6, 96, 1, true).translate(0, -.3, 0), M.gold);
   // THE ROOT: the platform's underside, a rough rock cone down into the air, with a few rocks hanging off it
-  { const cg = new THREE.ConeGeometry(W + 1.4, 22, 28, 6, true).rotateX(Math.PI).translate(0, -11.6, 0); const P = cg.attributes.position;
-    for (let i = 0; i < P.count; i++) { const y = P.getY(i), k = (-y) / 22, j = Math.sin(i * 12.9898) * 43758.5453 % 1; if (y < -.8) P.setXYZ(i, P.getX(i) * (1 + j * .18 * k), y - j * 1.2 * k, P.getZ(i) * (1 + j * .18 * k)); }
-    cg.computeVertexNormals(); put(cg, M.rock); put(new THREE.CircleGeometry(W + 1.4, 48).rotateX(Math.PI / 2).translate(0, -.6, 0), M.rock); }
+  isl({ R: W + 3.2, depth: 30, seed: 3, detail: 5, flat: .12, lobes: 4 }, 0, -.75, 0, { cherry: 0, pine: 0, rocks: 5, shrubs: 14, roots: 26, seed: 3, clear: W + 1.8 });     /* the platform's own island: grass and shrubs round the dais, roots off its rim */
   // THE RAIL: red lacquer posts round the rim, a timber top rail (the invisible wall is still what holds him)
   for (let i = 0; i < 48; i++) { const a = i / 48 * Math.PI * 2, [x, z] = at(a, W + 1.15); put(new THREE.BoxGeometry(.22, 1.1, .22).translate(x, .55, z), M.red); if (i % 6 === 0) put(new THREE.BoxGeometry(.32, .14, .32).translate(x, 1.17, z), M.gold); }
   { const rg = new THREE.TorusGeometry(W + 1.15, .08, 6, 128).rotateX(Math.PI / 2).translate(0, 1.08, 0); put(rg, M.timber); }
   // THE SWORD ALTARS (N and S), hovering high over the rim: a stone disc, a red rack with three katanas, a two-tier roof, lanterns
   D.altars = []; D.boxes = []; D.W = W;
   for (const a of [0, Math.PI]) { const [x, z] = at(a, D.altarR), y = D.altarY, face = a + Math.PI;
-    put(new THREE.CylinderGeometry(3.2, 2.2, 1.2, 24).translate(x, y - .6, z), M.stone); put(new THREE.ConeGeometry(2.2, 4, 16).rotateX(Math.PI).translate(x, y - 3.2, z), M.rock);
+    put(new THREE.CylinderGeometry(3.2, 2.9, 1.2, 24).translate(x, y - .6, z), M.stone); isl({ R: 4.2, depth: 7, seed: 11 + a, detail: 3, flat: .1, lobes: 2 }, x, y - 1.15, z, { cherry: 0, pine: 0, rocks: 0, shrubs: 3, roots: 6, seed: 5 + a, clear: 3.3 });
     put(new THREE.CylinderGeometry(3.3, 3.3, .2, 24, 1, true).translate(x, y - .1, z), M.gold);
     const ca = Math.cos(face), sa = Math.sin(face), L = (u, v, yy) => [x + ca * u + sa * v, yy, z - sa * u + ca * v];     // u across, v toward the floor
     for (const s of [-1, 1]) { const p = L(s * 1.6, -.6, y + 1.2); put(new THREE.BoxGeometry(.25, 2.4, .25).translate(...p), M.red); }
@@ -10208,7 +10261,7 @@ function dojoBuild(g, W) {
     // m1401: THE ROUTE UP: three floating stepping stones from the rim (where the rim wall is left open) up to the altar, each +2 m (his jump is
     // 2.7, comfy 2.2) and ~3 m apart (a run jump is 5.95 comfy), the last a 1 m hop onto the altar's disc -- which is now a floor (a box)
     const sg = a === 0 ? 1 : -1; [[20.6, .06, 1.9], [22.4, .2, 3.9], [22.6, .36, 5.9]].forEach(([r2, da, sy], k) => { const [sx, sz] = at(a + sg * da, r2);
-      put(new THREE.CylinderGeometry(1.35, 1.1, .5, 14).translate(sx, sy - .25, sz), M.stone); put(new THREE.ConeGeometry(1.1, 2.2, 8).rotateX(Math.PI).translate(sx, sy - 1.6, sz), M.rock); put(new THREE.CylinderGeometry(1.38, 1.38, .1, 14, 1, true).translate(sx, sy - .05, sz), M.gold);
+      put(new THREE.CylinderGeometry(1.35, 1.1, .5, 14).translate(sx, sy - .25, sz), M.stone); isl({ R: 1.7, depth: 3.2, seed: 21 + k + a, detail: 3, flat: .05, lobes: 1 }, sx, sy - .5, sz); put(new THREE.CylinderGeometry(1.38, 1.38, .1, 14, 1, true).translate(sx, sy - .05, sz), M.gold);
       D.boxes.push({ minx: sx - .95, maxx: sx + .95, miny: sy - .5, maxy: sy, minz: sz - .95, maxz: sz + .95 }); });
     D.boxes.push({ minx: x - 2.3, maxx: x + 2.3, miny: y - 1.2, maxy: y, minz: z - 2.3, maxz: z + 2.3 }); }
   // THE BANNER MASTS (E and W): a tall timber mast on a stone foot at the rim, a crossbar, and a long red chevron banner that WAVES
@@ -10220,7 +10273,7 @@ function dojoBuild(g, W) {
     const fl = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 15, 8, 24), fm); fl.position.set(x, H - 8.6, z); fl.rotation.y = a; fl.castShadow = true; g.add(fl); D.flags.push(fl); }
   // THE PAVILIONS (the diagonals), far out on floating rocks: a stone base, red pillars, white walls, THREE stacked roofs with upturned eaves
   for (let k = 0; k < 4; k++) { const a = Math.PI / 4 + k * Math.PI / 2, [x, z] = at(a, D.pavR), y0 = -4 + (k % 2) * 6, face = a + Math.PI;
-    put(new THREE.ConeGeometry(16, 30, 9, 3).rotateX(Math.PI).translate(x, y0 - 15, z), M.rock); put(new THREE.CylinderGeometry(15, 16, 3, 9).translate(x, y0 - 1.5, z), M.rock);
+    isl({ R: 19 + (k % 2) * 4, depth: 30 + k * 4, seed: 40 + k, detail: 5, flat: .25, lobes: 3 }, x, y0, z, { cherry: 3, pine: 3, rocks: 6, shrubs: 10, roots: 22, seed: 40 + k, clear: 11 });
     put(new THREE.BoxGeometry(18, 1.6, 18).rotateY(face).translate(x, y0 + .8, z), M.stone);
     for (const [px, pz] of [[-6, -6], [6, -6], [-6, 6], [6, 6], [-2, -6], [2, -6]]) { const c = Math.cos(face), s = Math.sin(face); put(new THREE.CylinderGeometry(.55, .6, 9, 10).translate(x + c * px + s * pz, y0 + 6.1, z - s * px + c * pz), M.red); }
     put(new THREE.BoxGeometry(11, 8, 11).rotateY(face).translate(x, y0 + 5.6, z), M.white);
@@ -10258,10 +10311,18 @@ function dojoBuild(g, W) {
     const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
     const crest = new THREE.Mesh(new THREE.CircleGeometry(5.2, 64).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ map: t, transparent: true, roughness: .5, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
     crest.position.y = .03; crest.receiveShadow = true; g.add(crest); }
+  // m1404: THE SCENERY -- islands big, medium and small, art-directed round the dojo (not a ring of copies): two great masses behind the pagodas,
+  // a chain of medium ones low and high, a few rocks and a twin-island (two overlapping masses) -- each dressed with cherry and pine
+  for (const [x, y, z, R2, dp, sdd, dress] of [[-120, -18, 40, 26, 44, 71, { cherry: 5, pine: 7, rocks: 8, shrubs: 18, roots: 30 }], [95, -26, -110, 30, 50, 72, { cherry: 3, pine: 9, rocks: 9, shrubs: 20, roots: 34 }],
+      [-52, 14, -60, 8, 14, 73, { cherry: 2, pine: 1, rocks: 2, shrubs: 6, roots: 10 }], [58, 22, 34, 6, 10, 74, { cherry: 1, pine: 2, rocks: 2, shrubs: 4, roots: 8 }], [-35, -12, 95, 11, 18, 75, { cherry: 3, pine: 2, rocks: 3, shrubs: 8, roots: 14 }],
+      [130, 6, 60, 14, 22, 76, { cherry: 2, pine: 5, rocks: 4, shrubs: 10, roots: 16 }], [142, 9, 48, 9, 16, 77, { cherry: 2, pine: 1, rocks: 2, shrubs: 6, roots: 8 }], [-90, 30, -20, 4, 7, 78, { cherry: 1, pine: 0, rocks: 1, shrubs: 2, roots: 5 }],
+      [20, -38, -60, 5, 9, 79, null], [-15, 38, 70, 3, 5, 80, null], [75, -8, 85, 4, 6, 81, null], [-70, 2, 120, 7, 11, 82, { cherry: 0, pine: 3, rocks: 1, shrubs: 3, roots: 6 }]])
+    isl({ R: R2, depth: dp, seed: sdd, detail: R2 > 12 ? 5 : 4, flat: .6, lobes: R2 > 10 ? 3 : 2 }, x, y, z, dress && Object.assign({ seed: sdd }, dress));
+  { const o = new THREE.Mesh(mergeGeometries(ISL), isl3Mat()); o.castShadow = o.receiveShadow = true; g.add(o); }
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o !== null; o.receiveShadow = true; g.add(o); }
   // THE DRIFTING PLATFORMS: small stone discs on rock roots, slowly bobbing and circling outside the rim (decor for now)
-  D.plats = []; const pgeo = mergeGeometries([new THREE.CylinderGeometry(2.4, 2, .7, 16).toNonIndexed(), new THREE.ConeGeometry(2, 3.6, 10).rotateX(Math.PI).translate(0, -2.1, 0).toNonIndexed()].map(q => { for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal') q.deleteAttribute(k); return q; }));
-  for (let i = 0; i < D.plat; i++) { const m = new THREE.Mesh(pgeo, M.stone); m.castShadow = true; g.add(m); const box = { minx: 0, maxx: 0, miny: 0, maxy: 0, minz: 0, maxz: 0 }; D.plats.push({ m, box, r: W + 9 + (i % 3) * 7, a: i / D.plat * Math.PI * 2 + .3, y: 3 + (i * 37 % 9), w: (i % 2 ? 1 : -1) * (.03 + i * .004), ph: i * 1.3, lx: null }); }     /* m1401: standable -- a BDYN box that carries him (pushed on the first dojo FRAME: this builder runs at module scope, above BDYN's declaration -- the TDZ landmine) */
+  D.plats = [];
+  for (let i = 0; i < D.plat; i++) { const m = new THREE.Mesh(floatIsland({ R: 2.6, depth: 4.5 + (i % 3), seed: 60 + i, detail: 3, flat: .04, lobes: 1 + (i % 2) }).geo, isl3Mat()); m.castShadow = true; g.add(m); const box = { minx: 0, maxx: 0, miny: 0, maxy: 0, minz: 0, maxz: 0 }; D.plats.push({ m, box, r: W + 9 + (i % 3) * 7, a: i / D.plat * Math.PI * 2 + .3, y: 3 + (i * 37 % 9), w: (i % 2 ? 1 : -1) * (.03 + i * .004), ph: i * 1.3, lx: null }); }     /* m1401: standable -- a BDYN box that carries him (pushed on the first dojo FRAME: this builder runs at module scope, above BDYN's declaration -- the TDZ landmine) */
   // m1399: PETALS -- pink cherry petals drifting across the dojo on the wind, tumbling (their size flickers as they turn)
   { const N = 700, P = new Float32Array(N * 3), S = new Float32Array(N), Ph = new Float32Array(N); for (let i = 0; i < N; i++) { P[i * 3] = (Math.random() - .5) * 60; P[i * 3 + 1] = Math.random() * 16; P[i * 3 + 2] = (Math.random() - .5) * 60; S[i] = .09 + Math.random() * .08; Ph[i] = Math.random() * 100; }
     const pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(P, 3)); pg.setAttribute('aSize', new THREE.BufferAttribute(S, 1)); pg.setAttribute('aPh', new THREE.BufferAttribute(Ph, 1));
@@ -10284,7 +10345,7 @@ function dojoStep(dt) { const D = DOJO; if (!D.on) return; D.t += dt; D.U.uTime.
   for (const P of D.plats) { P.a += P.w * dt; const x = Math.sin(P.a) * P.r, y = P.y + Math.sin(D.t * .6 + P.ph) * .5, z = Math.cos(P.a) * P.r, b = P.box, p = player;
     const on = P.lx !== null && p.grounded && p.pos.x > b.minx - .05 && p.pos.x < b.maxx + .05 && p.pos.z > b.minz - .05 && p.pos.z < b.maxz + .05 && Math.abs(p.pos.y - b.maxy) < .3;
     if (on) { p.pos.x += x - P.lx; p.pos.y += y - P.ly; p.pos.z += z - P.lz; }
-    b.minx = x - 1.7; b.maxx = x + 1.7; b.minz = z - 1.7; b.maxz = z + 1.7; b.miny = y - .4; b.maxy = y + .35; P.lx = x; P.ly = y; P.lz = z;
+    b.minx = x - 1.8; b.maxx = x + 1.8; b.minz = z - 1.8; b.maxz = z + 1.8; b.miny = y - .6; b.maxy = y + .05; P.lx = x; P.ly = y; P.lz = z;
     P.m.position.set(x, y, z); P.m.rotation.y += P.w * dt * 2; } }
 function arenaStage() {
   arenaSky();

@@ -33,7 +33,15 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - the altars REACHABLE: three floating stones from an opening in the rim up to each altar, and the altar disc is a floor
   - the seven drifting platforms are STANDABLE and carry you
   - `npm run check` now boots the arena and forge too (`check:worlds`)
-- [ ] pass 4:
+- [x] **pass 4 (m1404): NO MORE CONES.** Every floating rock is a `floatIsland` (shared, see NOTES):
+  - an irregular, notched outline
+  - a grass/dirt top
+  - a cliff band, then lobed undersides cracked and banded in strata, with moss at the rim
+  - dressed with cherry and pine trees, boulders, shrubs and hanging roots
+  - the platform's own island, the altars', the stepping stones', the pagodas' and the drifting platforms', plus twelve art-directed scenery masses (two great ones, a chain of medium, small rocks)
+- [ ] pass 5 (his, after m1403):
+  - the scene: his SHIP in the background, smaller flying ships, AIR CREATURES (one at a time: an alien whale, a manta, a serpent-dragon), and waterfalls off the big islands
+- [ ] pass 6:
   - the gates as ENTRANCES: bosses walk in through a torii (a DOORS entry for the dojo)
   - something AT the altars: take a katana from the rack, a chime, a glint on the blade
   - lit lanterns at dusk
