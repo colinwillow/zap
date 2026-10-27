@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- Timber Siege Fort pass 10 of 10: the polish (X3, WORKER A)
+
+Read back against the reference and the rules, and fixed:
+- **ROOM TO FIGHT: the top tier's front walk was 3.0 m.** Its setback is now 3.3 m (the back narrows to 1.7). The watch house, the hatch,
+  the hoppers and the zip post all follow it, because they are placed off the tier.
+- **An oil jar stood half over the top tier's hatch**, by its ladder. Both jars moved to the front of the house.
+- **TORCHES**: either side of both tunnel mouths and on the palisade gate's posts. Each is a bracket, a pot, a flickering additive flame and
+  a soft halo (one `Points` draw for the halos), breathing.
+- **The watch house is lit from inside**: warm paper glows in its two windows.
+
+All ten passes are in (m1328 to this build). It is not DONE until he has looked at it on his phone. SHIPPED UNVERIFIED.
+
 ## m1339 -- Timber Siege Fort pass 9 of 10: the set piece -- fire the watch house (X3, WORKER A)
 
 **Two OIL JARS** stand on the top deck either side of the watch house. Hit one, or put a rocket into the house, and it goes up
