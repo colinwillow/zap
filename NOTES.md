@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- Octagonal Block Pagoda pass 1 of 10: the stack (X4, WORKER A)
+## m1274 -- Octagonal Block Pagoda pass 1 of 10: the stack (X4, WORKER A)
 
 His favourite block reference (`block_pagoda_octagonal.jpg`), built in THE BLOCK STYLE. At (70, 72) in the forge, measured clear of every
 building there (nearest: the Festival at 42 m). `OPAG` / `opagBuild`; its code sits above the Sky Wreck, its hook in `bldHit` (`opagHit`).
