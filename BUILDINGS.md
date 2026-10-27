@@ -90,3 +90,23 @@ a pass on the next Set 2 item, then an extra pass (4-6) on a done building, olde
 | 23 | **Teahouse Garden** | a teahouse on stilts over a pond, a MOON BRIDGE (high arched, walkable) across it, stepping stones, a raked-gravel garden, a stone basin | (-47, 8) | 1 (m1219) · 2 (m1221) · 3 (m1223) DONE |
 | 24 | **Kneeling Colossus** | a giant ruined robot samurai statue kneeling, CLIMBABLE: up its thigh, a ramp along its forearm to the shoulder, a lookout in its open head, its sword planted as a bar-strung tower | (50, -26) (moved: (38, -44) is the Barracks) | 1 (m1225) · 2 (m1226) · 3 (m1227) DONE |
 
+## Set 3 (brainstormed m1228, after Set 2 finished)
+
+Set 2 filled the forge's middle, so Set 3 rings it further out, about 60 to 75 m from the centre. His style notes still rule: big,
+vertical, climbable, linked at height, manned and killable, Japanese-alien-cyber, with an inside and an outside. The loop
+ALTERNATES as before: a pass on the next Set 3 item, then an extra pass (6) on a done building, oldest first.
+
+| # | building | function | spot | passes |
+|---|---|---|---|---|
+| 25 | **Oni Gate** | a fortress gate carved as a giant demon face: you go in through its mouth (a portcullis of teeth), its two eyes are turrets that track and fire (killable), horns you can climb to a lookout, a guard room inside each cheek | (-72, 0) | · · |
+| 26 | **Jin Observatory** | a tall clockwork tower crowned by a rotating dome with a great telescope; gears and a spiral stair inside, a balcony ring, the dome turns to track whoever is in the open (a beam that marks him for the archers) | (72, -18) | · · |
+| 27 | **Lantern Festival Street** | a street of stalls under hundreds of hanging lanterns, a robot DRAGON DANCE parading up and down it (it knocks you aside, it can be cut apart segment by segment), firework launchers you can set off | (72, 30) | · · |
+| 28 | **Sky Wreck** | the broken hull of a great flying junk impaled on rock spires, decks tilted, holds to explore, loose cargo to smash, a Jin engine still sparking that blasts you up when struck | (30, -72) | · · |
+| 29 | **Bamboo Maze** | tall living bamboo walls in a maze (breakable stalks), ninja that drop from the canopy, a moon-gate shrine at the heart with a prize | (-30, -72) | · · |
+| 30 | **Waterwheel Mill** | a river channel with a giant waterwheel you can ride round (its paddles are platforms), a mill house with grinding gears inside, an aqueduct on arches walkable at height | (-72, 40) | · · |
+| 31 | **Mech Hangar** | a giant bipedal mech under repair in a gantry; climb the gantry levels, the mech wakes and stomps a short patrol (a boss: armour plates to cut off, a core to strike) | (60, 62) | · · |
+| 32 | **Sumo Dohyo** | a raised clay ring under a hanging roof, a sumo robot that charges and shoves (ring-out matters: off the edge is a fall), drums and banners round it | (-60, 68) | · · |
+| 33 | **Dragon Bell Tower** | a great bronze bell in a tall open tower; ring it and a Jin DRAGON flies a pass over the forge, scattering bodies where its shadow falls | (0, -74) | · · |
+| 34 | **Jin Tram Line** | an elevated rail looping the outer ring on pillars with two stations; a tram car runs it you can ride (and jump off anywhere), ladders up to each station | (0, 72) station | · · |
+| 35 | **Onsen Terraces** | stepped hot-spring pools down a hillside, each a terrace you jump between, steam geysers that launch you up a level, a bathhouse at the top | (-72, -40) | · · |
+

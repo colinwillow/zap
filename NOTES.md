@@ -5,6 +5,27 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1228 -- Set 3 brainstorm (Building Forge loop)
+
+Set 2 (14-24) is complete, so by his rule (*"if you run out of things to make tonight do another brain storm pass of another set"*)
+BUILDINGS.md has a SET 3: eleven buildings (25-35) ringing the forge further out, 60-75 m from the centre:
+
+| # | building |
+|---|---|
+| 25 | Oni Gate (a demon-face fortress with turret eyes) |
+| 26 | Jin Observatory (a rotating dome that marks you) |
+| 27 | Lantern Festival Street (a robot dragon dance you can cut apart) |
+| 28 | Sky Wreck (a junk impaled on spires) |
+| 29 | Bamboo Maze (ninja from the canopy) |
+| 30 | Waterwheel Mill (ride the wheel; an aqueduct at height) |
+| 31 | Mech Hangar (a gantry and a mech boss) |
+| 32 | Sumo Dohyo (ring-out against a sumo robot) |
+| 33 | Dragon Bell Tower (ring it for a dragon flyby) |
+| 34 | Jin Tram Line (a rideable elevated tram round the outer ring) |
+| 35 | Onsen Terraces (geysers that launch you up a level) |
+
+Every spot was checked against the standing ones. The loop alternates as before. Next: Set 3 #25 Oni Gate pass 1.
+
 ## m1227 -- Kneeling Colossus pass 3: the polish (Building Forge loop)
 
 - **Cracks:** dark seams across the stone (chest, shin, shoulder, thigh).
