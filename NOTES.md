@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1145 -- RAMPART pass 3 (DONE)
+
+- A great ONI MASK over the gateway on BOTH faces (red lacquer, black brows and moustache, glowing eye slits, gold horns, teeth) with two
+  crossed katanas behind it.
+- Pink NEON lines along both faces under the coping.
+- A DRONE orb patrolling the length of the wall on the courtyard side.
+`BLDG` rampart `pass: 3`. Next: the Airship Dock Tower (-30, 0). Shipped unverified.
+
 ## m1144 -- RAMPART pass 2: manned, banners, signal fires, grapple poles, supplies
 
 - MANNED: two red ARCHERS posted on the walkway (`archerPost`, x +-9), as well as the two sentry turrets on the bastions. Cleared with the
