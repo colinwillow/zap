@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1090 -- DISMEMBERMENT (SPAWN > SLICE DUMMY): katana cuts take limbs; he re-grabs the sword, kicks armless, hobbles, explodes
+
+*"A robot samurai -- a crash test dummy -- when you slice him pieces come off, his arm, his leg... the sword arm off, does he pick up the sword
+with his other arm; no arms, does he kick you or headbutt you; cut his legs off, does he explode? Just do it on one samurai at once."*
+- Code only, his current model (`LIMB`): the main skinned mesh is sorted into limbs by each vertex's DOMINANT bone (`limbPrep`, per kind,
+  once -- measured triangles: armR 1278, armL 1241, legR 1453, legL 1618, head 2050). A katana blow that LANDS unblocked at `power` .25+
+  (`dummyBlow`, `K.limbs`) takes the limb nearest the blade (`bladeSeg`; else his side of the blow): the limb is baked in its CURRENT pose
+  (`getVertexPosition` -> world) into a rigid piece thrown as arena debris (hot sparks, bounce), and its root bone is scaled to nothing
+  after the mixer every frame (`limbHide`, from `bodyMix`) -- it collapses into a sparking stump.
+- **Sword arm off:** the blade flies with the arm (a copy on the piece); `regrab` .8 s later a katana is in his LEFT hand (`katanaMountL`,
+  `weapon_root_left` via `mountPlace`). **Both arms:** his swings are KICKS (`katana_kick`, `flying_kick`; `d.swings`). **One leg:** he moves at
+  `limp` .35 (`foeMove`). **Both legs, or the head:** `limbBoom` -- every limb left flies, sparks, smoke, a boom, he is gone. **The head is the
+  FINISHER**, cuttable only once both arms are off: nearest the blade, it ended the first real test in 3 cuts.
+- **Measured** (`slice.cjs`, real loop): forced in order -- armR off (a piece flying), the left-hand katana at .8 s, armL off -> kicks, legL
+  off -> limp .35, legR off -> boomed. Real katana swings at a fresh dummy: first run 3 limbs in 4 swings (one the head -> the finisher rule);
+  second run 0 -- he was BLOCKING (his rule: no cut through a guard). Rendered: the left-hand sword after the arm; armless on one leg with
+  his pieces in the air. The pieces first flew off ORANGE: `clone` drops the hue hook -- copied across now.
+- The dummy: 40 hp, the fighter brain, beamed in 5 m ahead of you. Not on the horde yet -- one at a time, as he asked.
+- Shipped unverified on the phone.
+
 ## m1089 -- the JUGGLE: the slam is a shockwave that pops them up (no roll), launched men float, air hits keep them up; the TORNADO on side flicks
 
 *"The tornado kick when you melee left or right on the right stick. Also the slam -- he still does the roll; he's slamming the ground and it
