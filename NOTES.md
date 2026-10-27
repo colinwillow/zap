@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- Octagonal Block Pagoda pass 9 of 10: the set piece (X4, WORKER A)
+
+**Ring the bell at the top and the whole tower answers** (`opagShow`). Strike the bronze bell in storey 6's bell room:
+- **A boom and a shake**, and every wind bell on every corner swings and rings at once.
+- **The lanterns run UP the tower**, storey by storey, .5 s apart. Each storey's eight halos flare gold and settle bright. The lit windows
+  brighten too.
+- **At the top the beacon FLARES** into a 40 m column of light (additive, one draw), with sparks falling round the spire and a beam at
+  the foot.
+- **The stone lions stop hunting.** They walk home to their plinths and BOW, heads down and eyes turned gold, for as long as it lasts.
+- **In the shrine hall the altar opens on a RELIQUARY**: a gold casket with a red lid and a glowing jewel rises out of it, turning. Walk
+  into it for FULL health, with a beam and a gold spark fountain.
+
+It settles after 14 s (`OPAG.showT`) and the lions go back to sleep. Ring again for another, and the reliquary comes back with it.
+
+SHIPPED UNVERIFIED. Next: pass 10, the polish.
+
 ## White Heron Castle pass 7 of 10: the defenders (X2, WORKER B)
 
 All of them can be killed.
