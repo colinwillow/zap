@@ -5,6 +5,12 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## GRID LEVEL 1, PASS 10: THE HIGH ROAD PAYS OFF (m1365)
+
+- **New `zips: [[a, b]]` in `LVG1`:** extra ziplines beside the beat-11 zip, each from a 4.5 m post on cell a down to cell b. `lvgClear` drops them all.
+- **Level 1's:** from the zeppelin's high pad (9,3,Y6, 27 m) a ~75 m zip runs diagonally across the whole level to (2,9), the ground beside the boss door. It lands next to the catapult at (2,8), which is the welcome.
+- **Why:** pass 9's ride ended on a pad with nothing to do but drop. Now the high road (movers, rope, roof, zeppelin, zip) is a real alternative to the ground route from the tower walkway to the boss. You still need beats 3, 6 and 8 to open the door, so it is a way BACK after the beats, not a skip.
+
 ## GRID LEVEL 1, PASS 9: A ZEPPELIN ACROSS THE LEVEL (m1364)
 
 His: *"flying Zepplin... platforms"*.

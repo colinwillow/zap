@@ -97,6 +97,11 @@ This pass adds three new cell kinds to the spec:
 - flying zeppelin platforms
 - swimming (a new mechanic: its own sandbox first, per the whole-piece rule)
 
+## L1 pass 10 (m1365): THE LONG ZIP
+
+- **`zips: [[a, b]]`:** an extra zipline from a post on cell a down to cell b.
+- **Level 1's:** the zeppelin's high pad (9,3,Y6) to (2,9) beside the boss door, about 75 m.
+
 ## L1 pass 9 (m1364): THE ZEPPELIN
 
 - **`flyers: [[a, b]]`:** a deck under a zeppelin, shuttling between two docks and carrying you.
