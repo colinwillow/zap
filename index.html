@@ -9923,7 +9923,7 @@ function swatchBuild() { if (SWATCH.on) return; const g = new THREE.Group(); sce
     const p = new THREE.Mesh(new THREE.BoxGeometry(4, .3, 8), m); p.position.set(x, .15, z0 + 13); p.receiveShadow = true; g.add(p); O.boxes.push({ minx: x - 2, maxx: x + 2, miny: 0, maxy: .3, minz: z0 + 9, maxz: z0 + 17 }); });
   for (const b of O.boxes) BOXES.push(b); boxGrid(); SWATCH.on = { g, O, rings: [] }; }
 function swatchClear() { if (SWATCH.on) { bldClear(SWATCH.on); SWATCH.on = null; } }
-// m1383: THE SNOWFIELD (his, after m1382): *"a convincingly good snow simulation: you're trudging through the snow, the tracks, the snow piles up,
+// m1384: THE SNOWFIELD (his, after m1382): *"a convincingly good snow simulation: you're trudging through the snow, the tracks, the snow piles up,
 // but there's also snow in the air -- it's bouncing off your character, it's fluttering, it's super elegant, it's beautiful."* An ELEMENT sandbox
 // beside the sea (the Ship) and, later, the air. KORAJIN > The Snowfield opens the forge with `?w=forge&zone=snow`:
 //  - THE PACK: a 160 m field whose depth lives in a 640x640 byte map (`D`, 25 cm a texel, 0..`depth` m). The ground he walks on stays y = 0, so
@@ -10028,7 +10028,7 @@ function arenaStage() {
   arenaSky();
   const R = ARENA.r, g = new THREE.Group(), L = ARENA.look; world.add(g);
   // m1117: THE BUILDING FORGE -- a clean white floor under the arena's sky, nothing else: the buildings are spawned into it (SPAWN > BUILDINGS)
-  if (inForge() && SNOWZ.want) { snowStage(g); CWALL.g = g; COVER.meshes = []; COVER.boxes = []; ARENA.r = 60; return; }     // m1383: THE SNOWFIELD instead of the white floor
+  if (inForge() && SNOWZ.want) { snowStage(g); CWALL.g = g; COVER.meshes = []; COVER.boxes = []; ARENA.r = 60; return; }     // m1384: THE SNOWFIELD instead of the white floor
   if (inForge() && SHIPZ.want) { shipSea(g); CWALL.g = g; COVER.meshes = []; COVER.boxes = []; ARENA.r = 60; return; }     // m1373: THE SHIP's sea instead of the white floor
   if (inForge()) { const cv = document.createElement('canvas'); cv.width = cv.height = 512; const c = cv.getContext('2d'); c.fillStyle = '#f2f3f5'; c.fillRect(0, 0, 512, 512);
     c.strokeStyle = 'rgba(120,130,150,.35)'; c.lineWidth = 2; for (let i = 0; i <= 512; i += 64) { c.beginPath(); c.moveTo(i, 0); c.lineTo(i, 512); c.stroke(); c.beginPath(); c.moveTo(0, i); c.lineTo(512, i); c.stroke(); }

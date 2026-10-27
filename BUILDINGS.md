@@ -13,7 +13,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 
 - **WATER:** THE SHIP's sea (Worker A's track above).
 - **SNOW: KORAJIN > The Snowfield** (`?w=forge&zone=snow`).
-  - [x] **pass 1 (m1383):** the deformable pack, the flakes, and the drag:
+  - [x] **pass 1 (m1384):** the deformable pack, the flakes, and the drag:
     - knee-deep snow on a 640² depth map, displaced in the shader
     - feet carve tracks, the body ploughs, rolls and landings dig craters, rims pile up, and snow falls back in
     - hollows tint blue, and sparkles twinkle as you move
