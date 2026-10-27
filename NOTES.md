@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- Timber Siege Fort pass 9 of 10: the set piece -- fire the watch house (X3, WORKER A)
+## m1339 -- Timber Siege Fort pass 9 of 10: the set piece -- fire the watch house (X3, WORKER A)
 
 **Two OIL JARS** stand on the top deck either side of the watch house. Hit one, or put a rocket into the house, and it goes up
 (`tfortIgnite` / `tfortBurn`):
