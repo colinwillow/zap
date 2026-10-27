@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1205 -- Ninja Pillars pass 3: the polish (Building Forge loop)
+
+- **SAKURA tree** by the start: merged branches and pink blossom clumps, with a solid trunk. It drops a steady drift of petals
+  (`spk`, pink, falling slowly).
+- **Stone lanterns:** six round the ring, just outside the kerb.
+- **A carved stele** at the start with a glowing cyan glyph.
+- **Paper lanterns** on two strings from the bell pillar's frame out to two 8.6 m poles.
+- **A drone** circles the ring.
+
+The Ninja Pillars are DONE (3 passes). Next: alternate -- extra pass 5 on the Hall (oldest first), then Set 2 #21 Senbon Torii
+pass 1.
+
 ## m1204 -- Ninja Pillars pass 2: the trial and the sensei's hut (Building Forge loop)
 
 **THE TRIAL.** A bronze ring round each spiral pillar's cap LIGHTS (warm emissive) as he lands on it, with a rising chime.
