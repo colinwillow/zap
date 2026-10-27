@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- Timber Siege Fort pass 6 of 10: the defenders (X3, WORKER A)
+## m1335 -- Timber Siege Fort pass 6 of 10: the defenders (X3, WORKER A)
 
 All of them can be killed:
 - **Archers** (`archerPost`): two on the first deck's front corners, one on the second deck, one at the back of the top deck.
