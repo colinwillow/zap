@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1135 -- PAGODA pass 3 (DONE)
+
+- Every skirt corner sweeps UP into a curled timber TIP (16) -- without them the open frustums read as lampshades.
+- A vertical black-and-gold PLAQUE over the door on the second storey, a column of neon glyph bars on it.
+- Long red diamond-spiral BANNERS down both sides of the ground storey.
+- Four CABLES from the belfry's corners to stakes 11 m out (lamps along them), and a DRONE orb circling the spire.
+`BLDG` pagoda `pass: 3`. Next in the queue: the Market Stall row (16, 12). Shipped unverified.
+
 ## m1134 -- PAGODA pass 2: the bell TOLLS, the shrine, lanterns, chimes
 
 - **THE BELL TOLLS:** `pagodaBell`, reached through `bldHit` (so the katana, his shots and a parried bolt all ring it). A deep boom + clang,
