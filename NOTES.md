@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- Octagonal Block Pagoda pass 2 of 10: the block detail (X4, WORKER A)
+
+The reference's busy-but-blocky look, all of it static blocks merged into the material buckets (no new draws):
+- **Bracket clusters** under every eave, in a rhythm of about .7 m along all eight faces. Each one is a red root under the teal band, a red arm
+  stepping out, and a teal cap.
+- **A light edge on EVERY course** (not just the outer one), so each step of the eave reads as its own line from a distance.
+- **Tile ribs**: small dark blocks in a row down every course's tread, about .42 m apart.
+- **A red balustrade** round every roof walk: posts and a top rail along the outer edge of the top course. It is .32 m tall, under his .357
+  step, so you walk over it rather than having to jump.
+- **Lattice windows**: a red frame, five dark uprights and four rails in every window.
+- **Door frames**: red posts, a red lintel and a gold strip over every door.
+- **Gold caps** on the eight kicked-up corners of every eave.
+
+SHIPPED UNVERIFIED. Next: pass 3, everything breaks and repairs.
+
 ## m1274 -- Octagonal Block Pagoda pass 1 of 10: the stack (X4, WORKER A)
 
 His favourite block reference (`block_pagoda_octagonal.jpg`), built in THE BLOCK STYLE. At (70, 72) in the forge, measured clear of every
