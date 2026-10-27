@@ -11426,7 +11426,7 @@ function courseStep(dt) {
 //   both legs, or the head -> he EXPLODES: every limb he has left flies, sparks, smoke, a boom, and he is gone
 // If the cut edges read badly, his plan B is hard-surface pieces rigid on one bone each -- the same code, cleaner seams.
 const LIMB = { on: 1, sets: { armR: 'RightArm', armL: 'LeftArm', legR: 'RightUpLeg', legL: 'LeftUpLeg', head: 'Neck' }, power: .25, reach: .7,
-  regrab: .8, limp: .5, hopHz: 2.4, hopH: .28, sparkT: .22, kicks: ['katana_kick', 'flying_kick'], stat: { cuts: 0, booms: 0, regrabs: 0 } };
+  regrab: .8, limp: .5, hopHz: 1.7, hopH: .34, hopSink: .16, hopSign: 1, sparkT: .22, kicks: ['katana_kick', 'flying_kick'], stat: { cuts: 0, booms: 0, regrabs: 0 } };
 const _lmV = new THREE.Vector3(), _lmW = new THREE.Vector3();
 function limbMesh(d) { return d.limbMesh || (d.limbMesh = xrMain(d.model)); }
 // per KIND, once: limb -> the triangles whose three vertices are all dominated by a bone under that limb's root
@@ -11508,8 +11508,17 @@ function limbHide(d, dt) {
     if (Math.random() < dt / LIMB.sparkT) { b.getWorldPosition(_lmW); spk(_lmW.x, _lmW.y, _lmW.z, (Math.random() - .5) * 2, Math.random() * 2, (Math.random() - .5) * 2, .1, .35, [1, .7, .25]); } }
   if (d.limp && d.model) {     // m1093: the hop -- a bounce on the remaining leg while he travels, a little lean, settling when he stops
     const go = d.hopMv ? 1 : 0; d.hopMv = 0; d.hopK = (d.hopK || 0) + (go - (d.hopK || 0)) * Math.min(1, dt * 8);
-    d.hopPh = ((d.hopPh || 0) + dt * LIMB.hopHz) % 1; const up = Math.abs(Math.sin(d.hopPh * Math.PI));
-    d.model.position.y = LIMB.hopH * up * d.hopK; d.model.rotation.x = .12 * d.hopK; d.model.rotation.z = (d.cut.legL ? -1 : 1) * .1 * d.hopK;
+    // m1279: *"The hop is straight-legged, it just goes up and down -- I wanted him to bend down and then release."* A real hop now, on the
+    // phase: CROUCH (0-.3: he sinks, the standing leg folds -- hip, knee, ankle), the PUSH and the flight (.3-.88: up on a sine, the leg
+    // tucked a little), the LANDING (.88-1: he absorbs it, folding again). The leg's bones are bent AFTER the mixer (this runs after it), by
+    // `hopBend` x LIMB.hopSign -- the signs are dials, because which way a Mixamo knee folds is measured on the phone, not argued
+    d.hopPh = ((d.hopPh || 0) + dt * LIMB.hopHz) % 1; const ph = d.hopPh, k = d.hopK;
+    let bend, y; if (ph < .3) { const u = Math.sin(ph / .3 * Math.PI / 2); bend = u; y = -LIMB.hopSink * u; }
+    else if (ph < .88) { const u = (ph - .3) / .58; bend = .15 + .3 * Math.sin(Math.PI * u) * (u > .5 ? 1 : .4); y = LIMB.hopH * Math.sin(Math.PI * u); if (u < .12) bend = 1 - u / .12 * .85; }
+    else { const u = (ph - .88) / .12; bend = .75 * Math.sin(Math.PI * u); y = -LIMB.hopSink * .7 * Math.sin(Math.PI * u); }
+    d.model.position.y = y * k; d.model.rotation.x = (.1 + .12 * bend) * k; d.model.rotation.z = (d.cut.legL ? -1 : 1) * .08 * k;
+    { const side = d.cut.legL ? 'Right' : 'Left', S = LIMB.hopSign, b = bend * k, up = arenaBone(d, 'mixamorig_' + side + 'UpLeg'), kn = arenaBone(d, 'mixamorig_' + side + 'Leg'), ft = arenaBone(d, 'mixamorig_' + side + 'Foot');
+      if (up) up.rotateX(-S * .75 * b); if (kn) kn.rotateX(S * 1.4 * b); if (ft) ft.rotateX(-S * .55 * b); }
     if (d.hopK > .5 && d.hopPh < dt * LIMB.hopHz) snd('foot', { g: .25, r: .8, x: d.root.position.x, z: d.root.position.z });
   }
   if (d.regrabT > 0 && (d.regrabT -= dt) <= 0 && !(d.cut && d.cut.armL)) { katanaMountL(d); LIMB.stat.regrabs++; }
@@ -11547,7 +11556,7 @@ async function sliceDummy() {
 // cost: a katana cut ~2, a punch ~.8) that nothing refills; at 0 the next blow puts him down for good and at the end of the lie he is GONE --
 // blown to pieces if he is the slicing kind (`limbBoom`), beamed out otherwise. And by default they ARE the slicing kind (`slice`, the m1090
 // dummy's limbs: each katana cut takes an arm or a leg, the last one blows him apart). TOOLS > HORDE: SLICE / PLAIN.
-const HORDE = { floorK: 1.5, lieK: .45, kind: 'SAMURAI', per: 25, max: 150, list: [], busy: 0, hp: 3, notice: 12, fling: .25, fly: 1.7, life: 8, slice: 1, stat: { kills: 0 } };
+const HORDE = { mix: [.5, .35, .15], floorK: 1.5, lieK: .45, kind: 'SAMURAI', per: 25, max: 150, list: [], busy: 0, hp: 3, notice: 12, fling: .25, fly: 1.7, life: 8, slice: 1, stat: { kills: 0 } };
 try { if (localStorage.getItem('mel.hslice') === '0') HORDE.slice = 0; } catch (e) {}
 function hordeDie(d) {
   const P = d.root.position;
@@ -11570,6 +11579,7 @@ async function hordeAdd() {
       const d = bodySpawn(K.P, K, x, z, 0); if (A.katana) arenaKatana(d, A); d.horde = 1;     // m1086: his sword (*"none of them had samurai swords"*)
       d.aggro = 1; d.hp = d.hpMax = HORDE.hp; d.hordeHp = HORDE.life; d.gap = Math.random() * 2;
       d.h = Math.atan2(p.pos.x - x, p.pos.z - z); HORDE.list.push(d);
+      { const r = Math.random(), M = HORDE.mix; tierLook(d, r < M[0] ? 'peon' : r < M[0] + M[1] ? 'warrior' : 'brute'); }     // m1279
     }
     arenaBeam(p.pos.x, p.pos.z, [.9, .3, .3], 1); snd('clang', { g: .6, r: .5 });
   } catch (e) { console.error('[melee] horde', e); note('HORDE FAILED'); }
@@ -18062,6 +18072,21 @@ function tornStep(dt) {
   T.ring.visible = (p.tornC || 0) > 0; if (T.ring.visible) { const r = .35 + .75 * p.tornC; T.ring.scale.set(r, r, 1); T.ring.position.set(p.pos.x, p.pos.y + .05, p.pos.z); T.ring.material.color.setHex(p.tornC >= 1 ? 0xffc04a : 0xff8a2a); }
 }
 function tornGo() { const p = player; TORN.stat.charges++; p.torn = { n: TORN.spins }; p.tornC = 0; p.ltHold = 0; p.jump = 0; tornSpin(); }
+const WHIRL = { on: 1, idle: .3, spins: [1, 3], R: 2.6, dmg: 3, power: .95, dur: .5, stat: { whirls: 0, hits: 0 } };
+function whirlGo(k) { const p = player; WHIRL.stat.whirls++; p.torn = { n: Math.round(lerp(WHIRL.spins[0], WHIRL.spins[1], k)), whirl: 1, k }; p.ltHold = 0; p.jump = 0; whirlSpin(); }
+function whirlSpin() {
+  const p = player, nm = TORNADO.sword; if (!rig.actions[nm]) { p.torn = null; return; }
+  p.melee = 1; p.meleeIx = 0; p.meleeT = 0; p.meleeName = nm; p.meleeAir = 0; p.meleeBody = 0; p.melWall = 0; p.melFist = 0; p.melFront = 0; p.multi = 1;
+  p.meleeDur = WHIRL.dur; p.meleeChain = 0; p.melFired = 0; p.melU = 0; p.swPrev = null; p.swRootX = null; p.swRootZ = null; p.melV = 0; p.melTgt = null; p.melH = p.faceH;
+  playOnce(nm, clipLen(nm) / p.meleeDur); snd('swoosh', { r: .7, g: 1 }); snd('swoosh', { r: 1.1, g: .6 });
+  // the RING: everyone within reach, all the way round, takes the blow outward (the clip's own sweep may catch them too -- `tierHit`'s 140 ms
+  // debounce keeps that one blow), and machines / walls / props round him take it too
+  const P = p.pos, R = WHIRL.R + .4 * (p.torn ? p.torn.k : 0);
+  for (const d of DUMMIES) { if (d.st === 'gone' || !d.root.visible || d === p.carryD) continue; const Q = d.root.position, dd = Math.hypot(Q.x - P.x, Q.z - P.z); if (dd > R || Math.abs(Q.y - P.y) > 1.6) continue;
+    WHIRL.stat.hits++; dummyBlow(d, Math.atan2(Q.x - P.x, Q.z - P.z), WHIRL.power, WHIRL.dmg); }
+  for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2, x = P.x + Math.sin(a) * R * .8, z = P.z + Math.cos(a) * R * .8; if (TURRET.list.length) turretMelee(x, P.y + 1, z, .6, 2); else bldHit(x, P.y + 1, z, .6, 2);
+    spk(x, P.y + 1, z, Math.sin(a + 1.57) * 4, .5, Math.cos(a + 1.57) * 4, .12, .35, [1, .85, .5]); }
+}
 function tornSpin() {
   const p = player, SK = MELEE.spinKick, nm = SK.clip; if (!rig.actions[nm]) { p.torn = null; return; }
   TORN.stat.spins++; p.melee = 1; p.meleeIx = 0; p.meleeT = 0; p.meleeName = nm; p.meleeAir = 0; p.meleeBody = 0; p.melWall = 0; p.melFist = 0; p.melFront = 0; p.multi = 1;
@@ -23864,6 +23889,12 @@ function chargeRelease() {
   // before the release is ever stepped (m1009's swing bug, the charge's turn). With the blade in HALF cover the release is now the COVER LEAP;
   // with anything else (or full cover) he leaves cover first, so the release runs.
   if (!p.wall && slotNow().blade && p.kAim > KAIM.min && aimLeap(t0, p.kAim)) return;     // m1071: the thumb held low aimed it UP
+  // m1279: THE WHIRLWIND. *"A full 360 Link-style whirlwind... if you charge it up and you're pressing FORWARD on the left stick when you release,
+  // he does the launch; if you DON'T, he spin-attacks."* The left stick at rest (or pulled BACK) on the release = `whirlGo`: 1-3 full spins of
+  // the katana's 360 by the hold, a wider reach than the swing, everyone round him struck (a charge's blow: peons shatter), the stick steering
+  // him slowly through it. Pressing it any way but back = the launch, as before. (Back has its own move later; for now it whirls too.)
+  if (!p.wall && slotNow().blade && WHIRL.on && rig.actions[TORNADO.sword]) { const S = stickWorld(), dot = S.mag > .3 ? (S.x * Math.sin(p.faceH) + S.z * Math.cos(p.faceH)) : 0;
+    if (S.mag < WHIRL.idle || dot < -.5) { whirlGo(clamp(t0 / MELEE.charge, 0, 1)); return; } }
   if (p.wall) { if (slotNow().blade && p.wallLow && coverLeap()) return; p.wall = null; p.wallSt = ''; p.wallLow = 0; p.wallPop = 0; p.wallCool = WALL.cool; }
   p.chargeGo = 1; p.chargeGoT = 0; p.melWall = 0; p.melFist = 0; p.melFired = 0; p.melU = 0; p.swPrev = null; p.swRootX = null; p.swRootZ = null;
   // how full it was, from the half-charge floor up -- so even the shortest real swing moves
@@ -26336,7 +26367,7 @@ function stepPlayer(dt) {
       if (p.roll) p.roll = 0;
       else if (p.melee) {
         p.melee = 0; p.meleeAir = 0; p.meleeChain = MELEE.window; p.melRide = 0; p.multi = 0;
-        if (p.torn) { if (--p.torn.n > 0) { tornSpin(); return; } p.torn = null; }     // m1091: the tornado's next spin
+        if (p.torn) { if (--p.torn.n > 0) { p.torn.whirl ? whirlSpin() : tornSpin(); return; } p.torn = null; }     // m1091: the tornado's next spin (m1279: or the whirlwind's)
         // and the flick that arrived mid-strike is taken NOW, so a chain thrown as fast as the
         // thumb can move still lands every link
         if (p.melQ != null) { const q = p.melQ; p.melQn = Math.max(0, (p.melQn || 1) - 1); if (!p.melQn) p.melQ = null; p.fistNow = p.melQf || 0; try { meleeGo(q); } finally { p.fistNow = 0; } }
@@ -38112,8 +38143,19 @@ function dummyHit(x, z, dirH, power, reach, dmg, palK, maxN) {
 // from a pal", which is all m75 needed -- and the moment an orc can swing at the pal, the VICTIM
 // has to know WHO hit him or there is nothing to turn onto. `if (!pal)` still reads the same, so
 // every existing call site is untouched; what is added is that the blow now names its author.
+// m1279: THE TIERS. *"Tiers of the robot warriors -- bulk a few up, make them bigger, colour-coded. The peons, the small guys: with one charge
+// hit they should just break into a bunch of pieces. The medium guys take about three hits, the big guys about five."* A horde body carries
+// `d.tier` (rolled at spawn by `HORDE.mix`): its look (`TIER.<name>.s` scale and `col` tint on its own cloned materials) and its COUNT of
+// blows (`hits`) -- a charge, a whirlwind spin, a slam or a rocket counts `big` -- and at the count he is BLOWN APART on the spot (`limbBoom`),
+// whatever his life says. Limbs still come off cut by cut on the way.
+const TIER = { peon: { s: .82, hits: 2, col: [.62, .6, .58] }, warrior: { s: 1, hits: 3, col: [1, 1, 1] }, brute: { s: 1.32, hits: 5, col: [1.15, .5, .4] }, big: 2 };
+function tierLook(d, t) { const T = TIER[t]; d.tier = t; d.tierHits = 0; d.root.scale.setScalar(T.s); for (const m of d.mats || []) if (m.color) m.color.multiply(new THREE.Color(T.col[0], T.col[1], T.col[2])); }
+function tierHit(d, pal) { if (!d.tier || pal || d.boomed || (d.tierCd || 0) > performance.now()) return 0; d.tierCd = performance.now() + 140;
+  const p = player, heavy = p.chargeGo || p.slam || p.torn || BLOW_SRC === 'rocket'; d.tierHits += heavy ? TIER.big : 1;
+  if (d.tierHits >= TIER[d.tier].hits) { limbBoom(d, d.h || 0); return 1; } return 0; }
 function dummyBlow(d, dirH, power, dmg, pal) {
-  if (d.entering) return;     // m973: untouchable while he makes his entrance (a blow there could leave him outside the ring)
+  if (d.entering) return;
+  if (d.horde && tierHit(d, pal)) return;     // m1279: his tier's count of blows is up -- in pieces     // m973: untouchable while he makes his entrance (a blow there could leave him outside the ring)
   const K = d.K;
   if (d.sh && !pal && arenaShieldHit(d, dirH, power)) return;     // m896: the shield took it
   if (BLOW_SRC === 'shot' && d.arena && ARENA.stun.on && arenaStun(d)) { d.cool = K.cool; return; }     // m901: a stun bolt
@@ -62465,7 +62507,7 @@ window.melee = window.mel = { FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VE
   // of a rule measures a game that does not exist -- which is the oldest mistake there is, and
   // the only way not to make it is for `npm run sim` to call exactly these.
   DUMMY, DUMMIES, LOCK, LEDGE, WALL, STRIKE, PADS, DESK, meleeLock, dummyHit, dummyBlow, strikeSweep, stepDummies, bodySeat, SEAT, findLock, SFX, CHARGE, POSE, snd, PUNCH, PLASMA, HITSND, BODYSND, FLYHIT, STEP,
-  stepPlayer, muzzleWorld, RIC, coverAcross, cwallOf, KNOCK, knockHas, GSIDE, KAIM, aimLeap, kaimHold, DUCK, duckPose, RUNSWIPE, runSwipe, SHOTBLOCK, shotBlock, bladeSeg, steelFlash, STEEL, HURT, playerHurt, GOD, LEAP, coverLeap, wallGo, WRUN, wrunTap, wrunFind, wrunSpawn, wrunClear, stepWrun, backGo, HURDLE, hurdleTap, HOOK, barHook, meleeGo0, CART, cartGo, leftFlick, rigAnim, stepKit, frameBody, kickGo, SPRINGS, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, hbarCatch, stepBar, hbarPose, hbarFly, coverArmUndo, slideGo, coverShow, TURRET, beastFire, FIREBALL, BLDG, ZRAMP, MECH, UPLOOK, KIT3, AIM3, MECHAIM, WTOWER, HALL, hallBuild, hallClear, HOME, RW, rwHeight, HPATH, hwRc, RUNSLASH, AFLIP, airPush, DEFL, deflectThreat, threatList, ARCH, ARROWS, archerAdd, archerLoose, SWSEG, swingPeaks, KSET, knockAct, RUNLAND, AIRLEGS, airUpOf, sfxRevive, arenaLoad, BEASTTRIM, GSTRIKE, AIRK, leftFlick, kickGo, CROUCH, LHOLD, TORN, tornGo, LIMB, limbCut, limbPrep, sliceDummy, JUGGLE, TORNADO, FLOW, ZOOM, zoomGo, HORDE, hordeAdd, hordeClear, ACAM, actionCam, acamPip, turretSpawn, COURSE, courseBuild, courseClear, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
+  stepPlayer, muzzleWorld, RIC, coverAcross, cwallOf, KNOCK, knockHas, GSIDE, KAIM, aimLeap, kaimHold, DUCK, duckPose, RUNSWIPE, runSwipe, SHOTBLOCK, shotBlock, bladeSeg, steelFlash, STEEL, HURT, playerHurt, GOD, LEAP, coverLeap, wallGo, WRUN, wrunTap, wrunFind, wrunSpawn, wrunClear, stepWrun, backGo, HURDLE, hurdleTap, HOOK, barHook, meleeGo0, CART, cartGo, leftFlick, rigAnim, stepKit, frameBody, kickGo, SPRINGS, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, hbarCatch, stepBar, hbarPose, hbarFly, coverArmUndo, slideGo, coverShow, TURRET, beastFire, FIREBALL, BLDG, ZRAMP, MECH, UPLOOK, KIT3, AIM3, MECHAIM, TIER, WHIRL, WTOWER, HALL, hallBuild, hallClear, HOME, RW, rwHeight, HPATH, hwRc, RUNSLASH, AFLIP, airPush, DEFL, deflectThreat, threatList, ARCH, ARROWS, archerAdd, archerLoose, SWSEG, swingPeaks, KSET, knockAct, RUNLAND, AIRLEGS, airUpOf, sfxRevive, arenaLoad, BEASTTRIM, GSTRIKE, AIRK, leftFlick, kickGo, CROUCH, LHOLD, TORN, tornGo, LIMB, limbCut, limbPrep, sliceDummy, JUGGLE, TORNADO, FLOW, ZOOM, zoomGo, HORDE, hordeAdd, hordeClear, ACAM, actionCam, acamPip, turretSpawn, COURSE, courseBuild, courseClear, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
   MFX, camShake, palDive,
   // THE BOARD, LIVE (m159). `mel.SK8.hold` is where the deck sits IN HIS HAND while it is
   // carried, and how a carried board should look is a look-at-it decision -- so it is a dial he

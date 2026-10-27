@@ -5,7 +5,6 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-<<<<<<< HEAD
 ## White Heron Castle pass 2 of 10: the roofs (X2, WORKER B)
 
 The reference is all roof lines broken by gables. Everything below goes into the material buckets, so no new draws (two materials
@@ -30,6 +29,38 @@ added: dark tile and gold).
   - A mortared ridge cap on every ridge.
 
 SHIPPED UNVERIFIED. Next: pass 3, the walls (rows of small windows, timber frames, gun and arrow ports).
+## The robot tiers, a hop that bends, and the charged WHIRLWIND (his notes)
+
+- **Tiers (`TIER`, `tierLook`, `tierHit`).** *"Peons break into pieces with one charge hit; medium guys about three hits; big guys about
+  five."*
+  - **The roll.** Every horde body gets a tier at spawn (`HORDE.mix` 50 / 35 / 15):
+
+    | tier | size | colour | blows to break |
+    |---|---|---|---|
+    | PEON | x.82 | dull grey | 2 |
+    | WARRIOR | x1 | as is | 3 |
+    | BRUTE | x1.32 | dark red | 5 |
+
+  - **The count.** A charge, the whirlwind, a slam or a rocket counts as 2 (`TIER.big`), so ONE charge shatters a peon. At the count he is
+    BLOWN APART on the spot (`limbBoom`). Limbs still come off cut by cut on the way. The blows are debounced 140 ms, so one swing is one
+    blow.
+  - **Not yet.** Armour pieces and symbols on the brute (R8, boss armour, is the place for those).
+- **The one-legged hop bends.** *"I wanted him to bend down and then release; right now it's straight-legged."* It is a hop cycle now:
+  - CROUCH: he sinks `hopSink` .16, and the standing leg folds at the hip, knee and ankle
+  - PUSH and flight: up to `hopH` .34, the leg tucked
+  - LANDING: he absorbs it, folding again
+
+  The bones are bent after the mixer. Slower too (`hopHz` 1.7). `LIMB.hopSign` = -1 if the knee folds the wrong way: which way a Mixamo
+  knee bends is a phone question.
+- **THE WHIRLWIND (`whirlGo` / `whirlSpin`, `WHIRL`).** *"A full 360 Link-style whirlwind... charge it, and if you're pressing forward when
+  you release he launches; if you don't, he spin-attacks."*
+  - **Release with the LEFT STICK AT REST** (or pulled BACK): 1-3 full spins of `katana_360h` depending on the hold.
+  - **Every spin** strikes everyone within `R` 2.6 m (+.4 at a full hold), all the way round, outward, and hits turrets, walls and
+    props round him.
+  - **Steering.** The stick steers him slowly through it (the tornado's rule).
+  - **Release while PUSHING the stick** = the launch, as before. "Back" whirls for now; it is a slot for its own move.
+
+SHIPPED UNVERIFIED.
 
 ## White Heron Castle pass 1 of 10: the mass (X2, WORKER B)
 
@@ -55,7 +86,6 @@ His second 10-pass reference, `images/korajin/ref/white_castle_keep.jpg` (a Hime
 - **Draws.** Everything else is merged per material, about 5 draws plus the storehouse walls.
 
 SHIPPED UNVERIFIED. Next: pass 2, the roofs (chidori and kara gables, shachi on the ridges).
-=======
 ## m1279 -- Octagonal Block Pagoda pass 3 of 10: everything breaks, and it repairs (X4, WORKER A)
 
 THE BLOCK STYLE's third rule, *"every block can BREAK"*, now covers the whole building:
@@ -74,7 +104,6 @@ THE BLOCK STYLE's third rule, *"every block can BREAK"*, now covers the whole bu
 - **Draws**: the breakables are one InstancedMesh per material (cream, red, teal, tile, edge, dark).
 
 SHIPPED UNVERIFIED. Next: pass 4, the climb outside (bars, handholds, a zipline off the spire).
->>>>>>> e65b137 (Octagonal Block Pagoda pass 3 of 10: everything breaks and repairs (X4))
 
 ## m1276 -- Octagonal Block Pagoda pass 2 of 10: the block detail (X4, WORKER A)
 
