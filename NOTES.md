@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1092 -- the top speed is the medium run's own clip, sped up (TOOLS > TOP SPEED)
+
+*"At medium speed his arms do a nice gait, hands near his hips. As soon as he goes faster his arms come up, elbows at a very tight angle...
+why don't we just do the medium run, sped up, for the fast run?"* The STD set's top band was the library `Sprint` (`sprint_std`).
+`GAIT.topRun` (default on): `runSetUse` registers a COPY of the run band's clip (`<run>^top` -- a separate action, so the run and top rows
+can play at their own rates in one blend) and makes it the top band on the run's own measured ref and phase, allowed up to `topHi` 3x
+(7.2 m/s on his 2.68 m/s run = 2.7x). The stride set's leap is off with it (its contact windows were measured on the stride clip).
+Measured (`toprun.cjs`, real loop, STD, unarmed, full stick): at 7.2 m/s the top row `run_std^top` holds weight 1.0, the old run 0;
+rendered two strides 7 frames apart (arms low, a long stride). TOOLS > TOP SPEED: RUN SPED UP / OWN CLIP (the old sprint). Shipped unverified.
+
 ## m1091 -- the side flick is ONE sword spin (Link's 360); the TORNADO moved to the left pad's hold (charge, two spins, steerable); kicks and punches hit
 
 *"Swipe left and right on the right stick should be a single sword spin, like Link in Smash Bros -- the full 360 -- rather than that kick.
