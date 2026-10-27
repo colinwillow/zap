@@ -5,6 +5,24 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1267 -- Great Red Pagoda pass 3 of 10: the pavilion and the fence (X1)
+
+- **The pavilion at its foot** (the reference's side hall). It stands just past the pagoda's ground eave on the +z side:
+  - an open hall on a raised .45 m floor with steps up
+  - ten red columns and a dark beam frame with its own small brackets
+  - an offering table with a lamp
+  - a deep hip roof (ridge 5.7 m, eave 3.45)
+- **Its roof is walkable.** A 14 x 8 grid of triangles is laid on the roof's OWN curve (the same height function `bldRoof` draws, so he
+  stands on the tiles, not above them). It is the first step up: from its north eave it is a short jump to the first balcony.
+- **The fence.**
+  - **Layout.** Red posts every 2 m with two rails and dark balusters, round a 22 x 23.5 m court, solid to the waist (jumpable).
+  - **Finials.** Every third post is taller with a gold flame finial.
+  - **The gate.** A 4 m gate on the -x side, lined up with the pagoda's door, between two tall gate posts with gold buds and flames
+    under a dark lintel.
+
+The fence and the pavilion trim go through the merge buckets. SHIPPED UNVERIFIED. Next: pass 4, the climb OUTSIDE (eave tips to catch,
+bars between balconies, a rope from the spire).
+
 ## m1266 -- Great Red Pagoda pass 2 of 10: the reference's detail (X1)
 
 What was added, storey by storey, against `red_pagoda_tower.webp`:
