@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1117 -- THE BUILDING FORGE (a new white space) and the buildings' inventory
+
+*"Add a new white space and call it building forge... build retro Japanese inspired alien cyberpunk buildings, each building gets 3 passes...
+when you complete the third pass, add it to the inventory of things I can spawn into the new building space."* World `forge` (KORAJIN >
+Building Forge, `?w=forge`): the arena's sky over a clean white grid floor and nothing else; it runs on the arena's systems (`inArena()` is
+true for it: breakable walls, repair, bars, turrets, SPAWN). `BLDG.list` is the inventory; SPAWN > BUILDINGS (forge only) lists each with
+its pass (done at 3). `BUILDINGS.md` is the queue and the loop's rules. Shipped unverified.
+
 ## m1116 -- THE HALL, pass 1 (one building at a time)
 
 **His rule (Oct 27):** *"Work on ONE thing at a time... one room or one area at a time turns out interesting; scoping up gets messy. The
