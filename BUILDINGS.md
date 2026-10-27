@@ -41,6 +41,10 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   then again later if you run out again after that, etc."* So: when every row below is done, spend ONE pass brainstorming the NEXT SET
   (8-12 new buildings / props / moves in his style notes, each with a function and a spot in the forge), append it as a new table here,
   and carry on building. Repeat every time a set runs out. The loop never stops for lack of a queue.
+- **AND EXTRA PASSES (his, after m1124):** *"You can also continue with detail passes -- you can do an additional 3 passes on things
+  already completed."* So a DONE building may get passes 4-6 (more detail, more function, more delight) -- mark them in its row as
+  `4 (mNNNN)` etc. Order of work: new buildings in the queue first; when the queue is out, alternate between brainstorming a new set and
+  giving the done buildings their extra passes (oldest first), so the forge gets both new things and better old ones.
 - **Pass meaning**: 1 = the building stands, playable (shell, roof, doors, the main feature). 2 = the details and the function (interior,
   the moving parts, lights, the special feature working). 3 = the polish (proportions, colour, silhouette, one more delight).
 
