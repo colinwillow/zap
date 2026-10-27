@@ -42,6 +42,24 @@ reference's seven storeys.
 could only take a hatch near the middle of a face, which is what kept the old stairwell to 2.2 m.
 
 SHIPPED UNVERIFIED. Next (his go): X4's gates get real leaves (`bgateMake`), then X3.
+## THE ZOOM RAMP TOWER IS A MEGA WALL NOW (m1324)
+
+His note, with a photo of American Ninja Warrior's Mega Wall: *"The tall run tower thing is not really what I was talking about. More like the Ninja Warrior thing where they run really high -- like a skate ramp, just a little bit of a bend and then mostly straight up, and the flat part goes up quite a bit more since it's a video game."*
+
+- **The 16 m incline is gone.** In its place:
+  - a flat 24 m RUN-IN: the same distance as run-in + ramp before, so a full zoom still arrives at about 14.7 m/s
+  - a QUARTER-PIPE bend of radius `R` 3.2 m at the wall's foot
+  - the SHEER FACE
+- **The bend is walkable** up to `walkA` 50° (about 1.07 m up, 0.75 m off the face). His feet ride it, and `wrunAuto` takes over the run-up there. The rise per frame at 14 m/s on 50° is about .27 m, under his .357 step.
+  - The visual is the whole quarter, floor to vertical, as one extruded surface, so the face reads as a wall bending out of the ground.
+- **The lip** is `lift` 10.1 above the bend's top: about 11.2 m, solved as before (14.7² / 24 = 9.0 m of rise, plus his hands' reach). Only a full zoom makes it. `mel.ZRAMP.lift` is live, because the arrival speed is a prediction.
+- **The look, after the photo:**
+  - a dark skin the full width of the face (6.4 m)
+  - red/cyan LED strips up both edges that follow the bend down to the floor, on dark posts
+  - a dark run-in lane
+  - chevrons that chase down the lane, and six more that carry on up the face
+- **Kept as they were:** the scoreboard, the mark, the best line, the summit guard house, the brazier, the chimney and the zipline.
+- Renamed **Mega Wall** in SPAWN > BUILDINGS.
 
 ## GREAT RED PAGODA x1.5 -- STEER S2 (X1, m1323)
 

@@ -22987,7 +22987,13 @@ function heronClear() { const G = HERON.on; if (!G) return; for (const d of (G.a
 // with ~.3 m to spare and missed by anything much less. `lift` is live (mel.ZRAMP) because the arrival speed is a prediction. Every try
 // leaves a MARK on the face where his hands got to (red, or gold when he made it); tick lines every 2 m read the height. The summit: a guard
 // house, a brazier (R2 will put it out), rails on three sides (never on the lip), and a zipline back down to the gate.
-const ZRAMP = { at: [-60, -56], hw: 4, hd: 4, run: 8, ramp: 16, Hr: 5, lift: 10.1, rw: 2, markT: 8, chim: 3, gap: 3.2, on: null };
+// m1324 (his, with an American Ninja Warrior "Mega Wall" photo): *"The tall run tower is not really what I was talking about. More like the Ninja
+// Warrior thing where they run really high -- like a skate ramp, just a little bit of a bend and then mostly straight up, and the flat part goes
+// up quite a bit more since it's a video game."* So the 16 m incline is gone: a flat 24 m RUN-IN (the same distance, so the zoom arrives at
+// the same ~14.7 m/s), then a QUARTER-PIPE bend of radius `R` at the wall's foot (walkable to `walkA` deg, so his feet ride it up), then the
+// SHEER FACE -- one tall wall, wide like the Mega Wall, with LED strips up both edges and chevrons chasing up the middle. The run-up takes
+// over from the bend (`wrunAuto`); the lip is `lift` above the bend's top, solved as before (14.7^2 / 24 = 9.0 m of rise + the hands' reach).
+const ZRAMP = { at: [-60, -56], hw: 4, hd: 4, run: 24, R: 3.2, walkA: 50, lift: 10.1, rw: 3.2, markT: 8, chim: 3, gap: 3.2, on: null };
 function zrampBuild() {
   if (ZRAMP.on) return; const A = ZRAMP, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, tris = [];
   const sand = new THREE.MeshStandardMaterial({ color: 0xc9a27a, roughness: .95 }), stone = new THREE.MeshStandardMaterial({ color: 0x8c7f72, roughness: .95 }), wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 });
@@ -22995,24 +23001,29 @@ function zrampBuild() {
   const neon = new THREE.MeshBasicMaterial({ color: 0x3fe8ff, toneMapped: false }), gold = new THREE.MeshBasicMaterial({ color: 0xffc040, toneMapped: false }), lamp = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false });
   const box = (x0, x1, y0, y1, z0, z1, m, solid) => { const o = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), m); o.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); o.castShadow = o.receiveShadow = true; g.add(o);
     let b = null; if (solid) O.boxes.push(b = { minx: x0, maxx: x1, miny: y0, maxy: y1, minz: z0, maxz: z1 }); return b || o; };
-  const H = A.Hr + A.lift, fz = cz - A.hd, x0 = cx - A.hw, x1 = cx + A.hw;
+  const cy = A.R * (1 - Math.cos(A.walkA * Math.PI / 180)); A.Hr = cy; const H = cy + A.lift, fz = cz - A.hd, x0 = cx - A.hw, x1 = cx + A.hw;
   // THE TOWER: one solid box (the face is its -z side), bronze bands round the three other sides, a dark plinth
   const face = box(x0, x1, 0, H, fz, cz + A.hd, sand, 1);
   box(x0 - .3, x1 + .3, 0, .6, fz - .3, cz + A.hd + .3, stone, 0);
   for (let y = 3; y < H - 1; y += 3) { box(x0 - .08, x0, y, y + .3, fz + .2, cz + A.hd, bronze, 0); box(x1, x1 + .08, y, y + .3, fz + .2, cz + A.hd, bronze, 0); box(x0, x1, y, y + .3, cz + A.hd, cz + A.hd + .08, bronze, 0); }
   // the face's TICKS every 2 m above the ramp's top, and the LIP in gold
-  for (let y = A.Hr + 2; y < H - .5; y += 2) box(cx - 1.4, cx + 1.4, y - .03, y + .03, fz - .03, fz, neon, 0);
-  box(x0, x1, H - .06, H, fz - .05, fz, gold, 0);
-  // THE RAMP: walkable triangles from the run-in's end up to the face; a stone wedge under it, bronze edge rails (visual: he must not snag)
-  const rz0 = fz - A.ramp, rw = A.rw;
-  tris.push(cx - rw, 0, rz0, cx + rw, 0, rz0, cx + rw, A.Hr, fz, cx - rw, 0, rz0, cx + rw, A.Hr, fz, cx - rw, A.Hr, fz);
-  { const sh = new THREE.Shape(); sh.moveTo(0, 0); sh.lineTo(A.ramp, 0); sh.lineTo(A.ramp, A.Hr); sh.closePath();
-    const wg = new THREE.ExtrudeGeometry(sh, { depth: rw * 2, bevelEnabled: false }); const w = new THREE.Mesh(wg, stone); w.rotation.y = -Math.PI / 2; w.position.set(cx - rw, 0, rz0); w.castShadow = w.receiveShadow = true; g.add(w);
-    const ang = Math.atan2(A.Hr, A.ramp), L = Math.hypot(A.Hr, A.ramp);
-    for (const sx of [-1, 1]) { const r = new THREE.Mesh(new THREE.BoxGeometry(.12, .12, L), bronze); r.position.set(cx + sx * (rw + .06), A.Hr / 2 + .06, (rz0 + fz) / 2); r.rotation.x = -ang; g.add(r);
-      const n = new THREE.Mesh(new THREE.BoxGeometry(.04, .04, L), neon); n.position.set(cx + sx * (rw + .06), A.Hr / 2 + .14, (rz0 + fz) / 2); n.rotation.x = -ang; g.add(n); } }
+  for (let y = A.Hr + 2; y < H - .5; y += 2) box(cx - 1.4, cx + 1.4, y - .03, y + .03, fz - .07, fz - .04, neon, 0);
+  box(x0, x1, H - .06, H, fz - .09, fz, gold, 0);
+  // THE BEND (m1324): a quarter-pipe at the wall's foot. Walkable triangles up to `walkA` (his feet ride it up and the run-up takes over at the
+  // face); the visual is the whole quarter, from the floor to vertical, so the face reads as one surface bending out of the ground
+  const rz0 = fz - A.R, rw = A.rw, NB = 10, aW = A.walkA * Math.PI / 180, prof = a => [fz - A.R + A.R * Math.sin(a), A.R - A.R * Math.cos(a)];
+  for (let i = 0; i < NB; i++) { const [za, ya] = prof(aW * i / NB), [zb, yb] = prof(aW * (i + 1) / NB); tris.push(cx - rw, ya, za, cx + rw, ya, za, cx + rw, yb, zb, cx - rw, ya, za, cx + rw, yb, zb, cx - rw, yb, zb); }
+  { const sh = new THREE.Shape(); sh.moveTo(0, 0); for (let i = 0; i <= 16; i++) { const a = Math.PI / 2 * i / 16, [z, y] = prof(a); sh.lineTo(z - rz0, y); } sh.lineTo(A.R + .2, 0); sh.closePath();
+    const wg = new THREE.ExtrudeGeometry(sh, { depth: rw * 2, bevelEnabled: false, curveSegments: 16 }); const w = new THREE.Mesh(wg, new THREE.MeshStandardMaterial({ color: 0x3a3532, roughness: .7 })); w.rotation.y = -Math.PI / 2; w.position.set(cx - rw, 0, rz0); w.castShadow = w.receiveShadow = true; g.add(w); }
+  // the FACE's skin over the sand: dark like the Mega Wall's, its full width, with LED strips up both edges (they follow the bend down to the floor)
+  box(cx - rw, cx + rw, A.R - .05, H, fz - .04, fz, new THREE.MeshStandardMaterial({ color: 0x3a3532, roughness: .7 }), 0);
+  const led = []; { const lm = [new THREE.MeshBasicMaterial({ color: 0xff3030, toneMapped: false }), new THREE.MeshBasicMaterial({ color: 0x3fe8ff, toneMapped: false })];
+    for (const sx of [-1, 1]) { const ex = cx + sx * (rw + .18); for (let i = 0; i < 16; i++) { const a0 = Math.PI / 2 * i / 16, a1 = Math.PI / 2 * (i + 1) / 16, [za, ya] = prof(a0), [zb, yb] = prof(a1), L = Math.hypot(zb - za, yb - ya);
+        const m = new THREE.Mesh(new THREE.BoxGeometry(.32, .1, L + .02), lm[i % 2]); m.position.set(ex, (ya + yb) / 2 + .05, (za + zb) / 2 - .05); m.rotation.x = -Math.atan2(yb - ya, zb - za); g.add(m); led.push(m); }
+      for (let y = A.R; y < H - .3; y += .9) { const m = new THREE.Mesh(new THREE.BoxGeometry(.32, .82, .1), lm[Math.round(y / .9) % 2]); m.position.set(ex, y + .45, fz - .05); g.add(m); led.push(m); }
+      box(ex - .2, ex + .2, 0, H, fz - .02, fz + .3, new THREE.MeshStandardMaterial({ color: 0x1a1a1e, roughness: .6 }), 0); } }
   // THE START GATE: a red torii over the run-in, a stone slab to zoom from
-  const sz = rz0 - A.run; box(cx - rw, cx + rw, 0, .08, sz - 1, sz + 1, stone, 0);
+  const sz = rz0 - A.run; box(cx - rw, cx + rw, 0, .08, sz - 1, sz + 1, stone, 0); box(cx - rw, cx + rw, 0, .03, sz + 1, rz0, new THREE.MeshStandardMaterial({ color: 0x2c2a28, roughness: .8 }), 0);     /* the run-in's dark lane */
   for (const sx of [-1, 1]) box(cx + sx * (rw + .5) - .2, cx + sx * (rw + .5) + .2, 0, 4.4, sz - .2, sz + .2, red, 1);
   box(cx - rw - 1.4, cx + rw + 1.4, 4.4, 4.7, sz - .3, sz + .3, wood, 0); box(cx - rw - .8, cx + rw + .8, 3.8, 4.05, sz - .18, sz + .18, red, 0); box(cx - .5, cx + .5, 4.05, 4.4, sz - .06, sz + .06, lamp, 0);
   // THE SUMMIT: a guard house at the back, a brazier, rails on three sides (the lip stays clear)
@@ -23051,8 +23062,8 @@ function zrampBuild() {
   // ---- PASS 3 (m1258): the polish -- neon CHEVRONS up the ramp that chase toward the face (they run faster while he zooms), the gold lip
   // breathing, sparks off his feet as he runs up the face, an ONI MASK on the tower's back, lantern cables from the summit to the ground,
   // grapple rings over the summit, a drone ----
-  const chev = []; { const cm = new THREE.MeshBasicMaterial({ color: 0x3fe8ff, toneMapped: false, transparent: true, opacity: .25 }), ang = Math.atan2(A.Hr, A.ramp);
-    for (let k = 0; k < 8; k++) { const u = (k + .5) / 8, z = rz0 + u * A.ramp, y = u * A.Hr + .03, c = new THREE.Group(); c.position.set(cx, y, z); c.rotation.x = -ang; g.add(c);
+  const chev = []; { const cm = new THREE.MeshBasicMaterial({ color: 0x3fe8ff, toneMapped: false, transparent: true, opacity: .25 });
+    for (let k = 0; k < 14; k++) { const up = k >= 8, u = up ? (k - 8 + .5) / 6 : (k + .5) / 8, z = up ? fz - .07 : sz + 1 + u * (rz0 - sz - 1), y = up ? A.R + .6 + u * (H - A.R - 1.6) : .05, c = new THREE.Group(); c.position.set(cx, y, z); if (up) c.rotation.x = -Math.PI / 2; g.add(c);     /* m1324: 8 chase down the run-in, 6 on up the face */
       for (const sx of [-1, 1]) { const b = new THREE.Mesh(new THREE.BoxGeometry(1.3, .02, .16), cm.clone()); b.position.x = sx * .45; b.rotation.y = sx * .7; c.add(b); } chev.push(c); } }
   const lipM = new THREE.Mesh(new THREE.BoxGeometry(A.hw * 2, .1, .06), new THREE.MeshBasicMaterial({ color: 0xffc040, toneMapped: false, transparent: true })); lipM.position.set(cx, H - .03, fz - .06); g.add(lipM);
   { const mz = cz + A.hd + .06, my = H - 4.5, mk = new THREE.Group(); mk.position.set(cx, my, mz); g.add(mk);
@@ -23068,7 +23079,7 @@ function zrampBuild() {
   const drone = bldDrone(g);
   bldTris(O, tris);
   for (const b of O.boxes) BOXES.push(b); boxGrid();
-  ZRAMP.on = { g, O, bars: [], rings, chev, lipM, drone, face, braz, zip, mark, t: 0, best: -1, markT: 0, tries: 0, made: 0, fz, H, bestEver: -1, bestM: best, sc, stx };
+  ZRAMP.on = { g, O, bars: [], rings, chev, led, lipM, drone, face, braz, zip, mark, t: 0, best: -1, markT: 0, tries: 0, made: 0, fz, H, bestEver: -1, bestM: best, sc, stx };
   zrampBoard(ZRAMP.on);
   arenaBeam(cx, sz, [1, .7, .3], 1); snd('clang', { g: .7, r: .6 });
 }
@@ -23708,7 +23719,7 @@ const BLDG = { list: [
   { key: 'heron', t: 'White Heron Castle', sub: 'a Himeji-style castle on a battered stone base: a five-storey white keep under layered grey roofs (every roof walkable, a hall on every storey, steep stairs up, the great pillars, a 2.4 m lookout balcony at the top; every gate and outer door opens, breaks and is rehung), a gallery wing of two corridors to a hollow corner tower (a loop: keep up, across, tower down, back), its roof a path; a ballista on the gallery ridge, archers in the doorways and the lookout, a sentry gate held by two samurai; the approach: a walled ramp that doubles back to a drawbridge over a dry moat (strike a gong to raise or lower it, or knock it down) and a gate on the stone; black pines, stone and paper lanterns, war flags and three white herons wheeling round the keep; a stair up the stone, a storehouse at the foot whose walls break', pass: 12, build: () => heronBuild(), clear: () => heronClear(), on: () => !!HERON.on, step: dt => heronStep(dt) },
   { key: 'gpag', t: 'Great Red Pagoda', sub: 'five storeys of red lacquer: a room on every floor, ladders up through the hatches, a balcony round every storey, a spire; a pavilion whose roof you can climb; a red fence; climb the outside eave to eave, bars, a zipline off the spire; an armoury, a library, a bell room (the alarm), a lookout; archers, a sentry gun, gate guards; glowing windows, lantern halos, a beacon on the spire; streamers, chimes, birds; strike the gong at the top and the tower lights up and the gate opens', pass: 10, build: () => gpagBuild(), clear: () => gpagClear(), on: () => !!GPAG.on, step: dt => gpagStep(dt) },
   { key: 'court', t: 'The Courtyard', sub: 'a walled court far north (0, 150): a wall-walk all round, the south gate, a stone lane between two timber halls with balconies and walkable roofs, a koi pond and a moon bridge; the two-roofed watchtower over the inner gate; the high road: a lane bridge, a rope bridge, the bell house; the Great Red Pagoda in its corner, ziplines, the maple; archers, a sentry gun, gate guards and a patrol, woken by the bell; koi, pigeons, a fox, fairy dust, sun shafts and paper lanterns; swaying grass, moss, puddles, smashable barrels, a cart and a rack; silence the watchtower (its gun and two archers) and the inner gate opens on a glowing way on', pass: 10, build: () => courtBuild(), clear: () => courtClear(), on: () => !!COURT.on, step: dt => courtStep(dt) },
-  { key: 'zramp', t: 'Zoom Ramp Tower', sub: 'zoom from the red gate (full hold), up the ramp and straight up the face -- only a full zoom reaches the gold lip; your mark shows how close; or zigzag up the chimney', pass: 3, build: () => zrampBuild(), clear: () => zrampClear(), on: () => !!ZRAMP.on, step: dt => zrampStep(dt) },
+  { key: 'zramp', t: 'Mega Wall', sub: 'the Ninja Warrior wall: zoom from the red gate (full hold), down the lane, up the bend and straight up the face -- only a full zoom reaches the gold lip; your mark shows how close; or zigzag up the chimney', pass: 3, build: () => zrampBuild(), clear: () => zrampClear(), on: () => !!ZRAMP.on, step: dt => zrampStep(dt) },
   { key: 'swrk', t: 'Sky Wreck', sub: 'a flying junk come down on rock spires: a tilted deck up a fallen mast, a hold of cargo behind breakable planks, a crow\'s nest up two bars', pass: 1, build: () => swrkBuild(), clear: () => swrkClear(), on: () => !!SWRK.on, step: dt => swrkStep(dt) },
   { key: 'opag', t: 'Octagonal Block Pagoda', sub: 'x1.5 (his STEER): seven eight-sided storeys of 6 m, 9 m apothem, a 20-step stair of .30 risers; stepped slab eaves you can walk and climb eave to eave, cream panels that break block by block, a ladder up through every floor, a door onto every roof, a red fence, a stepped spire; lattice windows, bracket clusters under every eave, tile ribs, a balustrade round every roof walk, gold corner caps; every block breaks -- posts, bands, eave courses -- and flies back in; walks 2.2 m wide, rooms 6 m; a bar off every roof walk, a chain up a corner of every storey, a zipline off the top walk; a block stair up from the shrine hall, then an armoury, a scroll room, a tea room, a garden, a dragon shrine and a bell room at the top; two stone lions wake at the gate and hunt you round the court, archers on the walks, a sentry gun, a monk in the shrine -- all killable; a lantern under every corner, the windows lit, a beacon on the spire; wind bells that ring as you pass, banners on the fence, birds off the walks, the spire collars turning; ring the bell at the top and the tower answers -- lanterns run up it, a column of light, the lions bow, the altar opens on a reliquary', pass: 10, build: () => opagBuild(), clear: () => opagClear(), on: () => !!OPAG.on, step: dt => opagStep(dt) },
 ] };
