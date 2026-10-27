@@ -21,13 +21,19 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - seven drifting stone platforms
   - the middle CLEARED (no cover walls); everything still spawns from SPAWN
   - a boss enters by the beam
-- [ ] pass 2:
-  - THE GATES: four great torii/gatehouses on the rim where the stadium's doors were, so bosses walk in again (the DOORS entry)
-  - roofs with body (a soffit under the eaves, ridge tiles, hanging lanterns at the corners)
-  - the altars reachable (a hovering platform route up to each)
+- [x] **pass 2 (m1399):**
+  - four red TORII on the diagonals at the rim, framing the pagodas (curved black kasagi, nuki, gold plaque, stone feet)
+  - LANTERN STRINGS sagging from each banner mast to the torii beside it
+  - SOFFITS under every roof, and lanterns at the pagodas' lower eave corners
+  - a MITSUDOMOE crest (red, in a gold ring) inlaid at the centre
+  - PINK PETALS drifting on the wind
+  - the vending machine no longer stands in the dojo at the start (VEND still places one)
 - [ ] pass 3:
-  - life: petals or embers on the wind, birds, lanterns lit at dusk, the clouds moving, light shafts
-  - the floor's inlaid crest, and tatami/training marks
+  - the gates as ENTRANCES: bosses walk in through a torii again (a DOORS entry for the dojo)
+  - the altars REACHABLE: needs a fall-off-the-world rule first (the sky has an invisible floor at y 0)
+  - lit lanterns at dusk
+  - the drifting platforms standable
+- [ ] pass 4: life: birds, light shafts, the clouds moving under you, training marks on the floor
 - [ ] later: the training-dojo function (racks you take weapons from, targets that pop up, a sparring master), the music
 
 ## THE ELEMENTS (his, after m1382) -- sandboxes for water, snow and air

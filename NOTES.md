@@ -434,6 +434,17 @@ SHIPPED UNVERIFIED. The queue's passes 2 and 3 are done. Next is his call: more 
 
 SHIPPED UNVERIFIED. Next: pass 3, foam and wake, bow spray, the sun on the water, gulls, an island.
 
+## THE DOJO, PASS 2: TORII, LANTERN STRINGS, SOFFITS, THE CREST, PETALS (m1399)
+
+- **TORII:** four, on the diagonals just outside the rim (r W+2.6), each framing a pagoda behind it from the floor. Red pillars on stone feet with gold collars, a black KASAGI with upswept ends, a red shimaki under it, the NUKI crossbeam, and a gold plaque.
+- **LANTERN STRINGS:** from each banner mast's top to the two torii beside it. A catenary (sin sag 2.4 m) of rope segments, with seven paper lanterns (warm emissive) hung from each.
+- **SOFFITS:** every roof (the altars' and the pagodas' tiers) has a timber underside, because seen from below they were a single sheet. Paper lanterns hang at the four corners of each pagoda's lower eaves.
+- **The CREST:** a mitsudomoe painted to a canvas (each tomoe drawn as a run of shrinking circles sweeping round the centre) in red, inside a double gold ring, inlaid at the centre with polygon offset.
+- **PETALS:** 700 pink points drifting on a slowly turning wind, tumbling (their size flickers), wrapped round the lens.
+- **The vending machine** stood on the cleared floor at load (`vendAt` on the first arena frame). Not in the dojo now; VEND still places one.
+- **Checked headless:** three renders (torii, wide, the crest). The first tomoe drawing merged into a disc and was respaced.
+- **Still open:** the altars aren't reachable. The sky round the platform has the world's invisible floor at y 0, so a route out over the rail needs a fall-off rule first. Bosses still enter by the beam.
+
 ## THE DOJO, PASS 1: THE ARENA FLOATS -- ALTARS, BANNERS, PAGODAS, CLOUDS (m1394)
 
 His: *"Start making the arena the dojo... more Japanese, more samurai, more flying... clear the space entirely... triple-sword altars up high on the sides, flags on the other corners 90 degrees round, instead of a stadium big decorative architecture, the Japanese roofs with that layering."*

@@ -8868,7 +8868,7 @@ function vendHit(x, y, z, r) {     // a bolt or a swing at (x,y,z), reach r: tru
   return true;
 }
 function vendStep(dt) {
-  if (!VEND.placed) { VEND.placed = 1; vendAt(ARENA.r * .55, 0, -Math.PI / 2); }     // one stands at the side of the field from the start
+  if (!VEND.placed) { VEND.placed = 1; if (!DOJO.want) vendAt(ARENA.r * .55, 0, -Math.PI / 2); }     // m1399: not in the dojo (the floor is cleared; VEND still places one)     // one stands at the side of the field from the start
   VEND.cool = Math.max(0, VEND.cool - dt);
   if (VEND.g && VEND.shake > 0) { VEND.shake = Math.max(0, VEND.shake - dt * 4); const k = VEND.shake * VEND.shake;
     VEND.g.rotation.z = Math.sin(performance.now() * .06) * .05 * k; VEND.g.position.x = VEND.x + Math.sin(performance.now() * .05) * .03 * k; }
@@ -10071,7 +10071,7 @@ function dojoBuild(g, W) {
   const D = DOJO, R = ARENA.r, MG = new Map(), put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); const q = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal') q.deleteAttribute(k); MG.get(m).push(q); };
   const M = { plank: triMat('wood_planks', { scale: 2.4 }), floor: triMat('wood_timber', { scale: 3.2, color: 0xf2dcc0, rough: .6 }), stone: triMat('stone_blocks', { scale: 3 }), rock: triMat('sandstone', { scale: 6, color: 0xb8a48c }), timber: triMat('wood_timber', { scale: 2 }),
     red: new THREE.MeshStandardMaterial({ color: 0xa8201a, roughness: .45 }), gold: triMat('bronze', { scale: 1.5, metal: .75, rough: .35 }), roof: triMat('roof_tiles', { scale: 2.2, side: THREE.DoubleSide }), white: new THREE.MeshStandardMaterial({ color: 0xf1ead8, roughness: .9 }),
-    blade: new THREE.MeshStandardMaterial({ color: 0xdfe8f2, metalness: .9, roughness: .15, emissive: 0x3a5a7a, emissiveIntensity: .4 }), lamp: new THREE.MeshStandardMaterial({ color: 0xffb46a, emissive: 0xff8a2a, emissiveIntensity: 1.4 }) };
+    blade: new THREE.MeshStandardMaterial({ color: 0xdfe8f2, metalness: .9, roughness: .15, emissive: 0x3a5a7a, emissiveIntensity: .4 }), lamp: new THREE.MeshStandardMaterial({ color: 0xffb46a, emissive: 0xff8a2a, emissiveIntensity: 1.4 }), dark: new THREE.MeshStandardMaterial({ color: 0x1c1614, roughness: .6 }) };
   const at = (a, r) => [Math.sin(a) * r, Math.cos(a) * r];
   // SKY and CLOUDS: the sunrise dome, and a sea of cloud far below (soft noise, fading to the horizon)
   const sd = new THREE.Vector3(...D.sun).normalize(), U = { uTime: { value: 0 }, uSun: { value: sd } }; D.U = U;
@@ -10119,6 +10119,7 @@ function dojoBuild(g, W) {
       const tb = L(1.15, -.35, yy + .08); put(new THREE.BoxGeometry(.06, .2, .2).rotateY(face).translate(...tb), M.gold); }
     for (const s of [-1, 1]) { const p = L(s * 2.6, 1.6, y + 1.4); put(new THREE.BoxGeometry(.2, 2.8, .2).translate(...p), M.timber); }
     put(dojoRoof(5.4, 1.6, .9, .9).rotateY(face).translate(x, y + 3, z), M.roof); put(dojoRoof(3.2, 1.2, .6, .5).rotateY(face).translate(x, y + 4.3, z), M.roof);
+    put(dojoRoof(5.4, .35, .9, .9).rotateY(face).translate(x, y + 2.8, z), M.timber); put(dojoRoof(3.2, .3, .6, .5).rotateY(face).translate(x, y + 4.12, z), M.timber);     /* m1399: soffits */
     put(new THREE.ConeGeometry(.18, 1, 8).translate(x, y + 5.5, z), M.gold);
     for (const s of [-1, 1]) { const p = L(s * 2.3, -1.9, y + .5); put(new THREE.BoxGeometry(.5, .7, .5).translate(...p), M.lamp); }
     D.altars.push({ x, y, z }); }
@@ -10138,14 +10139,54 @@ function dojoBuild(g, W) {
     const tiers = [[17, 3.6, 1.5, 1.6, 10.2], [12.5, 3.2, 1.2, 1.3, 15.6], [8.5, 3.6, .9, .9, 20.8]];     /* each tier: a red fascia ring at the eave, the roof, then the next storey's white wall */
     for (const [w, h, lift, ov, yy] of tiers) { const e = w / 2 + ov * .5;
       for (const [u, v, a2, b2] of [[0, e, 2 * e, .45], [0, -e, 2 * e, .45], [e, 0, .45, 2 * e], [-e, 0, .45, 2 * e]]) { const c = Math.cos(face), s2 = Math.sin(face); put(new THREE.BoxGeometry(a2, .55, b2).rotateY(face).translate(x + c * u + s2 * v, y0 + yy + .1, z - s2 * u + c * v), M.red); }
-      put(dojoRoof(w, h, lift, ov).rotateY(face).translate(x, y0 + yy, z), M.roof); if (yy < 20) put(new THREE.BoxGeometry(w * .62, 3.4, w * .62).rotateY(face).translate(x, y0 + yy + 3.2, z), M.white); }
+      put(dojoRoof(w, h, lift, ov).rotateY(face).translate(x, y0 + yy, z), M.roof); put(dojoRoof(w, h * .14, lift, ov).rotateY(face).translate(x, y0 + yy - .35, z), M.timber);     /* m1399: the soffit */
+      if (yy < 12) { const e2 = (w / 2 + ov) * .97, c = Math.cos(face), s2 = Math.sin(face); for (const [u, v] of [[e2, e2], [-e2, e2], [e2, -e2], [-e2, -e2]]) put(new THREE.SphereGeometry(.42, 10, 8).scale(1, 1.3, 1).translate(x + c * u + s2 * v, y0 + yy + lift * .8 - 1.1, z - s2 * u + c * v), M.lamp); }
+      if (yy < 20) put(new THREE.BoxGeometry(w * .62, 3.4, w * .62).rotateY(face).translate(x, y0 + yy + 3.2, z), M.white); }
     put(new THREE.CylinderGeometry(.12, .2, 4, 8).translate(x, y0 + 24.4, z), M.gold); for (let r = 0; r < 4; r++) put(new THREE.TorusGeometry(.42 - r * .06, .08, 6, 16).rotateX(Math.PI / 2).translate(x, y0 + 23.2 + r * .6, z), M.gold); }
+  // m1399 (pass 2): TORII on the diagonals at the rim, framing each pagoda: red pillars on stone feet, the black curved KASAGI on top, the NUKI
+  // crossbeam, a gold plaque; LANTERN STRINGS sagging from each banner mast to the two torii beside it; and a SOFFIT under every roof (the roofs
+  // had no underside -- seen from below they were a sheet) with lanterns hung at the pagodas' lower eave corners.
+  D.torii = []; for (let k = 0; k < 4; k++) { const a = Math.PI / 4 + k * Math.PI / 2, r = W + 2.6, [cx, cz] = at(a, r), tx = Math.cos(a), tz = -Math.sin(a), H = 7.5, S = 2.9;
+    for (const s of [-1, 1]) { const x = cx + tx * S * s, z = cz + tz * S * s; put(new THREE.CylinderGeometry(.34, .42, H, 12).translate(x, H / 2, z), M.red); put(new THREE.CylinderGeometry(.62, .7, .7, 12).translate(x, .35, z), M.stone); put(new THREE.CylinderGeometry(.46, .46, .28, 12).translate(x, H - .9, z), M.gold); }
+    const ya = Math.atan2(tx, tz) - Math.PI / 2;
+    put(new THREE.BoxGeometry(8.6, .55, .7).rotateY(ya).translate(cx, H + .25, cz), M.dark); put(new THREE.BoxGeometry(8.2, .35, .5).rotateY(ya).translate(cx, H - .2, cz), M.red);
+    for (const s of [-1, 1]) { const g2 = new THREE.BoxGeometry(1.4, .5, .72); g2.rotateZ(s * .22); g2.translate(s * 4.6, .12, 0); g2.rotateY(ya); g2.translate(cx, H + .25, cz); put(g2, M.dark); }     // the upswept ends
+    put(new THREE.BoxGeometry(7.4, .4, .4).rotateY(ya).translate(cx, H - 1.9, cz), M.red); put(new THREE.BoxGeometry(.9, 1.2, .2).rotateY(ya).translate(cx, H - 1, cz), M.gold);
+    D.torii.push([cx, H + .2, cz]); }
+  D.lamps = []; const lampM = new THREE.MeshStandardMaterial({ color: 0xffcfa0, emissive: 0xff5a2a, emissiveIntensity: 1.25, roughness: .8 }), ropeM = M.timber;
+  for (const a of [Math.PI / 2, -Math.PI / 2]) { const [mx, mz] = at(a, D.mastR), top = [mx, D.mastH - 1.2, mz];
+    for (const T of D.torii) { const d = Math.hypot(T[0] - mx, T[2] - mz); if (d > 22) continue; const n = 8, sag = 2.4; let prev = null;
+      for (let i = 0; i <= n; i++) { const u = i / n, p = [top[0] + (T[0] - top[0]) * u, top[1] + (T[1] - top[1]) * u - Math.sin(u * Math.PI) * sag, top[2] + (T[2] - top[2]) * u];
+        if (prev) { const len = Math.hypot(p[0] - prev[0], p[1] - prev[1], p[2] - prev[2]), cg = new THREE.CylinderGeometry(.025, .025, len, 4);
+          const mid = new THREE.Vector3((p[0] + prev[0]) / 2, (p[1] + prev[1]) / 2, (p[2] + prev[2]) / 2), dir = new THREE.Vector3(p[0] - prev[0], p[1] - prev[1], p[2] - prev[2]).normalize();
+          cg.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir)); cg.translate(mid.x, mid.y, mid.z); put(cg, ropeM); }
+        if (i > 0 && i < n) { const l = new THREE.SphereGeometry(.32, 12, 8).scale(1, 1.35, 1).translate(p[0], p[1] - .55, p[2]); put(l, lampM); put(new THREE.CylinderGeometry(.2, .2, .1, 8).translate(p[0], p[1] - .1, p[2]), M.dark); D.lamps.push(p); }
+        prev = p; } } }
+  // the floor's CREST: a mitsudomoe (three commas) in red and gold, inlaid at the centre, under the boss's beam
+  { const cv = document.createElement('canvas'); cv.width = cv.height = 512; const c = cv.getContext('2d'), C = 256; c.clearRect(0, 0, 512, 512);
+    c.strokeStyle = '#d9a441'; c.lineWidth = 14; c.beginPath(); c.arc(C, C, 236, 0, Math.PI * 2); c.stroke(); c.lineWidth = 5; c.beginPath(); c.arc(C, C, 214, 0, Math.PI * 2); c.stroke();
+    c.fillStyle = '#a8201a'; for (let k = 0; k < 3; k++) { const a0 = k * Math.PI * 2 / 3;     /* a TOMOE: a round head, its tail sweeping round the centre and tapering to a point */
+      for (let i = 0; i <= 60; i++) { const u = i / 60, a = a0 + u * 2.1, rr = 100 + u * 62, w = 50 * Math.pow(1 - u, 1.3); c.beginPath(); c.arc(C + Math.cos(a) * rr, C + Math.sin(a) * rr, Math.max(1, w), 0, Math.PI * 2); c.fill(); } }
+    const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+    const crest = new THREE.Mesh(new THREE.CircleGeometry(5.2, 64).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ map: t, transparent: true, roughness: .5, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
+    crest.position.y = .03; crest.receiveShadow = true; g.add(crest); }
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o !== null; o.receiveShadow = true; g.add(o); }
   // THE DRIFTING PLATFORMS: small stone discs on rock roots, slowly bobbing and circling outside the rim (decor for now)
   D.plats = []; const pgeo = mergeGeometries([new THREE.CylinderGeometry(2.4, 2, .7, 16).toNonIndexed(), new THREE.ConeGeometry(2, 3.6, 10).rotateX(Math.PI).translate(0, -2.1, 0).toNonIndexed()].map(q => { for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal') q.deleteAttribute(k); return q; }));
   for (let i = 0; i < D.plat; i++) { const m = new THREE.Mesh(pgeo, M.stone); m.castShadow = true; g.add(m); D.plats.push({ m, r: W + 9 + (i % 3) * 7, a: i / D.plat * Math.PI * 2 + .3, y: 3 + (i * 37 % 9), w: (i % 2 ? 1 : -1) * (.03 + i * .004), ph: i * 1.3 }); }
+  // m1399: PETALS -- pink cherry petals drifting across the dojo on the wind, tumbling (their size flickers as they turn)
+  { const N = 700, P = new Float32Array(N * 3), S = new Float32Array(N), Ph = new Float32Array(N); for (let i = 0; i < N; i++) { P[i * 3] = (Math.random() - .5) * 60; P[i * 3 + 1] = Math.random() * 16; P[i * 3 + 2] = (Math.random() - .5) * 60; S[i] = .09 + Math.random() * .08; Ph[i] = Math.random() * 100; }
+    const pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(P, 3)); pg.setAttribute('aSize', new THREE.BufferAttribute(S, 1)); pg.setAttribute('aPh', new THREE.BufferAttribute(Ph, 1));
+    const pm = new THREE.ShaderMaterial({ uniforms: { uPx: { value: 600 }, uTime: U.uTime }, transparent: true, depthWrite: false,
+      vertexShader: 'attribute float aSize; attribute float aPh; uniform float uPx; uniform float uTime; varying float vT; void main() { vec4 mv = modelViewMatrix * vec4(position, 1.0); vT = aPh; float flip = abs(sin(uTime * 2.3 + aPh)); gl_PointSize = aSize * uPx / max(.1, -mv.z) * (.45 + .55 * flip); gl_Position = projectionMatrix * mv; }',
+      fragmentShader: 'varying float vT; void main() { vec2 d = gl_PointCoord - .5; d.x *= 1.6; float r = dot(d, d) * 4.0; if (r > 1.0) discard; vec3 c = mix(vec3(1.0, .72, .82), vec3(1.0, .9, .93), fract(vT)); gl_FragColor = vec4(c, .9 * (1.0 - r * r)); }' });
+    const pts = new THREE.Points(pg, pm); pts.frustumCulled = false; g.add(pts); D.petals = { P, Ph, pg, pm, N }; }
   D.on = { g }; ARENA.door.entry = 'BEAM'; }
 function dojoStep(dt) { const D = DOJO; if (!D.on) return; D.t += dt; D.U.uTime.value = D.t; D.dome.position.copy(camera.position);
+  if (D.petals) { const Q = D.petals, P2 = Q.P, t = D.t, cx = camera.position.x, cz = camera.position.z, wx = 1.6 + Math.sin(t * .2) * .8, wz = .5 + Math.sin(t * .13) * .5;
+    for (let i = 0; i < Q.N; i++) { const o = i * 3, ph = Q.Ph[i]; let x = P2[o] + (wx + Math.sin(t * 1.1 + ph) * .7) * dt, y = P2[o + 1] + (-.55 + Math.sin(t * 1.7 + ph) * .35) * dt, z = P2[o + 2] + (wz + Math.cos(t * .9 + ph * 1.3) * .7) * dt;
+      if (x - cx > 30) x -= 60; else if (x - cx < -30) x += 60; if (z - cz > 30) z -= 60; else if (z - cz < -30) z += 60; if (y < -1) y = 14 + Math.random() * 4; P2[o] = x; P2[o + 1] = y; P2[o + 2] = z; }
+    Q.pg.attributes.position.needsUpdate = true; Q.pm.uniforms.uPx.value = renderer.domElement.height / (2 * Math.tan(camera.fov * Math.PI / 360)); }
   for (const P of D.plats) { P.a += P.w * dt; P.m.position.set(Math.sin(P.a) * P.r, P.y + Math.sin(D.t * .6 + P.ph) * .5, Math.cos(P.a) * P.r); P.m.rotation.y += P.w * dt * 2; } }
 function arenaStage() {
   arenaSky();
