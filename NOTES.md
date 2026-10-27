@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1158 -- FORGE-WORKSHOP pass 1 (BUILDINGS.md #12, at (31, 25))
+
+`FWORK`, `fworkBuild` / `fworkStep` / `fworkClear`, `gearMesh` (a merged gear: one mesh). SPAWN > BUILDINGS > Forge-Workshop.
+(Moved a metre off (30, 24): the Market's cable stake stood at its corner.)
+- A tall open-fronted smithy shed (4.6 m walls, a high curved roof): breakable back and side walls, the courtyard side open between
+  three posts, lanterns under the beam.
+- THE FURNACE: a pot-bellied bronze body on a stone plinth, iron hoops, a flickering orange MOUTH toward the open front, an 8 m iron
+  FLUE up through the roof throwing sparks and smoke.
+- An ANVIL on a stone block and a QUENCH TROUGH of dark water.
+- Two GEARS meshing on the back wall, turning (the small one at the big one's ratio).
+- A JIB CRANE outside (north-west of the shed): an iron post, a slewing arm with a stone counterweight, a chain and hook -- and a HIGH
+  BAR hung under the hook (top 4 m) that RIDES round with the arm (the zeppelin trapeze's way): jump for it as it swings past.
+Pass 2 next. Shipped unverified.
+
 ## m1157 -- BATHHOUSE pass 3 (DONE)
 
 - An indigo NOREN in three panels across the top of the front, a white wave crest on each (canvas).
