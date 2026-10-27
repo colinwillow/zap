@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## GRID LEVEL 1, PASS 11: THE KEEP FIGHTS BACK (m1369)
+
+- **When the boss door opens (3, 6 and 8 done),** the keep wakes: three samurai spawn at its feet on the side facing the level, with a clang.
+- **Every leg you break** shakes one more samurai out of the keep. He drops from under its body, 6.4 m up, so the legs come down under pressure, not as a quiet demolition.
+- **What still ends the level:** felling the keep (E). The guards are a cost, not a gate.
+- **Crash gate for the grid level** (after m1368): every pass from now on builds `lvg1` headless in the forge and steps 3 s of frames before the push. This pass: `{ err: null }`.
+
 ## GRID LEVEL 1 THREW ON SPAWN SINCE m1359 (m1368)
 
 His: *"I tried to spawn Grid Level 1 and it just turned into a black screen. I can faintly see through it."*
