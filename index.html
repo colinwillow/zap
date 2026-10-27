@@ -14044,8 +14044,21 @@ const MARK = {
   gR: 1.05, gOpacity: .55, gCol: [.55, .80, 1.0],   // and the GUARD lock's own, steady (m101)
   spin: 1.9, pulse: 7.0,
 };
-const lockMk = new THREE.Mesh(new THREE.RingGeometry(.86, 1, 4, 1), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .9, depthTest: false, depthWrite: false, side: THREE.DoubleSide, toneMapped: false }));
+// m1276: *"I'm not loving the squares that rotate -- make the reticle much more stylised and cool."* A drawn mark, not a spinning shape: four
+// brush-cut corner BRACKETS that close in on the target as the hold fills, a thin broken ring inside them, a small diamond pip at the centre,
+// and tick marks at the cardinal points -- a KORAJIN sight. It never spins; it SNAPS in when the lock is made, breathes while filling, and
+// at full it goes hot and adds an outer glow. Drawn once to a canvas; tinted per frame.
+function lockMkTex() { const cv = document.createElement('canvas'); cv.width = cv.height = 256; const q = cv.getContext('2d'), c = 128;
+  q.strokeStyle = '#fff'; q.fillStyle = '#fff'; q.lineCap = 'round'; q.lineJoin = 'round';
+  q.lineWidth = 10; for (const [sx, sy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { q.beginPath(); q.moveTo(c + sx * 104, c + sy * 62); q.lineTo(c + sx * 104, c + sy * 104); q.lineTo(c + sx * 62, c + sy * 104); q.stroke(); }
+  q.lineWidth = 4; for (let k = 0; k < 4; k++) { const a0 = k * Math.PI / 2 + .28, a1 = (k + 1) * Math.PI / 2 - .28; q.beginPath(); q.arc(c, c, 66, a0, a1); q.stroke(); }
+  q.lineWidth = 5; for (const [dx, dy] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) { q.beginPath(); q.moveTo(c + dx * 58, c + dy * 58); q.lineTo(c + dx * 78, c + dy * 78); q.stroke(); }
+  q.beginPath(); q.moveTo(c, c - 11); q.lineTo(c + 11, c); q.lineTo(c, c + 11); q.lineTo(c - 11, c); q.closePath(); q.fill();
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t; }
+const lockMk = new THREE.Sprite(new THREE.SpriteMaterial({ map: lockMkTex(), color: 0xffffff, transparent: true, opacity: .9, depthTest: false, depthWrite: false, toneMapped: false }));
 lockMk.renderOrder = 61; lockMk.visible = false; lockMk.frustumCulled = false; scene.add(lockMk);     // m1260: the charge's lock, on the target
+const lockGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map: (() => { const cv = document.createElement('canvas'); cv.width = cv.height = 64; const q = cv.getContext('2d'), gr = q.createRadialGradient(32, 32, 8, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(.7, 'rgba(255,255,255,.35)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); q.fillStyle = gr; q.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(cv); })(), transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }));
+lockGlow.renderOrder = 60; lockGlow.visible = false; scene.add(lockGlow);
 const markRing = new THREE.Mesh(
   new THREE.RingGeometry(.80, 1.0, 40),
   new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .9,
@@ -14056,7 +14069,7 @@ markRing.visible = false;
 markRing.frustumCulled = false;
 scene.add(markRing);
 function markStep(dt, t) {
-  lockMk.visible = false;
+  lockMk.visible = false; lockGlow.visible = false;
   if (!MARK.on) { markRing.visible = false; player.chgTgt = null; return null; }
   const p = player, s = slotNow();
   // ONLY WHILE THE HAMMER IS WINDING. A ring that is always up is a HUD element, and this one
@@ -14097,9 +14110,13 @@ function markStep(dt, t) {
   markRing.visible = true;
   // m1260: AND A LOCK ON THE THING ITSELF. *"It should indicate that I'm indicating it, with some sort of lock."* A diamond bracket at its
   // middle, facing the lens, drawn over everything: it closes in as the hold fills and turns hot at full -- the same reading as the ring.
-  { const P = d.root.position, hh = d.mech ? .6 : (d.K && d.K.h || 1.8) * .55; lockMk.position.set(P.x, P.y + hh, P.z); lockMk.quaternion.copy(camera.quaternion);
-    lockMk.rotateZ(Math.PI / 4 + (full ? 0 : t * 2)); lockMk.scale.setScalar((full ? .55 : lerp(1.1, .6, A.chg01)) * (d.mech ? 1.4 : 1));
-    lockMk.material.color.setRGB(c[0], c[1], c[2]); lockMk.material.opacity = full ? 1 : .7; lockMk.visible = true; }
+  { const P = d.root.position, hh = d.mech ? .6 : (d.K && d.K.h || 1.8) * .55, big = d.mech ? 1.35 : 1;
+    if (lockMk.userData.d !== d) { lockMk.userData.d = d; lockMk.userData.snap = 1; }     // a new lock SNAPS in from wide
+    lockMk.userData.snap = Math.max(0, (lockMk.userData.snap || 0) - dt * 5);
+    const fill = full ? .95 : lerp(1.7, 1.1, A.chg01) * (1 + Math.sin(t * 6) * .03), sz = (fill + lockMk.userData.snap * .9) * big;
+    lockMk.position.set(P.x, P.y + hh, P.z); lockMk.scale.setScalar(sz); lockMk.material.rotation = 0;
+    lockMk.material.color.setRGB(full ? 1 : c[0], full ? .93 : c[1], full ? .7 : c[2]); lockMk.material.opacity = full ? 1 : .55 + A.chg01 * .35; lockMk.visible = true;
+    lockGlow.visible = full; if (full) { lockGlow.position.copy(lockMk.position); lockGlow.scale.setScalar(sz * 1.5 * (1 + Math.sin(t * 9) * .06)); lockGlow.material.color.setRGB(1, .7, .3); } }
   return A;
 }
 
@@ -17371,7 +17388,7 @@ function paintKit() {
   paintPalRow();
   // **THE WEAPON WHEEL LIGHTS WHERE HE IS GOING, NOT WHERE HE WAS (m173)** -- mid-reach that is
   // `swapTo`, so the press he just made is the segment that answers it on the same frame.
-  { const ix = wepRow._ix; let n = player.swap ? player.swapTo : player.slot; if (KIT3.on && WEAP.slots[n] && WEAP.slots[n].rocket) n = WEAP.slots.findIndex(q => q.aim && !q.rocket); paintArcRow(wepRow, 1, ix ? ix.indexOf(n) : n); }
+  { const ix = wepRow._ix, n = player.swap ? player.swapTo : player.slot; paintArcRow(wepRow, 1, ix ? ix.indexOf(n) : n); }
   // **AND THE LABEL IS THE SLOT AGAIN, EVEN WHILE HE IS SOMEBODY ELSE (m122).** *"We need to
   // still be able to swap through the weapons when you're like the NPC characters, which the
   // buttons don't show up."* m112 gave this line to the character's NAME because the kit was
@@ -17397,7 +17414,7 @@ function paintKit() {
   // THE ROW EXISTS ONLY WHERE IT MEANS SOMETHING. A mode row for a weapon with no modes is a
   // HUD element sitting in the play area saying nothing, which is the `actB` lesson one game
   // over: a prompt that is always on screen is a prompt nobody reads.
-  paintArcRow(modeRow, KIT3.on ? !!s.aim : !!m, KIT3.on && s.rocket ? WEAP.modes.length : WEAP.mode);     // m1259: ROCKET lights while the launcher is out
+  paintArcRow(modeRow, !!m, WEAP.mode);
   paintArcRow(aimRow, !!s.aim && !player.riding, AIM3.on ? 0 : -1);
   // EXACTLY ONE SLOT IS VISIBLE, decided in one place, so the label, the ring and the thing in
   // his hand cannot disagree about what he is carrying.
@@ -17448,7 +17465,7 @@ const PALROW = { mid: 180 - MODES.mid };
 // options, so it keeps the sub-options above the right stick."* `KIT3.on`: the left wheel shows HANDS / GUN / SWORD only (the hammer, the
 // board and the launcher are off it -- the launcher is now ROCKET in the gun's own row on the right), on a THICKER ring (`r1`, a narrower
 // span so its far tip stays on a 390 px screen: 94 - 116 cos 36 = 0). Off restores the old six. The hidden slots still exist (quests, GOD).
-const KIT3 = { on: 1, hide: ['hammer', 'board', 'launcher'], label: { none: 'HANDS', blaster: 'GUN' }, r1: 116, span: 108 };
+const KIT3 = { on: 1, hide: ['hammer', 'board', 'blaster'], label: { none: 'HANDS', launcher: 'GUN' }, r1: 116, span: 108 };     // m1276: *"keep the rocket launcher, not the blaster"*
 const WEPROW = { mid: PALROW.mid, r0: MODES.r0, get r1() { return KIT3.on ? KIT3.r1 : MODES.r1; }, get span() { return KIT3.on ? KIT3.span : 120; } };
 const OUTROW = { mid: PALROW.mid, get r0() { return WEPROW.r1 + 6; }, get r1() { return WEPROW.r1 + 36; }, span: 72 };
 const kit3Hid = i => KIT3.on && KIT3.hide.includes(WEAP.slots[i].key);
@@ -17522,7 +17539,7 @@ function paintArcRow(el, on, sel) {
 // HER FLIGHT TRIGGER (m271) on foot: a right thumb held still `holdT` arms (a tap is still the jump, a thumb that travels first is still the
 // camera), and from then its offset IS the aim -- across turns it up to `yaw` either side of the lens, up/down tilts it up to `pitch` -- and
 // lifting it fires (the blaster's charged ball, or a ROCKET). The lens comes in over his shoulder (`cam`) and tips with the aim.
-const AIM3 = { on: 0, holdT: .18, far: .30, yaw: 60 * Math.PI / 180, pitch: 60 * Math.PI / 180, ease: .05, cam: { dist: .55, side: .75, el: .6, lift: .25 } };
+const AIM3 = { on: 0, holdT: 0, far: 9, yaw: 85 * Math.PI / 180, pitch: 65 * Math.PI / 180, rate: 1.7, dead: .12, ease: .05, cam: { dist: .55, side: .75, el: .6, lift: .25 } };     // m1276: armed on touch, the thumb DRIVES the cursor
 try { AIM3.on = localStorage.getItem('mel.aim3') === '1' ? 1 : 0; } catch (e) {}
 const aimRow = (() => { const d = document.createElement('div'); d.id = 'aimRow'; d.setAttribute('aria-hidden', 'true'); document.body.appendChild(d); return d; })();
 const AIMROW = { mid: MODES.mid, r0: MODES.r1 + 6, r1: MODES.r1 + 40, span: 44 };
@@ -17540,8 +17557,8 @@ function gearSync(quiet, boot) {
   wepRow._ix = ix;
   buildArcRow(wepRow, ix.map(i => ({ label: (KIT3.on && KIT3.label[WEAP.slots[i].key]) || (KIT3.on && WEAP.slots[i].blade ? 'SWORD' : '') || WEAP.slots[i].short || WEAP.slots[i].label })), WEPROW.mid, j => kitPick(ix[j]), WEPROW);
   // at boot nothing below `paintKit` exists yet (a const read above its declaration is a blank page): the slot only
-  if (boot) { if (!(m & (1 << player.slot)) && !(KIT3.on && WEAP.slots[player.slot].rocket)) player.slot = 0; return; }
-  if (!(m & (1 << player.slot)) && !(KIT3.on && slotNow().rocket)) applySlot(0); else paintKit();
+  if (boot) { if (!(m & (1 << player.slot))) player.slot = 0; return; }
+  if (!(m & (1 << player.slot))) applySlot(0); else paintKit();
   const got = ix.filter(i => !(was & (1 << i)) && GEAR.say[WEAP.slots[i].key]);
   if (!quiet && was >= 0 && got.length)
     setTimeout(() => cardShow('FOUND', got.map(i => WEAP.slots[i].label).join(' + ') + ' \u00b7 ' + GEAR.say[WEAP.slots[got[0]].key], 3.2), 1700);
@@ -17555,7 +17572,7 @@ gearSync(1, 1);
 // m1259: THE GUN'S ROW. CHARGE / AUTO (the blaster's two triggers) and ROCKET (the launcher, which left the left wheel) -- picking a
 // trigger while the launcher is out puts the blaster back; ROCKET takes the launcher out. The OUTER ring is one button, 3D (`AIM3`).
 function gunRowBuild() {
-  buildArcRow(modeRow, KIT3.on ? WEAP.modes.concat([{ key: 'rocket', label: 'ROCKET' }]) : WEAP.modes, MODES.mid, gunPick);
+  buildArcRow(modeRow, WEAP.modes, MODES.mid, gunPick);
   buildArcRow(aimRow, [{ key: 'aim3', label: '3D AIM' }], AIMROW.mid, () => { AIM3.on = AIM3.on ? 0 : 1; try { localStorage.setItem('mel.aim3', AIM3.on ? '1' : '0'); } catch (e) {} triggerStop(); paintKit(); }, AIMROW);
 }
 function gunPick(i) {
@@ -22478,7 +22495,7 @@ function zrampClear() { const Z = ZRAMP.on; if (!Z) return; const i = ZIPS.index
 // roofs stepping in as it rises, a spire of gold rings on top. *"Much more visually interesting and much more functional"* -- so it is HOLLOW:
 // a room on every storey, a ladder inside each up through a hatch in the next floor (the corners turn as you climb), a door out onto every
 // balcony, and the ground storey's walls breakable. Pass 1 = the stack, the rooms, the ladders, the balconies, the roofs, the spire.
-const GPAG = { showT: 30, at: [90, 0], n: 5, hb0: 3.6, shrink: .45, sh: 3.8, balc: 1.25, eave: 1.9, t: .3, door: 1.6, doorH: 2.5, on: null };
+const GPAG = { showT: 30, at: [90, 0], n: 5, hb0: 4.2, shrink: .5, sh: 3.8, balc: 2.2, eave: 2.7, t: .3, door: 1.6, doorH: 2.5, on: null };
 function gpagBuild() {
   if (GPAG.on) return; const A = GPAG, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [];
   const lac = new THREE.MeshStandardMaterial({ color: 0xb3261c, roughness: .42 }), lacD = new THREE.MeshStandardMaterial({ color: 0x7e1913, roughness: .5 }), floorM = new THREE.MeshStandardMaterial({ color: 0x4a3324, roughness: .8 });
@@ -22522,6 +22539,7 @@ function gpagBuild() {
       const B = hb + A.balc;
       box(cx - B, cx + B, y0 - .25, y0, cz - B, z0, floorM, 1); box(cx - B, cx + B, y0 - .25, y0, z1, cz + B, floorM, 1); box(cx - B, x0, y0 - .25, y0, z0, z1, floorM, 1); box(x1, cx + B, y0 - .25, y0, z0, z1, floorM, 1);
       box(cx - B, cx + B, y0 + .85, y0 + .95, cz - B, cz - B + .08, lac, 1); box(cx - B, cx + B, y0 + .85, y0 + .95, cz + B - .08, cz + B, lac, 1); box(cx - B, cx - B + .08, y0 + .85, y0 + .95, cz - B, cz + B, lac, 1); box(cx + B - .08, cx + B, y0 + .85, y0 + .95, cz - B, cz + B, lac, 1);
+      for (let q = 1; q <= 4; q++) O.boxes[O.boxes.length - q].noCam = 1;     // m1276: a rail never pulls the lens in
       for (let i = 0; i <= 8; i++) { const u = -B + i * B / 4; for (const [px, pz] of [[u, -B], [u, B], [-B, u], [B, u]]) box(cx + px - .05, cx + px + .05, y0, y0 + .9, cz + pz - .05, cz + pz + .05, lac, 0); }
       box(cx - B, cx + B, y0 + .35, y0 + .42, cz - B, cz - B + .05, lacD, 0); box(cx - B, cx + B, y0 + .35, y0 + .42, cz + B - .05, cz + B, lacD, 0); box(cx - B, cx - B + .05, y0 + .35, y0 + .42, cz - B, cz + B, lacD, 0); box(cx + B - .05, cx + B, y0 + .35, y0 + .42, cz - B, cz + B, lacD, 0);
       // the LADDER up from the storey below, through the hatch
@@ -22560,8 +22578,8 @@ function gpagBuild() {
         if (Math.abs(mx) < hb + .15 && Math.abs(mz) < hb + .15) continue;
         tris.push(cx + xa, hR(xa, za), cz + za, cx + xb, hR(xb, za), cz + za, cx + xb, hR(xb, zb), cz + zb, cx + xa, hR(xa, za), cz + za, cx + xb, hR(xb, zb), cz + zb, cx + xa, hR(xa, zb), cz + zb); }
       const L = EX * .7; for (const [ax, sg] of [[1, -1], [1, 1], [0, -1], [0, 1]]) { const r0 = EX - .28, r1 = EX;
-        ax ? O.boxes.push({ minx: sg < 0 ? cx - r1 : cx + r0, maxx: sg < 0 ? cx - r0 : cx + r1, miny: eY - .9, maxy: eY + .05, minz: cz - L, maxz: cz + L })
-           : O.boxes.push({ minx: cx - L, maxx: cx + L, miny: eY - .9, maxy: eY + .05, minz: sg < 0 ? cz - r1 : cz + r0, maxz: sg < 0 ? cz - r0 : cz + r1 }); }
+        ax ? O.boxes.push({ minx: sg < 0 ? cx - r1 : cx + r0, maxx: sg < 0 ? cx - r0 : cx + r1, miny: eY - .9, maxy: eY + .05, minz: cz - L, maxz: cz + L, noCam: 1 })
+           : O.boxes.push({ minx: cx - L, maxx: cx + L, miny: eY - .9, maxy: eY + .05, minz: sg < 0 ? cz - r1 : cz + r0, maxz: sg < 0 ? cz - r0 : cz + r1, noCam: 1 }); }     // m1276: noCam -- the lip over his balcony was what shoved the lens into his back
       if (k > 0 && !top) { const B = hb + A.balc, op = sd[1] === 'x' ? (sd[0] === '-' ? '+x' : '-x') : (sd[0] === '-' ? '+z' : '-z'), sg = op[0] === '-' ? -1 : 1, ax = op[1] === 'x', bt = y0 + 2.25;
         const Bb = ax ? hbarMake(cx + sg * (B + .55), cz, Math.PI / 2, bt - HBAR.h, 0) : hbarMake(cx, cz + sg * (B + .55), 0, bt - HBAR.h, 0); HBAR.list.push(Bb); bars.push(Bb); } }
     // lanterns hung at the four eave corners
@@ -22594,7 +22612,7 @@ function gpagBuild() {
   // ---- PASS 3 (m1267): the PAVILION at its foot (the reference's side hall: an open hall on a raised floor under its own deep hip roof --
   // and its roof is WALKABLE, triangles laid on the roof's own curve, so it is the first step up to the first balcony) and the red FENCE
   // round the court, gold flame finials on the gate posts and on every third post ----
-  { const pz0 = cz + 5.7, pz1 = cz + 10.7, px0 = cx - 3.5, px1 = cx + 3.5, pzc = (pz0 + pz1) / 2, fl = .45;
+  { const pz0 = cz + 7.4, pz1 = cz + 12.4, px0 = cx - 3.5, px1 = cx + 3.5, pzc = (pz0 + pz1) / 2, fl = .45;
     box(px0, px1, 0, fl, pz0, pz1, floorM, 1);
     tris.push(px0 + 1, 0, pz1 + 1.4, px1 - 1, 0, pz1 + 1.4, px1 - 1, fl, pz1, px0 + 1, 0, pz1 + 1.4, px1 - 1, fl, pz1, px0 + 1, fl, pz1);     // the steps
     for (let i = 0; i <= 4; i++) for (const z of [pz0 + .2, pz1 - .2]) box(px0 + .2 + i * (px1 - px0 - .4) / 4 - .14, px0 + .2 + i * (px1 - px0 - .4) / 4 + .14, fl, 3.4, z - .14, z + .14, lac, 1);
@@ -22606,7 +22624,7 @@ function gpagBuild() {
       tris.push(cx + xa, hR(xa, za), pzc + za, cx + xb, hR(xb, za), pzc + za, cx + xb, hR(xb, zb), pzc + zb, cx + xa, hR(xa, za), pzc + za, cx + xb, hR(xb, zb), pzc + zb, cx + xa, hR(xa, zb), pzc + zb); }
     box(cx - 1, cx + 1, fl, 1.2, pzc - .4, pzc + .4, lacD, 1); box(cx - .2, cx + .2, 1.2, 1.5, pzc - .2, pzc + .2, lamp, 0);     // an offering table and its lamp
     // THE FENCE: red posts every 2 m, two rails, a 4 m gate on the -x side (to the pagoda's door), solid to the waist
-    const fx0 = cx - 11, fx1 = cx + 11, fz0 = cz - 10, fz1 = cz + 13.5, fh = 1.7, gw = 2;
+    const fx0 = cx - 12.5, fx1 = cx + 12.5, fz0 = cz - 11, fz1 = cz + 15.5, fh = 1.7, gw = 2;
     const run = (ax, c, a0, a1) => { const L = a1 - a0; if (L < .1) return; const n = Math.max(1, Math.round(L / 2));
       for (let i = 0; i <= n; i++) { const a = a0 + L * i / n, big = i % 3 === 0, [x, z] = ax ? [c, a] : [a, c]; mbox(x - .09, x + .09, 0, fh + (big ? .35 : 0), z - .09, z + .09, lac);
         if (big) mg(new THREE.ConeGeometry(.1, .35, 7), gold, _m4.makeTranslation(x, fh + .55, z)); }
@@ -22629,7 +22647,7 @@ function gpagBuild() {
   { const f = new THREE.Mesh(new THREE.ConeGeometry(.22, .8, 8), gold); f.position.set(cx, sy + 5.6, cz); g.add(f); }
   const rings = [gringAdd(g, cx + 1.2, sy + 3, cz)];
   // m1269: the ROPE FROM THE SPIRE -- a zipline off the spire's foot, over the court, down to the gate
-  const zip = { A: [cx - .6, sy + .2, cz], B: [cx - 10, 2, cz + 3.2] }; ZIPS.push(zip);
+  const zip = { A: [cx - .6, sy + .2, cz], B: [cx - 11.5, 2, cz + 3.4] }; ZIPS.push(zip);
   { const c = new THREE.Mesh(new THREE.TubeGeometry(new THREE.LineCurve3(new THREE.Vector3(...zip.A), new THREE.Vector3(...zip.B)), 10, .04, 5), gold); g.add(c); }
   // the GROUND SHRINE inside: an altar with a glowing Jin core
   box(cx + 1.6, cx + 3, 0, .9, cz - 1, cz + 1, lacD, 1); const core = new THREE.Mesh(new THREE.SphereGeometry(.3, 14, 10), new THREE.MeshBasicMaterial({ color: 0x5ff2ff, toneMapped: false })); core.position.set(cx + 2.3, 1.3, cz); g.add(core);
@@ -22673,7 +22691,7 @@ function gpagBuild() {
     for (const [k, sx, sz] of [[2, -1, 1], [4, 1, -1]]) { const [x, y, z] = cor(k, sx, sz); archerPost(x, y, z).then(d => { if (GPAG.on === G0) G0.arch.push(d); else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {}); }
     { const [x, y, z] = cor(3, 1, 1); G0.tur = turretAt(x, y, z, Math.PI / 4); }
     (async () => { try { const K0 = await arenaLoad('SAMURAI'), AK = ARENA.kinds.SAMURAI, K = HORDE.KS || (HORDE.KS = Object.assign(Object.create(K0), { notice: HORDE.notice, lose: 90, limbs: 1 }));
-      for (const sz of [-1, 1]) { if (GPAG.on !== G0) return; const x = cx - 9.2, z = cz + sz * 2.6, d = bodySpawn(K.P, K, x, z, 0); arenaKatana(d, AK); d.horde = 1; d.aggro = 0; d.hp = d.hpMax = 40; d.gap = 1; d.h = -Math.PI / 2;
+      for (const sz of [-1, 1]) { if (GPAG.on !== G0) return; const x = cx - 10.6, z = cz + sz * 2.6, d = bodySpawn(K.P, K, x, z, 0); arenaKatana(d, AK); d.horde = 1; d.aggro = 0; d.hp = d.hpMax = 40; d.gap = 1; d.h = -Math.PI / 2;
         HORDE.list.push(d); G0.guards.push(d); } } catch (e) { console.error('[melee] pagoda guards', e); } })(); }
   arenaBeam(cx, cz, [1, .45, .3], 1); snd('clang', { g: .7, r: .6 });
 }
@@ -24112,7 +24130,8 @@ PADS.L = bindStick(padL, stick.L,
 PADS.R = bindStick(padR, stick.R,
   // tap: jump -- and as her, a quick SECOND tap opens / folds the wings (m266)
   // ...unless someone in reach has something to say: then it is TALK (m277), and the left tap still jumps
-  () => { if (talkTap()) return; if (pickTap()) return; if (portalTap()) return; if (wingTapR()) return; if (hurdleTap()) return; if (mantleTap()) return; if (wrunTap()) return; player.jump = 1; },     // m1064: a tall face beside / ahead -> wall run     // m1063: pushing into a half block -> hurdle it     // m1039: a ledge in reach -> climb it
+  () => { if (AIM3.on && slotNow().aim && !player.riding && !player.wing) return;     // m1276: in 3D AIM the right pad is the trigger -- a tap fires, it does not jump (jump is the LEFT tap)
+    if (talkTap()) return; if (pickTap()) return; if (portalTap()) return; if (wingTapR()) return; if (hurdleTap()) return; if (mantleTap()) return; if (wrunTap()) return; player.jump = 1; },     // m1064: a tall face beside / ahead -> wall run     // m1063: pushing into a half block -> hurdle it     // m1039: a ledge in reach -> climb it
   // flick: a SLAM if he is in the air and it went down, otherwise a strike in that direction
   (dx, dy) => { if (player.wing) return; if (tossQuick(dx, dy)) return; if (boardFlick(dx, dy, 0)) return; if (runSwipe(dx, dy)) return; if (!slamGo(dx, dy)) { KATANA.dir = katanaDir(dx, dy); meleeGo(KATANA.dir === 'down' ? player.faceH : flickH(dx, dy)); } },     // m1054: DOWN is not a direction -- the strike goes where he faces (a slot kept for a grab / throw / special)     // m1014: the right pad is MELEE, by direction (m1012's down-slide is off it)
   null,
@@ -24567,15 +24586,18 @@ function aim3Gun(dt) {
     p.chg = 0;
     if (R.down && !p.knock && !p.roll && (R.far || 0) < F.far) {
       if ((p.gHold = (p.gHold || 0) + dt) >= F.holdT) { p.aim = 1; p.chg = 0; p.gYaw = 0; p.gPit = 0;
-        if (!s.rocket) chargeStart(); else for (const a of ROCKET.arm) snd(a.k, { g: a.g, r: a.r, dur: a.dur }); }
+        if (!s.rocket) chargeStart(); else for (const a of ROCKET.arm) snd(a.k, { g: a.g, r: a.r, dur: a.dur }); if (p.aimKeep && p.aimKeepT > 0) { p.gYaw = p.aimKeep.y; p.gPit = p.aimKeep.p; } }
     } else if (!R.down) p.gHold = 0;
     else p.gHold = .0001;     // travelled first: a camera drag until it lifts
   }
   if (p.aim) {
     if (R.down && !p.knock) {
       if (!s.rocket) p.chg = Math.min(1, p.chg + dt / WEAP.chargeT);
-      p.gYaw = damp(p.gYaw || 0, -clamp(R.x, -1, 1) * F.yaw, F.ease, dt);      // NEGATED: a thumb right is toward -yaw
-      p.gPit = damp(p.gPit || 0, clamp(-R.y, -1, 1) * F.pitch, F.ease, dt);   // the pad's +Y is DOWN the screen
+      // m1276: *"once it's enabled you move the cursor with the right stick in three dimensions -- touch, it locks in a shot ready to fire;
+      // move your thumb around, it aims; let go, it shoots -- rather than auto-aiming."* The thumb's offset is a RATE: held off-centre the
+      // cursor keeps travelling that way (`rate` rad/s at full, past a `dead` zone), let it rest and the cursor stays where you put it
+      const rx = Math.abs(R.x) > F.dead ? R.x : 0, ry = Math.abs(R.y) > F.dead ? R.y : 0;
+      p.gYaw = clamp((p.gYaw || 0) - rx * F.rate * dt, -F.yaw, F.yaw); p.gPit = clamp((p.gPit || 0) - ry * F.rate * dt, -F.pitch, F.pitch);
       const a = cam.az + p.gYaw, c = Math.cos(p.gPit);
       (p.gDir || (p.gDir = new THREE.Vector3())).set(Math.sin(a) * c, Math.sin(p.gPit), Math.cos(a) * c);
       if (!s.rocket) chargeStep(p.chg);
@@ -24583,9 +24605,11 @@ function aim3Gun(dt) {
       if (!p.knock && s.rocket) { if (!(p.rocketT > 0)) { fireRocket(); p.fireT = 1; p.rocketT = ROCKET.cool; snd('big', { g: .62, r: .62 + Math.random() * .06 });
           const kh = cam.az + (p.gYaw || 0); p.vel.x -= Math.sin(kh) * ROCKET.kick; p.vel.z -= Math.cos(kh) * ROCKET.kick; } }
       else if (!p.knock && p.chg >= WEAP.minChg) { fireBolt(p.chg); p.fireT = 1; snd(p.chg > .82 ? 'big' : 'shot', { g: .42 + p.chg * .3, r: 1.12 - p.chg * .3 }); playPair(CLIPS.shoot, clipLen(CLIPS.shoot) / WEAP.shootBeat); }
+      p.aimKeep = { y: p.gYaw || 0, p: p.gPit || 0 }; p.aimKeepT = 1.5;     // m1276: a touch within 1.5 s picks the cursor up where it was
       p.aim = 0; p.armT = 0; p.chg = 0; p.gHold = 0; chargeStop();
     }
   } else if (CHARGE.gain) chargeStop();
+  if (p.aimKeepT > 0) p.aimKeepT -= dt;
   const showBall = p.chg > .02;
   chargeFx.visible = showBall;
   if (showBall) { chargeFx.position.copy(muzzleWorld()); ballSize(chargeFx, (.35 + p.chg * 1.5) * (.92 + Math.random() * .16)); }
@@ -59062,10 +59086,10 @@ function acamPip() {
   renderer.setScissorTest(false); renderer.setViewport(0, 0, W, H);
   const B = ACAM.box.style; B.display = 'block'; B.width = w + 'px'; B.height = h + 'px'; B.top = (H - y - h) + 'px'; B.right = '10px';
 }
-const UPLOOK = { on: 1, dy: 2, tta: 2.2, el: .24, lift: 1.4, in: .07, out: .6 };
+const UPLOOK = { on: 1, dy: 2, tta: 3.4, el: .24, lift: 1.4, in: .32, out: .9 };     // m1276: *"a little earlier, more ease, so it's a warning and not a jerk"*
 function upLookW() { if (!UPLOOK.on || !inArena()) return 0; const p = player, cy = p.pos.y + 1; let w = 0;
   for (const T of threatList()) { const dy = T.p.y - cy; if (dy < UPLOOK.dy) continue; const t = threatTTA(T); if (t > UPLOOK.tta) continue;
-    w = Math.max(w, Math.min(1, (dy - UPLOOK.dy) / 6 + .4) * Math.min(1, (UPLOOK.tta - t) / .6 + .3)); }
+    const u = clamp((UPLOOK.tta - t) / UPLOOK.tta, 0, 1); w = Math.max(w, Math.min(1, (dy - UPLOOK.dy) / 6 + .4) * u * u * (3 - 2 * u)); }     // m1276: smoothstep in over the whole lead time
   return Math.min(1, w); }
 function stepCam(dt) {
   const p = player;

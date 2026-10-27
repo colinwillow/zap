@@ -70,7 +70,42 @@ building there (nearest: the Festival at 42 m). `OPAG` / `opagBuild`; its code s
 
 Draws: about ten merged buckets plus two instanced sets. SHIPPED UNVERIFIED. Next: pass 2, the block detail.
 
-## Great Red Pagoda pass 9 of 10: the set piece (X1)
+## His notes off the Great Red Pagoda (m1271 on his phone), answered
+
+- **"The walkways should be less narrow."** The pagoda got wider:
+  - balconies 1.25 -> **2.2 m**
+  - the tower 3.6 -> **4.2 m** half-width (rooms 8.4 m at the ground, 4.4 at the top)
+  - eaves 1.9 -> **2.7 m**, so every roof's edge now clears the balcony below it
+  - the pavilion, the fence and the gate guards moved out to suit
+
+  A new rule, **ROOM TO FIGHT**, is at the top of BUILDINGS.md for every building and both workers.
+- **"Why is the camera so close, there's nothing behind me."** It was the EAVE LIP of the roof above (pass 4's ledge box), hanging at
+  head height just beyond the rail, plus the rail itself. Both are now `noCam` (the m1088 flag `camHit` already honours), so only real
+  walls stop the lens.
+- **"Keep the rocket launcher, not the blaster."**
+  - The left wheel's GUN is now the LAUNCHER (`KIT3.hide` takes the blaster, and the hammer and the board as before).
+  - The right row's ROCKET button is gone, because the launcher has no modes. The 3D AIM ring stays.
+- **The 3D aim, as he meant it.** Once enabled:
+  - TOUCHING the right pad arms the shot at once (no hold).
+  - The thumb DRIVES the cursor as a rate: held off-centre it keeps travelling, `rate` 1.7 rad/s at full past a `dead` .12. Let the
+    thumb rest and the cursor stays put, so no auto-aim is involved.
+  - Lifting the thumb fires.
+  - The next touch within 1.5 s picks the cursor up where it was.
+  - In 3D AIM with a gun out the right TAP no longer jumps: it is the trigger, and the left tap still jumps.
+- **The charge's lock reticle.** No more spinning squares (`lockMk` is a Sprite now, drawn once to a canvas):
+  - four brush-cut corner BRACKETS, a thin broken ring, tick marks and a diamond pip at the centre
+  - it SNAPS in when the lock is made and closes and breathes as the hold fills
+  - at full it goes hot gold with an outer glow (`lockGlow`)
+
+  The floor ring he likes is unchanged.
+- **The look-up: earlier, with more ease.**
+  - `tta` 2.2 -> 3.4 s, so it starts sooner.
+  - The weight is now a smoothstep over the whole lead time rather than a ramp.
+  - It eases in over .32 s (was .07) and out over .9 s.
+
+SHIPPED UNVERIFIED.
+
+## m1275 -- Great Red Pagoda pass 9 of 10: the set piece (X1)
 
 A great bronze GONG now hangs in a dark frame on the lookout's balcony at the top. Strike it and the whole tower answers:
 - **The lanterns.** They light storey by storey from the ground up, .55 s apart. Each eave's halos flare (per-vertex colours on the halo

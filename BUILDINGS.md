@@ -51,6 +51,19 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 - **Pass meaning**: 1 = the building stands, playable (shell, roof, doors, the main feature). 2 = the details and the function (interior,
   the moving parts, lights, the special feature working). 3 = the polish (proportions, colour, silhouette, one more delight).
 
+## ROOM TO FIGHT (his, after m1275, a hard rule for EVERY building from here, and for the workers)
+
+*"The walkways should be less narrow so they're more fun and you can do battles on them -- write this to pretty much everything. I don't want
+the quarters to feel so narrow, in buildings, on walkways."* So:
+- **Balconies, walkways and wall-walks are at least 2.2 m clear** between the wall and the rail (two bodies and a sword swing).
+- **Bridges and beams that are FOR crossing are at least 1.6 m.** A deliberately narrow balance beam is the exception, and it is named
+  as one.
+- **Rooms are at least 6 x 6 m inside** where a fight can happen, and doors are at least 1.6 m wide.
+- **The eave above any walkway clears it.** Put the roof's edge beyond the walkway's rail. A lip or beam hanging over a walkway at
+  head height crowds it and shoves the camera in.
+- **Anything thin near a walkway is `noCam: 1`** (rails, posts, lips, lattice), so it never pulls the lens into his back. Only real
+  walls stop the camera.
+
 ## PARALLEL WORKERS (his, after m1270: *"spin up one or two extra context windows... one on one building, one on another"*)
 
 Three sessions build at once, each OWNING its rows; nobody touches a row (or its code) it does not own:
