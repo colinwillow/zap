@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1179 -- RAMPART pass 4: bars on top, banners outside, the defenders' rocks
+
+- Three HIGH BARS standing on the walkway (x -15.5, 0, 15.5), swing out over the wall.
+- The clan banners down the OUTER face too.
+- THE DEFENDERS' ROCKS: walk along the wall's outer foot (within 4 m, between the bastions) and every 1.6-2.6 s a SHADOW marks the ground
+  where he is going (his velocity led .3 s), and .55 s later a stone drops off the walkway onto it -- 14 damage and a knock if it lands on
+  him. Keep moving.
+Next: Set 2 #16 Moated Keep pass 2. Shipped unverified.
+
 ## m1178 -- MOATED KEEP pass 1 (Set 2 #16, at (46, 0))
 
 `KEEP`, `keepBuild` / `keepStep` / `keepGong` / `keepClear`. SPAWN > BUILDINGS > Moated Keep.
