@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1229 -- Oni Gate pass 1 (Building Forge loop, Set 3 #25)
+
+`ONI`, in BLDG.list as `oni`. A fortress wall at (-72, 0), 20 m wide, 12 m high and 6 m deep, faces the forge (+x).
+- **The face.** Its front is carved as a giant DEMON FACE:
+  - a red mask, black brows, and deep eye sockets with glowing amber eyes (they pulse)
+  - a nose ridge
+  - the MOUTH: a 5 x 4.5 m passage straight through the wall, with ivory fangs above (two long) and below, and black lips
+- **Eye turrets.** A sentry gun (`turretAt`) stands on a stone ledge under each eye. They are killable like every turret.
+- **Horns.** Two bronze HORNS curve up and out from the brow, tapering (tube geometry).
+- **The stair and the top.** A STAIR of 40 .3 risers climbs the back face along its length to the top walk, which has merlons
+  along the front. A timber LOOKOUT with a lantern sits between the horns.
+- **Guard huts.** Two (breakable walls) flank the approach, open toward the gate.
+
+Next: alternate -- an extra pass (6) on the Hall.
+
 ## m1228 -- Set 3 brainstorm (Building Forge loop)
 
 Set 2 (14-24) is complete, so by his rule (*"if you run out of things to make tonight do another brain storm pass of another set"*)
