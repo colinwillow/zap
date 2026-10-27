@@ -294,7 +294,7 @@ SHIPPED UNVERIFIED. The queue's passes 2 and 3 are done. Next is his call: more 
 
 SHIPPED UNVERIFIED. Next: pass 3, foam and wake, bow spray, the sun on the water, gulls, an island.
 
-## THE CHUNK LIBRARY: THE PIECES A LEVEL IS BUILT FROM, SIZED FROM THE MOVE TABLE (m1387)
+## THE CHUNK LIBRARY: THE PIECES A LEVEL IS BUILT FROM, SIZED FROM THE MOVE TABLE (m1389)
 
 Step 2 of the blueprint pipeline (LEVELDESIGN.md "THE BLUEPRINT", BUILDINGS STEER 000), after Worker B's move table (m1376).
 

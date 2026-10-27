@@ -24259,7 +24259,7 @@ function shipStep(dt) { const Z = SHIPZ; if (Z.U) Z.U.uTime.value += dt; const p
       for (const F of S.flags || []) { if (F.pen) { F.pv.rotation.y = Math.sin(t * .9 + F.ph) * .25; F.f.rotation.z = Math.sin(t * 3.3 + F.ph) * .15; continue; } F.pv.rotation.z = Math.sin(t * 1.3 + F.ph) * .12; F.f.rotation.x = Math.sin(t * 2.1 + F.ph) * .1 + .05; } } }
   if (p.pos.y < Z.sea - 2.5) { spkBurst(p.pos.x, Z.sea + .2, p.pos.z, 30, { col: [.8, .95, 1], spread: 5, up: 1.5, size: .16, life: .7 }); snd('thud', { g: .6, r: .6 }); shipHome(); }     /* in the sea: back aboard (no swimming here yet) */
   if (Z.dome) Z.dome.position.copy(camera.position); }
-// m1387: THE CHUNK LIBRARY -- step 2 of the blueprint pipeline (LEVELDESIGN.md, "THE BLUEPRINT"). Each CHUNK is a parametric piece of a run with
+// m1389: THE CHUNK LIBRARY -- step 2 of the blueprint pipeline (LEVELDESIGN.md, "THE BLUEPRINT"). Each CHUNK is a parametric piece of a run with
 // an IN port and an OUT port ({ x, y, z, dir }, `dir` one of the four axes), sized from the MEASURED move table (`tools/moves.json`, m1376: the
 // numbers below are its `comfy` values -- 80% of the most he can do -- and each chunk asks for a little under that, `MOVEC.ask`). The solver
 // (step 3) will chain them; for now SPAWN > BUILDINGS > Chunk Library lays every chunk out in its own lane, on a runway, labelled with what it asks

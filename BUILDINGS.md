@@ -95,7 +95,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   5. Level 1 v2 from a blueprint
 - **Progress:**
   - step 1, the move table: DONE (m1376, Worker B)
-  - step 2, the chunk library: pass 1 DONE (m1387, SPAWN > Chunk Library: walk them)
+  - step 2, the chunk library: pass 1 DONE (m1389, SPAWN > Chunk Library: walk them)
 - **Level 1 (the sketch) stays on the menu** to compare against.
 
 ## STEER 00 (his, after m1369) -- BUILD A LEVEL IN LAYERS, AND EACH LAYER HAS TO HOLD UP ON ITS OWN
