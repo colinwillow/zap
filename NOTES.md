@@ -5,6 +5,31 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE SHIP, PASS 2: IT RIDES THE SWELL; THE HOLD; CLIMBABLE SAILS; ROPE SWINGS (m@X4@, WORKER A)
+
+- **The ship rides the swell, by holding the SHIP still and moving the WORLD.** `shipWave` is a JS twin of the sea shader's five waves (the
+  same numbers, `SHIPZ.WV`). Each frame it is sampled at the bow, the stern, both sides and the middle, giving the pitch, roll and heave a
+  46 m hull would take (eased for its mass; `rock` 3 on the angles). Those are applied INVERTED to the sea (`Z.seaG`) and the sky dome.
+  - So every deck, collider, ramp, ladder and body aboard stays exactly where it is, and he is CARRIED for free. No collider has to rotate:
+    an axis-aligned box cannot pitch, and that is why the ship itself does not move.
+  - The horizon and the water heave and tilt round the deck, the way they do from a real deck. Measured headless: pitch ~1 degree, roll
+    ~1.3 degrees, heave +-.3 m.
+- **THE HOLD**, below the main deck from the stern castle to the forecastle (20 m):
+  - a plank floor at .7 m, walls where the hull is, bulkheads at both ends;
+  - frames and deck beams, lanterns hung down the middle, cargo stacked, hammocks slung, and barrels to smash (`smashAdd`);
+  - **a HATCH** cut in the main deck forward of the mainmast, with a coaming round it and a ladder up (`kitClimbAdd`, exit mark on deck).
+    You drop in, or climb.
+  - **The sea shader cuts the hull's footprint out of the water**, so the hold is dry.
+- **The SAILS are CLIMBABLE.** The battens are the rungs: climb up the forward face of each sail to its yard. **Every YARD and BOOM is a
+  walkable beam** (.5 m, a balance beam, named as one) out across the ship.
+- **Rope swings:** stays run between the mast tops, main to fore and mizzen to main, and a GRAPPLE RING (`gringAdd`) hangs from the middle
+  of each, so you can swing from one mast to the next.
+- **The spawn** moved to (0, -.5), aft of the mainmast. The old spot was over the new hatch: the first headless run spawned him in the hold.
+- **Checked headless** (the zone boots and `shipBuild` runs with no page errors; he stands grounded on the deck), and rendered from the side,
+  the deck and inside the hold.
+
+SHIPPED UNVERIFIED. Next: pass 3, foam and wake, bow spray, the sun on the water, gulls, an island.
+
 ## THE SHIP, PASS 1: A SAMURAI PIRATE JUNK ON A SUNRISE SEA (m1373)
 
 His: *"a classic retro pirate samurai alien water vessel just floating in an ocean scene, sunrise, really beautiful water shaders, interior and exterior, sails you can climb."*

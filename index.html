@@ -9839,7 +9839,9 @@ const PEAKS = { rings: [[380, 22, 70, 120, .35], [470, 28, 90, 150, .6]], wide: 
 // it as a literal classic Viking alien pirate ship floating in the water."* KORAJIN > The Ship opens the forge as a SEA (`?w=forge&zone=ship`):
 // no white floor, no peaks, an ocean shader to the horizon under a sunrise dome, and the ship built on the first frame. Declared HERE because
 // `arenaStage()` runs at module scope (below) and reads it -- a const read above its declaration is a blank page.
-const SHIPZ = { want: 0, on: null, sea: 0, deckY: 3.2, L: 46, B: 12, D: 5.2, sun: [.55, .13, .82], spawn: [0, 6] };
+const SHIPZ = { hatchK: 9, want: 0, on: null, sea: 0, deckY: 3.2, L: 46, B: 12, D: 5.2, sun: [.55, .13, .82], spawn: [0, -.5], rock: 3, holdY: .7,
+  WV: [[1, .35, .42, 34], [-.4, 1, .26, 19], [.7, -.6, .14, 9], [-.9, -.2, .08, 5.3], [.2, .95, .05, 3.1]] };     // m@X4@: the sea's five waves, the SAME numbers as the shader's WV
+function shipWave(x, z, t) { let h = 0; for (const [dx, dz, a, L] of SHIPZ.WV) { const n = Math.hypot(dx, dz), k = 6.2831853 / L, w = Math.sqrt(9.8 * k); h += a * Math.sin(k * (dx / n * x + dz / n * z) - w * t); } return h; }
 try { if (/[?&]zone=ship\b/.test(location.search)) SHIPZ.want = 1; } catch (e) {}
 const SKYGLSL = `vec3 skyAt(vec3 d, vec3 s) { float y = d.y; vec3 zen = vec3(.09, .16, .38), mid = vec3(.55, .42, .55), hor = vec3(1.0, .58, .36), low = vec3(.95, .45, .30);
   vec3 c = y > 0.0 ? mix(hor, mix(mid, zen, smoothstep(.12, .7, y)), smoothstep(0.0, .16, y)) : mix(low, vec3(.10, .14, .22), smoothstep(0.0, -.25, y));
@@ -9863,7 +9865,8 @@ function shipSea(g) {
     fragmentShader: SKYGLSL + `uniform float uTime; uniform vec3 uSun; varying vec3 vW; varying vec2 vG; varying float vH;
       float hsh(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
       float nz(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(hsh(i), hsh(i + vec2(1, 0)), f.x), mix(hsh(i + vec2(0, 1)), hsh(i + vec2(1, 1)), f.x), f.y); }
-      void main() { vec3 toC = cameraPosition - vW; float dist = length(toC); vec3 V = toC / dist; float far = smoothstep(30.0, 500.0, dist);
+      void main() { if (pow(vW.x / 5.5, 2.0) + pow(vW.z / 20.7, 2.0) < 1.0) discard;     /* m@X4@: no water inside the hull (its hold is dry) */
+        vec3 toC = cameraPosition - vW; float dist = length(toC); vec3 V = toC / dist; float far = smoothstep(30.0, 500.0, dist);
         vec2 p = vW.xz; vec2 rip = vec2(nz(p * .35 + uTime * .3) - nz(p * .35 + 7.0 - uTime * .25), nz(p * .35 + 3.0 + uTime * .2) - nz(p * .35 + 11.0 - uTime * .33)) * .35
           + vec2(nz(p * 1.3 - uTime * .6) - .5, nz(p * 1.3 + 5.0 + uTime * .5) - .5) * .18;
         vec2 gr = vG + rip * (1.0 - far * .8); vec3 n = normalize(vec3(-gr.x, 1.0, -gr.y)); float ndv = max(dot(n, V), 0.0), F = .02 + .98 * pow(1.0 - ndv, 5.0);
@@ -9876,7 +9879,7 @@ function shipSea(g) {
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
       }` }));
-  sea.frustumCulled = false; g.add(sea); Z.seaM = sea;
+  sea.frustumCulled = false; const seaG = new THREE.Group(); seaG.add(sea); g.add(seaG); Z.seaM = sea; Z.seaG = seaG;     // m@X4@: the sea rocks, not the ship
   scene.background = new THREE.Color(0xff9a6a); if (scene.fog) { scene.fog.color.setHex(0xe8a07a); scene.fog.near = 300; scene.fog.far = 900; }
   const L0 = Math.hypot(_sunOff.x, _sunOff.y, _sunOff.z) || 20; _sunOff.copy(sd).multiplyScalar(L0); sun.position.copy(_sunOff); sun.color.setHex(0xffc896); hemi.color.setHex(0xffd6b8); hemi.groundColor.setHex(0x2a3a4a);
   camera.far = Math.max(camera.far, 1000); camera.updateProjectionMatrix();
@@ -23934,7 +23937,8 @@ function shipBuild() {
       seg(.25, .9, red, .03); seg(1.15, .12, gold, .035); } }
   // THE MAIN DECK in strips (each as wide as the hull there), and the BULWARKS as boxes along each side
   const z0 = -L / 2 * .9, z1 = L / 2 * .86, NSg = 14; for (let k = 0; k < NSg; k++) { const za = z0 + (z1 - z0) * k / NSg, zb = za + (z1 - z0) / NSg, um = ((za + zb) / 2) / (L / 2), w = Math.max(.6, Math.min(halfW((za / (L / 2)) * .985), halfW((zb / (L / 2)) * .985)) - .15);
-    bx(w * 2, .4, zb - za + .02, 0, dY - .2, (za + zb) / 2, deckM, 1);
+    if (k === Z.hatchK) { for (const sx of [-1, 1]) bx(w - 1.3, .4, zb - za + .02, sx * (1.3 + (w - 1.3) / 2), dY - .2, (za + zb) / 2, deckM, 1); Z.hatch = [za, zb]; }     // m@X4@: the HATCH to the hold
+    else bx(w * 2, .4, zb - za + .02, 0, dY - .2, (za + zb) / 2, deckM, 1);
     for (const sx of [-1, 1]) { const top = Math.max(dY + 1.1, gun(um)); O.boxes.push({ minx: sx > 0 ? w - .05 : -w - .3, maxx: sx > 0 ? w + .3 : -w + .05, miny: dY, maxy: top, minz: za, maxz: zb }); } }
   // planks: dark seams across the deck
   for (let z = z0 + 1; z < z1 - 1; z += 1.1) { const w = Math.max(.5, halfW((z / (L / 2)) * .985) - .2); bx(w * 2, .02, .05, 0, dY + .01, z, dark); }
@@ -23982,13 +23986,46 @@ function shipBuild() {
   // LANTERNS on posts along the bulwarks, and BRONZE GUNS run out through the sides
   for (let z = z0 + 3; z < z1 - 2; z += 6) { const u = z / (L / 2), w = halfW(u * .985), y = Math.max(dY + 1.1, gun(u)); for (const sx of [-1, 1]) { bx(.12, 1.2, .12, sx * (w - .1), y + .6, z, dark); bx(.4, .55, .4, sx * (w - .1), y + 1.35, z, lamp); } }
   for (let z = -6; z <= 10; z += 5.5) { const w = halfW((z / (L / 2)) * .985); for (const sx of [-1, 1]) { put(new THREE.CylinderGeometry(.2, .26, 2.2, 10).rotateZ(Math.PI / 2).translate(sx * (w - .5), dY + .55, z), bronze); bx(1, .5, .9, sx * (w - 1.2), dY + .25, z, dark, 1); } }
+  // m@X4@ (pass 2): THE HOLD -- below the main deck from the stern castle to the forecastle: a plank floor at `holdY` over the dry hull (the sea
+  // shader cuts the hull's footprint out of the water), walls where the hull is, bulkheads at each end, a ladder up through the HATCH, lanterns
+  // hung down the middle, cargo stacked, barrels to smash, hammocks slung between the frames
+  { const HF = Z.holdY, hz0 = -9, hz1 = 11, half = (z, y) => { const u = z / (L / 2), w = halfW(u * .985), gy = gun(u), ky = Math.min(keel(u), gy - .3), q = Math.min(1, Math.max(0, (gy - y) / (gy - ky))), th = Math.asin(Math.pow(q, 1 / .65)); return w * Math.cos(th); };
+    for (let z = hz0; z < hz1 - .01; z += 1) { const za = z, zb = z + 1, hw = Math.min(half(za, HF), half(zb, HF)) - .05, hw2 = Math.min(half(za, dY - .4), half(zb, dY - .4));
+      bx(hw * 2, .3, 1.02, 0, HF - .15, z + .5, deckM, 1); for (const sx of [-1, 1]) O.boxes.push({ minx: sx > 0 ? hw - .05 : -hw2 - .3, maxx: sx > 0 ? hw2 + .3 : -hw + .05, miny: HF, maxy: dY - .2, minz: za, maxz: zb }); }
+    for (let z = hz0 + .7; z < hz1 - .3; z += 1.1) { const hw = half(z, HF) - .1; bx(hw * 2, .02, .05, 0, HF + .01, z, dark); }
+    for (const z of [hz0, hz1]) { const hw = half(z, dY - .4); bx(hw * 2, dY - .2 - HF, .3, 0, (HF + dY - .2) / 2, z, wood, 1); }
+    for (let z = hz0 + 1.5; z < hz1 - 1; z += 3.2) { const hw = half(z, (HF + dY) / 2); for (const sx of [-1, 1]) bx(.3, dY - .2 - HF, .25, sx * (hw - .1), (HF + dY - .2) / 2, z, dark); bx(hw * 2, .25, .25, 0, dY - .35, z, dark); }     // the frames and deck beams
+    for (let z = hz0 + 2; z < hz1 - 1; z += 4) { bx(.04, .5, .04, 0, dY - .45, z, rope); bx(.45, .5, .45, 0, dY - .95, z, lamp); }     // lanterns
+    for (const [x, z, n] of [[-2.6, -6.5, 3], [-2.4, -4.6, 2], [2.6, -7, 2], [2.8, 9, 3], [-2.8, 8.6, 2]]) for (let q = 0; q < n; q++) bx(1.1, .9, 1.1, x + (q % 2) * .1, HF + .45 + q * .9, z, q % 2 ? wood : deckM, 1);     // cargo
+    const canvasM = M(0xd8c8a0, .95, { side: THREE.DoubleSide }); for (const [hx, hzz] of [[-2.4, 1.5], [2.4, 1.5], [-2.4, 4.7]]) { const hm = new THREE.PlaneGeometry(1, 2.6, 1, 6); const P = hm.attributes.position; for (let i = 0; i < P.count; i++) P.setZ(i, -Math.cos(P.getY(i) / 2.6 * Math.PI) * .35); hm.computeVertexNormals(); put(hm.rotateX(-Math.PI / 2).translate(hx, dY - 1.3, hzz), canvasM); }
+    const barM = M(0x6d4c30, .8); Z.smash = Z.smash || []; for (const [x, z] of [[2.4, -2.5], [2.9, -1.6], [-2.6, 3.8], [-2, 9.8]]) { const m = new THREE.Mesh(new THREE.CylinderGeometry(.45, .45, 1.1, 10), barM); m.position.set(x, HF + .55, z); m.castShadow = true; g.add(m); smashAdd(Z.smash, m, { minx: x - .45, maxx: x + .45, miny: HF, maxy: HF + 1.1, minz: z - .45, maxz: z + .45 }, 2, 30, [.6, .45, .3]); }
+    const [za, zb] = Z.hatch || [5.3, 8.2]; for (const [w2, d2, ox, oz] of [[2.8, .2, 0, za - .1], [2.8, .2, 0, zb + .1], [.2, zb - za + .4, -1.4, (za + zb) / 2], [.2, zb - za + .4, 1.4, (za + zb) / 2]]) bx(w2, .25, d2, ox, dY + .12, oz, dark);
+    const lz = zb - .25; for (const o of [-.4, .4]) bx(.08, dY - HF + .9, .08, o, (HF + dY + .9) / 2, lz, dark); for (let y = HF + .35; y < dY + .8; y += .32) bx(.8, .06, .06, 0, y, lz, rope);
+    const L3 = kitClimbAdd({ minx: -.5, maxx: .5, miny: HF, maxy: dY, minz: lz - .12, maxz: lz + .12 }, 'ship_hatch', dY); L3.mark = { x: 0, y: dY, z: zb + .9 }; climbs.push(L3); }
+  // m@X4@ (pass 2): the SAILS ARE CLIMBABLE (the battens are the rungs: up the forward face of each sail to its yard) and every YARD and BOOM is
+  // a walkable beam (.5 m: a balance beam, named as one) out across the ship; and two GRAPPLE RINGS hang off stays between the masts -- swing
+  // from one mast's yard to the next
+  for (const [mz, base, H, sw, sh] of masts) { const s0 = base + 4, s1 = s0 + sh, yz = mz + .55 + 1.25;
+    bx(sw + .8, .3, .5, 0, s1 + .15, yz, dark, 1); bx(sw + .8, .3, .5, 0, s0 - .15, yz, dark, 1);
+    const L4 = kitClimbAdd({ minx: -sw / 2 * .85, maxx: sw / 2 * .85, miny: s0, maxy: s1, minz: yz - .35, maxz: yz + .35 }, 'ship_sail', s1 + .3); L4.mark = { x: sw / 4, y: s1 + .3, z: yz }; climbs.push(L4); }
+  const rings = []; { const [m0, m1, m2] = masts, stay = (a, b) => { const A = new THREE.Vector3(0, a[1] + a[2] - .5, a[0]), Bv = new THREE.Vector3(0, b[1] + b[2] - .5, b[0]), d = Bv.clone().sub(A), q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.clone().normalize());
+      put(new THREE.CylinderGeometry(.04, .04, d.length(), 4).applyQuaternion(q).translate((A.x + Bv.x) / 2, (A.y + Bv.y) / 2, (A.z + Bv.z) / 2), rope); const mid = A.clone().add(Bv).multiplyScalar(.5);
+      put(new THREE.CylinderGeometry(.03, .03, 3, 4).translate(mid.x, mid.y - 1.5, mid.z), rope); rings.push(gringAdd(g, mid.x, mid.y - 3.6, mid.z)); };
+    stay(m0, m1); stay(m2, m0); }
   // a banner off the stern
   { const bg = new THREE.PlaneGeometry(2.4, 5); const P = bg.attributes.position; for (let i = 0; i < P.count; i++) P.setZ(i, Math.sin(P.getY(i) * .9) * .25); bg.computeVertexNormals(); put(bg.translate(0, cy + 6, cz0 + 1), red); }
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
   bldTris(O, tris); for (const b of O.boxes) BOXES.push(b); boxGrid();
-  Z.on = { g, O, climbs }; bldXrayTag(g); shipHome(); }
+  Z.on = { g, O, climbs, rings }; bldXrayTag(g); shipHome(); }
 function shipHome() { const p = player, Z = SHIPZ; p.pos.set(Z.spawn[0], Z.deckY + .05, Z.spawn[1]); p.vel.set(0, 0, 0); p.faceH = p.heading = 0; p.grounded = false; }
+// m@X4@ (pass 2): THE SHIP RIDES THE SWELL -- by holding the SHIP still and moving the WORLD round it. The sea's own wave function (`shipWave`, the
+// shader's numbers) is sampled at the bow, the stern, both sides and the middle; the pitch, roll and heave a hull would take from them (eased,
+// for its mass) are applied INVERTED to the sea and the sky. So every deck, box, ramp, ladder and body aboard stays exactly where its collider
+// is and he is carried for free, while the horizon and the water heave and tilt round him the way they do from a real deck.
 function shipStep(dt) { const Z = SHIPZ; if (Z.U) Z.U.uTime.value += dt; const p = player;
+  if (Z.seaG && Z.U) { const t = Z.U.uTime.value, Lp = Z.L * .7, Bp = Z.B * .8, hB = shipWave(0, Lp / 2, t), hS = shipWave(0, -Lp / 2, t), hP = shipWave(-Bp / 2, 0, t), hR = shipWave(Bp / 2, 0, t), hC = shipWave(0, 0, t);
+    const M = Z.mo || (Z.mo = { p: 0, r: 0, h: 0 }), k = Math.min(1, dt * 1.2), R = Z.rock; M.p += (Math.atan((hB - hS) / Lp) * R - M.p) * k; M.r += (Math.atan((hR - hP) / Bp) * .7 * R - M.r) * k; M.h += ((hB + hS + hP + hR + 2 * hC) / 6 - M.h) * k;     /* (`rock` scales the angles only: a 46 m hull feels the swell's slope more than its height) */
+    Z.seaG.rotation.set(M.p, 0, -M.r); Z.seaG.position.y = -M.h; if (Z.dome) Z.dome.rotation.set(M.p, 0, -M.r); }
   if (p.pos.y < Z.sea - 2.5) { spkBurst(p.pos.x, Z.sea + .2, p.pos.z, 30, { col: [.8, .95, 1], spread: 5, up: 1.5, size: .16, life: .7 }); snd('thud', { g: .6, r: .6 }); shipHome(); }     /* in the sea: back aboard (no swimming here yet) */
   if (Z.dome) Z.dome.position.copy(camera.position); }
 const COURT = { scale: 1.5, at: [0, 150], hw: 28, hd: 32, wallH: 4, walk: 2.6, gate: 6, on: null };

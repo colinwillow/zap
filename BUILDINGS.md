@@ -19,7 +19,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
     - the forecastle and the ramps
     - three masts with junk sails, crow's nests and rope ladders
     - the dragon prow, lanterns and bronze guns
-  - [ ] pass 2: the ship RIDES the swell (pitch, roll, heave, with the decks carrying him); the hold below deck (an interior you drop into); sails you can CLIMB (the battens as rungs) and run along the yards; a rope swing between the masts
+  - [x] **pass 2 (m@X4@, WORKER A):** the ship RIDES the swell (pitch, roll, heave, with the decks carrying him); the hold below deck (an interior you drop into); sails you can CLIMB (the battens as rungs) and run along the yards; a rope swing between the masts
   - [ ] pass 3: the water's foam round the hull and a wake; spray off the bow; the sun on the water; gulls; the island on the horizon
   - [ ] later: swimming here; the AIRSHIP transform (his)
 
