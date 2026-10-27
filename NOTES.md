@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1240 -- Shrine pass 6: omikuji (Building Forge loop, extra pass)
+
+A hexagonal OMIKUJI fortune box now stands on the Shrine's terrace (front left, clear of the stone lanterns), with a rack of red
+cords beside it. Strike the box (`shrineKuji` in `bldHit`) and it rattles, and a paper fortune flies up in an arc and ties itself
+to the rack.
+- **GREAT LUCK** (a quarter of the time): full health, a gold shower and a beam.
+- **GOOD LUCK** (most of the time): +30 health.
+- **BAD LUCK** (one in five): a little lightning bolt on his own head, 8 damage. It is a comic hazard.
+
+One fortune every `kujiCd` 20 s. The rack keeps the last twelve slips (the oldest goes), and bad-luck slips are tinted lilac.
+
+Next: alternate -- Set 3 #27 Lantern Festival Street pass 1.
+
 ## m1239 -- Jin Observatory pass 3: the polish (Building Forge loop)
 
 - **Armillary sphere:** bronze rings turning round a glowing core, on the base roof's corner.
