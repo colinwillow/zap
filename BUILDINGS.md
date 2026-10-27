@@ -51,6 +51,13 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 - **Pass meaning**: 1 = the building stands, playable (shell, roof, doors, the main feature). 2 = the details and the function (interior,
   the moving parts, lights, the special feature working). 3 = the polish (proportions, colour, silhouette, one more delight).
 
+## THE 10-PASS EXPERIMENT (his, after m1260)
+
+*"I'm curious to see what 10 passes makes a building look like... go back through what we already have and refine them. A lot of the stuff
+-- the spiral blocky stairs -- they're fine, but functionally they're not that functional. I'm looking for much more visually interesting and
+much more functional."* He is sending a reference image of a tower. When it lands, it becomes the first 10-pass building (a pass per build,
+each pass a real step up in silhouette, material, detail and things to DO), and that result decides whether the rest get the same.
+
 ## HIS REQUESTS (m1251) -- these go FIRST, ahead of the rest of Set 3
 
 **The loop takes these rows first, in order, three passes each, and does NOT alternate with extra passes while any R row is open** (his, after m1256: *"start the loop again with this new stuff"*). A kit row (R3, R4, R9) is a set of pieces plus a showcase; its pass 1 is the pieces and the showcase.

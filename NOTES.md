@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1261 -- the air-swipe hook chases a MOVING bar (the zeppelin "imaginary collider")
+
+*"With the zeppelins flying around, I'd high-jump and swipe and just be grabbing onto an imaginary floating nothing... a weird collider of
+nothingness, I could never actually get up."* It was the HOOK (m1063, `barHook`), not a collider:
+- **What went wrong.** The flick picked the zeppelin's trapeze bar and dashed to where the bar was ON THAT FRAME (`tx`/`tz`/`ty`, fixed).
+  A zeppelin carries its trapeze about a metre on in the dash's .2-.4 s.
+- **What he saw.** He arrived at empty air, `hbarCatch` (within `grabR` .5 m) refused, and the fallback `p.vel.y = 0` held him there for a
+  beat: hanging on nothing, every try.
+- **The fix.** `stepHook` re-reads the bar's position every frame (the stored `u` / `side` on the live `B`), so a moving bar is caught
+  and a still one behaves exactly as before.
+
+His next direction (noted in BUILDINGS.md): a 10-PASS experiment on one building, aiming for much more visual interest and much more
+function. He is sending a reference image of a tower. SHIPPED UNVERIFIED.
+
 ## m1260 -- the charge locks onto ANYTHING it is aimed at, and SHOWS the lock (his report, with a screenshot at m1253)
 
 *"The charge up on the right stick doesn't really lock onto things. If I'm trying to hit this box and I'm clearly targeted on it, it should
