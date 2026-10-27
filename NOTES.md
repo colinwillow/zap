@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1220 -- Airship Dock pass 5: Jin kites (Building Forge loop, extra pass)
+
+A rack of three red tako-KITES (each with a cyan Jin mon) now stands on the 20 m deck's west rail.
+
+Step off the deck (standing on it arms the kite) and a kite opens over him on a line:
+- **Sink.** He falls no faster than `ADOCK.kite.sink` 2.2 m/s.
+- **Glide.** He is carried forward the way he faces at `kite.v` 7 m/s, steering as in the air.
+- **End.** The kite packs away the moment he lands, or grabs a bar, rope or zip.
+
+From 20 m that is about 9 s of flight and some 60 m of reach: across the courtyard to the Watchtower, the Bathhouse or the
+Teahouse Garden. Next: alternate -- Teahouse Garden pass 2.
+
 ## m1219 -- Teahouse Garden pass 1 (Building Forge loop, Set 2 #23)
 
 `TEAG`, in BLDG.list as `teag`, centred at (-47, 8).
