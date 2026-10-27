@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1160 -- FORGE-WORKSHOP pass 3 (DONE)
+
+- Leather BELLOWS by the furnace, breathing (scaled in and out), a bronze nozzle into the fire; solid.
+- Four INGOTS cooling on a rack, glowing hot to cold, flickering.
+- Tongs and hammers hung on the -z wall; the clan banner on the front; two cables to stakes; a drone.
+`BLDG` fwork `pass: 3`. Next: the Spider-Bot Hangar (#13, (-30, -24)) -- the last of the first set. Shipped unverified.
+
 ## m1159 -- FORGE-WORKSHOP pass 2: the trip-hammer, a loft, ore
 
 - THE TRIP-HAMMER: a timber beam on a post with an iron head over the anvil. It lifts over `FWORK.hammer.lift` 1.3 s and drops in .14 s,
