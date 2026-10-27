@@ -17593,7 +17593,7 @@ function paintArcRow(el, on, sel) {
 // HER FLIGHT TRIGGER (m271) on foot: a right thumb held still `holdT` arms (a tap is still the jump, a thumb that travels first is still the
 // camera), and from then its offset IS the aim -- across turns it up to `yaw` either side of the lens, up/down tilts it up to `pitch` -- and
 // lifting it fires (the blaster's charged ball, or a ROCKET). The lens comes in over his shoulder (`cam`) and tips with the aim.
-const AIM3 = { on: 0, holdT: 0, far: 9, yaw: 85 * Math.PI / 180, pitch: 65 * Math.PI / 180, rate: 1.7, dead: .12, ease: .05, absYaw: 42 * Math.PI / 180, absPit: 32 * Math.PI / 180, absEase: .025, cam: { dist: 1, side: 0, el: .35, lift: 0 } };     // m1293: ABSOLUTE, no zoom     // m1276: armed on touch, the thumb DRIVES the cursor
+const AIM3 = { on: 0, holdT: 0, far: 9, yaw: 85 * Math.PI / 180, pitch: 65 * Math.PI / 180, rate: 1.7, dead: .12, ease: .05, absYaw: 42 * Math.PI / 180, absPit: 32 * Math.PI / 180, absEase: .025, pMax: 25 * Math.PI / 180, pRate: 1.1, pSpan: .3, pBack: .25, pCam: .85, cam: { dist: 1, side: 0, el: 0, lift: 0 } };     // m1293: ABSOLUTE, no zoom     // m1276: armed on touch, the thumb DRIVES the cursor
 try { AIM3.on = localStorage.getItem('mel.aim3') === '1' ? 1 : 0; } catch (e) {}
 const aimRow = (() => { const d = document.createElement('div'); d.id = 'aimRow'; d.setAttribute('aria-hidden', 'true'); document.body.appendChild(d); return d; })();
 const AIMROW = { mid: MODES.mid, r0: MODES.r1 + 6, r1: MODES.r1 + 40, span: 44 };
@@ -25094,7 +25094,7 @@ PADS.L = bindStick(padL, stick.L,
   // `trav < tapMove` and `held < tapT`, which no steering hold ever is. Weapons moved to the
   // left wheel (`kitPick`).
   // tap: jump -- flying, a double tap is her BOOST (m266); on her skates on the ground, her SWIVEL (m268)
-  () => { if (aim3Now()) { aim3Fire(); return; }     // m1282: in 3D AIM the LEFT tap is the trigger
+  () => {     // m1326: the left tap is the jump again in 3D AIM too (m1282's left-tap trigger is gone)
     if (wingTapL()) return; if (fakieSwivel()) return; if (player.wall && player.wallLow && player.wallSt === 'hold') { wallDrop(0); return; } if (coverTap()) return; player.jump = 1; },     // m1009: in cover, a left tap stands him up out of it; m1012: near a half block, takes it
   // flick: a BODY FLIP on the board, otherwise the dodge roll in the flicked direction. The
   // board takes it first and says so, because a dodge roll on a moving deck is nothing.
@@ -25576,6 +25576,18 @@ function aim3Gun(dt) {
   GUNU.k.value = damp(GUNU.k.value, p.chg * WEAP.glow, .06, dt);
 }
 const aim3Now = () => AIM3.on && slotNow().aim && !player.riding && !player.wing && !player.swap;
+// m1326: *"Go back to the auto shoot upon release; leave the left tap to jumping. The aimer should never move to the side of the screen -- it
+// always stays centred. It doesn't need to work any different than the regular game: left on the right stick turns the camera left, right turns
+// it right. The only difference is your view can slightly gimbal up or down. When you let go it eases your view back to parallel to the ground."*
+// So 3D AIM no longer has its own trigger: the 2D one runs (hold up = aim, release = fire, sideways turns the lens). While aiming, the thumb's
+// travel UP or DOWN from where it armed is a pitch RATE (`pRate` at `pSpan` of travel), held to `pMax` either way; the shot leaves along the
+// lens's bearing at that pitch (`p.gDir`, so `aimPoint` walks the tilted line and the reticle stays dead centre); the lens tilts with it
+// (`pCam` of the pitch, in `stepCam`); let go and the pitch eases back to level (`pBack` s half-life).
+function aim3Pitch(dt) { const p = player, F = AIM3, R = stick.R;
+  if (p.aim && R.down) { const up = -R.y; if (p.a3up0 == null) p.a3up0 = up; const u = clamp((up - p.a3up0) / F.pSpan, -1, 1), dz = Math.abs(u) < .12 ? 0 : u;
+    p.gPit = clamp((p.gPit || 0) + dz * F.pRate * dt, -F.pMax, F.pMax); }
+  else { p.a3up0 = null; if (!(p.fireT > 0)) p.gPit = damp(p.gPit || 0, 0, F.pBack, dt); }
+  p.gYaw = 0; if (p.aim || p.fireT > 0) { const a = cam.az, c = Math.cos(p.gPit || 0); (p.gDir || (p.gDir = new THREE.Vector3())).set(Math.sin(a) * c, Math.sin(p.gPit || 0), Math.cos(a) * c); } }
 function aim3Fire() { const p = player, s = slotNow(); if (!p.aim || p.knock || p.roll) return;
   if (s.rocket) { if (p.rocketT > 0) return; fireRocket(); p.fireT = 1; p.rocketT = ROCKET.cool; snd('big', { g: .62, r: .62 + Math.random() * .06 });
     const kh = cam.az + (p.gYaw || 0); p.vel.x -= Math.sin(kh) * ROCKET.kick; p.vel.z -= Math.cos(kh) * ROCKET.kick; return; }
@@ -25643,8 +25655,8 @@ function stepKit(dt) {
   // back where it came from once she is down.
   if (p.gTemp && !p.wing && !p.aim) { const n = p.gTemp - 1; p.gTemp = 0; if (p.slot !== n) applySlot(n); }
   if (p.wing && BLADE.gun.fly.on && bladeOn()) { bladeGunFly(dt); return; }
-  if (aim3Now()) { aim3Gun(dt); return; }     // m1259: the 3D aim
   p.gHold = 0; p.gDir = null;
+  if (aim3Now()) aim3Pitch(dt);     // m1326: the 3D aim is the 2D aim plus a pitch (was m1259's own trigger, `aim3Gun`)
 
   // ---- DOWN ON THE RIGHT PAD IS A GUARD (m37). *"I want to make it so that down on the right
   //      stick is block. I know I don't have a block animation yet, but I'll put one in."*
@@ -60117,7 +60129,7 @@ function stepCam(dt) {
   // fix for something broken -- but 17 degrees of permanent lean is half the parry window.
   const dz = (p.block || padUp(p.aim || p.charge || p.center)) ? CAM.deadAim : CAM.dead;
   const ax = Math.abs(rx);
-  const flyAim = (p.wing || (AIM3.on && slotNow().aim)) && (p.aim || (p.gHold || 0) > 0);      // flying, her right thumb is the 3D aimer (m271); m1259: and on foot in 3D AIM
+  const flyAim = p.wing && (p.aim || (p.gHold || 0) > 0);     /* m1326: 3D AIM turns the lens sideways exactly like 2D */      // flying, her right thumb is the 3D aimer (m271); m1259: and on foot in 3D AIM
   // m1030: *"when you pull down on the right stick into guard you can turn him by nudging left or right -- I want it inverted."* In the guard
   // the nudge turns the other way (`CAM.guardInv`, 1 = inverted); the ordinary drag is untouched.
   const gInv = p.block && CAM.guardInv ? -1 : 1;
@@ -60185,7 +60197,7 @@ function stepCam(dt) {
   cam.up = damp(cam.up || 0, upLookW(), (cam.up || 0) < upLookW() ? UPLOOK.in : UPLOOK.out, dt);
   cam.a3 = damp(cam.a3 || 0, aim3Live() || (AIM3.on && p.aim && slotNow().aim) ? 1 : 0, .12, dt);     // m1259: the 3D aim's over-the-shoulder lens
   const a3 = cam.a3, a3p = (p.gPit || 0) * a3;
-  cam.el = damp(cam.el || CAM.el, kit.inside === 'cut' ? KIT.cutEl : CAM.el + KIT.highEl * Math.min(1, kit.high) - UPLOOK.el * cam.up - a3p * AIM3.cam.el, .12, dt);
+  cam.el = damp(cam.el || CAM.el, kit.inside === 'cut' ? KIT.cutEl : CAM.el + KIT.highEl * Math.min(1, kit.high) - UPLOOK.el * cam.up - a3p * AIM3.cam.el - (AIM3.on && slotNow().aim ? (p.gPit || 0) * AIM3.pCam : 0), .12, dt);
   // **AND THE LOOK POINT IS CHEST HEIGHT ON THE BODY BEING DRAWN (m112).** `CAM.look` is his own
   // chest; worn as a 1.78 m drunk that is the man's waist, so the lens frames him low. It is the
   // one term the morph moves -- the collider and every speed stay his, deliberately.

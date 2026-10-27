@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## 3D AIM IS THE 2D AIM PLUS A PITCH (m1326)
+
+*"Go back to the auto shoot upon release; leave the left stick to jumping. The aimer should never move to the side of the screen -- it always stays centred. It doesn't need to work any different than the regular game: pushing left on the right stick already turns the camera left. The only difference is your view can slightly gimbal up or down... when you let go it eases your camera view back to parallel to the ground. It might just become the default."*
+
+- **`aim3Gun`'s own trigger is out of the loop.** That was m1282's always-aiming with a left-tap fire, and m1293's absolute "drawing tablet" cursor. In 3D AIM, `stepKit` now runs the ORDINARY 2D trigger: hold up to aim, release to fire, sideways turns the lens (`flyAim` no longer includes 3D AIM).
+- **The left tap is the jump again** (the `aim3Fire` branch is removed from the left tap).
+- **`aim3Pitch` adds the one difference:**
+  - While aiming, the thumb's travel up or down from WHERE IT ARMED is a pitch RATE: `pRate` 1.1 rad/s at `pSpan` .3 of the pad, with a 12% dead zone, held to `pMax` ±25°.
+  - The shot leaves along the lens's bearing at that pitch (`p.gDir`, yaw always 0), so the reticle stays centred.
+  - The lens tilts with it: `cam.el` drops by `pCam` .85 of the pitch.
+  - On release the pitch eases back to level (`pBack` .25 s half-life).
+- In 3D AIM there is no lock-on assist: `aimRaw` already returns the raw line when `aim3Live`, so where you point is where it goes.
+- `AIM3.cam.el` is 0 now. The old over-the-shoulder dip is gone, because the view should be the 2D one.
+- **If the pitch feels slow, or the wrong way up,** the numbers are live on `mel.AIM3`: `pRate`, `pSpan`, `pMax`, `pCam`.
+
 ## m1326 -- the Octagonal Block Pagoda's gates (X4, WORKER A; his DOORS, GATES -- AND CHAOS rule)
 
 Every door in the pagoda and the fence gate now has **real leaves**, from the shared helper (`bgateMake` / `bgateStep` / `bgateHit`):
