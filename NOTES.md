@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- Timber Siege Fort pass 7 of 10: the timber gives way (X3, WORKER A)
+
+**Cut the braces and the bays sag and fall** (`tfortFace`):
+- **Each tier face keeps its own parts**: the X-braces in its bays, its rails, and the outer 2 m of the deck over it. That deck edge is now
+  breakable plank pieces (4 hits) that belong to the face. The middle of every deck stays whole, and so does the top tier's back, where
+  the watch house stands.
+- **Its strength is the share of its braces still standing.**
+  - Under 70% the deck edge SAGS: the planks droop toward the edge, up to .35 m at the lip, with a creak and a small shake.
+  - Under 35% the whole face COLLAPSES. Every brace, rail and edge plank on it comes down, a third of the planks tumble off outward as
+    long debris, and dust rolls along the face with a deep boom and a big shake. Anyone standing on that edge falls.
+- **It is built back.** A fallen face rebuilds a minute later, with a beam of light. Any other broken block (a rail, a brace, a log, a
+  palisade log) comes back a minute after it broke, never into him. A sagging face straightens once all its braces are back.
+
+SHIPPED UNVERIFIED. Next: pass 8, the camp round it.
+
 ## THE DOJO HALL x1.5 -- STEER S2 (older rows, m1336)
 
 The first of the older forge rows (27 of them), one per build.
