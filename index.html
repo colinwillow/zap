@@ -19849,9 +19849,12 @@ function smashStep(dt) { const p = player;
 // .32 m steps on the courtyard side, a vermilion TORII at their foot, STONE LANTERNS (toro) at the top and bottom, a HONDEN (the sanctuary)
 // at the back with a door and a curved roof, and in the middle of the terrace the JIN CORE: a great glowing crystal floating over a stone
 // basin, turning and breathing, with stones orbiting it. Grapple rings at the honden's eaves.
-const SHRINE = { kujiCd: 20, at: [0, 37.5], heal: 30, W: 14, D: 12, H: 3.2, steps: 10, on: null };
+const SHRINE = { scale: 1.5, kujiCd: 20, at: [0, 37.5], heal: 30, W: 14, D: 12, H: 3.2, steps: 10, on: null };
 function shrineBuild() {
-  if (SHRINE.on) return; const A = SHRINE, [cx, cz] = A.at, H = A.H, hw = A.W / 2, hd = A.D / 2, g = new THREE.Group(); scene.add(g);
+  // STEER S2 (x1.5, m1351): the terrace 14 x 12 x 3.2 -> 21 x 18 x 4.8, the honden, the torii and the spacing of everything on it scale;
+  // THE STEPS DO NOT -- his step is .357, so the 4.8 m terrace takes 16 risers of .30 (8 m of stair), never ten of .48
+  if (SHRINE.on) return; const k = SHRINE.scale || 1, A = Object.assign({}, SHRINE, { W: SHRINE.W * k, D: SHRINE.D * k, H: SHRINE.H * k }), [cx, cz] = A.at;
+  A.steps = Math.max(SHRINE.steps, Math.ceil(A.H / .3)); const H = A.H, hw = A.W / 2, hd = A.D / 2, g = new THREE.Group(); scene.add(g);
   const O = { meshes: [], boxes: [], walls: [] };
   const stone = new THREE.MeshStandardMaterial({ color: 0x9a948c, roughness: .95 }), stoneD = new THREE.MeshStandardMaterial({ color: 0x77726b, roughness: .95 }), wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 });
   const verm = new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .45 }), black = new THREE.MeshStandardMaterial({ color: 0x17130f, roughness: .6 }), plaster = new THREE.MeshStandardMaterial({ color: 0xeae6de, roughness: .9 });
@@ -19862,12 +19865,12 @@ function shrineBuild() {
   add(new THREE.BoxGeometry(A.W, H, A.D), stone, cx, H / 2, cz, 1);
   for (const [sx, sz, L, along] of [[0, 1, A.W, 1], [0, -1, A.W, 1], [1, 0, A.D, 0], [-1, 0, A.D, 0]]) add(new THREE.BoxGeometry(along ? L + .3 : .3, .2, along ? .3 : L + .3), stoneD, cx + sx * hw, H + .1 - .1, cz + sz * hd, 0);
   // THE STEPS down the front (-z): ten risers of .32, half a metre deep, 5 m wide, each its own solid box (a box top under a step is a floor)
-  const sw = 5, rise = H / A.steps, run = .5;
+  const sw = 5 * k, rise = H / A.steps, run = .5;
   for (let k = 0; k < A.steps; k++) { const top = (k + 1) * rise, z0 = cz - hd - (A.steps - k) * run; add(new THREE.BoxGeometry(sw, top, run + .02), k % 2 ? stone : stoneD, cx, top / 2, z0 + run / 2, 1); }
   const zFoot = cz - hd - A.steps * run;
   for (const sx of [-1, 1]) add(new THREE.BoxGeometry(.5, H + .5, A.steps * run), stoneD, cx + sx * (sw / 2 + .25), (H + .5) / 2, cz - hd - A.steps * run / 2, 1);     // the cheek walls
   // THE TORII at the foot of the steps
-  { const tz = zFoot - 1.6, TH = 6.2, px = 2.6;
+  { const tz = zFoot - 1.6 * k, TH = 6.2 * k, px = 2.6 * k;
     for (const sx of [-1, 1]) { add(new THREE.CylinderGeometry(.24, .28, TH, 12), verm, cx + sx * px, TH / 2, tz, 0); O.boxes.push({ minx: cx + sx * px - .3, maxx: cx + sx * px + .3, miny: 0, maxy: TH, minz: tz - .3, maxz: tz + .3 }); add(new THREE.CylinderGeometry(.34, .34, .35, 12), black, cx + sx * px, .17, tz, 0); }
     add(new THREE.BoxGeometry(px * 2 + 1.6, .3, .3), verm, cx, TH - 1, tz, 0); add(new THREE.BoxGeometry(px * 2 + 1.6, .26, .5), verm, cx, TH - .1, tz, 0); add(new THREE.BoxGeometry(px * 2 + 2, .24, .66), black, cx, TH + .14, tz, 0);
     for (const sx of [-1, 1]) { const e = add(new THREE.BoxGeometry(1.3, .24, .66), black, cx + sx * (px + 1.35), TH + .3, tz, 0); e.rotation.z = sx * .28; } }
@@ -19875,12 +19878,12 @@ function shrineBuild() {
   const toro = (x, y, z) => { add(new THREE.CylinderGeometry(.45, .55, .3, 6), stone, x, y + .15, z, 0); add(new THREE.CylinderGeometry(.16, .2, 1.1, 8), stone, x, y + .85, z, 0);
     add(new THREE.BoxGeometry(.7, .2, .7), stone, x, y + 1.5, z, 0); add(new THREE.BoxGeometry(.5, .5, .5), lamp, x, y + 1.85, z, 0); add(new THREE.ConeGeometry(.65, .55, 4).rotateY(Math.PI / 4), stoneD, x, y + 2.37, z, 0);
     add(new THREE.SphereGeometry(.12, 8, 6), stone, x, y + 2.75, z, 0); O.boxes.push({ minx: x - .45, maxx: x + .45, miny: y, maxy: y + 2.6, minz: z - .45, maxz: z + .45 }); };
-  for (const sx of [-1, 1]) { toro(cx + sx * 4.2, 0, zFoot + .6); toro(cx + sx * 3.4, H, cz - hd + 1); }
+  for (const sx of [-1, 1]) { toro(cx + sx * 4.2 * k, 0, zFoot + .6); toro(cx + sx * 3.4 * k, H, cz - hd + 1); }
   // THE HONDEN at the back of the terrace: plaster walls on a timber frame, a door on its front, a curved roof
-  const hz = cz + hd - 3, hw2 = 3.2, hd2 = 2.2, wh = 3;
+  const hz = cz + hd - 3 * k, hw2 = 3.2 * k, hd2 = 2.2 * k, wh = 3 * k, dW = k > 1 ? 1.2 : .8;
   for (const [sx, sz, L, along] of [[0, 1, hw2 * 2, 1], [1, 0, hd2 * 2, 0], [-1, 0, hd2 * 2, 0]]) add(new THREE.BoxGeometry(along ? L : .25, wh, along ? .25 : L), plaster, cx + sx * hw2, H + wh / 2, hz + sz * hd2, 1);
-  for (const sx of [-1, 1]) add(new THREE.BoxGeometry(hw2 - .8, wh, .25), plaster, cx + sx * (hw2 + .8) / 2, H + wh / 2, hz - hd2, 1);
-  add(new THREE.BoxGeometry(1.8, .4, .3), wood, cx, H + wh - .2, hz - hd2, 0);
+  for (const sx of [-1, 1]) add(new THREE.BoxGeometry(hw2 - dW, wh, .25), plaster, cx + sx * (hw2 + dW) / 2, H + wh / 2, hz - hd2, 1);
+  add(new THREE.BoxGeometry(dW * 2 + .2, .4, .3), wood, cx, H + wh - .2, hz - hd2, 0);
   for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) add(new THREE.BoxGeometry(.3, wh + .2, .3), wood, cx + sx * hw2, H + (wh + .2) / 2, hz + sz * hd2, 0);
   bldRoof(g, cx, hz, hw2 + 1.3, hd2 + 1.3, hw2 * .6, H + wh + 2.4, H + wh + .2, .55, wood);
   const rings = []; for (const [sx, sz] of [[-1, -1], [1, -1]]) rings.push(gringAdd(g, cx + sx * (hw2 + 1.6), H + wh + .1, hz + sz * (hd2 + 1.6)));
@@ -19892,7 +19895,7 @@ function shrineBuild() {
   const orb = []; for (let k = 0; k < 3; k++) { const st = new THREE.Mesh(new THREE.DodecahedronGeometry(.28, 0), stoneD); st.castShadow = true; g.add(st); orb.push(st); }
   // ---- PASS 2 (m1141): the koi pond, the stone beam, sake barrels and offering pots to smash, the core HEALS ----
   // THE KOI POND, west of the steps: a stone rim, dark water, koi circling, stepping stones across it
-  const pond = [cx - 6.6, cz - hd - 2.8], pr = 2.6;
+  const pond = [cx - 6.6 * k, cz - hd - 2.8 * k], pr = 2.6 * k;
   { add(new THREE.TorusGeometry(pr, .28, 6, 32).rotateX(Math.PI / 2), stoneD, pond[0], .15, pond[1], 0);
     add(new THREE.CircleGeometry(pr, 32).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x1d4a5a, roughness: .15, metalness: .2 }), pond[0], .04, pond[1], 0).castShadow = false;
     for (let k = 0; k < 4; k++) add(new THREE.CylinderGeometry(.36, .44, .3, 9), stone, pond[0] - 1.8 + k * 1.2, .15, pond[1] + (k % 2 ? .5 : -.4), 0); }
@@ -19905,10 +19908,10 @@ function shrineBuild() {
     bldTris(O, [bx0, H, bz - w, bx1, H, bz - w, bx1, H, bz + w, bx0, H, bz - w, bx1, H, bz + w, bx0, H, bz + w]); }
   // SAKE BARRELS (komodaru, straw-wrapped, a red band) by the honden and OFFERING POTS at the terrace's front corners -- smash them
   const smash = []; { const straw = new THREE.MeshStandardMaterial({ color: 0xd8c896, roughness: .95 }), band = new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .6 }), clay = new THREE.MeshStandardMaterial({ color: 0x5a4a3c, roughness: .7 });
-    for (const [dx, dz] of [[-5, 3.4], [-5.9, 3.4], [-5.45, 4.3], [5, 3.4], [5.9, 3.4], [5.45, 4.3]]) { const x = cx + dx, z = cz + dz, m = add(new THREE.CylinderGeometry(.42, .42, .9, 12), straw, x, H + .45, z, 0);
+    for (const [dx, dz] of [[-5, 3.4], [-5.9, 3.4], [-5.45, 4.3], [5, 3.4], [5.9, 3.4], [5.45, 4.3]]) { const x = cx + dx * k, z = cz + dz * k, m = add(new THREE.CylinderGeometry(.42, .42, .9, 12), straw, x, H + .45, z, 0);
       const bd = new THREE.Mesh(new THREE.CylinderGeometry(.43, .43, .18, 12), band); bd.position.y = .1; m.add(bd);
       smashAdd(smash, m, { minx: x - .42, maxx: x + .42, miny: H, maxy: H + .9, minz: z - .42, maxz: z + .42 }, 2, 15, [.85, .78, .55]); }
-    for (const [dx, dz] of [[-5.8, -4.8], [5.8, -4.8], [-6.2, -3.9], [6.2, -3.9]]) { const x = cx + dx, z = cz + dz, m = add(new THREE.SphereGeometry(.38, 12, 10), clay, x, H + .36, z, 0); m.scale.y = 1.15;
+    for (const [dx, dz] of [[-5.8, -4.8], [5.8, -4.8], [-6.2, -3.9], [6.2, -3.9]]) { const x = cx + dx * k, z = cz + dz * k, m = add(new THREE.SphereGeometry(.38, 12, 10), clay, x, H + .36, z, 0); m.scale.y = 1.15;
       smashAdd(smash, m, { minx: x - .38, maxx: x + .38, miny: H, maxy: H + .8, minz: z - .38, maxz: z + .38 }, 1, 12, [.45, .36, .28]); } }
   // ---- PASS 3 (m1142): the polish -- a shimenawa and a suzu bell on the honden, a glowing alien tree, cables and a drone ----
   { const straw = new THREE.MeshStandardMaterial({ color: 0xc9b07a, roughness: 1 }), paper = new THREE.MeshStandardMaterial({ color: 0xf4f1ea, roughness: .9, side: THREE.DoubleSide });
@@ -19933,7 +19936,7 @@ function shrineBuild() {
   // ---- PASS 4 (m1177): two stone KITSUNE (fox guardians) at the head of the steps whose glowing eyes and heads turn to WATCH him; an
   // OFFERING BOX before the honden -- strike it and gold coins burst out with a chime; a board of hanging EMA plaques that swing ----
   const foxes = []; { const st = new THREE.MeshStandardMaterial({ color: 0xb8b2a8, roughness: .95 }), eyeM = new THREE.MeshBasicMaterial({ color: 0xff8a2a, toneMapped: false }), bib = new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .8 });
-    for (const sx of [-1, 1]) { const fx = new THREE.Group(); fx.position.set(cx + sx * 3.2, H, cz - hd + 2.1); g.add(fx);
+    for (const sx of [-1, 1]) { const fx = new THREE.Group(); fx.position.set(cx + sx * 3.2 * k, H, cz - hd + 2.1); g.add(fx);
       const ped = new THREE.Mesh(new THREE.BoxGeometry(1, .7, 1), stoneD); ped.position.y = .35; fx.add(ped);
       const body = new THREE.Mesh(new THREE.SphereGeometry(.42, 12, 10), st); body.scale.set(.8, 1.1, 1.1); body.position.y = 1.15; fx.add(body);
       const hdg = new THREE.Group(); hdg.position.y = 1.75; fx.add(hdg); const head = new THREE.Mesh(new THREE.SphereGeometry(.28, 12, 10), st); head.scale.set(1, .9, 1.1); hdg.add(head);
@@ -19951,19 +19954,19 @@ function shrineBuild() {
   // ---- PASS 5 (m1216): THE FOX GATE -- a little vermilion torii east of the steps with a Jin veil hung in it: while the Senbon Torii
   // stands, walk through the veil and you are carried to its fox shrine's terrace; step up to that shrine's red door and you come back
   // out here. The veil goes dark (grey) when there is nowhere to go ----
-  const fg = [cx + 5, zFoot - .4]; let veil; { const r = new THREE.MeshStandardMaterial({ color: 0xd8401f, roughness: .55 }), k = new THREE.MeshStandardMaterial({ color: 0x1a1614, roughness: .6 });
+  const fg = [cx + 5 * k, zFoot - .4]; let veil; { const r = new THREE.MeshStandardMaterial({ color: 0xd8401f, roughness: .55 }), k = new THREE.MeshStandardMaterial({ color: 0x1a1614, roughness: .6 });
     for (const sx of [-1, 1]) { add(new THREE.CylinderGeometry(.1, .12, 2.4, 8), r, fg[0] + sx * .8, 1.2, fg[1], 0); O.boxes.push({ minx: fg[0] + sx * .8 - .12, maxx: fg[0] + sx * .8 + .12, miny: 0, maxy: 2.4, minz: fg[1] - .12, maxz: fg[1] + .12 }); BOXES.push(O.boxes[O.boxes.length - 1]); }
     add(new THREE.BoxGeometry(2.3, .16, .2), k, fg[0], 2.48, fg[1], 0); add(new THREE.BoxGeometry(1.9, .12, .14), r, fg[0], 2.1, fg[1], 0);
     veil = add(new THREE.PlaneGeometry(1.5, 2), new THREE.MeshBasicMaterial({ color: 0x7ff0ff, transparent: true, opacity: .35, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }), fg[0], 1.05, fg[1], 0); veil.castShadow = false; }
   // ---- PASS 6 (m1240): OMIKUJI -- a hexagonal fortune box on the terrace and a rack of cords beside it; strike the box and it rattles and
   // a paper fortune flies up and ties itself to the rack: GREAT LUCK (full health, a gold shower), GOOD LUCK (some health), or -- now and
   // then -- BAD LUCK (a little lightning bolt on his own head). One fortune every `kujiCd` s; the rack keeps the last twelve slips ----
-  const kuji = { x: cx - 4.8, z: cz - hd + 2.6, cd: 0, slips: [] }; { const kw = new THREE.MeshStandardMaterial({ color: 0x8a5a2a, roughness: .7 }), rk = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 });
+  const kuji = { x: cx - 4.8 * k, z: cz - hd + 2.6, cd: 0, slips: [] }; { const kw = new THREE.MeshStandardMaterial({ color: 0x8a5a2a, roughness: .7 }), rk = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 });
     kuji.box = new THREE.Mesh(new THREE.CylinderGeometry(.28, .28, .7, 6), kw); kuji.box.position.set(kuji.x, H + .35 + .5, kuji.z); kuji.box.castShadow = true; g.add(kuji.box);
     const stand = new THREE.Mesh(new THREE.BoxGeometry(.6, .5, .6), rk); stand.position.set(kuji.x, H + .25, kuji.z); g.add(stand); O.boxes.push({ minx: kuji.x - .3, maxx: kuji.x + .3, miny: H, maxy: H + .5, minz: kuji.z - .3, maxz: kuji.z + .3 }); BOXES.push(O.boxes[O.boxes.length - 1]); boxGrid();
     kuji.rx = kuji.x - 1.2; for (const s2 of [-1, 1]) { const p2 = new THREE.Mesh(new THREE.BoxGeometry(.08, 1.6, .08), rk); p2.position.set(kuji.rx + s2 * .9, H + .8, kuji.z); g.add(p2); }
     for (const y of [1.1, 1.45]) { const c = new THREE.Mesh(new THREE.CylinderGeometry(.015, .015, 1.8, 4).rotateZ(Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xc8341f })); c.position.set(kuji.rx, H + y, kuji.z); g.add(c); } kuji.H = H; }
-  SHRINE.on = { g, O, bars: [], rings, core, crys, shell, orb, t: 0, koi, pond, pr, smash, healT: 0, drone, wispT: 0, foxes, obox, ema, obT: 0, fg, veil, warpCd: 0, kuji };
+  SHRINE.on = { A, g, O, bars: [], rings, core, crys, shell, orb, t: 0, koi, pond, pr, smash, healT: 0, drone, wispT: 0, foxes, obox, ema, obT: 0, fg, veil, warpCd: 0, kuji };
   arenaBeam(cx, cz, [.5, .9, 1], 1); snd('clang', { g: .6, r: 1.1 });
 }
 function shrineWarp(S, dt) { const p = player, live = !!STORII.on; S.veil.material.color.setHex(live ? 0x7ff0ff : 0x404850); S.veil.material.opacity = live ? .3 + Math.sin(S.t * 3) * .12 : .12;
@@ -19977,15 +19980,15 @@ function shrineStep(dt) { const S = SHRINE.on; if (!S) return; S.t += dt; const 
     for (const P of K.slips) if (P.fly > 0) { P.fly -= dt; const u = 1 - P.fly / .8; P.m.position.set(K.x + (P.to[0] - K.x) * u, K.H + 1.2 + Math.sin(u * Math.PI) * 1.4 + (P.to[1] - K.H - 1.2) * u, K.z); P.m.rotation.y += dt * 9; } }
   if (S.foxes) { const p = player; for (const F of S.foxes) { const P = F.fx.position, want = Math.atan2(p.pos.x - P.x, p.pos.z - P.z) + Math.PI; F.hdg.rotation.y += clamp(wrapAngle(want - F.hdg.rotation.y), -2 * dt, 2 * dt); }
     for (let i = 0; i < S.ema.length; i++) S.ema[i].rotation.z = Math.sin(t * 2 + i * .9) * .12; if (S.obT > 0) { S.obT -= dt; S.obox.rotation.z = Math.sin(S.obT * 50) * S.obT * .05; } }
-  { const a = t * .28; S.drone.position.set(C.position.x + Math.cos(a) * 8, SHRINE.H + 8 + Math.sin(t * 1.2) * .4, C.position.z + Math.sin(a) * 6); S.drone.rotation.y = -a; S.drone.children[1].rotation.z = t * .6; }
-  if ((S.wispT -= dt) <= 0) { S.wispT = .12; const a = Math.random() * 6.28, r = Math.random() * 1.2; spk(C.position.x + Math.cos(a) * r, SHRINE.H + .8, C.position.z + Math.sin(a) * r, 0, .9 + Math.random() * .6, 0, .07, 1.6, [.5, .95, 1]); }     // wisps rise from the pool
+  { const a = t * .28; S.drone.position.set(C.position.x + Math.cos(a) * 8, S.A.H + 8 + Math.sin(t * 1.2) * .4, C.position.z + Math.sin(a) * 6); S.drone.rotation.y = -a; S.drone.children[1].rotation.z = t * .6; }
+  if ((S.wispT -= dt) <= 0) { S.wispT = .12; const a = Math.random() * 6.28, r = Math.random() * 1.2; spk(C.position.x + Math.cos(a) * r, S.A.H + .8, C.position.z + Math.sin(a) * r, 0, .9 + Math.random() * .6, 0, .07, 1.6, [.5, .95, 1]); }     // wisps rise from the pool
   for (let k = 0; k < S.koi.length; k++) { const r = S.pr * (.45 + .12 * k), a = t * (.35 + k * .07) * (k % 2 ? -1 : 1) + k * 1.3, f = S.koi[k];
     f.position.set(S.pond[0] + Math.cos(a) * r, .1, S.pond[1] + Math.sin(a) * r); f.rotation.y = -a + (k % 2 ? 0 : Math.PI) + Math.sin(t * 6 + k) * .2; }
   // THE CORE HEALS: stand at its basin and the Jin flows into him (health back at `heal`/s, motes streaming down into him)
   { const p = player, d = Math.hypot(p.pos.x - C.position.x, p.pos.z - C.position.z);
-    if (d < 2.8 && p.pos.y > SHRINE.H - .5 && p.hp < HEALTH.max) { p.hp = Math.min(HEALTH.max, p.hp + SHRINE.heal * dt); S.healT -= dt;
+    if (d < 2.8 && p.pos.y > S.A.H - .5 && p.hp < HEALTH.max) { p.hp = Math.min(HEALTH.max, p.hp + SHRINE.heal * dt); S.healT -= dt;
       if (S.healT <= 0) { S.healT = .05; const a = Math.random() * 6.28; spk(C.position.x + Math.cos(a) * .6, C.position.y, C.position.z + Math.sin(a) * .6, (p.pos.x - C.position.x) * 1.5, (p.pos.y + 1 - C.position.y) * 1.5, (p.pos.z - C.position.z) * 1.5, .1, .6, [.4, .95, 1]); } } }
-  C.position.y = SHRINE.H + 3 + Math.sin(t * 1.1) * .25; S.crys.rotation.y = t * .5; S.shell.rotation.y = -t * .3; const br = 1 + Math.sin(t * 2) * .06; S.shell.scale.set(.75 * br, 1.25 * br, .75 * br);
+  C.position.y = S.A.H + 3 + Math.sin(t * 1.1) * .25; S.crys.rotation.y = t * .5; S.shell.rotation.y = -t * .3; const br = 1 + Math.sin(t * 2) * .06; S.shell.scale.set(.75 * br, 1.25 * br, .75 * br);
   for (let k = 0; k < S.orb.length; k++) { const a = t * .7 + k * 2.094; S.orb[k].position.set(C.position.x + Math.cos(a) * 2.2, C.position.y + Math.sin(t * 1.3 + k) * .4, C.position.z + Math.sin(a) * 2.2); S.orb[k].rotation.set(t, t * .7, 0); } }
 function shrineKuji(x, y, z, rad) { const S = SHRINE.on; if (!S || !S.kuji || S.kuji.cd > 0) return 0; const K = S.kuji, P = K.box.position; if (Math.hypot(x - P.x, y - P.y, z - P.z) > .8 + rad) return 0;
   K.cd = SHRINE.kujiCd; snd('clang', { g: .4, r: 2.4, x: P.x, z: P.z }); const r = Math.random(), p = player;

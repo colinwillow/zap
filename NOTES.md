@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE SHRINE x1.5 -- STEER S2 (older rows, m1351)
+
+- **The terrace** 14 x 12 x 3.2 → 21 x 18 x 4.8 m.
+- **THE STEPS DO NOT SCALE.** The terrace now takes `ceil(4.8 / .3)` = **16 risers of .30 m** (8 m of stair, 7.5 m wide), not ten of .48: his step is .357.
+- **Scaled with it:**
+  - the honden 6.4 x 4.4 x 3 → 9.6 x 6.6 x 4.5, its door 1.6 → 2.4 m
+  - the torii 6.2 → 9.3 m
+  - the spacing of everything on and around the terrace: the lanterns, the pond (19.5 m round), the barrels and pots, the kitsune, the fox gate, the omikuji
+- **What stays his size:** the stone beam's 30 cm width (it now runs at 4.8 m), the lanterns themselves, barrels, pots, the offering box, the ema.
+- `shrineStep` reads the scaled height (`S.A.H`) for the core, the wisps, the heal zone and the drone.
+
 ## THE LENS TIPS FOR A SENTRY GUN TOO; THE LAST 2D SEND-BACK (m1350)
 
 *"When I hit the archers' arrows and they ricochet, I don't know that I want them to go straight back -- let's do it for now, but it's a little unrealistic and makes it easier. Also when the archers shoot at you your camera bends up so you can see the arrows coming, but it doesn't do this with the rockets, and it should."*
