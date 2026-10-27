@@ -63700,8 +63700,8 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 // to the shop front and to the round back door. Built in its OWN frame (local +z = the front, toward the river; `at`/`yaw` are HOME.hut's) and
 // merged per material; every collider a local box turned into the world (the yaw is a quarter turn, so a box stays a box); every walkable
 // surface a triangle. `?hut=glb` (or GHOME.on = 0) puts the GLB back, to compare. Pass 1: the massing and the walkable shell, with the inside.
-const GHOME = { on: 1, pass: 7, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
-  Rtu: 2.5, door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1.3, rise: .3, g: null, stat: {} };
+const GHOME = { on: 1, pass: 8, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
+  Rtu: 2.5, door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
 function ghNoise3(x, y, z) { const h = (i, j, k) => { let n = (i * 374761393 + j * 668265263 + k * 1274126177) | 0; n = Math.imul(n ^ (n >>> 13), 1274126177); return ((n ^ (n >>> 16)) >>> 0) / 4294967296; };
@@ -63838,11 +63838,30 @@ function ghomeBuild(at, yaw, y0) {
   // pass 5: TIMBER FLOORS in the three rooms
   for (const [x, z, r] of [[0, 0, A.R - A.t], [A.T[0], A.T[1], A.Rt - A.t], [A.Wc[0], A.Wc[1], A.Rw - A.t]]) put(new THREE.CircleGeometry(r - .02, 40), woodP, at4(x, P + .015, z, 0, -Math.PI / 2));
   // ---- INSIDE THE HALL: the screen wall between the shop and his quarters (a wide way through), a counter, his bed, a table ----
-  { const z = A.part, hw = A.R - A.t - .05, d = 1.2; vbox(-hw, -d, P, P + 3.2, z - .15, z + .15, stoneM, 1); vbox(d, hw, P, P + 3.2, z - .15, z + .15, stoneM, 1);
+  { const z = A.part, hw = A.R - A.t - .05, d = 1.2; vbox(-hw, -d, P, P + 3.2, z - .15, z + .15, stoneM, 1); vbox(d, 3.1, P, P + 3.2, z - .15, z + .15, stoneM, 1);     // (it stops short of the tower door)
     vbox(-d, d, P + 2.7, P + 3.2, z - .15, z + .15, wood, 0);
     vbox(-2.2, 2.2, P, P + 1.05, 1.6, 2.3, wood, 1);     // the shop counter, behind the shop front
-    vbox(-3.3, -1.3, P, P + .5, -3.7, -2.0, wood, 1); vbox(-3.25, -1.35, P + .5, P + .7, -3.65, -2.05, new THREE.MeshStandardMaterial({ color: 0x9a2c22, roughness: .9 }), 0);     // his bed
-    vbox(1.4, 2.8, P, P + .8, -3.3, -2.3, wood, 1); }     // a table
+  }
+  // ---- PASS 8: HIS QUARTERS, LIVED IN (behind the screen): his bed (a timber frame, a red blanket, a cream pillow), a woven rug, a brazier of
+  // glowing coals with its own warm light, his KATANA on a rack by the bed, a chest at its foot, a table with two stools and a lantern over it;
+  // and the STORE stacked with barrels, sacks and crates ----
+  { const red = new THREE.MeshStandardMaterial({ color: 0x9a2c22, roughness: .9 }), cream = new THREE.MeshStandardMaterial({ color: 0xe8d8b8, roughness: .9 }), coal = new THREE.MeshStandardMaterial({ color: 0xff7a30, emissive: 0xff5a10, emissiveIntensity: 2.4, toneMapped: false });
+    const steel = new THREE.MeshStandardMaterial({ color: 0xd8dde2, metalness: .9, roughness: .25 }), sack = new THREE.MeshStandardMaterial({ color: 0xb59a6a, roughness: 1 }), rnd = rwRng(91);
+    vbox(-3.0, -1.9, P, P + .38, -2.6, -1.25, wood, 1); vbox(-2.97, -1.93, P + .38, P + .56, -2.57, -1.28, red, 0); vbox(-2.9, -2.0, P + .56, P + .7, -2.55, -2.15, cream, 0);     // the bed
+    put(new THREE.CircleGeometry(1.25, 28), red, at4(0, P + .03, -2.5, 0, -Math.PI / 2, 0, 1, 1, .75)); put(new THREE.RingGeometry(1.05, 1.15, 28), cream, at4(0, P + .035, -2.5, 0, -Math.PI / 2, 0, 1, 1, .75));     // the rug
+    { const bx = 2.2, bz = -3.0; put(new THREE.CylinderGeometry(.5, .35, .5, 12), iron, at4(bx, P + .25, bz)); put(new THREE.CylinderGeometry(.42, .42, .06, 12), coal, at4(bx, P + .5, bz)); box(bx - .45, bx + .45, P, P + .55, bz - .45, bz + .45, { noCam: 1 });
+      const L = new THREE.PointLight(0xff8040, 6, 6, 1.6); L.position.set(bx, P + 1.1, bz); g.add(L); }     // the brazier
+    { const kx = -2.1, kz = -3.15; for (const ox of [-.4, .4]) vbox(kx + ox - .04, kx + ox + .04, P, P + 1.3, kz - .04, kz + .04, wood, 0); for (const yy of [.6, 1.05]) vbox(kx - .45, kx + .45, P + yy - .03, P + yy + .03, kz - .05, kz + .05, wood, 0);
+      vbox(kx - .55, kx + .45, P + 1.08, P + 1.12, kz + .02, kz + .06, steel, 0); vbox(kx + .45, kx + .7, P + 1.07, P + 1.13, kz + .02, kz + .06, red, 0); vbox(kx - .55, kx + .45, P + .63, P + .67, kz + .02, kz + .06, steel, 0); vbox(kx + .45, kx + .65, P + .62, P + .68, kz + .02, kz + .06, red, 0); }     // his katana rack
+    vbox(-1.6, -.9, P, P + .45, -1.65, -1.2, wood, 1); vbox(-1.62, -.88, P + .2, P + .26, -1.67, -1.18, iron, 0);     // the chest
+    vbox(1.6, 2.8, P, P + .78, -2.2, -1.35, wood, 1); for (const [x, z] of [[1.3, -1.8], [3.1, -1.8]]) put(new THREE.CylinderGeometry(.2, .18, .45, 10), wood, at4(x, P + .22, z));     // a table and two stools
+    put(new THREE.CylinderGeometry(.11, .11, .26, 6), coal, at4(2.2, P + 2.6, -1.8));
+    // the STORE: barrels, sacks, crates
+    const [Gx, Gz] = A.Wc; for (let i = 0; i < 9; i++) { const a = -2.4 + i * .55 + rnd() * .2, r = A.Rw - A.t - .55, x = Gx + Math.sin(a) * r, z = Gz + Math.cos(a) * r, k = rnd();
+      if (Math.abs(wrapAngle(a - Math.atan2(-Gx, -Gz))) < .6) continue;     // keep the way in from the hall clear
+      if (k < .4) { put(new THREE.CylinderGeometry(.34, .34, .85, 12), wood, at4(x, P + .425, z)); for (const yy of [.15, .7]) put(new THREE.CylinderGeometry(.36, .36, .06, 12), iron, at4(x, P + yy, z)); box(x - .3, x + .3, P, P + .85, z - .3, z + .3, { noCam: 1 }); }
+      else if (k < .7) put(new THREE.SphereGeometry(.36, 10, 8), sack, at4(x, P + .28, z, rnd() * 3, 0, 0, 1, .75, 1));
+      else vbox(x - .32, x + .32, P, P + .6, z - .32, z + .32, wood, 1, { noCam: 1 }); } }
   // ---- THE TOWER'S SPIRAL STAIR: from the hall door round and up to the balcony door, steps of .30 round a solid post ----
   { const a0 = th(Tx, Tz, 0, 0), a1 = balTh + TAU * (balTh > a0 ? 1 : 2) - (balTh > a0 ? 0 : TAU), n = Math.ceil(A.Yb / A.rise), r = A.Yb / n, ri = .6, ro = A.Rt - A.t - .08, da = (a1 - a0) / n;
     put(new THREE.CylinderGeometry(.5, .5, A.Yb + 2.6, 16), wood, at4(Tx, P + (A.Yb + 2.6) / 2, Tz)); box(Tx - .45, Tx + .45, P, P + A.Yb + 2.6, Tz - .45, Tz + .45);
