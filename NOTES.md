@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## GRID LEVEL 1, PASS 3: WALL RUNS AND BARS MADE NECESSARY (m1358)
+
+His list: *"wall running vertically and horizontally... wall run, jump to the other side, wall run more... a three-part jump with a pit, if you fall you do it again... high bars to launch up to another bar or a ledge."* (The rest of his list is in LEVELGRID.md's backlog.)
+
+- **New spec cell kinds:**
+  - **`'vw'`:** a 4.5 m face to run up instead of a ramp. First at (5,1), right after the guards.
+  - **`'wr'`:** a pit with a wall down one side. Consecutive ones alternate sides (`LVG.wrK`). The wall runs from 4 m under the run's height to 3.6 m over it.
+  - **`'bars'`:** a pit with three `hbarMake` bars (no posts), each 2.6 m higher, rising to the next cell's ledge 9 m up.
+- **The end of the level is now:** the gate → a three-part wall run over a pit at Y2 → land → three bars up to Y4 → the zip to E.
+- **A ladder from the ground back to the start of every pit run.**
+- **Measured numbers to watch (the wall run is untuned for this):**
+  - a side run lasts `WRUN.T` 1.15 s at 7.5 m/s, about 8.6 m: one 7 m cell, with the kick for the next
+  - the run-up face is 4.5 m, about what a sprint jump reaches
+  - the bars are 2.6 m apart vertically and 2.3 m horizontally
+
+  If a link is out of reach, those spacings are the numbers to move.
+
 ## GRID LEVEL 1, PASS 2: VERTICALITY (m1357)
 
 STEER 0: *"as many passes as we need... a lot of verticality."* The route and the reasoning are in LEVELGRID.md (L1 pass 2).

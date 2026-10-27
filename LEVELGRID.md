@@ -72,3 +72,27 @@ Change the path, the heights or the beats in `LVG1` (or tell me in words: "make 
   - does the gate-sends-you-back loop read
   - is the under-walkway passage a good reveal
   - the zip
+
+## L1 pass 3 (m1358): THE MOVES WE'VE BUILT, MADE NECESSARY
+
+His list: wall running horizontally and vertically, a three-part wall run with a pit (fall and you do it again), high bars to launch up to a ledge, archers across, destructible buildings and a boss building you bring down, catapults, rockets, turrets, moving platforms to a rope, monkey bars, ropes, swinging, flying zeppelin platforms, swimming.
+
+This pass adds three new cell kinds to the spec:
+
+- **`'vw'`, a VERTICAL WALL:** instead of a ramp, a 4.5 m face to run up. Its top is the ledge you catch.
+  - First used right after the guards (5,1): sprint and jump into it.
+- **`'wr'`, a WALL-RUN cell:** a pit with a tall wall down ONE side. Consecutive `wr` cells put their walls on alternating sides: run, kick across, run, kick, run.
+  - The east climb is now three of them at Y2, (9,7) to (9,9). The land is at (9,10).
+  - A LADDER from the ground leads back up to the start of every pit run, so a fall means doing it again.
+- **`'bars'`, a HIGH-BAR cell:** a pit with three bars, each 2.6 m higher than the last, rising to the ledge of the next cell 9 m up.
+  - At (8,10): from the landing up to (7,10), Y4, where the zip to E leaves.
+
+## The backlog (one or two per pass, from his list)
+
+- moving platforms, one to the next, up to a ROPE
+- monkey bars (R10), rope climbing and swinging, the experiments
+- archers posted ACROSS gaps (shooting while you wall-run)
+- catapults, rocket turrets on the route
+- a FULLY DESTRUCTIBLE building: knock out its legs and it crumbles (the boss building, after the boss)
+- flying zeppelin platforms
+- swimming (a new mechanic: its own sandbox first, per the whole-piece rule)

@@ -23634,9 +23634,14 @@ const LVG = { at: [-45, -185], cell: 7, lev: 4.5, slab: .6, pil: .7, on: null };
 // own walkway; the gate at 10 sends you back under the tower's walkway to find the candle (8) -- which comes out beside the opening ramp, a
 // shortcut loop; the purple spur climbs to the level's roof (Y6, 4) with the whole map below; and the end is a 56 m ZIP from the top of the
 // east climb (11) across the bottom of the map to E.
-const LVG1 = { path: [[1, 1, 0, 'S'], [2, 1, 0], [3, 1, 0], [4, 1, 0, 1], [5, 1, 1], [6, 1, 1], [7, 1, 2], [8, 1, 2], [8, 2, 2], [8, 3, 4, 2], [7, 3, 4], [6, 3, 4], [5, 3, 5, 3],
-    [4, 3, 5], [3, 3, 5], [3, 4, 4], [3, 5, 4, 5], [3, 6, 4, 'gap'], [3, 7, 4], [4, 7, 3, 6], [5, 7, 3], [6, 7, 3], [6, 6, 2], [6, 5, 1], [7, 5, 1], [8, 5, 1, 10], [9, 5, 1], [9, 6, 2], [9, 7, 3], [9, 8, 4],
-    [9, 9, 5], [9, 10, 6, 11], [1, 10, 0, 'E']],
+// L1 PASS 3 (m1358, his: *"implement the things we've made -- wall running, vertically and horizontally; wall run, jump to the other side, wall run
+// more, a three-part run with a pit (fall and you do it again); a vertical wall run; high bars to launch up to another bar or a ledge, two or
+// three to get up to a tower"*): a VERTICAL WALL ('vw', a 4.5 m face to run up) right after the first guards; the end climb is now a THREE-PART
+// WALL RUN over a pit ('wr' x3, walls alternating sides: run, kick across, run, kick, run) with a ladder from the ground back to its start; then
+// three HIGH BARS rising over a pit ('bars') to a ledge 9 m up, where the zip leaves.
+const LVG1 = { path: [[1, 1, 0, 'S'], [2, 1, 0], [3, 1, 0], [4, 1, 0, 1], [5, 1, 1, 'vw'], [6, 1, 1], [7, 1, 2], [8, 1, 2], [8, 2, 2], [8, 3, 4, 2], [7, 3, 4], [6, 3, 4], [5, 3, 5, 3],
+    [4, 3, 5], [3, 3, 5], [3, 4, 4], [3, 5, 4, 5], [3, 6, 4, 'gap'], [3, 7, 4], [4, 7, 3, 6], [5, 7, 3], [6, 7, 3], [6, 6, 2], [6, 5, 1], [7, 5, 1], [8, 5, 1, 10], [9, 5, 1], [9, 6, 2],
+    [9, 7, 2, 'wr'], [9, 8, 2, 'wr'], [9, 9, 2, 'wr'], [9, 10, 2], [8, 10, 2, 'bars'], [7, 10, 4, 11], [1, 10, 0, 'E']],
   branches: [[[6, 5, 1], [6, 4, 1], [6, 3, 1], [6, 2, 1, 8], [5, 2, 1]], [[3, 3, 5], [2, 3, 6], [2, 2, 6], [2, 1, 6, 4]], [[9, 7, 3], [10, 7, 3], [10, 8, 3, 9]]],
   beats: { 1: 'guards', 2: 'climb', 3: 'tower', 5: 'button', 6: 'guards', 8: 'candle', 10: 'gate', 11: 'zip', 4: 'ring', 9: 'cache' }, need: [3, 6, 8] };
 function lvgBuild(spec) {
@@ -23650,9 +23655,16 @@ function lvgBuild(spec) {
   // a cell: a pad (flat) or a ramp from the neighbour it is entered from
   const cellBuild = (q, prev, i) => { const [c, r, y, tag] = q, key = c + ',' + r + ',' + y; if (seen.has(key)) return; seen.add(key); at[key] = { c, r, y, tag, x: X(c), z: Z(r) };
     if (prev && Math.abs(prev[0] - c) + Math.abs(prev[1] - r) !== 1) prev = null;     /* not a neighbour (the zip's far end): a plain pad */
+    if (tag === 'wr' || tag === 'bars') { const pr = prev || q, dc = c - pr[0], dr = r - pr[1], base = pr[2] * Lv, x0 = X(c) - C / 2, z0 = Z(r) - C / 2;
+      if (tag === 'wr') { const sd = (A.wrK = (A.wrK || 0) + 1) % 2 ? 1 : -1, m = mat(i), y0 = Math.max(0, base - 4), y1 = base + 3.6, t = .5;     /* a WALL down one side of a pit, the next one on the other side */
+        const b = dr ? { minx: X(c) + sd * (C / 2 - t / 2) - t / 2, maxx: X(c) + sd * (C / 2 - t / 2) + t / 2, miny: y0, maxy: y1, minz: z0, maxz: z0 + C } : { minx: x0, maxx: x0 + C, miny: y0, maxy: y1, minz: Z(r) + sd * (C / 2 - t / 2) - t / 2, maxz: Z(r) + sd * (C / 2 - t / 2) + t / 2 };
+        put(new THREE.BoxGeometry(b.maxx - b.minx, y1 - y0, b.maxz - b.minz).translate((b.minx + b.maxx) / 2, (y0 + y1) / 2, (b.minz + b.maxz) / 2), m); O.boxes.push(b); }
+      else { for (let k = 0; k < 3; k++) { const u = (k + .5) / 3 - .5, bx = X(c) + dc * u * C, bz = Z(r) + dr * u * C, top2 = base + 2.55 + k * 2.6;     /* three bars, each 2.6 m higher than the last */
+          const B = hbarMake(bx, bz, dc ? Math.PI / 2 : 0, top2 - HBAR.h, 0); HBAR.list.push(B); L0bars.push(B); } }
+      return; }
     if (tag === 'gap') return; const x0 = X(c) - C / 2, x1 = X(c) + C / 2, z0 = Z(r) - C / 2, z1 = Z(r) + C / 2, top = y * Lv, m = mat(i);
-    const py = prev ? prev[2] : (tag === 'S' ? 0 : y), dy = y - py;
-    if (Math.abs(dy) === 1 && prev) { // RAMP: from the edge shared with `prev` at py to the far edge at y
+    const py = prev ? prev[2] : (tag === 'S' ? 0 : y), dy = y - py, vw = tag === 'vw';
+    if (Math.abs(dy) === 1 && prev && !vw) { // RAMP: from the edge shared with `prev` at py to the far edge at y
       const dc = c - prev[0], dr = r - prev[1], lo = Math.min(py, y) * Lv, hi = Math.max(py, y) * Lv, h = (u, w) => { const t = dc ? (dc > 0 ? (u - x0) / C : (x1 - u) / C) : (dr > 0 ? (w - z0) / C : (z1 - w) / C); return (py + (y - py) * t) * Lv; };
       const wg = new THREE.BoxGeometry(C, 1, C, 1, 1, 1); const P = wg.attributes.position; for (let v = 0; v < P.count; v++) { const u = X(c) + P.getX(v), w = Z(r) + P.getZ(v), t = h(u, w); P.setXYZ(v, u, P.getY(v) > 0 ? t : Math.max(0, t - LVG.slab), w); } wg.computeVertexNormals(); put(wg, m);
       pillars(x0, x1, z0, z1, (u, w) => h(u, w) - LVG.slab);     /* m1357: a thin ramp on pillars, open beneath */
@@ -23663,17 +23675,24 @@ function lvgBuild(spec) {
     /* m1357: a raised pad is a SLAB on four pillars (walk under it); the ground pad is a low slab */
     const sb = top > .05 ? LVG.slab : .3, yb = top > .05 ? top - sb : 0; put(new THREE.BoxGeometry(C, sb, C).translate(X(c), yb + sb / 2, Z(r)), m);
     O.boxes.push({ minx: x0, maxx: x1, miny: yb, maxy: yb + sb, minz: z0, maxz: z1 }); if (top > .05) pillars(x0, x1, z0, z1, () => yb);
-    if (prev && Math.abs(dy) >= 2 && dy > 0) { const dc = c - prev[0], dr = r - prev[1], lx = X(c) - dc * (C / 2 + .15), lz = Z(r) - dr * (C / 2 + .15), w = dc ? [.12, .4] : [.4, .12];
+    if (prev && vw && dy > 0) { const dc = c - prev[0], dr = r - prev[1], fx = X(c) - dc * (C / 2 - .3), fz = Z(r) - dr * (C / 2 - .3), lo = py * Lv, t = .6;     /* m1358: a FACE to run up, its top his ledge */
+      const b = dc ? { minx: fx - t / 2, maxx: fx + t / 2, miny: lo, maxy: top, minz: Z(r) - C / 2, maxz: Z(r) + C / 2 } : { minx: X(c) - C / 2, maxx: X(c) + C / 2, miny: lo, maxy: top, minz: fz - t / 2, maxz: fz + t / 2 };
+      put(new THREE.BoxGeometry(b.maxx - b.minx, top - lo, b.maxz - b.minz).translate((b.minx + b.maxx) / 2, (lo + top) / 2, (b.minz + b.maxz) / 2), m); O.boxes.push(b); }
+    if (prev && Math.abs(dy) >= 2 && dy > 0 && !vw && prev[3] !== 'bars') { const dc = c - prev[0], dr = r - prev[1], lx = X(c) - dc * (C / 2 + .15), lz = Z(r) - dr * (C / 2 + .15), w = dc ? [.12, .4] : [.4, .12];
       put(new THREE.BoxGeometry(dc ? .1 : .7, top, dc ? .7 : .1).translate(lx, top / 2, lz), pillar);
       const L = kitClimbAdd({ minx: lx - w[0], maxx: lx + w[0], miny: py * Lv, maxy: top, minz: lz - w[1], maxz: lz + w[1] }, 'lvg_ladder', top); L.mark = { x: X(c), y: top, z: Z(r) }; climbs.push(L); } };
-  spec.path.forEach((q, i) => cellBuild(q, spec.path[i - 1], i));
+  A.wrK = 0; const L0bars = []; spec.path.forEach((q, i) => cellBuild(q, spec.path[i - 1], i));
+  // m1358: a LADDER from the ground back up to the start of every pit run (wall runs, bars): fall, and you do it again
+  spec.path.forEach((q, i) => { const n = spec.path[i + 1]; if (!n || (n[3] !== 'wr' && n[3] !== 'bars') || (q[3] === 'wr' || q[3] === 'bars') || q[2] < 1) return; const top = q[2] * Lv, dc = n[0] - q[0], dr = n[1] - q[1];
+    const lx = X(q[0]) + dc * (C / 2 + .15), lz = Z(q[1]) + dr * (C / 2 + .15), w = dc ? [.12, .4] : [.4, .12]; put(new THREE.BoxGeometry(dc ? .1 : .7, top, dc ? .7 : .1).translate(lx, top / 2, lz), pillar);
+    const Lc = kitClimbAdd({ minx: lx - w[0], maxx: lx + w[0], miny: 0, maxy: top, minz: lz - w[1], maxz: lz + w[1] }, 'lvg_back', top); Lc.mark = { x: X(q[0]), y: top, z: Z(q[1]) }; climbs.push(Lc); });
   for (const B of spec.branches || []) B.forEach((q, i) => { if (i) cellBuild(q, B[i - 1], N - 1); });
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
   // the beats: a numbered marker over each, and its mechanism
   const num = (n, x, y, z, col) => { const cv = document.createElement('canvas'); cv.width = cv.height = 128; const q = cv.getContext('2d'); q.fillStyle = '#0b0d12'; q.beginPath(); q.arc(64, 64, 58, 0, 6.29); q.fill();
     q.strokeStyle = col || '#ffffff'; q.lineWidth = 8; q.stroke(); q.fillStyle = '#fff'; q.font = 'bold 64px sans-serif'; q.textAlign = 'center'; q.textBaseline = 'middle'; q.fillText(String(n), 64, 68);
     const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(cv), depthWrite: false })); sp.scale.setScalar(1.6); sp.position.set(x, y, z); g.add(sp); return sp; };
-  const L = { g, O, climbs, bars: [], rings: [], at, guards: [], arch: [], tur: [], marks: {}, done: {}, t: 0, db: null, gate: null, candle: null, boss: null, zip: null };
+  const L = { g, O, climbs, bars: L0bars, rings: [], at, guards: [], arch: [], tur: [], marks: {}, done: {}, t: 0, db: null, gate: null, candle: null, boss: null, zip: null };
   const C0 = L, top = q => q.y * Lv + .15, spawnSam = (x, z, n, y) => { (async () => { try { const K0 = await arenaLoad('SAMURAI'), AK = ARENA.kinds.SAMURAI, K = HORDE.KS || (HORDE.KS = Object.assign(Object.create(K0), { notice: HORDE.notice, lose: 90, limbs: 1 }));
       for (let k = 0; k < n; k++) { if (LVG.on !== C0) return; const d = bodySpawn(K.P, K, x + (k - (n - 1) / 2) * 1.6, z, (y || 0) + .5); arenaKatana(d, AK); d.horde = 1; d.aggro = 0; d.hp = d.hpMax = 40; d.gap = 1; HORDE.list.push(d); C0.guards.push(d); } } catch (e) {} })(); };
   for (const q of spec.path.concat(...(spec.branches || []))) { const [c, r, y, tag] = q; if (tag === undefined || tag === 'gap') continue; const k = c + ',' + r + ',' + y, P = at[k]; if (L.marks[tag]) continue;
@@ -24334,7 +24353,7 @@ const BLDG = { list: [
   { key: 'fest', t: 'Lantern Festival Street', sub: 'a street of festival stalls (roofs to stand on, breakable backs) under strings of paper lanterns, red gates at both ends, bars across, a robot dragon dance to cut apart (strike the taiko to make it wild)', pass: 3, build: () => festBuild(), clear: () => festClear(), on: () => !!FEST.on, step: dt => festStep(dt) },
   { key: 'heron', t: 'White Heron Castle', sub: 'a Himeji-style castle on a battered stone base: a five-storey white keep under layered grey roofs (every roof walkable, a hall on every storey, steep stairs up, the great pillars, a 2.4 m lookout balcony at the top; every gate and outer door opens, breaks and is rehung), a gallery wing of two corridors to a hollow corner tower (a loop: keep up, across, tower down, back), its roof a path; a ballista on the gallery ridge, archers in the doorways and the lookout, a sentry gate held by two samurai; the approach: a walled ramp that doubles back to a drawbridge over a dry moat (strike a gong to raise or lower it, or knock it down) and a gate on the stone; black pines, stone and paper lanterns, war flags and three white herons wheeling round the keep; a stair up the stone, a storehouse at the foot whose walls break', pass: 12, build: () => heronBuild(), clear: () => heronClear(), on: () => !!HERON.on, step: dt => heronStep(dt) },
   { key: 'gpag', t: 'Great Red Pagoda', sub: 'five storeys of red lacquer: a room on every floor, ladders up through the hatches, a balcony round every storey, a spire; a pavilion whose roof you can climb; a red fence; climb the outside eave to eave, bars, a zipline off the spire; an armoury, a library, a bell room (the alarm), a lookout; archers, a sentry gun, gate guards; glowing windows, lantern halos, a beacon on the spire; streamers, chimes, birds; strike the gong at the top and the tower lights up and the gate opens', pass: 10, build: () => gpagBuild(), clear: () => gpagClear(), on: () => !!GPAG.on, step: dt => gpagStep(dt) },
-  { key: 'lvg1', t: 'Grid Level 1', sub: 'a level planned as logic first (pass 2: VERTICALITY -- seven heights to 27 m, the route crossing under itself, a 56 m zip to the end): a 10 x 10 grid of 7 m cells, a coloured path, numbered beats -- clear the guards (1), the tower (3), strike the button to drop the drawbridge (5), beat the guards (6), light the candle (8) to open the gate (10), ride the zip (11); the boss door at E opens when 3, 6 and 8 are done', pass: 1, build: () => lvgBuild(LVG1), clear: () => lvgClear(), on: () => !!LVG.on, step: dt => lvgStep(dt) },
+  { key: 'lvg1', t: 'Grid Level 1', sub: 'a level planned as logic first (pass 3: a wall to run up, a three-part wall run over a pit, three high bars up to the zip; pass 2: VERTICALITY -- seven heights to 27 m, the route crossing under itself, a 56 m zip to the end): a 10 x 10 grid of 7 m cells, a coloured path, numbered beats -- clear the guards (1), the tower (3), strike the button to drop the drawbridge (5), beat the guards (6), light the candle (8) to open the gate (10), ride the zip (11); the boss door at E opens when 3, 6 and 8 are done', pass: 1, build: () => lvgBuild(LVG1), clear: () => lvgClear(), on: () => !!LVG.on, step: dt => lvgStep(dt) },
   { key: 'court', t: 'The Courtyard', sub: 'a walled court far north (0, 150): a wall-walk all round, the south gate, a stone lane between two timber halls with balconies and walkable roofs, a koi pond and a moon bridge; the two-roofed watchtower over the inner gate; the high road: a lane bridge, a rope bridge, the bell house; the Great Red Pagoda in its corner, ziplines, the maple; archers, a sentry gun, gate guards and a patrol, woken by the bell; koi, pigeons, a fox, fairy dust, sun shafts and paper lanterns; swaying grass, moss, puddles, smashable barrels, a cart and a rack; silence the watchtower (its gun and two archers) and the inner gate opens on a glowing way on', pass: 10, build: () => courtBuild(), clear: () => courtClear(), on: () => !!COURT.on, step: dt => courtStep(dt) },
   { key: 'zramp', t: 'Mega Wall', sub: 'the Ninja Warrior wall: zoom from the red gate (full hold), down the lane, up the bend and straight up the face -- only a full zoom reaches the gold lip; your mark shows how close; or zigzag up the chimney', pass: 3, build: () => zrampBuild(), clear: () => zrampClear(), on: () => !!ZRAMP.on, step: dt => zrampStep(dt) },
   { key: 'swrk', t: 'Sky Wreck', sub: 'a flying junk come down on rock spires: a tilted deck up a fallen mast, a hold of cargo behind breakable planks, a crow\'s nest up two bars', pass: 1, build: () => swrkBuild(), clear: () => swrkClear(), on: () => !!SWRK.on, step: dt => swrkStep(dt) },
