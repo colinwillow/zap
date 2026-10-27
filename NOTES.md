@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## White Heron Castle pass 8 of 10: the approach, the castle's maze (X2, WORKER B)
+
+- **The ramp.** A walled ramp runs along the south of the stone.
+  - **Leg 1** starts at an entrance gate (korai-mon: two posts, a beam, a little roof) at the east, and climbs west 0 to 3 m over 22 m.
+  - **The landing** at the west end turns him round.
+  - **Leg 2** doubles back east, 3 to 6 m over 14 m, to a landing at the stone's height. The legs are walkable ramps.
+- **The walls.** They step up with the ramp in 2 m runs, each 1.5 m above the path behind it: white plaster, a dark band, a tiled cap.
+  They are solid. The outer face carries gun ports at the path's height.
+- **The moat and the drawbridge.** Between the top landing and the stone is a 2.3 m dry moat. The DRAWBRIDGE over it is hinged at the
+  stone's edge under a GATE (yagura-mon: posts, a beam, a roof with shachi).
+  - It cycles: down 10 s, rising 2.5 s, up 6 s, lowering 2.5 s (`heronStep`).
+  - Its deck is solid only while it lies flat, so when it rises the gap opens under him. Standing up, it shuts the gate.
+  - When the bridge is up, the way in is the handholds (pass 4), a long jump, or round to the east stair.
+- **What the maze cost.** Every piece is a merged box or ramp (no new materials). The bridge is its own small group (it moves).
+
+SHIPPED UNVERIFIED. Next: pass 9, the light and life (pines, lanterns, the white catching the sun, flags).
 ## m1298 -- Octagonal Block Pagoda pass 10 of 10: the polish (X4, WORKER A)
 
 Read against the reference and the rules, and fixed what was wrong:
