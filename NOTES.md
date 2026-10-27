@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- Timber Siege Fort pass 4 of 10: the portcullis, the courtyard behind, the ramp up (X3, WORKER A)
+## m1333 -- Timber Siege Fort pass 4 of 10: the portcullis, the courtyard behind, the ramp up (X3, WORKER A)
 
 - **A PORTCULLIS** (his rule: a MACHINE you work), a grid of timber bars with spiked feet just inside the front mouth, behind the gate leaves.
   - It is DOWN (solid) until a **LEVER** is struck. There are two: one outside left of the mouth, and one inside the tunnel near the back,
