@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- Octagonal Block Pagoda pass 6 of 10: the guardians (X4, WORKER A)
+## m1289 -- Octagonal Block Pagoda pass 6 of 10: the guardians (X4, WORKER A)
 
 All of them can be killed:
 - **Two STONE LIONS of blocks** (komainu) sit on stone plinths either side of the gate, inside the fence (`opagLion`).
