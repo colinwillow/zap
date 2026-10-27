@@ -19,6 +19,26 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
   - They stream and ripple on a gusting wind.
 
 SHIPPED UNVERIFIED. Next: pass 3, climbing -- the braces and the base as a jungle gym.
+## THE COURTYARD x1.5 -- STEER S2 (C1, m-CT15)
+
+His STEER: *"increase the scale... 1.5... we need room to play"*.
+
+- **How it is scaled:**
+  - The court is still DESIGNED in its old numbers. Every mesh goes into one group `g`, built ×`COURT.scale` (1.5) about the court's centre (0, 150).
+  - Every WORLD-space record is mapped design → world in ONE place at the end of `courtBuild` (`MX`/`MY`/`MZ`): colliders, walkable triangles, ladders (with their exit marks; `fg` reset so the front is re-decided), ziplines, grapple rings, gates (x, z, w, h, r), smashables.
+  - Spawns are mapped where they happen: archers, the sentry gun, the gate pair, the brute, and the patrol's waypoints.
+  - `courtLife` and `courtWin` work in design space. They take his position back through the scale, and map their sparks and sounds out. The bell's hit test uses its world position (`bell.wp`).
+  - **The exception:** the halls' breakable plank walls are built straight in world space, in an unscaled group `gU`, because the chunk logic reads their numbers (Worker B's castle rule).
+- **World sizes now:**
+  - the court is 84 x 96 m
+  - the wall-walk is 3.9 m wide at 6 m
+  - hall balconies are 3.6 m wide at 6 m, hall roofs about 17 m
+  - the watchtower decks are 13.5 m square at 6 and 19.5 m, its top roof about 29 m
+  - the pond is 19.5 m across
+  - the bell deck is at 12 m
+- **What grows that is "his size":** rails (1.4 m), ladder rungs (.48 apart, visual only: the climb is a volume), kerbs (.24, still under his .357 step) and the barrels. Same trade as the castle.
+- **The Great Red Pagoda in the corner grows with it.** `gpagBuild({ court, scale })` is its own ×1.5 build: at (-27, 181.5) its widest eave clears the court's west wall by about 0.75 m.
+- **FIXED ON THE WAY: passes 7 and 10 were partly invisible.** The moss, the kerbs, the eave lanterns, the tower fascia and the gate lanterns were `box()` calls made AFTER the merge buckets were flushed, so they never drew. The flush is now the last thing `courtBuild` does.
 
 ## m1328 -- Timber Siege Fort pass 1 of 10: the mass (X3, WORKER A)
 

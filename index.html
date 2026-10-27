@@ -23282,9 +23282,13 @@ function bgateHit(G, x, y, z, rad) { if (!G || G.broken > 0 || G.hc > G.t) retur
   G.hc = G.t + .2; G.hp--; spkBurst(x, y, z, 14, { col: [.8, .5, .3], spread: 4, size: .14, life: .5 }); snd('thud', { g: .8, r: .8, x, z }); camShake(.08);
   if (G.hp <= 0) { G.broken = G.fix; for (const L of G.leaves) L.g.visible = false; for (let k = 0; k < 4; k++) spkBurst(G.x, 1.4, G.z, 26, { col: k % 2 ? [.55, .2, .15] : [.9, .7, .4], spread: 7, size: .22, life: .9 });
     for (let k = 0; k < 5; k++) smokeAt(G.x + (Math.random() - .5) * 2, 1 + Math.random() * 1.5, G.z + (Math.random() - .5) * 2, 1.6, 1.4); snd('boom', { g: .9, r: .9, x: G.x, z: G.z }); camShake(.3); } return 1; }
-const COURT = { at: [0, 150], hw: 28, hd: 32, wallH: 4, walk: 2.6, gate: 6, on: null };
+const COURT = { scale: 1.5, at: [0, 150], hw: 28, hd: 32, wallH: 4, walk: 2.6, gate: 6, on: null };
 function courtBuild() {
-  if (COURT.on) return; const A = COURT, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [], climbs = [];
+  // STEER S2 (his, after walking X4: *"increase the scale... 1.5... we need room to play"*): the court is DESIGNED in the old numbers and BUILT
+  // x`COURT.scale` about its centre. Every mesh goes into `g`, which is scaled; every WORLD-space thing (colliders, walkable triangles, ladders,
+  // ziplines, rings, gates, smashables, spawns, the pagoda) is mapped design -> world in ONE place at the end (`MX`/`MY`/`MZ`). The breakable
+  // plank walls are built straight in world space in an unscaled group `gU`, because their chunk logic reads their numbers.
+  if (COURT.on) return; const A = COURT, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g); const SC = A.scale || 1, MX = x => cx + (x - cx) * SC, MY = y => y * SC, MZ = z => cz + (z - cz) * SC, gU = new THREE.Group(); scene.add(gU); g.scale.setScalar(SC); g.position.set(cx * (1 - SC), 0, cz * (1 - SC)); const wallB = new Set(); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [], climbs = [];
   const M = (c, r, o) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: r }, o || {}));
   const stone = M(0x9a948c, .95), stoneD = M(0x6e6a64, .95), flag = M(0x8c8780, .9), timber = M(0x3e2c20, .82), timberL = M(0x5a4232, .85), grass = M(0x5f8a3e, .95), water = M(0x2e6f7a, .2, { metalness: .1, transparent: true, opacity: .82 });
   const lamp = M(0xffd9a8, .5, { emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false }), paper = M(0xf2e6c8, .9, { emissive: 0xffa050, emissiveIntensity: .35 }), red = M(0xb3261c, .45);
@@ -23317,7 +23321,7 @@ function courtBuild() {
   for (const sd of [-1, 1]) {
     const xi = cx + sd * 5, xo = cx + sd * 14, xa = Math.min(xi, xo), xb = Math.max(xi, xo), za = Z0 + W + 2.5, zb = za + 17, zm = (za + zb) / 2, hxm = (xa + xb) / 2, t = .35, Hg = 3.8, Y1 = 4, Y2 = 7.8;
     // ground floor: breakable plank walls (the timber texture of the hall's own), a 2 m door on the lane side
-    const wall = (x, z, L, yaw) => O.walls.push(cwallBuild(g, T, x, z, L, t, yaw, Hg, O));
+    const wall = (x, z, L, yaw) => { const n0 = O.boxes.length; O.walls.push(cwallBuild(gU, T, MX(x), MZ(z), L * SC, t * SC, yaw, Hg * SC, O)); for (let i = n0; i < O.boxes.length; i++) wallB.add(O.boxes[i]); };
     wall(hxm, za, xb - xa, 0); wall(hxm, zb, xb - xa, 0); wall(xo, zm, zb - za - t, Math.PI / 2);
     const seg = (zb - za - t - 2) / 2; wall(xi, za + t / 2 + seg / 2, seg, Math.PI / 2); wall(xi, zb - t / 2 - seg / 2, seg, Math.PI / 2);
     for (const [x, z] of [[xa, za], [xb, za], [xa, zb], [xb, zb], [xi, zm - 1.2], [xi, zm + 1.2]]) box(x - .2, x + .2, 0, Y2, z - .2, z + .2, timber, 1);
@@ -23426,23 +23430,19 @@ function courtBuild() {
     courtRings.push(gringAdd(g, tx + 2.6, 7.6, tzz)); }
   // the inner gate under the tower
   const gates = [bgateMake(g, cx, Z1 - W / 2, 5.2, 3.1, true, O)];
-  for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
-  bldTris(O, tris);
-  for (const b of O.boxes) if (!BOXES.includes(b)) BOXES.push(b); boxGrid();
-  for (const Z of zips) ZIPS.push(Z);
-  COURT.on = { g, O, bars: [], rings: courtRings, climbs, gates, zips, bell: { g: bellG, sw: 0, cd: 0 }, t: 0 };
-  if (GPAG.on && !GPAG.on.court) gpagClear(); if (!GPAG.on) { gpagBuild({ at: [cx - 18, cz + 21], court: 1, door: '+x', zipTo: [cx - 12, 1.2, cz + 6] }); if (GPAG.on) bldXrayTag(GPAG.on.g); }
+  COURT.on = { g, gU, O, bars: [], rings: courtRings, climbs, gates, zips, bell: { g: bellG, sw: 0, cd: 0, wp: new THREE.Vector3() }, t: 0, SC, MX, MZ };
+  if (GPAG.on && !GPAG.on.court) gpagClear(); if (!GPAG.on) { gpagBuild({ at: [MX(cx - 18), MZ(cz + 21)], court: 1, scale: SC, door: '+x', zipTo: [MX(cx - 12), 1.2, MZ(cz + 6)] }); if (GPAG.on) bldXrayTag(GPAG.on.g); }
   // ---- PASS 5: THE GUARDS. Archers hold their posts (the watchtower's two decks, the halls' lane balconies) and a sentry gun sits
   // on deck B's south-east corner; on the ground a pair at the south gate, a brute under the bell house and two on their ROUNDS
   // (the lane, the path to the pond, the west strip behind the hall). Every one is in `C.guards`, so the bell wakes them all ----
-  { const C0 = COURT.on; C0.guards = []; C0.arch = []; C0.tur = turretAt(cx + 3.6, YB, tz - 3.6, Math.PI); boxGrid();
-    C0.tw = []; const post = (x, y, z, tw) => archerPost(x, y, z).then(d => { if (COURT.on === C0 && d) { C0.arch.push(d); C0.guards.push(d); if (tw) C0.tw.push(d); } else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {});
+  { const C0 = COURT.on; C0.guards = []; C0.arch = []; C0.tur = turretAt(MX(cx + 3.6), MY(YB), MZ(tz - 3.6), Math.PI); boxGrid();
+    C0.tw = []; const post = (x, y, z, tw) => archerPost(MX(x), MY(y), MZ(z)).then(d => { if (COURT.on === C0 && d) { C0.arch.push(d); C0.guards.push(d); if (tw) C0.tw.push(d); } else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {});
     post(cx - 3.6, YB + .05, tz - 3.6, 1); post(cx - 3.6, YA + .05, tz - 3.8, 1); post(cx - 3.7, H + .05, zmH); post(cx + 3.7, H + .05, zmH);
-    const loop = [[cx + 2, Z0 + W + 4], [cx + 2, cz + 14], [cx - 5, cz + 14], [cx - 21, cz - 5], [cx - 21, Z0 + W + 6], [cx - 4, Z0 + W + 4]];
+    const loop = [[cx + 2, Z0 + W + 4], [cx + 2, cz + 14], [cx - 5, cz + 14], [cx - 21, cz - 5], [cx - 21, Z0 + W + 6], [cx - 4, Z0 + W + 4]].map(([x, z]) => [MX(x), MZ(z)]);
     (async () => { try { const K0 = await arenaLoad('SAMURAI'), AK = ARENA.kinds.SAMURAI, K = HORDE.KS || (HORDE.KS = Object.assign(Object.create(K0), { notice: HORDE.notice, lose: 90, limbs: 1 }));
       const man = (x, z, h, tier) => { if (COURT.on !== C0) return null; const d = bodySpawn(K.P, K, x, z, 0); arenaKatana(d, AK); d.horde = 1; d.aggro = 0; d.hp = d.hpMax = 40; d.gap = 1; d.h = h; if (tier) tierLook(d, tier); HORDE.list.push(d); C0.guards.push(d); return d; };
-      man(cx - 3.2, Z0 + W + 1.6, Math.PI, 'warrior'); man(cx + 3.2, Z0 + W + 1.6, Math.PI, 'warrior');
-      man(bhx - bh - 1.6, bhz, -Math.PI / 2, 'brute');
+      man(MX(cx - 3.2), MZ(Z0 + W + 1.6), Math.PI, 'warrior'); man(MX(cx + 3.2), MZ(Z0 + W + 1.6), Math.PI, 'warrior');
+      man(MX(bhx - bh - 1.6), MZ(bhz), -Math.PI / 2, 'brute');
       for (const i0 of [0, 3]) { const w = loop[i0], d = man(w[0], w[1], 0); if (d) d.patrol = { pts: loop, i: (i0 + 1) % loop.length, wait: 0, sp: 1.3 }; }
     } catch (e) { console.error('[melee] court guards', e); } })(); }
   // ---- PASS 6: THE LIFE. Koi in the pond that scatter when you land in it; pigeons on the two hall ridges and the watchtower's top
@@ -23522,24 +23522,40 @@ function courtBuild() {
           if (k === 1) { const cr = new THREE.Mesh(new THREE.CircleGeometry(.16, 12), gold); cr.position.set(0, -.42, sd * .01); cr.rotation.y = sd > 0 ? Math.PI : 0; pv.add(cr); } C0.noren.push({ pv, ph: k * 1.7 + sd }); } } }
     box(cx - T0 - .05, cx + T0 + .05, YA - .75, YA - .3, tz - T0 - .06, tz - T0 - .02, red, 0); box(cx - T0 - .05, cx + T0 + .05, YA - .82, YA - .75, tz - T0 - .08, tz - T0 - .02, gold, 0);
     for (const sx of [-1, 1]) { const lx = cx + sx * 3.2, lz = Z1 - W - .25; box(lx - .02, lx + .02, 2.6, 3.4, lz - .02, lz + .02, timber, 0); box(lx - .22, lx + .22, 1.95, 2.6, lz - .22, lz + .22, lamp, 0); }
-    { const pl = new THREE.PointLight(0xffa860, 14, 26, 1.6); pl.position.set(cx, 5.2, zmH); g.add(pl); C0.laneL = pl; } }
-  bldXrayTag(g); arenaBeam(cx, Z0, [1, .7, .35], 1); snd('clang', { g: .7, r: .6 });
+    { const pl = new THREE.PointLight(0xffa860, 14 * SC * SC, 26 * SC, 1.6); pl.position.set(cx, 5.2, zmH); g.add(pl); C0.laneL = pl; } }
+  // ---- THE ONE PLACE design -> world (S2): merge the buckets (AT THE END now, so the late passes' boxes -- the moss, the kerbs, the eave
+  // lanterns -- are in them: before this they were added after the flush and never drawn), then map every world-space record ----
+  for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
+  { const mb = b => { const x0 = MX(b.minx), x1 = MX(b.maxx), z0 = MZ(b.minz), z1 = MZ(b.maxz); b.minx = x0; b.maxx = x1; b.miny = MY(b.miny); b.maxy = MY(b.maxy); b.minz = z0; b.maxz = z1; };
+    if (SC !== 1) {
+      for (const b of O.boxes) if (!wallB.has(b)) mb(b);
+      for (let i = 0; i < tris.length; i += 3) { tris[i] = MX(tris[i]); tris[i + 1] = MY(tris[i + 1]); tris[i + 2] = MZ(tris[i + 2]); }
+      for (const L of climbs) { mb(L); L.cx = MX(L.cx); L.cz = MZ(L.cz); L.ha *= SC; L.hn *= SC; L.top = MY(L.top); L.fg = undefined; if (L.mark) L.mark = { x: MX(L.mark.x), y: MY(L.mark.y), z: MZ(L.mark.z) }; }
+      for (const Z of zips) { Z.A = [MX(Z.A[0]), MY(Z.A[1]), MZ(Z.A[2])]; Z.B = [MX(Z.B[0]), MY(Z.B[1]), MZ(Z.B[2])]; }
+      for (const Rg of courtRings) { Rg.x = MX(Rg.x); Rg.y = MY(Rg.y); Rg.z = MZ(Rg.z); }
+      for (const G of gates) { G.x = MX(G.x); G.z = MZ(G.z); G.w *= SC; G.h *= SC; G.r *= SC; }
+      for (const S2 of COURT.on.smash || []) mb(S2.b); }
+    COURT.on.bell.g.getWorldPosition(COURT.on.bell.wp); }
+  bldTris(O, tris);
+  for (const b of O.boxes) if (!BOXES.includes(b)) BOXES.push(b); boxGrid();
+  for (const Z of zips) ZIPS.push(Z);
+  bldXrayTag(g); bldXrayTag(gU); arenaBeam(cx, MZ(Z0), [1, .7, .35], 1); snd('clang', { g: .7, r: .6 });
 }
 // the court's clear condition and its set piece (pass 8)
-function courtWin(C, dt) { const W = C.win; if (!W) return; const [cx, cz] = COURT.at, tz = cz + COURT.hd - COURT.walk / 2;
+function courtWin(C, dt) { const W = C.win; if (!W) return; const [cx, cz] = COURT.at, k = C.SC || 1, tz = cz + COURT.hd - COURT.walk / 2, MXw = x => cx + (x - cx) * k, MZw = z => cz + (z - cz) * k;
   if (W.st === 0) { C.t > 4 && C.tur && C.tur.dead && C.tw && C.tw.length >= 2 && !C.tw.some(d => HORDE.list.includes(d)) && (W.st = 1, W.t = 0); return; }
   W.t += dt; const L = C.life;
-  if (W.st === 1) { W.st = 2; W.pil.visible = true; camShake(.4); snd('boom', { g: 1, r: .4, x: cx, z: tz }); arenaBeam(cx, tz, [.5, 1, 1], 3);
+  if (W.st === 1) { W.st = 2; W.pil.visible = true; camShake(.4); snd('boom', { g: 1, r: .4, x: cx, z: MZw(tz) }); arenaBeam(cx, MZw(tz), [.5, 1, 1], 3);
     if (C.bell) C.bell.sw = .5; for (const G of C.gates || []) { G.force = 1; G.hp = G.hp0 = 99; }
     for (const d of C.guards || []) if (d && HORDE.list.includes(d) && !d.archer) { d.aggro = 0; d.patrol = null; }
     if (C.laneL) C.laneL.color.setHex(0x6fe8ff); if (L) { for (const b of L.birds) if (b.st === 'perch') { b.st = 'flee'; b.t = 0; } L.lamp.emissive.setHex(0x3ad8ff); L.paper.emissive.setHex(0x2ab8ff); } }
   if (W.st === 2) { const u = Math.min(1, W.t / 2.5); W.dm.opacity = .35 * u + Math.sin(W.t * 2.3) * .05 * u; W.pil.material.opacity = Math.max(0, .3 * (1 - W.t / 6)); W.pil.scale.y = Math.min(1, W.t / 1.2); W.pil.position.y = 20 * W.pil.scale.y;
-    if (W.t < 3 && Math.random() < dt * 40) spk(cx + (Math.random() - .5) * 8, 13.5, tz + (Math.random() - .5) * 8, (Math.random() - .5) * 8, 4 + Math.random() * 6, (Math.random() - .5) * 8, .12, 1.6, Math.random() < .5 ? [.5, 1, 1] : [1, .85, .4]);
-    if (W.t > 1 && W.t < 1.1 && C.bell) { C.bell.sw = .5; snd('clang', { g: 1, r: .4, x: C.bell.g.position.x, z: C.bell.g.position.z }); }
+    if (W.t < 3 && Math.random() < dt * 40) spk(MXw(cx + (Math.random() - .5) * 8), 13.5 * k, MZw(tz + (Math.random() - .5) * 8), (Math.random() - .5) * 8, 4 + Math.random() * 6, (Math.random() - .5) * 8, .12, 1.6, Math.random() < .5 ? [.5, 1, 1] : [1, .85, .4]);
+    if (W.t > 1 && W.t < 1.1 && C.bell) { C.bell.sw = .5; snd('clang', { g: 1, r: .4, x: C.bell.wp.x, z: C.bell.wp.z }); }
     if (W.t > 6) W.pil.visible = false;
-    if (Math.random() < dt * 5) spk(cx + (Math.random() - .5) * 4.5, .3 + Math.random() * 2.6, cz + COURT.hd - .3, 0, .3 + Math.random() * .4, -.2, .08, 2, [.5, 1, 1]); }
+    if (Math.random() < dt * 5) spk(MXw(cx + (Math.random() - .5) * 4.5), (.3 + Math.random() * 2.6) * k, MZw(cz + COURT.hd - .3), 0, .3 + Math.random() * .4, -.2, .08, 2, [.5, 1, 1]); }
 }
-function courtLife(C, dt) { const L = C.life; if (!L) return; const t = C.t, p = player, [cx, cz] = COURT.at, px = cx - 12, pz = cz + 6;
+function courtLife(C, dt) { const L = C.life; if (!L) return; const t = C.t, [cx, cz] = COURT.at, k = C.SC || 1, p = { pos: { x: cx + (player.pos.x - cx) / k, y: player.pos.y / k, z: cz + (player.pos.z - cz) / k } }, MXw = x => cx + (x - cx) * k, MZw = z => cz + (z - cz) * k, px = cx - 12, pz = cz + 6;
   // koi: circle; a body in the water (or a landing) scatters them outward for a few seconds
   const inPond = Math.hypot(p.pos.x - px, p.pos.z - pz) < 6.5 && p.pos.y < 1.2;
   for (const K of L.koi) { if (inPond) K.sc = 3; K.sc = Math.max(0, K.sc - dt); const sp = 1 + K.sc * 1.5; K.a += K.w * sp * dt;
@@ -23547,7 +23563,7 @@ function courtLife(C, dt) { const L = C.life; if (!L) return; const t = C.t, p =
     K.f.position.set(px + Math.cos(K.a) * r, .02 + Math.sin(t * 2 + K.a) * .02, pz + Math.sin(K.a) * r); K.f.rotation.y = -K.a + (K.w > 0 ? Math.PI : 0); }
   // birds: perch, flee when you come near, circle over the court, home
   const Bd = L.birds; for (let i = 0; i < Bd.length; i++) { const b = Bd[i]; b.t += dt; const dp = Math.hypot(p.pos.x - b.px, p.pos.y - b.py, p.pos.z - b.pz);
-    if (b.st === 'perch') { b.x = b.px; b.y = b.py; b.z = b.pz; b.fl = 0; if (b.t > 2 + (i % 3)) { b.t = 0; b.h += (Math.random() - .5) * 2; } if (dp < 6 || C.alarm > 29) { b.st = 'flee'; b.t = 0; if (i % 3 === 0) snd('swoosh', { g: .25, r: 1.6, x: b.x, z: b.z }); } }
+    if (b.st === 'perch') { b.x = b.px; b.y = b.py; b.z = b.pz; b.fl = 0; if (b.t > 2 + (i % 3)) { b.t = 0; b.h += (Math.random() - .5) * 2; } if (dp < 6 || C.alarm > 29) { b.st = 'flee'; b.t = 0; if (i % 3 === 0) snd('swoosh', { g: .25, r: 1.6, x: MXw(b.x), z: MZw(b.z) }); } }
     else if (b.st === 'flee') { b.fl = 1; b.y += (5 - b.t * 1.5) * dt + 3 * dt; b.ang += dt * .4; const tx = cx + Math.cos(b.ang) * b.rad, tz2 = cz + Math.sin(b.ang) * b.rad; b.x += (tx - b.x) * Math.min(1, dt * 1.2); b.z += (tz2 - b.z) * Math.min(1, dt * 1.2); if (b.y > b.hy) { b.st = 'circle'; b.t = 0; } }
     else if (b.st === 'circle') { b.fl = .6; b.ang += dt * (.5 + (i % 3) * .1); b.x = cx + Math.cos(b.ang) * b.rad; b.z = cz + Math.sin(b.ang) * b.rad; b.y = b.hy + Math.sin(t + i) * .6; if (b.t > 8 + i % 4 && dp > 8) { b.st = 'home'; b.t = 0; } }
     else { b.fl = .8; const ex = b.px - b.x, ey = b.py - b.y, ez = b.pz - b.z, e = Math.hypot(ex, ey, ez), v = Math.min(e, 6 * dt); if (e > 1e-4) { b.x += ex / e * v; b.y += ey / e * v; b.z += ez / e * v; } if (e < .1) { b.st = 'perch'; b.t = 0; } if (dp < 5) { b.st = 'flee'; b.t = 0; } }
@@ -23558,14 +23574,14 @@ function courtLife(C, dt) { const L = C.life; if (!L) return; const t = C.t, p =
   L.bim.instanceMatrix.needsUpdate = true; L.wim.instanceMatrix.needsUpdate = true;
   // the fox: trots its loop of the west grass; you within 7 m and it BOLTS for the west hall's door, vanishes in, and is back 10 s later
   { const F = L.fox, P = F.g.position, dpl = Math.hypot(p.pos.x - P.x, p.pos.z - P.z); F.t += dt; let sp = 0, tgt = null;
-    if (F.st === 'trot') { tgt = F.pts[F.i]; sp = 1.6; if (Math.hypot(tgt[0] - P.x, tgt[1] - P.z) < .6) F.i = (F.i + 1) % F.pts.length; if (dpl < 7 && p.pos.y < 3) { F.st = 'bolt'; F.t = 0; snd('swoosh', { g: .2, r: 2, x: P.x, z: P.z }); } }
+    if (F.st === 'trot') { tgt = F.pts[F.i]; sp = 1.6; if (Math.hypot(tgt[0] - P.x, tgt[1] - P.z) < .6) F.i = (F.i + 1) % F.pts.length; if (dpl < 7 && p.pos.y < 3) { F.st = 'bolt'; F.t = 0; snd('swoosh', { g: .2, r: 2, x: MXw(P.x), z: MZw(P.z) }); } }
     else if (F.st === 'bolt') { tgt = F.den; sp = 6; if (Math.hypot(tgt[0] - P.x, tgt[1] - P.z) < .5) { F.st = 'hid'; F.t = 0; F.g.visible = false; } }
     else if (F.t > 10 && dpl > 12) { F.st = 'trot'; F.g.visible = true; P.set(F.pts[0][0], 0, F.pts[0][1]); F.i = 1; }
     if (tgt && sp) { const dx = tgt[0] - P.x, dz = tgt[1] - P.z, e = Math.hypot(dx, dz) || 1, v = Math.min(e, sp * dt); P.x += dx / e * v; P.z += dz / e * v; F.h += clamp(wrapAngle(Math.atan2(dx, dz) - F.h), -6 * dt, 6 * dt); F.g.rotation.y = F.h;
       const ph = t * sp * 5; F.legs.forEach((lg, k) => { lg.rotation.x = Math.sin(ph + (k === 0 || k === 3 ? 0 : Math.PI)) * .6; }); P.y = Math.abs(Math.sin(ph)) * .05; F.tail.rotation.y = Math.sin(ph * .5) * .3; } }
   // fairy dust: a few motes a second over the pond and the grass, slow, gold and pale cyan; sun shafts breathe; lamps breathe; lanterns sway
   if (Math.random() < dt * 6) { const a = Math.random() * 6.283, r = Math.random() * 7, cy = Math.random() < .5; const x = cy ? px + Math.cos(a) * r : cx - 22 + Math.random() * 6, z = cy ? pz + Math.sin(a) * r : cz - 20 + Math.random() * 26;
-    spk(x, .4 + Math.random() * 2.2, z, (Math.random() - .5) * .25, .12 + Math.random() * .15, (Math.random() - .5) * .25, .06 + Math.random() * .05, 3 + Math.random() * 2, Math.random() < .6 ? [1, .85, .45] : [.55, 1, .95]); }
+    spk(MXw(x), (.4 + Math.random() * 2.2) * k, MZw(z), (Math.random() - .5) * .25, .12 + Math.random() * .15, (Math.random() - .5) * .25, .06 + Math.random() * .05, 3 + Math.random() * 2, Math.random() < .6 ? [1, .85, .45] : [.55, 1, .95]); }
   L.shaftM.opacity = .055 + Math.sin(t * .37) * .02; L.lamp.emissiveIntensity = 1.8 + Math.sin(t * 1.3) * .25 + Math.sin(t * 7.1) * .06; L.paper.emissiveIntensity = 1.5 + Math.sin(t * 1.1 + 1) * .3;
   for (const N of C.noren || []) N.pv.rotation.x = Math.sin(t * 1.4 + N.ph) * .07 + Math.sin(t * 3.3 + N.ph * 2) * .025;
   if (C.laneL) C.laneL.intensity = 13 + Math.sin(t * 1.3) * 1.2 + Math.sin(t * 7.1) * .4;
@@ -23574,9 +23590,9 @@ function courtLife(C, dt) { const L = C.life; if (!L) return; const t = C.t, p =
 function courtStep(dt) { const C = COURT.on; if (!C) return; C.t += dt; courtWin(C, dt); if (C.tuftT) C.tuftT.value = C.t; if (C.alarm > 0) C.alarm -= dt; courtLife(C, dt); for (const G of C.gates || []) bgateStep(G, dt, C.guards);
   if (C.bell) { const B = C.bell; B.cd = Math.max(0, B.cd - dt); B.sw *= Math.exp(-.9 * dt); B.g.rotation.z = Math.sin(C.t * 3.2) * B.sw; } }
 function courtHit(x, y, z, rad) { const C = COURT.on; if (!C) return 0;
-  if (C.bell && C.bell.cd <= 0) { const P = C.bell.g.position; if (Math.hypot(x - P.x, z - P.z) < 1 + rad && y < P.y + rad && y > P.y - 1.9 - rad) { C.bell.cd = .5; C.bell.sw = Math.min(.5, C.bell.sw + .3); C.alarm = 30; for (const d of C.guards || []) if (d) d.aggro = 1; snd('clang', { g: 1.2, r: .45, x: P.x, z: P.z }); snd('boom', { g: .5, r: .35, x: P.x, z: P.z }); camShake(.15); return 1; } }     /* m1302: the court's alarm bell */
+  if (C.bell && C.bell.cd <= 0) { const P = C.bell.wp || C.bell.g.position, k = C.SC || 1; if (Math.hypot(x - P.x, z - P.z) < k + rad && y < P.y + rad && y > P.y - 1.9 * k - rad) { C.bell.cd = .5; C.bell.sw = Math.min(.5, C.bell.sw + .3); C.alarm = 30; for (const d of C.guards || []) if (d) d.aggro = 1; snd('clang', { g: 1.2, r: .45, x: P.x, z: P.z }); snd('boom', { g: .5, r: .35, x: P.x, z: P.z }); camShake(.15); return 1; } }     /* m1302: the court's alarm bell */
   for (const G of C.gates || []) if (bgateHit(G, x, y, z, rad)) return 1; return 0; }
-function courtClear() { const C = COURT.on; if (!C) return; for (const Z of C.zips || []) { const i = ZIPS.indexOf(Z); if (i >= 0) ZIPS.splice(i, 1); if (player.zip && player.zip.Z === Z) player.zip = null; } if (GPAG.on && GPAG.on.court) gpagClear(); for (const x of C.guards || []) if (x) { bowDrop(x); bodyGone(x); const i = HORDE.list.indexOf(x); if (i >= 0) HORDE.list.splice(i, 1); } if (C.tur) turretDrop(C.tur); smashDrop(C.smash); for (const L of C.climbs) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && C.climbs.includes(player.climb)) climbOff(); bldClear(C); COURT.on = null; }
+function courtClear() { const C = COURT.on; if (!C) return; for (const Z of C.zips || []) { const i = ZIPS.indexOf(Z); if (i >= 0) ZIPS.splice(i, 1); if (player.zip && player.zip.Z === Z) player.zip = null; } if (GPAG.on && GPAG.on.court) gpagClear(); for (const x of C.guards || []) if (x) { bowDrop(x); bodyGone(x); const i = HORDE.list.indexOf(x); if (i >= 0) HORDE.list.splice(i, 1); } if (C.tur) turretDrop(C.tur); smashDrop(C.smash); if (C.gU) C.gU.removeFromParent(); for (const L of C.climbs) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && C.climbs.includes(player.climb)) climbOff(); bldClear(C); COURT.on = null; }
 // m1262: THE GREAT RED PAGODA -- his 10-PASS EXPERIMENT (X1), after his reference `images/korajin/ref/red_pagoda_tower.webp`: a slender
 // five-storey tower in red lacquer, every storey wrapped in a railed BALCONY, every storey under a deep flared tile roof with gold fascia, the
 // roofs stepping in as it rises, a spire of gold rings on top. *"Much more visually interesting and much more functional"* -- so it is HOLLOW:
@@ -23589,7 +23605,7 @@ function gpagBuild(opt) {     // m1307: `opt.at` / `opt.court` -- the courtyard 
   // (storey, plan, shrink, balcony, eave, door, lift), while everything sized to HIS BODY stays: rails at the waist, windows, the rooms'
   // furniture, the ladders' rungs. The pavilion and the fence move OUT with it but keep their own size. Inside the courtyard it stays x1
   // until the court itself is rescaled (it would hit the court walls).
-  opt = opt || {}; if (GPAG.on) return; const S = opt.court ? 1 : GPAG.scale, A = S === 1 ? GPAG : Object.assign({}, GPAG, { hb0: GPAG.hb0 * S, shrink: GPAG.shrink * S, sh: 5.7, balc: GPAG.balc * S, eave: GPAG.eave * S, door: 2.4, doorH: 3.4, lift: GPAG.lift * S }), [cx, cz] = opt.at || A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [];
+  opt = opt || {}; if (GPAG.on) return; const S = opt.court ? (opt.scale || 1) : GPAG.scale, A = S === 1 ? GPAG : Object.assign({}, GPAG, { hb0: GPAG.hb0 * S, shrink: GPAG.shrink * S, sh: 5.7, balc: GPAG.balc * S, eave: GPAG.eave * S, door: 2.4, doorH: 3.4, lift: GPAG.lift * S }), [cx, cz] = opt.at || A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [];
   const lac = new THREE.MeshStandardMaterial({ color: 0xb3261c, roughness: .42 }), lacD = new THREE.MeshStandardMaterial({ color: 0x7e1913, roughness: .5 }), floorM = new THREE.MeshStandardMaterial({ color: 0x4a3324, roughness: .8 });
   const gold = new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .85, roughness: .3 }), stone = new THREE.MeshStandardMaterial({ color: 0x9a948c, roughness: .95 }), plaster = new THREE.MeshStandardMaterial({ color: 0xece4d4, roughness: .9 });
   const lamp = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false });
