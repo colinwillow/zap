@@ -56,5 +56,5 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 | 10 | **Flying Ship House** | a junk-ship hull with a house on deck, floating and bobbing, a gangplank ramp | (0, -40) floating | · · |
 | 11 | **Bathhouse** | a steaming pool inside, a chimney, sliding screens | (-30, 24) | · · |
 | 12 | **Forge-Workshop** | a bronze furnace glowing, gears turning, a crane arm (a bar) | (30, 24) | · · |
-| 13 | **Spider-Bot Hangar** | a low bunker the six-legged spider robots come out of and patrol from (the spider bot itself is built here) | (-30, -24) | · · |
+| 13 | **Spider-Bot Hangar** | a low bunker the six-legged spider robots come out of; the SPIDER BOTS CLIMB THE WALLS of every building (his: "spider robots climbing the walls") -- up the faces, across the roofs, over the beams | (-30, -24) | · · |
 | -- | **The forge's horizon** | snowy white-capped mountains round the forge (one pass, slotted in after the Gatehouse) | -- | |
