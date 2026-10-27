@@ -5,6 +5,29 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## GREAT RED PAGODA x1.5 -- STEER S2 (X1, m-GP15)
+
+His STEER after walking X4: *"increase the scale... 1.5... we need room to play... we're gonna go for SIZE"*.
+
+- **Scaled by its PROPORTIONS, not by a group transform.** `gpagBuild` takes a scaled copy of `GPAG` (`G.A`, read by `gpagStep` too):
+  - plan `hb0` 4.2 → 6.3, `shrink` .5 → .75
+  - storey `sh` 3.8 → 5.7
+  - balcony 2.2 → 3.3, eave 2.7 → 4.05, eave lift 1 → 1.5
+  - door 1.6 → 2.4 and 2.5 → 3.4 high
+
+  So the ground room is about 12 m across and the top one about 6.6 m. The tower stands about 28.5 m plus the spire.
+- **What stays sized to HIS BODY:** balcony rails at the waist, the paper windows, every room's furniture, the ladder rungs (.32). The tower has no stairs: its storeys are joined by the hatch ladders, which simply get longer (5.7 m), and they keep the m1316 one-side and step-over behaviour.
+- **The pavilion and fence move OUT, at their own size:**
+  - the pavilion starts at cz + 11.1
+  - the fence is about 37.5 x 36 m
+  - the gate guards stand at the new gate
+  - the spire's zipline lands inside the new gate
+
+  The pavilion's walkable roof (5.7 m at the ridge) is level with the first balcony (5.7 m), still the first step up.
+- **Moved** from (90, 0) to **(140, -5)**. At ×1.5 the fence would have run into (90, 18.5) and (84, 20.5). Its footprint is now about x 121..159, z -21.5..18, with nothing east of x 105.
+- **Inside the Courtyard it stays ×1** (`opt.court`). At ×1.5 it would cross the court's west and north walls. It grows when C1 is rescaled.
+- **Lost:** climbing the outside eave to eave. The eave lip is now about 4.6 m over each balcony, out of a jump. The bars stay off (m1293). Up is the inside ladders, or the pavilion roof to the first balcony.
+
 ## White Heron Castle x1.5 -- STEER S2 (X2, WORKER B)
 
 His STEER after walking X4: *"increase the scale... start with 1.5... we need room to play... we're gonna go for SIZE"*, and the stairs must

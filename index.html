@@ -23416,9 +23416,13 @@ function courtClear() { const C = COURT.on; if (!C) return; for (const Z of C.zi
 // a room on every storey, a ladder inside each up through a hatch in the next floor (the corners turn as you climb), a door out onto every
 // balcony, and the ground storey's walls breakable. Pass 1 = the stack, the rooms, the ladders, the balconies, the roofs, the spire.
 const GPAG = { gateR: 4.5, gateHp: 3, gateFix: 45, bars: 0, lift: 1.0,     // m1293: bars 0 -- *"I keep getting caught on the high bars climbing the outside"*
-  showT: 30, at: [90, 0], n: 5, hb0: 4.2, shrink: .5, sh: 3.8, balc: 2.2, eave: 2.7, t: .3, door: 1.6, doorH: 2.5, on: null };
+  showT: 30, at: [140, -5], scale: 1.5, n: 5, hb0: 4.2, shrink: .5, sh: 3.8, balc: 2.2, eave: 2.7, t: .3, door: 1.6, doorH: 2.5, on: null };
 function gpagBuild(opt) {     // m1307: `opt.at` / `opt.court` -- the courtyard places it in its north-west corner, with no fence, pavilion or gate of its own
-  opt = opt || {}; if (GPAG.on) return; const A = GPAG, [cx, cz] = opt.at || A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [];
+  // STEER S2 (his, after walking X4): *"increase the scale... 1.5... we need room to play"*. The tower's PROPORTIONS scale by `GPAG.scale`
+  // (storey, plan, shrink, balcony, eave, door, lift), while everything sized to HIS BODY stays: rails at the waist, windows, the rooms'
+  // furniture, the ladders' rungs. The pavilion and the fence move OUT with it but keep their own size. Inside the courtyard it stays x1
+  // until the court itself is rescaled (it would hit the court walls).
+  opt = opt || {}; if (GPAG.on) return; const S = opt.court ? 1 : GPAG.scale, A = S === 1 ? GPAG : Object.assign({}, GPAG, { hb0: GPAG.hb0 * S, shrink: GPAG.shrink * S, sh: 5.7, balc: GPAG.balc * S, eave: GPAG.eave * S, door: 2.4, doorH: 3.4, lift: GPAG.lift * S }), [cx, cz] = opt.at || A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [];
   const lac = new THREE.MeshStandardMaterial({ color: 0xb3261c, roughness: .42 }), lacD = new THREE.MeshStandardMaterial({ color: 0x7e1913, roughness: .5 }), floorM = new THREE.MeshStandardMaterial({ color: 0x4a3324, roughness: .8 });
   const gold = new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .85, roughness: .3 }), stone = new THREE.MeshStandardMaterial({ color: 0x9a948c, roughness: .95 }), plaster = new THREE.MeshStandardMaterial({ color: 0xece4d4, roughness: .9 });
   const lamp = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false });
@@ -23537,7 +23541,7 @@ function gpagBuild(opt) {     // m1307: `opt.at` / `opt.court` -- the courtyard 
   // ---- PASS 3 (m1267): the PAVILION at its foot (the reference's side hall: an open hall on a raised floor under its own deep hip roof --
   // and its roof is WALKABLE, triangles laid on the roof's own curve, so it is the first step up to the first balcony) and the red FENCE
   // round the court, gold flame finials on the gate posts and on every third post ----
-  { const pz0 = cz + 7.4, pz1 = cz + 12.4, px0 = cx - 3.5, px1 = cx + 3.5, pzc = (pz0 + pz1) / 2, fl = .45;
+  { const pz0 = cz + 7.4 * S, pz1 = pz0 + 5, px0 = cx - 3.5, px1 = cx + 3.5, pzc = (pz0 + pz1) / 2, fl = .45;
     box(px0, px1, 0, fl, pz0, pz1, floorM, 1);
     tris.push(px0 + 1, 0, pz1 + 1.4, px1 - 1, 0, pz1 + 1.4, px1 - 1, fl, pz1, px0 + 1, 0, pz1 + 1.4, px1 - 1, fl, pz1, px0 + 1, fl, pz1);     // the steps
     for (let i = 0; i <= 4; i++) for (const z of [pz0 + .2, pz1 - .2]) box(px0 + .2 + i * (px1 - px0 - .4) / 4 - .14, px0 + .2 + i * (px1 - px0 - .4) / 4 + .14, fl, 3.4, z - .14, z + .14, lac, 1);
@@ -23549,7 +23553,7 @@ function gpagBuild(opt) {     // m1307: `opt.at` / `opt.court` -- the courtyard 
       tris.push(cx + xa, hR(xa, za), pzc + za, cx + xb, hR(xb, za), pzc + za, cx + xb, hR(xb, zb), pzc + zb, cx + xa, hR(xa, za), pzc + za, cx + xb, hR(xb, zb), pzc + zb, cx + xa, hR(xa, zb), pzc + zb); }
     box(cx - 1, cx + 1, fl, 1.2, pzc - .4, pzc + .4, lacD, 1); box(cx - .2, cx + .2, 1.2, 1.5, pzc - .2, pzc + .2, lamp, 0);     // an offering table and its lamp
     // THE FENCE: red posts every 2 m, two rails, a 4 m gate on the -x side (to the pagoda's door), solid to the waist
-    const fx0 = cx - 12.5, fx1 = cx + 12.5, fz0 = cz - 11, fz1 = cz + 15.5, fh = 1.7, gw = 2;
+    const fx0 = cx - 12.5 * S, fx1 = cx + 12.5 * S, fz0 = cz - 11 * S, fz1 = cz + 7.4 * S + 8.1, fh = 1.7, gw = 2;
     const run = (ax, c, a0, a1) => { const L = a1 - a0; if (L < .1) return; const n = Math.max(1, Math.round(L / 2));
       for (let i = 0; i <= n; i++) { const a = a0 + L * i / n, big = i % 3 === 0, [x, z] = ax ? [c, a] : [a, c]; mbox(x - .09, x + .09, 0, fh + (big ? .35 : 0), z - .09, z + .09, lac);
         if (big) mg(new THREE.ConeGeometry(.1, .35, 7), gold, _m4.makeTranslation(x, fh + .55, z)); }
@@ -23572,7 +23576,7 @@ function gpagBuild(opt) {     // m1307: `opt.at` / `opt.court` -- the courtyard 
   { const f = new THREE.Mesh(new THREE.ConeGeometry(.22, .8, 8), gold); f.position.set(cx, sy + 5.6, cz); g.add(f); }
   const rings = [gringAdd(g, cx + 1.2, sy + 3, cz)];
   // m1269: the ROPE FROM THE SPIRE -- a zipline off the spire's foot, over the court, down to the gate
-  const zip = { A: [cx - .6, sy + .2, cz], B: opt.zipTo || [cx - 11.5, 2, cz + 3.4] }; ZIPS.push(zip);
+  const zip = { A: [cx - .6, sy + .2, cz], B: opt.zipTo || [cx - 12.5 * S + 1, 2, cz + 3.4] }; ZIPS.push(zip);
   { const c = new THREE.Mesh(new THREE.TubeGeometry(new THREE.LineCurve3(new THREE.Vector3(...zip.A), new THREE.Vector3(...zip.B)), 10, .04, 5), gold); g.add(c); }
   // the GROUND SHRINE inside: an altar with a glowing Jin core
   box(cx + 1.6, cx + 3, 0, .9, cz - 1, cz + 1, lacD, 1); const core = new THREE.Mesh(new THREE.SphereGeometry(.3, 14, 10), new THREE.MeshBasicMaterial({ color: 0x5ff2ff, toneMapped: false })); core.position.set(cx + 2.3, 1.3, cz); g.add(core);
@@ -23608,7 +23612,7 @@ function gpagBuild(opt) {     // m1307: `opt.at` / `opt.court` -- the courtyard 
   // spire's beacon flares into a column of light, the birds burst up, and the court GATE swings open. It settles back after `showT` s ----
   let gong; { const k = N - 1, B = hbOf(k) + A.balc, y0 = yOf(k), gx = cx + B - .45, gz = cz + 1.7; for (const dz of [-.6, .6]) box(gx - .06, gx + .06, y0, y0 + 2.2, gz + dz - .06, gz + dz + .06, lacD, 0); box(gx - .06, gx + .06, y0 + 2.1, y0 + 2.25, gz - .7, gz + .7, lacD, 0);
     gong = new THREE.Mesh(new THREE.CylinderGeometry(.5, .5, .06, 24), new THREE.MeshStandardMaterial({ color: 0xc08a40, metalness: .9, roughness: .3 })); gong.rotation.z = Math.PI / 2; gong.position.set(gx, y0 + 1.4, gz); gong.castShadow = true; g.add(gong); }
-  GPAG.on = { at: [cx, cz], court: !!opt.court, g, O, bars, rings, climbs, core, zip, bell, t: 0, arch: [], guards: [], tur: null, lamp, paperLit, halos, beacon, streamers, chimes, birds, gate, gong, show: -1, gsw: 0 };
+  GPAG.on = { at: [cx, cz], court: !!opt.court, A, g, O, bars, rings, climbs, core, zip, bell, t: 0, arch: [], guards: [], tur: null, lamp, paperLit, halos, beacon, streamers, chimes, birds, gate, gong, show: -1, gsw: 0 };
   // ---- PASS 6 (m1271): THE GUARDIANS -- all killable. ARCHERS posted in balcony corners on storeys 2 and 4 (they hold their posts and loose
   // at him), a SENTRY GUN on storey 3's balcony corner looking out over the court, and two robot SAMURAI at the gate who stand their post
   // until they see him. Strike the BELL and the alarm goes up: the gate pair come for him wherever he is ----
@@ -23616,7 +23620,7 @@ function gpagBuild(opt) {     // m1307: `opt.at` / `opt.court` -- the courtyard 
     for (const [k, sx, sz] of [[2, -1, 1], [4, 1, -1]]) { const [x, y, z] = cor(k, sx, sz); archerPost(x, y, z).then(d => { if (GPAG.on === G0) G0.arch.push(d); else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {}); }
     { const [x, y, z] = cor(3, 1, 1); G0.tur = turretAt(x, y, z, Math.PI / 4); }
     (async () => { try { const K0 = await arenaLoad('SAMURAI'), AK = ARENA.kinds.SAMURAI, K = HORDE.KS || (HORDE.KS = Object.assign(Object.create(K0), { notice: HORDE.notice, lose: 90, limbs: 1 }));
-      for (const sz of [-1, 1]) { if (GPAG.on !== G0 || opt.court) return; const x = cx - 10.6, z = cz + sz * 2.6, d = bodySpawn(K.P, K, x, z, 0); arenaKatana(d, AK); d.horde = 1; d.aggro = 0; d.hp = d.hpMax = 40; d.gap = 1; d.h = -Math.PI / 2;
+      for (const sz of [-1, 1]) { if (GPAG.on !== G0 || opt.court) return; const x = cx - 12.5 * S + 1.9, z = cz + sz * 2.6, d = bodySpawn(K.P, K, x, z, 0); arenaKatana(d, AK); d.horde = 1; d.aggro = 0; d.hp = d.hpMax = 40; d.gap = 1; d.h = -Math.PI / 2;
         HORDE.list.push(d); G0.guards.push(d); } } catch (e) { console.error('[melee] pagoda guards', e); } })(); }
   for (const [m, list] of MG) { const geo = mergeGeometries(list); const o = new THREE.Mesh(geo, m); o.castShadow = true; o.receiveShadow = true; g.add(o); } flushed = 1;     // the buckets, one draw each (pass 10: at the very end, every box in them)
   arenaBeam(cx, cz, [1, .45, .3], 1); snd('clang', { g: .7, r: .6 });
@@ -23631,16 +23635,16 @@ function gpagStep(dt) { const G = GPAG.on; if (!G) return; G.t += dt; G.core.pos
     const want = G.show >= 0 || Gt.broken > 0 || near(player.pos) || (G.guards || []).some(d => d && d.root && d.root.visible && d.aggro && near(d.root.position)) ? 1 : 0; Gt.open += (want - Gt.open) * Math.min(1, dt * 1.5); for (const D of Gt.doors) D.g.rotation.y = D.sz * Gt.open * 1.5;
     const solid = Gt.open < .3 && !(Gt.broken > 0), i = BOXES.indexOf(Gt.box); if (solid && i < 0) { BOXES.push(Gt.box); boxGrid(); } else if (!solid && i >= 0) { BOXES.splice(i, 1); boxGrid(); } }
   if (G.gong) { G.gsw *= Math.exp(-1.5 * dt); G.gong.rotation.x = Math.sin(G.t * 5) * G.gsw; }
-  if (G.show >= 0) { const S = G.show += dt, per = .55, N = GPAG.n, col = G.halos.geometry.attributes.color;
+  if (G.show >= 0) { const S = G.show += dt, per = .55, N = (G.A || GPAG).n, col = G.halos.geometry.attributes.color;
     for (let k = 0; k < N; k++) { const on = S > k * per ? Math.max(0, 1 - (S - k * per - 2) * .15) : 0, v = 1 + 2.5 * on; for (let c = 0; c < 4; c++) col.setXYZ(k * 4 + c, v, v * .9, v * .7);
-      if (S - dt <= k * per && S > k * per) { const [cx, cz] = G.at, y = (k + 1) * GPAG.sh - 1.4, EX = GPAG.hb0 - GPAG.shrink * k + GPAG.eave; for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) spkBurst(cx + sx * EX, y, cz + sz * EX, 14, { col: [1, .75, .3], spread: 4, size: .14, life: .7 }); snd('clang', { g: .5, r: 1.6 - k * .15, x: cx, z: cz }); } }
+      if (S - dt <= k * per && S > k * per) { const [cx, cz] = G.at, y = (k + 1) * (G.A || GPAG).sh - 1.4, EX = (G.A || GPAG).hb0 - (G.A || GPAG).shrink * k + (G.A || GPAG).eave; for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) spkBurst(cx + sx * EX, y, cz + sz * EX, 14, { col: [1, .75, .3], spread: 4, size: .14, life: .7 }); snd('clang', { g: .5, r: 1.6 - k * .15, x: cx, z: cz }); } }
     col.needsUpdate = true; const fl = S > N * per ? Math.max(0, 1 - (S - N * per) * .12) : 0; G.paperLit.emissiveIntensity = .5 + 1.6 * Math.min(1, S / (N * per)) * Math.max(0, 1 - (S - N * per - 4) * .2);
     if (S - dt <= N * per && S > N * per) { const [cx, cz] = G.at; arenaBeam(cx, cz, [1, .7, .3], 2); camShake(.3); snd('boom', { g: 1, r: .5, x: cx, z: cz }); for (const B of G.birds) if (B.st === 'perch') { B.st = 'fly'; B.t = 0; } }
     G.beacon.userData.halo.material.opacity = 1; G.beacon.userData.halo.scale.setScalar(4 + 14 * fl);
-    if (S > GPAG.showT) { G.show = -1; for (let i = 0; i < col.count; i++) col.setXYZ(i, 1, 1, 1); col.needsUpdate = true; } }
+    if (S > (G.A || GPAG).showT) { G.show = -1; for (let i = 0; i < col.count; i++) col.setXYZ(i, 1, 1, 1); col.needsUpdate = true; } }
   if (G.lamp) { const f = .85 + Math.sin(G.t * 7.3) * .08 + Math.sin(G.t * 17.1) * .05; G.lamp.emissiveIntensity = 2 * f; G.halos.material.size = 1.6 * f; if (G.show < 0) G.paperLit.emissiveIntensity = .5 + Math.sin(G.t * 1.3) * .05;     // m1272
     const b = 1 + Math.sin(G.t * 1.1) * .2; if (G.show < 0) G.beacon.userData.halo.scale.setScalar(4 * b); G.beacon.scale.setScalar(.9 + Math.sin(G.t * 9) * .08); }
-  if (G.streamers) { const p = player, [cx, cz] = G.at, top = GPAG.n * GPAG.sh;
+  if (G.streamers) { const p = player, [cx, cz] = G.at, top = (G.A || GPAG).n * (G.A || GPAG).sh;
     for (let i = 0; i < G.streamers.length; i++) { const S = G.streamers[i]; S.rotation.x = Math.sin(G.t * 1.7 + i) * .25; S.rotation.z = Math.sin(G.t * 1.3 + i * 1.7) * .18; }
     for (const C of G.chimes) { C.cd = Math.max(0, C.cd - dt); const P = C.g.position; if (C.cd <= 0 && Math.hypot(p.pos.x - P.x, p.pos.y - P.y, p.pos.z - P.z) < 2.2) { C.cd = 1.2; C.sw = .4; snd('clang', { g: .25, r: 2.4 + Math.random() * .4, x: P.x, z: P.z }); }
       C.sw *= Math.exp(-1.2 * dt); C.g.rotation.z = Math.sin(G.t * 6) * C.sw + Math.sin(G.t * 1.1) * .05; }
