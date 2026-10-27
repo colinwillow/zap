@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1183 -- ZEPPELINS pass 4: supply drops
+
+(The alternating order is oldest first: Hall, Watchtower, Gatehouse, Pagoda, Market, Shrine, Rampart, Airship Dock, now the Zeppelins.)
+- Every `ZEP.dropEvery` 22 s the first zeppelin lets a CRATE go on a red PARACHUTE (rigging lines and all); it drifts down at 2.2 m/s,
+  swaying, and lands wherever it falls -- the ground, a roof, a deck (`groundAt`). Landed, it is a smashable crate (shared `SMASH`, 2 hits,
+  never respawns); up to three lie about, the oldest removed.
+Next: Set 2 #17 Robot Samurai Barracks. Shipped unverified.
+
 ## m1182 -- MOATED KEEP pass 3 (DONE)
 
 - CHAINS from the drawbridge's tip up to the keep wall, following it as it rises and falls.
