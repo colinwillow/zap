@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home, procedural, pass 6: life -- the wind and the swinging orb (WORKER B)
+
+- **THE WIND.** The banner and awning materials flutter in the vertex shader. The cloth moves along its own normal: nothing at the edge it
+  hangs from, most at the torn hem (`1 - uv.y`). The banners have amplitude .16, the awnings .05. Its clock is `GHOME.U.uWind`, driven
+  from `homeStep`. It costs no extra draws: the merged cloth keeps its one draw per look.
+- **THE ORB SWINGS.** The crane's chain, the brass orb, its bands and the red tassel are pulled out of the merge into one pendulum hung
+  from the boom's tip (`GHOME.orb`), rocking on two slow sines. +3 draws.
+
+Checked headless (the shaders compile, the cloth still draws) and looked at a render of the crane. Shipped unverified. Next: more passes
+toward the four views.
+
 ## Grumbo's home, procedural, pass 5: the look (WORKER B)
 
 - **Main's texture library (m1382), triplanar (`triMat`).** No uv is needed, so every merged piece takes it:
