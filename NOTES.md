@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- Timber Siege Fort pass 8 of 10: the camp (X3, WORKER A)
+## m1338 -- Timber Siege Fort pass 8 of 10: the camp (X3, WORKER A)
 
 - **A PALISADE** of sharpened logs, each a two-block stack that breaks: across the front 46 m out, and down both sides 38 m out to the stone,
   roped at two heights. Inside it stand the ramps, the crane, the log stacks and the zipline's foot.
