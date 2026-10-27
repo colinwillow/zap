@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE GATEHOUSE x1.5 -- STEER S2 (older rows, m1343)
+
+- **Its proportions are its constants, so the constants changed:**
+  - passage 5 → 7.5 m wide, towers 2.6 → 3.9 m half-width
+  - first storey 3.6 → 5.4 m, the deck 7.2 → 10.8 m
+- **`GHOUSE.scale` (1.5) carries the literals inside the builder:**
+  - the torii, 11 → 16.5 m
+  - the shimenawa and the lantern cables
+  - the kasagi's cable anchors and grapple rings
+  - the tower doors (2.4 m), the ramp (2.4 m wide)
+  - the drawbridge, 5.2 → 7.8 m, and its raised box
+  - the portcullis, 4.6 → 6.9 m tall, hung at 3.3
+- **The two ramp flights** now climb 10.8 m over about 20 m each (~15°).
+- **What is his size stays:** the alarm bell at 3.6 m (a jump-strike; its rope now runs to the deck), the ballista, the oil cauldron, the archers' posts, the high bar.
+- The sky bridges to the watchtower, the market and the rampart land on the deck's gaps at 10.8 via `skAt` (`GHOUSE.scale`).
+
 ## THE WATCHTOWER x1.5 -- STEER S2 (older rows, m1342)
 
 - **Built from its parameters, scaled:**

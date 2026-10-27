@@ -19256,9 +19256,11 @@ function wtowerClear() { const W = WTOWER.on; if (!W) return; bldClear(W); turre
 // (cwallBuild) with doors onto the passage, a DECK across the top of both at 7.2 m you can walk the length of, a switchback ramp up the
 // back, a giant vermilion TORII over the front of the passage (pillars to 11 m, the black kasagi with upturned ends), a high bar on the
 // deck, cables and a drone. Pass 2: the ballista on the deck, the drawbridge, banners. Pass 3: polish.
-const GHOUSE = { at: [24, -12], portUp: 10, pw: 5, th: 2.6, s1: 3.6, s2: 7.2, on: null, balR: 34, balHp: 6, balFix: 20, balWind: 1.1, balCool: 4.2, balV: 30, manR: 1.5, oilT: 2.5, oilCd: 20, oilDmg: 10, dbDown: 9, dbUp: 6, dbMove: 2.6 };
+// STEER S2 (x1.5, m1343): its proportions ARE these numbers (they were pw 5, th 2.6, s1 3.6, s2 7.2); `scale` carries the literals inside the
+// builder (the torii, the portcullis, the drawbridge, the ramps' width) and tells `skAt` where the sky bridges now land
+const GHOUSE = { at: [24, -12], scale: 1.5, portUp: 10, pw: 7.5, th: 3.9, s1: 5.4, s2: 10.8, on: null, balR: 34, balHp: 6, balFix: 20, balWind: 1.1, balCool: 4.2, balV: 30, manR: 1.5, oilT: 2.5, oilCd: 20, oilDmg: 10, dbDown: 9, dbUp: 6, dbMove: 2.6 };
 function ghouseBuild() {
-  if (GHOUSE.on) return; const A = GHOUSE, [cx, cz] = A.at, th = A.th, pw = A.pw, S1 = A.s1, S2 = A.s2, g = new THREE.Group(); scene.add(g);
+  if (GHOUSE.on) return; const A = GHOUSE, k = A.scale || 1, [cx, cz] = A.at, th = A.th, pw = A.pw, S1 = A.s1, S2 = A.s2, g = new THREE.Group(); scene.add(g);
   const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [];
   const wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 }), plank = new THREE.MeshStandardMaterial({ color: 0x6e4a2e, roughness: .85 }), stone = new THREE.MeshStandardMaterial({ color: 0x8a8580, roughness: .95 });
   const plaster = new THREE.MeshStandardMaterial({ color: 0xeae6de, roughness: .9 }), verm = new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .45 }), black = new THREE.MeshStandardMaterial({ color: 0x17130f, roughness: .6 });
@@ -19267,7 +19269,7 @@ function ghouseBuild() {
     if (solid) { geo.computeBoundingBox(); const b = geo.boundingBox; O.boxes.push({ minx: x + b.min.x, maxx: x + b.max.x, miny: y + b.min.y, maxy: y + b.max.y, minz: z + b.min.z, maxz: z + b.max.z }); } return o; };
   const flat = (x0, x1, z0, z1, y) => tris.push(x0, y, z0, x1, y, z0, x1, y, z1, x0, y, z0, x1, y, z1, x0, y, z1);
   // THE TOWERS: a breakable ground storey (door on the passage side), a solid white upper storey banded in timber
-  const t = .4, dw = 1.6, sd = (th * 2 - dw) / 2;
+  const t = .4, dw = 1.6 * k, sd = (th * 2 - dw) / 2;
   for (const sx of [-1, 1]) { const tx = cx + sx * (pw / 2 + th), xi = cx + sx * pw / 2, xo = cx + sx * (pw / 2 + th * 2);
     const wall = (x, z, L, yaw) => O.walls.push(cwallBuild(g, T, x, z, L, t, yaw, S1, O));
     wall(tx, cz + th, th * 2, 0); wall(tx, cz - th, th * 2, 0); wall(xo, cz, th * 2 - t, Math.PI / 2);
@@ -19286,7 +19288,7 @@ function ghouseBuild() {
   for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) add(new THREE.BoxGeometry(.24, .32, .24), lamp, cx + sx * (DX - .1), S2 + .78, cz + sz * (DZ - .1), 0);
   add(new THREE.BoxGeometry(DX * 2, .04, .04), neon, cx, S2 - .32, cz + DZ + .02, 0); add(new THREE.BoxGeometry(DX * 2, .04, .04), neon, cx, S2 - .32, cz - DZ - .02, 0);
   // THE TORII over the front of the passage: vermilion pillars, the nuki, the black kasagi with upturned ends, a glowing plaque
-  { const tz = cz + DZ + .7, H = 11, px = pw / 2 + .5;
+  { const tz = cz + DZ + .7, H = 11 * k, px = pw / 2 + .5;
     for (const sx of [-1, 1]) { add(new THREE.CylinderGeometry(.34, .4, H, 14), verm, cx + sx * px, H / 2, tz, 0);
       O.boxes.push({ minx: cx + sx * px - .4, maxx: cx + sx * px + .4, miny: 0, maxy: H, minz: tz - .4, maxz: tz + .4 });
       add(new THREE.CylinderGeometry(.5, .5, .5, 14), black, cx + sx * px, .25, tz, 0); }
@@ -19295,7 +19297,7 @@ function ghouseBuild() {
     for (const sx of [-1, 1]) { const e = add(new THREE.BoxGeometry(1.8, .3, .9), black, cx + sx * (px + 2.0), H + .32, tz, 0); e.rotation.z = sx * .28; }
     add(new THREE.BoxGeometry(.9, 1.1, .25), black, cx, H - .85, tz, 0); add(new THREE.BoxGeometry(.6, .8, .05), neon, cx, H - .85, tz + .14, 0); }
   // THE RAMP up the back: two flights, a landing between, a landing onto the deck's back-east corner
-  { const w = 1.6, za = cz - DZ - .2, zb = za - w, zc = zb - w, xE = cx + DX - .4, xW = cx - DX + 2.6, mid = S2 / 2;
+  { const w = 1.6 * k, za = cz - DZ - .2, zb = za - w, zc = zb - w, xE = cx + DX - .4, xW = cx - DX + 2.6, mid = S2 / 2;
     const ramp = (xa, ya, xb, yb, z0, z1) => { tris.push(xa, ya, z0, xb, yb, z0, xb, yb, z1, xa, ya, z0, xb, yb, z1, xa, ya, z1);
       const L = Math.hypot(xb - xa, yb - ya), m = new THREE.Mesh(new THREE.BoxGeometry(L, .14, z1 - z0), plank); m.position.set((xa + xb) / 2, (ya + yb) / 2 - .07, (z0 + z1) / 2);
       m.rotation.z = Math.atan2(yb - ya, xb - xa); m.castShadow = m.receiveShadow = true; g.add(m); };
@@ -19328,7 +19330,7 @@ function ghouseBuild() {
   // THE DRAWBRIDGE over the passage's mouth: a timber span hinged at the towers' front, chained to the upper storeys. It cycles:
   // down (walk in), up (the passage is shut -- climb the ramp and go over), down again
   const db = new THREE.Group(); db.position.set(cx, .08, cz + th + .1); g.add(db);
-  { const w = pw - .3, L = 5.2, pl = new THREE.Mesh(new THREE.BoxGeometry(w, .16, L), plank); pl.position.z = L / 2; pl.castShadow = pl.receiveShadow = true; db.add(pl);
+  { const w = pw - .3, L = 5.2 * k, pl = new THREE.Mesh(new THREE.BoxGeometry(w, .16, L), plank); pl.position.z = L / 2; pl.castShadow = pl.receiveShadow = true; db.add(pl);
     for (let k = 0; k < 5; k++) { const st = new THREE.Mesh(new THREE.BoxGeometry(w + .1, .1, .2), black); st.position.set(0, .1, .5 + k * 1.05); db.add(st); }
     for (const sx of [-1, 1]) { const r = new THREE.Mesh(new THREE.BoxGeometry(.2, .2, .2), bronze); r.position.set(sx * (w / 2 - .1), .14, L - .15); db.add(r); }
     db.userData.L = L; db.userData.w = w; }
@@ -19345,30 +19347,30 @@ function ghouseBuild() {
     m(new THREE.BoxGeometry(1.4, .05, .22), black, 0, -.21, L * .55 - .65);
     for (let k = -2; k <= 2; k++) m(new THREE.ConeGeometry(.08, .22, 4), new THREE.MeshStandardMaterial({ color: 0xf2efe6 }), k * .26, -.24, L * .55 - .5).rotation.x = Math.PI / 2; }
   // the SHIMENAWA on the torii's nuki, white shide hanging off it
-  { const tz = cz + DZ + .7, y = 11 - 1.5 - .45, straw = new THREE.MeshStandardMaterial({ color: 0xc9b07a, roughness: 1 }), paper = new THREE.MeshStandardMaterial({ color: 0xf4f1ea, roughness: .9, side: THREE.DoubleSide });
-    const pts = []; for (let k = 0; k <= 16; k++) { const u = k / 16; pts.push(new THREE.Vector3(cx - 2.9 + 5.8 * u, y - Math.sin(u * Math.PI) * .5, tz + .3)); }
+  { const tz = cz + DZ + .7, y = 11 * k - 1.5 - .45, straw = new THREE.MeshStandardMaterial({ color: 0xc9b07a, roughness: 1 }), paper = new THREE.MeshStandardMaterial({ color: 0xf4f1ea, roughness: .9, side: THREE.DoubleSide });
+    const pts = []; for (let k = 0; k <= 16; k++) { const u = k / 16; pts.push(new THREE.Vector3(cx - 2.9 * k + 5.8 * k * u, y - Math.sin(u * Math.PI) * .5, tz + .3)); }
     add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 48, .14, 6), straw, 0, 0, 0, 0);
     const sg = []; for (let k = 0; k < 4; k++) { const q = new THREE.PlaneGeometry(.18, .22); q.translate(k % 2 ? .05 : -.05, -.11 - k * .21, 0); sg.push(q); } const shide = mergeGeometries(sg);
     for (const u of [.2, .4, .6, .8]) { const p0 = pts[Math.round(u * 16)]; add(shide, paper, p0.x, p0.y - .1, p0.z, 0); } }
   // a string of paper lanterns across the passage between the towers, under the deck
-  bldCable(g, [cx - pw / 2, 5.6, cz + th - .3], [cx + pw / 2, 5.6, cz + th - .3], .5, 3, lamp); bldCable(g, [cx - pw / 2, 5.6, cz - th + .3], [cx + pw / 2, 5.6, cz - th + .3], .5, 3, lamp);
+  bldCable(g, [cx - pw / 2, 5.6 * k, cz + th - .3], [cx + pw / 2, 5.6 * k, cz + th - .3], .5, 3, lamp); bldCable(g, [cx - pw / 2, 5.6 * k, cz - th + .3], [cx + pw / 2, 5.6 * k, cz - th + .3], .5, 3, lamp);
   for (const b of O.boxes) BOXES.push(b); boxGrid();
   // a HIGH BAR on the deck's west end (m1122: bars work at any height)
   const bar = hbarMake(cx - DX + 1.6, cz, Math.PI / 2, S2); HBAR.list.push(bar);
   // cables from the kasagi's ends down to stakes, lamps along them; the drone
-  for (const sx of [-1, 1]) { const E = [cx + sx * (pw / 2 + 2.9), 11.3, cz + DZ + .7], G = [cx + sx * (pw / 2 + 10), .3, cz + DZ + 8];
+  for (const sx of [-1, 1]) { const E = [cx + sx * (pw / 2 + 2.9 * k), 11.3 * k, cz + DZ + .7], G = [cx + sx * (pw / 2 + 10), .3, cz + DZ + 8];
     bldCable(g, E, G, 1.2, 4, lamp); add(new THREE.CylinderGeometry(.08, .1, .8, 6), wood, G[0], .4, G[2], 0); }
   const drone = bldDrone(g);
-  const rings = []; for (const sx of [-1, 1]) rings.push(gringAdd(g, cx + sx * (pw / 2 + 3.6), 10.9, cz + DZ + .7));     // m1129: grapple rings under the kasagi's upturned ends
+  const rings = []; for (const sx of [-1, 1]) rings.push(gringAdd(g, cx + sx * (pw / 2 + 3.6 * k), 10.9 * k, cz + DZ + .7));     // m1129: grapple rings under the kasagi's upturned ends
   // ---- PASS 4 (m1171): MANNED and LOCKABLE -- two archers on the deck's front corners; an iron PORTCULLIS in the passage that DROPS when
   // the alarm goes up (strike the bronze ALARM BELL hung in the passage, or the Watchtower's war drum) and rises again `portUp` s later ----
-  const port = new THREE.Group(); port.position.set(cx, 2.2, cz); g.add(port);
-  { const ir = new THREE.MeshStandardMaterial({ color: 0x2c2e32, metalness: .7, roughness: .45 }), pH = 4.6;
+  const port = new THREE.Group(); port.position.set(cx, 2.2 * k, cz); g.add(port);
+  { const ir = new THREE.MeshStandardMaterial({ color: 0x2c2e32, metalness: .7, roughness: .45 }), pH = 4.6 * k;
     for (let x = -pw / 2 + .25; x <= pw / 2 - .2; x += .45) { const b = new THREE.Mesh(new THREE.BoxGeometry(.1, pH, .1), ir); b.position.set(x, pH / 2, 0); b.castShadow = true; port.add(b); const sp = new THREE.Mesh(new THREE.ConeGeometry(.08, .25, 4), ir); sp.position.set(x, -.12, 0); sp.rotation.x = Math.PI; port.add(sp); }
     for (let y = .4; y < pH; y += .9) { const b = new THREE.Mesh(new THREE.BoxGeometry(pw, .08, .12), ir); b.position.y = y; port.add(b); } }
-  const portB = { minx: cx - pw / 2, maxx: cx + pw / 2, miny: 0, maxy: 4.6, minz: cz - .15, maxz: cz + .15, _off: 1 }; BDYN.push(portB);
+  const portB = { minx: cx - pw / 2, maxx: cx + pw / 2, miny: 0, maxy: 4.6 * k, minz: cz - .15, maxz: cz + .15, _off: 1 }; BDYN.push(portB);
   const abell = new THREE.Mesh(new THREE.SphereGeometry(.32, 14, 10, 0, Math.PI * 2, 0, Math.PI * .65), new THREE.MeshStandardMaterial({ color: 0xc08a40, metalness: .85, roughness: .3, side: THREE.DoubleSide })); abell.position.set(cx + pw / 2 - .6, 3.6, cz + th - .6); abell.castShadow = true; g.add(abell);
-  add(new THREE.CylinderGeometry(.02, .02, 3, 4), wood, cx + pw / 2 - .6, 5.4, cz + th - .6, 0);
+  add(new THREE.CylinderGeometry(.02, .02, S1 - 3.6, 4), wood, cx + pw / 2 - .6, (S1 + 3.6) / 2, cz + th - .6, 0);     /* the bell stays at 3.6 (a jump-strike), its rope runs to the deck */
   const archs = []; for (const sx of [-1, 1]) archerPost(cx + sx * (DX - 1.2), S2 + .05, cz + DZ - 1).then(d => { if (GHOUSE.on && GHOUSE.on.archs === archs) archs.push(d); else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {});
   // ---- PASS 6 (m1234): THE MURDER HOLE -- an iron CAULDRON on a pivot over a grated hole in the deck above the passage; strike it and it
   // TIPS, pouring a sheet of glowing Jin-oil down through the hole for `oilT` s: every body in the passage below is burned and knocked
@@ -19379,7 +19381,7 @@ function ghouseBuild() {
     for (const s2 of [-1, 1]) add(new THREE.BoxGeometry(.12, 1.1, .12), iron, cx + .9, S1 + .55, cz + s2 * .8, 0); add(new THREE.CylinderGeometry(.05, .05, 1.7, 6).rotateX(Math.PI / 2), iron, cx + .9, S1 + 1.05, cz, 0);
     add(new THREE.BoxGeometry(1.2, .04, 1.2), new THREE.MeshStandardMaterial({ color: 0x0a0806 }), cx, S1 + .02, cz, 0);
     oil = new THREE.Mesh(new THREE.BoxGeometry(1, S1, 1), new THREE.MeshBasicMaterial({ color: 0xff9a3a, transparent: true, opacity: .75, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })); oil.position.set(cx, S1 / 2, cz); oil.visible = false; g.add(oil); }
-  GHOUSE.on = { rings, g, O, bars: [bar], drone, t: 0, bal, balT: 2, db, dbS: 'down', dbT: 6, dbK: 0, dbBox: null, chains, port, portB, portY: 2.2, portT: 0, abell, archs, caul, oil, oilT: 0, oilCd: 0 };
+  GHOUSE.on = { rings, g, O, bars: [bar], drone, t: 0, bal, balT: 2, db, dbS: 'down', dbT: 6, dbK: 0, dbBox: null, chains, port, portB, portY: 2.2 * k, portT: 0, abell, archs, caul, oil, oilT: 0, oilCd: 0 };
   arenaBeam(cx, cz, [1, .5, .35], 1); snd('clang', { g: .7, r: .55 });
 }
 function ghouseOil(G, dt) { const A = GHOUSE, [cx, cz] = A.at, p = player; if (G.oilCd > 0) G.oilCd -= dt;
@@ -19393,8 +19395,8 @@ function ghouseOil(G, dt) { const A = GHOUSE, [cx, cz] = A.at, p = player; if (G
 function ghouseOilHit(x, y, z, rad) { const G = GHOUSE.on; if (!G || !G.caul || G.oilCd > 0) return 0; const P = G.caul.position; if (Math.hypot(x - P.x, y - P.y, z - P.z) > 1 + rad) return 0;
   G.oilT = GHOUSE.oilT; G.oilCd = GHOUSE.oilCd; snd('clang', { g: .8, r: .6, x: P.x, z: P.z }); snd('swoosh', { g: .9, r: .5, x: P.x, z: P.z }); return 1; }
 function ghouseStep(dt) { const G = GHOUSE.on; if (!G) return; G.t += dt; if (G.caul) ghouseOil(G, dt); const [cx, cz] = GHOUSE.at, a = -G.t * .3, A = GHOUSE;
-  { if (G.portT > 0) G.portT -= dt; const want = G.portT > 0 ? 0 : 2.2; G.portY += Math.sign(want - G.portY) * Math.min(Math.abs(want - G.portY), dt * (want < G.portY ? 9 : 1.2));
-    G.port.position.y = G.portY; G.portB._off = G.portY > 1 ? 1 : 0; if (G.abell.userData.sw) { G.abell.userData.sw -= dt; G.abell.rotation.z = Math.sin(G.abell.userData.sw * 18) * G.abell.userData.sw * .5; } }
+  { if (G.portT > 0) G.portT -= dt; const want = G.portT > 0 ? 0 : 2.2 * (GHOUSE.scale || 1); G.portY += Math.sign(want - G.portY) * Math.min(Math.abs(want - G.portY), dt * (want < G.portY ? 9 : 1.2));
+    G.port.position.y = G.portY; G.portB._off = G.portY > 1 * (GHOUSE.scale || 1) ? 1 : 0; if (G.abell.userData.sw) { G.abell.userData.sw -= dt; G.abell.rotation.z = Math.sin(G.abell.userData.sw * 18) * G.abell.userData.sw * .5; } }
   // THE BALLISTA: track him inside `balR`, wind (the eye brightens, the bolt pulls back), loose, reload
   if (G.balHC > 0) G.balHC -= dt;
   if (G.balDead) { G.balDeadT -= dt; const B = G.bal, P = B.position; if (Math.random() < dt * 3) smokeAt(P.x + (Math.random() - .5) * .6, P.y + 1.2, P.z + (Math.random() - .5) * .6, 1.2, 1.4, [.25, .24, .23]);
@@ -19422,7 +19424,7 @@ function ghouseStep(dt) { const G = GHOUSE.on; if (!G) return; G.t += dt; if (G.
       snd('clang', { g: .6, r: .45, x: cx, z: cz + A.th }); }
     const u = G.dbS === 'rise' ? 1 - G.dbT / A.dbMove : G.dbS === 'lower' ? G.dbT / A.dbMove : G.dbS === 'up' ? 1 : 0, e = u * u * (3 - 2 * u);
     G.dbK = e; G.db.rotation.x = -e * Math.PI / 2;
-    const shut = e > .5; if (shut && !G.dbBox) { G.dbBox = { minx: cx - A.pw / 2, maxx: cx + A.pw / 2, miny: 0, maxy: 5.2, minz: cz + A.th - .1, maxz: cz + A.th + .4 }; BOXES.push(G.dbBox); boxGrid(); }
+    const shut = e > .5; if (shut && !G.dbBox) { G.dbBox = { minx: cx - A.pw / 2, maxx: cx + A.pw / 2, miny: 0, maxy: 5.2 * (A.scale || 1), minz: cz + A.th - .1, maxz: cz + A.th + .4 }; BOXES.push(G.dbBox); boxGrid(); }
     else if (!shut && G.dbBox) { const i = BOXES.indexOf(G.dbBox); if (i >= 0) BOXES.splice(i, 1); G.dbBox = null; boxGrid(); }
     const L = G.db.userData.L, w = G.db.userData.w, tipY = .08 + Math.sin(e * Math.PI / 2) * L, tipZ = cz + A.th + .1 + Math.cos(e * Math.PI / 2) * L;
     for (const C of G.chains) { const arr = C.ln.geometry.attributes.position.array; arr.set([cx + C.sx * (w / 2 - .1), tipY + .14, tipZ, cx + C.sx * (A.pw / 2 + .3), A.s1 + 2, cz + A.th + .1]); C.ln.geometry.attributes.position.needsUpdate = true; } }
