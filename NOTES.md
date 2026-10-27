@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- Octagonal Block Pagoda pass 10 of 10: the polish (X4, WORKER A)
+
+Read against the reference and the rules, and fixed what was wrong:
+- **The doors were taller than the eave over them.** Since pass 4 every eave's teal band hangs 1.85 m over the floor of the storey it
+  sits on, and the door frames (2.6 m) poked up through the band and the porch roof.
+  - The door cut is now 1.71 m tall (`OPAG.doorH` 1.85, rounded down to whole block rows), and the frame and gold lintel sit under the band.
+  - The bracket clusters that hung in front of every doorway are left out of that span.
+  - Doors are still 1.8-2.3 m WIDE (ROOM TO FIGHT), and he is 1.25 m tall.
+- **The top roof is steeper and taller**, like the reference's spike. The cap's courses step in .38 instead of .45, and every step has a
+  light edge, so the top reads as stepped blocks rather than a grey cone.
+- **Colour, toward the reference**: the red a touch more orange, the tile a step lighter, the edges whiter, the cream warmer.
+- **A flagstone path** runs from the gate to the plinth's steps: two rows, stone and light by turns.
+- **Draws**: the bell room's bell is one mesh, not five, and the zipline's cable is merged into the gold bucket.
+
+All ten passes are in. BUILDINGS.md's rule still holds: it is not DONE until he has looked at it on his phone. SHIPPED UNVERIFIED.
+
 ## The pagoda's gate opens and breaks; DOORS AND CHAOS is a rule (his)
 
 *"There are doors in the red pagoda I can't break down or go through... the guys are behind them and can't get out... I like the idea of
