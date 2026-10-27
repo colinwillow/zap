@@ -9,6 +9,79 @@ His direction, with two blueprint images (a 10 x 10 top-down grid, a coloured pa
 > that allows this; then you zipline back across and finish, and that opens the boss of the level."*
 
 
+## MOVE TABLE (layer 0: the numbers every gap and ledge is sized from -- LEVELDESIGN.md, STEER 000 step 1)
+
+**Measured, never derived.** `npm run moves` boots the shipped `index.html` headless in the Building Forge as Grumbo (`agoblin`), steps
+the real frame at 60 fps on a fake clock, and plays every move through the PADS: real pointer events into the shipped `bindStick` (tap,
+flick, hold, release), so a row is whatever the game's own code does with that gesture. Test faces, bars and ledges are put on the empty
+floor for each row. It writes `tools/moves.json` (the generator reads it: `moves.<key>.h / d / comfy_h / comfy_d`) and rewrites the table
+below. **Re-run it after any change to movement, and commit both files.**
+
+**The contract:** a generated gap is never wider than its move's **comfy d**, a ledge never higher than its move's **comfy h**. "max" is
+the most the move can do, played perfectly. h is his FEET over the floor he left, or, for the wall runs and the ledge, the highest LIP he
+gets his hands to or the top he gets onto. d is take-off to touch-down along the floor.
+
+<!-- MOVE TABLE START (npm run moves writes this) -->
+Measured on **m1375**'s physics, 2026-10-27, as agoblin. Comfortable = 80% of max.
+
+| move | max h (m) | max d (m) | air (s) | comfy h | comfy d | notes |
+|---|---|---|---|---|---|---|
+| jump (standing, left tap) | 2.72 | 0 | 1.03 | 2.18 | 0 |  |
+| walk + jump | 2.72 | 4.85 | 1.03 | 2.18 | 3.88 | at 2.22 m/s.  |
+| run + jump | 2.72 | 7.44 | 1.03 | 2.18 | 5.95 | at 7.2 m/s.  |
+| sprint, let go = the LONG JUMP | 2.67 | 13.73 | 1.02 | 2.14 | 10.98 | at 9 m/s. right pad held still while running; letting go jumps. Spends the double. |
+| double jump (standing) | 5.01 | 0 | 1.72 | 4.01 | 0 |  |
+| run + double jump (second tap at the top) | 5.01 | 12.48 | 1.72 | 4.01 | 9.98 | at 7.2 m/s.  |
+| high jump (backflip), bare charge | 4.69 | 0 | 1.35 | 3.75 | 0 |  |
+| high jump (backflip), full charge | 6.66 | 0 | 1.62 | 5.33 | 0 | right pad held still at rest 0.85 s. Spends the double. |
+| high jump + push forward in the air | 6.66 | 6.67 | 1.62 | 5.33 | 5.34 |  |
+| run jump + 1 air kick | 2.72 | 11.74 | 1.28 | 2.18 | 9.39 | at 7.2 m/s.  |
+| long jump + 1 air kick | 2.67 | 15.89 | 1.28 | 2.14 | 12.71 | at 9 m/s.  |
+| run + double jump + 1 air kick | 5.01 | 17.02 | 2 | 4.01 | 13.62 | at 7.2 m/s.  |
+| high jump + 1 air kick | 6.66 | 12.52 | 1.92 | 5.33 | 10.02 |  |
+| run jump + 2 air kicks | 2.72 | 15.54 | 1.53 | 2.18 | 12.43 | at 7.2 m/s.  |
+| long jump + 2 air kicks | 2.67 | 18.53 | 1.5 | 2.14 | 14.82 | at 9 m/s.  |
+| run + double jump + 2 air kicks | 5.01 | 21.85 | 2.37 | 4.01 | 17.48 | at 7.2 m/s.  |
+| high jump + 2 air kicks | 6.66 | 17.46 | 2.3 | 5.33 | 13.97 |  |
+| run jump + 3 air kicks | 2.72 | 15.65 | 1.52 | 2.18 | 12.52 | at 7.2 m/s.  |
+| long jump + 3 air kicks | 2.67 | 18.81 | 1.5 | 2.14 | 15.05 | at 9 m/s.  |
+| run + double jump + 3 air kicks | 5.01 | 26.49 | 2.7 | 4.01 | 21.19 | at 7.2 m/s.  |
+| high jump + 3 air kicks | 6.66 | 22.59 | 2.7 | 5.33 | 18.07 |  |
+| zoom + jump | 2.72 | 17.13 | 1.03 | 2.18 | 13.7 | at 17 m/s.  |
+| zoom + double jump | 5.01 | 27.07 | 1.72 | 4.01 | 21.66 | at 17 m/s.  |
+| zoom + double jump + 3 air kicks | 5.01 | 36.81 | 2.7 | 4.01 | 29.45 | at 17 m/s.  |
+| HIGH BAR launch, released for height | 14.82 | 0.87 | 2.35 | 11.86 | 0.7 | full pump, let go at 1.4 rad past the bottom; h over the floor, d from the bar |
+| HIGH BAR launch, released for distance | 6.18 | 23.92 | 1.5 | 4.94 | 19.14 | full pump, let go at 0.2 rad past the bottom; h over the floor, d from the bar |
+| wall run UP, from a run (right tap at the face) | 3.31 |  |  | 2.65 |  | at 7.2 m/s. feet reach 2.1 m; h = the highest lip his hands reach |
+| wall run UP, from a sprint (no tap needed) | 4.51 |  |  | 3.61 |  | at 9 m/s. feet reach 3.3 m; h = the highest lip his hands reach |
+| wall run UP, from a zoom (no tap) | 11.58 |  |  | 9.26 |  | at 15.99 m/s. feet reach 10.38 m; h = the highest lip his hands reach |
+| wall run UP, jumping into the face at a run | 5.2 |  |  | 4.16 |  | at 7.2 m/s. feet reach 3.99 m; h = the highest lip his hands reach |
+| wall run UP, long-jumping into the face | 10.65 |  |  | 8.52 |  | at 9 m/s. feet reach 9.44 m; h = the highest lip his hands reach |
+| wall run UP, zoom-jumping into the face | 13.37 |  |  | 10.7 |  | at 16.63 m/s. feet reach 12.17 m; h = the highest lip his hands reach |
+| SIDE wall run, from a run (right tap beside the face) | 0.95 | 6.88 |  | 0.76 | 5.5 | at 7.07 m/s. d = metres along the face |
+| SIDE wall run, from a sprint | 0.95 | 8.11 |  | 0.76 | 6.49 | at 8.8 m/s. d = metres along the face |
+| SIDE wall run + KICK off it (tap again) | 2.55 | 7.48 | 0.9 | 2.04 | 5.98 | kicked off 0.4 s into the run; lands 5.65 m out from the face |
+| WALL SLIDE + wall jump chain (faces 4.6 m apart), per kick | 2.07 |  |  | 1.66 |  | first catch at 2.82 m off a run jump, then +2.07 m every kick, no limit met in 7 kicks (top 17.32 m) |
+| highest TOP reached from the face: jump | 4.47 |  |  | 3.58 |  | the highest top he gets onto (a ledge caught, or landed on), jumping from .9 m back from the face with the left tap and pushing into it in the air; bisected to 2 cm |
+| highest TOP reached from the face: double jump | 5.86 |  |  | 4.69 |  | the highest top he gets onto (a ledge caught, or landed on), jumping from .9 m back from the face with the left tap and pushing into it in the air; bisected to 2 cm |
+| the STEP (walked up with no jump) | 0.38 |  |  | 0.3 |  | MOVE.step 0.4; stairs are cut at .30 risers (STEER) |
+| SAFE FALL | 24 |  |  |  |  | NO fall damage at any height tried (to 24 m); the HARD landing from 4 m (impact over 11 m/s) pins him 1.15 s, a soft one 0.63 s |
+
+Speeds (m/s): walk 2.22, run 7.2, sprint 9, zoom launch 17 (31.4 m in its first 2 s).
+<!-- MOVE TABLE END -->
+
+**What the numbers say about the grid (7 m cells, 4.5 m levels):**
+- **A 7 m gap is not a plain jump.** A run jump's comfy reach is 5.95 m. A cell-wide gap is the LONG JUMP (comfy 11), a run jump plus
+  a kick (9.4), or a double jump (10).
+- **A 4.5 m level is not a double jump.** The double jump's comfy height is 4.0 m. A level is the HIGH JUMP (5.3), a ledge caught off
+  the double (4.7), a long-jump wall run (8.5 of lip), the wall-jump chain (+2.07 m a kick, any height between two faces 4.6 m apart),
+  or the bar (11.9 up).
+- **The kicks are the distance.** Each air kick holds his height while it dashes, about +4 m each. The third one only comes off a
+  double or a high jump: a kick needs 1.1 m of air under him.
+- **Nothing hurts to fall from.** A drop over about 3 m is the hard landing, which pins him 1.15 s. A fall is a time cost, not damage,
+  until the game gives it one.
+- **His step is .38 m** (`MOVE.step` is .40 for his height; .357 is Zap's). Stairs stay at .30.
+
 ## THE FIVE LAYERS (his method, after m1369 -- every grid level is built this way)
 
 | layer | what | the test it has to pass alone |
