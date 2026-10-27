@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1174 -- CLIFF LODGE pass 2: boulders roll down the path
+
+- Every `CLIFF.rockEvery` 9 s a BOULDER is tipped off the summit and rolls the whole path down (corner to corner, the way you came up),
+  bouncing, spinning the right way, speeding up to 9 m/s; at the foot it bursts. At most two at once.
+- It BOWLS HIM OVER (`playerHurt` 22, knocked along its line) and any body in its way (`dummyBlow`). Jump it, dodge it, or CUT IT APART:
+  `rockHp` 3 hits through `bldHit` and it explodes into gravel.
+- The lodge got an IRORI hearth: a sunken square of glowing coals and an iron pot hung over it.
+Pass 3 (polish) next. Shipped unverified.
+
 ## m1173 -- PAGODA pass 4: climb the outside
 
 His: *"lots of things that are climbable... verticality."* The Pagoda can now be climbed on the OUTSIDE with the ledge grab (`LEDGE`, the
