@@ -19,11 +19,7 @@ The method (written up in LEVELGRID.md, "THE FIVE LAYERS"):
 
 **Each layer is built in turn, and each must still play with every layer under it.**
 
-- **In the game:** SPAWN > BUILDINGS has Grid Level 1 four ways:
-  - LAYER 1: RUN (only the traversal; every gate open)
-  - LAYERS 1-2
-  - LAYERS 1-3
-  - ALL LAYERS
+- **In the game (m1371):** KORAJIN > **Level 1 -- The Grid** on the title menu opens it on its own. A LAYERS bar sits at the top: L1 RUN is always on, and L2 PUZZLE, L3 ENEMIES, L4 THEME and L5 BOSS toggle (saved). Each tap rebuilds the level from S. SPAWN > BUILDINGS still spawns everything else round it.
 - **The loop works on LAYER 1 of Level 1 until he signs it off.** No new enemies, gates or bosses until then.
 - **Already known about layer 3:** the catapults (55 m reach), the perch archers and the guns have no zones. They get zones before layer 3 is his to judge.
 

@@ -19,7 +19,8 @@ His direction, with two blueprint images (a 10 x 10 top-down grid, a coloured pa
 | **4 THEME** | the level's one distinctive thing: air, puzzle, enemies, water, vehicles, co-op | would you know which level this is from one screenshot? |
 | **5 BOSS** | the final arena: a big open dojo and the boss | is it the biggest moment in the level, and does it use what the level taught? |
 
-- **In code:** `lvgBuild(spec, lay)` builds layers 1..lay. Below 2, every gate stands open and the boss door is gone. Below 3, the guard beats count as done. The keep is layer 5.
+- **In the game:** KORAJIN > Level 1 -- The Grid, with the LAYERS bar at the top (m1371).
+- **In code:** `lvgBuild(spec, lay)` builds layers 1..lay, or a set `{2: 1, 3: 0, ...}`. Below 2, every gate stands open and the boss door is gone. Below 3, the guard beats count as done. The keep is layer 5.
 - **Which layer each thing is in:**
   - **layer 1:** the path, branches, climbs, bars, movers, flyers, zips and rings
   - **layer 2:** the button, candle, cache, drawbridge, gate and boss door

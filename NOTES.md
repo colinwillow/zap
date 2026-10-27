@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## LEVEL 1 IS ITS OWN MENU ENTRY, WITH LAYER TOGGLES (m1371)
+
+His: *"Level 1 should be its own thing you choose from the menu rather than spawning it in the building spawn, with toggles -- its own debug menu, so you can still spawn all the other stuff, but you can toggle layer one, two, three, four... if there's enemies I can turn them off. Layer one is always there cause it's just the geometry."*
+
+- **KORAJIN title menu > "Level 1 -- The Grid":** goes to the forge with `?w=forge&lvl=1`. The first forge frame (`lvlStart`) builds LVG1 and puts him at S.
+- **The LAYERS bar** (`#lvlBar`, top centre, `lvlBar`):
+  - L1 RUN is always lit
+  - L2 PUZZLE, L3 ENEMIES, L4 THEME and L5 BOSS toggle
+  - the set is saved (`mel.lvlLayers`, all off by default), and each tap rebuilds the level from S
+- **`lvgBuild(spec, lay)`:** `lay` may be a SET now (`has(n)`), so enemies can be on with the puzzle off.
+  - Without the puzzle, every gate stands open and the guard beats count as done.
+  - L4 THEME has nothing in it yet. That is the honest state.
+- **The four Grid Level 1 rows are gone from SPAWN > BUILDINGS.** `lvgStep` runs from the forge's step line whenever a level is up.
+- **Crash gate:** booted headless with `?w=forge&lvl=1`. The bar came up with all five, a tap on L3 rebuilt it, and there was no page error.
+
 ## GRID LEVEL 1 IN LAYERS: THE RUN COMES FIRST (m1370)
 
 His: *"I spawn in and I'm just getting hammered with cannonballs before I've even moved... First and foremost the level should operate like a ninja parkour centre... layer two the puzzle... layer three the enemies, strategically placed to guard key areas, each with a region of influence contained to the thing it is guarding... layer four what sets it apart... layer five the boss arena... each stage needs to hold up and work with the others."*
