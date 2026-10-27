@@ -20,6 +20,11 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   CABLES and WIRES strung between things (sagging, with little lamps or tags on them); shrine pieces (ropes, paper streamers, stone);
   alien gizmos (glowing cores, antennas, dishes); and the zen lodge: dark timber, deep eaves, stone, calm. Ref:
   `images/korajin/ref/forge_style_dojo_drones.webp`. Every building from here gets some of each.
+- **AND (his, during m1120):** *"Sentry guns and snowy white-capped mountains with robotic turrets and spider robots and robotic samurai
+  guards with bow and arrow on the watchtowers."* So: buildings are MANNED where it fits -- the red ARCHERS (m1103) posted on lookouts and
+  walls, the TURRET (m1011) as sentry guns on decks and gates; SPIDER ROBOTS (to build: a six-legged bot that patrols and climbs); and the
+  forge's horizon gets a ring of SNOWY WHITE-CAPPED MOUNTAINS (the Refuge's low-poly peaks, whiter). Watchtower pass 2 posts an archer on
+  the lookout and a sentry gun on the second deck.
 - **Every building is PLAYABLE**: breakable walls (`cwallBuild`, they repair), things to swing on (`hbarMake`), things to climb or run up
   (ramps: walkable `triAdd` surfaces, rise <= .32 m a step), an inside and an outside, and where it fits a function (a turret, a ballista,
   a balance beam, a lookout). Code-built and merged per material (draw calls matter on his phone).
@@ -44,3 +49,5 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 | 10 | **Flying Ship House** | a junk-ship hull with a house on deck, floating and bobbing, a gangplank ramp | (0, -40) floating | · · |
 | 11 | **Bathhouse** | a steaming pool inside, a chimney, sliding screens | (-30, 24) | · · |
 | 12 | **Forge-Workshop** | a bronze furnace glowing, gears turning, a crane arm (a bar) | (30, 24) | · · |
+| 13 | **Spider-Bot Hangar** | a low bunker the six-legged spider robots come out of and patrol from (the spider bot itself is built here) | (-30, -24) | · · |
+| -- | **The forge's horizon** | snowy white-capped mountains round the forge (one pass, slotted in after the Gatehouse) | -- | |
