@@ -22380,7 +22380,23 @@ function gpagBuild() {
     halos = new THREE.Points(geo, new THREE.PointsMaterial({ map: tex, size: 1.6, sizeAttenuation: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false })); g.add(halos);
     const by = yOf(N) + 1.6 + 6.1; beacon = new THREE.Mesh(new THREE.SphereGeometry(.22, 12, 8), new THREE.MeshBasicMaterial({ color: 0xffb050, toneMapped: false })); beacon.position.set(cx, by, cz); g.add(beacon);
     const bh = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false })); bh.scale.setScalar(4); beacon.add(bh); beacon.userData.halo = bh; }
-  GPAG.on = { g, O, bars, rings, climbs, core, zip, bell, t: 0, arch: [], guards: [], tur: null, lamp, paperLit, halos, beacon };
+  // ---- PASS 8 (m1273): MOTION -- long red-and-white STREAMERS off two corners of every balcony, swaying in the wind; WIND CHIMES at the
+  // top roof's corners that ring when he comes near; and BIRDS perched along the eaves that burst up when he gets close, circle the spire,
+  // and settle back ----
+  const streamers = [], chimes = [], birds = [];
+  { const sm = [new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .85, side: THREE.DoubleSide }), new THREE.MeshStandardMaterial({ color: 0xf2ece0, roughness: .85, side: THREE.DoubleSide })];
+    for (let k = 1; k < N; k++) { const B = hbOf(k) + A.balc, y0 = yOf(k); for (const [sx, sz, i] of [[1, 1, 0], [-1, -1, 1]]) { const pv = new THREE.Group(); pv.position.set(cx + sx * B, y0 + .9, cz + sz * B); g.add(pv);
+        const st = new THREE.Mesh(new THREE.PlaneGeometry(.35, 2.4), sm[(k + i) % 2]); st.position.y = -1.2; st.rotation.y = Math.atan2(sx, sz) + Math.PI / 2; pv.add(st); streamers.push(pv); } }
+    const cm = new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .9, roughness: .25 }), topEX = hbOf(N - 1) + A.eave + .3, ty = yOf(N) - 1.5;
+    for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const ch = new THREE.Group(); ch.position.set(cx + sx * (topEX - .9), ty, cz + sz * (topEX - .9)); g.add(ch);
+      for (let i = 0; i < 5; i++) { const r = new THREE.Mesh(new THREE.CylinderGeometry(.025, .025, .3 + i * .05, 5), cm); const a = i / 5 * Math.PI * 2; r.position.set(Math.cos(a) * .12, -.3 - i * .025, Math.sin(a) * .12); ch.add(r); }
+      chimes.push({ g: ch, sw: 0, cd: 0 }); }
+    const bm = new THREE.MeshStandardMaterial({ color: 0x2a2a30, roughness: .8, side: THREE.DoubleSide });
+    for (let i = 0; i < 7; i++) { const k = 1 + (i % 4), EX = hbOf(k) + A.eave - .4, a = i * 2.3, hx = cx + Math.sign(Math.cos(a)) * EX * .7, hz = cz + Math.sign(Math.sin(a)) * EX, y = yOf(k) + A.sh - 1.05 + .15;
+      const b = new THREE.Group(); b.position.set(hx, y, hz); g.add(b); const body = new THREE.Mesh(new THREE.BoxGeometry(.1, .1, .28), bm); b.add(body);
+      for (const s2 of [-1, 1]) { const w = new THREE.Mesh(new THREE.PlaneGeometry(.32, .14), bm); w.position.x = s2 * .17; w.rotation.x = -Math.PI / 2; b.add(w); }
+      birds.push({ g: b, home: b.position.clone(), st: 'perch', t: Math.random() * 5, a: Math.random() * 6.28, r: 4 + Math.random() * 4, h: 0 }); } }
+  GPAG.on = { g, O, bars, rings, climbs, core, zip, bell, t: 0, arch: [], guards: [], tur: null, lamp, paperLit, halos, beacon, streamers, chimes, birds };
   // ---- PASS 6 (m1271): THE GUARDIANS -- all killable. ARCHERS posted in balcony corners on storeys 2 and 4 (they hold their posts and loose
   // at him), a SENTRY GUN on storey 3's balcony corner looking out over the court, and two robot SAMURAI at the gate who stand their post
   // until they see him. Strike the BELL and the alarm goes up: the gate pair come for him wherever he is ----
@@ -22395,6 +22411,16 @@ function gpagBuild() {
 function gpagStep(dt) { const G = GPAG.on; if (!G) return; G.t += dt; G.core.position.y = 1.3 + Math.sin(G.t * 1.7) * .08;
   if (G.lamp) { const f = .85 + Math.sin(G.t * 7.3) * .08 + Math.sin(G.t * 17.1) * .05; G.lamp.emissiveIntensity = 2 * f; G.halos.material.size = 1.6 * f; G.paperLit.emissiveIntensity = .5 + Math.sin(G.t * 1.3) * .05;     // m1272
     const b = 1 + Math.sin(G.t * 1.1) * .2; G.beacon.userData.halo.scale.setScalar(4 * b); G.beacon.scale.setScalar(.9 + Math.sin(G.t * 9) * .08); }
+  if (G.streamers) { const p = player, [cx, cz] = GPAG.at, top = GPAG.n * GPAG.sh;
+    for (let i = 0; i < G.streamers.length; i++) { const S = G.streamers[i]; S.rotation.x = Math.sin(G.t * 1.7 + i) * .25; S.rotation.z = Math.sin(G.t * 1.3 + i * 1.7) * .18; }
+    for (const C of G.chimes) { C.cd = Math.max(0, C.cd - dt); const P = C.g.position; if (C.cd <= 0 && Math.hypot(p.pos.x - P.x, p.pos.y - P.y, p.pos.z - P.z) < 2.2) { C.cd = 1.2; C.sw = .4; snd('clang', { g: .25, r: 2.4 + Math.random() * .4, x: P.x, z: P.z }); }
+      C.sw *= Math.exp(-1.2 * dt); C.g.rotation.z = Math.sin(G.t * 6) * C.sw + Math.sin(G.t * 1.1) * .05; }
+    for (const B of G.birds) { B.t += dt; const g2 = B.g;
+      if (B.st === 'perch') { g2.position.copy(B.home); g2.position.y += Math.abs(Math.sin(B.t * 3)) * .02; if (Math.hypot(p.pos.x - B.home.x, p.pos.y - B.home.y, p.pos.z - B.home.z) < 5) { B.st = 'fly'; B.t = 0; B.a = Math.atan2(B.home.z - cz, B.home.x - cx); } }
+      else { B.a += dt * (.9 + B.r * .05); const ht = top + 3 + Math.sin(B.t * .7) * 2, k = B.st === 'fly' ? Math.min(1, B.t / 1.5) : 0, tx = cx + Math.cos(B.a) * (B.r + 2), tz = cz + Math.sin(B.a) * (B.r + 2);
+        if (B.st === 'fly') { g2.position.lerp(new THREE.Vector3(tx, ht, tz), Math.min(1, dt * (1 + k * 2))); if (B.t > 9) { B.st = 'home'; B.t = 0; } }
+        else { g2.position.lerp(B.home, Math.min(1, dt * 1.6)); if (g2.position.distanceTo(B.home) < .2) { B.st = 'perch'; B.t = 0; } }
+        g2.rotation.y = -B.a; for (let j = 1; j < 3; j++) g2.children[j].rotation.z = (j === 1 ? 1 : -1) * Math.sin(G.t * 18 + B.r) * .7; } } }
   if (G.bell) { const B = G.bell; B.cd = Math.max(0, B.cd - dt); B.sw *= Math.exp(-.9 * dt); B.g.rotation.z = Math.sin(G.t * 3.4) * B.sw; } }
 // m1270: strike the bell room's great bell
 function gpagBell(x, y, z, rad) { const G = GPAG.on; if (!G || !G.bell || G.bell.cd > 0) return 0; const B = G.bell, P = B.g.position;
@@ -22432,7 +22458,7 @@ const BLDG = { list: [
   { key: 'oni', t: 'Oni Gate', sub: 'a fortress wall carved as a demon face: walk in through its fanged mouth (it BITES on a cycle), guard rooms in its cheeks, sentry guns in its eyes, horns, a stair up the back to a lookout', pass: 3, build: () => oniBuild(), clear: () => oniClear(), on: () => !!ONI.on, step: dt => oniStep(dt) },
   { key: 'obs', t: 'Jin Observatory', sub: 'a clockwork tower: a spiral stair inside past great gears to a balcony under a copper dome whose telescope marks you in the open for a volley of arrows (blind its lens), a clock face', pass: 3, build: () => obsBuild(), clear: () => obsClear(), on: () => !!OBS.on, step: dt => obsStep(dt) },
   { key: 'fest', t: 'Lantern Festival Street', sub: 'a street of festival stalls (roofs to stand on, breakable backs) under strings of paper lanterns, red gates at both ends, bars across, a robot dragon dance to cut apart (strike the taiko to make it wild)', pass: 3, build: () => festBuild(), clear: () => festClear(), on: () => !!FEST.on, step: dt => festStep(dt) },
-  { key: 'gpag', t: 'Great Red Pagoda', sub: 'five storeys of red lacquer: a room on every floor, ladders up through the hatches, a balcony round every storey, a spire; a pavilion whose roof you can climb; a red fence; climb the outside eave to eave, bars, a zipline off the spire; an armoury, a library, a bell room (the alarm), a lookout; archers, a sentry gun, gate guards; glowing windows, lantern halos, a beacon on the spire', pass: 7, build: () => gpagBuild(), clear: () => gpagClear(), on: () => !!GPAG.on, step: dt => gpagStep(dt) },
+  { key: 'gpag', t: 'Great Red Pagoda', sub: 'five storeys of red lacquer: a room on every floor, ladders up through the hatches, a balcony round every storey, a spire; a pavilion whose roof you can climb; a red fence; climb the outside eave to eave, bars, a zipline off the spire; an armoury, a library, a bell room (the alarm), a lookout; archers, a sentry gun, gate guards; glowing windows, lantern halos, a beacon on the spire; streamers, chimes, birds', pass: 8, build: () => gpagBuild(), clear: () => gpagClear(), on: () => !!GPAG.on, step: dt => gpagStep(dt) },
   { key: 'zramp', t: 'Zoom Ramp Tower', sub: 'zoom from the red gate (full hold), up the ramp and straight up the face -- only a full zoom reaches the gold lip; your mark shows how close; or zigzag up the chimney', pass: 3, build: () => zrampBuild(), clear: () => zrampClear(), on: () => !!ZRAMP.on, step: dt => zrampStep(dt) },
   { key: 'swrk', t: 'Sky Wreck', sub: 'a flying junk come down on rock spires: a tilted deck up a fallen mast, a hold of cargo behind breakable planks, a crow\'s nest up two bars', pass: 1, build: () => swrkBuild(), clear: () => swrkClear(), on: () => !!SWRK.on, step: dt => swrkStep(dt) },
 ] };

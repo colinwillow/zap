@@ -5,7 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## Great Red Pagoda pass 7 of 10: the light (X1)
+## Great Red Pagoda pass 8 of 10: motion (X1)
+
+- **Streamers.** Long red and white streamers hang off two corners of every balcony, swaying in the wind.
+- **Wind chimes.** Five gold rods hang at each of the top roof's corners. They ring (a high, quiet clang) and swing when he comes within
+  2.2 m.
+- **Birds.** Seven are perched along the eaves. When he comes within 5 m they burst up and circle above the spire for about 9 s,
+  wings beating, then glide home and settle.
+
+The bell's swing (pass 5) completes the set. SHIPPED UNVERIFIED. Next: pass 9, the set piece.
+
+## m1272 -- Great Red Pagoda pass 7 of 10: the light (X1)
 
 - **Windows.** The paper windows glow warm from inside (`paperLit`, a faint breathing emissive).
 - **Lantern halos.** Every eave lantern (20 of them) gets a soft halo: ONE additive `Points` draw for all of them, sized in world metres.
