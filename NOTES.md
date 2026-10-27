@@ -5,6 +5,28 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1196 -- Floating Islands pass 1 (Building Forge loop, Set 2 #19)
+
+`FISL`, in BLDG.list as `fisl`. Three rock islands hang in the air round (44, 32):
+- **The low island** at (42, 22), top 5 m.
+- **The middle island** at (52, 32), top 7 m.
+- **The high island** at (42, 42), top 9 m.
+
+**Each island:**
+- **Rock:** a jagged rock cone hangs under it. Its height is capped at top - 2 so it never touches the street.
+- **Top:** a flat grassy top of walkable triangles, with a slab collider under them, so you can walk underneath.
+- **Chains:** three iron chains run to stakes in the street. A stake that would land inside the Forge-Workshop is turned
+  60 degrees.
+- **Waterfall:** an animated waterfall falls off its outer rim into a misting pool.
+
+**Rope bridges** (`bridgeSpan`, with prayer flags that flap) climb from the low island to the middle one and on to the high one,
+about 7.8 m each at a .26 slope. The high island carries a red TORII and a little hokora with a lamp.
+
+**Getting up is by GRAPPLE.** A ring hangs 8 m up off the low island's outer (south) edge, in reach from the street: climb the
+rope above the rim and jump in. A second ring hangs over the shrine.
+
+Next: alternate -- Moated Keep pass 4.
+
 ## m1195 -- Cliff Lodge pass 4: the boulder cradle (Building Forge loop, extra pass)
 
 A timber CRADLE now stands on the top landing at the head of the path, with a boulder waiting in it. Beside it on the summit is
