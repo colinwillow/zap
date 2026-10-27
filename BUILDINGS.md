@@ -29,6 +29,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - L1 pass 7 (m1362): three catapults on the ground lobbing up at the high moves
   - L1 pass 8 (m1363): a long bar to shimmy across a pit (monkey-bar greybox)
   - L1 pass 9 (m1364): a zeppelin deck from the roof across the level to a high pad
+  - L1 pass 10 (m1365): a 75 m zip from the zeppelin pad to the boss door
   - ...
 
 ## STEER (his, after walking X4, Oct 27 2026) -- OUTRANKS THE QUEUE BELOW
