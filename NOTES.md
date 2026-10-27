@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE COURTYARD, PASS 7: THE GROUND (m-COURT7)
+
+COURTYARD.md pass 7. Shipped unverified.
+
+- **Flags:** the lane's flags are now three tones by a hash, and some sit a few millimetres low, so the path reads as cut stone and not a print.
+- **Grass tufts:**
+  - About 420 tufts in one `InstancedMesh` of crossed blades, each tinted on its own HSL.
+  - They are placed by a rule: open grass only. Off the lane, the pond, the halls, the tower, the pagoda, the bell house and the maple trunk.
+  - They sway in the vertex shader by their own world position, so a wind visibly runs across the court. `C.tuftT` is driven from `courtStep`.
+- **Moss:** irregular moss strips at the inner foot of all four walls, and mossy caps on the pond rim stones (two greens, merged).
+- **Puddles:** six near-mirror puddles (metal .55, rough .04) on the lane, so the lanterns have something to shine in.
+- **Dressing, all smashable** through `smashAdd` (they come back after 20-30 s):
+  - barrels at both hall fronts
+  - a sack pile on the west
+  - a hand cart with cargo on the east
+  - a spear rack on the east
+- **The lane stays 7 m clear.** The dressing sits at x ±4.1-4.6, under the balconies.
+- `courtClear` drops the smashables.
+- **Which box this moves:** C1 pass 7 of 10. Still open: the clear condition and the watchtower gate (8), the playtest fixes (9) and the polish (10).
+
 ## THE COURTYARD, PASS 6: THE LIFE (m1309)
 
 COURTYARD.md pass 6 (`courtLife`, stepped by `courtStep`). Shipped unverified.
