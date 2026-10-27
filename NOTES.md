@@ -41,6 +41,28 @@ No lights are added, because a new light recompiles every material in the scene.
 - **Two lanterns** sit on the gate posts.
 
 SHIPPED UNVERIFIED. Next: pass 8, motion (wind bells, banners, birds, turning collars).
+## The Courtyard pass 1 of 10 (C1, COURTYARD.md)
+
+`COURT`, `courtBuild` / `courtStep` / `courtClear`; SPAWN > BUILDINGS > The Courtyard.
+- **Where.** Its own corner of the forge, centred (0, 150), 56 x 64 m. The forge floor runs to 200 and the peaks start at 250, so it
+  clears every building.
+- **The walls.** Solid stone, `walk` 2.6 m thick, so their TOPS are the wall-walk at 4 m all the way round. A crenellated outer parapet
+  (`noCam` merlons) and LADDERS at the four inner corners (`kitClimbAdd`, the exit mark on the walk).
+- **The SOUTH GATE.** 6 m wide, its lintel carrying the walk over it, red posts and a beam.
+- **The ground.** The stone LANE of flags runs up the middle, with grass everywhere else.
+- **The two TIMBER LANE HALLS.** They flank the lane's south half, after his reference:
+  - **Ground floor.** Breakable plank walls with a 2 m door on the lane, lanterns either side. Inside, a 9 x 17 m room with a ladder up
+    through a hatch.
+  - **Upper room.** Dark timber walls with log-course lines, warm paper windows, and a door onto a 2.4 m BALCONY over the lane (`noCam`
+    rail).
+  - **The roof.** A deep hip roof turned along the hall. Its eave clears the balcony and reaches over the lane, the two roofs 3.6 m apart
+    so you can jump across. It is WALKABLE (triangles on its own curve), with lanterns hung at its corners.
+- **The koi POND.** West of the lane's north half: a stone rim, shallow water you wade in, and lotus pads.
+- **The MOON BRIDGE.** It arches 1.9 m high and 2.2 m wide from the lane over the pond: walkable, red rails, posts.
+- **Stone lanterns.** Two where the bridge meets the lane.
+
+Everything static is merged per material (one draw each). ROOM TO FIGHT throughout. SHIPPED UNVERIFIED. Next: pass 2, the Watchtower Gate
+at the lane's north end.
 
 ## m1289 -- Octagonal Block Pagoda pass 6 of 10: the guardians (X4, WORKER A)
 
