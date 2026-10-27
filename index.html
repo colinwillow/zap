@@ -63344,7 +63344,7 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 // to the shop front and to the round back door. Built in its OWN frame (local +z = the front, toward the river; `at`/`yaw` are HOME.hut's) and
 // merged per material; every collider a local box turned into the world (the yaw is a quarter turn, so a box stays a box); every walkable
 // surface a triangle. `?hut=glb` (or GHOME.on = 0) puts the GLB back, to compare. Pass 1: the massing and the walkable shell, with the inside.
-const GHOME = { on: 1, pass: 1, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 7, Hd: 2.8, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-7, .8], Rw: 3.3, Hwg: 3.2,
+const GHOME = { on: 1, pass: 2, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 7, Hd: 2.8, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1.3, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
@@ -63358,13 +63358,33 @@ function ghStone(x, y, z, out) {     // LINEAR colour (vertex colours are not sR
   if (spot > .7) { const k = Math.min(1, (spot - .7) * 7); out[0] += (.34 - out[0]) * k; out[1] += (.22 - out[1]) * k; out[2] += (.44 - out[2]) * k; }     // the purple spots (a muted lavender)
   if (fine > .74) { const k = Math.min(1, (fine - .74) * 5) * .8; out[0] += (.12 - out[0]) * k; out[1] += (.06 - out[1]) * k; out[2] += (.03 - out[2]) * k; }     // the dark speckle
   return out; }
+// pass 2: THE CLOTH, drawn on a canvas -- weathered red with cream chevrons and diamonds, patched and specked, its TORN hem cut into the alpha
+function ghClothTex(kind) { const C = GHOME.tex || (GHOME.tex = {}); if (C[kind]) return C[kind];
+  const aw = kind === 'awning', W = aw ? 512 : 256, H = aw ? 256 : 512, cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d'), R = rwRng(aw ? 5 : 9);
+  const dia = (x, y, r) => { g.lineWidth = r * .28; g.beginPath(); g.moveTo(x, y - r); g.lineTo(x + r, y); g.lineTo(x, y + r); g.lineTo(x - r, y); g.closePath(); g.stroke();
+    g.beginPath(); g.moveTo(x, y - r * .4); g.lineTo(x + r * .4, y); g.lineTo(x, y + r * .4); g.lineTo(x - r * .4, y); g.closePath(); g.fill(); };
+  g.fillStyle = '#b5342a'; g.fillRect(0, 0, W, H);
+  for (let i = 0; i < 12; i++) { g.fillStyle = R() < .5 ? 'rgba(140,28,22,.45)' : 'rgba(214,84,62,.35)'; g.fillRect(R() * W, R() * H, 30 + R() * 70, 20 + R() * 50); }
+  g.strokeStyle = g.fillStyle = '#efe0c4';
+  if (aw) { g.lineWidth = 9; for (let k = 0; k < 2; k++) { const y = H * .6 + k * 24; g.beginPath(); for (let x = 0; x <= W; x += 32) g.lineTo(x, y + ((x / 32) % 2 ? 12 : -12)); g.stroke(); }
+    for (let x = 48; x < W; x += 104) dia(x, H * .28, 24); }
+  else { dia(W / 2, 78, 40); g.lineWidth = 24; for (let k = 0; k < 4; k++) { const y = 160 + k * 64; g.beginPath(); g.moveTo(34, y); g.lineTo(W / 2, y + 54); g.lineTo(W - 34, y); g.stroke(); } }
+  for (let i = 0; i < 300; i++) { g.fillStyle = `rgba(45,16,10,${.15 + R() * .3})`; g.fillRect(R() * W, R() * H, 2 + R() * 4, 2 + R() * 4); }
+  g.globalCompositeOperation = 'destination-out'; g.fillStyle = '#000';
+  if (aw) { for (let x = 0; x < W;) { const w = 10 + R() * 26, d = 10 + R() * 42; g.beginPath(); g.moveTo(x, H); g.lineTo(x + w / 2, H - d); g.lineTo(x + w, H); g.fill(); x += w; }
+    for (let i = 0; i < 9; i++) { g.beginPath(); g.arc(R() * W, H * .15 + R() * H * .6, 3 + R() * 7, 0, 7); g.fill(); } }
+  else { g.beginPath(); g.moveTo(0, H * .74); g.lineTo(W / 2, H * .985); g.lineTo(W, H * .74); g.lineTo(W, H); g.lineTo(0, H); g.closePath(); g.fill();
+    for (let u = 0; u < 1; u += .07 + R() * .05) { const x = u * W, y = H * .74 + (H * .245) * (1 - Math.abs(u - .5) * 2), d = 14 + R() * 30; g.beginPath(); g.moveTo(x - 8, y + 2); g.lineTo(x, y - d); g.lineTo(x + 8, y + 2); g.fill(); }
+    for (let i = 0; i < 5; i++) { g.beginPath(); g.arc(R() * W, H * .1 + R() * H * .5, 3 + R() * 6, 0, 7); g.fill(); } }
+  g.globalCompositeOperation = 'source-over';
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return (C[kind] = t); }
 function ghomeBuild(at, yaw, y0) {
   const A = GHOME, g = new THREE.Group(); g.position.set(at[0], y0, at[1]); g.rotation.y = yaw; scene.add(g); A.g = g;
   const c = Math.round(Math.cos(yaw) * 1e6) / 1e6, s = Math.round(Math.sin(yaw) * 1e6) / 1e6, P = A.P;
   const Wx = (x, z) => at[0] + x * c + z * s, Wz = (x, z) => at[1] - x * s + z * c;
   // ---- the buckets: only position + normal (+ colour on the stone) survive, so every piece merges (mixed attribute sets merge to NULL) ----
   const MG = new Map(), _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _v = new THREE.Vector3(), _one = new THREE.Vector3(1, 1, 1), col = [0, 0, 0];
-  const put = (geo, m, mat4) => { geo = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(geo.attributes)) if (k !== 'position' && k !== 'normal') geo.deleteAttribute(k);
+  const put = (geo, m, mat4) => { geo = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(geo.attributes)) if (k !== 'position' && k !== 'normal' && !(k === 'uv' && m.map)) geo.deleteAttribute(k);
     if (mat4) geo.applyMatrix4(mat4); if (!geo.attributes.normal) geo.computeVertexNormals();
     if (m.vertexColors) { const p = geo.attributes.position, a = new Float32Array(p.count * 3); for (let i = 0; i < p.count; i++) { ghStone(p.getX(i), p.getY(i), p.getZ(i), col); a[i * 3] = col[0]; a[i * 3 + 1] = col[1]; a[i * 3 + 2] = col[2]; } geo.setAttribute('color', new THREE.BufferAttribute(a, 3)); }
     if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); };
@@ -63381,12 +63401,23 @@ function ghomeBuild(at, yaw, y0) {
   const quad = (a, b, d, e) => { tri(a, b, d); tri(a, d, e); };
   // a solid VISUAL box in local
   const vbox = (x0, x1, ya, yb, z0, z1, m, solid, ex) => { put(new THREE.BoxGeometry(x1 - x0, yb - ya, z1 - z0), m, at4((x0 + x1) / 2, (ya + yb) / 2, (z0 + z1) / 2)); if (solid) box(x0, x1, ya, yb, z0, z1, ex); };
+  // pass 2: CLOTH -- an awning (a sagging, rippling sheet from a high edge to a low one, walkable) and a hanging banner, both on the canvas cloth
+  const awning = (a, b, d, e, m, sag) => { const NU = 24, NV = 8, pos = [], uv = [], L = Math.hypot(b[0] - a[0], b[2] - a[2]), at = (u, v) => { const p = [0, 0, 0];
+      for (let k = 0; k < 3; k++) p[k] = (a[k] * (1 - u) + b[k] * u) * (1 - v) + (e[k] * (1 - u) + d[k] * u) * v; p[1] -= sag * Math.sin(Math.PI * u) * (.35 + .65 * Math.sin(Math.PI * v * .9)) + .05 * Math.sin(u * 19) * v; return p; };
+    for (let i = 0; i < NU; i++) for (let j = 0; j < NV; j++) { const u0 = i / NU, u1 = (i + 1) / NU, v0 = j / NV, v1 = (j + 1) / NV, P0 = at(u0, v0), P1 = at(u1, v0), P2 = at(u1, v1), P3 = at(u0, v1);
+      for (const [p, u, v] of [[P0, u0, v0], [P1, u1, v0], [P2, u1, v1], [P0, u0, v0], [P2, u1, v1], [P3, u0, v1]]) { pos.push(...p); uv.push(u * L / 4.2, 1 - v); }
+      quad([P0[0], P0[1] + .03, P0[2]], [P1[0], P1[1] + .03, P1[2]], [P2[0], P2[1] + .03, P2[2]], [P3[0], P3[1] + .03, P3[2]]); }
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); geo.computeVertexNormals(); put(geo, m); };
+  const banner = (x, ytop, z, w, h, m) => { const geo = new THREE.PlaneGeometry(w, h, 4, 10), p = geo.attributes.position;
+    for (let i = 0; i < p.count; i++) { const u = p.getX(i) / w + .5, v = p.getY(i) / h + .5; p.setZ(i, .07 * Math.sin(Math.PI * u) + .04 * Math.sin(v * 9 + u * 3)); }
+    geo.computeVertexNormals(); put(geo, m, at4(x, ytop - h / 2, z)); };
   // ---- 1. THE MOUND: an oval plinth of stone (its top is the floor of every room), boulders round its foot ----
   { const prof = [[0, P], [.9, P], [.965, P - .1], [.995, P - .35], [1.03, .3], [1.06, -.4]].map(([r, y]) => new THREE.Vector2(r, y));
     put(new THREE.LatheGeometry(prof, 160), stoneM, at4(0, 0, 0, 0, 0, 0, A.rx, 1, A.rz));
     runs((x, z) => (x / A.rx) ** 2 + (z / A.rz) ** 2 <= 1, -A.rx, A.rx, -A.rz, A.rz, -1, P);
     const rnd = rwRng(41); for (let i = 0; i < 26; i++) { const a = i / 26 * Math.PI * 2 + rnd() * .15, r = 1.02 + rnd() * .05, x = Math.sin(a) * A.rx * r, z = Math.cos(a) * A.rz * r;
       if (Math.abs(x) < 2.4 && Math.abs(z) > A.rz * .8) continue;     // the steps' gaps, front and back
+      if (z > 3 && Math.abs(x) < 10.2) continue;     // pass 2: the stall decks
       const k = .8 + rnd() * .9; put(new THREE.IcosahedronGeometry(1, 4), stoneM, at4(x, .2 + k * .3, z, rnd() * 6, 0, 0, k * 1.4, k * .8, k * 1.2)); } }
   // ---- the STEPS up the mound: timber treads, .30 risers, a walkable ramp under them; front (to the shop) and back (to the round door) ----
   const steps = (sg) => { const n = Math.ceil(P / A.rise), r = P / n, w = 1.7, z0 = sg * A.rz * .985, run = .38;
@@ -63454,11 +63485,50 @@ function ghomeBuild(at, yaw, y0) {
     win(0, 0, A.R, .85, P + 4.6, .42); win(0, 0, A.R, -.85, P + 4.6, .42); win(0, 0, A.R, 2.4, P + 2, .38); win(Tx, Tz, A.Rt, 1.2, P + 2.2, .36); win(Tx, Tz, A.Rt, .2, P + 7.4, .4); win(Tx, Tz, A.Rt, 1.0, P + 7.6, .36);
     win(Gx, Gz, A.Rw, -.6, P + 1.9, .38); win(Gx, Gz, A.Rw, -1.8, P + 1.9, .34);
     put(new THREE.TorusGeometry(A.door / 2, .12, 6, 16, Math.PI), wood, at4(0, P + A.doorH - A.door / 2 + .02, -A.R - .03, Math.PI)); }
-  // ---- the frame round the SHOP FRONT (posts and a beam; the scaffold proper is pass 2) ----
-  { const hw = A.shopW / 2 + .15, z = Math.sqrt(A.R * A.R - hw * hw) + .15; vbox(-hw - .14, -hw + .14, P, P + A.shopH + .3, z - .14, z + .14, wood, 1, { noCam: 1 }); vbox(hw - .14, hw + .14, P, P + A.shopH + .3, z - .14, z + .14, wood, 1, { noCam: 1 });
-    vbox(-hw - .4, hw + .4, P + A.shopH, P + A.shopH + .35, z - .18, z + .18, wood, 0); }
+  // ---- PASS 2: THE TIMBER SCAFFOLD, THE TORN AWNINGS, THE CHEVRON BANNERS (refs: the frame across the front, a stall deck either side of the
+  // steps under a sloping red awning on outer posts, the big V-hemmed banner over the shop front, narrow ones down the posts; a ladder; the
+  // long ramp off the right side). Posts are square timber with iron bands (noCam: thin things never pull the camera); the decks and the
+  // ramp are walkable timber; the awnings are walkable too (a scramble onto the roofs); the cloth is a canvas texture with its torn hem in
+  // the alpha ----
+  { const iron = new THREE.MeshStandardMaterial({ color: 0x2c2724, metalness: .6, roughness: .5 });
+    const awnM = new THREE.MeshStandardMaterial({ map: ghClothTex('awning'), alphaTest: .5, side: THREE.DoubleSide, roughness: .9 }), banM = new THREE.MeshStandardMaterial({ map: ghClothTex('banner'), alphaTest: .5, side: THREE.DoubleSide, roughness: .9 });
+    const NC = { noCam: 1 }, Zf = 4.6, Zo = 7.4, Yu = P + 4.6, Yt = P + 6.3, Yo = P + 2.85;
+    const post = (x, z, ya, yb) => { vbox(x - .13, x + .13, ya, yb, z - .13, z + .13, wood, 1, NC); for (const yy of [ya + .5, (ya + yb) / 2, yb - .35]) vbox(x - .16, x + .16, yy - .05, yy + .05, z - .16, z + .16, iron, 0); };
+    const beamX = (x0, x1, y, z, t = .22) => { vbox(x0, x1, y - t / 2, y + t / 2, z - t / 2, z + t / 2, wood, 0); for (let x = x0 + .4; x < x1 - .2; x += 1.6) vbox(x - .04, x + .04, y - t / 2 - .02, y + t / 2 + .02, z - t / 2 - .02, z + t / 2 + .02, iron, 0); };
+    const rodW = (a, b, r, m) => { const d = new THREE.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]), L = d.length(); _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize());
+      put(new THREE.BoxGeometry(r, L, r), m, _m4.compose(new THREE.Vector3((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2), _q, _one)); };
+    // the front frame: four tall posts, the beam at Yu, the top beam over the shop front at Yt, diagonal braces
+    for (const x of [-6.2, 6.2]) post(x, Zf, P, Yu + .3);
+    for (const x of [-2.3, 2.3]) post(x, Zf, P, Yt + .3);
+    beamX(-6.5, 6.5, Yu, Zf + .02); beamX(-2.7, 2.7, Yt, Zf + .02);
+    for (const sx of [-1, 1]) { rodW([sx * 6.2, P + 3, Zf], [sx * 3.8, Yu, Zf], .14, wood); rodW([sx * 2.3, Yu + .2, Zf], [sx * 1.2, Yt, Zf], .14, wood); }
+    // the stall DECKS either side of the steps, at the floor's height, on outer posts; their front beam carries the awning's low edge
+    for (const sx of [-1, 1]) { const xa = sx < 0 ? -9.8 : 2.4, xb = sx < 0 ? -2.4 : 9.8;
+      box(xa, xb, -1, P, 3.4, Zo + .2); for (let x = xa; x < xb - .01; x += .32) vbox(x + .01, Math.min(xb, x + .31), P - .12, P, 3.4, Zo + .2, wood, 0);
+      vbox(xa, xb, P - .45, P - .12, Zo, Zo + .2, wood, 0);
+      for (const x of sx < 0 ? [-9.6, -6.2, -2.6] : [2.6, 6.2, 9.6]) { post(x, Zo, 0, Yo + .25); }
+      beamX(xa - .1, xb + .1, Yo, Zo);
+      // the AWNING: from just under the front beam, sagging, down to the outer beam; walkable
+      awning([xa - .15, Yu - .18, Zf + .15], [xb + .15, Yu - .18, Zf + .15], [xb + .25, Yo + .05, Zo + .35], [xa - .25, Yo + .05, Zo + .35], awnM, .22); }
+    // the BANNERS: the big one over the shop front, narrow ones down the outer posts and the posts by the shop
+    banner(0, Yt - .05, Zf + .16, 3.4, 2.5, banM); for (const x of [-6.2, 6.2]) banner(x, Yu - .2, Zf + .18, .9, 2.3, banM);
+    for (const x of [-2.3, 2.3]) banner(x, Yu - .2, Zf + .18, .75, 1.7, banM);
+    // the LADDER up the store's front to its dome (kitClimbAdd, its mark on the dome where he steps off)
+    { const lx = A.Wc[0], lz = A.Wc[1] + A.Rw + .14, ya = P, yb = P + A.Hwg + .4;
+      for (const ox of [-.32, .32]) vbox(lx + ox - .04, lx + ox + .04, ya, yb + .5, lz - .04, lz + .04, wood, 0);
+      for (let y = ya + .3; y < yb + .3; y += .34) vbox(lx - .32, lx + .32, y - .03, y + .03, lz - .03, lz + .03, wood, 0);
+      const nx = s, nz = c, cxw = Wx(lx, lz), czw = Wz(lx, lz), hx = .12, hz = .45;     // the local +z normal in the world
+      const ex = Math.abs(nx) * hx + Math.abs(nz) * hz, ez = Math.abs(nz) * hx + Math.abs(nx) * hz;
+      const Lb = kitClimbAdd({ cs: nx, sn: nz, hx, hz, cx: cxw, cz: czw, minx: cxw - ex, maxx: cxw + ex, miny: y0 + ya, maxy: y0 + yb, minz: czw - ez, maxz: czw + ez }, 'ghome_ladder', y0 + P + A.Hwg);
+      const mr = A.Rw - 1, my = P + A.Hwg + 2.2 * Math.cos(Math.asin(mr / A.Rw)); Lb.mark = { x: Wx(A.Wc[0], A.Wc[1] + mr), y: y0 + my, z: Wz(A.Wc[0], A.Wc[1] + mr) }; A.climbs = [Lb]; }
+    // the long RAMP off the right deck down to the ground, railed (noCam)
+    { const x0 = 9.8, x1 = 16.2, z0 = 4.5, z1 = 6.6, n = Math.ceil((x1 - x0) / .34);
+      for (let i = 0; i < n; i++) { const xa = x0 + (x1 - x0) * i / n, xb = x0 + (x1 - x0) * (i + 1) / n, ym = P * (1 - (i + .5) / n); vbox(xa + .01, xb - .01, ym - .14, ym + .02, z0, z1, wood, 0); }
+      quad([x0, P + .03, z0], [x0, P + .03, z1], [x1, .05, z1], [x1, .05, z0]);
+      for (const z of [z0 + .05, z1 - .05]) { for (const f of [0, .5, 1]) { const x = x0 + (x1 - x0) * f, y = P * (1 - f); vbox(x - .06, x + .06, Math.min(0, y - .5), y + 1, z - .06, z + .06, wood, 1, NC); }
+        rodW([x0, P + .95, z], [x1, .95, z], .08, wood); } } }
   // ---- merge, and the world gets the boxes and the floors ----
-  let draws = 0; for (const [m, list] of MG) { const geo = mergeGeometries(list); if (!geo) { console.warn('[melee] ghome: a bucket would not merge', m.name || m.color); continue; } const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; g.add(o); draws++; }
+  let draws = 0; for (const [m, list] of MG) { if (m.map) m.map.wrapS = THREE.RepeatWrapping; const geo = mergeGeometries(list); if (!geo) { console.warn('[melee] ghome: a bucket would not merge', m.name || m.color); continue; } const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; g.add(o); draws++; }
   for (const b of boxes) BOXES.push(b);
   for (let i = 0; i < tris.length; i += 9) { const q = tris.slice(i, i + 9); triAdd(...q); triAdd(q[0], q[1], q[2], q[6], q[7], q[8], q[3], q[4], q[5]); }
   A.stat.draws = draws; A.stat.boxes = boxes.length; A.stat.tris = tris.length / 9;

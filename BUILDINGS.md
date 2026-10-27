@@ -19,13 +19,13 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 - **Passes:** the massing and walkable shell first, with an INSIDE (a room with the shop front and his quarters, stairs up to the balcony); then the timber frame, awnings and banners; then the crane, tent, wheels and stacks; then the dressing (pots, lanterns, cacti); then the look (materials, and textures when the texture maps exist).
 - **Textures:** OpenAI image generation is reachable (the key is the environment's), but the account is OUT OF CREDITS (`credit_balance_exhausted`, m1376). When he tops it up: tileable wood, sandstone, stone, marble, metal and red cloth.
 - **Built in code: `GHOME` / `ghomeBuild` (WORKER B).** It replaces the GLB in the Red Hollows. `?hut=glb` brings the Tripo model back to compare.
-  - [x] **pass 1 (next tick):** the massing and the walkable shell, with an inside:
+  - [x] **pass 1 (m1380):** the massing and the walkable shell, with an inside:
     - the boulder mound and its steps (.30 risers);
     - the HALL: the shop front, the round back door, a screen wall between the shop and his quarters, a counter, a bed, a table;
     - the balcony TOWER: a spiral stair inside (.30 risers) up to a railed balcony on a mushroom ledge;
     - the STORE wing;
     - round windows; the sandstone's cream, speckle and purple spots as vertex colour.
-  - [ ] pass 2: the timber scaffold round the base, the torn awnings, the chevron banners
+  - [x] **pass 2 (next tick):** the timber scaffold (iron-banded posts, beams, braces), two stall decks under sagging torn awnings (walkable), the big V-hemmed chevron banner and four post banners, a ladder up the store to its dome, the long ramp off the right deck
   - [ ] pass 3: the tent cone on its frame, the brass ship's wheels, the bronze stacks, the crane with its brass orb and red tassel, the balcony canopy, the flags
   - [ ] pass 4: the dressing -- pots, crates, the lantern-lit stalls, cacti and succulents, more boulders
   - [ ] pass 5: the look -- the domes' bulge (lathed, not cylinders), the stone's texture, the warm interior light
