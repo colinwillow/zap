@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1096 -- the dragon fireball is a living thing: it arcs, bounces, scorches, and explodes
+
+**What he said:** *"blue dragon fireballs just look like little balls... way cooler way more alive way more particle... more
+natural trajectory bounce around... hit stuff explode."*
+
+**What changed (`beastFire`, `beastFxStep`, `beastBoom`, `FIREBALL`, `fireballLook`):** the ball is three layers (a white-hot core,
+an orange shell, a red outer glow) that flicker and spin, and it sheds a `rocketTrail` puff every .022 s. Gravity carries it.
+On the floor it BOUNCES (up to `FIREBALL.bounces` 2, losing `rest` .55 of its fall and `slide` .8 of its run), leaves a scorch,
+and splashes `splashK` .6 of its damage on each touch. It explodes on the player, on a wall (`boxRay`), or after its last bounce:
+a fire bloom, smoke, two spark bursts, plus a `slamRing` and a scorch when it bursts low. `mel.FIREBALL.stat` counts bounces and booms.
+
+**Measured (real loop, dragon 12 m away, player steps 7 m aside after the shot):** 77 frames in flight, peak 1.46 m, one bounce
+at .45 m, then the burst. With the player stood still it hits him directly (0 bounces, 1 boom). Pictures: an orange ball with a
+puff trail in flight, then a smoke bloom with a ground ring.
+
+**Open:** whether it reads as "alive" enough is his look. The numbers live on `mel.FIREBALL`.
+
 ## m1095 -- every cut of a multi-cut katana swing connects; the blue dragon's (and the dog's) padded clips trimmed to their real motion
 
 *"A lot of the katana attacks are two strikes... only one of them registers."* / *"There's a bunch of extra frames on every animation in the
