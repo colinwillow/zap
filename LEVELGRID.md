@@ -97,6 +97,11 @@ This pass adds three new cell kinds to the spec:
 - flying zeppelin platforms
 - swimming (a new mechanic: its own sandbox first, per the whole-piece rule)
 
+## L1 pass 6 (m1361): THE BOSS KEEP
+
+- **Behind the door at E** stands a fortress on four stilts, with a rocket gun on its roof.
+- **The legs are shielded** until the door opens. After that, break all four (10 hp each) and the keep tilts, falls and crumbles. That ends the level.
+
 ## L1 pass 5 (m1360): ARCHERS AND GUNS ACROSS THE GAPS
 
 - **`posts: [[c, r, y, 'archer'|'gun'], ...]`:** a perch (a pillar with a deck on top) at an OFF-path cell, at level y.

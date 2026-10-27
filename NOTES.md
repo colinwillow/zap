@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## GRID LEVEL 1, PASS 6: THE BOSS KEEP FALLS WHEN ITS LEGS GO (m1361)
+
+His: *"knock down a building... fully destructible buildings... the boss... crumbles"*.
+
+- **The boss keep stands behind the door at E:** a 12 x 12 x 9 m red fortress with a pyramid roof and a pulsing eye, on four 1.6 m stilts 8 m tall, with a rocket gun on its roof facing the level.
+- **The legs:**
+  - **Shielded until the boss door opens** (3, 6 and 8 done): a pink cylinder round each leg, and hits do nothing (`S.cool` is held).
+  - **After that,** each leg is a `smashAdd` piece with 10 hp that never rebuilds.
+  - **Each leg lost tips the keep towards it** (.05 rad per leg).
+- **When all four are gone,** the keep falls:
+  - its collider and gun go
+  - it tumbles and lands in dust and smoke, with a big shake
+  - E is marked done, with a beam
+  - the wreck sinks and is gone after 4 s
+- **Teardown:** `lvgClear` drops the legs, the gun and the body box.
+- **Still open:** the keep is a SHAPE you fell, not yet a fight. It has no guards of its own and no attack beyond the gun. Falling it is the level's end.
+
 ## GRID LEVEL 1, PASS 5: ARCHERS AND GUNS ACROSS THE GAPS (m1360)
 
 His: *"archers across certain places"*, *"catapults rockets turrets"*.
