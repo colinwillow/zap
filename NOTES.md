@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## THE SHIP, PASS 3: FOAM AND WAKE, BOW SPRAY, THE SUN ON THE WATER, GULLS, THE ISLAND (m@X4@, WORKER A)
+## THE SHIP, PASS 3: FOAM AND WAKE, BOW SPRAY, THE SUN ON THE WATER, GULLS, THE ISLAND (m1375, WORKER A)
 
 - **Foam round the hull and a wake**, in the sea shader. A band of broken, drifting foam hugs the hull's waterline (an ellipse round its
   footprint). A WAKE trails aft from the stern: widening, streaked and flowing away, and fading out 95 m back.

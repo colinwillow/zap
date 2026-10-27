@@ -20,7 +20,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
     - three masts with junk sails, crow's nests and rope ladders
     - the dragon prow, lanterns and bronze guns
   - [x] **pass 2 (m1374, WORKER A):** the ship RIDES the swell (pitch, roll, heave, with the decks carrying him); the hold below deck (an interior you drop into); sails you can CLIMB (the battens as rungs) and run along the yards; a rope swing between the masts
-  - [x] **pass 3 (m@X4@, WORKER A):** the water's foam round the hull and a wake; spray off the bow; the sun on the water; gulls; the island on the horizon
+  - [x] **pass 3 (m1375, WORKER A):** the water's foam round the hull and a wake; spray off the bow; the sun on the water; gulls; the island on the horizon
   - [ ] later: swimming here; the AIRSHIP transform (his)
 
 ## STEER 000 (his, after m1372) -- BLUEPRINTS FIRST, GENERATED BLOCKOUTS, NOT A TRANSCRIBED IMAGE
