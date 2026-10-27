@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1204 -- Ninja Pillars pass 2: the trial and the sensei's hut (Building Forge loop)
+
+**THE TRIAL.** A bronze ring round each spiral pillar's cap LIGHTS (warm emissive) as he lands on it, with a rising chime.
+- **Touch the sand** inside the ring and every light goes out with a thud.
+- **Ring the bell with all ten lit** and the field CELEBRATES: 4 s of fireworks off random pillar tops, full health, a gold
+  beam. Then the lights reset for another try.
+- The lights are `NPIL.on.lamps`, the state is `lit`, and the check is in `npilHit` on the bell.
+
+**THE SENSEI'S HUT** stands west of the ring at (15.3, 46). It was first placed south, where the Forge-Workshop's crane bar
+would have swept through its roof.
+- Breakable walls on all four sides, with a door on the north.
+- A tatami floor and a roof.
+- Inside: a straw dummy and a sword rack. Lamps outside the door.
+
+Next: alternate -- extra passes (5) begin on the oldest done buildings, or Ninja Pillars pass 3.
+
 ## m1203 -- Floating Islands pass 4: the tengu crow (Building Forge loop, extra pass)
 
 A bronze Jin CROW now circles the islands at 12 m out and about 15 m up, with flapping wings, gold tips and beak, and red eyes.
