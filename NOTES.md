@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE LENS TIPS FOR A SENTRY GUN TOO; THE LAST 2D SEND-BACK (m1350)
+
+*"When I hit the archers' arrows and they ricochet, I don't know that I want them to go straight back -- let's do it for now, but it's a little unrealistic and makes it easier. Also when the archers shoot at you your camera bends up so you can see the arrows coming, but it doesn't do this with the rockets, and it should."*
+
+- **The camera.** An arrow lobs for 2-3 s, so the m1276 ease (`UPLOOK.in` .32 s) has time to arrive. A rocket covers a tower's height in about 1 s, so the lens was still turning when it hit.
+  - `upLookW` now also tips the lens for any SENTRY GUN that has SEEN him from above: its eye is red (`T.see`), it is within range + 6 m, and it is at least `UPLOOK.dy` above his chest.
+  - The tilt holds for as long as the gun tracks him, BEFORE it fires, at `UPLOOK.gun` .85 of an arrow's tilt. The warning is the gun's attention, not the shot.
+- **Arrows still go straight back** (his "let's do it for now"). He finds it a little unrealistic and easy. That is a taste call left open: the alternative is the ordinary glance for a late block, and a straight return only for a perfect parry.
+- **The third send-back path was 2D too:** the auto-deflect (`deflectThreat`) sent turret rockets home on a level line. It now uses `turAimHome` (3D) like m1348's two.
+
 ## THE MARKET STALLS x1.5 -- STEER S2 (older rows, m1349)
 
 - **From its parameters:**
