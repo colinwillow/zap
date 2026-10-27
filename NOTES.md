@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1201 -- Jin Lighthouse pass 4: take the light (Building Forge loop, extra pass)
+
+Strike the bronze DRIVE in the keeper's room: the drum and shaft at the room's centre, from inside, through `bldHit`.
+
+For `ownT` 30 s the searchlight is HIS:
+- **Gold.** The beam, crystal and runes turn gold.
+- **Faster sweep.** It sweeps twice as fast and never locks on him.
+- **It hunts.** It picks the nearest standing body within `seeR` 55 m, locks on (the same .9 s), and throws the bolt at it:
+  a `dummyBlow` at 1.5x `zapDmg` (18) with a knock-down, then the next target after half the usual rest.
+- **Then it turns back on him.** When the 30 s run out, it goes back to hunting him.
+
+The drive won't take while the crystal is dark. Pass 4 is an extra on a done building, so it moves no sandbox box.
+Next: alternate -- Set 2 #20 Ninja Pillars pass 1.
+
 ## m1200 -- Floating Islands pass 3: the polish (Building Forge loop)
 
 - **Drifting rocks:** four small rocks float round each island, bobbing and turning slowly. They are picture only, with no collision.
