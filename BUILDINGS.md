@@ -36,7 +36,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
     - every wall is the same: a timber frame (posts, rails) that stays, with breakable infill (the `cwallBuild` chunks already are this).
     - railings, balusters and gates are breakable pieces.
     - panels come back on a slow timer (or a worker rebuilds them).
-  - **S3a (next):** a shared helper (`bldSkinRoof`): a hip/gable roof cut into panels between rafters, each panel its own walkable triangles plus a merged-range mesh. Hits (`bldHit`, rockets, strikes) knock panels out with debris and a tile clatter. The rafters stay walkable beams. First on the Dojo Hall's roof.
+  - **S3a (DONE m1353, the Dojo Hall):** a shared helper (`bldSkinRoof`): a hip/gable roof cut into panels between rafters, each panel its own walkable triangles plus a merged-range mesh. Hits (`bldHit`, rockets, strikes) knock panels out with debris and a tile clatter. The rafters stay walkable beams. First on the Dojo Hall's roof.
   - **S3b:** railings, balusters and gates as breakable pieces (a shared `bldRail` helper), first on the Courtyard's balconies and bridges.
   - **S3c:** retrofit the rest, roof by roof, as each building's S2 pass comes up.
 - **GIANTS:** *"Enemies like 100 times your size."* A design note for R7 (the sky dragon) and R8 (boss armour): build the bosses
