@@ -19437,6 +19437,7 @@ function bldHit(x, y, z, rad, dmg) {
   if (rampHorn(x, y, z, rad)) return 1;     // m1242: the war horn
   if (rampSenHit(x, y, z, rad, dmg)) return 1;     // m1218: the wall sentries
   if (opagHit(x, y, z, rad, dmg)) return 1;     // m1274: the octagonal block pagoda's blocks (X4, WORKER A)
+  if (tfortHit(x, y, z, rad, dmg)) return 1;     // m@X4@: the timber siege fort (X3, WORKER A)
   if (zepLever(x, y, z, rad)) return 1;     // m1246: a zeppelin's bomb lever
   if (zepHit(x, y, z, rad, dmg)) return 1;     // m1222: a zeppelin's envelope
   if (hallSparHit(x, y, z, rad, dmg)) return 1;     // m1206: the hall's sparring partner
@@ -22519,6 +22520,123 @@ function opagHit(x, y, z, rad, dmg) { const G = OPAG.on; if (!G) return 0; const
   for (const [, B] of take) { B.hp -= dmg || 1; if (B.hp <= 0) opagBreak(B, dir); else spkBurst(B.P.x, B.P.y, B.P.z, 4, { col: [.9, .88, .8], spread: 1.5, size: .1, life: .3 }); }
   snd('hit', { g: .55, r: .6 + Math.random() * .15, x, z }); return 1; }
 function opagClear() { const G = OPAG.on; if (!G) return; for (const d of G.arch.concat(G.guards)) if (d && HORDE.list.includes(d)) { bowDrop(d); bodyGone(d); HORDE.list.splice(HORDE.list.indexOf(d), 1); } else if (d) { bowDrop(d); bodyGone(d); } for (const L of G.lions) { const i = BDYN.indexOf(L.box); if (i >= 0) BDYN.splice(i, 1); } if (G.tur) turretDrop(G.tur); { const i = ZIPS.indexOf(G.zip); if (i >= 0) ZIPS.splice(i, 1); if (player.zip && player.zip.Z === G.zip) player.zip = null; if (player.bar && G.bars.includes(player.bar.B)) player.bar = null; } for (const L of G.climbs) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && G.climbs.includes(player.climb)) climbOff(); bldClear(G); OPAG.on = null; }
+// m@X4@: X3 -- THE TIMBER SIEGE FORT (WORKER A; BUILDINGS.md X3, his third reference `timber_siege_fort.webp`), built at the STEER's x1.5. A
+// battered base of ROUGH fitted boulders (six 1.5 m courses, each stepping in .35 m: a ledge to catch at every course) with a dark TUNNEL
+// straight through it, gated at both mouths; on top an open TIMBER LATTICE fortress of three 6 m tiers stepping back -- posts, beams, an X of
+// braces in every bay (they BREAK), plank decks with breakable rails, a ladder up through each deck -- and a watch house of timber blocks
+// under a stepped block roof on the top deck. Two lashed scaffold ladders climb the base. The front (the gate) faces -z, toward the forge.
+const TFORT = { at: [-70, 100], hx: 18, hz: 14, course: 1.5, nC: 6, bat: .35, tunW: 6, tunH: 6, tierH: 6,
+  tiers: [[30, 22, 0, 0], [22, 15, 0, 1], [15, 10, 0, .8]], bay: 3, blkHp: 2, on: null };     // tiers: [w, d, x offset, z offset (+ = toward the back)]
+function tfortBuild() {
+  if (TFORT.on) return; const A = TFORT, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] };
+  const M = (c, r, x) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: r }, x || {}));
+  const st = [M(0x8f8a82, .97), M(0x7a766f, .97), M(0xa39e95, .97)], mortar = M(0x3e3b38, 1), post = M(0x6b4f36, .85), brace = M(0x7d5f42, .85), plank = M(0x8c6c4b, .85), dark = M(0x35281d, .85), red = M(0xb3261c, .5), tile = M(0x4b4f55, .7), edge = M(0xd9d4c8, .8), gold = M(0xd9a441, .3, { metalness: .85 });
+  const MG = new Map(), _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _up = new THREE.Vector3(0, 1, 0), _s = new THREE.Vector3(), _one = new THREE.Vector3(1, 1, 1);
+  const mg = (geo, m, mat4) => { geo = geo.index ? geo.toNonIndexed() : geo; if (mat4) geo.applyMatrix4(mat4); if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); };
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;     // the boulders come out the same every build
+  // a block: static (bucketed) or breakable (instanced, `brk` 1 hittable with a collider if `solid`, a hit box otherwise); `q` turns it any way
+  const blks = [], climbs = [];
+  const blk = (x, y0, y1, z, w, d, m, o) => { o = o || {}; const h = y1 - y0; if (w < .01 || d < .01 || h < .01) return null; const yaw = o.yaw || 0, q = o.q || _q.clone().setFromAxisAngle(_up, yaw), P = new THREE.Vector3(x, (y0 + y1) / 2, z);
+    const b = o.solid || o.brk ? (o.q ? { minx: x - o.ex, maxx: x + o.ex, miny: y0, maxy: y1, minz: z - o.ez, maxz: z + o.ez } : opagTB(x, z, w / 2, d / 2, yaw, y0, y1)) : null;
+    if (b && o.solid) O.boxes.push(b); if (b && o.noCam) b.noCam = 1;
+    if (o.brk) { const sc = new THREE.Vector3(w * .985, h * .985, d * .985), B = { m, P, q, sc, mtx: new THREE.Matrix4().compose(P, q, sc), box: b, alive: 1, hp: o.hp || A.blkHp, up: null, dn: null, kids: null, dead: 0, solid: !!o.solid }; blks.push(B); return B; }
+    mg(new THREE.BoxGeometry(w, h, d), m, _m4.compose(P, q, _one)); return b; };
+  // a timber rod between two points (a brace), breakable, no collider (a hit box round its middle)
+  const rod = (ax, ay, az, bx, by, bz, r, m) => { const a = new THREE.Vector3(ax, ay, az), b = new THREE.Vector3(bx, by, bz), d = b.clone().sub(a), L = d.length(), q = new THREE.Quaternion().setFromUnitVectors(_up, d.clone().normalize()), mid = a.clone().add(b).multiplyScalar(.5);
+    return blk(mid.x, mid.y - L / 2, mid.y + L / 2, mid.z, r, r, m, { q, brk: 1, ex: Math.abs(d.x) / 2 + r, ez: Math.abs(d.z) / 2 + r, hp: 2 }); };
+  // ---- THE BASE: six courses of boulders, each stepping in `bat`; solid course boxes (a tunnel cut through the lower four), and the
+  // boulders drawn over the four faces and down the tunnel's walls -- random lengths, depths, tones and a hair of twist, on dark mortar ----
+  const H0 = A.course * A.nC, tw = A.tunW / 2, nTun = Math.round(A.tunH / A.course);
+  for (let c = 0; c < A.nC; c++) { const y0 = c * A.course, y1 = y0 + A.course, hx = A.hx - A.bat * c, hz = A.hz - A.bat * c, cut = c < nTun;
+    if (cut) { blk(cx - (hx + tw) / 2, y0, y1, cz, hx - tw, 2 * hz, mortar, { solid: 1 }); blk(cx + (hx + tw) / 2, y0, y1, cz, hx - tw, 2 * hz, mortar, { solid: 1 }); }
+    else blk(cx, y0, y1, cz, 2 * hx, 2 * hz, mortar, { solid: 1 });
+    const face = (ax, sg, lo, hi) => { let u = lo; while (u < hi - .05) { const L = Math.min(hi - u, .9 + rnd() * 1.6), m = st[Math.floor(rnd() * 3)], dp = .35 + rnd() * .25, hh = A.course - .08 - rnd() * .1, um = u + L / 2, yj = y0 + .04 + rnd() * .04, tw2 = (rnd() - .5) * .08;
+        if (ax === 'z') blk(cx + um, yj, yj + hh, cz + sg * (hz - dp / 2 + .12), L - .08, dp, m, { yaw: tw2 }); else blk(cx + sg * (hx - dp / 2 + .12), yj, yj + hh, cz + um, dp, L - .08, m, { yaw: tw2 }); u += L; } };
+    for (const sg of [-1, 1]) { if (cut) { face('z', sg, -hx, -tw); face('z', sg, tw, hx); } else face('z', sg, -hx, hx); face('x', sg, -hz, hz); }
+    if (cut) for (const sg of [-1, 1]) { let u = -hz; while (u < hz - .05) { const L = Math.min(hz - u, .9 + rnd() * 1.6), m = st[Math.floor(rnd() * 3)], hh = A.course - .08 - rnd() * .1;
+      blk(cx + sg * (tw + .12), y0 + .04, y0 + .04 + hh, cz + u + L / 2, .3, L - .08, m, {}); u += L; } } }     // the tunnel's walls
+  blk(cx, nTun * A.course - .02, nTun * A.course + .5, cz, 2 * tw, 2 * (A.hz - A.bat * nTun), dark, {});     // its dark ceiling beam course
+  for (const sg of [-1, 1]) { const z = cz + sg * (A.hz - .1); blk(cx, A.tunH, A.tunH + .6, z, A.tunW + 1.6, .7, dark, {}); for (const s2 of [-1, 1]) blk(cx + s2 * (tw + .3), 0, A.tunH, z, .6, .7, dark, {}); }     // timber frames at the two mouths
+  // ---- THE LATTICE: three tiers of posts on a `bay` grid round the edge (and a 6 m grid inside), a beam round the top and one at half height,
+  // an X of braces in every half-bay, a plank deck on top (a hatch cut for the ladder from below), a rail round what the next tier leaves open ----
+  let yb = H0; const T = A.tiers.map(([w, d, ox, oz]) => [w, d, ox, oz]); let px = cx, pz = cz, prev = null; const tierBoxes = [];
+  for (let k = 0; k < T.length; k++) { const [w, d] = T[k]; let x0, z0; if (!prev) { x0 = cx - w / 2; z0 = cz - d / 2; } else { const [pw, pd, px0, pz0] = prev; x0 = px0 + (pw - w) / 2; z0 = pz0 + (pd - d) * (k === 1 ? .7 : .6); }
+    const x1 = x0 + w, z1 = z0 + d, H = A.tierH, ytop = yb + H; tierBoxes.push([x0, x1, z0, z1, yb, ytop]); prev = [w, d, x0, z0];
+    const nxB = Math.round(w / A.bay), nzB = Math.round(d / A.bay), bx = w / nxB, bz = d / nzB;
+    const P = (x, z) => blk(x, yb, ytop, z, .45, .45, post, { solid: 1 });
+    for (let i = 0; i <= nxB; i++) { P(x0 + i * bx, z0); P(x0 + i * bx, z1); } for (let j = 1; j < nzB; j++) { P(x0, z0 + j * bz); P(x1, z0 + j * bz); }
+    for (let x = x0 + 6; x < x1 - 3; x += 6) for (let z = z0 + 6; z < z1 - 3; z += 6) P(x, z);
+    for (const yy of [yb + H / 2 - .15, ytop - .55]) { const th = yy > yb + H / 2 ? .55 : .3; for (const z of [z0, z1]) blk((x0 + x1) / 2, yy, yy + th, z, w + .45, .35, post, { solid: 1, noCam: 1 }); for (const x of [x0, x1]) blk(x, yy, yy + th, (z0 + z1) / 2, .35, d + .45, post, { solid: 1, noCam: 1 }); }
+    const half = H / 2;     // the X-braces, two per bay (low and high), a rod each way
+    for (const [ax, c, a0, n, bw] of [['x', z0, x0, nxB, bx], ['x', z1, x0, nxB, bx], ['z', x0, z0, nzB, bz], ['z', x1, z0, nzB, bz]]) for (let i = 0; i < n; i++) for (const ya of [yb, yb + half]) {
+      const u0 = a0 + i * bw + .25, u1 = a0 + (i + 1) * bw - .25, y0b = ya + .2, y1b = ya + half - .25;
+      if (ax === 'x') { rod(u0, y0b, c, u1, y1b, c, .16, brace); rod(u0, y1b, c, u1, y0b, c, .16, brace); } else { rod(c, y0b, u0, c, y1b, u1, .16, brace); rod(c, y1b, u0, c, y0b, u1, .16, brace); } }
+    // the deck on top: planks along x in strips, a hatch cut at the back-left for the next ladder (none on the top tier)
+    const hx0 = x0 + 1.2, hx1 = hx0 + 1.4, hz1 = z1 - 1.2, hz0 = hz1 - 1.4;     // (the top tier's hatch opens beside the watch house)
+    for (let z = z0; z < z1 - .01; z += .5) { const za = z, zb = Math.min(z1, z + .5), hole = zb > hz0 && za < hz1;
+      if (hole) { blk((x0 + hx0) / 2, ytop - .3, ytop, (za + zb) / 2, hx0 - x0 + .45, zb - za - .03, plank, { solid: 1 }); blk((hx1 + x1) / 2, ytop - .3, ytop, (za + zb) / 2, x1 - hx1 + .45, zb - za - .03, plank, { solid: 1 }); }
+      else blk((x0 + x1) / 2, ytop - .3, ytop, (za + zb) / 2, w + .45, zb - za - .03, plank, { solid: 1 }); }
+    // the LADDER up to this deck from the floor of this tier (the base's top for the first), at the back-left, its rungs on the hatch's front edge
+    { const lx = (hx0 + hx1) / 2, lz = hz0 + .1, ly0 = yb, ly1 = ytop; for (const o of [-.4, .4]) blk(lx + o, ly0, ly1 + 1, lz, .1, .1, dark, {});
+      for (let r = ly0 + .3; r < ly1 + .9; r += .32) blk(lx, r - .035, r + .035, lz, .8, .07, post, {});
+      const L = kitClimbAdd({ minx: lx - .5, maxx: lx + .5, miny: ly0, maxy: ly1, minz: lz - .12, maxz: lz + .12 }, 'tfort_ladder_' + k, ly1); L.mark = { x: lx, y: ly1, z: hz1 + .8 }; climbs.push(L); }
+    yb = ytop; }
+  // the RAILS: breakable timber round every deck edge not covered by the tier above (posts every 1.5 m, a rail at 1 m, a mid rail)
+  for (let k = 0; k < tierBoxes.length; k++) { const [x0, x1, z0, z1, , ytop] = tierBoxes[k], up = tierBoxes[k + 1];
+    const run = (ax, c, a0, a1) => { for (let u = a0; u < a1 - .05; u += 1.5) { const ub = Math.min(a1, u + 1.5), um = (u + ub) / 2;
+        if (up && (ax === 'x' ? (c > up[2] - .1 && c < up[3] + .1 && um > up[0] && um < up[1]) : (c > up[0] - .1 && c < up[1] + .1 && um > up[2] && um < up[3]))) continue;
+        const [x, z, wx, wz] = ax === 'x' ? [um, c, ub - u, .14] : [c, um, .14, ub - u], B1 = blk(x, ytop + .95, ytop + 1.08, z, wx, wz, plank, { brk: 1, solid: 1, noCam: 1 }), B0 = blk(x, ytop + .45, ytop + .55, z, wx, wz, plank, { brk: 1, solid: 1, noCam: 1 });
+        if (B0 && B1) { B0.up = B1; B1.dn = B0; } blk(ax === 'x' ? u : c, ytop, ytop + 1.08, ax === 'x' ? c : u, .16, .16, post, { solid: 1, noCam: 1 }); } };
+    run('x', z0, x0, x1); run('x', z1, x0, x1); run('z', x0, z0, z1); run('z', x1, z0, z1); }
+  // ---- THE WATCH HOUSE on the top deck: walls of timber blocks (they break), a door with gate leaves toward the front, a window each side, and
+  // a STEPPED roof of four slab courses with its corners kicked up (the block style) and a ridge cap ----
+  const gates = []; { const [x0, x1, z0, z1, , y0] = tierBoxes[tierBoxes.length - 1], hw = 4.5, hd = 3.3, wx = (x0 + x1) / 2, wz = (z0 + z1) / 2 + .6, wh = 4.5, bwid = .9, bh = .6;
+    for (const [ax, sg] of [['x', -1], ['x', 1], ['z', -1], ['z', 1]]) { const L = ax === 'x' ? 2 * hw : 2 * hd, n = Math.round(L / bwid), w2 = L / n;
+      for (let c = 0; c < n; c++) { const u = -L / 2 + w2 * (c + .5); let below = null; for (let r = 0; r < wh / bh; r++) { const yc = y0 + bh * (r + .5);
+          if (ax === 'x' && sg < 0 && Math.abs(u) < 1.3 && yc < y0 + 3) { below = null; continue; }     // the door
+          if (ax === 'z' && Math.abs(u) < .5 && yc > y0 + 1.5 && yc < y0 + 3.3) { below = null; continue; }     // a window each side
+          const [x, z, ww, dd] = ax === 'x' ? [wx + u, wz + sg * hd, w2, .3] : [wx + sg * hw, wz + u, .3, w2]; const B = blk(x, y0 + bh * r, y0 + bh * (r + 1), z, ww, dd, (r + c) % 4 ? plank : brace, { brk: 1, solid: 1 }); if (below) { below.up = B; B.dn = below; } below = B; } } }
+    for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) blk(wx + sx * hw, y0, y0 + wh, wz + sz * hd, .45, .45, post, { solid: 1 });
+    { const G = bgateMake(g, wx, wz - hd, 2.6, 3, true, { boxes: [] }, { hp: 3, hp0: 3, fix: 45, r: 4.5 }); G.box.miny += y0; G.box.maxy += y0; G.y = y0; for (const L of G.leaves) L.g.position.y += y0; O.boxes.push(G.box); gates.push(G); }
+    const rt = y0 + wh; for (let j = 0; j < 4; j++) { const ex = 1.9 - .55 * j, yy = rt + .3 * j; blk(wx, yy, yy + .3, wz, 2 * (hw + ex), 2 * (hd + ex), tile, { solid: 1 }); blk(wx, yy + .3, yy + .34, wz, 2 * (hw + ex) + .04, 2 * (hd + ex) + .04, edge, {}); }
+    for (let j = 0; j < 4; j++) blk(wx, rt + 1.2 + .3 * j, rt + 1.5 + .3 * j, wz, 2 * hw - 1.2 * j, 2 * hd - 1.6 - .9 * j, tile, { solid: 1 });
+    blk(wx, rt + 2.4, rt + 2.75, wz, 2 * hw - 3, .5, dark, {});
+    for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const ex = hw + 1.9, ez = hd + 1.9; blk(wx + sx * (ex - .4), rt + .3, rt + .75, wz + sz * (ez - .4), .7, .7, tile, {}); blk(wx + sx * (ex - .1), rt + .75, rt + 1.2, wz + sz * (ez - .1), .45, .45, edge, {}); blk(wx + sx * ex, rt + 1.2, rt + 1.45, wz + sz * ez, .28, .28, gold, {}); }
+    A.topY = rt + 2.75; A.house = [wx, wz]; }
+  // ---- THE WAY UP THE BASE: two lashed scaffold ladders, front-left and back-right, each with a plank gangway at the top across to the stone ----
+  for (const [sx, sz] of [[-1, -1], [1, 1]]) { const lx = cx + sx * 11, z0 = cz + sz * (A.hz + .6), zt = cz + sz * (A.hz - A.bat * (A.nC - 1) - .4);
+    for (const o of [-.45, .45]) blk(lx + o, 0, H0 + 1.1, z0, .14, .14, post, {}); for (let r = .3; r < H0 + 1; r += .32) blk(lx, r - .035, r + .035, z0, .9, .08, post, {});
+    for (const o of [-1.2, 1.2]) blk(lx + o, 0, H0, z0 + sz * .2, .3, .3, post, { solid: 1 });
+    blk(lx, H0 - .3, H0, (z0 + sz * .5 + zt) / 2 + sz * .2, 2.7, Math.abs(z0 + sz * .5 - zt) + .4, plank, { solid: 1 });
+    const L = kitClimbAdd({ minx: lx - .5, maxx: lx + .5, miny: 0, maxy: H0, minz: z0 - .12, maxz: z0 + .12 }, 'tfort_base_' + (sx > 0 ? 1 : 0), H0); L.mark = { x: lx, y: H0, z: zt - sz * .6 }; climbs.push(L); }
+  // the TUNNEL's gates, one at each mouth (`bgateMake`): open for anyone near, break under 4 blows, rehung
+  for (const sg of [-1, 1]) { const G = bgateMake(g, cx, cz + sg * (A.hz - .3), A.tunW - .2, A.tunH - .1, true, { boxes: [] }, { hp: 4, hp0: 4, fix: 45, r: 6 }); O.boxes.push(G.box); gates.push(G); }
+  for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
+  const ims = []; { const by = new Map(); for (const B of blks) { if (!by.has(B.m)) by.set(B.m, []); by.get(B.m).push(B); }
+    for (const [m, L] of by) { const im = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), m, L.length); im.castShadow = im.receiveShadow = true; L.forEach((B, k) => { B.k = k; B.im = im; im.setMatrixAt(k, B.mtx); }); im.instanceMatrix.needsUpdate = true; g.add(im); ims.push(im); } }
+  for (const B of blks) if (B.solid && B.box && !O.boxes.includes(B.box)) O.boxes.push(B.box);
+  for (const b of O.boxes) if (!BOXES.includes(b)) BOXES.push(b); boxGrid();
+  TFORT.on = { g, O, climbs, blks, ims, gates, tiers: tierBoxes, t: 0 };
+  arenaBeam(cx, cz, [.95, .7, .4], 1); snd('clang', { g: .7, r: .55 });
+}
+function tfortStep(dt) { const G = TFORT.on; if (!G) return; G.t += dt; for (const Q of G.gates) bgateStep(Q, dt, []); }
+function tfortBreak(B, dir, quiet) {
+  if (!B.alive) return; B.alive = 0; B.im.setMatrixAt(B.k, _opZ); B.im.instanceMatrix.needsUpdate = true; const G = TFORT.on; B.dead = G ? G.t : 0;
+  if (B.solid) { const i = BOXES.indexOf(B.box); if (i >= 0) BOXES.splice(i, 1); CWALL.dirty = 1; }
+  if (!quiet) { for (let j = 0; j < 3; j++) { const sz = .12 + Math.random() * .2, c = new THREE.Mesh(new THREE.BoxGeometry(sz * 2.2, sz * .6, sz * .6), B.m); c.position.copy(B.P); c.castShadow = true; scene.add(c);
+      const a = dir != null ? dir + (Math.random() - .5) * 1.6 : Math.random() * 6.28, v = 2 + Math.random() * 4;
+      CWALL.debris.push({ c, v: new THREE.Vector3(Math.sin(a) * v, 2 + Math.random() * 4, Math.cos(a) * v), w: new THREE.Vector3(Math.random() * 9, Math.random() * 9, Math.random() * 9), t: 0 }); }
+    spkBurst(B.P.x, B.P.y, B.P.z, 8, { col: [.75, .55, .35], spread: 2.5, size: .14, life: .5 }); smokeAt(B.P.x, B.P.y, B.P.z, .8, 1, [.6, .5, .4]); }
+  if (B.up) tfortBreak(B.up, dir, 1); }
+function tfortHit(x, y, z, rad, dmg) { const G = TFORT.on; if (!G) return 0; const [cx, cz] = TFORT.at; if (Math.abs(x - cx) > 26 + rad || Math.abs(z - cz) > 22 + rad) return 0;
+  for (const Q of G.gates) if (y > (Q.y || 0) - .5 - rad && bgateHit(Q, x, y, z, rad)) return 1;
+  const hits = []; for (const B of G.blks) { if (!B.alive || !B.box) continue; const d = opagDist(B.box, x, y, z); if (d <= rad + .1) hits.push([d, B]); }
+  if (!hits.length) return 0; hits.sort((p, q) => p[0] - q[0]);
+  const dir = Math.atan2(x - player.pos.x, z - player.pos.z), take = rad > .9 ? hits : hits.slice(0, rad > .45 ? 2 : 1);
+  for (const [, B] of take) { B.hp -= dmg || 1; if (B.hp <= 0) tfortBreak(B, dir); else spkBurst(B.P.x, B.P.y, B.P.z, 4, { col: [.8, .6, .4], spread: 1.5, size: .1, life: .3 }); }
+  snd('thud', { g: .6, r: .9 + Math.random() * .2, x, z }); return 1; }
+function tfortClear() { const G = TFORT.on; if (!G) return; for (const L of G.climbs) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && G.climbs.includes(player.climb)) climbOff();
+  for (const Q of G.gates) { const i = BOXES.indexOf(Q.box); if (i >= 0) BOXES.splice(i, 1); } bldClear(G); TFORT.on = null; }
 // m1247: THE SKY WRECK (Set 3 #28, pass 1). The broken hull of a great flying junk come down on rock spires, its deck TILTED (stern 3 m, bow
 // 7 m: walkable triangles), a fallen mast laid as a ramp up to the stern, the HOLD underneath (breakable hull planks, an open breach at the
 // stern, a torn hole on the +z side, cargo crates to smash), a spire speared up through the bow with a flat top, the broken main mast with a
@@ -23731,6 +23849,7 @@ const BLDG = { list: [
   { key: 'zramp', t: 'Mega Wall', sub: 'the Ninja Warrior wall: zoom from the red gate (full hold), down the lane, up the bend and straight up the face -- only a full zoom reaches the gold lip; your mark shows how close; or zigzag up the chimney', pass: 3, build: () => zrampBuild(), clear: () => zrampClear(), on: () => !!ZRAMP.on, step: dt => zrampStep(dt) },
   { key: 'swrk', t: 'Sky Wreck', sub: 'a flying junk come down on rock spires: a tilted deck up a fallen mast, a hold of cargo behind breakable planks, a crow\'s nest up two bars', pass: 1, build: () => swrkBuild(), clear: () => swrkClear(), on: () => !!SWRK.on, step: dt => swrkStep(dt) },
   { key: 'opag', t: 'Octagonal Block Pagoda', sub: 'x1.5 (his STEER): seven eight-sided storeys of 6 m, 9 m apothem, a 20-step stair of .30 risers; stepped slab eaves you can walk and climb eave to eave, cream panels that break block by block, a ladder up through every floor, a door onto every roof -- red gate leaves in every door and the fence gate that swing open as you come and break under blows, a red fence, a stepped spire; lattice windows, bracket clusters under every eave, tile ribs, a balustrade round every roof walk, gold corner caps; every block breaks -- posts, bands, eave courses -- and flies back in; walks 2.2 m wide, rooms 6 m; a bar off every roof walk, a chain up a corner of every storey, a zipline off the top walk; a block stair up from the shrine hall, then an armoury, a scroll room, a tea room, a garden, a dragon shrine and a bell room at the top; two stone lions wake at the gate and hunt you round the court, archers on the walks, a sentry gun, a monk in the shrine -- all killable; a lantern under every corner, the windows lit, a beacon on the spire; wind bells that ring as you pass, banners on the fence, birds off the walks, the spire collars turning; ring the bell at the top and the tower answers -- lanterns run up it, a column of light, the lions bow, the altar opens on a reliquary', pass: 10, build: () => opagBuild(), clear: () => opagClear(), on: () => !!OPAG.on, step: dt => opagStep(dt) },
+  { key: 'tfort', t: 'Timber Siege Fort', sub: 'a battered base of rough boulders with a gated tunnel straight through it; three open timber lattice tiers stepping back, X-braces that break, plank decks, ladders up through hatches, a watch house under a stepped roof; scaffold ladders up the stone', pass: 1, build: () => tfortBuild(), clear: () => tfortClear(), on: () => !!TFORT.on, step: dt => tfortStep(dt) },
 ] };
 // m1250: THE X-RAY IN THE FORGE. *"When you're inside the building the camera doesn't see through walls -- we need x-ray vision."* The kit
 // worlds' x-ray (m181: anything between the lens and him, above his feet, inside a circle round him, dithered thin) is `kitCutMat` on a

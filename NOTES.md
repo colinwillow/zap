@@ -5,6 +5,35 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- Timber Siege Fort pass 1 of 10: the mass (X3, WORKER A)
+
+His third reference (`timber_siege_fort.webp`): a scaffold fortress on a cyclopean stone base. Built at the STEER's x1.5, at (-70, 100),
+measured clear of every building (the Courtyard at x -28 is 14 m off even after the pass-8 camp). `TFORT` / `tfortBuild`; its hook in
+`bldHit` is `tfortHit`.
+- **The base: ROUGH fitted boulders.**
+  - Six 1.5 m courses, 36 x 28 m at the foot, 9 m tall.
+  - Each course steps in .35 m (battered), so every course top is a LEDGE to catch.
+  - Each face is drawn as boulders of random length, depth and tone, with a hair of twist, on dark mortar (seeded, so they come out the
+    same every build). The colliders are one solid box per course.
+- **The TUNNEL**: 6 x 6 m, straight through the base front to back, lined with boulders, timber frames at both mouths.
+  - **Gate leaves at each mouth** (`bgateMake`): they open for anyone near, break under 4 blows, and are rehung 45 s later.
+- **The lattice: three open timber tiers of 6 m**, stepping back toward the rear:
+  - sizes 30 x 22, then 22 x 15, then 15 x 10;
+  - front terraces 4.9 m and 3 m, wider than ROOM TO FIGHT's 3.3 m except the top's front;
+  - posts on a 3 m bay round the edge and a 6 m grid inside;
+  - a beam round the top and one at half height;
+  - **an X of BRACES in every half-bay that BREAK** (instanced, two hits each). They have hit boxes, but no colliders yet;
+  - a plank deck on each tier;
+  - **breakable timber rails** (1 m, with a mid rail) round every open edge.
+- **The inside way up**: a ladder up through a hatch in every deck, each with its exit `mark` on the deck behind it.
+- **Up the base**: two lashed scaffold ladders, front-left and back-right, with plank gangways across to the stone at the top.
+- **The watch house** on the top deck:
+  - walls of timber blocks that break, with a window each side;
+  - **a gated door** (`bgateMake`) toward the front;
+  - a STEPPED block roof: four slab courses with light edges, the corners kicked up two blocks with gold caps, a stepped cap and a ridge.
+
+SHIPPED UNVERIFIED. Next: pass 2, the lattice detail and the war banners.
+
 ## 3D AIM IS THE 2D AIM PLUS A PITCH (m1327)
 
 *"Go back to the auto shoot upon release; leave the left stick to jumping. The aimer should never move to the side of the screen -- it always stays centred. It doesn't need to work any different than the regular game: pushing left on the right stick already turns the camera left. The only difference is your view can slightly gimbal up or down... when you let go it eases your camera view back to parallel to the ground. It might just become the default."*
