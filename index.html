@@ -11153,6 +11153,123 @@ function courseStep(dt) {
   if (p.pos.y < C.blocks[C.block].base - 4 && p.grounded) { C.stat.falls++; courseBeamTo(C.checks[C.last]); }
   for (const Q of C.checks) if (!Q.lit) Q.m.rotation.z = Math.sin(t * 2 + Q.u) * .05;
 }
+// m1090: DISMEMBERMENT (one test samurai first: SPAWN > SLICE DUMMY). *"What if he's a robot samurai -- a crash test dummy -- and when you slice
+// him pieces come off, his arm, his leg... if one is holding the katana and you slice that arm off, does he pick up the sword with his other
+// arm and attack you with it, and once he has no arms does he just kick you or headbutt you, and if you cut his legs off at that point does
+// he explode?"* Code only, his current model: a body's main skinned mesh is sorted into LIMBS by each vertex's dominant bone (the x-ray
+// skeleton's own idea, m901). A katana blow that LANDS unblocked, `power` or more, takes the limb nearest the blade (`bladeSeg`; a side rule
+// when there is no blade): the limb's triangles are baked in their CURRENT pose into a rigid piece that flies off as debris, and the limb's
+// root bone is scaled to nothing on him every frame (`limbHide`) -- it collapses into the stump, which sparks.
+//   sword arm (right) off  -> the sword flies with it; `regrab` s later a katana is in his LEFT hand and he fights on
+//   both arms off          -> his swings are KICKS (`katana_kick`, `flying_kick`)
+//   one leg off            -> he hobbles at `limp` x his speed
+//   both legs, or the head -> he EXPLODES: every limb he has left flies, sparks, smoke, a boom, and he is gone
+// If the cut edges read badly, his plan B is hard-surface pieces rigid on one bone each -- the same code, cleaner seams.
+const LIMB = { on: 1, sets: { armR: 'RightArm', armL: 'LeftArm', legR: 'RightUpLeg', legL: 'LeftUpLeg', head: 'Neck' }, power: .25, reach: .7,
+  regrab: .8, limp: .35, sparkT: .22, kicks: ['katana_kick', 'flying_kick'], stat: { cuts: 0, booms: 0, regrabs: 0 } };
+const _lmV = new THREE.Vector3(), _lmW = new THREE.Vector3();
+function limbMesh(d) { return d.limbMesh || (d.limbMesh = xrMain(d.model)); }
+// per KIND, once: limb -> the triangles whose three vertices are all dominated by a bone under that limb's root
+function limbPrep(d) {
+  const K = d.K; if (K.limbTris) return K.limbTris;
+  const M = limbMesh(d); if (!M) return (K.limbTris = {});
+  const G = M.geometry, bones = M.skeleton.bones, SI = G.attributes.skinIndex, SW = G.attributes.skinWeight, n = G.attributes.position.count;
+  const of = new Int8Array(bones.length).fill(-1), names = Object.keys(LIMB.sets);
+  names.forEach((nm, li) => { const r = bones.find(b => b.name.replace(/^mixamorig[_:]?/, '') === LIMB.sets[nm]); if (r) r.traverse(o => { const i = bones.indexOf(o); if (i >= 0) of[i] = li; }); });
+  const dom = new Int8Array(n);
+  for (let v = 0; v < n; v++) { let bw = -1, bi = 0; for (let c = 0; c < 4; c++) { const w = SW.getComponent(v, c); if (w > bw) { bw = w; bi = SI.getComponent(v, c); } } dom[v] = of[bi]; }
+  const idx = G.index ? G.index.array : null, tri = (idx ? idx.length : n) / 3, out = {}; names.forEach(nm => out[nm] = []);
+  for (let t = 0; t < tri; t++) { const a = idx ? idx[t * 3] : t * 3, b = idx ? idx[t * 3 + 1] : t * 3 + 1, c = idx ? idx[t * 3 + 2] : t * 3 + 2;
+    const l = dom[a]; if (l >= 0 && (dom[b] === l || dom[c] === l)) out[names[l]].push(a, b, c); }
+  return (K.limbTris = out);
+}
+function limbRoot(d, nm) { const want = LIMB.sets[nm]; let b = null; d.model.traverse(o => { if (!b && o.isBone && o.name.replace(/^mixamorig[_:]?/, '') === want) b = o; }); return b; }
+// which limb the blow took: the standing limb nearest the blade, else by side and a coin
+function limbPick(d, dirH) {
+  const left = Object.keys(LIMB.sets).filter(nm => !(d.cut && d.cut[nm]));
+  if (!left.length) return '';
+  const S = typeof bladeSeg === 'function' ? bladeSeg() : null;
+  if (S) { let best = '', bd = 1e9; for (const nm of left) { const b = limbRoot(d, nm); if (!b) continue; const c = b.children[0] || b; c.getWorldPosition(_lmV); const q = S.at(_lmV), dd = q.distanceTo(_lmV); if (dd < bd) { bd = dd; best = nm; } }
+    if (best && bd < LIMB.reach + .4) return best; }
+  const side = Math.sin(d.h - dirH) > 0 ? 'R' : 'L', pool = left.filter(nm => nm.endsWith(side) || nm === 'head');
+  const P = pool.length ? pool : left; return P[(Math.random() * P.length) | 0];
+}
+// the limb, baked where it is now, as a rigid piece flying along the blow
+function limbBake(d, nm, dirH, kick) {
+  const M = limbMesh(d), T = limbPrep(d)[nm]; if (!M || !T || !T.length) return null;
+  d.model.updateMatrixWorld(true);
+  const map = new Map(), pos = [], uv = [], ix = [], UV = M.geometry.attributes.uv;
+  for (const v of T) { let k = map.get(v); if (k === undefined) { k = map.size; map.set(v, k); M.getVertexPosition(v, _lmV); _lmV.applyMatrix4(M.matrixWorld); pos.push(_lmV.x, _lmV.y, _lmV.z); if (UV) uv.push(UV.getX(v), UV.getY(v)); } ix.push(k); }
+  let cx = 0, cy = 0, cz = 0; for (let i = 0; i < pos.length; i += 3) { cx += pos[i]; cy += pos[i + 1]; cz += pos[i + 2]; } const nv = pos.length / 3; cx /= nv; cy /= nv; cz /= nv;
+  for (let i = 0; i < pos.length; i += 3) { pos[i] -= cx; pos[i + 1] -= cy; pos[i + 2] -= cz; }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); if (UV) g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(ix); g.computeVertexNormals();
+  const mat = (Array.isArray(M.material) ? M.material[0] : M.material).clone(); mat.side = THREE.DoubleSide;
+  const m = new THREE.Mesh(g, mat); m.position.set(cx, cy, cz); m.castShadow = true; scene.add(m);
+  // the sword goes with its arm: a copy of the mounted blade, where it is, on the piece
+  if (nm === 'armR' && d.wmount && d.wmount.visible) { d.wmount.updateMatrixWorld(true); const c = d.wmount.clone(true); d.wmount.matrixWorld.decompose(c.position, c.quaternion, c.scale); scene.add(c); c.updateMatrixWorld(true); m.updateMatrixWorld(true); m.attach(c); d.wmount.visible = false; }
+  const sp = 3.5 + Math.random() * 2;
+  ARENA.debris.push({ m, v: new THREE.Vector3(Math.sin(dirH) * sp + (Math.random() - .5) * 2, 4 + Math.random() * 3 + (kick || 0), Math.cos(dirH) * sp + (Math.random() - .5) * 2),
+    w: new THREE.Vector3((Math.random() - .5) * 14, (Math.random() - .5) * 14, (Math.random() - .5) * 14), r: .35, rest: 0, hot: 1, mats: [], s0: m.scale.clone() });
+  while (ARENA.debris.length > 60) { const o = ARENA.debris.shift(); scene.remove(o.m); }
+  return m;
+}
+// a blow that landed on a dismemberable body: cut a limb (true when it did)
+function limbCut(d, dirH, power) {
+  if (!LIMB.on || !d.K.limbs || power < LIMB.power || d.boomed) return false;
+  const nm = limbPick(d, dirH); if (!nm) return false;
+  const b = limbRoot(d, nm); if (!b) return false;
+  limbBake(d, nm, dirH, 0);
+  (d.cut = d.cut || {})[nm] = b; LIMB.stat.cuts++;
+  b.getWorldPosition(_lmW); spkBurst(_lmW.x, _lmW.y, _lmW.z, 30, { col: [1, .75, .3], spread: 5, size: .16, life: .45 }); snd('clang', { g: .8, r: 1.3, x: _lmW.x, z: _lmW.z }); camShake(.12);
+  const C = d.cut;
+  if (C.head || (C.legL && C.legR)) { limbBoom(d, dirH); return true; }
+  if (nm === 'armR' && !C.armL) d.regrabT = LIMB.regrab;
+  if (C.armL && C.armR) { d.swings = LIMB.kicks.filter(n => d.actions[n]); if (!d.swings.length) d.swings = null; if (d.wmount) d.wmount.visible = false; if (d.wmountL) d.wmountL.visible = false; }
+  if (nm === 'armL' && d.wmountL) { d.wmountL.visible = false; if (!C.armR && d.wmount) d.wmount.visible = true; }
+  if (C.legL || C.legR) d.limp = LIMB.limp;
+  return true;
+}
+// everything he has left goes at once
+function limbBoom(d, dirH) {
+  if (d.boomed) return; d.boomed = 1; LIMB.stat.booms++;
+  for (const nm of Object.keys(LIMB.sets)) if (!(d.cut && d.cut[nm])) { const b = limbRoot(d, nm); if (b) { limbBake(d, nm, Math.random() * Math.PI * 2, 3); (d.cut = d.cut || {})[nm] = b; } }
+  const P = d.root.position;
+  for (let i = 0; i < 3; i++) spkBurst(P.x, P.y + 1, P.z, 26, { col: i % 2 ? [1, .55, .15] : [1, 1, .85], spread: 8, size: .28, life: .8 });
+  for (let i = 0; i < 6; i++) smokeAt(P.x + (Math.random() - .5), P.y + .5 + Math.random(), P.z + (Math.random() - .5), 2, 1.6);
+  snd('boom', { g: .9, r: 1, x: P.x, z: P.z }); camShake(.4);
+  d.st = 'gone'; d.root.visible = false;
+  const i = HORDE.list.indexOf(d); if (i >= 0) HORDE.list.splice(i, 1); setTimeout(() => bodyGone(d), 0);
+}
+// every frame, after the mixer: the cut limbs stay collapsed; a stump sparks; the sword comes into his other hand
+function limbHide(d, dt) {
+  for (const nm in d.cut) { const b = d.cut[nm]; b.scale.setScalar(1e-4); b.updateMatrixWorld(true);
+    if (Math.random() < dt / LIMB.sparkT) { b.getWorldPosition(_lmW); spk(_lmW.x, _lmW.y, _lmW.z, (Math.random() - .5) * 2, Math.random() * 2, (Math.random() - .5) * 2, .1, .35, [1, .7, .25]); } }
+  if (d.regrabT > 0 && (d.regrabT -= dt) <= 0 && !(d.cut && d.cut.armL)) { katanaMountL(d); LIMB.stat.regrabs++; }
+}
+// m1090: a katana in his LEFT hand (the sword arm is gone): `arenaKatana`'s mount, on `weapon_root_left`
+function katanaMountL(d) {
+  const hand = arenaBone(d, 'mixamorig_LeftHand'); if (!hand || d.wmountL) return;
+  d.root.updateMatrixWorld(true); const m = new THREE.Object3D(); hand.add(m);
+  if (!mountPlace(hand, 'weapon_root_left', m)) { note('NO LEFT MOUNT'); return; }
+  const got = weaponParts(katanaScene()), tipO = m.children.find(c => /^weapon_tip/.test(c.name)); if (!tipO) return;
+  const g = new THREE.Group(); g.quaternion.setFromUnitVectors(got.tip.clone().normalize(), tipO.position.clone().normalize()); m.add(g); m.updateMatrixWorld(true);
+  g.scale.setScalar(WEAP.unit / m.getWorldScale(new THREE.Vector3()).x);
+  for (const q of got.parts) { const o = new THREE.Mesh(q.geometry, q.material.clone()); o.matrixAutoUpdate = false; o.matrix.copy(q.matrix); o.castShadow = true; o.frustumCulled = false; g.add(o); }
+  d.wmountL = g; d.root.updateMatrixWorld(true); g.getWorldPosition(_lmW);
+  spkBurst(_lmW.x, _lmW.y, _lmW.z, 12, { col: [.6, .9, 1], spread: 2, size: .12, life: .3 }); snd('clang', { g: .4, r: 1.6, x: _lmW.x, z: _lmW.z });
+}
+// SPAWN > SLICE DUMMY: one sworded samurai, dismemberable, sturdier (he should last a few cuts), on the fighter brain
+async function sliceDummy() {
+  if (HORDE.busy) return; HORDE.busy = 1; arenaUi();
+  try {
+    const K0 = await arenaLoad('SAMURAI'), A = ARENA.kinds.SAMURAI, p = player;
+    const K = HORDE.KS || (HORDE.KS = Object.assign(Object.create(K0), { notice: HORDE.notice, lose: 90, limbs: 1 }));
+    const h = p.faceH, x = clamp(p.pos.x + Math.sin(h) * 5, -ARENA.r + 1, ARENA.r - 1), z = clamp(p.pos.z + Math.cos(h) * 5, -ARENA.r + 1, ARENA.r - 1);
+    const d = bodySpawn(K.P, K, x, z, 0); arenaKatana(d, A); d.horde = 1; d.aggro = 1; d.hp = d.hpMax = 40; d.gap = 1; d.h = Math.atan2(p.pos.x - x, p.pos.z - z);
+    HORDE.list.push(d); arenaBeam(x, z, [.4, .9, 1], 1); snd('clang', { g: .6, r: .6 });
+  } catch (e) { console.error('[melee] slice dummy', e); note('SLICE DUMMY FAILED'); }
+  HORDE.busy = 0; arenaUi();
+}
 // m1084: THE HORDE PROBE (HORDE.md stage 1). *"Can the phone handle 100 fully rigged, skinned enemies all acting on their own to try to fight
 // me?"* -- measured before anything is optimised. SPAWN > HORDE adds `per` samurai a tap (to `max`) in rings on the dais round him, each a
 // plain `bodySpawn` clone on the ordinary fighter brain (`foeAI`: chase, swing, knocked flying by your hits) -- NOT the arena rival's
@@ -11211,6 +11328,7 @@ function arenaUi() {
       else if (a === 'hbar') { ARENA.menu = ''; if (HBAR.list.length) hbarClear(); else hbarSpawn(); }     // m1034; m1072
       else if (a === 'beam') { ARENA.menu = ''; if (BEAM.list.length) beamClear(); else beamSpawn(); }     // m1037; m1072
       else if (a === 'horde') { hordeAdd(); }     // m1084
+      else if (a === 'slice') { ARENA.menu = ''; sliceDummy(); }     // m1090
       else if (a === 'course') { ARENA.menu = ''; if (COURSE.on) courseClear(); else courseBuild('ACRO'); }     // m1078
       else if (a === 'wrun') { ARENA.menu = ''; if ((WRUN.boxes || []).length) wrunClear(); else wrunSpawn(); }     // m1064; m1072
       else if (a === 'smear') { SMEAR.on = SMEAR.on ? 0 : 1; try { localStorage.setItem('mel.smear', SMEAR.on ? '1' : '0'); } catch (err) {} }
@@ -11260,7 +11378,7 @@ function arenaUi() {
   const tools = ARENA.tools && !m;     // a menu open folds the tools away: the screen is not tall enough for both
   let h = '<div class="ar-bar">' + B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('vend', 'VEND') + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
     (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('kswing', 'SWING ' + KATANA.style) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
-  if (m === 'top') h += '<div class="ar-menu">' + B('cat', 'WARBOSS &rsaquo;', 'boss') + B('cat', 'PEOPLE &rsaquo;', 'people') + B('cat', 'BEASTS &rsaquo;', 'beasts') + B('cat', 'RIVALS &rsaquo;', 'rival') + B('turret', 'TURRET<small>' + (TURRET.list.length ? 'tap to remove' : 'sentry gun') + '</small>', '', TURRET.list.length ? 'ar-on' : '') + B('hbar', 'HIGH BAR<small>' + (HBAR.list.length ? 'tap to remove' : 'swing on it') + '</small>', '', HBAR.list.length ? 'ar-on' : '') + B('beam', 'BALANCE BEAM<small>' + (BEAM.list.length ? 'tap to remove' : 'walk it') + '</small>', '', BEAM.list.length ? 'ar-on' : '') + B('wrun', 'WALL RUN<small>' + ((WRUN.boxes || []).length ? 'tap to remove' : 'run along it') + '</small>', '', (WRUN.boxes || []).length ? 'ar-on' : '') + B('course', 'ACROBATICS<small>' + (COURSE.on ? 'tap to remove' : 'the course') + '</small>', '', COURSE.on ? 'ar-on' : '') + B('horde', 'HORDE<small>' + (HORDE.busy ? 'loading...' : HORDE.list.length ? HORDE.list.length + ' -- tap for +' + HORDE.per : '+' + HORDE.per + ' samurai') + '</small>', '', HORDE.list.length ? 'ar-on' : '') + '<button class="ar-off">GRUNTS<small>soon</small></button><button class="ar-off">GREYS<small>soon</small></button></div>';
+  if (m === 'top') h += '<div class="ar-menu">' + B('cat', 'WARBOSS &rsaquo;', 'boss') + B('cat', 'PEOPLE &rsaquo;', 'people') + B('cat', 'BEASTS &rsaquo;', 'beasts') + B('cat', 'RIVALS &rsaquo;', 'rival') + B('turret', 'TURRET<small>' + (TURRET.list.length ? 'tap to remove' : 'sentry gun') + '</small>', '', TURRET.list.length ? 'ar-on' : '') + B('hbar', 'HIGH BAR<small>' + (HBAR.list.length ? 'tap to remove' : 'swing on it') + '</small>', '', HBAR.list.length ? 'ar-on' : '') + B('beam', 'BALANCE BEAM<small>' + (BEAM.list.length ? 'tap to remove' : 'walk it') + '</small>', '', BEAM.list.length ? 'ar-on' : '') + B('wrun', 'WALL RUN<small>' + ((WRUN.boxes || []).length ? 'tap to remove' : 'run along it') + '</small>', '', (WRUN.boxes || []).length ? 'ar-on' : '') + B('course', 'ACROBATICS<small>' + (COURSE.on ? 'tap to remove' : 'the course') + '</small>', '', COURSE.on ? 'ar-on' : '') + B('slice', 'SLICE DUMMY<small>' + (LIMB.stat.cuts ? LIMB.stat.cuts + ' cut, ' + LIMB.stat.booms + ' blown' : 'cut him up') + '</small>') + B('horde', 'HORDE<small>' + (HORDE.busy ? 'loading...' : HORDE.list.length ? HORDE.list.length + ' -- tap for +' + HORDE.per : '+' + HORDE.per + ' samurai') + '</small>', '', HORDE.list.length ? 'ar-on' : '') + '<button class="ar-off">GRUNTS<small>soon</small></button><button class="ar-off">GREYS<small>soon</small></button></div>';
   else if (m === 'boss' || m === 'people' || m === 'beasts' || m === 'rival') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back');
     for (const k in ARENA.kinds) { const A = ARENA.kinds[k]; if (!!A.creature !== (m === 'beasts')) continue; if (!!A.rival !== (m === 'rival')) continue; if (m !== 'beasts' && !A.both && !!A.civ !== (m === 'people')) continue; h += B('spawn', A.t + (A.sub ? '<small>' + A.sub + '</small>' : ''), k); } h += '</div>'; }
   U.innerHTML = h;
@@ -33090,6 +33208,7 @@ function dummyBlow(d, dirH, power, dmg, pal) {
   // HOW MUCH DAMAGE, and it is per WEAPON rather than per hit: *"different weapons will do
   // different effects to him."* A kind with no `dmg` table is the officer, who has always
   // spent one hit point per blow whatever hit him.
+  if (K.limbs && !pal && !guard && !BLOW_SRC && player.melee && slotNow().blade && limbCut(d, dirH, power) && d.boomed) return;     // m1090: a katana cut takes a limb
   let cost = K.dmg ? (dmg || K.dmg.fist) * (guard ? K.blockCut : 1) * Math.max(.35, power) : 1;
   if (K.resist) { const r = K.resist[BLOW_SRC || 'melee']; if (r != null) { cost *= r; if (r === 0 && d.arena) arenaWaste('resist'); } }     // m905: what each weapon does to HIM
   if (d.armor) cost = arenaArmourHit(d, dirH, cost, power);     // z1: his plates take it first
@@ -33907,7 +34026,7 @@ function foeSwing(d, delay) {
   if (d.arena) { arenaSwing(d, delay); return; }     // m898: the held wind-up
   const K = d.K;
   bodyVox(d, 'angry');            // a kind with no voice never reaches the sound
-  const nm = K.clips.swings[(Math.random() * K.clips.swings.length) | 0];
+  const SW = d.swings || K.clips.swings, nm = SW[(Math.random() * SW.length) | 0];     // m1090: armless, he kicks
   // **THE TARGET IS LATCHED WHERE THE SWING STARTS (m77).** `foeTarget` runs every frame, so
   // reading it again at the contact frame is a blow that can land on somebody other than the man
   // it was thrown at -- the picture and its consequence have to be ONE event, which is this
@@ -33920,7 +34039,7 @@ function foeSwing(d, delay) {
 // HE WALKS ON THE PLAYER'S OWN RESOLVER, and is separated from the other bodies by the same
 // rule that separates the player from all of them -- one description of a body taking up room.
 function foeMove(d, h, sp, dt) {
-  const K = d.K, step = sp * dt;
+  const K = d.K, step = sp * dt * (d.limp || 1);     // m1090: one leg -- he hobbles
   // **A MAN WHO WALKS INTO A BUILDING WALKS ALONG IT (m145, `K.slide`).** *"All the characters
   // get stuck on stuff like buildings -- they're just constantly stuck walking into buildings.
   // It needs a much more sophisticated state machine."* m74 built the stuck detector against
@@ -34551,6 +34670,9 @@ function bodyCull() {
   PERF.seen = seen;
 }
 function bodyMix(d, dt) {
+  bodyMix0(d, dt); if (d.cut || d.regrabT > 0) limbHide(d, dt);     // m1090
+}
+function bodyMix0(d, dt) {
   d.mixAcc = (d.mixAcc || 0) + dt;
   if (d.seen || d.mixAcc >= 1 / PERF.animHz) {
     if (d.armQ) armUndo(d);
@@ -56880,7 +57002,7 @@ window.melee = window.mel = { FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VE
   // of a rule measures a game that does not exist -- which is the oldest mistake there is, and
   // the only way not to make it is for `npm run sim` to call exactly these.
   DUMMY, DUMMIES, LOCK, LEDGE, WALL, STRIKE, PADS, DESK, meleeLock, dummyHit, dummyBlow, strikeSweep, stepDummies, bodySeat, SEAT, findLock, SFX, CHARGE, POSE, snd, PUNCH, PLASMA, HITSND, BODYSND, FLYHIT, STEP,
-  stepPlayer, muzzleWorld, RIC, coverAcross, cwallOf, KNOCK, knockHas, GSIDE, KAIM, aimLeap, kaimHold, DUCK, duckPose, RUNSWIPE, runSwipe, SHOTBLOCK, shotBlock, bladeSeg, steelFlash, STEEL, HURT, playerHurt, GOD, LEAP, coverLeap, wallGo, WRUN, wrunTap, wrunFind, wrunSpawn, wrunClear, stepWrun, backGo, HURDLE, hurdleTap, HOOK, barHook, meleeGo0, CART, cartGo, leftFlick, rigAnim, stepKit, frameBody, kickGo, SPRINGS, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, hbarCatch, stepBar, hbarPose, hbarFly, coverArmUndo, slideGo, coverShow, TURRET, JUGGLE, TORNADO, FLOW, ZOOM, zoomGo, HORDE, hordeAdd, hordeClear, ACAM, actionCam, acamPip, turretSpawn, COURSE, courseBuild, courseClear, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
+  stepPlayer, muzzleWorld, RIC, coverAcross, cwallOf, KNOCK, knockHas, GSIDE, KAIM, aimLeap, kaimHold, DUCK, duckPose, RUNSWIPE, runSwipe, SHOTBLOCK, shotBlock, bladeSeg, steelFlash, STEEL, HURT, playerHurt, GOD, LEAP, coverLeap, wallGo, WRUN, wrunTap, wrunFind, wrunSpawn, wrunClear, stepWrun, backGo, HURDLE, hurdleTap, HOOK, barHook, meleeGo0, CART, cartGo, leftFlick, rigAnim, stepKit, frameBody, kickGo, SPRINGS, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, hbarCatch, stepBar, hbarPose, hbarFly, coverArmUndo, slideGo, coverShow, TURRET, LIMB, limbCut, limbPrep, sliceDummy, JUGGLE, TORNADO, FLOW, ZOOM, zoomGo, HORDE, hordeAdd, hordeClear, ACAM, actionCam, acamPip, turretSpawn, COURSE, courseBuild, courseClear, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
   MFX, camShake, palDive,
   // THE BOARD, LIVE (m159). `mel.SK8.hold` is where the deck sits IN HIS HAND while it is
   // carried, and how a carried board should look is a look-at-it decision -- so it is a dial he
