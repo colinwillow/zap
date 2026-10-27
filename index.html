@@ -9895,6 +9895,31 @@ function shipSea(g) {
       const t = new THREE.Mesh(new THREE.ConeGeometry(2.4, 9, 5), pine); t.position.set(x, y + 4, z); isl.add(t); }
     const pg = new THREE.Group(); pg.position.set(14, 19.4, -6);     /* (on the high hill's crown: its top is 30 * .9 * .75 = 20.25 over the water) */ isl.add(pg); for (let q = 0; q < 3; q++) { const b = new THREE.Mesh(new THREE.BoxGeometry(5 - q * 1.2, 3, 5 - q * 1.2), redM); b.position.y = q * 3.6 + 1.5; pg.add(b); const rf = new THREE.Mesh(new THREE.ConeGeometry(5.6 - q * 1.3, 1.6, 4), roofI); rf.rotation.y = Math.PI / 4; rf.position.y = q * 3.6 + 3.6; pg.add(rf); }
     Z.island = isl; }
+  // m@X4@ (pass 8): THE SKY OF HIS REFERENCE -- FLOATING ISLANDS hanging over the sea round the horizon (a jagged inverted rock under a grass cap,
+  // pines, a pagoda on some, a WATERFALL pouring off the lip into the haze), each bobbing slowly; a pale RINGED PLANET low in the sky; soft CLOUDS
+  // drifting past at the islands' height
+  { const F = (c, r) => new THREE.MeshStandardMaterial({ color: c, roughness: r, flatShading: true }), rockM = F(0x7a6e62, .95), rockD = F(0x5a5048, .95), grass = F(0x5a8a42, .9), pine = F(0x2c4a2a, .9), redM = F(0xb3261c, .6), roofI = F(0x2a2f38, .7);
+    const fcv = document.createElement('canvas'); fcv.width = 32; fcv.height = 256; const fq = fcv.getContext('2d'); for (let i = 0; i < 60; i++) { fq.fillStyle = 'rgba(255,255,255,' + (.25 + Math.random() * .6) + ')'; fq.fillRect(Math.random() * 32, Math.random() * 256, 1 + Math.random() * 4, 20 + Math.random() * 60); }
+    const ftex = new THREE.CanvasTexture(fcv); ftex.wrapS = ftex.wrapT = THREE.RepeatWrapping; const fallM = new THREE.MeshBasicMaterial({ map: ftex, transparent: true, opacity: .75, depthWrite: false, side: THREE.DoubleSide, color: 0xe8f4ff }); Z.fallTex = ftex;
+    let sd2 = 11; const r = () => (sd2 = (sd2 * 16807) % 2147483647) / 2147483647; Z.floaters = [];
+    for (const [ang, dist, hy, R, pag, fall] of [[1.9, 420, 95, 34, 1, 1], [2.6, 520, 140, 26, 0, 1], [3.6, 380, 70, 22, 1, 0], [4.4, 470, 120, 40, 1, 1], [5.3, 560, 160, 24, 0, 0], [0.9, 600, 110, 30, 0, 1]]) {
+      const fl = new THREE.Group(); fl.position.set(Math.cos(ang) * dist, hy, Math.sin(ang) * dist); seaG.add(fl);
+      const cone = new THREE.ConeGeometry(R, R * 2.2, 9, 5); cone.rotateX(Math.PI); const P = cone.attributes.position; for (let i = 0; i < P.count; i++) { const y = P.getY(i); if (y < R * 1.05) P.setXYZ(i, P.getX(i) * (.8 + r() * .4), y + (r() - .5) * R * .25, P.getZ(i) * (.8 + r() * .4)); } cone.computeVertexNormals();
+      const rk = new THREE.Mesh(cone, r() < .5 ? rockM : rockD); rk.position.y = -R * 1.1; fl.add(rk);
+      const cap = new THREE.Mesh(new THREE.CylinderGeometry(R * 1.02, R * .95, R * .25, 9), grass); cap.position.y = R * .05; fl.add(cap);
+      for (let q = 0; q < 10 + R / 3; q++) { const a = r() * 6.28, d = r() * R * .8, t = new THREE.Mesh(new THREE.ConeGeometry(R * .07, R * .3, 5), pine); t.position.set(Math.cos(a) * d, R * .3, Math.sin(a) * d); fl.add(t); }
+      if (pag) { const pg = new THREE.Group(); pg.position.set(R * .15, R * .18, -R * .1); fl.add(pg); const s3 = R / 14; for (let q = 0; q < 3; q++) { const b = new THREE.Mesh(new THREE.BoxGeometry((5 - q * 1.2) * s3, 3 * s3, (5 - q * 1.2) * s3), redM); b.position.y = (q * 3.6 + 1.5) * s3; pg.add(b); const rf = new THREE.Mesh(new THREE.ConeGeometry((5.8 - q * 1.3) * s3, 1.6 * s3, 4), roofI); rf.rotation.y = Math.PI / 4; rf.position.y = (q * 3.6 + 3.6) * s3; pg.add(rf); } }
+      if (fall) { const fw = new THREE.Mesh(new THREE.PlaneGeometry(R * .22, hy * 1.1), fallM); const fa = r() * 6.28; fw.position.set(Math.cos(fa) * R * .98, R * .1 - hy * .55, Math.sin(fa) * R * .98); fw.rotation.y = -fa + Math.PI / 2; fl.add(fw); }
+      Z.floaters.push({ g: fl, y0: hy, ph: r() * 6.28 }); }
+    // the planet: a pale disc of lavender and cream with a ring, high off the starboard quarter, untouched by the haze
+    const pcv = document.createElement('canvas'); pcv.width = pcv.height = 256; const pq = pcv.getContext('2d'), pgr = pq.createLinearGradient(0, 0, 256, 256); pgr.addColorStop(0, '#f4e6f0'); pgr.addColorStop(.6, '#c8b4d8'); pgr.addColorStop(1, '#8a7aa8'); pq.fillStyle = pgr; pq.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 9; i++) { pq.fillStyle = 'rgba(255,255,255,' + (.05 + Math.random() * .12) + ')'; pq.fillRect(0, 20 + i * 26 + Math.random() * 10, 256, 6 + Math.random() * 10); }
+    const planet = new THREE.Mesh(new THREE.SphereGeometry(70, 32, 20), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(pcv), fog: false, transparent: true, opacity: .92 })); planet.position.set(-420, 330, -480); planet.rotation.z = .4; g.add(planet);
+    const ring = new THREE.Mesh(new THREE.RingGeometry(92, 128, 64), new THREE.MeshBasicMaterial({ color: 0xe8d8f0, fog: false, transparent: true, opacity: .45, side: THREE.DoubleSide })); ring.position.copy(planet.position); ring.rotation.set(1.25, .2, .4); g.add(ring); Z.planet = planet;
+    // clouds: soft sprites drifting slowly round the ship at the islands' height
+    const ccv = document.createElement('canvas'); ccv.width = ccv.height = 128; const cq = ccv.getContext('2d'); for (let i = 0; i < 14; i++) { const x = 30 + Math.random() * 68, y = 50 + Math.random() * 30, rr = 18 + Math.random() * 22, gr2 = cq.createRadialGradient(x, y, 0, x, y, rr); gr2.addColorStop(0, 'rgba(255,240,235,.85)'); gr2.addColorStop(1, 'rgba(255,230,225,0)'); cq.fillStyle = gr2; cq.fillRect(0, 0, 128, 128); }
+    const cmat = new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(ccv), transparent: true, depthWrite: false, opacity: .8, color: 0xffe8e0 }); Z.clouds = [];
+    for (let i = 0; i < 16; i++) { const c = new THREE.Sprite(cmat); const a = r() * 6.28, d = 260 + r() * 360; c.position.set(Math.cos(a) * d, 60 + r() * 110, Math.sin(a) * d); const k = 70 + r() * 90; c.scale.set(k, k * .5, 1); g.add(c); Z.clouds.push({ s: c, a, d, v: .004 + r() * .006 }); } }
   scene.background = new THREE.Color(0xff9a6a); if (scene.fog) { scene.fog.color.setHex(0xe8a07a); scene.fog.near = 300; scene.fog.far = 900; }
   const L0 = Math.hypot(_sunOff.x, _sunOff.y, _sunOff.z) || 20, ld = new THREE.Vector3(sd.x, Math.max(sd.y, .5), sd.z).normalize(); _sunOff.copy(ld).multiplyScalar(L0); sun.shadow.normalBias = .07;     /* m1377 (pass 4): the LIGHT stands ~27 deg up though the drawn sun sits at 7.5 -- at 7.5 every shadow texel stretched x7.7 across the deck, the stair-stepped bands and the acne he saw */ sun.position.copy(_sunOff); sun.color.setHex(0xffc896); hemi.color.setHex(0xffd6b8); hemi.groundColor.setHex(0x2a3a4a);
   camera.far = Math.max(camera.far, 1000); camera.updateProjectionMatrix();
@@ -24249,6 +24274,8 @@ function shipBuild() {
   // the stern lanterns and the castle's bronze cornice
   for (const sx of [-1, 1]) { const x = sx * (cw + .2), z = cz0 - .3; bx(.12, .12, 1.4, x, cy - .4, z - .5, dark); put(new THREE.CylinderGeometry(.45, .45, 1.3, 10).translate(x, cy - 1.3, z - 1.1), lamp); for (const dy of [-.62, .62]) put(new THREE.CylinderGeometry(.55, .55, .12, 10).translate(x, cy - 1.3 + dy, z - 1.1), gold); put(new THREE.ConeGeometry(.3, .5, 8).translate(x, cy - .4, z - 1.1), gold); }
   bx(cw * 2 + .8, .18, .18, 0, cy - .5, cz0 - .1, gold); for (const sx of [-1, 1]) bx(.18, .18, cz1 - cz0 + .2, sx * (cw + .35), cy - .5, (cz0 + cz1) / 2, gold);
+  // m@X4@ (pass 8): the GALLEY CHIMNEY on the forecastle, a bronze stack with a rain cap, smoking
+  const chimney = [1.8, fy + 3.1, fz0 + 2]; { put(new THREE.CylinderGeometry(.28, .32, 3, 10).translate(chimney[0], fy + 1.5, chimney[2]), bronze); put(new THREE.ConeGeometry(.5, .35, 10).translate(chimney[0], fy + 3.3, chimney[2]), dark); for (const y of [fy + .6, fy + 2.2]) put(new THREE.TorusGeometry(.32, .05, 5, 12).rotateX(Math.PI / 2).translate(chimney[0], y, chimney[2]), gold); O.boxes.push({ minx: chimney[0] - .35, maxx: chimney[0] + .35, miny: fy, maxy: fy + 3, minz: chimney[2] - .35, maxz: chimney[2] + .35 }); }
   // strings of paper lanterns sagging between the masts and down to the castle (`bldCable`)
   { const lm = M(0xffb070, .5, { emissive: 0xff7a2a, emissiveIntensity: 1.8 }), [m0, m1, m2] = masts, hy = (m, f) => m[1] + m[2] * f;
     bldCable(g, [0, hy(m0, .55), m0[0]], [0, hy(m1, .55), m1[0]], 1.4, 6, lm); bldCable(g, [0, hy(m2, .6), m2[0]], [0, hy(m0, .45), m0[0]], 1.2, 5, lm);
@@ -24259,7 +24286,7 @@ function shipBuild() {
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
   { const o = new THREE.Mesh(mergeGeometries(sails.map(q => q.index ? q.toNonIndexed() : q)), sailM); o.castShadow = o.receiveShadow = true; g.add(o); }
   bldTris(O, tris); for (const b of O.boxes) BOXES.push(b); boxGrid();
-  Z.on = { g, O, climbs, rings, gulls, sprayT: 0, bowH: 0, coreM, flags, sparkAt, fish: shipFishMake(g) }; bldXrayTag(g); shipHome(); }
+  Z.on = { g, O, climbs, rings, gulls, sprayT: 0, bowH: 0, coreM, flags, sparkAt, fish: shipFishMake(g), chimney }; bldXrayTag(g); shipHome(); }
 // m1375 (pass 3): the gulls -- wheel round the masts (circles of their own, a glide in every few seconds); the percher bursts off the yard when he is near and comes back
 const _shgM = new THREE.Matrix4(), _shgQ = new THREE.Quaternion(), _shgE = new THREE.Euler(), _shgV = new THREE.Vector3(), _shgU = new THREE.Vector3(1, 1, 1);
 function shipGulls(S, dt) { const G = S.gulls, p = player, t = SHIPZ.U ? SHIPZ.U.uTime.value : 0; if (!G || !G.im) return;
@@ -24290,6 +24317,9 @@ function shipStep(dt) { const Z = SHIPZ; if (Z.U) Z.U.uTime.value += dt; const p
   if (Z.seaG && Z.U) { const t = Z.U.uTime.value, Lp = Z.L * .7, Bp = Z.B * .8, hB = shipWave(0, Lp / 2, t), hS = shipWave(0, -Lp / 2, t), hP = shipWave(-Bp / 2, 0, t), hR = shipWave(Bp / 2, 0, t), hC = shipWave(0, 0, t);
     const M = Z.mo || (Z.mo = { p: 0, r: 0, h: 0 }), k = Math.min(1, dt * 1.2), R = Z.rock; M.p += (Math.atan((hB - hS) / Lp) * R - M.p) * k; M.r += (Math.atan((hR - hP) / Bp) * .7 * R - M.r) * k; M.h += ((hB + hS + hP + hR + 2 * hC) / 6 - M.h) * k;     /* (`rock` scales the angles only: a 46 m hull feels the swell's slope more than its height) */
     Z.seaG.rotation.set(M.p, 0, -M.r); Z.seaG.position.y = -M.h; if (Z.dome) Z.dome.rotation.set(M.p, 0, -M.r);
+    for (const f of Z.floaters || []) f.g.position.y = f.y0 + Math.sin(t * .25 + f.ph) * 3;     // m@X4@ (pass 8): the sky islands bob, the falls pour, the clouds drift
+    if (Z.fallTex) Z.fallTex.offset.y = (Z.fallTex.offset.y - dt * .6) % 1; for (const c of Z.clouds || []) { c.a += c.v * dt; c.s.position.x = Math.cos(c.a) * c.d; c.s.position.z = Math.sin(c.a) * c.d; }
+    if (Z.on && Z.on.chimney && Math.random() < dt * 3) { const [cx2, cy2, cz2] = Z.on.chimney; smokeAt(cx2 + (Math.random() - .5) * .2, cy2, cz2, 1.1, 1.6, [.55, .5, .48]); }
     // m1375 (pass 3): BOW SPRAY -- when the bow drives down into the swell (its height relative to the ship falling fast), a burst of spray off the stem and the bows
     const S = Z.on; if (S) { const bh = hB - M.h, vb = (bh - S.bowH) / Math.max(dt, 1e-3); S.bowH = bh; S.sprayT -= dt;
       if (vb < -.18 && S.sprayT <= 0) { S.sprayT = 1.6 + Math.random(); const bz = Z.L / 2 * .97; spkBurst(0, .6, bz + 1, 34, { col: [.9, .97, 1], spread: 4.5, up: 3.2, size: .2, life: 1 }); for (const sx of [-1, 1]) spkBurst(sx * 2.4, .4, bz - 3, 16, { col: [.85, .95, 1], spread: 3, up: 2.2, size: .16, life: .8 });

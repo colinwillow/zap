@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE SHIP, PASS 8: THE SKY OF HIS REFERENCE (m@X4@, WORKER A)
+
+His: *"Send it."* This pass reaches past the hull into the world on his reference sheet (the airship among floating islands):
+- **SIX FLOATING ISLANDS** hang over the sea round the horizon, 380-600 m off and 70-160 m up.
+  - Each is a jagged inverted rock (its vertices jittered, seeded) under a grass cap, with pines.
+  - Three carry a red three-storey pagoda.
+  - Four pour a **WATERFALL** off the lip into the haze: a tall streaked plane whose texture scrolls down.
+  - Each bobs slowly on its own phase. They sit in the sea's group, so they ride with the swell.
+- **A RINGED PLANET**, pale lavender and cream with faint bands, high off the starboard quarter, untouched by the fog, with a translucent
+  ring tilted across it.
+- **CLOUDS**: sixteen soft sprites at the islands' height, drifting slowly round the ship.
+- **A GALLEY CHIMNEY** on the forecastle, a bronze stack with brass rings and a rain cap, smoking all the time (it has a collider).
+- **Checked headless**: boots, builds, no errors; renders aloft toward the islands and the planet, and a wide shot of the ship.
+
+SHIPPED UNVERIFIED.
+
 ## Grumbo's home, procedural, pass 7: the shapes, closer (WORKER B)
 
 - **The tower steps in at the balcony.** It is now the refs' stacked blobs: a fat drum up to the balcony, then a narrower TURRET (radius
