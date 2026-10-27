@@ -96,3 +96,9 @@ This pass adds three new cell kinds to the spec:
 - a FULLY DESTRUCTIBLE building: knock out its legs and it crumbles (the boss building, after the boss)
 - flying zeppelin platforms
 - swimming (a new mechanic: its own sandbox first, per the whole-piece rule)
+
+## L1 pass 4 (m1359): MOVING PLATFORMS UP TO A ROPE
+
+- **New cell kind `'movers'`:** a pit with four platforms, each 0.9 m higher than the last, sliding back and forth across it (2.2 m either way, each at its own speed). A platform CARRIES him while he stands on it.
+- **A cell entered from `'movers'` going up** hangs a climbable ROPE from its ledge down to the top platform.
+- **The roof spur (beat 4) is now this:** from the tower walkway at Y5, hop the four moving platforms over the pit at (2,3), catch the rope, and climb to the roof at Y7 (31.5 m). The ring is up there, with the whole level below.

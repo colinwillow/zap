@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## GRID LEVEL 1, PASS 4: MOVING PLATFORMS UP TO A ROPE (m1359)
+
+His: *"moving platforms where you jump from one to another to another to get up onto a rope."*
+
+- **Cell kind `'movers'`:**
+  - four 2.2 m platforms, each .9 m higher, sliding ±2.2 m across the pit at different rates (`w` 1.9-2.65 rad/s)
+  - each is a `BDYN` box, so he stands on it, it blocks and the lens sees it
+  - **`lvgStep` CARRIES him:** while he is grounded on a platform's top, its frame's movement is added to his position. This is the first platform carry in the game; the zeppelin decks never had one.
+- **A rope:** the cell after `'movers'`, going up, hangs a rope (a `kitClimbAdd` volume, so the m1316 one-side climb and step-over apply) from its ledge to the top platform.
+- **The roof spur** (beat 4) goes walkway Y5 → four platforms → the rope → the roof at Y7.
+- **Watch:** whether the carry feels attached, and whether the platform spacing (0.9 m up, 1.75 m apart along the run) is jumpable while they move.
+
 ## GRID LEVEL 1, PASS 3: WALL RUNS AND BARS MADE NECESSARY (m1358)
 
 His list: *"wall running vertically and horizontally... wall run, jump to the other side, wall run more... a three-part jump with a pit, if you fall you do it again... high bars to launch up to another bar or a ledge."* (The rest of his list is in LEVELGRID.md's backlog.)
