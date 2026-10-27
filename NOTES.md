@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1149 -- ZEPPELINS pass 1 (BUILDINGS.md #9)
+
+`ZEP`, `zepMake` / `zepPose` / `zepBuild` / `zepStep` / `zepClear`. SPAWN > BUILDINGS > Zeppelins.
+- TWO zeppelins drift endless elliptical loops, never docking: a 7 x 7 x 24 m cigar hull with bronze hoops, pink neon stripes down its
+  sides, red fins, a three-blade propeller; a red-lacquered GONDOLA (3.6 x 7 m) hung on ropes with a little pagoda roof and four lamps.
+- The gondola deck is a turned DYNAMIC box (`BDYN`) re-posed every frame, and `zepPose` CARRIES him if he stands on it (the airship's
+  method, made reusable). Two GRAPPLE RINGS under each gondola ride along.
+- Zeppelin 1 (y 11, 110 s a loop) circles the Pagoda and passes along the Watchtower's south side ~3.7 m off its lookout and a metre below
+  it: a running jump across. Zeppelin 2 (y 14, 90 s) loops the east side over the Gatehouse and the Market.
+Pass 2 next: rope ladders / bars to grab, a cabin, something aboard. Shipped unverified.
+
 ## m1148 -- AIRSHIP DOCK pass 3 (DONE): grapple the flying ship
 
 - Two GRAPPLE RINGS hang under the gondola (fore and aft). They ride the ship: their `R.x/y/z` are re-posed every frame from the ship's
