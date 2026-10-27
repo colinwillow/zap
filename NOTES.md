@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1120 -- Watchtower, pass 1 (and the shared building pieces)
+
+Shared now: `bldRoof` (the hall's concave, corner-lifted roof as a function; RH 0 = a pagoda cap), `bldClear`, `bldCable` (a sagging wire
+with lamps -- his style note), `bldDrone` (the floating white egg in a dark ring). THE WATCHTOWER at (-16, -8): a ground floor of breakable
+walls with a door (+z), two open storeys on corner posts with solid decks (3.2 / 6.4) and a lookout (9.6) under a pagoda cap with a bronze
+finial; a plank RAMP wraps the outside a side at a time (1.6 m a side, landings at the corners, posts under): two sides to the first deck,
+four to the second, six to the lookout. Cables from the cap's eaves to stakes with lamps; lanterns and a cyan neon line on every deck; a
+drone orb circles the cap (`wtowerStep`, each building's step now runs from `BLDG`). Shipped unverified.
+
 ## m1119 -- Dojo Hall, pass 3 (polish) -- DONE, in SPAWN > BUILDINGS
 
 A tiled roof (a canvas of ridged courses, channels down the slope), bracket stacks on the eave posts, vermilion lacquer on the door posts, the
