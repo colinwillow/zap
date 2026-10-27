@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## GREAT RED PAGODA x1.5 -- STEER S2 (X1, m-GP15)
+## GREAT RED PAGODA x1.5 -- STEER S2 (X1, m1323)
 
 His STEER after walking X4: *"increase the scale... 1.5... we need room to play... we're gonna go for SIZE"*.
 
