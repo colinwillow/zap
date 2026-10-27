@@ -23,7 +23,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - every new ladder carries a `mark` on the floor it leads to, so its front is decided.
 - **THE QUEUE, FIRST:**
   - **S1 -- X4 the Octagonal Block Pagoda: x1.5 and climbable stairs** -- DONE m1324 (Worker A): storeys 6 m, apothem 9 m (rooms 9.9 m at the top), walks 3.3 m+, doors 2.7 m+, the hall stair two flights of ten at .30 risers / .40 treads
-  - **S2 -- the other done buildings, x1.5, one per build:** X1 pagoda (DONE m1323), C1 courtyard (DONE m1330), X2 castle (DONE m1321, Worker B), R1 Mega Wall (DONE m1332), and the older forge rows: hall (DONE m1336), wtower (DONE m1342), gate (DONE m1343), pagoda (DONE m1346), market (DONE m1349), shrine (DONE m1351), rampart, adock, zep, fship, bath, fwork, sphang, skyb, cliff, keep, barr, lhouse, fisl, npil, storii, siege, teag, colo, oni, obs, fest, swrk -- in that order.
+  - **S2 -- the other done buildings, x1.5, one per build:** X1 pagoda (DONE m1323), C1 courtyard (DONE m1330), X2 castle (DONE m1321, Worker B), R1 Mega Wall (DONE m1332), and the older forge rows: hall (DONE m1336), wtower (DONE m1342), gate (DONE m1343), pagoda (DONE m1346), market (DONE m1349), shrine (DONE m1351), rampart (DONE m1356), adock, zep, fship, bath, fwork, sphang, skyb, cliff, keep, barr, lhouse, fisl, npil, storii, siege, teag, colo, oni, obs, fest, swrk -- in that order.
     One build each, with stairs re-cut to .30 risers.
   - **then** the queue below (R2 Four Fires on), built at the new scale.
 - **S3 -- BREAKABLE SKINS ON A STANDING FRAME (his, after m1352):** *"A lot of stuff I wish was breakable -- balusters, gates, railings, parts of
