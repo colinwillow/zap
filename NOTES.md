@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1129 -- THE NINJA GRAPPLING HOOK (first pass)
+
+His: *"ninja grappling hooks to swing between buildings."* `GRING`, `gringAdd`, `ropeThrow`, `stepRope`.
+- **Rings:** bronze grapple rings with a glowing cyan bead -- 4 on the Watchtower's cap corners (14.1 m), 2 under the Gatehouse
+  torii's upturned ends (10.9 m), 4 at the Dojo Hall's eave corners (4.15 m). Spawned and removed with their building (`gringDrop`).
+- **Throw:** IN THE AIR, a right-pad flick toward a ring within `r` 13 m, above his hands, inside `ang` 1.2 rad of the flick or of his
+  flight. It is checked BEFORE the bar hook and the air kick (`meleeGo0`), so near a building a flick at a ring is the hook, not a kick.
+- **Swing:** a real pendulum -- gravity, the rope only PULLS (outward speed removed), reeled in 3.2 m/s for .45 s on the catch, a `pull` 3
+  m/s toward the ring, the left stick pumps. A rope (line) from his right hand to the ring, shooting out over .12 s. He hangs in the high
+  bar's hang clip.
+- **Let go:** TAP: x1.12 speed and +3.5 m/s up, and a jump back (`p.jumps = 1`); the ground or 7 s also let go.
+- **Not done:** no collision while swinging (he can swing through a wall), no ring highlight when one is in reach. That is pass 2.
+Shipped unverified.
+
 ## m1128 -- GATEHOUSE pass 3 (DONE) + TURRETS AND THE BALLISTA ARE KILLABLE
 
 His, mid-pass: *"Don't forget to make the turrets and stuff destroyable -- I could kill it."*
