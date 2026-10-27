@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- STEER S1: the Octagonal Block Pagoda x1.5, and a stair he can climb (X4, WORKER A)
+## m1324 -- STEER S1: the Octagonal Block Pagoda x1.5, and a stair he can climb (X4, WORKER A)
 
 His notes from walking it: *"increase the scale... maybe 1.5. The stairs on the ground floor are so steep I couldn't climb; I had to jump
 from one stair to the next."*
