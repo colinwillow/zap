@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- Octagonal Block Pagoda pass 4 of 10: the climb outside, and ROOM TO FIGHT (X4, WORKER A)
+## m1282 -- Octagonal Block Pagoda pass 4 of 10: the climb outside, and ROOM TO FIGHT (X4, WORKER A)
 
 **ROOM TO FIGHT first** (his rule off the red pagoda, now at the top of BUILDINGS.md). The pagoda got bigger:
 - apothem 5 -> **6 m** at the ground, stepping in .45 -> **.4** a storey, so the TOP room is 6.4 m across inside;
