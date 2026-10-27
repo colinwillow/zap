@@ -21,7 +21,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 - **Each pass: one clear change to the level, a NOTES entry saying what it changes and why, and LEVELGRID.md kept as the plan.** His notes become the next pass.
 - **The pass log** (tick here):
   - L1 pass 1 (m1356): the greybox system and his blueprint's path
-  - L1 pass 2: verticality
+  - L1 pass 2 (m1357): verticality
   - L1 pass 3
   - ...
 
