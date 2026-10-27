@@ -5,6 +5,28 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE SHIP, PASS 9: FLAGS THAT FLOW (m@X4@, WORKER A)
+
+His: *"are they actually flowing in the wind, are they rigged like actual flags?"* They were not. Each was a flat plane swinging whole,
+and the masthead "pennants" were the banner texture turned on its side, which read as stiff boards.
+
+- **Every flag is CLOTH now** (`shipFlag`, `shipCloth`). Each keeps its rest shape and is bent every frame:
+  - two travelling waves (a long one and a fast small one) run from where it is tied to its free end, growing with the distance from the
+    hoist, so it ripples and snaps;
+  - a slow shared GUST swells and slackens every flag on the ship together;
+  - a pennant streams out in a gust and DROOPS as the wind drops;
+  - the side banners belly out and sway along the hull.
+
+  Their meshes got the segments for it (24 x 2 on a pennant, 2 x 12 on a banner), and normals are recomputed, so the light rolls across the
+  folds.
+- **Real pennants, rigged**: a dark staff with a brass ball stands on every masthead's finial. Each flies a 6 m pennant with its own
+  texture (`shipPennantTex`): red, a cream chain of diamonds between two cream lines, weathering, and a SWALLOW-TAIL cut into its free end.
+  - They stream forward, the same way the wind fills the sails (it blows from astern), and swing a little on their staffs.
+- The stern banner on its pole flows the same way.
+- **Checked headless**: boots, builds, no errors; renders of the mastheads and the side banners.
+
+SHIPPED UNVERIFIED.
+
 ## Grumbo's home, procedural, pass 11: the windows and the lookout (WORKER B)
 
 - **The windows.** In the refs every round window is sunk in a soft lavender surround. Now each one is: a lavender disc behind the dark

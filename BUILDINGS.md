@@ -110,6 +110,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - [x] **pass 6 (m1386, WORKER A):** onto the SHARED painted texture library (`triMat`); a detail pass -- helm, capstan, bell, balustrade, gun ports, lantern strings, pennants, sheets, sea chests, rope coils, the dragon's whiskers
   - [x] **pass 7 (m1391, WORKER A):** another detail pass -- the ANTI-GRAV CORE ROOM in the hold, the captain's cabin dressed, ratlines, crow's-nest and stern lanterns, a bronze cornice, core and turbine sparks, flying fish
   - [x] **pass 8 (m1393, WORKER A):** his reference's SKY -- floating islands with pagodas and waterfalls, a ringed planet, drifting clouds; a smoking galley chimney
+  - [x] **pass 9 (m@X4@, WORKER A):** flags that FLOW -- every banner and pennant is cloth (a travelling wave from the hoist, a shared gust); real pennants on masthead staffs with swallow-tails
   - [ ] later: swimming here; the AIRSHIP transform (his)
 
 ## STEER 000 (his, after m1372) -- BLUEPRINTS FIRST, GENERATED BLOCKOUTS, NOT A TRANSCRIBED IMAGE

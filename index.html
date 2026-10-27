@@ -24316,7 +24316,7 @@ function shipBuild() {
     // banners down the sides, from the rail
     const banM = new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 });
     for (const u of [-.3, -.12, .12, .3, .5]) { const z = u * L / 2, w = halfW(u * .985), y = Math.max(dY + 1.1, gun(u)); for (const sx of [-1, 1]) { const pv = new THREE.Group(); pv.position.set(sx * (w + .08), y + .1, z); pv.rotation.y = sx * Math.PI / 2; g.add(pv);
-        const f = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 3.2, 1, 6).translate(0, -1.6, 0), banM); f.castShadow = true; pv.add(f); flags.push({ pv, f, ph: flags.length * 1.1 }); } } }
+        const f = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 3.2, 2, 12).translate(0, -1.6, 0), banM); f.castShadow = true; pv.add(f); flags.push(shipFlag({ pv, f, ph: flags.length * 1.1, len: 3.2, amp: .3 })); } } }
   // m1386 (pass 6): THE DETAIL PASS. A brass-and-timber HELM on the quarterdeck's forward rail; a CAPSTAN abaft the mainmast; a BELL in a
   // frame on the forecastle; a BALUSTRADE along both gunwales (a rail cap on posts, brass caps); GUN PORTS with red lids along both sides; STRINGS
   // OF PAPER LANTERNS sagging between the masts and down to the castle; long PENNANTS streaming off the mastheads; SHEETS from the booms to the
@@ -24338,7 +24338,9 @@ function shipBuild() {
     for (let z = -12; z <= 14; z += 3.4) { const u = z / (L / 2), w = halfW(u * .985) + .06; for (const sx of [-1, 1]) { bx(.1, .8, .9, sx * w, 2.3, z, portM); bx(.08, .1, 1.05, sx * (w + .03), 2.74, z, gold);
       put(new THREE.BoxGeometry(.08, .8, .95).translate(0, .4, 0).rotateZ(sx * -.9).translate(sx * (w + .05), 2.72, z), red); } }
     // pennants off the mastheads
-    for (const [mz, base, H] of masts) { const pv = new THREE.Group(); pv.position.set(0, base + H + 1.4, mz); g.add(pv); const f = new THREE.Mesh(new THREE.PlaneGeometry(4.4, .7, 8, 1).translate(-2.2, 0, 0), new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 })); f.rotation.y = Math.PI / 2; pv.add(f); flags.push({ pv, f, ph: mz, pen: 1 }); }
+    const penM = new THREE.MeshStandardMaterial({ map: shipPennantTex(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 });     // m@X4@ (pass 9): real pennants, on a staff at each masthead
+    for (const [mz, base, H] of masts) { const top = base + H; put(new THREE.CylinderGeometry(.04, .05, 2.6, 5).translate(0, top + 2.1, mz), dark); put(new THREE.SphereGeometry(.1, 8, 6).translate(0, top + 3.45, mz), gold);
+      const pv = new THREE.Group(); pv.position.set(0, top + 3.1, mz); g.add(pv); const f = new THREE.Mesh(new THREE.PlaneGeometry(6, .8, 24, 2).translate(-3, -.4, 0), penM); f.rotation.y = Math.PI / 2; pv.add(f); flags.push(shipFlag({ pv, f, ph: mz, pen: 1, len: 6, amp: .55 })); }
     // sheets: from each boom's ends down to the rails
     for (const [mz, base, , sw] of masts) { const by = base + 4 - .15, bz2 = mz + .55 + 1.25; for (const sx of [-1, 1]) { const u = (bz2 - 3) / (L / 2), w = halfW(u * .985), a = new THREE.Vector3(sx * (sw / 2 + .3), by, bz2), b = new THREE.Vector3(sx * (w - .2), Math.max(dY + 1.1, gun(u)) + .9, bz2 - 3), d = b.clone().sub(a);
       put(new THREE.CylinderGeometry(.025, .025, d.length(), 4).applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.clone().normalize())).translate((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2), rope); } }
@@ -24384,7 +24386,7 @@ function shipBuild() {
     for (const sx of [-1, 1]) bldCable(g, [0, hy(m0, .35), m0[0]], [sx * (halfW(.25) - .3), Math.max(dY + 1.1, gun(.25)) + 1, L / 2 * .25], 1, 4, lm); }
   // a banner off the stern (m1378: a real one, on a pole, stirring with the rest)
   { put(new THREE.CylinderGeometry(.08, .08, 7, 6).translate(0, cy + 3.5, cz0 + .6), dark); put(new THREE.CylinderGeometry(.04, .04, 2.6, 4).rotateZ(Math.PI / 2).translate(1.3, cy + 6.8, cz0 + .6), dark);
-    const pv = new THREE.Group(); pv.position.set(0, cy + 6.8, cz0 + .6); g.add(pv); const f = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 5, 1, 8).translate(1.3, -2.5, 0), new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 })); f.castShadow = true; pv.add(f); flags.push({ pv, f, ph: 9 }); }
+    const pv = new THREE.Group(); pv.position.set(0, cy + 6.8, cz0 + .6); g.add(pv); const f = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 5, 3, 16).translate(1.3, -2.5, 0), new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 })); f.castShadow = true; pv.add(f); flags.push(shipFlag({ pv, f, ph: 9, len: 5, amp: .45 })); }
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
   { const o = new THREE.Mesh(mergeGeometries(sails.map(q => q.index ? q.toNonIndexed() : q)), sailM); o.castShadow = o.receiveShadow = true; g.add(o); }
   bldTris(O, tris); for (const b of O.boxes) BOXES.push(b); boxGrid();
@@ -24410,6 +24412,24 @@ function shipLife(S, dt, t) { const Z = SHIPZ;
     if (f.t <= 0 && !f.o.visible) { if (f.t < -3) { f.o.visible = true; f.T = 1.4 + Math.random() * .8; f.t = f.T; const sx = Math.random() < .5 ? -1 : 1; f.x0 = sx * (11 + Math.random() * 14); f.z0 = -20 + Math.random() * 40; f.vz = (Math.random() < .5 ? -1 : 1) * (6 + Math.random() * 4); f.vx = -sx * (Math.random() * 1.5); spkBurst(f.x0, .2, f.z0, 10, { col: [.85, .95, 1], spread: 2, up: 1.5, size: .1, life: .5 }); } continue; }
     if (f.o.visible) { const k = 1 - f.t / f.T, x = f.x0 + f.vx * k * f.T, z = f.z0 + f.vz * k * f.T, y = Math.sin(k * Math.PI) * 2.2 - .2; f.o.position.set(x, y, z); f.o.rotation.set(-Math.cos(k * Math.PI) * .6 * Math.sign(f.vz), Math.atan2(f.vx, f.vz), 0);
       if (f.t <= 0) { f.o.visible = false; f.t = -(2 + Math.random() * 6); spkBurst(x, .2, z, 10, { col: [.85, .95, 1], spread: 2, up: 1.5, size: .1, life: .5 }); } } } }
+// m@X4@ (pass 9): CLOTH THAT FLOWS. Every flag keeps its rest shape (`base`) and is bent each frame: a travelling wave (two of them, one fast and
+// small) runs from where it is tied to its free end, growing with the distance from the hoist, so it ripples and snaps the way cloth does in a
+// wind; a slow GUST (shared, so the whole ship's flags swell and slacken together) lifts and streams them, and lets a pennant droop when it
+// drops. Pennants stream from their staff (the hoist is local x 0, the tail at -len); banners hang from their top edge
+function shipFlag(F) { F.base = Float32Array.from(F.f.geometry.attributes.position.array); return F; }
+function shipCloth(F, t) { const P = F.f.geometry.attributes.position, B = F.base, L = F.len, A = F.amp, gust = .65 + .35 * Math.sin(t * .31) * Math.sin(t * .13 + 1), ph = F.ph;
+  for (let i = 0; i < P.count; i++) { const x = B[i * 3], y = B[i * 3 + 1], z = B[i * 3 + 2], d = Math.min(1, Math.max(0, F.pen ? -x / L : -y / L));
+    const w = (Math.sin(d * 7.5 - t * 6.2 * gust + ph) * .75 + Math.sin(d * 17 - t * 11 + ph * 2) * .25) * A * d;
+    if (F.pen) P.setXYZ(i, x * (.96 + .04 * gust), y - d * d * .9 * (1 - gust) + Math.sin(d * 5 - t * 3 + ph) * .12 * d, z + w * (.6 + .6 * gust));
+    else P.setXYZ(i, x + Math.sin(d * 4 - t * 2.4 + ph) * .12 * d * gust, y, z + w * gust + d * d * .35 * gust); }
+  P.needsUpdate = true; F.f.geometry.computeVertexNormals(); F.pv.rotation.y = F.pen ? Math.sin(t * .4 + ph) * .18 : F.pv.rotation.y; }
+// the masthead pennant: long, red, a cream chain of diamonds between two cream lines, a swallow-tail cut into its free end (u = 0)
+function shipPennantTex() { if (SHIPZ.penTex) return SHIPZ.penTex; const cv = document.createElement('canvas'); cv.width = 512; cv.height = 64; const c = cv.getContext('2d');
+  c.fillStyle = '#b3201f'; c.fillRect(0, 0, 512, 64); c.fillStyle = '#f1e2c8'; c.fillRect(0, 6, 512, 4); c.fillRect(0, 54, 512, 4);
+  for (let x = 40; x < 500; x += 44) { c.beginPath(); c.moveTo(x, 18); c.lineTo(x + 14, 32); c.lineTo(x, 46); c.lineTo(x - 14, 32); c.closePath(); c.fill(); }
+  c.fillStyle = 'rgba(40,10,5,.22)'; for (let i = 0; i < 160; i++) c.fillRect(Math.random() * 512, Math.random() * 64, 2 + Math.random() * 4, 2 + Math.random() * 4);
+  c.globalCompositeOperation = 'destination-out'; c.beginPath(); c.moveTo(0, 0); c.lineTo(70, 32); c.lineTo(0, 64); c.closePath(); c.fill();
+  const T = new THREE.CanvasTexture(cv); T.colorSpace = THREE.SRGBColorSpace; return (SHIPZ.penTex = T); }
 function shipHome() { const p = player, Z = SHIPZ; p.pos.set(Z.spawn[0], Z.deckY + .05, Z.spawn[1]); p.vel.set(0, 0, 0); p.faceH = p.heading = 0; p.grounded = false; }
 // m1374 (pass 2): THE SHIP RIDES THE SWELL -- by holding the SHIP still and moving the WORLD round it. The sea's own wave function (`shipWave`, the
 // shader's numbers) is sampled at the bow, the stern, both sides and the middle; the pitch, roll and heave a hull would take from them (eased,
@@ -24428,7 +24448,7 @@ function shipStep(dt) { const Z = SHIPZ; if (Z.U) Z.U.uTime.value += dt; const p
         if (Math.hypot(p.pos.x, p.pos.z - bz) < 16) snd('swoosh', { g: .35, r: .5 + Math.random() * .2, x: 0, z: bz }); } shipGulls(S, dt);
       shipLife(S, dt, t);
       if (S.coreM) { const k = 2.2 + Math.sin(t * 2.3) * .5 + Math.sin(t * 7.1) * .15; S.coreM.emissiveIntensity = k; if (Z.engHalo) Z.engHalo.material.size = 4.2 * (.85 + .15 * Math.sin(t * 2.3)); }     // m1378: the cores breathe
-      for (const F of S.flags || []) { if (F.pen) { F.pv.rotation.y = Math.sin(t * .9 + F.ph) * .25; F.f.rotation.z = Math.sin(t * 3.3 + F.ph) * .15; continue; } F.pv.rotation.z = Math.sin(t * 1.3 + F.ph) * .12; F.f.rotation.x = Math.sin(t * 2.1 + F.ph) * .1 + .05; } } }
+      for (const F of S.flags || []) shipCloth(F, t); } }
   if (p.pos.y < Z.sea - 2.5) { spkBurst(p.pos.x, Z.sea + .2, p.pos.z, 30, { col: [.8, .95, 1], spread: 5, up: 1.5, size: .16, life: .7 }); snd('thud', { g: .6, r: .6 }); shipHome(); }     /* in the sea: back aboard (no swimming here yet) */
   if (Z.dome) Z.dome.position.copy(camera.position); }
 // m1389: THE CHUNK LIBRARY -- step 2 of the blueprint pipeline (LEVELDESIGN.md, "THE BLUEPRINT"). Each CHUNK is a parametric piece of a run with
