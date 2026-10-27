@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- Timber Siege Fort pass 10 of 10: the polish (X3, WORKER A)
+## m1340 -- Timber Siege Fort pass 10 of 10: the polish (X3, WORKER A)
 
 Read back against the reference and the rules, and fixed:
 - **ROOM TO FIGHT: the top tier's front walk was 3.0 m.** Its setback is now 3.3 m (the back narrows to 1.7). The watch house, the hatch,
