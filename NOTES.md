@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- Timber Siege Fort pass 4 of 10: the portcullis, the courtyard behind, the ramp up (X3, WORKER A)
+
+- **A PORTCULLIS** (his rule: a MACHINE you work), a grid of timber bars with spiked feet just inside the front mouth, behind the gate leaves.
+  - It is DOWN (solid) until a **LEVER** is struck. There are two: one outside left of the mouth, and one inside the tunnel near the back,
+    so it works from both sides. Then it grinds slowly up into the stone.
+  - Strike a lever again and it drops fast, with a boom, a shake and dust.
+  - A big blast (a rocket) drops it if it is up.
+  - Eight blows BREAK it; it is rehung, down, 45 s later.
+- **The courtyard behind.** The tunnel runs out into a palisaded yard, 30 x 18 m against the back of the base.
+  - The palisade is sharpened logs, each a stack of three blocks that BREAK (the ones on them come down), roped at two heights.
+  - **A gated way out** at the back (`bgateMake`, 4.8 m).
+- **The way up from inside: a STEPPED TIMBER RAMP** up the back of the stone. 30 steps, risers **.30 m**, treads .6 m, 3.3 m wide, posts along
+  its outer edge, and a landing onto the base's top.
+- The back scaffold ladder moved to the front-right (the ramp is the way up at the back), so both scaffold ladders are at the front now.
+
+SHIPPED UNVERIFIED. Next: pass 5, the work site (leaning poles and scaffolding as ramps, timber stacks, a crane, a half-built bay).
+
 ## THE MEGA WALL x1.5 -- STEER S2 (R1, m-MW15)
 
 - **Every SIZE is ×1.5:**
