@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1178 -- MOATED KEEP pass 1 (Set 2 #16, at (46, 0))
+
+`KEEP`, `keepBuild` / `keepStep` / `keepGong` / `keepClear`. SPAWN > BUILDINGS > Moated Keep.
+- A 24 m square CURB wall (2.8 m, solid, a coping) climbed by ten .28 steps on the courtyard side; inside it a MOAT (water planes) round a
+  3 m stone ISLAND.
+- THE DRAWBRIDGE: hinged on the curb's inner edge, it starts RAISED. Strike the bronze GONG on the curb beside it and it swings down across
+  the moat to the island (a `BDYN` box when down); strike again and it goes back up (~2 s). Or drop into the moat and climb the island.
+- THE KEEP: thick plaster walls 4.5 m high on dark stone corners, a door facing the bridge (lamps by it), a STAIR of fifteen .3 risers up
+  the inside of the +z wall to a HATCH in the roof slab, a crenellated ROOF, a little roofed turret-house, and a SENTRY GUN (killable).
+Shipped unverified.
+
 ## m1177 -- SHRINE pass 4: fox guardians, an offering box, ema
 
 - Two stone KITSUNE on pedestals at the head of the steps (red bibs, bushy tails, glowing amber eyes); their HEADS TURN to watch him
