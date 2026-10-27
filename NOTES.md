@@ -5,6 +5,24 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE COURTYARD, PASS 9: FIXES FROM READING THE ROUTES (m-COURT9)
+
+COURTYARD.md pass 9 is "playtest-driven fixes from his notes". He has not walked the court yet, so this pass walked the four routes in the code and fixed what blocks them. Shipped unverified.
+
+- **The high road had no way onto the hall roofs.**
+  - Route 2 is gate lintel → wall-walk → hall roof → rope bridge → bell house. The hall roofs were walkable, but their eave sits at about 7.6 m: 3.6 m over the balcony and 3.6 m over the wall-walk. The jump apex is 2.81 m. The only ladder in each hall went ground → upper floor.
+  - **Fix:** a ROOF LADDER on each hall (`court_roof`). It stands on the south wall-walk, 0.85 m off the south gable's eave, and runs from 4 m up to 8.1 m. Its exit drops you onto the roof 1.4 m inside the eave.
+  - The exit mark is set 9.2 m high so you fall onto the walkable tris. If you land inside the roof instead, that height is the number to move.
+- **THE LANDMINE AGAIN (fourth time).** The balcony's END rails (`for (const zz of [za, zb]) ...`) had sat behind a mid-line `// m1302: a gap for the lane bridge` since pass 3, so they were never built. Both balcony ends were open drops. The note is now a `/* */` at the end of the line, and the rails are back.
+- **Checked and fine:**
+  - the four corner ladders onto the walk
+  - the walk runs onto watchtower deck A at 4 m
+  - deck A to deck B by the shaft ladder
+  - the bell house's two ladders
+  - the lane bridge meets the balcony rail gaps (zm ± 1.15)
+  - the eave clears the balcony by 3.6 m
+- **Which box this moves:** C1 pass 9 of 10. When he walks it, his notes become a further fix pass. Still open: the polish against the reference (10).
+
 ## THE COURTYARD, PASS 8: THE CLEAR AND THE WAY ON (m1311)
 
 COURTYARD.md pass 8 (`courtWin`, stepped first in `courtStep`). Shipped unverified.
