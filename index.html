@@ -14062,12 +14062,21 @@ const MARK = {
 // brush-cut corner BRACKETS that close in on the target as the hold fills, a thin broken ring inside them, a small diamond pip at the centre,
 // and tick marks at the cardinal points -- a KORAJIN sight. It never spins; it SNAPS in when the lock is made, breathes while filling, and
 // at full it goes hot and adds an outer glow. Drawn once to a canvas; tinted per frame.
+// m1318: *"I still don't love the square reticle... he has that symbol on his clothes -- something closer to this."* His cloak's SUN-WHEEL,
+// read off his screenshot: a solid centre pip, a ring round it, a second wider ring, and a crown of rays standing off the outer ring --
+// tapered spokes, each capped with a short cross-bar, long and short by turns, with a few deliberately broken (it is a painted mark, worn,
+// not a gear). Painted with a slight wobble so it reads as brushwork. Drawn once to a canvas; tinted and breathed per frame as before.
 function lockMkTex() { const cv = document.createElement('canvas'); cv.width = cv.height = 256; const q = cv.getContext('2d'), c = 128;
+  let sd = 7; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
   q.strokeStyle = '#fff'; q.fillStyle = '#fff'; q.lineCap = 'round'; q.lineJoin = 'round';
-  q.lineWidth = 10; for (const [sx, sy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { q.beginPath(); q.moveTo(c + sx * 104, c + sy * 62); q.lineTo(c + sx * 104, c + sy * 104); q.lineTo(c + sx * 62, c + sy * 104); q.stroke(); }
-  q.lineWidth = 4; for (let k = 0; k < 4; k++) { const a0 = k * Math.PI / 2 + .28, a1 = (k + 1) * Math.PI / 2 - .28; q.beginPath(); q.arc(c, c, 66, a0, a1); q.stroke(); }
-  q.lineWidth = 5; for (const [dx, dy] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) { q.beginPath(); q.moveTo(c + dx * 58, c + dy * 58); q.lineTo(c + dx * 78, c + dy * 78); q.stroke(); }
-  q.beginPath(); q.moveTo(c, c - 11); q.lineTo(c + 11, c); q.lineTo(c, c + 11); q.lineTo(c - 11, c); q.closePath(); q.fill();
+  const ring = (r, w, gaps) => { q.lineWidth = w; const n = 48; q.beginPath(); for (let k = 0; k <= n; k++) { const a = k / n * Math.PI * 2, rr = r + (rnd() - .5) * 2.2, x = c + Math.cos(a) * rr, y = c + Math.sin(a) * rr; if (gaps && gaps.some(([g0, g1]) => a > g0 && a < g1)) { q.stroke(); q.beginPath(); continue; } k && !(gaps && gaps.some(([g0, g1]) => (k - 1) / n * Math.PI * 2 > g0 && (k - 1) / n * Math.PI * 2 < g1)) ? q.lineTo(x, y) : q.moveTo(x, y); } q.stroke(); };
+  q.beginPath(); q.arc(c, c, 13, 0, Math.PI * 2); q.fill();
+  ring(30, 8); ring(56, 9, [[.5, .62], [3.9, 4.05]]);
+  const N = 16; for (let k = 0; k < N; k++) { const a = k / N * Math.PI * 2 - Math.PI / 2, long = k % 2 === 0, r0 = 66, r1 = long ? 108 : 92, w0 = long ? 11 : 8, w1 = 3.5;
+    if (k === 5 || k === 12) continue;     /* worn: two rays missing */
+    const cs = Math.cos(a), sn = Math.sin(a), px = -sn, py = cs, jit = (rnd() - .5) * 4;
+    q.beginPath(); q.moveTo(c + cs * r0 + px * w0 / 2, c + sn * r0 + py * w0 / 2); q.lineTo(c + cs * (r1 + jit) + px * w1 / 2, c + sn * (r1 + jit) + py * w1 / 2); q.lineTo(c + cs * (r1 + jit) - px * w1 / 2, c + sn * (r1 + jit) - py * w1 / 2); q.lineTo(c + cs * r0 - px * w0 / 2, c + sn * r0 - py * w0 / 2); q.closePath(); q.fill();
+    if (long) { const cb = 9; q.lineWidth = 5; q.beginPath(); q.moveTo(c + cs * (r1 + jit) + px * cb, c + sn * (r1 + jit) + py * cb); q.lineTo(c + cs * (r1 + jit) - px * cb, c + sn * (r1 + jit) - py * cb); q.stroke(); } }
   const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t; }
 const lockMk = new THREE.Sprite(new THREE.SpriteMaterial({ map: lockMkTex(), color: 0xffffff, transparent: true, opacity: .9, depthTest: false, depthWrite: false, toneMapped: false }));
 lockMk.renderOrder = 61; lockMk.visible = false; lockMk.frustumCulled = false; scene.add(lockMk);     // m1260: the charge's lock, on the target

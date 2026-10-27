@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE LOCK RETICLE IS HIS SUN-WHEEL (m1318)
+
+*"I still don't love the square reticle for the charge attack... we start building with squares and then upgrade. He has that symbol on his clothes -- maybe something closer to this."* (his screenshot of Grumbo's cloak)
+
+`lockMkTex` now draws the cloak's emblem in place of m1276's corner brackets:
+
+- a solid centre pip
+- a ring
+- a wider ring with two worn gaps
+- a crown of 16 tapered rays, long and short by turns. The long ones carry cross-bars; two are missing, like worn paint.
+- a slight seeded wobble, so it reads as brushwork
+
+It is still one canvas, tinted, breathed and glowing exactly as before (`lockMk`, `lockGlow`). The gun's lock wears it too.
+
 ## THE WHIRLWIND, CONTINUOUS AND STEERED (m1317)
 
 He took back m1316's "one spin": *"Link probably does three. The problem is ours does one, then he stops, does another, stops... they need to be continuous. And I want to control it -- launch forward with it, like a tornado, moving around."*
