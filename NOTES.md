@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1195 -- Cliff Lodge pass 4: the boulder cradle (Building Forge loop, extra pass)
+
+A timber CRADLE now stands on the top landing at the head of the path, with a boulder waiting in it. Beside it on the summit is
+a LEVER with a red knob.
+
+Strike the knob with a blade, an arrow or a parried shot (through `bldHit`). The lever throws over and a boulder is tipped down
+the path NOW, instead of on the `rockEvery` clock. Up to 4 can be rolling at once, and the waiting stone vanishes from the cradle
+while its twin rolls.
+
+The trap is his to spring on whoever is climbing behind him: rolling boulders already bowl bodies over (`dummyBlow`). Pass 4 is
+an extra on a done building, so it moves no sandbox box. Next: alternate -- Moated Keep pass 4.
+
 ## m1194 -- Jin Lighthouse pass 3: the polish (Building Forge loop)
 
 What was added:
