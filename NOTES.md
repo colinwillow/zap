@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1236 -- Pagoda pass 6: the spire's chain lightning (Building Forge loop, extra pass)
+
+Strike the Jin CORE floating over the ground-floor altar (`pagodaChain` in `bldHit`) and the spire answers:
+- **The bolt.** It leaps from the spire's tip (about 28 m up) to the nearest standing body within `chainR` 30 m of the pagoda.
+- **The chain.** It then JUMPS body to body, each hop up to `chainHop` 9 m, up to `chainN` 5 bodies.
+- **The hits.** It knocks each one down (`dummyBlow`, `chainDmg` 10). The bolt is one jagged line through every link, .3 s.
+- **Cooldown.** The core goes dark for `chainCd` 18 s.
+
+With nobody in reach it only crackles at the spire. Next: alternate -- Jin Observatory pass 2.
+
 ## m1235 -- Jin Observatory pass 1 (Building Forge loop, Set 3 #26)
 
 `OBS`, in BLDG.list as `obs`, at (72, -18). A clockwork tower:
