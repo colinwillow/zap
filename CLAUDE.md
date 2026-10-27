@@ -526,6 +526,7 @@ means anything you can carry from one situation to the next.
 | inner wheel | **the WEAPONS, one segment each (m173)** | the blaster's CHARGE / AUTO / **DNA** (m112) |
 | outer wheel | **Clancy: ROAM / PACK**, or **REVERT** while disguised (m121) | — |
 | tap | **jump (m173)** — so a thumb holding the trigger can still jump | jump |
+| hold in place | **charge the TORNADO (m1091)** — release: two steerable spinning kicks | — |
 | flick | dodge roll, in the flicked direction | strike, in the flicked direction |
 | drag | — | orbit the camera |
 
@@ -559,7 +560,7 @@ a map at all:
   the right pad is purely the camera and the jump, so the conflict between "drag" and "hold"
   only exists where it buys something.
 - **THE GESTURE VOCABULARY IS DELIBERATELY NOT FULL.** Left-pad press-and-hold-in-place is
-  unassigned, and so is anything on a second tap. Those are the slots to spend next; do not
+  the TORNADO's charge as of m1091; anything on a second tap is still unassigned. Those are the slots to spend next; do not
   spend one on something the gait blend already handles for free.
 - **AND A FLICK IS A SWEEP ACROSS THE PAD, NOT MERELY A FAST MOVE (m104).** A thumb coming off the
   glass produces a fast move and an immediate lift, which is geometrically the same event -- so

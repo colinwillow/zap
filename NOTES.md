@@ -5,6 +5,25 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1091 -- the side flick is ONE sword spin (Link's 360); the TORNADO moved to the left pad's hold (charge, two spins, steerable); kicks and punches hit
+
+*"Swipe left and right on the right stick should be a single sword spin, like Link in Smash Bros -- the full 360 -- rather than that kick.
+Press and hold the middle of the left stick charges the tornado, like the right stick's charge; after the charge it does two full
+sequences in a row and you can move while it's spinning to control it. And the tornado kick, the handspring kick, the flying jump punch
+don't really hit guys as well as the sword -- different colliders on the fists and feet?"*
+- **Side flicks** (`TORNADO`): with the blade, ONE `katana_360h` (`_m` for left), `swordDur` .62 s; bare-handed the tornado kick still.
+  TOOLS > SIDE FLICK: SPIN / SWING (an old `TORNADO` pick reads as SPIN).
+- **The tornado's own gesture** (`TORN`, `tornStep`): the LEFT pad pressed and held INSIDE the tap radius past the tap time (the unassigned
+  slot) fills `p.tornC` over .8 s -- an orange ring under him, gold and the charge ping at full. Release past .3 -> `spins` 2 hurricane kicks
+  back to back (`tornSpin`, chained where a strike ends); the stick steers him at `speed` 4.2 m/s through both; every spin catches everyone
+  round him (`p.multi`, the same as the sword's 360).
+- **Kicks and punches HIT** (`strikeSweep`): two causes. A body move (the flying kick) counted ONLY his travel, so a kick spun in place could
+  never land; and a boot was the fist's .26 sphere on the ANKLE. Now a fast limb counts on a body move too, the toes are swept, and any
+  non-katana strike's fists / feet sweep `limbR` .44 (the katana's own cut is unchanged).
+- **Measured** (`spin.cjs`, real loop): right flick `katana_360h`, left `katana_360h_m`; held left pad -> full at ~.95 s, two spins (~1.3 s),
+  steered 4.6 m by the stick during them; into a ring of 10 at 1.5 m (steering him OUT of it) 4 of 10 hit, katana slot and bare-handed alike.
+- Shipped unverified on the phone.
+
 ## m1090 -- DISMEMBERMENT (SPAWN > SLICE DUMMY): katana cuts take limbs; he re-grabs the sword, kicks armless, hobbles, explodes
 
 *"A robot samurai -- a crash test dummy -- when you slice him pieces come off, his arm, his leg... the sword arm off, does he pick up the sword
