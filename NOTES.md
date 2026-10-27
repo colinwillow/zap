@@ -5,6 +5,28 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1097 -- a running landing, sound that survives leaving the app, and the course pad off
+
+**What he said:** *"the landing that we play is a stationary landing and if you're running... it just looks weird... there should be a
+landing that you play when you're running."* / *"when I navigate away from the game and come back the sounds no longer play and I have to
+restart."* / *"I keep running into a door... I just go to the acrobatics level... keep it locked to only when I spawn it."*
+
+**1. RUNNING LANDING (`RUNLAND`, TOOLS > RUN LAND: DIP / STOP).** No rig of his has a moving-landing clip (checked every GLB: only
+`landing_soft` / `landing_hard`, and Colin's own `landing_roll`). So a SOFT landing at more than `at` 2.5 m/s with the stick held plays
+NO landing clip and keeps the full run speed (the old landing braked to .35 for its length). The cover duck's procedural knee-bend
+(`duckPose`: feet kept where the run puts them, knees take the drop, spine curls) fires as a quick dip, `t` .2 s, `drop` .13 x height,
+deeper for a harder fall (`fullV`). A high fall still rolls. Real loop: speed 7.2 before, 7.2 minimum after, no landing state,
+dip weight peaked at .96.
+
+**2. SOUND AFTER BACKGROUNDING (`sfxRevive`).** iOS suspends or 'interrupts' the AudioContext when the page goes away and never resumes it,
+and `sfxWake` returned early once a context existed, so nothing ever resumed it. Now every touch (pointerdown and touchend) and the page
+returning (visibilitychange, pageshow, focus) asks a stopped context to resume. If a touch still leaves it not running 0.4 s later, the
+context is closed and rebuilt from the kept raw files, along with the persistent voices (the hum). `SFX.rebuilt` counts rebuilds. This
+cannot be tested headless: it is his phone's call.
+
+**3. THE COURSE PAD IS OFF (`COURSE.padOn` 0).** The dais ring no longer exists, so walking over it does nothing. The course boots from
+SPAWN > COURSE only. `mel.COURSE.padOn = 1` brings the pad back.
+
 ## m1096 -- the dragon fireball is a living thing: it arcs, bounces, scorches, and explodes
 
 **What he said:** *"blue dragon fireballs just look like little balls... way cooler way more alive way more particle... more
