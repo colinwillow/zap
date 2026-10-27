@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## White Heron Castle pass 7 of 10: the defenders (X2, WORKER B)
+
+All of them can be killed.
+- **The ballista.** It stands on a timber deck astride the gallery ridge. It is the castle's own, modelled on the Gatehouse's (`heronStep`):
+  - it tracks him inside 40 m, winds (the eye flickers, the bolt draws back) and looses a real ARROWS bolt, which can be blocked, glanced
+    off or PARRIED home;
+  - 6 hits wreck it (`heronHit`, in `bldHit` just above `smashHit`); it slumps and smokes, then repairs after 20 s.
+- **Archers (`archerPost`).**
+  - In the keep's doorways on storeys 2 (east) and 3 (west), shooting out over the roofs.
+  - At two opposite corners of the lookout balcony.
+- **The sentry gate.** Two timber posts, a beam and its own little roof with shachi over the foot of the east stair. Two robot SAMURAI
+  stand outside it and hold their post (`aggro` 0) until they see him.
+- **Clear-up.** `heronClear` drops every one of them.
+- **NO SENTRY GUN, AND WHY.** In the forge `ARENA.r` is 60. `turretStep` destroys a turret shot more than `ARENA.r` + 4 from the
+  forge's middle, and the castle stands ~117 m out, so a turret here would fire and its shot would vanish at once. The same goes for any
+  building past 64 m: the Great Red Pagoda's sentry at (90, 0) is ~92 m out. That code belongs to MAIN, so it is reported rather than
+  touched.
+
+SHIPPED UNVERIFIED. Next: pass 8, the approach (a winding walled ramp up to a gate in the base, a drawbridge).
+
 ## m1293 -- Octagonal Block Pagoda pass 8 of 10: motion (X4, WORKER A)
 
 - **Wind bells.** A gold bell of blocks hangs off the tip of every kicked-up corner: 56 of them in ONE InstancedMesh.
