@@ -10573,7 +10573,7 @@ try { const v = localStorage.getItem('mel.duck'); if (v !== null && DUCK.drops.i
 const _dkL = new THREE.Vector3(), _dkR = new THREE.Vector3(), _dkQL = new THREE.Quaternion(), _dkQR = new THREE.Quaternion(), _dkQ = new THREE.Quaternion(), _dkQ2 = new THREE.Quaternion(), _dkA = new THREE.Vector3(), _dkH = new THREE.Quaternion();
 function duckWant() {
   const p = player, R = stick.R, up = -R.y, mag = Math.hypot(R.x, R.y);
-  if (p.crouchS) return 1;     // m1093: the crouch-walk wears the same pose
+  if (p.crouchS || (p.melee && p.lowSwing)) return 1;     // m1093: the crouch-walk wears the same pose; m1094: so does a low strike
   return p.wall && p.wallLow && DUCK.drop > 0 && R.down && up < 0 && mag > WEAP.blockKeep && Math.abs(Math.atan2(R.x, -up)) < WEAP.blockArc ? 1 : 0;
 }
 function duckPose(dt) {
@@ -11364,7 +11364,7 @@ function arenaUi() {
       else if (a === 'getup') { KNOCK.getUp = KNOCK.getUps[(KNOCK.getUps.indexOf(KNOCK.getUp) + 1) % KNOCK.getUps.length]; try { localStorage.setItem('mel.getup', KNOCK.getUp); } catch (err) {} }
       else if (a === 'cart') { CART.pose = CART.poses[(CART.poses.indexOf(CART.pose) + 1) % CART.poses.length]; try { localStorage.setItem('mel.cart2', CART.pose); } catch (err) {} }
       else if (a === 'kcslow') { const T = KATANA.chargeSlows; KATANA.chargeSlow = T[(T.indexOf(KATANA.chargeSlow) + 1) % T.length]; try { localStorage.setItem('mel.kat.cslow', KATANA.chargeSlow); } catch (err) {} }
-      else if (a === 'rhold') { CROUCH.mode = CROUCH.modes[(CROUCH.modes.indexOf(CROUCH.mode) + 1) % CROUCH.modes.length]; try { localStorage.setItem('mel.rhold', CROUCH.mode); } catch (err) {} }     // m1093
+      else if (a === 'rhold') { CROUCH.mode = CROUCH.modes[(CROUCH.modes.indexOf(CROUCH.mode) + 1) % CROUCH.modes.length]; try { localStorage.setItem('mel.rhold2', CROUCH.mode); } catch (err) {} }     // m1093
       else if (a === 'lhold') { LHOLD.pick = LHOLD.picks[(LHOLD.picks.indexOf(LHOLD.pick) + 1) % LHOLD.picks.length]; try { localStorage.setItem('mel.lhold', LHOLD.pick); } catch (err) {} }     // m1093
       else if (a === 'toprun') { GAIT.topRun = GAIT.topRun ? 0 : 1; try { localStorage.setItem('mel.toprun', GAIT.topRun ? '1' : '0'); } catch (err) {} runSetUse(GAIT.runSet, 0); }     // m1092
       else if (a === 'sprint') { const T = NINJA.looks; NINJA.look = T[(T.indexOf(NINJA.look) + 1) % T.length]; try { localStorage.setItem('mel.sprint', NINJA.look); } catch (err) {} }
@@ -17486,25 +17486,32 @@ const aimAt = d => {
 // AND THE ACQUIRE RANGE IS WHAT THE MOVE CAN COVER, NOT A TYPED NUMBER. A flat range locks a
 // JAB onto a man six metres off and then cannot get him there -- and a lock that turns him
 // toward somebody he cannot reach is worse than no lock at all.
+// m1094: OUT OF THE GUARD. *"Pulling down on the right stick already has him duck -- that's his guard, he kneels. If you're in guard and swipe
+// up he does a stab forward, low; swipe to a side, he slashes to that side, because he's already down low."* With the blade, a right flick
+// within `t` s of the guard: UP = the thrust (`katana_attack`), RIGHT = `katana_horiz`, LEFT = `katana_backhand` (the cut the other way),
+// DOWN = the low 360. All LOW: the crouch pose holds through the strike (`duckWant`) and they go for the legs (`p.lowSwing`).
+const GSTRIKE = { on: 1, t: .35, up: 'katana_attack', right: 'katana_horiz', left: 'katana_backhand', down: 'katana_360l', dur: .55, stat: { n: 0 } };
+const guardRecent = () => GSTRIKE.on && performance.now() / 1000 - (player.blockAt || -9) < GSTRIKE.t;
 // m1093: THE CROUCH. *"Holding the right stick he winds up for the big backflip, which is fine if he's not moving at all. But instead he could
 // just be crouched -- you can move around crouched -- and if I flick from the crouch he does a LOW swing, so with the dummy you could cut
 // their legs off."* RIGHT HOLD (TOOLS): CROUCH (default) -- the right pad held at rest while the LEFT stick moves him is a crouch-walk
 // (`p.crouchS`: the cover duck's legs-and-spine pose, `drop` x his height, over his walk, at `speed`); held standing still it is still the
 // backflip's wind-up. A flick within `lowT` s of either is a LOW swing (the katana's `katana_360l`, round him) that goes for the LEGS. SPRINT
 // = m1026's held run + long jump. The sprint is not lost: the ZOOM (m1085) is the speed now.
-const CROUCH = { mode: 'CROUCH', modes: ['CROUCH', 'SPRINT'], speed: 2.4, drop: .26, lowT: .35, low: 'katana_360l', lowDur: .6, stat: { lows: 0 } };
+const CROUCH = { mode: 'SPRINT', modes: ['SPRINT', 'CROUCH'],     // m1094: back to the sprint by default -- the GUARD is the low stance (*"pulling down already has him duck"*)
+  speed: 2.4, drop: .26, lowT: .35, low: 'katana_360l', lowDur: .6, stat: { lows: 0 } };
 // m1093: LEFT HOLD (TOOLS): ZOOM (default) -- the left pad pressed and held in place charges the ZOOM (m1085) with ANY weapon (*"I forget how you
 // initiate the speed run... put it back... I don't know that I'm loving the charge tornado"*); TORNADO = m1091's. The right-pad UP zoom,
 // unarmed, still works.
 const LHOLD = { pick: 'ZOOM', picks: ['ZOOM', 'TORNADO'] };
-try { const v = localStorage.getItem('mel.rhold'); if (CROUCH.modes.includes(v)) CROUCH.mode = v; const w = localStorage.getItem('mel.lhold'); if (LHOLD.picks.includes(w)) LHOLD.pick = w; } catch (e) {}
+try { const v = localStorage.getItem('mel.rhold2'); if (CROUCH.modes.includes(v)) CROUCH.mode = v; const w = localStorage.getItem('mel.lhold'); if (LHOLD.picks.includes(w)) LHOLD.pick = w; } catch (e) {}
 const crouchRecent = () => performance.now() / 1000 - (player.crouchAt || -9) < CROUCH.lowT;
 // m1091: THE TORNADO ON THE LEFT PAD'S HOLD (the slot CLAUDE.md kept free). *"Press and hold the middle of the left stick and it charges to do
 // the tornado, like the charge on the right stick... after the charge it does two full animation sequences in a row, and you can move while
 // it's spinning to control it."* Thumb down on the LEFT pad and kept inside the tap radius past the tap time (`MOVE.tapR` / `tapT`): `p.tornC`
 // fills 0..1 over `T` s (an orange ring under him, a click at full). Lift past `min` -> `spins` hurricane kicks back to back; the stick
 // steers him at `speed` m/s the whole time, and every spin catches everyone round him (`p.multi`).
-const TORN = { on: 1, T: .8, min: .3, spins: 2, speed: 4.2, ring: null, stat: { charges: 0, spins: 0 } };
+const TORN = { on: 1, flick: 1, max: 8, T: .8, min: .3, spins: 2, speed: 4.2, ring: null, stat: { charges: 0, spins: 0 } };
 function tornStep(dt) {
   const p = player, L = stick.L, T = TORN;
   if (LHOLD.pick !== 'TORNADO') { p.tornC = 0; if (T.ring) T.ring.visible = false; return; }
@@ -17533,6 +17540,7 @@ const JUGGLE = { on: 1, slamHold: .35, rise: 9, hang: 1.8, g: .22, band: 3.2, po
 // m1091: *"Swipe left and right on the right stick should be just a single sword spin -- Link in Smash Bros, the full 360 -- rather than that kick."*
 // With the blade a side flick is ONE `katana_360h` (left its mirror); bare-handed it is still the tornado kick. SPIN / SWING (the katana's
 // side swings) on TOOLS > SIDE FLICK. The TORNADO kick itself moved to the LEFT pad's press-and-hold (`TORN`).
+const AIRK = { max: 3, minH: 1.1 };
 const TORNADO = { pick: 'SPIN', picks: ['SPIN', 'SWING'], sword: 'katana_360h', swordDur: .62 };
 try { let v = localStorage.getItem('mel.sideflick'); if (v === 'TORNADO') v = 'SPIN'; if (v === 'SPIN' || v === 'SWING') TORNADO.pick = v; } catch (e) {}
 const bodyAir = d => d.root.position.y > groundAt(d.root.position.x, d.root.position.z, d.root.position.y, .5) + .35;
@@ -17588,7 +17596,7 @@ function kickGo(h, spinNm) {
   const p = player, SK = MELEE.spinKick, nm = spinNm || MELEE.air;
   // m1051: a strike out of a flip keeps the turn going -- a spinning kick -- and the flip still lands him upright
   if (h == null) h = p.faceH;
-  p.airKick = 1; p.meleeAir = 1; p.flip = ''; p.bkHang = 0; p.melWall = 0; p.melFist = 0;   // the kick owns the body (m1025: no stale left-pad flag)
+  p.airKick = 1; p.airKicks = (p.airKicks || 0) + 1; p.meleeAir = 1; p.flip = ''; p.bkHang = 0; p.melWall = 0; p.melFist = 0;   // the kick owns the body (m1025: no stale left-pad flag)
   p.melFront = 0;     // m993: a kick spends its travel on its own clock, never a katana lash's
   p.melee = 1; p.meleeIx = 0; p.meleeT = 0; p.meleeName = nm; p.meleeDur = spinNm ? SK.dur : MELEE.airDur;
   p.meleeChain = 0; p.melFired = 0; p.melU = 0; p.swPrev = null; p.swRootX = null; p.swRootZ = null;
@@ -17653,7 +17661,10 @@ function meleeGo0(h) {
   // cleared beside `p.jumps` on landing), or it is a flutter kick across the street.
   if (!p.grounded) {
     if (!p.hook && barHook(h)) return;     // m1063: a swipe toward a high bar in reach hooks onto it (before the one-kick-per-airtime rule)
-    if (p.melee || p.roll || p.slam || p.airKick) return;
+    // m1094: *"High jump, then flick, flick -- one spinny aerial kick only allows one; as long as you have the height you could get two, maybe
+    // three, and cover a long gap."* Up to `AIRK.max` kicks in one airtime, each needing `minH` m of air under him.
+    if (p.melee || p.roll || p.slam) return;
+    if (p.airKick && !((p.airKicks || 0) < AIRK.max && p.pos.y - groundAt(p.pos.x, p.pos.z, p.pos.y, MOVE.step) > AIRK.minH)) return;
     // m1001: with the katana the kick goes where he is GOING, as the katana's swings do (m1000), not where you flicked
     // m1002: and so does every flying kick, unarmed included (`MELEE.dirBy`)
     // m1050: *"in the air, the attack goes in the direction he's already going; on the ground we keep the directional one."* In the air every
@@ -17703,14 +17714,16 @@ function meleeGo0(h) {
   const SKt = MELEE.spinKick, sideF = (KATANA.dir === 'left' || KATANA.dir === 'right') && TORNADO.pick === 'SPIN' && !tackle && SKt;
   const sfx = KATANA.dir === 'left' ? MIRROR.suffix : '', kat360 = sideF && slotNow().blade ? TORNADO.sword + sfx : '';     // m1091: the sword's 360
   const tornado = sideF && !kat360 ? SKt.clip + sfx : '';
-  const low = !tackle && crouchRecent() && slotNow().blade && rig.actions[CROUCH.low] ? CROUCH.low : '';     // m1093: out of the crouch -- LOW, for the legs
+  const gs = !tackle && slotNow().blade && guardRecent() ? GSTRIKE[KATANA.dir] : '';     // m1094: out of the guard
+  const low = gs && rig.actions[gs] ? gs : !tackle && crouchRecent() && slotNow().blade && rig.actions[CROUCH.low] ? CROUCH.low : '';     // m1093: out of the crouch -- LOW, for the legs
   const name = low ? low : kat360 && rig.actions[kat360] ? kat360 : tornado && rig.actions[tornado] ? tornado : tackle ? MELEE.slide : pool[katInOrder ? Math.min(ix, pool.length - 1) : j];     // m984: the katana's combo plays IN ORDER (link 3 = the finisher); m1088: a side flick is the TORNADO
   if (!rig.actions[name]) { note('NO CLIP ' + name); return; }
   p.melee = 1; p.meleeIx = ix; p.meleeLinks = links; p.meleeT = 0; p.meleeName = name; p.meleeAir = 0; p.melWall = 0; p.melFist = p.fistNow ? 1 : 0;     // m1021: a left-pad strike never breaks a wall
   p.meleeBody = tackle ? 1 : 0;   // see `STRIKE.bodyAt` -- the blow is him arriving
   const CL = clipOf(name);
-  p.meleeDur = tackle ? MELEE.slideDur : name === tornado ? SKt.dur : name === kat360 ? TORNADO.swordDur : name === low ? CROUCH.lowDur : melBeat(name, ix);
-  p.multi = name === kat360 || name === tornado || name === low ? 1 : 0; p.lowSwing = name === low ? 1 : 0; if (low) CROUCH.stat.lows++;     // m1091: a spin catches everyone round him
+  p.meleeDur = tackle ? MELEE.slideDur : name === tornado ? SKt.dur : name === kat360 ? TORNADO.swordDur : name === low ? (gs ? GSTRIKE.dur : CROUCH.lowDur) : melBeat(name, ix);
+  p.multi = name === kat360 || name === tornado || name === low ? 1 : 0; p.lowSwing = name === low ? 1 : 0; if (low) { CROUCH.stat.lows++; if (gs) GSTRIKE.stat.n++; p.block = 0; }
+  if (gs && name === low) p.multi = KATANA.dir === 'down' ? 1 : 0;     // m1091: a spin catches everyone round him
   p.meleeChain = 0; p.melFired = 0; p.melU = 0; p.swPrev = null; p.swRootX = null; p.swRootZ = null;
   const base = tackle ? MELEE.slideV
              : (CL && CL.lunge) || MELEE.lunge[Math.min(ix, MELEE.lunge.length - 1)];
@@ -17967,7 +17980,14 @@ function coverTap() {
 // kicks (`CLIPS.fist`, dealt as an unarmed chain) toward where you flicked. `COVER.left` 'ROLL' = m1008's slide tackle / dive roll instead.
 function leftFlick(dx, dy) {
   const h = flickH(dx, dy), p = player;
-  if (p.block && p.grounded && cartGo(dx, dy)) return;     // m1061/m1062: the guard held + any flick = a cartwheel (sides) or a front / back flip
+  if (p.block && p.grounded && cartGo(dx, dy)) return;
+  // m1094: *"Flick down on the left stick is the tornado kick -- it just needs to not make him turn around: do it the way he's facing, still
+  // controllable, and keep flicking and it keeps spinning, like a top, until somebody hits you."* DOWN (not in guard, which flips): a spin
+  // the way he faces; flicked again while it spins, one more (to `TORN.max`), so a thumb flicking down keeps the top going.
+  if (TORN.flick && dy > Math.abs(dx) && p.grounded && !p.wall && !p.knock && !p.riding && !mphBare()) {
+    if (p.torn) { p.torn.n = Math.min(TORN.max, p.torn.n + 1); return; }
+    if (!p.melee && !p.roll) { p.torn = { n: 1 }; TORN.stat.charges++; tornSpin(); return; }
+  }     // m1061/m1062: the guard held + any flick = a cartwheel (sides) or a front / back flip
   if (!p.grounded && !p.bar && !p.ledge && !p.wing && !p.knock && airFlipGo(dx, dy)) return;     // m1050: in the air the left stick is the ACROBATICS stick
   // m1021: *"when I'm unarmed and I flick the left stick, instead of covering on the wall he does the melee stuff and breaks the wall.
   // Breaking the wall should be reserved for the right stick."* A swing or a roll still playing made `slideGo` refuse, so the flick fell
@@ -19941,7 +19961,7 @@ function stepKit(dt) {
     if ((arming || keeping) && !busy) {
       p.blockT += dt;
       if (p.blockT >= WEAP.blockT) {
-        p.block = 1;
+        p.block = 1; p.blockAt = performance.now() / 1000;     // m1094: a flick out of it is a guard strike
         if (!slotNow().blade) triggerStop();     // m980b: with the katana the guard IS the charge -- it must not cancel it every frame
         p.center = 0; p.centerT = 0;
       }
@@ -20358,7 +20378,7 @@ function integrate(dt, wantX, wantZ, wantSp, ctl) {
       // ground sounds like a man hitting the ground whichever man it is. `MOVE.landSoft` and
       // `landHard` pick the CLIP by the same speed; this is the sound of the same event.
       bumpSnd(p.fallV * BODYSND.drop.me, p.pos.x, p.pos.z);
-      p.pos.y = gy; p.vel.y = 0; p.grounded = true; p.jumps = 0; p.slamUsed = 0; p.airKick = 0; p.flip = ''; landed = 1;
+      p.pos.y = gy; p.vel.y = 0; p.grounded = true; p.jumps = 0; p.slamUsed = 0; p.airKick = 0; p.airKicks = 0; p.flip = ''; landed = 1;
     }
   }
   p.speed = Math.hypot(p.vel.x, p.vel.z);
@@ -34357,7 +34377,8 @@ function knockStand(nm) {
   const top = y[N]; for (let i = 0; i <= N; i++) if (y[i] >= top * KNOCK.stand && i > N * .2) return i / N;
   return 1;
 }
-function playerHurt(dmg, dirH, push, up, stun, knock) {
+function playerHurt(dmg0, h0, push0, up0, stun0, knock0) { if (player.torn && (dmg0 > 0 || push0 > 0)) player.torn = null; return playerHurt0(dmg0, h0, push0, up0, stun0, knock0); }     // m1094: a hit stops the top
+function playerHurt0(dmg, dirH, push, up, stun, knock) {
   // m1067: GOD is NO DAMAGE, not "nothing happens" (m298 returned here): *"have the turret actually launch my character through the air"* -- he
   // tests with GOD on, so a rocket never moved him. The blow, the push and the launch all run; only the hp is spared.
   if (GOD.on) dmg = 0;
@@ -57084,7 +57105,7 @@ window.melee = window.mel = { FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VE
   // of a rule measures a game that does not exist -- which is the oldest mistake there is, and
   // the only way not to make it is for `npm run sim` to call exactly these.
   DUMMY, DUMMIES, LOCK, LEDGE, WALL, STRIKE, PADS, DESK, meleeLock, dummyHit, dummyBlow, strikeSweep, stepDummies, bodySeat, SEAT, findLock, SFX, CHARGE, POSE, snd, PUNCH, PLASMA, HITSND, BODYSND, FLYHIT, STEP,
-  stepPlayer, muzzleWorld, RIC, coverAcross, cwallOf, KNOCK, knockHas, GSIDE, KAIM, aimLeap, kaimHold, DUCK, duckPose, RUNSWIPE, runSwipe, SHOTBLOCK, shotBlock, bladeSeg, steelFlash, STEEL, HURT, playerHurt, GOD, LEAP, coverLeap, wallGo, WRUN, wrunTap, wrunFind, wrunSpawn, wrunClear, stepWrun, backGo, HURDLE, hurdleTap, HOOK, barHook, meleeGo0, CART, cartGo, leftFlick, rigAnim, stepKit, frameBody, kickGo, SPRINGS, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, hbarCatch, stepBar, hbarPose, hbarFly, coverArmUndo, slideGo, coverShow, TURRET, CROUCH, LHOLD, TORN, tornGo, LIMB, limbCut, limbPrep, sliceDummy, JUGGLE, TORNADO, FLOW, ZOOM, zoomGo, HORDE, hordeAdd, hordeClear, ACAM, actionCam, acamPip, turretSpawn, COURSE, courseBuild, courseClear, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
+  stepPlayer, muzzleWorld, RIC, coverAcross, cwallOf, KNOCK, knockHas, GSIDE, KAIM, aimLeap, kaimHold, DUCK, duckPose, RUNSWIPE, runSwipe, SHOTBLOCK, shotBlock, bladeSeg, steelFlash, STEEL, HURT, playerHurt, GOD, LEAP, coverLeap, wallGo, WRUN, wrunTap, wrunFind, wrunSpawn, wrunClear, stepWrun, backGo, HURDLE, hurdleTap, HOOK, barHook, meleeGo0, CART, cartGo, leftFlick, rigAnim, stepKit, frameBody, kickGo, SPRINGS, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, hbarCatch, stepBar, hbarPose, hbarFly, coverArmUndo, slideGo, coverShow, TURRET, GSTRIKE, AIRK, leftFlick, kickGo, CROUCH, LHOLD, TORN, tornGo, LIMB, limbCut, limbPrep, sliceDummy, JUGGLE, TORNADO, FLOW, ZOOM, zoomGo, HORDE, hordeAdd, hordeClear, ACAM, actionCam, acamPip, turretSpawn, COURSE, courseBuild, courseClear, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
   MFX, camShake, palDive,
   // THE BOARD, LIVE (m159). `mel.SK8.hold` is where the deck sits IN HIS HAND while it is
   // carried, and how a carried board should look is a look-at-it decision -- so it is a dial he
