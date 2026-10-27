@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1109 -- his KORAJIN posters on the title screen
+
+**What he said:** *"I put them in the repo -- zap/images/korajin."* (`korajin_title_01` / `_02`, png + webp, 941x1672: the splash's own size.)
+
+**What changed (`startGate`):** PICK A GAME is now the two games' posters side by side (KORAJIN's title_01, Zap n' Clancy's splash), each a
+button with its name along the bottom. KORAJIN's page sits on title_02: its painted KORAJIN / コラジン / GRUMBO shows at the top (the typed
+heading is gone so they do not collide), and the menu fades in under Grumbo. The webps are used (344 / 368 KB; the PNGs are 3 MB each and
+unused); the URL carries the build like the splash. Headless renders of both pages (390 px wide) read right.
+
 ## m1108 -- the arrow PARRY: guard at the right moment and it goes back at the archer, from any side
 
 **What he said:** *"I want to send the arrows back by parrying at the right time -- guard at the right time... The charged slice works, but
