@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1242 -- Rampart pass 6: the war horn (Building Forge loop, extra pass)
+
+A great bronze WAR HORN (a lathe-turned flare on a timber stand) now sits on the Rampart's wall walk. Blow it by striking it
+(`rampHorn` in `bldHit`): a deep boom and a shake.
+- **The raid.** A RAIDING PARTY of `raidN` 3 samurai appears outside the wall, beyond the merlons, each with a red beam. They are
+  horde fighters (`bodySpawn` with a katana, aggro), and they charge.
+- **Limits.** One raid at a time: the horn won't sound again while any raider stands, nor for `raidCd` 40 s.
+
+It is the forge's first building that starts a fight on purpose: hold the wall. Next: alternate -- Lantern Festival Street pass 2
+(the dragon dance).
+
 ## m1241 -- Lantern Festival Street pass 1 (Building Forge loop, Set 3 #27)
 
 `FEST`, in BLDG.list as `fest`. A paved street at (72, 30) runs north-south (z 16 to 44, 6.4 m wide).
