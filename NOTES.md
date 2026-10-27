@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1163 -- SPIDER-BOT HANGAR pass 2: THE SPIDERS CLIMB THE WALLS
+
+His: *"spider robots climbing the walls."* Each spider is now a little state machine (`sphangStep`):
+- `loop` round the bunker for 3-16 s, then picks a RAID target (`sphangPick`): any tall box in BOXES within `raidR` 40 m of the hangar
+  (top 2.5-26 m, footprint .6-30 m a side; turned/dynamic boxes and turrets left alone) -- a building's wall, a tower, a deck, a crate
+  stack, the bunker -- so they climb whatever is spawned.
+- `go`: scuttles to the nearest point of its footprint; works out the face it reached and that face's outward normal.
+- `up`: climbs the face at `climbV` 1.6 m/s, belly to the wall (Euler YXZ: yaw into the wall, pitch -90 deg), legs still walking.
+- `top`: crosses the top to the far edge.
+- `down`: climbs down the far face head-first (yaw out, pitch +90); a box that floats (a deck) it climbs to its underside and DROPS
+  (gravity, a thud). Then `home` to its loop.
+Still killable anywhere on the route. Pass 3 (polish) next. Shipped unverified.
+
 ## m1162 -- SPIDER-BOT HANGAR pass 1 (BUILDINGS.md #13, at (-32, -24))
 
 `SPHANG`, `spiderMake`, `sphangBuild` / `sphangStep` / `sphangHit` / `sphangClear`. SPAWN > BUILDINGS > Spider-Bot Hangar.
