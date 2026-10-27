@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1166 -- SKY BRIDGES pass 1 (Set 2 #14)
+
+`SKYB`, `bridgeSpan(g, A, B, w, sag, tris, mats)` (reusable: a sagging plank bridge with walkable tris, rope rails and hangers, posts and
+lanterns at both ends), `skybBuild` / `skybClear`. SPAWN > BUILDINGS > Sky Bridges -- SPAWN THE BUILDINGS FIRST: each span is built only
+if both its ends are standing.
+- Watchtower lookout (12 m) -> over the Hall -> Gatehouse deck's west end (7.2 m), 21 m, passing over the perch bar.
+- Gatehouse deck's front -> down between the torii pillars -> the Market roof (stepping over its front rail), 16 m.
+- Rampart's east bastion (5.7) -> up to the Gatehouse's back ramp landing (7.2), 7.4 m.
+- The Gatehouse deck's front and west rails now have a 2.2 m GAP mid-side where the bridges arrive (solid rails would have stopped him).
+Pass 2 next: the zipline from the Airship Dock down to the Watchtower, a span to the Pagoda. Shipped unverified.
+
 ## m1165 -- SET 2 BRAINSTORMED (BUILDINGS.md)
 
 The first set is done (m1164), so per his rule (m1124) this pass brainstorms the next set into BUILDINGS.md: Sky Bridges (linking the
