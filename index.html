@@ -11186,7 +11186,7 @@ function limbPrep(d) {
 function limbRoot(d, nm) { const want = LIMB.sets[nm]; let b = null; d.model.traverse(o => { if (!b && o.isBone && o.name.replace(/^mixamorig[_:]?/, '') === want) b = o; }); return b; }
 // which limb the blow took: the standing limb nearest the blade, else by side and a coin
 function limbPick(d, dirH) {
-  const left = Object.keys(LIMB.sets).filter(nm => !(d.cut && d.cut[nm]));
+  const C = d.cut || {}, left = Object.keys(LIMB.sets).filter(nm => !C[nm] && (nm !== 'head' || (C.armL && C.armR)));     // the head is the FINISHER: armless first (measured: nearest the blade, it ended him in 3 cuts)
   if (!left.length) return '';
   const S = typeof bladeSeg === 'function' ? bladeSeg() : null;
   if (S) { let best = '', bd = 1e9; for (const nm of left) { const b = limbRoot(d, nm); if (!b) continue; const c = b.children[0] || b; c.getWorldPosition(_lmV); const q = S.at(_lmV), dd = q.distanceTo(_lmV); if (dd < bd) { bd = dd; best = nm; } }
@@ -11214,9 +11214,9 @@ function limbBake(d, nm, dirH, kick) {
   return m;
 }
 // a blow that landed on a dismemberable body: cut a limb (true when it did)
-function limbCut(d, dirH, power) {
+function limbCut(d, dirH, power, force) {
   if (!LIMB.on || !d.K.limbs || power < LIMB.power || d.boomed) return false;
-  const nm = limbPick(d, dirH); if (!nm) return false;
+  const nm = force || limbPick(d, dirH); if (!nm || (d.cut && d.cut[nm])) return false;
   const b = limbRoot(d, nm); if (!b) return false;
   limbBake(d, nm, dirH, 0);
   (d.cut = d.cut || {})[nm] = b; LIMB.stat.cuts++;
