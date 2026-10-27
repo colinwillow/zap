@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1142 -- SHRINE pass 3 (DONE)
+
+- A SHIMENAWA with four shide across the honden's front, and a bronze SUZU bell over its door on a red-and-white rope.
+- An ALIEN TREE on the terrace's back-left corner: a twisting dark trunk (solid) and a canopy of 26 glowing pink pods (one merged mesh).
+- Cyan WISPS rise from the Jin pool all the time; cables from the honden's back eaves to stakes; a drone orb over the terrace.
+`BLDG` shrine `pass: 3`. Next: the Rampart Wall (0, -24). Shipped unverified.
+
 ## m1141 -- SHRINE pass 2 + SMASHABLES (a shared system)
 
 - **`SMASH` / `smashAdd` / `smashHit` / `smashStep` / `smashDrop`:** breakable props for ANY building. The mesh lives in the building's
