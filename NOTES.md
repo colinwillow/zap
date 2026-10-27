@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1212 -- Pagoda pass 5: shinobi on the roofs (Building Forge loop, extra pass)
+
+Two archers (`archerPost`) now crouch on the Pagoda's tile skirts, on the 2nd and 4th roofs. They sit on the corners the grapple
+rings are not on, part-way down the slope, and loose arrows down at him. They are killable like every posted archer: shoot them,
+parry their arrows home, or climb the gutter ledges (m1173) and cut them down.
+
+The bodies are tracked in `PAGODA.on.arch` and removed in `pagodaClear` (bow dropped, body gone, out of `HORDE.list`), the same
+as the Keep's. Next: alternate -- Set 2 #22 Siege Yard pass 1.
+
 ## m1211 -- Senbon Torii pass 3: the polish (Building Forge loop)
 
 - **Maples.** Four red maples (merged trunks, merged leaf clumps, solid trunks) flank the walk, with red leaves drifting down.
