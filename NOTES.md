@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## THE SHIP, PASS 9: FLAGS THAT FLOW (m@X4@, WORKER A)
+## THE SHIP, PASS 9: FLAGS THAT FLOW (m1399, WORKER A)
 
 His: *"are they actually flowing in the wind, are they rigged like actual flags?"* They were not. Each was a flat plane swinging whole,
 and the masthead "pennants" were the banner texture turned on its side, which read as stiff boards.
