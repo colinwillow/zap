@@ -9529,7 +9529,7 @@ function beastKind(key, A) {
     reach: C.reach, hitR: C.reach, hold: C.reach * .8, push: FOE.push * 1.6, pushUp: FOE.pushUp * 1.2, drop: /^CINEMA_4D_Main$/, keepEmit: 1, opaque: 1,
     voice: '', clips: C.clips, stunHits: 99, notice: 60, lose: 90, bar: { w: 1.6, h: .14, up: 1.08, fade: 4 } });
 }
-const BEASTTRIM = { k: .04, floor: 1e-4 };
+const BEASTTRIM = { k: .04, floor: 1e-4, tail: .07 };
 function beastPrep(K) {     // trim the padding off every clip, de-drift the loops, measure his facing off his own bones
   const P = K.P, loops = bodyLoops(K), out = [];
   for (const c of P.clips) {
@@ -9541,7 +9541,10 @@ function beastPrep(K) {     // trim the padding off every clip, de-drift the loo
     for (const tr of c.tracks) { if (/scale$/.test(tr.name)) continue; const T = tr.times, V = tr.values, sz = tr.getValueSize();
       for (let i = 1; i < T.length; i++) { let df = 0; for (let k = 0; k < sz; k++) df = Math.max(df, Math.abs(V[i * sz + k] - V[(i - 1) * sz + k])); const key = Math.round(T[i] * 60); prof[key] = Math.max(prof[key] || 0, df); } }
     const busy = prof.filter(v => v > 0).sort((a, b) => a - b), p90 = busy.length ? busy[Math.floor(busy.length * .9)] : 0, thr = Math.max(BEASTTRIM.floor, p90 * BEASTTRIM.k);
-    for (let i = prof.length - 1; i >= 0; i--) if ((prof[i] || 0) > thr) { end = i / 60; break; }
+    // and the padding's LAST key snaps a few bones (measured on the dragon's run: .03-.045 at 5.03 s, nothing in the 4 s before it) -- a blip in the
+    // final `tail` s is not motion. A clip that really moves to its end still ends within `tail` + a frame of it, and is not cut.
+    const tailK = Math.round((c.duration - BEASTTRIM.tail) * 60);
+    for (let i = prof.length - 1; i >= 0; i--) if (i < tailK && (prof[i] || 0) > thr) { end = i / 60; break; }
     end = Math.max(.2, end + 1 / 30);
     if (end < c.duration - .05) { for (const tr of c.tracks) tr.trim(0, end); c.duration = end; }
     if (loops.has(c.name)) for (const tr of c.tracks) { if (!/^Bip001(_Pelvis)?\.position$/.test(tr.name)) continue;
