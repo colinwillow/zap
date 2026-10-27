@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1186 -- ROBOT BARRACKS pass 2: the drill breaks ranks
+
+- While he is in the YARD (or for `BARR.fightT` 10 s after one of them is struck) the robots BREAK RANKS and come for him at `rbV` 1.7 m/s,
+  stopping 1.1 m off, facing him -- still on the drill's count, so the CUT lands on the beat: inside `rbReach` 1.7 m in front of one, it
+  hurts (`rbDmg` 10). Read the rhythm, slip in after the cut. When he leaves the yard they march back to their places and face the hall.
+- Inside the hall: two rows of BUNKS with blue bedrolls (solid), a lamp.
+Next: alternate -- Bathhouse pass 4. Shipped unverified.
+
 ## m1185 -- FLYING SHIP pass 4: broadside cannons
 
 - A bronze CANNON on each beam amidships (on a timber carriage, solid). When he is off its side within `FSHIP.canR` 28 m it trains on
