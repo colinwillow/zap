@@ -2079,6 +2079,7 @@ const STRIKE = {
   // is the A/B back.
   dashFrom: .55,
   to: 1.0,           // and runs to the end of the strike
+  rehit: .22,        // m1095: s after a connect before the same strike may connect again (a two-cut clip lands both)
   swing: 2.4,        // m/s IN HIS OWN FRAME. Under this a limb is being carried, not swung.
 
   // **A TACKLE AND A FLYING KICK ARE NOT SWINGS, AND `swing` IS WHY THEY BARELY CONNECTED
@@ -9528,12 +9529,19 @@ function beastKind(key, A) {
     reach: C.reach, hitR: C.reach, hold: C.reach * .8, push: FOE.push * 1.6, pushUp: FOE.pushUp * 1.2, drop: /^CINEMA_4D_Main$/, keepEmit: 1, opaque: 1,
     voice: '', clips: C.clips, stunHits: 99, notice: 60, lose: 90, bar: { w: 1.6, h: .14, up: 1.08, fade: 4 } });
 }
+const BEASTTRIM = { k: .04, floor: 1e-4 };
 function beastPrep(K) {     // trim the padding off every clip, de-drift the loops, measure his facing off his own bones
   const P = K.P, loops = bodyLoops(K), out = [];
   for (const c of P.clips) {
-    let end = 0;
-    for (const tr of c.tracks) { const T = tr.times, V = tr.values, sz = tr.getValueSize();
-      for (let i = T.length - 1; i > 0; i--) { let df = 0; for (let k = 0; k < sz; k++) df = Math.max(df, Math.abs(V[i * sz + k] - V[(i - 1) * sz + k])); if (df > 1e-4) { end = Math.max(end, T[i]); break; } } }
+    // m1095: *"A bunch of extra frames on every animation... when it runs it just floats, because the animation finishes and it has all these
+    // extra frames."* MEASURED: every blue dragon clip is padded to 5.03 s (the dog's to 4.40) and the padding DRIFTS a hair, so "any change
+    // over 1e-4" found the motion running to the end and trimmed nothing -- the run moves for .83 s of 5.03. The end is now the last frame
+    // whose pose change is past `BEASTTRIM.k` of the clip's own busy frames (its 90th percentile), never under `floor`.
+    const prof = []; let end = 0;
+    for (const tr of c.tracks) { if (/scale$/.test(tr.name)) continue; const T = tr.times, V = tr.values, sz = tr.getValueSize();
+      for (let i = 1; i < T.length; i++) { let df = 0; for (let k = 0; k < sz; k++) df = Math.max(df, Math.abs(V[i * sz + k] - V[(i - 1) * sz + k])); const key = Math.round(T[i] * 60); prof[key] = Math.max(prof[key] || 0, df); } }
+    const busy = prof.filter(v => v > 0).sort((a, b) => a - b), p90 = busy.length ? busy[Math.floor(busy.length * .9)] : 0, thr = Math.max(BEASTTRIM.floor, p90 * BEASTTRIM.k);
+    for (let i = prof.length - 1; i >= 0; i--) if ((prof[i] || 0) > thr) { end = i / 60; break; }
     end = Math.max(.2, end + 1 / 30);
     if (end < c.duration - .05) { for (const tr of c.tracks) tr.trim(0, end); c.duration = end; }
     if (loops.has(c.name)) for (const tr of c.tracks) { if (!/^Bip001(_Pelvis)?\.position$/.test(tr.name)) continue;
@@ -21437,14 +21445,16 @@ function stepPlayer(dt) {
       // there is no single contact frame on a six-metre slide, the contact IS the travel -- and
       // it stays live rather than closing on the first man, which is what lets him take a line
       // of them one at a time as he reaches each.
-      const open = body ? u >= STRIKE.bodyFrom : !p.melFired && u >= at * from;
+      // m1095: *"A lot of the katana attacks are two strikes, but only one connects."* The window closed on the FIRST connect (`melFired`), so a
+      // two- or three-cut clip landed its first cut only. It re-opens `rehit` s after the last connect (a man's own `cool` still guards him).
+      const open = body ? u >= STRIKE.bodyFrom : (!p.melFired || p.meleeT - (p.melHitT || 0) > STRIKE.rehit) && u >= at * from;
       const hitB = strikeSweep(dt, pw, open && u <= STRIKE.to, dm, body);
       if (hitB) {
         // WHEN, as a fraction of the clip. "It connects at the wrong part of the animation" is a
         // measurement, and this is the only place that can take it -- `MELEE.at` says where the
         // window OPENS and the sweep says where the limb actually arrived.
         if (!p.melFired) p.melU = u;
-        p.melFired = 1;
+        p.melFired = 1; p.melHitT = p.meleeT;
         // a hammer rings and a fist thuds -- the weapon decides, not the strike
         // **A BLOW ON A BODY RINGS (m55).** *"The sound effect for when he melees and hits
         // the warriors is like a box break, and I want it to be more like the clang noise."*
