@@ -22211,7 +22211,7 @@ function opagBuild() {
       if (door) { const r0 = rc + t / 2 + .03, dh = y0 + rh * Math.ceil(A.doorH / rh - .5); let dw = 0; for (let c = 0; c < cols; c++) { const u = Math.abs(-Lh + w * (c + .5)); if (u < A.doorW) dw = Math.max(dw, u + w / 2); }
         for (const s of [-1, 1]) { const [x, z] = at(s * (dw + .1), r0); blk(x, y0, dh, z, .22, .18, yaw, red, 0, 0); }
         { const [x, z] = at(0, r0); blk(x, dh, dh + .22, z, 2 * dw + .5, .2, yaw, red, 0, 0); blk(x, dh + .22, dh + .34, z, 1.8, .14, yaw, gold, 0, 0); }
-        { const [x, z] = at(0, rc); gateAt.push({ x, z, yaw, w: 2 * dw, h: dh - y0, y: y0, hp: 3 }); } } }     // m1326: its gate
+        { const [x, z] = at(0, rc); gateAt.push({ x, z, yaw, w: 2 * dw, h: dh - y0, y: y0, hp: 3 }); } } }     // m1327: its gate
     // THE FLOOR of this storey (the ceiling of the one below). m1324 (S1): ROW STRIPS (.25 m, axis-aligned, merged where a run repeats) so a
     // hole can be cut anywhere -- the sector slabs overlapped each other's corners and could only take a hatch near the middle of a face
     if (k > 0) { const hi = hatch[k - 1], [hx, hz] = fN(hi), rh = a - t - 1, hw = .7, holes = [[hx * rh - hw, hx * rh + hw, hz * rh - hw, hz * rh + hw]];
@@ -22363,7 +22363,7 @@ function opagBuild() {
   { mg(new THREE.TubeGeometry(new THREE.LineCurve3(new THREE.Vector3(...zip.A), new THREE.Vector3(...zip.B)), 12, .04, 5), gold);
     blk(zip.B[0], 0, zip.B[1] + .3, zip.B[2], .3, .3, 0, red, 1, 0); blk(cx + zd[0] * (zr - .35), zy, zy + 2.5, cz + zd[1] * (zr - .35), .3, .3, 0, red, 0, 0); }
   const rings = [gringAdd(g, cx - 1.4, A.apex + 5.4, cz)];
-  // m1326: THE GATES (his DOORS, GATES -- AND CHAOS rule): two red leaves in every door and across the fence gate (`bgateMake`, laid out in a
+  // m1327: THE GATES (his DOORS, GATES -- AND CHAOS rule): two red leaves in every door and across the fence gate (`bgateMake`, laid out in a
   // group turned onto the face, since every door here is on a diagonal; its collider swapped for a TURNED box). They swing open for him or an
   // alarmed guard coming near, shut behind, break under 3 blows (the fence gate 4) and are rehung 45 s later
   const gates = gateAt.map(Q => { const gg = new THREE.Group(); gg.position.set(Q.x, Q.y, Q.z); gg.rotation.y = Q.yaw; g.add(gg);
@@ -22406,7 +22406,7 @@ function opagBuild() {
 function opagStep(dt) { const G = OPAG.on; if (!G) return; G.t += dt; const A = OPAG, p = player;
   if (G.core) G.core.position.y = G.core.userData.y + Math.sin(G.t * 1.7) * .08;
   for (const L of G.lions) opagLion(G, L, dt);
-  for (const Q of G.gates) bgateStep(Q, dt, G.arch.concat(G.guards));     // m1326: the gates
+  for (const Q of G.gates) bgateStep(Q, dt, G.arch.concat(G.guards));     // m1327: the gates
   { const c = G.halos.geometry.attributes.color, S = G.show; for (let i = 0; i < c.count; i++) { let f = .82 + .18 * Math.sin(G.t * (7 + i % 5) + i * 1.7) * Math.sin(G.t * 3.1 + i);
       if (S >= 0) { const at = i < 56 ? Math.floor(i / 8) * .5 : 0; if (S > at) f *= 1.4 + 2.2 * Math.exp(-(S - at) * 2.5); }     // m1295: in the set piece the lanterns run UP the tower, storey by storey
       c.setXYZ(i, f, f * .92, f * .8); } c.needsUpdate = true;     // m1290: the lanterns flicker
@@ -25094,7 +25094,7 @@ PADS.L = bindStick(padL, stick.L,
   // `trav < tapMove` and `held < tapT`, which no steering hold ever is. Weapons moved to the
   // left wheel (`kitPick`).
   // tap: jump -- flying, a double tap is her BOOST (m266); on her skates on the ground, her SWIVEL (m268)
-  () => {     // m1326: the left tap is the jump again in 3D AIM too (m1282's left-tap trigger is gone)
+  () => {     // m1327: the left tap is the jump again in 3D AIM too (m1282's left-tap trigger is gone)
     if (wingTapL()) return; if (fakieSwivel()) return; if (player.wall && player.wallLow && player.wallSt === 'hold') { wallDrop(0); return; } if (coverTap()) return; player.jump = 1; },     // m1009: in cover, a left tap stands him up out of it; m1012: near a half block, takes it
   // flick: a BODY FLIP on the board, otherwise the dodge roll in the flicked direction. The
   // board takes it first and says so, because a dodge roll on a moving deck is nothing.
@@ -25576,7 +25576,7 @@ function aim3Gun(dt) {
   GUNU.k.value = damp(GUNU.k.value, p.chg * WEAP.glow, .06, dt);
 }
 const aim3Now = () => AIM3.on && slotNow().aim && !player.riding && !player.wing && !player.swap;
-// m1326: *"Go back to the auto shoot upon release; leave the left tap to jumping. The aimer should never move to the side of the screen -- it
+// m1327: *"Go back to the auto shoot upon release; leave the left tap to jumping. The aimer should never move to the side of the screen -- it
 // always stays centred. It doesn't need to work any different than the regular game: left on the right stick turns the camera left, right turns
 // it right. The only difference is your view can slightly gimbal up or down. When you let go it eases your view back to parallel to the ground."*
 // So 3D AIM no longer has its own trigger: the 2D one runs (hold up = aim, release = fire, sideways turns the lens). While aiming, the thumb's
@@ -25656,7 +25656,7 @@ function stepKit(dt) {
   if (p.gTemp && !p.wing && !p.aim) { const n = p.gTemp - 1; p.gTemp = 0; if (p.slot !== n) applySlot(n); }
   if (p.wing && BLADE.gun.fly.on && bladeOn()) { bladeGunFly(dt); return; }
   p.gHold = 0; p.gDir = null;
-  if (aim3Now()) aim3Pitch(dt);     // m1326: the 3D aim is the 2D aim plus a pitch (was m1259's own trigger, `aim3Gun`)
+  if (aim3Now()) aim3Pitch(dt);     // m1327: the 3D aim is the 2D aim plus a pitch (was m1259's own trigger, `aim3Gun`)
 
   // ---- DOWN ON THE RIGHT PAD IS A GUARD (m37). *"I want to make it so that down on the right
   //      stick is block. I know I don't have a block animation yet, but I'll put one in."*
@@ -60129,7 +60129,7 @@ function stepCam(dt) {
   // fix for something broken -- but 17 degrees of permanent lean is half the parry window.
   const dz = (p.block || padUp(p.aim || p.charge || p.center)) ? CAM.deadAim : CAM.dead;
   const ax = Math.abs(rx);
-  const flyAim = p.wing && (p.aim || (p.gHold || 0) > 0);     /* m1326: 3D AIM turns the lens sideways exactly like 2D */      // flying, her right thumb is the 3D aimer (m271); m1259: and on foot in 3D AIM
+  const flyAim = p.wing && (p.aim || (p.gHold || 0) > 0);     /* m1327: 3D AIM turns the lens sideways exactly like 2D */      // flying, her right thumb is the 3D aimer (m271); m1259: and on foot in 3D AIM
   // m1030: *"when you pull down on the right stick into guard you can turn him by nudging left or right -- I want it inverted."* In the guard
   // the nudge turns the other way (`CAM.guardInv`, 1 = inverted); the ordinary drag is untouched.
   const gInv = p.block && CAM.guardInv ? -1 : 1;

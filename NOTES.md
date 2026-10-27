@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## 3D AIM IS THE 2D AIM PLUS A PITCH (m1326)
+## 3D AIM IS THE 2D AIM PLUS A PITCH (m1327)
 
 *"Go back to the auto shoot upon release; leave the left stick to jumping. The aimer should never move to the side of the screen -- it always stays centred. It doesn't need to work any different than the regular game: pushing left on the right stick already turns the camera left. The only difference is your view can slightly gimbal up or down... when you let go it eases your camera view back to parallel to the ground. It might just become the default."*
 
