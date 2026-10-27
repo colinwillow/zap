@@ -24048,8 +24048,10 @@ function shipBuild() {
   // axis picks the plane; `userData.uvS` metres per tile), so one texture density runs across every merged box, strip and loft
   const TX = (f, rep) => { const t = new THREE.TextureLoader().load(A('images/' + f)); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; };
   const MT = (c, r, f, uvS, x) => { const m = M(c, r, Object.assign({ map: TX(f) }, x || {})); m.userData.uvS = uvS; return m; };
-  const wood = MT(0xb08870, .8, 'ship_hull.jpg', 3.2), deckM = MT(0xffffff, .85, 'ship_deck.jpg', 2.6), red = MT(0xffffff, .55, 'ship_lacquer.jpg', 2.2, { side: THREE.DoubleSide }), gold = MT(0xffe0a0, .32, 'ship_brass.jpg', 1.2, { metalness: .85 }), dark = MT(0x6a5444, .85, 'ship_hull.jpg', 2.2), bronze = MT(0xd8a070, .35, 'ship_brass.jpg', 1, { metalness: .8 }),
-    lamp = M(0xff7a3a, .4, { emissive: 0xff5a1a, emissiveIntensity: 1.6 }), eye = new THREE.MeshBasicMaterial({ color: 0x5affe0, toneMapped: false }), roofM = MT(0xffffff, .6, 'ship_roof.jpg', 2), rope = M(0xc9b07a, 1);
+  // m@X4@ (pass 6): THE SHARED LIBRARY's painted maps (`triMat`, triplanar in world space: the hull's boards run fore and aft on its sides, the deck's
+  // timber fore and aft on top) -- the ship keeps only its own lacquer and its crested sail canvas
+  const wood = triMat('wood_planks', { scale: 3, color: 0xd8c0b0 }), deckM = triMat('wood_timber', { scale: 2.6 }), red = MT(0xffffff, .55, 'ship_lacquer.jpg', 2.2, { side: THREE.DoubleSide }), gold = triMat('bronze', { scale: 1.4, metal: .75, rough: .32, color: 0xffe6b0 }), dark = triMat('wood_planks', { scale: 2.2, color: 0x7a6658 }), bronze = triMat('bronze', { scale: 1.1, metal: .7, rough: .35 }),
+    lamp = M(0xff7a3a, .4, { emissive: 0xff5a1a, emissiveIntensity: 1.6 }), eye = new THREE.MeshBasicMaterial({ color: 0x5affe0, toneMapped: false }), roofM = triMat('roof_tiles', { scale: 2.2, rough: .55 }), rope = M(0xc9b07a, 1);
   const sailM = M(0xffffff, .85, { map: TX('ship_sail.jpg'), side: THREE.DoubleSide }), sails = [];     // the sails keep their own 0..1 UVs (the crest is centred on each)
   const wUV = (q, S) => { const P = q.attributes.position, Nn = q.attributes.normal, uv = new Float32Array(P.count * 2); for (let i = 0; i < P.count; i++) { const ax = Math.abs(Nn.getX(i)), ay = Math.abs(Nn.getY(i)), az = Math.abs(Nn.getZ(i)), x = P.getX(i), y = P.getY(i), z = P.getZ(i);
       if (ay >= ax && ay >= az) { uv[i * 2] = z / S; uv[i * 2 + 1] = x / S; } else if (ax >= az) { uv[i * 2] = z / S; uv[i * 2 + 1] = y / S; } else { uv[i * 2] = x / S; uv[i * 2 + 1] = y / S; } } q.setAttribute('uv', new THREE.BufferAttribute(uv, 2)); };
@@ -24063,7 +24065,7 @@ function shipBuild() {
       for (let j = 0; j <= NS; j++) { const th = Math.PI * j / NS; pos.push(-w * Math.cos(th), gy - (gy - ky) * Math.pow(Math.sin(th), .65), z); } }
     for (let i = 0; i < NU; i++) for (let j = 0; j < NS; j++) { const a = i * (NS + 1) + j, b = a + NS + 1; idx.push(a, b, a + 1, a + 1, b, b + 1); }
     const hg = new THREE.BufferGeometry(); hg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); hg.setIndex(idx); hg.computeVertexNormals(); wUV(hg, 3.2);
-    const hull = new THREE.Mesh(hg, MT(0xc49a80, .75, 'ship_hull.jpg', 3.2, { side: THREE.DoubleSide })); hull.castShadow = hull.receiveShadow = true; g.add(hull);
+    const hull = new THREE.Mesh(hg, triMat('wood_planks', { scale: 3.2, color: 0xc8aa98, side: THREE.DoubleSide })); hull.castShadow = hull.receiveShadow = true; g.add(hull);
     // the red band and the gold line just under the gunwale, both sides
     for (const sx of [-1, 1]) for (let i = 0; i < NU; i++) { const u0 = -1 + 2 * i / NU, u1 = u0 + 2 / NU, z0 = u0 * L / 2, z1 = u1 * L / 2, w0 = halfW(u0 * .985), w1 = halfW(u1 * .985); if (w0 < .4 || w1 < .4) continue;
       const y0 = gun(u0), y1 = gun(u1), seg = (dy, h, m, off) => { const geo = new THREE.BufferGeometry(); const P = [sx * (w0 + off), y0 - dy, z0, sx * (w1 + off), y1 - dy, z1, sx * (w1 + off), y1 - dy - h, z1, sx * (w0 + off), y0 - dy - h, z0];
@@ -24188,6 +24190,41 @@ function shipBuild() {
     const banM = new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 });
     for (const u of [-.3, -.12, .12, .3, .5]) { const z = u * L / 2, w = halfW(u * .985), y = Math.max(dY + 1.1, gun(u)); for (const sx of [-1, 1]) { const pv = new THREE.Group(); pv.position.set(sx * (w + .08), y + .1, z); pv.rotation.y = sx * Math.PI / 2; g.add(pv);
         const f = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 3.2, 1, 6).translate(0, -1.6, 0), banM); f.castShadow = true; pv.add(f); flags.push({ pv, f, ph: flags.length * 1.1 }); } } }
+  // m@X4@ (pass 6): THE DETAIL PASS. A brass-and-timber HELM on the quarterdeck's forward rail; a CAPSTAN abaft the mainmast; a BELL in a
+  // frame on the forecastle; a BALUSTRADE along both gunwales (a rail cap on posts, brass caps); GUN PORTS with red lids along both sides; STRINGS
+  // OF PAPER LANTERNS sagging between the masts and down to the castle; long PENNANTS streaming off the mastheads; SHEETS from the booms to the
+  // rails; coiled ropes and brass-bound SEA CHESTS about the deck; whiskers and a brighter eye on the dragon
+  { const qz = cz1 - 1.2;     // the helm
+    bx(.3, 1.3, .3, 0, cy + .65, qz, dark); put(new THREE.TorusGeometry(.75, .07, 6, 20).translate(0, cy + 1.45, qz + .2), dark); put(new THREE.CylinderGeometry(.14, .14, .3, 10).rotateX(Math.PI / 2).translate(0, cy + 1.45, qz + .2), gold);
+    for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4; put(new THREE.CylinderGeometry(.03, .03, 1.9, 5).rotateZ(a).translate(0, cy + 1.45, qz + .2), k % 2 ? dark : gold); }
+    // the capstan
+    put(new THREE.CylinderGeometry(.55, .7, 1, 12).translate(0, dY + .5, -4.6), dark); put(new THREE.CylinderGeometry(.62, .62, .12, 12).translate(0, dY + 1.02, -4.6), gold); O.boxes.push({ minx: -.7, maxx: .7, miny: dY, maxy: dY + 1.1, minz: -5.3, maxz: -3.9 });
+    for (let k = 0; k < 4; k++) put(new THREE.BoxGeometry(2.6, .1, .12).rotateY(k * Math.PI / 4).translate(0, dY + 1.1, -4.6), wood);
+    // the bell on the forecastle
+    { const bz = fz1 - 2; for (const sx of [-1, 1]) bx(.2, 2.4, .2, sx * .9, fy + 1.2, bz, red); bx(2.1, .25, .3, 0, fy + 2.45, bz, red); put(new THREE.CylinderGeometry(.3, .45, .7, 12).translate(0, fy + 1.9, bz), bronze); put(new THREE.SphereGeometry(.3, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2).translate(0, fy + 2.24, bz), bronze); }
+    // the balustrade along both gunwales: a lacquered rail cap on posts every 1.4 m, brass caps
+    for (let z = z0 + .7; z < z1 - .6; z += 1.4) { const u = z / (L / 2), w = halfW(u * .985), y = Math.max(dY + 1.1, gun(u)); if (z > cz0 && z < cz1) continue; for (const sx of [-1, 1]) { bx(.16, .9, .16, sx * (w - .12), y + .45, z, dark); bx(.22, .1, .22, sx * (w - .12), y + .95, z, gold); } }
+    for (let z = z0 + .7; z < z1 - 2; z += 1.4) { const za = z, zb = z + 1.4, ua = za / (L / 2), ub = zb / (L / 2); if (za > cz0 - 1 && za < cz1) continue; for (const sx of [-1, 1]) { const A2 = new THREE.Vector3(sx * (halfW(ua * .985) - .12), Math.max(dY + 1.1, gun(ua)) + .92, za), B2 = new THREE.Vector3(sx * (halfW(ub * .985) - .12), Math.max(dY + 1.1, gun(ub)) + .92, zb), d = B2.clone().sub(A2);
+      put(new THREE.BoxGeometry(.14, .1, d.length()).applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), d.clone().normalize())).translate((A2.x + B2.x) / 2, (A2.y + B2.y) / 2, (A2.z + B2.z) / 2), red); } }
+    // gun ports with their lids raised, along both sides at the gun deck's height
+    const portM = M(0x0c0806, .9);
+    for (let z = -12; z <= 14; z += 3.4) { const u = z / (L / 2), w = halfW(u * .985) + .06; for (const sx of [-1, 1]) { bx(.1, .8, .9, sx * w, 2.3, z, portM); bx(.08, .1, 1.05, sx * (w + .03), 2.74, z, gold);
+      put(new THREE.BoxGeometry(.08, .8, .95).translate(0, .4, 0).rotateZ(sx * -.9).translate(sx * (w + .05), 2.72, z), red); } }
+    // pennants off the mastheads
+    for (const [mz, base, H] of masts) { const pv = new THREE.Group(); pv.position.set(0, base + H + 1.4, mz); g.add(pv); const f = new THREE.Mesh(new THREE.PlaneGeometry(4.4, .7, 8, 1).translate(-2.2, 0, 0), new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 })); f.rotation.y = Math.PI / 2; pv.add(f); flags.push({ pv, f, ph: mz, pen: 1 }); }
+    // sheets: from each boom's ends down to the rails
+    for (const [mz, base, , sw] of masts) { const by = base + 4 - .15, bz2 = mz + .55 + 1.25; for (const sx of [-1, 1]) { const u = (bz2 - 3) / (L / 2), w = halfW(u * .985), a = new THREE.Vector3(sx * (sw / 2 + .3), by, bz2), b = new THREE.Vector3(sx * (w - .2), Math.max(dY + 1.1, gun(u)) + .9, bz2 - 3), d = b.clone().sub(a);
+      put(new THREE.CylinderGeometry(.025, .025, d.length(), 4).applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.clone().normalize())).translate((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2), rope); } }
+    // coils of rope and sea chests
+    for (const [x, z] of [[2.8, -1.4], [-3, 3.4], [3.2, 12.6], [-2.4, -7.6]]) { put(new THREE.TorusGeometry(.4, .12, 6, 14).rotateX(Math.PI / 2).translate(x, dY + .12, z), rope); put(new THREE.TorusGeometry(.26, .1, 6, 12).rotateX(Math.PI / 2).translate(x, dY + .3, z), rope); }
+    for (const [x, z, yaw] of [[-3.4, -3, .2], [3.6, 9, -.3], [-3.2, 12.8, .1]]) { const ch = new THREE.BoxGeometry(1.2, .7, .75).rotateY(yaw).translate(x, dY + .35, z); put(ch, wood); put(new THREE.BoxGeometry(1.24, .08, .79).rotateY(yaw).translate(x, dY + .72, z), gold); for (const o of [-.4, .4]) put(new THREE.BoxGeometry(.08, .74, .8).rotateY(yaw).translate(x + Math.cos(yaw) * o, dY + .36, z - Math.sin(yaw) * o), gold); O.boxes.push({ minx: x - .65, maxx: x + .65, miny: dY, maxy: dY + .75, minz: z - .5, maxz: z + .5 }); }
+    // the dragon's whiskers and a fierce eye glow
+    { const pz = L / 2 * .98, py = gun(1) - .2; for (const sx of [-1, 1]) for (let k = 0; k < 6; k++) { const t2 = k / 5; put(new THREE.CylinderGeometry(.035, .02, .7, 4).rotateZ(sx * (1.1 + t2 * .5)).translate(sx * (.7 + t2 * .9), py + 2.3 - t2 * .7, pz + 5.6 - t2 * 1.3), gold); }
+      for (const sx of [-1, 1]) put(new THREE.SphereGeometry(.32, 8, 6).translate(sx * .66, py + 2.95, pz + 5.15), eye); } }
+  // strings of paper lanterns sagging between the masts and down to the castle (`bldCable`)
+  { const lm = M(0xffb070, .5, { emissive: 0xff7a2a, emissiveIntensity: 1.8 }), [m0, m1, m2] = masts, hy = (m, f) => m[1] + m[2] * f;
+    bldCable(g, [0, hy(m0, .55), m0[0]], [0, hy(m1, .55), m1[0]], 1.4, 6, lm); bldCable(g, [0, hy(m2, .6), m2[0]], [0, hy(m0, .45), m0[0]], 1.2, 5, lm);
+    for (const sx of [-1, 1]) bldCable(g, [0, hy(m0, .35), m0[0]], [sx * (halfW(.25) - .3), Math.max(dY + 1.1, gun(.25)) + 1, L / 2 * .25], 1, 4, lm); }
   // a banner off the stern (m1378: a real one, on a pole, stirring with the rest)
   { put(new THREE.CylinderGeometry(.08, .08, 7, 6).translate(0, cy + 3.5, cz0 + .6), dark); put(new THREE.CylinderGeometry(.04, .04, 2.6, 4).rotateZ(Math.PI / 2).translate(1.3, cy + 6.8, cz0 + .6), dark);
     const pv = new THREE.Group(); pv.position.set(0, cy + 6.8, cz0 + .6); g.add(pv); const f = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 5, 1, 8).translate(1.3, -2.5, 0), new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 })); f.castShadow = true; pv.add(f); flags.push({ pv, f, ph: 9 }); }
@@ -24219,7 +24256,7 @@ function shipStep(dt) { const Z = SHIPZ; if (Z.U) Z.U.uTime.value += dt; const p
       if (vb < -.18 && S.sprayT <= 0) { S.sprayT = 1.6 + Math.random(); const bz = Z.L / 2 * .97; spkBurst(0, .6, bz + 1, 34, { col: [.9, .97, 1], spread: 4.5, up: 3.2, size: .2, life: 1 }); for (const sx of [-1, 1]) spkBurst(sx * 2.4, .4, bz - 3, 16, { col: [.85, .95, 1], spread: 3, up: 2.2, size: .16, life: .8 });
         if (Math.hypot(p.pos.x, p.pos.z - bz) < 16) snd('swoosh', { g: .35, r: .5 + Math.random() * .2, x: 0, z: bz }); } shipGulls(S, dt);
       if (S.coreM) { const k = 2.2 + Math.sin(t * 2.3) * .5 + Math.sin(t * 7.1) * .15; S.coreM.emissiveIntensity = k; if (Z.engHalo) Z.engHalo.material.size = 4.2 * (.85 + .15 * Math.sin(t * 2.3)); }     // m1378: the cores breathe
-      for (const F of S.flags || []) { F.pv.rotation.z = Math.sin(t * 1.3 + F.ph) * .12; F.f.rotation.x = Math.sin(t * 2.1 + F.ph) * .1 + .05; } } }
+      for (const F of S.flags || []) { if (F.pen) { F.pv.rotation.y = Math.sin(t * .9 + F.ph) * .25; F.f.rotation.z = Math.sin(t * 3.3 + F.ph) * .15; continue; } F.pv.rotation.z = Math.sin(t * 1.3 + F.ph) * .12; F.f.rotation.x = Math.sin(t * 2.1 + F.ph) * .1 + .05; } } }
   if (p.pos.y < Z.sea - 2.5) { spkBurst(p.pos.x, Z.sea + .2, p.pos.z, 30, { col: [.8, .95, 1], spread: 5, up: 1.5, size: .16, life: .7 }); snd('thud', { g: .6, r: .6 }); shipHome(); }     /* in the sea: back aboard (no swimming here yet) */
   if (Z.dome) Z.dome.position.copy(camera.position); }
 const COURT = { scale: 1.5, at: [0, 150], hw: 28, hd: 32, wallH: 4, walk: 2.6, gate: 6, on: null };

@@ -5,6 +5,38 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE SHIP, PASS 6: THE SHARED PAINTED MAPS, AND A DETAIL PASS (m@X4@, WORKER A)
+
+His: *"it looks freaking awesome... do another detail pass. Should we share the maps? The main session is generating genuinely painted
+textures, so it'll probably look even better -- your call."*
+
+**My call: share them.** The library's maps (m1382, `textures/`, `triMat`) are hand-painted, and they beat pass 4's procedural ones (the
+bronze, the slate tiles and the timber most of all). They also keep the ship in the same visual language as every other building.
+- `triMat` projects triplanar in WORLD space, so it needs no UVs on the merged geometry, and it lays the boards the right way by itself:
+  - **the hull** and the castle walls: `wood_planks` (on a side face the boards run along the hull, fore and aft);
+  - **the deck**: `wood_timber` (on top its boards run fore and aft);
+  - **the beams and battens**: `wood_planks`, darkened;
+  - **brass trim, guns, rings and the bell**: `bronze`;
+  - **the pagoda roofs**: `roof_tiles`.
+- The ship keeps only two of its own: the red lacquer (the band and the rails) and the sail canvas with its key crest (his reference's motif,
+  centred on each sail). Pass 4's four other files are DELETED, so nothing is shipped that the page does not use.
+
+**The detail pass:**
+- **A HELM** on the quarterdeck's forward rail: a timber wheel with eight spokes (brass and timber by turns) and a brass hub, on a post.
+- **A CAPSTAN** abaft the mainmast: a drum, a brass cap and four bars, with a collider.
+- **A BELL** in a red frame on the forecastle.
+- **A BALUSTRADE** along both gunwales: posts every 1.4 m with brass caps, and a lacquered rail cap following the sheer.
+- **GUN PORTS** along both sides: dark ports with brass sills and red lids propped open.
+- **STRINGS OF PAPER LANTERNS** sagging between the masts and down to the rails (`bldCable`, glowing).
+- **PENNANTS**: 4.4 m streamers off every masthead, streaming and snapping in the wind.
+- **SHEETS** from every boom's ends down to the rails.
+- **Coils of rope** and **brass-bound SEA CHESTS** about the deck (the chests have colliders).
+- **The dragon**: six brass whiskers a side and a bigger, fiercer eye glow.
+
+**Checked headless**: boots, builds, no errors; renders from the side, the main deck, the quarterdeck and the bow.
+
+SHIPPED UNVERIFIED.
+
 ## Grumbo's home, procedural, pass 3: the tent, the wheels, the stacks, the crane (WORKER B)
 
 The top of the four views:

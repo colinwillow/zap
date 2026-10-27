@@ -76,6 +76,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - [x] **pass 3 (m1375, WORKER A):** the water's foam round the hull and a wake; spray off the bow; the sun on the water; gulls; the island on the horizon
   - [x] **pass 4 (m1377, WORKER A):** his looks notes -- the stair-stepped shadow bands and the z-fighting fixed; REAL SURFACES (authored tileable textures: deck planks, hull timber, brass, red lacquer, slate roof tiles, the sail's canvas and key crest)
   - [x] **pass 5 (m1378, WORKER A):** the ALIEN-SAMURAI AIRSHIP look (his reference sheet): anti-grav turbines with blue cores along the hull and astern, a horned dragon figurehead, the stern castle as a tiered pagoda, banners and hanging lanterns, rigging, brass fittings
+  - [x] **pass 6 (m@X4@, WORKER A):** onto the SHARED painted texture library (`triMat`); a detail pass -- helm, capstan, bell, balustrade, gun ports, lantern strings, pennants, sheets, sea chests, rope coils, the dragon's whiskers
   - [ ] later: swimming here; the AIRSHIP transform (his)
 
 ## STEER 000 (his, after m1372) -- BLUEPRINTS FIRST, GENERATED BLOCKOUTS, NOT A TRANSCRIBED IMAGE
