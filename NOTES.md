@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1161 -- SPIDER-BOT HANGAR pass 1 (BUILDINGS.md #13, at (-32, -24))
+
+`SPHANG`, `spiderMake`, `sphangBuild` / `sphangStep` / `sphangHit` / `sphangClear`. SPAWN > BUILDINGS > Spider-Bot Hangar.
+(2 m west of its slot: the Rampart's west bastion stands at x -25.)
+- A low VAULTED BUNKER (a half-cylinder of grey concrete-stone, 9 m wide, 12 m long, on a plinth, ribbed): colliders are the two thick
+  long sides and a flat CROWN you can stand on; inside is open under it. The back end closed; the front (+z) a HANGAR DOOR (3.2 m) between
+  two breakable panels (cwallBuild), a lintel, yellow-and-black warning stripes, red lamps.
+- THE SPIDER BOTS: three six-legged bronze crawlers -- a squat body, a dark head with a red eye, six two-segment legs on a procedural
+  tripod gait (alternate legs lift and swing), a little bob. They patrol a 6.8 m loop round the bunker (clear of the bastion).
+- Killable: `sphangHit` through `bldHit` (katana, shots, parried bolts), 3 hits, a burst and a boom; a new one walks out of the door
+  `spBack` 10 s later and back to its loop.
+Pass 2 next: THE SPIDERS CLIMB THE WALLS (his note). Shipped unverified.
+
 ## m1160 -- FORGE-WORKSHOP pass 3 (DONE)
 
 - Leather BELLOWS by the furnace, breathing (scaled in and out), a bronze nozzle into the fire; solid.
