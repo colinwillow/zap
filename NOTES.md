@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1215 -- Siege Yard pass 2: the ballista battery and the firing step (Building Forge loop)
+
+**THE BALLISTA BATTERY.** Two bolt-throwers on solid timber platforms (.8 m) by the gate, with a stock, a bow, a bolt and a red eye.
+- **Tracking.** Each turns to track him within `balR` 30 m.
+- **Firing.** It looses a heavy bolt every `balCool` 3.6 s, leading his run. Its eye flutters as it fires. The bolts are ordinary
+  `ARROWS`, so they can be parried home.
+- **Killable.** Each takes `balHp` 4 hits (in `siegeHit`) to wreck: it slumps and smokes for `balFix` 20 s.
+
+**THE FIRING STEP.** A timber walk at 2.1 m along the inside of the north palisade, on posts. A 7 m ramp of walkable triangles
+climbs to it along the inside of the west wall. From it he can look over the stakes.
+
+Next: alternate -- an extra pass (5) on the Shrine.
+
 ## m1214 -- Market pass 5: the pickpocket (Building Forge loop, extra pass)
 
 Every `thiefEvery` 30 s a little robot PICKPOCKET (a `robotSam` at x0.6) bolts through the market along the stall fronts.
