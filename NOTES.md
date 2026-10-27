@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## THE SHIP, PASS 5: THE ALIEN-SAMURAI AIRSHIP LOOK (m@X4@, WORKER A)
+## THE SHIP, PASS 5: THE ALIEN-SAMURAI AIRSHIP LOOK (m1378, WORKER A)
 
 His reference sheet (the flying junk: turbines with blue cores, a horned dragon figurehead, a pagoda stern castle, red diamond banners,
 lanterns, rigging, brass everywhere), built onto pass 1's hull:
