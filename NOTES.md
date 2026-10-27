@@ -5,6 +5,29 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE SHIP, PASS 5: THE ALIEN-SAMURAI AIRSHIP LOOK (m@X4@, WORKER A)
+
+His reference sheet (the flying junk: turbines with blue cores, a horned dragon figurehead, a pagoda stern castle, red diamond banners,
+lanterns, rigging, brass everywhere), built onto pass 1's hull:
+- **ANTI-GRAV TURBINES**: three a side along the hull on brass struts, and two big ones on the transom.
+  - Each is a dark drum in three brass rings, with a brass nose cone forward and a **blue core** glowing at its after end inside a brass bezel.
+  - The cores share one material that BREATHES (two sines). Their halos are one additive `Points` draw. This is ready for the airship
+    transform, when it comes.
+- **THE STERN PAGODA**: the house on the quarterdeck is now two tiers in the block style:
+  - red corner posts, lit lattice windows;
+  - eaves of three stepped slate courses with brass edges and the corners kicked up with brass caps;
+  - lanterns hung at the eight eave corners, a stepped cap and a brass finial with three rings.
+- **THE HORNED DRAGON**: the prow's head has a jaw, two brass horns swept back, a mane of red fins down its neck, white fangs and a brass ring
+  through its nose.
+- **A BOWSPRIT**, 11 m, angled up off the stem, with a red-and-brass lantern hung off its tip and a forestay to the foremast.
+- **SHROUDS**: three lines a side from every masthead down to the rails. **Brass bands** up every mast.
+- **BANNERS**: ten red banners with cream diamonds and ragged hems (`hwBanner`, the reference's motif) hang down both sides from the rail,
+  stirring. The stern banner is a real one on a pole now (pass 1's flat lacquer slab is gone), and the sails' gold discs gave way to the
+  crest in their canvas.
+- **Checked headless**: boots, builds, no errors; renders from the side, astern, the bow and the quarterdeck.
+
+SHIPPED UNVERIFIED.
+
 ## THE SHIP, PASS 4: THE RENDERING BANDS FIXED; REAL SURFACES (m1377, WORKER A)
 
 His (from the deck, m1375): *"a bunch of areas are having this weird rendering issue -- I think this happens when two objects overlap... we
