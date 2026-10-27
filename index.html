@@ -11285,7 +11285,7 @@ function turretStep(dt) {
     // the world: full walls stop it (`boxRay` flies over half cover), and so does its own launcher's box -- skipped
     const hit = boxRay(ox, oy, oz, S.p.x, S.p.y, S.p.z, _tuR);
     if (hit && !(_tuR.box && _tuR.box.turret && !S.mine)) { turretShotBoom(S, 0); continue; }     // its own launcher's box is skipped -- unless it is coming BACK
-    if (S.p.y < .05 || S.t > S.K.life || Math.hypot(S.p.x, S.p.z) > ARENA.r + 4) turretShotBoom(S, 0);
+    if (S.p.y < .05 || S.t > S.K.life || Math.hypot(S.p.x, S.p.z) > (inForge() ? 210 : ARENA.r + 4)) turretShotBoom(S, 0);     // m1306: the forge runs to 200 m -- at ARENA.r (60) a sentry 92 m out (the pagoda's) had every shot die as it left the barrel (Worker B's finding)
   }
   if (TURRET.shots.length > 24) TURRET.shots = TURRET.shots.filter(S => !S.dead);
 }

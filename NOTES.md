@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Turret shots no longer die beyond 64 m in the forge (Worker B's finding)
+
+`turretStep` blew up every turret shot past `ARENA.r + 4` from the middle, and the forge sets `ARENA.r` to 60. So any sentry gun placed
+further out (the Great Red Pagoda's, at 92 m) had its shots die as they left the barrel, and Worker B left the castle without one for
+that reason. In the forge the cut-off is 210 m now (the floor runs to 200). Worker B finished X2, the White Heron Castle, all 10 passes
+(m1277-m1303). SHIPPED UNVERIFIED.
+
 ## White Heron Castle pass 10 of 10: the polish (X2, WORKER B)
 
 I re-read the whole build against the reference and fixed what reading it turned up.
