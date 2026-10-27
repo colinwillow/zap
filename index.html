@@ -19080,9 +19080,11 @@ function bldDrone(g) {
 // lifted). A plank RAMP wraps the OUTSIDE, one side at a time, 1.6 m up each side, a landing at each corner: two sides to the first deck,
 // four to the second, six to the lookout (walkable surfaces, `bldTris`). A drone orb circles the cap; cables run from the eaves down to
 // stakes in the ground, lamps hung on them; lanterns at the deck corners.
-const WTOWER = { at: [-24, -12], hs: 3, storey: 4, ro: 3.95, rw: .65, beaconT: 40, on: null };     // m1121: bigger (his: *"large scale, everything is big"*)
+const WTOWER = { at: [-24, -12], scale: 1.5, hs: 3, storey: 4, ro: 3.95, rw: .65, beaconT: 40, on: null };     // m1121: bigger (his: *"large scale, everything is big"*)
 function wtowerBuild() {
-  if (WTOWER.on) return; const A = WTOWER, [cx, cz] = A.at, hs = A.hs, S = A.storey, g = new THREE.Group(); scene.add(g);
+  // STEER S2 (x1.5, m1342): the plan, the storeys, the ramp's ring and width scale (hs 4.5, storeys 6 m -- the lookout at 18 -- the ramp a
+  // 2 m wide spiral at 5.9 m out, each flight 3 m up over ~9.8 m, about 17 deg); the door 2.4 m; what is his size stays.
+  if (WTOWER.on) return; const k0 = WTOWER.scale || 1, A = Object.assign({}, WTOWER, { hs: WTOWER.hs * k0, storey: WTOWER.storey * k0, ro: WTOWER.ro * k0, rw: WTOWER.rw * k0 }), [cx, cz] = A.at, hs = A.hs, S = A.storey, g = new THREE.Group(); scene.add(g);
   const O = { meshes: [], boxes: [], walls: [] }, T = hallTex();
   const wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 }), plank = new THREE.MeshStandardMaterial({ color: 0x6e4a2e, roughness: .85 }), stone = new THREE.MeshStandardMaterial({ color: 0x8a8580, roughness: .95 });
   const lamp = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false }), neon = new THREE.MeshBasicMaterial({ color: 0x3fe8ff, toneMapped: false });
@@ -19091,7 +19093,7 @@ function wtowerBuild() {
   // the ground floor: breakable walls, a door in the front (+z)
   const t = .4, wall = (x, z, L, yaw) => O.walls.push(cwallBuild(g, T, x, z, L, t, yaw, S - .2, O));
   wall(cx, cz - hs, hs * 2, 0); wall(cx - hs, cz, hs * 2 - t, Math.PI / 2); wall(cx + hs, cz, hs * 2 - t, Math.PI / 2);
-  const dw = 1.6, sd = (hs * 2 - dw) / 2; wall(cx - hs + sd / 2, cz + hs, sd, 0); wall(cx + hs - sd / 2, cz + hs, sd, 0);
+  const dw = k0 > 1 ? 2.4 : 1.6, sd = (hs * 2 - dw) / 2; wall(cx - hs + sd / 2, cz + hs, sd, 0); wall(cx + hs - sd / 2, cz + hs, sd, 0);
   add(new THREE.BoxGeometry(dw + .4, .3, t + .1), wood, cx, S - .35, cz + hs, 1);
   add(new THREE.BoxGeometry(hs * 2 + 1.4, .18, hs * 2 + 1.4), stone, cx, .09, cz, 0);
   // the decks (solid slabs: stand on them), the corner posts all the way up, lanterns and a neon line on each deck's edge
@@ -19197,7 +19199,7 @@ function wtowerBuild() {
   let beacon; { const bx = cx + hs - .7, bz = cz - hs + .7, iron = new THREE.MeshStandardMaterial({ color: 0x34383e, metalness: .6, roughness: .5, side: THREE.DoubleSide });
     add(new THREE.CylinderGeometry(.08, .1, 1, 6), iron, bx, S * 3 + .5, bz, 0); add(new THREE.CylinderGeometry(.55, .3, .45, 10, 1, true), iron, bx, S * 3 + 1.2, bz, 0);
     const coal = add(new THREE.SphereGeometry(.38, 8, 6), new THREE.MeshBasicMaterial({ color: 0x3a1a10, toneMapped: false }), bx, S * 3 + 1.2, bz, 0); coal.scale.y = .4; coal.castShadow = false; beacon = { coal, x: bx, y: S * 3 + 1.4, z: bz, t: 0 }; }
-  WTOWER.on = { rings, g, O, bars: wbars, drone, t: 0, tur, fire, arch: null, sl, core, lift, beacon }; const W = WTOWER.on;
+  WTOWER.on = { A, rings, g, O, bars: wbars, drone, t: 0, tur, fire, arch: null, sl, core, lift, beacon }; const W = WTOWER.on;
   archerPost(cx - hs + 1, S * 3 + .05, cz + hs - 1).then(d => { if (WTOWER.on === W) W.arch = d; else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {});
   // ---- PASS 4 (m1169): a second archer on deck 2, the WAR DRUM (taiko) on deck 1 -- strike it and the alarm goes up: every archer and sentry
   // gun in the forge looses at once -- and two carp KITES flying off the lookout on long lines ----
@@ -19222,7 +19224,7 @@ function wtowerStep(dt) { const W = WTOWER.on; if (!W) return; W.t += dt; const 
   if (W.beacon) { const B = W.beacon; if (B.t > 0) { B.t -= dt; B.coal.material.color.setRGB(1, .45 + Math.random() * .15, .1);
       if ((B.fT = (B.fT || 0) - dt) <= 0) { B.fT = .06; spk(B.x + (Math.random() - .5) * .5, B.y, B.z + (Math.random() - .5) * .5, (Math.random() - .5) * .6, 2.5 + Math.random() * 2, (Math.random() - .5) * .6, .16, .6, [1, .55 + Math.random() * .3, .15]); if (Math.random() < .5) smokeAt(B.x, B.y + 1.5 + Math.random() * 3, B.z, 2.2, 3, [.3, .29, .28]); }
       if (B.t <= 0) B.coal.material.color.setRGB(.23, .1, .06); } }
-  if (W.kites) for (const K of W.kites) { const ax = cx - WTOWER.hs, ay = WTOWER.storey * 3 + 1, az = cz - WTOWER.hs + K.k * 2, ph = W.t * (.5 + K.k * .13) + K.k * 2;
+  if (W.kites) for (const K of W.kites) { const ax = cx - W.A.hs, ay = W.A.storey * 3 + 1, az = cz - W.A.hs + K.k * 2, ph = W.t * (.5 + K.k * .13) + K.k * 2;
     const x = ax - 10 - K.k * 4 + Math.sin(ph) * 3, y = ay + 9 + K.k * 3 + Math.sin(ph * 1.7) * 1.5, z = az - 6 + Math.cos(ph * .8) * 4; K.kt.position.set(x, y, z); K.kt.lookAt(ax, ay, az); K.kt.rotateZ(Math.sin(W.t * 4 + K.k) * .3);
     K.ln.geometry.attributes.position.array.set([ax, ay, az, x, y, z]); K.ln.geometry.attributes.position.needsUpdate = true; }
   if (W.drum && W.drumT > 0) { W.drumT -= dt; W.drum.scale.setScalar(1 + Math.sin(W.drumT * 40) * W.drumT * .08); }
@@ -19231,7 +19233,7 @@ function wtowerStep(dt) { const W = WTOWER.on; if (!W) return; W.t += dt; const 
       if (Math.random() < .12) smokeAt(fx + (Math.random() - .5) * .6, 2.6, fz + (Math.random() - .5) * .6, 1.2, 1.6, [.3, .28, .26]); } }
   if (W.sl) { W.sl.rotation.y = Math.PI * .75 + Math.sin(W.t * .32) * 1.1; W.sl.rotation.x = .32 + Math.sin(W.t * .21) * .08; }     // m1123: the searchlight sweeps
   if (W.core) W.core.scale.setScalar(1 + Math.sin(W.t * 2.4) * .14);
-  W.drone.position.set(cx + Math.cos(a) * 6.5, WTOWER.storey * 3 + 3.2 + Math.sin(W.t * 1.3) * .35, cz + Math.sin(a) * 6.5); W.drone.rotation.y = -a; W.drone.children[1].rotation.z = W.t * .6; }
+  W.drone.position.set(cx + Math.cos(a) * 6.5 * (WTOWER.scale || 1), W.A.storey * 3 + 3.2 + Math.sin(W.t * 1.3) * .35, cz + Math.sin(a) * 6.5); W.drone.rotation.y = -a; W.drone.children[1].rotation.z = W.t * .6; }
 // m1171: THE GATEHOUSE ALARM -- struck bell (or the Watchtower's drum): the portcullis drops with a crash, archers loose
 function ghouseAlarm() { const G = GHOUSE.on; if (!G) return; if (G.portT <= 0) { const [cx, cz] = GHOUSE.at; setTimeout(() => { snd('clang', { g: 1, r: .4, x: cx, z: cz }); snd('thud', { g: 1, r: .5, x: cx, z: cz }); camShake(.15); }, 220); }
   G.portT = GHOUSE.portUp; for (const d of HORDE.list) if (d.archer && d.st !== 'gone') d.arCool = 0; }

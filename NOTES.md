@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE WATCHTOWER x1.5 -- STEER S2 (older rows, m1342)
+
+- **Built from its parameters, scaled:**
+  - plan `hs` 3 → 4.5 (9 m square)
+  - storeys 4 → 6 m: decks at 6 / 12 / 18, the cap about 25 m
+  - the outside ramp ring `ro` 3.95 → 5.9, its width 1.3 → 2 m
+  - door 1.6 → 2.4 m
+- **The spiral ramp stays a walk:** six flights of 3 m over about 9.8 m each (~17°).
+- Everything hung off `hs` / `storey` moves with it: perches, the fire pit, the mask, the shimenawa, the banners, the searchlight, the pulley basket (it now hauls 18 m), the beacon, the drum, the kites. The drone circles wider.
+- What is his size stays: rails, the perch beams' 3.6 m reach, the bars, the lamps.
+- **Its sky bridge to the gatehouse and its zips** follow via `skAt` (`WTOWER.scale`).
+
 ## m1340 -- Timber Siege Fort pass 10 of 10: the polish (X3, WORKER A)
 
 Read back against the reference and the rules, and fixed:
