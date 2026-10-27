@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1148 -- AIRSHIP DOCK pass 3 (DONE): grapple the flying ship
+
+- Two GRAPPLE RINGS hang under the gondola (fore and aft). They ride the ship: their `R.x/y/z` are re-posed every frame from the ship's
+  pose, and `stepRope` reads the ring's live position, so a hook caught on one SWINGS FROM THE MOVING AIRSHIP. (The ring meshes are in the
+  ship's group; the data follows them.)
+- Three long streamers (red / cream / blue) off the tail that flutter harder in flight; four lanterns on the gondola's rail corners.
+- Three cables from the deck's corners to stakes (lamps); a drone orb circling the tower top.
+`BLDG` adock `pass: 3`. Next: the Zeppelin (#9). Shipped unverified.
+
 ## m1147 -- AIRSHIP DOCK pass 2: THE AIRSHIP FLIES (and carries you)
 
 - The airship waits docked `ADOCK.fly.wait` 14 s, sounds a horn, then flies one loop of an ellipse (22 x 26 m half-axes) out from the
