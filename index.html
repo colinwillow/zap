@@ -63337,13 +63337,142 @@ function rwBuild() {
 }
 const rwMat = (hex, o) => rwPatch(new THREE.MeshStandardMaterial(Object.assign({ color: hex, roughness: .85 }, o || {})));
 const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeometries(geos.map(q => q.index ? q.toNonIndexed() : q), false), mat); m.castShadow = shadow; m.receiveShadow = true; scene.add(m); return m; };
+// GRUMBO'S HOME, PROCEDURAL (his, after m1376; BUILDINGS.md "GRUMBO'S HOME, PROCEDURAL"; refs images/korajin/ref/grumbo_home_1..4.jpg). The
+// Tripo hut, built again in code so it can be walked INTO and dressed in the game's own style: a cluster of rounded cream sandstone domes and
+// towers with purple spots on a boulder mound -- the HALL in the middle (the shop front at the front, his quarters behind a screen wall), the
+// balcony TOWER on one side (a spiral stair inside up to a balcony on a mushroom ledge), the STORE wing on the other, wooden steps up the mound
+// to the shop front and to the round back door. Built in its OWN frame (local +z = the front, toward the river; `at`/`yaw` are HOME.hut's) and
+// merged per material; every collider a local box turned into the world (the yaw is a quarter turn, so a box stays a box); every walkable
+// surface a triangle. `?hut=glb` (or GHOME.on = 0) puts the GLB back, to compare. Pass 1: the massing and the walkable shell, with the inside.
+const GHOME = { on: 1, pass: 1, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 7, Hd: 2.8, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-7, .8], Rw: 3.3, Hwg: 3.2,
+  door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1.3, rise: .3, g: null, stat: {} };
+try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
+// the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
+function ghNoise3(x, y, z) { const h = (i, j, k) => { let n = (i * 374761393 + j * 668265263 + k * 1274126177) | 0; n = Math.imul(n ^ (n >>> 13), 1274126177); return ((n ^ (n >>> 16)) >>> 0) / 4294967296; };
+  const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z), fx = x - xi, fy = y - yi, fz = z - zi, s = t => t * t * (3 - 2 * t), u = s(fx), v = s(fy), w = s(fz);
+  const L = (a, b, t) => a + (b - a) * t;
+  return L(L(L(h(xi, yi, zi), h(xi + 1, yi, zi), u), L(h(xi, yi + 1, zi), h(xi + 1, yi + 1, zi), u), v), L(L(h(xi, yi, zi + 1), h(xi + 1, yi, zi + 1), u), L(h(xi, yi + 1, zi + 1), h(xi + 1, yi + 1, zi + 1), u), v), w); }
+function ghStone(x, y, z, out) {     // LINEAR colour (vertex colours are not sRGB-decoded): cream sRGB ~(.9,.79,.6), purple ~(.56,.42,.68), speckle dark brown
+  const big = ghNoise3(x * .55 + 3, y * .55, z * .55 - 7), spot = ghNoise3(x * .9 + 11, y * .9, z * .9 + 5), fine = ghNoise3(x * 2.4, y * 2.4, z * 2.4), g = .86 + .18 * big;
+  out[0] = .78 * g; out[1] = .58 * g; out[2] = .33 * g;
+  if (spot > .7) { const k = Math.min(1, (spot - .7) * 7); out[0] += (.34 - out[0]) * k; out[1] += (.22 - out[1]) * k; out[2] += (.44 - out[2]) * k; }     // the purple spots (a muted lavender)
+  if (fine > .74) { const k = Math.min(1, (fine - .74) * 5) * .8; out[0] += (.12 - out[0]) * k; out[1] += (.06 - out[1]) * k; out[2] += (.03 - out[2]) * k; }     // the dark speckle
+  return out; }
+function ghomeBuild(at, yaw, y0) {
+  const A = GHOME, g = new THREE.Group(); g.position.set(at[0], y0, at[1]); g.rotation.y = yaw; scene.add(g); A.g = g;
+  const c = Math.round(Math.cos(yaw) * 1e6) / 1e6, s = Math.round(Math.sin(yaw) * 1e6) / 1e6, P = A.P;
+  const Wx = (x, z) => at[0] + x * c + z * s, Wz = (x, z) => at[1] - x * s + z * c;
+  // ---- the buckets: only position + normal (+ colour on the stone) survive, so every piece merges (mixed attribute sets merge to NULL) ----
+  const MG = new Map(), _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _v = new THREE.Vector3(), _one = new THREE.Vector3(1, 1, 1), col = [0, 0, 0];
+  const put = (geo, m, mat4) => { geo = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(geo.attributes)) if (k !== 'position' && k !== 'normal') geo.deleteAttribute(k);
+    if (mat4) geo.applyMatrix4(mat4); if (!geo.attributes.normal) geo.computeVertexNormals();
+    if (m.vertexColors) { const p = geo.attributes.position, a = new Float32Array(p.count * 3); for (let i = 0; i < p.count; i++) { ghStone(p.getX(i), p.getY(i), p.getZ(i), col); a[i * 3] = col[0]; a[i * 3 + 1] = col[1]; a[i * 3 + 2] = col[2]; } geo.setAttribute('color', new THREE.BufferAttribute(a, 3)); }
+    if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); };
+  const at4 = (x, y, z, ry = 0, rx = 0, rz = 0, sx = 1, sy = 1, sz = 1) => _m4.compose(_v.set(x, y, z), _q.setFromEuler(_e.set(rx, ry, rz)), new THREE.Vector3(sx, sy, sz));
+  const stoneM = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .92, side: THREE.DoubleSide }), wood = new THREE.MeshStandardMaterial({ color: 0x5a3a22, roughness: .85 });
+  const dark = new THREE.MeshStandardMaterial({ color: 0x1a120c, roughness: 1 }), brass = new THREE.MeshStandardMaterial({ color: 0xc8963c, metalness: .8, roughness: .35 });
+  // ---- colliders: local boxes into the world; and solid RUNS (a test over a cell grid, merged along x) for the round shells ----
+  const boxes = [], tris = [];
+  const box = (x0, x1, y0b, y1, z0, z1, ex) => { const xa = Wx(x0, z0), xb = Wx(x1, z1), za = Wz(x0, z0), zb = Wz(x1, z1);
+    const b = Object.assign({ minx: Math.min(xa, xb), maxx: Math.max(xa, xb), miny: y0 + y0b, maxy: y0 + y1, minz: Math.min(za, zb), maxz: Math.max(za, zb) }, ex); boxes.push(b); return b; };
+  const runs = (test, X0, X1, Z0, Z1, ya, yb, cell = .3, ex) => { let n = 0; for (let z = Z0; z < Z1; z += cell) { let s0 = null; for (let x = X0; x <= X1 + cell; x += cell) { const on = x <= X1 && test(x + cell / 2, z + cell / 2);
+      if (on && s0 === null) s0 = x; if (!on && s0 !== null) { box(s0, x, ya, yb, z, z + cell, ex); s0 = null; n++; } } } return n; };
+  const tri = (a, b, d) => { for (const q of [a, b, d]) tris.push(Wx(q[0], q[2]), y0 + q[1], Wz(q[0], q[2])); };
+  const quad = (a, b, d, e) => { tri(a, b, d); tri(a, d, e); };
+  // a solid VISUAL box in local
+  const vbox = (x0, x1, ya, yb, z0, z1, m, solid, ex) => { put(new THREE.BoxGeometry(x1 - x0, yb - ya, z1 - z0), m, at4((x0 + x1) / 2, (ya + yb) / 2, (z0 + z1) / 2)); if (solid) box(x0, x1, ya, yb, z0, z1, ex); };
+  // ---- 1. THE MOUND: an oval plinth of stone (its top is the floor of every room), boulders round its foot ----
+  { const prof = [[0, P], [.9, P], [.965, P - .1], [.995, P - .35], [1.03, .3], [1.06, -.4]].map(([r, y]) => new THREE.Vector2(r, y));
+    put(new THREE.LatheGeometry(prof, 160), stoneM, at4(0, 0, 0, 0, 0, 0, A.rx, 1, A.rz));
+    runs((x, z) => (x / A.rx) ** 2 + (z / A.rz) ** 2 <= 1, -A.rx, A.rx, -A.rz, A.rz, -1, P);
+    const rnd = rwRng(41); for (let i = 0; i < 26; i++) { const a = i / 26 * Math.PI * 2 + rnd() * .15, r = 1.02 + rnd() * .05, x = Math.sin(a) * A.rx * r, z = Math.cos(a) * A.rz * r;
+      if (Math.abs(x) < 2.4 && Math.abs(z) > A.rz * .8) continue;     // the steps' gaps, front and back
+      const k = .8 + rnd() * .9; put(new THREE.IcosahedronGeometry(1, 4), stoneM, at4(x, .2 + k * .3, z, rnd() * 6, 0, 0, k * 1.4, k * .8, k * 1.2)); } }
+  // ---- the STEPS up the mound: timber treads, .30 risers, a walkable ramp under them; front (to the shop) and back (to the round door) ----
+  const steps = (sg) => { const n = Math.ceil(P / A.rise), r = P / n, w = 1.7, z0 = sg * A.rz * .985, run = .38;
+    for (let i = 0; i < n; i++) { const za = z0 + sg * (n - 1 - i) * run, zb = za + sg * run; vbox(-w, w, 0, (i + 1) * r, Math.min(za, zb), Math.max(za, zb), wood); }
+    const zf = z0 + sg * n * run; quad([-w, .06, zf], [w, .06, zf], [w, P + .04, z0], [-w, P + .04, z0]); };
+  steps(1); steps(-1);
+  // ---- a ROUND SHELL: a wall ring (outer + inner faces, the gaps cut for doors and the shop front) and a dome on it; solid by RUNS ----
+  const TAU = Math.PI * 2;
+  const shell = (cx, cz, R, H, Hdome, gaps) => {     // gaps: [theta (0 = +z, PI/2 = +x), half-width m, top m, bottom m (0 = the floor)]
+    const t = A.t, gs = gaps.map(([th, hw, hh, lo]) => ({ th, ha: Math.asin(Math.min(.99, hw / R)), hh, lo: lo || 0 })).sort((a, b) => a.th - b.th);
+    const arc = (a0, a1, ya, yb) => { if (a1 - a0 < .01 || yb - ya < .01) return; const seg = Math.max(2, Math.ceil((a1 - a0) / TAU * 64));
+      for (const r of [R, R - t]) put(new THREE.CylinderGeometry(r, r, yb - ya, Math.max(2, seg * 2), Math.max(1, Math.round((yb - ya) / .3)), true, a0, a1 - a0), stoneM, at4(cx, (ya + yb) / 2, cz)); };
+    const jamb = (a, ya, yb) => put(new THREE.BoxGeometry(.04, yb - ya, t), stoneM, at4(cx + Math.sin(a) * (R - t / 2), (ya + yb) / 2, cz + Math.cos(a) * (R - t / 2), a));
+    if (!gs.length) arc(0, TAU, P, P + H);
+    else { for (let i = 0; i < gs.length; i++) { const G = gs[i], N = gs[(i + 1) % gs.length], a0 = G.th + G.ha, a1 = N.th - N.ha + (i === gs.length - 1 ? TAU : 0); arc(a0, a1, P, P + H);
+        arc(G.th - G.ha, G.th + G.ha, P + G.hh, P + H); arc(G.th - G.ha, G.th + G.ha, P, P + G.lo); jamb(G.th - G.ha, P + G.lo, P + G.hh); jamb(G.th + G.ha, P + G.lo, P + G.hh); } }
+    put(new THREE.SphereGeometry(R, 112, 28, 0, TAU, 0, Math.PI / 2), stoneM, at4(cx, P + H, cz, 0, 0, 0, 1, Hdome / R, 1));
+    // the solid: by layers between the gaps' heights, each gap open only in the layers it spans
+    const ys = [...new Set([0, ...gs.map(G => G.hh), ...gs.map(G => G.lo), H])].sort((a, b) => a - b); let nb = 0;
+    for (let k = 0; k < ys.length - 1; k++) { const open = gs.filter(G => G.lo <= ys[k] + .01 && G.hh >= ys[k + 1] - .01);
+      nb += runs((x, z) => { const dx = x - cx, dz = z - cz, r = Math.hypot(dx, dz); if (r < R - t || r > R) return false; const th = Math.atan2(dx, dz);
+        return !open.some(G => Math.abs(wrapAngle(th - G.th)) < G.ha); }, cx - R, cx + R, cz - R, cz + R, P + ys[k], P + ys[k + 1], .25); }
+    // the dome's outside is walkable where it is not too steep
+    const NA = 40, NP = 8, pmax = 1.1, Y = (p) => P + H + Hdome * Math.cos(p), Rr = p => R * Math.sin(p);
+    for (let i = 0; i < NA; i++) for (let j = 0; j < NP; j++) { const a0 = i / NA * TAU, a1 = (i + 1) / NA * TAU, p0 = j / NP * pmax, p1 = (j + 1) / NP * pmax, V = (a, p) => [cx + Math.sin(a) * Rr(p), Y(p) + .04, cz + Math.cos(a) * Rr(p)];
+      quad(V(a0, p0), V(a1, p0), V(a1, p1), V(a0, p1)); }
+    return nb; };
+  const th = (fx, fz, tx, tz) => Math.atan2(tx - fx, tz - fz);
+  const [Tx, Tz] = A.T, [Gx, Gz] = A.Wc;
+  // the HALL: the shop front at the front, the round back door, a door into the tower and one into the store
+  A.stat.hall = shell(0, 0, A.R, A.Hw, A.Hd, [[0, A.shopW / 2, A.shopH], [Math.PI, A.door / 2, A.doorH], [th(0, 0, Tx, Tz), A.door / 2, A.doorH], [th(0, 0, Gx, Gz), A.door / 2, A.doorH]]);
+  // the TOWER: its door from the hall, and the balcony door at the top of its stair
+  const balTh = .5;     // the balcony door faces front-right
+  A.stat.tower = shell(Tx, Tz, A.Rt, A.Ht, 2, [[th(Tx, Tz, 0, 0), A.door / 2, A.doorH], [balTh, A.door / 2, A.Yb + A.doorH, A.Yb]]);
+  // the STORE wing
+  A.stat.store = shell(Gx, Gz, A.Rw, A.Hwg, 2.2, [[th(Gx, Gz, 0, 0), A.door / 2, A.doorH]]);
+  // ---- INSIDE THE HALL: the screen wall between the shop and his quarters (a wide way through), a counter, his bed, a table ----
+  { const z = A.part, hw = A.R - A.t - .05, d = 1.2; vbox(-hw, -d, P, P + 3.2, z - .15, z + .15, stoneM, 1); vbox(d, hw, P, P + 3.2, z - .15, z + .15, stoneM, 1);
+    vbox(-d, d, P + 2.7, P + 3.2, z - .15, z + .15, wood, 0);
+    vbox(-2.2, 2.2, P, P + 1.05, 1.6, 2.3, wood, 1);     // the shop counter, behind the shop front
+    vbox(-3.3, -1.3, P, P + .5, -3.7, -2.0, wood, 1); vbox(-3.25, -1.35, P + .5, P + .7, -3.65, -2.05, new THREE.MeshStandardMaterial({ color: 0x9a2c22, roughness: .9 }), 0);     // his bed
+    vbox(1.4, 2.8, P, P + .8, -3.3, -2.3, wood, 1); }     // a table
+  // ---- THE TOWER'S SPIRAL STAIR: from the hall door round and up to the balcony door, steps of .30 round a solid post ----
+  { const a0 = th(Tx, Tz, 0, 0), a1 = balTh + TAU * (balTh > a0 ? 1 : 2) - (balTh > a0 ? 0 : TAU), n = Math.ceil(A.Yb / A.rise), r = A.Yb / n, ri = .6, ro = A.Rt - A.t - .08, da = (a1 - a0) / n;
+    put(new THREE.CylinderGeometry(.5, .5, A.Yb + 2.6, 16), wood, at4(Tx, P + (A.Yb + 2.6) / 2, Tz)); box(Tx - .45, Tx + .45, P, P + A.Yb + 2.6, Tz - .45, Tz + .45);
+    for (let i = 0; i < n; i++) { const a = a0 + da * (i + .5), rm = (ri + ro) / 2;
+      put(new THREE.BoxGeometry(ro - ri, .14, Math.abs(da) * ro * 1.05), wood, at4(Tx + Math.sin(a) * rm, P + (i + 1) * r - .07, Tz + Math.cos(a) * rm, a + Math.PI / 2)); }
+    const NS = n * 3; for (let i = 0; i < NS; i++) { const u0 = i / NS, u1 = (i + 1) / NS, b0 = a0 + (a1 - a0) * u0, b1 = a0 + (a1 - a0) * u1, y0s = P + A.Yb * u0 + .05, y1s = P + A.Yb * u1 + .05;
+      const V = (a, rr, y) => [Tx + Math.sin(a) * rr, y, Tz + Math.cos(a) * rr]; quad(V(b0, ri, y0s), V(b0, ro, y0s), V(b1, ro, y1s), V(b1, ri, y1s)); }
+    // the landing at the top, out to the balcony door
+    const V = (a, rr) => [Tx + Math.sin(a) * rr, P + A.Yb + .05, Tz + Math.cos(a) * rr]; for (let k = 0; k < 4; k++) { const b0 = a1 + k * .12 - .2, b1 = b0 + .12; quad(V(b0, ri), V(b0, A.Rt + .2), V(b1, A.Rt + .2), V(b1, ri)); }
+    A.stat.stair = n + ' risers of ' + r.toFixed(3); }
+  // ---- THE BALCONY on its MUSHROOM LEDGE round the tower's outer side, railed (noCam) ----
+  { const b0 = -.7, b1 = 2.9, ri = A.Rt - .05, ro = A.Rt + 2.4, Y = P + A.Yb;
+    const prof = [[ri, Y - 1.9], [ri + 1.2, Y - 1.1], [ro - .2, Y - .45], [ro, Y - .2], [ro, Y], [ri, Y]].map(([r, y]) => new THREE.Vector2(r, y));
+    put(new THREE.LatheGeometry(prof, 40, b0, b1 - b0), stoneM, at4(Tx, 0, Tz));
+    const N = 24, V = (a, rr) => [Tx + Math.sin(a) * rr, Y + .04, Tz + Math.cos(a) * rr]; for (let i = 0; i < N; i++) { const a = b0 + (b1 - b0) * i / N, e = b0 + (b1 - b0) * (i + 1) / N; quad(V(a, ri), V(a, ro), V(e, ro), V(e, ri)); }
+    for (let i = 0; i <= 18; i++) { const a = b0 + (b1 - b0) * i / 18, x = Tx + Math.sin(a) * (ro - .1), z = Tz + Math.cos(a) * (ro - .1); vbox(x - .06, x + .06, Y, Y + 1, z - .06, z + .06, wood, 1, { noCam: 1 });
+      if (i < 18) { const e = b0 + (b1 - b0) * (i + 1) / 18, x2 = Tx + Math.sin(e) * (ro - .1), z2 = Tz + Math.cos(e) * (ro - .1), L = Math.hypot(x2 - x, z2 - z);
+        put(new THREE.BoxGeometry(L, .08, .08), wood, at4((x + x2) / 2, Y + .95, (z + z2) / 2, Math.atan2(x2 - x, z2 - z) + Math.PI / 2)); box(Math.min(x, x2) - .05, Math.max(x, x2) + .05, Y + .5, Y + 1, Math.min(z, z2) - .05, Math.max(z, z2) + .05, { noCam: 1 }); } } }
+  // ---- ROUND WINDOWS (dark glass in a timber ring) and the round BACK DOOR's arch ----
+  { const win = (cx, cz, R, a, y, r) => { const x = cx + Math.sin(a) * (R + .02), z = cz + Math.cos(a) * (R + .02);
+      put(new THREE.CircleGeometry(r, 20), dark, at4(x, y, z, a)); put(new THREE.TorusGeometry(r, .07, 6, 20), wood, at4(x, y, z, a));
+      put(new THREE.BoxGeometry(r * 2, .05, .05), wood, at4(x, y, z, a)); put(new THREE.BoxGeometry(.05, r * 2, .05), wood, at4(x, y, z, a)); };
+    win(0, 0, A.R, .85, P + 4.6, .42); win(0, 0, A.R, -.85, P + 4.6, .42); win(0, 0, A.R, 2.4, P + 2, .38); win(Tx, Tz, A.Rt, 1.2, P + 2.2, .36); win(Tx, Tz, A.Rt, .2, P + 7.4, .4); win(Tx, Tz, A.Rt, 1.0, P + 7.6, .36);
+    win(Gx, Gz, A.Rw, -.6, P + 1.9, .38); win(Gx, Gz, A.Rw, -1.8, P + 1.9, .34);
+    put(new THREE.TorusGeometry(A.door / 2, .12, 6, 16, Math.PI), wood, at4(0, P + A.doorH - A.door / 2 + .02, -A.R - .03, Math.PI)); }
+  // ---- the frame round the SHOP FRONT (posts and a beam; the scaffold proper is pass 2) ----
+  { const hw = A.shopW / 2 + .15, z = Math.sqrt(A.R * A.R - hw * hw) + .15; vbox(-hw - .14, -hw + .14, P, P + A.shopH + .3, z - .14, z + .14, wood, 1, { noCam: 1 }); vbox(hw - .14, hw + .14, P, P + A.shopH + .3, z - .14, z + .14, wood, 1, { noCam: 1 });
+    vbox(-hw - .4, hw + .4, P + A.shopH, P + A.shopH + .35, z - .18, z + .18, wood, 0); }
+  // ---- merge, and the world gets the boxes and the floors ----
+  let draws = 0; for (const [m, list] of MG) { const geo = mergeGeometries(list); if (!geo) { console.warn('[melee] ghome: a bucket would not merge', m.name || m.color); continue; } const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; g.add(o); draws++; }
+  for (const b of boxes) BOXES.push(b);
+  for (let i = 0; i < tris.length; i += 9) { const q = tris.slice(i, i + 9); triAdd(...q); triAdd(q[0], q[1], q[2], q[6], q[7], q[8], q[3], q[4], q[5]); }
+  A.stat.draws = draws; A.stat.boxes = boxes.length; A.stat.tris = tris.length / 9;
+  console.log('[melee] grumbo home (procedural): ' + draws + ' draws, ' + boxes.length + ' boxes, ' + tris.length / 9 + ' walkable tris, stair ' + A.stat.stair);
+}
 async function buildHome() {
   const H = HOME; try { const q = new URLSearchParams(location.search).get('style'); if (q === 'lake' || q === 'hollows') H.style = q; } catch (e) {}
   if (H.style !== 'lake') { H.padY = 1.3; H.hut.at = [hwRc(-4) - 14, -4]; H.hut.yaw = Math.PI / 2; H.spawn = [hwRc(10) - 7, 10]; RW.time = { el: 18, az: 200, sun: [1, .8, .58], zen: [.28, .46, .78], hor: [1, .86, .7] }; }
   else H.padY = 1.15;
+  if (GHOME.on) { if (H.style !== 'lake') H.hut.at = [hwRc(-4) - 15, -4]; H.hut.w = 12; H.hutS = 1.6; }     // GRUMBO'S HOME (procedural): a bigger pad, his things set further out
   rwBuild();
-  // the hut, on its levelled pad
-  try { const g = await loadGLB(H.hut.file, 'loading the refuge');
+  // the hut, on its levelled pad -- built in code (GHOME), or his Tripo GLB to compare (`?hut=glb`)
+  if (GHOME.on) { try { ghomeBuild(H.hut.at, H.hut.yaw, H.padY); H.stat.hutK = 'proc'; } catch (e) { console.error('[melee] grumbo home', e); note('HOME BUILD THREW'); } }
+  else try { const g = await loadGLB(H.hut.file, 'loading the refuge');
     const m = g.scene, drop = []; m.traverse(o => { if (o.isLight) drop.push(o); }); for (const o of drop) o.removeFromParent();
     m.updateMatrixWorld(true); const bb = new THREE.Box3(); m.traverse(o => { if (o.isMesh && o.name !== 'collider' && o.geometry) { o.geometry.computeBoundingBox(); bb.union(o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld)); } });
     const k = H.hut.w / Math.max(.01, bb.max.x - bb.min.x); m.scale.setScalar(k); m.rotation.y = H.hut.yaw; m.position.set(H.hut.at[0], H.padY - bb.min.y * k, H.hut.at[1]);
@@ -63434,7 +63563,7 @@ function hollowDress() {
   // SANDSTONE FORMATIONS: rounded boulders on the floor, stacked hoodoos, lumps on the rim
   { const rk = [], cs = []; const sCol = (gg, hex) => { const cc = new THREE.Color(hex), a = new Float32Array(gg.attributes.position.count * 3); for (let k = 0; k < a.length; k += 3) a.set([cc.r, cc.g, cc.b], k); gg.setAttribute('color', new THREE.BufferAttribute(a, 3)); return gg; };
     for (let i = 0; i < 34; i++) { const z = -110 + r() * 220, side = r() < .55 ? -1 : 1, s = hwRc(z) + side * (8 + r() * ((side < 0 ? HOLLOW.floorW : HOLLOW.floorE) - 9));
-      if (Math.hypot(s - H.hut.at[0], z - H.hut.at[1]) < 9 || Math.hypot(s - H.spawn[0], z - H.spawn[1]) < 5) continue;
+      if (Math.hypot(s - H.hut.at[0], z - H.hut.at[1]) < 9 * (H.hutS || 1) || Math.hypot(s - H.spawn[0], z - H.spawn[1]) < 5) continue;
       const y = rwHeight(s, z), n = r() < .35 ? 3 : 1;
       for (let k = 0; k < n; k++) { const R = (n > 1 ? 1.6 - k * .35 : 1.2 + r() * 2.2); const g = new THREE.IcosahedronGeometry(R, 2); g.scale(1.1, n > 1 ? .7 : .55 + r() * .3, 1);
         g.translate(s + (r() - .5) * .4, y + (n > 1 ? R * .7 + k * R * 1.15 : R * .3), z); rk.push(sCol(g.toNonIndexed(), [0xd09066, 0xc06a45, 0xe0b08a][(i + k) % 3])); }
@@ -63461,7 +63590,7 @@ function hollowDress() {
     rwMesh(plank, rwMat(0x6e4a2e)); const rg = new THREE.BufferGeometry(); rg.setAttribute('position', new THREE.Float32BufferAttribute(rope, 3));
     const rl = new THREE.LineSegments(rg, new THREE.LineBasicMaterial({ color: 0x3a2a1c })); rl.frustumCulled = false; scene.add(rl); }
   // BANNER POLES by the hut and along the west floor
-  { const pole = []; for (const [x, z] of [[H.hut.at[0] - 6, H.hut.at[1] + 5], [H.hut.at[0] + 6, H.hut.at[1] + 5], [-4, 22], [-12, -26]]) { const y = rwHeight(x, z);
+  { const pole = []; for (const [x, z] of [[H.hut.at[0] - 6 * (H.hutS || 1), H.hut.at[1] + 5 * (H.hutS || 1)], [H.hut.at[0] + 6 * (H.hutS || 1), H.hut.at[1] + 5 * (H.hutS || 1)], [-4, 22], [-12, -26]]) { const y = rwHeight(x, z);
       pole.push(Cy(.1, .12, 6, x, y + 3, z, 6), B(1.8, .12, .12, x, y + 5.8, z)); const bg = new THREE.PlaneGeometry(1.5, 3.2); bg.translate(0, -1.6, 0); const bm = new THREE.Mesh(bg, banM); bm.position.set(x, y + 5.7, z + .08); scene.add(bm); ban.push({ m: bm, ph: r() * 6 });
       BOXES.push({ minx: x - .25, maxx: x + .25, miny: -2, maxy: y + 6, minz: z - .25, maxz: z + .25 }); }
     rwMesh(pole, rwMat(0x4a3424)); }
@@ -63481,7 +63610,7 @@ function hollowDress() {
       if (r() < .7) { const f = new THREE.PlaneGeometry(s * .25, y * 1.1); f.translate(x + s * .7, y - y * .55, z); f.rotateY(0); fall.push(f); } }
     rwMesh(isl, rwMat(0xb7744e, { flatShading: true })); rwMesh(top, rwMat(0x5f8a45)); if (fall.length) { const fm = rwMesh(fall, new THREE.MeshBasicMaterial({ color: 0xeaf6ff, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false }), false); fm.renderOrder = 3; } }
   // HIS STONE LANTERNS on the approach
-  { const st = [], lit = []; for (const [dx, dz] of [[9, -3.2], [9, 3.2], [6.2, -3.2], [6.2, 3.2]]) { const x = H.hut.at[0] + dx, z = H.hut.at[1] + dz, y = rwHeight(x, z);     // in front of the door (the hut faces the river, +x)
+  { const st = [], lit = []; for (const [dx, dz] of [[9, -3.2], [9, 3.2], [6.2, -3.2], [6.2, 3.2]]) { const x = H.hut.at[0] + dx + (H.hutS ? 1.2 : 0), z = H.hut.at[1] + dz * (H.hutS || 1), y = rwHeight(x, z);     // in front of the door (the hut faces the river, +x)
       st.push(B(.9, .3, .9, x, y + .15, z), Cy(.16, .2, 1.1, x, y + .85, z, 6), B(.7, .18, .7, x, y + 1.45, z), B(1.05, .2, 1.05, x, y + 2.2, z), Cy(.0, .62, .45, x, y + 2.5, z, 4));
       lit.push(B(.5, .5, .5, x, y + 1.8, z)); BOXES.push({ minx: x - .45, maxx: x + .45, miny: -2, maxy: y + 2.6, minz: z - .45, maxz: z + .45 }); }
     rwMesh(st, rwMat(0x9b8b78, { roughness: .95 })); rwMesh(lit, new THREE.MeshStandardMaterial({ color: 0xffd8a0, emissive: 0xffa040, emissiveIntensity: 2.2 }), false); }
@@ -64425,7 +64554,7 @@ async function init() {
 
 // the console handle. Every tuning object is live, so a number can be moved on the phone
 // without a rebuild and without a push.
-window.melee = window.mel = { SHIMMY, VAIM, SHIPZ, shipBuild, FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, gaitMeasure, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
+window.melee = window.mel = { GHOME, SHIMMY, VAIM, SHIPZ, shipBuild, FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, gaitMeasure, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
   // PROGRESS (m276): `mel.SAVE` is the save; the setters write it through; `mel.progReset()` is a new game
   // TALK (m277): `mel.TALK` live; `mel.TALKS` the scripts by kind; `mel.talk` the state
   TALK, TALKS, talk,
