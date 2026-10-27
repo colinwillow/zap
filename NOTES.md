@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home, procedural, pass 4: the dressing (WORKER B)
+
+From the refs:
+- **The stalls.** A two-shelf rack along the back of each deck, heaped with lathed pots (five shapes: clay, dark clay, a lavender glaze,
+  brass), with crates and big pots on the decks. The crates and big pots are solid (noCam).
+- **Under the beams.** Rows of glowing brass lanterns (emissive) and clusters of little brass bells.
+- **The SHOP.** Four lit shelves of pots along the screen wall, seen through the shop front; more pots on the counter; three lanterns; and
+  one warm point light in the room.
+- **Plants.** Saguaros with arms (solid trunks), prickly pears and green or red agave rosettes all round the mound, clear of the steps and
+  the ramp. Potted agaves stand at the deck corners.
+- **More boulders** half-buried round the foot (solid).
+- **Not smashable yet.** The smash system repairs only in the arena worlds, so a broken pot here would stay broken.
+- **Counts.** 17 draws (pots, plants and the glow add their materials), 612 boxes.
+
+Checked headless and looked at renders of the front and into the shop against the refs. Shipped unverified. Next: pass 5, the look (the
+domes' bulge, main's sandstone and timber textures, a timber floor inside).
+
 ## THE SHIP, PASS 6: THE SHARED PAINTED MAPS, AND A DETAIL PASS (m1386, WORKER A)
 
 His: *"it looks freaking awesome... do another detail pass. Should we share the maps? The main session is generating genuinely painted
