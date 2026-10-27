@@ -5,6 +5,45 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1259 -- three big buttons, the gun's row, the 3D AIM, and ROBITS' vertical (his request)
+
+*"We definitely don't need the skateboard... we can get rid of the club. I want these things big, convenient and simple: one button switches
+you from unarmed to ballistic to melee -- three buttons above the left stick, big and easy to hit. When you select ballistic it has the
+sub-options above the right stick. One of those options is a toggle between 3D and not 3D: a little more zoomed in, still not first person,
+you can aim in three dimensions. Press anywhere on the right stick, it locks in a shot, you aim around, let go and it shoots."* And about
+ROBITS: *"the aiming was on a 2D plane, but if the guy was in front of you and above you, it just auto-aimed up to him."*
+
+- **The left wheel (`KIT3.on`).**
+  - It shows HANDS / GUN / SWORD only, on a thicker ring (`r1` 116 against 106, span 108, so the far tip stays on a 390 px screen).
+  - The hammer, the board and the launcher are filtered out of `gearSync` and of the kit cycle (`kit3Hid`). The slots still exist, so
+    quests and GOD are untouched.
+  - While the launcher is out, GUN is the lit button.
+  - The outer ring (Clancy / revert) moved out with it (`OUTROW` now follows `WEPROW.r1`).
+  - `mel.KIT3.on = 0` brings the old wheel back, but it needs a reload.
+- **The gun's row on the right.**
+  - It reads CHARGE / AUTO / ROCKET (`gunRowBuild`, `gunPick`). ROCKET takes the launcher out; a trigger picked while the launcher is
+    out puts the blaster back.
+  - It shows for either gun.
+  - A new OUTER ring above it, `#aimRow`, has one gold button: **3D AIM**. It toggles `AIM3.on`, which is remembered
+    (`mel.aim3` in localStorage).
+- **The 3D aim (`aim3Gun`).** This is her flight trigger (m271 `bladeGunFly`) on foot:
+  - **Arm.** A right thumb held still for `holdT` .18 s arms it. A tap is still the jump, and a thumb that travels first is still the
+    camera.
+  - **Aim.** From then its offset is the aim: across, up to `yaw` 60 degrees either side of the lens; up and down, up to `pitch` 60
+    degrees.
+  - **Fire.** Lifting the thumb fires the charged ball, or a ROCKET from the launcher.
+  - **The aim point.** `aimPoint` walks the 3D direction, `aimRaw` skips the locks while it is live (`aim3Live`), and the reticle and the
+    shot agree because both read `aimTarget`.
+  - **The body.** The body turns to the aim through the ONE facing writer (`faceTgt` gets `cam.az + p.gYaw`). The camera drag stands
+    down while aiming (`flyAim`).
+  - **The lens.** `cam.a3` eases the camera in: `dist` x .55, the look point `side` .75 m to his right (over the shoulder) and lifted
+    .25, and the elevation tipping with the aim's pitch (`el` .6).
+- **ROBITS' vertical (`mechAim`).** In the ordinary 2D aim, a MACHINE within `MECHAIM.cone` .16 rad of the lens's line, at any height, now
+  pulls the shot up or down to it, the way a body already pulls it to his chest. Examples are the turret on the tower and the ballista on
+  the wall. `mechTargets(dyMax)` takes a height limit now.
+
+SHIPPED UNVERIFIED. Everything is on `mel` (`KIT3`, `AIM3`, `MECHAIM`).
+
 ## m1258 -- Zoom Ramp Tower pass 3: the polish (Building Forge loop, R1) -- DONE
 
 - **Chevrons.** Eight neon chevrons lie on the ramp, and a pulse chases up them toward the face, three times faster while he is zooming.
