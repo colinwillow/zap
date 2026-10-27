@@ -5,6 +5,29 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1225 -- Kneeling Colossus pass 1 (Building Forge loop, Set 2 #24)
+
+`COLO`, in BLDG.list as `colo`. It is MOVED to (50, -26): the listed (38, -44) is the Robot Barracks.
+
+A giant ruined robot samurai of weathered stone and bronze kneels facing the forge (-x).
+- **Legs.** The right knee is down: its shin is a long low wall on the ground and its thigh rises to the hip. The left foot is
+  planted.
+- **THE CLIMB, all solid steps** (.3 risers, his step is .357):
+  - 18 stairs carved up the left shin's front, to the knee at 5.5 m.
+  - Along the thigh.
+  - 7 steps up the left FOREARM (resting on the knee) to the elbow guard at 7.6 m.
+  - 12 steps up the upper arm to the bronze SHOULDER PAD at 11.2 m.
+  - A neck ring at 11.55 m that runs forward past the cheeks.
+  - Into the OPEN HEAD: a floor at 11.9 m with back and cheek walls, a crown with a gold crest, and glowing cyan eyes. It is a
+    lookout.
+- **THE SWORD** is planted point-down before it, a 9 m blade with a guard and a hilt under the right hand. A ladder of three
+  BARS (tops 2.8 / 4.9 / 7 m) is strung across the blade.
+- **The rest.** Moss, a red waist sash, and broken offering walls (breakable) in front.
+
+What wants a look: every step of the climb (the upper-arm steps are steep: .3 rise per .27 run), and whether the head reads as
+open. Next: alternate -- an extra pass (6) begins on the oldest done buildings. Set 2 is otherwise COMPLETE once this has three
+passes.
+
 ## m1224 -- Flying Ship pass 5: take the helm (Building Forge loop, extra pass)
 
 Stand at the ship's WHEEL on the deck (within 1.4 m, at the deck's height) and the broadside is YOURS, with a clank and a gold
