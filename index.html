@@ -22987,7 +22987,7 @@ function heronClear() { const G = HERON.on; if (!G) return; for (const d of (G.a
 // with ~.3 m to spare and missed by anything much less. `lift` is live (mel.ZRAMP) because the arrival speed is a prediction. Every try
 // leaves a MARK on the face where his hands got to (red, or gold when he made it); tick lines every 2 m read the height. The summit: a guard
 // house, a brazier (R2 will put it out), rails on three sides (never on the lip), and a zipline back down to the gate.
-// m1324 (his, with an American Ninja Warrior "Mega Wall" photo): *"The tall run tower is not really what I was talking about. More like the Ninja
+// m1325 (his, with an American Ninja Warrior "Mega Wall" photo): *"The tall run tower is not really what I was talking about. More like the Ninja
 // Warrior thing where they run really high -- like a skate ramp, just a little bit of a bend and then mostly straight up, and the flat part goes
 // up quite a bit more since it's a video game."* So the 16 m incline is gone: a flat 24 m RUN-IN (the same distance, so the zoom arrives at
 // the same ~14.7 m/s), then a QUARTER-PIPE bend of radius `R` at the wall's foot (walkable to `walkA` deg, so his feet ride it up), then the
@@ -23009,7 +23009,7 @@ function zrampBuild() {
   // the face's TICKS every 2 m above the ramp's top, and the LIP in gold
   for (let y = A.Hr + 2; y < H - .5; y += 2) box(cx - 1.4, cx + 1.4, y - .03, y + .03, fz - .07, fz - .04, neon, 0);
   box(x0, x1, H - .06, H, fz - .09, fz, gold, 0);
-  // THE BEND (m1324): a quarter-pipe at the wall's foot. Walkable triangles up to `walkA` (his feet ride it up and the run-up takes over at the
+  // THE BEND (m1325): a quarter-pipe at the wall's foot. Walkable triangles up to `walkA` (his feet ride it up and the run-up takes over at the
   // face); the visual is the whole quarter, from the floor to vertical, so the face reads as one surface bending out of the ground
   const rz0 = fz - A.R, rw = A.rw, NB = 10, aW = A.walkA * Math.PI / 180, prof = a => [fz - A.R + A.R * Math.sin(a), A.R - A.R * Math.cos(a)];
   for (let i = 0; i < NB; i++) { const [za, ya] = prof(aW * i / NB), [zb, yb] = prof(aW * (i + 1) / NB); tris.push(cx - rw, ya, za, cx + rw, ya, za, cx + rw, yb, zb, cx - rw, ya, za, cx + rw, yb, zb, cx - rw, yb, zb); }
@@ -23063,7 +23063,7 @@ function zrampBuild() {
   // breathing, sparks off his feet as he runs up the face, an ONI MASK on the tower's back, lantern cables from the summit to the ground,
   // grapple rings over the summit, a drone ----
   const chev = []; { const cm = new THREE.MeshBasicMaterial({ color: 0x3fe8ff, toneMapped: false, transparent: true, opacity: .25 });
-    for (let k = 0; k < 14; k++) { const up = k >= 8, u = up ? (k - 8 + .5) / 6 : (k + .5) / 8, z = up ? fz - .07 : sz + 1 + u * (rz0 - sz - 1), y = up ? A.R + .6 + u * (H - A.R - 1.6) : .05, c = new THREE.Group(); c.position.set(cx, y, z); if (up) c.rotation.x = -Math.PI / 2; g.add(c);     /* m1324: 8 chase down the run-in, 6 on up the face */
+    for (let k = 0; k < 14; k++) { const up = k >= 8, u = up ? (k - 8 + .5) / 6 : (k + .5) / 8, z = up ? fz - .07 : sz + 1 + u * (rz0 - sz - 1), y = up ? A.R + .6 + u * (H - A.R - 1.6) : .05, c = new THREE.Group(); c.position.set(cx, y, z); if (up) c.rotation.x = -Math.PI / 2; g.add(c);     /* m1325: 8 chase down the run-in, 6 on up the face */
       for (const sx of [-1, 1]) { const b = new THREE.Mesh(new THREE.BoxGeometry(1.3, .02, .16), cm.clone()); b.position.x = sx * .45; b.rotation.y = sx * .7; c.add(b); } chev.push(c); } }
   const lipM = new THREE.Mesh(new THREE.BoxGeometry(A.hw * 2, .1, .06), new THREE.MeshBasicMaterial({ color: 0xffc040, toneMapped: false, transparent: true })); lipM.position.set(cx, H - .03, fz - .06); g.add(lipM);
   { const mz = cz + A.hd + .06, my = H - 4.5, mk = new THREE.Group(); mk.position.set(cx, my, mz); g.add(mk);
