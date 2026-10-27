@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1249 -- machines are melee targets: the charge stops ON a turret (his report)
+
+*"I make it up a tower and there's a sentry gun or a turret or the giant crossbow... I charge-attack it and I launch over it or through it,
+it doesn't stop on it. It does that with humans, but not with these."* He is right, and the cause was not the dash.
+- **What was wrong.** Every melee lock (`meleeLock`, behind the charge's `chargeAim`, the swipe's lunge `meleeGo`, the air kick, the
+  swipe segment) only looped `DUMMIES`. A machine was empty air to it, so the charge flew its whole hold-length (`wantD`) straight past.
+- **The fix.** `mechTargets()` hands the lock a stand-in body for every live shooting machine:
+  - every turret (tower guns, the zeppelin, airship and skiff guns, the sentry guns)
+  - the Gatehouse ballista
+  - the Siege Yard's ballistas and trebuchet
+  - the Flying Ship's cannons
+  - the Rampart's wall sentries
+
+  Each stand-in is scored exactly like a man. Its standoff is widened by how much fatter the machine is than a body (`dr`), so the
+  dash stops at arm's length from its surface. Only machines within `MECH.dy` 2.2 m of his own height count, because the dash is flat.
+- **The indicator.** The charge's existing floor RING (`markRing`, the one that closes as the hold fills) now draws under the locked
+  machine as it does under a man, so a lock is visible before he lets go.
+
+The swipe lunge gets the same lock, so an ordinary cut steps in to the gun too. SHIPPED UNVERIFIED.
+
 ## m1248 -- Flying Ship House pass 6: climb her (Building Forge loop, extra pass)
 
 The ship gets its first LADDERS in the forge. They use the kit worlds' climbing (`kitClimbAdd` into `KCLIMB`): walk into one and climb,
