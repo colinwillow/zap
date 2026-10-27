@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1200 -- Floating Islands pass 3: the polish (Building Forge loop)
+
+- **Drifting rocks:** four small rocks float round each island, bobbing and turning slowly. They are picture only, with no collision.
+- **Jin crystals:** three glowing cyan crystals stick out of each rock underside.
+- **Vines:** seven vines hang off each rim.
+- **Pull-up bar:** on the middle island, clear of its bridge ends, lanterns and waterfall.
+- **Drone:** one circles the whole group.
+
+The Floating Islands are DONE (3 passes). Next: alternate -- an extra pass on the next done building that hasn't had one (oldest
+first), then Set 2 #20 Ninja Pillars.
+
 ## m1199 -- Robot Barracks pass 4: the drill master (Building Forge loop, extra pass)
 
 **The DRILL MASTER** now stands beside the taiko dais, facing his six ranks. He is a robot samurai at `bossK` x1.45 scale with
