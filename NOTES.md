@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1202 -- Ninja Pillars pass 1 (Building Forge loop, Set 2 #20)
+
+`NPIL`, in BLDG.list as `npil`, centred at (27, 46) inside a raked-sand ring (r 7.6) with a stone kerb.
+- **The spiral.** Ten narrow octagonal stone pillars with bronze caps climb from 1 m to 8 m: .78 m higher each, 2.2 m centre
+  to centre (about 1.3 m edge to edge), tightening from r 5.2 to 4.1.
+- **Other pillars.** Two low strays (.5 and .25 m) to start from, and three off the line at mid height (2.2, 3.6 and 4.6 m) as a
+  second way, or a place to fall to.
+- **Colliders.** Each pillar is a solid box column (.85 x its radius). The bodies and the caps are one merged mesh each.
+- **Two BARS** hang on chains crosswise between the tallest pairs (6-7 and 8-9), 1.4 m over the higher one, so you swing along
+  the line.
+- **A BELL** hangs on a frame on top of the last (8 m) pillar. Strike it and it rings (`npilHit` in `bldHit`).
+- **Red banners** mark the start.
+
+What wants a look: whether .78 m up and 1.3 m across is a fair leap at every step.
+Next: alternate -- an extra pass on Floating Islands (4).
+
 ## m1201 -- Jin Lighthouse pass 4: take the light (Building Forge loop, extra pass)
 
 Strike the bronze DRIVE in the keeper's room: the drum and shaft at the room's centre, from inside, through `bldHit`.
