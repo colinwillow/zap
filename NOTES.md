@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- Timber Siege Fort pass 6 of 10: the defenders (X3, WORKER A)
+
+All of them can be killed:
+- **Archers** (`archerPost`): two on the first deck's front corners, one on the second deck, one at the back of the top deck.
+- **A SENTRY GUN** inside the watch house, looking out of its door over the front.
+- **Two SAMURAI** at the tunnel's mouth, katanas drawn. They stand their post until they see you, and alarmed guards and archers open the
+  gates (`bgateStep`'s list).
+- **ROCK HOPPERS**, timber bins of stones on the top deck's two front corners (`tfortRocks`).
+  - While you are on the ground in front of the fort, each tips a boulder at you every 3.5-4.5 s.
+  - The boulder is aimed at where you stand (with half a lead on your run) and falls on a real arc over the terraces.
+  - It lands with a boom, dust and a shake: 14 damage within 2.2 m, and a roll dodges it.
+  - Five blows break a hopper; it is rebuilt a minute later.
+
+SHIPPED UNVERIFIED. Next: pass 7, the timber breaks -- cut the braces and the bays sag and fall.
+
 ## m1334 -- Timber Siege Fort pass 5 of 10: the work site (X3, WORKER A)
 
 The reference's half-built siege works, all round the fort:
