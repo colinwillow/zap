@@ -22521,19 +22521,21 @@ function heronBuild() {
     const part = (geo, at, dir) => { _q.setFromUnitVectors(up, dir.normalize()); mg(geo, gold, _m4.compose(at, _q, new THREE.Vector3(1, 1, 1))); };
     part(new THREE.ConeGeometry(.22 * sc, .8 * sc, 6), P0.clone().addScaledVector(up, .5 * sc).addScaledVector(out, -.12 * sc), up.clone().addScaledVector(out, -.35));
     part(new THREE.ConeGeometry(.34 * sc, .45 * sc, 3), P0.clone().addScaledVector(up, 1.05 * sc).addScaledVector(out, .2 * sc), up.clone().addScaledVector(out, .9)); };
-  const roof = (rx, rz, hx, hz, run, top, drop, lift, hole, G, fish) => {
+  const roof = (rx, rz, hx, hz, run, top, drop, lift, hole, G, fish, cut) => {
+    const inCut = (x, z) => cut && x > cut.x0 && x < cut.x1 && z > cut.z0 && z < cut.z1;     // pass 6: where the gallery's corridors run
     const EX = hx + run, EZ = hz + run, h = (x, z) => { const ax = Math.abs(x) - hx, az = Math.abs(z) - hz, u = clamp(Math.max(ax, az) / run, 0, 1), cor = Math.pow(clamp(ax / run, 0, 1), 3) * Math.pow(clamp(az / run, 0, 1), 3);
       return top - drop * (1 - (1 - u) * (1 - u)) + lift * cor; };
     const bp = (E, hh) => { const a = [], seg = (p, q, n) => { for (let i = 0; i < n; i++) a.push(p + (q - p) * i / n); }; seg(-E, -hh, 6); if (hh > .01) seg(-hh, hh, Math.max(1, Math.round(hh / .8))); seg(hh, E, 6); a.push(E); return a; };
     const XS = bp(EX, hx), ZS = bp(EZ, hz), pos = [], uv = [];
     for (let i = 0; i < XS.length - 1; i++) for (let j = 0; j < ZS.length - 1; j++) { const xa = XS[i], xb = XS[i + 1], za = ZS[j], zb = ZS[j + 1], mx = (xa + xb) / 2, mz = (za + zb) / 2;
-      if (hole && Math.abs(mx) < hx && Math.abs(mz) < hz) continue;
+      if (hole && Math.abs(mx) < hx && Math.abs(mz) < hz) continue; if (!(cut && cut.lipOnly) && inCut(rx + mx, rz + mz)) continue;
       const onX = Math.abs(mx) - hx > Math.abs(mz) - hz, P = [[xa, za], [xa, zb], [xb, zb], [xa, za], [xb, zb], [xb, za]];
       for (const [x, z] of P) { const y = h(x, z); pos.push(rx + x, y, rz + z); uv.push((onX ? z : x) / .45, Math.max(Math.abs(x) - hx, Math.abs(z) - hz) / .7); tris.push(rx + x, y + .04, rz + z); } }
     const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); geo.computeVertexNormals(); mg(geo, tile, null, 1);
     const rim = []; for (let k = 0; k < 48; k++) { const s = k / 48 * 4, f = s % 1, e = Math.floor(s); rim.push(e === 0 ? [-EX + 2 * EX * f, EZ] : e === 1 ? [EX, EZ - 2 * EZ * f] : e === 2 ? [EX - 2 * EX * f, -EZ] : [-EX, -EZ + 2 * EZ * f]); }
     for (let k = 0; k < 48; k++) { const [x0, z0] = rim[k], [x1, z1] = rim[(k + 1) % 48]; rod([rx + x0, h(x0, z0), rz + z0], [rx + x1, h(x1, z1), rz + z1], .09, timber); }
     const eY = top - drop; for (const [ax, sg] of [[1, -1], [1, 1], [0, -1], [0, 1]]) { const L = (ax ? EZ : EX) * .6;
+      if (cut && (ax ? rx + sg * (EX - .14) > cut.x0 && rx + sg * (EX - .14) < cut.x1 && rz + L > cut.z0 && rz - L < cut.z1 : rz + sg * (EZ - .14) > cut.z0 && rz + sg * (EZ - .14) < cut.z1 && rx + L > cut.x0 && rx - L < cut.x1)) continue;
       O.boxes.push(ax ? { minx: sg < 0 ? rx - EX : rx + EX - .28, maxx: sg < 0 ? rx - EX + .28 : rx + EX, miny: eY - .9, maxy: eY + .05, minz: rz - L, maxz: rz + L }
                       : { minx: rx - L, maxx: rx + L, miny: eY - .9, maxy: eY + .05, minz: sg < 0 ? rz - EZ : rz + EZ - .28, maxz: sg < 0 ? rz - EZ + .28 : rz + EZ }); }
     // PASS 2: the roof's RHYTHM -- white-mortared HIP RIBS up every corner (the reference's white lines), a round tile END CAP every .5 m
@@ -22541,7 +22543,7 @@ function heronBuild() {
     for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { let pv = null; for (let i = 0; i <= 7; i++) { const f = i / 7, x = sx * (hx + run * f), z = sz * (hz + run * f), v = [rx + x, h(x, z) + .07, rz + z]; if (pv) rod(pv, v, .085, plaster); pv = v; }
       box(rx + sx * EX - .2, rx + sx * EX + .2, h(sx * EX, sz * EZ) - .05, h(sx * EX, sz * EZ) + .3, rz + sz * EZ - .2, rz + sz * EZ + .2, tileD, 0); }
     for (const [ax, sg] of [[1, -1], [1, 1], [0, -1], [0, 1]]) { const len = ax ? EZ : EX, n = Math.round(len * 2 / .5);
-      for (let i = 1; i < n; i++) { const l = -len + 2 * len * i / n, x = ax ? sg * EX : l, z = ax ? l : sg * EZ, y = h(x, z) - .03, o = [ax ? sg * .09 : 0, 0, ax ? 0 : sg * .09]; rod([rx + x - o[0], y, rz + z - o[2]], [rx + x + o[0], y, rz + z + o[2]], .085, tileD); } }
+      for (let i = 1; i < n; i++) { const l = -len + 2 * len * i / n, x = ax ? sg * EX : l, z = ax ? l : sg * EZ, y = h(x, z) - .03; if (!(cut && cut.lipOnly) && inCut(rx + x, rz + z)) continue; const o = [ax ? sg * .09 : 0, 0, ax ? 0 : sg * .09]; rod([rx + x - o[0], y, rz + z - o[2]], [rx + x + o[0], y, rz + z + o[2]], .085, tileD); } }
     if (!hole) { const ex = hx > hz ? hx : 0, ez = hx > hz ? 0 : hz; rod([rx - ex, top + .04, rz - ez], [rx + ex, top + .04, rz + ez], .17, plaster); rod([rx - ex, top + .16, rz - ez], [rx + ex, top + .16, rz + ez], .12, tileD);
       if (fish) for (const e of [-1, 1]) shachi(rx + e * ex, top + .2, rz + e * ez, hx > hz ? e : 0, hx > hz ? 0 : e, fish); }
     for (const [S, u, w, ty, yr] of G || []) gable(rx, rz, hx, hz, run, h, S, u, w, ty, yr, !hole); };
@@ -22573,7 +22575,7 @@ function heronBuild() {
     tris.push(x0, .15, zb, x1, .15, zb, x1, A.H + .15, zt, x0, .15, zb, x1, A.H + .15, zt, x0, A.H + .15, zt); }
   // ---- THE MAIN KEEP: five hollow storeys stepping in, a door on alternate sides out onto the roof below, a ladder up through a hatch ----
   const kx = cx - 1, kz = cz - 7, hxOf = k => A.hx0 - A.shrink * k, hzOf = k => A.hz0 - A.shrink * k, yOf = k => A.H + A.sh * k, N = A.n, t = A.t, run = A.shrink + A.eave;
-  const doors = ['+x', '-x', '+x', '-x', '+x'];
+  const doors = ['+x', '-x', '+x', '-x', '+x'], GCUT = { x0: cx - 6, x1: cx, z0: kz + hzOf(1), z1: cz + 8.1 };     // GCUT: the gallery's corridors (pass 6)
   for (let k = 0; k < N; k++) {
     const hx = hxOf(k), hz = hzOf(k), y0 = yOf(k), y1 = y0 + A.sh, wt = y1 - .45, x0 = kx - hx, x1 = kx + hx, z0 = kz - hz, z1 = kz + hz, dw = A.door / 2, sd = doors[k];
     for (const S of ['-x', '+x', '-z', '+z']) { const ax = S[1] === 'x', sg = S[0] === '-' ? -1 : 1, c = (ax ? kx : kz) + sg * ((ax ? hx : hz) - t / 2);
@@ -22583,6 +22585,7 @@ function heronBuild() {
         const f = c + sg * (t / 2 + .04);     // the door's dark timber frame on the outer face
         for (const e of [-1, 1]) box(f - .06, f + .06, y0, y0 + A.doorH + .15, mid + e * dw - .12 * (e < 0 ? 1 : 0), mid + e * dw + .12 * (e > 0 ? 1 : 0), timber, 0);
         box(f - .06, f + .06, y0 + A.doorH, y0 + A.doorH + .18, mid - dw - .12, mid + dw + .12, timber, 0); }
+      else if (S === '+z' && k < 2) { const gm = cx - 3; wall(lo, gm - dw, y0, wt); wall(gm + dw, hi, y0, wt); wall(gm - dw, gm + dw, y0 + A.doorH, wt); }     // pass 6: into the gallery
       else if (k === N - 1) { const ow = (hi - lo) * .3; wall(lo, mid - ow, y0, wt); wall(mid + ow, hi, y0, wt); wall(mid - ow, mid + ow, y0, y0 + .9); wall(mid - ow, mid + ow, y0 + 2.5, wt); }     // pass 5: the lookout's wide openings
       else wall(lo, hi, y0, wt); }
     box(x0 - .04, x1 + .04, y0, y0 + .3, z0 - .04, z1 + .04, timber, 0);     // a dark sill band at every storey's foot
@@ -22603,9 +22606,9 @@ function heronBuild() {
     // THE ROOF over this storey: round the next storey's walls (a hole), or on the top storey a ridge along x
     // PASS 2: which gables break which roof line (the reference's rhythm: a kara-hafu low on the front, chidori up the faces, a door side
     // keeps its middle clear); the top roof's ridge ends become irimoya gables, and its ridge carries the two shachi
-    const GB = [[['+x', 0, 4.6, 'kara'], ['-z', 0, 5, 'chidori']], [['+x', -2.7, 2.8, 'chidori'], ['+x', 2.7, 2.8, 'chidori'], ['-z', 0, 3.6, 'kara'], ['+z', 0, 3.8, 'chidori'], ['-x', 0, 3.4, 'chidori']],
+    const GB = [[['+x', 0, 4.6, 'kara'], ['-z', 0, 5, 'chidori']], [['+x', -2.7, 2.8, 'chidori'], ['+x', 2.7, 2.8, 'chidori'], ['-z', 0, 3.6, 'kara'], ['-x', 0, 3.4, 'chidori']],
       [['+x', 0, 5, 'chidori'], ['-z', 0, 3.6, 'chidori'], ['+z', 0, 3.4, 'chidori']], []][k];     // (roof 3's gables gave way to the lookout's balcony, pass 5)
-    if (k < N - 1) { const u = A.shrink / run, drop = 1.25; roof(kx, kz, hxOf(k + 1), hzOf(k + 1), run, wt + drop * (1 - (1 - u) * (1 - u)), drop, .55, 1, GB); }
+    if (k < N - 1) { const u = A.shrink / run, drop = 1.25; roof(kx, kz, hxOf(k + 1), hzOf(k + 1), run, wt + drop * (1 - (1 - u) * (1 - u)), drop, .55, 1, GB, 0, k < 2 ? GCUT : null); }
     else { const r2 = hz + A.eave, u = hz / r2, drop = 2.6, top = wt + drop * (1 - (1 - u) * (1 - u)); roof(kx, kz, hx - hz, 0, r2, top, drop, .7, 0, [['+x', 0, hz * 1.5, 'chidori', top - .2], ['-x', 0, hz * 1.5, 'chidori', top - .2]], 1.3); }
   }
   // ---- PASS 5: INSIDE THE KEEP. The GREAT PILLARS (the reference's shinbashira: two timber columns through every storey, solid, a dark
@@ -22626,18 +22629,39 @@ function heronBuild() {
     for (const [a, b, ax] of [[X0, X1, 0], [Z0, Z1, 1]]) for (let u = a; u <= b + .01; u += (b - a) / Math.round((b - a) / 1.1)) for (const c of ax ? [X0 + .04, X1 - .04] : [Z0 + .04, Z1 - .04]) { const [x, z] = ax ? [c, u] : [u, c]; box(x - .05, x + .05, d1, d1 + .9, z - .05, z + .05, timber, 0); }
     const tx = kx + hx + .7, tz = kz + 1.6; for (const a of [0, 2.1, 4.2]) rod([tx + Math.cos(a) * .3, d1, tz + Math.sin(a) * .3], [tx, d1 + 1.1, tz], .025, gold);
     rod([tx - .45, d1 + 1.05, tz - .1], [tx + .55, d1 + 1.35, tz + .1], .07, gold); }
-  // ---- THE TOWER (north end, three storeys) and THE GALLERY joining it to the keep: solid white masses for now, their roofs walkable ----
-  { const tx = cx - 3, tz = cz + 11, sh = 3.2, sk = .6, ev = 1.5, rn2 = sk + ev, thx = k => 4 - sk * k, thz = k => 3.5 - sk * k;
-    for (let k = 0; k < 3; k++) { const y0 = A.H + sh * k, wt = y0 + sh - .45, hx = thx(k), hz = thz(k);
-      box(tx - hx, tx + hx, y0, wt, tz - hz, tz + hz, plaster, 1); box(tx - hx - .04, tx + hx + .04, y0, y0 + .3, tz - hz - .04, tz + hz + .04, timber, 0);
-      for (const S of ['-x', '+x', '-z', '+z']) { const ax = S[1] === 'x', sg = S[0] === '-' ? -1 : 1; if (S === '-z' && k < 2) continue;
-        winRow(ax, sg, (ax ? tx : tz) + sg * (ax ? hx : hz), ax ? tz - hz : tx - hx, ax ? tz + hz : tx + hx, y0 + (k ? 1.2 : 1.3), 1.5, null, k === 0); }     // pass 3
-      if (k < 2) { const u = sk / rn2, drop = 1.1; roof(tx, tz, thx(k + 1), thz(k + 1), rn2, wt + drop * (1 - (1 - u) * (1 - u)), drop, .45, 1, k ? [['+x', 0, 2.6, 'kara']] : [['+x', 0, 3.4, 'chidori'], ['+z', 0, 3, 'chidori']]); }
+  // ---- PASS 6: THE CORNER TOWER and THE GALLERY, hollow. The tower's storeys now match the keep's (3.6 m), so the gallery's two
+  // CORRIDORS join floor to floor: the lower runs from the keep's ground hall to the tower's, the upper from the keep's storey 1 to the
+  // tower's, and the stairs in each make a loop (keep up, gallery across, tower down, gallery back). The tower has a door out onto the
+  // stone, a steep stair up each storey, and a watch room on top with a door onto its roof; the gallery's roof is a path from the
+  // keep's roofs to the tower's. Lanterns down both corridors. The lips under the eaves are left out where they would hang in a
+  // corridor (`roof`'s cut) ----
+  const slab = (x0, x1, z0, z1, y, wa, wb, wc, wd) => { box(x0, wa, y - .25, y, z0, z1, floorM, 1); box(wb, x1, y - .25, y, z0, z1, floorM, 1); box(wa, wb, y - .25, y, z0, wc, floorM, 1); box(wa, wb, y - .25, y, wd, z1, floorM, 1); };
+  const stair = (alongX, b, e, c0, c1, ylo, yhi, rail) => { const n = 12, P = (a, c, y) => alongX ? [a, y, c] : [c, y, a], da = (e - b) / n, rise = (yhi - ylo) / n;
+    for (let i = 0; i < n; i++) { const a0 = b + da * i, lo = Math.min(a0, a0 + da), hi = Math.max(a0, a0 + da); alongX ? box(lo, hi, ylo + rise * i, ylo + rise * (i + 1), c0, c1, timber, 0) : box(c0, c1, ylo + rise * i, ylo + rise * (i + 1), lo, hi, timber, 0); }
+    tris.push(...P(b, c0, ylo + .12), ...P(e, c0, yhi + .05), ...P(e, c1, yhi + .05), ...P(b, c0, ylo + .12), ...P(e, c1, yhi + .05), ...P(b, c1, ylo + .12));
+    for (const f of [0, .5, 1]) { const [x, y, z] = P(b + (e - b) * f, rail, ylo + (yhi - ylo) * f); box(x - .04, x + .04, y, y + 1, z - .04, z + .04, timber, 0); }
+    rod(P(b, rail, ylo + 1), P(e, rail, yhi + 1), .04, timber); };
+  const lampG = new THREE.MeshStandardMaterial({ color: 0xffe2b8, emissive: 0xff9a40, emissiveIntensity: 1.8, toneMapped: false });
+  { const tx = cx - 3, tz = cz + 11, sh = A.sh, sk = .6, ev = 1.5, rn2 = sk + ev, thx = k => 4 - sk * k, thz = k => 3.5 - sk * k, tt = .3, dw = A.door / 2, TD = [[['-z', tx], ['+x', tz]], [['-z', tx]], [['-x', tz]]];
+    for (let k = 0; k < 3; k++) { const y0 = A.H + sh * k, wt = y0 + sh - .45, hx = thx(k), hz = thz(k), x0 = tx - hx, x1 = tx + hx, z0 = tz - hz, z1 = tz + hz;
+      for (const S of ['-x', '+x', '-z', '+z']) { const ax = S[1] === 'x', sg = S[0] === '-' ? -1 : 1, c = (ax ? tx : tz) + sg * ((ax ? hx : hz) - tt / 2), lo = ax ? z0 : x0, hi = ax ? z1 : x1, d = TD[k].find(q => q[0] === S);
+        const wall = (a0, a1, yy0, yy1) => ax ? box(c - tt / 2, c + tt / 2, yy0, yy1, a0, a1, plaster, 1) : box(a0, a1, yy0, yy1, c - tt / 2, c + tt / 2, plaster, 1);
+        if (d) { wall(lo, d[1] - dw, y0, wt); wall(d[1] + dw, hi, y0, wt); wall(d[1] - dw, d[1] + dw, y0 + A.doorH, wt); } else wall(lo, hi, y0, wt);
+        if (!(S === '-z' && k < 2)) winRow(ax, sg, (ax ? tx : tz) + sg * (ax ? hx : hz), lo, hi, y0 + (k ? 1.35 : 1.5), 1.5, d ? [[d[1] - dw - .7, d[1] + dw + .7]] : null, k === 0); }
+      box(x0 - .04, x1 + .04, y0, y0 + .3, z0 - .04, z1 + .04, timber, 0);
+      if (k === 0) box(x0 + tt, x1 - tt, y0, y0 + .04, z0 + tt, z1 - tt, floorM, 0);
+      else if (k === 1) { const zi = z1 - tt - .05; slab(x0, x1, z0, z1, y0, tx - 1.8, tx + 1.8, zi - 1.15, zi + .05); stair(1, tx - 1.7, tx + 1.7, zi - 1.1, zi, y0 - sh, y0, zi - 1.1); }
+      else { const xi = x1 - tt - .05; slab(x0, x1, z0, z1, y0, xi - 1.15, xi + .05, tz - 1.8, tz + 1.4); stair(0, tz - 1.7, tz + 1.3, xi - 1.1, xi, y0 - sh, y0, xi - 1.1); }
+      rod([tx, wt - .1, tz], [tx, wt - .7, tz], .02, timber); box(tx - .2, tx + .2, wt - 1.15, wt - .7, tz - .2, tz + .2, lampG, 0);
+      if (k < 2) { const u = sk / rn2, drop = 1.1; roof(tx, tz, thx(k + 1), thz(k + 1), rn2, wt + drop * (1 - (1 - u) * (1 - u)), drop, .45, 1, k ? [['+x', 0, 2.6, 'kara']] : [['+x', 0, 3.4, 'chidori'], ['+z', 0, 3, 'chidori']], 0, GCUT); }
       else { const r2 = hz + ev, u = hz / r2, drop = 1.9, top = wt + drop * (1 - (1 - u) * (1 - u)); roof(tx, tz, hx - hz, 0, r2, top, drop, .55, 0, [['+x', 0, hz * 1.4, 'chidori', top - .15], ['-x', 0, hz * 1.4, 'chidori', top - .15]], .9); } }
-    const gx = cx - 3, gz0 = kz + A.hz0, gz1 = tz - 3.5, gw = 3, wt = A.H + 6.4 - .45, rr = gw + 1.2, u = gw / rr, drop = 2, ez0 = kz + hzOf(1) + .1, ez1 = gz1 + 1.2, gzc = (ez0 + ez1) / 2;
-    box(gx - gw, gx + gw, A.H, wt, gz0, gz1, plaster, 1);
-    for (const sg of [-1, 1]) { winRow(1, sg, gx + sg * gw, gz0, gz1, A.H + 1.45, 1.4, null, 1); winRow(1, sg, gx + sg * gw, gz0, gz1, A.H + 4.5, 1.4, null, 0); }     // pass 3 box(gx - gw - .04, gx + gw + .04, A.H, A.H + .3, gz0, gz1, timber, 0); box(gx - gw - .04, gx + gw + .04, A.H + 3.2, A.H + 3.45, gz0, gz1, timber, 0);
-    roof(gx, gzc, 0, (ez1 - ez0) / 2 - rr, rr, wt + drop * (1 - (1 - u) * (1 - u)), drop, .4, 0, [['+x', -1.6, 2.6, 'chidori'], ['+x', 2.2, 2.2, 'kara'], ['-x', 0, 2.8, 'chidori']]); }
+    const gx = cx - 3, gw = 3, tt2 = .3, zL0 = kz + A.hz0, zL1 = tz - thz(0), zU0 = kz + hzOf(1), zU1 = tz - thz(1), yU = A.H + A.sh, wt = yU + 2.75, rr = gw + 1.2, u = gw / rr, drop = 2, ez0 = zU0 + .1, ez1 = zL1 + 1.2, gzc = (ez0 + ez1) / 2;
+    for (const sg of [-1, 1]) { const c = gx + sg * (gw - tt2 / 2); box(c - tt2 / 2, c + tt2 / 2, A.H, yU, zL0, zL1, plaster, 1); box(c - tt2 / 2, c + tt2 / 2, yU, wt, zU0, zU1, plaster, 1); }
+    box(gx - gw + tt2, gx + gw - tt2, yU - .25, yU, zU0, zU1, floorM, 1); box(gx - gw + tt2, gx + gw - tt2, A.H, A.H + .04, zL0, zL1, floorM, 0);
+    for (const sg of [-1, 1]) { winRow(1, sg, gx + sg * gw, zL0, zL1, A.H + 1.45, 1.4, null, 1); winRow(1, sg, gx + sg * gw, zU0, zU1, yU + .9, 1.4, null, 0); }
+    box(gx - gw - .04, gx + gw + .04, A.H, A.H + .3, zL0, zL1, timber, 0); box(gx - gw - .04, gx + gw + .04, yU - .25, yU, zU0, zU1, timber, 0);
+    for (const f of [.2, .5, .8]) { const z = zL0 + (zL1 - zL0) * f; for (const [yy, top] of [[A.H, yU - .25], [yU, wt]]) { rod([gx, top - .05, z], [gx, top - .5, z], .02, timber); box(gx - .18, gx + .18, top - .9, top - .5, z - .18, z + .18, lampG, 0); } }
+    roof(gx, gzc, 0, (ez1 - ez0) / 2 - rr, rr, wt + drop * (1 - (1 - u) * (1 - u)), drop, .4, 0, [['+x', -1.6, 2.6, 'chidori'], ['+x', 2.2, 2.2, 'kara'], ['-x', 0, 2.8, 'chidori']], 0, Object.assign({ lipOnly: 1 }, GCUT)); }
   // ---- THE STOREHOUSE at the foot (the reference's low white building in front of the stone): breakable walls, a door to the east ----
   { const T = hallTex(), sx0 = cx + A.bx + 2.5, sx1 = sx0 + 6, sz0 = cz - 14, sz1 = cz - 6, sxc = (sx0 + sx1) / 2, szc = (sz0 + sz1) / 2, H = 3, dw = 1, tt = .3;
     const wall = (x, z, L, yaw) => O.walls.push(cwallBuild(g, T, x, z, L, tt, yaw, H, O));
@@ -23038,7 +23062,7 @@ const BLDG = { list: [
   { key: 'oni', t: 'Oni Gate', sub: 'a fortress wall carved as a demon face: walk in through its fanged mouth (it BITES on a cycle), guard rooms in its cheeks, sentry guns in its eyes, horns, a stair up the back to a lookout', pass: 3, build: () => oniBuild(), clear: () => oniClear(), on: () => !!ONI.on, step: dt => oniStep(dt) },
   { key: 'obs', t: 'Jin Observatory', sub: 'a clockwork tower: a spiral stair inside past great gears to a balcony under a copper dome whose telescope marks you in the open for a volley of arrows (blind its lens), a clock face', pass: 3, build: () => obsBuild(), clear: () => obsClear(), on: () => !!OBS.on, step: dt => obsStep(dt) },
   { key: 'fest', t: 'Lantern Festival Street', sub: 'a street of festival stalls (roofs to stand on, breakable backs) under strings of paper lanterns, red gates at both ends, bars across, a robot dragon dance to cut apart (strike the taiko to make it wild)', pass: 3, build: () => festBuild(), clear: () => festClear(), on: () => !!FEST.on, step: dt => festStep(dt) },
-  { key: 'heron', t: 'White Heron Castle', sub: 'a Himeji-style castle on a battered stone base: a five-storey white keep under layered grey roofs (every roof walkable, a hall on every storey, steep stairs up, the great pillars, a lookout balcony at the top), a gallery wing to a corner tower, a stair up the stone, a storehouse at the foot whose walls break', pass: 5, build: () => heronBuild(), clear: () => heronClear(), on: () => !!HERON.on, step: dt => heronStep(dt) },
+  { key: 'heron', t: 'White Heron Castle', sub: 'a Himeji-style castle on a battered stone base: a five-storey white keep under layered grey roofs (every roof walkable, a hall on every storey, steep stairs up, the great pillars, a lookout balcony at the top), a gallery wing of two corridors to a hollow corner tower (a loop: keep up, across, tower down, back), its roof a path, a stair up the stone, a storehouse at the foot whose walls break', pass: 6, build: () => heronBuild(), clear: () => heronClear(), on: () => !!HERON.on, step: dt => heronStep(dt) },
   { key: 'gpag', t: 'Great Red Pagoda', sub: 'five storeys of red lacquer: a room on every floor, ladders up through the hatches, a balcony round every storey, a spire; a pavilion whose roof you can climb; a red fence; climb the outside eave to eave, bars, a zipline off the spire; an armoury, a library, a bell room (the alarm), a lookout; archers, a sentry gun, gate guards; glowing windows, lantern halos, a beacon on the spire; streamers, chimes, birds; strike the gong at the top and the tower lights up and the gate opens', pass: 10, build: () => gpagBuild(), clear: () => gpagClear(), on: () => !!GPAG.on, step: dt => gpagStep(dt) },
   { key: 'zramp', t: 'Zoom Ramp Tower', sub: 'zoom from the red gate (full hold), up the ramp and straight up the face -- only a full zoom reaches the gold lip; your mark shows how close; or zigzag up the chimney', pass: 3, build: () => zrampBuild(), clear: () => zrampClear(), on: () => !!ZRAMP.on, step: dt => zrampStep(dt) },
   { key: 'swrk', t: 'Sky Wreck', sub: 'a flying junk come down on rock spires: a tilted deck up a fallen mast, a hold of cargo behind breakable planks, a crow\'s nest up two bars', pass: 1, build: () => swrkBuild(), clear: () => swrkClear(), on: () => !!SWRK.on, step: dt => swrkStep(dt) },
