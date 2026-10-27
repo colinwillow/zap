@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1211 -- Senbon Torii pass 3: the polish (Building Forge loop)
+
+- **Maples.** Four red maples (merged trunks, merged leaf clumps, solid trunks) flank the walk, with red leaves drifting down.
+- **Chozubachi.** A stone water basin with a bamboo spout and ladles by the gate-hall.
+- **Ema.** A rack of prayer boards beside the fox shrine.
+- **Shimenawa.** A rope with paper shide hung on the top gate.
+- **Pull-up bar** on the terrace.
+- **A drone.**
+
+The Senbon Torii is DONE (3 passes). Next: alternate -- an extra pass (5) on the Pagoda, then Set 2 #22 Siege Yard pass 1.
+
 ## m1210 -- Gatehouse pass 5: man the ballista (Building Forge loop, extra pass)
 
 Stand at the ballista's breech on the deck (within `manR` 1.5 m, at the deck's height) and it is YOURS:
