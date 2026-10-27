@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m1161 -- SPIDER-BOT HANGAR pass 1 (BUILDINGS.md #13, at (-32, -24))
+## m1162 -- SPIDER-BOT HANGAR pass 1 (BUILDINGS.md #13, at (-32, -24))
 
 `SPHANG`, `spiderMake`, `sphangBuild` / `sphangStep` / `sphangHit` / `sphangClear`. SPAWN > BUILDINGS > Spider-Bot Hangar.
 (2 m west of its slot: the Rampart's west bastion stands at x -25.)
