@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1238 -- Market pass 6: the fireworks stall (Building Forge loop, extra pass)
+
+A FIREWORKS STALL now stands at the market's east end: a booth with a red roof and a rack of eight paper rockets in four colours.
+Strike it (`mktFireHit` in `bldHit`) and the rack LAUNCHES:
+- **The rockets.** All eight streak up, then dive on the nearest standing bodies within `fwR` 26 m. They share the targets out,
+  homing at 16 m/s with spark trails.
+- **The burst.** Each bursts in its colour with a boom and knocks its target flat (`dummyBlow`, `fwDmg` 6).
+- **Nobody near.** With nobody in reach they burst high in the sky, as a show.
+- **Reload.** The rack takes `fwCd` 25 s.
+
+Next: alternate -- Jin Observatory pass 3.
+
 ## m1237 -- Jin Observatory pass 2: the dome hunts (Building Forge loop)
 
 **THE DOME HUNTS** (his spec: "the dome turns to track whoever is in the open").
