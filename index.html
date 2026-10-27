@@ -10148,6 +10148,7 @@ function arenaStep(dt) {
   if (COVER.pending) { COVER.pending = 0; coverShow(COVER.show); }     // m1008
   if (TURRET.list.length || TURRET.shots.length) turretStep(dt);     // m1011
   courseStep(dt);     // m1078: the testing ground's boot pad and course
+  slamRingStep(dt);     // m1088: the slam's shockwave rings
   steelStep(dt);     // m1067
   coverStep(dt);     // m1014
   for (const d of ARENA.live) tailSway(d, dt);     // m989: a KO'd body too -- lying on his back is when the tail matters most
@@ -11235,6 +11236,7 @@ function arenaUi() {
       else if (a === 'cart') { CART.pose = CART.poses[(CART.poses.indexOf(CART.pose) + 1) % CART.poses.length]; try { localStorage.setItem('mel.cart2', CART.pose); } catch (err) {} }
       else if (a === 'kcslow') { const T = KATANA.chargeSlows; KATANA.chargeSlow = T[(T.indexOf(KATANA.chargeSlow) + 1) % T.length]; try { localStorage.setItem('mel.kat.cslow', KATANA.chargeSlow); } catch (err) {} }
       else if (a === 'sprint') { const T = NINJA.looks; NINJA.look = T[(T.indexOf(NINJA.look) + 1) % T.length]; try { localStorage.setItem('mel.sprint', NINJA.look); } catch (err) {} }
+      else if (a === 'sideflick') { TORNADO.pick = TORNADO.picks[(TORNADO.picks.indexOf(TORNADO.pick) + 1) % TORNADO.picks.length]; try { localStorage.setItem('mel.sideflick', TORNADO.pick); } catch (err) {} }     // m1088
       else if (a === 'aslam') { SLAM.katPick = SLAM.katPicks[(SLAM.katPicks.indexOf(SLAM.katPick) + 1) % SLAM.katPicks.length]; try { localStorage.setItem('mel.aslam', SLAM.katPick); } catch (err) {} }     // m1087
       else if (a === 'kswing') { const T = KATANA.styles; KATANA.style = T[(T.indexOf(KATANA.style) + 1) % T.length]; katStyle(); try { localStorage.setItem('mel.kat.style', KATANA.style); } catch (err) {} }
       else if (a === 'ktilt') { const T = KATANA.tilts; KATANA.runTilt = T[(T.indexOf(KATANA.runTilt) + 1) % T.length]; try { localStorage.setItem('mel.kat.tilt', KATANA.runTilt); } catch (err) {} }
@@ -11257,7 +11259,7 @@ function arenaUi() {
   if (ARENA.tools === undefined) { try { ARENA.tools = +localStorage.getItem('mel.arena.tools') || 0; } catch (err) { ARENA.tools = 0; } }
   const tools = ARENA.tools && !m;     // a menu open folds the tools away: the screen is not tall enough for both
   let h = '<div class="ar-bar">' + B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('vend', 'VEND') + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
-    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('kswing', 'SWING ' + KATANA.style) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
+    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('kswing', 'SWING ' + KATANA.style) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
   if (m === 'top') h += '<div class="ar-menu">' + B('cat', 'WARBOSS &rsaquo;', 'boss') + B('cat', 'PEOPLE &rsaquo;', 'people') + B('cat', 'BEASTS &rsaquo;', 'beasts') + B('cat', 'RIVALS &rsaquo;', 'rival') + B('turret', 'TURRET<small>' + (TURRET.list.length ? 'tap to remove' : 'sentry gun') + '</small>', '', TURRET.list.length ? 'ar-on' : '') + B('hbar', 'HIGH BAR<small>' + (HBAR.list.length ? 'tap to remove' : 'swing on it') + '</small>', '', HBAR.list.length ? 'ar-on' : '') + B('beam', 'BALANCE BEAM<small>' + (BEAM.list.length ? 'tap to remove' : 'walk it') + '</small>', '', BEAM.list.length ? 'ar-on' : '') + B('wrun', 'WALL RUN<small>' + ((WRUN.boxes || []).length ? 'tap to remove' : 'run along it') + '</small>', '', (WRUN.boxes || []).length ? 'ar-on' : '') + B('course', 'ACROBATICS<small>' + (COURSE.on ? 'tap to remove' : 'the course') + '</small>', '', COURSE.on ? 'ar-on' : '') + B('horde', 'HORDE<small>' + (HORDE.busy ? 'loading...' : HORDE.list.length ? HORDE.list.length + ' -- tap for +' + HORDE.per : '+' + HORDE.per + ' samurai') + '</small>', '', HORDE.list.length ? 'ar-on' : '') + '<button class="ar-off">GRUNTS<small>soon</small></button><button class="ar-off">GREYS<small>soon</small></button></div>';
   else if (m === 'boss' || m === 'people' || m === 'beasts' || m === 'rival') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back');
     for (const k in ARENA.kinds) { const A = ARENA.kinds[k]; if (!!A.creature !== (m === 'beasts')) continue; if (!!A.rival !== (m === 'rival')) continue; if (m !== 'beasts' && !A.both && !!A.civ !== (m === 'people')) continue; h += B('spawn', A.t + (A.sub ? '<small>' + A.sub + '</small>' : ''), k); } h += '</div>'; }
@@ -17352,6 +17354,27 @@ const aimAt = d => {
 // AND THE ACQUIRE RANGE IS WHAT THE MOVE CAN COVER, NOT A TYPED NUMBER. A flat range locks a
 // JAB onto a man six metres off and then cannot get him there -- and a lock that turns him
 // toward somebody he cannot reach is worse than no lock at all.
+// m1088: THE JUGGLE. *"The slam -- he wouldn't roll, he's slamming the ground and it makes a shockwave, sends people up in the air, hang time.
+// I like hitting people up in the air and you keep stringing attacks and it keeps them in the air... not floating, but like slow-mo in the
+// air, and you're going from one to the next."* A body YOU launch (or the slam pops) is JUGGLED for `hang` s: near the top of its arc
+// (|vy| under `band`) it falls at `g` x gravity -- the slow-mo float; a blow that lands on it while it is airborne POPS it back up (`pop`
+// m/s, a little `push` along the blow) and restarts the clock, so a chain keeps it up. The slam drives everyone in `SLAM.r` straight up
+// (`slamUp`), and FLOW (m1086) will chase an airborne man, hopping him up to meet it (`hopMax`).
+// TORNADO: a left / right flick on the ground is the spin kick (`hurricane_kick`, left its mirror) -- it was air only. TOOLS > SIDE FLICK.
+const JUGGLE = { on: 1, hang: 1.8, g: .22, band: 3.2, pop: 6.5, push: 1.6, slamUp: 9.5, slamOut: 1.2, hopMax: 9, stat: { pops: 0, slams: 0, hops: 0 } };
+const TORNADO = { pick: 'TORNADO', picks: ['TORNADO', 'SWING'] };
+try { const v = localStorage.getItem('mel.sideflick'); if (v === 'TORNADO' || v === 'SWING') TORNADO.pick = v; } catch (e) {}
+const bodyAir = d => d.root.position.y > groundAt(d.root.position.x, d.root.position.z, d.root.position.y, .5) + .35;
+function jugMark(d) { if (JUGGLE.on) d.jugT = performance.now() / 1000 + JUGGLE.hang; }
+let SLAMRINGS = [];
+function slamRing(x, y, z) {     // the slam's shockwave: a flat ring racing out to `SLAM.r` and fading
+  const m = new THREE.Mesh(new THREE.RingGeometry(.86, 1, 48), new THREE.MeshBasicMaterial({ color: 0xffe2a8, transparent: true, opacity: .9, toneMapped: false, depthWrite: false }));
+  m.rotation.x = -Math.PI / 2; m.position.set(x, y + .06, z); scene.add(m); SLAMRINGS.push({ m, t: 0 });
+}
+function slamRingStep(dt) {
+  for (const S of SLAMRINGS) { S.t += dt; const u = S.t / .38, r = .4 + (SLAM.r * 1.15) * Math.sqrt(Math.min(1, u)); S.m.scale.set(r, r, 1); S.m.material.opacity = .9 * (1 - u); if (u >= 1) { S.m.removeFromParent(); S.m.geometry.dispose(); S.dead = 1; } }
+  if (SLAMRINGS.length && SLAMRINGS.some(S => S.dead)) SLAMRINGS = SLAMRINGS.filter(S => !S.dead);
+}
 // m1086: FREEFLOW. *"Develop a more stringy melee system so you can keep swiping and string those attacks from one guy to the next guy to the
 // next guy, with launch, leap, leap, launch, and send them flying if they're not blocking."* (The crowd in the horde boxed him in: one swing,
 // then nothing in reach.) A swing that LANDS on a body opens `window` s of FLOW; a swing thrown inside it reaches `reach` m (the katana's
@@ -17370,7 +17393,7 @@ function meleeLock(h, reachMax, cone, flow) {
   const now = flowNow();
   for (let pass = flow ? 0 : 1; pass < 2 && !best; pass++)     // m1086: flowing, a fresh man first (pass 0); anybody standing if none (pass 1)
   for (const d of DUMMIES) {
-    if (flow && (d.st === 'down' || d.st === 'up' || d.gone)) continue;
+    if (flow && (((d.st === 'down' && !bodyAir(d)) || d.st === 'up') || d.gone)) continue;     // m1088: one in the AIR is fair game (the juggle)
     if (pass === 0 && now - (d.flowAt || -9) < FLOW.recent) continue;
     const a = aimAt(d);
     if (a.dist > reachMax || a.dist < .3) continue;
@@ -17502,12 +17525,14 @@ function meleeGo0(h) {
   const tackle = !kat && !cont && MELEE.slide && rig.actions[MELEE.slide] && p.runT >= MELEE.slideT;     // m984: a running flick with the katana is a swing, not a slide kick
   const j = ((p.meleeRoll + ix) % pool.length + pool.length) % pool.length;
   const katInOrder = kat && pool !== CLIPS.fist && !KATANA.cuts;     // m1014: the fist chain is dealt the unarmed way; m1015: so are the cut strikes (round the pool, no repeats)     // m1000: the unarmed chain is dealt the unarmed way
-  const name = tackle ? MELEE.slide : pool[katInOrder ? Math.min(ix, pool.length - 1) : j];     // m984: the katana's combo plays IN ORDER (link 3 = the finisher)
+  const SKt = MELEE.spinKick, sideF = (KATANA.dir === 'left' || KATANA.dir === 'right') && TORNADO.pick === 'TORNADO' && !tackle && SKt;
+  const tornado = sideF ? SKt.clip + (KATANA.dir === 'left' ? MIRROR.suffix : '') : '';
+  const name = tornado && rig.actions[tornado] ? tornado : tackle ? MELEE.slide : pool[katInOrder ? Math.min(ix, pool.length - 1) : j];     // m984: the katana's combo plays IN ORDER (link 3 = the finisher); m1088: a side flick is the TORNADO
   if (!rig.actions[name]) { note('NO CLIP ' + name); return; }
   p.melee = 1; p.meleeIx = ix; p.meleeLinks = links; p.meleeT = 0; p.meleeName = name; p.meleeAir = 0; p.melWall = 0; p.melFist = p.fistNow ? 1 : 0;     // m1021: a left-pad strike never breaks a wall
   p.meleeBody = tackle ? 1 : 0;   // see `STRIKE.bodyAt` -- the blow is him arriving
   const CL = clipOf(name);
-  p.meleeDur = tackle ? MELEE.slideDur : melBeat(name, ix);
+  p.meleeDur = tackle ? MELEE.slideDur : name === tornado ? SKt.dur : melBeat(name, ix);
   p.meleeChain = 0; p.melFired = 0; p.melU = 0; p.swPrev = null; p.swRootX = null; p.swRootZ = null;
   const base = tackle ? MELEE.slideV
              : (CL && CL.lunge) || MELEE.lunge[Math.min(ix, MELEE.lunge.length - 1)];
@@ -17571,6 +17596,8 @@ function meleeGo0(h) {
   // m993: THE KATANA LASHES IN. The same travel, spent in the first `front` of the swing (the dash's `dashLand` clock) -- in fast,
   // then planted for the cut -- rather than drifted across the whole beat. *"I was just standing there swinging my sword."*
   p.melFront = katL ? KATANA.lock.front : 0; if (katL) p.melV = Math.min(flowL ? FLOW.maxV / KATANA.lock.front : MELEE.maxV, p.melV / KATANA.lock.front);
+  if (flow && L && JUGGLE.on && p.grounded) { const dy = L.d.root.position.y + (L.d.K.h || 1.8) * .35 - p.pos.y;     // m1088: up to meet a juggled man
+    if (dy > .8) { p.vel.y = Math.min(JUGGLE.hopMax, Math.sqrt(2 * MOVE.g * (dy + .3))); p.grounded = false; p.coyote = 0; JUGGLE.stat.hops++; } }
   if (flow && L) { FLOW.stat.links++; if (L.dist > FLOW.leapAt) { FLOW.stat.leaps++; p.flowLeap = { t: 0, dur: Math.max(.12, p.meleeDur * (katL ? KATANA.lock.front : .5)), h: FLOW.leapH * Math.min(1, L.dist / FLOW.reach) }; } }
   if (katL) p.melGap = p.melV * spend * KATANA.lock.front;     // the chip's travel: the same metres, spent early
   p.melGap = p.melV * spend;          // how far this strike will actually carry him, for the chip
@@ -17585,6 +17612,7 @@ function meleeGo0(h) {
   // THE CLIP IS COMPRESSED TO THE BEAT, not the beat stretched to the clip. `melee_03` is
   // 1.417 s and the finisher 1.75 -- a three-hit chain at 1x is over four seconds of watching,
   // which reads as lag rather than as a combo.
+  if (name === tornado) { const L0 = clipLen(name); playOnce(name, L0 * (SKt.to - SKt.from) / p.meleeDur); rig.actions[name].time = L0 * SKt.from; } else
   playOnce(name, clipLen(name) / p.meleeDur);
   snd('swoosh', { r: .95 + ix * .1, g: .8 });
   // and he covers ground: full speed for `carry` of the strike, then linear to zero, which
@@ -18623,7 +18651,7 @@ function slamGo(dx, dy) {
   // different one."* The katana now drives down with the unarmed slam (`weapon_melee_finish`) too; TOOLS > AIR SLAM: JUMP ATK is m995's.
   const kat = slotNow().melee === 'katana' && SLAM.katPick === 'JUMP ATK' && rig.actions[KATANA.air.clip], nm = kat ? KATANA.air.clip : CLIPS.chargeGo;
   if (!rig.actions[nm]) { note('NO CLIP ' + nm); return 0; }
-  p.slamClip = kat ? nm : '';
+  p.slamClip = nm;     // m1088: always -- the landing plays the slam clip out (it was the hard-landing ROLL unarmed)
   // ONE PER AIRTIME. Without it a held thumb flicking repeatedly is a man hammering the floor
   // on the way down, which is the flutter-kick shape `p.airKick` refuses one repo over.
   p.slam = 1; p.slamUsed = 1; p.slamT = 0; p.flip = ''; p.bkHang = 0;
@@ -18722,7 +18750,10 @@ function slamLand() {
     const q = Math.hypot(dx, dz);
     const rr = SLAM.r * (d.K.pal ? WEAP.palBlast : 1) + d.K.r;
     if (q > rr) continue;
-    dummyBlow(d, q > 1e-3 ? Math.atan2(dx, dz) : p.faceH, SLAM.power, SLAM.dmg);
+    const sh = q > 1e-3 ? Math.atan2(dx, dz) : p.faceH;
+    dummyBlow(d, sh, SLAM.power, SLAM.dmg);
+    // m1088: the shockwave sends him UP (not out) -- into the juggle
+    if (JUGGLE.on && d.st === 'down' && bodyWeightK(d.K) >= KNOCKDOWN.heavy) { d.vy = JUGGLE.slamUp * (.85 + Math.random() * .3); d.vx = Math.sin(sh) * JUGGLE.slamOut; d.vz = Math.cos(sh) * JUGGLE.slamOut; d.t = 0; jugMark(d); JUGGLE.stat.slams++; }
     hitRing(d.K, 1, d.root.position.x, d.root.position.z);
     // the chip's `!` -- "it never fired", "it fired and reached nobody" and "it landed" are
     // three bugs with one picture on a phone, and the sweep cannot answer it here (it is not
@@ -18730,7 +18761,7 @@ function slamLand() {
     p.melFired = 1;
   }
   snd('hit', { g: 1.0, r: .78, x: p.pos.x, z: p.pos.z });
-  slamFx(p.pos.x, p.pos.y, p.pos.z);
+  slamFx(p.pos.x, p.pos.y, p.pos.z); slamRing(p.pos.x, p.pos.y, p.pos.z); camShake(.35);     // m1088: the shockwave
   slamMark(p.pos.x, p.pos.y, p.pos.z);
   // **AND IT HANDS TO THE HARD LANDING, BECAUSE THE CLIP IS CUT AT THE IMPACT.** `rateMax`
   // means a slam from a low jump plays only part of the swing, and ending there would snap him
@@ -33034,6 +33065,10 @@ function dummyBlow(d, dirH, power, dmg, pal) {
   // A MAN ON THE GROUND IS STILL A BODY. Hitting him while he is down does not stand him up
   // to play a reaction -- it PUNTS him, and restarts the clock on the lie, so kicking him
   // along the floor works for as long as you like and he still eventually gets up.
+  if (d.st === 'down' && !pal && JUGGLE.on && bodyAir(d) && bodyWeightK(K) >= KNOCKDOWN.heavy) {     // m1088: hit in the air -> popped back up, the clock restarts
+    d.vy = JUGGLE.pop; d.vx = Math.sin(dirH) * JUGGLE.push; d.vz = Math.cos(dirH) * JUGGLE.push; d.t = 0; jugMark(d); JUGGLE.stat.pops++;
+    bodyWhoosh(d); if (K.dmg) d.hp -= (dmg || K.dmg.fist) * .5; return;
+  }
   if (d.st === 'down') {
     const w = bodyWeightK(K);     // m906: a big body on the floor is barely moved by another blow
     d.vx = Math.sin(dirH) * K.flyV * .35 * power * w;
@@ -33076,7 +33111,7 @@ function dummyBlow(d, dirH, power, dmg, pal) {
     const kk = (K.knock || 0) * Math.max(.35, power) * (guard ? K.blockCut : 1);
     // m905 (his rule): *"a character should never fly through the air and land on his feet."* A shove strong enough to lift him
     // is a KNOCKDOWN -- the fall clip in the air, landing lying, the get-up; anything weaker keeps his feet ON the ground (no hop).
-    if (kk >= KNOCKDOWN.at && !guard) { bodyLaunch(d, dirH, kk * KNOCKDOWN.v, KNOCKDOWN.up0 + (K.flyUp || 6) * KNOCKDOWN.up * clamp(power, 0, 1)); return; }
+    if (kk >= KNOCKDOWN.at && !guard) { bodyLaunch(d, dirH, kk * KNOCKDOWN.v, KNOCKDOWN.up0 + (K.flyUp || 6) * KNOCKDOWN.up * clamp(power, 0, 1)); if (!pal) jugMark(d); return; }
     if (kk) { d.vx = Math.sin(dirH) * kk; d.vz = Math.cos(dirH) * kk; bodyWhoosh(d); }
     if (guard) {
       d.st = 'block'; d.t = 0; d.blockT = K.blockDur;
@@ -33109,6 +33144,7 @@ function dummyBlow(d, dirH, power, dmg, pal) {
   const fk = k * rnd(K.flyVary || FLAIL.flyVary);
   turfKnock(d, pal);              // m412: a body you put down costs its faction ground in that block
   bodyLaunch(d, dirH, K.flyV * fk, K.flyUp * fk);
+  if (!pal) jugMark(d);     // m1088
 }
 
 // ============================================================================================
@@ -34242,7 +34278,7 @@ function bodyFly(d, dt) {
   if (!d.vx && !d.vz && !d.vy && !d.spin) return;
   const gy = groundAt(P.x, P.z, P.y, .5);
   const air = P.y > gy + .02 || d.vy > 0;
-  if (air) d.vy -= K.flyG * dt;
+  if (air) d.vy -= K.flyG * dt * (d.jugT > performance.now() / 1000 && Math.abs(d.vy) < JUGGLE.band ? JUGGLE.g : 1);     // m1088: a juggled body floats at the top of its arc
   // **A BODY GOING PAST AT SPEED BREAKS WHAT IT GOES THROUGH (m161).** *"A thrown body, you
   // know, can run into things, break it."* It costs one call, because `brkBlast` is a POSITION,
   // a RADIUS and a DAMAGE -- it never asked who was swinging. **The damage is the body's own
@@ -56839,7 +56875,7 @@ window.melee = window.mel = { FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VE
   // of a rule measures a game that does not exist -- which is the oldest mistake there is, and
   // the only way not to make it is for `npm run sim` to call exactly these.
   DUMMY, DUMMIES, LOCK, LEDGE, WALL, STRIKE, PADS, DESK, meleeLock, dummyHit, dummyBlow, strikeSweep, stepDummies, bodySeat, SEAT, findLock, SFX, CHARGE, POSE, snd, PUNCH, PLASMA, HITSND, BODYSND, FLYHIT, STEP,
-  stepPlayer, muzzleWorld, RIC, coverAcross, cwallOf, KNOCK, knockHas, GSIDE, KAIM, aimLeap, kaimHold, DUCK, duckPose, RUNSWIPE, runSwipe, SHOTBLOCK, shotBlock, bladeSeg, steelFlash, STEEL, HURT, playerHurt, GOD, LEAP, coverLeap, wallGo, WRUN, wrunTap, wrunFind, wrunSpawn, wrunClear, stepWrun, backGo, HURDLE, hurdleTap, HOOK, barHook, meleeGo0, CART, cartGo, leftFlick, rigAnim, stepKit, frameBody, kickGo, SPRINGS, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, hbarCatch, stepBar, hbarPose, hbarFly, coverArmUndo, slideGo, coverShow, TURRET, FLOW, ZOOM, zoomGo, HORDE, hordeAdd, hordeClear, ACAM, actionCam, acamPip, turretSpawn, COURSE, courseBuild, courseClear, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
+  stepPlayer, muzzleWorld, RIC, coverAcross, cwallOf, KNOCK, knockHas, GSIDE, KAIM, aimLeap, kaimHold, DUCK, duckPose, RUNSWIPE, runSwipe, SHOTBLOCK, shotBlock, bladeSeg, steelFlash, STEEL, HURT, playerHurt, GOD, LEAP, coverLeap, wallGo, WRUN, wrunTap, wrunFind, wrunSpawn, wrunClear, stepWrun, backGo, HURDLE, hurdleTap, HOOK, barHook, meleeGo0, CART, cartGo, leftFlick, rigAnim, stepKit, frameBody, kickGo, SPRINGS, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, hbarCatch, stepBar, hbarPose, hbarFly, coverArmUndo, slideGo, coverShow, TURRET, JUGGLE, TORNADO, FLOW, ZOOM, zoomGo, HORDE, hordeAdd, hordeClear, ACAM, actionCam, acamPip, turretSpawn, COURSE, courseBuild, courseClear, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
   MFX, camShake, palDive,
   // THE BOARD, LIVE (m159). `mel.SK8.hold` is where the deck sits IN HIS HAND while it is
   // carried, and how a carried board should look is a look-at-it decision -- so it is a dial he
