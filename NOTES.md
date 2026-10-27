@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1194 -- Jin Lighthouse pass 3: the polish (Building Forge loop)
+
+What was added:
+- **A solid gallery rail.** 24 post colliders round the 18 m gallery, with a gap where the zipline leaves, so he can no longer
+  walk off the edge.
+- **Nobori.** Four long red banners hanging below the gallery, each with a cyan mon.
+- **Rune bands.** Glowing Jin bands on the shaft that pulse. They turn red and bright while the searchlight is locked on him and
+  go dim when the crystal is dark.
+- **Shimenawa.** A rope with paper shide round the shaft's foot on the roof.
+- **Outside the building.** Stone lanterns at the ramp's foot, a pull-up bar on the roof's south-west corner, lamp cables from
+  the gallery to stakes, and a drone.
+
+**One bug fixed.** Pass 2's furniture (the desk, the bunk and the shaft's drum) was added to `O.boxes` after the
+`BOXES.push` loop, so it was never solid. A final sweep now pushes anything not yet in `BOXES`.
+
+The Jin Lighthouse is DONE (3 passes). Next: alternate -- Cliff Lodge pass 4.
+
 ## m1193 -- Sky Bridges pass 4: the lighthouse zipline and a brake (Building Forge loop, extra pass)
 
 - **A third ZIPLINE.** It runs from the Jin Lighthouse's gallery (an anchor 1.3 m over the deck, inside the rail, on the
