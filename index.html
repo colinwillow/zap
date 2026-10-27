@@ -19500,9 +19500,11 @@ function ghouseClear() { const G = GHOUSE.on; if (!G) return; { const i = BDYN.i
 // SPIRAL RAMP up the inside round a central pillar (shinbashira) -- 20 flights of .9 m, corner landings -- arriving at an open BELFRY at
 // 18 m under a pagoda cap with a bronze spire (sorin) to 30 m, and a great bronze BELL hanging in it. Ground storey breakable, a door on +z.
 // The belfry floor is laid only over the lane the last two flights do NOT run under (headroom). Grapple rings on storeys 2 and 4.
-const PAGODA = { chainR: 30, chainHop: 9, chainN: 5, chainDmg: 10, chainCd: 18, at: [-24, 18], tollR: 14, tollT: 1.1, S: 5, h: 3.6, hs0: 4.5, dhs: .45, ro: 1.7, rw: .5, on: null };
+const PAGODA = { scale: 1.5, chainR: 30, chainHop: 9, chainN: 5, chainDmg: 10, chainCd: 18, at: [-24, 18], tollR: 14, tollT: 1.1, S: 5, h: 3.6, hs0: 4.5, dhs: .45, ro: 1.7, rw: .5, on: null };
 function pagodaBuild() {
-  if (PAGODA.on) return; const A = PAGODA, [cx, cz] = A.at, S = A.S, Hh = A.h, top = S * Hh, g = new THREE.Group(); scene.add(g);
+  // STEER S2 (x1.5, m1346): the storey (3.6 -> 5.4), the plan (hs0 4.5 -> 6.75, the step-in), the inner spiral's ring and width (2.55 / 1.5 m)
+  // and the skirts scale; the spiral keeps its slope (each flight 1.35 m over 3.6 m, ~20 deg); the door is 2.4 m.
+  if (PAGODA.on) return; const KS = PAGODA.scale || 1, A = Object.assign({}, PAGODA, { h: PAGODA.h * KS, hs0: PAGODA.hs0 * KS, dhs: PAGODA.dhs * KS, ro: PAGODA.ro * KS, rw: PAGODA.rw * KS }), [cx, cz] = A.at, S = A.S, Hh = A.h, top = S * Hh, g = new THREE.Group(); scene.add(g);
   const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [];
   const wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 }), plank = new THREE.MeshStandardMaterial({ color: 0x6e4a2e, roughness: .85 }), stone = new THREE.MeshStandardMaterial({ color: 0x8a8580, roughness: .95 });
   const plaster = new THREE.MeshStandardMaterial({ color: 0xeae6de, roughness: .9 }), verm = new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .45 }), tile = new THREE.MeshStandardMaterial({ color: 0x3a4250, roughness: .7, side: THREE.DoubleSide });
@@ -19513,7 +19515,7 @@ function pagodaBuild() {
   add(new THREE.BoxGeometry(A.hs0 * 2 + 2, .3, A.hs0 * 2 + 2), stone, cx, .15, cz, 0);
   add(new THREE.BoxGeometry(2.4, .15, 1.2), stone, cx, .07, cz + A.hs0 + 1.3, 0);
   for (let k = 0; k < S; k++) { const y0 = k * Hh, hs = hsOf(k), t = .3;
-    if (k === 0) { const wall = (x, z, L, yaw) => O.walls.push(cwallBuild(g, T, x, z, L, t, yaw, Hh - .2, O)), dw = 1.8, sd = (hs * 2 - dw) / 2;
+    if (k === 0) { const wall = (x, z, L, yaw) => O.walls.push(cwallBuild(g, T, x, z, L, t, yaw, Hh - .2, O)), dw = KS > 1 ? 2.4 : 1.8, sd = (hs * 2 - dw) / 2;
       wall(cx, cz - hs, hs * 2, 0); wall(cx - hs, cz, hs * 2 - t, Math.PI / 2); wall(cx + hs, cz, hs * 2 - t, Math.PI / 2);
       wall(cx - hs + sd / 2, cz + hs, sd, 0); wall(cx + hs - sd / 2, cz + hs, sd, 0); add(new THREE.BoxGeometry(dw + .4, .3, t + .1), wood, cx, Hh - .45, cz + hs, 1); }
     else { for (const [sx, sz] of [[0, 1], [0, -1], [1, 0], [-1, 0]]) add(new THREE.BoxGeometry(sx ? t : hs * 2, Hh, sz ? t : hs * 2), plaster, cx + sx * hs, y0 + Hh / 2, cz + sz * hs, 1);
@@ -19521,8 +19523,8 @@ function pagodaBuild() {
     for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) add(new THREE.BoxGeometry(.3, Hh, .3), k ? wood : verm, cx + sx * hs, y0 + Hh / 2, cz + sz * hs, 0);
     add(new THREE.BoxGeometry(hs * 2 + .5, .24, hs * 2 + .5), wood, cx, y0 + Hh - .3, cz, 0);
     // the SKIRT: from the next storey's wall out and down past this one's
-    if (k < S - 1) { const rt = hsOf(k + 1) * Math.SQRT2, rb = (hs + 1.9) * Math.SQRT2, sh = 1.3, sk = new THREE.CylinderGeometry(rt, rb, sh, 4, 1, true); sk.rotateY(Math.PI / 4);
-      add(sk, tile, cx, y0 + Hh + .45 - sh / 2, cz, 0);
+    if (k < S - 1) { const rt = hsOf(k + 1) * Math.SQRT2, rb = (hs + 1.9 * KS) * Math.SQRT2, sh = 1.3 * KS, sk = new THREE.CylinderGeometry(rt, rb, sh, 4, 1, true); sk.rotateY(Math.PI / 4);
+      add(sk, tile, cx, y0 + Hh + .45 * KS - sh / 2, cz, 0);
       for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { add(new THREE.BoxGeometry(.24, .32, .24), lamp, cx + sx * (hs + 1.7), y0 + Hh - .55 - .45, cz + sz * (hs + 1.7), 0);
         if ((k === 1 || k === 3) && sx === sz) rings.push(gringAdd(g, cx + sx * (hs + 2.2), y0 + Hh - .6, cz + sz * (hs + 2.2))); } } }
   // THE SHINBASHIRA: the central pillar, ground to the belfry
@@ -19544,7 +19546,7 @@ function pagodaBuild() {
     fl(-i, i, -i, i); fl(i, e, -e, e); fl(-i, i, -e, -i); }
   bldTris(O, tris);
   // the belfry's posts, a low rail, the cap and the spire, and the BELL
-  const hT = hsOf(S - 1), bH = 3.2;
+  const hT = hsOf(S - 1), bH = 3.2 * KS;
   for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) add(new THREE.BoxGeometry(.3, bH, .3), verm, cx + sx * hT, top + bH / 2, cz + sz * hT, 0);
   for (const [sx, sz] of [[0, 1], [0, -1], [1, 0], [-1, 0]]) add(new THREE.BoxGeometry(sx ? .12 : hT * 2, .12, sz ? .12 : hT * 2), wood, cx + sx * hT, top + .85, cz + sz * hT, 0);
   bldRoof(g, cx, cz, hT + 1.7, hT + 1.7, 0, top + bH + 3, top + bH, .6, wood);
@@ -19566,12 +19568,12 @@ function pagodaBuild() {
     for (let k = 0; k < S; k++) { const f = [[1, 0], [0, 1], [-1, 0], [0, -1]][k % 4], lx = cx + f[0] * .8, lz = cz + f[1] * .8, ly = k * Hh + 2.6;
       add(new THREE.CylinderGeometry(.24, .24, .5, 12), paper, lx, ly, lz, 0).castShadow = false; add(new THREE.CylinderGeometry(.01, .01, .9, 4), wood, lx, ly + .7, lz, 0); } }
   // WIND CHIMES: a little bronze bell under every skirt corner, swaying (`pagodaStep`)
-  const chimes = []; for (let k = 0; k < S - 1; k++) { const hs = hsOf(k) + 1.85, y = k * Hh + Hh - 1.25;
+  const chimes = []; for (let q = 0; q < S - 1; q++) { const hs = hsOf(q) + 1.85 * KS, y = q * Hh + Hh - 1.25 * KS;
     for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const c = new THREE.Group(); c.position.set(cx + sx * hs, y, cz + sz * hs); g.add(c);
       const m = new THREE.Mesh(new THREE.ConeGeometry(.12, .22, 8, 1, true), bronze); m.position.y = -.3; c.add(m); const st = new THREE.Mesh(new THREE.CylinderGeometry(.01, .01, .3, 4), wood); st.position.y = -.12; c.add(st); chimes.push(c); } }
   // ---- PASS 3 (m1135): the polish -- upturned eave tips, a vertical plaque, long banners, cables and a drone ----
   // every skirt corner sweeps UP into a curled tip (the flat frustum read as a lampshade without them)
-  for (let k = 0; k < S - 1; k++) { const hs = hsOf(k) + 1.9, y = k * Hh + Hh + .45 - 1.3;
+  for (let q = 0; q < S - 1; q++) { const hs = hsOf(q) + 1.9 * KS, y = q * Hh + Hh + .45 * KS - 1.3 * KS;
     for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const tip = add(new THREE.ConeGeometry(.16, 1.2, 5), tile, cx + sx * (hs + .25), y + .35, cz + sz * (hs + .25), 0);
       tip.rotation.set(sz * .9, 0, -sx * .9); tip.material = wood; } }
   // a vertical PLAQUE over the door, gold edge, a neon glyph column
@@ -19592,7 +19594,7 @@ function pagodaBuild() {
   { const gut = new THREE.MeshStandardMaterial({ color: 0x2a1e18, roughness: .8 }), ring = (R0, R1, y, th) => { const m = (R0 + R1) / 2, w = R1 - R0;
       for (const [sx, sz] of [[0, 1], [0, -1]]) add(new THREE.BoxGeometry(R1 * 2, th, w), gut, cx, y - th / 2, cz + sz * m, 1);
       for (const sx of [-1, 1]) add(new THREE.BoxGeometry(w, th, R0 * 2), gut, cx + sx * m, y - th / 2, cz, 1); };
-    for (let k = 0; k < S - 1; k++) { const R = hsOf(k) + 1.9; ring(R - .1, R + .5, k * Hh + Hh - .85, .3); }
+    for (let q = 0; q < S - 1; q++) { const R = hsOf(q) + 1.9 * KS; ring(R - .1, R + .5, q * Hh + Hh - .85 * KS, .3); }
     ring(hsOf(S - 1), hsOf(S - 1) + 1.9, top - 2.1, .25);
     for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) add(new THREE.BoxGeometry(.22, .3, .22), lamp, cx + sx * (hsOf(S - 1) + 1.7), top - 1.95, cz + sz * (hsOf(S - 1) + 1.7), 0); }
   for (const b of O.boxes) BOXES.push(b); boxGrid();
@@ -19600,10 +19602,10 @@ function pagodaBuild() {
   // to the nearest body within `chainR` of the pagoda, then JUMPS body to body (up to `chainN`), knocking each down; the core goes dark
   // for `chainCd` s ----
   const chain = new THREE.Line(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(64 * 3), 3)), new THREE.LineBasicMaterial({ color: 0xbff8ff, toneMapped: false })); chain.visible = false; chain.frustumCulled = false; g.add(chain);
-  PAGODA.on = { g, O, bars: [], rings, bell, t: 0, core, chimes, drone, bw: 0, bv: 0, toll: null, tollC: 0, arch: [], chain, chainT: 0, chainCd: 0, spire: [cx, top + 10, cz] };
+  PAGODA.on = { A, g, O, bars: [], rings, bell, t: 0, core, chimes, drone, bw: 0, bv: 0, toll: null, tollC: 0, arch: [], chain, chainT: 0, chainCd: 0, spire: [cx, top + 10, cz] };
   // ---- PASS 5 (m1212): SHINOBI ON THE ROOFS -- two archers crouched on the tile skirts (the 2nd and 4th roofs, the corners the grapple
   // rings are not on) loosing arrows down at him; killable like every archer, and the gutter ledges (m1173) are how you reach them ----
-  { const P0 = PAGODA.on; for (const [k, sx, sz] of [[1, -1, 1], [3, 1, -1]]) { const hs = A.hs0 - A.dhs * k, r = hs + 1.05, y = (k + 1) * Hh - .2;
+  { const P0 = PAGODA.on; for (const [k, sx, sz] of [[1, -1, 1], [3, 1, -1]]) { const hs = A.hs0 - A.dhs * k, r = hs + 1.05 * PAGODA.scale, y = (k + 1) * Hh - .2;
       archerPost(cx + sx * r, y, cz + sz * r).then(d => { if (PAGODA.on === P0) P0.arch.push(d); else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {}); } }
   arenaBeam(cx, cz, [1, .6, .35], 1); snd('clang', { g: .7, r: .5 });
 }
@@ -19613,7 +19615,7 @@ function pagodaStep(dt) { const P = PAGODA.on; if (!P) return; P.t += dt;
   if (P.tollC > 0) P.tollC -= dt;
   P.core.position.y = 1.8 + Math.sin(P.t * 1.6) * .12; P.core.rotation.y = P.t * .7;
   if (P.chain) { if (P.chainCd > 0) { P.chainCd -= dt; P.core.material.color.setRGB(.15, .3, .35); if (P.chainCd <= 0) P.core.material.color.setHex(0x5ff2ff); } if (P.chainT > 0 && (P.chainT -= dt) <= 0) P.chain.visible = false; }
-  { const [cx, cz] = PAGODA.at, a = P.t * .25; P.drone.position.set(cx + Math.cos(a) * 7.5, PAGODA.S * PAGODA.h + 8 + Math.sin(P.t * 1.2) * .4, cz + Math.sin(a) * 7.5); P.drone.rotation.y = -a; P.drone.children[1].rotation.z = P.t * .6; }
+  { const [cx, cz] = PAGODA.at, a = P.t * .25; P.drone.position.set(cx + Math.cos(a) * 7.5, PAGODA.S * P.A.h + 8 + Math.sin(P.t * 1.2) * .4, cz + Math.sin(a) * 7.5); P.drone.rotation.y = -a; P.drone.children[1].rotation.z = P.t * .6; }
   for (let i = 0; i < P.chimes.length; i++) P.chimes[i].rotation.z = Math.sin(P.t * 1.7 + i * 1.3) * .12 + (P.toll ? Math.sin(P.t * 9 + i) * .25 * (1 - P.toll.t) : 0);
   // the TOLL: a ring of force spreading from the belfry -- it knocks down anybody within `tollR`
   if (P.toll) { const T = P.toll; T.t += dt / PAGODA.tollT; T.m.scale.setScalar(1 + T.t * PAGODA.tollR); T.m.material.opacity = .7 * (1 - T.t); if (T.t >= 1) { T.m.removeFromParent(); P.toll = null; } }

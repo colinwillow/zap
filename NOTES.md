@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE PAGODA x1.5 -- STEER S2 (older rows, m1346)
+
+- **From its parameters:**
+  - storey 3.6 → 5.4 m (five storeys, the belfry at 27 m)
+  - plan `hs0` 4.5 → 6.75 and the step-in, so the ground storey is 13.5 m square
+  - the inner spiral's ring 1.7 → 2.55 and its width 1 → 1.5 m
+  - the skirts' overhang and height, the belfry
+  - the door 2.4 m
+- **The spiral keeps its slope:** each quarter-flight rises 1.35 m over 3.6 m (~20°).
+- **Lost:** the outside gutter-to-gutter climb (m1173). The lips are now 5.4 m apart, past a jump, the same trade as the Great Red Pagoda. Up is the inside spiral and the grapple rings.
+- The roof archers sit out on the bigger skirts.
+
 ## 3D AIM OWNS THE WHOLE RIGHT PAD, WITH ITS OWN CIRCLE (m1345)
 
 *"I keep trying to aim it upward and it won't -- it aims down but not up. I touch the right stick in 3D and he jumps, or I push up and it shoots instead of aiming the cursor up, or I push down and he blocks. 3D mode takes over the whole stick. And when you click 3D aim it unfolds into its own circle up there, centred on what used to be the flick-up position."*
