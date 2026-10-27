@@ -11150,7 +11150,28 @@ function courseStep(dt) {
   if (p.pos.y < C.blocks[C.block].base - 4 && p.grounded) { C.stat.falls++; courseBeamTo(C.checks[C.last]); }
   for (const Q of C.checks) if (!Q.lit) Q.m.rotation.z = Math.sin(t * 2 + Q.u) * .05;
 }
+// m1084: THE HORDE PROBE (HORDE.md stage 1). *"Can the phone handle 100 fully rigged, skinned enemies all acting on their own to try to fight
+// me?"* -- measured before anything is optimised. SPAWN > HORDE adds `per` samurai a tap (to `max`) in rings on the dais round him, each a
+// plain `bodySpawn` clone on the ordinary fighter brain (`foeAI`: chase, swing, knocked flying by your hits) -- NOT the arena rival's
+// brain. The chip already reads FPS / DC (draw calls) / kT (triangles) / B (bodies): that is the baseline on his phone.
+const HORDE = { kind: 'SAMURAI', per: 25, max: 150, list: [], busy: 0, hp: 3 };
+async function hordeAdd() {
+  if (HORDE.busy || HORDE.list.length >= HORDE.max) return; HORDE.busy = 1; arenaUi();
+  try {
+    const K = await arenaLoad(HORDE.kind), p = player, n = Math.min(HORDE.per, HORDE.max - HORDE.list.length);
+    for (let i = 0; i < n; i++) {
+      const k = HORDE.list.length, ring = 5 + (k % 50) / 50 * 9, a = k * 2.399963;     // a sunflower spiral, 5..14 m out
+      const x = clamp(p.pos.x + Math.sin(a) * ring, -ARENA.r + 1, ARENA.r - 1), z = clamp(p.pos.z + Math.cos(a) * ring, -ARENA.r + 1, ARENA.r - 1);
+      const d = bodySpawn(K.P, K, x, z, 0); d.horde = 1; d.aggro = 1; d.hp = d.hpMax = HORDE.hp; d.gap = Math.random() * 2;
+      d.h = Math.atan2(p.pos.x - x, p.pos.z - z); HORDE.list.push(d);
+    }
+    arenaBeam(p.pos.x, p.pos.z, [.9, .3, .3], 1); snd('clang', { g: .6, r: .5 });
+  } catch (e) { console.error('[melee] horde', e); note('HORDE FAILED'); }
+  HORDE.busy = 0; arenaUi();
+}
+function hordeClear() { for (const d of HORDE.list) bodyGone(d); HORDE.list.length = 0; }
 function arenaClear() {
+  hordeClear();     // m1084
   turretClear();     // m1011
   hbarClear();     // m1034
   beamClear();     // m1037
@@ -11181,6 +11202,7 @@ function arenaUi() {
       else if (a === 'turret') { ARENA.menu = ''; if (TURRET.list.length) turretClear(); else turretSpawn(); }     // m1011; m1072: a second tap takes it away
       else if (a === 'hbar') { ARENA.menu = ''; if (HBAR.list.length) hbarClear(); else hbarSpawn(); }     // m1034; m1072
       else if (a === 'beam') { ARENA.menu = ''; if (BEAM.list.length) beamClear(); else beamSpawn(); }     // m1037; m1072
+      else if (a === 'horde') { hordeAdd(); }     // m1084
       else if (a === 'course') { ARENA.menu = ''; if (COURSE.on) courseClear(); else courseBuild('ACRO'); }     // m1078
       else if (a === 'wrun') { ARENA.menu = ''; if ((WRUN.boxes || []).length) wrunClear(); else wrunSpawn(); }     // m1064; m1072
       else if (a === 'smear') { SMEAR.on = SMEAR.on ? 0 : 1; try { localStorage.setItem('mel.smear', SMEAR.on ? '1' : '0'); } catch (err) {} }
@@ -11228,7 +11250,7 @@ function arenaUi() {
   const tools = ARENA.tools && !m;     // a menu open folds the tools away: the screen is not tall enough for both
   let h = '<div class="ar-bar">' + B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('vend', 'VEND') + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
     (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('kswing', 'SWING ' + KATANA.style) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
-  if (m === 'top') h += '<div class="ar-menu">' + B('cat', 'WARBOSS &rsaquo;', 'boss') + B('cat', 'PEOPLE &rsaquo;', 'people') + B('cat', 'BEASTS &rsaquo;', 'beasts') + B('cat', 'RIVALS &rsaquo;', 'rival') + B('turret', 'TURRET<small>' + (TURRET.list.length ? 'tap to remove' : 'sentry gun') + '</small>', '', TURRET.list.length ? 'ar-on' : '') + B('hbar', 'HIGH BAR<small>' + (HBAR.list.length ? 'tap to remove' : 'swing on it') + '</small>', '', HBAR.list.length ? 'ar-on' : '') + B('beam', 'BALANCE BEAM<small>' + (BEAM.list.length ? 'tap to remove' : 'walk it') + '</small>', '', BEAM.list.length ? 'ar-on' : '') + B('wrun', 'WALL RUN<small>' + ((WRUN.boxes || []).length ? 'tap to remove' : 'run along it') + '</small>', '', (WRUN.boxes || []).length ? 'ar-on' : '') + B('course', 'ACROBATICS<small>' + (COURSE.on ? 'tap to remove' : 'the course') + '</small>', '', COURSE.on ? 'ar-on' : '') + '<button class="ar-off">GRUNTS<small>soon</small></button><button class="ar-off">GREYS<small>soon</small></button></div>';
+  if (m === 'top') h += '<div class="ar-menu">' + B('cat', 'WARBOSS &rsaquo;', 'boss') + B('cat', 'PEOPLE &rsaquo;', 'people') + B('cat', 'BEASTS &rsaquo;', 'beasts') + B('cat', 'RIVALS &rsaquo;', 'rival') + B('turret', 'TURRET<small>' + (TURRET.list.length ? 'tap to remove' : 'sentry gun') + '</small>', '', TURRET.list.length ? 'ar-on' : '') + B('hbar', 'HIGH BAR<small>' + (HBAR.list.length ? 'tap to remove' : 'swing on it') + '</small>', '', HBAR.list.length ? 'ar-on' : '') + B('beam', 'BALANCE BEAM<small>' + (BEAM.list.length ? 'tap to remove' : 'walk it') + '</small>', '', BEAM.list.length ? 'ar-on' : '') + B('wrun', 'WALL RUN<small>' + ((WRUN.boxes || []).length ? 'tap to remove' : 'run along it') + '</small>', '', (WRUN.boxes || []).length ? 'ar-on' : '') + B('course', 'ACROBATICS<small>' + (COURSE.on ? 'tap to remove' : 'the course') + '</small>', '', COURSE.on ? 'ar-on' : '') + B('horde', 'HORDE<small>' + (HORDE.busy ? 'loading...' : HORDE.list.length ? HORDE.list.length + ' -- tap for +' + HORDE.per : '+' + HORDE.per + ' samurai') + '</small>', '', HORDE.list.length ? 'ar-on' : '') + '<button class="ar-off">GRUNTS<small>soon</small></button><button class="ar-off">GREYS<small>soon</small></button></div>';
   else if (m === 'boss' || m === 'people' || m === 'beasts' || m === 'rival') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back');
     for (const k in ARENA.kinds) { const A = ARENA.kinds[k]; if (!!A.creature !== (m === 'beasts')) continue; if (!!A.rival !== (m === 'rival')) continue; if (m !== 'beasts' && !A.both && !!A.civ !== (m === 'people')) continue; h += B('spawn', A.t + (A.sub ? '<small>' + A.sub + '</small>' : ''), k); } h += '</div>'; }
   U.innerHTML = h;
@@ -56726,7 +56748,7 @@ window.melee = window.mel = { FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VE
   // of a rule measures a game that does not exist -- which is the oldest mistake there is, and
   // the only way not to make it is for `npm run sim` to call exactly these.
   DUMMY, DUMMIES, LOCK, LEDGE, WALL, STRIKE, PADS, DESK, meleeLock, dummyHit, dummyBlow, strikeSweep, stepDummies, bodySeat, SEAT, findLock, SFX, CHARGE, POSE, snd, PUNCH, PLASMA, HITSND, BODYSND, FLYHIT, STEP,
-  stepPlayer, muzzleWorld, RIC, coverAcross, cwallOf, KNOCK, knockHas, GSIDE, KAIM, aimLeap, kaimHold, DUCK, duckPose, RUNSWIPE, runSwipe, SHOTBLOCK, shotBlock, bladeSeg, steelFlash, STEEL, HURT, playerHurt, GOD, LEAP, coverLeap, wallGo, WRUN, wrunTap, wrunFind, wrunSpawn, wrunClear, stepWrun, backGo, HURDLE, hurdleTap, HOOK, barHook, meleeGo0, CART, cartGo, leftFlick, rigAnim, stepKit, frameBody, kickGo, SPRINGS, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, hbarCatch, stepBar, hbarPose, hbarFly, coverArmUndo, slideGo, coverShow, TURRET, ACAM, actionCam, acamPip, turretSpawn, COURSE, courseBuild, courseClear, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
+  stepPlayer, muzzleWorld, RIC, coverAcross, cwallOf, KNOCK, knockHas, GSIDE, KAIM, aimLeap, kaimHold, DUCK, duckPose, RUNSWIPE, runSwipe, SHOTBLOCK, shotBlock, bladeSeg, steelFlash, STEEL, HURT, playerHurt, GOD, LEAP, coverLeap, wallGo, WRUN, wrunTap, wrunFind, wrunSpawn, wrunClear, stepWrun, backGo, HURDLE, hurdleTap, HOOK, barHook, meleeGo0, CART, cartGo, leftFlick, rigAnim, stepKit, frameBody, kickGo, SPRINGS, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, hbarCatch, stepBar, hbarPose, hbarFly, coverArmUndo, slideGo, coverShow, TURRET, HORDE, hordeAdd, hordeClear, ACAM, actionCam, acamPip, turretSpawn, COURSE, courseBuild, courseClear, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
   MFX, camShake, palDive,
   // THE BOARD, LIVE (m159). `mel.SK8.hold` is where the deck sits IN HIS HAND while it is
   // carried, and how a carried board should look is a look-at-it decision -- so it is a dial he
