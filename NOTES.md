@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1144 -- RAMPART pass 2: manned, banners, signal fires, grapple poles, supplies
+
+- MANNED: two red ARCHERS posted on the walkway (`archerPost`, x +-9), as well as the two sentry turrets on the bastions. Cleared with the
+  wall.
+- Four long red BANNERS down the inner face on timber rods.
+- SIGNAL FIRES: a bronze brazier on each bastion's back corner, flames, sparks and smoke (`rampStep`, new).
+- GRAPPLE POLES: a vermilion pole on each bastion's outer corner with a ring on top (~9.8 m).
+- SUPPLIES on the walkway to smash (the shared `SMASH`, m1141): four crates and two barrels of arrows (arrows sticking out of them).
+Pass 3 (polish) next. Shipped unverified.
+
 ## m1143 -- RAMPART WALL pass 1 (BUILDINGS.md #7, at (0, -24))
 
 `RAMP`, `rampBuild` / `rampClear`. SPAWN > BUILDINGS > Rampart Wall.
