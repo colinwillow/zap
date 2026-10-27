@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1138 -- MARKET pass 3 (DONE)
+
+- Four NOBORI (tall vertical banners on poles) out front between the crates.
+- A ROBOT MERCHANT behind the counter of stall 4: bronze box body, a round head with one cyan eye and an antenna, little arms; it bobs, and
+  its head turns to follow him (clamped to +-1.2 rad off the courtyard).
+- Tall vermilion POLES at both ends of the roof with GRAPPLE RINGS on top (8.3 m): swing off the market roof.
+- Cables from the poles to stakes behind (lamps), and a DRONE orb looping over the row.
+`BLDG` market `pass: 3`. Next: the Shrine (0, 24). Shipped unverified.
+
 ## m1137 -- MARKET pass 2: the noodle bar, signs, lanterns, falling crates
 
 - **Stacked crates fall:** each crate knows the one under it (`below`); smash the bottom and the top one DROPS (gravity, a thud and a
