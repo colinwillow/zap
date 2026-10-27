@@ -1549,6 +1549,7 @@ const GAIT = {
   // mixer, the lowest foot never slides less than his whole speed (117-240%), against 19-40% for
   // `run_fwd_fast`. No number here can fix that; lifting the swing foot in the export does.
   runSet: 'stride',     // m193: back to the stride, now that it leaps (see `leap`)
+  topRun: 1, topHi: 3.0,     // m1092: the top speed is the run's own clip sped up (see `runSetUse`); TOOLS > TOP SPEED
   // **THE LEAP (m193, `leap`).** *"I want the stride slower and more airtime -- like a sprinter:
   // legs fast, but in the air longer. Slow the clip down, but he travels farther per leap."* An
   // in-place clip's airtime is tied to its playback rate, so the stride is played at TWO rates:
@@ -11355,6 +11356,7 @@ function arenaUi() {
       else if (a === 'getup') { KNOCK.getUp = KNOCK.getUps[(KNOCK.getUps.indexOf(KNOCK.getUp) + 1) % KNOCK.getUps.length]; try { localStorage.setItem('mel.getup', KNOCK.getUp); } catch (err) {} }
       else if (a === 'cart') { CART.pose = CART.poses[(CART.poses.indexOf(CART.pose) + 1) % CART.poses.length]; try { localStorage.setItem('mel.cart2', CART.pose); } catch (err) {} }
       else if (a === 'kcslow') { const T = KATANA.chargeSlows; KATANA.chargeSlow = T[(T.indexOf(KATANA.chargeSlow) + 1) % T.length]; try { localStorage.setItem('mel.kat.cslow', KATANA.chargeSlow); } catch (err) {} }
+      else if (a === 'toprun') { GAIT.topRun = GAIT.topRun ? 0 : 1; try { localStorage.setItem('mel.toprun', GAIT.topRun ? '1' : '0'); } catch (err) {} runSetUse(GAIT.runSet, 0); }     // m1092
       else if (a === 'sprint') { const T = NINJA.looks; NINJA.look = T[(T.indexOf(NINJA.look) + 1) % T.length]; try { localStorage.setItem('mel.sprint', NINJA.look); } catch (err) {} }
       else if (a === 'sideflick') { TORNADO.pick = TORNADO.picks[(TORNADO.picks.indexOf(TORNADO.pick) + 1) % TORNADO.picks.length]; try { localStorage.setItem('mel.sideflick', TORNADO.pick); } catch (err) {} }     // m1088
       else if (a === 'aslam') { SLAM.katPick = SLAM.katPicks[(SLAM.katPicks.indexOf(SLAM.katPick) + 1) % SLAM.katPicks.length]; try { localStorage.setItem('mel.aslam', SLAM.katPick); } catch (err) {} }     // m1087
@@ -11379,7 +11381,7 @@ function arenaUi() {
   if (ARENA.tools === undefined) { try { ARENA.tools = +localStorage.getItem('mel.arena.tools') || 0; } catch (err) { ARENA.tools = 0; } }
   const tools = ARENA.tools && !m;     // a menu open folds the tools away: the screen is not tall enough for both
   let h = '<div class="ar-bar">' + B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('vend', 'VEND') + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
-    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('kswing', 'SWING ' + KATANA.style) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
+    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('kswing', 'SWING ' + KATANA.style) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
   if (m === 'top') h += '<div class="ar-menu">' + B('cat', 'WARBOSS &rsaquo;', 'boss') + B('cat', 'PEOPLE &rsaquo;', 'people') + B('cat', 'BEASTS &rsaquo;', 'beasts') + B('cat', 'RIVALS &rsaquo;', 'rival') + B('turret', 'TURRET<small>' + (TURRET.list.length ? 'tap to remove' : 'sentry gun') + '</small>', '', TURRET.list.length ? 'ar-on' : '') + B('hbar', 'HIGH BAR<small>' + (HBAR.list.length ? 'tap to remove' : 'swing on it') + '</small>', '', HBAR.list.length ? 'ar-on' : '') + B('beam', 'BALANCE BEAM<small>' + (BEAM.list.length ? 'tap to remove' : 'walk it') + '</small>', '', BEAM.list.length ? 'ar-on' : '') + B('wrun', 'WALL RUN<small>' + ((WRUN.boxes || []).length ? 'tap to remove' : 'run along it') + '</small>', '', (WRUN.boxes || []).length ? 'ar-on' : '') + B('course', 'ACROBATICS<small>' + (COURSE.on ? 'tap to remove' : 'the course') + '</small>', '', COURSE.on ? 'ar-on' : '') + B('slice', 'SLICE DUMMY<small>' + (LIMB.stat.cuts ? LIMB.stat.cuts + ' cut, ' + LIMB.stat.booms + ' blown' : 'cut him up') + '</small>') + B('horde', 'HORDE<small>' + (HORDE.busy ? 'loading...' : HORDE.list.length ? HORDE.list.length + ' -- tap for +' + HORDE.per : '+' + HORDE.per + ' samurai') + '</small>', '', HORDE.list.length ? 'ar-on' : '') + '<button class="ar-off">GRUNTS<small>soon</small></button><button class="ar-off">GREYS<small>soon</small></button></div>';
   else if (m === 'boss' || m === 'people' || m === 'beasts' || m === 'rival') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back');
     for (const k in ARENA.kinds) { const A = ARENA.kinds[k]; if (!!A.creature !== (m === 'beasts')) continue; if (!!A.rival !== (m === 'rival')) continue; if (m !== 'beasts' && !A.both && !!A.civ !== (m === 'people')) continue; h += B('spawn', A.t + (A.sub ? '<small>' + A.sub + '</small>' : ''), k); } h += '</div>'; }
@@ -19547,6 +19549,7 @@ function fxSet(k, on) {
 let fxLit = -1;
 // WHICH SPRINT (m191). One place writes the clip, its ref (on the load-time scale) and its ceiling,
 // and the footstep stride follows, so the three cannot disagree. Remembered per phone.
+try { const v = localStorage.getItem('mel.toprun'); if (v === '0' || v === '1') GAIT.topRun = +v; } catch (e) {}
 function runSetUse(key, save) {
   const R = GAIT.runSets[key]; if (!R) return;
   GAIT.runSet = key; CLIPS.sprint = R.clip;
@@ -19556,6 +19559,15 @@ function runSetUse(key, save) {
   if (!GAIT.run0) GAIT.run0 = { clip: CLIPS.run, ref: GAIT.runRef };
   const rc = R.run && rig.actions && rig.actions[R.run] ? R.run : GAIT.run0.clip; CLIPS.run = rc; GAIT.runRef = rc === R.run ? R.runRef : GAIT.run0.ref;
   if (rig.clips && rig.clips[rc]) STEP.clip.run = { d: rig.clips[rc].duration, r: GAIT.runRef };
+  // m1092: *"When he starts going faster his arms come up, his elbows at a very tight angle... why don't we just do the medium run, sped up,
+  // for the fast run?"* `GAIT.topRun` (TOOLS > TOP SPEED: RUN SPED UP / OWN): the top band plays a COPY of the run band's own clip
+  // (`<run>^top`, so the two rows can run at their own rates in one blend), on the run's own measured ref and phase, allowed up to
+  // `topHi` x -- 7.2 m/s on a ~3 m/s run is ~2.3x, which is the run's stride, quicker.
+  if (GAIT.topRun && rig.clips && rig.clips[rc]) {
+    const nm = rc + '^top'; if (!rig.clips[nm]) rigClips([new THREE.AnimationClip(nm, rig.clips[rc].duration, rig.clips[rc].tracks.map(t => t.clone()))]);
+    CLIPS.sprint = nm; GAIT.sprintRef = GAIT.runRef; GAIT.sprintHi = GAIT.topHi; if (GAIT.phase && GAIT.phase[rc] != null) GAIT.phase[nm] = GAIT.phase[rc];
+    STEP.clip.sprint = { d: rig.clips[nm].duration, r: GAIT.sprintRef };
+  }
   if (save) { try { localStorage.setItem('mel.run2', key); } catch (e) {} }
 }
 // m956: *"I hate the run... I just want the normal basic run."* His two (the stride with its leap -- "prancing" -- and the fast
@@ -23119,7 +23131,7 @@ function rigAnim(dt) {
 // THE LEAP'S TWO QUESTIONS (m193). `leapContact` is 1 inside a contact window and 0 in the air,
 // eased over `edge` so the rate change is a gear shift rather than a hitch. `leapAir` is how far
 // through the airborne part between two contacts this phase is (0..1), or -1 on the ground.
-function leapNow() { const R = GAIT.runSets[GAIT.runSet]; return R && R.leap && GAIT.leapOn !== 0 ? R.leap : null; }
+function leapNow() { const R = GAIT.runSets[GAIT.runSet]; return R && R.leap && GAIT.leapOn !== 0 && !GAIT.topRun ? R.leap : null; }     // m1092: the leap is measured on the stride clip, not on the run sped up
 function leapContact(L, u) {
   let c = 0;
   for (const [a, b] of L.contact) {
