@@ -55,3 +55,20 @@ His first image's path, read in order, given heights:
 ## How to iterate
 
 Change the path, the heights or the beats in `LVG1` (or tell me in words: "make 6 a tower", "put a ladder here", "the gap should be two cells") and the greybox rebuilds from it. When the logic plays well, the art goes on top: the kit pieces, the towers, the streams.
+
+## L1 pass 2 (m1357): VERTICALITY
+
+- **Heights go to Y6 (27 m).** Raised pads are slabs on four PILLARS, open beneath, so the route can pass UNDER itself. Ramps are thin wedges on pillars too.
+- **The route now:**
+  1. A ground run to the guards (1).
+  2. Ramps up east to Y2, then a LADDER (2) up to the Y4 walkway along row 3.
+  3. The TOWER (3) at Y5 overlooks everything.
+  4. *Spur:* climb to the level's roof at Y6 (4), with the whole map below.
+  5. Down to the BUTTON (5); the drawbridge over the gap at (3,6).
+  6. The guards (6) at Y3, then down the east side to the GATE (10), which is shut.
+  7. *The gate sends you back:* a spur runs UNDER the Y4 walkway at Y1 to the CANDLE (8). It comes out beside the opening ramp, a shortcut loop to the start.
+  8. With the candle lit, through the gate and up the east climb to Y6 (11), then a 56 m ZIP across the bottom of the map to E.
+- **What to look at:**
+  - does the gate-sends-you-back loop read
+  - is the under-walkway passage a good reveal
+  - the zip

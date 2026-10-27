@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## GRID LEVEL 1, PASS 2: VERTICALITY (m1357)
+
+STEER 0: *"as many passes as we need... a lot of verticality."* The route and the reasoning are in LEVELGRID.md (L1 pass 2).
+
+- **The greybox can stack now:**
+  - cells are keyed by column, row AND height, so the same square can carry a walkway and a passage under it
+  - raised pads are slabs (`LVG.slab` .6) on four pillars (`LVG.pil` .7), and ramps are thin wedges on pillars, open beneath
+  - a non-neighbour step (the zip's far end) is a plain pad
+- **The route:**
+  - heights to Y6 (27 m)
+  - a ladder up to a Y4 walkway
+  - the tower at Y5
+  - a spur to the roof at Y6
+  - the gate (10) that sends you back UNDER the walkway to the candle (8), which comes out as a shortcut beside the start
+  - a 56 m zip from the east climb's top (11) to E
+- **Fixed on the way:** guards spawn ON their pad (`bodySpawn`'s height), not on the ground beneath it, and the gate is hung at its cells' height.
+
 ## THE GRID LEVEL: A LEVEL PLANNED AS LOGIC FIRST (m1356)
 
 His two blueprint images, and: *"start with the game logic of the level first -- the path, the beats, the gates and buttons -- and add the towers and streams and archers later."*
