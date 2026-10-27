@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## White Heron Castle pass 4 of 10: the stone base is a climb (X2, WORKER B)
+
+- **The run-up.** The base's collider is one tall solid box face, so the m1251 run-up already goes straight up it: no tap at a zoom's
+  speed, a tap at a sprint's. No engine change.
+- **The heights are what made the rest necessary.** A sprint run-up rises about 2.2 m and a jump puts the hands about 3.9 m up. Neither
+  reaches the 6 m lip from the ground.
+- **Handholds.** The stone courses stick out in two staggered rows of solid blocks (1.4 m long, .6 m deep), round all four faces. They
+  skip the stair on the east face.
+  - **The lower row** (lip at 2.9 m) is one jump's reach from the ground.
+  - **The upper row** (4.5 m) sits between them.
+  - From either row, a jump or a run-up reaches the 6 m lip. `LEDGE` catches their lips like any box edge.
+- **The route up the outside.** Ground, then a handhold, then the base lip, then a jump from the base top to the keep's first eave lip
+  (8.55 m). The lips under every eave (pass 1) take it roof to roof from there.
+- **The quoins.** The corners are long-and-short stones stepping in with the batter (visual only).
+
+SHIPPED UNVERIFIED. Next: pass 5, inside the keep (steep stairs instead of ladders, the great pillar, a lookout at the top).
+
 ## White Heron Castle pass 3 of 10: the walls (X2, WORKER B)
 
 - **Rows of small windows (`winRow`).** Each window is:
