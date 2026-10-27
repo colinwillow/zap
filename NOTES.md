@@ -5,6 +5,26 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1094 -- strikes OUT OF THE GUARD (low stab / side slashes); the TORNADO on the left flick DOWN, forward, kept spinning by more flicks; up to 3 AIR KICKS a jump
+
+*"Pulling down on the right stick already has him duck -- that's his guard, he kneels -- so moves out of guard: swipe up, a stab forward low;
+swipe to a side, he slashes to that side. So leave the press and hold as it was. Flick down on the left stick is the tornado kick -- it just
+needs to not turn him around: the direction he's facing, still controllable, and keep flicking and it keeps spinning like a top until
+somebody hits you. And high jump, then flick, flick -- the spinny aerial kick only allows one; as long as you have the height, two or three,
+to cover a long gap."*
+- **The right hold is the SPRINT again** (`CROUCH.mode` default SPRINT; the m1093 crouch stays on TOOLS > RIGHT HOLD).
+- **Guard strikes** (`GSTRIKE`): with the blade, a right flick within .35 s of the guard (`p.blockAt`): UP `katana_attack` (the thrust), RIGHT
+  `katana_horiz`, LEFT `katana_backhand`, DOWN `katana_360l` -- all LOW: the crouch pose holds through them (`duckWant` on `p.lowSwing`) and
+  a low strike takes a LEG (m1093's `limbPick` rule). The guard drops for the strike.
+- **The tornado on the left flick DOWN** (`leftFlick`, `TORN.flick`): on the ground and not guarding (guard + flick is still the flips), a
+  spin the way he FACES -- never turned round; another flick down while it spins adds one (`TORN.max` 8), so flicking keeps the top going;
+  the stick steers it (m1091); any blow that lands on him ends it (`playerHurt`).
+- **Air kicks** (`AIRK`): up to 3 a jump (was 1), each needing 1.1 m of air under him.
+- **Measured** (`guard.cjs`, real loop, katana): guard then up / right / left / down -> `katana_attack` / `katana_horiz` / `katana_backhand` /
+  `katana_360l`, all low, hips down .30-.35 m mid-strike; left flick down + three more -> 4 spins, still facing the way he faced, a hit
+  stopped it; from a 5.5 m jump's top, kicks as each ends -> 3 kicks (at 5.5, 4.2, 3.0 m), 15.7 m covered.
+- Shipped unverified on the phone.
+
 ## m1093 -- the CROUCH (right hold while moving) and its LOW swing for legs; the ZOOM back on a hold (the left pad, any weapon); the one-legged samurai HOPS
 
 *"Holding down the right stick he winds up the big backflip -- instead he could be crouched, move around crouched, and a flick from the crouch
