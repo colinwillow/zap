@@ -9923,6 +9923,92 @@ function swatchBuild() { if (SWATCH.on) return; const g = new THREE.Group(); sce
     const p = new THREE.Mesh(new THREE.BoxGeometry(4, .3, 8), m); p.position.set(x, .15, z0 + 13); p.receiveShadow = true; g.add(p); O.boxes.push({ minx: x - 2, maxx: x + 2, miny: 0, maxy: .3, minz: z0 + 9, maxz: z0 + 17 }); });
   for (const b of O.boxes) BOXES.push(b); boxGrid(); SWATCH.on = { g, O, rings: [] }; }
 function swatchClear() { if (SWATCH.on) { bldClear(SWATCH.on); SWATCH.on = null; } }
+// m1383: THE SNOWFIELD (his, after m1382): *"a convincingly good snow simulation: you're trudging through the snow, the tracks, the snow piles up,
+// but there's also snow in the air -- it's bouncing off your character, it's fluttering, it's super elegant, it's beautiful."* An ELEMENT sandbox
+// beside the sea (the Ship) and, later, the air. KORAJIN > The Snowfield opens the forge with `?w=forge&zone=snow`:
+//  - THE PACK: a 160 m field whose depth lives in a 640x640 byte map (`D`, 25 cm a texel, 0..`depth` m). The ground he walks on stays y = 0, so
+//    fresh snow is KNEE-DEEP round him; his FEET carve it (the toe bones, wherever they touch), his body ploughs a trench when he moves, a roll
+//    or a landing digs a crater, and what they push aside piles up as a RIM. Snow falls back in (`refill` per second). The map is a texture the
+//    snow surface displaces by in its vertex shader (normals from the neighbours), bluer in the hollows, with SPARKLES that twinkle as you move.
+//  - TRUDGING: deep untouched snow drags at him (`drag`, exp, scaled by how deep); his own track is easy going.
+//  - THE AIR: `flakes` soft points round the lens, each fluttering on its own (two sines) in a wind that GUSTS; a flake that meets his body is
+//    pushed out of it and BOUNCES off (and drifts off again); his footsteps and landings KICK UP puffs that arc and fall.
+const SNOWZ = { want: 0, on: null, size: 160, res: 640, depth: .55, refill: .012, foot: .17, plough: .32, rim: .2, rimAdd: .14, drag: 2.6,
+  flakes: 5000, box: 34, puffs: 600, fall: [.55, 1.2], flutter: .5, wind: [1.2, 0, .4], gust: 1.6 };
+try { if (/[?&]zone=snow\b/.test(location.search)) SNOWZ.want = 1; } catch (e) {}
+function snowStage(g) {
+  const Z = SNOWZ, N = Z.res; Z.D = new Uint8Array(N * N).fill(255); Z.T = new THREE.DataTexture(Z.D, N, N, THREE.RedFormat, THREE.UnsignedByteType);
+  Z.T.magFilter = Z.T.minFilter = THREE.LinearFilter; Z.T.wrapS = Z.T.wrapT = THREE.ClampToEdgeWrapping; Z.T.needsUpdate = true;
+  scene.background = new THREE.Color(0xc9d6e6); if (scene.fog) { scene.fog.color.setHex(0xc9d6e6); scene.fog.near = 40; scene.fog.far = 340; }     // cold, pale
+  hemi.color.setHex(0xdfe9ff); hemi.groundColor.setHex(0xb8c4d8); sun.color.setHex(0xfff0dc);
+  const geo = new THREE.PlaneGeometry(Z.size, Z.size, 400, 400).rotateX(-Math.PI / 2), U = { uD: { value: Z.T }, uDepth: { value: Z.depth }, uTexel: { value: 1 / N }, uSize: { value: Z.size } };
+  const m = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .82, metalness: 0 });
+  m.onBeforeCompile = sh => { Object.assign(sh.uniforms, U);
+    sh.vertexShader = 'uniform sampler2D uD; uniform float uDepth; uniform float uTexel; uniform float uSize; varying float vSd; varying vec3 vSW;\n' + sh.vertexShader
+      .replace('#include <beginnormal_vertex>', `float hL = texture2D(uD, uv - vec2(uTexel, 0.0)).r, hR = texture2D(uD, uv + vec2(uTexel, 0.0)).r, hD = texture2D(uD, uv - vec2(0.0, uTexel)).r, hU = texture2D(uD, uv + vec2(0.0, uTexel)).r;
+        float stp = uTexel * uSize; vec3 objectNormal = normalize(vec3((hL - hR) * uDepth / (2.0 * stp), 1.0, -(hD - hU) * uDepth / (2.0 * stp)));
+        #ifdef USE_TANGENT
+        vec3 objectTangent = vec3(1.0, 0.0, 0.0);
+        #endif`)
+      .replace('#include <begin_vertex>', 'float sd = texture2D(uD, uv).r; vSd = sd; vec3 transformed = vec3(position.x, sd * uDepth, position.z); vSW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+    sh.fragmentShader = 'varying float vSd; varying vec3 vSW;\nfloat snH(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }\n' + sh.fragmentShader
+      .replace('#include <color_fragment>', '#include <color_fragment>\n diffuseColor.rgb *= mix(vec3(.48, .62, .92), vec3(1.0), smoothstep(.12, .9, vSd));')
+      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n { vec2 c = floor(vSW.xz * 38.0); float h = snH(c + floor(cameraPosition.xz * 3.0) * .37); totalEmissiveRadiance += vec3(.9, .95, 1.0) * step(.9965, h) * 1.6 * smoothstep(30.0, 4.0, length(cameraPosition - vSW)); }'); };
+  const snow = new THREE.Mesh(geo, m); snow.receiveShadow = true; snow.frustumCulled = false; g.add(snow); Z.mesh = snow;
+  const far = new THREE.Mesh(new THREE.RingGeometry(Z.size * .7, 900, 64, 1).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xf4f7fc, roughness: .9 })); far.position.y = Z.depth - .02; g.add(far);     // an even white plain to the peaks
+  forgePeaks(g);
+  camera.far = Math.max(camera.far, 900); camera.updateProjectionMatrix();
+  // THE AIR: flakes, and the kicked-up puffs, in one Points
+  const NF = Z.flakes, NP = Z.puffs, NT = NF + NP, P = new Float32Array(NT * 3), S = new Float32Array(NT), A = new Float32Array(NT);
+  const F = { vx: new Float32Array(NT), vy: new Float32Array(NT), vz: new Float32Array(NT), ph: new Float32Array(NT), sp: new Float32Array(NT), life: new Float32Array(NT), nextP: 0 };
+  for (let i = 0; i < NF; i++) { P[i * 3] = (Math.random() - .5) * Z.box; P[i * 3 + 1] = Math.random() * 18; P[i * 3 + 2] = (Math.random() - .5) * Z.box; S[i] = .035 + Math.random() * .05; A[i] = .6 + Math.random() * .4; F.ph[i] = Math.random() * 100; F.sp[i] = Z.fall[0] + Math.random() * (Z.fall[1] - Z.fall[0]); }
+  for (let i = NF; i < NT; i++) { P[i * 3 + 1] = -99; S[i] = .05; A[i] = 0; }
+  const pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(P, 3)); pg.setAttribute('aSize', new THREE.BufferAttribute(S, 1)); pg.setAttribute('aA', new THREE.BufferAttribute(A, 1));
+  const pm = new THREE.ShaderMaterial({ uniforms: { uPx: { value: 600 } }, transparent: true, depthWrite: false,
+    vertexShader: 'attribute float aSize; attribute float aA; uniform float uPx; varying float vA; void main() { vec4 mv = modelViewMatrix * vec4(position, 1.0); gl_PointSize = aSize * uPx / max(.1, -mv.z); vA = aA * smoothstep(.3, 1.2, -mv.z); gl_Position = projectionMatrix * mv; }',
+    fragmentShader: 'varying float vA; void main() { vec2 d = gl_PointCoord - .5; float r = dot(d, d) * 4.0; if (r > 1.0) discard; gl_FragColor = vec4(1.0, 1.0, 1.0, vA * (1.0 - r * r)); }' });
+  const pts = new THREE.Points(pg, pm); pts.frustumCulled = false; g.add(pts); Z.air = { pts, pg, pm, P, S, A, F, NF, NP };
+  Z.on = { g }; Z.t = 0; Z.acc = 0; }
+function snowAt(x, z) { const Z = SNOWZ, N = Z.res, u = (x / Z.size + .5) * N, v = (.5 - z / Z.size) * N, i = u | 0, j = v | 0; if (i < 0 || j < 0 || i >= N || j >= N) return 1; return Z.D[j * N + i] / 255; }
+// carve a hole of radius r down to `to` (0..1 of the depth) and pile what it moved into a rim
+function snowStamp(x, z, r, to) { const Z = SNOWZ, N = Z.res, cs = Z.size / N, ci = (x / Z.size + .5) * N, cj = (.5 - z / Z.size) * N, R = (r + Z.rim) / cs, t = to * 255, add = Z.rimAdd * 255, D = Z.D;
+  for (let j = Math.max(0, Math.floor(cj - R)); j <= Math.min(N - 1, Math.ceil(cj + R)); j++) for (let i = Math.max(0, Math.floor(ci - R)); i <= Math.min(N - 1, Math.ceil(ci + R)); i++) {
+    const d = Math.hypot(i - ci, j - cj) * cs, k = j * N + i; if (d < r) { if (D[k] > t) D[k] = t; } else if (d < r + Z.rim && D[k] > t + 20) D[k] = Math.min(255, D[k] + add * (1 - (d - r) / Z.rim) * .5); }
+  Z.dirty = 1; }
+function snowPuff(x, y, z, n, up, sp) { const A = SNOWZ.air; if (!A) return; const F = A.F; for (let k = 0; k < n; k++) { const i = A.NF + (F.nextP++ % A.NP), a = Math.random() * 6.283, s = Math.random() * sp;
+    A.P[i * 3] = x; A.P[i * 3 + 1] = y; A.P[i * 3 + 2] = z; F.vx[i] = Math.cos(a) * s; F.vz[i] = Math.sin(a) * s; F.vy[i] = up * (.5 + Math.random() * .7); F.life[i] = .8 + Math.random() * .6; A.S[i] = .05 + Math.random() * .07; A.A[i] = .9; } }
+const _snF = new THREE.Vector3();
+function snowStep(dt) { const Z = SNOWZ, A = Z.air, p = player; if (!A) return; Z.t += dt; const t = Z.t;
+  // the PACK: feet, the plough, the drag, the refill
+  const under = snowAt(p.pos.x, p.pos.z), sp = Math.hypot(p.vel.x, p.vel.z), inField = Math.abs(p.pos.x) < Z.size / 2 && Math.abs(p.pos.z) < Z.size / 2;
+  if (inField && p.pos.y < Z.depth + .2) {
+    if (p.grounded && under > .35) { const k = Math.exp(-Z.drag * (under - .3) * dt); p.vel.x *= k; p.vel.z *= k; }
+    const bn = rig.bones || {}; for (const nm of ['mixamorig_LeftToeBase', 'mixamorig_RightToeBase']) { const b = bn[nm]; if (!b) continue; b.getWorldPosition(_snF);
+      if (_snF.y < snowAt(_snF.x, _snF.z) * Z.depth + .05) { const before = snowAt(_snF.x, _snF.z); snowStamp(_snF.x, _snF.z, Z.foot, .08); if (before > .4 && sp > .5 && Math.random() < .5) snowPuff(_snF.x, before * Z.depth, _snF.z, 3, 1.6, 1.2); } }
+    if (sp > .4 && p.grounded) snowStamp(p.pos.x, p.pos.z, Z.plough * Math.min(1, sp / 4), .3);
+    if (p.roll) snowStamp(p.pos.x, p.pos.z, .7, .05);
+    if (p.grounded && !Z.wasG && (Z.lastVy || 0) < -6) { snowStamp(p.pos.x, p.pos.z, 1.1, .02); snowPuff(p.pos.x, Z.depth, p.pos.z, 40, 3.5, 3.5); }     // a landing digs a crater
+  }
+  Z.wasG = p.grounded; Z.lastVy = p.vel.y;
+  Z.acc += dt; if (Z.acc > .25) { const inc = Math.max(1, Math.round(Z.refill * 255 * Z.acc)); Z.acc = 0; const D = Z.D; for (let k = 0; k < D.length; k++) if (D[k] < 255) D[k] = Math.min(255, D[k] + inc); Z.dirty = 1; }
+  if (Z.dirty) { Z.T.needsUpdate = true; Z.dirty = 0; }
+  // the AIR
+  const P = A.P, F = A.F, cx = camera.position.x, cz = camera.position.z, hb = Z.box / 2, gx = Z.wind[0] * (1 + Z.gust * Math.max(0, Math.sin(t * .23) * Math.sin(t * .61))), gz = Z.wind[2] + Math.sin(t * .17) * .6;
+  const px = p.pos.x, py = p.pos.y, pz = p.pos.z, hh = RIG.height * (typeof bodyK === 'function' ? bodyK() : 1), rr = .5;
+  for (let i = 0; i < A.NF; i++) { const o = i * 3; let x = P[o], y = P[o + 1], z = P[o + 2]; const ph = F.ph[i];
+    x += (gx + Math.sin(t * 1.3 + ph) * Z.flutter + F.vx[i]) * dt; z += (gz + Math.cos(t * 1.1 + ph * 1.7) * Z.flutter + F.vz[i]) * dt; y += (-F.sp[i] + Math.sin(t * 2.1 + ph) * .15 + F.vy[i]) * dt;
+    const kd = Math.exp(-2.2 * dt); F.vx[i] *= kd; F.vy[i] *= kd; F.vz[i] *= kd;
+    // off his body: a capsule round him; a flake inside is put on its skin and bounced outward
+    const dx = x - px, dz = z - pz, d = Math.hypot(dx, dz); if (y > py && y < py + hh && d < rr) { const nx = d > 1e-3 ? dx / d : 1, nz = d > 1e-3 ? dz / d : 0; x = px + nx * rr; z = pz + nz * rr;
+      const vin = Math.max(0, p.vel.x * nx + p.vel.z * nz); F.vx[i] = nx * (1.2 + vin) + p.vel.x * .4; F.vz[i] = nz * (1.2 + vin) + p.vel.z * .4; F.vy[i] = .8 + Math.random() * .8; }
+    // wrapped round the lens, and back to the top when it lands
+    if (x - cx > hb) x -= Z.box; else if (x - cx < -hb) x += Z.box; if (z - cz > hb) z -= Z.box; else if (z - cz < -hb) z += Z.box;
+    const gy = Math.abs(x) < Z.size / 2 && Math.abs(z) < Z.size / 2 ? snowAt(x, z) * Z.depth : Z.depth; if (y < gy) { y = camera.position.y + 10 + Math.random() * 8; F.vx[i] = F.vy[i] = F.vz[i] = 0; }
+    P[o] = x; P[o + 1] = y; P[o + 2] = z; }
+  for (let i = A.NF; i < A.NF + A.NP; i++) { if (F.life[i] <= 0) continue; const o = i * 3; F.life[i] -= dt; F.vy[i] -= 9 * dt; const kd = Math.exp(-1.5 * dt); F.vx[i] *= kd; F.vz[i] *= kd;
+    P[o] += F.vx[i] * dt; P[o + 1] += F.vy[i] * dt; P[o + 2] += F.vz[i] * dt; A.A[i] = Math.max(0, Math.min(.9, F.life[i])); if (F.life[i] <= 0 || P[o + 1] < 0) { A.A[i] = 0; P[o + 1] = -99; F.life[i] = 0; } }
+  A.pg.attributes.position.needsUpdate = true; A.pg.attributes.aA.needsUpdate = true; A.pg.attributes.aSize.needsUpdate = true;
+  A.pm.uniforms.uPx.value = renderer.domElement.height / (2 * Math.tan(camera.fov * Math.PI / 360)); }
 function forgePeaks(g) {
   let sd = PEAKS.seed; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
   const geos = [], rock = new THREE.Color(PEAKS.rock), cap = new THREE.Color(PEAKS.cap), haze = new THREE.Color(PEAKS.haze), c = new THREE.Color();
@@ -9942,6 +10028,7 @@ function arenaStage() {
   arenaSky();
   const R = ARENA.r, g = new THREE.Group(), L = ARENA.look; world.add(g);
   // m1117: THE BUILDING FORGE -- a clean white floor under the arena's sky, nothing else: the buildings are spawned into it (SPAWN > BUILDINGS)
+  if (inForge() && SNOWZ.want) { snowStage(g); CWALL.g = g; COVER.meshes = []; COVER.boxes = []; ARENA.r = 60; return; }     // m1383: THE SNOWFIELD instead of the white floor
   if (inForge() && SHIPZ.want) { shipSea(g); CWALL.g = g; COVER.meshes = []; COVER.boxes = []; ARENA.r = 60; return; }     // m1373: THE SHIP's sea instead of the white floor
   if (inForge()) { const cv = document.createElement('canvas'); cv.width = cv.height = 512; const c = cv.getContext('2d'); c.fillStyle = '#f2f3f5'; c.fillRect(0, 0, 512, 512);
     c.strokeStyle = 'rgba(120,130,150,.35)'; c.lineWidth = 2; for (let i = 0; i <= 512; i += 64) { c.beginPath(); c.moveTo(i, 0); c.lineTo(i, 512); c.stroke(); c.beginPath(); c.moveTo(0, i); c.lineTo(512, i); c.stroke(); }
@@ -28041,7 +28128,7 @@ function boardPose(dt) {
 }
 
 function stepPlayer(dt) {
-  if (inArena()) { deflStep(dt); hallStep(dt); if (SKIN.list.length) skinStep(dt); if (PIECE.list.length) pieceStep(dt); if (SMASH.list.length) smashStep(dt); for (const E of BLDG.list) if (E.step && E.on()) E.step(dt); if (LVL.want && inForge()) lvlStart(); if (LVG.on) lvgStep(dt); if (SHIPZ.want === 1 && inForge()) shipBuild(); if (SHIPZ.on) shipStep(dt); }     // m1105; m1119; m1120: each building's own life
+  if (inArena()) { deflStep(dt); hallStep(dt); if (SKIN.list.length) skinStep(dt); if (PIECE.list.length) pieceStep(dt); if (SMASH.list.length) smashStep(dt); for (const E of BLDG.list) if (E.step && E.on()) E.step(dt); if (LVL.want && inForge()) lvlStart(); if (LVG.on) lvgStep(dt); if (SHIPZ.want === 1 && inForge()) shipBuild(); if (SHIPZ.on) shipStep(dt); if (SNOWZ.on) snowStep(dt); }     // m1105; m1119; m1120: each building's own life
   const p = player;
   stepFeet(dt);
   const hadLock = p.lock;
@@ -64624,7 +64711,7 @@ async function init() {
 
 // the console handle. Every tuning object is live, so a number can be moved on the phone
 // without a rebuild and without a push.
-window.melee = window.mel = { GHOME, SHIMMY, VAIM, SHIPZ, shipBuild, FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, gaitMeasure, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
+window.melee = window.mel = { SNOWZ, snowStamp, GHOME, SHIMMY, VAIM, SHIPZ, shipBuild, FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, gaitMeasure, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
   // PROGRESS (m276): `mel.SAVE` is the save; the setters write it through; `mel.progReset()` is a new game
   // TALK (m277): `mel.TALK` live; `mel.TALKS` the scripts by kind; `mel.talk` the state
   TALK, TALKS, talk,
@@ -65070,6 +65157,7 @@ function startGate() {
       add('h4', '', 'KORAJIN GRUMBO');
       btn(el, 'The Arena', 'The katana, the horde, the archers, the rival. Where the fighting is built.', () => go('arena'), 'main');
       btn(el, 'Level 1 -- The Grid', 'The first level, built in layers: the run first, then the puzzle, the enemies, the theme, the boss. Toggle each layer at the top.', () => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter('forge', '?w=forge&lvl=1'); });
+      btn(el, 'The Snowfield', 'Deep snow under a falling sky: trudge, leave tracks, plough, dive -- the snow bounces off you. (An element sandbox.)', () => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter('forge', '?w=forge&zone=snow'); });
       btn(el, 'The Ship', 'A samurai pirate ship on a sunrise sea: climb the rigging, the sails, the castle, the cabin. (Being built.)', () => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter('forge', '?w=forge&zone=ship'); });
       btn(el, 'Building Forge', 'An empty white floor: spawn the buildings, run on them, swing on them, blow them up.', () => go('forge'));
       btn(el, 'The Red Hollows', 'His home: the canyon, the river, the hut. (Being built.)', () => go('home'));

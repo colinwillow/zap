@@ -5,6 +5,33 @@ Every time you complete the third pass on a building, add it to the inventory I 
 run on it, swing on it, blow it up and repair it. Make various TYPES of buildings that are modular and will eventually fit together, with
 different functions: bars and ramps, interior and exterior, turrets, ballistae, beams -- floating flying ship buildings, zeppelins, towers."*
 
+## THE ELEMENTS (his, after m1382) -- sandboxes for water, snow and air
+
+> *"Half of a video game is the visual. One thing that would be super fun is a convincingly good snow simulation: you're trudging through the snow, the
+> tracks, the snow piles up, but there's also snow in the air, bouncing off your character, fluttering -- super elegant, beautiful... We're gonna have a
+> few water simulations, a lot of air -- floating buildings, floating zeppelins. I want to get these different elements going."*
+
+- **WATER:** THE SHIP's sea (Worker A's track above).
+- **SNOW: KORAJIN > The Snowfield** (`?w=forge&zone=snow`).
+  - [x] **pass 1 (m1383):** the deformable pack, the flakes, and the drag:
+    - knee-deep snow on a 640² depth map, displaced in the shader
+    - feet carve tracks, the body ploughs, rolls and landings dig craters, rims pile up, and snow falls back in
+    - hollows tint blue, and sparkles twinkle as you move
+    - deep snow drags at you
+    - 5000 flakes flutter in a gusting wind and BOUNCE off his body
+    - footsteps and landings kick up puffs
+  - [ ] pass 2:
+    - snow that SETTLES on him (his shoulders and head whiten while he stands, shaken off when he moves)
+    - his breath fogs
+    - drifts and banks with varied depth (wind-shaped), a frozen pond to slide on, and pines that drop their snow when you hit them
+    - the sound of crunching
+  - [ ] pass 3:
+    - wind-blown spindrift sheets along the ground
+    - a blizzard that comes and goes
+    - deep powder you sink into (to the waist) and dive through
+    - footprints that read as real prints (heel and toe)
+- **AIR:** (later) floating islands, zeppelins and wind currents to ride.
+
 ## GRUMBO'S HOME, PROCEDURAL (his, after m1376) -- its own track, many passes
 
 > *"These are the images I used to make the Tripo model of his home, but building it procedurally is going to be better, so we can go inside and add

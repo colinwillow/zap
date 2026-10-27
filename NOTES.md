@@ -208,6 +208,27 @@ SHIPPED UNVERIFIED. The queue's passes 2 and 3 are done. Next is his call: more 
 
 SHIPPED UNVERIFIED. Next: pass 3, foam and wake, bow spray, the sun on the water, gulls, an island.
 
+## THE SNOWFIELD, PASS 1: TRACKS, PILES, FLAKES THAT BOUNCE OFF HIM (m1383)
+
+His: *"a convincingly good snow simulation where you're trudging through the snow, the tracks, the snow piles up, but there's also snow in the air, bouncing off your character, fluttering, super elegant."*
+
+- **KORAJIN > The Snowfield** (`?w=forge&zone=snow`). `SNOWZ` and `snowStage` are declared above `arenaStage()` (the TDZ rule), and `snowStep` is in the forge step line.
+- **THE PACK:**
+  - **The depth map:** a 160 m field with a 640² byte map, 25 cm a texel, 0 to 0.55 m. The ground stays at y = 0 for walking, so fresh snow is knee-deep on him.
+  - **The surface:** a 400² plane displaced in the vertex shader by the map, with normals from the neighbouring texels. It is tinted blue in the hollows, with view-dependent SPARKLES (a hash on a 2.6 cm grid, reseeded by the camera's position, so they twinkle as you move).
+  - **What carves it:** the TOE BONES wherever they dip into the snow (radius .17, down to 8%), a PLOUGH under him at speed, a roll (radius .7), and a hard landing (vy < -6: a 1.1 m crater plus a puff of 40).
+  - **Rims:** pile up round every cut (`rim`, `rimAdd`).
+  - **Refill:** snow falls back in at `refill` .012/s (about 80 s to fill a track).
+- **TRUDGING:** in deep untouched snow (over 35%) his speed is scrubbed by `exp(-drag * depth * dt)`. His own track is free.
+- **THE AIR:**
+  - **Flakes:** 5000 soft points in a 34 m box wrapped round the lens. Each falls at its own speed, flutters on two sines, and drifts in a wind that GUSTS.
+  - **Bouncing off him:** a flake inside his body's capsule (r .5, his height) is put on its skin and BOUNCED outward and up, harder when he runs into it.
+  - **Landing:** a flake that lands goes back to the top.
+  - **Kicked-up puffs** (a 600 pool with gravity) come off footsteps in fresh snow and off landings.
+  - **Size:** points are sized in world metres from the lens (`uPx`).
+- **Checked headless:** it boots, and a stamped line of footprints and a crater render as blue-shadowed hollows with the flakes in the air (two renders).
+- **Live dials:** `mel.SNOWZ` (`drag`, `refill`, `flakes` (rebuild), `wind`, `gust`, `flutter`, `fall`) and `mel.snowStamp(x, z, r, to)`.
+
 ## THE TEXTURE LIBRARY: GENERATED MAPS, TRIPLANAR ON CODE-BUILT GEOMETRY (m1379)
 
 His: *"start generating texture maps for the endgame assets -- the wood, the marble, the stone, the metal -- so the game starts having a bit more depth"*, and he topped up the OpenAI credits.
