@@ -5,6 +5,46 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE SHIP, PASS 10: THE SCENERY REBUILT -- NO MORE CONES (m@X4@, WORKER A)
+
+His: *"I'm not loving the background scenery... it feels very low rent... take a cone, flip it upside down and call it a floating island and
+it looks so goddamn geometric. Break up the flat surfaces, make the rim eroded, differences in ground textures, bushes, trees... the
+underside, pieces missing, different materials... and the island is just a circle."*
+
+**`shipIsle`, one seeded generator for every island** (pure THREE and vertex colours; it runs at module scope from `shipSea`):
+- **The OUTLINE**: a radius per angle from eight random harmonics, with NOTCHES bitten out. On the sea island they are coves; on a floating
+  island they are the bays a waterfall leaves by.
+- **The TOP**: rings from the middle to that outline, rolling ground from layered value noise, painted per vertex. Grass is in three greens,
+  with dirt patches and rock where the rim or the heights are.
+  - A floating island's rim CRUMBLES down.
+  - The sea island's ground falls to a beach and under the sea (two skirt rings).
+- **The UNDERSIDE** (floating): a cliff of STRATA.
+  - Twelve levels down, each ring tapering by a noisy power and ledging in and out.
+  - The taper is split into 2-4 LOBES, so it drips into several points instead of one cone.
+  - It is banded in four rock tones under a root-brown lip.
+  - Broken CHUNKS of rock float beneath, and VINES hang off the rim.
+- **LIFE**: pines (stacked cones), broadleaf trees with blob crowns (a fifth of them CHERRY BLOSSOM), bushes and boulders, set on the
+  ground's own height. All of it is one vertex-coloured mesh per island.
+- **The SEA ISLAND** (R 95):
+  - a mountain with a plateau summit and the pagoda on it;
+  - beaches round a real coastline with coves;
+  - **SURF** on a strip that follows that coastline, its streaks scrolling and working up and down the beach;
+  - six jagged SEA STACKS, wet-dark at the waterline, with foam round their feet;
+  - **a HARBOUR** in the first cove: a pier on posts out over the water with lanterns, two houses with tiled roofs, and a red torii on the
+    sand.
+- **EIGHT floating islands** now, up from six (two small near ones). Three carry pagodas and five pour waterfalls from a notch.
+- **The haze** is pushed out (fog 380-1250, camera far 1400), so the islands at 300-600 m keep their colour.
+- **Checked headless**: boots, builds, no errors; close renders of a floating island, the sea island and its coast. The first render had
+  the strata washed nearly white, the sea stacks pale boxes, and the pagoda oversized on a needle peak; all three are fixed.
+
+**Queued (BUILDINGS.md, THE SHIP)**, from the rest of his message:
+- foam and the first big sea creature, a giant alien whale;
+- a serpent-fish;
+- mantas that swim AND fly;
+- later: other ships, a bigger harbour, air creatures for the airship.
+
+SHIPPED UNVERIFIED.
+
 ## Grumbo's home, procedural, pass 12: smoke from the stacks, the fires flicker (WORKER B)
 
 - **SMOKE from both bronze stacks.** One point cloud (1 draw) of 40 soft puffs. Each puff rises from a stack's top, drifts downwind and
