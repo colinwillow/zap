@@ -434,7 +434,7 @@ SHIPPED UNVERIFIED. The queue's passes 2 and 3 are done. Next is his call: more 
 
 SHIPPED UNVERIFIED. Next: pass 3, foam and wake, bow spray, the sun on the water, gulls, an island.
 
-## THE DOJO, PASS 2: TORII, LANTERN STRINGS, SOFFITS, THE CREST, PETALS (m1399)
+## THE DOJO, PASS 2: TORII, LANTERN STRINGS, SOFFITS, THE CREST, PETALS (m1400)
 
 - **TORII:** four, on the diagonals just outside the rim (r W+2.6), each framing a pagoda behind it from the floor. Red pillars on stone feet with gold collars, a black KASAGI with upswept ends, a red shimaki under it, the NUKI crossbeam, and a gold plaque.
 - **LANTERN STRINGS:** from each banner mast's top to the two torii beside it. A catenary (sin sag 2.4 m) of rope segments, with seven paper lanterns (warm emissive) hung from each.

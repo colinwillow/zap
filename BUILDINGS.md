@@ -21,7 +21,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - seven drifting stone platforms
   - the middle CLEARED (no cover walls); everything still spawns from SPAWN
   - a boss enters by the beam
-- [x] **pass 2 (m1399):**
+- [x] **pass 2 (m1400):**
   - four red TORII on the diagonals at the rim, framing the pagodas (curved black kasagi, nuki, gold plaque, stone feet)
   - LANTERN STRINGS sagging from each banner mast to the torii beside it
   - SOFFITS under every roof, and lanterns at the pagodas' lower eave corners
