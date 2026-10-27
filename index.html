@@ -10573,6 +10573,7 @@ try { const v = localStorage.getItem('mel.duck'); if (v !== null && DUCK.drops.i
 const _dkL = new THREE.Vector3(), _dkR = new THREE.Vector3(), _dkQL = new THREE.Quaternion(), _dkQR = new THREE.Quaternion(), _dkQ = new THREE.Quaternion(), _dkQ2 = new THREE.Quaternion(), _dkA = new THREE.Vector3(), _dkH = new THREE.Quaternion();
 function duckWant() {
   const p = player, R = stick.R, up = -R.y, mag = Math.hypot(R.x, R.y);
+  if (p.crouchS) return 1;     // m1093: the crouch-walk wears the same pose
   return p.wall && p.wallLow && DUCK.drop > 0 && R.down && up < 0 && mag > WEAP.blockKeep && Math.abs(Math.atan2(R.x, -up)) < WEAP.blockArc ? 1 : 0;
 }
 function duckPose(dt) {
@@ -10581,7 +10582,7 @@ function duckPose(dt) {
   if (!LU || !LL || !LF || !RU || !RL || !RF) return;
   rig.root.updateMatrixWorld(true); LF.getWorldPosition(_dkL); RF.getWorldPosition(_dkR); LF.getWorldQuaternion(_dkQL); RF.getWorldQuaternion(_dkQR);
   const H = hbarH(), k = DUCK.k * DUCK.k * (3 - 2 * DUCK.k);
-  rig.root.position.y -= DUCK.drop * H * k; rig.root.updateMatrixWorld(true);
+  rig.root.position.y -= (player.crouchS ? CROUCH.drop : DUCK.drop) * H * k; rig.root.updateMatrixWorld(true);
   ik2(LU, LL, LF, _dkL, 1); ik2(RU, RL, RF, _dkR, 1);
   const keepW = (bone, qw) => { bone.parent.updateMatrixWorld(true); bone.parent.getWorldQuaternion(_dkQ).invert(); bone.quaternion.copy(_dkQ.multiply(qw)); };
   keepW(LF, _dkQL); keepW(RF, _dkQR);
@@ -11168,7 +11169,7 @@ function courseStep(dt) {
 //   both legs, or the head -> he EXPLODES: every limb he has left flies, sparks, smoke, a boom, and he is gone
 // If the cut edges read badly, his plan B is hard-surface pieces rigid on one bone each -- the same code, cleaner seams.
 const LIMB = { on: 1, sets: { armR: 'RightArm', armL: 'LeftArm', legR: 'RightUpLeg', legL: 'LeftUpLeg', head: 'Neck' }, power: .25, reach: .7,
-  regrab: .8, limp: .35, sparkT: .22, kicks: ['katana_kick', 'flying_kick'], stat: { cuts: 0, booms: 0, regrabs: 0 } };
+  regrab: .8, limp: .35, hopHz: 2.4, hopH: .28, sparkT: .22, kicks: ['katana_kick', 'flying_kick'], stat: { cuts: 0, booms: 0, regrabs: 0 } };
 const _lmV = new THREE.Vector3(), _lmW = new THREE.Vector3();
 function limbMesh(d) { return d.limbMesh || (d.limbMesh = xrMain(d.model)); }
 // per KIND, once: limb -> the triangles whose three vertices are all dominated by a bone under that limb's root
@@ -11188,7 +11189,8 @@ function limbPrep(d) {
 function limbRoot(d, nm) { const want = LIMB.sets[nm]; let b = null; d.model.traverse(o => { if (!b && o.isBone && o.name.replace(/^mixamorig[_:]?/, '') === want) b = o; }); return b; }
 // which limb the blow took: the standing limb nearest the blade, else by side and a coin
 function limbPick(d, dirH) {
-  const C = d.cut || {}, left = Object.keys(LIMB.sets).filter(nm => !C[nm] && (nm !== 'head' || (C.armL && C.armR)));     // the head is the FINISHER: armless first (measured: nearest the blade, it ended him in 3 cuts)
+  const C = d.cut || {}; let left = Object.keys(LIMB.sets).filter(nm => !C[nm] && (nm !== 'head' || (C.armL && C.armR)));
+  if (player.lowSwing) { const legs = left.filter(nm => nm.startsWith('leg')); if (legs.length) return legs[(Math.random() * legs.length) | 0]; }     // m1093: a low swing takes a LEG     // the head is the FINISHER: armless first (measured: nearest the blade, it ended him in 3 cuts)
   if (!left.length) return '';
   const S = typeof bladeSeg === 'function' ? bladeSeg() : null;
   if (S) { let best = '', bd = 1e9; for (const nm of left) { const b = limbRoot(d, nm); if (!b) continue; const c = b.children[0] || b; c.getWorldPosition(_lmV); const q = S.at(_lmV), dd = q.distanceTo(_lmV); if (dd < bd) { bd = dd; best = nm; } }
@@ -11247,6 +11249,12 @@ function limbBoom(d, dirH) {
 function limbHide(d, dt) {
   for (const nm in d.cut) { const b = d.cut[nm]; b.scale.setScalar(1e-4); b.updateMatrixWorld(true);
     if (Math.random() < dt / LIMB.sparkT) { b.getWorldPosition(_lmW); spk(_lmW.x, _lmW.y, _lmW.z, (Math.random() - .5) * 2, Math.random() * 2, (Math.random() - .5) * 2, .1, .35, [1, .7, .25]); } }
+  if (d.limp && d.model) {     // m1093: the hop -- a bounce on the remaining leg while he travels, a little lean, settling when he stops
+    const go = d.hopMv ? 1 : 0; d.hopMv = 0; d.hopK = (d.hopK || 0) + (go - (d.hopK || 0)) * Math.min(1, dt * 8);
+    d.hopPh = ((d.hopPh || 0) + dt * LIMB.hopHz) % 1; const up = Math.abs(Math.sin(d.hopPh * Math.PI));
+    d.model.position.y = LIMB.hopH * up * d.hopK; d.model.rotation.x = .12 * d.hopK; d.model.rotation.z = (d.cut.legL ? -1 : 1) * .1 * d.hopK;
+    if (d.hopK > .5 && d.hopPh < dt * LIMB.hopHz) snd('foot', { g: .25, r: .8, x: d.root.position.x, z: d.root.position.z });
+  }
   if (d.regrabT > 0 && (d.regrabT -= dt) <= 0 && !(d.cut && d.cut.armL)) { katanaMountL(d); LIMB.stat.regrabs++; }
 }
 // m1090: a katana in his LEFT hand (the sword arm is gone): `arenaKatana`'s mount, on `weapon_root_left`
@@ -11356,6 +11364,8 @@ function arenaUi() {
       else if (a === 'getup') { KNOCK.getUp = KNOCK.getUps[(KNOCK.getUps.indexOf(KNOCK.getUp) + 1) % KNOCK.getUps.length]; try { localStorage.setItem('mel.getup', KNOCK.getUp); } catch (err) {} }
       else if (a === 'cart') { CART.pose = CART.poses[(CART.poses.indexOf(CART.pose) + 1) % CART.poses.length]; try { localStorage.setItem('mel.cart2', CART.pose); } catch (err) {} }
       else if (a === 'kcslow') { const T = KATANA.chargeSlows; KATANA.chargeSlow = T[(T.indexOf(KATANA.chargeSlow) + 1) % T.length]; try { localStorage.setItem('mel.kat.cslow', KATANA.chargeSlow); } catch (err) {} }
+      else if (a === 'rhold') { CROUCH.mode = CROUCH.modes[(CROUCH.modes.indexOf(CROUCH.mode) + 1) % CROUCH.modes.length]; try { localStorage.setItem('mel.rhold', CROUCH.mode); } catch (err) {} }     // m1093
+      else if (a === 'lhold') { LHOLD.pick = LHOLD.picks[(LHOLD.picks.indexOf(LHOLD.pick) + 1) % LHOLD.picks.length]; try { localStorage.setItem('mel.lhold', LHOLD.pick); } catch (err) {} }     // m1093
       else if (a === 'toprun') { GAIT.topRun = GAIT.topRun ? 0 : 1; try { localStorage.setItem('mel.toprun', GAIT.topRun ? '1' : '0'); } catch (err) {} runSetUse(GAIT.runSet, 0); }     // m1092
       else if (a === 'sprint') { const T = NINJA.looks; NINJA.look = T[(T.indexOf(NINJA.look) + 1) % T.length]; try { localStorage.setItem('mel.sprint', NINJA.look); } catch (err) {} }
       else if (a === 'sideflick') { TORNADO.pick = TORNADO.picks[(TORNADO.picks.indexOf(TORNADO.pick) + 1) % TORNADO.picks.length]; try { localStorage.setItem('mel.sideflick', TORNADO.pick); } catch (err) {} }     // m1088
@@ -11381,7 +11391,7 @@ function arenaUi() {
   if (ARENA.tools === undefined) { try { ARENA.tools = +localStorage.getItem('mel.arena.tools') || 0; } catch (err) { ARENA.tools = 0; } }
   const tools = ARENA.tools && !m;     // a menu open folds the tools away: the screen is not tall enough for both
   let h = '<div class="ar-bar">' + B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('vend', 'VEND') + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
-    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('kswing', 'SWING ' + KATANA.style) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
+    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('kswing', 'SWING ' + KATANA.style) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
   if (m === 'top') h += '<div class="ar-menu">' + B('cat', 'WARBOSS &rsaquo;', 'boss') + B('cat', 'PEOPLE &rsaquo;', 'people') + B('cat', 'BEASTS &rsaquo;', 'beasts') + B('cat', 'RIVALS &rsaquo;', 'rival') + B('turret', 'TURRET<small>' + (TURRET.list.length ? 'tap to remove' : 'sentry gun') + '</small>', '', TURRET.list.length ? 'ar-on' : '') + B('hbar', 'HIGH BAR<small>' + (HBAR.list.length ? 'tap to remove' : 'swing on it') + '</small>', '', HBAR.list.length ? 'ar-on' : '') + B('beam', 'BALANCE BEAM<small>' + (BEAM.list.length ? 'tap to remove' : 'walk it') + '</small>', '', BEAM.list.length ? 'ar-on' : '') + B('wrun', 'WALL RUN<small>' + ((WRUN.boxes || []).length ? 'tap to remove' : 'run along it') + '</small>', '', (WRUN.boxes || []).length ? 'ar-on' : '') + B('course', 'ACROBATICS<small>' + (COURSE.on ? 'tap to remove' : 'the course') + '</small>', '', COURSE.on ? 'ar-on' : '') + B('slice', 'SLICE DUMMY<small>' + (LIMB.stat.cuts ? LIMB.stat.cuts + ' cut, ' + LIMB.stat.booms + ' blown' : 'cut him up') + '</small>') + B('horde', 'HORDE<small>' + (HORDE.busy ? 'loading...' : HORDE.list.length ? HORDE.list.length + ' -- tap for +' + HORDE.per : '+' + HORDE.per + ' samurai') + '</small>', '', HORDE.list.length ? 'ar-on' : '') + '<button class="ar-off">GRUNTS<small>soon</small></button><button class="ar-off">GREYS<small>soon</small></button></div>';
   else if (m === 'boss' || m === 'people' || m === 'beasts' || m === 'rival') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back');
     for (const k in ARENA.kinds) { const A = ARENA.kinds[k]; if (!!A.creature !== (m === 'beasts')) continue; if (!!A.rival !== (m === 'rival')) continue; if (m !== 'beasts' && !A.both && !!A.civ !== (m === 'people')) continue; h += B('spawn', A.t + (A.sub ? '<small>' + A.sub + '</small>' : ''), k); } h += '</div>'; }
@@ -17476,6 +17486,19 @@ const aimAt = d => {
 // AND THE ACQUIRE RANGE IS WHAT THE MOVE CAN COVER, NOT A TYPED NUMBER. A flat range locks a
 // JAB onto a man six metres off and then cannot get him there -- and a lock that turns him
 // toward somebody he cannot reach is worse than no lock at all.
+// m1093: THE CROUCH. *"Holding the right stick he winds up for the big backflip, which is fine if he's not moving at all. But instead he could
+// just be crouched -- you can move around crouched -- and if I flick from the crouch he does a LOW swing, so with the dummy you could cut
+// their legs off."* RIGHT HOLD (TOOLS): CROUCH (default) -- the right pad held at rest while the LEFT stick moves him is a crouch-walk
+// (`p.crouchS`: the cover duck's legs-and-spine pose, `drop` x his height, over his walk, at `speed`); held standing still it is still the
+// backflip's wind-up. A flick within `lowT` s of either is a LOW swing (the katana's `katana_360l`, round him) that goes for the LEGS. SPRINT
+// = m1026's held run + long jump. The sprint is not lost: the ZOOM (m1085) is the speed now.
+const CROUCH = { mode: 'CROUCH', modes: ['CROUCH', 'SPRINT'], speed: 2.4, drop: .26, lowT: .35, low: 'katana_360l', lowDur: .6, stat: { lows: 0 } };
+// m1093: LEFT HOLD (TOOLS): ZOOM (default) -- the left pad pressed and held in place charges the ZOOM (m1085) with ANY weapon (*"I forget how you
+// initiate the speed run... put it back... I don't know that I'm loving the charge tornado"*); TORNADO = m1091's. The right-pad UP zoom,
+// unarmed, still works.
+const LHOLD = { pick: 'ZOOM', picks: ['ZOOM', 'TORNADO'] };
+try { const v = localStorage.getItem('mel.rhold'); if (CROUCH.modes.includes(v)) CROUCH.mode = v; const w = localStorage.getItem('mel.lhold'); if (LHOLD.picks.includes(w)) LHOLD.pick = w; } catch (e) {}
+const crouchRecent = () => performance.now() / 1000 - (player.crouchAt || -9) < CROUCH.lowT;
 // m1091: THE TORNADO ON THE LEFT PAD'S HOLD (the slot CLAUDE.md kept free). *"Press and hold the middle of the left stick and it charges to do
 // the tornado, like the charge on the right stick... after the charge it does two full animation sequences in a row, and you can move while
 // it's spinning to control it."* Thumb down on the LEFT pad and kept inside the tap radius past the tap time (`MOVE.tapR` / `tapT`): `p.tornC`
@@ -17484,13 +17507,14 @@ const aimAt = d => {
 const TORN = { on: 1, T: .8, min: .3, spins: 2, speed: 4.2, ring: null, stat: { charges: 0, spins: 0 } };
 function tornStep(dt) {
   const p = player, L = stick.L, T = TORN;
+  if (LHOLD.pick !== 'TORNADO') { p.tornC = 0; if (T.ring) T.ring.visible = false; return; }
   const ok = T.on && p.grounded && !p.melee && !p.roll && !p.knock && !p.slam && !p.riding && !p.wall && !mphBare() && !p.torn;
-  if (L.down && (L.far || 0) < MOVE.tapR && ok) { p.lHold = (p.lHold || 0) + dt; if (p.lHold > MOVE.tapT) { const was = p.tornC || 0; p.tornC = Math.min(1, was + dt / T.T); if (was < 1 && p.tornC >= 1) { snd(HCHG.snd, HCHG.play); spkBurst(p.pos.x, p.pos.y + .3, p.pos.z, 18, { col: [1, .6, .2], spread: 3, size: .14, life: .4 }); } } }
-  else { if (!L.down && (p.tornC || 0) >= T.min && ok) tornGo(); if (!L.down || (L.far || 0) >= MOVE.tapR) { p.lHold = 0; p.tornC = 0; } }
+  if (L.down && (L.far || 0) < MOVE.tapR && ok) { p.ltHold = (p.ltHold || 0) + dt; if (p.ltHold > MOVE.tapT) { const was = p.tornC || 0; p.tornC = Math.min(1, was + dt / T.T); if (was < 1 && p.tornC >= 1) { snd(HCHG.snd, HCHG.play); spkBurst(p.pos.x, p.pos.y + .3, p.pos.z, 18, { col: [1, .6, .2], spread: 3, size: .14, life: .4 }); } } }
+  else { if (!L.down && (p.tornC || 0) >= T.min && ok) tornGo(); if (!L.down || (L.far || 0) >= MOVE.tapR) { p.ltHold = 0; p.tornC = 0; } }
   if (!T.ring) { const m = new THREE.Mesh(new THREE.RingGeometry(.86, 1, 40), new THREE.MeshBasicMaterial({ color: 0xff8a2a, transparent: true, opacity: .85, toneMapped: false, depthWrite: false })); m.rotation.x = -Math.PI / 2; m.visible = false; scene.add(m); T.ring = m; }
   T.ring.visible = (p.tornC || 0) > 0; if (T.ring.visible) { const r = .35 + .75 * p.tornC; T.ring.scale.set(r, r, 1); T.ring.position.set(p.pos.x, p.pos.y + .05, p.pos.z); T.ring.material.color.setHex(p.tornC >= 1 ? 0xffc04a : 0xff8a2a); }
 }
-function tornGo() { const p = player; TORN.stat.charges++; p.torn = { n: TORN.spins }; p.tornC = 0; p.lHold = 0; p.jump = 0; tornSpin(); }
+function tornGo() { const p = player; TORN.stat.charges++; p.torn = { n: TORN.spins }; p.tornC = 0; p.ltHold = 0; p.jump = 0; tornSpin(); }
 function tornSpin() {
   const p = player, SK = MELEE.spinKick, nm = SK.clip; if (!rig.actions[nm]) { p.torn = null; return; }
   TORN.stat.spins++; p.melee = 1; p.meleeIx = 0; p.meleeT = 0; p.meleeName = nm; p.meleeAir = 0; p.meleeBody = 0; p.melWall = 0; p.melFist = 0; p.melFront = 0; p.multi = 1;
@@ -17679,13 +17703,14 @@ function meleeGo0(h) {
   const SKt = MELEE.spinKick, sideF = (KATANA.dir === 'left' || KATANA.dir === 'right') && TORNADO.pick === 'SPIN' && !tackle && SKt;
   const sfx = KATANA.dir === 'left' ? MIRROR.suffix : '', kat360 = sideF && slotNow().blade ? TORNADO.sword + sfx : '';     // m1091: the sword's 360
   const tornado = sideF && !kat360 ? SKt.clip + sfx : '';
-  const name = kat360 && rig.actions[kat360] ? kat360 : tornado && rig.actions[tornado] ? tornado : tackle ? MELEE.slide : pool[katInOrder ? Math.min(ix, pool.length - 1) : j];     // m984: the katana's combo plays IN ORDER (link 3 = the finisher); m1088: a side flick is the TORNADO
+  const low = !tackle && crouchRecent() && slotNow().blade && rig.actions[CROUCH.low] ? CROUCH.low : '';     // m1093: out of the crouch -- LOW, for the legs
+  const name = low ? low : kat360 && rig.actions[kat360] ? kat360 : tornado && rig.actions[tornado] ? tornado : tackle ? MELEE.slide : pool[katInOrder ? Math.min(ix, pool.length - 1) : j];     // m984: the katana's combo plays IN ORDER (link 3 = the finisher); m1088: a side flick is the TORNADO
   if (!rig.actions[name]) { note('NO CLIP ' + name); return; }
   p.melee = 1; p.meleeIx = ix; p.meleeLinks = links; p.meleeT = 0; p.meleeName = name; p.meleeAir = 0; p.melWall = 0; p.melFist = p.fistNow ? 1 : 0;     // m1021: a left-pad strike never breaks a wall
   p.meleeBody = tackle ? 1 : 0;   // see `STRIKE.bodyAt` -- the blow is him arriving
   const CL = clipOf(name);
-  p.meleeDur = tackle ? MELEE.slideDur : name === tornado ? SKt.dur : name === kat360 ? TORNADO.swordDur : melBeat(name, ix);
-  p.multi = name === kat360 || name === tornado ? 1 : 0;     // m1091: a spin catches everyone round him
+  p.meleeDur = tackle ? MELEE.slideDur : name === tornado ? SKt.dur : name === kat360 ? TORNADO.swordDur : name === low ? CROUCH.lowDur : melBeat(name, ix);
+  p.multi = name === kat360 || name === tornado || name === low ? 1 : 0; p.lowSwing = name === low ? 1 : 0; if (low) CROUCH.stat.lows++;     // m1091: a spin catches everyone round him
   p.meleeChain = 0; p.melFired = 0; p.melU = 0; p.swPrev = null; p.swRootX = null; p.swRootZ = null;
   const base = tackle ? MELEE.slideV
              : (CL && CL.lunge) || MELEE.lunge[Math.min(ix, MELEE.lunge.length - 1)];
@@ -19957,8 +19982,12 @@ function stepKit(dt) {
     const Z = ZOOM, free = Z.on && !s.aim && !s.charge && !s.blade && !p.riding && !mphBare();
     const startOK = p.grounded && Math.hypot(p.vel.x, p.vel.z) < Z.still && stickWorld().mag < .25;
     const hold = free && !p.melee && !p.roll && !p.knock && !p.chargeGo && padUp(1);
+    // m1093: and the LEFT pad held in place, any weapon (`LHOLD`) -- its own clock, past the tap time so a tap is still a jump
+    const LS = stick.L, holdL = Z.on && LHOLD.pick === 'ZOOM' && LS.down && (LS.far || 0) < MOVE.tapR && p.grounded && !p.melee && !p.roll && !p.knock && !p.riding && !p.wall && !mphBare();
+    p.lzHold = holdL ? (p.lzHold || 0) + dt : 0;
+    const byL = holdL && p.lzHold > MOVE.tapT && Math.hypot(p.vel.x, p.vel.z) < Z.still;
     const R = zoomRings();
-    if (hold && ((p.zoomC || 0) > 0 || (startOK && p.center))) {
+    if (byL || (hold && ((p.zoomC || 0) > 0 || (startOK && p.center)))) {
       const was = p.zoomC || 0; p.zoomC = Math.min(1, was + dt / Z.T);
       if (was < 1 && p.zoomC >= 1) { Z.stat.full++; snd(HCHG.snd, HCHG.play); spkBurst(p.pos.x, p.pos.y + .2, p.pos.z, HCHG.pop, { col: HCHG.hot, spread: 4, up: .6, r: .3, size: .16, life: .45 }); }
       if ((Z.dustT -= dt) <= 0) { Z.dustT = .14 - .09 * p.zoomC; spkBurst(p.pos.x, p.pos.y + .05, p.pos.z, 2 + (p.zoomC * 4 | 0), { col: [.82, .8, .76], spread: 1 + 2 * p.zoomC, up: .4, size: .14, life: .35 }); }
@@ -19966,7 +19995,7 @@ function stepKit(dt) {
       const r = Z.rIn + (Z.rOut - Z.rIn) * p.zoomC; R.inn.scale.set(r, r, 1);
       const col = p.zoomC >= 1 ? 0xffc04a : 0x39f0ff; R.inn.material.color.setHex(col); R.out.material.color.setHex(col);
     } else {
-      if ((p.zoomC || 0) >= Z.min && free && p.grounded) zoomGo(p.zoomC);
+      if ((p.zoomC || 0) >= Z.min && p.grounded && (free || LHOLD.pick === 'ZOOM')) zoomGo(p.zoomC);
       p.zoomC = 0; R.g.visible = false;
     }
   }
@@ -19998,8 +20027,13 @@ function stepKit(dt) {
     if (repHold) p.rTouch = 1; else if (!R.down) p.rTouch = 0;
     // m1007: ...UNLESS THE LEFT STICK IS PUSHED: then the same still hold is the NINJA SPRINT (`NINJA`)
     const moving = Math.hypot(stick.L.x, stick.L.y) > NINJA.minMag && stick.L.down;
+    p.crouchS = 0;     // m1093: set again below while it is held
     if (repHold || p.rTouch) { p.bkT = 0; p.bkOn = 0; p.ninja = 0; p.ninjaHold = 0; }
-    else if (NINJA.on && !busy && R.down && R.far < MOVE.tapR && (moving || p.ninja) && (moving || p.ninjaHold > 0)) {
+    else if (CROUCH.mode === 'CROUCH' && !busy && R.down && R.far < MOVE.tapR && moving) {     // m1093: held while he moves = the crouch-walk
+      p.ninjaHold = (p.ninjaHold || 0) + dt; p.bkT = 0; p.bkOn = 0; p.ninja = 0;
+      if (p.ninjaHold >= MOVE.tapT) { p.crouchS = 1; p.crouchAt = performance.now() / 1000; }
+    }
+    else if (CROUCH.mode === 'SPRINT' && NINJA.on && !busy && R.down && R.far < MOVE.tapR && (moving || p.ninja) && (moving || p.ninjaHold > 0)) {
       p.ninjaHold = (p.ninjaHold || 0) + dt; p.bkT = 0; p.bkOn = 0;
       if (moving && p.ninjaHold >= MOVE.tapT) p.ninja = 1; else if (!moving) p.ninja = 0;
     } else {
@@ -20007,7 +20041,7 @@ function stepKit(dt) {
       p.ninja = 0; p.ninjaHold = 0;
       if (!busy && R.down && R.far < MOVE.tapR) {
         p.bkT = Math.min(AIR.hold, p.bkT + dt);
-        p.bkOn = p.bkT >= MOVE.tapT ? 1 : 0;
+        p.bkOn = p.bkT >= MOVE.tapT ? 1 : 0; if (p.bkOn) p.crouchAt = performance.now() / 1000;     // m1093: a flick out of the wind-up is low too
       } else { p.bkT = 0; p.bkOn = 0; }
     }
     if (p.ninjaWin > 0) p.ninjaWin = Math.max(0, p.ninjaWin - dt);
@@ -21624,6 +21658,7 @@ function stepPlayer(dt) {
   // the blade, the clip sped up to match (its rate is speed / its measured ref, held to `tsHi` -- past that the feet slide a little).
   if (KATANA.capRun && katStance() && KATANA.refs && KATANA.refs.run > .2) wantSp = Math.min(wantSp, KATANA.refs.run * GAIT.tsHi * KATANA.runK);
   if (p.bkOn) wantSp = Math.min(wantSp, AIR.duckSp);   // a duck shuffles; it does not run
+  if (p.crouchS) wantSp = Math.min(wantSp, CROUCH.speed);     // m1093: the crouch-walk
   if (p.ninja) wantSp = (NINJA.look === 'NINJA' ? NINJA.speed : NINJA.runSpeed) * Math.max(s.mag, .75);     // m1007: the ninja sprint, past every cap above
   if (p.ljump) { if (p.grounded && p.airT > .1) p.ljump = 0; else wantSp = Math.max(wantSp, p.ljump * Math.max(s.mag, .5)); }     // the long jump keeps its speed till he lands
   if (p.zoomC > 0) wantSp = 0;     // m1085: running in place
@@ -33561,9 +33596,9 @@ function foeAI(d, dt, t) {
     const surge = foeGait(d, K, dt);
     if (surge <= 0) { t[K.clips.idle] = 1; return; }   // a hesitation, and he is looking at you
     const sp = (fast ? K.run : K.walk) * V.pace * surge;
-    const nm = fast ? K.clips.run : K.clips.walk;
+    const nm = d.limp ? K.clips.idle : fast ? K.clips.run : K.clips.walk;     // m1093: one leg -- he HOPS (the stance, bounced in `limbHide`), not a phantom stride
     const ref = fast ? K.runRef : K.walkRef;
-    foeMove(d, d.h, sp, dt);
+    foeMove(d, d.h, sp, dt); d.hopMv = 1;
     t[nm] = 1;
     // THE CLIP IS SCALED TO THE SPEED HE IS ACTUALLY GOING, capped -- a run played at twice its
     // reference is a scramble, and the honest fix for a slow clip is a faster clip.
@@ -57049,7 +57084,7 @@ window.melee = window.mel = { FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VE
   // of a rule measures a game that does not exist -- which is the oldest mistake there is, and
   // the only way not to make it is for `npm run sim` to call exactly these.
   DUMMY, DUMMIES, LOCK, LEDGE, WALL, STRIKE, PADS, DESK, meleeLock, dummyHit, dummyBlow, strikeSweep, stepDummies, bodySeat, SEAT, findLock, SFX, CHARGE, POSE, snd, PUNCH, PLASMA, HITSND, BODYSND, FLYHIT, STEP,
-  stepPlayer, muzzleWorld, RIC, coverAcross, cwallOf, KNOCK, knockHas, GSIDE, KAIM, aimLeap, kaimHold, DUCK, duckPose, RUNSWIPE, runSwipe, SHOTBLOCK, shotBlock, bladeSeg, steelFlash, STEEL, HURT, playerHurt, GOD, LEAP, coverLeap, wallGo, WRUN, wrunTap, wrunFind, wrunSpawn, wrunClear, stepWrun, backGo, HURDLE, hurdleTap, HOOK, barHook, meleeGo0, CART, cartGo, leftFlick, rigAnim, stepKit, frameBody, kickGo, SPRINGS, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, hbarCatch, stepBar, hbarPose, hbarFly, coverArmUndo, slideGo, coverShow, TURRET, TORN, tornGo, LIMB, limbCut, limbPrep, sliceDummy, JUGGLE, TORNADO, FLOW, ZOOM, zoomGo, HORDE, hordeAdd, hordeClear, ACAM, actionCam, acamPip, turretSpawn, COURSE, courseBuild, courseClear, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
+  stepPlayer, muzzleWorld, RIC, coverAcross, cwallOf, KNOCK, knockHas, GSIDE, KAIM, aimLeap, kaimHold, DUCK, duckPose, RUNSWIPE, runSwipe, SHOTBLOCK, shotBlock, bladeSeg, steelFlash, STEEL, HURT, playerHurt, GOD, LEAP, coverLeap, wallGo, WRUN, wrunTap, wrunFind, wrunSpawn, wrunClear, stepWrun, backGo, HURDLE, hurdleTap, HOOK, barHook, meleeGo0, CART, cartGo, leftFlick, rigAnim, stepKit, frameBody, kickGo, SPRINGS, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, hbarCatch, stepBar, hbarPose, hbarFly, coverArmUndo, slideGo, coverShow, TURRET, CROUCH, LHOLD, TORN, tornGo, LIMB, limbCut, limbPrep, sliceDummy, JUGGLE, TORNADO, FLOW, ZOOM, zoomGo, HORDE, hordeAdd, hordeClear, ACAM, actionCam, acamPip, turretSpawn, COURSE, courseBuild, courseClear, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
   MFX, camShake, palDive,
   // THE BOARD, LIVE (m159). `mel.SK8.hold` is where the deck sits IN HIS HAND while it is
   // carried, and how a carried board should look is a look-at-it decision -- so it is a dial he
