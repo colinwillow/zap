@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1139 -- SHRINE pass 1 (BUILDINGS.md #6, at (0, 25))
+
+`SHRINE`, `shrineBuild` / `shrineStep` / `shrineClear`. SPAWN > BUILDINGS > Shrine.
+- A raised stone TERRACE, 14 x 12 m, 3.2 m up (one solid block, a darker coping), climbed by TEN STEPS of .32 m (under his .357 step),
+  .5 m deep, 5 m wide, each a solid box, between stone cheek walls -- on the courtyard side (-z).
+- A vermilion TORII (6.2 m) at the foot of the steps; four STONE LANTERNS (toro: base, post, lit firebox, pyramid cap, finial; solid) --
+  two at the foot, two at the top.
+- The HONDEN at the back of the terrace: plaster walls on a dark frame, a door gap on its front, a curved roof (`bldRoof`); grapple rings
+  at its two front eave corners.
+- THE JIN CORE in the middle of the terrace: a stone basin with a glowing cyan pool, a great crystal (octahedron) floating 3 m over it,
+  turning, bobbing, an additive shell breathing round it, three stones orbiting.
+- Not breakable yet (the terrace is not at ground level, and `cwallBuild` builds from the ground): pass 2 gives it something to smash
+  and the balance beam.
+- The Market's cables ran sideways into the Shrine's terrace; their stakes now go straight back.
+Shipped unverified.
+
 ## m1138 -- MARKET pass 3 (DONE)
 
 - Four NOBORI (tall vertical banners on poles) out front between the crates.
