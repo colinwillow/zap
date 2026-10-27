@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE DOJO HALL x1.5 -- STEER S2 (older rows, m-DH15)
+
+The first of the older forge rows (27 of them), one per build.
+
+- **The hall is built from its parameters,** so the PROPORTIONS scale: plan 10 x 7 → 15 x 10.5 m, walls 3.1 → 4.65 m, eave 3.55 → 5.3 m, ridge 6.6 → 9.9 m, eave overhang, corner lift.
+- **The door is 3.2 m.** The rule's minimum is 2.4.
+- **What is his size stays:** the tatami (now filling the bigger floor in front of the dais), the weapon rack, the scroll, the gong, the straw dummies, the stone lanterns, and the bars' own height.
+- **What moves out with the hall:** the yard, the dummies' spacing, the lanterns, the stepping-stone path (7 stones now), the bars under the front eave, and the roof ramp.
+  - The ramp is wider (1.5 → 2.25 m) and longer. It climbs 5.3 m over about 13 m (~22°), against 3.55 m over 4.2 m (~40°) before.
+- `hallTrophy` reads the hall's own scaled depth (`HALL.on.A`).
+
 ## m1335 -- Timber Siege Fort pass 6 of 10: the defenders (X3, WORKER A)
 
 All of them can be killed:

@@ -18852,7 +18852,7 @@ function cwallBuild(g, tex, x, z, L, D, yaw, H, O) {
 // over), timber posts at the corners and the door, a low stone plinth to stand it on, a hipped roof with CONCAVE slopes and UPTURNED
 // corners (one surface: a height over the eave rectangle -- steep at the ridge, flattening to the eave, lifted at the corners), a ridge cap
 // with end horns, two paper lanterns at the door, and two high bars under the front eave. SPAWN > HALL puts it up / takes it away.
-const HALL = { at: [0, -7.5], W: 10, D: 7, H: 3.1, door: 2.6, thick: .5, eave: 1.5, ridgeY: 6.6, eaveY: 3.55, lift: .7, sparHp: 3, sparV: 1.8, sparWind: .6, sparDmg: 9, on: null };
+const HALL = { scale: 1.5, at: [0, -7.5], W: 10, D: 7, H: 3.1, door: 2.6, thick: .5, eave: 1.5, ridgeY: 6.6, eaveY: 3.55, lift: .7, sparHp: 3, sparV: 1.8, sparWind: .6, sparDmg: 9, on: null };
 function hallTex() {
   if (HALL.tex) return HALL.tex;
   const cv = document.createElement('canvas'); cv.width = 256; cv.height = 128; const c = cv.getContext('2d');
@@ -18862,7 +18862,10 @@ function hallTex() {
   const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; return (HALL.tex = t);
 }
 function hallBuild() {
-  if (HALL.on) return; const A = HALL, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g);
+  // STEER S2 (x1.5, m1333): the hall's PROPORTIONS scale (plan, wall height, eave, ridge, the door to 3.2), so the room is 15 x 10.5 and the
+  // eave 5.3 m up; what is his size stays (the tatami, the rack, the dummies, the lanterns, the bars' height). The yard and the roof ramp
+  // move out with it.
+  if (HALL.on) return; const S = HALL.scale || 1, A = Object.assign({}, HALL, { W: HALL.W * S, D: HALL.D * S, H: HALL.H * S, door: S > 1 ? 3.2 : HALL.door, eave: HALL.eave * S, ridgeY: HALL.ridgeY * S, eaveY: HALL.eaveY * S, lift: HALL.lift * S }), [cx, cz] = A.at, g = new THREE.Group(); scene.add(g);
   const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), hw = A.W / 2, hd = A.D / 2, t = A.thick;
   const wall = (x, z, L, yaw) => O.walls.push(cwallBuild(g, T, x, z, L, t, yaw, A.H, O));
   // the four walls; the front (+z, toward the player's side) is split for the door
@@ -18908,7 +18911,7 @@ function hallBuild() {
   // ---- PASS 2 (m1118): the inside, the outside, the roof you can run on ----
   // INSIDE: a tatami floor (dark-edged mats), a raised dais at the back with a glowing Jin panel, a weapon rack, a hanging scroll, a gong
   { const tat = new THREE.MeshStandardMaterial({ color: 0xb9b07a, roughness: .9 }), edge = new THREE.MeshStandardMaterial({ color: 0x24302a, roughness: .9 }), tm = [], te = [];
-    for (let i = 0; i < 4; i++) for (let j = 0; j < 3; j++) { const x = cx - hw + t + .1 + i * 2.25 + 1.05, z = cz - hd + t + .1 + j * 1.5 + .72; if (x > cx + hw - t) continue;
+    for (let i = 0; i < Math.floor((A.W - 2 * t) / 2.25); i++) for (let j = 0; j < Math.floor((A.D - 2 * t - 1.8) / 1.5); j++) { const x = cx - hw + t + .1 + i * 2.25 + 1.05, z = cz - hd + t + 1.9 + j * 1.5 + .72; if (x > cx + hw - t) continue;
       const a = new THREE.BoxGeometry(2.1, .05, 1.38); a.translate(x, .045, z); tm.push(a); const b = new THREE.BoxGeometry(2.18, .04, 1.46); b.translate(x, .03, z); te.push(b); }
     const mt = new THREE.Mesh(mergeGeometries(tm, false), tat); mt.receiveShadow = true; g.add(mt); g.add(new THREE.Mesh(mergeGeometries(te, false), edge));
     add(new THREE.BoxGeometry(A.W - 2.2, .45, 1.5), wood, cx, .225, cz - hd + t + .8, 1);     // the dais (solid: step up onto it)
@@ -18931,23 +18934,23 @@ function hallBuild() {
   // THE ROOF IS WALKABLE (its own triangles), and a RAMP up the east side reaches its eave: a timber gangway on posts
   { const RT = []; const rg = HALL.roofGeo, P = rg.attributes.position, ix = rg.index.array;
     for (let i = 0; i < ix.length; i += 3) for (const v of [ix[i], ix[i + 1], ix[i + 2]]) RT.push(P.getX(v) + cx, P.getY(v), P.getZ(v) + cz);
-    const r0 = [cx + hw + 1.5 + 1.1, .05, cz + 6.5], r1 = [cx + hw + 1.5 + 1.1, A.eaveY + .1, cz + hd - 1.2], w = .75;     // along -z, up to the eave
+    const r0 = [cx + hw + 1.5 * S + 1.1, .05, cz + hd + 3 + 3.5 * S], r1 = [cx + hw + 1.5 * S + 1.1, A.eaveY + .1, cz + hd - 1.2], w = .75 * S;     // along -z, up to the eave
     RT.push(r0[0] - w, r0[1], r0[2], r0[0] + w, r0[1], r0[2], r1[0] + w, r1[1], r1[2], r0[0] - w, r0[1], r0[2], r1[0] + w, r1[1], r1[2], r1[0] - w, r1[1], r1[2]);
-    RT.push(r1[0] - w, r1[1], r1[2], r1[0] + w, r1[1], r1[2], cx + hw + .6, A.eaveY + .1, r1[2] - 1.4, r1[0] - w, r1[1], r1[2], cx + hw + .6, A.eaveY + .1, r1[2] - 1.4, cx + hw + .6, A.eaveY + .1, r1[2]);     // a landing onto the eave
+    RT.push(r1[0] - w, r1[1], r1[2], r1[0] + w, r1[1], r1[2], cx + hw + .6, A.eaveY + .1, r1[2] - 1.4 * S, r1[0] - w, r1[1], r1[2], cx + hw + .6, A.eaveY + .1, r1[2] - 1.4 * S, cx + hw + .6, A.eaveY + .1, r1[2]);     // a landing onto the eave
     bldTris(O, RT);
     const len = Math.hypot(r1[1] - r0[1], r1[2] - r0[2]), ramp = new THREE.Mesh(new THREE.BoxGeometry(w * 2, .12, len), wood);
     ramp.position.set(r0[0], (r0[1] + r1[1]) / 2 - .06, (r0[2] + r1[2]) / 2); ramp.rotation.x = Math.atan2(r1[1] - r0[1], r0[2] - r1[2]); ramp.castShadow = true; g.add(ramp);
     for (let k = 0; k < 6; k++) { const u = (k + .5) / 6, y = r0[1] + (r1[1] - r0[1]) * u, z = r0[2] + (r1[2] - r0[2]) * u; for (const sx of [-1, 1]) add(new THREE.BoxGeometry(.12, y, .12), wood, r0[0] + sx * (w - .08), y / 2, z, 0);
       const tr = new THREE.BoxGeometry(w * 2, .05, .08); tr.translate(r0[0], y + .04, z); g.add(new THREE.Mesh(tr, wood)); } }
   // the bars, under the front eave, either side of the door -- and one INSIDE along the ridge, to swing across the hall
-  const bars = [hbarMake(cx - 3.2, cz + hd + 2.6, 0), hbarMake(cx + 3.2, cz + hd + 2.6, 0), hbarMake(cx, cz - .3, 0)]; for (const B of bars) HBAR.list.push(B);
+  const bars = [hbarMake(cx - 3.2 * S, cz + hd + 2.6 * S, 0), hbarMake(cx + 3.2 * S, cz + hd + 2.6 * S, 0), hbarMake(cx, cz - .3, 0)]; for (const B of bars) HBAR.list.push(B);
   for (const b of O.boxes) if (!(b.chunk && !b.chunk.alive)) BOXES.push(b);
   const rings = []; { const hw = A.W / 2, hd = A.D / 2; for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) rings.push(gringAdd(g, cx + sx * (hw + A.eave - .2), A.eaveY + A.lift - .1, cz + sz * (hd + A.eave - .2))); }     // m1129
   // ---- PASS 4 (m1167): a TRAINING YARD out front -- four straw practice dummies on posts (smash them, they come back), a KOINOBORI pole
   // with three carp windsocks streaming in the wind, two stone lanterns and a stepping-stone path to the door ----
   const smash = [], koi = []; { const straw = new THREE.MeshStandardMaterial({ color: 0xc9b07a, roughness: 1 }), post = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 }), rope = new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .7 });
-    const hd2 = A.D / 2, fz = cz + hd2 + 5.2;
-    for (const dx of [-6.5, -4.5, 4.5, 6.5]) { const X = cx + dx, Z = fz + (Math.abs(dx) > 5 ? .8 : 0), m = new THREE.Mesh(new THREE.CylinderGeometry(.28, .3, 1.1, 10), straw); m.position.set(X, 1.25, Z); m.castShadow = true; g.add(m);
+    const hd2 = A.D / 2, fz = cz + hd2 + 5.2 * S;
+    for (const dx of [-6.5 * S, -4.5 * S, 4.5 * S, 6.5 * S]) { const X = cx + dx, Z = fz + (Math.abs(dx) > 5 ? .8 : 0), m = new THREE.Mesh(new THREE.CylinderGeometry(.28, .3, 1.1, 10), straw); m.position.set(X, 1.25, Z); m.castShadow = true; g.add(m);
       const p = new THREE.Mesh(new THREE.CylinderGeometry(.06, .06, 1.9, 6), post); p.position.y = -.25; m.add(p); const arm = new THREE.Mesh(new THREE.BoxGeometry(1.1, .1, .1), post); arm.position.y = .25; m.add(arm);
       const hd = new THREE.Mesh(new THREE.SphereGeometry(.2, 10, 8), straw); hd.position.y = .75; m.add(hd); const bd = new THREE.Mesh(new THREE.CylinderGeometry(.29, .29, .1, 10), rope); bd.position.y = -.2; m.add(bd);
       smashAdd(smash, m, { minx: X - .3, maxx: X + .3, miny: 0, maxy: 2.1, minz: Z - .3, maxz: Z + .3 }, 3, 10, [.85, .75, .5]); }
@@ -18958,10 +18961,10 @@ function hallBuild() {
       const body = new THREE.Mesh(new THREE.ConeGeometry(.42 - k * .06, 2.6 - k * .4, 12, 1, true), new THREE.MeshStandardMaterial({ color: kc[k], roughness: .8, side: THREE.DoubleSide })); body.rotation.z = Math.PI / 2; body.position.x = (1.3 - k * .2); fish.add(body);
       const eye = new THREE.Mesh(new THREE.TorusGeometry(.2 - k * .03, .04, 6, 16), new THREE.MeshStandardMaterial({ color: 0xf4f1ea })); eye.position.set(.15, 0, 0); eye.rotation.y = Math.PI / 2; fish.add(eye); koi.push(fish); }
     const st = new THREE.MeshStandardMaterial({ color: 0x9a948c, roughness: .95 }), lampM = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false });
-    for (const sx of [-1, 1]) { const tx = cx + sx * 2.4, tz = cz + hd2 + 3.6; for (const [geo, m, y] of [[new THREE.CylinderGeometry(.35, .45, .25, 6), st, .12], [new THREE.CylinderGeometry(.12, .15, .8, 8), st, .65], [new THREE.BoxGeometry(.4, .38, .4), lampM, 1.25], [new THREE.ConeGeometry(.5, .38, 4).rotateY(Math.PI / 4), st, 1.63]]) { const o = new THREE.Mesh(geo, m); o.position.set(tx, y, tz); o.castShadow = true; g.add(o); }
+    for (const sx of [-1, 1]) { const tx = cx + sx * 2.4 * S, tz = cz + hd2 + 3.6 * S; for (const [geo, m, y] of [[new THREE.CylinderGeometry(.35, .45, .25, 6), st, .12], [new THREE.CylinderGeometry(.12, .15, .8, 8), st, .65], [new THREE.BoxGeometry(.4, .38, .4), lampM, 1.25], [new THREE.ConeGeometry(.5, .38, 4).rotateY(Math.PI / 4), st, 1.63]]) { const o = new THREE.Mesh(geo, m); o.position.set(tx, y, tz); o.castShadow = true; g.add(o); }
       O.boxes.push({ minx: tx - .35, maxx: tx + .35, miny: 0, maxy: 1.8, minz: tz - .35, maxz: tz + .35 }); BOXES.push(O.boxes[O.boxes.length - 1]); }
-    for (let k = 0; k < 5; k++) { const s2 = new THREE.Mesh(new THREE.CylinderGeometry(.4, .44, .08, 9), st); s2.position.set(cx + (k % 2 ? .25 : -.25), .04, cz + hd2 + 1.2 + k * .9); s2.receiveShadow = true; g.add(s2); } }
-  boxGrid(); HALL.on = { g, O, bars, rings, smash, koi }; arenaBeam(cx, cz, [1, .7, .4], 1); snd('clang', { g: .7, r: .6 });
+    for (let k = 0; k < Math.round(5 * S); k++) { const s2 = new THREE.Mesh(new THREE.CylinderGeometry(.4, .44, .08, 9), st); s2.position.set(cx + (k % 2 ? .25 : -.25), .04, cz + hd2 + 1.2 + k * .9); s2.receiveShadow = true; g.add(s2); } }
+  boxGrid(); HALL.on = { A, g, O, bars, rings, smash, koi }; arenaBeam(cx, cz, [1, .7, .4], 1); snd('clang', { g: .7, r: .6 });
 }
 // m1119: the hall's little life -- the door lanterns sway, and THE GONG RINGS when a strike reaches it (once a swing): a deep clang, a warm
 // glow off the bronze, a wobble that dies away
@@ -19008,7 +19011,7 @@ function hallSparHit(x, y, z, rad, dmg) { const S = HALL.spar; if (!S || S.st ==
 function hallTrophy() { const H = HALL.on; if (!H || H.trophy) return; const [cx, cz] = HALL.at, gold = new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .9, roughness: .25, emissive: 0x3a2400 }), t = new THREE.Group();
   const cup = new THREE.Mesh(new THREE.CylinderGeometry(.28, .12, .45, 14, 1, true), gold); cup.position.y = .75; cup.material.side = THREE.DoubleSide; t.add(cup); const st = new THREE.Mesh(new THREE.CylinderGeometry(.05, .05, .4, 8), gold); st.position.y = .35; t.add(st);
   const base = new THREE.Mesh(new THREE.BoxGeometry(.4, .14, .4), gold); base.position.y = .07; t.add(base); for (const s2 of [-1, 1]) { const h = new THREE.Mesh(new THREE.TorusGeometry(.12, .025, 6, 12, Math.PI), gold); h.position.set(s2 * .3, .8, 0); h.rotation.z = -s2 * Math.PI / 2; t.add(h); }
-  t.position.set(cx + 1.6, .45, cz - HALL.D / 2 + 1.1); t.traverse(o => { if (o.isMesh) o.castShadow = true; }); H.g.add(t); H.trophy = t; arenaBeam(t.position.x, t.position.z, [1, .85, .3], 1); snd('clang', { g: 1, r: 1.8 }); spkBurst(t.position.x, 1.2, t.position.z, 30, { col: [1, .85, .3], spread: 4, size: .14, life: .9 }); }
+  t.position.set(cx + 1.6, .45, cz - (H.A || HALL).D / 2 + 1.1); t.traverse(o => { if (o.isMesh) o.castShadow = true; }); H.g.add(t); H.trophy = t; arenaBeam(t.position.x, t.position.z, [1, .85, .3], 1); snd('clang', { g: 1, r: 1.8 }); spkBurst(t.position.x, 1.2, t.position.z, 30, { col: [1, .85, .3], spread: 4, size: .14, life: .9 }); }
 function hallClear() { if (HALL.spar) { HALL.spar.g.removeFromParent(); HALL.spar = null; } if (HALL.on) { gringDrop(HALL.on.rings); smashDrop(HALL.on.smash); }
   const H = HALL.on; if (!H) return; H.g.removeFromParent(); bldTrisDrop(H.O);
   for (const b of H.O.boxes) { const i = BOXES.indexOf(b); if (i >= 0) BOXES.splice(i, 1); }
