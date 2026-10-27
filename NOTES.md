@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1107 -- the running jump-slash; flips that carry you where you flick
+
+**What he said:** *"When I'm running and flick up on the right stick he just stops and hits with his sword... a lurch forward and down to
+the ground -- a smaller version of the charge attack, only when actually running."* / *"the flips should be accompanied by a direction --
+flip forward, he moves forward; flick left, he moves left... in guard, the front and back flips don't move him much."*
+
+- **RUN SLASH (`RUNSLASH`, TOOLS > RUN SLASH):** blade out, on the ground, running over `minV` 4.2 m/s, not mid-chain, a flick UP = the charged
+  swing's release at `k` .7 of a full charge (`chargeRelease`: at whoever is in front, the slash, the landing) plus a hop to `apex` 1.1 m, so he
+  leaves the ground and the slash comes down with him. Not the standing chain's link 1. The deflect lock never applies (it wants a FULL
+  charge). Real loop: at 7.2 m/s, a flick up -> the charged release, 11.6 m covered, apex 1.04 m.
+- **AIR FLIPS MOVE (`airPush`):** every left-stick flick in the air adds `push` 6 m/s along the flick's world direction (his facing held, the
+  horizontal capped at 9), and air steering is held off it for `pushHold` .8 s so it is not steered away. Real loop: a flick to his side took
+  his side speed from 0 to 6.1 m/s.
+- **GUARD FRONT / BACK FLIPS (`CART.vFB` 4.5 -> 6.5):** a front flip in guard now travels 4.1 m (was ~2.9).
+
 ## m1106 -- blocked arrows glance off (or go home), finish them on the floor, no DNA ring, robots don't grunt
 
 **What he said:** *"I'm blocking the arrows... I want them to actually zing off in a direction, visibly, like the rockets, and deflect them
