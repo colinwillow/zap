@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1182 -- MOATED KEEP pass 3 (DONE)
+
+- CHAINS from the drawbridge's tip up to the keep wall, following it as it rises and falls.
+- An ONI MASK over the keep door (red lacquer, glowing eyes, gold horns).
+- Six KOI swimming round the moat; eight lanterns round the curb; two cables from the keep to stakes; a drone circling.
+`BLDG` keep `pass: 3`. Next: alternate -- Flying Ship House pass 4. Shipped unverified.
+
 ## m1181 -- AIRSHIP DOCK pass 4: dispatch bell, a stern gun, a wind sock
 
 - A DISPATCH BELL on the deck by the arm: strike it and, if the airship is docked, it casts off within .6 s (no 14 s wait).
