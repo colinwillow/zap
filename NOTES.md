@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## 2D AIM: WALK BACKWARDS AND THE RETICLE RISES (m1344)
+
+*"The 3D aim thing is not working as it's supposed to. Another idea: in 2D, the normal aiming mode, what if your reticle nudged slightly upward when you walked backwards -- as you're walking backwards it slowly edges upward, and as soon as you stop walking it goes back to level."*
+
+- `aimBackPitch`, in the ordinary 2D aim (with 3D AIM off):
+  - while AIMING, the left stick's component pointing AWAY from his facing, past `BACKAIM.at` .35, raises the shot's pitch at up to about `rate` .55 rad/s × 1.6 at a full pull, capped at `max` 32°
+  - anything else eases it back to level (`back` .3 s half-life)
+  - since aiming faces him down the lens, "backwards" is the left stick pulled down
+- **Tilted, the shot leaves along the lens's bearing at that pitch** (`p.gDir`, the 3D aim's own path through `aimPoint`). The lock and machine assists step aside (`aimRaw`), so the tilt is what you get. The lens tilts up with it at half the pitch (`BACKAIM.cam`).
+- The 3D AIM toggle is untouched. He says it is not working right; what is wrong with it is an open question for him.
+- **Live on `mel.BACKAIM`** (`rate`, `max`, `at`, `cam`). `on: 0` turns it off.
+
 ## THE GATEHOUSE x1.5 -- STEER S2 (older rows, m1343)
 
 - **Its proportions are its constants, so the constants changed:**
