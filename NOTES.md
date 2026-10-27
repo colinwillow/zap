@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- Timber Siege Fort pass 1 of 10: the mass (X3, WORKER A)
+## m1328 -- Timber Siege Fort pass 1 of 10: the mass (X3, WORKER A)
 
 His third reference (`timber_siege_fort.webp`): a scaffold fortress on a cyclopean stone base. Built at the STEER's x1.5, at (-70, 100),
 measured clear of every building (the Courtyard at x -28 is 14 m off even after the pass-8 camp). `TFORT` / `tfortBuild`; its hook in
