@@ -9583,14 +9583,32 @@ function beastFire(d) {     // a fireball from his head, led a little at you
   const tgt = player.pos.clone(); tgt.y += .7; const tt = o.distanceTo(tgt) / C.fireV;
   if (player.vel) tgt.addScaledVector(player.vel, Math.min(.6, tt) * .5);
   const v = tgt.sub(o).normalize().multiplyScalar(C.fireV); v.y += .5 * C.fireG * tt;     // aimed up by what it will fall
-  const m = new THREE.Mesh(beastFire.g || (beastFire.g = new THREE.SphereGeometry(1, 16, 12)), beastFire.m || (beastFire.m = new THREE.MeshBasicMaterial({ color: 0xffa040, toneMapped: false })));
+  // m1096: *"The fireballs just look like little balls, a literal sphere. Way cooler, way more alive, way more particles, a more natural
+  // trajectory, bounce around, hit stuff, explode."* A white-hot CORE inside a flickering orange SHELL (both flicker and churn every frame),
+  // the rocket's fire trail at fireball size behind it (`rocketTrail`: yellow -> orange -> red puffs, embers, smoke); it BOUNCES off the
+  // floor (`FIREBALL.bounces`, each bounce a scorch, a splash, a hop at `rest` of its speed) and bursts on the next floor, a wall, or you.
+  const m = new THREE.Group(), FB = FIREBALL;
+  const core = new THREE.Mesh(FB.geo || (FB.geo = new THREE.IcosahedronGeometry(1, 2)), new THREE.MeshBasicMaterial({ color: 0xfff1b8, toneMapped: false }));
+  const shell = new THREE.Mesh(FB.geo, new THREE.MeshBasicMaterial({ color: 0xff6a12, toneMapped: false, transparent: true, opacity: .72, depthWrite: false }));
+  const shell2 = new THREE.Mesh(FB.geo, new THREE.MeshBasicMaterial({ color: 0xc8260a, toneMapped: false, transparent: true, opacity: .35, depthWrite: false }));
+  core.scale.setScalar(.55); shell2.scale.setScalar(1.3); m.add(core, shell, shell2); m.userData.fb = { core, shell, shell2 };
   m.scale.setScalar(C.fireR); m.position.copy(o); scene.add(m);
-  ARENA.beast.fx.push({ m, v, life: 3, dmg: d.K.hitDmg * C.fireDmg, splash: C.fireSplash, push: d.K.push });
+  ARENA.beast.fx.push({ m, v, life: 4, dmg: d.K.hitDmg * C.fireDmg, splash: C.fireSplash, push: d.K.push, bounces: 0, tr: 0, r: C.fireR });
   snd('plasma', { g: .8, r: .6, x: o.x, z: o.z });
 }
+const FIREBALL = { bounces: 2, rest: .55, slide: .8, trailK: 1.7, every: .022, splashK: .6, geo: null, stat: { bounces: 0, booms: 0 } };
+function fireballLook(f, dt) {     // the flicker and churn
+  const U = f.m.userData.fb; if (!U) return; const t = performance.now() / 1000;
+  U.shell.scale.setScalar(.95 + Math.random() * .2); U.shell2.scale.setScalar(1.2 + Math.random() * .3); U.core.scale.setScalar(.5 + Math.random() * .12);
+  U.shell.rotation.set(t * 5, t * 7, 0); U.shell2.rotation.set(-t * 3, t * 4, t * 2); U.shell.material.opacity = .6 + Math.random() * .25;
+}
 function beastBoom(f, hitP) {
-  const P = f.m.position; snd('boom', { g: .7, r: .9, x: P.x, z: P.z }); camShake(.12);
-  spkBurst(P.x, P.y, P.z, 26, { col: [1, .55, .15], spread: 5, size: .35, life: .6 });
+  const P = f.m.position; snd('boom', { g: .9, r: .85, x: P.x, z: P.z }); camShake(.22); FIREBALL.stat.booms++;
+  // m1096: a fire BLOOM (alpha-blended puffs, so it reads on white), sparks, rising smoke, a ring, a scorch
+  for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2, r = .3 + Math.random() * .6; smokeAt(P.x + Math.sin(a) * r, P.y + .1 + Math.random() * .5, P.z + Math.cos(a) * r, 5 + Math.random() * 3, .14, i % 3 ? ROCKTRAIL.org : ROCKTRAIL.yel, 1.3); }
+  for (let i = 0; i < 6; i++) smokeAt(P.x + (Math.random() - .5), P.y + .4 + Math.random(), P.z + (Math.random() - .5), 4, 1.5, [.3, .28, .26]);
+  spkBurst(P.x, P.y, P.z, 34, { col: [1, .55, .15], spread: 7, size: .3, life: .7 }); spkBurst(P.x, P.y, P.z, 16, { col: [1, .95, .7], spread: 4, size: .2, life: .3 });
+  if (P.y < 1) { slamRing(P.x, Math.max(0, P.y - .3), P.z); if (typeof slamMark === 'function') slamMark(P.x, 0, P.z); }
   const dx = player.pos.x - P.x, dz = player.pos.z - P.z;
   if (!player.roll && (hitP || Math.hypot(dx, dz) < f.splash && P.y < 1.5)) playerHurt(f.dmg * (hitP ? 1 : .5), Math.atan2(f.v.x, f.v.z), f.push, 2, .4, 1);
   scene.remove(f.m);
@@ -9603,10 +9621,18 @@ function beastStrike(d) {     // lightning: a ring where you stand, then the bol
 }
 function beastFxStep(dt) {
   const B = ARENA.beast;
-  for (let i = B.fx.length - 1; i >= 0; i--) { const f = B.fx[i], P = f.m.position; f.life -= dt; f.v.y -= B.dragon.fireG * dt; P.addScaledVector(f.v, dt);
-    if (Math.random() < dt * 60) spk(P.x, P.y, P.z, (Math.random() - .5), Math.random() * .8, (Math.random() - .5), .28, .35, [1, .5 + Math.random() * .3, .1]);
-    const hit = Math.hypot(player.pos.x - P.x, player.pos.y + .7 - P.y, player.pos.z - P.z) < .9 + f.m.scale.x;
-    if (hit || P.y < .15 || f.life <= 0) { beastBoom(f, hit); B.fx.splice(i, 1); } }
+  for (let i = B.fx.length - 1; i >= 0; i--) { const f = B.fx[i], P = f.m.position, ox = P.x, oy = P.y, oz = P.z; f.life -= dt; f.v.y -= B.dragon.fireG * dt; P.addScaledVector(f.v, dt);
+    fireballLook(f, dt);
+    f.tr += dt; const vl = f.v.length() || 1; while (f.tr > FIREBALL.every) { f.tr -= FIREBALL.every; rocketTrail(P.x - f.v.x / vl * f.r, P.y - f.v.y / vl * f.r, P.z - f.v.z / vl * f.r, f.v.x / vl, f.v.y / vl, f.v.z / vl, FIREBALL.trailK); }
+    const hit = Math.hypot(player.pos.x - P.x, player.pos.y + .7 - P.y, player.pos.z - P.z) < .9 + f.r;
+    const wall = boxRay(ox, oy, oz, P.x, P.y, P.z, _tuR) && P.y > f.r + .05;
+    if (!hit && !wall && P.y < f.r && f.bounces < FIREBALL.bounces && f.life > 0) {     // m1096: the bounce -- a scorch, a splash, a hop
+      f.bounces++; FIREBALL.stat.bounces++; P.y = f.r; f.v.y = Math.abs(f.v.y) * FIREBALL.rest; f.v.x *= FIREBALL.slide; f.v.z *= FIREBALL.slide;
+      spkBurst(P.x, .1, P.z, 14, { col: [1, .6, .2], spread: 4, size: .22, life: .45 }); for (let k = 0; k < 4; k++) smokeAt(P.x + (Math.random() - .5) * .6, .2, P.z + (Math.random() - .5) * .6, 4, .12, ROCKTRAIL.org, 1.2);
+      snd('thud', { g: .5, r: 1.2, x: P.x, z: P.z }); if (typeof slamMark === 'function') slamMark(P.x, 0, P.z);
+      const dx = player.pos.x - P.x, dz = player.pos.z - P.z; if (!player.roll && Math.hypot(dx, dz) < f.splash * .7 && player.pos.y < 1.2) playerHurt(f.dmg * FIREBALL.splashK * .5, Math.atan2(dx, dz), f.push * .5, 1.5, .25, 0);
+      continue; }
+    if (hit || wall || P.y < f.r || f.life <= 0) { beastBoom(f, hit); B.fx.splice(i, 1); } }
   for (let i = B.bolts.length - 1; i >= 0; i--) { const b = B.bolts[i]; b.t += dt; const u = b.t / b.T;
     b.ring.material.opacity = .35 + .45 * Math.abs(Math.sin(b.t * 18)); b.ring.scale.setScalar(1.25 - .25 * Math.min(1, u));
     if (u >= 1 && !b.line) { const o = b.d.root.visible ? beastHead(b.d) : b.at.clone().setY(12), pts = [];
@@ -57118,7 +57144,7 @@ window.melee = window.mel = { FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VE
   // of a rule measures a game that does not exist -- which is the oldest mistake there is, and
   // the only way not to make it is for `npm run sim` to call exactly these.
   DUMMY, DUMMIES, LOCK, LEDGE, WALL, STRIKE, PADS, DESK, meleeLock, dummyHit, dummyBlow, strikeSweep, stepDummies, bodySeat, SEAT, findLock, SFX, CHARGE, POSE, snd, PUNCH, PLASMA, HITSND, BODYSND, FLYHIT, STEP,
-  stepPlayer, muzzleWorld, RIC, coverAcross, cwallOf, KNOCK, knockHas, GSIDE, KAIM, aimLeap, kaimHold, DUCK, duckPose, RUNSWIPE, runSwipe, SHOTBLOCK, shotBlock, bladeSeg, steelFlash, STEEL, HURT, playerHurt, GOD, LEAP, coverLeap, wallGo, WRUN, wrunTap, wrunFind, wrunSpawn, wrunClear, stepWrun, backGo, HURDLE, hurdleTap, HOOK, barHook, meleeGo0, CART, cartGo, leftFlick, rigAnim, stepKit, frameBody, kickGo, SPRINGS, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, hbarCatch, stepBar, hbarPose, hbarFly, coverArmUndo, slideGo, coverShow, TURRET, arenaLoad, BEASTTRIM, GSTRIKE, AIRK, leftFlick, kickGo, CROUCH, LHOLD, TORN, tornGo, LIMB, limbCut, limbPrep, sliceDummy, JUGGLE, TORNADO, FLOW, ZOOM, zoomGo, HORDE, hordeAdd, hordeClear, ACAM, actionCam, acamPip, turretSpawn, COURSE, courseBuild, courseClear, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
+  stepPlayer, muzzleWorld, RIC, coverAcross, cwallOf, KNOCK, knockHas, GSIDE, KAIM, aimLeap, kaimHold, DUCK, duckPose, RUNSWIPE, runSwipe, SHOTBLOCK, shotBlock, bladeSeg, steelFlash, STEEL, HURT, playerHurt, GOD, LEAP, coverLeap, wallGo, WRUN, wrunTap, wrunFind, wrunSpawn, wrunClear, stepWrun, backGo, HURDLE, hurdleTap, HOOK, barHook, meleeGo0, CART, cartGo, leftFlick, rigAnim, stepKit, frameBody, kickGo, SPRINGS, NINJA, MIRROR, COVER, HBAR, hbarSpawn, hbarClear, BEAM, beamSpawn, MANTLE, mantleFind, mantleTap, stepMantle, mantleCurve, VAULT, vaultGo, stepVault, renderer, camera, scene, LEDGE, hbarCatch, stepBar, hbarPose, hbarFly, coverArmUndo, slideGo, coverShow, TURRET, beastFire, FIREBALL, arenaLoad, BEASTTRIM, GSTRIKE, AIRK, leftFlick, kickGo, CROUCH, LHOLD, TORN, tornGo, LIMB, limbCut, limbPrep, sliceDummy, JUGGLE, TORNADO, FLOW, ZOOM, zoomGo, HORDE, hordeAdd, hordeClear, ACAM, actionCam, acamPip, turretSpawn, COURSE, courseBuild, courseClear, turretHurt, coverTap, downSlide, turretDeflect, swapGo, lowFind, wallHit, wallRepair, CWALL, coverReset, leftFlick, arenaClear, SMEAR, STRIKECUT, handSpeed, stepCam, integrate, stickWorld, flickH, rollGo, meleeGo, slamGo, chargeRelease, groundAt,
   MFX, camShake, palDive,
   // THE BOARD, LIVE (m159). `mel.SK8.hold` is where the deck sits IN HIS HAND while it is
   // carried, and how a carried board should look is a look-at-it decision -- so it is a dial he
