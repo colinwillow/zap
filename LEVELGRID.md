@@ -97,6 +97,12 @@ This pass adds three new cell kinds to the spec:
 - flying zeppelin platforms
 - swimming (a new mechanic: its own sandbox first, per the whole-piece rule)
 
+## L1 pass 7 (m1362): CATAPULTS
+
+- **`cats: [[c, r], ...]`:** a catapult on the ground at that cell.
+- **Level 1 has three:** (5,5), (8,8) and (2,8).
+- **How they work:** each lobs a stone at where you'll be, with a red ring where it will land. Smash a catapult (8 hp) on the ground to stop it.
+
 ## L1 pass 6 (m1361): THE BOSS KEEP
 
 - **Behind the door at E** stands a fortress on four stilts, with a rocket gun on its roof.

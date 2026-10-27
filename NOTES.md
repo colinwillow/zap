@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## GRID LEVEL 1, PASS 7: CATAPULTS UNDER THE ROUTE (m1362)
+
+His: *"catapults rockets turrets"*.
+
+- **Three catapults on the GROUND** (`cats` in `LVG1`: (5,5), (8,8), (2,8)), under the raised route, so they lob UP at you on the high moves.
+- **How they fire:**
+  - each turns slowly towards him and fires every 5-6.5 s when he is 6-55 m away
+  - it aims at where he will be (60% of his velocity times the flight time)
+  - the flight takes 1.7 s plus 1 s per 30 m, under a gravity of 20
+- **Telegraph:** a RED RING where the stone will land, which tightens and brightens as it comes. Out of the ring or in a roll, and you are safe.
+- **The hit:** 18 damage with a big push and lift, plus dust and smoke. The stone also calls `bldHit` with a 2.2 m radius, so it breaks anything breakable where it lands.
+- **Killing one:** drop to the ground and smash it (its base is a `smashAdd`, 8 hp, never rebuilds). The choice is the risk: going down costs you the climb.
+- **Still open:** a stone landing on the boss keep's legs (once they are unshielded) hurts them. Luring a stone onto them is a trick, not a plan.
+
 ## GRID LEVEL 1, PASS 6: THE BOSS KEEP FALLS WHEN ITS LEGS GO (m1361)
 
 His: *"knock down a building... fully destructible buildings... the boss... crumbles"*.
