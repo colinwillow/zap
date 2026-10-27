@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1114 -- paths up to the bridges (pushed as is, at his word)
+
+- `hwPath`: from each end of both bridges a ledge cut along the canyon wall down to the floor at slope .5 (~27 deg), 2.3 m wide, stone treads
+  every .3 m of rise over a smooth walkable ramp, a retaining face under the outer edge, rope posts. The bridge planks are walkable, the full
+  spacing so there are no gaps.
+- The canyon walls are SOLID now: columns along the wall band (6,252 at 1.5 m), each topped at its cell's lowest corner so no column stands over
+  a path; the steep faces are in the walkable store too. (Before, walking into a wall's footprint fell through the heightfield.)
+- The cave at z 70 moved to 95 (it sat at the west path's foot).
+- Checked headless: the west path climbed from y 2.3 to 14.8 at the bridge; walking straight at a wall stops at it. The bridge crossing was
+  NOT checked. Shipped unverified.
+- Process note (his): this build ran long because of repeated headless test runs. Back to the rule: change, `npm run check`, push.
+
 ## m1113 -- THE RED HOLLOWS: Grumbo's homeland is a canyon (the Refuge's lake is `?style=lake`)
 
 **What he said:** *"Grumbo's home territory should establish the entire identity of KORAJIN... ancient, organic, slightly primitive, with
