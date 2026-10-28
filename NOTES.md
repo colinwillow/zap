@@ -5,6 +5,27 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE SHIP, PASS 11: FOAM, AND THE FIRST BIG SEA CREATURE -- A GIANT ALIEN WHALE (m@X4@, WORKER A)
+
+His: *"I'm wondering if we can do foam on the water too... spend some time doing passes on developing one big sea creature at a time,
+like giant alien whales."*
+
+- **FOAM** is two more terms in the sea shader, both merged into the existing `foam` (so the ship's hull-ellipse discard and the fog still
+  apply): `streak` -- wind lanes, a noise stretched along the wind and bent by a second noise so they curl rather than slash (the first
+  cut was 15:1 and read as RAIN on the water; it is ~5:1 and warped now), masked by a slow patch noise and faded with distance; and
+  `lace` -- whitecaps on the crests.
+- **THE WHALE** (`shipWhaleMake` / `shipWhaleStep`, `SHIPZ.on.whale`): 46 m long, a lofted body in `Z.seaG` (so it rocks with the sea,
+  not with the ship), a spine of ridge plates, a row of glowing cyan spots that pulse (`glowM`), a hind group that BENDS and flukes that
+  FLICK. A four-state loop: `under` (invisible, swims to a random spot 70-150 m out) -> `rise` (4 s, eases up from -14) -> `cruise`
+  (13 s at y -0.55 so the back and ridge break the surface; 2-3 BLOWS from the blowhole, a column of spray bursts and a sound inside
+  150 m) -> `dive` (6 s, pitches down, the tail arches, a fluke SPLASH at 3.4 s) -> `under`.
+- **MEASURED HEADLESS, NOT GUESSED:** at y -1.4 only the ridge plates showed; at -0.55 the back reads. And forcing `cruise` from the
+  console showed the body invisible -- `R.visible` was only ever set by `rise`. It is set from the state every frame now
+  (`R.visible = W.st !== 'under'`), so any entry into a state draws right.
+- `mel.SHIPZ.on.whale` is live: `st`, `t`, `x`, `z`, `h` (set `st = 'rise'` to call it up).
+- **Moves:** THE SHIP pass 11. **Open:** the serpent fish (pass 12), the mantas that swim AND fly (pass 13), other ships / a harbour /
+  air creatures after. The whale is not yet tied to the ship's own wake and nothing reacts to it. Not signed off.
+
 ## Grumbo's home pass 15 (Worker B): THE BACK, from ref 2
 - He asked whether the renders had come through. None had been sent: every render so far stayed in the scratchpad. A four-view grid and the new back view were sent this time.
 - The back had been plain domes and a door. Ref 2 has a heavy timber belt round the hall with brass wheels, plaques, banners and tassels, and an arched door. Built: an open cylinder segment (theta PI +/- 1.0, r 4.95, just outside the bulge's 4.87 at P + 4.4) with two iron bands and studs. A brass wheel at each end (PI +/- .75). Brass plaques with dark insets at PI +/- .95. The big chevron banner at PI + .42 (1.5 x 2.6) and a narrow one at PI - .42, both on the wind shader through `clothM('banner')`. Red tassels with brass beads in the gaps. The back door gets timber jambs with iron bands, a half-torus arch, an iron outer ring and a dark tympanum.
@@ -21,6 +42,7 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - **Signboard (ref 1).** Two banded posts, a plank board with iron straps and a small board hung under it, at local (-9.6, 9.4). At (-5.4, 8.6) it was buried in the dressing boulder in front of the left deck, so it was moved out onto the sand. One noCam box.
 - Pass 12's smoke was rendered headless (300 stepped frames): both stacks give a plume that drifts downwind. Confirmed.
 - Whole-piece rule: this is the home sandbox's checklist (BUILDINGS.md, GRUMBO'S HOME, PROCEDURAL). It adds to nothing unsigned. Still open: more passes, then his sign-off on the phone.
+
 ## THE SHIP, PASS 10: THE SCENERY REBUILT -- NO MORE CONES (m1404, WORKER A)
 
 His: *"I'm not loving the background scenery... it feels very low rent... take a cone, flip it upside down and call it a floating island and
