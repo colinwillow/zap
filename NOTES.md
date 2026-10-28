@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- A FULL KATANA CHARGE CUTS THEM IN HALF (his: "it should just slice through -- small and medium guys cut in half; anything less shouldn't")
+## m1693 -- A FULL KATANA CHARGE CUTS THEM IN HALF (his: "it should just slice through -- small and medium guys cut in half; anything less shouldn't")
 - **`HALVE`:** a blow from a FULL charge (`chargeGoK` 1) with the katana on a horde body that is not heavy (`TIER` brute is the heavy class;
   peons, warriors and the Osari are small / medium) is `limbHalve`, an instant kill. A partial charge, a plain swing or a brute: as before.
 - **The split:** per kind, once (`halfPrep`), every triangle of his skin goes to the UPPER half (dominated by a bone under `Spine1`: chest,

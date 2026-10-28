@@ -13719,7 +13719,7 @@ function limbBake(d, nm, dirH, kick, tris) {
   while (ARENA.debris.length > 60) { const o = ARENA.debris.shift(); scene.remove(o.m); }
   return m;
 }
-// m15xx (his: "a full charge katana attack should just slice through -- cut one in HALF; anything less, or a normal sword, shouldn't. Classes of
+// m1693 (his: "a full charge katana attack should just slice through -- cut one in HALF; anything less, or a normal sword, shouldn't. Classes of
 // guys -- small, medium, heavy -- for the small and medium a full charge cuts them in half"): THE HALVING. Per kind, once: every triangle goes
 // to the UPPER half (dominated by a bone under `Spine1`: chest, arms, head) or the LOWER (hips, belly, legs), by two of its three vertices.
 // Both halves are lifted out of the skin as real pieces (`limbBake` on a given triangle list): the top flies on along the cut, turning; the
@@ -44360,7 +44360,7 @@ function dummyBlow(d, dirH, power, dmg, pal) {
   // HOW MUCH DAMAGE, and it is per WEAPON rather than per hit: *"different weapons will do
   // different effects to him."* A kind with no `dmg` table is the officer, who has always
   // spent one hit point per blow whatever hit him.
-  if (HALVE.on && d.horde && !pal && !BLOW_SRC && player.chargeGo && slotNow().blade && (player.chargeGoK || 0) >= HALVE.full && d.tier !== 'brute' && limbHalve(d, dirH)) return;     // m15xx: a FULL charge cuts the small and the medium in half
+  if (HALVE.on && d.horde && !pal && !BLOW_SRC && player.chargeGo && slotNow().blade && (player.chargeGoK || 0) >= HALVE.full && d.tier !== 'brute' && limbHalve(d, dirH)) return;     // m1693: a FULL charge cuts the small and the medium in half
   if (K.limbs && !pal && !guard && !BLOW_SRC && player.melee && slotNow().blade && limbCut(d, dirH, power) && d.boomed) return;     // m1090: a katana cut takes a limb
   let cost = K.dmg ? (dmg || K.dmg.fist) * (guard ? K.blockCut : 1) * Math.max(.35, power) : 1;
   if (K.resist) { const r = K.resist[BLOW_SRC || 'melee']; if (r != null) { cost *= r; if (r === 0 && d.arena) arenaWaste('resist'); } }     // m905: what each weapon does to HIM
