@@ -10721,8 +10721,9 @@ function dojoBuild(g, W) {
       let J, boxes, deckY, step = null; if (SM) { J = SM.g; g.add(J); boxes = SM.deck.map(mkBox); deckY = SM.deckY; step = SM.step; }
       else { const S2 = 3; J = mkJunk(S2, 1); deckY = 1.07 * S2; boxes = [{ dyn: 1, hx: 1.5 * S2, hz: 2.5 * S2, lx: 0, lz: .2 * S2, y0: deckY - .4, y1: deckY, cs: 1, sn: 0, cx: 0, cz: 0, minx: 0, maxx: 0, minz: 0, maxz: 0, miny: 0, maxy: 0 }]; }
       let bx0 = 1e9, bx1 = -1e9, bz0 = 1e9, bz1 = -1e9; for (const b of boxes) { bx0 = Math.min(bx0, b.lx - b.hx); bx1 = Math.max(bx1, b.lx + b.hx); bz0 = Math.min(bz0, b.lz - b.hz); bz1 = Math.max(bz1, b.lz + b.hz); }
-      const beam = Math.max(-bx0, bx1);
-      D.flag = { J, boxes, step, deckLocal: deckY, foot: [bx0, bx1, bz0, bz1], T: 170, cruise: 120, inn: 15, dock: 25, R: 210, Y: 42, dockR: D.pier.r + D.pier.R + beam + .4, dockY: D.pier.y - deckY, h: Math.PI / 2, t: 126, last: null }; } }
+      // m1483: the airship form has WINGS (57 m tip to tip, along local X), so it docks BOW-FIRST: the wings clear the pier, and the bow deck stops a hop from its edge
+      let bowZ = 0; for (const b of boxes) if (Math.abs(b.y1 - deckY) < .6 && b.hx > 1 && b.hx < 8) bowZ = Math.max(bowZ, b.lz + b.hz);
+      D.flag = { J, boxes, step, deckLocal: deckY, foot: [bx0, bx1, bz0, bz1], T: 170, cruise: 120, inn: 15, dock: 25, R: 210, Y: 42, dockR: D.pier.r + D.pier.R + (bowZ || 6) + .5, dockY: D.pier.y - deckY, dockH: Math.PI, h: Math.PI, t: 126, last: null }; } }
   { const N = 40, prof = []; for (let i = 0; i <= N; i++) { const u = i / N, rr = Math.sin(Math.pow(u, .8) * Math.PI) * (1 - u * .45) * 3.2 + .05; prof.push(new THREE.Vector2(rr, u * 26 - 13)); }
     const body = new THREE.LatheGeometry(prof, 24).rotateX(Math.PI / 2), BP = body.attributes.position, col = new Float32Array(BP.count * 3), cc = new THREE.Color();
     for (let i = 0; i < BP.count; i++) { const x = BP.getX(i), y = BP.getY(i), z = BP.getZ(i); BP.setY(i, y * .8); const belly = y < -.4 ? 1 : 0, spot = Math.abs(y) < 1.2 && x > 0 && Math.sin(z * 1.1) > .7 ? 1 : 0;
@@ -10909,7 +10910,7 @@ function dojoFlagPath(F, t) { const u = ((t % F.T) + F.T) % F.T, sm = v => v * v
   else { const v = sm((u - F.cruise - F.inn - F.dock) / (F.T - F.cruise - F.inn - F.dock)); a = 0; r = F.dockR + (F.R - F.dockR) * v; y = F.dockY + (F.Y - F.dockY) * v; }
   return [Math.sin(a) * r, y, Math.cos(a) * r, u >= F.cruise + F.inn - 4 && u < F.cruise + F.inn + F.dock]; }
 function dojoFlagStep(F, dt) { F.t += dt; const [x, y, z, docked] = dojoFlagPath(F, F.t), [x2, , z2] = dojoFlagPath(F, F.t + .5);
-  const want = docked ? Math.PI / 2 : Math.atan2(x2 - x, z2 - z); if (Math.hypot(x2 - x, z2 - z) > .01 || docked) F.h += wrapAngle(want - F.h) * (1 - Math.exp(-dt * .9));
+  const want = docked ? F.dockH : Math.atan2(x2 - x, z2 - z); if (Math.hypot(x2 - x, z2 - z) > .01 || docked) F.h += wrapAngle(want - F.h) * (1 - Math.exp(-dt * .9));
   const J = F.J, p = player, c = Math.cos(F.h), s = Math.sin(F.h), Fo = F.foot;
   if (F.last && p.grounded && p.pos.y > F.last.y + 1) { const L = F.last, dx = p.pos.x - L.x, dz = p.pos.z - L.z, lc = Math.cos(L.h), ls = Math.sin(L.h), lx = dx * lc - dz * ls, lz = dx * ls + dz * lc;     // his feet in the ship's OLD frame
     if (lx > Fo[0] - .2 && lx < Fo[1] + .2 && lz > Fo[2] - .2 && lz < Fo[3] + .2) { p.pos.x = x + lx * c + lz * s; p.pos.z = z - lx * s + lz * c; p.pos.y += y - L.y; p.heading += F.h - L.h; p.faceH = (p.faceH || 0) + F.h - L.h; } }
