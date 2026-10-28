@@ -124,6 +124,26 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
+## THE SHIP, PASS 12c: THE SERPENT IN PAINTED TEXTURES (m@X4@, WORKER A)
+
+His: *"We might need custom textures."* Four generated, hand-painted textures in `images/` (OpenAI images API: `gpt-image-2` returned
+"upstream request failed" every time, at `high` and `medium` quality; `gpt-image-1.5` at `auto` worked; `gpt-image-1` no longer exists):
+
+- `serpent_skin.webp` (1024^2, 252 KB): the serpent UNROLLED, spine with bony scutes at the top, iridescent teal scales with a lateral
+  line of cyan dots, cream-gold belly plates at the bottom. Made seamless left-right (roll by half, cross-fade the old centre over the
+  seam). **UV: u = metres along the body / 3.5, v = .5 + .5 * sin(angle)**, so the top of the image is the back and the bottom the belly
+  on both flanks (mirrored), on the body tube AND the head/jaw lofts. Vertex colour is now white except for a .78 band shade along the back.
+- `serpent_glow.webp`: the lateral-line DOTS lifted out of the skin (the brightest row between 38% and 49% down, found by counting
+  bright pixels; a first wider band also caught scale highlights) into an emissive map, so the dots glow exactly where the paint has them.
+- `serpent_fin.webp`: a spined membrane, 8 spines a tile, laid one per 6 body rings and one per ray on the fans. The canvas fin is
+  kept only as a grey-gradient ALPHA map (opaque at the root, thinner at the tip).
+- `serpent_eye.webp`: a slit-pupil iris on a flat disc in the socket ring. A hemisphere eye showed mostly its dark border, and the disc
+  maps the picture exactly.
+- Tapers sample the paint at a fixed v: the horns take the gold belly plates (banded), the whiskers the teal scales (`tv` .7); every
+  tooth's uv is pinned to the belly, so the teeth read cream-gold instead of striped.
+- `images/` is already in `bump.mjs`'s `DIRS` and `.webp` is in `EXT`: all four are hashed (`grep serpent_ index.html` in `ASSETS`).
+- **Moves:** the serpent. **Open:** no mouth interior colour any more (the jaw lofts are skin-painted), and nothing reacts to it. Not signed off.
+
 ## THE SHIP, PASS 12b: THE SERPENT REBUILT -- ONE SKIN, A REAL HEAD (m1433, WORKER A)
 
 His: *"Do a pass on the monster, it's pretty ugly, low quality lol -- we need like 600,000 passes."* m1416's serpent was 44 instanced
