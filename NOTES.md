@@ -312,6 +312,20 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
+## THE RE-PASS: THE PAGODA, PASS 1 -- CLASSICAL HERITAGE IN OUR MAPS, AND THE BUDGET (m@X4@, WORKER A)
+
+The Pagoda is CLASSICAL (ARCHITECTURE.md keeps classical pagodas as the world's older culture), so it keeps its form; this pass is its
+materials and its cost. It already played well (six passes: the inner spiral, gutter ledges up the outside, the tolling bell, roof archers,
+the altar core's chain lightning).
+
+- **Style:** painted ROOF TILES (`triMat('roof_tiles')`) on every skirt, `K.timber`, painted planks, sandstone storeys and plinth, `K.redL`
+  lacquer, bronze where the cyan neon strips were. The altar core and the spire's orb are JINRA mint (they are power: the core calls the
+  lightning). The four lamp cables became BUNTING (`korBunting`) to banded posts. Grass, ferns, stones, boulders, flowers and a small cherry round
+  the plinth (`plantPlant`, clear of the door).
+- **Budget:** `add` flags everything for `bldMergeStatic` (the core unflagged, it bobs); the inner ramp flights are flagged; each of the 16
+  wind chimes is merged into one mesh (its string is bronze now). **Measured headless: ~270 -> 85 draws** (193 meshes folded).
+- **Open:** pass 2, breakable and alive (the belfry cap as a breakable skeleton, the door); pass 3, the layers. Not signed off.
+
 ## THE RE-PASS: THE WATCHTOWER, PASS 3 -- THE LAYERS (m1490, WORKER A)
 
 Rubric 3 (L1 / L2 / L3, LEVELDESIGN.md). With this the Watchtower has its three passes; the last box is his OK.
