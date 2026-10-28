@@ -132,7 +132,7 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
-## THE ENEMY STYLE GUIDE AND ITS CODE KIT (mXXXX)
+## THE ENEMY STYLE GUIDE AND ITS CODE KIT (m1522)
 *"Use an enemy style guide you can transfer to the other context windows for the building guide."* (His two generated sheets.)
 - **The sheets** are `images/korajin/ref/enemy_style_1.jpg` / `_2.jpg`. **The guide** is `ENEMY_STYLE.md`: the destroy-not-restore rule, the palette (A, black lacquer and gold, is the working default; B and C are his to pick), the emblem, the kit (roofs, walls and bases, gates, walkways, braziers and lanterns, statues, banners), the five buildings (torch tower, keep, gate, barracks, Jinra shrine), the constructs, and how to build them.
 - **The code kit**, beside `korMats`:
