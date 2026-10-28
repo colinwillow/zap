@@ -253,7 +253,7 @@ shaft. Placement: the layout test's spot, in the stream 66 m below the home (z 6
 *"We're gonna wanna get another element of height, so maybe put a hill, a mountain, on the top up there... a plateau or an actual
 mountain. Maybe there's a lookout tower at the very top... anchoring those drawbridges to buildings, building dedicated pads, paths."*
 - **Passes:**
-  - [x] **pass 1 (next tick):** the MOUNTAIN raised out of the east plateau (`gpeakLift` in `hwHeight`: 38 m over the plateau, top at
+  - [x] **pass 1 (m1486):** the MOUNTAIN raised out of the east plateau (`gpeakLift` in `hwHeight`: 38 m over the plateau, top at
     64 m, radius 58, so its slopes are ground and a hike); a stratified PINNACLE on its top (24 m, sheer, cell-box collider) climbed by
     two ladders and a ledge to its PAD at 88 m; the timber LOOKOUT on the pad (deck at 96 m, railed, a hatch and a ladder, a red roof,
     a flag), its signal BELL (rings when struck) and a BRAZIER (sparks); a 134 m ZIPLINE from the lookout down to a post beside the
@@ -263,6 +263,24 @@ mountain. Maybe there's a lookout tower at the very top... anchoring those drawb
   - [ ] the mountain reads as a mountain (ridges, outcrops, scree, not a smooth bump) from the home and the mill
   - [ ] the trail is a real path (the worn ribbon, switchbacks, steps where it is steep) and the climb is fun
   - [ ] the lookout is dressed (telescope, flags, a roof you can see from far) and the zipline ride lands well at the home
+  - [ ] his sign-off on the phone
+
+## THE JINRA REFINERY-SHOP (his sheet `images/korajin/ref/jinra_sheet.jpg`; placement his, after m1486) -- a floating island over the peak
+*"High up in a mountain... it might be floating, because that's the whole idea, it's magical power stuff... its own floating island above a
+mountain."* What it does: *"you can buy Jinra, also refined Jinra, powers; it gives you special weapons and stuff -- I don't know yet, to be
+fully fleshed out."* So **`GJINRA.goods` (name, vessel kind, price: null) and `gjinraBuy(item)` are the hook** and take nothing yet.
+Mint is ONLY Jinra. The bottles, canisters, globe and crystals are the shared **JINRA VESSELS** kit (`jvesMats` / `jvesPut`, PROPS.md).
+- **Passes:**
+  - [x] **pass 1 (next tick):** the FLOATING ISLAND (stratified inverted rock, a grass cap, hanging crags, a falling sheet of Jinra off
+    one edge with motes) at 124 m, east of and above the lookout; the deck on stilts with front steps and a rail; the sandstone DOME
+    with a mint-lit doorway and a counter of vessels; the GLASS GLOBE of glowing Jinra on its crown in a copper cage, copper PIPES, a
+    stack on top and a CHIMNEY breathing mint; teal Jinra AWNINGS and the BANNER; mint lanterns; the vessels along the front; and the
+    way up: 14 FLOATING STONES spiralling from the lookout's deck (96 m) up to the island, each about a 2 m jump
+- **DONE WHEN:**
+  - [ ] the exterior reads as the sheet's hero (dome, globe, pipes, deck, awnings, banners) from the lookout and from the valley
+  - [ ] the interior: shelves of bottles, the PROCESSING STATION (the dripping vat fed by pipes), the LARGE STORAGE gallery
+  - [ ] the floating stones are a fun climb (bobbing, measured jumps) and the island is framed with the peak and the valley
+  - [ ] what it sells and what it does with Jinra (his call), wired to `COIN` / the Jinra he carries
   - [ ] his sign-off on the phone
 
 ## THE MERCHANT SHOP (his, after m1459) -- high on a cliff, hard to reach, many passes (minimum 3 for every element)
