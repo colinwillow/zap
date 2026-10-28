@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the BATHHOUSE, pass 3 (verticality, L3; its third pass, so the loop moves on)
+## m1620 -- THE RE-PASS: the BATHHOUSE, pass 3 (verticality, L3; its third pass, so the loop moves on)
 - **A MONOHOSHI**, the traditional rooftop drying deck: a plank deck at 6.3 m perched over the -z eave on four posts (the outer pair to the
   ground, the inner pair down to the roof), solid railings on three sides, two laundry poles with four towels that flap (`bathStep`).
   A LADDER up to it from the yard (`kitClimbAdd`, its exit mark on the deck). Two doubloons on the deck.
