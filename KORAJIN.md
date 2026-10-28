@@ -51,6 +51,19 @@ out of weirdport. Do it when Korajin stops needing Zap's code, or the day he ask
 - **Visual reference:** `images/korajin/ref/jinra_sheet.jpg`. A Jinra refinery-shop (a sandstone dome with a giant glass globe tank, copper pipes, teal banners, a timber deck), bottles and containers, canisters and storage, esoteric items (crystals, a gyroscope orb, a dripping basin, amulets), environment props, an interior shop, a processing station and large storage.
 - **In code:** the colour token is `JIN` / `JINHEX` (mint), and the rule stands: mint is the Jinra's alone. Gold doubloons are money (MONEY, above).
 
+## THE JINRA BEACONS -- a spine for the campaign (his idea, Oct 28 2026; open, "we'll figure it out")
+> *"The evil army has giant torch towers. When you defeat a tower you shoot the Jinra into it, and it lights up green and shoots off -- the levels
+> are arranged around a central place, and you're aligning all the Jinra to the central tower, so it becomes one giant powerful thing that powers
+> the whole world, or your planet, or the ship."*
+- **Each level ends at the enemy's TORCH TOWER** (its boss, layer 5). Beat it, then pour your gathered Jinra into the brazier. It turns from the
+  enemy's colour to MINT and fires a beam across the sky to the CENTRAL TOWER.
+- **The world map is a ring of levels round the central place.** Every lit beacon is visible from everywhere (a beam in the sky), so progress
+  is something you SEE from the hub and from inside every level.
+- **When all the beacons are aligned,** the central tower wakes and powers something huge: the world, the planet, or the ship's true flight.
+  Open, his call.
+- **Ties together:** gathering Jinra (THE LOOP), the enemy factions' architecture (ARCHITECTURE.md: their towers in their colours), the boss layer
+  (LEVELDESIGN.md, layer 5), and VERTICALITY (the towers are the tallest things in each level, so the climb to the brazier is the finale).
+
 ## THE JIN GLOW -- the essence you can SEE (now named JINRA, above) (his, Oct 28 2026, off the serpent fish's spots)
 
 > *"I really like this green glowing stuff... floating candles with this green glowing fire-liquid, things that should be spewing water but it's

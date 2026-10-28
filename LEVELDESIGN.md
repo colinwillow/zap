@@ -78,6 +78,8 @@ round them. A blueprint that puts everything at one y is wrong before it is buil
 - **The test:** would you know which level this is from one screenshot?
 
 ## Layer 5: THE BOSS (the final arena)
+**(his, Oct 28 2026) Every level's finale is the enemy's TORCH TOWER: climb it, beat its keeper, pour your Jinra into the brazier, and it turns mint and beams to the central tower (KORAJIN.md, THE JINRA BEACONS).**
+
 - **The boss is the level's CONCLUSION:** it tests the mechanics the level taught, in a big open space (a dojo). It is not a new rule.
 - **Telegraphed attacks,** a rest between phases, and a spectacle at the end (the keep falling).
 
