@@ -22303,7 +22303,7 @@ function ghouseStep(dt) { const G = GHOUSE.on; if (!G) return; G.t += dt; if (G.
 // his shots (`turretBlast`) and its own bolt PARRIED back (`arrowStep`): `balHp` hits and it smashes (sparks, smoke, the stock slumps),
 // stops shooting, and is REPAIRED after `balFix` s.
 function bldHit(x, y, z, rad, dmg) {
-  if (gmillHit(x, y, z, rad) || gpeakHit(x, y, z, rad)) return 1;     // the water mill's wheel jams and frees (Worker B)
+  if (gmillHit(x, y, z, rad) || gpeakHit(x, y, z, rad) || caveHit(x, y, z, rad)) return 1;     // the water mill's wheel jams and frees (Worker B)
   if (PLANT.list.length) plantHit(x, y, z, rad);     // m1424: plants bend and keep going (they never stop the shot)
   if (ghomeHit(x, y, z, rad)) return 1;     // pass 14 (Worker B): Grumbo's home -- its back door, the orb, the bells
   if (pagodaChain(x, y, z, rad)) return 1;     // m1236: the altar core calls the spire's chain lightning
@@ -67618,7 +67618,26 @@ const rwIslandR = a => RW.R * (1 + .16 * Math.sin(a * 2 + .7) + .1 * Math.sin(a 
 // walls in lumps (`HOLLOW.wall`) up to a rim plateau. `HOME.style` 'lake' is m1111's mountain lake (`?style=lake`).
 const HOLLOW = { floorW: 24, floorE: 13, bed: -1.7, rim: 30, wall: 9, colCell: 1.5, colMin: 2.2 };
 const hwRc = z => 7 * Math.sin(z * .028) + 3 * Math.sin(z * .071 + 1.3);
-function hwHeight(x, z) {
+// THE CAVES YOU GO INTO (his, after m1712: "make the caves something you can go in -- a continuous, actual physical hole; little treasures,
+// maybe animals"). Each cave is CARVED out of the height itself (`caveCarve`: the floor runs flat in through the wall, so walking, the
+// walk store and the wall columns all simply follow), lined by a SHELL (walls and vault, painted cliff, darkening as it goes in), and the
+// cliff above is put back by a CAP -- the original surface over the carved patch, never lower than the vault -- so from outside the wall
+// is whole but for its mouth. A tunnel `tl` m in, then a chamber (`rd` x `rz`, `chH` high). A cave whose rock is too thin for its chamber
+// (`caveList` samples it) stays a painted arch. Its contents: Jinra crystals, glowing mushrooms, a CHEST (strike it: doubloons), BATS that
+// scatter when he comes in, and one shared light in the nearest one
+const HCAVE = { on: 1, at: [[-30, -1], [18, -1], [-55, 1], [40, 1], [95, -1]], tw: 2.6, th: 3.8, tl: 7, rd: 6, rz: 6.5, chH: 5.6, list: null, stat: {} };
+function caveList() { if (HCAVE.list) return HCAVE.list; const C = HCAVE, out = []; C.list = out;
+  for (const [z, side] of C.at) { const rc = hwRc(z), fw = side < 0 ? HOLLOW.floorW : HOLLOW.floorE, fy = hwHeight0(rc + side * (fw - 3), z); let d = fw - 4; while (d < 70 && hwHeight0(rc + side * d, z) < fy + 1.2) d += .25;
+    const K = { z, side, mx: rc + side * d, fy, ok: 1, cc: C.tl + C.rd * .8 };
+    // inside the rock enough: the tunnel 2 m over its floor from 2 m in, the chamber 60% of its height (where it is thinner the cap bulges a little)
+    for (let u = 2; u <= K.cc + C.rd * .9 && K.ok; u += 1.5) for (const w of u < C.tl ? [-C.tw, 0, C.tw] : [-C.rz * .8, 0, C.rz * .8]) if (hwHeight0(K.mx + side * u, z + w) < fy + (u < C.tl ? 2 : C.chH * .6)) K.ok = 0;
+    out.push(K); }
+  C.stat.ok = out.filter(K => K.ok).length; return out; }
+// in the cave's own frame: u = metres into the wall from the mouth, w = across; `m` grows it (the carve runs a metre past the shell)
+function caveIn(K, u, w, m) { const C = HCAVE; if (u > -.6 - (u < 0 ? 0 : m) && u < C.tl + m && Math.abs(w) < C.tw + (u < .5 ? 0 : m)) return true; const a = (u - K.cc) / (C.rd + m), b = w / (C.rz + m); return a * a + b * b < 1; }
+function caveCarve(x, z, h) { for (const K of caveList()) { if (!K.ok || Math.abs(z - K.z) > HCAVE.rz + 3) continue; if (caveIn(K, (x - K.mx) * K.side, z - K.z, 1)) return Math.min(h, K.fy); } return h; }
+function hwHeight(x, z) { const h = hwHeight0(x, z); return HCAVE.on && HOME.style !== 'lake' ? caveCarve(x, z, h) : h; }
+function hwHeight0(x, z) {
   const H = HOLLOW, s = x - hwRc(z), d = Math.abs(s), fw = s < 0 ? H.floorW : H.floorE;
   const lump = rwFbm(x * .09, z * .09) * 14 + rwFbm(x * .23 + 7, z * .23) * 5;
   let h = H.bed + (.7 - H.bed) * smooth(3.2, 6.5, d);                               // the river bed up to the bank
@@ -67825,13 +67844,18 @@ const HWPAINT = { k: .85, sand: { n: 'hollows_sand', s: 7, mean: [.8579, .2564, 
 function hwPaint(mat, kind) { if (!HWPAINT.k) return mat; const P = HWPAINT, ob = mat.onBeforeCompile, ok = mat.customProgramCacheKey, land = kind === 'land', A1 = land ? P.cliff : P[kind] || P.rock;
   mat.onBeforeCompile = function (sh, r) { if (ob) ob.call(this, sh, r);
     Object.assign(sh.uniforms, { uHwA: { value: texGet(A1.n) }, uHwAs: { value: 1 / A1.s }, uHwAm: { value: new THREE.Vector3(...A1.mean) }, uHwK: { value: P.k } });
-    if (land) Object.assign(sh.uniforms, { uHwB: { value: texGet(P.sand.n) }, uHwBs: { value: 1 / P.sand.s }, uHwBm: { value: new THREE.Vector3(...P.sand.mean) }, uHwC: { value: texGet(P.pebble.n) }, uHwCs: { value: 1 / P.pebble.s }, uHwCm: { value: new THREE.Vector3(...P.pebble.mean) } });
-    sh.vertexShader = 'varying vec3 vHwP; varying vec3 vHwN;\n' + sh.vertexShader.replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\n  vHwP = (modelMatrix * vec4(transformed, 1.0)).xyz; vHwN = normalize(mat3(modelMatrix) * objectNormal);');
-    sh.fragmentShader = 'varying vec3 vHwP; varying vec3 vHwN; uniform sampler2D uHwA; uniform float uHwAs; uniform vec3 uHwAm; uniform float uHwK;' + (land ? ' uniform sampler2D uHwB; uniform float uHwBs; uniform vec3 uHwBm; uniform sampler2D uHwC; uniform float uHwCs; uniform vec3 uHwCm;' : '') + '\n' +
+    if (land) Object.assign(sh.uniforms, { uHwB: { value: texGet(P.sand.n) }, uHwBs: { value: 1 / P.sand.s }, uHwBm: { value: new THREE.Vector3(...P.sand.mean) }, uHwC: { value: texGet(P.pebble.n) }, uHwCs: { value: 1 / P.pebble.s }, uHwCm: { value: new THREE.Vector3(...P.pebble.mean) }, uCv: { value: hwCaveU() }, uCvR: { value: new THREE.Vector3(HCAVE.tl + HCAVE.rd * .8, HCAVE.rz, HCAVE.rd) }, uCvS: { value: new THREE.Vector4(HCAVE.tl, HCAVE.tw, HCAVE.th, HCAVE.chH) } });
+    sh.vertexShader = 'varying vec3 vHwP; varying vec3 vHwN;\n' + sh.vertexShader.replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\n  vHwP = (modelMatrix * vec4(transformed, 1.0)).xyz; vHwN = normalize(mat3(modelMatrix) * ' + (mat.isMeshBasicMaterial ? 'normal' : 'objectNormal') + ');');
+    sh.fragmentShader = 'varying vec3 vHwP; varying vec3 vHwN; uniform sampler2D uHwA; uniform float uHwAs; uniform vec3 uHwAm; uniform float uHwK;' + (land ? ' uniform sampler2D uHwB; uniform float uHwBs; uniform vec3 uHwBm; uniform sampler2D uHwC; uniform float uHwCs; uniform vec3 uHwCm; uniform vec4 uCv[5]; uniform vec3 uCvR; uniform vec4 uCvS;' : '') + '\n' +
       sh.fragmentShader.replace('#include <color_fragment>', `{ vec3 hn = normalize(vHwN), bw = pow(abs(hn), vec3(4.0)); bw /= (bw.x + bw.y + bw.z);
         vec3 ta = (texture2D(uHwA, vHwP.zy * uHwAs).rgb * bw.x + texture2D(uHwA, vHwP.xz * uHwAs).rgb * bw.y + texture2D(uHwA, vHwP.xy * uHwAs).rgb * bw.z) / uHwAm;` +
         (land ? ` vec3 tb = texture2D(uHwB, vHwP.xz * uHwBs).rgb / uHwBm; tb = mix(vec3(1.0), tb, 1.6); vec3 tc = texture2D(uHwC, vHwP.xz * uHwCs).rgb / uHwCm; tb = mix(tb, tc, smoothstep(0.4, 0.0, vHwP.y)); ta = mix(ta, tb, smoothstep(0.62, 0.82, hn.y));` : '') + `
-        diffuseColor.rgb *= mix(vec3(1.0), clamp(ta, 0.0, 2.2), uHwK); }
+        diffuseColor.rgb *= mix(vec3(1.0), clamp(ta, 0.0, 2.2), uHwK);` + (land ? `
+        for (int i = 0; i < 5; i++) { vec4 K = uCv[i]; if (K.w == 0.0) continue; float u = (vHwP.x - K.x) * K.w, w = vHwP.z - K.z; if (u < -1.0 || abs(w) > uCvR.y + 2.0 || vHwP.y > K.y + 8.0) continue;
+          { float a = 0.0, b = 0.0; if (u < uCvS.x) { a = uCvS.y; b = uCvS.z; } float t = (u - uCvR.x) / uCvR.z; if (abs(t) < 1.0) { float q = sqrt(1.0 - t * t); a = max(a, uCvR.y * q); b = max(b, uCvS.w * sqrt(q)); }
+            if (u > 0.3 && abs(w) < a && vHwP.y > K.y + 0.4 && vHwP.y < K.y + b) discard; }     // the coarse land's own slope, inside the cave's volume: not there
+          if (vHwP.y > K.y + 2.5) continue; float k = smoothstep(-0.5, 3.5, u) * (1.0 - smoothstep(uCvR.y, uCvR.y + 2.0, abs(w))); float g = max(0.0, 1.0 - length(vec2((u - uCvR.x) / uCvR.z, w / uCvR.y)));
+          diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * 0.1 + vec3(0.05, 0.16, 0.13) * g * g, k); }` : '') + ` }
       #include <color_fragment>`); };
   mat.customProgramCacheKey = () => String(ok ? ok.call(mat) : '') + 'hwp' + kind; mat.needsUpdate = true; return mat; }
 function ghRockGeo(seed, sx, sy, sz, det = 3) { const g = new THREE.IcosahedronGeometry(1, det), p = g.attributes.position, o = seed * 7.31;
@@ -69349,6 +69373,70 @@ function hwPath(side, zb, y0, dir) {
 }
 // where the wall face reaches height `y` at this z, on this side (marched out from the river), `off` m back into the open
 function hwWallAt(z, side, y, off = 0) { const c = hwRc(z); for (let d = 4; d < 80; d += .25) { const x = c + side * d; if (hwHeight(x, z) >= y) return x - side * off; } return c + side * 40; }
+// the open caves for the land shader's dimming: (mouth x, floor y, z, side), side 0 = none
+function hwCaveU() { const L = HCAVE.on && HOME.style !== 'lake' ? caveList() : []; return [0, 1, 2, 3, 4].map(i => { const K = L[i]; return K && K.ok ? new THREE.Vector4(K.mx, K.fy, K.z, K.side) : new THREE.Vector4(0, 0, 0, 0); }); }
+function caveBuild(K) { const C = HCAVE, { side, z: z0, mx, fy, cc } = K, X = u => mx + side * u, uEnd = cc + C.rd, rnd = rwRng(4400 + Math.round(z0));
+  // the cross-section's half-width A and height B at depth u: the tunnel, swelling into the chamber
+  const sq = t => Math.sqrt(Math.max(0, 1 - t * t)), A = u => Math.max(u <= C.tl ? C.tw : 0, C.rz * sq((u - cc) / C.rd)), B = u => Math.max(u <= C.tl ? C.th : 0, C.chH * sq((u - cc) / C.rd) ** .5);
+  // THE SHELL: rings along u, a squarish arch each (floor to vault), noisy, darkening inward; DoubleSide (one draw)
+  { const NU = Math.ceil((uEnd + .3) / .45), NT = 16, pos = [], col = [], idx = [], c0 = new THREE.Color(0x7a4230), c1 = new THREE.Color(0x1c0d08), mint = new THREE.Color(0x3a8a74), cc2 = new THREE.Color();
+    for (let i = 0; i <= NU; i++) { const u = -.3 + (uEnd + .3) * i / NU, a = Math.max(.05, A(u)), b = Math.max(.05, B(u)); cc2.copy(c0).lerp(c1, Math.min(1, Math.max(0, u / (C.tl + 1)))).lerp(mint, .55 * Math.max(0, 1 - Math.abs(u - cc) / C.rd) ** 1.5);
+      for (let j = 0; j <= NT; j++) { const t = j / NT * Math.PI, ct = Math.cos(t), st = Math.sin(t), n = 1 + .14 * (ghNoise3(u * .45, j * .6, z0 * .1) - .5) * (j && j < NT ? 1 : 0);
+        pos.push(X(u), fy - .35 + b * Math.pow(st, .55) * n + (j === 0 || j === NT ? 0 : .35 * (1 - st)), z0 + a * Math.sign(ct) * Math.pow(Math.abs(ct), .6) * n); col.push(cc2.r, cc2.g, cc2.b); } }
+    for (let i = 0; i < NU; i++) for (let j = 0; j < NT; j++) { const a = i * (NT + 1) + j, b = a + NT + 1; idx.push(a, b, a + 1, a + 1, b, b + 1); }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.setIndex(idx); g.computeVertexNormals();
+    // UNLIT: nothing here can occlude the sun or the sky, so a lit shell is as bright as the cliff outside and the mouth reads as solid rock
+    const m = new THREE.Mesh(g, hwPaint(new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide }), 'cliff')); scene.add(m); }
+  // THE CAP: the original surface over the carved patch, never lower than the vault (+.35) -- the cliff stays whole above the mouth (its lintel)
+  { const U0 = -1.6, U1 = uEnd + 5.4, W = C.rz + 5.4, st = .5, nu = Math.ceil((U1 - U0) / st), nw = Math.ceil(2 * W / st), pos = [], idx = [], keep = [];
+    const keepU = []; for (let i = 0; i <= nu; i++) for (let j = 0; j <= nw; j++) { const u = U0 + (U1 - U0) * i / nu, w = -W + 2 * W * j / nw, x = X(u), zz = z0 + w, h0 = hwHeight0(x, zz); keepU.push(u >= -.6 || Math.abs(w) > C.tw + 2);
+      pos.push(x, caveIn(K, u, w, .2) ? Math.max(h0, fy + B(Math.max(0, u)) * 1.1 + .45) : h0 + .03, zz); keep.push(u >= -.6 && caveIn(K, u, w, 5)); }     /* the land is a 2 m grid: its dip round the carve reaches ~3 m past the shell; never in front of the mouth */
+    for (let i = 0; i < nu; i++) for (let j = 0; j < nw; j++) { const a = i * (nw + 1) + j, b = a + nw + 1; if (!(keep[a] || keep[a + 1] || keep[b] || keep[b + 1]) || pos[a * 3 + 0] === undefined) continue; if ([a, a + 1, b, b + 1].some(q => !keepU[q])) continue;     /* a cell reaching in front of the mouth hung a curtain across it */ if (side > 0) idx.push(a, a + 1, b, a + 1, b + 1, b); else idx.push(a, b, a + 1, a + 1, b, b + 1); }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals();
+    const m = new THREE.Mesh(g, hwPaint(rwMat(0xc0714a, { roughness: .95 }), 'land')); m.castShadow = m.receiveShadow = true; scene.add(m); }
+  // the RIM: a heavy arch of darker stone round the mouth
+  { const t = new THREE.TorusGeometry(C.tw + .35, .55, 6, 18, Math.PI); t.scale(1, C.th / C.tw, 1); t.rotateY(side < 0 ? Math.PI / 2 : -Math.PI / 2); t.translate(X(-.1), fy - .2, z0); scene.add(new THREE.Mesh(t, hwPaint(rwMat(0x8a4430), 'rock'))); }
+  // THE WALLS HE BUMPS: boxes just outside the shell all round (the carve runs a metre wider, so the terrain's own slope never shows inside)
+  for (let u = .2; u < uEnd; u += .8) { const a = A(u); if (a < .3) continue; for (const sd of [-1, 1]) { const w0 = sd * a, w1 = sd * (a + 1.3), x0 = X(u - .45), x1 = X(u + .45); BOXES.push({ minx: Math.min(x0, x1), maxx: Math.max(x0, x1), miny: fy - 2, maxy: fy + 9, minz: z0 + Math.min(w0, w1), maxz: z0 + Math.max(w0, w1), noCam: 1 }); } }
+  { const x0 = X(uEnd - .3), x1 = X(uEnd + 1.4); BOXES.push({ minx: Math.min(x0, x1), maxx: Math.max(x0, x1), miny: fy - 2, maxy: fy + 9, minz: z0 - 3, maxz: z0 + 3, noCam: 1 }); }
+  // THE CONTENTS: Jinra crystal clusters on the floor and hanging from the vault, glowing mushrooms along the foot of the walls
+  const cry = [], cry2 = [], mush = [], stem = [];
+  for (let k = 0; k < 7; k++) { const a = rnd() * Math.PI * 2, r = .55 + rnd() * .35, u = cc + Math.cos(a) * C.rd * r * .85, w = Math.sin(a) * C.rz * r * .85, hi = rnd() < .3;
+    for (let q = 0; q < 4 + ((rnd() * 4) | 0); q++) { const h = .4 + rnd() * 1.1, g = new THREE.CylinderGeometry(0, .12 + rnd() * .1, h, 6); g.translate(0, h / 2, 0); g.rotateZ((rnd() - .5) * .9); g.rotateX((rnd() - .5) * .9);
+      if (hi) { g.rotateX(Math.PI); g.translate(X(u), fy + B(u) * .92, z0 + w); } else g.translate(X(u) + (rnd() - .5) * .5, fy - .05, z0 + w + (rnd() - .5) * .5); (k % 3 ? cry : cry2).push(g); } }
+  for (let k = 0; k < 16; k++) { const u = C.tl * .5 + rnd() * (uEnd - C.tl * .5 - 1), sd = rnd() < .5 ? -1 : 1, w = sd * (A(u) - .35), h = .15 + rnd() * .25, r = .1 + rnd() * .12;
+    const s1 = new THREE.CylinderGeometry(.025, .035, h, 5); s1.translate(X(u), fy + h / 2, z0 + w); stem.push(s1); const c1 = new THREE.SphereGeometry(r, 8, 4, 0, Math.PI * 2, 0, Math.PI / 2); c1.translate(X(u), fy + h, z0 + w); mush.push(c1); }
+  const glow = (c, e, k) => new THREE.MeshStandardMaterial({ color: c, emissive: e, emissiveIntensity: k, roughness: .3, toneMapped: false });
+  rwMesh(cry, glow(0x9affd8, 0x30d0a0, 1.6), false); rwMesh(cry2, glow(0xd0a8ff, 0x8050e0, 1.4), false); rwMesh(stem, rwMat(0xd8d0c0), false); rwMesh(mush, glow(0x9ff4ff, 0x2fb8d8, 1.2), false);
+  // THE CHEST at the back of the chamber: strike it and the lid flies open, doubloons spill out (once; `caveHit`)
+  const ch = new THREE.Group(); ch.position.set(X(cc + C.rd * .6), fy, z0); ch.rotation.y = side < 0 ? -Math.PI / 2 : Math.PI / 2; scene.add(ch);
+  { const wd = new THREE.MeshStandardMaterial({ color: 0x6a3a1e, roughness: .8 }), br = new THREE.MeshStandardMaterial({ color: 0xc89a3a, metalness: .8, roughness: .35 }), bx = (w, h, d, x, y, zz, m, par) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); o.position.set(x, y, zz); o.castShadow = true; (par || ch).add(o); return o; };
+    bx(1.2, .6, .75, 0, .3, 0, wd); for (const x of [-.5, .5]) bx(.08, .62, .77, x, .3, 0, br); const lid = new THREE.Group(); lid.position.set(0, .6, -.37); ch.add(lid);
+    const lg = new THREE.Mesh(new THREE.CylinderGeometry(.375, .375, 1.2, 10, 1, false, 0, Math.PI), wd); lg.rotation.z = Math.PI / 2; lg.position.set(0, 0, .37); lid.add(lg); bx(.16, .2, .06, 0, -.05, .76, br, lid);
+    K.chest = { g: ch, lid, open: 0, t: 0, x: ch.position.x, y: fy + .4, z: z0 }; BOXES.push({ minx: ch.position.x - .45, maxx: ch.position.x + .45, miny: fy - 1, maxy: fy + .6, minz: z0 - .65, maxz: z0 + .65 }); }
+  // BATS hanging from the vault; they scatter round the chamber when he comes in, then settle back
+  K.bats = []; { const bm = new THREE.MeshStandardMaterial({ color: 0x2a1c22, roughness: .9 }), wm = new THREE.MeshStandardMaterial({ color: 0x3a2430, roughness: .9, side: THREE.DoubleSide });
+    for (let k = 0; k < 3; k++) { const b = new THREE.Group(), body = new THREE.Mesh(new THREE.SphereGeometry(.12, 8, 6), bm); body.scale.set(1, .8, 1.4); b.add(body);
+      const wings = []; for (const e of [-1, 1]) { const wg = new THREE.Group(), sh = new THREE.Shape(); sh.moveTo(0, 0); sh.lineTo(.42, .08); sh.lineTo(.34, -.05); sh.lineTo(.22, .02); sh.lineTo(.14, -.06); sh.lineTo(0, -.04); const wgm = new THREE.Mesh(new THREE.ShapeGeometry(sh), wm); wgm.rotation.x = -Math.PI / 2; wgm.scale.x = e; wg.add(wgm); b.add(wg); wings.push(wg); }
+      const a = rnd() * Math.PI * 2, r = rnd() * .5, hu = cc + Math.cos(a) * C.rd * r, hw = Math.sin(a) * C.rz * r, home = new THREE.Vector3(X(hu), fy + B(hu) - .25, z0 + hw); b.position.copy(home); b.rotation.x = Math.PI; scene.add(b);
+      K.bats.push({ g: b, wings, home, ph: rnd() * 6, r: 1.5 + rnd() * 2.5, y: 1.8 + rnd() * 2, t: 0 }); } }
+  K.light = [X(cc), fy + 3.2, z0]; HCAVE.stat.built = (HCAVE.stat.built || 0) + 1;
+}
+// the caves: the bats, the chest's lid, and one shared mint light in the nearest cave while he is near it
+function caveStep(dt) { const C = HCAVE; if (!C.list || !inHome()) return; const p = player.pos; let near = null, nd = 1e9;
+  for (const K of C.list) { if (!K.ok || !K.bats) continue; const d = Math.hypot(p.x - K.light[0], p.z - K.light[2]); if (d < nd) { nd = d; near = K; }
+    const inside = (p.x - K.mx) * K.side > -1 && Math.abs(p.z - K.z) < C.rz + 1 && d < C.rd + C.tl;
+    for (const B of K.bats) { if (inside && !B.t) B.t = 7 + Math.random() * 4; B.ph += dt; const fly = B.t > 0; if (fly) { B.t = Math.max(0, B.t - dt); B.t = B.t || 0; }
+      const tgt = fly ? new THREE.Vector3(K.light[0] + Math.cos(B.ph * 1.7) * B.r, K.fy + B.y + Math.sin(B.ph * 2.3) * .5, K.z + Math.sin(B.ph * 1.7) * B.r * 1.2) : B.home;
+      B.g.position.lerp(tgt, 1 - Math.exp(-(fly ? 4 : 2) * dt)); B.g.rotation.x = fly ? 0 : Math.PI; if (fly) B.g.rotation.y = -B.ph * 1.7; const f = fly || B.g.position.distanceTo(B.home) > .1 ? Math.sin(B.ph * 26) * .9 : .1; B.wings[0].rotation.z = f; B.wings[1].rotation.z = -f; }
+    const Ch = K.chest; if (Ch && Ch.open && Ch.t < 1) { Ch.t = Math.min(1, Ch.t + dt * 2.5); Ch.lid.rotation.x = -1.9 * (1 - (1 - Ch.t) ** 3); } }
+  if (!C.lamp) { C.lamp = new THREE.PointLight(0x9affd8, 0, 16, 1.6); scene.add(C.lamp); }
+  if (near) { C.lamp.position.set(...near.light); C.lamp.intensity = 14 * (1 - smooth(18, 34, nd)); }
+  if (COIN.list.length && !inArena()) coinStep(dt); }
+function caveHit(x, y, z, rad) { const C = HCAVE; if (!C.list || !inHome()) return 0;
+  for (const K of C.list) { const Ch = K.chest; if (!Ch || Ch.open || Math.hypot(x - Ch.x, y - Ch.y, z - Ch.z) > .9 + rad) continue; Ch.open = 1; snd('clang', { g: .9, r: .7, x: Ch.x, z: Ch.z }); spkBurst(Ch.x, Ch.y + .4, Ch.z, 40, { col: [1, .82, .3], spread: 4, size: .16, life: .9 });
+    for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2; coinDrop(scene, Ch.x + Math.cos(a) * 1.1, Ch.y + .5, Ch.z + Math.sin(a) * 1.1); } C.stat.chests = (C.stat.chests || 0) + 1; return 1; }
+  return 0; }
 function hollowDress() {
   const H = HOME, r = rwRng(13), wallX = (z, side, inset = 0) => hwWallAt(z, side, 2.5, inset - 2);
   const B = (w, h, d, x, y, z, ry = 0) => { const g = new THREE.BoxGeometry(w, h, d); g.rotateY(ry); g.translate(x, y, z); return g; };
@@ -69367,11 +69455,12 @@ function hollowDress() {
     for (let i = 0; i < 40; i++) { const z = -150 + r() * 300, side = r() < .5 ? -1 : 1, s = hwRc(z) + side * ((side < 0 ? HOLLOW.floorW : HOLLOW.floorE) + HOLLOW.wall + 6 + r() * 20), y = rwHeight(s, z), R = 3 + r() * 5;
       const g = ghRockGeo(i + 500, R * (1.1 + r() * .4), R * (.5 + r() * .25), R * (.85 + r() * .3), 2); g.rotateY(r() * 6); g.computeBoundingBox(); g.translate(s, y - g.boundingBox.min.y - (g.boundingBox.max.y - g.boundingBox.min.y) * .2, z); rk.push(ghStrataCol(g)); }
     const m = rwMesh(rk, hwPaint(rwMat(0xffffff, { vertexColors: true, roughness: .95 }), 'rock')); m.geometry.computeVertexNormals(); }
-  // CAVE MOUTHS in the walls at the floor: a dark arch with a rim of darker stone
-  { const dark = [], rim = []; for (const [z, side] of [[-30, -1], [18, -1], [-55, 1], [40, 1], [95, -1]]) { const x = wallX(z, side, 1.5), y = rwHeight(x, z) - .3, ry = side < 0 ? Math.PI / 2 : -Math.PI / 2;     // m1114: the cave at 70 moved to 95, out of the west path's foot
+  // CAVE MOUTHS in the walls at the floor: a dark arch with a rim of darker stone -- and where the rock is deep enough, a CAVE (`caveBuild`)
+  { const dark = [], rim = []; for (const K of caveList()) { const { z, side } = K; if (K.ok) { caveBuild(K); continue; } const x = wallX(z, side, 1.5), y = rwHeight(x, z) - .3, ry = side < 0 ? Math.PI / 2 : -Math.PI / 2;
       const a = new THREE.CircleGeometry(3, 18, 0, Math.PI); a.scale(1, 1.3, 1); a.rotateY(ry); a.translate(x - side * .3, y, z); dark.push(a);
       const t = new THREE.TorusGeometry(3.1, .5, 6, 16, Math.PI); t.scale(1, 1.3, 1); t.rotateY(ry); t.translate(x - side * .2, y, z); rim.push(t); }
-    rwMesh(dark, hwPaint(rwMat(0x2a120a, { side: THREE.DoubleSide, roughness: 1 }), 'rock'), false); rwMesh(rim, hwPaint(rwMat(0x9a4e34), 'rock')); }
+    console.log('[melee] caves: ' + caveList().map(K => (K.ok ? 'OPEN' : 'arch') + '@z' + K.z + ' x' + K.mx.toFixed(1) + ' floor ' + K.fy.toFixed(1)).join(', '));
+    if (dark.length) { rwMesh(dark, hwPaint(rwMat(0x2a120a, { side: THREE.DoubleSide, roughness: 1 }), 'rock'), false); rwMesh(rim, hwPaint(rwMat(0x9a4e34), 'rock')); } }
   // ROPE BRIDGES across the canyon, high up, sagging; banners hang from them
   const ban = [], banM = new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 });
   { const plank = [], rope = []; for (const [z, y0] of [[-24, 15], [32, 21]]) { const xa = hwWallAt(z, -1, y0 + .3, -1.2), xb = hwWallAt(z, 1, y0 + .3, -1.2), N = Math.max(12, Math.round(Math.abs(xb - xa) / .62)), sag = Math.abs(xb - xa) * .07;     // anchored IN the wall at its height
@@ -69493,7 +69582,7 @@ function homeLanterns() {
 }
 function homeStep(dt) {
   const H = HOME; H.t += dt; if (RW.U) RW.U.uTime.value = H.t;
-  gmillStep(dt, H.t); gpeakStep(dt); gjinraStep(dt, H.t); if (GMERCH.g) rsChunkSync(GMERCH);
+  gmillStep(dt, H.t); gpeakStep(dt); gjinraStep(dt, H.t); caveStep(dt); if (GMERCH.g) rsChunkSync(GMERCH);
   if (GHOME.U) GHOME.U.uWind.value = H.t; ghomeSmoke(dt, H.t); ghomeShut(dt); ghomeLift(dt); ghomePots(dt); for (const G of GHOME.gates || []) bgateStep(G, dt);     // pass 9: his back door
   if (GHOME.canoe) { const C = GHOME.canoe, t = H.t; C.g.position.y = C.y + rwWaveAt(C.x, C.z, t) * .8 * (1 - Math.min(1, (C.lift || 0) * 2)) + .02 + (C.lift || 0); C.ht = (C.ht == null ? 12 : C.ht) - dt; if (C.ht <= 0 && !C.hu) { C.hu = 1e-3; } if (C.hu) { C.hu += dt; if (C.hu > 6) { C.hu = 0; C.ht = 18 + Math.random() * 20; const P = C.g.getWorldPosition(new THREE.Vector3()); spkBurst(P.x, GHOME.g.position.y + C.y + .05, P.z, 30, { col: [.85, .93, 1], spread: 4, size: .09, life: .6 }); snd('thud', { g: .5, r: .7, x: P.x, z: P.z }); } }     // pass 24: now and then it LIFTS on its discs, hangs dripping, and settles
   const lift = C.hu ? .5 * Math.min(1, C.hu / 1.4) * Math.min(1, Math.max(0, (6 - C.hu) / 1.2)) : 0; if (lift > .05 && Math.random() < dt * 14) { const P = C.g.localToWorld(new THREE.Vector3((Math.random() - .5) * .8, -.4, (Math.random() - .5) * 4)); spkBurst(P.x, P.y, P.z, 2, { col: [.8, .9, 1], spread: .4, size: .05, life: .5 }); }
