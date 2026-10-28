@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## THE SHIP: THE SEA STOPS TILING FROM AFAR (m@X4@, WORKER A)
+## THE SHIP: THE SEA STOPS TILING FROM AFAR (m1411, WORKER A)
 
 His (screenshot from far out, zoomed): *"you can see the repetition -- is there any way to break that up with a few different sizes of
 noises or variations?"*
