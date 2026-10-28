@@ -26491,6 +26491,10 @@ function beaconRock(lo, dk, hi) { const m = new THREE.MeshStandardMaterial({ col
       'float sb = vRW.y * .23 + sin(vRW.x * .061 + vRW.z * .043) * .9 + sin(vRW.x * .21 - vRW.z * .17) * .18; float band = fract(sb); vec3 rc = mix(uLo, uHi, smoothstep(.15, .55, band) * (1.0 - smoothstep(.75, .95, band)));' +
       ' rc = mix(rc, uDk, smoothstep(.88, .98, band) * .8); float st = sin(vRW.x * 1.7 + sin(vRW.z * .9) * 2.0) * sin(vRW.z * 1.3 + vRW.y * .05); rc *= 1.0 - smoothstep(.6, 1.0, st) * .12; diffuseColor.rgb *= rc;'); };
   m.customProgramCacheKey = () => 'brock' + lo + dk + hi; return m; }
+// m15xx: a CARVED tier, not a box: rounded vertical edges and a chamfered lip (`arenaBevelBox`, its shape shrunk by the bevel so the flats sit ON the
+// collider's faces), tapering 8% toward the top like weathered rock. The collider stays the full box.
+function beaconCarve(w, h, d) { const r = Math.min(1.4, Math.min(w, d) * .16, h * .3), g = arenaBevelBox(w - r * 1.2, h, d - r * 1.2, r), P = g.attributes.position;
+  for (let i = 0; i < P.count; i++) { const k = 1 - .08 * (P.getY(i) / h + .5); P.setX(i, P.getX(i) * k); P.setZ(i, P.getZ(i) * k); } g.computeVertexNormals(); return g; }
 function beaconFill(f) { if (f < .05) return []; const n = Math.floor(f / 12), w = (f - n * 7.5) / (n + 1), out = []; for (let i = 0; i <= n; i++) { if (w > .05) out.push('walk:' + w.toFixed(2)); if (i < n) out.push('hop'); } return out; }
 function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, MG = new Map(), bars = [], climbs = [], zips = [];
   const put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); const q = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal') q.deleteAttribute(k); MG.get(m).push(q); };
@@ -26577,7 +26581,7 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
       let h = near ? Math.min(30, Math.max(4, yN * (.5 + R() * .7))) : C.wall0 + R() * C.wall1 + Math.min(10, (d - C.mid) * .4);     /* near: ledges and shoulders under the route's height; far: the canyon wall, rising outward */
       if (dz2 < 8 + w / 2) h = Math.min(h, zy - 5); for (const V of sight) { const vx = V[3] - V[0], vz = V[5] - V[2], t = Math.max(0, Math.min(1, ((jx - V[0]) * vx + (jz - V[2]) * vz) / (vx * vx + vz * vz || 1))); if (Math.hypot(jx - V[0] - vx * t, jz - V[2] - vz * t) < 3 + w * .75) h = Math.min(h, V[1] + (V[4] - V[1]) * t - 2); }     /* m1566: under every station's line to the brazier */ if (h < 3) continue;
       const tiers = h > 18 ? 3 : 2; let y = 0, ww = w, wd = w * (.8 + R() * .4);
-      for (let k = 0; k < tiers; k++) { const th = k === tiers - 1 ? h - y : h * (k ? .3 : .5) * (.8 + R() * .3); put(new THREE.BoxGeometry(ww, th, wd).translate(jx, y + th / 2, jz), (k + n) % 2 ? M2 : M.mesa);
+      for (let k = 0; k < tiers; k++) { const th = k === tiers - 1 ? h - y : h * (k ? .3 : .5) * (.8 + R() * .3); put(beaconCarve(ww, th, wd).translate(jx, y + th / 2, jz), (k + n) % 2 ? M2 : M.mesa);
         O.boxes.push({ minx: jx - ww / 2, maxx: jx + ww / 2, miny: y, maxy: y + th, minz: jz - wd / 2, maxz: jz + wd / 2 }); y += th; ww *= .72 + R() * .12; wd *= .72 + R() * .12; } n++; }
     L.mesas = n; }
   // m1562: THE AUDIT (pass 4). HEADROOM: nothing may sit in the 2.2 m over any walking surface (a crossing's pillar, a mesa). FAIL FORWARD: every

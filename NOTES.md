@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- The First Beacon pass 9: carved rock
+- **`beaconCarve`:** each mesa tier is `arenaBevelBox` (rounded vertical edges, chamfered lip) with its shape shrunk by the bevel's outward 1.2 r so
+  the flats lie on the collider's faces, then tapered 8% toward the top. The colliders stay the full boxes: the only mismatch is at the top edge
+  (up to ~.4 m of invisible ledge past the lip), and no mesa top is on the route. The route's own pieces stay square: they are the greybox, and the
+  cream climbing faces have to read as built, not grown.
+- Audit and route check unchanged: headroom ok, 63 pairs ok.
+
 ## m1576 -- The First Beacon pass 8: the route checked off the built boxes
 - **`L.walk`:** every walking surface (`top`) in build order -- which is route order -- paired with the next, the gap between their EDGES and the rise,
   each matched to a move from `MOVEC`: walk (step .38, gap .3), run jump (5.95), double (9.98), ledge caught (3.58 / 4.69 up, gap 2.5), drop, chimney
