@@ -16,6 +16,24 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - Statics merged (109 meshes; the straw dummies, the archery butt and the drum stay their own: they are smashed or pulsed). 71
   children with the seven robots, the bar, cables and drone -- over the ~40 mark, mostly robots.
 Render-checked headless (the yard and veranda from the north, along the veranda). Shipped unverified.
+## m15xx -- THE OSARI BOWMAN: rigged from his zip and in the game as the ARCHER (his: "the enemy race is the Osari of the Hollow")
+- **The rig:** `blender-addons/pipeline/hero.sh models/characters/osari_bowman.zip osari_bowman --profile samurai`.
+  - orient: Tripo FBX, rot 0, the front checked in `in_front.png`
+  - Auto-Rig Pro, 52 of 52 bones renamed to mixamorig
+  - `handrig` found NO thumbs (mitts: his hands are wrapped)
+  - the Forge, 121 clips (the samurai profile)
+  - the 4K JPG down to 2048 webp, draco
+  - hipshift / hipfix ok
+  - -> `models/characters/osari_bowman_game.glb`, 9.1 MB, 17.5k verts.
+- **hero.sh's last step had failed silently:** `npm i @gltf-transform/cli@4.1.1` now pulls `functions@4.5.1`, which carries its own `core`,
+  so `resize` died ("getRoot of null") and no game file was written. Fixed here by pinning `functions@4.1.1`, and done through the API
+  WITHOUT a prune. The CLI's `draco` prunes 47 nodes, among them `socket_hand_l/r`, `hold_hand_l` and the `forge_ref_*` nodes. Node counts
+  were checked against the other heroes: 2 sockets and 44 refs each, the same.
+- **His bow bake:** a new library profile `osari_archer` (the same longbow pack as `samurai_archer` + the knock six, fists on the bow
+  clips) -> `models/characters/forged/osari_archer.glb` (17 clips, every duration identical to the samurai archer's).
+- **In the game:** `ARENA.kinds.OSARI_BOW`; `ARCH.body` = 'OSARI_BOW' (the A/B back to the red samurai is 'ARCHER'). SPAWN > ARCHERS and
+  the posted lookouts spawn him, in his own colours (no red hue). Rendered: 4 Osari bowmen drawing and aiming, bows in hand.
+- Next from him: the OSARI SPIDER (four legs: not a humanoid ARP rig), then a swordsman, a bigger swordsman and a giant.
 
 ## m1657 -- THE RE-PASS: the MOATED KEEP, pass 3 (THE EAVE BELT) -- its third pass, DONE; and TWO BUGS IN `restoreRideTris`
 - THE EAVE BELT: a black-tile pent roof round the keep at the skirt's top, 5.4 m at the wall falling to 5.0 at its edge .9 m out, four

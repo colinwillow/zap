@@ -7529,6 +7529,13 @@ const ARENA = {
         hits: ['take_damage_body', 'take_damage_head'], big: ['take_damage_head'], downF: 'take_damage_and_fall_down', downB: 'take_damage_and_fall_down',
         upF: 'lay_to_get_up', upB: 'lay_to_get_up', swings: ['bow_recoil'] },
       over: { walkRef: 1.2, runRef: 3.0 } },
+    // m15xx: THE OSARI BOWMAN (his: "the enemy race is the OSARI OF THE HOLLOW; the bowman takes the place of the archer"). His Tripo model through
+    // `hero.sh` (Auto-Rig Pro, the samurai's Forge profile) and his own bow bake (`osari_archer`: the same longbow pack + knock six). His colours.
+    OSARI_BOW: { t: 'Osari Bowman', sub: 'the Osari of the Hollow', file: 'models/characters/osari_bowman_game.glb', forged: 'osari_archer', h: 1.85, hp: 3, hitDmg: 9, beam: [.4, 1, .6], archer: 1,
+      clips: { idle: 'bow_idle', look: null, walk: 'bow_walk_f', run: 'katana_run', block: 'bow_aim', blockHit: 'take_damage_body', taunt: ['bow_equip'],
+        hits: ['take_damage_body', 'take_damage_head'], big: ['take_damage_head'], downF: 'take_damage_and_fall_down', downB: 'take_damage_and_fall_down',
+        upF: 'lay_to_get_up', upB: 'lay_to_get_up', swings: ['bow_recoil'] },
+      over: { walkRef: 1.2, runRef: 3.0 } },
     SKULLBACK: { bones: 'reptile', t: 'Skullback', sub: 'Reptilian heavy', file: 'models/characters/rept_heavy_armor.glb', weapon: 'models/weapons/w_rept_maul.glb', h: 2.7, hp: 16, hitDmg: 22, beam: [.35, 1, .45] },
   },
   beamT: 1.5, lie: 2.4, outT: 1.3,
@@ -13710,7 +13717,7 @@ function bowDrop(d) { if (d.bow) { d.bow.g.removeFromParent(); d.bow.str.removeF
 // will be (`lead`), gravity, its own trail; it hurts you (your guard takes it the usual way, `playerHurt`), and it STICKS in the floor or a block
 // and stays `stay` s. THE BOW is built in code and placed every frame BETWEEN HIS HANDS: the grip in the left fist, the limbs across the line
 // to the right hand, and the string pulled to the right hand while he draws (`archerBow`). They have horde life (`HORDE.life`) and die.
-const ARCH = { parryWin: .4, parryR: 2, blockR: 1.3, per: 4, near: 7, far: 13, back: 1.7, walk: 1.5, side: 1.3, draw: 1.07, aim: [.55, 1.1], loose: .73, cool: [.9, 2.2], speed: 26, lead: .7,
+const ARCH = { body: 'OSARI_BOW', Kb: {}, parryWin: .4, parryR: 2, blockR: 1.3, per: 4, near: 7, far: 13, back: 1.7, walk: 1.5, side: 1.3, draw: 1.07, aim: [.55, 1.1], loose: .73, cool: [.9, 2.2], speed: 26, lead: .7,
   dmg: 9, push: 4, stay: 7, limb: .62, bend: .16, rate: 1.0, red: { value: 20 * Math.PI / 180 }, stat: { shots: 0, hits: 0, blocked: 0, stuck: 0 } };
 ARCH.redMul = new THREE.Color(1, .5, .3);     // m1106: .62/.58 read PINK on his phone-sized render; less blue, red     // measured offline through the shader's own YIQ: +28 deg takes his orange (hue 34) to ~5, red; the multiply deepens it
 const ARROWS = [];
@@ -13857,22 +13864,22 @@ function archerAI(d, dt, t) {
 }
 // m1121: ONE archer POSTED at a spot (a tower's lookout), holding it, shooting from it; a horde body (life, dies)
 async function archerPost(x, y, z) {
-  await forgedFetch('samurai_archer'); const K0 = await arenaLoad('ARCHER');
-  const K = ARCH.K || (ARCH.K = Object.assign(Object.create(K0), { notice: 30, lose: 90, fling: HORDE.fling, flyV: K0.flyV * HORDE.fly, flyUp: K0.flyUp * HORDE.fly, fly0: .75, limbs: HORDE.slice ? 1 : 0, voice: '', out: (K0.out || 1) * HORDE.lieK }));
-  const d = bodySpawn(K.P, K, x, z, y); d.model.traverse(o => { if (o.isMesh && o.material && o.material.color) { o.material = o.material.clone(); rivalHue(o.material, ARCH.red, 'archerHue'); o.material.color.multiply(ARCH.redMul); } });
+  await forgedFetch(ARENA.kinds[ARCH.body].forged); const K0 = await arenaLoad(ARCH.body);
+  const K = ARCH.Kb[ARCH.body] || (ARCH.Kb[ARCH.body] = Object.assign(Object.create(K0), { notice: 30, lose: 90, fling: HORDE.fling, flyV: K0.flyV * HORDE.fly, flyUp: K0.flyUp * HORDE.fly, fly0: .75, limbs: HORDE.slice ? 1 : 0, voice: '', out: (K0.out || 1) * HORDE.lieK }));
+  const d = bodySpawn(K.P, K, x, z, y); d.model.traverse(o => { if (ARCH.body === 'ARCHER' && o.isMesh && o.material && o.material.color) { o.material = o.material.clone(); rivalHue(o.material, ARCH.red, 'archerHue'); o.material.color.multiply(ARCH.redMul); } });
   for (const n of ['bow_idle', 'bow_aim', 'bow_walk_f', 'bow_walk_b', 'bow_walk_l', 'bow_walk_r']) { const a = d.actions[n]; if (a) { a.setLoop(THREE.LoopRepeat, Infinity); a.clampWhenFinished = false; } }
   d.horde = 1; d.archer = 1; d.post = 1; d.aggro = 1; d.hp = d.hpMax = HORDE.hp; d.hordeHp = HORDE.life; HORDE.list.push(d); return d;
 }
 async function archerAdd() {
   if (HORDE.busy) return; HORDE.busy = 1; arenaUi();
   try {
-    await forgedFetch('samurai_archer');
-    const K0 = await arenaLoad('ARCHER'), p = player;
-    const K = ARCH.K || (ARCH.K = Object.assign(Object.create(K0), { notice: 30, lose: 90, fling: HORDE.fling, flyV: K0.flyV * HORDE.fly, flyUp: K0.flyUp * HORDE.fly, fly0: .75, limbs: HORDE.slice ? 1 : 0, voice: '', out: (K0.out || 1) * HORDE.lieK }));
+    await forgedFetch(ARENA.kinds[ARCH.body].forged);
+    const K0 = await arenaLoad(ARCH.body), p = player;
+    const K = ARCH.Kb[ARCH.body] || (ARCH.Kb[ARCH.body] = Object.assign(Object.create(K0), { notice: 30, lose: 90, fling: HORDE.fling, flyV: K0.flyV * HORDE.fly, flyUp: K0.flyUp * HORDE.fly, fly0: .75, limbs: HORDE.slice ? 1 : 0, voice: '', out: (K0.out || 1) * HORDE.lieK }));
     for (let i = 0; i < ARCH.per; i++) {
       const a = Math.atan2(-p.pos.x, -p.pos.z) + (i - (ARCH.per - 1) / 2) * .7 + (Math.random() - .5) * .3, R = ARENA.r - 2;
       const x = Math.sin(a) * R, z = Math.cos(a) * R, d = bodySpawn(K.P, K, x, z, 0);
-      d.model.traverse(o => { if (o.isMesh && o.material && o.material.color) { o.material = o.material.clone(); rivalHue(o.material, ARCH.red, 'archerHue'); o.material.color.multiply(ARCH.redMul); } });
+      d.model.traverse(o => { if (ARCH.body === 'ARCHER' && o.isMesh && o.material && o.material.color) { o.material = o.material.clone(); rivalHue(o.material, ARCH.red, 'archerHue'); o.material.color.multiply(ARCH.redMul); } });
       for (const n of ['bow_idle', 'bow_aim', 'bow_walk_f', 'bow_walk_b', 'bow_walk_l', 'bow_walk_r']) { const a = d.actions[n]; if (a) { a.setLoop(THREE.LoopRepeat, Infinity); a.clampWhenFinished = false; } }
       d.horde = 1; d.archer = 1; d.aggro = 1; d.hp = d.hpMax = HORDE.hp; d.hordeHp = HORDE.life; d.h = Math.atan2(p.pos.x - x, p.pos.z - z);
       HORDE.list.push(d); arenaBeam(x, z, [1, .35, .3], 1);
