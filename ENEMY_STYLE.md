@@ -5,8 +5,8 @@
 
 **The rule that comes first:** enemy places are for DESTROYING. They are never FALLEN or RESTORED and they never float (KORAJIN.md, OURS vs THEIRS). Every enemy building is **destructible**, and its keystones (the torch tower's brazier, the shrine's core) are the payoff. Torn down, they make way for our SACRED buildings.
 
-## Palette: A, black lacquer and gold, is the working default
-Both sheets lead with A. His final pick is still open (B: black and acid green; C: bone white, black and gold). So keep the palette in ONE place in code, `ENEMY.pal`, so switching is a one-line change.
+## Palette: BLACK AND GOLD (A), his pick, Oct 28 2026
+**DECIDED: black lacquer and aged gold** (*"Black and gold"*). B and C are retired. The palette still lives in ONE place in code, `ENEMY.pal`.
 
 | role | colour | used for |
 |---|---|---|

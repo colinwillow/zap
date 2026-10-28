@@ -106,8 +106,8 @@ illuminating, pieces moving in and fixing themselves -- very cinematic. The tran
 - **OUR places** (the Korajin's towns, his home) start FALLEN and are RESTORED: rebuilt and lifted into the sky on Jinra jets (RESTORE kit).
 - **ENEMY places are for DESTROYING.** They never float. You tear them down (fully destructible), and in their place you raise SACRED
   buildings: Jinra power plants, shrines, which feed the restoration. *"Why would we put the enemy buildings up into the sky? That's the opposite."*
-- **The enemy has its OWN LOOK, our opposite:** classical Japanese (the forge's original style, embellished) in an ENEMY palette. He leans
-  black with a yellow or gold emblem, maybe green; NOT decided. Concept images come next, from `ENEMY_BRIEF.md`.
+- **The enemy has its OWN LOOK, our opposite:** classical Japanese (the forge's original style, embellished) in an ENEMY palette. DECIDED:
+  **BLACK AND GOLD** (his pick, Oct 28 2026). The guide is `ENEMY_STYLE.md`.
 
 ## THE BLUE DRAGON, THE FIRST MOUNT (his, Oct 28 2026)
 *"Embellish the blue dragon GLB. When he becomes yours I want to control him, really fun: shoot fireballs, the same feel as RollerGirl with her

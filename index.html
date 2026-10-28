@@ -10474,7 +10474,7 @@ function korTentRuin(T, keep, seed = 3) { let sd = seed; const rnd = () => (sd =
   for (const P of T.panels) { if (rnd() < keep) continue; const pos = P.m.geometry.attributes.position; for (let v = 0; v < P.cnt; v++) pos.setXYZ(P.start + v, T.x, T.y + T.h, T.z); pos.needsUpdate = true; P.dead = 1; } }
 function bldDoorsRuin(doors, which = 0) { const D = doors && doors[which]; if (!D) return; D.dead = 1; D.t2 = -1e9; D.vy = 0; D.vz = 0; D.pv.position.y = -.2; D.pv.rotation.x = 1.45; D.pv.position.z += .9; }
 // m1521: THE ENEMY KIT (ENEMY_STYLE.md, his style sheets): heavy, angular, monumental -- black lacquer, aged GOLD, pale sandstone, terracotta, dark
-// iron, and STOLEN Jinra (mint) as the one glow. Palette A is the working default and lives ONLY in `ENEMY.pal`, so his final pick is one line.
+// iron, and STOLEN Jinra (mint) as the one glow. BLACK AND GOLD is his pick (Oct 28 2026); the palette lives ONLY in `ENEMY.pal`.
 const ENEMY = { pal: { lacquer: 0x1b1916, gold: 0xc99a3e, stone: 0xcdb48c, terra: 0xb07a52, iron: 0x2a2724, jin: 0x7affd8 }, m: null, emblem: null };
 function enemyEmblemTex() { if (ENEMY.emblem) return ENEMY.emblem; const S = 256, cv = document.createElement('canvas'); cv.width = cv.height = S; const c = cv.getContext('2d'), gold = '#' + ENEMY.pal.gold.toString(16).padStart(6, '0');
   c.clearRect(0, 0, S, S); c.fillStyle = gold; c.strokeStyle = gold; c.lineJoin = 'miter';
