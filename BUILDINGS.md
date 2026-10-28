@@ -62,7 +62,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 | building | p1 | p2 | p3 | his OK |
 |---|---|---|---|---|
 | Dojo Hall |  |  |  |  |
-| Watchtower | m1487 hero kit: tent-cone crown, box lanterns, bunting, wheel winch, plants, a low bar; ~180 -> 87 draws | m1489 the crown breaks panel by panel to a rafter skeleton; doors swing open and break | m1490 layers: a rope-ladder SHORTCUT that drops from deck 2, doubloons on the perch tips, a guarded Jinra canister on the lookout; m1512 restorable test; **m@X4@ ENEMY: classical again, and DESTRUCTIBLE -- cut three corner posts and it collapses round its ground floor** |  |
+| Watchtower | m1487 hero kit: tent-cone crown, box lanterns, bunting, wheel winch, plants, a low bar; ~180 -> 87 draws | m1489 the crown breaks panel by panel to a rafter skeleton; doors swing open and break | m1490 layers: a rope-ladder SHORTCUT that drops from deck 2, doubloons on the perch tips, a guarded Jinra canister on the lookout; m1512 restorable test; **m1521 ENEMY: classical again, and DESTRUCTIBLE -- cut three corner posts and it collapses round its ground floor** |  |
 | Gatehouse |  |  |  |  |
 | Pagoda | m1494 classical heritage in painted maps (roof tiles, timber, sandstone), Jinra core, bunting, plants; ~270 -> 85 draws | m1497 the belfry cap breaks panel by panel to a rafter skeleton; doors open and break (shared `bldDoors`) | m1500 layers: a launch bar at the foot, doubloons up the gutter climb, the bell unfurls a climbable RAIN CHAIN shortcut; **m1518 RESTORES IN PLACE (one set of pieces: storeys fly home, colour back)** |  |
 | Great Red Pagoda | m1507 painted floors, roof tiles and sandstone (the lacquer kept bright), Jinra core, plants, fallen/restored |  |  |  |
