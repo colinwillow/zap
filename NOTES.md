@@ -5,7 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- THE ROCKET'S JUMP-THROW (DOCKET 3; his: "you can kind of throw your rockets up -- like that movie where they bend bullets")
+## m15xx -- THE DRAGON'S CONTROLS, his map (DOCKET 4)
+His: *"when you're riding, the character has the blaster again; use the stick to shoot fireballs the way RollerGirl shoots her blaster in the
+air; the right flick on the ground does melee -- lunges, bites; flicking the left stick left and right does barrel rolls, up and down flips."*
+- **Right pad held UP:** HIS fireballs, every `holdFbT` .38 s, from his head at the middle of the screen (the camera's line, 90 m out). The
+  old blaster bolt from the saddle is gone. Grumbo keeps the seat clip (no `ride_gun`), and every worn weapon is hidden while he is in the
+  saddle (`dragRiderPose`).
+- **Right flick, ground:** the BITE -- his `attack_ground` with a LUNGE (`biteV` 15 m/s fading over `biteT` .32 s). The bite lands at the
+  clip's strike point on anything within `biteR` 4.5 m of his jaws. **Right flick, air:** the fireball, as before.
+- **Left flick, in flight:** a BARREL ROLL (sideways, `rollT` .7 s) or a LOOP (up = over the top, down = under; `flipT` 1 s). Drawn on his
+  root on top of the bank and pitch, the flight path unchanged.
+- The saddle tip lists the new map.
+- Checked headless: the bite lunges; the take-off flies; mid-roll the root reads -2.93 rad and the trick ends; 0 weapons visible in the
+  saddle. The hold-up fire was not driven (it needs a thumb).
+- Still his to settle: what the left stick's up / down do for SPEED versus climbing.
+
+## m1670 -- THE ROCKET'S JUMP-THROW (DOCKET 3; his: "you can kind of throw your rockets up -- like that movie where they bend bullets")
 Hold up on the right pad to ready the rocket, jump (left tap), release while he is still RISING: `ROCKET.throwK` (1.6) x his climb speed is
 added to the rocket's upward speed (its own speed kept), so the shot tips up. Released at take-off (10.6 m/s up) that is ~30 deg; near the apex,
 almost level. Falling or on the ground: as aimed, unchanged. `mel.ROCKET.throwK` is live (0 = off). Not tested on a body; the arithmetic only.

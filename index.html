@@ -11476,7 +11476,7 @@ function dragRide(dt) { const p = player, R = p.dragon, B = DRAGZ.on && DRAGZ.on
   const seat = B.seat.getWorldPosition(_drV), sx = seat.x, sy = seat.y - R.hip, sz = seat.z, h = dragH(B);
   if (R.st === 'on') { const u = Math.min(1, R.t / (R.T || DRAGZ.mountT)), k = smooth(0, 1, u);
     p.pos.set(R.from.x + (sx - R.from.x) * k, R.from.y + (sy - R.from.y) * k + Math.sin(u * Math.PI) * DRAGZ.arc, R.from.z + (sz - R.from.z) * k);
-    p.faceH = p.heading = R.h0 + wrapAngle(h - R.h0) * k; if (u >= 1) { R.st = 'sit'; R.t = 0; dragDriveStart(B); tipShow('In the saddle. Left pad: ride. Right tap: jump. Right double tap: fly. Right hold: hover. Double-tap the left pad (on the meadow): get off.', 5); } }
+    p.faceH = p.heading = R.h0 + wrapAngle(h - R.h0) * k; if (u >= 1) { R.st = 'sit'; R.t = 0; dragDriveStart(B); tipShow('In the saddle. Left pad: ride. Right tap: jump; double tap: fly. Right hold: hover. Right pad held UP: fireballs. Right flick: bite (ground) / fireball (air). Left flick in the air: rolls and loops. Double-tap the left pad (meadow): get off.', 6); } }
   else if (R.st === 'sit') { p.pos.set(sx, sy, sz); p.faceH = p.heading = h; p.speed = B.drive ? B.drive.v * .3 : 0; dragGun(dt); dragHoldR(R, dt); }
   else { const u = Math.min(1, R.t / (R.T || DRAGZ.offT)), k = smooth(0, 1, u), to = B.mountAt;
     p.pos.set(R.from.x + (to.x - R.from.x) * k, R.from.y + (to.y - R.from.y) * k + Math.sin(u * Math.PI) * DRAGZ.arc * .6, R.from.z + (to.z - R.from.z) * k);
@@ -11551,7 +11551,8 @@ function dragDrive(B, dt) { const Z = DRAGZ, D = B.drive, p = player, sit = p.dr
     if (F && P.y <= F.y && A.pitch < .3) { P.y = F.y; D.v = Math.min(Z.runSp, A.v * cp); D.air = null; D.pad = F.pad; snd('swoosh', { g: .5, r: .4 }); }     // down
     else if (F && P.y < F.y) P.y = F.y;
     if (P.y < Z.cloudY + 8) { P.set(Z.at[0], Z.daisY, Z.at[1]); D.air = null; D.v = 0; D.pad = null; tipShow('Into the clouds -- back to the dais.', 3); }
-    B.root.rotation.order = 'YXZ'; B.root.rotation.set(-(D.air ? A.pitch : 0), h + (B.faceOff || 0), -A.bank * (D.air ? 1 : 0));
+    let tr = 0, tf = 0; if (A.trick) { const T = A.trick; T.t += dt; const u = Math.min(1, T.t / T.T), e = u * u * (3 - 2 * u); if (T.k === 'roll') tr = T.s * e * Math.PI * 2; else tf = T.s * e * Math.PI * 2; if (u >= 1) A.trick = null; }
+    B.root.rotation.order = 'YXZ'; B.root.rotation.set(-(D.air ? A.pitch + tf : 0), h + (B.faceOff || 0), -(A.bank + tr) * (D.air ? 1 : 0));
     D.v = D.air ? A.v : D.v; D.spread = damp(D.spread || 0, 1, Z.spreadHL, dt); }
   else if (D.air) { const A = D.air, s2 = sit ? stickWorld() : { x: 0, z: 0, mag: 0 };     // m1625: the HOP and the HOVER -- steered as on the ground, gently
     if (s2.mag > 0) { const want = Math.atan2(s2.x, s2.z), dh = wrapAngle(want - h); h += clamp(dh, -Z.turn * dt, Z.turn * dt); D.v = damp(D.v, s2.mag * Z.airSp, .5, dt); } else D.v = damp(D.v, 0, .8, dt);
@@ -11566,6 +11567,7 @@ function dragDrive(B, dt) { const Z = DRAGZ, D = B.drive, p = player, sit = p.dr
     if (s2.mag > 0) { const want = Math.atan2(s2.x, s2.z), dh = wrapAngle(want - h), mx = (D.v > 2 ? Z.turn : Z.turnStill) * dt; h += clamp(dh, -mx, mx);
       D.v = damp(D.v, s2.mag * Z.runSp * clamp(1 - Math.abs(dh) / 2.4, .2, 1), Z.accHL, dt); }
     else D.v = damp(D.v, 0, Z.brakeHL, dt);
+    if (D.bite > 0) { D.bite -= dt; D.v = Math.max(D.v, Z.biteV * (D.bite / Z.biteT)); }     // m15xx: the lunge
     if (D.v < .02) D.v = 0;
     let nx = P.x + Math.sin(h) * D.v * dt, nz = P.z + Math.cos(h) * D.v * dt;
     if (!D.pad) for (const [ox, oz, orr] of Z.obst) { const dx = nx - ox, dz = nz - oz, d = Math.hypot(dx, dz), m = orr + Z.bodyR; if (d < m && d > 1e-4) { nx = ox + dx / d * m; nz = oz + dz / d * m; } }
@@ -11576,7 +11578,7 @@ function dragDrive(B, dt) { const Z = DRAGZ, D = B.drive, p = player, sit = p.dr
     B.root.rotation.order = 'YXZ'; B.root.rotation.set(0, h + (B.faceOff || 0), D.lean); D.spread = damp(D.spread || 0, 0, Z.spreadHL, dt); }
   // his clips: idle / run on the ground by speed, `attack_air` in the air; the weights eased and always summing to 1
   D.fbCool = Math.max(0, (D.fbCool || 0) - dt);
-  if (D.atkT > 0) { D.atkT -= dt; if (D.atkFire !== null && D.atkT <= D.atkFire) { D.atkFire = null; dragFire(B); } if (D.air) D.atkT = 0; }
+  if (D.atkT > 0) { D.atkT -= dt; if (D.atkFire !== null && D.atkT <= D.atkFire) { D.atkFire = null; if (D.atkMelee) { D.atkMelee = 0; dragBite(B); } else dragFire(B); } if (D.air) D.atkT = 0; }
   D.wA = damp(D.wA || 0, D.atkT > .15 && D.aAtk ? 1 : 0, .08, dt); if (D.wA < .01 && D.aAtk && D.atkT <= 0) D.aAtk.stop();
   const run = D.air ? 0 : clamp(D.v / Z.runRef, 0, 1), fl = D.air ? 1 : 0; D.wF = damp(D.wF || 0, D.aFly ? fl : 0, .12, dt); const rest = (1 - D.wF) * (1 - D.wA);
   if (D.aAtk) D.aAtk.setEffectiveWeight((1 - D.wF) * D.wA);
@@ -11598,6 +11600,7 @@ function dragWings(B) { const D = B.drive, S = D ? D.spread || 0 : 0; if (S < .0
     const want = cur.clone().lerp(fan, S).normalize(); _dwQ.setFromUnitVectors(cur, want);
     const pq = b.parent.getWorldQuaternion(_dwQ2), wq = b.getWorldQuaternion(new THREE.Quaternion()); b.quaternion.copy(pq.invert().multiply(_dwQ.multiply(wq))); b.updateMatrixWorld(true); } }
 function dragRiderPose() { const R = player.dragon, B = DRAGZ.on && DRAGZ.on.B; if (!R || R.st !== 'sit' || !B || !B.seat) return;
+  for (const k in WEAP.worn) { const w = WEAP.worn[k]; if (w && w.group) w.group.visible = false; }     // m15xx (his: "for some reason the character has the blaster again"): nothing in his hands in the saddle
   const bq = B.root.getWorldQuaternion(_dwQ3); rig.root.quaternion.copy(bq).multiply(_dwQ2.setFromAxisAngle(_wkY, (rig.faceOff || 0) - (B.faceOff || 0)));
   const seat = B.seat.getWorldPosition(_drV), up = _dwA.set(0, 1, 0).applyQuaternion(bq); rig.root.position.copy(seat).addScaledVector(up, -R.hip);
   // m1627 (his: "he was sitting inside the dragon"): the HIPS BONE put exactly on the seat (plus `seatUp`), measured on this frame's final pose --
@@ -11623,7 +11626,7 @@ Object.assign(DRAGZ, { seatUp: .14 });
 // the saddle: blaster bolts every `gunT` s from his chest toward the middle of the screen (the lens is the sight; the bolts are the game's own
 // `BOLTS`). The targets: straw-and-lacquer archery butts on posts, spread over the meadow, the crag, the islands and hung in the air by the
 // hoops; a hit bursts one, and it is back after `tgBack` s.
-Object.assign(DRAGZ, { fbV: 34, fbG: 5, fbR: .8, fbSplash: 4.5, fbCool: .6, breathAt: .38, gunT: .16, gunUp: .72, gunArc: .5, tgBack: 10 });
+Object.assign(DRAGZ, { holdFbT: .38, biteV: 15, biteT: .32, biteR: 4.5, rollT: .7, flipT: 1.0, fbV: 34, fbG: 5, fbR: .8, fbSplash: 4.5, fbCool: .6, breathAt: .38, gunT: .16, gunUp: .72, gunArc: .5, tgBack: 10 });
 function dragTargets(g) { const Z = DRAGZ, T = [], cv = document.createElement('canvas'); cv.width = cv.height = 128; const c = cv.getContext('2d');
   for (const [r, col] of [[64, '#efe2c8'], [52, '#b3261c'], [40, '#efe2c8'], [28, '#b3261c'], [16, '#d9a441']]) { c.fillStyle = col; c.beginPath(); c.arc(64, 64, r, 0, 7); c.fill(); }
   const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
@@ -11646,9 +11649,21 @@ function dragTargetHit(t) { if (t.dead > 0) return; t.dead = DRAGZ.tgBack; t.G.v
   const O = DRAGZ.on; O.hits = (O.hits || 0) + 1; const up = O.tg.filter(x => x.dead <= 0).length; tipShow('Target! ' + (O.tg.length - up) + ' / ' + O.tg.length + ' down', 1.6); }
 function dragBreath() { const R = player.dragon, B = DRAGZ.on && DRAGZ.on.B, D = B && B.drive; if (!R || R.st !== 'sit' || !D || (D.fbCool || 0) > 0) return; D.fbCool = DRAGZ.fbCool;
   if (D.air || !D.aAtk) { dragFire(B); return; }
+  // m15xx (his: "on the ground the flick does melee -- lunges or bites"): his `attack_ground` with a LUNGE forward (`biteV` for `biteT` s), and the
+  // bite lands `breathAt` into it on anything within `biteR` of his jaws (the archery butts now; bodies when the zone has them)
+  D.bite = DRAGZ.biteT; D.atkMelee = 1;
   D.aAtk.reset().setLoop(THREE.LoopOnce, 1).play(); D.aAtk.clampWhenFinished = true; D.atkT = D.aAtk.getClip().duration; D.atkFire = D.atkT * (1 - DRAGZ.breathAt); snd('creature', { g: .7, r: .8 }); }
-function dragFire(B) { const Z = DRAGZ, D = B.drive, hd = B.m.getObjectByName('Bip001_Head'); if (!hd) return;
-  const h = dragH(B), pt = D.air ? D.air.pitch : -.12, f = new THREE.Vector3(Math.sin(h) * Math.cos(pt), Math.sin(pt), Math.cos(h) * Math.cos(pt)), o = hd.getWorldPosition(new THREE.Vector3()).addScaledVector(f, B.hd * .14);
+function dragBite(B) { const Z = DRAGZ, hd = B.m.getObjectByName('Bip001_Head'); if (!hd) return; const P = hd.getWorldPosition(new THREE.Vector3());
+  snd('thud', { g: .9, r: .5, x: P.x, z: P.z }); camShake(.12); spkBurst(P.x, P.y, P.z, 10, { col: [1, .9, .7], spread: 3, size: .15, life: .3 });
+  for (const t of Z.on.tg) if (t.dead <= 0 && Math.hypot(t.x - P.x, t.y - P.y, t.z - P.z) < Z.biteR) dragTargetHit(t); }
+// m15xx (his: "flicking the LEFT stick left and right does BARREL ROLLS, up and down FLIPS, like RollerGirl"): in flight, a left-pad flick turns
+// him once round his own forward axis (a roll, `rollT` s, the flick's side) or once round his wings' axis (a loop: UP the screen = over the top,
+// DOWN = under), drawn on his root on top of the bank and pitch (`A.trick`); his flight path is not changed, so a trick costs no height
+function dragTrick(dx, dy) { const B = DRAGZ.on && DRAGZ.on.B, D = B && B.drive, A = D && D.air; if (!A || A.mode !== 'fly' || A.trick) return;
+  if (Math.abs(dx) > Math.abs(dy)) A.trick = { k: 'roll', s: dx > 0 ? 1 : -1, t: 0, T: DRAGZ.rollT }; else A.trick = { k: 'flip', s: dy < 0 ? 1 : -1, t: 0, T: DRAGZ.flipT };
+  snd('swoosh', { g: .6, r: .7 }); }
+function dragFire(B, aim) { const Z = DRAGZ, D = B.drive, hd = B.m.getObjectByName('Bip001_Head'); if (!hd) return;
+  const h = dragH(B), pt = D.air ? D.air.pitch : -.12, f = aim ? aim.clone() : new THREE.Vector3(Math.sin(h) * Math.cos(pt), Math.sin(pt), Math.cos(h) * Math.cos(pt)), o = hd.getWorldPosition(new THREE.Vector3()).addScaledVector(f, B.hd * .14);
   const m = new THREE.Group(), FB = FIREBALL;
   const core = new THREE.Mesh(FB.geo || (FB.geo = new THREE.IcosahedronGeometry(1, 2)), new THREE.MeshBasicMaterial({ color: 0xfff1b8, toneMapped: false }));
   const shell = new THREE.Mesh(FB.geo, new THREE.MeshBasicMaterial({ color: 0xff6a12, toneMapped: false, transparent: true, opacity: .72, depthWrite: false }));
@@ -11671,10 +11686,11 @@ function dragFxStep(dt) { const Z = DRAGZ, O = Z.on;
 // the gun from the saddle: the right pad held UP (the trigger's own arc), a bolt every `gunT`
 function dragGun(dt) { const Z = DRAGZ, R = player.dragon, S = stick.R; R.gunT = Math.max(0, (R.gunT || 0) - dt);
   const up = S.down && -S.y > Z.gunUp && Math.abs(Math.atan2(S.x, -S.y)) < Z.gunArc; R.trig = up ? (R.trig || 0) + dt : 0;
-  if (R.trig < .1 || R.gunT > 0) return; R.gunT = Z.gunT;
-  const o = rig.root.position.clone(); o.y += 1.0; const d = camera.getWorldDirection(new THREE.Vector3()), tgt = camera.position.clone().addScaledVector(d, 90), dir = tgt.sub(o).normalize();
-  o.addScaledVector(dir, .8); const size = WEAP.ball0, gb = glowBall(size); gb.position.copy(o); scene.add(gb);
-  BOLTS.push({ g: gb, pos: o, vel: dir.multiplyScalar(WEAP.boltV), t: 0, chg: 0, size, dna: 0, virus: 0, auto: 1, blast: WEAP.blast0 }); snd('shot', { g: .5, r: 1.2 }); }
+  if (R.trig < .1 || R.gunT > 0) return; R.gunT = Z.holdFbT;
+  // m15xx (his: "use the stick to shoot FIREBALLS the same way RollerGirl shoots her blaster in the air"): held UP, HIS fire, at the middle of
+  // the screen (where the camera looks, 90 m out), every `holdFbT` s -- no gun in Grumbo's hands
+  const B = DRAGZ.on && DRAGZ.on.B, hd = B && B.m.getObjectByName('Bip001_Head'); if (!hd) return; const o = hd.getWorldPosition(new THREE.Vector3());
+  const d = camera.getWorldDirection(new THREE.Vector3()), tgt = camera.position.clone().addScaledVector(d, 90); dragFire(B, tgt.sub(o).normalize()); }
 // m1622: TAMING (DRAGON.md box 6; KORAJIN.md: "you fight the dragon, tame it by giving it good Jinra"). WILD is the EVIL look: he will not be
 // ridden, he turns to watch you, growls, and SHOVES you off if you crowd him (`wildR`). On the meadow by the spawn is a JINRA SPRING (a stone
 // basin with a mint orb floating over it): walk into it and Grumbo carries the orb in his right hand. Take it to the dragon and tap the right
@@ -11743,7 +11759,7 @@ function dragAnim(dt, t) { const R = player.dragon;
   let nm;
   if (R.st === 'on') nm = dragHas('ride_on') && R.t > .05 ? 'ride_on' : dragHas('in_air') ? 'in_air' : CLIPS.idle;
   else if (R.st === 'off') nm = dragHas('ride_off') ? 'ride_off' : R.t < (R.T || DRAGZ.offT) * .8 && dragHas('in_air') ? 'in_air' : CLIPS.idle;
-  else nm = R.trig > .1 && dragHas('ride_gun') ? 'ride_gun' : dragHas('ride_seat') ? 'ride_seat' : dragHas('driving') ? 'driving' : CLIPS.idle;
+  else nm = dragHas('ride_seat') ? 'ride_seat' : dragHas('driving') ? 'driving' : CLIPS.idle;     /* m15xx: the fire is HIS now; Grumbo holds the reins */
   t[nm] = 1; setWeights(t, dt); }
 // the measuring kit both dressing passes use: his bones by name, raycasts on his posed skinned mesh, and `pin` (an object built in WORLD metres,
 // upright to him, centred at `at`, parented to a bone with the bone's world scale and turn undone). `bag` collects every pinned piece.
@@ -16995,7 +17011,7 @@ const ROCKET = {
   fire: [1, .62, .22], smokeCol: [.62, .60, .58],
   arm: [{ k: 'clang', g: .34, r: .52, dur: .18 }, { k: 'lock', g: .2, r: .85 }],
   home: 0,           // 1 = it curves onto bodies like the bolt does (m258: off -- see `boltHome`)
-  throwK: 1.6,       // m15xx: x his rising speed added to the rocket's climb when it leaves during a jump (MOVE.jump 10.6 m/s at take-off -> ~30 deg up, less as he slows)
+  throwK: 1.6,       // m1670: x his rising speed added to the rocket's climb when it leaves during a jump (MOVE.jump 10.6 m/s at take-off -> ~30 deg up, less as he slows)
 };
 // m1077: THE ROCKET, RE-MODELLED to match the turret -- a red-lacquer LATHE body (nozzle bell, waist, ogive nose), two gold bands, a
 // cyan neon ring behind the nose, four swept fins, and a real FLAME: two open cones (an orange sheath, a white-yellow core) out of the
@@ -17064,7 +17080,7 @@ function fireRocket() {
   const g = rocketBody();
   g.position.copy(m);
   scene.add(g);
-  // m15xx: THE JUMP-THROW (his: "hold up to ready the shot, jump, release while you're going up -- the upward trajectory has a velocity effect, the
+  // m1670: THE JUMP-THROW (his: "hold up to ready the shot, jump, release while you're going up -- the upward trajectory has a velocity effect, the
   // rocket goes up at a slight angle; not an exact science, you can kind of THROW your rockets up... like that movie where they bend bullets").
   // Released while he is RISING, `throwK` of his climb speed is added to the rocket's own upward speed (its speed kept), so the jump tips the
   // shot up; the higher he is still rising, the steeper. Falling or on the ground: the shot as aimed.
@@ -29934,7 +29950,7 @@ PADS.L = bindStick(padL, stick.L,
   // flick: a BODY FLIP on the board, otherwise the dodge roll in the flicked direction. The
   // board takes it first and says so, because a dodge roll on a moving deck is nothing.
   // Flying (m266) it is her loop / barrel roll.
-  (dx, dy) => { if (player.dragon) return; if (player.wing) { wingTrick(dx, dy); return; }
+  (dx, dy) => { if (player.dragon) { dragTrick(dx, dy); return; } if (player.wing) { wingTrick(dx, dy); return; }
                 if (boardMount(dx, dy)) return;
                 if (!boardFlick(dx, dy, 1)) leftFlick(dx, dy); },     // m1014: cover in range -> slide in; else Zap's acrobatics (TOOLS > LEFT)
   null, null, zoneL);
