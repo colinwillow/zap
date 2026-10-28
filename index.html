@@ -6091,7 +6091,7 @@ function bodyWhoosh(d) {
   for (const k in SFX.files) {
     SFX.raw[k] = [];
     SFX.files[k].forEach((u, i) => {
-      fetch(A(u)).then(r => r.ok ? r.arrayBuffer() : null).then(b => { if (b) SFX.raw[k][i] = b; })
+      fetch(A(u)).then(r => r.ok ? r.arrayBuffer() : null).then(b => { if (b) { SFX.raw[k][i] = b; if (SFX.ctx) sfxDecode(k, i); } })     /* m15xx: a file that lands AFTER the first touch is decoded too (it was never: a quick tap through the menu = no sound) */
         .catch(() => {});
     });
   }
@@ -6112,7 +6112,8 @@ function sfxRevive(touch) {
 }
 for (const t of ['visibilitychange', 'pageshow', 'focus']) addEventListener(t, () => { if (document.visibilityState !== 'hidden') sfxRevive(0); });
 function sfxWake() {
-  if (SFX.ctx) { sfxRevive(1); return; }
+  if (SFX.ctx && sfxWasHidden && document.visibilityState === 'visible') { sfxWasHidden = 0; sfxRebuild(); return; }
+  if (SFX.ctx) { sfxRevive(1); if (SFX.ctx && SFX.ctx.state !== 'running') sfxUnlock(); return; }
   const AC = window.AudioContext || window.webkitAudioContext;
   if (!AC) { note('NO AUDIO'); return; }
   SFX.ctx = new AC();
@@ -6121,21 +6122,23 @@ function sfxWake() {
   SFX.bus = SFX.ctx.createGain();
   SFX.bus.gain.value = SFX.vol;
   SFX.bus.connect(SFX.ctx.destination);
-  for (const k in SFX.raw) {
-    SFX.buf[k] = []; SFX.edge[k] = [];
-    SFX.raw[k].forEach((ab, i) => {
-      if (!ab) return;
-      SFX.ctx.decodeAudioData(ab.slice(0)).then(b => {
-        SFX.buf[k][i] = b;
-        SFX.edge[k][i] = sfxEdge(b);
-        sfxEven(k);
-        SFX.ready = 1;
-      }).catch(() => {});
-    });
-  }
+  for (const k in SFX.raw) { SFX.buf[k] = []; SFX.edge[k] = []; SFX.raw[k].forEach((ab, i) => sfxDecode(k, i)); }
+  sfxUnlock();
 }
+function sfxDecode(k, i) { const ab = SFX.raw[k] && SFX.raw[k][i], c = SFX.ctx; if (!ab || !c) return; SFX.buf[k] = SFX.buf[k] || []; SFX.edge[k] = SFX.edge[k] || [];
+  c.decodeAudioData(ab.slice(0)).then(b => { if (SFX.ctx !== c) return; SFX.buf[k][i] = b; SFX.edge[k][i] = sfxEdge(b); sfxEven(k); SFX.ready = 1; }).catch(() => {}); }
+// m15xx: iOS's own unlock -- a one-sample silent buffer started INSIDE the gesture, with a resume, is what reliably wakes the output on a phone
+function sfxUnlock() { const c = SFX.ctx; if (!c) return; try { const b = c.createBuffer(1, 1, 22050), s = c.createBufferSource(); s.buffer = b; s.connect(c.destination); s.start(0); } catch (e) {} try { c.resume().catch(() => {}); } catch (e) {} }
+// m15xx (his: "every time I leave the game and come back the audio is muted"): iOS can hand the context back reporting 'running' while it plays
+// NOTHING, so `sfxRevive` saw nothing to fix. Once the page has been HIDDEN, the next touch throws the context away and builds it again from the
+// raw files, inside that gesture -- whatever state it claims
+let sfxWasHidden = 0;
+for (const t of ['pagehide', 'blur']) addEventListener(t, () => { sfxWasHidden = 1; });
+addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') sfxWasHidden = 1; });
+function sfxRebuild() { const c = SFX.ctx; if (c) { try { c.close(); } catch (e) {} } SFX.ctx = null; SFX.ready = 0; try { HUM.nodes = null; CHERO.hum = null; } catch (e) {} SFX.rebuilt = (SFX.rebuilt || 0) + 1; sfxWake(); }
 addEventListener('pointerdown', sfxWake, { capture: true, once: false });
 addEventListener('touchend', sfxWake, { capture: true, once: false });     // m1097: iOS only lets a context resume inside some gestures
+addEventListener('click', sfxWake, { capture: true, once: false }); addEventListener('keydown', sfxWake, { capture: true, once: false });     // m15xx
 // EDGE:START -- lifted verbatim by `npm run sfx`. A tool with its own copy of the rule is this
 // repo's oldest mistake; the text between these markers may reach nothing but its arguments and
 // the `SFX` global.

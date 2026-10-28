@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- AUDIO THAT COMES UP EVERY TIME (his: "if I go through the menu quickly and get to a game there's no audio; and if I leave the game and
+come back, the audio is muted")
+- **No sound after a quick menu:** the first touch built the context and decoded only the files ALREADY fetched. A file landing after that
+  first touch was never decoded, so a fast tap through the menu left most of the bank silent for the whole session. Now a file that arrives
+  after the context exists is decoded on arrival (`sfxDecode`).
+- **Muted after coming back:** iOS can hand the context back reporting `running` while it plays nothing, so m1097's `sfxRevive` (which
+  only acts on a context that is not running) saw nothing to fix. Now, once the page has been hidden (`pagehide`, `blur`, hidden
+  `visibilitychange`), the NEXT TOUCH throws the context away and rebuilds it from the raw files (`sfxRebuild`) inside that gesture,
+  whatever state it claims. Persistent voices (the hum) are rebuilt with it.
+- **`sfxUnlock`:** a one-sample silent buffer started inside the gesture, plus a resume -- iOS's own reliable unlock. It runs on every
+  build, and on any touch while the context is not running.
+- `click` and `keydown` wake it too.
+- Not testable headless (no audio device); his phone is the test.
+
 ## m1697 -- THE INTERCEPT STOPS AT THE ARROW; the green smoke in shades (his: "right now you go THROUGH the arrow -- meet it right where it would
 be, slice it, stop in its track"; "tint the green slightly different shades -- depth to the billowing, very subtle")
 - **`chargeIntercept`:** his middle is aimed a blade's REACH (`INTER.reach` .95 m) short of the arrow's point, so the sword meets it there.
