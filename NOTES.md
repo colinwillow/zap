@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the SHRINE, pass 2 (rubric 7: RESTORES IN PLACE)
+**Moves:** the Shrine's rubric-7 box (two states, restored in place, no lift). The Pagoda's m1518 is the pattern.
+- Base (survived, stays): the terrace, steps, cheek walls, coping, the stone beam and its pillar, the basin, the foxes, the omikuji, the ema board.
+- Pieces (`restorePieces`, `cls`): `honden` (walls, posts, roof, shimenawa, suzu, offering box and the eave rings), `torii`, and `t0`..`t4`
+  (the five stone lanterns, found by distance from each one's foot). Fallen: the honden lies wrecked off the back of the terrace, the torii
+  on its side by the steps, the lanterns toppled. Restoring (`at`): the lanterns right themselves first, then the torii, the honden last.
+- `restoreSkin` drains the colour. Bunting, the back cables and the drone are `up.objs`, so they exist only when whole. The honden walls,
+  torii pillars, lanterns and offering box are the `up` boxes.
+- The core (animated every frame, so not a piece) sinks to lie dark in its basin when not whole: no heal, no wisps, the shell hidden, the
+  orbit stones resting round it. `bldJinraMotes` when whole.
+- Trigger: a mint plate east of the terrace's front corner (`R.trig`), or SPAWN > BUILDINGS > STATE (the BLDG entry has its `rig` hook now).
+  `shrineClear` drops the rig and the plate.
+Render-checked headless: fallen and restored. Shipped unverified. **Next (pass 3):** layers and breakables.
+
 ## m1539 -- THE RE-PASS: the SHRINE, pass 1 (a HERO / TOWN place: the look)
 The Shrine is on the HERO / TOWN list (hero kit, restored in place later). **Moves:** its pass-1 row (the look). Restoring in place is pass 2.
 - Materials: a stone-block triMat for the terrace, steps and coping (two tones); plain warm plaster on the honden; `K.timber`, `K.redL`,

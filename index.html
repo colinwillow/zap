@@ -21767,7 +21767,8 @@ function shrineBuild() {
   for (const sx of [-1, 1]) korBunting(put, K, [cx + sx * (hw2 + 1.2), H + wh + .1, hz - hd2 - 1.2], [cx + sx * 3.4 * k, H + 2.6, cz - hd + 1], 9, .9);
   korBunting(put, K, [cx - 2.6 * k, 6.2 * k - 1.3, zFoot - 1.6 * k - .2], [cx + 2.6 * k, 6.2 * k - 1.3, zFoot - 1.6 * k - .2], 8, .5);
   // cables from the honden's back eaves to stakes, and a drone over the terrace
-  for (const sx of [-1, 1]) { const E = [cx + sx * (hw2 + 1.2), H + wh + .2, hz + hd2 + 1.2], G = [cx + sx * (hw + 6), .3, cz + hd + 6]; bldCable(g, E, G, 1.4, 4, lamp); add(new THREE.CylinderGeometry(.08, .1, .8, 6), wood, G[0], .4, G[2], 0); }
+  const c0 = g.children.length; for (const sx of [-1, 1]) { const E = [cx + sx * (hw2 + 1.2), H + wh + .2, hz + hd2 + 1.2], G = [cx + sx * (hw + 6), .3, cz + hd + 6]; bldCable(g, E, G, 1.4, 4, lamp); add(new THREE.CylinderGeometry(.08, .1, .8, 6), wood, G[0], .4, G[2], 0); }
+  const cables = g.children.slice(c0).filter(o => !o.userData.mg);
   const drone = bldDrone(g);
   for (const b of O.boxes) BOXES.push(b); boxGrid();
   // ---- PASS 4 (m1177): two stone KITSUNE (fox guardians) at the head of the steps whose glowing eyes and heads turn to WATCH him; an
@@ -21803,9 +21804,33 @@ function shrineBuild() {
     const stand = new THREE.Mesh(new THREE.BoxGeometry(.6, .5, .6), rk); stand.position.set(kuji.x, H + .25, kuji.z); g.add(stand); O.boxes.push({ minx: kuji.x - .3, maxx: kuji.x + .3, miny: H, maxy: H + .5, minz: kuji.z - .3, maxz: kuji.z + .3 }); BOXES.push(O.boxes[O.boxes.length - 1]); boxGrid();
     kuji.rx = kuji.x - 1.2; for (const s2 of [-1, 1]) { const p2 = new THREE.Mesh(new THREE.BoxGeometry(.08, 1.6, .08), rk); p2.position.set(kuji.rx + s2 * .9, H + .8, kuji.z); g.add(p2); }
     for (const y of [1.1, 1.45]) { const c = new THREE.Mesh(new THREE.CylinderGeometry(.015, .015, 1.8, 4).rotateZ(Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xc8341f })); c.position.set(kuji.rx, H + y, kuji.z); g.add(c); } kuji.H = H; }
-  for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list.map(q => { const n = q.index ? q.toNonIndexed() : q; for (const a2 of Object.keys(n.attributes)) if (a2 !== 'position' && a2 !== 'normal') n.deleteAttribute(a2); if (!n.attributes.normal) n.computeVertexNormals(); return n; })), m); o.castShadow = o.receiveShadow = true; g.add(o); }
-  bldMergeStatic(g); const plantMs = plantFlush(g, plants);
+  const bunt = []; for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list.map(q => { const n = q.index ? q.toNonIndexed() : q; for (const a2 of Object.keys(n.attributes)) if (a2 !== 'position' && a2 !== 'normal') n.deleteAttribute(a2); if (!n.attributes.normal) n.computeVertexNormals(); return n; })), m); o.castShadow = o.receiveShadow = true; g.add(o); bunt.push(o); }
+  const plantMs = plantFlush(g, plants);
   SHRINE.on = { plantMs, A, g, O, bars: [], rings, core, crys, shell, orb, t: 0, koi, pond, pr, smash, healT: 0, drone, wispT: 0, foxes, obox, ema, obT: 0, fg, veil, warpCd: 0, kuji };
+  // ---- RE-PASS 2 (m@X4@): RESTORABLE IN PLACE (rubric 7, a HERO place: no lift). The stone TERRACE, its steps, the beam and the basin survived and
+  // stay; the HONDEN (walls, posts, roof, shimenawa, bell, offering box), the TORII and the five STONE LANTERNS are the pieces. FALLEN: the honden
+  // lies wrecked off the back of the terrace, the torii on its side by the steps, the lanterns toppled; the colour is drained, the bunting, the
+  // cables and the drone are gone, and the core lies dark in its basin (it does not heal). RESTORE (the mint plate by the terrace's east wall, or
+  // SPAWN > BUILDINGS > STATE): the lanterns right themselves, the torii stands, the honden flies home last and the Jinra comes back ----
+  const S0 = SHRINE.on, R = restoreRig(g, { lift: 0, dur: 8, bob: 0 }); S0.R = R; S0.ground = [];
+  const bx1 = cx + hw + 9, toroAt = [[cx - 4.2 * k, 0, zFoot + .6], [cx + 4.2 * k, 0, zFoot + .6], [cx - 3.4 * k, H, cz - hd + 1], [cx + 3.4 * k, H, cz - hd + 1], [bx1 + .7, H, cz]], tzT = zFoot - 1.6 * k;
+  const pairs = []; for (const o of g.children.slice()) if (o.isMesh && o.userData.mg) { const m = o.material, tri = m.customProgramCacheKey && String(m.customProgramCacheKey()).startsWith('tri'); if (m.transparent || (m.map && !tri)) continue;
+    o.updateMatrix(); pairs.push([(o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()).applyMatrix4(o.matrix), m]); o.removeFromParent(); }
+  const cls = (c, sz) => { for (let i = 0; i < toroAt.length; i++) { const T = toroAt[i]; if (Math.hypot(c.x - T[0], c.z - T[2]) < .8 && c.y > T[1] && c.y < T[1] + 3) return 't' + i; }
+    if (Math.abs(c.z - tzT) < .9 && Math.abs(c.x - cx) < 2.6 * k + 3) return 'torii';
+    if (c.y > H + .1 && Math.abs(c.x - cx) < hw2 + 1.6 && c.z > hz - hd2 - 1.7 && c.z < hz + hd2 + 1.7) return 'honden'; return null; };
+  const fall = (key, c, sz) => { if (key === 'honden') return { p: [c.x + 2.5, 2.6, cz + hd + 4.5], r: [-.55, .45, .3], hop: 3, at: .55 };
+    if (key === 'torii') return { p: [c.x + 1.5, .45, c.z - 1.6], r: [0, .3, Math.PI / 2 * .96], hop: 2, at: .3 };
+    const i = +key.slice(1), T = toroAt[i]; return { p: [c.x + (i % 2 ? .8 : -.8), T[1] + .35, c.z + .5], r: [Math.PI / 2 * .9, i * 1.3, .2], hop: 1.2, at: .04 + i * .05 }; };
+  const pieces = S0.pieces = restorePieces(R, g, pairs, cls, fall); bldMergeStatic(g);
+  { const skip = new Set([drone, core, ...orb, ...koi, ...cables, ...bunt, ...plantMs, ...Object.values(pieces)]), wb = new THREE.Box3(), wc = new THREE.Vector3(), ws = new THREE.Vector3();
+    for (const o of g.children.slice()) { if (skip.has(o) || o.isInstancedMesh) continue; wb.setFromObject(o); if (wb.isEmpty()) continue; wb.getCenter(wc); wb.getSize(ws); const key = cls(wc, ws); if (key && pieces[key]) pieces[key].attach(o); } }
+  restoreSkin(R);
+  const bk = b2 => cls(new THREE.Vector3((b2.minx + b2.maxx) / 2, (b2.miny + b2.maxy) / 2, (b2.minz + b2.maxz) / 2), new THREE.Vector3(b2.maxx - b2.minx, b2.maxy - b2.miny, b2.maxz - b2.minz));
+  restoreRide(R, { base: { boxes: [], tris: [] }, up: { boxes: O.boxes.filter(b2 => bk(b2)), tris: [], climbs: [], bars: [], rings, coins: [], objs: [drone, ...cables, ...bunt] } });
+  R.onSet = R2 => restoreRideSet(R2);
+  { const px = cx + hw + 2, pz = cz - hd + 1.5, plate = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, .12, 24), new THREE.MeshStandardMaterial({ color: 0x3a4a46, emissive: 0x7affd8, emissiveIntensity: .7 })); plate.position.set(px, .06, pz); scene.add(plate); S0.ground.push(plate); R.trig = { x: px, y: 0, z: pz, armed: 1 }; }
+  { const t0 = AGE.st === 'fallen' ? 0 : 1; R.goal = t0; restoreSet(R, t0); restoreRideSet(R, true); }
   arenaBeam(cx, cz, [.5, .9, 1], 1); snd('clang', { g: .6, r: 1.1 });
 }
 function shrineWarp(S, dt) { const p = player, live = !!STORII.on; S.veil.material.color.setHex(live ? 0x7ff0ff : 0x404850); S.veil.material.opacity = live ? .3 + Math.sin(S.t * 3) * .12 : .12;
@@ -21814,20 +21839,22 @@ function shrineWarp(S, dt) { const p = player, live = !!STORII.on; S.veil.materi
     arenaBeam(x, z, [.55, .9, 1], .6); spkBurst(x, y + 1, z, 24, { col: [.55, .9, 1], spread: 4, size: .14, life: .6 }); snd('swoosh', { g: .8, r: 1.6, x, z }); };
   if (Math.abs(p.pos.x - S.fg[0]) < .7 && Math.abs(p.pos.z - S.fg[1]) < .3 && p.pos.y < 1.5) { const T = STORII; go(T.x1 - 1.5, T.top + .05, T.z, -Math.PI / 2); return; }
   { const T = STORII, dx = T.x1 - 8.5 + 3 + 1.55; if (Math.abs(p.pos.x - dx) < .5 && Math.abs(p.pos.z - T.z) < .7 && p.pos.y > T.top - .5) go(S.fg[0], 0, S.fg[1] - 1.4, Math.PI); } }
-function shrineStep(dt) { const S = SHRINE.on; if (!S) return; S.t += dt; const C = S.core, t = S.t; if (S.veil) shrineWarp(S, dt);
+function shrineStep(dt) { const S = SHRINE.on; if (!S) return; S.t += dt; const C = S.core, t = S.t, whole = !S.R || S.R.t >= 1; if (whole) bldJinraMotes(SHRINE.at[0], SHRINE.at[1], S.A.W / 2, dt); if (S.veil) shrineWarp(S, dt);
   if (S.kuji) { const K = S.kuji; if (K.cd > 0) { K.cd -= dt; K.box.rotation.z = K.cd > SHRINE.kujiCd - .6 ? Math.sin(S.t * 40) * .25 : 0; }
     for (const P of K.slips) if (P.fly > 0) { P.fly -= dt; const u = 1 - P.fly / .8; P.m.position.set(K.x + (P.to[0] - K.x) * u, K.H + 1.2 + Math.sin(u * Math.PI) * 1.4 + (P.to[1] - K.H - 1.2) * u, K.z); P.m.rotation.y += dt * 9; } }
   if (S.foxes) { const p = player; for (const F of S.foxes) { const P = F.fx.position, want = Math.atan2(p.pos.x - P.x, p.pos.z - P.z) + Math.PI; F.hdg.rotation.y += clamp(wrapAngle(want - F.hdg.rotation.y), -2 * dt, 2 * dt); }
     for (let i = 0; i < S.ema.length; i++) S.ema[i].rotation.z = Math.sin(t * 2 + i * .9) * .12; if (S.obT > 0) { S.obT -= dt; S.obox.rotation.z = Math.sin(S.obT * 50) * S.obT * .05; } }
   { const a = t * .28; S.drone.position.set(C.position.x + Math.cos(a) * 8, S.A.H + 8 + Math.sin(t * 1.2) * .4, C.position.z + Math.sin(a) * 6); S.drone.rotation.y = -a; S.drone.children[1].rotation.z = t * .6; }
-  if ((S.wispT -= dt) <= 0) { S.wispT = .12; const a = Math.random() * 6.28, r = Math.random() * 1.2; spk(C.position.x + Math.cos(a) * r, S.A.H + .8, C.position.z + Math.sin(a) * r, 0, .9 + Math.random() * .6, 0, .07, 1.6, [.5, .95, 1]); }     // wisps rise from the pool
+  if (whole && (S.wispT -= dt) <= 0) { S.wispT = .12; const a = Math.random() * 6.28, r = Math.random() * 1.2; spk(C.position.x + Math.cos(a) * r, S.A.H + .8, C.position.z + Math.sin(a) * r, 0, .9 + Math.random() * .6, 0, .07, 1.6, [.5, .95, 1]); }     // wisps rise from the pool
   for (let k = 0; k < S.koi.length; k++) { const r = S.pr * (.45 + .12 * k), a = t * (.35 + k * .07) * (k % 2 ? -1 : 1) + k * 1.3, f = S.koi[k];
     f.position.set(S.pond[0] + Math.cos(a) * r, .1, S.pond[1] + Math.sin(a) * r); f.rotation.y = -a + (k % 2 ? 0 : Math.PI) + Math.sin(t * 6 + k) * .2; }
   // THE CORE HEALS: stand at its basin and the Jin flows into him (health back at `heal`/s, motes streaming down into him)
   { const p = player, d = Math.hypot(p.pos.x - C.position.x, p.pos.z - C.position.z);
-    if (d < 2.8 && p.pos.y > S.A.H - .5 && p.hp < HEALTH.max) { p.hp = Math.min(HEALTH.max, p.hp + SHRINE.heal * dt); S.healT -= dt;
+    if (whole && d < 2.8 && p.pos.y > S.A.H - .5 && p.hp < HEALTH.max) { p.hp = Math.min(HEALTH.max, p.hp + SHRINE.heal * dt); S.healT -= dt;
       if (S.healT <= 0) { S.healT = .05; const a = Math.random() * 6.28; spk(C.position.x + Math.cos(a) * .6, C.position.y, C.position.z + Math.sin(a) * .6, (p.pos.x - C.position.x) * 1.5, (p.pos.y + 1 - C.position.y) * 1.5, (p.pos.z - C.position.z) * 1.5, .1, .6, [.4, .95, 1]); } } }
-  C.position.y = S.A.H + 3 + Math.sin(t * 1.1) * .25; S.crys.rotation.y = t * .5; S.shell.rotation.y = -t * .3; const br = 1 + Math.sin(t * 2) * .06; S.shell.scale.set(.75 * br, 1.25 * br, .75 * br);
+  { const cy = whole ? S.A.H + 3 + Math.sin(t * 1.1) * .25 : S.A.H + 1.05; C.position.y += (cy - C.position.y) * Math.min(1, dt * 2); }     // RE-PASS 2: fallen, the core lies dark in its basin
+  S.shell.visible = whole; if (!whole) { for (let k = 0; k < S.orb.length; k++) S.orb[k].position.set(C.position.x + Math.cos(k * 2.094) * 1.05, S.A.H + .9, C.position.z + Math.sin(k * 2.094) * 1.05); return; }
+  S.crys.rotation.y = t * .5; S.shell.rotation.y = -t * .3; const br = 1 + Math.sin(t * 2) * .06; S.shell.scale.set(.75 * br, 1.25 * br, .75 * br);
   for (let k = 0; k < S.orb.length; k++) { const a = t * .7 + k * 2.094; S.orb[k].position.set(C.position.x + Math.cos(a) * 2.2, C.position.y + Math.sin(t * 1.3 + k) * .4, C.position.z + Math.sin(a) * 2.2); S.orb[k].rotation.set(t, t * .7, 0); } }
 function shrineKuji(x, y, z, rad) { const S = SHRINE.on; if (!S || !S.kuji || S.kuji.cd > 0) return 0; const K = S.kuji, P = K.box.position; if (Math.hypot(x - P.x, y - P.y, z - P.z) > .8 + rad) return 0;
   K.cd = SHRINE.kujiCd; snd('clang', { g: .4, r: 2.4, x: P.x, z: P.z }); const r = Math.random(), p = player;
@@ -21838,7 +21865,7 @@ function shrineKuji(x, y, z, rad) { const S = SHRINE.on; if (!S || !S.kuji || S.
   const m = new THREE.Mesh(new THREE.PlaneGeometry(.12, .4), new THREE.MeshStandardMaterial({ color: luck === 'bad' ? 0xd8d0f0 : 0xf4f1ea, side: THREE.DoubleSide, emissive: luck === 'great' ? 0x3a2a00 : 0 })); S.g.add(m);
   const n = K.slips.length % 12; K.slips.push({ m, fly: .8, to: [K.rx - .75 + (n % 6) * .3, K.H + (n < 6 ? 1.1 : 1.45) - .2] }); if (K.slips.length > 12) { const o = K.slips.shift(); o.m.removeFromParent(); }
   return 1; }
-function shrineClear() { const S = SHRINE.on; if (!S) return; smashDrop(S.smash); if (S.plantMs) plantDrop(S.plantMs); bldClear(S); SHRINE.on = null; }
+function shrineClear() { const S = SHRINE.on; if (!S) return; if (S.R) { const i = RESTORE.list.indexOf(S.R); if (i >= 0) RESTORE.list.splice(i, 1); if (S.R.ride) { bldTrisDrop(S.R.ride.tb); bldTrisDrop(S.R.ride.tu); } } for (const o of S.ground || []) o.removeFromParent(); smashDrop(S.smash); if (S.plantMs) plantDrop(S.plantMs); bldClear(S); SHRINE.on = null; }
 // m1143: THE RAMPART WALL (BUILDINGS.md #7, pass 1) at (0, -24). A 40 m stone wall, 4.2 m high and 3 m thick, its top a walkway behind a row
 // of MERLONS (crenels) on the outer side; a GATEWAY in the middle closed by a breakable timber-and-plaster panel (smash through) under a
 // lintel the walkway runs over; a RAMP up the inner face at each half; and at each end a BASTION 1.5 m higher (steps up from the
@@ -26775,7 +26802,7 @@ const BLDG = { list: [
   { key: 'gate', t: 'Gatehouse', sub: 'a torii, a ballista you can man (stand at its breech), a drawbridge, archers, an alarm bell that drops the portcullis, a murder-hole cauldron', pass: 6, build: () => ghouseBuild(), clear: () => ghouseClear(), on: () => !!GHOUSE.on, step: dt => ghouseStep(dt) },
   { key: 'pagoda', t: 'Pagoda', sub: 'five storeys, a spiral ramp, gutters to climb the outside, a bell that knocks everyone down, shinobi archers on the roofs, an altar core that calls chain lightning off the spire', pass: 6, build: () => pagodaBuild(), clear: () => pagodaClear(), rig: () => PAGODA.on && PAGODA.on.R, on: () => !!PAGODA.on, step: dt => pagodaStep(dt) },
   { key: 'market', t: 'Market Stalls', sub: 'four stalls, a noodle bar, a rooftop teahouse, a robot merchant, bars, crates and fruit to smash, a pickpocket to catch, a fireworks stall that launches at enemies', pass: 6, build: () => mktBuild(), clear: () => mktClear(), on: () => !!MKT.on, step: dt => mktStep(dt) },
-  { key: 'shrine', t: 'Shrine', sub: 'a terrace, a koi pond, fox guardians that watch you, an offering box, a Jin core that heals, a fox gate to the Senbon Torii, an omikuji fortune box', pass: 6, build: () => shrineBuild(), clear: () => shrineClear(), on: () => !!SHRINE.on, step: dt => shrineStep(dt) },
+  { key: 'shrine', t: 'Shrine', sub: 'a terrace, a koi pond, fox guardians that watch you, an offering box, a Jin core that heals, a fox gate to the Senbon Torii, an omikuji fortune box', pass: 6, build: () => shrineBuild(), clear: () => shrineClear(), rig: () => SHRINE.on && SHRINE.on.R, on: () => !!SHRINE.on, step: dt => shrineStep(dt) },
   { key: 'rampart', t: 'Rampart Wall', sub: 'a 40 m wall, a gateway to smash, archers, sentry guns, bars on top, rocks dropped on you, robot sentries on the walk, a war horn that summons a raid', pass: 6, build: () => rampBuild(), clear: () => rampClear(), on: () => !!RAMP.on, step: dt => rampStep(dt) },
   { key: 'adock', t: 'Airship Dock', sub: 'a 20 m tower, a lift, an airship that flies you round (ring the bell to cast off; grapple it); kites to glide off the deck; sky pirates raid the flight', pass: 6, build: () => adockBuild(), clear: () => adockClear(), on: () => !!ADOCK.on, step: dt => adockStep(dt) },
   { key: 'zep', t: 'Zeppelins', sub: 'two zeppelins: land on a gondola, swing from its trapeze, grapple it, kill its gun, supply drops; hole the envelope and it sinks low; strike the bow lever to bomb the forge below', pass: 6, build: () => zepBuild(), clear: () => zepClear(), on: () => !!ZEP.on, step: dt => zepStep(dt) },
