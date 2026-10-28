@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1531 -- THE TRAINING DOJO, part 1: weapon racks and pop-up straw targets (dojo pass 19)
+His (BUILDINGS.md THE DOJO, "later"): *"racks you take weapons from, targets that pop up"*. `dojoTrain` builds both, `dojoTrainStep` runs them, `dojoHit` takes the blows.
+- **RACKS** (`D.racks`, `DTRAIN.rackR` 16.9): on the stone dais at E and W, between the floor's red ring and the invisible rim wall (its boxes' inner face is
+  at r 16.0, so the rack stands half in it and nothing on the fighting floor moves). Red lacquer posts, a timber beam with turned-up ends, a red board
+  with the gold diamond, bronze pegs, a lantern. **Only two** because his kit is HANDS / SWORD / GUN (`KIT3.hide` has the hammer and blaster);
+  `SHOW` still draws all four, so a rack is one row if they come back. Standing within `reach` of the rack's foot calls `swapGo` (edge-triggered,
+  re-armed when he steps away); the weapon leaves the pegs while he holds it, and walking up with it puts it back (bare hands).
+- **TARGETS** (`D.tgts`, r 10 at N/E/S/W): post, straw bundle (`dojoStrawTex`, a canvas of stalks), three red rope bands, on a bronze hatch. The swing
+  hook beside `vendHit` calls `dojoHit`: a wobble spring away from him, a straw puff, a thud; `hp` 3, then it sinks (spring on `up`, so it bounces
+  on the way back up `back` 3.2 s later). All four down at once: a doubloon (`coinDrop`) at the centre. **A live, un-KO'd body in `ARENA.live` sinks
+  them all**, which is the "never obstruct the fighting floor" rule.
+- Measured headless: 2 racks, 4 targets, `dojoHit` at a target took hp 3 -> 2; renders of both racks and a target. **Bolts do not hit the targets
+  yet** (a shot flies through: they have no box). `mel.DTRAIN`, `mel.dojoHit` are live.
+
 ## The water-mill tower, pass 4 (Worker B): its revival, live, on the shared chunk rig
 - **The home's method is shared now**: `rsTag(A, geo)` (a builder's `put` tags each piece's chunk by its middle), `rsChunkRig(A, MG, fallen, plate, extra)` (`aChunk` and `uDrain` into every material, a RESTORE stand-in per chunk at its bottom-centre pivot with its FALLEN pose, `restoreMat` rusts, the plate as `R.trig`, plus `extra` real Object3Ds posed directly), and `rsChunkSync(A)` (every frame: the matrices, the drain, a mint burst as each piece lands, the plate breathing). The home still runs its own copy (pass 26); the merchant and the refinery will use the shared one.
 - **The mill's chunks**: base, tower lower, tower upper, top (gallery and lantern), balcony 1, balcony 2, stair. The island, bridges, turrets and wall stairs stay put. **The wheel and the rotor** spin inside new holder groups (`wheelH`, `rotorH`) that the kit poses, because the kit writes a piece's quaternion and the spin would fight it.

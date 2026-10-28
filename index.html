@@ -10870,7 +10870,7 @@ function dojoBuild(g, W) {
       for (let i = 0; i < ring; i++) { const a = i / ring * 6.283 + Rr() * .05, r = I.rimR(a) * (.9 + Rr() * .07); if (r < clr + .4) continue; const x = Math.cos(a) * r, z = Math.sin(a) * r, y = Y + I.topAt(x, z) - .2, q = Rr();
         plantPlant(rec, q < .55 ? 'grass' : q < .7 ? 'tallgrass' : q < .82 ? 'frond' : q < .92 ? 'stones' : 'boulder', X + x, y - (q >= .92 ? .3 : 0), Z + z, q < .82 ? 1.6 + Rr() * .9 : .6 + Rr() * .9, Rr() * 6.28); } }
     D.plantMeshes = plantFlush(g, rec); }
-  dojoTrain(D, g, put, M, W, at);     /* m15xx: the racks and the targets (their static parts go in this merge) */
+  dojoTrain(D, g, put, M, W, at);     /* m1531: the racks and the targets (their static parts go in this merge) */
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o !== null; o.receiveShadow = true; g.add(o); }
   // THE DRIFTING PLATFORMS: small stone discs on rock roots, slowly bobbing and circling outside the rim (decor for now)
   D.plats = [];
@@ -11066,7 +11066,7 @@ function dojoBuild(g, W) {
     D.dragon = { body, mane, H, legs, tuft, N, gap: .17, m4: new THREE.Matrix4(), q: new THREE.Quaternion(), v: new THREE.Vector3(), v2: new THREE.Vector3(), v3: new THREE.Vector3(), up: new THREE.Vector3(0, 1, 0), sc: new THREE.Vector3(), M: new THREE.Matrix4() }; }
   D.on = { g }; }     /* m1429: the entry is his TOOLS > ENTRY again -- DOORS (the default) = through the gates */
 let _dcM = null;
-// m15xx: THE TRAINING DOJO (pass 19, his: *"racks you take weapons from, targets that pop up"*). Two WEAPON RACKS on the dais E and W, against the
+// m1531: THE TRAINING DOJO (pass 19, his: *"racks you take weapons from, targets that pop up"*). Two WEAPON RACKS on the dais E and W, against the
 // rail and outside the fighting floor: walk up to one and you take what is on it (the weapon leaves the pegs while you hold it); walk up to it holding
 // that weapon and you put it back (E: the SWORD, W: the GUN -- his kit). Four STRAW TARGETS (makiwara) rise out of bronze hatches in the floor: three blows and one sinks in a puff of
 // straw, then pops back up; drop all four together and a gold doubloon rises at the centre. When a fight is on they all SINK, so the floor is clear.
