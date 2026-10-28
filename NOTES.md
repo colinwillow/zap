@@ -52,7 +52,7 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
-## THE DOJO CAN TRY A PANORAMA SKY: TOOLS > SKY (mXXXX)
+## THE DOJO CAN TRY A PANORAMA SKY: TOOLS > SKY (m1446)
 *"Curious to try out different HDRIs -- not necessarily in love with this one, I just want to see what it would add."* A taste call, so it is a SWITCH, not a pick.
 - **The image:** his sunset (an LDR equirect PNG, 1774x887) is `textures/sky_sunset_01.webp` (250 KB).
 - **`PANOS`** is the list to try. Each entry gives the file, `uOff`/`vOff` (turns the image so its sun sits on the dojo's sun line, `DOJO.sun`; this one's sun was MEASURED at u .310, v .638), the image-light strength, and the sun, hemisphere and fog colours to retint to.
