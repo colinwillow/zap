@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## mDRG -- THE DRAGON RIDE, build 5: ATTACKS (DRAGON.md box 5)
+- **His breath** (`dragBreath` on the right flick in the saddle; `fbCool` .6 s): on the ground `attack_ground` plays once (weighted in over
+  idle / run, `wA`, still summing to 1) and the ball leaves `breathAt` .38 into it; aloft (`attack_air` already playing) it leaves at once.
+  `dragFire`: from `Bip001_Head` + .14 H along his forward (his pitch aloft, -.12 rad on the ground), `fbV` 34 m/s + his own speed, falling at
+  `fbG` 5; the m1096 picture (core, two flickering shells, `fireballLook`, the rocket's trail). It bursts (`dragBoom`: fire bloom, smoke,
+  sparks, a ring on the ground) on `dragFloor`, a box (`boxRay`), a target, its life, or the clouds, and takes every target in `fbSplash` 4.5.
+  It hurts nobody -- the zone has no bodies -- and is a separate list from the arena beasts' (`ARENA.beast.fx` hurts the player).
+- **Grumbo's gun from the saddle** (`dragGun`): the right pad held UP past `gunUp` .72 inside `gunArc` .5 rad (the trigger's own shape) for
+  .1 s fires the game's blaster bolt (`glowBall`, `BOLTS`, `WEAP.boltV`) every `gunT` .16 s from his chest at the point 90 m down the middle of
+  the screen -- the lens is the sight. Not the kit's charge-and-release (that lives in `stepKit`, which the saddle replaces).
+- **Targets** (`dragTargets`): 12 straw butts with a red-and-cream face -- five on the meadow, one on the crag, four on islands, three hung by
+  ropes near the hoops (in the air, for the flying). A ball's splash or a bolt that passes within its radius bursts one (`dragTargetHit`:
+  splinters, dust, a crack, "Target! n / 12 down"); back after `tgBack` 10 s.
+**Moves:** DRAGON.md box 5 (his feel open). **Still open:** 6 (taming) and his sign-off. Gates: check ok, zone boot ok. Shipped unverified.
+
 ## m1619 -- THE DRAGON RIDE, build 4: FLYING (DRAGON.md box 4)
 - **The model is `wingFly`'s** (RollerGirl's wingsuit) on the beast, in `dragDrive`'s air branch (`B.drive.air = { v, pitch, bank }`): stick X
   turns (`fturn`, negated -- heading grows toward his LEFT) and banks him (`bank`); stick UP climbs, DOWN dives (her game's way round), centred
