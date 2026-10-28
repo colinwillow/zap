@@ -24165,9 +24165,13 @@ function cliffClear() { const C = CLIFF.on; if (!C) return; for (const R of C.ro
 const KEEP = { at: [69, 0], isl: 6, cin: 10, cout: 12, ch: 2.8, ih: 3, kh: 4, kH: 4.5, eelHp: 5, eelDmg: 10, eelV: 2.4, eelBack: 20, on: null };
 function keepBuild() {
   if (KEEP.on) return; const A = KEEP, [cx, cz] = A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] };
-  const stone = new THREE.MeshStandardMaterial({ color: 0x8e8880, roughness: .95 }), stoneD = new THREE.MeshStandardMaterial({ color: 0x66605a, roughness: .95 }), wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 });
-  const plank = new THREE.MeshStandardMaterial({ color: 0x6e4a2e, roughness: .85 }), plaster = new THREE.MeshStandardMaterial({ color: 0xeae6de, roughness: .9 }), lamp = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false });
-  const add = (geo, m, x, y, z, solid) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; g.add(o);
+  // m@X4@ (the RE-PASS, pass 1): an ENEMY keep (ENEMY_STYLE.md, the classical fortress) -- pale sandstone block for the curb and the island,
+  // white plaster walls over a BLACK lacquer skirt with black corner posts and gold caps, black timber, a black-tile turret roof with a gold
+  // finial, the oni mask in black/gold/mint, emblem banners, mint braziers on the curb, two SPHINXES at the curb steps; statics merged
+  const E = enemyMats(), stone = triMat('stone_blocks', { scale: 2.5, color: ENEMY.pal.stone }), stoneD = triMat('stone_blocks', { scale: 2.2, color: 0x9c8a6c }), wood = E.lacquer;
+  const plank = triMat('wood_planks', { scale: 2.2, color: 0x5a4c40 }), plaster = new THREE.MeshStandardMaterial({ color: 0xece8e0, roughness: .9 }), lamp = E.glass;
+  const putM = (geo, m) => { const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; g.add(o); return o; };
+  const add = (geo, m, x, y, z, solid) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; g.add(o);
     if (solid) { geo.computeBoundingBox(); const b = geo.boundingBox; O.boxes.push({ minx: x + b.min.x, maxx: x + b.max.x, miny: y + b.min.y, maxy: y + b.max.y, minz: z + b.min.z, maxz: z + b.max.z }); } return o; };
   const ring = (r0, r1, y0, y1, m, solid) => { const w = r1 - r0, mid = (r0 + r1) / 2; for (const sz of [-1, 1]) add(new THREE.BoxGeometry(r1 * 2, y1 - y0, w), m, cx, (y0 + y1) / 2, cz + sz * mid, solid); for (const sx of [-1, 1]) add(new THREE.BoxGeometry(w, y1 - y0, r0 * 2), m, cx + sx * mid, (y0 + y1) / 2, cz, solid); };
   // THE CURB (the moat's outer wall) and its steps up on the -x side; THE ISLAND; the moat's water between
@@ -24182,7 +24186,11 @@ function keepBuild() {
   add(new THREE.BoxGeometry(t, KH, kh * 2), plaster, cx + kh - t / 2, Y0 + KH / 2, cz, 1);
   for (const sz of [-1, 1]) add(new THREE.BoxGeometry(t, KH, kh - dw / 2), plaster, cx - kh + t / 2, Y0 + KH / 2, cz + sz * (dw / 2 + (kh - dw / 2) / 2), 1);
   add(new THREE.BoxGeometry(t, KH - 2.8, dw), plaster, cx - kh + t / 2, Y0 + 2.8 + (KH - 2.8) / 2, cz, 1);
-  for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) add(new THREE.BoxGeometry(.5, KH + .3, .5), stoneD, cx + sx * kh, Y0 + (KH + .3) / 2, cz + sz * kh, 0);
+  for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { add(new THREE.BoxGeometry(.5, KH + .3, .5), wood, cx + sx * kh, Y0 + (KH + .3) / 2, cz + sz * kh, 1); add(new THREE.BoxGeometry(.56, .1, .56), E.gold, cx + sx * kh, Y0 + KH + .35, cz + sz * kh, 0); }     // m@X4@: black corner posts, solid (they are drawn), gold caps
+  // m@X4@: the black lacquer SKIRT (shitami boards) over the lower half of each outer face, a gold band at its top, gold studs above
+  for (const sz of [-1, 1]) { add(new THREE.BoxGeometry(kh * 2 - .5, KH * .45, .04), wood, cx, Y0 + KH * .225, cz + sz * (kh + .02), 0); add(new THREE.BoxGeometry(kh * 2 - .5, .07, .06), E.gold, cx, Y0 + KH * .45, cz + sz * (kh + .03), 0); }
+  add(new THREE.BoxGeometry(.04, KH * .45, kh * 2 - .5), wood, cx + kh + .02, Y0 + KH * .225, cz, 0); add(new THREE.BoxGeometry(.06, .07, kh * 2 - .5), E.gold, cx + kh + .03, Y0 + KH * .45, cz, 0);
+  for (const sz of [-1, 1]) { const L = kh - dw / 2 - .25; add(new THREE.BoxGeometry(.04, KH * .45, L), wood, cx - kh - .02, Y0 + KH * .225, cz + sz * (dw / 2 + L / 2), 0); add(new THREE.BoxGeometry(.06, .07, L), E.gold, cx - kh - .03, Y0 + KH * .45, cz + sz * (dw / 2 + L / 2), 0); }
   // the stair inside along the +z wall, 15 risers of .3 from the door side up to the hatch
   const nS = Math.round(KH / .3), sr = KH / nS, sd = .42, sx0 = cx - kh + 1.2, lz0 = cz + kh - t - 1.3, lz1 = cz + kh - t;
   for (let k = 0; k < nS; k++) { const top = Y0 + (k + 1) * sr, x0 = sx0 + k * sd; add(new THREE.BoxGeometry(sd + .02, top - Y0, lz1 - lz0), stoneD, x0 + sd / 2, (Y0 + top) / 2, (lz0 + lz1) / 2, 1); }
@@ -24194,7 +24202,9 @@ function keepBuild() {
   for (let a = -kh + .4; a <= kh - .4; a += 1.6) { add(new THREE.BoxGeometry(.6, .8, .5), stone, cx + a, RY + .7, cz - kh + .25, 1); add(new THREE.BoxGeometry(.6, .8, .5), stone, cx + a, RY + .7, cz + kh - .25, 1);
     add(new THREE.BoxGeometry(.5, .8, .6), stone, cx + kh - .25, RY + .7, cz + a, 1); add(new THREE.BoxGeometry(.5, .8, .6), stone, cx - kh + .25, RY + .7, cz + a, 1); }
   // a small roofed turret-house on the keep's roof
-  bldRoof(g, cx + 1.4, cz - 1.4, 2.2, 2.2, 0, RY + 4.8, RY + 2.6, .45, wood);
+  bldRoof(g, cx + 1.4, cz - 1.4, 2.2, 2.2, 0, RY + 4.8, RY + 2.6, .45, wood); { const n = g.children.length; g.children[n - 2].material = E.roof; g.children[n - 2].userData.mg = g.children[n - 1].userData.mg = 1; }
+  add(new THREE.ConeGeometry(.12, .8, 6), E.gold, cx + 1.4, RY + 5.2, cz - 1.4, 0); add(new THREE.SphereGeometry(.18, 10, 8), E.gold, cx + 1.4, RY + 4.85, cz - 1.4, 0);     // m@X4@: the gold finial
+  for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const e = add(new THREE.ConeGeometry(.1, .6, 4), E.gold, cx + 1.4 + sx * 2.3, RY + 2.95, cz - 1.4 + sz * 2.3, 0); e.rotation.set(sz * .9, 0, -sx * .9); }
   for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) add(new THREE.BoxGeometry(.22, 2.6, .22), wood, cx + 1.4 + sx * 1.4, RY + 1.6, cz - 1.4 + sz * 1.4, 0);
   for (const sz of [-1, 1]) add(new THREE.BoxGeometry(.28, .36, .28), lamp, cx - kh - .3, Y0 + 2.6, cz + sz * 1.3, 0);
   // THE DRAWBRIDGE (pivot on the curb's inner edge, swinging down across to the island) and THE GONG beside it on the curb
@@ -24204,7 +24214,7 @@ function keepBuild() {
   const dbB = { minx: cx - A.cin, maxx: cx - A.isl + .1, miny: A.ch - .2, maxy: A.ih, minz: cz - 1.2, maxz: cz + 1.2, _off: 1 }; BDYN.push(dbB);
   const gong = new THREE.Group(); gong.position.set(cx - A.cin - 1, A.ch, cz + 1.9); g.add(gong);
   { for (const sx of [-1, 1]) { const p = new THREE.Mesh(new THREE.BoxGeometry(.14, 2, .14), wood); p.position.set(sx * .8, 1, 0); gong.add(p); } const bar = new THREE.Mesh(new THREE.BoxGeometry(1.8, .14, .14), wood); bar.position.y = 2; gong.add(bar);
-    const disc = new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, .06, 24), new THREE.MeshStandardMaterial({ color: 0xc08a40, metalness: .85, roughness: .3, emissive: 0x000000 })); disc.rotation.x = Math.PI / 2; disc.position.y = 1.2; disc.rotation.z = 0; gong.add(disc); gong.userData.disc = disc;
+    const disc = new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, .06, 24), new THREE.MeshStandardMaterial({ color: ENEMY.pal.gold, metalness: .85, roughness: .3, emissive: 0x000000 })); disc.rotation.x = Math.PI / 2; disc.position.y = 1.2; disc.rotation.z = 0; gong.add(disc); gong.userData.disc = disc;
     gong.rotation.y = Math.PI / 2; gong.traverse(o => { if (o.isMesh) o.castShadow = true; }); }
   for (const b of O.boxes) BOXES.push(b); boxGrid();
   const tur = turretAt(cx - 1.5, RY, cz + 1.5, -Math.PI / 2); boxGrid();
@@ -24214,20 +24224,29 @@ function keepBuild() {
   { const rim = new THREE.Mesh(new THREE.TorusGeometry(.55, .06, 6, 20), wood); winch.add(rim); for (let k = 0; k < 6; k++) { const sp = new THREE.Mesh(new THREE.BoxGeometry(.05, 1.1, .05), wood); sp.rotation.z = k * Math.PI / 6; winch.add(sp); }
     const ax = new THREE.Mesh(new THREE.CylinderGeometry(.06, .06, .5, 8), wood); ax.rotation.x = Math.PI / 2; winch.add(ax); winch.rotation.y = Math.PI / 2; }
   add(new THREE.BoxGeometry(.25, 1.1, .25), wood, cx - kh + 1, Y0 + .55, cz - 1.6, 0);
-  const smash = []; { const bm = new THREE.MeshStandardMaterial({ color: 0x5a4030, roughness: .8 }); for (const [dx, dz] of [[2.4, -2.6], [3, -2], [2.4, -1.4]]) { const X = cx + dx, Z = cz + dz, m = add(new THREE.CylinderGeometry(.36, .36, .8, 10), bm, X, Y0 + .4, Z, 0);
+  const smash = []; { const bm = new THREE.MeshStandardMaterial({ color: 0x5a4030, roughness: .8 }); for (const [dx, dz] of [[2.4, -2.6], [3, -2], [2.4, -1.4]]) { const X = cx + dx, Z = cz + dz, m = add(new THREE.CylinderGeometry(.36, .36, .8, 10), bm, X, Y0 + .4, Z, 0); m.userData.mg = 0;
       smashAdd(smash, m, { minx: X - .36, maxx: X + .36, miny: Y0, maxy: Y0 + .8, minz: Z - .36, maxz: Z + .36 }, 2, 15, [.45, .32, .22]); } }
-  { const ban = new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 });
-    for (const [sx, sz] of [[1, 1], [-1, -1]]) { add(new THREE.CylinderGeometry(.05, .06, 3.2, 6), wood, cx + sx * (kh - .4), RY + 1.6, cz + sz * (kh - .4), 0); const f = add(new THREE.PlaneGeometry(1, 1.6), ban, cx + sx * (kh - .4) + .5, RY + 2.4, cz + sz * (kh - .4), 0); f.castShadow = false; } }
+  { for (const [sx, sz] of [[1, 1], [-1, -1]]) { add(new THREE.CylinderGeometry(.05, .06, 3.2, 6), wood, cx + sx * (kh - .4), RY + 1.6, cz + sz * (kh - .4), 0); add(new THREE.SphereGeometry(.1, 8, 6), E.gold, cx + sx * (kh - .4), RY + 3.25, cz + sz * (kh - .4), 0); enemyBanner(putM, E, cx + sx * (kh - .4) + .55, RY + 3, cz + sz * (kh - .4), 0, .9, 1.8); } }     // m@X4@: black emblem banners
+  // m@X4@: tall emblem banners down the keep's three closed faces, under the merlons
+  for (const sz of [-1, 1]) enemyBanner(putM, E, cx + 1.4, RY - .2, cz + sz * (kh + .06), sz > 0 ? 0 : Math.PI, 1.1, 2.6);
+  enemyBanner(putM, E, cx + kh + .06, RY - .2, cz, Math.PI / 2, 1.1, 2.6);
   // ---- PASS 3 (m1182): the polish -- CHAINS from the drawbridge's tip to the keep, an ONI MASK over the keep door, lanterns round the
   // curb, koi in the moat, cables and a drone ----
   const chains = []; for (const sz of [-1, 1]) { const ln = new THREE.Line(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3)), new THREE.LineBasicMaterial({ color: 0x2a2622 })); ln.frustumCulled = false; g.add(ln); chains.push({ ln, sz }); }
-  { const lq = new THREE.MeshStandardMaterial({ color: 0xa8231e, roughness: .4 }), blk = new THREE.MeshStandardMaterial({ color: 0x14100e }), gl = new THREE.MeshBasicMaterial({ color: 0xffb03a, toneMapped: false }), gold = new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .9, roughness: .3 });
+  { const lq = E.lacquer, blk = E.iron, gl = E.jin, gold = E.gold;     // m@X4@: the oni mask in black, gold and mint
     const mx = cx - kh - .02, my = Y0 + 3.6; const face = add(new THREE.SphereGeometry(.7, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2), lq, mx, my, cz, 0); face.rotation.z = Math.PI / 2; face.scale.set(1.1, .5, 1);
     for (const sz of [-1, 1]) { add(new THREE.BoxGeometry(.05, .06, .26), gl, mx - .36, my + .12, cz + sz * .25, 0); const br = add(new THREE.BoxGeometry(.1, .1, .5), blk, mx - .34, my + .26, cz + sz * .27, 0); br.rotation.x = sz * .35; const hn = add(new THREE.ConeGeometry(.1, .7, 6), gold, mx - .1, my + .7, cz + sz * .55, 0); hn.rotation.x = -sz * .5; } }
   const koi = []; { const km = [new THREE.MeshStandardMaterial({ color: 0xff7a2a }), new THREE.MeshStandardMaterial({ color: 0xf4f1ea }), new THREE.MeshStandardMaterial({ color: 0xd8302a })]; for (let k = 0; k < 6; k++) { const f = new THREE.Mesh(new THREE.SphereGeometry(.16, 8, 6), km[k % 3]); f.scale.set(.6, .35, 1.8); g.add(f); koi.push(f); } }
   for (let k = 0; k < 8; k++) { const a = k / 8 * 6.283 + .39, r = (A.cin + A.cout) / 2, x = cx + Math.sign(Math.cos(a)) * Math.min(Math.abs(Math.cos(a)) * 1.6, 1) * r, z = cz + Math.sign(Math.sin(a)) * Math.min(Math.abs(Math.sin(a)) * 1.6, 1) * r; add(new THREE.BoxGeometry(.25, .3, .25), lamp, x, A.ch + .3, z, 0); }
   for (const sz of [-1, 1]) { const E = [cx + kh, RY + .8, cz + sz * kh], G2 = [cx + A.cout + 6, .3, cz + sz * (A.cout + 3)]; bldCable(g, E, G2, 1.4, 5, lamp); add(new THREE.CylinderGeometry(.08, .1, .8, 6), wood, G2[0], .4, G2[2], 0); }
   const drone = bldDrone(g);
+  // m@X4@: two SPHINXES at the foot of the curb steps, facing out (-x); three boxes each off `enemySphinx`'s own sizes, turned with it
+  for (const sz of [-1, 1]) { const x = cx - A.cout - 2.5, z = cz - 3.2 + sz * 2.2; enemySphinx(putM, E, x, z, -Math.PI / 2, 1);
+    O.boxes.push({ minx: x - 1.46, maxx: x + 1.46, miny: 0, maxy: .72, minz: z - .81, maxz: z + .81 }, { minx: x - .95, maxx: x + 1.25, miny: .72, maxy: 1.57, minz: z - .42, maxz: z + .42 }, { minx: x - .9, maxx: x - .22, miny: 1.05, maxy: 2.6, minz: z - .39, maxz: z + .39 }); }
+  for (const b of O.boxes.slice(-6)) BOXES.push(b); boxGrid();
+  // m@X4@: mint BRAZIERS on the curb's two west corners, flanking the approach
+  const fires = []; for (const sz of [-1, 1]) { const m = (A.cin + A.cout) / 2, bz = enemyBrazier(E, 1.1), x = cx - m, z = cz + sz * m; bz.position.set(x, A.ch + .12, z); g.add(bz); fires.push([x, A.ch + .12 + bz.userData.top, z]); }
+  const nm = bldMergeStatic(g);
   // ---- PASS 4 (m1197): THE MOAT EEL -- a bronze Jin serpent, seven plates and a lantern-eyed head, swims the moat's square; wade in and
   // it comes for you and BITES (`eelDmg`); cut it (`eelHp` hits on any plate) and it sinks, to surface again `eelBack` s later ----
   const eel = { segs: [], hp: A.eelHp, dead: 0, t: 0, s: 0, bc: 0, hc: 0 };
@@ -24236,11 +24255,12 @@ function keepBuild() {
       if (!k) { for (const sx of [-1, 1]) { const e = new THREE.Mesh(new THREE.SphereGeometry(.07, 6, 5), eyeM); e.position.set(sx * .2, .14, .25); m.add(e); } const jaw = new THREE.Mesh(new THREE.ConeGeometry(.2, .5, 6), bm); jaw.rotation.x = Math.PI / 2; jaw.position.z = .45; m.add(jaw); }
       else { const fin = new THREE.Mesh(new THREE.BoxGeometry(.04, .25, .3), bm); fin.position.y = .25; m.add(fin); }
       m.position.set(cx - (A.isl + A.cin) / 2, .3, cz + k * .5); eel.segs.push(m); } }
-  KEEP.on = { g, O, bars: [], db, dbB, gong, down: 0, ang: Math.PI / 2, tur, t: 0, gT: 0, winch, wT: 0, smash, arch: [], chains, koi, drone, eel }; db.rotation.z = Math.PI / 2;
+  KEEP.on = { g, O, bars: [], db, dbB, gong, down: 0, ang: Math.PI / 2, tur, t: 0, gT: 0, winch, wT: 0, smash, arch: [], chains, koi, drone, eel, fires, nm }; db.rotation.z = Math.PI / 2;
   { const K0 = KEEP.on; for (const [sx, sz] of [[1, 1], [1, -1]]) archerPost(cx + sx * (A.cout - 1), A.ch + .1, cz + sz * (A.cout - 1)).then(d => { if (KEEP.on === K0) K0.arch.push(d); else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {}); }
   arenaBeam(cx, cz, [1, .6, .35], 1); snd('clang', { g: .7, r: .5 });
 }
 function keepStep(dt) { const K = KEEP.on; if (!K) return; K.t += dt;
+  if (K.fires && (K.fT = (K.fT || 0) - dt) <= 0) { K.fT = .07; for (const [fx, fy, fz] of K.fires) spk(fx + (Math.random() - .5) * .6, fy, fz + (Math.random() - .5) * .6, (Math.random() - .5) * .4, 2 + Math.random() * 1.6, (Math.random() - .5) * .4, .22 + Math.random() * .14, .5, Math.random() < .5 ? [.45, 1, .82] : [.75, 1, .92]); }     // m@X4@: the braziers burn mint
   if (K.chains) { const [cx, cz] = KEEP.at, L = KEEP.cin - KEEP.isl + .2, px = cx - KEEP.cin, py = KEEP.ch, tx = px + Math.cos(K.ang) * L, ty = py + Math.sin(K.ang) * L;
     for (const C of K.chains) { C.ln.geometry.attributes.position.array.set([tx, ty + .1, cz + C.sz * 1.1, cx - KEEP.kh, KEEP.ih + KEEP.kH - .5, cz + C.sz * 1.1]); C.ln.geometry.attributes.position.needsUpdate = true; }
     for (let i = 0; i < K.koi.length; i++) { const a = K.t * (.2 + i * .03) * (i % 2 ? -1 : 1) + i, r = (KEEP.isl + KEEP.cin) / 2, f = K.koi[i], u = ((a % 6.283) + 6.283) % 6.283 / 6.283 * 4, side = Math.floor(u), w = u - side;

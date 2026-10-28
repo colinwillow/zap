@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the MOATED KEEP, pass 1 (ENEMY look, classical)
+- ENEMY_STYLE's classical fortress through `enemyMats`: pale sandstone block (`stone_blocks` tinted `ENEMY.pal.stone`) for the curb ring,
+  the island and the curb steps; the keep's walls stay white plaster over a BLACK lacquer skirt (the lower 45% of each outer face, a gold
+  band on top: the black-and-white plaster of a castle keep); black corner posts with gold caps; black timber; dark planks; mint glass in
+  every lamp; the turret-house roof in black tile with a gold finial and four gold eave tips; the oni mask black, gold and mint; the gong
+  gold. Emblem banners (`enemyBanner`) on the keep's three closed faces and on the two roof poles (the old `hwBanner` flags).
+- Two SPHINXES at the foot of the curb steps facing out, each three boxes off `enemySphinx`'s own sizes turned with it (plinth, body,
+  chest-and-head); two mint BRAZIERS on the curb's west corners flanking the approach, sparking in `keepStep`.
+- COLLIDER AUDIT: the keep's four corner posts were drawn .5 m square, standing .25 proud of the walls, with no box -- solid now. Every
+  other box already matched its mesh (curb, island, steps, walls, slab, merlons); the drawbridge's dynamic box sits .09 over its planks.
+- Statics merged (`bldMergeStatic`, 164 meshes; the smashable barrels stay their own). 66 children with the gong, winch, bridge, eel,
+  koi, cables and drone.
+Render-checked headless (from the south-west over the curb, and along the curb at the bridge). Shipped unverified.
+
 ## m1652 -- THE RE-PASS: the CLIFF LODGE, pass 3 (L1: THE SHORTCUT) -- its third pass, DONE
 - The path is a full lap of the crag (four faces, 12 m). The shortcut: a ROPE LADDER (two ropes, 37 timber rungs, merged: 2 meshes) from
   the ground straight up to the perch's tip at 12 m, hanging .2 m in from the tip and 4.3 m off the north face (clear of the path's 1.6 m
