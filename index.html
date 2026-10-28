@@ -26491,7 +26491,7 @@ function beaconRock(lo, dk, hi) { const m = new THREE.MeshStandardMaterial({ col
       'float sb = vRW.y * .23 + sin(vRW.x * .061 + vRW.z * .043) * .9 + sin(vRW.x * .21 - vRW.z * .17) * .18; float band = fract(sb); vec3 rc = mix(uLo, uHi, smoothstep(.15, .55, band) * (1.0 - smoothstep(.75, .95, band)));' +
       ' rc = mix(rc, uDk, smoothstep(.88, .98, band) * .8); float st = sin(vRW.x * 1.7 + sin(vRW.z * .9) * 2.0) * sin(vRW.z * 1.3 + vRW.y * .05); rc *= 1.0 - smoothstep(.6, 1.0, st) * .12; diffuseColor.rgb *= rc;'); };
   m.customProgramCacheKey = () => 'brock' + lo + dk + hi; return m; }
-// m15xx: a CARVED tier, not a box: rounded vertical edges and a chamfered lip (`arenaBevelBox`, its shape shrunk by the bevel so the flats sit ON the
+// m1578: a CARVED tier, not a box: rounded vertical edges and a chamfered lip (`arenaBevelBox`, its shape shrunk by the bevel so the flats sit ON the
 // collider's faces), tapering 8% toward the top like weathered rock. The collider stays the full box.
 function beaconCarve(w, h, d) { const r = Math.min(1.4, Math.min(w, d) * .16, h * .3), g = arenaBevelBox(w - r * 1.2, h, d - r * 1.2, r), P = g.attributes.position;
   for (let i = 0; i < P.count; i++) { const k = 1 - .08 * (P.getY(i) / h + .5); P.setX(i, P.getX(i) * k); P.setZ(i, P.getZ(i) * k); } g.computeVertexNormals(); return g; }
