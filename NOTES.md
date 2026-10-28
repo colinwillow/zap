@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the SKY BRIDGES, pass 1 (HERO look, merged)
+- The hero kit (`korMats`): painted warm planks (`wood_planks`), kit timber, kit bronze and red, the kit lamp. The zip cables are bronze.
+- Each span gets a small GATE 1.2 m in from each end (an end sits inside its building, so a gate at the end stood in the Watchtower's
+  lookout): two 2.3 m timber posts with bronze foot caps, a red lacquer kasagi with upturned bronze tips, a tie beam, a lantern hung on
+  the deck's axis. The posts stand off the deck's edge and have no box (picture only, as the rope rails always were).
+- The five-colour prayer flags are now the kit's red-and-cream bunting, and every flag of a span is ONE mesh: each flag's vertices carry
+  `aW` (depth below the line) and `aPh` (phase), and the vertex shader swings them along the flag's normal (`uT` from `skybStep`). It was
+  one mesh per flag (~40 a span) rotated on the CPU.
+- `bridgeSpan` is shared with the Floating Islands: a caller without the new materials gets the kit red/bronze and a still flag
+  material, so the islands' bridges change look but keep working (their `flapList` is now empty).
+- Merged: three spans went from 287 meshes to 9 (`bldMergeStatic`). Colliders unchanged: the walk is the plank tris.
+Render-checked headless (with the Watchtower, Gatehouse, Market and Rampart up: the mid-span, the Watchtower end, the Market end).
+Shipped unverified.
+
 ## m1639 -- THE RE-PASS: the SPIDER-BOT HANGAR, pass 3 (THE CLIMB) -- its third pass, DONE
 - How you get UP: a sandstone stair on the east flank, outside the eave (x = hw + .8 + .15), 14 risers of .286 m on .38 treads (under the
   .357 step), every step a box from the ground that is its drawn block, to a 1.6 m landing at the eave height (4.0) with a gold edge and
