@@ -10298,11 +10298,17 @@ function swatchClear() { if (SWATCH.on) { bldClear(SWATCH.on); SWATCH.on = null;
 //  - TRUDGING: deep untouched snow drags at him (`drag`, exp, scaled by how deep); his own track is easy going.
 //  - THE AIR: `flakes` soft points round the lens, each fluttering on its own (two sines) in a wind that GUSTS; a flake that meets his body is
 //    pushed out of it and BOUNCES off (and drifts off again); his footsteps and landings KICK UP puffs that arc and fall.
-const SNOWZ = { want: 0, on: null, size: 160, res: 640, depth: .55, refill: .012, foot: .17, plough: .32, rim: .2, rimAdd: .14, drag: 2.6,
+const SNOWZ = { want: 0, on: null, size: 160, res: 640, depth: 1.1, base: .5, drift: .42, pines: 46,     /* m15xx: depth 1.1 m with a base fill of .5 (= the old .55 m) so DRIFTS can rise over it */ refill: .012, foot: .17, plough: .32, rim: .2, rimAdd: .14, drag: 2.6,
   flakes: 5000, box: 34, puffs: 600, fall: [.55, 1.2], flutter: .5, wind: [1.2, 0, .4], gust: 1.6 };
 try { if (/[?&]zone=snow\b/.test(location.search)) SNOWZ.want = 1; } catch (e) {}
 function snowStage(g) {
-  const Z = SNOWZ, N = Z.res; Z.D = new Uint8Array(N * N).fill(255); Z.T = new THREE.DataTexture(Z.D, N, N, THREE.RedFormat, THREE.UnsignedByteType);
+  const Z = SNOWZ, N = Z.res; Z.D = new Uint8Array(N * N); Z.B = new Uint8Array(N * N);
+  // m15xx: WIND-SHAPED DRIFTS AND BANKS -- the pack's resting depth is a field, not a sheet: long ridges stretched ALONG the wind (2.6x), banks
+  // where the noise piles up, the base everywhere else; the refill returns to THIS, not to full. Flat round the spawn.
+  { const wx = Z.wind[0], wz = Z.wind[2], wl = Math.hypot(wx, wz) || 1, ax = wx / wl, az = wz / wl;
+    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) { const x = (i / N - .5) * Z.size, z = (.5 - j / N) * Z.size, u = x * ax + z * az, v = -x * az + z * ax;
+      const r = Math.max(0, isl3Fbm(u * .018, 2.3, v * .05, 4) + .05), spawnK = Math.min(1, Math.max(0, (Math.hypot(x, z - 8) - 6) / 10)), edge = Math.min(1, Math.max(0, (Z.size / 2 - Math.max(Math.abs(x), Math.abs(z))) / 12));
+      const b = Z.base + Z.drift * Math.min(1, r * 1.8) * spawnK * edge; Z.B[j * N + i] = Z.D[j * N + i] = Math.round(Math.min(1, b) * 255); } } Z.T = new THREE.DataTexture(Z.D, N, N, THREE.RedFormat, THREE.UnsignedByteType);
   Z.T.magFilter = Z.T.minFilter = THREE.LinearFilter; Z.T.wrapS = Z.T.wrapT = THREE.ClampToEdgeWrapping; Z.T.needsUpdate = true;
   scene.background = new THREE.Color(0xc9d6e6); if (scene.fog) { scene.fog.color.setHex(0xc9d6e6); scene.fog.near = 40; scene.fog.far = 340; }     // cold, pale
   hemi.color.setHex(0xdfe9ff); hemi.groundColor.setHex(0xb8c4d8); sun.color.setHex(0xfff0dc);
@@ -10320,7 +10326,7 @@ function snowStage(g) {
       .replace('#include <color_fragment>', '#include <color_fragment>\n diffuseColor.rgb *= mix(vec3(.48, .62, .92), vec3(1.0), smoothstep(.12, .9, vSd));')
       .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n { vec2 c = floor(vSW.xz * 38.0); float h = snH(c + floor(cameraPosition.xz * 3.0) * .37); totalEmissiveRadiance += vec3(.9, .95, 1.0) * step(.9965, h) * 1.6 * smoothstep(30.0, 4.0, length(cameraPosition - vSW)); }'); };
   const snow = new THREE.Mesh(geo, m); snow.receiveShadow = true; snow.frustumCulled = false; g.add(snow); Z.mesh = snow;
-  const far = new THREE.Mesh(new THREE.RingGeometry(Z.size * .7, 900, 64, 1).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xf4f7fc, roughness: .9 })); far.position.y = Z.depth - .02; g.add(far);     // an even white plain to the peaks
+  const far = new THREE.Mesh(new THREE.RingGeometry(Z.size * .7, 900, 64, 1).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xf4f7fc, roughness: .9 })); far.position.y = Z.depth * Z.base - .02; g.add(far);     // an even white plain to the peaks
   forgePeaks(g);
   camera.far = Math.max(camera.far, 900); camera.updateProjectionMatrix();
   // THE AIR: flakes, and the kicked-up puffs, in one Points
@@ -10333,7 +10339,17 @@ function snowStage(g) {
     vertexShader: 'attribute float aSize; attribute float aA; uniform float uPx; varying float vA; void main() { vec4 mv = modelViewMatrix * vec4(position, 1.0); gl_PointSize = aSize * uPx / max(.1, -mv.z); vA = aA * smoothstep(.3, 1.2, -mv.z); gl_Position = projectionMatrix * mv; }',
     fragmentShader: 'varying float vA; void main() { vec2 d = gl_PointCoord - .5; float r = dot(d, d) * 4.0; if (r > 1.0) discard; gl_FragColor = vec4(1.0, 1.0, 1.0, vA * (1.0 - r * r)); }' });
   const pts = new THREE.Points(pg, pm); pts.frustumCulled = false; g.add(pts); Z.air = { pts, pg, pm, P, S, A, F, NF, NP };
-  Z.on = { g }; Z.t = 0; Z.acc = 0; }
+  // m15xx: SNOWY PINES in stands, each three dark tiers under a white CAP (instanced: trunks, needles, caps = 3 draws), a collider on the trunk.
+  // A strike or a body slammed into one SHAKES it: the caps drop in a burst of powder and grow back over half a minute.
+  { const R = plantRnd(301), T = [], mk = (n, geo, mat) => { const m = new THREE.InstancedMesh(geo, mat, n); m.castShadow = true; m.receiveShadow = true; m.frustumCulled = false; g.add(m); return m; };
+    for (let c = 0; c < 7; c++) { const a = R() * 6.283, d = 22 + R() * 50, cx = Math.cos(a) * d, cz = Math.sin(a) * d; for (let k = 0; k < Z.pines / 7; k++) { const x = cx + (R() - .5) * 14, z = cz + (R() - .5) * 14; if (Math.hypot(x, z - 8) < 12) continue; T.push({ x, z, s: .8 + R() * .7, yaw: R() * 6.28, cap: 1, t: 0 }); } }
+    const tg = [], cg = []; for (let k = 0; k < 3; k++) { const r = 1.5 - k * .38, y = 1.7 + k * 1.15; tg.push(new THREE.ConeGeometry(r, 1.7, 8).translate(0, y, 0)); cg.push(new THREE.ConeGeometry(r * .82, .95, 8).translate(0, y + .48, 0)); }
+    const tr = mk(T.length, new THREE.CylinderGeometry(.13, .22, 2, 6).translate(0, 1, 0), new THREE.MeshStandardMaterial({ color: 0x3e2a1e, roughness: .95 })),
+      nd = mk(T.length, mergeGeometries(tg), new THREE.MeshStandardMaterial({ color: 0x1f3f36, roughness: .9 })), cp = mk(T.length, mergeGeometries(cg), new THREE.MeshStandardMaterial({ color: 0xf6f9ff, roughness: .85 }));
+    const M = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(); T.forEach((P, i) => { M.compose(new THREE.Vector3(P.x, 0, P.z), q.setFromEuler(e.set(0, P.yaw, 0)), new THREE.Vector3(P.s, P.s, P.s)); tr.setMatrixAt(i, M); nd.setMatrixAt(i, M); cp.setMatrixAt(i, M);
+      BOXES.push({ minx: P.x - .3 * P.s, maxx: P.x + .3 * P.s, miny: 0, maxy: 2 * P.s, minz: P.z - .3 * P.s, maxz: P.z + .3 * P.s }); });
+    Z.pine = { T, cp, M, q, e }; }
+  Z.on = { g }; Z.t = 0; Z.acc = 0; Z.breath = 1; }
 function snowAt(x, z) { const Z = SNOWZ, N = Z.res, u = (x / Z.size + .5) * N, v = (.5 - z / Z.size) * N, i = u | 0, j = v | 0; if (i < 0 || j < 0 || i >= N || j >= N) return 1; return Z.D[j * N + i] / 255; }
 // carve a hole of radius r down to `to` (0..1 of the depth) and pile what it moved into a rim
 function snowStamp(x, z, r, to) { const Z = SNOWZ, N = Z.res, cs = Z.size / N, ci = (x / Z.size + .5) * N, cj = (.5 - z / Z.size) * N, R = (r + Z.rim) / cs, t = to * 255, add = Z.rimAdd * 255, D = Z.D;
@@ -10347,7 +10363,7 @@ function snowStep(dt) { const Z = SNOWZ, A = Z.air, p = player; if (!A) return; 
   // the PACK: feet, the plough, the drag, the refill
   const under = snowAt(p.pos.x, p.pos.z), sp = Math.hypot(p.vel.x, p.vel.z), inField = Math.abs(p.pos.x) < Z.size / 2 && Math.abs(p.pos.z) < Z.size / 2;
   if (inField && p.pos.y < Z.depth + .2) {
-    if (p.grounded && under > .35) { const k = Math.exp(-Z.drag * (under - .3) * dt); p.vel.x *= k; p.vel.z *= k; }
+    const um = under * Z.depth / .55; if (p.grounded && um > .35) { const k = Math.exp(-Z.drag * Math.min(1.6, um - .3) * dt); p.vel.x *= k; p.vel.z *= k; }     /* in METRES (the old .55 m pack = 1): a drift drags harder */
     const bn = rig.bones || {}; for (const nm of ['mixamorig_LeftToeBase', 'mixamorig_RightToeBase']) { const b = bn[nm]; if (!b) continue; b.getWorldPosition(_snF);
       if (_snF.y < snowAt(_snF.x, _snF.z) * Z.depth + .05) { const before = snowAt(_snF.x, _snF.z); snowStamp(_snF.x, _snF.z, Z.foot, .08); if (before > .4 && sp > .5 && Math.random() < .5) snowPuff(_snF.x, before * Z.depth, _snF.z, 3, 1.6, 1.2); } }
     if (sp > .4 && p.grounded) snowStamp(p.pos.x, p.pos.z, Z.plough * Math.min(1, sp / 4), .3);
@@ -10359,10 +10375,18 @@ function snowStep(dt) { const Z = SNOWZ, A = Z.air, p = player; if (!A) return; 
     if (rig.root) { if (!Z.wm || Z.wmFor !== rig.root.uuid + (p.slot | 0)) { Z.wm = []; Z.wmFor = rig.root.uuid + (p.slot | 0); rig.root.traverse(o => { if (o.isMesh && !o.isSkinnedMesh && o.geometry) { o.geometry.computeBoundingBox(); Z.wm.push(o); } }); }
       for (const o of Z.wm) { if (!o.visible) continue; const bb = o.geometry.boundingBox; for (let c = 0; c < 8; c++) { _snF.set(c & 1 ? bb.max.x : bb.min.x, c & 2 ? bb.max.y : bb.min.y, c & 4 ? bb.max.z : bb.min.z).applyMatrix4(o.matrixWorld);
           const top = snowAt(_snF.x, _snF.z) * Z.depth; if (_snF.y < top - .02) { snowStamp(_snF.x, _snF.z, .11, Math.max(0, _snF.y / Z.depth - .1)); if (p.melee && Math.random() < .25) snowPuff(_snF.x, top, _snF.z, 2, 2.2, 1.6); } } } }
-    if (p.grounded && !Z.wasG && (Z.lastVy || 0) < -6) { snowStamp(p.pos.x, p.pos.z, 1.1, .02); snowPuff(p.pos.x, Z.depth, p.pos.z, 40, 3.5, 3.5); }     // a landing digs a crater
+    if (p.grounded && !Z.wasG && (Z.lastVy || 0) < -6) { snowStamp(p.pos.x, p.pos.z, 1.1, .02); snowPuff(p.pos.x, under * Z.depth, p.pos.z, 40, 3.5, 3.5); }     // a landing digs a crater
   }
   Z.wasG = p.grounded; Z.lastVy = p.vel.y;
-  Z.acc += dt; if (Z.acc > .25) { const inc = Math.max(1, Math.round(Z.refill * 255 * Z.acc)); Z.acc = 0; const D = Z.D; for (let k = 0; k < D.length; k++) if (D[k] < 255) D[k] = Math.min(255, D[k] + inc); Z.dirty = 1; }
+  if (Z.pine) { const PN = Z.pine; let dirty = 0; const fast = p.melee || p.roll || Math.hypot(p.vel.x, p.vel.z) > 5;
+    for (let i = 0; i < PN.T.length; i++) { const P = PN.T[i], d = Math.hypot(p.pos.x - P.x, p.pos.z - P.z);
+      if (P.cap > .99 && fast && d < 1.9 * P.s && p.pos.y < 3) { P.cap = 0; P.t = 0; for (let k = 0; k < 3; k++) snowPuff(P.x, (2.4 + k * 1.15) * P.s, P.z, 30, 1.2, 2.2); snd('thud', { g: .35, r: .6, x: P.x, z: P.z }); }
+      if (P.cap < 1) { P.t += dt; const c = P.t < 8 ? 0 : Math.min(1, (P.t - 8) / 22); if (c !== P.cap) { P.cap = c; PN.M.compose(new THREE.Vector3(P.x, 0, P.z), PN.q.setFromEuler(PN.e.set(0, P.yaw, 0)), new THREE.Vector3(P.s, P.s * Math.max(.001, c), P.s)); PN.cp.setMatrixAt(i, PN.M); dirty = 1; } } }
+    if (dirty) PN.cp.instanceMatrix.needsUpdate = true; }
+  // his BREATH in the cold: a soft puff from his mouth every ~1.6 s (quicker when he runs)
+  Z.breath -= dt * (1 + Math.min(2, Math.hypot(p.vel.x, p.vel.z) / 3)); if (Z.breath < 0 && rig.bones && rig.bones.mixamorig_Head) { Z.breath = 1.4 + Math.random() * .5; rig.bones.mixamorig_Head.getWorldPosition(_snF);
+    snowPuff(_snF.x + Math.sin(p.faceH) * .22, _snF.y - .05, _snF.z + Math.cos(p.faceH) * .22, 5, .25, .35); }
+  Z.acc += dt; if (Z.acc > .25) { const inc = Math.max(1, Math.round(Z.refill * 255 * Z.acc)); Z.acc = 0; const D = Z.D, B = Z.B; for (let k = 0; k < D.length; k++) if (D[k] < B[k]) D[k] = Math.min(B[k], D[k] + inc); Z.dirty = 1; }
   if (Z.dirty) { Z.T.needsUpdate = true; Z.dirty = 0; }
   // the AIR
   const P = A.P, F = A.F, cx = camera.position.x, cz = camera.position.z, hb = Z.box / 2, gx = Z.wind[0] * (1 + Z.gust * Math.max(0, Math.sin(t * .23) * Math.sin(t * .61))), gz = Z.wind[2] + Math.sin(t * .17) * .6;

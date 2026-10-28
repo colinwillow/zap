@@ -33,6 +33,13 @@ seat, edited -- what he did by hand before.
 - Colliders: every new box sits on a drawn plank, cap or grating (no invisible ledges); the flue-cap coin of the first try was unreachable
   and moved onto the platform.
 Render-checked headless (the ladder, the gangway, the platform and a coin in frame). Next: the Spider-Bot Hangar (ENEMY). Shipped unverified.
+## m15xx -- SNOW pass 2a: wind-shaped drifts, pines that drop their snow, his breath
+- **Drifts:** `SNOWZ.depth` 1.1 m (was .55) with a resting field `Z.B`: the base .5 (= the old .55 m pack) plus up to `drift` .42 in ridges stretched
+  2.6x ALONG the wind (fbm in wind-aligned coordinates), flat round the spawn and at the field's edge. The refill returns to `Z.B`, not to full;
+  the drag reads the depth in METRES (a drift drags harder, the base exactly as before). The far plain sits at the base height.
+- **Pines:** seven stands, 46 trees, instanced (trunk, needles, caps: 3 draws), a collider on each trunk. A strike, a roll or a body over 5 m/s within
+  reach SHAKES one: the caps drop (scale to 0) in three bursts of powder with a thud, and grow back from 8 s to 30 s.
+- **Breath:** a soft puff from his head bone, forward, every 1.4-1.9 s (faster with speed).
 
 ## m1627 -- THE DRAGON RIDE: THE RIDER SAT INSIDE THE DRAGON
 His: *"he was sitting inside the dragon -- that's why"* (he could not see himself). The rider's root went at the seat less a HIP HEIGHT that was
