@@ -112,6 +112,25 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
+## THE RESTORATION KIT AND ITS DEMO -- ONE SET OF PIECES, A CINEMATIC LIFT (mXXXX)
+*"When we say fallen... the opposite of fallen is literally lifted into the air, floating on jets. It can't be one or the other -- it has to be made of essentially the same pieces so we can animate it going up into the air, lighting, illuminating, moving in and fixing itself. Very cinematic. The transformation is going to be huge."*
+- **`RESTORE`, the shared kit (KORAJIN.md THE TRANSFORMATION):**
+  - `restoreRig(group, { lift, dur })`
+  - `restorePiece(R, mesh, { p, r, hop }, at)`: the mesh's own transform is the RESTORED pose; `p`/`r` are its FALLEN pose in the same frame; `at` staggers it in the show
+  - `restoreMat(R, mat, rust)`: the colour floods from rust and the emissive comes on
+  - `R.jets`: they ignite and pour mint sparks
+  - `restoreSet(R, t)` / `restorePlay(R, goal)` / `restoreStep(dt)`: `restoreStep` is called every frame
+- **The timeline (t 0 to 1, `dur` 7 s):**
+  - the pieces fly home between t 0 and 1 by `at`: lerp with a back-ease SNAP, an arc `hop`, a slerped turn
+  - the colour floods over .15-.75
+  - the jets ignite at .3-.5
+  - the base heaves free at .45 (a shake, a thud, dust) and rises `lift` m by 1
+  - then it hovers and bobs
+  - Falling runs at 1.8x with the mirrored dust.
+- **The demo (SPAWN > BUILDINGS > Restoration Demo, forge (-180, 120)):** a hero-kit shrine of 23 moving pieces: an island base, a stone floor, 4 posts, 4 walls with red bands, 2 roof halves, a ridge, a finial, a lantern, a banner, 4 bronze jet pods with mint flames. Its own materials, so the rust flood is per building. Step on the MINT PLATE to raise it; step again to drop it. `mel.restoreSet(mel.RESTORE.on.R, t)` poses it.
+- **Rendered at t 0 / .35 / .6 / 1:** scattered rusted pieces, then mid-flight, then assembled with the roof landing, then floating on four jets. The first try had the roof halves pitched inward (the x-rotation sign); fixed.
+- **Not built yet:** a camera move for the moment (the shake is it for now); colliders that ride the lift (he can't stand on it in the air yet); cracks that heal (the pieces are whole).
+
 ## THE DOJO, PASS 18: JINRA SEEPS FROM WHAT YOU BREAK (m1502)
 *"Every time you destroy one, a little of the green stuff leaves them -- it seeps out and rises into the air, or you collect it."* (KORAJIN.md, THE ENEMY.)
 - **`JINRA`:** a count `n` saved in `mel.jinra`, plus a pool of up to 260 wisps drawn as ONE additive Points draw with a soft mint sprite.
