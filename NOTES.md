@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE ZEPPELINS, detail pass 7 (the envelope walk: a moving climb)
+- A rope LADDER from the gondola deck (aft of the chart table) up through a hatch in the roof, and a railed plank CATWALK, 12 m along the
+  envelope's spine at local y 11.15, on struts where the spine curves away, with a lantern at each end and three doubloons along it.
+- **A CLIMB THAT RIDES A MOVING SHIP:** `stepClimb` re-centres him on `L.cx/cz` along `L.ux/uz` every frame, so a `KCLIMB` entry whose
+  fields are rewritten every frame carries him with the ship. `zepPose` poses the ladder (`Z.lad`: centre, axes, volume, `top` and `mark`,
+  the mark on the catwalk) and the catwalk's turned dynamic box (`Z.walkB`, in `BDYN` beside `deckB`). Topping out, the step-over arcs from
+  the ladder's top (4.1 m) up onto the catwalk (11.2 m): read it as climbing the shaft inside the envelope.
+- While fallen the ladder and catwalk are parked at -600 (the catwalk deflates with the envelope). `zepClear` removes both.
+Render-checked headless (from above: catwalk, rails, struts, doubloons). Not checked: grabbing the ladder on a moving ship, and how the
+7 m step-over looks. Shipped unverified.
+
 ## m1591 -- THE ZEPPELINS, detail pass 6 (the deck, the piers from afar)
 - A WORKED DECK: a bronze helm (`korWheel`) on a timber binnacle at the bow, plank benches on legs along both rails, cargo aft (two crates and
   one stacked, a bronze-hooped barrel), a chart table with its chart, a bronze ship's bell under the roof. All merged into the ship and none
