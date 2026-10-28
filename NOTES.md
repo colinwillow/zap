@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the GATEHOUSE, pass 1 (an ENEMY gate: the look)
+The Gatehouse is on the ENEMY list, so it gets ENEMY_STYLE.md's "FORTIFIED GATE" and is never restored. **Moves:** its pass-1 row (the look).
+- Palette through `enemyMats()` only: black lacquer timber, upper storeys and torii; `E.iron` for the old black; a dark plank triMat for the
+  deck and ramps; gold where the cyan neon was (trim on the timber bands, studs on the front corner posts, the kasagi edge); mint `E.glass`
+  lanterns; the ballista's eye, the oni mask's eyes and the murder-hole oil (and its sparks) glow stolen Jinra mint.
+- The gold EMBLEM (`enemyEmblemTex`) on each tower's upper front face and on the torii plaque; the red `hwBanner`s are gone for
+  `enemyBanner`s: two down each tower's outer face, two hanging in the passage mouth.
+- **`enemySphinx(put, M, x, z, ry, s)`** (new, beside `enemyBanner`): a couchant lion on a battered sandstone plinth, black-and-gold nemes,
+  gold mask, mint eyes. Two flank the approach, each a solid box. Shared, so the Keep, the Oni Gate and the castle can use it.
+- Every static `add` and ramp mesh is flagged `mg` and goes through `bldMergeStatic`.
+**Still open:** the ground storey is still the cream `hallTex` breakable walls (pass 2 moves it to stone with the destructibility); the
+triplanar sandstone reads blotchy up close on the sphinx; no braziers yet; it is not yet destructible to the ground (pass 2).
+Render-checked headless (front, sphinx close-up). Shipped unverified.
+
 ## Grumbo's home pass 27 (Worker B): the restoration's colour, its bursts and its motes
 - Pass 26's colour flood was faint: `restoreMat` tints a material's colour, and over still-saturated maps a tint barely shows. Every home material's shader now also takes **`uDrain`** (`GHOME.drain`) after `color_fragment`, the recipe of main's AGE: pulled 78% to its own luminance with a dust tint, darkened 20%. `uDrain = 1 - rsEase((t - .15) / .6)`, the kit's own colour curve. The rust colours went milder (35% to dust, x .85), because the drain does the work. Rendered headless: FALLEN is a dusty grey-brown ruin (pier and plants too); RESTORED is the full colour.
 - **Landings**: as each chunk's own progress passes .985 on the way up, a mint `spkBurst` at its pivot, a thud, a small shake. It re-arms below .5. On a RESTORED start every piece is marked landed, so nothing bursts at load.

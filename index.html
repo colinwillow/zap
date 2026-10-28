@@ -10495,6 +10495,23 @@ function enemyBanner(put, M, x, y, z, ry, w = 1.2, h = 4) { const g = new THREE.
   for (let i = 0; i < P.count; i++) if (P.getY(i) < -h / 2 + .01) P.setY(i, P.getY(i) - (Math.abs(P.getX(i)) < .01 ? h * .12 : 0));     // the pointed hem
   put(g.rotateY(ry).translate(x, y - h / 2, z), M.banner); put(new THREE.BoxGeometry(w * 1.25, .08, .08).rotateY(ry).translate(x, y + .04, z), M.lacquer);
   for (const sd of [-1, 1]) put(new THREE.SphereGeometry(.07, 8, 6).translate(x + Math.cos(ry) * sd * w * .66, y + .04, z - Math.sin(ry) * sd * w * .66), M.gold); }
+// m@X4@: a SPHINX guardian (ENEMY_STYLE.md "STATUES"): a lion body couchant on a battered sandstone plinth, a black-and-gold nemes headdress,
+// a gold mask with mint eyes; it faces local +z (yaw `ry`), `s` its scale (about 2.2 m tall at 1). Static: every piece through `put`
+function enemySphinx(put, M, x, z, ry = 0, s = 1) { const q = (geo, m, px, py, pz, rx = 0) => put(geo.rotateX(rx).translate(px, py, pz).scale(s, s, s).rotateY(ry).translate(x, 0, z), m);
+  q(new THREE.CylinderGeometry(.95, 1.15, .7, 4, 1).rotateY(Math.PI / 4).scale(1, 1, 1.8), M.stone, 0, .35, 0);     // the battered plinth
+  q(new THREE.BoxGeometry(1.46, .07, 2.66), M.gold, 0, .72, 0);
+  q(new THREE.CapsuleGeometry(.42, 1, 4, 10), M.stone, 0, 1.15, -.15, Math.PI / 2);     // the couchant body
+  q(new THREE.SphereGeometry(.5, 12, 8).scale(1, .8, 1.1), M.stone, 0, 1.05, -.75);     // the haunches
+  for (const sd of [-1, 1]) { q(new THREE.BoxGeometry(.26, .2, .9), M.stone, sd * .3, .85, .75); q(new THREE.BoxGeometry(.3, .12, .3), M.stone, sd * .3, .8, 1.15); }     // the forepaws
+  q(new THREE.BoxGeometry(.78, 1, .55), M.stone, 0, 1.55, .5);     // the raised chest
+  q(new THREE.BoxGeometry(.52, .58, .5), M.stone, 0, 2.2, .62);     // the head
+  q(new THREE.CylinderGeometry(.34, .5, .62, 4, 1).rotateY(Math.PI / 4).scale(1, 1, .7), M.lacquer, 0, 2.3, .5);     // the nemes
+  for (const sd of [-1, 1]) q(new THREE.BoxGeometry(.16, .7, .2), M.lacquer, sd * .3, 1.85, .72);     // its lappets
+  for (const y of [2.12, 2.32, 2.52]) q(new THREE.BoxGeometry(.72, .04, .5), M.gold, 0, y, .5);     // gold stripes
+  q(new THREE.BoxGeometry(.44, .48, .06), M.gold, 0, 2.17, .89);     // the mask
+  for (const sd of [-1, 1]) q(new THREE.BoxGeometry(.11, .04, .03), M.jin, sd * .11, 2.25, .93);
+  q(new THREE.ConeGeometry(.07, .3, 4), M.gold, 0, 2.73, .62);     // the crest
+  q(new THREE.ConeGeometry(.1, .7, 6), M.stone, 0, 1.05, -1.3, -1.2); }     // the tail
 function korMats() { if (KOR.m) return KOR.m; const S = (c, r, x) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: r }, x || {}));
   return (KOR.m = { cream: triMat('sandstone', { scale: 3.2 }), timber: triMat('wood_timber', { scale: 1.6, color: 0x8a6a52 }), iron: S(0x2a2522, .55, { metalness: .5 }), bronze: triMat('bronze', { scale: 1.2, metal: .75, rough: .35 }),
     red: triMat('red_cloth', { scale: 2.4, side: THREE.DoubleSide }), cloth: S(0xeadcc4, .85, { side: THREE.DoubleSide }), redL: S(0xa8201a, .45), lamp: S(0xffc070, .6, { emissive: 0xff9028, emissiveIntensity: 1.5 }),
@@ -20786,11 +20803,15 @@ const GHOUSE = { at: [24, -12], scale: 1.5, portUp: 10, pw: 7.5, th: 3.9, s1: 5.
 function ghouseBuild() {
   if (GHOUSE.on) return; const A = GHOUSE, k = A.scale || 1, [cx, cz] = A.at, th = A.th, pw = A.pw, S1 = A.s1, S2 = A.s2, g = new THREE.Group(); scene.add(g);
   const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [];
-  const wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 }), plank = new THREE.MeshStandardMaterial({ color: 0x6e4a2e, roughness: .85 }), stone = new THREE.MeshStandardMaterial({ color: 0x8a8580, roughness: .95 });
-  const plaster = new THREE.MeshStandardMaterial({ color: 0xeae6de, roughness: .9 }), verm = new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .45 }), black = new THREE.MeshStandardMaterial({ color: 0x17130f, roughness: .6 });
-  const lamp = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false }), neon = new THREE.MeshBasicMaterial({ color: 0x3fe8ff, toneMapped: false });
-  const add = (geo, m, x, y, z, solid) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; g.add(o);
+  // m@X4@ (the RE-PASS, pass 1): an ENEMY gate (BUILDINGS.md, ENEMY_STYLE.md "FORTIFIED GATE") -- black lacquer timber, the upper storeys and the torii
+  // black, a sandstone base, gold where the cyan neon was, mint Jinra the one glow; every static piece merges (`mg`)
+  const E = enemyMats(), wood = E.lacquer, plank = triMat('wood_planks', { scale: 2.2, color: 0x5a4c40 }), stone = E.stone;
+  const plaster = E.lacquer, verm = E.lacquer, black = E.iron;
+  const lamp = E.glass, neon = E.gold;
+  const putM = (geo, m) => { const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; g.add(o); return o; };
+  const add = (geo, m, x, y, z, solid) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; g.add(o);
     if (solid) { geo.computeBoundingBox(); const b = geo.boundingBox; O.boxes.push({ minx: x + b.min.x, maxx: x + b.max.x, miny: y + b.min.y, maxy: y + b.max.y, minz: z + b.min.z, maxz: z + b.max.z }); } return o; };
+  const emb = new THREE.MeshStandardMaterial({ map: enemyEmblemTex(), transparent: true, alphaTest: .4, metalness: .8, roughness: .35, side: THREE.DoubleSide });
   const flat = (x0, x1, z0, z1, y) => tris.push(x0, y, z0, x1, y, z0, x1, y, z1, x0, y, z0, x1, y, z1, x0, y, z1);
   // THE TOWERS: a breakable ground storey (door on the passage side), a solid white upper storey banded in timber
   const t = .4, dw = 1.6 * k, sd = (th * 2 - dw) / 2;
@@ -20803,7 +20824,9 @@ function ghouseBuild() {
     add(new THREE.BoxGeometry(th * 2 + .1, S2 - .3 - S1, th * 2 + .1), plaster, tx, (S1 + S2 - .3) / 2, cz, 1);
     for (const y of [S1 + .1, S2 - .45]) add(new THREE.BoxGeometry(th * 2 + .3, .22, th * 2 + .3), wood, tx, y, cz, 0);
     for (const [px, pz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) add(new THREE.BoxGeometry(.26, S2 - S1 - .3, .26), wood, tx + px * (th + .06), (S1 + S2 - .3) / 2, cz + pz * (th + .06), 0);
-    add(new THREE.BoxGeometry(th * 1.4, .06, .04), neon, tx, (S1 + S2) / 2, cz + th + .1, 0); }
+    putM(new THREE.PlaneGeometry(2.2, 2.2).translate(tx, (S1 + S2) / 2 + .2, cz + th + .09), emb);
+    for (const y of [S1 + .1, S2 - .45]) add(new THREE.BoxGeometry(th * 2 + .34, .05, th * 2 + .34), neon, tx, y + .12, cz, 0);     // gold trim on the timber bands
+    for (const [px, pz] of [[-1, 1], [1, 1]]) for (let y = S1 + .9; y < S2 - .8; y += 1.1) add(new THREE.SphereGeometry(.07, 6, 4), neon, tx + px * (th + .2), y, cz + pz * (th + .2), 0); }     // gold studs
   // THE DECK across both towers and the passage, rails round it (a gap at the back-east corner where the ramp arrives)
   const DX = pw / 2 + th * 2 + .2, DZ = th + .3;
   add(new THREE.BoxGeometry(DX * 2, .3, DZ * 2), plank, cx, S2 - .15, cz, 1);
@@ -20819,12 +20842,13 @@ function ghouseBuild() {
     add(new THREE.BoxGeometry(px * 2 + 2.4, .45, .45), verm, cx, H - 1.5, tz, 0);
     add(new THREE.BoxGeometry(px * 2 + 2.2, .35, .7), verm, cx, H - .2, tz, 0); add(new THREE.BoxGeometry(px * 2 + 2.6, .3, .9), black, cx, H + .12, tz, 0);
     for (const sx of [-1, 1]) { const e = add(new THREE.BoxGeometry(1.8, .3, .9), black, cx + sx * (px + 2.0), H + .32, tz, 0); e.rotation.z = sx * .28; }
-    add(new THREE.BoxGeometry(.9, 1.1, .25), black, cx, H - .85, tz, 0); add(new THREE.BoxGeometry(.6, .8, .05), neon, cx, H - .85, tz + .14, 0); }
+    add(new THREE.BoxGeometry(.9, 1.1, .25), black, cx, H - .85, tz, 0); putM(new THREE.PlaneGeometry(.8, .8).translate(cx, H - .85, tz + .14), emb); add(new THREE.BoxGeometry(1.05, 1.25, .2), neon, cx, H - .85, tz - .03, 0);
+    add(new THREE.BoxGeometry(px * 2 + 2.7, .06, .95), neon, cx, H + .3, tz, 0); }     // a gold edge on the kasagi
   // THE RAMP up the back: two flights, a landing between, a landing onto the deck's back-east corner
   { const w = 1.6 * k, za = cz - DZ - .2, zb = za - w, zc = zb - w, xE = cx + DX - .4, xW = cx - DX + 2.6, mid = S2 / 2;
     const ramp = (xa, ya, xb, yb, z0, z1) => { tris.push(xa, ya, z0, xb, yb, z0, xb, yb, z1, xa, ya, z0, xb, yb, z1, xa, ya, z1);
       const L = Math.hypot(xb - xa, yb - ya), m = new THREE.Mesh(new THREE.BoxGeometry(L, .14, z1 - z0), plank); m.position.set((xa + xb) / 2, (ya + yb) / 2 - .07, (z0 + z1) / 2);
-      m.rotation.z = Math.atan2(yb - ya, xb - xa); m.castShadow = m.receiveShadow = true; g.add(m); };
+      m.rotation.z = Math.atan2(yb - ya, xb - xa); m.castShadow = m.receiveShadow = true; m.userData.mg = 1; g.add(m); };
     ramp(xE, 0, xW, mid, zb, za); flat(xW - w, xW, zc, za, mid); add(new THREE.BoxGeometry(w, .14, w * 2), plank, xW - w / 2, mid - .07, (za + zc) / 2, 0);
     ramp(xW, mid, xE - w, S2, zc, zb); flat(xE - w, cx + DX, zc, cz - DZ + .05, S2); add(new THREE.BoxGeometry(cx + DX - xE + w, .14, cz - DZ - zc), plank, (xE - w + cx + DX) / 2, S2 - .07, (zc + cz - DZ) / 2, 0);
     flat(xE, xE + 1.2, zb, za, .02);
@@ -20833,12 +20857,12 @@ function ghouseBuild() {
   bldTris(O, tris);
   // ---- PASS 2 (m1127): the ballista, the drawbridge, the banners ----
   // BANNERS: the red diamond-spiral down each tower's outer face
-  { const ban = new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 });
-    for (const sx of [-1, 1]) { const x = cx + sx * (pw / 2 + th * 2 + .1); const bm = add(new THREE.PlaneGeometry(1.5, 4.6), ban, x, S2 - 2.9, cz, 0); bm.rotation.y = Math.PI / 2; bm.castShadow = false;
-      add(new THREE.BoxGeometry(.1, .1, 1.8), wood, x + sx * .02, S2 - .55, cz, 0); } }
+  // m@X4@: the enemy's black emblem banners -- one down each tower's outer face, two hanging in the passage mouth under the deck
+  for (const sx of [-1, 1]) { const x = cx + sx * (pw / 2 + th * 2 + .15); enemyBanner(putM, E, x, S2 - .5, cz - 1.3, Math.PI / 2, 1.5, 4.8); enemyBanner(putM, E, x, S2 - .5, cz + 1.3, Math.PI / 2, 1.5, 4.8);
+    enemyBanner(putM, E, cx + sx * (pw / 2 - .7), S1 - .2, cz + th + .35, 0, .9, 2.2); }
   // THE BALLISTA on the deck: a bronze turntable, a timber stock, two great bow arms and a string, a bolt the size of a spear on it;
   // it turns to track him and looses a bolt (a real ARROWS projectile: it can be blocked, glanced and PARRIED back) -- `ghouseStep`
-  const bronze = new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 });
+  const bronze = E.gold;
   const bal = new THREE.Group(); bal.position.set(cx + .8, S2, cz - .6); g.add(bal);
   { const mk = (geo, m, x, y, z) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = true; return o; };
     bal.add(mk(new THREE.CylinderGeometry(.85, 1, .4, 18), bronze, 0, .2, 0), mk(new THREE.CylinderGeometry(.18, .22, .9, 10), wood, 0, .85, 0));
@@ -20849,7 +20873,7 @@ function ghouseBuild() {
     const sg = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-1.6, 0, .9), new THREE.Vector3(0, 0, -.6), new THREE.Vector3(1.6, 0, .9)]);
     yawG.add(new THREE.Line(sg, new THREE.LineBasicMaterial({ color: 0x1a1a1a })));
     const bolt = arrowMesh(); bolt.scale.setScalar(2.4); bolt.position.set(0, .2, .4); yawG.add(bolt); bal.userData.bolt = bolt;
-    const eye = mk(new THREE.SphereGeometry(.09, 10, 8), new THREE.MeshBasicMaterial({ color: 0xff3a2a, toneMapped: false }), 0, .12, 1.52); yawG.add(eye); bal.userData.eye = eye; }
+    const eye = mk(new THREE.SphereGeometry(.09, 10, 8), new THREE.MeshBasicMaterial({ color: ENEMY.pal.jin, toneMapped: false }), 0, .12, 1.52); yawG.add(eye); bal.userData.eye = eye; }
   O.boxes.push({ minx: bal.position.x - .9, maxx: bal.position.x + .9, miny: S2, maxy: S2 + 1.6, minz: bal.position.z - .9, maxz: bal.position.z + .9 });
   // THE DRAWBRIDGE over the passage's mouth: a timber span hinged at the towers' front, chained to the upper storeys. It cycles:
   // down (walk in), up (the passage is shut -- climb the ramp and go over), down again
@@ -20862,14 +20886,14 @@ function ghouseBuild() {
     const ln = new THREE.Line(cg, new THREE.LineBasicMaterial({ color: 0x2a2622 })); ln.frustumCulled = false; g.add(ln); chains.push({ ln, sx }); }
   // ---- PASS 3 (m1128): the polish ----
   // an ONI MASK painted on the drawbridge's underside: when it rises, the shut gate glares at you
-  { const lq = new THREE.MeshStandardMaterial({ color: 0xa8231e, roughness: .4 }), gold = new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .9, roughness: .3 }), glow = new THREE.MeshBasicMaterial({ color: 0xffb03a, toneMapped: false });
+  { const lq = E.lacquer, gold = E.gold, glow = E.jin;
     const L = db.userData.L, m = (geo, mat, x, y, z) => { const o = new THREE.Mesh(geo, mat); o.position.set(x, y, z); db.add(o); return o; };
     const face = m(new THREE.CylinderGeometry(1.5, 1.7, .12, 20), lq, 0, -.14, L * .55); face.scale.z = 1.2;
     for (const sx of [-1, 1]) { m(new THREE.BoxGeometry(.6, .05, .18), glow, sx * .55, -.21, L * .55 + .5);     // eyes (the far end of the span is the top when raised)
       const br = m(new THREE.BoxGeometry(.8, .08, .16), black, sx * .55, -.22, L * .55 + .8); br.rotation.y = sx * .35;
       const hn = m(new THREE.ConeGeometry(.16, .9, 6), gold, sx * .9, -.3, L * .55 + 1.75); hn.rotation.x = -Math.PI / 2; hn.rotation.z = sx * .4; }
-    m(new THREE.BoxGeometry(1.4, .05, .22), black, 0, -.21, L * .55 - .65);
-    for (let k = -2; k <= 2; k++) m(new THREE.ConeGeometry(.08, .22, 4), new THREE.MeshStandardMaterial({ color: 0xf2efe6 }), k * .26, -.24, L * .55 - .5).rotation.x = Math.PI / 2; }
+    m(new THREE.BoxGeometry(1.4, .05, .22), gold, 0, -.21, L * .55 - .65);
+    for (let k = -2; k <= 2; k++) m(new THREE.ConeGeometry(.08, .22, 4), gold, k * .26, -.24, L * .55 - .5).rotation.x = Math.PI / 2; }
   // the SHIMENAWA on the torii's nuki, white shide hanging off it
   { const tz = cz + DZ + .7, y = 11 * k - 1.5 - .45, straw = new THREE.MeshStandardMaterial({ color: 0xc9b07a, roughness: 1 }), paper = new THREE.MeshStandardMaterial({ color: 0xf4f1ea, roughness: .9, side: THREE.DoubleSide });
     const pts = []; for (let k = 0; k <= 16; k++) { const u = k / 16; pts.push(new THREE.Vector3(cx - 2.9 * k + 5.8 * k * u, y - Math.sin(u * Math.PI) * .5, tz + .3)); }
@@ -20878,6 +20902,9 @@ function ghouseBuild() {
     for (const u of [.2, .4, .6, .8]) { const p0 = pts[Math.round(u * 16)]; add(shide, paper, p0.x, p0.y - .1, p0.z, 0); } }
   // a string of paper lanterns across the passage between the towers, under the deck
   bldCable(g, [cx - pw / 2, 5.6 * k, cz + th - .3], [cx + pw / 2, 5.6 * k, cz + th - .3], .5, 3, lamp); bldCable(g, [cx - pw / 2, 5.6 * k, cz - th + .3], [cx + pw / 2, 5.6 * k, cz - th + .3], .5, 3, lamp);
+  // m@X4@: two SPHINX guardians flank the passage's approach, gold-masked, mint-eyed, on battered sandstone plinths
+  for (const sx of [-1, 1]) { const x = cx + sx * (pw / 2 + 2.6), z = cz + DZ + 3.4; enemySphinx(putM, E, x, z, 0, 1.25 * k);
+    O.boxes.push({ minx: x - 1.1 * k, maxx: x + 1.1 * k, miny: 0, maxy: 2.6 * k, minz: z - 2 * k, maxz: z + 2 * k }); }
   for (const b of O.boxes) BOXES.push(b); boxGrid();
   // a HIGH BAR on the deck's west end (m1122: bars work at any height)
   const bar = hbarMake(cx - DX + 1.6, cz, Math.PI / 2, S2); HBAR.list.push(bar);
@@ -20893,24 +20920,25 @@ function ghouseBuild() {
     for (let x = -pw / 2 + .25; x <= pw / 2 - .2; x += .45) { const b = new THREE.Mesh(new THREE.BoxGeometry(.1, pH, .1), ir); b.position.set(x, pH / 2, 0); b.castShadow = true; port.add(b); const sp = new THREE.Mesh(new THREE.ConeGeometry(.08, .25, 4), ir); sp.position.set(x, -.12, 0); sp.rotation.x = Math.PI; port.add(sp); }
     for (let y = .4; y < pH; y += .9) { const b = new THREE.Mesh(new THREE.BoxGeometry(pw, .08, .12), ir); b.position.y = y; port.add(b); } }
   const portB = { minx: cx - pw / 2, maxx: cx + pw / 2, miny: 0, maxy: 4.6 * k, minz: cz - .15, maxz: cz + .15, _off: 1 }; BDYN.push(portB);
-  const abell = new THREE.Mesh(new THREE.SphereGeometry(.32, 14, 10, 0, Math.PI * 2, 0, Math.PI * .65), new THREE.MeshStandardMaterial({ color: 0xc08a40, metalness: .85, roughness: .3, side: THREE.DoubleSide })); abell.position.set(cx + pw / 2 - .6, 3.6, cz + th - .6); abell.castShadow = true; g.add(abell);
+  const abell = new THREE.Mesh(new THREE.SphereGeometry(.32, 14, 10, 0, Math.PI * 2, 0, Math.PI * .65), new THREE.MeshStandardMaterial({ color: ENEMY.pal.gold, metalness: .85, roughness: .3, side: THREE.DoubleSide })); abell.position.set(cx + pw / 2 - .6, 3.6, cz + th - .6); abell.castShadow = true; g.add(abell);
   add(new THREE.CylinderGeometry(.02, .02, S1 - 3.6, 4), wood, cx + pw / 2 - .6, (S1 + 3.6) / 2, cz + th - .6, 0);     /* the bell stays at 3.6 (a jump-strike), its rope runs to the deck */
   const archs = []; for (const sx of [-1, 1]) archerPost(cx + sx * (DX - 1.2), S2 + .05, cz + DZ - 1).then(d => { if (GHOUSE.on && GHOUSE.on.archs === archs) archs.push(d); else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {});
   // ---- PASS 6 (m1234): THE MURDER HOLE -- an iron CAULDRON on a pivot over a grated hole in the deck above the passage; strike it and it
   // TIPS, pouring a sheet of glowing Jin-oil down through the hole for `oilT` s: every body in the passage below is burned and knocked
   // flat (and him too, if he is under it); it rights itself and refills for `oilCd` s ----
   const caul = new THREE.Group(); caul.position.set(cx + .9, S1 + .55, cz); g.add(caul); let oil;
-  { const iron = new THREE.MeshStandardMaterial({ color: 0x2a2c30, metalness: .7, roughness: .45, side: THREE.DoubleSide }); const pot = new THREE.Mesh(new THREE.SphereGeometry(.6, 14, 8, 0, Math.PI * 2, Math.PI * .35, Math.PI * .65), iron); pot.rotation.x = Math.PI; pot.position.y = .1; pot.castShadow = true; caul.add(pot);
-    const brim = new THREE.Mesh(new THREE.CircleGeometry(.5, 14).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xff8a2a, toneMapped: false })); brim.position.y = .35; caul.add(brim);
+  { const iron = new THREE.MeshStandardMaterial({ color: ENEMY.pal.iron, metalness: .6, roughness: .5, side: THREE.DoubleSide }); const pot = new THREE.Mesh(new THREE.SphereGeometry(.6, 14, 8, 0, Math.PI * 2, Math.PI * .35, Math.PI * .65), iron); pot.rotation.x = Math.PI; pot.position.y = .1; pot.castShadow = true; caul.add(pot);
+    const brim = new THREE.Mesh(new THREE.CircleGeometry(.5, 14).rotateX(-Math.PI / 2), E.jin); brim.position.y = .35; caul.add(brim);
     for (const s2 of [-1, 1]) add(new THREE.BoxGeometry(.12, 1.1, .12), iron, cx + .9, S1 + .55, cz + s2 * .8, 0); add(new THREE.CylinderGeometry(.05, .05, 1.7, 6).rotateX(Math.PI / 2), iron, cx + .9, S1 + 1.05, cz, 0);
     add(new THREE.BoxGeometry(1.2, .04, 1.2), new THREE.MeshStandardMaterial({ color: 0x0a0806 }), cx, S1 + .02, cz, 0);
-    oil = new THREE.Mesh(new THREE.BoxGeometry(1, S1, 1), new THREE.MeshBasicMaterial({ color: 0xff9a3a, transparent: true, opacity: .75, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })); oil.position.set(cx, S1 / 2, cz); oil.visible = false; g.add(oil); }
+    oil = new THREE.Mesh(new THREE.BoxGeometry(1, S1, 1), new THREE.MeshBasicMaterial({ color: ENEMY.pal.jin, transparent: true, opacity: .75, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })); oil.position.set(cx, S1 / 2, cz); oil.visible = false; g.add(oil); }
+  bldMergeStatic(g);
   GHOUSE.on = { rings, g, O, bars: [bar], drone, t: 0, bal, balT: 2, db, dbS: 'down', dbT: 6, dbK: 0, dbBox: null, chains, port, portB, portY: 2.2 * k, portT: 0, abell, archs, caul, oil, oilT: 0, oilCd: 0 };
   arenaBeam(cx, cz, [1, .5, .35], 1); snd('clang', { g: .7, r: .55 });
 }
 function ghouseOil(G, dt) { const A = GHOUSE, [cx, cz] = A.at, p = player; if (G.oilCd > 0) G.oilCd -= dt;
   if (G.oilT > 0) { G.oilT -= dt; G.caul.rotation.z = Math.min(1.6, G.caul.rotation.z + dt * 6); G.oil.visible = true; G.oil.scale.set(1 + Math.sin(G.t * 30) * .08, 1, 1);
-    if (Math.random() < .6) spkBurst(cx + (Math.random() - .5) * 1.4, .2, cz + (Math.random() - .5) * 1.4, 4, { col: [1, .6, .2], spread: 3, size: .12, life: .4 }); if (Math.random() < .3) smokeAt(cx, .5, cz, 1.2, 1.2, [.3, .28, .27]);
+    if (Math.random() < .6) spkBurst(cx + (Math.random() - .5) * 1.4, .2, cz + (Math.random() - .5) * 1.4, 4, { col: [.48, 1, .85], spread: 3, size: .12, life: .4 }); if (Math.random() < .3) smokeAt(cx, .5, cz, 1.2, 1.2, [.3, .28, .27]);
     const inPass = (x, y, z) => Math.abs(x - cx) < A.pw / 2 && Math.abs(z - cz) < A.th && y < A.s1 - .5;
     if (inPass(p.pos.x, p.pos.y, p.pos.z) && !(G.oilHit > G.t)) { G.oilHit = G.t + .6; playerHurt(A.oilDmg, Math.atan2(p.pos.x - cx, p.pos.z - cz), 5, 1.5, .25, 0); }
     for (const d of DUMMIES) { if (d.st === 'gone' || d.st === 'down' || !d.root.visible || (d._oil || 0) > G.t) continue; const R = d.root.position; if (inPass(R.x, R.y, R.z)) { d._oil = G.t + 1; dummyBlow(d, Math.atan2(R.x - cx, R.z - cz), 1.4, A.oilDmg); } }
@@ -20931,7 +20959,7 @@ function ghouseStep(dt) { const G = GHOUSE.on; if (!G) return; G.t += dt; if (G.
     const man = Math.hypot(pl.pos.x - wx, pl.pos.z - wz) < A.manR && Math.abs(pl.pos.y - A.s2) < 1.4; let p = pl;
     if (man) { let best = A.balR, tg = null; for (const b of DUMMIES) { if (b.st === 'gone' || b.st === 'down' || !b.root.visible) continue; const q = Math.hypot(b.root.position.x - wx, b.root.position.z - wz); if (q > 2.5 && q < best) { best = q; tg = b; } }
       p = tg ? { pos: tg.root.position, vel: tg.vel || { x: 0, z: 0 } } : null; }
-    if (man !== G.manned) { G.manned = man; B.userData.eye.material.color.setHex(man ? 0xffc84a : 0xff3a2a); if (man) snd('clang', { g: .5, r: 1.5, x: wx, z: wz }); }
+    if (man !== G.manned) { G.manned = man; B.userData.eye.material.color.setHex(man ? 0xffc84a : ENEMY.pal.jin); if (man) snd('clang', { g: .5, r: 1.5, x: wx, z: wz }); }
     const dx = p ? p.pos.x - wx : 0, dz = p ? p.pos.z - wz : 0, d = p ? Math.hypot(dx, dz) : 0;
     const live = !!p && d < A.balR && d > 2.5; if (live) Y.rotation.y = wrapAngle(Y.rotation.y + clamp(wrapAngle(Math.atan2(dx, dz) - Y.rotation.y), -1.6 * dt, 1.6 * dt));
     G.balT -= dt; const wind = live && G.balT < A.balWind; B.userData.bolt.position.z = wind ? .4 - (1 - G.balT / A.balWind) * .5 : .4; B.userData.bolt.visible = G.balT < A.balCool - .4 || !live;
