@@ -5,6 +5,10 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## GOD > SWITCHES > RED HOLLOWS: FALLEN / RESTORED (Worker B)
+His ask: "how can I see the Red Hollows in all its glory (built) on a phone?" The state switch lived only in SPAWN > BUILDINGS, which is the
+arena/forge UI and never shows in the Red Hollows. Now a GOD menu switch in the hollows flips main's `AGE` (`mel.age`, saved) and reloads,
+dropping any `?hs=` (which would win). The mint plates still play each piece's restoration live.
 ## m1680 -- THE DRAGON FLAPS WITH HIS ARMS (a wyvern), and his legs sweep back in flight (DOCKET 11)
 His: *"in the sequence where he jumps up and flaps, he relies on his ARMS to flap the wings -- with our edit the arms are stationary, as though
 he's standing, and the wings flap without them. It's basically a wyvern. And in the air his legs look like he's standing rather than back."*
