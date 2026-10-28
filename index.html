@@ -13682,7 +13682,7 @@ function limbCut(d, dirH, power, force) {
   (d.cut = d.cut || {})[nm] = b; LIMB.stat.cuts++;
   b.getWorldPosition(_lmW); jinraEmit(_lmW.x, _lmW.y, _lmW.z, JINRA.seep);     /* m1500: Jinra seeps from the break */ spkBurst(_lmW.x, _lmW.y, _lmW.z, 30, { col: [1, .75, .3], spread: 5, size: .16, life: .45 }); snd('clang', { g: .8, r: 1.3, x: _lmW.x, z: _lmW.z }); camShake(.12);
   const C = d.cut;
-  if (C.head || (C.legL && C.legR)) { if (d.K.osari) { if (d.st !== 'gone') osariVanish(d); } else limbBoom(d, dirH); return true; }     // m15xx: an Osari goes to green smoke
+  if (C.head || (C.legL && C.legR)) { if (d.K.osari) { if (d.st !== 'gone') osariVanish(d); } else limbBoom(d, dirH); return true; }     // m1675: an Osari goes to green smoke
   if (nm === 'armR' && !C.armL) d.regrabT = LIMB.regrab;
   if (C.armL && C.armR) { d.swings = LIMB.kicks.filter(n => d.actions[n]); if (!d.swings.length) d.swings = null; if (d.wmount) d.wmount.visible = false; if (d.wmountL) d.wmountL.visible = false; }
   if (nm === 'armL' && d.wmountL) { d.wmountL.visible = false; if (!C.armR && d.wmount) d.wmount.visible = true; }
@@ -13756,7 +13756,7 @@ async function sliceDummy() {
 // dummy's limbs: each katana cut takes an arm or a leg, the last one blows him apart). TOOLS > HORDE: SLICE / PLAIN.
 const HORDE = { mix: [.5, .35, .15], floorK: 1.5, lieK: .45, kind: 'SAMURAI', per: 25, max: 150, list: [], busy: 0, hp: 3, notice: 12, fling: .25, fly: 1.7, life: 8, slice: 1, stat: { kills: 0 } };
 try { if (localStorage.getItem('mel.hslice') === '0') HORDE.slice = 0; } catch (e) {}
-// m15xx: THE OSARI OF THE HOLLOW DO NOT FALL (his: "when you finally kill him he turns into GREEN SMOKE -- he kind of explodes and evaporates").
+// m1675: THE OSARI OF THE HOLLOW DO NOT FALL (his: "when you finally kill him he turns into GREEN SMOKE -- he kind of explodes and evaporates").
 // An Osari's death is a burst of green Jinra smoke and sparks; the body swells a touch, its materials fade to nothing over `fadeT`, and he is
 // gone. His limbs still come off before that (an Osari always has `limbs`).
 const OSARI = { fadeT: .7, col: [.12, .85, .32], col2: [.04, .5, .2], fades: [] };
@@ -65032,7 +65032,7 @@ function stepDummies(dt) {
     if (d.archer) { d.model.updateMatrixWorld(true); archerBow(d); }     // m1103: after the pose
   }
   if (ARROWS.length) arrowStep(dt);
-  if (OSARI.fades.length) osariStep(dt);     // m15xx
+  if (OSARI.fades.length) osariStep(dt);     // m1675
 }
 
 // ============================================================================================

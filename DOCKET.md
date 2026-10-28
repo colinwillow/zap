@@ -13,6 +13,6 @@
        tucked); dynamic tail and wing tips (wind). Built in Blender (hand-keyed on his rig, or rotations stolen from the lightning dragon's
        `idle_fly_1/2`, `fly_fast`). Today's `attack_air` cut is not a loop and does not read as flying.
 6. [ ] **The Osari spider, rigged by hand** (four legs; not a humanoid ARP rig): body, abdomen, fangs, each leg a chain; procedural stepping.
-7. [x] (m15xx; the inner-green version is his model, open) **The Osari bowman, the race's look:** limbs that chop off (as the samurai), and his DEATH = green smoke: he bursts and evaporates.
+7. [x] (m1675; the inner-green version is his model, open) **The Osari bowman, the race's look:** limbs that chop off (as the samurai), and his DEATH = green smoke: he bursts and evaporates.
        Later: an "inner green" version of him as the war-boss-style reveal under armour.
 8. [ ] (his, last) the saddle is HIS (he will cut it from the mesh); the dragon's other bugs -- he will describe them.
