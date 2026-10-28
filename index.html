@@ -11239,18 +11239,10 @@ function dojoBeastIdle(B) { const n = B.idles[B.i++ % B.idles.length], c = B.cli
 // Every piece rides one of his own bones (so it moves with his clips). Sizes come from his height; WHERE the skin is comes from RAYCASTS on his
 // posed, skinned mesh (the back's height over the spine, the neck's girth), never guessed. Each piece's turn is solved on the rest pose so it sits
 // upright to him, then it follows the bone. TOOLS > DRAGON: CAPTURED (dressed) / WILD (bare) -- reloads.
-try { DOJO.dragonPick = localStorage.getItem('mel.dragon') === 'WILD' ? 'WILD' : 'CAPTURED'; } catch (e) { DOJO.dragonPick = 'CAPTURED'; }
-function dojoDragonDress(B, m, root, P) { const H = (B.hd = (P.h || 3.2) * B.mul), bone = n => m.getObjectByName(n), rc = new THREE.Raycaster(), meshes = []; m.traverse(o => { if (o.isSkinnedMesh) meshes.push(o); });
-  const wq = root.getWorldQuaternion(new THREE.Quaternion()), up = new THREE.Vector3(0, 1, 0), side = new THREE.Vector3(1, 0, 0).applyQuaternion(wq), fwd = new THREE.Vector3(0, 0, 1).applyQuaternion(wq);
-  // the skin hit NEAREST the bone along a line through it (the first hit is often a spike or a wing in front of the body)
-  const hitAlong = (from, dir, far, bonePos) => { rc.set(from.clone().addScaledVector(dir, -far), dir); rc.far = far * 2; const h = rc.intersectObjects(meshes, false); if (!h.length) return null; if (!bonePos) return h[0].point;
-    let best = null, bd = 1e9; for (const x of h) { const d = x.point.distanceTo(bonePos); if (x.point.clone().sub(bonePos).dot(dir) < 0 && d < bd) { bd = d; best = x.point; } } return best; };
+try { const v = localStorage.getItem('mel.dragon'); DOJO.dragonPick = v && v !== 'CAPTURED' ? 'WILD' : 'CAPTURED'; } catch (e) { DOJO.dragonPick = 'CAPTURED'; }     // m1602: the zone's EVIL / BARE read as WILD here
+function dojoDragonDress(B, m, root, P) { const H = (B.hd = (P.h || 3.2) * B.mul), { bone, wq, up, side, fwd, hitAlong, pin, bw } = dragKit(m, root, H, B.bag);     // m1602: the kit is shared with pass 2 (and `bag` collects the pieces for the zone's look switch)
   const mat = { leather: new THREE.MeshStandardMaterial({ color: 0x5a3220, roughness: .7 }), red: new THREE.MeshStandardMaterial({ color: 0xb3261c, roughness: .6, side: THREE.DoubleSide }), gold: new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .85, roughness: .3 }),
     jin: new THREE.MeshBasicMaterial({ color: JINHEX, toneMapped: false }), iron: new THREE.MeshStandardMaterial({ color: 0x2a2624, metalness: .6, roughness: .5 }) };
-  // attach `obj` (built in WORLD metres, upright to him, centred at `at`) to `bn`, compensating the bone's world scale and turn
-  const pin = (bn, obj, at) => { const b = bone(bn); if (!b) return; b.updateMatrixWorld(true); const bp = new THREE.Vector3(), bq = new THREE.Quaternion(), bs = new THREE.Vector3(); b.matrixWorld.decompose(bp, bq, bs);
-    const inv = bq.clone().invert(); obj.position.copy(at.clone().sub(bp).applyQuaternion(inv).divide(bs)); obj.quaternion.copy(inv.multiply(wq).multiply(obj.quaternion));     /* the piece's own turn is in HIS frame */ obj.scale.set(1 / bs.x, 1 / bs.y, 1 / bs.z); obj.traverse(o => { if (o.isMesh) o.castShadow = true; }); b.add(obj); };
-  const bw = n => { const b = bone(n); return b ? b.getWorldPosition(new THREE.Vector3()) : null; };
   // THE SADDLE on the back over Spine1: a seat, a raised pommel and cantle, a red blanket with a gold edge, stirrups hanging either side
   { const sp = bw('Bip001_Spine1'), top = sp && (hitAlong(sp, up.clone().negate(), H * 1.2, sp) || sp.clone().addScaledVector(up, H * .15));
     if (top) { const S = new THREE.Group(), w = H * .34, l = H * .38;
@@ -11296,10 +11288,211 @@ function dojoFlagStep(F, dt) { F.t += dt; const [x, y, z, docked] = dojoFlagPath
   for (const b of F.boxes) { b.cs = c; b.sn = -s; b.cx = x + b.lx * c + b.lz * s; b.cz = z - b.lx * s + b.lz * c; const ex = Math.abs(c) * b.hx + Math.abs(s) * b.hz, ez = Math.abs(s) * b.hx + Math.abs(c) * b.hz;
     b.minx = b.cx - ex; b.maxx = b.cx + ex; b.minz = b.cz - ez; b.maxz = b.cz + ez; b.miny = y + b.y0; b.maxy = y + b.y1; }
   F.last = { x, y, z, h: F.h }; }
+// m1602: THE DRAGON RIDE (DRAGON.md; his: *"build the blue dragon: armour and a mount, a little zone where I can mount it and ride it, for the part
+// in the game when I tame it, then play with flying it, controlling it on the ground, making it shoot an attack"*). KORAJIN > The Dragon Ride opens
+// the forge as `?w=forge&zone=dragon`: a meadow island over a sea of cloud at sunset, his blue dragon standing armoured on a stone dais at the far
+// end, stepping stones climbing to a high crag (the take-off perch, later), islands spread above and below, and Jinra hoops hung through the
+// tiers to fly through (later). The walk stays on y = 0 like every forge zone, so the island IS the floor: a rock rim at the edge, and a step off
+// the edge puts him back at the start. Declared HERE because `arenaStage()` runs at module scope (below) and reads it.
+// THE LOOKS (TOOLS > DRAGON, live in the zone, no reload): CAPTURED (ours: red lacquer, gold, the Jinra glow, the saddle, bridle and reins),
+// EVIL (the enemy's: blackened iron, spikes, chains, stolen red Jinra, his hide darkened), BARE (his model as he made it).
+const DRAGZ = { want: 0, on: null, R: 52, mul: 1.8, at: [0, 16], spawn: [0, -14], sun: [.5, .2, .84], cloudY: -60, look: 'CAPTURED', looks: ['CAPTURED', 'EVIL', 'BARE'],
+  evilTint: 0x6f5f8f, idles: ['idle', 'casual', 'idle', 'wake_up'] };
+try { if (/[?&]zone=dragon\b/.test(location.search)) DRAGZ.want = 1; } catch (e) {}
+try { const v = localStorage.getItem('mel.dragon'); DRAGZ.look = v === 'WILD' || v === 'EVIL' ? 'EVIL' : v === 'BARE' ? 'BARE' : 'CAPTURED'; } catch (e) {}
+function dragStage(g) { const Z = DRAGZ, sd = new THREE.Vector3(...Z.sun).normalize(), U = { uTime: { value: 0 }, uSun: { value: sd } }; Z.U = U;
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(880, 48, 24), new THREE.ShaderMaterial({ uniforms: U, side: THREE.BackSide, depthWrite: false, fog: false,
+    vertexShader: 'varying vec3 vD; void main() { vD = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: SKYGLSL + `uniform vec3 uSun; varying vec3 vD; void main() { gl_FragColor = vec4(skyAt(normalize(vD), uSun), 1.0);
+      #include <tonemapping_fragment>
+      #include <colorspace_fragment>
+    }` })); dome.renderOrder = -2; dome.frustumCulled = false; g.add(dome);
+  const cloud = new THREE.Mesh(new THREE.PlaneGeometry(2400, 2400, 1, 1).rotateX(-Math.PI / 2), new THREE.ShaderMaterial({ uniforms: U, transparent: true, depthWrite: false, fog: false,
+    vertexShader: 'varying vec3 vW; void main() { vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
+    fragmentShader: SKYGLSL + `uniform float uTime; uniform vec3 uSun; varying vec3 vW;
+      float h2(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); } float n2(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(h2(i), h2(i + vec2(1, 0)), f.x), mix(h2(i + vec2(0, 1)), h2(i + vec2(1, 1)), f.x), f.y); }
+      float fb(vec2 p) { float a = .5, s = 0.0; for (int i = 0; i < 5; i++) { s += a * n2(p); p *= 2.03; a *= .5; } return s; }
+      void main() { vec2 p = vW.xz * .012 + vec2(uTime * .011, uTime * .004); float c = smoothstep(.38, .78, fb(p)); float d = length(vW.xz - cameraPosition.xz);
+        vec3 lit = mix(vec3(.62, .55, .66), vec3(1.0, .86, .74), c); vec3 hz = skyAt(normalize(vec3(vW.x - cameraPosition.x, -0.02, vW.z - cameraPosition.z)), uSun);
+        vec3 col = mix(lit, hz, smoothstep(250.0, 1100.0, d)); gl_FragColor = vec4(col, mix(.55 + c * .45, 1.0, smoothstep(250.0, 900.0, d)));
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+      }` })); cloud.position.y = Z.cloudY; cloud.renderOrder = -1; cloud.frustumCulled = false; g.add(cloud);
+  scene.background = new THREE.Color(0xf0b089); if (scene.fog) { scene.fog.color.setHex(0xe8b49a); scene.fog.near = 120; scene.fog.far = 700; }
+  { const L0 = Math.hypot(_sunOff.x, _sunOff.y, _sunOff.z) || 20; _sunOff.copy(sd).multiplyScalar(L0); sun.position.copy(_sunOff); sun.color.setHex(0xffd2a6); hemi.color.setHex(0xffe0c8); hemi.groundColor.setHex(0x5a4a5a); }
+  camera.far = Math.max(camera.far, 1000); camera.updateProjectionMatrix();
+  const MG = new Map(), put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); const q = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal') q.deleteAttribute(k); MG.get(m).push(q); };
+  const M = isl3M(), ISL = [], box = (x, z, hx, hz, y0, y1) => BOXES.push({ minx: x - hx, maxx: x + hx, miny: y0, maxy: y1, minz: z - hz, maxz: z + hz });
+  // THE MEADOW: one big flat-topped island, the floor at y = 0, trees and rocks kept off the middle
+  const I = floatIsland({ R: Z.R, depth: 38, seed: 211, detail: 14, flat: 0, lobes: 4 }); I.geo.translate(0, .02, 0); ISL.push(I.geo); Z.I = I;
+  islandDress(put, I, 0, 0, 0, { cherry: 5, pine: 6, rocks: 7, shrubs: 12, roots: 26, seed: 211, clear: 24 });
+  // THE RIM: rough rocks round the edge, each its own box (seen, not invisible)
+  for (let i = 0; i < 150; i++) { const a = i / 150 * Math.PI * 2, r = I.rimR(a) * .93, x = Math.cos(a) * r, z = Math.sin(a) * r, h = .9 + isl3Hash(i, 3, 5) * .5, rg = new THREE.DodecahedronGeometry(1, 0).scale(1, h, 1).rotateY(i * 1.7);
+    put(rg.translate(x, h * .55, z), M.stone); box(x, z, .8, .8, 0, h * 1.1); }
+  // THE DAIS the dragon stands on: two low round steps (each under his .357 step), a gold ring at the edge
+  { const [x, z] = Z.at; put(new THREE.CylinderGeometry(9, 9.4, .3, 40).translate(x, .15, z), M.stone); put(new THREE.CylinderGeometry(7.2, 7.4, .3, 40).translate(x, .45, z), M.stone);
+    box(x, z, 6.4, 6.4, 0, .3); box(x, z, 5, 5, 0, .6); Z.daisY = .6;
+    const gold = new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .85, roughness: .3 }); put(new THREE.TorusGeometry(7.3, .07, 6, 64).rotateX(Math.PI / 2).translate(x, .61, z), gold);
+    for (const sd2 of [-1, 1]) { const px = x + sd2 * 10.5, pz = z - 4; put(new THREE.CylinderGeometry(.22, .28, 4.2, 8).translate(px, 2.1, pz), M.trunk); put(new THREE.BoxGeometry(.9, .9, .9).translate(px, 4.5, pz), gold); box(px, pz, .3, .3, 0, 4.2); } }
+  // THE CLIMB: stepping stones rising round the side to a high crag (the take-off perch for the flying, later)
+  const step = (x, y, z, R2, seed) => { const S = floatIsland({ R: R2, depth: 2.5 + R2, seed, detail: 3, flat: .03, lobes: 1 }); ISL.push(S.geo.translate(x, y, z)); box(x, z, R2 * .7, R2 * .7, y - .6, y + .02); };
+  for (let i = 0; i < 9; i++) { const a = .7 + i * .13, r = 28; step(Math.sin(a) * r, 1 + i, Math.cos(a) * r, 1.5, 300 + i); }
+  { const a = 1.98, r = 31, x = Math.sin(a) * r, z = Math.cos(a) * r, C = floatIsland({ R: 7, depth: 22, seed: 331, detail: 5, flat: .02, lobes: 2 }); ISL.push(C.geo.translate(x, 10, z)); box(x, z, 4.8, 4.8, 9.2, 10.02);
+    islandDress(put, C, x, 10, z, { cherry: 1, pine: 1, rocks: 2, shrubs: 2, roots: 10, seed: 331, clear: 4 }); Z.perch = [x, 10, z]; }
+  // THE TIERS: islands spread out below, level, above and high above (scenery now; places to fly to later)
+  for (const [x, y, z, R2, sdI] of [[-84, 24, 52, 13, 401], [78, 38, -74, 10, 402], [-52, 60, -104, 15, 403], [112, 14, 38, 8, 404], [24, -24, 98, 11, 405], [-118, -10, -30, 12, 406]]) {
+    const S = floatIsland({ R: R2, depth: R2 * 2.2, seed: sdI, detail: 5, flat: .05, lobes: 3 }); ISL.push(S.geo.translate(x, y, z)); islandDress(put, S, x, y, z, { cherry: 2, pine: 2, rocks: 3, shrubs: 4, roots: 12, seed: sdI }); }
+  { const o = new THREE.Mesh(mergeGeometries(ISL), isl4Mat()); o.castShadow = o.receiveShadow = true; g.add(o); }
+  for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = true; o.receiveShadow = true; g.add(o); }
+  // THE HOOPS: Jinra rings hung through the tiers
+  const hoops = [], hm = new THREE.MeshBasicMaterial({ color: 0x7affd8, toneMapped: false });
+  for (const [x, y, z, w] of [[0, 22, 64, .25], [-46, 34, 22, -.2], [42, 48, -42, .3], [-22, 14, -62, -.15], [70, 26, 40, .2]]) { const m = new THREE.Mesh(new THREE.TorusGeometry(4.5, .22, 8, 40), hm); m.position.set(x, y, z); m.rotation.y = Math.atan2(x, z); g.add(m); hoops.push({ m, w }); }
+  Z.on = { g, t: 0, go: 0, hoops, B: null }; }
+function dragHome() { const p = player, Z = DRAGZ; p.pos.set(Z.spawn[0], .05, Z.spawn[1]); p.vel.set(0, 0, 0); p.faceH = p.heading = 0; p.grounded = false; }
+function dragStep(dt) { const Z = DRAGZ, O = Z.on; O.t += dt; Z.U.uTime.value = O.t;
+  if (!O.go) { O.go = 1; dragHome(); dragBeast(); }
+  const B = O.B; if (B && B.mx) { B.mx.update(dt); B.t -= dt; if (B.t <= 0) dojoBeastIdle(B); if (B.reins && B.reins.m.visible) dragReins(B.reins); }
+  for (const h of O.hoops) h.m.rotation.y += h.w * dt;
+  const p = player.pos; if (Math.hypot(p.x, p.z) > Z.I.rimR(Math.atan2(p.z, p.x)) && p.y < 2) dragHome(); }     // off the edge: back to the start
+// HIS DRAGON in the zone: the arena's prototype cloned (scale and facing measured there), his own material per instance so the EVIL tint stays
+// here, the two armour sets built once on his posed bones and switched by visibility, a body box so he is not walked through
+async function dragBeast() { const Z = DRAGZ, O = Z.on; try { const K = await arenaLoad('DRAGON'), P = K.P, m = skeletonClone(P.proto); m.scale.setScalar(P.scale * Z.mul);
+    const [x, z] = Z.at, root = new THREE.Group(); root.add(m); root.position.set(x, Z.daisY, z); root.rotation.y = Math.atan2(Z.spawn[0] - x, Z.spawn[1] - z) + (P.faceOff || 0);
+    const mats = []; m.traverse(o => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; o.material = o.material.clone(); mats.push({ m: o.material, c: o.material.color.clone() }); } });
+    O.g.add(root); const B = { root, m, mul: Z.mul, mats, idles: Z.idles, clips: {}, i: 0, t: 0, cur: null, bag: [] }; B.mx = new THREE.AnimationMixer(m); for (const c of P.clips) B.clips[c.name] = c; dojoBeastIdle(B);
+    B.mx.update(0); root.updateMatrixWorld(true);
+    O.B = B; B.sets = { CAPTURED: B.bag, EVIL: [] };     // stood and breathing first: a dressing that throws leaves him bare, not frozen
+    try { dojoDragonDress(B, m, root, P); dragDress2(B, m, root, P); } catch (e) { console.warn('[melee] dragon dress', e); note('DRAGON DRESS ' + e.message); }
+    { const bb = new THREE.Box3(); for (const n of ['Bip001_Pelvis', 'Bip001_Spine2', 'Bip001_Neck', 'Bip001_L_UpperArm', 'Bip001_R_UpperArm', 'Bip001_L_Thigh', 'Bip001_R_Thigh']) { const b = m.getObjectByName(n); if (b) bb.expandByPoint(b.getWorldPosition(new THREE.Vector3())); }
+      const pd = B.hd * .1; B.box = { minx: bb.min.x - pd, maxx: bb.max.x + pd, miny: 0, maxy: bb.max.y, minz: bb.min.z - pd, maxz: bb.max.z + pd, noCam: 1 }; BOXES.push(B.box); boxGrid(); }
+    dragLook();
+  } catch (e) { console.warn('[melee] dragon zone', e); note('NO DRAGON ' + e.message); } }
+function dragLook() { const B = DRAGZ.on && DRAGZ.on.B; if (!B) return; const L = DRAGZ.look;
+  for (const k in B.sets) for (const o of B.sets[k]) o.visible = k === L;
+  if (B.reins) B.reins.m.visible = L === 'CAPTURED';
+  for (const q of B.mats) { q.m.color.copy(q.c); if (L === 'EVIL') q.m.color.multiply(new THREE.Color(DRAGZ.evilTint)); } }
+// the measuring kit both dressing passes use: his bones by name, raycasts on his posed skinned mesh, and `pin` (an object built in WORLD metres,
+// upright to him, centred at `at`, parented to a bone with the bone's world scale and turn undone). `bag` collects every pinned piece.
+function dragKit(m, root, H, bag) { const bone = n => m.getObjectByName(n), rc = new THREE.Raycaster(), meshes = []; m.traverse(o => { if (o.isSkinnedMesh) meshes.push(o); });
+  const wq = root.getWorldQuaternion(new THREE.Quaternion()), up = new THREE.Vector3(0, 1, 0), side = new THREE.Vector3(1, 0, 0).applyQuaternion(wq), fwd = new THREE.Vector3(0, 0, 1).applyQuaternion(wq);
+  // the skin hit NEAREST the bone along a line through it (the first hit is often a spike or a wing in front of the body); no bone: the first hit
+  const hitAlong = (from, dir, far, bonePos) => { rc.set(from.clone().addScaledVector(dir, -far), dir); rc.far = far * 2; const h = rc.intersectObjects(meshes, false); if (!h.length) return null; if (!bonePos) return h[0].point;
+    let best = null, bd = 1e9; for (const x of h) { const d = x.point.distanceTo(bonePos); if (x.point.clone().sub(bonePos).dot(dir) < 0 && d < bd) { bd = d; best = x.point; } } return best; };
+  const pin = (bn, obj, at) => { const b = bone(bn); if (!b) return; b.updateMatrixWorld(true); const bp = new THREE.Vector3(), bq = new THREE.Quaternion(), bs = new THREE.Vector3(); b.matrixWorld.decompose(bp, bq, bs);
+    const inv = bq.clone().invert(); obj.position.copy(at.clone().sub(bp).applyQuaternion(inv).divide(bs)); obj.quaternion.copy(inv.multiply(wq).multiply(obj.quaternion));     /* the piece's own turn is in HIS frame */ obj.scale.set(1 / bs.x, 1 / bs.y, 1 / bs.z); obj.traverse(o => { if (o.isMesh) o.castShadow = true; }); b.add(obj); if (bag) bag.push(obj); };
+  const bw = n => { const b = bone(n); return b ? b.getWorldPosition(new THREE.Vector3()) : null; };
+  // a WORLD turn as the piece's turn in his frame (what `pin` wants)
+  const inHis = q => wq.clone().invert().multiply(q);
+  return { H, bone, wq, up, side, fwd, hitAlong, pin, bw, inHis }; }
+// m1602: DRESSING PASS 2 (BUILDINGS.md THE DRAGON RIDE; KORAJIN.md THE BLUE DRAGON). On top of pass 1 (saddle, collar, bands, cape) for CAPTURED:
+// a red-lacquer HEAD PLATE with a gold ridge and a Jinra gem, a BRIDLE (brow band, nose band, cheek straps, gold bit rings) and REINS that run
+// live from the bit to the saddle, a tall CANTLE and hanging saddle LAMES, PAULDRONS, a CHEST PLATE with our nested-diamond crest, lacquer PLATES
+// down the neck and tail, gold TAIL RINGS and a crescent blade with red tassels at the tip. EVIL is the enemy's version of the same body: a
+// blackened iron MASK with swept horns, SPIKED plates, a spiked collar with a hanging CHAIN, shackles with broken links, and STOLEN Jinra glowing
+// red in crystals on the shoulders and chest. Every size comes from his height; every placement from raycasts on his posed skin.
+function dragDress2(B, m, root, P) { const H = B.hd, cap = B.sets.CAPTURED, evil = B.sets.EVIL;
+  const KC = dragKit(m, root, H, cap), KE = dragKit(m, root, H, evil), { up, side, fwd, hitAlong, bw, inHis } = KC, Zv = new THREE.Vector3(0, 0, 1);
+  const std = (c, o) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: .5 }, o || {}));
+  const mt = { lac: std(0xa31d18, { roughness: .32, metalness: .1, side: THREE.DoubleSide }), blk: std(0x1a1512, { roughness: .35, side: THREE.DoubleSide }), gold: std(0xd9a441, { metalness: .85, roughness: .3 }),
+    leather: std(0x4a2a1a, { roughness: .75 }), red: std(0xb3261c, { roughness: .7, side: THREE.DoubleSide }), jin: new THREE.MeshBasicMaterial({ color: 0x7affd8, toneMapped: false }),
+    iron: std(0x262220, { metalness: .7, roughness: .42, side: THREE.DoubleSide }), rust: std(0x4a3226, { metalness: .4, roughness: .6 }), blood: new THREE.MeshBasicMaterial({ color: 0xff3424, toneMapped: false }) };
+  // an arched PLATE: an open shell over +Y, its length along Z, its crown at the origin; gold edges front and back when `edge`
+  const shell = (w, l, mat, edge, arc = 2.3) => { const r = w / 2 / Math.sin(arc / 2), G = new THREE.Group(), s = new THREE.Mesh(new THREE.CylinderGeometry(r, r, l, 14, 1, true, -arc / 2, arc).rotateX(-Math.PI / 2).translate(0, -r, 0), mat); G.add(s);
+    if (edge) for (const zz of [-l / 2, l / 2]) G.add(new THREE.Mesh(new THREE.TorusGeometry(r, H * .006, 5, 16, arc).rotateZ(Math.PI / 2 - arc / 2).translate(0, -r, zz), edge));
+    return G; };
+  const spike = (h, r, mat) => new THREE.Mesh(new THREE.ConeGeometry(r, h, 6).translate(0, h / 2, 0), mat);
+  const qTo = (a, b) => new THREE.Quaternion().setFromUnitVectors(a, b);
+  const girth = (p, bn) => { const e = hitAlong(p, side.clone().negate(), H * .6, p); return e ? Math.max(H * .03, e.distanceTo(p)) : H * .06; };
+  const topOf = p => hitAlong(p, up.clone().negate(), H, p) || p.clone().addScaledVector(up, H * .06);
+  // PLATES down the neck and the tail (and the EVIL twins, spiked)
+  const chain = [['Bip001_Neck', 'Bip001_Neck1'], ['Bip001_Neck1', 'Bip001_Neck2'], ['bone01', 'bone02'], ['bone02', 'bone03'], ['bone03', 'bone04'], ['bone04', 'bone05']];
+  for (const [a, b] of chain) { const pa = bw(a), pb = bw(b); if (!pa || !pb) continue; const mid = pa.clone().lerp(pb, .5), dir = pb.clone().sub(pa), L = dir.length(); dir.normalize();
+    const t = topOf(mid), hw = girth(mid), q = inHis(qTo(Zv, dir));
+    const C = shell(hw * 1.5, L * 1.05, mt.lac, mt.gold); C.quaternion.copy(q); KC.pin(a, C, t);
+    const E = shell(hw * 1.5, L * 1.05, mt.iron, mt.rust); E.add(spike(H * .07 * Math.min(1.4, hw / (H * .06)), H * .018, mt.rust)); E.quaternion.copy(q); KE.pin(a, E, t); }
+  // THE HEAD: the snout measured (the first skin hit from in front), the skull's top (the hit nearest the bone from above)
+  const hp = bw('Bip001_Head');
+  if (hp) { const st = hitAlong(hp, fwd.clone().negate(), H) || hp.clone().addScaledVector(fwd, H * .14), sl = Math.max(H * .06, st.distanceTo(hp)), d = st.clone().sub(hp).normalize(), qd = inHis(qTo(Zv, d));
+    const at = k => hp.clone().addScaledVector(d, sl * k), c1 = at(.42), t1 = topOf(c1), w1 = girth(c1);
+    // CAPTURED: the head plate, a gold ridge, a Jinra gem on the brow
+    { const C = shell(w1 * 1.7, sl * .62, mt.lac, mt.gold); C.add(new THREE.Mesh(new THREE.BoxGeometry(H * .012, H * .014, sl * .6).translate(0, H * .006, 0), mt.gold));
+      const gem = new THREE.Mesh(new THREE.OctahedronGeometry(H * .022), mt.jin); gem.scale.set(1, .6, 1.4); gem.position.set(0, H * .014, -sl * .26); C.add(gem); C.quaternion.copy(qd); KC.pin('Bip001_Head', C, t1); }
+    // EVIL: the iron mask, ridge spikes, two swept horns, glowing slits
+    { const E = shell(w1 * 1.75, sl * .66, mt.iron, mt.rust); for (let k = 0; k < 3; k++) { const s = spike(H * (.05 - k * .01), H * .012, mt.rust); s.position.z = -sl * .2 + k * sl * .2; E.add(s); }
+      for (const sd2 of [-1, 1]) { const hn = spike(H * .16, H * .022, mt.iron); hn.position.set(sd2 * w1 * .7, -H * .005, -sl * .3); hn.rotation.set(-1.15, 0, -sd2 * .45); E.add(hn);
+        const sl2 = new THREE.Mesh(new THREE.BoxGeometry(H * .03, H * .006, H * .008), mt.blood); sl2.position.set(sd2 * w1 * .55, -H * .01, -sl * .12); sl2.rotation.y = sd2 * .4; E.add(sl2); }
+      E.quaternion.copy(qd); KE.pin('Bip001_Head', E, t1); }
+    // THE BRIDLE: a brow band and a nose band (upper arcs, so the jaw still opens), cheek straps between them, gold bit rings
+    const band = (k, mat, tube) => { const c = at(k), r = girth(c) * 1.08, G = new THREE.Group(); G.add(new THREE.Mesh(new THREE.TorusGeometry(r, tube, 6, 18, Math.PI * 1.3).rotateZ(-Math.PI * .15), mat));
+      for (let s = 0; s < 5; s++) { const a = Math.PI * (-.1 + s * .3), st2 = new THREE.Mesh(new THREE.SphereGeometry(tube * 1.4, 6, 4), mt.gold); st2.position.set(Math.cos(a) * r, Math.sin(a) * r, 0); G.add(st2); }
+      G.quaternion.copy(qd); KC.pin('Bip001_Head', G, c); return { c, r }; };
+    const bb = band(.12, mt.gold, H * .007), nb = band(.74, mt.leather, H * .009);
+    const sideW = new THREE.Vector3().crossVectors(up, d).normalize();
+    B.bits = [];
+    for (const sd2 of [-1, 1]) { const a = bb.c.clone().addScaledVector(sideW, sd2 * bb.r * .95).addScaledVector(up, -bb.r * .2), b = nb.c.clone().addScaledVector(sideW, sd2 * nb.r * .95).addScaledVector(up, -nb.r * .2), L = a.distanceTo(b);
+      const s = new THREE.Mesh(new THREE.BoxGeometry(H * .006, H * .014, L), mt.leather); s.quaternion.copy(inHis(qTo(Zv, b.clone().sub(a).normalize()))); KC.pin('Bip001_Head', s, a.clone().lerp(b, .5));
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(H * .016, H * .004, 6, 14), mt.gold); ring.quaternion.copy(inHis(qTo(Zv, sideW.clone().multiplyScalar(sd2)))); const rp = b.clone().addScaledVector(sideW, sd2 * H * .008).addScaledVector(up, -nb.r * .25); KC.pin('Bip001_Head', ring, rp); B.bits.push(ring); } }
+  // THE SADDLE, finished: a tall lacquer CANTLE behind the seat, hanging LAMES either side, two gold REIN RINGS at the pommel
+  const sp = bw('Bip001_Spine1'), stop = sp && topOf(sp);
+  if (stop) { const w = H * .34, l = H * .38, G = new THREE.Group();
+    const back = new THREE.Mesh(new THREE.BoxGeometry(w * .95, H * .13, H * .022), mt.lac); back.position.set(0, H * .1, -l * .5); back.rotation.x = -.2; G.add(back);
+    const bar = new THREE.Mesh(new THREE.CylinderGeometry(H * .009, H * .009, w, 8).rotateZ(Math.PI / 2), mt.gold); bar.position.set(0, H * .165, -l * .52); G.add(bar);
+    const crest = new THREE.Mesh(new THREE.TorusGeometry(H * .03, H * .005, 3, 4), mt.gold); crest.position.set(0, H * .1, -l * .5 + H * .013); crest.rotation.x = -.2; G.add(crest);
+    for (const sd2 of [-1, 1]) for (let k = 0; k < 3; k++) { const lm = new THREE.Mesh(new THREE.BoxGeometry(H * .012, H * .05, l * .8), k % 2 ? mt.blk : mt.lac); lm.position.set(sd2 * (w * .86 + k * H * .006), -H * .02 - k * H * .045, 0); lm.rotation.z = sd2 * .25; G.add(lm);
+      const tr = new THREE.Mesh(new THREE.BoxGeometry(H * .013, H * .006, l * .81), mt.gold); tr.position.set(lm.position.x, lm.position.y - H * .025, 0); tr.rotation.z = sd2 * .25; G.add(tr); }
+    KC.pin('Bip001_Spine1', G, stop);
+    B.reinAt = [];
+    for (const sd2 of [-1, 1]) { const rr = new THREE.Mesh(new THREE.TorusGeometry(H * .014, H * .004, 6, 12), mt.gold); rr.rotation.y = Math.PI / 2; const at2 = stop.clone().addScaledVector(up, H * .1).addScaledVector(fwd, l * .5).addScaledVector(side, sd2 * w * .2); KC.pin('Bip001_Spine1', rr, at2); B.reinAt.push(rr); } }
+  if (B.bits && B.bits.length === 2 && B.reinAt && B.reinAt.length === 2) B.reins = dragReinsMake(B, H, mt.leather);
+  // PAULDRONS (CAPTURED: lacquer lames with gold; EVIL: iron with a red crystal) over each shoulder
+  for (const [bn, sd2] of [['Bip001_L_UpperArm', 1], ['Bip001_R_UpperArm', -1]]) { const pa = bw(bn); if (!pa) continue; const S = side.clone().multiplyScalar(sd2).addScaledVector(up, .8).normalize(), p = hitAlong(pa, S.clone().negate(), H * .6, pa) || pa.clone().addScaledVector(S, H * .05), q = inHis(qTo(up, S));
+    const C = new THREE.Group(); for (let k = 0; k < 3; k++) { const s = shell(H * (.19 - k * .025), H * .12, k % 2 ? mt.blk : mt.lac, mt.gold); s.position.y = -k * H * .03; s.rotation.x = k * .12; C.add(s); } C.quaternion.copy(q); KC.pin(bn, C, p);
+    const E = shell(H * .2, H * .14, mt.iron, mt.rust); for (let k = 0; k < 3; k++) { const s = spike(H * .05, H * .012, mt.rust); s.position.z = (k - 1) * H * .045; s.rotation.x = (k - 1) * .3; E.add(s); }
+    const cr = new THREE.Mesh(new THREE.OctahedronGeometry(H * .035), mt.blood); cr.scale.set(.6, 1.8, .6); cr.position.set(0, H * .02, -H * .05); cr.rotation.x = -.6; E.add(cr); E.quaternion.copy(q); KE.pin(bn, E, p); }
+  // THE CHEST PLATE on the breast (CAPTURED: lacquer, gold rim, our nested-diamond crest round a Jinra gem; EVIL: iron, a stolen red crystal)
+  { const pc = bw('Bip001_Spine2'); if (pc) { const S = fwd.clone().multiplyScalar(.75).addScaledVector(up, -.66).normalize(), p = hitAlong(pc, S.clone().negate(), H, pc) || pc.clone().addScaledVector(S, H * .1), hw = girth(pc), q = inHis(qTo(up, S));
+    const C = shell(hw * 1.7, H * .2, mt.lac, mt.gold, 1.9); for (const r of [.055, .036, .018]) { const dm = new THREE.Mesh(new THREE.TorusGeometry(H * r, H * .004, 3, 4), mt.gold); dm.rotation.x = Math.PI / 2; dm.position.y = H * .006; C.add(dm); }
+    const gem = new THREE.Mesh(new THREE.OctahedronGeometry(H * .012), mt.jin); gem.position.y = H * .01; C.add(gem); C.quaternion.copy(q); KC.pin('Bip001_Spine2', C, p);
+    const E = shell(hw * 1.75, H * .22, mt.iron, mt.rust, 1.9); const cr = new THREE.Mesh(new THREE.OctahedronGeometry(H * .03), mt.blood); cr.scale.set(1, .7, 1.6); cr.position.y = H * .01; E.add(cr);
+    for (const sd2 of [-1, 1]) { const s = spike(H * .05, H * .012, mt.rust); s.position.x = sd2 * hw * .55; E.add(s); } E.quaternion.copy(q); KE.pin('Bip001_Spine2', E, p); } }
+  // THE TAIL: gold rings (CAPTURED) or iron studded bands (EVIL), and at the tip a crescent blade with red tassels, or an iron spiked mace-head
+  for (const [bn, nx] of [['bone04', 'bone05'], ['bone05', 'bone06']]) { const pa = bw(bn), pb = bw(nx); if (!pa || !pb) continue; const at2 = pa.clone().lerp(pb, .55), r = girth(at2) * 1.12, q = inHis(qTo(Zv, pb.clone().sub(pa).normalize()));
+    const C = new THREE.Mesh(new THREE.CylinderGeometry(r, r, H * .03, 16, 1, true).rotateX(Math.PI / 2), mt.gold); C.quaternion.copy(q); KC.pin(bn, C, at2);
+    const E = new THREE.Group(); E.add(new THREE.Mesh(new THREE.CylinderGeometry(r, r, H * .035, 12, 1, true).rotateX(Math.PI / 2), mt.iron)); for (let k = 0; k < 4; k++) { const s = spike(H * .03, H * .008, mt.rust); s.rotation.z = k * Math.PI / 2; s.position.set(-Math.sin(k * Math.PI / 2) * r, Math.cos(k * Math.PI / 2) * r, 0); E.add(s); } E.quaternion.copy(q); KE.pin(bn, E, at2); }
+  { const pa = bw('bone05'), pb = bw('bone06'); if (pa && pb) { const dir = pb.clone().sub(pa).normalize(), q = inHis(qTo(Zv, dir));
+    const C = new THREE.Group(), bl = new THREE.Mesh(new THREE.TorusGeometry(H * .07, H * .012, 4, 20, Math.PI * 1.1).rotateZ(-Math.PI * .05), mt.gold); bl.rotation.y = Math.PI / 2; bl.position.z = H * .04; C.add(bl);
+    for (const sd2 of [-1, 1]) { const ts = new THREE.Mesh(new THREE.ConeGeometry(H * .018, H * .12, 6).translate(0, -H * .06, 0), mt.red); ts.position.set(sd2 * H * .02, 0, 0); ts.rotation.z = sd2 * .3; C.add(ts); }
+    C.quaternion.copy(q); KC.pin('bone06', C, pb);
+    const E = new THREE.Group(); E.add(new THREE.Mesh(new THREE.IcosahedronGeometry(H * .04, 0), mt.iron)); for (let k = 0; k < 8; k++) { const s = spike(H * .06, H * .012, mt.rust); s.quaternion.setFromUnitVectors(up, new THREE.Vector3(Math.cos(k * 2.4), Math.sin(k * 1.7), Math.sin(k * 2.4)).normalize()); E.add(s); }
+    E.quaternion.copy(q); KE.pin('bone06', E, pb); } }
+  // EVIL's collar: a spiked iron band round the neck with a chain hanging from it; and shackles with broken links on the four limbs
+  { const nk = bw('Bip001_Neck1'), n2 = bw('Bip001_Neck2'); if (nk && n2) { const r = Math.min(H * .12, girth(nk) * 1.15), E = new THREE.Group();
+      E.add(new THREE.Mesh(new THREE.CylinderGeometry(r, r, H * .06, 20, 1, true).rotateX(Math.PI / 2), mt.iron));
+      for (let k = 0; k < 10; k++) { const a = k / 10 * Math.PI * 2, s = spike(H * .06, H * .013, mt.rust); s.position.set(Math.cos(a) * r, Math.sin(a) * r, 0); s.rotation.z = a - Math.PI / 2; E.add(s); }
+      for (let k = 0; k < 7; k++) { const lk = new THREE.Mesh(new THREE.TorusGeometry(H * .016, H * .005, 5, 10), mt.iron); lk.position.set(0, -r - k * H * .026, H * .01); lk.rotation.y = k % 2 ? Math.PI / 2 : 0; lk.scale.y = 1.4; E.add(lk); }
+      E.quaternion.copy(inHis(qTo(Zv, n2.clone().sub(nk).normalize()))); KE.pin('Bip001_Neck1', E, nk); } }
+  for (const [bn, rr] of [['Bip001_L_Forearm', .05], ['Bip001_R_Forearm', .05], ['Bip001_L_Calf', .055], ['Bip001_R_Calf', .055]]) { const pa = bw(bn), pb = bw(bn.replace('Forearm', 'Hand').replace('Calf', 'Foot')); if (!pa || !pb) continue;
+    const at2 = pa.clone().lerp(pb, .7), E = new THREE.Group(), r = H * rr; E.add(new THREE.Mesh(new THREE.CylinderGeometry(r, r * 1.05, H * .06, 14, 1, true), mt.iron));
+    for (let k = 0; k < 3; k++) { const lk = new THREE.Mesh(new THREE.TorusGeometry(H * .014, H * .0045, 5, 10), mt.iron); lk.position.set(r * 1.1, -H * .03 - k * H * .022, 0); lk.rotation.y = k % 2 ? Math.PI / 2 : 0; lk.scale.y = 1.4; E.add(lk); }
+    E.quaternion.copy(inHis(qTo(up, pb.clone().sub(pa).normalize()))); KE.pin(bn, E, at2); } }
+// THE REINS: two leather tubes from the bit rings to the saddle rings, rebuilt every frame from where those rings are (so they follow his head
+// and his breathing) with a little sag; in the zone's group, in WORLD space
+function dragReinsMake(B, H, mat) { const N = 14, S = 5, R = [], g = new THREE.BufferGeometry(), V = 2 * (N + 1) * S, pos = new Float32Array(V * 3), nor = new Float32Array(V * 3), idx = [];
+  for (let k = 0; k < 2; k++) for (let i = 0; i < N; i++) for (let j = 0; j < S; j++) { const a = k * (N + 1) * S + i * S + j, b = a + S, c = k * (N + 1) * S + i * S + (j + 1) % S, d = c + S; idx.push(a, b, c, c, b, d); }
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); g.setIndex(idx);
+  const m = new THREE.Mesh(g, mat); m.frustumCulled = false; m.castShadow = true; DRAGZ.on.g.add(m);
+  return { m, g, pos, nor, N, S, r: H * .005, sag: .12, from: B.bits, to: B.reinAt, a: new THREE.Vector3(), b: new THREE.Vector3(), p: new THREE.Vector3(), t: new THREE.Vector3(), n1: new THREE.Vector3(), n2: new THREE.Vector3(), up: new THREE.Vector3(0, 1, 0) }; }
+function dragReins(Rn) { const { N, S, pos, nor, a, b, p, t, n1, n2 } = Rn;
+  for (let k = 0; k < 2; k++) { Rn.from[k].getWorldPosition(a); Rn.to[k].getWorldPosition(b); const L = a.distanceTo(b); t.subVectors(b, a).normalize(); n1.crossVectors(t, Rn.up).normalize(); n2.crossVectors(n1, t);
+    for (let i = 0; i <= N; i++) { const u = i / N; p.lerpVectors(a, b, u); p.y -= Rn.sag * L * 4 * u * (1 - u);
+      for (let j = 0; j < S; j++) { const th = j / S * Math.PI * 2, cx = Math.cos(th), sy = Math.sin(th), o = (k * (N + 1) * S + i * S + j) * 3, nx = n1.x * cx + n2.x * sy, ny = n1.y * cx + n2.y * sy, nz = n1.z * cx + n2.z * sy;
+        pos[o] = p.x + nx * Rn.r; pos[o + 1] = p.y + ny * Rn.r; pos[o + 2] = p.z + nz * Rn.r; nor[o] = nx; nor[o + 1] = ny; nor[o + 2] = nz; } } }
+  Rn.g.attributes.position.needsUpdate = Rn.g.attributes.normal.needsUpdate = true; }
 function arenaStage() {
   arenaSky();
   const R = ARENA.r, g = new THREE.Group(), L = ARENA.look; world.add(g);
   // m1117: THE BUILDING FORGE -- a clean white floor under the arena's sky, nothing else: the buildings are spawned into it (SPAWN > BUILDINGS)
+  if (inForge() && DRAGZ.want) { dragStage(g); CWALL.g = g; COVER.meshes = []; COVER.boxes = []; ARENA.r = 60; return; }     // m1602: THE DRAGON RIDE's island instead of the white floor
   if (inForge() && SNOWZ.want) { snowStage(g); CWALL.g = g; COVER.meshes = []; COVER.boxes = []; ARENA.r = 60; return; }     // m1384: THE SNOWFIELD instead of the white floor
   if (inForge() && SHIPZ.want) { shipSea(g); CWALL.g = g; COVER.meshes = []; COVER.boxes = []; ARENA.r = 60; return; }     // m1373: THE SHIP's sea instead of the white floor
   if (inForge()) { const cv = document.createElement('canvas'); cv.width = cv.height = 512; const c = cv.getContext('2d'); c.fillStyle = '#f2f3f5'; c.fillRect(0, 0, 512, 512);
@@ -13374,6 +13567,7 @@ function arenaUi() {
       else if (a === 'grip') { gripSet({ HIGH: 'MID', MID: 'OFF', OFF: 'HIGH' }[MOVE.gripPick]); try { localStorage.setItem('mel.grip', MOVE.gripPick); } catch (err) {} }
       else if (a === 'rhue') { const k = Object.keys(RIVAL.hues), n = k[(k.indexOf(RIVAL.pick) + 1) % k.length]; RIVAL.pick = n; RIVAL.u.value = RIVAL.hues[n] * Math.PI / 180; try { localStorage.setItem('mel.rival.hue', n); } catch (err) {} }
       else if (a === 'tlie') { TAIL.lie = { FLAT: 'BELLY', BELLY: 'OFF', OFF: 'FLAT' }[TAIL.lie]; try { localStorage.setItem('mel.tail.lie', TAIL.lie); } catch (err) {} }
+      else if (a === 'dragon' && DRAGZ.on) { const T = DRAGZ.looks; DRAGZ.look = T[(T.indexOf(DRAGZ.look) + 1) % T.length]; try { localStorage.setItem('mel.dragon', DRAGZ.look); } catch (err) {} dragLook(); }     // m1602: live in the zone
       else if (a === 'dragon') { try { localStorage.setItem('mel.dragon', DOJO.dragonPick === 'WILD' ? 'CAPTURED' : 'WILD'); } catch (err) {} location.reload(); }     // m1518
       else if (a === 'rwsky') { try { localStorage.setItem('mel.rwsky', RWSKYS[(RWSKYS.indexOf(RW.skyPick) + 1) % RWSKYS.length]); } catch (err) {} location.reload(); }     // his panorama over the Red Hollows
       else if (a === 'dsky') { try { localStorage.setItem('mel.dojo.sky', SKYPICKS[(SKYPICKS.indexOf(DOJO.skyPick) + 1) % SKYPICKS.length]); } catch (err) {} location.reload(); }     // m1446
@@ -13393,7 +13587,7 @@ function arenaUi() {
   if (ARENA.tools === undefined) { try { ARENA.tools = +localStorage.getItem('mel.arena.tools') || 0; } catch (err) { ARENA.tools = 0; } }
   const tools = ARENA.tools && !m;     // a menu open folds the tools away: the screen is not tall enough for both
   let h = '<div class="ar-bar">' + B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('vend', 'VEND') + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
-    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('btrail', 'TRAIL ' + (BTRAIL.jin ? 'JIN' : 'BLUE')) + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('sample', 'DNA SAMPLE ' + (SAMPLE.on ? 'ON' : 'OFF')) + B('runslash', 'RUN SLASH ' + (RUNSLASH.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('dsky', 'SKY ' + DOJO.skyPick) + B('rwsky', 'HOLLOWS SKY ' + RW.skyPick) + B('dragon', 'DRAGON ' + DOJO.dragonPick) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
+    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('btrail', 'TRAIL ' + (BTRAIL.jin ? 'JIN' : 'BLUE')) + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('sample', 'DNA SAMPLE ' + (SAMPLE.on ? 'ON' : 'OFF')) + B('runslash', 'RUN SLASH ' + (RUNSLASH.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('dsky', 'SKY ' + DOJO.skyPick) + B('rwsky', 'HOLLOWS SKY ' + RW.skyPick) + B('dragon', 'DRAGON ' + (DRAGZ.on ? DRAGZ.look : DOJO.dragonPick)) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
   if (m === 'bld') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back') + B('age', 'STATE: ' + (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + '<small>tap to switch -- rebuilds what stands</small>', '', AGE.st === 'fallen' ? '' : 'ar-on');
     for (const E of BLDG.list) h += B('bld', E.t + '<small>' + (E.on() ? 'tap to remove' : E.pass >= 3 ? E.sub : 'IN PROGRESS · pass ' + E.pass + ' of 3') + '</small>', E.key, E.on() ? 'ar-on' : '');
     h += '</div>'; }
@@ -30713,7 +30907,7 @@ function boardPose(dt) {
 }
 
 function stepPlayer(dt) {
-  if (inArena()) { deflStep(dt); hallStep(dt); if (SKIN.list.length) skinStep(dt); if (PIECE.list.length) pieceStep(dt); if (SMASH.list.length) smashStep(dt); for (const E of BLDG.list) if (E.step && E.on()) E.step(dt); if (LVL.want && inForge()) lvlStart(); if (BEACON.want && inForge()) { try { beaconBuild(); } catch (e) { BEACON.want = 0; note("BEACON THREW " + e.message); } } if (BEACON.on) beaconStep(dt); if (LVG.on) lvgStep(dt); if (SHIPZ.want === 1 && inForge()) shipBuild(); if (SHIPZ.on) shipStep(dt); if (SNOWZ.on) snowStep(dt); }
+  if (inArena()) { deflStep(dt); hallStep(dt); if (SKIN.list.length) skinStep(dt); if (PIECE.list.length) pieceStep(dt); if (SMASH.list.length) smashStep(dt); for (const E of BLDG.list) if (E.step && E.on()) E.step(dt); if (LVL.want && inForge()) lvlStart(); if (BEACON.want && inForge()) { try { beaconBuild(); } catch (e) { BEACON.want = 0; note("BEACON THREW " + e.message); } } if (BEACON.on) beaconStep(dt); if (LVG.on) lvgStep(dt); if (SHIPZ.want === 1 && inForge()) shipBuild(); if (SHIPZ.on) shipStep(dt); if (SNOWZ.on) snowStep(dt); if (DRAGZ.on) dragStep(dt); }
   if (PLANT.list.length) plantStep(dt);     // m1424
   if (RESTORE.list.length) restoreStep(dt);     // m1505     // m1105; m1119; m1120: each building's own life
   const p = player;
@@ -69071,6 +69265,7 @@ function startGate() {
       btn(el, 'Level 1 -- The Grid', 'The first level, built in layers: the run first, then the puzzle, the enemies, the theme, the boss. Toggle each layer at the top.', () => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter('forge', '?w=forge&lvl=1'); });
       btn(el, 'Level 1 v2 -- The First Beacon', 'The blueprint level: the canyon to the enemy torch tower, generated from the measured moves. The run only (layer 1), a greybox.', () => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter('forge', '?w=forge&lvl=beacon'); });
       btn(el, 'The Snowfield', 'Deep snow under a falling sky: trudge, leave tracks, plough, dive -- the snow bounces off you. (An element sandbox.)', () => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter('forge', '?w=forge&zone=snow'); });
+      btn(el, 'The Dragon Ride', 'His blue dragon on a sky island: armoured, the evil and captured looks (TOOLS > DRAGON). Mount, ride, fly, fireballs, taming -- being built.', () => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter('forge', '?w=forge&zone=dragon'); });
       btn(el, 'The Ship', 'A samurai pirate ship on a sunrise sea: climb the rigging, the sails, the castle, the cabin. (Being built.)', () => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter('forge', '?w=forge&zone=ship'); });
       btn(el, 'Building Forge', 'An empty white floor: spawn the buildings, run on them, swing on them, blow them up.', () => go('forge'));
       btn(el, 'The Red Hollows', 'His home: the canyon, the river, the hut. (Being built.)', () => go('home'));

@@ -100,7 +100,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 - [ ] a sandbox: the blue dragon, tame (a Jinra offering), mount, ride on the ground, take off, fly (RollerGirl's wingsuit model), land
 - [ ] fireballs from the saddle; Grumbo's gun while riding
 - [x] **dressing pass 1 (m1519):** on HIS bones, measured by raycasts on his skinned mesh: a saddle (seat, pommel, cantle, red blanket with a gold edge, stirrups), a gold collar with a glowing Jinra ring and tag, gold bands on the forearms and calves, our red cape with the nested-diamond crest. TOOLS > DRAGON: CAPTURED / WILD
-- [ ] dressing pass 2: tail ornaments, a bridle and reins, a richer saddle (to fit Grumbo), EVIL vs CAPTURED textures
+- [x] **dressing pass 2 (m1602, DRAGON.md):** in its own zone (KORAJIN > The Dragon Ride): head plate, bridle and live reins, cantle and saddle lames, pauldrons, crest chest plate, neck and tail plates, tail rings and blade; an EVIL set in blackened iron with stolen red Jinra; CAPTURED / EVIL / BARE live on TOOLS > DRAGON. The sandbox's checklist is DRAGON.md now
 - [ ] needs from him: a fly cycle (and any riding clips)
 
 ## THE DOJO (his, after m1390) -- the arena becomes the floating samurai dojo; many passes

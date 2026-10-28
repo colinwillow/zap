@@ -5,6 +5,30 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1602 -- THE DRAGON RIDE, build 1: the zone and the armour (DRAGON.md box 1)
+His: *"build the blue dragon: armour and a mount, a little zone where I can mount it and ride it... flying it, controlling it on the ground,
+an attack."* A new sandbox with its own DONE WHEN (`DRAGON.md`); KORAJIN > The Dragon Ride opens `?w=forge&zone=dragon` (`DRAGZ`).
+- **The zone** (`dragStage`): the dojo's sunset dome and cloud sea, a 52 m flat meadow island (`floatIsland`, `flat: 0`, so the forge's
+  y = 0 walk IS its top), trees kept 24 m off the middle, a ring of 150 rough rocks at the rim (each its own box: seen, not invisible), and
+  a step off the edge (past `rimR`) puts him back at the spawn. The dais (two .3 m steps, under his .357), nine stepping stones rising 1 m
+  each to a crag at 10 m (the perch for take-off), six islands spread from -24 m to +60 m, five Jinra hoops through the tiers.
+- **The dragon** (`dragBeast`): the arena's prototype cloned at x1.8, facing the spawn, his material cloned per instance (so the EVIL tint
+  stays in the zone), idles cycling, one AABB body box (`noCam`). Set going BEFORE the dressing, so a dressing that throws leaves him bare
+  and breathing with `DRAGON DRESS <msg>` in the chip, not frozen.
+- **`dragKit`**: pass 1's measuring kit (bones, raycasts on the posed skin, `pin`) lifted out of `dojoDragonDress` so pass 2 shares it; its
+  `bag` collects every pinned piece, which is how the look switch finds them. The dojo's call is unchanged (no bag).
+- **Pass 2** (`dragDress2`): CAPTURED -- head plate (the snout measured as the first skin hit from in front, the skull top as the hit
+  nearest the bone from above), brow and nose bands as UPPER arcs (so the jaw still opens), cheek straps, gold bit rings, REINS rebuilt every
+  frame from the bit rings to two rings at the pommel (`dragReins`, world space, a sag), a tall cantle and hanging lames on the saddle,
+  three-lame pauldrons, a chest plate with the nested-diamond crest round a Jinra gem, lacquer plates down the neck and tail, gold tail
+  rings, a crescent blade with red tassels at the tip. EVIL -- an iron mask with swept horns and red slits, spiked plates, a spiked collar
+  with a hanging chain, shackles with broken links, stolen red Jinra crystals on the shoulders and chest, a spiked tail head, his hide x`0x6f5f8f`.
+- **TOOLS > DRAGON** cycles CAPTURED / EVIL / BARE live in the zone (`dragLook`, visibility only); outside it, it still toggles the dojo's
+  CAPTURED / WILD and reloads. The dojo now reads anything but CAPTURED as WILD.
+**Moves:** DRAGON.md box 1 (his look still open). **Still open:** boxes 2-6 and his sign-off; no fly clip in his file (asked for).
+Gates: `npm run check` ok, and a boot of `MEL_WORLD='forge&zone=dragon'` ok (the dragon itself loads after boot, so a throw in the
+dressing is only visible on the phone, as the chip line above). Shipped unverified.
+
 ## m1599 -- THE RE-PASS: the FLYING SHIP HOUSE, pass 1 (a HERO flyer: the look; a collider audit)
 **Moves:** its pass-1 row.
 - Kit materials: `K.timber`, a warm planks deck, a dark warm planks hull, `K.redL` ribs and pennants, `K.bronze` (the figurehead too, its
