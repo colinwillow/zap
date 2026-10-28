@@ -30755,6 +30755,7 @@ function stepPlayer(dt) {
       const front = !fr || (nx * fr.x + nz * fr.z) > 0;
       if (front && into > CLIMB.grab) { climbGo(L, side); stepClimb(dt); return; }
     }
+    if (p.grounded && climbTopTry(s)) { stepClimb(dt); return; }
   }
   // THE PUSH. He is on the floor, extending, and the launch is at the end of it -- the clip is
   // already running and `rigAnim` draws it, because the flip branch sits above the air test.
@@ -35405,6 +35406,11 @@ const CLIMB = {
   cool: .35,
   top: .45,         // how far above `climb_top` he is set down
   lip: .35, overT: .32, overD: .9, overUp: .12,   // m1316: the step-over starts this far below the top and takes this long; m1352: it carries him `overD` in, rising `overUp`
+  // THE LADDER REFACTOR (after m1590, his: "perfect getting onto the ladder and off at the top"): `inT` s to ease onto the rungs from where he
+  // stood (no snap); `downT` s to step off a top onto the rungs (turn round at the edge, then lower and swing in); `mantle` 1 = the top-out is
+  // the ledge CLIMB-OVER clip with his hands pinned to the lip (`stepMantle`), 0 = m1316's scripted arc; `topIn` how far in on the top it
+  // sets him down; `topR` how far back from the edge a push toward it still mounts from the top
+  inT: .22, downT: .8, mantle: 1, topIn: .65, topR: 1.3,
   rate: 1.9,        // the walk clip, quickened -- there is no climb clip in this export and a
                     // walk cycle facing a wall IS legs on rungs and arms reaching (the grind's
                     // and the hang's own stand-in rule)
@@ -35496,7 +35502,7 @@ function climbFind(px, py, pz) {
 }
 function climbGo(L, into) {
   const p = player;
-  p.climb = L; p.climbT = 0; p.climbSide = into;
+  p.climb = L; p.climbT = 0; p.climbSide = into; p.climbIn = { t: 0, x: p.pos.x, z: p.pos.z }; p.climbDown = null; p.climbTop = 0;
   // **A LADDER WHOSE FOOT IS ABOVE HIM IS STEPPED ONTO (m180).** A city ladder stands on the
   // pavement, 25 cm over the road he walks up from, and `stepClimb`'s "off the bottom" test read
   // that as having climbed down past it and let go on the very first frame.
@@ -35505,9 +35511,20 @@ function climbGo(L, into) {
   triggerStop(); swapStop();
   snd('foot', { g: .16, r: 1.15 });
 }
+// ONTO A LADDER FROM ITS TOP (the refactor; there was no way at all): standing on the top behind its rungs (within `topR` of the edge, his feet
+// at the top) and walking toward the edge it hangs from -> he turns round and lowers himself onto it (`climbDown` in `stepClimb`)
+function climbTopTry(s) {
+  const p = player; if (!(s.mag > .45)) return 0;
+  for (const L of KCLIMB) { if (Math.abs(p.pos.y - L.top) > .45) continue; const dx = p.pos.x - L.cx, dz = p.pos.z - L.cz; if (Math.abs(dx) > 4 || Math.abs(dz) > 4) continue;
+    const fr = ladderFront(L); if (!fr) continue; const a = dx * L.ux + dz * L.uz, d = dx * fr.x + dz * fr.z; if (Math.abs(a) > L.ha + .25 || d > .1 || d < -CLIMB.topR) continue;
+    if (s.x * fr.x + s.z * fr.z < .6) continue;
+    const side = Math.sign(L.nx * fr.x + L.nz * fr.z) || 1, f0 = p.faceH; climbGo(L, side); p.climbIn = null; p.climbTop = 1; const C = CLIMB.mantle && mantleCurve(), hy = L.top - (C ? C.H[0] : 1.2) - .15;
+    p.pos.y = L.top; p.climbDown = { t: 0, a: { x: p.pos.x, y: L.top, z: p.pos.z }, e: { x: L.cx + L.ux * a - fr.x * .2, z: L.cz + L.uz * a - fr.z * .2 }, h: { x: L.cx + L.ux * a + fr.x * CLIMB.out, y: Math.max(L.miny, hy), z: L.cz + L.uz * a + fr.z * CLIMB.out }, f0 };
+    return 1; }
+  return 0; }
 function climbOff(cool) {
   const p = player;
-  p.climb = null; p.climbOver = null; p.climbT = 0; p.climbCool = cool === undefined ? CLIMB.cool : cool;
+  p.climb = null; p.climbOver = null; p.climbIn = null; p.climbDown = null; p.climbTop = 0; p.climbT = 0; p.climbCool = cool === undefined ? CLIMB.cool : cool;
 }
 function stepClimb(dt) {
   const p = player, L = p.climb, s = stickWorld();
@@ -35521,6 +35538,11 @@ function stepClimb(dt) {
   // the ladder's SHORT horizontal axis is out of the wall; `climbSide` is which way along it that
   // is, measured where he grabbed it
   const nx = L.nx * p.climbSide, nz = L.nz * p.climbSide;
+  // ONTO THE RUNGS FROM THE TOP (the refactor): at the edge he turns round to face the ladder, then lowers himself and swings in onto the rungs
+  if (p.climbDown) { const D = p.climbDown; D.t += dt; const u = Math.min(1, D.t / CLIMB.downT), face = Math.atan2(-nx, -nz); p.vel.set(0, 0, 0); p.grounded = false; p.airT = 0; p.speed = 1.2;
+    if (u < .4) { const e = smooth(0, 1, u / .4); p.pos.set(lerp(D.a.x, D.e.x, e), D.a.y, lerp(D.a.z, D.e.z, e)); p.faceH = D.f0 + wrapAngle(face - D.f0) * e; }
+    else { const v = (u - .4) / .6, eh = smooth(0, 1, v), ev = v * v * (3 - 2 * v), bulge = Math.sin(v * Math.PI) * .12; p.pos.set(lerp(D.e.x, D.h.x, eh) + nx * bulge, lerp(D.a.y, D.h.y, ev), lerp(D.e.z, D.h.z, eh) + nz * bulge); p.faceH = face; }
+    p.heading = p.faceH; if (u >= 1) p.climbDown = null; return; }
   // HE FACES THE WALL, which is the opposite of the way he came at it
   const face = Math.atan2(-nx, -nz);
   p.faceH += wrapAngle(face - p.faceH) * Math.min(1, 9 * dt);
@@ -35528,7 +35550,9 @@ function stepClimb(dt) {
   // **THE THUMB'S COMPONENT ALONG THE WALL'S NORMAL IS THE WHOLE CONTROL.** Into the rungs is
   // up, away is down, and sideways is nothing -- which is what a ladder actually offers.
   const into = -(s.x * nx + s.z * nz) * s.mag;
-  if (into < -CLIMB.off) { climbOff(); return; }              // he pushed off it
+  // mounted from the top he got here pushing AWAY from the wall, so that push means DOWN until his thumb comes back
+  if (p.climbTop && Math.abs(into) < .2) p.climbTop = 0;
+  if (into < -CLIMB.off && !p.climbTop) { climbOff(); return; }              // he pushed off it
   if (p.jump) { p.jump = 0; climbOff(); p.vel.y = MOVE.jump * .55; return; }   // or hopped off
   p.speed = Math.abs(into) * CLIMB.speed;
   p.pos.y += into * CLIMB.speed * dt;
@@ -35539,10 +35563,20 @@ function stepClimb(dt) {
   // middle, so he climbs the ladder rather than the air beside it
   const al = clamp((p.pos.x - cx) * L.ux + (p.pos.z - cz) * L.uz, -L.ha, L.ha) * Math.exp(-10 * dt);
   p.pos.x = cx + L.ux * al + nx * CLIMB.out; p.pos.z = cz + L.uz * al + nz * CLIMB.out;
+  // and he EASES onto the rungs from where he stood rather than snapping there (the refactor)
+  if (p.climbIn) { const I = p.climbIn; I.t += dt; const e = smooth(0, 1, I.t / CLIMB.inT); p.pos.x = lerp(I.x, p.pos.x, e); p.pos.z = lerp(I.z, p.pos.z, e); if (e >= 1) p.climbIn = null; }
   p.vel.set(0, 0, 0); p.grounded = false; p.airT = 0; p.jumps = 1;
   // **TOPPING OUT GOES TO HIS OWN MARKER WHEN THERE IS ONE.** `nav_ladder_top__X#` is a real
   // standing point on the roof; without it the fallback is the volume's own top pushed INTO the
   // building, which is a guess and is marked as one.
+  // THE TOP-OUT IS THE CLIMB-OVER (the refactor): when his hands reach the lip he hands over to the ledge climb-up -- the clip's own pull, his
+  // hands pinned to the lip (`stepMantle`, m1043/m1051) -- and comes up over the top onto his feet `topIn` m in, toward his exit mark
+  { const C = CLIMB.mantle && mantleCurve(); if (C && p.pos.y >= L.top - C.H[0] - .02) { p.pos.y = Math.min(p.pos.y, L.top - C.H[0]);
+    if (into > .15) { const M = L.mark, ex = p.pos.x - nx * (CLIMB.out + .12), ez = p.pos.z - nz * (CLIMB.out + .12), tIn = M ? clamp(-((M.x - ex) * nx + (M.z - ez) * nz), .3, CLIMB.topIn) : CLIMB.topIn, tx = ex - nx * tIn, tz = ez - nz * tIn;
+      const ty = M ? Math.max(L.top, groundAt(tx, tz, L.top + .6, MOVE.step)) : L.top; climbOff();
+      p.mantle = { x0: p.pos.x, y0: p.pos.y, z0: p.pos.z, lx: ex - nx * MANTLE.grip, lz: ez - nz * MANTLE.grip, nx, nz, tx, ty, tz, lip: L.top, t: 0, t0: 0, grab: 0, pull: MANTLE.pull, C, lad: L.lady || 1 };
+      p.faceH = p.heading = Math.atan2(-nx, -nz); const nm = LEDGE.clips.up; if (rig.actions[nm]) { const Lc = clipLen(nm); playOnce(nm, Lc / MANTLE.pull); rig.actions[nm].time = 0; } snd('foot', { g: .16, r: .9 }); }
+    return; } }
   if (p.pos.y >= L.top - CLIMB.lip) {
     const M = L.mark, b0 = M ? { x: M.x, y: M.y + .05, z: M.z } : { x: cx - nx * .8, y: L.top + CLIMB.top, z: cz - nz * .8 };
     /* m1352: *"the push forward at the top of the ladder is a really dramatic launch -- four times too much"*: a mark can sit metres in (more at
@@ -65282,7 +65316,7 @@ function frameBody() {
     if ((PERF.memT -= 1) <= 0) { PERF.memT = PERF.memEvery; try { perfMem(); } catch (e) {} }
     const mem = PERF.mem ? ' TX' + PERF.mem.tex + '/' + PERF.mem.texMB.toFixed(0) + 'M G' + PERF.mem.geoMB.toFixed(0) + 'M' : '';
     const line = fps.toFixed(0) + ' FPS · ' + renderer.info.render.calls + ' DC ' + Math.round(renderer.info.render.triangles / 1000) + 'kT' + mem + (PERF.bootMs ? ' boot' + (PERF.bootMs / 1000).toFixed(1) + 's' : '') + (CELL.list.length ? ' c' + CELL.shown + '/' + CELL.list.length : '') + (LOD.groups.length ? ' L' + LOD.active + '/' + LOD.groups.length : '') + (PERF.multi ? ' md' : '') + (STEPUP.n ? ' ke' + STEPUP.n : '') + PROF.sum + ' · pr' + PERF.pr.toFixed(2) + (PERF.holdT > 0 ? 'h' : '') + ' B' + PERF.seen + '/' + DUMMIES.length + ' · ' +
-      p.speed.toFixed(1) + ' m/s · ' + st + lk + hue + bx + cv + brkC + kitC + (LADY.on || (p.climb && p.climb.lady) ? ' LAD' + (p.climbOver ? 'OVER' : p.climb ? (p.climbT < .3 ? 'MOUNT' : 'CLIMB') : 'OFF') + (p.climb && p.climb.lady ? '#' + p.climb.lady : '') : '') + inf + shp + cl + sk + sk8 + vs + mo + fl + wp + tc + mp +
+      p.speed.toFixed(1) + ' m/s · ' + st + lk + hue + bx + cv + brkC + kitC + (LADY.on || (p.climb && p.climb.lady) ? ' LAD' + (p.mantle && p.mantle.lad ? 'OVER' : p.climbOver ? 'ARC' : p.climbDown ? 'TOPIN' : p.climb ? (p.climbIn ? 'MOUNT' : 'CLIMB') : 'OFF') + (p.climb && p.climb.lady ? '#' + p.climb.lady : '') : '') + inf + shp + cl + sk + sk8 + vs + mo + fl + wp + tc + mp +
       bk + (IWIND.k > 0 ? ' WIND' + IWIND.spd.toFixed(0) + (IWIND.gustT > 0 ? 'G' : '') : '') + (ITHERM.k > 0 ? ' TH' + Math.round(ITHERM.k * 100) : '') + (TURF.k ? ' TURF ' + TURF.k + (TPUSH.n ? ' m' + TPUSH.n : '') : '') + (TFLASH.k ? ' FP ' + TFLASH.k : '') + (RADIO.heard ? ' R' + RADIO.heard + (RADIO.calls ? 'c' + RADIO.calls : '') : '') + (KSWAP.made || KSWAP.gone.size || KSWAP.settles ? ' RB' + KSWAP.made + '/' + KSWAP.gone.size + (KSWAP.settles ? 's' + KSWAP.settles : '') : '') + ' · HP' + p.hp.toFixed(0) + (DUMMIES.length ? ' ' + DUMMIES.length + 'B' : '') +
       // CH: the saved chapter (m276); NEW = this boot was `?fresh`, BADSAVE = a save was there and would not parse
       (GOD.on ? ' · GOD' + (GOD.fly ? ' FLY' : '') : '') +
