@@ -22,7 +22,7 @@
        parabola (it rises, then moves forward, then swings, then drops), and the strike lands WITH him on the ground, not 3 m up.
 11. [x] (m1680; dive sweep / bank tuck to redo on the arms) **The dragon's wings are his ARMS (a wyvern):** in his own up-and-flap clip the ARMS beat and the wings follow; ours holds the arms still
        and flaps only the fingers. Drive the arms (from that clip's flap, looped). And in the air his LEGS stand: sweep them back.
-12. [ ] **Wall run, sound:** the SIDE run hardly ever starts (a sideways flick reads as UP); touching a wall in the air PERCHES at once, FACING
+12. [x] (m15xx; the camera's help still open) **Wall run, sound:** the SIDE run hardly ever starts (a sideways flick reads as UP); touching a wall in the air PERCHES at once, FACING
        AWAY, skimming down, ready to jump off (Prince of Persia) -- no flail first; jumping wall to wall easy and smooth; the wall's friction
        only on the way DOWN (a jump beside a wall is not cut short); the camera helps.
 13. [ ] **The zip line:** you can drop off mid-line; slow; the hands are off the line; the sword is not out; no sparks. Wanted: speed, a swing

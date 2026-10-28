@@ -9,6 +9,26 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 His ask: "how can I see the Red Hollows in all its glory (built) on a phone?" The state switch lived only in SPAWN > BUILDINGS, which is the
 arena/forge UI and never shows in the Red Hollows. Now a GOD menu switch in the hollows flips main's `AGE` (`mel.age`, saved) and reloads,
 dropping any `?hs=` (which would win). The mint plates still play each piece's restoration live.
+## m15xx -- WALL RUN, sound: the side run starts, the perch catches at once FACING AWAY, and the wall only brakes the way DOWN (DOCKET 12)
+His: *"the horizontal wall run seems gone -- it kept engaging only the vertical; when the character touches a wall in the air he needs to go
+straight into skimming down it, ready to jump off FACING AWAY (Prince of Persia) -- he flails for a second first and his momentum starts
+going down; a friction stops his upward momentum: standing at the base and jumping, his height is hindered; only on the way down should
+the friction slow him."*
+- **The side run:** a thumb flicks sideways AND a little up, and every flick with |up| >= |side| was the run-up. Now UP must be clearly up
+  (`upCone` 1.8: within ~30 deg of straight up); anything else is the side run. Checked: a right-and-up flick (.8, -.7) from the perch ->
+  `side`.
+- **The perch catches at once and keeps his climb:**
+  - `slideReach` .35 -> .5, so he takes the wall from a little further off.
+  - Catching it no longer cuts his vertical speed to 40%.
+  - RISING he flies on under gravity alone. Only from the top of the rise does the moment's hold, then the skim down (`slideV`), begin.
+  - The slide's time limit counts from that top.
+  - Checked: a jump standing at the base of a wall peaks at **2.72 m, the same as in the open**.
+- **The perch faces AWAY:** back to the wall, crouched lower (`perchDrop`), leaning OUT over his knees (`perchLean`). The left foot is
+  planted on the wall behind him, the right knee up with its foot under him, both hands back on the wall at his hips, elbows out. A tap
+  springs him off forward (the wall jump, already away). Rendered.
+- **The pose snaps in** over .06 s (was .1).
+- Not done: a camera that helps (his idea), and the run-up and side run are unchanged.
+
 ## m1680 -- THE DRAGON FLAPS WITH HIS ARMS (a wyvern), and his legs sweep back in flight (DOCKET 11)
 His: *"in the sequence where he jumps up and flaps, he relies on his ARMS to flap the wings -- with our edit the arms are stationary, as though
 he's standing, and the wings flap without them. It's basically a wyvern. And in the air his legs look like he's standing rather than back."*
