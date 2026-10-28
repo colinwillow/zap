@@ -10298,12 +10298,12 @@ function swatchClear() { if (SWATCH.on) { bldClear(SWATCH.on); SWATCH.on = null;
 //  - TRUDGING: deep untouched snow drags at him (`drag`, exp, scaled by how deep); his own track is easy going.
 //  - THE AIR: `flakes` soft points round the lens, each fluttering on its own (two sines) in a wind that GUSTS; a flake that meets his body is
 //    pushed out of it and BOUNCES off (and drifts off again); his footsteps and landings KICK UP puffs that arc and fall.
-const SNOWZ = { want: 0, on: null, size: 160, res: 640, depth: 1.1, base: .5, drift: .42, pines: 46,     /* m15xx: depth 1.1 m with a base fill of .5 (= the old .55 m) so DRIFTS can rise over it */ refill: .012, foot: .17, plough: .32, rim: .2, rimAdd: .14, drag: 2.6,
+const SNOWZ = { want: 0, on: null, size: 160, res: 640, depth: 1.1, base: .5, drift: .42, pines: 46,     /* m1632: depth 1.1 m with a base fill of .5 (= the old .55 m) so DRIFTS can rise over it */ refill: .012, foot: .17, plough: .32, rim: .2, rimAdd: .14, drag: 2.6,
   flakes: 5000, box: 34, puffs: 600, fall: [.55, 1.2], flutter: .5, wind: [1.2, 0, .4], gust: 1.6 };
 try { if (/[?&]zone=snow\b/.test(location.search)) SNOWZ.want = 1; } catch (e) {}
 function snowStage(g) {
   const Z = SNOWZ, N = Z.res; Z.D = new Uint8Array(N * N); Z.B = new Uint8Array(N * N);
-  // m15xx: WIND-SHAPED DRIFTS AND BANKS -- the pack's resting depth is a field, not a sheet: long ridges stretched ALONG the wind (2.6x), banks
+  // m1632: WIND-SHAPED DRIFTS AND BANKS -- the pack's resting depth is a field, not a sheet: long ridges stretched ALONG the wind (2.6x), banks
   // where the noise piles up, the base everywhere else; the refill returns to THIS, not to full. Flat round the spawn.
   { const wx = Z.wind[0], wz = Z.wind[2], wl = Math.hypot(wx, wz) || 1, ax = wx / wl, az = wz / wl;
     for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) { const x = (i / N - .5) * Z.size, z = (.5 - j / N) * Z.size, u = x * ax + z * az, v = -x * az + z * ax;
@@ -10339,7 +10339,7 @@ function snowStage(g) {
     vertexShader: 'attribute float aSize; attribute float aA; uniform float uPx; varying float vA; void main() { vec4 mv = modelViewMatrix * vec4(position, 1.0); gl_PointSize = aSize * uPx / max(.1, -mv.z); vA = aA * smoothstep(.3, 1.2, -mv.z); gl_Position = projectionMatrix * mv; }',
     fragmentShader: 'varying float vA; void main() { vec2 d = gl_PointCoord - .5; float r = dot(d, d) * 4.0; if (r > 1.0) discard; gl_FragColor = vec4(1.0, 1.0, 1.0, vA * (1.0 - r * r)); }' });
   const pts = new THREE.Points(pg, pm); pts.frustumCulled = false; g.add(pts); Z.air = { pts, pg, pm, P, S, A, F, NF, NP };
-  // m15xx: SNOWY PINES in stands, each three dark tiers under a white CAP (instanced: trunks, needles, caps = 3 draws), a collider on the trunk.
+  // m1632: SNOWY PINES in stands, each three dark tiers under a white CAP (instanced: trunks, needles, caps = 3 draws), a collider on the trunk.
   // A strike or a body slammed into one SHAKES it: the caps drop in a burst of powder and grow back over half a minute.
   { const R = plantRnd(301), T = [], mk = (n, geo, mat) => { const m = new THREE.InstancedMesh(geo, mat, n); m.castShadow = true; m.receiveShadow = true; m.frustumCulled = false; g.add(m); return m; };
     for (let c = 0; c < 7; c++) { const a = R() * 6.283, d = 22 + R() * 50, cx = Math.cos(a) * d, cz = Math.sin(a) * d; for (let k = 0; k < Z.pines / 7; k++) { const x = cx + (R() - .5) * 14, z = cz + (R() - .5) * 14; if (Math.hypot(x, z - 8) < 12) continue; T.push({ x, z, s: .8 + R() * .7, yaw: R() * 6.28, cap: 1, t: 0 }); } }
@@ -10368,13 +10368,7 @@ function snowStep(dt) { const Z = SNOWZ, A = Z.air, p = player; if (!A) return; 
       if (_snF.y < snowAt(_snF.x, _snF.z) * Z.depth + .05) { const before = snowAt(_snF.x, _snF.z); snowStamp(_snF.x, _snF.z, Z.foot, .08); if (before > .4 && sp > .5 && Math.random() < .5) snowPuff(_snF.x, before * Z.depth, _snF.z, 3, 1.6, 1.2); } }
     if (sp > .4 && p.grounded) snowStamp(p.pos.x, p.pos.z, Z.plough * Math.min(1, sp / 4), .3);
     if (p.roll) snowStamp(p.pos.x, p.pos.z, .7, .05);
-    // m1628 (his: *"in the snow sandbox the katana -- it's not showing the sword, a weird rendering issue"*): it was not rendering wrong, it was
-    // BURIED -- he wades with his feet on the ground under .55 m of snow, and a blade held low dips under the surface and vanishes. Now whatever
-    // he holds CUTS the snow: the low corners of every weapon mesh in his hand, wherever they go under the surface, carve a groove (and a fast
-    // swing throws powder), so the blade always shows and a cut through deep snow leaves its slash.
-    if (rig.root) { if (!Z.wm || Z.wmFor !== rig.root.uuid + (p.slot | 0)) { Z.wm = []; Z.wmFor = rig.root.uuid + (p.slot | 0); rig.root.traverse(o => { if (o.isMesh && !o.isSkinnedMesh && o.geometry) { o.geometry.computeBoundingBox(); Z.wm.push(o); } }); }
-      for (const o of Z.wm) { if (!o.visible) continue; const bb = o.geometry.boundingBox; for (let c = 0; c < 8; c++) { _snF.set(c & 1 ? bb.max.x : bb.min.x, c & 2 ? bb.max.y : bb.min.y, c & 4 ? bb.max.z : bb.min.z).applyMatrix4(o.matrixWorld);
-          const top = snowAt(_snF.x, _snF.z) * Z.depth; if (_snF.y < top - .02) { snowStamp(_snF.x, _snF.z, .11, Math.max(0, _snF.y / Z.depth - .1)); if (p.melee && Math.random() < .25) snowPuff(_snF.x, top, _snF.z, 2, 2.2, 1.6); } } } }
+    // (m1628's held-weapon snow cutting is GONE: its diagnosis -- a buried blade -- was wrong, and stamping every frame piled its rims into spikes)
     if (p.grounded && !Z.wasG && (Z.lastVy || 0) < -6) { snowStamp(p.pos.x, p.pos.z, 1.1, .02); snowPuff(p.pos.x, under * Z.depth, p.pos.z, 40, 3.5, 3.5); }     // a landing digs a crater
   }
   Z.wasG = p.grounded; Z.lastVy = p.vel.y;
@@ -15316,7 +15310,7 @@ function measureHeight(scene) {
 function katanaScene() {
   const root = new THREE.Group(); root.name = 'weapon_root_right';
   const tip = new THREE.Object3D(); tip.name = 'weapon_tip'; tip.position.set(-14.3102, 0, 0); root.add(tip);
-  const steel = new THREE.MeshStandardMaterial({ color: 0x8e99a7, metalness: .72, roughness: .27 }), wrap =     /* m15xx: was metalness 1 -- a pure mirror has NO colour of its own, so on the white snowfield it reflected white and the blade vanished; a little diffuse grey steel reads on any ground */
+  const steel = new THREE.MeshStandardMaterial({ color: 0x55606c, metalness: .5, roughness: .32, envMapIntensity: .45 }), wrap =     /* m1634/m15xx: was metalness 1 -- a mirror has NO colour of its own, so lit by the snowfield's white sky it came out white on white and vanished (forced red in a render, it was there all along). Darker gunmetal with most of the env taken out reads on any ground */
     new THREE.MeshStandardMaterial({ color: 0x2b2421, roughness: .85 }),
     iron = new THREE.MeshStandardMaterial({ color: 0x3b342e, metalness: .7, roughness: .45 }), gold = new THREE.MeshStandardMaterial({ color: 0xc9a14a, metalness: 1, roughness: .35 });
   const grip = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.6, 22, 10), wrap); grip.position.y = -3; root.add(grip);
