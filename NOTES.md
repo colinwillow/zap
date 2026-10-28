@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the MOATED KEEP, pass 3 (THE EAVE BELT) -- its third pass, DONE; and TWO BUGS IN `restoreRideTris`
+## m1657 -- THE RE-PASS: the MOATED KEEP, pass 3 (THE EAVE BELT) -- its third pass, DONE; and TWO BUGS IN `restoreRideTris`
 - THE EAVE BELT: a black-tile pent roof round the keep at the skirt's top, 5.4 m at the wall falling to 5.0 at its edge .9 m out, four
   mitred trapezoids (the west run split over the door, |z| < 1.6, so the lamps and the door stay clear). From the island's rim it is a
   2.0 m jump (his apex is 2.81) and a walk all the way round. Gold eave tips and a gold band along its foot, a doubloon on each corner,
