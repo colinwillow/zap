@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- THE SPIDER FIGHTS (his: "animate the spider attacks and hit reactions, maybe a jump and a block -- keep their current size --
+## m1701 -- THE SPIDER FIGHTS (his: "animate the spider attacks and hit reactions, maybe a jump and a block -- keep their current size --
 let them take damage so I can beat them up, then an explosion of them; have them lose limbs... maybe they spit or shoot at you")
 - **All procedural, on the same rig and planted-foot IK as the walk.** An attack moves the feet and body somewhere else for a moment.
   The body's pitch, lift and sag sit on `S.m` (the inner model). The root stays on the ground.
