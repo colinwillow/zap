@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the BATHHOUSE, pass 2 (rubric 7: RESTORES IN PLACE)
+- Base (stays): the floor, the breakable walls, the pool and its rim, the benches, the tub, the boiler and its valve, the engawa, the
+  shoji (their own dynamic boxes), the engawa lanterns. Pieces (`cls`): `roof` (with the bunting under its eave), `front` (posts, beam,
+  eave lanterns), `chim` (the chimney and its cap), `fence` (the bamboo fence) and `toro` (the garden's stone lantern).
+- FALLEN: the roof sags 2.4 m into the hall, the chimney lies in the yard, the front posts lie across the engawa, the fence lies flat, the
+  lantern is tipped. The pool is COLD: no steam, no healing, and the valve will not set off the geyser. Drained; the drone and the
+  cables are gone. RESTORE: the lantern rights itself, the fence and posts stand, the chimney rises, the roof settles back on last; the
+  pool steams again; Jinra motes.
+- Plate before the engawa's corner; `rig` hook; `bathClear` drops the rig and the plate.
+Render-checked headless: fallen and restored. Shipped unverified.
+
 ## m1614 -- THE DRAGON RIDE, build 2: MOUNT / DISMOUNT (DRAGON.md box 2)
 - **The mount spot** (`dragSeat`): a mint ring at his LEFT flank, stepped out along his side until it is clear of his body box (+1.1 m),
   level with the dais. It pulses, brightens when you stand on it, and a tip says what to do (or, not CAPTURED, that he will not be ridden).
