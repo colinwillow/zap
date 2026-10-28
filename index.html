@@ -64196,7 +64196,7 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 // to the shop front and to the round back door. Built in its OWN frame (local +z = the front, toward the river; `at`/`yaw` are HOME.hut's) and
 // merged per material; every collider a local box turned into the world (the yaw is a quarter turn, so a box stays a box); every walkable
 // surface a triangle. `?hut=glb` (or GHOME.on = 0) puts the GLB back, to compare. Pass 1: the massing and the walkable shell, with the inside.
-const GHOME = { on: 1, pass: 18, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
+const GHOME = { on: 1, pass: 19, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   Rtu: 2.5, door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
@@ -64689,6 +64689,52 @@ function ghomeBuild(at, yaw, y0) {
     // the EAVES: a plank skirt flaring out where the hall's and the store's walls meet their domes
     for (const [x, z, R, y] of [[0, 0, A.R, P + A.Hw], [A.Wc[0], A.Wc[1], A.Rw, P + A.Hwg]]) { put(new THREE.CylinderGeometry(R * .97, R + .6, .5, 48, 1, true), woodP, at4(x, y + .12, z)); put(new THREE.CylinderGeometry(R + .62, R + .62, .08, 48, 1, true), iron, at4(x, y - .1, z));
       for (let k = 0; k < Math.round(R * 3); k++) { const q = k / Math.round(R * 3) * TAU; put(new THREE.BoxGeometry(.1, .1, .7), wood, at4(x + Math.sin(q) * (R + .2), y - .05, z + Math.cos(q) * (R + .2), q, -.5)); } } }
+  // ---- PASS 19 (his ask): a FISHING PIER straight out from the shop steps into the stream -- plank deck on posts down to the bed, following
+  // the bank down until it clears the water, then level; a rail on one side, a T-head with lantern posts, a stool, a bait barrel, rope coils
+  // and a rod leaning out; and his ALIEN CANOE moored alongside (`GHOME.canoe`: it bobs on the waves) ----
+  { const gH = (x, z) => rwHeight(Wx(x, z), Wz(x, z)) - y0, wY = -y0, dY = wY + .62, z0 = 8.6, z1 = 13.0, hw = 1.1, NC = { noCam: 1 };
+    let zz = z0; while (zz < z1) { const za = zz, zb = Math.min(z1, zz + .34), yd = Math.max(dY, gH(0, (za + zb) / 2) + .06); vbox(-hw, hw, yd - .09, yd, za + .015, zb - .015, woodP, 0);
+      quad([-hw, yd + .01, za], [hw, yd + .01, za], [hw, yd + .01, zb], [-hw, yd + .01, zb]); zz = zb; }
+    // the T-head
+    const tz0 = z1 - .2, tz1 = z1 + 2.6, tx = 3.6; for (let x = -tx; x < tx - .01; x += .34) { vbox(x + .015, x + .325, dY - .09, dY, tz0, tz1, woodP, 0); } quad([-tx, dY + .01, tz0], [tx, dY + .01, tz0], [tx, dY + .01, tz1], [-tx, dY + .01, tz1]);
+    for (const x of [-tx, tx]) vbox(x - .06, x + .06, dY - .32, dY - .09, tz0, tz1, wood, 0); for (const z of [tz0, tz1]) vbox(-tx, tx, dY - .32, dY - .09, z - .06, z + .06, wood, 0);
+    // posts (to the bed), an iron band at the waterline; a rail down the left
+    const post = (x, z, top) => { const yb = Math.min(gH(x, z), wY) - 1.4; vbox(x - .11, x + .11, yb, top, z - .11, z + .11, wood, 0); vbox(x - .14, x + .14, wY - .05, wY + .12, z - .14, z + .14, iron, 0); };
+    for (let z = z0 + .8; z < z1; z += 1.7) { const yd = Math.max(dY, gH(0, z) + .06); for (const x of [-hw, hw]) post(x, z, yd - .09); }
+    for (const [x, z] of [[-tx, tz0], [tx, tz0], [-tx, tz1], [tx, tz1], [0, tz1]]) post(x, z, dY - .09);
+    for (let z = z0 + .8; z < z1 + .1; z += 1.7) { const yd = Math.max(dY, gH(0, z) + .06); vbox(-hw - .06, -hw + .06, yd, yd + 1.0, z - .06, z + .06, wood, 0); }
+    { let zp = z0 + .8, yp = Math.max(dY, gH(0, zp) + .06) + .95; for (let z = zp + 1.7; z < z1 + .1; z += 1.7) { const y = Math.max(dY, gH(0, z) + .06) + .95, d = new THREE.Vector3(0, y - yp, z - zp), L = d.length();
+        put(new THREE.BoxGeometry(.08, L, .08), wood, _m4.compose(new THREE.Vector3(-hw, (y + yp) / 2, (z + zp) / 2), _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()), _one)); zp = z; yp = y; } }
+    box(-hw - .1, -hw + .1, dY, dY + 1.0, z0 + .5, z1, NC);
+    // lantern posts on the T-head's corners, a stool, the bait barrel, rope coils, the rod and its line and float
+    const lamp = (x, z) => { vbox(x - .08, x + .08, dY, dY + 2.1, z - .08, z + .08, wood, 1, NC); vbox(x - .08, x + .5, dY + 2.0, dY + 2.1, z - .05, z + .05, wood, 0);
+      put(new THREE.CylinderGeometry(.012, .012, .3, 4), iron, at4(x + .42, dY + 1.85, z)); put(new THREE.ConeGeometry(.14, .12, 6), bronzeT, at4(x + .42, dY + 1.68, z)); put(new THREE.CylinderGeometry(.09, .09, .22, 6), glowM, at4(x + .42, dY + 1.5, z)); put(new THREE.CylinderGeometry(.11, .08, .04, 6), bronzeT, at4(x + .42, dY + 1.37, z)); };
+    lamp(-tx + .15, tz1 - .15); lamp(tx - .55, tz1 - .15);
+    put(new THREE.CylinderGeometry(.2, .2, .06, 10), wood, at4(-1.2, dY + .5, tz1 - .7)); for (let k = 0; k < 3; k++) { const q = k / 3 * TAU; put(new THREE.CylinderGeometry(.025, .03, .5, 4), wood, at4(-1.2 + Math.sin(q) * .14, dY + .25, tz1 - .7 + Math.cos(q) * .14)); }
+    put(new THREE.CylinderGeometry(.3, .26, .7, 12), wood, at4(-2.3, dY + .35, tz1 - .6)); for (const yy of [.12, .58]) put(new THREE.CylinderGeometry(.31, .31, .05, 12), iron, at4(-2.3, dY + yy, tz1 - .6)); box(-2.6, -2, dY, dY + .7, tz1 - .9, tz1 - .3, NC);
+    for (const [x, z] of [[1.4, tz0 + .5], [-.6, z1 - 3]]) for (let k = 0; k < 4; k++) put(new THREE.TorusGeometry(.26 - k * .045, .035, 5, 16), wood, at4(x, dY + .04 + k * .05, z, 0, Math.PI / 2));
+    { const a = [-1.0, dY + .6, tz1 - .55], b = [-1.6, dY + 3.0, tz1 + 2.4], d = new THREE.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]), L = d.length(); put(new THREE.CylinderGeometry(.012, .03, L, 5), wood, _m4.compose(new THREE.Vector3((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2), _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()), _one));
+      put(new THREE.CylinderGeometry(.004, .004, b[1] - wY, 3), iron, at4(b[0], (b[1] + wY) / 2, b[2])); put(new THREE.SphereGeometry(.06, 8, 6), redW, at4(b[0], wY + .03, b[2])); }
+    // the CANOE: his alien skiff -- a long bowl of a hull with an upswept prow and stern, brass gunwales, swept fins at its waist and a tail
+    // fin (it looks as if it flies), lavender runes along its flank and two glowing hover discs under it. Its own group: it rides the water
+    { const cg = new THREE.Group(), cx = -.4, cz = tz1 + 1.55; cg.position.set(cx, wY, cz); cg.rotation.y = Math.PI / 2; g.add(cg);     // alongside the T-head, along the current
+      const hullM = new THREE.MeshStandardMaterial({ color: 0x3f6f78, roughness: .45, metalness: .3, side: THREE.DoubleSide }), innerM = new THREE.MeshStandardMaterial({ color: 0x6a4a34, roughness: .9 }), runeM = new THREE.MeshStandardMaterial({ color: 0xc9b6ff, emissive: 0x8a6aff, emissiveIntensity: 1.6, toneMapped: false }), deckM = new THREE.MeshStandardMaterial({ color: 0x6a4a34, roughness: .9, side: THREE.BackSide });
+      const CB = new Map(), cadd = (geo, m) => { geo = geo.index ? geo.toNonIndexed() : geo; geo.deleteAttribute('uv'); if (!geo.attributes.normal) geo.computeVertexNormals(); if (!CB.has(m)) CB.set(m, []); CB.get(m).push(geo); };     // merged per material: five draws for the whole boat
+      const L = 2.7, W = .62, D = .42, sw = z => .55 * Math.pow(Math.abs(z / L), 3.2), up = gg => { const q = gg.attributes.position; for (let i = 0; i < q.count; i++) q.setY(i, q.getY(i) + sw(q.getZ(i))); gg.computeVertexNormals(); return gg; };
+      const hull = new THREE.SphereGeometry(1, 28, 10, 0, TAU, Math.PI / 2, Math.PI / 2); hull.scale(W, D, L); cadd(up(hull), hullM);
+      const deck = new THREE.SphereGeometry(1, 24, 6, 0, TAU, Math.PI / 2 + .25, Math.PI / 2 - .25); deck.scale(W * .9, D * .6, L * .9); deck.translate(0, -.02, 0); cadd(up(deck), deckM);
+      const gun = new THREE.TorusGeometry(1, .045, 5, 48); gun.rotateX(Math.PI / 2); gun.scale(W, 1, L); cadd(up(gun), bronzeT);
+      for (const sz of [-1, 1]) { const pr = new THREE.ConeGeometry(.06, .7, 6); pr.rotateX(sz * .9); pr.translate(0, sw(L) + .25, sz * (L + .1)); cadd(pr, bronzeT); }     // the curled prow and stern posts
+      const fin = sd => { const sh = new THREE.Shape(); sh.moveTo(0, .45); sh.lineTo(1.25, -.2); sh.lineTo(1.05, -.55); sh.lineTo(0, -.3); sh.closePath(); const fg = new THREE.ExtrudeGeometry(sh, { depth: .04, bevelEnabled: false }); fg.rotateX(-Math.PI / 2); if (sd < 0) fg.scale(-1, 1, 1); fg.rotateZ(sd * .18); fg.translate(sd * W * .9, -.06, .2); fg.computeVertexNormals(); cadd(fg, hullM);
+        const t = new THREE.BoxGeometry(1.1, .03, .05); t.rotateZ(sd * .18); t.translate(sd * (W + .5), .02, -.1); cadd(t, bronzeT); };
+      fin(1); fin(-1); { const sh = new THREE.Shape(); sh.moveTo(0, 0); sh.lineTo(-.9, .1); sh.lineTo(-.4, .75); sh.closePath(); const tf = new THREE.ExtrudeGeometry(sh, { depth: .04, bevelEnabled: false }); tf.rotateY(Math.PI / 2); tf.translate(-.02, .25, -L + .45); cadd(tf, hullM); }
+      for (let k = -3; k <= 3; k++) for (const sd of [-1, 1]) { const zq = k * .55, xr = W * Math.sqrt(Math.max(0, 1 - (zq / L) ** 2)) * .98 + .005, r = new THREE.BoxGeometry(.02, .09, .16); r.rotateZ(Math.PI / 4); r.translate(sd * xr, -.12 + sw(zq), zq); cadd(r, runeM); }
+      for (const z of [-1.2, 1.2]) { const dsc = new THREE.CylinderGeometry(.24, .3, .06, 16); dsc.translate(0, -D * Math.sqrt(1 - (z / L) ** 2) + .01 + sw(z), z); cadd(dsc, runeM); }
+      for (const z of [-.7, .7]) { const sb = new THREE.BoxGeometry(W * 1.7, .05, .26); sb.translate(0, -.04, z); cadd(sb, innerM); }
+      { const pd = new THREE.CylinderGeometry(.025, .025, 1.9, 5); pd.rotateX(Math.PI / 2 - .25); pd.rotateY(.3); pd.translate(.1, .05, .1); cadd(pd, innerM); const bl = new THREE.BoxGeometry(.18, .02, .42); bl.rotateY(.3); bl.translate(.36, -.17, .95); cadd(bl, innerM); }
+      // the mooring line, bow to the T-head's corner post (in the canoe's own frame)
+      { const a = new THREE.Vector3(0, .8, L + .05), b = new THREE.Vector3(-(tz1 - .05 - cz), dY - wY - .05, tx - .15 - cx), c = a.clone().lerp(b, .5); c.y -= .45; cadd(new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(a, c, b), 12, .018, 4), innerM); }
+      for (const [m, list] of CB) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = true; cg.add(o); } GHOME.canoe = { g: cg, x: Wx(cx, cz), z: Wz(cx, cz), y: wY, ry: Math.PI / 2 }; } }
   // ---- PASS 12: SMOKE from both stacks -- one point cloud (one draw), each puff rising, drifting downwind and swelling until it is gone;
   // stepped in `ghomeSmoke` ----
   { const N = 40, pos = new Float32Array(N * 3), cv = document.createElement('canvas'); cv.width = cv.height = 64; const q = cv.getContext('2d'), gr = q.createRadialGradient(32, 32, 2, 32, 32, 31);
@@ -64851,7 +64897,7 @@ function hollowDress() {
       if (r() < .7) { const f = new THREE.PlaneGeometry(s * .25, y * 1.1); f.translate(x + s * .7, y - y * .55, z); f.rotateY(0); fall.push(f); } }
     rwMesh(isl, rwMat(0xb7744e, { flatShading: true })); rwMesh(top, rwMat(0x5f8a45)); if (fall.length) { const fm = rwMesh(fall, new THREE.MeshBasicMaterial({ color: 0xeaf6ff, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false }), false); fm.renderOrder = 3; } }
   // HIS STONE LANTERNS on the approach
-  { const st = [], lit = []; for (const [dx, dz] of [[9, -3.2], [9, 3.2], [6.2, -3.2], [6.2, 3.2]]) { const x = H.hut.at[0] + dx + (H.hutS ? 1.2 : 0), z = H.hut.at[1] + dz * (H.hutS || 1), y = rwHeight(x, z);     // in front of the door (the hut faces the river, +x)
+  { const st = [], lit = []; for (const [dx, dz] of [[9, -3.2], [9, 3.2], [6.2, -3.2], [6.2, 3.2]]) { const x = H.hut.at[0] + dx + (H.hutS ? 0 : 0), z = H.hut.at[1] + dz * (H.hutS || 1), y = rwHeight(x, z);     // in front of the door (the hut faces the river, +x)
       st.push(B(.9, .3, .9, x, y + .15, z), Cy(.16, .2, 1.1, x, y + .85, z, 6), B(.7, .18, .7, x, y + 1.45, z), B(1.05, .2, 1.05, x, y + 2.2, z), Cy(.0, .62, .45, x, y + 2.5, z, 4));
       lit.push(B(.5, .5, .5, x, y + 1.8, z)); BOXES.push({ minx: x - .45, maxx: x + .45, miny: -2, maxy: y + 2.6, minz: z - .45, maxz: z + .45 }); }
     rwMesh(st, rwMat(0x9b8b78, { roughness: .95 })); rwMesh(lit, new THREE.MeshStandardMaterial({ color: 0xffd8a0, emissive: 0xffa040, emissiveIntensity: 2.2 }), false); }
@@ -64937,6 +64983,7 @@ function homeLanterns() {
 function homeStep(dt) {
   const H = HOME; H.t += dt; if (RW.U) RW.U.uTime.value = H.t;
   if (GHOME.U) GHOME.U.uWind.value = H.t; ghomeSmoke(dt, H.t); for (const G of GHOME.gates || []) bgateStep(G, dt);     // pass 9: his back door
+  if (GHOME.canoe) { const C = GHOME.canoe, t = H.t; C.g.position.y = C.y + rwWaveAt(C.x, C.z, t) * .8 + .02; C.g.rotation.set(Math.sin(t * .9) * .03, C.ry + Math.sin(t * .23) * .04, Math.sin(t * 1.1 + 1) * .05); }     // pass 19: the canoe rides the waves
   if (GHOME.sw) GHOME.sw.hc -= dt; GHOME.bellT -= dt; ghomeOrb(dt, H.t);     // pass 6 / pass 14: the orb swings (that line had been inside the comment above since pass 9)
   // the boat rides the waves
   if (H.boat) { const B = H.boat, t = H.t, hh = rwWaveAt(B.x, B.z, t); B.o.position.y = hh * .8 - .05; B.o.rotation.set(Math.sin(t * .9) * .03, B.ry, Math.sin(t * 1.1 + 1) * .04); }
