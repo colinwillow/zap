@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## mDRG -- THE DRAGON RIDE: his first look (m1614 on the phone) -- the saddle, the plates, the lens, the dismount
+## m1624 -- THE DRAGON RIDE: his first look (m1614 on the phone) -- the saddle, the plates, the lens, the dismount
 His (screenshot at M1614 +3, i.e. three builds behind -- the riding, flying and fire are m1618-m1622 and had not reached him): *"When I got on
 I'm pretty much in the dragon, can't even see me. The saddle is crooked. The armour kind of cuts into his body (I'll probably model that on
 my own, but keep trying). I wasn't able to control him, or make him fly or jump. When I pushed the right stick he just got off again."*
