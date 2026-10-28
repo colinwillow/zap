@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the SHRINE, pass 2 (rubric 7: RESTORES IN PLACE)
+## m1540 -- THE RE-PASS: the SHRINE, pass 2 (rubric 7: RESTORES IN PLACE)
 **Moves:** the Shrine's rubric-7 box (two states, restored in place, no lift). The Pagoda's m1518 is the pattern.
 - Base (survived, stays): the terrace, steps, cheek walls, coping, the stone beam and its pillar, the basin, the foxes, the omikuji, the ema board.
 - Pieces (`restorePieces`, `cls`): `honden` (walls, posts, roof, shimenawa, suzu, offering box and the eave rings), `torii`, and `t0`..`t4`
