@@ -410,6 +410,18 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
+## THE RE-PASS: THE WATCHTOWER IN THE ENEMY LOOK (m@X4@, WORKER A)
+
+ENEMY_STYLE.md (his sheets, m1522), palette A through `enemyMats()` / `ENEMY.pal` only.
+
+- BLACK LACQUER for every timber (`E.lacquer`), dark aged planks for the decks and ramps, pale SANDSTONE plinth, a BLACK tiled cap (`E.roof`),
+  GOLD where the bronze trim was. The lanterns are iron cages of MINT Jinra glass (`E.glass`), on the cables too. Black BANNERS with the gold
+  border and emblem (`enemyBanner`, as their own meshes so they keep their uvs) down both sides, and the gold EMBLEM (`enemyEmblemTex`) on the
+  lookout's front. The fire pit and the beacon burn STOLEN JINRA (mint coals and flames); the core is mint; the door mask is gold; the kites
+  black and gold. It stays destructible (cut three posts). 126 draws.
+- **Open:** the ground floor's breakable walls still wear the hall's cream planks (`hallTex`); sphinx guardians at the foot are the next pass.
+  Not signed off.
+
 ## THE RE-PASS: THE GREAT RED PAGODA, PASS 3 -- FEWER PIECES, A BALCONY REWARD (m1526, WORKER A)
 
 - **Pieces paired:** storeys 2-3 fly home together (`lo`, at .12) and 4-5 (`hi`, at .45), the spire last; measured 169 -> 158 draws (the four

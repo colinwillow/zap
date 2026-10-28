@@ -20520,9 +20520,11 @@ function wtowerBuild() {
   // a red-and-cream TENT CONE crown for the lookout (not a borrowed pagoda cap), bunting down to the stakes, a ship's-wheel winch on the lift,
   // boulders and plants round the base, and a low BAR at the east foot that flips you up the side. Every static piece is merged per material.
   const K = korMats(), MG = new Map(), put = (geo, m) => { const q = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal') q.deleteAttribute(k); if (!q.attributes.normal) q.computeVertexNormals(); if (!MG.has(m)) MG.set(m, []); MG.get(m).push(q); };
-  const wood = K.timber, plank = triMat('wood_planks', { scale: 2.2, color: 0xc8a68a }), stone = K.cream, lamp = K.lamp, neon = K.bronze, bronzeM = K.bronze;
+  // m@X4@ (ENEMY_STYLE.md, his sheets): BLACK LACQUER and AGED GOLD over pale SANDSTONE, iron, and the stolen Jinra the one glow -- through `enemyMats()` / `ENEMY.pal`
+  const E = enemyMats(), wood = E.lacquer, plank = triMat('wood_planks', { scale: 2.2, color: 0x5a4c40 }), stone = E.stone, lamp = E.glass, neon = E.gold, bronzeM = E.gold;
+  const putM = (geo, m) => { const o = new THREE.Mesh(geo, m); o.castShadow = true; g.add(o); return o; };     // keeps its uvs (the banners' map)
   // m1521 (his steer: an ENEMY tower keeps its CLASSICAL Japanese base, embellished -- not the hero kit): paper lanterns, a tiled pagoda cap
-  const paperL = new THREE.MeshStandardMaterial({ color: 0xd8302a, emissive: 0xff5a2a, emissiveIntensity: .9, roughness: .8 }), tileM = triMat('roof_tiles', { scale: 1.8, rough: .55, side: THREE.DoubleSide });
+  const paperL = E.glass, tileM = E.roof;     // the lanterns are iron cages of mint Jinra glass; the cap is black tile
   const add = (geo, m, x, y, z, solid) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; g.add(o);
     if (solid) { geo.computeBoundingBox(); const b = geo.boundingBox; O.boxes.push({ minx: x + b.min.x, maxx: x + b.max.x, miny: y + b.min.y, maxy: y + b.max.y, minz: z + b.min.z, maxz: z + b.max.z }); } return o; };
   // the ground floor: breakable walls, a door in the front (+z)
@@ -20588,10 +20590,10 @@ function wtowerBuild() {
   const fire = [cx + hs + 2.8, cz + hs + 2.4]; { const bronze = new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 });
     add(new THREE.CylinderGeometry(1.1, .7, .9, 16, 1, true), Object.assign(bronze.clone(), { side: THREE.DoubleSide }), fire[0], 1.15, fire[1], 0);
     for (let k = 0; k < 3; k++) { const a = k / 3 * 6.283, leg = add(new THREE.CylinderGeometry(.08, .08, .9, 6), bronze, fire[0] + Math.cos(a) * .65, .45, fire[1] + Math.sin(a) * .65, 0); leg.rotation.z = Math.cos(a) * .25; leg.rotation.x = -Math.sin(a) * .25; }
-    add(new THREE.CylinderGeometry(.95, .95, .12, 16), new THREE.MeshBasicMaterial({ color: 0xff6a1a, toneMapped: false }), fire[0], 1.45, fire[1], 0);
+    add(new THREE.CylinderGeometry(.95, .95, .12, 16), E.jin, fire[0], 1.45, fire[1], 0);     // m@X4@: the brazier burns STOLEN Jinra
     O.boxes.push({ minx: fire[0] - 1, maxx: fire[0] + 1, miny: 0, maxy: 1.6, minz: fire[1] - 1, maxz: fire[1] + 1 }); }
   // THE KATANA MASK over the door: a red-lacquer mempo face, brows and moustache in black, eye slits glowing, two crossed katanas behind
-  { const lq = new THREE.MeshStandardMaterial({ color: 0xa8231e, roughness: .4, metalness: .1 }), blk = new THREE.MeshStandardMaterial({ color: 0x14100e, roughness: .5 }), steel = new THREE.MeshStandardMaterial({ color: 0xd4dae0, metalness: .9, roughness: .2 });
+  { const lq = E.gold, blk = new THREE.MeshStandardMaterial({ color: 0x14100e, roughness: .5 }), steel = new THREE.MeshStandardMaterial({ color: 0xd4dae0, metalness: .9, roughness: .2 });
     const mx = cx, my = S - .4 + 1.6, mz = cz + hs + .35;
     for (const sg of [-1, 1]) { const k = add(new THREE.BoxGeometry(.09, 3.6, .04), steel, mx, my, mz - .12, 0); k.rotation.z = sg * .7; const hlt = add(new THREE.BoxGeometry(.12, .9, .08), blk, mx + Math.sin(sg * .7) * -1.95, my - Math.cos(sg * .7) * 1.95, mz - .12, 0); hlt.rotation.z = sg * .7; }
     const face = add(new THREE.SphereGeometry(.85, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2), lq, mx, my, mz, 0); face.rotation.x = Math.PI / 2; face.scale.set(1, .5, 1.15);
@@ -20611,9 +20613,8 @@ function wtowerBuild() {
     const shide = mergeGeometries(sg);
     for (let e = 0; e < 4; e++) for (const u of [.25, .5, .75]) { const p0 = pts[e * 12 + Math.round(u * 12) % 12] || pts[e * 12], o = add(shide, paper, p0.x, p0.y - .05, p0.z, 0); o.rotation.y = e % 2 ? Math.PI / 2 : 0; } }
   // LONG BANNERS: the red diamond-spiral down the two sides, from the lookout to the first deck
-  { const ban = new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 });
-    for (const sx of [-1, 1]) { const bm = add(new THREE.PlaneGeometry(1.5, S * 1.5), ban, cx + sx * (hs + .2), S * 3 - .3 - S * .75, cz, 0); bm.rotation.y = Math.PI / 2; bm.castShadow = false;
-      add(new THREE.BoxGeometry(.1, .1, 1.8), wood, cx + sx * (hs + .22), S * 3 - .25, cz, 0); } }
+  for (const sx of [-1, 1]) enemyBanner(putM, E, cx + sx * (hs + .25), S * 3 - .3, cz, Math.PI / 2, 1.6, S * 1.5);     // m@X4@: the enemy's black banners, gold border and emblem
+  { const em = new THREE.MeshStandardMaterial({ map: enemyEmblemTex(), transparent: true, alphaTest: .4, metalness: .8, roughness: .35, color: 0xffffff }); const o = putM(new THREE.PlaneGeometry(1.6, 1.6), em); o.position.set(cx, S * 3 - 1.2, cz + hs + .3); }     // the EMBLEM on the lookout's front (the door has its mask)
   // THE SEARCHLIGHT on the lookout's back corner, its beam sweeping the forge; and the Jin core glowing on the finial
   const sl = new THREE.Group(); sl.position.set(cx + hs - .4, S * 3 + 1.15, cz - hs + .4); g.add(sl);
   { sl.add(new THREE.Mesh(new THREE.CylinderGeometry(.3, .38, .5, 12).rotateX(Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x2c2f33, metalness: .7, roughness: .4 })));
@@ -20621,7 +20622,7 @@ function wtowerBuild() {
     const bg = new THREE.ConeGeometry(2.6, 20, 20, 1, true); bg.translate(0, -10, 0); bg.rotateX(-Math.PI / 2);
     const beam = new THREE.Mesh(bg, new THREE.MeshBasicMaterial({ color: 0xfff0c0, transparent: true, opacity: .09, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, toneMapped: false })); beam.position.z = .26; sl.add(beam);
     add(new THREE.CylinderGeometry(.06, .08, 1.1, 6), wood, sl.position.x, S * 3 + .55, sl.position.z, 0); }
-  const core = add(new THREE.SphereGeometry(.26, 16, 12), new THREE.MeshBasicMaterial({ color: 0x5ff2ff, toneMapped: false }), cx, crownTop + .35, cz, 0); core.castShadow = false; core.userData.mg = 0;
+  const core = add(new THREE.SphereGeometry(.26, 16, 12), E.jin, cx, crownTop + .35, cz, 0); core.castShadow = false; core.userData.mg = 0;
   // MANNED: a sentry gun on the second deck, and a red archer posted on the lookout
   const lf0 = AGE.st === 'fallen' ? 0 : WTOWER.lift, tur = AGE.st === 'fallen' ? null : turretAt(cx + hs - .9, S * 2 + lf0, cz + hs - .9, Math.atan2(ARENA.youAt[0] - cx, ARENA.youAt[1] - cz)); boxGrid();
   const rings = []; for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) rings.push(gringAdd(g, cx + sx * (hs + 1.7), S * 3 + 2.1, cz + sz * (hs + 1.7)));     // m1129: grapple rings
@@ -20677,7 +20678,7 @@ function wtowerBuild() {
       const rim = new THREE.Mesh(new THREE.TorusGeometry(.74, .04, 6, 20), new THREE.MeshStandardMaterial({ color: 0x17130f })); rim.position.z = sz * .44; drum.add(rim); }
     const stand = new THREE.Mesh(new THREE.BoxGeometry(1.4, .7, .5), wood); stand.position.y = -.75; drum.add(stand); drum.traverse(o => { if (o.isMesh) { o.castShadow = true; o.userData.mg = 1; } }); bldMergeStatic(drum);
     O.boxes.push({ minx: cx + .4, maxx: cx + 2, miny: S, maxy: S + 1.8, minz: cz - hs + .7, maxz: cz - hs + 1.7 }); BOXES.push(O.boxes[O.boxes.length - 1]); boxGrid(); W.drum = drum; }
-  { const kc = [0xc8341f, 0x2a6ac8]; W.kites = []; for (let k = 0; k < 2; k++) { const kt = new THREE.Group(); g.add(kt); const b2 = new THREE.Mesh(new THREE.ConeGeometry(.6, 2.4, 10, 1, true), new THREE.MeshStandardMaterial({ color: kc[k], side: THREE.DoubleSide, roughness: .8 })); b2.rotation.x = -Math.PI / 2; kt.add(b2);
+  { const kc = [ENEMY.pal.lacquer, ENEMY.pal.gold]; W.kites = []; for (let k = 0; k < 2; k++) { const kt = new THREE.Group(); g.add(kt); const b2 = new THREE.Mesh(new THREE.ConeGeometry(.6, 2.4, 10, 1, true), new THREE.MeshStandardMaterial({ color: kc[k], side: THREE.DoubleSide, roughness: .8 })); b2.rotation.x = -Math.PI / 2; kt.add(b2);
       const ln = new THREE.Line(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3)), new THREE.LineBasicMaterial({ color: 0x2a2622 })); ln.frustumCulled = false; g.add(ln); W.kites.push({ kt, ln, k }); } }
   // m1521 (his steer: ENEMY buildings are FOR DESTROYING -- never restored, never floating): the PIECES (base, three decks, four posts, the cap)
   // are kept, but used the other way: the tower stands whole, and when three of its four corner POSTS are cut through it COLLAPSES -- the decks,
@@ -20727,15 +20728,15 @@ function wtowerStep(dt) { const W = WTOWER.on; if (!W) return; W.t += dt; const 
     if (L.L) { if (whole) { L.L.miny = 0; L.L.maxy = L.top + lf; L.L.top = L.top + lf; L.L.mark.y = L.top + lf; } else { L.L.miny = L.L.maxy = L.L.top = -600; } }
     if (L.jin) { L.jin.material.emissiveIntensity = 1.3 + Math.sin(W.t * 2.6) * .5; L.jin.rotation.y = W.t * .4; } }
   bldDoorsStep(W.doors, dt);
-  if (W.beacon) { const B = W.beacon; if (B.t > 0) { B.t -= dt; B.coal.material.color.setRGB(1, .45 + Math.random() * .15, .1);
-      if ((B.fT = (B.fT || 0) - dt) <= 0) { B.fT = .06; spk(B.x + (Math.random() - .5) * .5, B.y, B.z + (Math.random() - .5) * .5, (Math.random() - .5) * .6, 2.5 + Math.random() * 2, (Math.random() - .5) * .6, .16, .6, [1, .55 + Math.random() * .3, .15]); if (Math.random() < .5) smokeAt(B.x, B.y + 1.5 + Math.random() * 3, B.z, 2.2, 3, [.3, .29, .28]); }
+  if (W.beacon) { const B = W.beacon; if (B.t > 0) { B.t -= dt; B.coal.material.color.setRGB(.45, .9 + Math.random() * .1, .8);
+      if ((B.fT = (B.fT || 0) - dt) <= 0) { B.fT = .06; spk(B.x + (Math.random() - .5) * .5, B.y, B.z + (Math.random() - .5) * .5, (Math.random() - .5) * .6, 2.5 + Math.random() * 2, (Math.random() - .5) * .6, .16, .6, [.45 + Math.random() * .2, 1, .8, .15]); if (Math.random() < .5) smokeAt(B.x, B.y + 1.5 + Math.random() * 3, B.z, 2.2, 3, [.3, .29, .28]); }
       if (B.t <= 0) B.coal.material.color.setRGB(.23, .1, .06); } }
   if (W.kites) for (const K of W.kites) { const ax = cx - W.A.hs, ay = W.A.storey * 3 + 1, az = cz - W.A.hs + K.k * 2, ph = W.t * (.5 + K.k * .13) + K.k * 2;
     const x = ax - 10 - K.k * 4 + Math.sin(ph) * 3, y = ay + 9 + K.k * 3 + Math.sin(ph * 1.7) * 1.5, z = az - 6 + Math.cos(ph * .8) * 4; K.kt.position.set(x, y, z); K.kt.lookAt(ax, ay, az); K.kt.rotateZ(Math.sin(W.t * 4 + K.k) * .3);
     K.ln.geometry.attributes.position.array.set([ax, ay, az, x, y, z]); K.ln.geometry.attributes.position.needsUpdate = true; }
   if (W.drum && W.drumT > 0) { W.drumT -= dt; W.drum.scale.setScalar(1 + Math.sin(W.drumT * 40) * W.drumT * .08); }
   if (W.fire && whole) { const [fx, fz] = W.fire; W.fT = (W.fT || 0) - dt; if (W.fT <= 0) { W.fT = .045;     // the fire: flames leaping, sparks, a little smoke
-      spk(fx + (Math.random() - .5) * 1.2, 1.55 + lf, fz + (Math.random() - .5) * 1.2, (Math.random() - .5) * .6, 2.6 + Math.random() * 2.4, (Math.random() - .5) * .6, .32 + Math.random() * .25, .55, Math.random() < .5 ? [1, .55, .12] : [1, .82, .3]);
+      spk(fx + (Math.random() - .5) * 1.2, 1.55 + lf, fz + (Math.random() - .5) * 1.2, (Math.random() - .5) * .6, 2.6 + Math.random() * 2.4, (Math.random() - .5) * .6, .32 + Math.random() * .25, .55, Math.random() < .5 ? [.45, 1, .82] : [.75, 1, .92]);
       if (Math.random() < .12) smokeAt(fx + (Math.random() - .5) * .6, 2.6 + lf, fz + (Math.random() - .5) * .6, 1.2, 1.6, [.3, .28, .26]); } }
   if (W.sl && !W.fallen) { W.sl.rotation.y = Math.PI * .75 + Math.sin(W.t * .32) * 1.1; W.sl.rotation.x = .32 + Math.sin(W.t * .21) * .08; }     // m1123: the searchlight sweeps
   if (W.core) W.core.scale.setScalar(1 + Math.sin(W.t * 2.4) * .14);
