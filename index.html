@@ -34594,7 +34594,7 @@ function kitCutMat(m) {
       sh.fragmentShader.replace('void main() {', 'void main() {\n' +
         '  if (uKXOn > .5 && vKCutW.y > uKXFeet && distance(vKCutW, cameraPosition) < distance(uKXP, cameraPosition) - .6) {\n' +
         '    vec3 kxd = uKXP - cameraPosition; float kxt = clamp(dot(vKCutW - cameraPosition, kxd) / dot(kxd, kxd), 0.0, 1.0);\n' +
-        '    float kxa = mix(uKXMin, 1.0, smoothstep(.6, 1.0, distance(vKCutW, cameraPosition + kxd * kxt) / (.95 * max(kxt, .3))));\n' +     /* m15xx: a CONE, thin at the lens and body-wide (.95 m) at him, not a 1.6 m tube: what sits beside the line stays solid */     /* m1352: a world CAPSULE round the lens->him line, not a screen circle -- a side wall beside him was dithered into a grey checker */
+        '    float kxa = mix(uKXMin, 1.0, smoothstep(.6, 1.0, distance(vKCutW, cameraPosition + kxd * kxt) / (.95 * max(kxt, .3))));\n' +     /* m1584: a CONE, thin at the lens and body-wide (.95 m) at him, not a 1.6 m tube: what sits beside the line stays solid */     /* m1352: a world CAPSULE round the lens->him line, not a screen circle -- a side wall beside him was dithered into a grey checker */
         '    if (kxa < .999 && kxa <= kxBayer(gl_FragCoord.xy)) discard;\n  }\n' +
         '  if (uKCutOn > .5 && vKCutW.y > uKCutY) {\n' +
         '    vec2 kd = vKCutW.xz - uKCutXf.xy;\n' +
@@ -34639,7 +34639,7 @@ function kitXrayStep() {
   const d = Math.max(.5, camera.position.distanceTo(KCUT.xP.value));
   const r = (kit.inside || WORLD.now === 'forge' ? KIT.xrayWIn : KIT.xrayW) / d * (_kxs.y * .5) / Math.tan(camera.fov * Math.PI / 360);
   KCUT.xS.value.set((_kxv.x * .5 + .5) * _kxs.x, (_kxv.y * .5 + .5) * _kxs.y, Math.max(1, r));
-  // m15xx: ONLY WHEN SOMETHING IS IN THE WAY (his: *"things won't even be in front of the camera and they'll just be see-through -- it looks like
+  // m1584: ONLY WHEN SOMETHING IS IN THE WAY (his: *"things won't even be in front of the camera and they'll just be see-through -- it looks like
   // rendering issues everywhere"*). Three segments, the lens to his shins / chest / head, against the colliders (`BOXES`, `BDYN`); the thinning
   // fades in over ~.15 s when one is cut and out over ~.4 s when none is. In the open, nothing is ever thinned.
   const cx = camera.position.x, cy = camera.position.y, cz = camera.position.z, H = RIG.height * bodyK(); let hit = 0;

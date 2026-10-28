@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- THE X-RAY ONLY WHEN SOMETHING IS IN THE WAY (his: "it just looks like a sphere... things won't even be in front of the camera and they'll be see-through")
+## m1584 -- THE X-RAY ONLY WHEN SOMETHING IS IN THE WAY (his: "it just looks like a sphere... things won't even be in front of the camera and they'll be see-through")
 What was wrong: the x-ray (`kitCutMat`'s `uKXOn` block, m181 / m1352) thinned every tagged surface inside a 1.6 m world tube round the lens->him
 line, ALL THE TIME it was switched on (kit worlds, the forge's buildings). In the open nothing occludes him, but a lamp, a post, a crate beside the
 line still fell inside the tube and dithered -- "rendering issues everywhere".
