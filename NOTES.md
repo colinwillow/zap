@@ -23,6 +23,13 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
+## THE BOOT GATE NEVER BUILT A WORLD PAST `init()`'s AWAITS -- NOW IT BUILDS THE HOME (mXXXX)
+Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while ghomeBuild was throwing."* There were two holes, and the second was bigger:
+- **The throw is caught.** `buildHome` logs `HOME BUILD THREW` and carries on. Now every logged line containing THREW fails the gate.
+- **The builder was never reached.** `init()` awaits asset loads that never resolve in node, so this gate only ever evaluated MODULE-SCOPE code. That is how it caught the arena's BDYN (m1401), and why it could not see the home. `MEL_WORLD=home` now appends `globalThis.__bootWorld = () => buildHome()` to the module and awaits it (capped at 4 s).
+- **Proven:** a planted `throw` in the ghomeBuild try gives BOOT FAIL `logged: [melee] HOME BUILD THREW`; without it, boot ok, and the home reports 26 draws.
+- `check:worlds` boots the home too now. **A world whose builder sits behind an await needs its own `__bootWorld` line** -- add one when a world's build starts to matter.
+
 ## THE PLANT LIBRARY, PASS 1: A SHARED KIT THAT SWAYS AND TAKES A HIT (m1425)
 *"Plants of various sizes and styles that are dynamic, move, flow in the wind, but you can also kinda hit them."* PROPS.md is the program (families, sandboxes, ten passes each).
 - **`PLANTK`:** eight types, each with `make()` returning parts built by `plantPart(geo, col, sw, fl, gl)`. `col` can be a hex, an [r,g,b] array or fn(x,y,z). The array case was missed at first and the Jin bulb drew BLACK.

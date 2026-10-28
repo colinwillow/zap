@@ -159,6 +159,10 @@ globalThis.Image = class { set src(v) {} addEventListener() {} };
 
 let src = m[1].replace(/(from\s*)['"]three['"]/g, `$1'${pathToFileURL(path.join(TMP, 'three-shim.mjs')).href}'`);
 src = src.replace(/(from\s*)['"]\.\/vendor\//g, `$1'${ROOT}vendor/`);
+// AND THE WORLD BUILDERS ARE CALLED DIRECTLY (m1427). `init()` awaits asset loads that never resolve here, so a world's builder past
+// those awaits was never evaluated by this gate at all -- Grumbo's home threw for builds while it said boot ok. MEL_WORLD=home calls
+// `buildHome()` itself, after the module has run; its catch logs "HOME BUILD THREW", which fails the gate (below).
+if (_w === 'home') src += '\nglobalThis.__bootWorld = () => buildHome();\n';
 const f = path.join(TMP, 'boot.mjs');
 fs.writeFileSync(f, src);
 
@@ -172,11 +176,15 @@ const note = e => { const t = (e && (e.stack || e.message)) || String(e); if (!E
 process.on('unhandledRejection', note);
 process.on('uncaughtException', note);
 const quiet = console.error, quietW = console.warn;
-console.error = (...a) => { if (!ENVY.test(a.map(String).join(' '))) quiet(...a); };
-console.warn = (...a) => { if (!ENVY.test(a.map(String).join(' '))) quietW(...a); };
+// A BUILD THAT THROWS INSIDE ITS OWN try/catch IS STILL A BROKEN PAGE (Worker B, m1424: `buildHome` caught ghomeBuild's throw and logged
+// "HOME BUILD THREW", and this printed boot ok). Any logged line saying THREW fails the gate.
+const threw = t => { if (/THREW/.test(t)) failed = failed || new Error('logged: ' + t); };
+console.error = (...a) => { const t = a.map(String).join(' '); threw(t); if (!ENVY.test(t)) quiet(...a); };
+console.warn = (...a) => { const t = a.map(String).join(' '); threw(t); if (!ENVY.test(t)) quietW(...a); };
 try {
   await import(pathToFileURL(f).href + '?t=' + Date.now());
   await new Promise(r => setTimeout(r, 500));
+  if (globalThis.__bootWorld) await Promise.race([globalThis.__bootWorld(), new Promise(r => setTimeout(r, 4000))]);
 } catch (e) { note(e); }
 console.error = quiet; console.warn = quietW;
 
