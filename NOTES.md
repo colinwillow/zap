@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- NEON GREEN SMOKE (his: "the green smoke has gone kind of dark... I want it glowing, neon, fluorescent. Instead of shades, HUES --
+a little more turquoise, a little more slime green-yellow")
+- **Why it was dark:** the smoke pool's shader outputs premultiplied colour, and its NormalBlending multiplies by alpha a SECOND time. Every
+  puff's colour lands at roughly colour x alpha squared over the background, which greys a coloured puff to murk on white snow. Grey smoke
+  hid this; a mid-green (m1697's "shades", .28-.48 / .78-.95) made it obvious.
+- **Fix:** a second pool, `gsmoke`, built by the same `puffPool` and stepped by the same `stepSmoke`, blended premultiplied (One,
+  OneMinusSrcAlpha). A puff's centre is its own colour at full strength. `smokeAt` takes the pool as an optional last argument.
+  Grey smoke is untouched.
+- **Colours:** `OSARI.shade` now picks a HUE: neon green 55%, turquoise 25%, slime yellow-green 20%, all at full green. It feeds the kill
+  blast and the Osari vanish. The green fire's tail no longer darkens to .55.
+- **Checked:** a headless render of a spider burst (bright, no dark core). **Not checked:** on his phone.
+
 ## m1701 -- THE SPIDER FIGHTS (his: "animate the spider attacks and hit reactions, maybe a jump and a block -- keep their current size --
 let them take damage so I can beat them up, then an explosion of them; have them lose limbs... maybe they spit or shoot at you")
 - **All procedural, on the same rig and planted-foot IK as the walk.** An attack moves the feet and body somewhere else for a moment.
