@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: MARKET STALLS, pass 2 (rubric 7: RESTORES IN PLACE)
+## m1548 -- THE RE-PASS: MARKET STALLS, pass 2 (rubric 7: RESTORES IN PLACE)
 **Moves:** its rubric-7 box. The Pagoda's and the Shrine's pattern.
 - Base (stays): the paving, the chunk walls (breakable as before), the back ramp, the fireworks booth, the crates and fruit crates, the potted plants.
 - Pieces (`cls`): `roof` (slab, rail, signboards and their glyphs and lanterns, teahouse tables, cushions, parasol), `posts` (the front posts
