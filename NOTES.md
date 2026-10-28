@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the BATHHOUSE, pass 1 (a HERO / TOWN place: the look; a collider audit)
+- Kit materials: `K.timber`, a warm planks triMat, a `stone_blocks` triMat in two tones, `K.lamp`, `K.bronze` (chimney cap, boiler, pipe).
+- The cold plunge tub gets bronze hoops and **its own** double-sided material: `.material.side = DoubleSide` on it had been flipping the
+  SHARED plank material (every plank in the build) to double-sided.
+- The side garden planted (ferns, flowers, grass, stones), bamboo along the fence, a cherry outside it, grass round the outside (the open
+  front kept clear); `korLantern`s on posts at the engawa's two ends; bunting along the front eave. Statics merged except the smash buckets.
+- **COLLIDER AUDIT:** the tub (r .9) and the boiler (r .75) were round meshes with full-square boxes, so .26 m and .31 m of each corner
+  diagonal was solid air. Their boxes are .85 r half-size now (a corner within .2 r, a flat face .15 r inside). Everything else (walls,
+  posts, engawa, rim, benches, chimney, fence) sits on drawn geometry.
+Render-checked headless (three-quarter, garden). Shipped unverified.
+
 ## m1610 -- THE DRAGON RIDE, build 1: the zone and the armour (DRAGON.md box 1)
 His: *"build the blue dragon: armour and a mount, a little zone where I can mount it and ride it... flying it, controlling it on the ground,
 an attack."* A new sandbox with its own DONE WHEN (`DRAGON.md`); KORAJIN > The Dragon Ride opens `?w=forge&zone=dragon` (`DRAGZ`).
@@ -28,6 +39,7 @@ an attack."* A new sandbox with its own DONE WHEN (`DRAGON.md`); KORAJIN > The D
 **Moves:** DRAGON.md box 1 (his look still open). **Still open:** boxes 2-6 and his sign-off; no fly clip in his file (asked for).
 Gates: `npm run check` ok, and a boot of `MEL_WORLD='forge&zone=dragon'` ok (the dragon itself loads after boot, so a throw in the
 dressing is only visible on the phone, as the chip line above). Shipped unverified.
+
 ## m1607 -- THE RE-PASS: the FLYING SHIP HOUSE, pass 3 (alive, L3; its third pass, so the loop moves on)
 - THE SAILS BILLOW: each junk sail is an 8 x 6 grid now, merged; every vertex carries its (u, v) inside its own sail (from `FSHIP.sailR`)
   and is pushed forward by sin(pi u) sin(pi v), a belly that breathes. Afloat only. A deeper belly lifted the sail off its battens.
