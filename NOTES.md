@@ -103,6 +103,17 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
+## THE SKY WHALE, PASS 2 (mXXXX)
+- **Pass 1's lathe profile was BACKWARDS.** The fat end was at -z (where the flukes were) and the thin end at +z (where the eyes were), so it read as a pale shark-blimp. Rebuilt: tail at z -15, head at +13, a slow swell to a max at t .68 and then a ROUNDED, blunt head (`radAt`), the belly flattened (.72) under the back (.86).
+- **Paint (per vertex):**
+  - a dark mouth line along the head
+  - pale THROAT PLEATS (stripes) under the front half
+  - barnacles on the brow
+  - a violet-navy back counter-shaded to the belly
+  - nine glowing JINRA spots along each flank, with `aGl` emissive that pulses
+- **Parts:** pectoral PADDLES are flat capsules out along ±X with a light droop and a back sweep. MEASURED, not trusted: both tips at (±9.5, -2.75, .24) from roots at z 5. A top-down render looked asymmetric, and that was the camera. Also a broad swept fluke, a dorsal hump, eyes with mint irises.
+- **Scale and orbit:** x2.6 (~73 m, was ~95); orbit r 175, y -24, slower.
+
 ## HIS SHIP FLIES WITH WINGS NOW, AND DOCKS BOW-FIRST (m1483)
 - **Worker A's `shipModel()` has the airship form by default since m1479:** two battened junk-sail wings, 57 m tip to tip along local X, tail fins, the canvas rippling in `step`, and 167 boxes (the two new ones are walkable wing spars). The dojo picked it up with no change.
 - **But docked broadside, the wing pointed AT the pier,** and since the dock distance was taken from the boxes' union (wings included), the hull sat ~20 m off. It now docks BOW-FIRST (`F.dockH` = PI). `dockR` = pier edge + `bowZ` (the furthest forward point of the deck-height boxes, ignoring thin spars) + .5, so the bow deck stops a hop from the pier and the wings stand clear either side.
