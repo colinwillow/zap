@@ -48,7 +48,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 | Dojo Hall |  |  |  |  |
 | Watchtower | m1487 hero kit: tent-cone crown, box lanterns, bunting, wheel winch, plants, a low bar; ~180 -> 87 draws | m1489 the crown breaks panel by panel to a rafter skeleton; doors swing open and break | m1490 layers: a rope-ladder SHORTCUT that drops from deck 2, doubloons on the perch tips, a guarded Jinra canister on the lookout |  |
 | Gatehouse |  |  |  |  |
-| Pagoda | m@X4@ classical heritage in painted maps (roof tiles, timber, sandstone), Jinra core, bunting, plants; ~270 -> 85 draws |  |  |  |
+| Pagoda | m1494 classical heritage in painted maps (roof tiles, timber, sandstone), Jinra core, bunting, plants; ~270 -> 85 draws |  |  |  |
 | Great Red Pagoda |  |  |  |  |
 | Shrine |  |  |  |  |
 | Market Stalls |  |  |  |  |
