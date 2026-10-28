@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the ROBOT BARRACKS, pass 2 (DESTRUCTIBLE TO THE GROUND)
+## m1663 -- THE RE-PASS: the ROBOT BARRACKS, pass 2 (DESTRUCTIBLE TO THE GROUND)
 - Keystones: the veranda's six black PILLARS (m1659), each its own piece, 3 blows (`barrBreak`, after `barrHit` so a robot in front of
   one takes the blow first). A cut pillar topples OUT into the yard (1.5 rad about x, its centre swung down to the ground). Four cut and
   the ROOF piece drops into the hall front-first (roof, fascia, ridge and finials, the eave lanterns, the head beam, the interior lamp,
