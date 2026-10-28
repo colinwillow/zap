@@ -522,6 +522,8 @@ rule that has to be in front of me *before* I know which system I am in.
   way the loader builds them.
 - **A TASTE DECISION IS HIS.** Put it on a switch he can reach on the phone; do not ship a pick
   and an argument for it.
+- **EVERY ENEMY HAS A STONE TWIN (STATUES.md, m1705).** One rig, two looks: stone (posed, no glow) and live (the Jinra glow). An enemy is not
+  finished without its statue form; a level wakes statues on an EVENT (the chalice), never by proximity.
 - **A VEHICLE BANKS INTO ITS TURN (m1703): left stick, LEFT side DOWN.** Every vehicle this file has built leaned OUT of the turn. Prove it
   with a dot product (root up . the side it turns toward > 0), never by reasoning about a rotation sign.
 - **HIS STEP IS .357 M, NOT .5 (m368).** `MOVE.step` is `.5 * SZ` and the rig is 1.25 m. A riser over .357 is a WALL

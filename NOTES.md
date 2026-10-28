@@ -5,6 +5,29 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- STATUES: THE ENEMY'S STONE TWIN AND THE CHALICE (his: "every time we make a new enemy we should first make the statue version --
+pose the rigged model, texture it with no green glowing parts, then the one that does; they guard the lairs; at the end you take a chalice
+and a cut scene shows them all coming to life")
+- **STATUES.md** is the rule and the checklist; CLAUDE.md carries one line.
+- **Built first on the spider** (its brain is all ours):
+  - `spiderSpawn` was split out of `spiderAdd`.
+  - A statue is a spider with `S.statue`: pose `guard` or `crouch` held, no think, no turn, pinned to `plinthY`.
+  - Materials: `statueStone` clones (the map's luminance over sandstone-grey, no emissive) swapped in by `statueSet`. The clones have
+    THEIR OWN `customProgramCacheKey` (the m1650 rule).
+  - A blow on stone: chips, dust, a clang, nothing else.
+- **SPAWN > STATUES** (`statueAdd`): 4 plinths (1.2 / 2.6 / 1.8 / 3.4 m, colliders in BOXES), spread .6 rad on a 12 m arc, and a chalice
+  6 m ahead.
+- **The wake:** walking into the chalice starts it (`statueStep`). Each statue in turn, `gap` 1.1 s apart: a crack (chips, dust), then
+  `statueWake` (live mats, mint flash, green fire, grey dust, a boom).
+  - `statueCam` lerps the lens to 6 m out from each statue on the chalice side, 2 m up and 2.2 m aside, looking at it. It is applied
+    after `stepCam`'s lookAt.
+  - The woken REAR (`guard`) and nobody attacks until the lens is back.
+- **First render:** a woken spider walked off its plinth straight through the lens, and the arc (3.8 m apart for 3.2 m plinths) was
+  crowded. Hence the rearing hold, the wider spread, and the lens moved behind the statue's line to the chalice.
+- **Measured headless:** statues at y 1.4 / 2.8 / 2.0 / 3.6; chalice taken; 4 wakes; all held in `guard` through the cut-away. 2 s after,
+  they walk and he still has 100 hp.
+- **Not built:** bowman / swordsman statues (horde bodies), the sphinx, statues in a real lair. **Not checked:** on his phone.
+
 ## m1704 -- A HIT BREAKS THE CHARGE; THE DRAGON SHOOTS LIKE A FIGHTER PLANE
 **The charge (his: "when I'm charging up on the right stick and the enemy attacks, it auto-lets-go and I auto attack them -- that's too
 easy, you'd charge over and over and never get hurt. If you don't release in time it should just f--- you up. The counter is the parry"):**

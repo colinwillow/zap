@@ -13921,6 +13921,58 @@ function osariStep(dt) { for (let i = OSARI.fades.length - 1; i >= 0; i--) { con
 // with back-right, then the other two), never both pairs at once. Each leg is solved every frame from rest: two bones onto the ankle
 // (the foot plus the last segment's length straight up), the knee bent up and out, the last segment aimed down at the foot. It walks at
 // you and stops `near` off. SPAWN > OSARI SPIDER. (m1701: it fights now -- below.)
+// m15xx (his: "every time we make a new enemy -- humanoid, a spider, a big sphinx-like dog or cat -- we should first make the STATUE version: the
+// rigged model posed, textured so it has NO green glowing parts, and the live one that does. In the level they stand guarding the evil
+// lairs; you do the acrobatic part first, at the end you take a CHALICE, and a cut scene shows them all coming to life"). STATUES.md is the
+// rule. This is the first one, the spider: the SAME rig, posed (rearing guard or crouched) and frozen, in STONE -- every material swapped for
+// a clone whose map is read as LUMINANCE only (the gems and Jinra seams go dull with the rest) over `stone`, no emissive. A blow chips it
+// and does nothing else. SPAWN > STATUES stands four on plinths of four heights in an arc, with a CHALICE on a pedestal in front: walk into
+// it and the WAKE runs -- the lens leaves him (`statueCam`) and visits each statue in turn: dust and chips, a crack, then its own
+// materials back with a mint flash and green fire, and it steps off its plinth into the fight.
+const STATUE = { stone: [.8, .74, .64], plinth: [1.2, 2.6, 1.8, 3.4], arc: 12, spread: .6, gap: 1.1, crack: .45, camIn: .5, list: [], g: null, boxes: [], chal: null, cine: null, stat: { wakes: 0 } };
+function statueStone(m) { const c = m.clone(); c.color.setRGB(STATUE.stone[0], STATUE.stone[1], STATUE.stone[2]); if (c.emissive) c.emissive.setScalar(0); c.emissiveMap = null; c.emissiveIntensity = 0; c.metalness = 0; c.roughness = .95;
+  c.onBeforeCompile = sh => { sh.fragmentShader = sh.fragmentShader.replace('#include <map_fragment>', '#ifdef USE_MAP\n  vec4 sampledDiffuseColor = texture2D( map, vMapUv );\n  float lum = dot( sampledDiffuseColor.rgb, vec3( .299, .587, .114 ) );\n  diffuseColor.rgb *= vec3( .35 + lum * 1.1 );\n#endif'); };
+  c.customProgramCacheKey = () => 'statueStone'; return c; }     // its OWN key: the shared program cache is the m1650 snow bug
+function statueSet(S, stone) { let i = 0; S.m.traverse(o => { if (o.isMesh) { o.material = stone ? S.stoneMats[i] : S.mats[i]; i++; } }); }
+async function statueAdd() { try { const P = await spiderLoad(), p = player, Z = STATUE; statueClear(); const g = Z.g = new THREE.Group(); scene.add(g);
+    const h0 = p.faceH, fx = Math.sin(h0), fz = Math.cos(h0), cx = p.pos.x + fx * 6, cz = p.pos.z + fz * 6, gy = groundAt(cx, cz, p.pos.y + 2, 3);
+    const stoneM = new THREE.MeshStandardMaterial({ color: 0xcdb48c, roughness: .95 }), dark = new THREE.MeshStandardMaterial({ color: 0x1b1916, roughness: .6 });
+    for (let k = 0; k < 4; k++) { const a = h0 + (k - 1.5) * Z.spread, x = cx + Math.sin(a) * Z.arc, z = cz + Math.cos(a) * Z.arc, H = Z.plinth[k], w = 3.2;
+      const pl = new THREE.Mesh(new THREE.BoxGeometry(w, H, w), stoneM); pl.position.set(x, gy + H / 2, z); pl.rotation.y = Math.atan2(cx - x, cz - z); pl.castShadow = pl.receiveShadow = true; g.add(pl);
+      const cap = new THREE.Mesh(new THREE.BoxGeometry(w + .3, .22, w + .3), dark); cap.position.set(x, gy + H + .11, z); cap.rotation.y = pl.rotation.y; g.add(cap);
+      const hw = w * .72; Z.boxes.push({ minx: x - hw, maxx: x + hw, miny: gy, maxy: gy + H + .22, minz: z - hw, maxz: z + hw });     // a turned square's AABB, a little in
+      const S = spiderSpawn(P, x, z, Math.atan2(cx - x, cz - z), gy + H + .22); S.statue = 1; S.pose = k % 2 ? 'crouch' : 'guard'; S.plinthY = gy + H + .22; S.stoneMats = S.mats.map(statueStone); statueSet(S, 1); Z.list.push(S); }
+    // the chalice: gold, on a black pedestal, mint Jinra in the bowl, turning
+    const ped = new THREE.Mesh(new THREE.CylinderGeometry(.45, .6, 1, 12), dark); ped.position.set(cx, gy + .5, cz); g.add(ped);
+    const gold = new THREE.MeshStandardMaterial({ color: 0xc99a3e, metalness: .85, roughness: .3 }), pts = [[0, 0], [.22, 0], [.24, .03], [.06, .08], [.05, .3], [.12, .36], [.2, .46], [.22, .58], [.2, .6]].map(q => new THREE.Vector2(q[0], q[1]));
+    const cup = new THREE.Mesh(new THREE.LatheGeometry(pts, 16), gold); cup.material.side = THREE.DoubleSide; const liq = new THREE.Mesh(new THREE.CircleGeometry(.19, 16), new THREE.MeshBasicMaterial({ color: 0x7affd8 })); liq.rotation.x = -Math.PI / 2; liq.position.y = .55;
+    const ch = new THREE.Group(); ch.add(cup, liq, glowSprite(0x7affd8, .9)); ch.children[2].position.y = .62; ch.position.set(cx, gy + 1, cz); g.add(ch); Z.chal = { g: ch, x: cx, z: cz, y: gy + 1, taken: 0 };
+    for (const b of Z.boxes) BOXES.push(b); boxGrid(); snd('clang', { g: .5, r: .45 }); } catch (e) { console.error('[melee] statue', e); note('STATUES FAILED ' + e.message); } }
+function statueClear() { const Z = STATUE; for (const S of Z.list) { const i = SPIDER.list.indexOf(S); if (i >= 0) { S.root.removeFromParent(); SPIDER.list.splice(i, 1); } } Z.list.length = 0;
+  if (Z.g) { Z.g.removeFromParent(); Z.g = null; } for (const b of Z.boxes) { const i = BOXES.indexOf(b); if (i >= 0) BOXES.splice(i, 1); } if (Z.boxes.length) boxGrid(); Z.boxes.length = 0; Z.chal = null; Z.cine = null; }
+function statueWake(S) { const Z = STATUE; S.statue = 0; statueSet(S, 0); S.flash = 1.6; S.st = 'stag'; S.stT = 0; S.cool = 1.2 + Math.random(); Z.stat.wakes++;
+  const M = spiderMid(S, _sdC); for (let i = 0; i < 6; i++) smokeAt(M.x + (Math.random() - .5) * 2, M.y - .3 + Math.random() * .6, M.z + (Math.random() - .5) * 2, 3, 1.2, [.82, .76, .66]);
+  for (let i = 0; i < 4; i++) smokeAt(M.x + (Math.random() - .5), M.y + Math.random() * .6, M.z + (Math.random() - .5), 4, 1.4, OSARI.shade(), 1.3, gsmoke);
+  for (let i = 0; i < 30; i++) gfire(M.x + (Math.random() - .5) * 1.6, M.y + (Math.random() - .5) * .4, M.z + (Math.random() - .5) * 1.6, .9);
+  spkBurst(M.x, M.y, M.z, 30, { col: [.8, .74, .64], spread: 6, size: .16, life: .6 }); spkBurst(M.x, M.y, M.z, 16, { col: [.5, 1, .85], spread: 4, size: .14, life: .5 });
+  snd('boom', { g: .45, r: 1.3, x: M.x, z: M.z }); snd('clang', { g: .5, r: .55, x: M.x, z: M.z }); camShake(.22); }
+function statueStep(dt) { const Z = STATUE, C = Z.chal, p = player; if (!C) return;
+  if (!C.taken) { C.g.rotation.y += dt * 1.2; C.g.position.y = C.y + Math.sin(performance.now() / 500) * .05;
+    if (Math.hypot(p.pos.x - C.x, p.pos.z - C.z) < 1.3 && Math.abs(p.pos.y - (C.y - 1)) < 2) { C.taken = 1; C.g.visible = false; spkBurst(C.x, C.y + .6, C.z, 30, { col: [.5, 1, .85], spread: 4, size: .14, life: .6 }); snd('clang', { g: .8, r: 1.8, x: C.x, z: C.z });
+      Z.cine = { t: 0, i: -1, cracked: -1, T: Z.camIn + Z.list.length * Z.gap + 1.2, from: camera.position.clone(), look: new THREE.Vector3(C.x, C.y, C.z) }; } return; }
+  const K = Z.cine; if (!K) return; K.t += dt; const L = Z.list.filter(S => !S.dead);
+  for (let k = 0; k < Z.list.length; k++) { const S = Z.list[k], t0 = Z.camIn + k * Z.gap; if (S.dead || !S.statue) continue;
+    if (K.t > t0 + Z.crack * .2 && S.crk !== 1) { S.crk = 1; const M = spiderMid(S, _sdC); spkBurst(M.x, M.y + .4, M.z, 14, { col: [.8, .74, .64], spread: 3, size: .1, life: .4 }); smokeAt(M.x, M.y, M.z, 2, 1, [.82, .76, .66]); snd('clang', { g: .35, r: .45, x: M.x, z: M.z }); camShake(.08); }
+    if (K.t > t0 + Z.crack) statueWake(S); }
+  for (const S of L) if (!S.statue) { S.cool = Math.max(S.cool, K.T - K.t + .4); if (S.stT > .45 || S.st === 'guard') { S.st = 'guard'; S.stT = .3; } }     // awake, they REAR on their plinths until the lens is back -- then all come down at once
+  if (K.t > K.T) Z.cine = null; }
+// the lens during the wake: eased off him, to a point beside each statue as it goes (looking at it), then back
+function statueCam() { const Z = STATUE, K = Z.cine, p = player; if (!K) return; const n = Z.list.length, u = (K.t - Z.camIn) / Z.gap, k = clamp(Math.floor(u), 0, n - 1), S = Z.list[k];
+  const inK = clamp(K.t / Z.camIn, 0, 1), outK = clamp((K.T - K.t) / .6, 0, 1), w = Math.min(inK, outK), e = w * w * (3 - 2 * w); if (!S || e <= 0) return;
+  const R = S.root.position, C = Z.chal, ax = R.x - C.x, az = R.z - C.z, L = Math.hypot(ax, az) || 1, sx = -az / L, sz = ax / L;
+  _sdA.set(R.x - ax / L * 6 + sx * 2.2, R.y + 2, R.z - az / L * 6 + sz * 2.2); _sdB.set(R.x, R.y + SPIDER.P.h * .7, R.z);
+  K.eye = K.eye ? K.eye.lerp(_sdA, 1 - Math.exp(-6 * 1 / 60)) : _sdA.clone(); K.at = K.at ? K.at.lerp(_sdB, 1 - Math.exp(-6 * 1 / 60)) : _sdB.clone();
+  camera.position.lerp(K.eye, e); _sdC.copy(cam.tgt).lerp(K.at, e); camera.lookAt(_sdC); }
 // m1701 (his: "animate the spider attacks and hit reactions, a jump, a block -- keep them their current size -- let them take damage so I
 // can beat them up, then an explosion of them; have them lose limbs... maybe they spit or shoot at you"): THE SPIDER FIGHTS. All procedural,
 // on the same rig and the same planted-foot IK -- an attack is the FEET and the BODY told somewhere else for a moment:
@@ -13949,17 +14001,18 @@ function spiderTris(M) { const P = SPIDER.P; if (P.tris) return P.tris; const G 
   const idx = G.index ? G.index.array : null, tri = (idx ? idx.length : n) / 3, T = {};
   for (let t = 0; t < tri; t++) { const a = idx ? idx[t * 3] : t * 3, b = idx ? idx[t * 3 + 1] : t * 3 + 1, c = idx ? idx[t * 3 + 2] : t * 3 + 2, g = vg[b] === vg[c] ? vg[b] : vg[a]; (T[g] = T[g] || []).push(a, b, c); }
   return (P.tris = T); }
-async function spiderAdd() { try { const P = await spiderLoad(), p = player;
-    for (let k = 0; k < 2; k++) { const m = skeletonClone(P.proto); m.scale.setScalar(P.scale); const root = new THREE.Group(); root.add(m);
-      const a = Math.atan2(-p.pos.x, -p.pos.z) + (k ? .6 : -.6), x = p.pos.x + Math.sin(a) * 12, z = p.pos.z + Math.cos(a) * 12; root.position.set(x, groundAt(x, z, p.pos.y + 2, 3), z); root.rotation.y = Math.atan2(p.pos.x - x, p.pos.z - z);
+function spiderSpawn(P, x, z, h, y) { const m = skeletonClone(P.proto); m.scale.setScalar(P.scale); const root = new THREE.Group(); root.add(m);
+      root.position.set(x, y == null ? groundAt(x, z, player.pos.y + 2, 3) : y, z); root.rotation.y = h;
       let mesh = null; const mats = []; m.traverse(o => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; o.material = o.material.clone(); mats.push(o.material); if (o.isSkinnedMesh) mesh = o; } }); scene.add(root); root.updateMatrixWorld(true);
       const bn = {}; m.traverse(o => { if (o.isBone) bn[o.name] = o; }); const rest = []; m.traverse(o => { if (o.isBone) rest.push([o, o.quaternion.clone()]); });
       const legs = []; for (const L of ['FL', 'FR', 'BL', 'BR']) { const b1 = bn['leg_' + L + '_1'], b2 = bn['leg_' + L + '_2'], b3 = bn['leg_' + L + '_3'], tip = bn['leg_' + L + '_tip']; if (!b1 || !b2 || !b3 || !tip) continue;
         const tw = tip.getWorldPosition(new THREE.Vector3()), restL = root.worldToLocal(tw.clone()), len3 = b3.getWorldPosition(new THREE.Vector3()).distanceTo(tw), out = new THREE.Vector3(L[1] === 'L' ? 1 : -1, 0, 0);
         legs.push({ L, b1, b2, b3, tip, restL, len3, out, front: L[0] === 'F', grp: L === 'FL' || L === 'BR' ? 0 : 1, foot: tw.clone(), from: tw.clone(), to: tw.clone(), t: -1 }); }
-      SPIDER.list.push({ root, m, mesh, mats, bn, rest, legs, t: Math.random() * 3, y0: root.position.y, hp: SPIDER.hp, acc: 0, cut: [], st: 'walk', stT: 0, cool: 1 + Math.random() * 2, hitCd: 0, flash: 0, kx: 0, kz: 0, recoil: 0, pitch: 0, lift: 0, vy: 0, air: 0, ax: 0, az: 0, front: 0, dead: 0 }); }
+      const S = { root, m, mesh, mats, bn, rest, legs, t: Math.random() * 3, y0: root.position.y, hp: SPIDER.hp, acc: 0, cut: [], st: 'walk', stT: 0, cool: 1 + Math.random() * 2, hitCd: 0, flash: 0, kx: 0, kz: 0, recoil: 0, pitch: 0, lift: 0, vy: 0, air: 0, ax: 0, az: 0, front: 0, dead: 0 }; SPIDER.list.push(S); return S; }
+async function spiderAdd() { try { const P = await spiderLoad(), p = player;
+    for (let k = 0; k < 2; k++) { const a = Math.atan2(-p.pos.x, -p.pos.z) + (k ? .6 : -.6), x = p.pos.x + Math.sin(a) * 12, z = p.pos.z + Math.cos(a) * 12; spiderSpawn(P, x, z, Math.atan2(p.pos.x - x, p.pos.z - z)); }
     snd('clang', { g: .5, r: .5 }); } catch (e) { console.error('[melee] spider', e); note('SPIDER FAILED ' + e.message); } }
-function spiderClear() { for (const S of SPIDER.list) S.root.removeFromParent(); SPIDER.list.length = 0; for (const G of SPIDER.globs) G.m.removeFromParent(); SPIDER.globs.length = 0; }
+function spiderClear() { if (STATUE.g) statueClear(); for (const S of SPIDER.list) S.root.removeFromParent(); SPIDER.list.length = 0; for (const G of SPIDER.globs) G.m.removeFromParent(); SPIDER.globs.length = 0; }
 function spiderMid(S, v) { const R = S.root.position; return v.set(R.x, R.y + S.lift + SPIDER.P.h * .5, R.z); }
 // a piece of it, lifted out of the skin as it stands and thrown along `dirH`
 function spiderBake(S, g, dirH, kick) { const T = SPIDER.P.tris && SPIDER.P.tris[g]; if (!T || !S.mesh) return null; for (const m of S.mats) if (m.emissive) m.emissive.setScalar(0);
@@ -13977,6 +14030,7 @@ function spiderDie(S, dirH) { if (S.dead) return; S.dead = 1; spiderTris(S.mesh)
   S.root.removeFromParent(); SPIDER.list.splice(SPIDER.list.indexOf(S), 1); SPIDER.stat.kills++; HORDE.stat.kills++; }
 // ONE BLOW on a spider: `dirH` the way it travels, `hx/hz` where it landed (nearest leg comes off). Returns 'block', 1 (landed) or 0.
 function spiderBlow(S, dirH, power, dmg, hx, hz) { if (S.dead || S.hitCd > 0) return 0; S.hitCd = .2; const R = S.root, Z = SPIDER, p = player;
+  if (S.statue) { const M = spiderMid(S, _sdC); spkBurst(M.x, M.y, M.z, 16, { col: [.8, .74, .64], spread: 4, size: .1, life: .4 }); smokeAt(M.x, M.y, M.z, 1.5, .8, [.82, .76, .66]); snd('clang', { g: .6, r: .6, x: M.x, z: M.z }); return 'block'; }     // m15xx: stone chips
   const full = p.chargeGo && slotNow().blade && (p.chargeGoK || 0) >= HALVE.full, front = Math.abs(wrapAngle(dirH + Math.PI - R.rotation.y)) < 1.1, M = spiderMid(S, _sdC);
   if (S.st === 'guard' && front && !full) { SPIDER.stat.blocks++; S.stT = 0; S.recoil = .5; spkBurst(M.x + Math.sin(R.rotation.y) * 1, M.y + .3, M.z + Math.cos(R.rotation.y) * 1, 20, { col: [1, .9, .6], spread: 5, size: .13, life: .35 });
     snd('clang', { g: 1, r: 1.1 + Math.random() * .2, x: M.x, z: M.z }); camShake(.08); return 'block'; }
@@ -14037,9 +14091,9 @@ function spiderThink(S, d, dt) { const Z = SPIDER, R = S.root, p = player, roll 
     case 'guard': if (S.stT > Z.guardT * 2) { S.st = 'walk'; S.stT = 0; } break; } }
 function spiderStep(dt) { const p = player, Z = SPIDER; if (Z.globs.length) spiderGlobStep(dt);
   for (const S of Z.list.slice()) { S.t += dt; S.hitCd -= dt; const R = S.root, dx = p.pos.x - R.position.x, dz = p.pos.z - R.position.z, d = Math.hypot(dx, dz);
-    spiderThink(S, d, dt); if (S.dead) continue;
+    if (S.statue) { S.st = S.pose || 'guard'; S.stT = 9; S.t = 0; S.kx = S.kz = 0; } else spiderThink(S, d, dt); if (S.dead) continue;
     const st = S.st, busy = st !== 'walk', legK = S.legs.length / 4;
-    const want = Math.atan2(dx, dz); if (st === 'walk' || st === 'bwind' || st === 'swind' || st === 'crouch' || st === 'guard') R.rotation.y += clamp(wrapAngle(want - R.rotation.y), -Z.turn * dt, Z.turn * dt);
+    const want = Math.atan2(dx, dz); if (!S.statue && (st === 'walk' || st === 'bwind' || st === 'swind' || st === 'crouch' || st === 'guard')) R.rotation.y += clamp(wrapAngle(want - R.rotation.y), -Z.turn * dt, Z.turn * dt);
     const go = st === 'walk' && d > Z.near ? Z.speed * (.35 + .65 * legK) * clamp(1 - Math.abs(wrapAngle(want - R.rotation.y)) / 1.6, .25, 1) : 0, fx = Math.sin(R.rotation.y), fz = Math.cos(R.rotation.y);
     R.position.x += fx * go * dt + S.kx * dt; R.position.z += fz * go * dt + S.kz * dt; const kd = Math.exp(-6 * dt); S.kx *= kd; S.kz *= kd;
     const gy = groundAt(R.position.x, R.position.z, R.position.y + 1.5, 1.5);
@@ -14048,6 +14102,7 @@ function spiderStep(dt) { const p = player, Z = SPIDER; if (Z.globs.length) spid
         spkBurst(R.position.x, gy + .1, R.position.z, 20, { col: [.8, .9, .8], spread: 4, size: .12, life: .4 }); for (const l of S.legs) { l.foot.copy(R.localToWorld(_sdA.copy(l.restL))); l.foot.y = gy; l.t = -1; }
         if (Math.hypot(p.pos.x - R.position.x, p.pos.z - R.position.z) < Z.pounce.R + .6 && Math.abs(p.pos.y - gy) < 1.4 && !p.roll) playerHurt(Z.pounce.dmg, Math.atan2(dx, dz), 7, 3, .4, 0);
         S.cool = (Z.pounce.cool[0] + Math.random() * (Z.pounce.cool[1] - Z.pounce.cool[0])) * .5; } }
+    else if (S.statue) R.position.y = S.plinthY;
     else { const stepping = S.legs.some(l => l.t >= 0); R.position.y = damp(R.position.y, gy + (stepping ? Z.bob : 0), .08, dt); }
     R.updateMatrixWorld(true);
     // the BODY: crouch / rear / recoil, and the sag towards whatever legs are gone
@@ -14329,6 +14384,7 @@ function arenaUi() {
       else if (a === 'beam') { ARENA.menu = ''; if (BEAM.list.length) beamClear(); else beamSpawn(); }     // m1037; m1072
       else if (a === 'horde') { hordeAdd(); }     // m1084
       else if (a === 'archers') { archerAdd(); }     // m1103
+      else if (a === 'statue') { ARENA.menu = ''; if (STATUE.g) statueClear(); else statueAdd(); }     // m15xx
       else if (a === 'spider') { ARENA.menu = ''; if (SPIDER.list.length) spiderClear(); else spiderAdd(); }     // m1677
       else if (a === 'hall') { ARENA.menu = ''; if (HALL.on) hallClear(); else hallBuild(); }     // m1116
       else if (a === 'age') { AGE.st = AGE.st === 'fallen' ? 'restored' : 'fallen'; try { localStorage.setItem('mel.age', AGE.st); } catch (err) {} for (const E of BLDG.list) if (E.on()) { const rg = E.rig && E.rig(); if (rg) restorePlay(rg, AGE.st === 'fallen' ? 0 : 1); else { E.clear(); E.build(); } } if (inHome()) location.reload(); }     // m1501: FALLEN / RESTORED; a restorable building PLAYS it (m1512); the Red Hollows' pieces read it as they build: reload (Worker B)
@@ -14406,7 +14462,7 @@ function arenaUi() {
   if (m === 'bld') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back') + B('age', 'STATE: ' + (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + '<small>tap to switch -- rebuilds what stands</small>', '', AGE.st === 'fallen' ? '' : 'ar-on');
     for (const E of BLDG.list) h += B('bld', E.t + '<small>' + (E.on() ? 'tap to remove' : E.pass >= 3 ? E.sub : 'IN PROGRESS · pass ' + E.pass + ' of 3') + '</small>', E.key, E.on() ? 'ar-on' : '');
     h += '</div>'; }
-  else if (m === 'top') h += '<div class="ar-menu">' + (inForge() ? B('cat', 'BUILDINGS &rsaquo;', 'bld') : '') + B('cat', 'WARBOSS &rsaquo;', 'boss') + B('cat', 'PEOPLE &rsaquo;', 'people') + B('cat', 'BEASTS &rsaquo;', 'beasts') + B('cat', 'RIVALS &rsaquo;', 'rival') + B('turret', 'TURRET<small>' + (TURRET.list.length ? 'tap to remove' : 'sentry gun') + '</small>', '', TURRET.list.length ? 'ar-on' : '') + B('hbar', 'HIGH BAR<small>' + (HBAR.list.length ? 'tap to remove' : 'swing on it') + '</small>', '', HBAR.list.length ? 'ar-on' : '') + B('beam', 'BALANCE BEAM<small>' + (BEAM.list.length ? 'tap to remove' : 'walk it') + '</small>', '', BEAM.list.length ? 'ar-on' : '') + B('wrun', 'WALL RUN<small>' + ((WRUN.boxes || []).length ? 'tap to remove' : 'run along it') + '</small>', '', (WRUN.boxes || []).length ? 'ar-on' : '') + B('course', 'ACROBATICS<small>' + (COURSE.on ? 'tap to remove' : 'the course') + '</small>', '', COURSE.on ? 'ar-on' : '') + B('slice', 'SLICE DUMMY<small>' + (LIMB.stat.cuts ? LIMB.stat.cuts + ' cut, ' + LIMB.stat.booms + ' blown' : 'cut him up') + '</small>') + B('horde', 'HORDE<small>' + (HORDE.busy ? 'loading...' : HORDE.list.length ? HORDE.list.length + ' left, ' + HORDE.stat.kills + ' down -- +' + HORDE.per : '+' + HORDE.per + (HORDE.slice ? ' (slice)' : ' samurai')) + '</small>', '', HORDE.list.length ? 'ar-on' : '') + B('hall', 'HALL<small>' + (HALL.on ? 'tap to remove' : 'the first building') + '</small>', '', HALL.on ? 'ar-on' : '') + B('archers', 'ARCHERS<small>' + (HORDE.busy ? 'loading...' : '+' + ARCH.per + (ARCH.body === 'OSARI_BOW' ? ' Osari bowmen' : ' red bowmen')) + '</small>') + B('spider', 'OSARI SPIDER<small>' + (SPIDER.list.length ? 'tap to remove' : 'the walker') + '</small>', '', SPIDER.list.length ? 'ar-on' : '') + '<button class="ar-off">GRUNTS<small>soon</small></button><button class="ar-off">GREYS<small>soon</small></button></div>';
+  else if (m === 'top') h += '<div class="ar-menu">' + (inForge() ? B('cat', 'BUILDINGS &rsaquo;', 'bld') : '') + B('cat', 'WARBOSS &rsaquo;', 'boss') + B('cat', 'PEOPLE &rsaquo;', 'people') + B('cat', 'BEASTS &rsaquo;', 'beasts') + B('cat', 'RIVALS &rsaquo;', 'rival') + B('turret', 'TURRET<small>' + (TURRET.list.length ? 'tap to remove' : 'sentry gun') + '</small>', '', TURRET.list.length ? 'ar-on' : '') + B('hbar', 'HIGH BAR<small>' + (HBAR.list.length ? 'tap to remove' : 'swing on it') + '</small>', '', HBAR.list.length ? 'ar-on' : '') + B('beam', 'BALANCE BEAM<small>' + (BEAM.list.length ? 'tap to remove' : 'walk it') + '</small>', '', BEAM.list.length ? 'ar-on' : '') + B('wrun', 'WALL RUN<small>' + ((WRUN.boxes || []).length ? 'tap to remove' : 'run along it') + '</small>', '', (WRUN.boxes || []).length ? 'ar-on' : '') + B('course', 'ACROBATICS<small>' + (COURSE.on ? 'tap to remove' : 'the course') + '</small>', '', COURSE.on ? 'ar-on' : '') + B('slice', 'SLICE DUMMY<small>' + (LIMB.stat.cuts ? LIMB.stat.cuts + ' cut, ' + LIMB.stat.booms + ' blown' : 'cut him up') + '</small>') + B('horde', 'HORDE<small>' + (HORDE.busy ? 'loading...' : HORDE.list.length ? HORDE.list.length + ' left, ' + HORDE.stat.kills + ' down -- +' + HORDE.per : '+' + HORDE.per + (HORDE.slice ? ' (slice)' : ' samurai')) + '</small>', '', HORDE.list.length ? 'ar-on' : '') + B('hall', 'HALL<small>' + (HALL.on ? 'tap to remove' : 'the first building') + '</small>', '', HALL.on ? 'ar-on' : '') + B('archers', 'ARCHERS<small>' + (HORDE.busy ? 'loading...' : '+' + ARCH.per + (ARCH.body === 'OSARI_BOW' ? ' Osari bowmen' : ' red bowmen')) + '</small>') + B('spider', 'OSARI SPIDER<small>' + (SPIDER.list.length ? 'tap to remove' : 'the walker') + '</small>', '', SPIDER.list.length ? 'ar-on' : '') + B('statue', 'STATUES<small>' + (STATUE.g ? 'tap to remove' : 'take the chalice') + '</small>', '', STATUE.g ? 'ar-on' : '') + '<button class="ar-off">GRUNTS<small>soon</small></button><button class="ar-off">GREYS<small>soon</small></button></div>';
   else if (m === 'boss' || m === 'people' || m === 'beasts' || m === 'rival') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back');
     for (const k in ARENA.kinds) { const A = ARENA.kinds[k]; if (!!A.creature !== (m === 'beasts')) continue; if (!!A.rival !== (m === 'rival')) continue; if (m !== 'beasts' && !A.both && !!A.civ !== (m === 'people')) continue; h += B('spawn', A.t + (A.sub ? '<small>' + A.sub + '</small>' : ''), k); } h += '</div>'; }
   U.innerHTML = h;
@@ -65414,7 +65470,7 @@ function stepDummies(dt) {
   if (ARROWS.length) arrowStep(dt);
   if (OSARI.fades.length) osariStep(dt);
   gfireStep(dt);     // m1675
-  if (SPIDER.list.length || SPIDER.globs.length) spiderStep(dt);     // m1677
+  if (SPIDER.list.length || SPIDER.globs.length) spiderStep(dt); if (STATUE.chal) statueStep(dt);     // m1677
 }
 
 // ============================================================================================
@@ -65672,6 +65728,7 @@ function stepCam(dt) {
     camera.position.z += -bx * Math.sin(w * .77 + 1.9) * cam.shakeA * S.side;
   } else cam.shakeA = 0;
   camera.lookAt(cam.tgt);
+  if (STATUE.cine) statueCam();     // m15xx: the wake's cut-away
   // the lens widens with speed -- the cheapest speed cue there is, and it costs nothing
   const rush = smooth(CAM.rush0, CAM.rush0 + CAM.rushSpan, p.speed);
   // m1035: *"horizontal it's very widescreen and far away -- change the FOV so the character is more or less the same distance and size, with
