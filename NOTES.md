@@ -37,6 +37,14 @@ controls locomotion on the ground and in the air; right stick still controls the
 - In `hop` / `hover` the left pad steers as on the ground, gentler (`airSp` 7); in `fly` it is the wingsuit stick as before.
 - **Getting off** moved to the LEFT pad's double tap (`dragTapL` -> `dragTap`); the left tap no longer beats the wings.
 **Moves:** nothing ticked -- his feel of the new map. Gates: check ok, zone boot ok. Shipped unverified.
+## m15xx -- THE SNOWFIELD: the katana was buried, now it cuts the snow
+His (first time in the snowfield: *"might be my favorite thing of all time... expand on that"*): *"the katana -- it's not showing the sword, a weird
+rendering issue."* Measured headless: the hero stands at y 0 and the snow surface is at `SNOWZ.depth` .55 (he WADES; that is the design), and the
+katana's meshes sat at .38-.48 m in his hand at rest -- under the surface. Nothing was mis-rendered; the blade was in the snow.
+- `snowStep`: every non-skinned mesh under his rig (the weapon in his hand, whatever it is; recollected when the rig or slot changes), its 8
+  bounding-box corners each frame -- any corner under the snow's surface carves a .11 m groove down to the corner's own depth (`snowStamp`), and
+  a swing (`p.melee`) throws powder. The blade always shows, and a cut through deep snow leaves its slash.
+- BUILDINGS.md THE ELEMENTS: the snow is a region to grow now (his), with the SNOW DRAGON's lair as its height.
 
 ## m1624 -- THE DRAGON RIDE: his first look (m1614 on the phone) -- the saddle, the plates, the lens, the dismount
 His (screenshot at M1614 +3, i.e. three builds behind -- the riding, flying and fire are m1618-m1622 and had not reached him): *"When I got on

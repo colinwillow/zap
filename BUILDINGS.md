@@ -182,6 +182,11 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
     - deep snow drags at you
     - 5000 flakes flutter in a gusting wind and BOUNCE off his body
     - footsteps and landings kick up puffs
+  - **HIS (Oct 28 2026, first time in it): *"that might be my favorite thing of all time. I love the snow. Expand on that, expand on that, expand on
+    that -- maybe that's where you find the dragon. A snow dragon."*** It is a REGION now, not a test patch: the passes below, then a snow world
+    with height (VERTICALITY: ice shelves, a frozen waterfall, a cliff cave) where the SNOW DRAGON's lair is.
+  - [x] **the katana vanished (m15xx):** it was BURIED, not mis-rendered -- he wades with his feet on the ground under .55 m of snow, and a low blade
+    dips under the surface. Whatever he holds now CUTS the snow (a groove where it passes, powder on a swing)
   - [ ] pass 2:
     - snow that SETTLES on him (his shoulders and head whiten while he stands, shaken off when he moves)
     - his breath fogs

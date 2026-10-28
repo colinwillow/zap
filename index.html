@@ -10352,6 +10352,13 @@ function snowStep(dt) { const Z = SNOWZ, A = Z.air, p = player; if (!A) return; 
       if (_snF.y < snowAt(_snF.x, _snF.z) * Z.depth + .05) { const before = snowAt(_snF.x, _snF.z); snowStamp(_snF.x, _snF.z, Z.foot, .08); if (before > .4 && sp > .5 && Math.random() < .5) snowPuff(_snF.x, before * Z.depth, _snF.z, 3, 1.6, 1.2); } }
     if (sp > .4 && p.grounded) snowStamp(p.pos.x, p.pos.z, Z.plough * Math.min(1, sp / 4), .3);
     if (p.roll) snowStamp(p.pos.x, p.pos.z, .7, .05);
+    // m15xx (his: *"in the snow sandbox the katana -- it's not showing the sword, a weird rendering issue"*): it was not rendering wrong, it was
+    // BURIED -- he wades with his feet on the ground under .55 m of snow, and a blade held low dips under the surface and vanishes. Now whatever
+    // he holds CUTS the snow: the low corners of every weapon mesh in his hand, wherever they go under the surface, carve a groove (and a fast
+    // swing throws powder), so the blade always shows and a cut through deep snow leaves its slash.
+    if (rig.root) { if (!Z.wm || Z.wmFor !== rig.root.uuid + (p.slot | 0)) { Z.wm = []; Z.wmFor = rig.root.uuid + (p.slot | 0); rig.root.traverse(o => { if (o.isMesh && !o.isSkinnedMesh && o.geometry) { o.geometry.computeBoundingBox(); Z.wm.push(o); } }); }
+      for (const o of Z.wm) { if (!o.visible) continue; const bb = o.geometry.boundingBox; for (let c = 0; c < 8; c++) { _snF.set(c & 1 ? bb.max.x : bb.min.x, c & 2 ? bb.max.y : bb.min.y, c & 4 ? bb.max.z : bb.min.z).applyMatrix4(o.matrixWorld);
+          const top = snowAt(_snF.x, _snF.z) * Z.depth; if (_snF.y < top - .02) { snowStamp(_snF.x, _snF.z, .11, Math.max(0, _snF.y / Z.depth - .1)); if (p.melee && Math.random() < .25) snowPuff(_snF.x, top, _snF.z, 2, 2.2, 1.6); } } } }
     if (p.grounded && !Z.wasG && (Z.lastVy || 0) < -6) { snowStamp(p.pos.x, p.pos.z, 1.1, .02); snowPuff(p.pos.x, Z.depth, p.pos.z, 40, 3.5, 3.5); }     // a landing digs a crater
   }
   Z.wasG = p.grounded; Z.lastVy = p.vel.y;
