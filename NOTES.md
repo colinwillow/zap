@@ -45,6 +45,19 @@ Render-checked headless: intact, then all three seams cut (walls slumped, roof d
 Merged 137 meshes (38 children). Render-checked headless (outside, from above, at the gate: the first render caught the tie beams and
 the emblem through the roof and frieze, fixed). Next: pass 2 (DESTRUCTIBLE TO THE GROUND). Shipped unverified.
 
+## m15xx -- THE MISSING BLADE, FOUND THIS TIME: its faces shade as BACK faces (m1628 "buried" and m1634/m1637 "mirror" were both WRONG)
+m1637's gunmetal still vanished in a render. So I tested it in the page, swapping the blade's material and nothing else:
+- flat red MeshBasic: DRAWS
+- green MeshLambert: DRAWS
+- red MeshStandard, FrontSide: **INVISIBLE**
+- blue MeshStandard, DoubleSide: DRAWS
+
+The plain lit material vanishes even with no toon or paint patch. Under the physical BRDF its faces shade as back faces and blow out to white,
+the sky's colour. Lambert doesn't do that, which is why the hilt (cylinders) and the dojo's sunset hid the cause. Fix: `side: DoubleSide` on
+`katanaScene`'s steel (108 vertices, free), grey steel `0x6b7683`. Rendered: the blade reads in his hand on the snow, from the side and the front.
+**Lesson: when a mesh vanishes, swap its material for Basic, Lambert and Standard in the page before theorising -- three renders settled what
+three builds of guessing did not.** (The mega sword is built the same way and may share it; not touched.)
+
 ## m1637 -- THE SNOWFIELD'S MISSING BLADE, the real cause: a pure-mirror material (m1628's "buried" was WRONG)
 His screenshot after m1628: the hilt and guard plain in his hand, held high, the blade gone -- *"it was always missing, it's still missing."* So it
 was never buried. Measured in the page: the blade (`katanaScene`'s `steel`) was `0xd9dee5`, **metalness 1**, roughness .22. A fully metallic
