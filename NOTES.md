@@ -5,6 +5,11 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home pass 15 (Worker B): THE BACK, from ref 2
+- He asked whether the renders had come through. None had been sent: every render so far stayed in the scratchpad. A four-view grid and the new back view were sent this time.
+- The back had been plain domes and a door. Ref 2 has a heavy timber belt round the hall with brass wheels, plaques, banners and tassels, and an arched door. Built: an open cylinder segment (theta PI +/- 1.0, r 4.95, just outside the bulge's 4.87 at P + 4.4) with two iron bands and studs. A brass wheel at each end (PI +/- .75). Brass plaques with dark insets at PI +/- .95. The big chevron banner at PI + .42 (1.5 x 2.6) and a narrow one at PI - .42, both on the wind shader through `clothM('banner')`. Red tassels with brass beads in the gaps. The back door gets timber jambs with iron bands, a half-torus arch, an iron outer ring and a dark tympanum.
+- Every piece uses an existing material: **draws unchanged at 26**.
+- Not yet from ref 2: the leaning LADDER at the back-left, and the stall rack at the back-right.
 ## Grumbo's home pass 14 (Worker B): blows reach the home -- the back door, the orb, the bells
 - **The orb had not swung since pass 9.** Pass 9 put `bgateStep` and its `// pass 9: his back door` comment on the same line as the orb's sway, so the sway sat inside the comment. That is the landmine about a behaviour that lives only in a comment. It is its own call now (`ghomeOrb`).
 - **The orb is a pendulum.** A damped spring at omega^2 = g / L (2.25 m of chain) toward the wind's sway. A blow pushes it away from the striker, in the home's own frame. Measured headless: a hit from 3 m on +x took it to 0.79 rad, and it settled back into the wind inside 4 s. Clamped at 1.1 rad.
