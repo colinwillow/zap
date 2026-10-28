@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- The First Beacon pass 8: the route checked off the built boxes
+## m1576 -- The First Beacon pass 8: the route checked off the built boxes
 - **`L.walk`:** every walking surface (`top`) in build order -- which is route order -- paired with the next, the gap between their EDGES and the rise,
   each matched to a move from `MOVEC`: walk (step .38, gap .3), run jump (5.95), double (9.98), ledge caught (3.58 / 4.69 up, gap 2.5), drop, chimney
   (its landing tagged `wj` with the chimney's height), zip (its landing tagged `zip`). 63 pairs: walk 36, run jump 10, double 2, ledge 4, ledge

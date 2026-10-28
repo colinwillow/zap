@@ -26551,7 +26551,7 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
     y = P.y; inDir = one ? d1 : d2; if (short < -.05) { note('BEACON: run ' + S.id + '->' + T.id + ' SHORT by ' + (-short).toFixed(1) + ' m'); T.x = P.x + inDir[0] * T.R / 2; T.z = P.z + inDir[1] * T.R / 2; }
     fit.push(S.id + T.id + ' ' + (L1 + L2).toFixed(0) + 'm/' + (s1 + s2).toFixed(0) + (short < -.05 ? ' SHORT' : '')); }
   L.fit = fit;
-  // m15xx: THE ROUTE CHECK. Every pair of walking surfaces in the order the route builds them (stations, chunk tops, corner pads), measured off the
+  // m1576: THE ROUTE CHECK. Every pair of walking surfaces in the order the route builds them (stations, chunk tops, corner pads), measured off the
   // BOXES -- the gap between their edges and the rise -- against the move table's comfy values: a step, a run jump (5.95), a double (9.98), a ledge
   // caught (jump 3.58 / double 4.69 up), a drop, a chimney (its landing's own height), a zip. What the builder made, not what each piece meant to.
   { const T = O.boxes.filter(b => b.top && !b.prop), tally = {}, fail = [], C = MOVEC;
