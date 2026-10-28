@@ -5,6 +5,12 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- THE SWORD TASSEL (his: *"a little rope off the end of the handle with a fluffy ball on it, like Chinese swords"*)
+A red cord off the katana's pommel, a gold bead, and a fluffy red pompom with a ragged fringe. It is a 5-point VERLET chain in world space
+(`tasselStep`, `TASSEL`: seg .038 m, gravity, damping 2.2, 6 constraint passes), anchored to the pommel every frame, so it swings with every
+cut, roll and jump. Three draws. It only hangs on the PLAYER's katana (`WEAP.worn.katana`), not on the rivals' or the dummies'. The pommel's
+geometry carries `userData.tassel`, which is how it is found. If it throws, it switches itself off and the chip says TASSEL THREW.
+
 ## m1643 -- THE RE-PASS: the SKY BRIDGES, pass 2 (rubric 7: RESTORES IN PLACE)
 - One rig for the set (`SKYB.on.R`, BLDG `rig`). Each built span is two pieces, `s<i>a` / `s<i>b`: its planks, hangers and gate on that
   side of the middle (filed by projecting the piece's centre onto the span). The whole-length meshes -- the two rope rails, the flag line
@@ -32,7 +38,7 @@ Render-checked headless with the Watchtower, Gatehouse, Market and Rampart: fall
 Render-checked headless (with the Watchtower, Gatehouse, Market and Rampart up: the mid-span, the Watchtower end, the Market end).
 Shipped unverified.
 
-## m1639 -- THE RE-PASS: the SPIDER-BOT HANGAR, pass 3 (THE CLIMB) -- its third pass, DONE
+## m1640 -- THE RE-PASS: the SPIDER-BOT HANGAR, pass 3 (THE CLIMB) -- its third pass, DONE
 - How you get UP: a sandstone stair on the east flank, outside the eave (x = hw + .8 + .15), 14 risers of .286 m on .38 treads (under the
   .357 step), every step a box from the ground that is its drawn block, to a 1.6 m landing at the eave height (4.0) with a gold edge and
   a mint lantern on a lacquer post (its box the post). The landing stands .15 m off the eave's edge: step across onto the roof, whose
@@ -72,7 +78,7 @@ Render-checked headless: intact, then all three seams cut (walls slumped, roof d
 Merged 137 meshes (38 children). Render-checked headless (outside, from above, at the gate: the first render caught the tie beams and
 the emblem through the roof and frieze, fixed). Next: pass 2 (DESTRUCTIBLE TO THE GROUND). Shipped unverified.
 
-## m1639 -- THE MISSING BLADE, FOUND THIS TIME: its faces shade as BACK faces (m1628 "buried" and m1634/m1637 "mirror" were both WRONG)
+## m1640 -- THE MISSING BLADE, FOUND THIS TIME: its faces shade as BACK faces (m1628 "buried" and m1634/m1637 "mirror" were both WRONG)
 m1637's gunmetal still vanished in a render. So I tested it in the page, swapping the blade's material and nothing else:
 - flat red MeshBasic: DRAWS
 - green MeshLambert: DRAWS

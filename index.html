@@ -15314,7 +15314,7 @@ function katanaScene() {
     new THREE.MeshStandardMaterial({ color: 0x2b2421, roughness: .85 }),
     iron = new THREE.MeshStandardMaterial({ color: 0x3b342e, metalness: .7, roughness: .45 }), gold = new THREE.MeshStandardMaterial({ color: 0xc9a14a, metalness: 1, roughness: .35 });
   const grip = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.6, 22, 10), wrap); grip.position.y = -3; root.add(grip);
-  const pommel = new THREE.Mesh(new THREE.CylinderGeometry(1.8, 1.8, 1.4, 10), iron); pommel.position.y = -14.5; root.add(pommel);
+  const pommel = new THREE.Mesh(new THREE.CylinderGeometry(1.8, 1.8, 1.4, 10), iron); pommel.position.y = -14.5; root.add(pommel); pommel.geometry.userData.tassel = 1;     // m15xx: the TASSEL hangs off here (`tasselStep`)
   const guard = new THREE.Mesh(new THREE.CylinderGeometry(4.2, 4.2, 1.1, 20), iron); guard.position.y = 8.6; root.add(guard);
   const collar = new THREE.Mesh(new THREE.BoxGeometry(1.4, 2.2, 3.4), gold); collar.position.y = 10.2; root.add(collar);
   // the blade: a thin tapered slab, its edge along +Z, curved back a touch toward the spine (-Z) along its length
@@ -15354,6 +15354,36 @@ function megaSwordScene() {
   const g = new THREE.Group(); g.add(root); return g;
 }
 // m1004: A HERO'S OWN SWORD in the katana's slot -- the katana's moves, his blade. `base` / `tip` = the trail's ends (katana units).
+// m15xx: THE SWORD TASSEL (his: *"a little dangling thing from the back of the sword -- Chinese swords have a little rope off the end of the
+// handle with a little fluffy ball on it"*). A red cord off the katana's pommel, a gold bead, and a fluffy red pompom with a short fringe. It is
+// a 5-point VERLET chain in WORLD space, anchored to the pommel every frame, so it swings with every cut, roll and jump. 3 draws, katana only.
+const TASSEL = { on: 1, n: 5, seg: .038, grav: 9.8, damp: 2.2, iters: 6, ball: .03, col: 0xc4202c, gold: 0xd9a441, o: null };
+function tasselBuild() { const T = TASSEL, R = plantRnd(77);
+  const cg = new THREE.CylinderGeometry(.0045, .0045, 1, 5, 1, true).translate(0, .5, 0), red = new THREE.MeshStandardMaterial({ color: T.col, roughness: .9 });
+  const cord = new THREE.InstancedMesh(cg, red, T.n - 1); cord.frustumCulled = false; cord.castShadow = true;
+  const bg = new THREE.IcosahedronGeometry(T.ball, 2), P = bg.attributes.position; for (let i = 0; i < P.count; i++) { const k = .82 + R() * .36; P.setXYZ(i, P.getX(i) * k, P.getY(i) * k, P.getZ(i) * k); } bg.computeVertexNormals();
+  const fr = new THREE.ConeGeometry(T.ball * .9, T.ball * 2.2, 10, 1, true).translate(0, -T.ball * 1.5, 0), Q = fr.attributes.position;
+  for (let i = 0; i < Q.count; i++) if (Q.getY(i) < -T.ball * 2.4) { const a = Math.atan2(Q.getZ(i), Q.getX(i)); Q.setY(i, Q.getY(i) + Math.sin(a * 7) * T.ball * .25); }     /* a ragged fringe hem */
+  const ball = new THREE.Mesh(mergeGeometries([bg.toNonIndexed(), fr.toNonIndexed()].map(g => { g.deleteAttribute('uv'); return g; })), new THREE.MeshStandardMaterial({ color: T.col, roughness: 1, side: THREE.DoubleSide }));
+  ball.castShadow = true; ball.frustumCulled = false;
+  const bead = new THREE.Mesh(new THREE.SphereGeometry(.011, 8, 6), new THREE.MeshStandardMaterial({ color: T.gold, metalness: .7, roughness: .35 })); bead.frustumCulled = false;
+  const g = new THREE.Group(); g.add(cord, ball, bead); scene.add(g);
+  return { g, cord, ball, bead, p: [], q: [], M: new THREE.Matrix4(), V: new THREE.Vector3(), U: new THREE.Vector3(0, 1, 0), Qt: new THREE.Quaternion(), S: new THREE.Vector3(), host: null, look: 0 }; }
+function tasselStep(dt) { const T = TASSEL; if (!T.on) { if (T.o) T.o.g.visible = false; return; }
+  const w = WEAP.worn && WEAP.worn.katana, g = w && w.group; let host = null;
+  if (g && g.visible && g.parent) { if (T.o && T.o.host && T.o.host.parent === g) host = T.o.host; else g.traverse(o => { if (!host && o.isMesh && o.geometry.userData.tassel) host = o; }); }
+  if (!host) { if (T.o) T.o.g.visible = false; return; }
+  const O = T.o || (T.o = tasselBuild()); O.g.visible = true; host.updateWorldMatrix(true, false);
+  const a = host.localToWorld(O.V.set(0, -.75, 0)).clone(), N = T.n;
+  if (O.host !== host || !O.p.length || O.p[0].distanceTo(a) > 1.5) { O.p = []; O.q = []; for (let i = 0; i < N; i++) { O.p.push(a.clone().setY(a.y - i * T.seg)); O.q.push(O.p[i].clone()); } }
+  O.host = host; const h = Math.min(dt, 1 / 30), kd = Math.exp(-T.damp * h);
+  O.p[0].copy(a); O.q[0].copy(a);
+  for (let i = 1; i < N; i++) { const p = O.p[i], q = O.q[i], vx = (p.x - q.x) * kd, vy = (p.y - q.y) * kd, vz = (p.z - q.z) * kd; q.copy(p); p.x += vx; p.y += vy - T.grav * h * h; p.z += vz; }
+  for (let it = 0; it < T.iters; it++) for (let i = 1; i < N; i++) { const A = O.p[i - 1], B = O.p[i], d = A.distanceTo(B) || 1e-6, e = (d - T.seg) / d;
+    if (i === 1) B.addScaledVector(O.V.subVectors(B, A), -e); else { O.V.subVectors(B, A).multiplyScalar(e * .5); A.add(O.V); B.sub(O.V); } }
+  for (let i = 0; i < N - 1; i++) { const A = O.p[i], B = O.p[i + 1]; O.V.subVectors(B, A); const L = O.V.length() || 1e-6; O.Qt.setFromUnitVectors(O.U, O.V.multiplyScalar(1 / L)); O.M.compose(A, O.Qt, O.S.set(1, L, 1)); O.cord.setMatrixAt(i, O.M); }
+  O.cord.instanceMatrix.needsUpdate = true; O.bead.position.copy(O.p[1]);
+  const E = O.p[N - 1], D = O.V.subVectors(E, O.p[N - 2]).normalize(); O.ball.position.copy(E).addScaledVector(D, T.ball * .8); O.ball.quaternion.setFromUnitVectors(O.U, D.negate()); }
 const SWORDS = { orc: { gen: megaSwordScene, label: 'MEGA SWORD', base: 16, tip: 118, dmgK: 1.35 } };
 const heroSword = () => SWORDS[HERO.pick] || null;
 function weaponParts(src) {
@@ -31548,6 +31578,7 @@ function boardPose(dt) {
 }
 
 function stepPlayer(dt) {
+  try { tasselStep(dt); } catch (e) { TASSEL.on = 0; note('TASSEL THREW ' + e.message); }     // m15xx
   if (inArena()) { deflStep(dt); hallStep(dt); if (SKIN.list.length) skinStep(dt); if (PIECE.list.length) pieceStep(dt); if (SMASH.list.length) smashStep(dt); for (const E of BLDG.list) if (E.step && E.on()) E.step(dt); if (LVL.want && inForge()) lvlStart(); if (BEACON.want && inForge()) { try { beaconBuild(); } catch (e) { BEACON.want = 0; note("BEACON THREW " + e.message); } } if (BEACON.on) beaconStep(dt); if (LVG.on) lvgStep(dt); if (SHIPZ.want === 1 && inForge()) shipBuild(); if (SHIPZ.on) shipStep(dt); if (SNOWZ.on) snowStep(dt); if (DRAGZ.on) dragStep(dt); }
   if (PLANT.list.length) plantStep(dt);     // m1424
   if (RESTORE.list.length) restoreStep(dt);     // m1505     // m1105; m1119; m1120: each building's own life
