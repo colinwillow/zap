@@ -11338,7 +11338,7 @@ function dragStage(g) { const Z = DRAGZ, sd = new THREE.Vector3(...Z.sun).normal
   { const L0 = Math.hypot(_sunOff.x, _sunOff.y, _sunOff.z) || 20; _sunOff.copy(sd).multiplyScalar(L0); sun.position.copy(_sunOff); sun.color.setHex(0xffd2a6); hemi.color.setHex(0xffe0c8); hemi.groundColor.setHex(0x5a4a5a); }
   camera.far = Math.max(camera.far, 1000); camera.updateProjectionMatrix();
   const MG = new Map(), put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); const q = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal') q.deleteAttribute(k); MG.get(m).push(q); };
-  Z.obst = []; const M = isl3M(), ISL = [], box = (x, z, hx, hz, y0, y1) => BOXES.push({ minx: x - hx, maxx: x + hx, miny: y0, maxy: y1, minz: z - hz, maxz: z + hz });
+  Z.obst = []; Z.pads = []; const M = isl3M(), ISL = [], box = (x, z, hx, hz, y0, y1) => BOXES.push({ minx: x - hx, maxx: x + hx, miny: y0, maxy: y1, minz: z - hz, maxz: z + hz });
   // THE MEADOW: one big flat-topped island, the floor at y = 0, trees and rocks kept off the middle
   const I = floatIsland({ R: Z.R, depth: 38, seed: 211, detail: 14, flat: 0, lobes: 4 }); I.geo.translate(0, .02, 0); ISL.push(I.geo); Z.I = I;
   islandDress(put, I, 0, 0, 0, { cherry: 5, pine: 6, rocks: 7, shrubs: 12, roots: 26, seed: 211, clear: 24 });
@@ -11354,10 +11354,10 @@ function dragStage(g) { const Z = DRAGZ, sd = new THREE.Vector3(...Z.sun).normal
   const step = (x, y, z, R2, seed) => { const S = floatIsland({ R: R2, depth: 2.5 + R2, seed, detail: 3, flat: .03, lobes: 1 }); ISL.push(S.geo.translate(x, y, z)); box(x, z, R2 * .7, R2 * .7, y - .6, y + .02); if (y < 5) Z.obst.push([x, z, R2]); };
   for (let i = 0; i < 9; i++) { const a = .7 + i * .13, r = 28; step(Math.sin(a) * r, 1 + i, Math.cos(a) * r, 1.5, 300 + i); }
   { const a = 1.98, r = 31, x = Math.sin(a) * r, z = Math.cos(a) * r, C = floatIsland({ R: 7, depth: 22, seed: 331, detail: 5, flat: .02, lobes: 2 }); ISL.push(C.geo.translate(x, 10, z)); box(x, z, 4.8, 4.8, 9.2, 10.02);
-    islandDress(put, C, x, 10, z, { cherry: 1, pine: 1, rocks: 2, shrubs: 2, roots: 10, seed: 331, clear: 4 }); Z.perch = [x, 10, z]; }
+    islandDress(put, C, x, 10, z, { cherry: 1, pine: 1, rocks: 2, shrubs: 2, roots: 10, seed: 331, clear: 4 }); Z.perch = [x, 10, z]; Z.pads.push({ x, z, r: 5.2, y: 10.02, I: C }); }
   // THE TIERS: islands spread out below, level, above and high above (scenery now; places to fly to later)
   for (const [x, y, z, R2, sdI] of [[-84, 24, 52, 13, 401], [78, 38, -74, 10, 402], [-52, 60, -104, 15, 403], [112, 14, 38, 8, 404], [24, -24, 98, 11, 405], [-118, -10, -30, 12, 406]]) {
-    const S = floatIsland({ R: R2, depth: R2 * 2.2, seed: sdI, detail: 5, flat: .05, lobes: 3 }); ISL.push(S.geo.translate(x, y, z)); islandDress(put, S, x, y, z, { cherry: 2, pine: 2, rocks: 3, shrubs: 4, roots: 12, seed: sdI }); }
+    const S = floatIsland({ R: R2, depth: R2 * 2.2, seed: sdI, detail: 5, flat: .05, lobes: 3 }); ISL.push(S.geo.translate(x, y, z)); islandDress(put, S, x, y, z, { cherry: 2, pine: 2, rocks: 3, shrubs: 4, roots: 12, seed: sdI }); Z.pads.push({ x, z, r: R2 * .72, y: y + S.topAt(0, 0), I: S }); }
   { const o = new THREE.Mesh(mergeGeometries(ISL), isl4Mat()); o.castShadow = o.receiveShadow = true; g.add(o); }
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = true; o.receiveShadow = true; g.add(o); }
   // THE HOOPS: Jinra rings hung through the tiers
@@ -11367,12 +11367,12 @@ function dragStage(g) { const Z = DRAGZ, sd = new THREE.Vector3(...Z.sun).normal
 function dragHome() { const p = player, Z = DRAGZ; p.pos.set(Z.spawn[0], .05, Z.spawn[1]); p.vel.set(0, 0, 0); p.faceH = p.heading = 0; p.grounded = false; }
 function dragStep(dt) { const Z = DRAGZ, O = Z.on; O.t += dt; Z.U.uTime.value = O.t;
   if (!O.go) { O.go = 1; dragHome(); dragBeast(); }
-  const B = O.B; if (B && B.mx) { if (B.drive) dragDrive(B, dt); else { B.t -= dt; if (B.t <= 0) dojoBeastIdle(B); } B.mx.update(dt); if (B.reins && B.reins.m.visible) dragReins(B.reins);
+  const B = O.B; if (B && B.mx) { if (B.drive) dragDrive(B, dt); else { B.t -= dt; if (B.t <= 0) dojoBeastIdle(B); } B.mx.update(dt); dragWings(B); if (B.reins && B.reins.m.visible) dragReins(B.reins);
     if (B.ring && !B.drive && B.mountL) { B.root.updateMatrixWorld(true); B.mountAt.copy(B.mountL); B.root.localToWorld(B.mountAt); B.mountAt.y = dragGround(B.mountAt.x, B.mountAt.z); B.ring.position.copy(B.mountAt).y += .03; } }
   for (const h of O.hoops) h.m.rotation.y += h.w * dt;
   if (B && B.ring) { const near = dragNear(); B.ring.visible = !player.dragon && Z.look === 'CAPTURED'; B.ring.material.opacity = near ? 1 : .45 + .3 * Math.sin(O.t * 3); B.ring.scale.setScalar(near ? 1.15 : 1);
     if (near && !Z.tipped) { Z.tipped = 1; tipShow(Z.look === 'CAPTURED' ? 'Tap the right pad to climb on.' : 'He is wild -- he will not be ridden. (TOOLS > DRAGON)', 4); } else if (!near) Z.tipped = 0; }
-  const p = player.pos; if (Math.hypot(p.x, p.z) > Z.I.rimR(Math.atan2(p.z, p.x)) && p.y < 2) dragHome(); }     // off the edge: back to the start
+  const p = player.pos; if (!player.dragon && Math.hypot(p.x, p.z) > Z.I.rimR(Math.atan2(p.z, p.x)) && p.y < 2) dragHome(); }     // off the edge: back to the start
 // HIS DRAGON in the zone: the arena's prototype cloned (scale and facing measured there), his own material per instance so the EVIL tint stays
 // here, the two armour sets built once on his posed bones and switched by visibility, a body box so he is not walked through
 async function dragBeast() { const Z = DRAGZ, O = Z.on; try { const K = await arenaLoad('DRAGON'), P = K.P, m = skeletonClone(P.proto); m.scale.setScalar(P.scale * Z.mul);
@@ -11417,7 +11417,7 @@ function dragSeat(B, m, root, P) { const K = dragKit(m, root, B.hd), sp = K.bw('
 function dragNear() { const B = DRAGZ.on && DRAGZ.on.B, p = player; if (!B || !B.mountAt || p.dragon) return 0;
   return Math.hypot(p.pos.x - B.mountAt.x, p.pos.z - B.mountAt.z) < DRAGZ.reach && Math.abs(p.pos.y - B.mountAt.y) < 1.5; }
 function dragTap() { if (!DRAGZ.on) return false; const p = player, R = p.dragon;
-  if (R) { if (R.st === 'sit') { const B = DRAGZ.on.B; dragDriveEnd(B); R.st = 'off'; R.t = 0; R.from = p.pos.clone(); snd('swoosh', { g: .4, r: 1.1 }); } return true; }
+  if (R) { if (R.st === 'sit') { const B = DRAGZ.on.B; if (B.drive && (B.drive.air || B.drive.pad)) { tipShow(B.drive.air ? 'Land first.' : 'Land on the meadow to get off.', 2.5); return true; } dragDriveEnd(B); R.st = 'off'; R.t = 0; R.from = p.pos.clone(); snd('swoosh', { g: .4, r: 1.1 }); } return true; }
   if (!dragNear() || !p.grounded) return false;
   if (DRAGZ.look !== 'CAPTURED') { tipShow('He will not be ridden -- not yet. (TOOLS > DRAGON: CAPTURED. The taming comes later.)', 4); return true; }
   const B = DRAGZ.on.B; if (!B.seat) return false;
@@ -11429,7 +11429,7 @@ function dragRide(dt) { const p = player, R = p.dragon, B = DRAGZ.on && DRAGZ.on
   const seat = B.seat.getWorldPosition(_drV), sx = seat.x, sy = seat.y - R.hip, sz = seat.z, h = dragH(B);
   if (R.st === 'on') { const u = Math.min(1, R.t / DRAGZ.mountT), k = smooth(0, 1, u);
     p.pos.set(R.from.x + (sx - R.from.x) * k, R.from.y + (sy - R.from.y) * k + Math.sin(u * Math.PI) * DRAGZ.arc, R.from.z + (sz - R.from.z) * k);
-    p.faceH = p.heading = R.h0 + wrapAngle(h - R.h0) * k; if (u >= 1) { R.st = 'sit'; R.t = 0; dragDriveStart(B); tipShow('In the saddle. Left pad: ride. Tap the right pad to get off.', 4); } }
+    p.faceH = p.heading = R.h0 + wrapAngle(h - R.h0) * k; if (u >= 1) { R.st = 'sit'; R.t = 0; dragDriveStart(B); tipShow('In the saddle. Left pad: ride. Left tap: take off, then beat the wings. Right tap (on the meadow): get off.', 5); } }
   else if (R.st === 'sit') { p.pos.set(sx, sy, sz); p.faceH = p.heading = h; p.speed = B.drive ? B.drive.v * .3 : 0; }
   else { const u = Math.min(1, R.t / DRAGZ.offT), k = smooth(0, 1, u), to = B.mountAt;
     p.pos.set(R.from.x + (to.x - R.from.x) * k, R.from.y + (to.y - R.from.y) * k + Math.sin(u * Math.PI) * DRAGZ.arc * .6, R.from.z + (to.z - R.from.z) * k);
@@ -11442,24 +11442,88 @@ function dragRide(dt) { const p = player, R = p.dragon, B = DRAGZ.on && DRAGZ.on
 // lantern posts and the low stepping stones (circles, `obst`). His body box is parked while he is ridden and rebuilt where he stops.
 Object.assign(DRAGZ, { runSp: 11, runRef: 7, turn: 2.0, turnStill: 3.2, accHL: .45, brakeHL: .3, lean: .05, bodyR: 2.2 });
 function dragGround(x, z) { const [ax, az] = DRAGZ.at, d = Math.hypot(x - ax, z - az); return d < 7.2 ? DRAGZ.daisY : d < 9.4 ? .3 : 0; }
-function dragDriveStart(B) { B.mx.stopAllAction(); const D = B.drive = { v: 0, lean: 0, aIdle: B.mx.clipAction(B.clips.idle), aRun: B.clips.run ? B.mx.clipAction(B.clips.run) : null };
+function dragDriveStart(B) { B.mx.stopAllAction(); const D = B.drive = { v: 0, lean: 0, air: null, pad: null, beat: null, flapCool: 0, aIdle: B.mx.clipAction(B.clips.idle), aRun: B.clips.run ? B.mx.clipAction(B.clips.run) : null, aFly: B.clips.attack_air ? B.mx.clipAction(B.clips.attack_air) : null };
+  if (D.aFly) D.aFly.reset().setLoop(THREE.LoopRepeat).setEffectiveWeight(0).play();
   D.aIdle.reset().setLoop(THREE.LoopRepeat).setEffectiveWeight(1).play(); if (D.aRun) D.aRun.reset().setLoop(THREE.LoopRepeat).setEffectiveWeight(0).play(); B.cur = D.aIdle; dragBox(B, 1); }
-function dragDriveEnd(B) { const D = B.drive; if (!D) return; if (D.aRun) D.aRun.stop(); D.aIdle.setEffectiveWeight(1).setEffectiveTimeScale(1); B.cur = D.aIdle; B.t = 3; B.drive = null; B.root.rotation.z = 0;
+function dragDriveEnd(B) { const D = B.drive; if (!D) return; if (D.aRun) D.aRun.stop(); if (D.aFly) D.aFly.stop(); D.aIdle.setEffectiveWeight(1).setEffectiveTimeScale(1); B.cur = D.aIdle; B.t = 3; B.drive = null; B.root.rotation.x = B.root.rotation.z = 0;
   B.root.updateMatrixWorld(true); dragBox(B); B.mountAt.copy(B.mountL); B.root.localToWorld(B.mountAt);
   const r = Math.hypot(B.mountAt.x, B.mountAt.z), lim = DRAGZ.I.rimR(Math.atan2(B.mountAt.z, B.mountAt.x)) * .9; if (r > lim) { B.mountAt.x *= lim / r; B.mountAt.z *= lim / r; } B.mountAt.y = dragGround(B.mountAt.x, B.mountAt.z); }
-function dragDrive(B, dt) { const Z = DRAGZ, D = B.drive, p = player, s = p.dragon && p.dragon.st === 'sit' ? stickWorld() : { x: 0, z: 0, mag: 0 };
+// mDRG: FLYING (DRAGON.md box 4). RollerGirl's wingsuit model (`wingFly`) on a beast: in the air the LEFT PAD is the stick -- sideways turns
+// (and banks him), UP climbs, DOWN dives, the same way round as her flight; his speed `v` is pulled toward `cruise` by `thrust` and by gravity
+// along his pitch (a dive GAINS speed, a climb SPENDS it), and under `stall` the lift goes and his nose drops whatever you hold. The LEFT TAP is
+// a wing beat: `flapV` of speed and a lift of the nose (on the ground it is the TAKE-OFF: a leap and a beat). Run off any edge and he glides.
+// He lands on whatever is under him -- the meadow, the dais, the crag, any of the six islands (`pads`, each a circle at its top) -- and rides on
+// from there; dismounting is only on the meadow. Below the clouds: back to the dais.
+// THE WINGS: his file has no fly clip. His base pose in the air is `attack_air` (the nearest, a hovering strike), and on top of it, unless
+// TOOLS > DRAGON WINGS says CLIP, each wing's finger chains are AIMED in code (`dragWings`): fanned out from the leading edge to the back, the
+// spread eased in with flight, and a beat swings the whole fan up and down about his spine. Replace with his fly cycle when there is one.
+Object.assign(DRAGZ, { cruise: 16, thrust: .35, gk: 1, stall: 8, vmax: 42, fturn: 1.3, pitchRate: 1.3, climb: .75, dive: 1.2, levelHL: 1.2, bank: .7, bankHL: .2,
+  flapV: 4.5, flapLift: .22, flapT: .5, flapCool: .3, flapAmp: .75, takeV: 10, takePitch: .45, spreadHL: .25, flyPull: 4, landPitch: -.9 });
+try { DRAGZ.wingPick = localStorage.getItem('mel.dwing') === 'CLIP' ? 'CLIP' : 'CODE'; } catch (e) { DRAGZ.wingPick = 'CODE'; }
+// what he stands on at (x, z) at or under height y: the dais, the meadow, a pad; null over the void
+function dragFloor(x, z, y) { const Z = DRAGZ; let best = null;
+  if (Math.hypot(x, z) < Z.I.rimR(Math.atan2(z, x)) * .9 && y > -1) best = { y: dragGround(x, z), pad: null };
+  for (const P of Z.pads) if (Math.hypot(x - P.x, z - P.z) < P.r && P.y <= y + .8 && (!best || P.y > best.y)) best = { y: P.y, pad: P };
+  return best; }
+function dragFlap(D) { if (D.flapCool > 0) return; D.flapCool = DRAGZ.flapCool; D.beat = 0; snd('swoosh', { g: .7, r: .55 });
+  if (!D.air) { D.air = { v: Math.max(D.v, DRAGZ.takeV), pitch: DRAGZ.takePitch, bank: 0 }; return; }
+  D.air.v = Math.min(DRAGZ.vmax, D.air.v + DRAGZ.flapV); D.air.pitch = Math.min(DRAGZ.climb, D.air.pitch + DRAGZ.flapLift); }
+// the left tap in the saddle
+function dragTapL() { const R = player.dragon, B = DRAGZ.on && DRAGZ.on.B; if (!R || R.st !== 'sit' || !B || !B.drive) return; dragFlap(B.drive); }
+function dragDrive(B, dt) { const Z = DRAGZ, D = B.drive, p = player, sit = p.dragon && p.dragon.st === 'sit', P = B.root.position;
+  D.flapCool = Math.max(0, (D.flapCool || 0) - dt); if (D.beat !== undefined && D.beat !== null) { D.beat += dt / Z.flapT; if (D.beat >= 1) D.beat = null; }
   let h = dragH(B); const h0 = h;
-  if (s.mag > 0) { const want = Math.atan2(s.x, s.z), dh = wrapAngle(want - h), mx = (D.v > 2 ? Z.turn : Z.turnStill) * dt; h += clamp(dh, -mx, mx);
-    D.v = damp(D.v, s.mag * Z.runSp * clamp(1 - Math.abs(dh) / 2.4, .2, 1), Z.accHL, dt); }
-  else D.v = damp(D.v, 0, Z.brakeHL, dt);
-  if (D.v < .02) D.v = 0;
-  const P = B.root.position; let nx = P.x + Math.sin(h) * D.v * dt, nz = P.z + Math.cos(h) * D.v * dt;
-  for (const [ox, oz, orr] of Z.obst) { const dx = nx - ox, dz = nz - oz, d = Math.hypot(dx, dz), m = orr + Z.bodyR; if (d < m && d > 1e-4) { nx = ox + dx / d * m; nz = oz + dz / d * m; } }
-  const r = Math.hypot(nx, nz), lim = Z.I.rimR(Math.atan2(nz, nx)) * .85; if (r > lim) { nx *= lim / r; nz *= lim / r; D.v *= Math.exp(-5 * dt); }
-  P.x = nx; P.z = nz; P.y = damp(P.y, dragGround(nx, nz), .08, dt);
-  const yawRate = wrapAngle(h - h0) / Math.max(dt, 1e-4); D.lean = damp(D.lean, clamp(-yawRate * D.v * Z.lean, -.35, .35), .15, dt);
-  B.root.rotation.y = h + (B.faceOff || 0); B.root.rotation.z = D.lean;
-  if (D.aRun) { const k = clamp(D.v / Z.runRef, 0, 1); D.aRun.setEffectiveWeight(k); D.aIdle.setEffectiveWeight(1 - k); D.aRun.setEffectiveTimeScale(clamp(D.v / Z.runRef, .7, 1.6)); } }
+  if (D.air) { const A = D.air; let sx = sit ? stick.L.x : 0, sy = sit ? stick.L.y : 0;
+    if (sit) { if (keys.a || keys.arrowleft) sx -= 1; if (keys.d || keys.arrowright) sx += 1; if (keys.w || keys.arrowup) sy -= 1; if (keys.s || keys.arrowdown) sy += 1; }
+    sx = clamp(sx, -1, 1); sy = clamp(sy, -1, 1);
+    const tx = Math.abs(sx) > .08 ? Math.sign(sx) * clamp((Math.abs(sx) - .08) / .62, 0, 1) : 0, ty = Math.abs(sy) > .12 ? Math.sign(sy) * clamp((Math.abs(sy) - .12) / .58, 0, 1) : 0;
+    h -= tx * Z.fturn * dt;     // NEGATED: heading grows +Z toward +X, his LEFT (her flight's rule)
+    if (ty) A.pitch += -ty * Z.pitchRate * dt; else A.pitch = damp(A.pitch, 0, Z.levelHL, dt);
+    if (A.v < Z.stall) A.pitch = damp(A.pitch, -.7, .5 / Math.max(.05, 1 - A.v / Z.stall), dt);     // no lift: the nose goes down
+    A.pitch = clamp(A.pitch, -Z.dive, Z.climb);
+    A.v += (Z.thrust * (Z.cruise - A.v) - MOVE.g * Math.sin(A.pitch) * Z.gk) * dt; A.v = clamp(A.v, 3, Z.vmax);
+    const cp = Math.cos(A.pitch); P.x += Math.sin(h) * cp * A.v * dt; P.z += Math.cos(h) * cp * A.v * dt; P.y += Math.sin(A.pitch) * A.v * dt;
+    A.bank = damp(A.bank, tx * Z.bank, Z.bankHL, dt);
+    const F = dragFloor(P.x, P.z, P.y + 1);
+    if (F && P.y <= F.y && A.pitch < .3) { P.y = F.y; D.v = Math.min(Z.runSp, A.v * cp); D.air = null; D.pad = F.pad; snd('swoosh', { g: .5, r: .4 }); }     // down
+    else if (F && P.y < F.y) P.y = F.y;
+    if (P.y < Z.cloudY + 8) { P.set(Z.at[0], Z.daisY, Z.at[1]); D.air = null; D.v = 0; D.pad = null; tipShow('Into the clouds -- back to the dais.', 3); }
+    B.root.rotation.order = 'YXZ'; B.root.rotation.set(-(D.air ? A.pitch : 0), h + (B.faceOff || 0), -A.bank * (D.air ? 1 : 0));
+    D.v = D.air ? A.v : D.v; D.spread = damp(D.spread || 0, 1, Z.spreadHL, dt); }
+  else { const s2 = sit ? stickWorld() : { x: 0, z: 0, mag: 0 };
+    if (s2.mag > 0) { const want = Math.atan2(s2.x, s2.z), dh = wrapAngle(want - h), mx = (D.v > 2 ? Z.turn : Z.turnStill) * dt; h += clamp(dh, -mx, mx);
+      D.v = damp(D.v, s2.mag * Z.runSp * clamp(1 - Math.abs(dh) / 2.4, .2, 1), Z.accHL, dt); }
+    else D.v = damp(D.v, 0, Z.brakeHL, dt);
+    if (D.v < .02) D.v = 0;
+    let nx = P.x + Math.sin(h) * D.v * dt, nz = P.z + Math.cos(h) * D.v * dt;
+    if (!D.pad) for (const [ox, oz, orr] of Z.obst) { const dx = nx - ox, dz = nz - oz, d = Math.hypot(dx, dz), m = orr + Z.bodyR; if (d < m && d > 1e-4) { nx = ox + dx / d * m; nz = oz + dz / d * m; } }
+    const F = dragFloor(nx, nz, P.y + .5);
+    if (!F || F.y < P.y - 1.2) { P.x = nx; P.z = nz; D.air = { v: Math.max(D.v, Z.stall), pitch: -.1, bank: 0 }; }     // off the edge: he spreads his wings
+    else { P.x = nx; P.z = nz; P.y = damp(P.y, F.y, .08, dt); D.pad = F.pad; }
+    const yawRate = wrapAngle(h - h0) / Math.max(dt, 1e-4); D.lean = damp(D.lean, clamp(-yawRate * D.v * Z.lean, -.35, .35), .15, dt);
+    B.root.rotation.order = 'YXZ'; B.root.rotation.set(0, h + (B.faceOff || 0), D.lean); D.spread = damp(D.spread || 0, 0, Z.spreadHL, dt); }
+  // his clips: idle / run on the ground by speed, `attack_air` in the air; the weights eased and always summing to 1
+  const run = D.air ? 0 : clamp(D.v / Z.runRef, 0, 1), fl = D.air ? 1 : 0; D.wF = damp(D.wF || 0, D.aFly ? fl : 0, .12, dt); const rest = 1 - D.wF;
+  if (D.aRun) { D.aRun.setEffectiveWeight(run * rest); D.aRun.setEffectiveTimeScale(clamp(D.v / Z.runRef, .7, 1.6)); } D.aIdle.setEffectiveWeight((D.aRun ? 1 - run : 1) * rest);
+  if (D.aFly) { D.aFly.setEffectiveWeight(D.wF); D.aFly.setEffectiveTimeScale(D.beat !== null && D.beat !== undefined ? 1.4 : .8); } }
+// THE WINGS IN CODE: each finger chain off a forearm, aimed root-to-tip at a fan direction in his own frame (outward, swept back by its place in
+// the fan, a little up), blended in by `spread`, the whole fan swung about his spine by a beat. Run after his mixer, so it is the last word.
+const _dwA = new THREE.Vector3(), _dwB = new THREE.Vector3(), _dwC = new THREE.Vector3(), _dwQ = new THREE.Quaternion(), _dwQ2 = new THREE.Quaternion(), _dwQ3 = new THREE.Quaternion(), _dwZ = new THREE.Vector3(0, 0, 1);
+function dragWingsInit(B) { const W = []; B.root.updateMatrixWorld(true);
+  for (const [fa, sd] of [['Bip001_L_Forearm', 1], ['Bip001_R_Forearm', -1]]) { const f = B.m.getObjectByName(fa); if (!f) continue; const side = [];
+    for (const c of f.children) { if (!c.isBone || /Hand/.test(c.name)) continue; let t = c, n = 1; while (t.children.find(k => k.isBone)) { t = t.children.find(k => k.isBone); n++; } if (n < 3) continue;
+      const a = B.root.worldToLocal(c.getWorldPosition(new THREE.Vector3())), b = B.root.worldToLocal(t.getWorldPosition(new THREE.Vector3())); side.push({ b: c, tip: t, sd, rz: b.sub(a).normalize().z }); }
+    side.sort((u, v) => v.rz - u.rz); side.forEach((w, i) => { w.a = .12 + i * (1.25 / Math.max(1, side.length - 1)); W.push(w); }); }
+  return W; }
+function dragWings(B) { const D = B.drive, S = D ? D.spread || 0 : 0; if (S < .01 || DRAGZ.wingPick !== 'CODE') return; if (!B.wings) B.wings = dragWingsInit(B);
+  const beat = D.beat !== null && D.beat !== undefined ? Math.sin(D.beat * Math.PI * 2) : 0, glide = Math.sin(DRAGZ.on.t * 2.2) * .06, rq = B.root.getWorldQuaternion(_dwQ3);
+  for (const w of B.wings) { const b = w.b; b.updateMatrixWorld(true); const ra = b.getWorldPosition(_dwA), rt = w.tip.getWorldPosition(_dwB), cur = rt.sub(ra).normalize();
+    const fan = _dwC.set(w.sd * Math.cos(w.a), .1, -Math.sin(w.a)).normalize().applyAxisAngle(_dwZ, w.sd * (beat * DRAGZ.flapAmp + glide)).applyQuaternion(rq);
+    const want = cur.clone().lerp(fan, S).normalize(); _dwQ.setFromUnitVectors(cur, want);
+    const pq = b.parent.getWorldQuaternion(_dwQ2), wq = b.getWorldQuaternion(new THREE.Quaternion()); b.quaternion.copy(pq.invert().multiply(_dwQ.multiply(wq))); b.updateMatrixWorld(true); } }
+function dragRiderPose() { const R = player.dragon, B = DRAGZ.on && DRAGZ.on.B; if (!R || R.st !== 'sit' || !B || !B.seat) return;
+  const bq = B.root.getWorldQuaternion(_dwQ3); rig.root.quaternion.copy(bq).multiply(_dwQ2.setFromAxisAngle(_wkY, (rig.faceOff || 0) - (B.faceOff || 0)));
+  const seat = B.seat.getWorldPosition(_drV), up = _dwA.set(0, 1, 0).applyQuaternion(bq); rig.root.position.copy(seat).addScaledVector(up, -R.hip); }
 // his clips while mounted: in the air on the way up and down, `driving` in the saddle
 function dragAnim(dt, t) { const R = player.dragon, has = n => !!(n && rig.actions[n]);
   const air = R.st === 'on' ? true : R.st === 'off' && R.t < DRAGZ.offT * .8;
@@ -13683,6 +13747,7 @@ function arenaUi() {
       else if (a === 'grip') { gripSet({ HIGH: 'MID', MID: 'OFF', OFF: 'HIGH' }[MOVE.gripPick]); try { localStorage.setItem('mel.grip', MOVE.gripPick); } catch (err) {} }
       else if (a === 'rhue') { const k = Object.keys(RIVAL.hues), n = k[(k.indexOf(RIVAL.pick) + 1) % k.length]; RIVAL.pick = n; RIVAL.u.value = RIVAL.hues[n] * Math.PI / 180; try { localStorage.setItem('mel.rival.hue', n); } catch (err) {} }
       else if (a === 'tlie') { TAIL.lie = { FLAT: 'BELLY', BELLY: 'OFF', OFF: 'FLAT' }[TAIL.lie]; try { localStorage.setItem('mel.tail.lie', TAIL.lie); } catch (err) {} }
+      else if (a === 'dwing') { DRAGZ.wingPick = DRAGZ.wingPick === 'CODE' ? 'CLIP' : 'CODE'; try { localStorage.setItem('mel.dwing', DRAGZ.wingPick); } catch (err) {} }     // mDRG
       else if (a === 'dragon' && DRAGZ.on) { const T = DRAGZ.looks; DRAGZ.look = T[(T.indexOf(DRAGZ.look) + 1) % T.length]; try { localStorage.setItem('mel.dragon', DRAGZ.look); } catch (err) {} dragLook(); }     // m1610: live in the zone
       else if (a === 'dragon') { try { localStorage.setItem('mel.dragon', DOJO.dragonPick === 'WILD' ? 'CAPTURED' : 'WILD'); } catch (err) {} location.reload(); }     // m1518
       else if (a === 'rwsky') { try { localStorage.setItem('mel.rwsky', RWSKYS[(RWSKYS.indexOf(RW.skyPick) + 1) % RWSKYS.length]); } catch (err) {} location.reload(); }     // his panorama over the Red Hollows
@@ -13704,7 +13769,7 @@ function arenaUi() {
   if (ARENA.tools === undefined) { try { ARENA.tools = +localStorage.getItem('mel.arena.tools') || 0; } catch (err) { ARENA.tools = 0; } }
   const tools = ARENA.tools && !m;     // a menu open folds the tools away: the screen is not tall enough for both
   let h = '<div class="ar-bar">' + B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('vend', 'VEND') + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
-    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('climbspd', 'CLIMB ' + CLIMB.speed.toFixed(1) + ' m/s') + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('btrail', 'TRAIL ' + (BTRAIL.jin ? 'JIN' : 'BLUE')) + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('sample', 'DNA SAMPLE ' + (SAMPLE.on ? 'ON' : 'OFF')) + B('runslash', 'RUN SLASH ' + (RUNSLASH.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('dsky', 'SKY ' + DOJO.skyPick) + B('dfx', 'DOJO FX ' + (DOJO.fx || 'FULL')) + B('rwsky', 'HOLLOWS SKY ' + RW.skyPick) + B('dragon', 'DRAGON ' + (DRAGZ.on ? DRAGZ.look : DOJO.dragonPick)) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
+    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('climbspd', 'CLIMB ' + CLIMB.speed.toFixed(1) + ' m/s') + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('btrail', 'TRAIL ' + (BTRAIL.jin ? 'JIN' : 'BLUE')) + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('sample', 'DNA SAMPLE ' + (SAMPLE.on ? 'ON' : 'OFF')) + B('runslash', 'RUN SLASH ' + (RUNSLASH.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('dsky', 'SKY ' + DOJO.skyPick) + B('dfx', 'DOJO FX ' + (DOJO.fx || 'FULL')) + B('rwsky', 'HOLLOWS SKY ' + RW.skyPick) + B('dragon', 'DRAGON ' + (DRAGZ.on ? DRAGZ.look : DOJO.dragonPick)) + B('dwing', 'DRAGON WINGS ' + DRAGZ.wingPick) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
   if (m === 'bld') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back') + B('age', 'STATE: ' + (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + '<small>tap to switch -- rebuilds what stands</small>', '', AGE.st === 'fallen' ? '' : 'ar-on');
     for (const E of BLDG.list) h += B('bld', E.t + '<small>' + (E.on() ? 'tap to remove' : E.pass >= 3 ? E.sub : 'IN PROGRESS · pass ' + E.pass + ' of 3') + '</small>', E.key, E.on() ? 'ar-on' : '');
     h += '</div>'; }
@@ -29167,7 +29232,7 @@ PADS.L = bindStick(padL, stick.L,
   // left wheel (`kitPick`).
   // tap: jump -- flying, a double tap is her BOOST (m266); on her skates on the ground, her SWIVEL (m268)
   () => {     // m1327: the left tap is the jump again in 3D AIM too (m1282's left-tap trigger is gone)
-    if (player.dragon) return;     /* m1614: no jump from the saddle */ if (wingTapL()) return; if (fakieSwivel()) return; if (player.wall && player.wallLow && player.wallSt === 'hold') { wallDrop(0); return; } if (coverTap()) return; player.jump = 1; },     // m1009: in cover, a left tap stands him up out of it; m1012: near a half block, takes it
+    if (player.dragon) { dragTapL(); return; }     /* m1614: no jump from the saddle; mDRG: a wing beat (on the ground, the take-off) */ if (wingTapL()) return; if (fakieSwivel()) return; if (player.wall && player.wallLow && player.wallSt === 'hold') { wallDrop(0); return; } if (coverTap()) return; player.jump = 1; },     // m1009: in cover, a left tap stands him up out of it; m1012: near a half block, takes it
   // flick: a BODY FLIP on the board, otherwise the dodge roll in the flicked direction. The
   // board takes it first and says so, because a dodge roll on a moving deck is nothing.
   // Flying (m266) it is her loop / barrel roll.
@@ -64437,7 +64502,7 @@ function stepCam(dt) {
   // HER BOOST'S LENS (m267) -- in fast, out slowly, so it reads as a kick and not a zoom
   cam.boost = damp(cam.boost || 0, p.boostFx > 0 ? 1 : 0, p.boostFx > 0 ? .05 : .35, dt);
   const want0 = kit.inside === 'cut' ? KIT.cutDist : kit.inside === 'close' ? KIT.closeDist
-             : (CAM.dist + p.speed * CAM.distV) * (1 + (KIT.highK - 1) * (kit.high || 0)) + cam.boost * SKBOOST.pull + (p.dragon ? DRAGZ.camPull : 0);     // m1614: out for the dragon
+             : (CAM.dist + p.speed * CAM.distV) * (1 + (KIT.highK - 1) * (kit.high || 0)) + cam.boost * SKBOOST.pull + (p.dragon ? DRAGZ.camPull + (DRAGZ.on && DRAGZ.on.B && DRAGZ.on.B.drive && DRAGZ.on.B.drive.air ? DRAGZ.flyPull : 0) : 0);     // m1614: out for the dragon
   const want = acamFrame(want0) * (1 - (1 - AIM3.cam.dist) * a3);     // m1083: the look point toward the event, the lens out to fit both
   const free = camFree(cam.tgt.x, cam.tgt.y, cam.tgt.z, bx, by, bz, want);
   // SNAP IN, EASE OUT. Easing IN is time spent inside the wall; easing OUT is what stops every
@@ -65387,6 +65452,7 @@ function frameBody() {
     // position and the speed cap is measured against how far it moved, so solving before the
     // root is written measures last frame's travel -- which at a knock-down's 12 m/s is most
     // of a metre of phantom motion through the limbs on every single frame.
+    dragRiderPose();                   // mDRG: in the saddle, pitched and banked with his dragon (after every pose that writes the root)
     rig.root.updateMatrixWorld(true); springsStep(dt);     // m1058: hair / cape chains, on the FINAL root (after every pose above)
     dollStep(dt);
     _pt = pT('rig', _pt);

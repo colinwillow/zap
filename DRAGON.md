@@ -24,9 +24,11 @@ dragon into a level (the WHOLE-PIECE RULE).
 - [ ] **3. Ground riding** (m1618): the left pad steers him camera-relative (turns at `turn`, on the spot when still), `idle` + `run` blended
       and sped by his speed (`runRef` 7 is a dial: his run is not measured), leans into turns, keeps in the rim, walks round the posts and low
       stones; the lens behind and above. *Open: his feel of it (speed, turn, the run's rate).*
-- [ ] **4. Flying**: take off (from the ground or off the perch), glide and flap with RollerGirl's wingsuit feel (`WING`: lift from speed,
-      bank to turn, dive for speed), land. **There is no fly clip in his file**: the wings are posed in code on their bones until he
-      makes one.
+- [ ] **4. Flying** (mDRG): the LEFT TAP takes off (a leap and a beat) and beats the wings in the air; the left pad flies him like
+      RollerGirl's wingsuit (sideways turns and banks, up climbs, down dives; a dive gains speed, a climb spends it; under `stall` his nose
+      drops); run off any edge and he glides; he lands on whatever is under him (meadow, dais, crag, the six islands) and rides on from there.
+      Get off only on the meadow. **No fly clip in his file**: `attack_air` is his base pose aloft and his wing fingers are fanned and beaten in
+      code (TOOLS > DRAGON WINGS: CODE / CLIP). *Open: his feel of it, and his fly cycle.*
 - [ ] **5. Attacks**: the right pad breathes the fireball (m1096) from his head (`attack_ground` on the ground, `attack_air` in flight), Grumbo's
       gun from the saddle, targets in the zone to hit.
 - [ ] **6. Taming**: he starts WILD (the EVIL look, will not be mounted); give him good Jinra and he goes `dizzy`, `wake_up`, turns CAPTURED and

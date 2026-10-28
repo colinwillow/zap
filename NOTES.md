@@ -5,6 +5,27 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## mDRG -- THE DRAGON RIDE, build 4: FLYING (DRAGON.md box 4)
+- **The model is `wingFly`'s** (RollerGirl's wingsuit) on the beast, in `dragDrive`'s air branch (`B.drive.air = { v, pitch, bank }`): stick X
+  turns (`fturn`, negated -- heading grows toward his LEFT) and banks him (`bank`); stick UP climbs, DOWN dives (her game's way round), centred
+  it levels (`levelHL`); `v += thrust (cruise - v) - g sin(pitch)`, so a dive gains speed and a climb spends it; under `stall` 8 m/s the nose
+  is pulled down whatever is held (no lift). Position integrates along heading and pitch. His root turns `YXZ` (yaw, then pitch about his own
+  X, then the bank about his own Z) -- an `XYZ` root would pitch about the WORLD's X once he had turned.
+- **The left tap** (`dragTapL`): on the ground the TAKE-OFF (`takeV` 10 m/s, pitch .45, a beat); in the air a BEAT (`flapV` +4.5 m/s, the nose
+  up `flapLift`, `flapCool` .3 s), each with a swoosh. Running off any edge (`dragFloor` drops > 1.2 m or is the void) he spreads and glides.
+- **Landing** (`dragFloor`): the meadow (inside 90 % of `rimR`), the dais steps, and `pads` -- the crag and the six tier islands, each a circle
+  at its top. Touching one with the nose under .3 he is down and RIDES ON from there (ground riding on a pad keeps no rim -- run off and he
+  glides). Below `cloudY` + 8: back to the dais. Getting off is meadow-only ("Land on the meadow to get off").
+- **His pose aloft**: `attack_air` looped (the nearest clip; weights eased, always summing to 1 with idle and run). **`dragWings`** after his
+  mixer (TOOLS > DRAGON WINGS: CODE, the default; CLIP shows the clip alone): each finger chain off a forearm (3+ bones; found by walking the
+  forearm's non-hand children) is AIMED root-to-tip at a fan in his own frame -- outward, swept back by its place in the fan (sorted by how far
+  forward its tip rests), a little up -- blended in by `spread` (eased 0 -> 1 with flight), and the whole fan swung about his spine by a beat
+  (`flapAmp`) plus a slow glide flutter. Guessed, not measured: no harness here can build his skin. His fly cycle replaces all of it.
+- **The rider** (`dragRiderPose`, last before the springs): Grumbo's root takes the dragon's whole turn (pitch and bank too) and sits on the
+  seat along the DRAGON's up, not the world's. The lens pulls out a further `flyPull` 4 m aloft.
+**Moves:** DRAGON.md box 4 (his feel open; the fly cycle is his). **Still open:** 5, 6 and his sign-off. Gates: check ok, zone boot ok.
+Shipped unverified.
+
 ## m1618 -- THE DRAGON RIDE, build 3: GROUND RIDING (DRAGON.md box 3)
 - **`dragDrive`** (from `dragStep` while `B.drive`): the left pad's world direction (`stickWorld`, so camera-relative like walking) is where he
   goes. He turns toward it at `turn` 2.0 rad/s (`turnStill` 3.2 under 2 m/s, so he can turn on the spot) and runs to `runSp` 11 m/s x the
