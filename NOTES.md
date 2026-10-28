@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the CLIFF LODGE, pass 3 (L1: THE SHORTCUT) -- its third pass, DONE
+## m1652 -- THE RE-PASS: the CLIFF LODGE, pass 3 (L1: THE SHORTCUT) -- its third pass, DONE
 - The path is a full lap of the crag (four faces, 12 m). The shortcut: a ROPE LADDER (two ropes, 37 timber rungs, merged: 2 meshes) from
   the ground straight up to the perch's tip at 12 m, hanging .2 m in from the tip and 4.3 m off the north face (clear of the path's 1.6 m
   lane). `kitClimbAdd` `cliff_perch`, top 12, its mark on the beam; climb it, walk the beam in. It rides the perch (`up.climbs`,
