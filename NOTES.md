@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## mDRG -- THE DRAGON RIDE, build 6: TAMING (DRAGON.md box 6; the last box before his sign-off)
+## m1622 -- THE DRAGON RIDE, build 6: TAMING (DRAGON.md box 6; the last box before his sign-off)
 - **Wild = the EVIL look**, and an unvisited zone starts there (`mel.dragon` unset -> EVIL; the dojo still reads unset as CAPTURED). Wild
   (`dragWild`, not ridden, not taming): he turns to face you inside `watchR` 16 m, growls every ~`growlT` s, and inside `wildR` 6.5 m SHOVES you
   off (9 m/s out, 4 up; a tip the first time) -- unless you carry the orb.

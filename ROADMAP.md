@@ -55,7 +55,7 @@ levels later. **Each sandbox is tuned until it feels great on its own before any
 - [ ] **WHITE BOX HUB**: the arena is the one sandbox world; a MODE switch on its menu (DUEL / TRANSFORM / ...), so
       every sandbox lives in one place. (Small; can ride with the DUEL's first build.)
 - [ ] **THE DRAGON RIDE -- OPEN (his, Oct 28):** `DRAGON.md` -- his blue dragon in a zone of its own (KORAJIN > The Dragon Ride): armour,
-      mount, ground riding, flying, fireballs, taming. m1610: the zone and armour pass 2 (CAPTURED / EVIL / BARE). All six boxes built by mDRG (zone/armour, mount, ground riding, flying, attacks, taming) -- each waits on his play and sign-off.
+      mount, ground riding, flying, fireballs, taming. m1610: the zone and armour pass 2 (CAPTURED / EVIL / BARE). All six boxes built by m1622 (zone/armour, mount, ground riding, flying, attacks, taming) -- each waits on his play and sign-off.
 - [ ] **TRANSFORMATION -- OPEN** (m910: the wrapped proxies + the MORPH test in the arena, hick <-> Zap, BLEND / GROW) : `TRANSFORM.md` -- a civilian turns into his alien region by
       region from the wound (veins, bulge, green, armour bursts out, the cry); triggers: drink, alien syringe/beacon, Zap's
       stab/dart, debug toggle; a speed slider.
