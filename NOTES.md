@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home pass 25 (Worker B): paths and trails
+- His list: *"path textures, trails, mountain shrubs, plants."* The plan he agreed to: paths, shutters, rocks 3, plants 3 (with cliff shrubs), the rope lift, breakable pots, then his sign-off.
+- **`A.paths`** (home-local polylines, defined BEFORE pass 1 so everything after can avoid them) and `A.onPath(x, z, r)`, sampled every .5 m. Routes:
+  - the front strip from the left deck's end, along z 8.2 under the stalls, to the ramp's foot;
+  - the step-to-pier stub;
+  - round both sides of the mound to the back door;
+  - out to the two cave mouths in the canyon walls;
+  - up and down the bank. Local z = `hwRc(at[1] - x) - at[0] - 6.6`, so the bank path follows the river's own curve.
+- Pass 4's cacti and boulders, pass 20's shelves and every pass-20/23 plant now skip anything on a path.
+- **The ribbon**: one indexed mesh (3 quads across, noise-varied width) at `gH + .07`, with its own 128 x 512 canvas (trodden sand darker than the floor, a noisy alpha edge, pebbles, a line of footprints), transparent, no depth write, polygon offset. **One draw.** Small chips of `rockM` are kicked to the edges here and there.
+- **Two bugs before it showed.** (1) Raising it off the ground changed nothing. (2) A scene query showed the mesh was there (1,568 verts, the right bounds). **Its triangles faced DOWN**: `(a, b, a + 1)` with `b` one step along the path and `a + 1` one step across winds clockwise from above. Back-face culling hid every one. The winding is now `(a, a + 1, b)`.
+- Draws 35 + the canoe's 5.
 ## Grumbo's home pass 24 (Worker B): the pier and canoe, third pass -- and m1442 threw every frame
 - **m1442 WAS BROKEN IN THE HOME.** In pass 23 I appended a `//` comment to `function ghomeTumble(dt) {`, a one-line function, so its whole body was commented out. The next line's code then used `T` undeclared, `homeStep` threw `ReferenceError: T is not defined` on every frame, and `npm run check` passed it: the gate builds the home but never steps a frame. A stepped headless frame (this pass's canoe test) found it. **Fixed here.** This is the THIRD time this session that a comment appended to a one-line statement swallowed code (pass 9's orb sway, pass 23's lantern line, this). **Rule for this file: never append `//` to a line that is a whole statement or block; put the comment on its own line above.**
 - **Fish.** Slim (.022 x h x .075), a flattened tail, an eye. They read as fish instead of pods.
