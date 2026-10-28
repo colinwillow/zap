@@ -373,6 +373,10 @@ the home in a wide shot from the valley floor.
 - [ ] the colliders audited against the visible ship (no invisible walls, nothing to stick to that is not meant to be climbed)
 - [ ] the dynamics test grounds, each a sandbox of its own first: ROPE CLIMB, ROPE SWING, MAST SWING
 - [ ] then onto the ship: tightrope along the mast and yards, the rigging climbable, a swing
+- **THE TARGET (his, same day): A JUNGLE GYM.** *"I want the ship to be super climbable: climb everything, hang on the ledges, climb up the mast, tiptoe
+  tightrope across the beam up high between the masts, swing on a rope, climb the ladders up into the perch, ropes hanging down. A little jungle gym."*
+  Every rail and ledge a hang/shimmy edge; the masts climbable; the yard between the masts a tightrope; rope ladders to the crow's nests; ropes
+  hanging from the yards, climbable and swingable.
 
 
 > *"A classic retro pirate, samurai, alien water vessel just floating in an ocean scene... the island could just be there... interior, exterior,
