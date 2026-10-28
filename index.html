@@ -11363,7 +11363,7 @@ function arenaBody(d, dt, t) {
 }
 function arenaKO(d) {
   starsStep(d, 0, 0); xrayShow(d, false); if (d.shock) shockStep(d, 0, 0); d.model.position.set(0, 0, 0);     // m903: out cold, not stunned
-  d.ko = 1; ARENA.slow = ARENA.slowT; camShake(.35);
+  d.ko = 1; ARENA.slow = ARENA.slowT; camShake(.35); jinraBody(d, JINRA.burst);     /* m1500 */
   snd('thud', { g: 1.2, r: .7, x: d.root.position.x, z: d.root.position.z });
 }
 // after `stepDummies` -- never inside it, because removing a body splices the list it walks
@@ -11442,6 +11442,7 @@ function arenaStep(dt) {
   for (const d of ARENA.live) tailSway(d, dt);     // m989: a KO'd body too -- lying on his back is when the tail matters most
   hintStep(dt);
   tmStep(dt);
+  if (JINRA.w.length || JINRA.pts) jinraStep(dt);     /* m1500 */
   vendStep(dt); pickStep(dt); arenaLabStep(dt); if (DOJO.on) dojoStep(dt); beastFxStep(dt); bladeTrail(dt);
   if (DRINK.cans.length) drinkScan();
   if (player.toss || DRINK.flying.length) drinkThrowStep(dt);
@@ -12683,7 +12684,7 @@ function limbCut(d, dirH, power, force) {
   const b = limbRoot(d, nm); if (!b) return false;
   limbBake(d, nm, dirH, 0);
   (d.cut = d.cut || {})[nm] = b; LIMB.stat.cuts++;
-  b.getWorldPosition(_lmW); spkBurst(_lmW.x, _lmW.y, _lmW.z, 30, { col: [1, .75, .3], spread: 5, size: .16, life: .45 }); snd('clang', { g: .8, r: 1.3, x: _lmW.x, z: _lmW.z }); camShake(.12);
+  b.getWorldPosition(_lmW); jinraEmit(_lmW.x, _lmW.y, _lmW.z, JINRA.seep);     /* m1500: Jinra seeps from the break */ spkBurst(_lmW.x, _lmW.y, _lmW.z, 30, { col: [1, .75, .3], spread: 5, size: .16, life: .45 }); snd('clang', { g: .8, r: 1.3, x: _lmW.x, z: _lmW.z }); camShake(.12);
   const C = d.cut;
   if (C.head || (C.legL && C.legR)) { limbBoom(d, dirH); return true; }
   if (nm === 'armR' && !C.armL) d.regrabT = LIMB.regrab;
@@ -12760,7 +12761,7 @@ async function sliceDummy() {
 const HORDE = { mix: [.5, .35, .15], floorK: 1.5, lieK: .45, kind: 'SAMURAI', per: 25, max: 150, list: [], busy: 0, hp: 3, notice: 12, fling: .25, fly: 1.7, life: 8, slice: 1, stat: { kills: 0 } };
 try { if (localStorage.getItem('mel.hslice') === '0') HORDE.slice = 0; } catch (e) {}
 function hordeDie(d) {
-  const P = d.root.position;
+  const P = d.root.position; jinraBody(d, Math.round(JINRA.burst * .6));     /* m1500 */
   bowDrop(d);
   if (d.K.limbs) { limbBoom(d, d.h || 0); return; }
   HORDE.stat.kills++; arenaBeam(P.x, P.z, [.9, .3, .3], 0); snd('swoosh', { g: .6, r: .7, x: P.x, z: P.z });
@@ -19065,6 +19066,26 @@ const KATANA = { dmgK: 1.6,
 const BTRAIL = { n: 18, base: 14, tip: 70, col: [.25, .72, 1], k: .7 };     // a cool blue, NORMAL blending: additive white vanished on the white arena
 // m1421: JIN ESSENCE (his, KORAJIN.md "THE JIN GLOW"): the mint glow first seen on the serpent fish's spots is the visible Jin. One colour, used
 // everywhere the Jin shows: the blade trail and the motes it sheds, the dojo's floating candles, a Jin spring. TOOLS > TRAIL: JIN / BLUE
+// m1500: JINRA WISPS (his: *"the enemy feeds off the Jinra -- every time you break one or destroy one, a little of the green stuff leaves them, it
+// seeps out and rises into the air, or you collect it"*; KORAJIN.md THE ENEMY). A cut limb SEEPS a few wisps from the break, a knock-out or a
+// death BURSTS from the chest; each wisp rises, hangs, then homes to his chest and is collected (`JINRA.n`, saved). One pooled Points draw.
+const JINRA = { n: 0, w: [], max: 260, seep: 6, burst: 22, rise: .9, home: 9, pts: null };
+try { JINRA.n = +localStorage.getItem('mel.jinra') || 0; } catch (e) {}
+function jinraEmit(x, y, z, k) { for (let i = 0; i < k && JINRA.w.length < JINRA.max; i++) { const a = Math.random() * 6.283, s = .6 + Math.random() * 1.6; JINRA.w.push({ x, y, z, vx: Math.cos(a) * s, vy: 1.2 + Math.random() * 1.8, vz: Math.sin(a) * s, t: -Math.random() * .25 }); } }
+function jinraBody(d, k) { const P = d.root.position; jinraEmit(P.x, P.y + (d.K.h || 1.8) * .62, P.z, k); }
+function jinraStep(dt) { const J = JINRA, p = player.pos;
+  if (!J.pts) { const G = new THREE.BufferGeometry(); G.setAttribute('position', new THREE.BufferAttribute(new Float32Array(J.max * 3), 3)); G.setDrawRange(0, 0);
+    const cv = document.createElement('canvas'); cv.width = cv.height = 64; const c = cv.getContext('2d'), gr = c.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(230,255,248,1)'); gr.addColorStop(.3, 'rgba(122,255,216,.8)'); gr.addColorStop(1, 'rgba(122,255,216,0)'); c.fillStyle = gr; c.fillRect(0, 0, 64, 64);
+    const t = new THREE.CanvasTexture(cv); J.pts = new THREE.Points(G, new THREE.PointsMaterial({ map: t, size: .45, sizeAttenuation: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xffffff }));
+    J.pts.frustumCulled = false; scene.add(J.pts); }
+  const A = J.pts.geometry.attributes.position; let n = 0, got = 0;
+  for (let i = J.w.length - 1; i >= 0; i--) { const w = J.w[i]; w.t += dt;
+    if (w.t < J.rise) { const f = Math.exp(-2.2 * dt); w.vx *= f; w.vz *= f; w.vy = w.vy * f + .4 * dt; w.x += w.vx * dt; w.y += w.vy * dt; w.z += w.vz * dt; w.x += Math.sin(w.t * 6 + i) * .01; }
+    else { const tx = p.x - w.x, ty = p.y + 1.1 - w.y, tz = p.z - w.z, d = Math.hypot(tx, ty, tz), sp = J.home * Math.min(1, (w.t - J.rise) * 1.5) + 2;
+      if (d < .5) { J.w.splice(i, 1); got++; continue; } w.x += tx / d * sp * dt; w.y += ty / d * sp * dt; w.z += tz / d * sp * dt; }
+    if (w.t > 0) A.setXYZ(n++, w.x, w.y, w.z); }
+  if (got) { J.n += got; try { localStorage.setItem('mel.jinra', J.n); } catch (e) {} if (!(J.chimeT > 0)) { snd('ready', { g: .22 }); J.chimeT = .12; } }
+  J.chimeT = (J.chimeT || 0) - dt; A.needsUpdate = true; J.pts.geometry.setDrawRange(0, n); }
 const JIN = { hex: 0x7affd8, col: [.48, 1, .85], shed: 26, bless: 0, blessT: 20, blessX: 4 };     // m1432: `bless` s left of an altar's blessing: the blade sheds `blessX` x
 try { BTRAIL.jin = localStorage.getItem('mel.btrail') === 'blue' ? 0 : 1; } catch (e) { BTRAIL.jin = 1; }
 function bladeTrail(dt) {
@@ -67222,7 +67243,7 @@ async function init() {
 
 // the console handle. Every tuning object is live, so a number can be moved on the phone
 // without a rebuild and without a push.
-window.melee = window.mel = { GMERCH, GMILL, GPEAK, GJINRA, gjinraBuy, PLANT, plantLibBuild, plantHit, SNOWZ, snowStamp, GHOME, SHIMMY, VAIM, SHIPZ, shipBuild, FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, gaitMeasure, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
+window.melee = window.mel = { JINRA, jinraEmit, COIN, coinDrop, GMERCH, GMILL, GPEAK, GJINRA, gjinraBuy, PLANT, plantLibBuild, plantHit, SNOWZ, snowStamp, GHOME, SHIMMY, VAIM, SHIPZ, shipBuild, FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, gaitMeasure, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
   // PROGRESS (m276): `mel.SAVE` is the save; the setters write it through; `mel.progReset()` is a new game
   // TALK (m277): `mel.TALK` live; `mel.TALKS` the scripts by kind; `mel.talk` the state
   TALK, TALKS, talk,
