@@ -34592,9 +34592,9 @@ function kitCutMat(m) {
       'float kxBayer(vec2 p) { ivec2 q = ivec2(mod(p, 4.0)); int a = q.x ^ q.y;\n' +
       '  return (float(((a & 1) << 3) | ((q.y & 1) << 2) | (((a >> 1) & 1) << 1) | ((q.y >> 1) & 1)) + .5) / 16.0; }\n' +
       sh.fragmentShader.replace('void main() {', 'void main() {\n' +
-        '  if (uKXOn > .5 && vKCutW.y > uKXFeet && distance(vKCutW, cameraPosition) < distance(uKXP, cameraPosition) - .35) {\n' +
+        '  if (uKXOn > .5 && vKCutW.y > uKXFeet && distance(vKCutW, cameraPosition) < distance(uKXP, cameraPosition) - .6) {\n' +
         '    vec3 kxd = uKXP - cameraPosition; float kxt = clamp(dot(vKCutW - cameraPosition, kxd) / dot(kxd, kxd), 0.0, 1.0);\n' +
-        '    float kxa = mix(uKXMin, 1.0, smoothstep(.55, 1.0, distance(vKCutW, cameraPosition + kxd * kxt) / 1.6));\n' +     /* m1352: a world CAPSULE round the lens->him line, not a screen circle -- a side wall beside him was dithered into a grey checker */
+        '    float kxa = mix(uKXMin, 1.0, smoothstep(.6, 1.0, distance(vKCutW, cameraPosition + kxd * kxt) / (.95 * max(kxt, .3))));\n' +     /* m15xx: a CONE, thin at the lens and body-wide (.95 m) at him, not a 1.6 m tube: what sits beside the line stays solid */     /* m1352: a world CAPSULE round the lens->him line, not a screen circle -- a side wall beside him was dithered into a grey checker */
         '    if (kxa < .999 && kxa <= kxBayer(gl_FragCoord.xy)) discard;\n  }\n' +
         '  if (uKCutOn > .5 && vKCutW.y > uKCutY) {\n' +
         '    vec2 kd = vKCutW.xz - uKCutXf.xy;\n' +
@@ -34639,7 +34639,17 @@ function kitXrayStep() {
   const d = Math.max(.5, camera.position.distanceTo(KCUT.xP.value));
   const r = (kit.inside || WORLD.now === 'forge' ? KIT.xrayWIn : KIT.xrayW) / d * (_kxs.y * .5) / Math.tan(camera.fov * Math.PI / 360);
   KCUT.xS.value.set((_kxv.x * .5 + .5) * _kxs.x, (_kxv.y * .5 + .5) * _kxs.y, Math.max(1, r));
-  KCUT.xMin.value = KIT.xrayMin;
+  // m15xx: ONLY WHEN SOMETHING IS IN THE WAY (his: *"things won't even be in front of the camera and they'll just be see-through -- it looks like
+  // rendering issues everywhere"*). Three segments, the lens to his shins / chest / head, against the colliders (`BOXES`, `BDYN`); the thinning
+  // fades in over ~.15 s when one is cut and out over ~.4 s when none is. In the open, nothing is ever thinned.
+  const cx = camera.position.x, cy = camera.position.y, cz = camera.position.z, H = RIG.height * bodyK(); let hit = 0;
+  for (const fy of [.35, .62, .92]) { const tx = p.pos.x, ty = p.pos.y + H * fy, tz = p.pos.z, dx = tx - cx, dy = ty - cy, dz = tz - cz;
+    for (const L of [BOXES, BDYN]) { for (const b of L) { if (b.maxy <= p.pos.y + .1) continue; let t0 = 0, t1 = .97, ok = true;
+        for (const [o, d, lo, hi] of [[cx, dx, b.minx, b.maxx], [cy, dy, b.miny, b.maxy], [cz, dz, b.minz, b.maxz]]) { if (Math.abs(d) < 1e-6) { if (o < lo || o > hi) { ok = false; break; } continue; }
+          let u = (lo - o) / d, v = (hi - o) / d; if (u > v) { const w = u; u = v; v = w; } if (u > t0) t0 = u; if (v < t1) t1 = v; if (t0 > t1) { ok = false; break; } }
+        if (ok) { hit = 1; break; } } if (hit) break; } if (hit) break; }
+  const dt = KIT.xrayDt || 1 / 60; KIT.xrayK = Math.max(0, Math.min(1, (KIT.xrayK || 0) + (hit ? dt / .15 : -dt / .4)));
+  KCUT.xMin.value = 1 - (1 - KIT.xrayMin) * KIT.xrayK;     // 1 = solid: the shader thins nothing
   KCUT.xFeet.value = p.pos.y + .12;
 }
 // **ONE LADDER PAIRING PER BUILDING (m178, `kitSlot`).** The house paired a `climb_` volume with its
@@ -64854,7 +64864,7 @@ function frameBody() {
   crashHeroStep(dt);            // ...and pulses, arcs, hums, and stands a beam over the farm (m300)
   riverStep(dt);                // the farm's river: no wading, the current puts you back (m291)
   cellStep();
-  kitXrayStep();
+  KIT.xrayDt = dt; kitXrayStep();
   // AFTER the camera, because the rim is placed off the bearing the lens was actually drawn at
   // -- one taken from last frame trails every swing, and a colour sitting on an edge is exactly
   // where a frame of lag shows.

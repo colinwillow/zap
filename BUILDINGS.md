@@ -358,6 +358,15 @@ the home in a wide shot from the valley floor.
 
 ## THE SHIP (his, after m1372) -- its own track, alongside the blueprint work
 
+### STEER (his, Oct 28 2026, playing it on the phone) -- given to Worker A (the ship's builder)
+> *"There is weird collider all over it. I try to climb it, I get stuck in this pose... stuck to walls, weird artifacting. There's tightrope walking
+> at the top of the mast, you should be able to climb certain things, we should be able to swing. We need some more dynamics test grounds: a rope
+> climb, a rope swing, a mast swing."*
+- [ ] the colliders audited against the visible ship (no invisible walls, nothing to stick to that is not meant to be climbed)
+- [ ] the dynamics test grounds, each a sandbox of its own first: ROPE CLIMB, ROPE SWING, MAST SWING
+- [ ] then onto the ship: tightrope along the mast and yards, the rigging climbable, a swing
+
+
 > *"A classic retro pirate, samurai, alien water vessel just floating in an ocean scene... the island could just be there... interior, exterior,
 > sails you can climb up on. I'm going to make it transform into an airship -- floating in the water and in the air -- but start it as a literal
 > classic Viking alien pirate ship floating in the water, with sunrise and really beautiful water shaders."*

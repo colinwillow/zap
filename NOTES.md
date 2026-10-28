@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- THE X-RAY ONLY WHEN SOMETHING IS IN THE WAY (his: "it just looks like a sphere... things won't even be in front of the camera and they'll be see-through")
+What was wrong: the x-ray (`kitCutMat`'s `uKXOn` block, m181 / m1352) thinned every tagged surface inside a 1.6 m world tube round the lens->him
+line, ALL THE TIME it was switched on (kit worlds, the forge's buildings). In the open nothing occludes him, but a lamp, a post, a crate beside the
+line still fell inside the tube and dithered -- "rendering issues everywhere".
+- **Gated by a real occlusion test:** `kitXrayStep` casts three segments, the lens to his shins / chest / head (.35 / .62 / .92 of his height), against
+  `BOXES` and `BDYN` (slab test, boxes under his feet ignored). Only when one is cut does `KIT.xrayK` rise to 1 (~.15 s); with none it falls to 0
+  (~.4 s), and `xMin` = 1 - (1 - `xrayMin`) x k, so at 0 the shader thins NOTHING. One writer for `xMin`: this function.
+- **A cone, not a tube:** the thinned region is .95 m round the line at HIS depth, shrinking toward the lens (`max(kxt, .3)`), and only for
+  fragments at least .6 m nearer than him (was .35). What stands beside him stays solid.
+- Colliders stand in for the visible occluder: a mesh with no box (pure decor) will not trigger it by itself. If he sees one, that is the next note.
+
 ## m1582 -- The First Beacon: layer 1 handed to him (the Beacon loop stopped)
 Every box of BEACON.md's layer 1 that this side can tick is ticked (passes m1549-m1580): the route on his sheet's layout and exact heights, the
 spine crossing itself, a carved strata canyon, the wall jump in four beats, rests and checkpoints, fail-forward ladders, headroom, the route checked
