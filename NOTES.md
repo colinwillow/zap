@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the SPIDER-BOT HANGAR, pass 3 (THE CLIMB) -- its third pass, DONE
+## m1639 -- THE RE-PASS: the SPIDER-BOT HANGAR, pass 3 (THE CLIMB) -- its third pass, DONE
 - How you get UP: a sandstone stair on the east flank, outside the eave (x = hw + .8 + .15), 14 risers of .286 m on .38 treads (under the
   .357 step), every step a box from the ground that is its drawn block, to a 1.6 m landing at the eave height (4.0) with a gold edge and
   a mint lantern on a lacquer post (its box the post). The landing stands .15 m off the eave's edge: step across onto the roof, whose
