@@ -35,7 +35,7 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
-## THE DOJO, PASS 11: THE ALTARS ANSWER (mXXXX)
+## THE DOJO, PASS 11: THE ALTARS ANSWER (m1434)
 - **Each altar has a chime, a ring and a glint.** The chime is a bronze wind-chime under the canopy (5 tubes, a striker, a mint tassel) on a spring (`A.sw`). The Jin ring is an additive mint torus that rises 3.2 m and fades over 1.4 s. The glint is a star sprite (`dojoGlintTex`) that runs the top katana in .55 s.
 - **The trigger:** `dojoStep` checks him on the disc (within 2.4 m, |dy| < .7) and calls `dojoBlessing(A)` once. It re-arms past 3.5 m.
 - **`dojoBlessing` does five things:**
