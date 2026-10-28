@@ -5,6 +5,19 @@ Every time you complete the third pass on a building, add it to the inventory I 
 run on it, swing on it, blow it up and repair it. Make various TYPES of buildings that are modular and will eventually fit together, with
 different functions: bars and ramps, interior and exterior, turrets, ballistae, beams -- floating flying ship buildings, zeppelins, towers."*
 
+## THE PROP LIBRARY (his, Oct 28 2026; PROPS.md)
+*"Plants, pots and pans, tables, benches... rocks, water features, fountains, fences, ladders -- detailed passes on all of those tertiary items."* About ten passes each; each family gets a sandbox.
+- [x] **plants pass 1 (mXXXX):** SPAWN > BUILDINGS > Plant Library: cherry, pine, saguaro, agave, bamboo, fern, Jin bulb, grass. Wind sway; a katana, a bolt or walking through bends them and they spring back
+- [ ] plants pass 2: real silhouettes per type (PROPS.md has the ten-pass plan)
+- [ ] rocks, water, courtyard, fences and blocks, household, climbing: each its own sandbox, pass 1 each
+
+## THE CREATURES, PASS BY PASS (his: *"individual passes on the animals themselves, a bunch of passes on each, because the first pass on anything is never good"*)
+- [ ] sky whale (dojo, pass 1 at m1413): pass 2 -- a real silhouette (a heavier head, a jaw line, barnacle and Jin markings, a slower roll)
+- [ ] sky manta (dojo, pass 1 at m1417): pass 2 -- a thicker body, a curled cephalic fin, a proper underside, wings that ripple, not fold
+- [ ] serpent fish (the Ship, Worker A): its own passes in the Ship's list
+- [ ] serpent-dragon (not built)
+
+
 ## THE DOJO (his, after m1390) -- the arena becomes the floating samurai dojo; many passes
 
 > *"Start making the arena the dojo, more in line with the game aesthetic: our texture maps, our architecture -- take reference from his home and the

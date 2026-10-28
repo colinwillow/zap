@@ -10030,6 +10030,109 @@ function triMat(name, o) { o = o || {}; const m = new THREE.MeshStandardMaterial
     sh.fragmentShader = 'uniform float uTS; varying vec3 vTriW; varying vec3 vTriN;\n' + sh.fragmentShader.replace('#include <map_fragment>',
       'vec3 tbw = pow(abs(normalize(vTriN)), vec3(4.0)); tbw /= (tbw.x + tbw.y + tbw.z); vec4 sampledDiffuseColor = texture2D(map, vTriW.zy * uTS) * tbw.x + texture2D(map, vTriW.xz * uTS) * tbw.y + texture2D(map, vTriW.xy * uTS) * tbw.z; diffuseColor *= sampledDiffuseColor;'); };
   m.customProgramCacheKey = () => 'tri' + ts; return m; }
+// m1424: THE PLANT LIBRARY, pass 1 (his: *"plants are really great... a nice mix of plants of various sizes and styles that are dynamic, move,
+// flow in the wind, but you can also kinda hit them: trees, cactuses, Japanese, alien, ivy... to really spice up what we already have"*).
+// A SHARED kit, not a one-off: `plantKind(name)` builds a type's geometry once (vertex colours + `aSw` sway weight 0 at the root -> 1 at the
+// tips, `aFl` leaf flutter, `aGl` Jin glow), and `plantPlant(g, kind, x, y, z, s, yaw)` puts one down. Every type is ONE InstancedMesh (one draw)
+// on ONE shared material: the WIND bends each plant in WORLD space (a gusting field that rolls across, so neighbours sway together, not in
+// lockstep) and each instance carries its own SPRING (`iB` = bend x/z, phase, stiffness) -- a katana, a bolt or him walking through it pushes the
+// spring and the plant whips back and wobbles. `plantStep` runs the springs; `plantHit` is called from the swing and from `bldHit`.
+// SPAWN > BUILDINGS > Plant Library lays every type out in three sizes on a lawn, plus a garden of them mixed.
+const PLANT = { at: [200, 120], on: null, kinds: {}, list: [], wind: [.55, .25], k: 34, damp: 3.2, hitK: 3.2, brushK: .9, U: { uTime: { value: 0 }, uWind: { value: new THREE.Vector2() } } };
+function plantMat() { if (PLANT.mat) return PLANT.mat; const m = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .75, side: THREE.DoubleSide });
+  m.onBeforeCompile = sh => { sh.uniforms.uTime = PLANT.U.uTime; sh.uniforms.uWind = PLANT.U.uWind;
+    sh.vertexShader = 'uniform float uTime; uniform vec2 uWind; attribute float aSw; attribute float aFl; attribute float aGl; attribute vec4 iB; varying float vGl;\n' + sh.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
+      vGl = aGl; vec3 wp = (instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz; float sc2 = dot(instanceMatrix[0].xyz, instanceMatrix[0].xyz);
+      float gust = .55 + .45 * sin(uTime * .9 - dot(wp.xz, vec2(.09, .05)) + iB.z) + .25 * sin(uTime * 2.3 + wp.x * .3 + iB.z * 2.0);
+      vec2 off = (uWind * gust * iB.w + iB.xy) * aSw; off += vec2(sin(uTime * 1.7 + iB.z), cos(uTime * 1.3 + iB.z)) * .04 * iB.w * aSw;
+      vec3 lo = transpose(mat3(instanceMatrix)) * vec3(off.x, -dot(off, off) * .35, off.y) / sc2; transformed += lo;
+      transformed += objectNormal * sin(uTime * 9.0 + position.x * 6.0 + position.y * 5.0 + iB.z) * .025 * aFl;`);
+    sh.fragmentShader = 'varying float vGl;\n' + sh.fragmentShader.replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n totalEmissiveRadiance += vColor.rgb * vGl * .9;'); };
+  m.customProgramCacheKey = () => 'plant1'; PLANT.mat = m; return m; }
+// one part: any geometry -> non-indexed with colour (a hex, or fn(x,y,z) -> [r,g,b]), sway (fn or number), flutter and glow
+function plantPart(geo, col, sw, fl, gl) { const q = geo.index ? geo.toNonIndexed() : geo.clone(); if (q.attributes.uv) q.deleteAttribute('uv'); const P = q.attributes.position, n = P.count;
+  const C = new Float32Array(n * 3), S = new Float32Array(n), F = new Float32Array(n).fill(fl || 0), G = new Float32Array(n).fill(gl || 0), cc = new THREE.Color();
+  for (let i = 0; i < n; i++) { const x = P.getX(i), y = P.getY(i), z = P.getZ(i); if (typeof col === 'function') C.set(col(x, y, z), i * 3); else if (Array.isArray(col)) C.set(col, i * 3); else { cc.setHex(col); C.set([cc.r, cc.g, cc.b], i * 3); }
+    S[i] = typeof sw === 'function' ? sw(x, y, z) : sw; }
+  q.setAttribute('color', new THREE.BufferAttribute(C, 3)); q.setAttribute('aSw', new THREE.BufferAttribute(S, 1)); q.setAttribute('aFl', new THREE.BufferAttribute(F, 1)); q.setAttribute('aGl', new THREE.BufferAttribute(G, 1)); if (!q.attributes.normal) q.computeVertexNormals(); return q; }
+function plantRnd(s) { return () => (s = (s * 16807) % 2147483647) / 2147483647; }
+function plantBlob(r, seed, d = 1) { const g = new THREE.IcosahedronGeometry(r, d), P = g.attributes.position, R = plantRnd(seed), seen = new Map();     // a lumpy blob (shared verts move together)
+  for (let i = 0; i < P.count; i++) { const k = P.getX(i).toFixed(3) + P.getY(i).toFixed(3) + P.getZ(i).toFixed(3); if (!seen.has(k)) seen.set(k, .82 + R() * .3); const f = seen.get(k); P.setXYZ(i, P.getX(i) * f, P.getY(i) * f * .85, P.getZ(i) * f); } g.computeVertexNormals(); return g; }
+function plantTube(pts, r0, r1, seg = 8) { const c = new THREE.CatmullRomCurve3(pts.map(p => new THREE.Vector3(...p))), g = new THREE.TubeGeometry(c, 12, 1, seg, false), P = g.attributes.position;
+  const ring = seg + 1; for (let i = 0; i < P.count; i++) { const t = Math.floor(i / ring) / 12, p = c.getPointAt(Math.min(1, t)), r = r0 + (r1 - r0) * t; P.setXYZ(i, p.x + (P.getX(i) - p.x) * r, p.y + (P.getY(i) - p.y) * r, p.z + (P.getZ(i) - p.z) * r); }
+  g.computeVertexNormals(); return g; }
+function plantMix(c1, c2, R) { const a = new THREE.Color(c1), b = new THREE.Color(c2); return () => { const t = R(); return [a.r + (b.r - a.r) * t, a.g + (b.g - a.g) * t, a.b + (b.b - a.b) * t]; }; }
+// THE TYPES. h = height (m, at scale 1), r = how near counts as touching it, stiff = how far the wind moves its tips, bend = how far a blow does
+const PLANTK = {
+  cherry: { h: 6.5, r: 1.4, stiff: .55, bend: .9, make() { const R = plantRnd(11), H = 6.5, sw = (x, y) => Math.pow(Math.max(0, y / H), 1.6), parts = [];
+    parts.push(plantPart(plantTube([[0, 0, 0], [.2, 1.4, .1], [-.1, 2.6, .2], [.3, 3.6, 0]], .36, .16), 0x5a3a2c, sw));
+    for (const [a, l] of [[0, 1.9], [2.2, 1.7], [4.1, 2]]) parts.push(plantPart(plantTube([[.3, 3.4, 0], [.3 + Math.cos(a) * l * .5, 4.1, Math.sin(a) * l * .5], [.3 + Math.cos(a) * l, 4.5, Math.sin(a) * l]], .13, .05, 6), 0x5a3a2c, sw));
+    const pink = plantMix(0xe58aa8, 0xffc8da, R); for (let i = 0; i < 9; i++) { const a = R() * 6.28, d = R() * 1.6, y = 4.3 + R() * 1.6; parts.push(plantPart(plantBlob(.9 + R() * .6, 20 + i).translate(.3 + Math.cos(a) * d, y, Math.sin(a) * d), (x, y2) => { const c = pink(); return y2 < 4.4 ? c.map(v => v * .82) : c; }, sw, 1)); }
+    return parts; } },
+  pine: { h: 7, r: 1.2, stiff: .35, bend: .6, make() { const H = 7, sw = (x, y) => Math.pow(Math.max(0, y / H), 1.8), parts = [plantPart(plantTube([[0, 0, 0], [0, 3, 0], [.1, 6.8, 0]], .3, .08), 0x4a3226, sw)], R = plantRnd(7), gr = plantMix(0x1f5a3c, 0x2f7a4a, R);
+    for (let k = 0; k < 5; k++) { const c = new THREE.ConeGeometry(2.4 - k * .4, 2.2, 9, 2).translate(0, 2.2 + k * 1.05, 0), P = c.attributes.position; for (let i = 0; i < P.count; i++) if (P.getY(i) < 1.6 + k * 1.05) { const f = .85 + R() * .3; P.setX(i, P.getX(i) * f); P.setZ(i, P.getZ(i) * f); }
+      c.computeVertexNormals(); parts.push(plantPart(c, (x, y) => gr().map(v => v * (.8 + .25 * ((y - 1) % 1.05))), sw, .5)); } return parts; } },
+  saguaro: { h: 4.2, r: .7, stiff: .06, bend: .25, make() { const H = 4.2, sw = (x, y) => Math.max(0, y / H) * .6, rib = (x, y, z) => { const a = Math.atan2(z, x); return Math.sin(a * 14) > .3 ? [.24, .42, .16] : [.15, .3, .11]; };
+    const col = (x, y, z) => rib(x, y, z); const p = [plantPart(new THREE.CapsuleGeometry(.42, 3.4, 6, 16).translate(0, 2.1, 0), col, sw)];
+    p.push(plantPart(plantTube([[0, 1.5, 0], [.9, 1.6, 0], [1.05, 2.2, 0], [1.05, 2.9, 0]], .28, .26, 12), (x, y, z) => rib(x - 1, y, z), sw));
+    p.push(plantPart(plantTube([[0, 2.2, 0], [-.75, 2.3, .1], [-.85, 2.8, .1], [-.85, 3.3, .1]], .24, .22, 12), (x, y, z) => rib(x + .85, y, z - .1), sw));
+    for (const [x, y, z] of [[0, 3.95, 0], [1.05, 3.05, 0], [-.85, 3.45, .1]]) p.push(plantPart(new THREE.SphereGeometry(.12, 8, 6).translate(x, y, z), 0xf4a6c8, sw)); return p; } },
+  agave: { h: 1.4, r: .9, stiff: .12, bend: .5, make() { const R = plantRnd(5), p = [];
+    for (let i = 0; i < 16; i++) { const a = i * 2.4, tilt = .35 + (i % 3) * .28, L = 1.1 + R() * .5, lf = new THREE.ConeGeometry(.16, L, 4, 3).translate(0, L / 2, 0), P = lf.attributes.position;
+      for (let j = 0; j < P.count; j++) { P.setZ(j, P.getZ(j) * .35); const t = P.getY(j) / L; P.setY(j, P.getY(j)); P.setZ(j, P.getZ(j) + t * t * .35); }
+      lf.rotateX(tilt).rotateY(a); lf.computeVertexNormals(); p.push(plantPart(lf, (x, y) => [.3 + y * .08, .42 + y * .08, .34 + y * .04], (x, y, z) => Math.min(1, Math.hypot(x, y, z) / 1.3) * .8)); } return p; } },
+  bamboo: { h: 6, r: 1, stiff: 1, bend: 1.2, make() { const R = plantRnd(3), p = [], H = 6;
+    for (let i = 0; i < 7; i++) { const a = R() * 6.28, d = R() * .6, x = Math.cos(a) * d, z = Math.sin(a) * d, h = 4.5 + R() * 2, lean = (R() - .5) * .5, sw = (X, y) => Math.pow(Math.max(0, y / H), 1.4) * 1.1;
+      p.push(plantPart(plantTube([[x, 0, z], [x + lean * .3, h * .5, z], [x + lean, h, z + lean * .3]], .07, .05, 6), (X, y) => (y % .9) < .06 ? [.6, .62, .3] : [.45, .66, .32], sw));
+      for (let k = 0; k < 4; k++) { const ty = h * (.6 + k * .12), lx = x + lean * (ty / h), lz = z + lean * .3 * (ty / h); for (let j = 0; j < 3; j++) { const la = R() * 6.28, lv = new THREE.PlaneGeometry(.9, .14).translate(.45, 0, 0).rotateZ(-.4).rotateY(la).translate(lx, ty, lz);
+        p.push(plantPart(lv, 0x5aa040, sw, 1)); } } } return p; } },
+  fern: { h: 1.2, r: .9, stiff: .9, bend: 1, make() { const R = plantRnd(13), p = [];
+    for (let i = 0; i < 11; i++) { const a = i / 11 * 6.28 + R() * .3, L = 1.2 + R() * .4, fr = new THREE.PlaneGeometry(L, .42, 8, 1).translate(L / 2, 0, 0), P = fr.attributes.position;
+      for (let j = 0; j < P.count; j++) { const t = P.getX(j) / L; P.setY(j, P.getY(j) * (1 - t) * (.6 + .4 * Math.abs(Math.sin(t * 22)))); P.setZ(j, Math.sin(t * Math.PI * .9) * .55 - t * t * .5); }
+      fr.rotateX(-Math.PI / 2).rotateY(a).translate(0, .15, 0); fr.computeVertexNormals(); p.push(plantPart(fr, (x, y, z) => { const t = Math.min(1, Math.hypot(x, z) / L); return [.2 + t * .15, .48 + t * .15, .2]; }, (x, y, z) => Math.min(1, Math.hypot(x, z) / 1.4), 1)); } return p; } },
+  jinbulb: { h: 2.6, r: .6, stiff: .8, bend: 1.3, make() { const H = 2.6, sw = (x, y) => Math.pow(Math.max(0, y / H), 1.3), p = [];
+    p.push(plantPart(plantTube([[0, 0, 0], [.25, .9, 0], [-.15, 1.8, .1], [.2, 2.3, 0]], .1, .05, 7), 0x3a2a4a, sw));
+    p.push(plantPart(new THREE.SphereGeometry(.32, 14, 10).scale(1, 1.3, 1).translate(.22, 2.45, 0), [.48, 1, .85], sw, 0, 1));
+    for (const a of [0, 2.1, 4.2]) { const pe = new THREE.PlaneGeometry(.5, .32).translate(.25, 0, 0).rotateZ(.7).rotateY(a).translate(.22, 2.2, 0); p.push(plantPart(pe, 0x5a3a7a, sw, .6)); }
+    for (const a of [1, 3.5]) { const lf = new THREE.PlaneGeometry(.7, .25).translate(.35, 0, 0).rotateZ(.3).rotateY(a).translate(.1, .8, 0); p.push(plantPart(lf, 0x4a6a5a, sw, 1)); } return p; } },
+  grass: { h: .6, r: .5, stiff: 1.2, bend: 1, make() { const R = plantRnd(17), p = [], gr = plantMix(0x4f8a34, 0x8ab84a, R);
+    for (let i = 0; i < 26; i++) { const a = R() * 6.28, d = R() * .35, h = .35 + R() * .4, b = new THREE.BufferGeometry(); const x = Math.cos(a) * d, z = Math.sin(a) * d, w = .05, ta = R() * 6.28, lx = Math.cos(ta) * .12, lz = Math.sin(ta) * .12;
+      b.setAttribute('position', new THREE.Float32BufferAttribute([x - w, 0, z, x + w, 0, z, x + lx, h, z + lz], 3)); b.computeVertexNormals(); const c = gr(); p.push(plantPart(b, (X, y) => c.map(v => v * (.7 + y)), (X, y) => y / .75, .3)); } return p; } },
+};
+function plantKind(name) { if (PLANT.kinds[name]) return PLANT.kinds[name]; const K = PLANTK[name], geo = mergeGeometries(K.make()); PLANT.kinds[name] = { K, geo, n: 0, list: [] }; return PLANT.kinds[name]; }
+// put the instanced meshes down for every kind used under `g` (call once after all plantPlant calls for that group)
+function plantPlant(rec, kind, x, y, z, s, yaw) { rec.push({ kind, x, y, z, s, yaw }); }
+function plantFlush(g, rec) { const by = {}; for (const r of rec) (by[r.kind] = by[r.kind] || []).push(r); const meshes = [];
+  for (const [kind, rs] of Object.entries(by)) { const Kd = plantKind(kind), geo = Kd.geo.clone(), iB = new Float32Array(rs.length * 4);
+    rs.forEach((r, i) => iB.set([0, 0, (r.x * 1.7 + r.z * 2.3) % 6.28, Kd.K.stiff], i * 4)); const at = new THREE.InstancedBufferAttribute(iB, 4); geo.setAttribute('iB', at);
+    const m = new THREE.InstancedMesh(geo, plantMat(), rs.length), mx = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler();
+    rs.forEach((r, i) => { mx.compose(new THREE.Vector3(r.x, r.y, r.z), q.setFromEuler(e.set(0, r.yaw, 0)), new THREE.Vector3(r.s, r.s, r.s)); m.setMatrixAt(i, mx);
+      PLANT.list.push({ at, i, x: r.x, y: r.y, z: r.z, h: Kd.K.h * r.s, r: Kd.K.r * r.s, bend: Kd.K.bend, bx: 0, bz: 0, vx: 0, vz: 0, m }); });
+    m.castShadow = true; m.receiveShadow = true; m.frustumCulled = false; g.add(m); meshes.push(m); } return meshes; }
+function plantDrop(meshes) { PLANT.list = PLANT.list.filter(P => !meshes.includes(P.m)); }
+function plantPush(P, dx, dz, imp) { const L = Math.hypot(dx, dz) || 1; P.vx += dx / L * imp * P.bend; P.vz += dz / L * imp * P.bend; }
+function plantHit(x, y, z, rad) { if (!PLANT.list.length) return 0; let n = 0; const p = player.pos;
+  for (const P of PLANT.list) { const d = Math.hypot(P.x - x, P.z - z); if (d > P.r + rad + .4 || y < P.y - .5 || y > P.y + P.h + .5) continue; let dx = P.x - p.x, dz = P.z - p.z; if (Math.hypot(dx, dz) < .2) { dx = P.x - x; dz = P.z - z; }
+    plantPush(P, dx, dz, PLANT.hitK * (1 + Math.random() * .3)); n++; if (Math.random() < .5) spk(x, y, z, (Math.random() - .5) * 2, 1 + Math.random(), (Math.random() - .5) * 2, .06, .5, [.5, .85, .4]); } return n; }
+function plantStep(dt) { const U = PLANT.U; U.uTime.value += dt; const t = U.uTime.value; U.uWind.value.set(PLANT.wind[0] * (1 + .3 * Math.sin(t * .23)), PLANT.wind[1] * (1 + .3 * Math.cos(t * .17)));
+  const p = player, pv = p.vel, sp = Math.hypot(pv.x, pv.z), k = PLANT.k, c = PLANT.damp, dirty = new Set();
+  for (const P of PLANT.list) { if (sp > .5) { const d = Math.hypot(p.pos.x - P.x, p.pos.z - P.z); if (d < P.r + .35 && p.pos.y < P.y + P.h && p.pos.y > P.y - 1) { P.vx += pv.x * PLANT.brushK * dt * 6 * P.bend * (1 - d / (P.r + .35)); P.vz += pv.z * PLANT.brushK * dt * 6 * P.bend * (1 - d / (P.r + .35)); } }
+    if (Math.abs(P.bx) + Math.abs(P.bz) + Math.abs(P.vx) + Math.abs(P.vz) < 1e-4) continue;
+    P.vx += (-k * P.bx - c * P.vx) * dt; P.vz += (-k * P.bz - c * P.vz) * dt; P.bx += P.vx * dt; P.bz += P.vz * dt; const L = Math.hypot(P.bx, P.bz), mx = 1.4 * P.bend; if (L > mx) { P.bx *= mx / L; P.bz *= mx / L; }
+    P.at.array[P.i * 4] = P.bx; P.at.array[P.i * 4 + 1] = P.bz; dirty.add(P.at); }
+  for (const a of dirty) a.needsUpdate = true; }
+// SPAWN > BUILDINGS > Plant Library: a lawn, a lane per type (three sizes), and a mixed garden at the far end
+function plantLibBuild() { if (PLANT.on) return; const g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, [x0, z0] = PLANT.at, rec = [], R = plantRnd(99);
+  const lawn = new THREE.Mesh(new THREE.PlaneGeometry(60, 110).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x6f9a4a, roughness: .95 })); lawn.position.set(x0 + 24, .02, z0 + 40); lawn.receiveShadow = true; g.add(lawn);
+  Object.keys(PLANTK).forEach((kind, i) => { const z = z0 + i * 9; [.7, 1, 1.3].forEach((s, j) => plantPlant(rec, kind, x0 + j * 7, 0, z, s, R() * 6.28)); });
+  const gz = z0 + Object.keys(PLANTK).length * 9 + 6;     // the garden: big trees behind, bamboo and cactus in clumps, ferns and agave under, grass everywhere
+  for (let i = 0; i < 6; i++) plantPlant(rec, i % 2 ? 'pine' : 'cherry', x0 + 4 + i * 8 + R() * 3, 0, gz + 22 + R() * 4, .9 + R() * .4, R() * 6.28);
+  for (let i = 0; i < 3; i++) plantPlant(rec, 'bamboo', x0 + 8 + i * 15 + R() * 3, 0, gz + 12 + R() * 4, .8 + R() * .4, R() * 6.28);
+  for (let i = 0; i < 4; i++) plantPlant(rec, 'saguaro', x0 + 2 + i * 12 + R() * 4, 0, gz + 3 + R() * 6, .7 + R() * .5, R() * 6.28);
+  for (let i = 0; i < 14; i++) plantPlant(rec, ['fern', 'agave', 'jinbulb'][i % 3], x0 + R() * 46, 0, gz + R() * 20, .7 + R() * .6, R() * 6.28);
+  for (let i = 0; i < 160; i++) plantPlant(rec, 'grass', x0 - 4 + R() * 54, 0, gz - 4 + R() * 32, .8 + R() * .7, R() * 6.28);
+  const meshes = plantFlush(g, rec); PLANT.on = { g, O, rings: [], meshes }; player.pos.set(x0 - 6, 0, z0 - 6); player.vel.set(0, 0, 0); }
+function plantLibClear() { if (!PLANT.on) return; plantDrop(PLANT.on.meshes); bldClear(PLANT.on); PLANT.on = null; }
 // SPAWN > BUILDINGS > Material Swatches: one block, one ball and one plank of each map, in a row, to look at them in the forge's light
 const SWATCH = { at: [110, -150], on: null };
 function swatchBuild() { if (SWATCH.on) return; const g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, [x0, z0] = SWATCH.at;
@@ -20175,6 +20278,7 @@ function ghouseStep(dt) { const G = GHOUSE.on; if (!G) return; G.t += dt; if (G.
 // his shots (`turretBlast`) and its own bolt PARRIED back (`arrowStep`): `balHp` hits and it smashes (sparks, smoke, the stock slumps),
 // stops shooting, and is REPAIRED after `balFix` s.
 function bldHit(x, y, z, rad, dmg) {
+  if (PLANT.list.length) plantHit(x, y, z, rad);     // m1424: plants bend and keep going (they never stop the shot)
   if (ghomeHit(x, y, z, rad)) return 1;     // pass 14 (Worker B): Grumbo's home -- its back door, the orb, the bells
   if (pagodaChain(x, y, z, rad)) return 1;     // m1236: the altar core calls the spire's chain lightning
   if (pagodaBell(x, y, z, rad)) return 1;     // m1134: the Pagoda's bell rings
@@ -25595,6 +25699,7 @@ const BLDG = { list: [
   { key: 'heron', t: 'White Heron Castle', sub: 'a Himeji-style castle on a battered stone base: a five-storey white keep under layered grey roofs (every roof walkable, a hall on every storey, steep stairs up, the great pillars, a 2.4 m lookout balcony at the top; every gate and outer door opens, breaks and is rehung), a gallery wing of two corridors to a hollow corner tower (a loop: keep up, across, tower down, back), its roof a path; a ballista on the gallery ridge, archers in the doorways and the lookout, a sentry gate held by two samurai; the approach: a walled ramp that doubles back to a drawbridge over a dry moat (strike a gong to raise or lower it, or knock it down) and a gate on the stone; black pines, stone and paper lanterns, war flags and three white herons wheeling round the keep; a stair up the stone, a storehouse at the foot whose walls break', pass: 12, build: () => heronBuild(), clear: () => heronClear(), on: () => !!HERON.on, step: dt => heronStep(dt) },
   { key: 'gpag', t: 'Great Red Pagoda', sub: 'five storeys of red lacquer: a room on every floor, ladders up through the hatches, a balcony round every storey, a spire; a pavilion whose roof you can climb; a red fence; climb the outside eave to eave, bars, a zipline off the spire; an armoury, a library, a bell room (the alarm), a lookout; archers, a sentry gun, gate guards; glowing windows, lantern halos, a beacon on the spire; streamers, chimes, birds; strike the gong at the top and the tower lights up and the gate opens', pass: 10, build: () => gpagBuild(), clear: () => gpagClear(), on: () => !!GPAG.on, step: dt => gpagStep(dt) },
   { key: 'chunks', t: 'Chunk Library', sub: 'every piece the level generator will build runs from, one per lane on a 6 m runway (ladder up at its start), sized from the MEASURED move table and labelled with what it asks of you: run jump, long jump, double jump and swipe gaps, ledges, wall runs up, a side wall run, a wall-jump chimney, bar launches up and far, stairs, a ladder, a drop, a zip -- walk them and say which feel right', pass: 1, build: () => chunkBuild(), clear: () => chunkClear(), on: () => !!CHUNK.on },
+  { key: 'plants', t: 'Plant Library', sub: 'the shared plants (pass 1): cherry, pine, saguaro, agave, bamboo, fern, a Jin bulb, grass -- three sizes each and a garden of them mixed. They sway in a gusting wind; swing at them, shoot them or walk through them and they whip and wobble back', pass: 1, build: () => plantLibBuild(), clear: () => plantLibClear(), on: () => !!PLANT.on },
   { key: 'swatch', t: 'Material Swatches', sub: 'the generated texture maps (wood planks, timber, sandstone, stone blocks, marble, bronze, red cloth, roof tiles) on a block, a ball and a plank each, triplanar-mapped -- `triMat(name)` puts any of them on code-built geometry', pass: 3, build: () => swatchBuild(), clear: () => swatchClear(), on: () => !!SWATCH.on },
   { key: 'court', t: 'The Courtyard', sub: 'a walled court far north (0, 150): a wall-walk all round, the south gate, a stone lane between two timber halls with balconies and walkable roofs, a koi pond and a moon bridge; the two-roofed watchtower over the inner gate; the high road: a lane bridge, a rope bridge, the bell house; the Great Red Pagoda in its corner, ziplines, the maple; archers, a sentry gun, gate guards and a patrol, woken by the bell; koi, pigeons, a fox, fairy dust, sun shafts and paper lanterns; swaying grass, moss, puddles, smashable barrels, a cart and a rack; silence the watchtower (its gun and two archers) and the inner gate opens on a glowing way on', pass: 10, build: () => courtBuild(), clear: () => courtClear(), on: () => !!COURT.on, step: dt => courtStep(dt) },
   { key: 'zramp', t: 'Mega Wall', sub: 'the Ninja Warrior wall: zoom from the red gate (full hold), down the lane, up the bend and straight up the face -- only a full zoom reaches the gold lip; your mark shows how close; or zigzag up the chimney', pass: 3, build: () => zrampBuild(), clear: () => zrampClear(), on: () => !!ZRAMP.on, step: dt => zrampStep(dt) },
@@ -28892,7 +28997,8 @@ function boardPose(dt) {
 }
 
 function stepPlayer(dt) {
-  if (inArena()) { deflStep(dt); hallStep(dt); if (SKIN.list.length) skinStep(dt); if (PIECE.list.length) pieceStep(dt); if (SMASH.list.length) smashStep(dt); for (const E of BLDG.list) if (E.step && E.on()) E.step(dt); if (LVL.want && inForge()) lvlStart(); if (LVG.on) lvgStep(dt); if (SHIPZ.want === 1 && inForge()) shipBuild(); if (SHIPZ.on) shipStep(dt); if (SNOWZ.on) snowStep(dt); }     // m1105; m1119; m1120: each building's own life
+  if (inArena()) { deflStep(dt); hallStep(dt); if (SKIN.list.length) skinStep(dt); if (PIECE.list.length) pieceStep(dt); if (SMASH.list.length) smashStep(dt); for (const E of BLDG.list) if (E.step && E.on()) E.step(dt); if (LVL.want && inForge()) lvlStart(); if (LVG.on) lvgStep(dt); if (SHIPZ.want === 1 && inForge()) shipBuild(); if (SHIPZ.on) shipStep(dt); if (SNOWZ.on) snowStep(dt); }
+  if (PLANT.list.length) plantStep(dt);     // m1424     // m1105; m1119; m1120: each building's own life
   const p = player;
   stepFeet(dt);
   const hadLock = p.lock;
@@ -40858,6 +40964,7 @@ function strikeSweep(dt, power, live, dmg, body) {
         // fist by construction rather than by a second number. **`p.melFired` does not gate it**
         // -- that is for the SOUND, and a swing through two crates should take out two.
         if (BRK.on && BREAK.length) brkBlast(_sw.x, _sw.y, _sw.z, rad, dmg || FOE.dmg.fist);
+        if (PLANT.list.length) plantHit(_sw.x, _sw.y, _sw.z, rad);     /* m1424 */
         if (inArena()) { vendHit(_sw.x, _sw.y, _sw.z, rad); turretMelee(_sw.x, _sw.y, _sw.z, rad, dmg); if (TURRET.shots.length) turretDeflect(_sw.x, _sw.y, _sw.z, rad); if (ARROWS.length) arrowDeflect(_sw.x, _sw.y, _sw.z, rad); }
         else if (inHome()) bldHit(_sw.x, _sw.y, _sw.z, rad, dmg);     /* m1403: the Red Hollows take blows too (Worker B: his home's door, bells, orb hook into bldHit) */     // m1016: walls are hit by `wallMelee`, once per strike     // m1011: and the turret; m1013: and its shots     // m950
         // AND THE SAME SWING REACHES A WALL CHUNK (m170). A hammer through a brick wall is
@@ -65844,7 +65951,7 @@ async function init() {
 
 // the console handle. Every tuning object is live, so a number can be moved on the phone
 // without a rebuild and without a push.
-window.melee = window.mel = { SNOWZ, snowStamp, GHOME, SHIMMY, VAIM, SHIPZ, shipBuild, FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, gaitMeasure, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
+window.melee = window.mel = { PLANT, plantLibBuild, plantHit, SNOWZ, snowStamp, GHOME, SHIMMY, VAIM, SHIPZ, shipBuild, FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, gaitMeasure, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
   // PROGRESS (m276): `mel.SAVE` is the save; the setters write it through; `mel.progReset()` is a new game
   // TALK (m277): `mel.TALK` live; `mel.TALKS` the scripts by kind; `mel.talk` the state
   TALK, TALKS, talk,

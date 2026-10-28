@@ -23,6 +23,15 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
+## THE PLANT LIBRARY, PASS 1: A SHARED KIT THAT SWAYS AND TAKES A HIT (mXXXX)
+*"Plants of various sizes and styles that are dynamic, move, flow in the wind, but you can also kinda hit them."* PROPS.md is the program (families, sandboxes, ten passes each).
+- **`PLANTK`:** eight types, each with `make()` returning parts built by `plantPart(geo, col, sw, fl, gl)`. `col` can be a hex, an [r,g,b] array or fn(x,y,z). The array case was missed at first and the Jin bulb drew BLACK.
+- **One InstancedMesh per kind** on the one `plantMat()`. Wind: an offset in WORLD space mapped into instance-local space with `transpose(mat3(instanceMatrix)) / scale^2`, so a turned plant still leans downwind.
+- **`iB` per instance:** bend x/z, phase, stiffness. `plantStep` runs a spring per plant (k 34, damp 3.2) and writes only the moving ones.
+- **The hooks:** `plantHit` from the katana's sweep (before the inArena branch) and from the top of `bldHit` (bolts and rockets; it never returns 1). The brush is his velocity when he is inside a plant's `r`.
+- **Colour rule:** the saguaro and the agave started near Jin mint and were pulled to sage and olive. Mint is the Jin's alone (KORAJIN.md).
+- `mel.PLANT`, `mel.plantLibBuild()`, `mel.plantHit(x, y, z, r)`. The library is at (200, 120) in the forge; building it puts him at its entrance.
+
 ## THE JIN GLOW: CANDLES, A SPRING, AND THE KATANA (m1422)
 *"I really like this green glowing stuff... floating candles... spewing water but green... his katana makes it as it cuts the air... the stuff he collects... the essence of the Jin."* (He saw it on Worker A's serpent fish, whose glow spots are `0x7affd8`.)
 - **`JIN = { hex, col, shed }`** sits beside `BTRAIL` and is the ONE source of the colour. KORAJIN.md "THE JIN GLOW" is the design, and it includes the collect, store and fly loop he described.
