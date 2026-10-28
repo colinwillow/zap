@@ -95,6 +95,13 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
+## THE SKY DRAGON, PASS 1 (mXXXX)
+- **The body:** 64 segments in ONE InstancedMesh (red, with every third gold), placed where the head was `i * gap` s ago on one 3D path (`dojoDragonP`: a slow weave r ~150, y -30 to +60, between the islands). The body flows through the curves the head took.
+- **The mane:** a mint cone per segment in a second InstancedMesh, flickering. The Jin's colour is allowed: it is a Jin creature.
+- **The head:** a group (snout, jaw, gold horns, mint eyes, long bronze whiskers), x1.9.
+- **The first render was a string of beads.** `gap` .55 s at ~6.7 m/s put the segments 3.7 m apart along a 236 m body. Now `gap` .17 s, so they overlap into one tube ~75 m long, with a gentler taper and a head as wide as the neck.
+- **Next (pass 2):** a real head, clawed legs, a tail tuft, a roll into the turns.
+
 ## THE DOUBLOON WEARS THE BANNER'S CROSSHAIR DIAMOND (m1476)
 *"Put the design from our crosshair banner thing on the doubloon."* (The banners' nested red-and-cream diamond: it reads as a target, a crosshair.)
 - **The hole is a DIAMOND now,** the centre of the motif. Two embossed diamond rings round it (.17 and .27), and four chevron points out toward the rim on the axes: the crosshair. These replace the square spiral. Still two-tone, with the raised work bright.
