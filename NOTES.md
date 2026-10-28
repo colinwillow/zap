@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the MOATED KEEP, pass 1 (ENEMY look, classical)
+## m1653 -- THE RE-PASS: the MOATED KEEP, pass 1 (ENEMY look, classical)
 - ENEMY_STYLE's classical fortress through `enemyMats`: pale sandstone block (`stone_blocks` tinted `ENEMY.pal.stone`) for the curb ring,
   the island and the curb steps; the keep's walls stay white plaster over a BLACK lacquer skirt (the lower 45% of each outer face, a gold
   band on top: the black-and-white plaster of a castle keep); black corner posts with gold caps; black timber; dark planks; mint glass in
