@@ -20,7 +20,7 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - **The lens** (`stepCam`, the one writer of `cam.az`): comes round behind his heading after `camIdle` .8 s of no drag, pulled back `camPull`
   6 m and lifted `camLift` .4 m.
 **Moves:** DRAGON.md box 2 (his look open). **Still open:** 3-6 and his sign-off. Gates: check ok, zone boot ok. Shipped unverified.
-## m15xx -- the dojo stops beaming him home off the gates; TOOLS > DOJO FX to find the 20 fps
+## m1615 -- the dojo stops beaming him home off the gates; TOOLS > DOJO FX to find the 20 fps
 - **"When I try to go anywhere other than the main dojo it spawns me back in the middle":** the four gate LANDINGS and their BRIDGES were drawn at
   floor height with NO collider -- he stood on the world's invisible floor at y 0, which is exactly what the off-the-edge rule (m1401: past the
   rim, at y < .35 -> beam home) exists to catch. They are real ground now (`safe` boxes), and the rule fires only when nothing real is under his feet.

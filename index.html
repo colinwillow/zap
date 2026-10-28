@@ -10820,7 +10820,7 @@ function dojoBuild(g, W) {
       for (const sd of [-1, 1]) { const lat = sd * 3.2, [px, pz] = [lx + Math.cos(a) * lat * -1, lz + Math.sin(a) * lat]; korLantern(put, K, px, 0, pz, 1); }
       const r0 = W + 1.3, r1 = W + 4.6, [bx, bz] = at(a, (r0 + r1) / 2), Lb = r1 - r0;
       put(new THREE.BoxGeometry(3.4, .22, Lb).rotateY(ya).translate(bx, -.11, bz), M.plank);
-      { const s4 = 4.2 * .7071; D.boxes.push({ minx: lx - s4, maxx: lx + s4, miny: -.6, maxy: 0, minz: lz - s4, maxz: lz + s4, safe: 1 }); for (let j = 0; j <= 4; j++) { const [qx, qz] = at(a, r0 + j * Lb / 4); D.boxes.push({ minx: qx - 1.4, maxx: qx + 1.4, miny: -.3, maxy: 0, minz: qz - 1.4, maxz: qz + 1.4, safe: 1 }); } }     /* m15xx: the landing and the bridge are REAL ground (they stood on the world's invisible floor, so the off-the-edge rule beamed him home) */
+      { const s4 = 4.2 * .7071; D.boxes.push({ minx: lx - s4, maxx: lx + s4, miny: -.6, maxy: 0, minz: lz - s4, maxz: lz + s4, safe: 1 }); for (let j = 0; j <= 4; j++) { const [qx, qz] = at(a, r0 + j * Lb / 4); D.boxes.push({ minx: qx - 1.4, maxx: qx + 1.4, miny: -.3, maxy: 0, minz: qz - 1.4, maxz: qz + 1.4, safe: 1 }); } }     /* m1615: the landing and the bridge are REAL ground (they stood on the world's invisible floor, so the off-the-edge rule beamed him home) */
       for (let j = 0; j < 4; j++) { const [jx, jz] = at(a, r0 + .4 + j * (Lb - .8) / 3); put(new THREE.BoxGeometry(3.6, .1, .18).rotateY(ya).translate(jx, .02, jz), K.iron); }
       for (const sd of [-1, 1]) { const ox = Math.cos(a) * 1.7 * sd, oz = -Math.sin(a) * 1.7 * sd, [p0x, p0z] = at(a, r0), [p1x, p1z] = at(a, r1);
         korPost(put, K, p1x + ox, 0, p1z + oz, 1.3, .12); korRod(put, K.timber, [p0x + ox, 1, p0z + oz], [p1x + ox, 1.1, p1z + oz], .05); } } }
@@ -11007,7 +11007,7 @@ function dojoBuild(g, W) {
         vertexShader: `attribute vec4 iC; attribute float iS; ${aux ? 'attribute vec2 iA; varying vec2 vA; varying float vWy;' : ''} uniform float uTime; varying vec2 vU; varying float vS; varying vec3 vW; void main() { vU = uv; vS = iS; vec3 c = iC.xyz; ${aux ? 'vA = iA; vWy = c.y + position.y * iC.w;' : ''} ${o.move || ''}
           vW = c; vec4 mv = viewMatrix * vec4(c, 1.0); mv.xy += position.xy * iC.w * vec2(${o.aspect || '1.0'}, 1.0); gl_Position = projectionMatrix * mv; }`,
         fragmentShader: `uniform float uTime; uniform vec3 uSun; ${o.uniDecl || ''} ${aux ? 'varying vec2 vA; varying float vWy;' : ''} varying vec2 vU; varying float vS; varying vec3 vW; ${NZ} ${o.frag}` });
-      const ms = new THREE.Mesh(G, m); ms.frustumCulled = false; ms.renderOrder = o.order || 0; g.add(ms); (D.fxCards = D.fxCards || []).push(ms); return ms; };     /* m15xx: every card layer, for TOOLS > DOJO FX */
+      const ms = new THREE.Mesh(G, m); ms.frustumCulled = false; ms.renderOrder = o.order || 0; g.add(ms); (D.fxCards = D.fxCards || []).push(ms); return ms; };     /* m1615: every card layer, for TOOLS > DOJO FX */
     // BIG FLUFFY CLOUDS: cumulus banks -- each a cluster of 9-16 puffs, the big ones at the bottom, smaller piling up, lit warm on top and toward the
     // sun, lavender in the shade; the edge is eaten by noise so every puff is lumpy, never a disc
     // m1448 (his: *"I like the clouds -- match the colour scheme more, and different Y heights: they all have the same coordinates so they look like a
@@ -11182,7 +11182,7 @@ function dojoShot(b) { const D = DOJO; if (!D.on) return 0; const r = (b.size ||
     const v = b.vel || b.v; dojoTgtHit(T, y, v ? v.x : T.x - player.pos.x, v ? v.z : T.z - player.pos.z, b.rocket ? DTRAIN.hp : 1); return 1; }
   return 0; }
 const _dojoSup = [];
-// m15xx (his: *"the dojo is still about 20 frames per second"*; the chip: ~50 ms a frame, the CPU 14 of it -- the GPU is the wait): TOOLS > DOJO FX
+// m1615 (his: *"the dojo is still about 20 frames per second"*; the chip: ~50 ms a frame, the CPU 14 of it -- the GPU is the wait): TOOLS > DOJO FX
 // steps the suspects off CUMULATIVELY so the FPS on the chip says which one costs the frames: FULL / NO SKY FX (every card layer -- cloud banks,
 // fog, wisps, god rays, lanterns, flecks -- and the sun glow) / NO PLANTS (the plant library's instanced ground cover and trees) / NO SHADOWS.
 function dojoFxApply() { const D = DOJO, f = D.fx || 'FULL', lv = { FULL: 0, 'NO SKY FX': 1, 'NO PLANTS': 2, 'NO SHADOWS': 3 }[f] || 0;
@@ -11192,7 +11192,7 @@ function dojoFxApply() { const D = DOJO, f = D.fx || 'FULL', lv = { FULL: 0, 'NO
 function dojoStep(dt) { const D = DOJO; if (!D.on) return; D.t += dt; D.U.uTime.value = D.t; D.dome.position.copy(camera.position);
   // m1401: OFF THE EDGE. The world has a floor at y 0 everywhere, so past the rim he would stand on the sky. Out there and down at y 0, he has
   // FALLEN: a gust of petals where he went, and he is put back on the floor at his pad, with a beam.
-  { const p = player, r = Math.hypot(p.pos.x, p.pos.z); if (r > D.W + 2 && p.pos.y < .35 && !p.climb && !boxesNear(p.pos.x, p.pos.x, p.pos.z, p.pos.z, _dojoSup).some(b => p.pos.x >= b.minx && p.pos.x <= b.maxx && p.pos.z >= b.minz && p.pos.z <= b.maxz && b.maxy > -.7 && b.maxy < p.pos.y + .4)) {     /* m15xx: only when nothing real is under him */ spkBurst(p.pos.x, .5, p.pos.z, 30, { col: [1, .75, .85], spread: 5, up: 2, size: .14, life: .8 }); const [yx, yz] = ARENA.youAt;
+  { const p = player, r = Math.hypot(p.pos.x, p.pos.z); if (r > D.W + 2 && p.pos.y < .35 && !p.climb && !boxesNear(p.pos.x, p.pos.x, p.pos.z, p.pos.z, _dojoSup).some(b => p.pos.x >= b.minx && p.pos.x <= b.maxx && p.pos.z >= b.minz && p.pos.z <= b.maxz && b.maxy > -.7 && b.maxy < p.pos.y + .4)) {     /* m1615: only when nothing real is under him */ spkBurst(p.pos.x, .5, p.pos.z, 30, { col: [1, .75, .85], spread: 5, up: 2, size: .14, life: .8 }); const [yx, yz] = ARENA.youAt;
       p.pos.set(yx, .05, yz); p.vel.set(0, 0, 0); arenaBeam(yx, yz, [1, .55, .7], 1); snd('swoosh', { g: .5, r: .7 }); } }
   if (D.petals) { const Q = D.petals, P2 = Q.P, t = D.t, cx = camera.position.x, cz = camera.position.z, wx = 1.6 + Math.sin(t * .2) * .8, wz = .5 + Math.sin(t * .13) * .5;
     for (let i = 0; i < Q.N; i++) { const o = i * 3, ph = Q.Ph[i]; let x = P2[o] + (wx + Math.sin(t * 1.1 + ph) * .7) * dt, y = P2[o + 1] + (-.55 + Math.sin(t * 1.7 + ph) * .35) * dt, z = P2[o + 2] + (wz + Math.cos(t * .9 + ph * 1.3) * .7) * dt;
@@ -13653,7 +13653,7 @@ function arenaUi() {
       else if (a === 'dragon' && DRAGZ.on) { const T = DRAGZ.looks; DRAGZ.look = T[(T.indexOf(DRAGZ.look) + 1) % T.length]; try { localStorage.setItem('mel.dragon', DRAGZ.look); } catch (err) {} dragLook(); }     // m1610: live in the zone
       else if (a === 'dragon') { try { localStorage.setItem('mel.dragon', DOJO.dragonPick === 'WILD' ? 'CAPTURED' : 'WILD'); } catch (err) {} location.reload(); }     // m1518
       else if (a === 'rwsky') { try { localStorage.setItem('mel.rwsky', RWSKYS[(RWSKYS.indexOf(RW.skyPick) + 1) % RWSKYS.length]); } catch (err) {} location.reload(); }     // his panorama over the Red Hollows
-      else if (a === 'dfx') { const L = ['FULL', 'NO SKY FX', 'NO PLANTS', 'NO SHADOWS']; DOJO.fx = L[(L.indexOf(DOJO.fx || 'FULL') + 1) % L.length]; dojoFxApply(); }     // m15xx: find what costs the frames, one layer at a time
+      else if (a === 'dfx') { const L = ['FULL', 'NO SKY FX', 'NO PLANTS', 'NO SHADOWS']; DOJO.fx = L[(L.indexOf(DOJO.fx || 'FULL') + 1) % L.length]; dojoFxApply(); }     // m1615: find what costs the frames, one layer at a time
       else if (a === 'dsky') { try { localStorage.setItem('mel.dojo.sky', SKYPICKS[(SKYPICKS.indexOf(DOJO.skyPick) + 1) % SKYPICKS.length]); } catch (err) {} location.reload(); }     // m1446
       else if (a === 'entry') { ARENA.door.entry = ARENA.door.entry === 'DOORS' ? 'BEAM' : 'DOORS'; try { localStorage.setItem('mel.arena.entry', ARENA.door.entry); } catch (err) {} }
       else if (a === 'glow') { arenaGlowSet(ARENA.look.glow === 'WHITE' ? 'CYAN' : 'WHITE'); }
