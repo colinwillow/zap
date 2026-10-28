@@ -46,7 +46,7 @@ out of weirdport. Do it when Korajin stops needing Zap's code, or the day he ask
 
 - **What it is:** the Jin made visible -- a liquid light, MINT (`JIN.hex` 0x7affd8, first drawn as `shipSerpentMake`'s glow spots). It is
   always the same colour, so the player learns one rule: **mint = Jin = power.** Nothing else in the palette may use that hue.
-- **Where it shows (built so far, m1421):** the katana's trail, and the motes it sheds as it cuts (TOOLS > TRAIL: JIN / BLUE); the dojo's
+- **Where it shows (built so far, m1422):** the katana's trail, and the motes it sheds as it cuts (TOOLS > TRAIL: JIN / BLUE); the dojo's
   floating JIN CANDLES; the JIN SPRING pouring off the pagoda island.
 - **Where it can show (to build):** Jin springs and fountains in the world in place of water; Jin-fed lanterns; creatures that carry it (the
   serpent fish, the manta and whale spots -- living sources); Jin weapons that fire it; a beaten enemy releasing it.

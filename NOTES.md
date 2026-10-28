@@ -16,7 +16,7 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
-## THE JIN GLOW: CANDLES, A SPRING, AND THE KATANA (mXXXX)
+## THE JIN GLOW: CANDLES, A SPRING, AND THE KATANA (m1422)
 *"I really like this green glowing stuff... floating candles... spewing water but green... his katana makes it as it cuts the air... the stuff he collects... the essence of the Jin."* (He saw it on Worker A's serpent fish, whose glow spots are `0x7affd8`.)
 - **`JIN = { hex, col, shed }`** sits beside `BTRAIL` and is the ONE source of the colour. KORAJIN.md "THE JIN GLOW" is the design, and it includes the collect, store and fly loop he described.
 - **Blade:** `BTRAIL.jin` (TOOLS > TRAIL: JIN / BLUE, stored in `mel.btrail`) turns the trail mint and sheds `JIN.shed`/s motes along the edge through `spk`. Each mote is thrown along the tip's motion.
