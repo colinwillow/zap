@@ -5,6 +5,12 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- GREEN FIRE: smaller, shorter, and every tongue turned (his: "a little tall, no rotation -- random rotation, smaller")
+- `aR`: each particle carries its own angle, turned in the fragment shader (the corners outside the turned sprite discarded). It starts
+  within +/-.7 rad and spins at up to +/-2.5 rad/s as it rises.
+- Size .42-.82 m -> .24-.5 m. The painted tongues are shorter (.86 -> .62 of the cell), their licks and core to match.
+- Rendered: the burst, the turning tongues, the fade.
+
 ## m1689 -- THE OSARI BURN IN GREEN FIRE (DOCKET 14; his: "the green smoke needs to feel MUCH more like bright particle fire -- generate some sprites")
 - **`GFIRE`:** its own particle pool (one draw), its sprites PAINTED at load into a 2x2 atlas: four tall, blurred flame tongues (a body and
   two or three licks off it). The atlas's red is the flame's mask, its green the HOT CORE, which the shader runs to yellow-green.
