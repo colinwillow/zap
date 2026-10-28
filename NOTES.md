@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## THE DOJO, PASS 6: SKY JUNKS AND THE FIRST SKY WHALE (mXXXX)
+## THE DOJO, PASS 6: SKY JUNKS AND THE FIRST SKY WHALE (m1413)
 *"Flying ships... sea creatures... manta rays... whales"* and, mid-pass, *"we can still use the more classical Japanese architecture... both exist"*.
 - `D.junks`: three hero-kit airships on rings r 150/210/260 at different heights and speeds, bobbing. Each is its own group, about 6 draws.
 - `D.whale`: a lathed 26 m body x3.4 with vertex colours (a dark back, a pale belly, cyan spots), fins, flukes, a dorsal fin and eyes, all merged into one draw. A vertex-shader undulation; it circles at r 165, below the disc.
