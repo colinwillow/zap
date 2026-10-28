@@ -22389,17 +22389,19 @@ const ZEP = { trap: 4.2, dropEvery: 22, hp: 10, downT: 30, bomb: { cd: 4, r: 4.5
   { c: [36, -6], rx: 15, rz: 27, y: 21, T: 115, ph: .5 } ], on: null };
 function zepMake(g) {
   const ship = new THREE.Group(); g.add(ship);
-  const plank = new THREE.MeshStandardMaterial({ color: 0x6e4a2e, roughness: .85 }), wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 }), lq = new THREE.MeshStandardMaterial({ color: 0xa8231e, roughness: .4 });
-  const bronze = new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 }), lamp = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false });
-  const sb = (geo, m, x, y, z) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; ship.add(o); return o; };
+  // m@X4@ (the RE-PASS, pass 1): HERO flyers -- the hero kit (warm planks, timber, the kit red and bronze), a cream envelope with red lacquer
+  // flank bands where the neon was, a tiled pagoda roof on the gondola, bunting rigged from it to the hull; its statics merge into the ship
+  const K = korMats(), plank = ZEP.plank || (ZEP.plank = triMat('wood_planks', { scale: 2.2, color: 0xc8a68a })), wood = K.timber, lq = K.redL;
+  const bronze = K.bronze, lamp = K.lamp, tile = ZEP.tile || (ZEP.tile = triMat('roof_tiles', { scale: 1.8, rough: .55, side: THREE.DoubleSide })), envM = ZEP.env || (ZEP.env = new THREE.MeshStandardMaterial({ color: 0xf0e2c8, roughness: .75 }));
+  const sb = (geo, m, x, y, z) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; ship.add(o); return o; };
   sb(new THREE.BoxGeometry(3.6, .3, 7), plank, 0, -.15, 0); sb(new THREE.BoxGeometry(3.8, 1, 7.2), lq, 0, -.8, 0);
   for (const sx of [-1, 1]) sb(new THREE.BoxGeometry(.1, .55, 7), wood, sx * 1.8, .28, 0);
   for (const [x, z] of [[-1.6, -3.3], [1.6, -3.3], [-1.6, 3.3], [1.6, 3.3]]) { sb(new THREE.BoxGeometry(.12, 2.4, .12), wood, x, 1.2, z); sb(new THREE.BoxGeometry(.22, .28, .22), lamp, x, .7, z); }
-  const roof = sb(new THREE.CylinderGeometry(1.2, 3.2, 1, 4, 1), new THREE.MeshStandardMaterial({ color: 0x3a4250, roughness: .7 }), 0, 2.7, 0); roof.rotation.y = Math.PI / 4; roof.scale.z = 1.9;
-  const hull = sb(new THREE.SphereGeometry(1, 28, 16), new THREE.MeshStandardMaterial({ color: 0xe6e0d2, roughness: .65 }), 0, 7.5, 0); hull.scale.set(3.6, 3.6, 12);
+  const roof = sb(new THREE.CylinderGeometry(1.2, 3.2, 1, 4, 1), tile, 0, 2.7, 0); roof.rotation.y = Math.PI / 4; roof.scale.z = 1.9; sb(new THREE.ConeGeometry(.12, .6, 6), bronze, 0, 3.5, 0);
+  const hull = sb(new THREE.SphereGeometry(1, 28, 16), envM, 0, 7.5, 0); hull.scale.set(3.6, 3.6, 12);
   for (const zz of [-7, -2.5, 2.5, 7]) { const k = Math.sqrt(1 - (zz / 12) ** 2); sb(new THREE.TorusGeometry(1, .06, 6, 28), bronze, 0, 7.5, zz).scale.set(3.65 * k, 3.65 * k, 1); }
-  sb(new THREE.BoxGeometry(.06, .5, 18), new THREE.MeshBasicMaterial({ color: 0xff3a5c, toneMapped: false }), 3.55, 7.5, 0);
-  sb(new THREE.BoxGeometry(.06, .5, 18), new THREE.MeshBasicMaterial({ color: 0xff3a5c, toneMapped: false }), -3.55, 7.5, 0);
+  sb(new THREE.BoxGeometry(.08, .5, 18), lq, 3.56, 7.5, 0); sb(new THREE.BoxGeometry(.08, .5, 18), lq, -3.56, 7.5, 0);
+  for (const e of [-1, 1]) korBunting((geo, m) => { const o = new THREE.Mesh(geo, m); o.userData.mg = 1; ship.add(o); }, K, [0, 3.2, e * 3.3], [0, 5.2, e * 9.5], 7, .5);
   for (const [fx, fy, rz] of [[0, 3, 0], [0, -3, 0], [3, 0, Math.PI / 2], [-3, 0, Math.PI / 2]]) { const f = sb(new THREE.BoxGeometry(.12, 2.6, 3.4), lq, fx, 7.5 + fy, -10.6); f.rotation.z = rz; }
   for (const [x, z] of [[-1.7, -3], [1.7, -3], [-1.7, 3], [1.7, 3]]) { const r = sb(new THREE.CylinderGeometry(.025, .025, 4.6, 4), wood, x * 1.2, 4.6, z * 1.2); r.rotation.z = x > 0 ? -.25 : .25; }
   const prop = new THREE.Group(); prop.position.set(0, 7.5, -12.3); ship.add(prop);
@@ -22445,12 +22447,13 @@ function zepBuild() {
   // ---- PASS 6 (m1246): the BOMB BAY -- each gondola carries a bronze RELEASE LEVER at its bow, a rack of black Jin bombs under the keel and
   // a red target ring that shows him where one will land while he rides; strike the lever and a bomb falls (`zepBomb`), blasting bodies,
   // turrets and walls below. `bomb.cd` s to re-arm ----
-  { const brz = new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 }), tip = new THREE.MeshBasicMaterial({ color: 0xff3a2a, toneMapped: false }), bm = new THREE.MeshStandardMaterial({ color: 0x15151a, metalness: .5, roughness: .4 }), gl = new THREE.MeshBasicMaterial({ color: 0x5ff2ff, toneMapped: false });
+  { const brz = korMats().bronze, tip = new THREE.MeshBasicMaterial({ color: 0xff3a2a, toneMapped: false }), bm = new THREE.MeshStandardMaterial({ color: 0x15151a, metalness: .5, roughness: .4 }), gl = new THREE.MeshBasicMaterial({ color: 0x7affd8, toneMapped: false });     /* m@X4@: Jinra mint */
     for (const Z of zs) { const lv = new THREE.Group(); lv.position.set(1.1, 0, 2.8); Z.ship.add(lv); const base = new THREE.Mesh(new THREE.BoxGeometry(.4, .3, .4), brz); base.position.y = .15; lv.add(base);
       const arm = new THREE.Group(); arm.position.y = .3; lv.add(arm); const st = new THREE.Mesh(new THREE.CylinderGeometry(.04, .04, 1, 6), brz); st.position.y = .5; arm.add(st); const kn = new THREE.Mesh(new THREE.SphereGeometry(.11, 8, 6), tip); kn.position.y = 1; arm.add(kn); arm.rotation.x = -.5;
       Z.lever = lv; Z.larm = arm; Z.racks = [];
       for (const lz of [-1.2, 0, 1.2]) { const b = new THREE.Mesh(new THREE.SphereGeometry(.32, 12, 8), bm); b.position.set(0, -1.6, lz); b.scale.y = 1.25; Z.ship.add(b); const r = new THREE.Mesh(new THREE.TorusGeometry(.33, .03, 4, 14), gl); r.rotation.x = Math.PI / 2; b.add(r); Z.racks.push(b); }
       const tr = new THREE.Mesh(new THREE.RingGeometry(ZEP.bomb.r - .25, ZEP.bomb.r, 40).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xff3a2a, transparent: true, opacity: .5, depthWrite: false, toneMapped: false })); tr.visible = false; g.add(tr); Z.tring = tr; Z.bcd = 0; } }
+  for (const Z of zs) bldMergeStatic(Z.ship);     // m@X4@
   ZEP.on = { g, O, bars, rings: zs.flatMap(Z => Z.rings), zs, t: 0, drops: [], landed: [], dropT: 8, bombs: [] };
   zepStep(0); snd('swoosh', { g: .6, r: .4 });
 }

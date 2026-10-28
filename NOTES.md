@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the ZEPPELINS, pass 1 (HERO flyers: the look)
+**Moves:** its pass-1 row.
+- `zepMake`: shared kit materials (cached on `ZEP` so the two ships share them): a warm planks triMat deck, `K.timber`, `K.redL` gondola and
+  fins, `K.bronze` hoops and propeller; a cream envelope; the two neon flank stripes are red lacquer bands; the gondola's pagoda roof is
+  `roof_tiles` with a bronze finial; `korBunting` rigged from the roof's ends up to the hull fore and aft.
+- The bomb racks' glowing bands are Jinra mint (they are Jin bombs); the lever is kit bronze.
+- Each ship's static meshes merge into the ship (`bldMergeStatic(Z.ship)`), so it still flies as one: 86 meshes for both, with the
+  searchlights, lanterns, banners, rings, trapezes and drones.
+Render-checked headless (gondola, underside). Shipped unverified.
+
 ## m1569 -- The First Beacon pass 6: rests and checkpoints
 - Each station (not the brazier) gets a REST: a stone bench and a lantern on a post at its corner (`L.cps`). Standing on the station top (within its
   half-size, feet within .8 m of the top) lights the lantern mint with a chime and a burst, and makes it `L.cp`. The start is lit on the first frame
