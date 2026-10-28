@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## mDRG -- THE DRAGON RIDE: READY TO RIDE BY DEFAULT (his: "I can't even begin to get on him; I run into him and he hits me back")
+## m1646 -- THE DRAGON RIDE: READY TO RIDE BY DEFAULT (his: "I can't even begin to get on him; I run into him and he hits me back")
 What he saw was m1622's WILD start: the EVIL look (no saddle, no lacquer -- "his saddle is gone, his armour is gone" -- the spiked iron collar
 with its chain), the shove inside `wildR`, and no mount until the Jinra spring's taming -- with nothing on screen saying so before the shove.
 A sandbox for RIDING must open ready to ride: the zone's look has its OWN key now (`mel.dragz`; it read the dojo's `mel.dragon`, so an old
