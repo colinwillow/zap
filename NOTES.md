@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the SHRINE, pass 1 (a HERO / TOWN place: the look)
+## m1539 -- THE RE-PASS: the SHRINE, pass 1 (a HERO / TOWN place: the look)
 The Shrine is on the HERO / TOWN list (hero kit, restored in place later). **Moves:** its pass-1 row (the look). Restoring in place is pass 2.
 - Materials: a stone-block triMat for the terrace, steps and coping (two tones); plain warm plaster on the honden; `K.timber`, `K.redL`,
   `K.iron`, `K.lamp`; `bldRoof`'s flat blue tiles swapped for the `roof_tiles` triMat, with bronze ridge finials; the suzu bell is `K.bronze`.
