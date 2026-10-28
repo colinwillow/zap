@@ -12,6 +12,21 @@ timer comes round (~seconds in), so `check:worlds`' 8 frames never reach it. Eve
 A scan of every top-level function for a `TAU` with no local declaration finds no other. Lesson for the boot gate: a throw behind a timer
 needs frames, not a boot -- the headless walk (scratchpad `hcrash.mjs`, 1500 stepped frames) found it in one run.
 ## m15xx -- THE DRAGON'S CONTROLS, his map (DOCKET 4)
+## m15xx -- THE DRAGON FLIES: the lightning dragon's flight on his body, his wings flapping in code (DOCKET 5)
+His: *"the fly sequence is not working -- it's him on flat ground going up and coming back down, clipped; it's not a loop, he doesn't even look
+like he's in the air. Steal from the lightning dragon or hand-animate: an air idle with the legs not on the ground, a looping wing flap; a dive,
+wings back; banks, one wing tucked; dynamic tail and wings."*
+- **Measured:** both are 3ds Max bipeds. The shared `Bip001` spine / neck / head / legs differ at rest by 0-24 deg; the lightning dragon has
+  NO arms, and the blue dragon's wings ARE his arms.
+- **`dragFlyLoad`:** when the zone loads him, the lightning dragon's `idle_fly_1` -> `fly_idle`, `fly_fast` -> `fly_fast` and `idle_fly_2`
+  are carried onto his body by rotation, rest-corrected per bone (blue rest x mech rest^-1 x mech).
+- **In the air:** `fly_idle` (a hover, legs off the ground); past .6 x cruise speed `fly_fast` is eased in (body level, legs tucked back).
+- **`dragWings`:** a CONTINUOUS flap (`flyHz` 1.6, `flyAmp` .55 rad), stilled and swept back in a dive (`diveSweep`), the inside wing tucked
+  in a bank (`bankTuck`; the side is unverified -- flip the sign if the outside one folds), and the tap's big beat on top.
+- `DRAGZ.flyPick` 'CLIP' is the A/B back to `attack_air`.
+- Rendered in flight at 15 m/s: body level, legs tucked, wings mid-beat; and from behind.
+- Not built: tail and wing-tip springs (wind), his own hand-keyed cycle.
+
 ## m1671 -- THE DRAGON'S CONTROLS, his map (DOCKET 4)
 His: *"when you're riding, the character has the blaster again; use the stick to shoot fireballs the way RollerGirl shoots her blaster in the
 air; the right flick on the ground does melee -- lunges, bites; flicking the left stick left and right does barrel rolls, up and down flips."*

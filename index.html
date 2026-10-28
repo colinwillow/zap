@@ -11429,6 +11429,7 @@ async function dragBeast() { const Z = DRAGZ, O = Z.on; try { const K = await ar
     O.B = B; B.sets = { CAPTURED: B.bag, EVIL: [] };     // stood and breathing first: a dressing that throws leaves him bare, not frozen
     B.hd = (P.h || 3.2) * B.mul; try { if (SADDLE.dress) { dojoDragonDress(B, m, root, P); dragDress2(B, m, root, P); } } catch (e) { console.warn('[melee] dragon dress', e); note('DRAGON DRESS ' + e.message); }
     dragBox(B);
+    dragFlyLoad(B, P);     // m15xx: his flying, borrowed from the lightning dragon
     dragSeat(B, m, root, P);
     dragLook();
   } catch (e) { console.warn('[melee] dragon zone', e); note('NO DRAGON ' + e.message); } }
@@ -11489,10 +11490,10 @@ function dragRide(dt) { const p = player, R = p.dragon, B = DRAGZ.on && DRAGZ.on
 // lantern posts and the low stepping stones (circles, `obst`). His body box is parked while he is ridden and rebuilt where he stops.
 Object.assign(DRAGZ, { runSp: 11, runRef: 7, turn: 2.0, turnStill: 3.2, accHL: .45, brakeHL: .3, lean: .05, bodyR: 2.2 });
 function dragGround(x, z) { const [ax, az] = DRAGZ.at, d = Math.hypot(x - ax, z - az); return d < 7.2 ? DRAGZ.daisY : d < 9.4 ? .3 : 0; }
-function dragDriveStart(B) { B.mx.stopAllAction(); const D = B.drive = { v: 0, lean: 0, air: null, pad: null, beat: null, flapCool: 0, aIdle: B.mx.clipAction(B.clips.idle), aRun: B.clips.run ? B.mx.clipAction(B.clips.run) : null, aFly: B.clips.attack_air ? B.mx.clipAction(B.clips.attack_air) : null, aAtk: B.clips.attack_ground ? B.mx.clipAction(B.clips.attack_ground) : null, atkT: 0, wA: 0, fbCool: 0 };
+function dragDriveStart(B) { B.mx.stopAllAction(); const flyC = (DRAGZ.flyPick === 'MECH' && B.clips.fly_idle) || B.clips.attack_air; const D = B.drive = { v: 0, lean: 0, air: null, pad: null, beat: null, flapCool: 0, aIdle: B.mx.clipAction(B.clips.idle), aRun: B.clips.run ? B.mx.clipAction(B.clips.run) : null, aFly: flyC ? B.mx.clipAction(flyC) : null, aAtk: B.clips.attack_ground ? B.mx.clipAction(B.clips.attack_ground) : null, atkT: 0, wA: 0, fbCool: 0 };
   if (D.aFly) D.aFly.reset().setLoop(THREE.LoopRepeat).setEffectiveWeight(0).play();
   D.aIdle.reset().setLoop(THREE.LoopRepeat).setEffectiveWeight(1).play(); if (D.aRun) D.aRun.reset().setLoop(THREE.LoopRepeat).setEffectiveWeight(0).play(); B.cur = D.aIdle; dragBox(B, 1); }
-function dragDriveEnd(B) { const D = B.drive; if (!D) return; if (D.aRun) D.aRun.stop(); if (D.aFly) D.aFly.stop(); if (D.aAtk) D.aAtk.stop(); D.aIdle.setEffectiveWeight(1).setEffectiveTimeScale(1); B.cur = D.aIdle; B.t = 3; B.drive = null; B.root.rotation.x = B.root.rotation.z = 0;
+function dragDriveEnd(B) { const D = B.drive; if (!D) return; if (D.aRun) D.aRun.stop(); if (D.aFly) D.aFly.stop(); if (D.aFast) D.aFast.stop(); if (D.aAtk) D.aAtk.stop(); D.aIdle.setEffectiveWeight(1).setEffectiveTimeScale(1); B.cur = D.aIdle; B.t = 3; B.drive = null; B.root.rotation.x = B.root.rotation.z = 0;
   B.root.updateMatrixWorld(true); dragBox(B); B.mountAt.copy(B.mountL); B.root.localToWorld(B.mountAt);
   const r = Math.hypot(B.mountAt.x, B.mountAt.z), lim = DRAGZ.I.rimR(Math.atan2(B.mountAt.z, B.mountAt.x)) * .9; if (r > lim) { B.mountAt.x *= lim / r; B.mountAt.z *= lim / r; } B.mountAt.y = dragGround(B.mountAt.x, B.mountAt.z); }
 // m1619: FLYING (DRAGON.md box 4). RollerGirl's wingsuit model (`wingFly`) on a beast: in the air the LEFT PAD is the stick -- sideways turns
@@ -11512,6 +11513,24 @@ function dragFloor(x, z, y) { const Z = DRAGZ; let best = null;
   if (Math.hypot(x, z) < Z.I.rimR(Math.atan2(z, x)) * .9 && y > -1) best = { y: dragGround(x, z), pad: null };
   for (const P of Z.pads) if (Math.hypot(x - P.x, z - P.z) < P.r && P.y <= y + .8 && (!best || P.y > best.y)) best = { y: P.y, pad: P };
   return best; }
+// m15xx: HIS FLYING (his: "the fly sequence is not working -- clipped from the one where he goes up and comes back down; it's not a loop, he doesn't
+// even look like he's in the air. Steal from the LIGHTNING DRAGON, or hand-animate: an idle in the air, legs tucked, a looping wing flap; a dive,
+// wings back; banks, one wing tucked"). The lightning dragon's `idle_fly_1` is carried onto his BODY by rotation, rest-corrected per bone
+// (target = restBlue * restMech^-1 * mech): the two are both 3ds Max bipeds whose Bip001 spine, neck, head and legs share names and differ at
+// rest by 0-24 deg (measured), so his legs TUCK and his body flies. The lightning dragon has no ARMS, and his wings ARE his arms, so the wings are
+// HIS, in code (`dragWings`): a continuous flap (`flyHz`, `flyAmp`), swept back and stilled in a dive, the inside wing tucked in a bank, and the
+// tap's big beat on top. TOOLS > DRAGON WINGS: CLIP is the A/B back to `attack_air`; `DRAGZ.flyPick` 'CLIP' does the same for the body.
+Object.assign(DRAGZ, { flyPick: 'MECH', flyHz: 1.6, flyAmp: .55, diveSweep: .9, bankTuck: .55 });
+async function dragFlyLoad(B, P) { try { const K = await arenaLoad('MECH'), M = K.P; const rest = (root) => { const r = {}; root.traverse(o => { if (o.isBone && /^Bip001/.test(o.name)) r[o.name] = o.quaternion.clone(); }); return r; };
+    const rB = rest(P.proto), rM = rest(M.proto), q = new THREE.Quaternion();
+    for (const [src, dst] of [['idle_fly_1', 'fly_idle'], ['fly_fast', 'fly_fast'], ['idle_fly_2', 'fly_idle2']]) { const c = M.clips.find(x => x.name === src); if (!c) continue; const tracks = [];
+      for (const t of c.tracks) { const dot = t.name.lastIndexOf('.'), bn = t.name.slice(0, dot), pr = t.name.slice(dot + 1); if (pr !== 'quaternion' || !rB[bn] || !rM[bn]) continue;
+        const A = rB[bn], Bi = rM[bn].clone().invert(), v = Float32Array.from(t.values); for (let i = 0; i < v.length; i += 4) { q.fromArray(v, i).premultiply(Bi).premultiply(A); q.toArray(v, i); }
+        tracks.push(new THREE.QuaternionKeyframeTrack(t.name, Float32Array.from(t.times), v)); }
+      if (tracks.length) B.clips[dst] = new THREE.AnimationClip(dst, c.duration, tracks); }
+    B.flyN = Object.keys(B.clips).filter(n => /^fly_/.test(n)).length;
+    if (B.drive && DRAGZ.flyPick === 'MECH' && B.clips.fly_idle) { const D = B.drive, w = D.aFly ? D.aFly.getEffectiveWeight() : 0; if (D.aFly) D.aFly.stop(); D.aFly = B.mx.clipAction(B.clips.fly_idle); D.aFly.reset().setLoop(THREE.LoopRepeat).setEffectiveWeight(w).play(); }
+  } catch (e) { note('DRAGON FLY ' + e.message); } }
 function dragFlap(D) { if (D.flapCool > 0) return; D.flapCool = DRAGZ.flapCool; D.beat = 0; snd('swoosh', { g: .7, r: .55 });
   if (!D.air || D.air.mode !== 'fly') { D.air = { mode: 'fly', v: Math.max(D.v, DRAGZ.takeV), pitch: DRAGZ.takePitch, bank: 0 }; return; }
   D.air.v = Math.min(DRAGZ.vmax, D.air.v + DRAGZ.flapV); D.air.pitch = Math.min(DRAGZ.climb, D.air.pitch + DRAGZ.flapLift); }
@@ -11583,7 +11602,11 @@ function dragDrive(B, dt) { const Z = DRAGZ, D = B.drive, p = player, sit = p.dr
   const run = D.air ? 0 : clamp(D.v / Z.runRef, 0, 1), fl = D.air ? 1 : 0; D.wF = damp(D.wF || 0, D.aFly ? fl : 0, .12, dt); const rest = (1 - D.wF) * (1 - D.wA);
   if (D.aAtk) D.aAtk.setEffectiveWeight((1 - D.wF) * D.wA);
   if (D.aRun) { D.aRun.setEffectiveWeight(run * rest); D.aRun.setEffectiveTimeScale(clamp(D.v / Z.runRef, .7, 1.6)); } D.aIdle.setEffectiveWeight((D.aRun ? 1 - run : 1) * rest);
-  if (D.aFly) { D.aFly.setEffectiveWeight(D.wF); D.aFly.setEffectiveTimeScale(D.beat !== null && D.beat !== undefined ? 1.4 : .8); } }
+  // m15xx: FAST flight is the lightning dragon's `fly_fast`, eased in with his airspeed past `cruise` x .6 (a hover and a slow glide stay `fly_idle`)
+  const fast = DRAGZ.flyPick === 'MECH' && B.clips.fly_fast && D.air && D.air.mode === 'fly' ? clamp((D.air.v - Z.cruise * .6) / (Z.cruise * .6), 0, 1) : 0;
+  if (fast > 0 && !D.aFast) { D.aFast = B.mx.clipAction(B.clips.fly_fast); D.aFast.reset().setLoop(THREE.LoopRepeat).setEffectiveWeight(0).play(); }
+  D.wFast = damp(D.wFast || 0, fast, .3, dt); if (D.aFast) D.aFast.setEffectiveWeight(D.wF * D.wFast);
+  if (D.aFly) { D.aFly.setEffectiveWeight(D.wF * (D.aFast ? 1 - D.wFast : 1)); D.aFly.setEffectiveTimeScale(D.beat !== null && D.beat !== undefined ? 1.4 : .8); } }
 // THE WINGS IN CODE: each finger chain off a forearm, aimed root-to-tip at a fan direction in his own frame (outward, swept back by its place in
 // the fan, a little up), blended in by `spread`, the whole fan swung about his spine by a beat. Run after his mixer, so it is the last word.
 const _dwA = new THREE.Vector3(), _dwB = new THREE.Vector3(), _dwC = new THREE.Vector3(), _dwQ = new THREE.Quaternion(), _dwQ2 = new THREE.Quaternion(), _dwQ3 = new THREE.Quaternion(), _dwZ = new THREE.Vector3(0, 0, 1);
@@ -11595,8 +11618,10 @@ function dragWingsInit(B) { const W = []; B.root.updateMatrixWorld(true);
   return W; }
 function dragWings(B) { const D = B.drive, S = D ? D.spread || 0 : 0; if (S < .01 || DRAGZ.wingPick !== 'CODE') return; if (!B.wings) B.wings = dragWingsInit(B);
   const beat = D.beat !== null && D.beat !== undefined ? Math.sin(D.beat * Math.PI * 2) : 0, glide = Math.sin(DRAGZ.on.t * 2.2) * .06, rq = B.root.getWorldQuaternion(_dwQ3);
-  for (const w of B.wings) { const b = w.b; b.updateMatrixWorld(true); const ra = b.getWorldPosition(_dwA), rt = w.tip.getWorldPosition(_dwB), cur = rt.sub(ra).normalize();
-    const fan = _dwC.set(w.sd * Math.cos(w.a), .1, -Math.sin(w.a)).normalize().applyAxisAngle(_dwZ, w.sd * (beat * DRAGZ.flapAmp + glide)).applyQuaternion(rq);
+  // m15xx: the CONTINUOUS flap in the air (stilled and swept back as he dives), and the inside wing tucked in a bank
+  const A = D.air, fly = A && A.mode === 'fly', pitch = fly ? A.pitch || 0 : 0, dive = clamp(-pitch / .9, 0, 1), cont = A ? DRAGZ.flyAmp * (1 - dive) * Math.sin(DRAGZ.on.t * DRAGZ.flyHz * Math.PI * 2) : 0, bank = fly ? A.bank || 0 : 0;
+  for (const w of B.wings) { const tuck = clamp(-bank * w.sd / .7, 0, 1) * DRAGZ.bankTuck, a0 = w.a, aa = a0 + dive * DRAGZ.diveSweep + tuck; const b = w.b; b.updateMatrixWorld(true); const ra = b.getWorldPosition(_dwA), rt = w.tip.getWorldPosition(_dwB), cur = rt.sub(ra).normalize();
+    const fan = _dwC.set(w.sd * Math.cos(aa), .1, -Math.sin(aa)).normalize().applyAxisAngle(_dwZ, w.sd * (beat * DRAGZ.flapAmp + glide + cont)).applyQuaternion(rq);
     const want = cur.clone().lerp(fan, S).normalize(); _dwQ.setFromUnitVectors(cur, want);
     const pq = b.parent.getWorldQuaternion(_dwQ2), wq = b.getWorldQuaternion(new THREE.Quaternion()); b.quaternion.copy(pq.invert().multiply(_dwQ.multiply(wq))); b.updateMatrixWorld(true); } }
 function dragRiderPose() { const R = player.dragon, B = DRAGZ.on && DRAGZ.on.B; if (!R || R.st !== 'sit' || !B || !B.seat) return;

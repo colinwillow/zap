@@ -9,7 +9,7 @@
 4. [x] (m1671) **Dragon riding controls, rebuilt:** no blaster in the saddle (he carries the ROCKET LAUNCHER at the start); RIGHT HOLD = fireballs,
        aimed like RollerGirl's blaster in the air; RIGHT FLICK on the ground = melee (lunge / bite / claw, from his clips); LEFT FLICK in the air
        = barrel rolls (sideways) and flips (up / down), like RollerGirl. (His speed / climb mapping to be settled -- ask.)
-5. [ ] **Dragon fly animations:** an AIR IDLE (legs tucked, not standing) with a LOOPING wing flap; a DIVE (wings swept back); BANKS (one wing
+5. [x] (m15xx; tail/wing springs still open) **Dragon fly animations:** an AIR IDLE (legs tucked, not standing) with a LOOPING wing flap; a DIVE (wings swept back); BANKS (one wing
        tucked); dynamic tail and wing tips (wind). Built in Blender (hand-keyed on his rig, or rotations stolen from the lightning dragon's
        `idle_fly_1/2`, `fly_fast`). Today's `attack_air` cut is not a loop and does not read as flying.
 6. [ ] **The Osari spider, rigged by hand** (four legs; not a humanoid ARP rig): body, abdomen, fangs, each leg a chain; procedural stepping.
