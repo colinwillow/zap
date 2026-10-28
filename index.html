@@ -10520,6 +10520,15 @@ function enemySphinx(put, M, x, z, ry = 0, s = 1) { const q = (geo, m, px, py, p
   for (const sd of [-1, 1]) q(new THREE.BoxGeometry(.11, .04, .03), M.jin, sd * .11, 2.25, .93);
   q(new THREE.ConeGeometry(.07, .3, 4), M.gold, 0, 2.73, .62);     // the crest
   q(new THREE.ConeGeometry(.1, .7, 6), M.stone, 0, 1.05, -1.3, -1.2); }     // the tail
+// m@X4@: a standing BRAZIER (ENEMY_STYLE.md): a sandstone foot, an iron stem and bowl, a gold rim, mint Jinra coals and a flickering flame.
+// A Group (it can be tipped over); `userData.top` is the coals' height, `userData.flame` the flame mesh
+function enemyBrazier(M, s = 1) { const g = new THREE.Group(), q = (geo, m, y) => { const o = new THREE.Mesh(geo, m); o.position.y = y * s; o.scale.setScalar(s); o.castShadow = true; g.add(o); return o; };
+  ENEMY.flame = ENEMY.flame || new THREE.MeshBasicMaterial({ color: ENEMY.pal.jin, transparent: true, opacity: .6, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
+  q(new THREE.CylinderGeometry(.3, .42, .22, 6), M.stone, .11); q(new THREE.CylinderGeometry(.07, .09, 1.25, 6), M.iron, .85);
+  for (let i = 0; i < 3; i++) { const o = q(new THREE.BoxGeometry(.05, .5, .05), M.iron, 1.35); o.position.x = Math.cos(i * 2.09) * .22 * s; o.position.z = Math.sin(i * 2.09) * .22 * s; o.rotation.set(Math.sin(i * 2.09) * .5, 0, -Math.cos(i * 2.09) * .5); }
+  q(new THREE.CylinderGeometry(.5, .26, .42, 8), M.iron, 1.66); q(new THREE.TorusGeometry(.5, .045, 6, 16).rotateX(Math.PI / 2), M.gold, 1.87);
+  q(new THREE.CylinderGeometry(.45, .45, .05, 8), M.jin, 1.86); const flame = q(new THREE.ConeGeometry(.32, 1, 8).translate(0, .5, 0), ENEMY.flame, 1.86); flame.castShadow = false;
+  g.userData.top = 1.9 * s; g.userData.flame = flame; return g; }
 function korMats() { if (KOR.m) return KOR.m; const S = (c, r, x) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: r }, x || {}));
   return (KOR.m = { cream: triMat('sandstone', { scale: 3.2 }), timber: triMat('wood_timber', { scale: 1.6, color: 0x8a6a52 }), iron: S(0x2a2522, .55, { metalness: .5 }), bronze: triMat('bronze', { scale: 1.2, metal: .75, rough: .35 }),
     red: triMat('red_cloth', { scale: 2.4, side: THREE.DoubleSide }), cloth: S(0xeadcc4, .85, { side: THREE.DoubleSide }), redL: S(0xa8201a, .45), lamp: S(0xffc070, .6, { emissive: 0xff9028, emissiveIntensity: 1.5 }),
@@ -20983,6 +20992,22 @@ function ghouseBuild() {
   // a string of paper lanterns across the passage between the towers, under the deck
   bldCable(g, [cx - pw / 2, 5.6 * k, cz + th - .3], [cx + pw / 2, 5.6 * k, cz + th - .3], .5, 3, lamp); bldCable(g, [cx - pw / 2, 5.6 * k, cz - th + .3], [cx + pw / 2, 5.6 * k, cz - th + .3], .5, 3, lamp);
   // m1529: two SPHINX guardians flank the passage's approach, gold-masked, mint-eyed, on battered sandstone plinths
+  // ---- RE-PASS 3 (m@X4@): two YAGURA on the deck, one over each tower -- black lacquer posts, a gold beam band, a two-tier black-tile hip roof
+  // with gold ridge finials and corner tips, a mint lantern hung inside. They are part of the tower they stand on and fall with it ----
+  for (const sx of [-1, 1]) { const tx = cx + sx * (pw / 2 + th), tz = cz - 1.2, a = 1.8, y0 = S2, R2 = Math.SQRT2;
+    for (const [px, pz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) add(new THREE.BoxGeometry(.26, 3, .26), wood, tx + px * (a - .2), y0 + 1.5, tz + pz * (a - .2), 1);
+    for (const sz of [-1, 1]) { add(new THREE.BoxGeometry(a * 2, .22, .2), neon, tx, y0 + 2.85, tz + sz * (a - .2), 0); add(new THREE.BoxGeometry(.2, .22, a * 2), neon, tx + sz * (a - .2), y0 + 2.85, tz, 0); }
+    add(new THREE.BoxGeometry(a * 2 + .2, .16, a * 2 + .2), wood, tx, y0 + 3.04, tz, 0);
+    add(new THREE.CylinderGeometry(1.25 * R2, (a + .9) * R2, .95, 4, 1, true).rotateY(Math.PI / 4), E.roof, tx, y0 + 3.55, tz, 0);
+    add(new THREE.ConeGeometry(1.25 * R2, 1.5, 4).rotateY(Math.PI / 4), E.roof, tx, y0 + 4.78, tz, 0);
+    add(new THREE.ConeGeometry(.12, .7, 6), neon, tx, y0 + 5.8, tz, 0); add(new THREE.SphereGeometry(.16, 8, 6), neon, tx, y0 + 5.48, tz, 0);
+    for (const [px, pz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const e = add(new THREE.ConeGeometry(.1, .6, 4), neon, tx + px * (a + .75), y0 + 3.2, tz + pz * (a + .75), 0); e.rotation.set(pz * .9, 0, -px * .9); }
+    putM(new THREE.BoxGeometry(.34, .5, .34).translate(tx, y0 + 2.2, tz), lamp); putM(new THREE.BoxGeometry(.42, .08, .42).translate(tx, y0 + 2.49, tz), neon); }
+  // the BRAZIERS: four standing iron bowls of stolen Jinra -- two before the sphinxes, two on the deck's back corners. A blow tips one over
+  // (it spills its mint coals and goes out; `ghouseBreak`)
+  const braz = []; for (const [bx, by, bz] of [[cx - pw / 2 - 2.6, 0, cz + DZ + 6.6], [cx + pw / 2 + 2.6, 0, cz + DZ + 6.6], [cx - DX + .7, S2, cz - DZ + .7], [cx + DX - 3.4, S2, cz - DZ + .7]]) {
+    const bg = enemyBrazier(E, 1.15); bg.position.set(bx, by, bz); g.add(bg); braz.push({ g: bg, x: bx, y: by, z: bz, top: by + bg.userData.top, tip: 0, dead: 0, ang: Math.atan2(bx - cx, bz - cz) });
+    if (!by) O.boxes.push({ minx: bx - .45, maxx: bx + .45, miny: 0, maxy: 2, minz: bz - .45, maxz: bz + .45, gnd: 1 }); }
   const putG = (geo, m) => { const o = putM(geo, m); o.userData.gnd = 1; return o; };
   for (const sx of [-1, 1]) { const x = cx + sx * (pw / 2 + 2.6), z = cz + DZ + 3.4; enemySphinx(putG, E, x, z, 0, 1.25 * k);
     O.boxes.push({ minx: x - 1.1 * k, maxx: x + 1.1 * k, miny: 0, maxy: 2.6 * k, minz: z - 2 * k, maxz: z + 2 * k, gnd: 1 }); }
@@ -21021,14 +21046,14 @@ function ghouseBuild() {
   const pairs = []; for (const o of g.children.slice()) if (o.isMesh && o.userData.mg && !o.userData.gnd) { const m = o.material, tri = m.customProgramCacheKey && String(m.customProgramCacheKey()).startsWith('tri'); if (m.transparent || (m.map && !tri)) continue;
     o.updateMatrix(); pairs.push([(o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()).applyMatrix4(o.matrix), m]); o.removeFromParent(); }
   const cls = (c, sz) => { if (c.y < 1.2 && sz.y < 2.5) return null; if (Math.abs(c.z - tzT) < 1 || (c.z > tzT + 1 && c.y > 1)) return 'torii'; if (c.z < cz - DZ - .1 || c.y < S1 - .2) return null;
-    if (c.y < S2 - .4 && Math.abs(Math.abs(c.x - cx) - (pw / 2 + th)) < th + .8) return c.x > cx ? 'u1' : 'u0'; return 'deck'; };
+    if ((c.y < S2 - .4 && Math.abs(Math.abs(c.x - cx) - (pw / 2 + th)) < th + .8) || (c.y > S2 + 1.2 && Math.abs(Math.abs(c.x - cx) - (pw / 2 + th)) < 3)) return c.x > cx ? 'u1' : 'u0'; return 'deck'; };
   const fall = (key, c, sz) => { const rn = (Math.sin(key.length * 91.7 + c.x) * 43758.5) % 1;
     if (key[0] === 'u') { const sx = key === 'u1' ? 1 : -1; return { p: [c.x + sx * (th + 1.2 + sz.y / 2), sz.x / 2 - .4, c.z + rn * 2], r: [rn * .15, rn * .4, -sx * Math.PI / 2 * .9], hop: 1.5, at: 0 }; }
     if (key === 'deck') return { p: [c.x + .3, S1 * .38, c.z + .6], r: [.14, .05, .12], hop: .3, at: 0 };
     return { p: [c.x + .4, .6, c.z + c.y * .95], r: [Math.PI / 2 * .96, .06, 0], hop: 0, at: 0 }; };
   const pieces = restorePieces(R0, g, pairs, cls, fall);
   const keep = new Set([drone, port, db, oil, abell, ...Object.values(pieces), ...chains.map(C => C.ln), ...O.meshes]), wb = new THREE.Box3(), wc = new THREE.Vector3(), ws = new THREE.Vector3();
-  for (const o of g.children.slice()) { if (keep.has(o) || o.userData.gnd) continue; wb.setFromObject(o); if (wb.isEmpty()) continue; wb.getCenter(wc); wb.getSize(ws); const key = o === bal || o === caul ? 'deck' : cls(wc, ws); if (key && pieces[key]) pieces[key].attach(o); }
+  for (const o of g.children.slice()) { if (keep.has(o) || o.userData.gnd) continue; wb.setFromObject(o); if (wb.isEmpty()) continue; wb.getCenter(wc); wb.getSize(ws); const bz = braz.find(B => B.g === o); if (bz && !bz.y) continue; const key = o === bal || o === caul || bz ? 'deck' : cls(wc, ws); if (key && pieces[key]) pieces[key].attach(o); }
   bldMergeStatic(g);     // what stays (the sphinxes, the ramp, the lintels), merged AFTER the sort so a merged lump is never filed as a piece
   const rig = {}, bkey = b => b.cw || b.gnd ? null : cls(new THREE.Vector3((b.minx + b.maxx) / 2, (b.miny + b.maxy) / 2, (b.minz + b.maxz) / 2), new THREE.Vector3(b.maxx - b.minx, b.maxy - b.miny, b.maxz - b.minz));
   for (const key of Object.keys(pieces)) { const Rk = rig[key] = restoreRig(g, { lift: 0, dur: 3.2, bob: 0 }); Rk.pieces = R0.pieces.filter(P => P.obj === pieces[key]);
@@ -21037,7 +21062,7 @@ function ghouseBuild() {
   RESTORE.list.splice(RESTORE.list.indexOf(R0), 1);
   const sup = []; for (const sx of [-1, 1]) for (const [px, pz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) sup.push({ key: sx > 0 ? 'u1' : 'u0', x: cx + sx * (pw / 2 + th) + px * (th + .06), z: cz + pz * (th + .06), r: .45, y0: S1, y1: S2, hp: GHOUSE.postHp, cut: 0 });
   for (const sx of [-1, 1]) sup.push({ key: 'torii', x: cx + sx * (pw / 2 + .5), z: tzT, r: .5, y0: 0, y1: HT, hp: GHOUSE.postHp + 2, cut: 0 });
-  GHOUSE.on = { rig, pieces, sup, fell: {}, rings, g, O, bars: [bar], drone, t: 0, bal, balT: 2, db, dbS: 'down', dbT: 6, dbK: 0, dbBox: null, chains, port, portB, portY: 2.2 * k, portT: 0, abell, archs, caul, oil, oilT: 0, oilCd: 0 };
+  GHOUSE.on = { rig, pieces, sup, braz, fell: {}, rings, g, O, bars: [bar], drone, t: 0, bal, balT: 2, db, dbS: 'down', dbT: 6, dbK: 0, dbBox: null, chains, port, portB, portY: 2.2 * k, portT: 0, abell, archs, caul, oil, oilT: 0, oilCd: 0 };
   arenaBeam(cx, cz, [1, .5, .35], 1); snd('clang', { g: .7, r: .55 });
 }
 function ghouseOil(G, dt) { const A = GHOUSE, [cx, cz] = A.at, p = player; if (G.oilCd > 0) G.oilCd -= dt;
@@ -21051,11 +21076,18 @@ function ghouseOil(G, dt) { const A = GHOUSE, [cx, cz] = A.at, p = player; if (G
 // RE-PASS 2 (m1534): THE GATEHOUSE COMES DOWN -- a blow on a support (an upper corner post, a torii pillar) chips it; cut through enough and
 // that piece's rig plays backwards (its fallen pose); both towers down drops the deck, which kills the ballista, the archers and the oil
 function ghouseBreak(x, y, z, rad) { const G = GHOUSE.on; if (!G || !G.sup) return 0;
+  for (const B of G.braz || []) { if (B.dead) continue; const P = B.g.getWorldPosition(_ghV); if (Math.hypot(x - P.x, z - P.z) > .7 + rad || y < P.y - .3 || y > P.y + 2.6) continue;
+    B.dead = 1; B.ang = Math.atan2(P.x - x, P.z - z); B.g.userData.flame.visible = false; snd('clang', { g: 1, r: .7, x, z }); spkBurst(P.x, P.y + 1.9, P.z, 26, { col: [.48, 1, .85], spread: 4, size: .16, life: .9 }); smokeAt(P.x, P.y + 2, P.z, 1.4, 2, [.3, .29, .28]); return 1; }
   for (const P of G.sup) { if (P.cut || G.fell[P.key] || Math.hypot(x - P.x, z - P.z) > P.r + rad || y < P.y0 - .3 || y > P.y1 + .3) continue;
     P.hp--; snd('thud', { g: .9, r: .9, x, z }); spkBurst(x, y, z, 10, { col: [.25, .23, .2], spread: 1.5, size: .12, life: .5 }); camShake(.06);
     if (P.hp <= 0) { P.cut = 1; snd('crack', { g: 1.2, r: .5, x, z }); if (G.sup.filter(q => q.key === P.key && !q.cut).length <= 1) ghouseFell(G, P.key); }
     return 1; }
   return 0; }
+function ghouseBraz(G, dt) { for (const B of G.braz) { if (B.dead) { if (B.tip < 1) { B.tip = Math.min(1, B.tip + dt * 3); B.g.rotation.set(Math.cos(B.ang) * B.tip * 1.45, 0, -Math.sin(B.ang) * B.tip * 1.45); } continue; }
+    if (G.fell.deck && B.y) { B.dead = 1; B.tip = 1; B.g.userData.flame.visible = false; continue; }
+    const f = B.g.userData.flame; f.scale.set(1 + Math.sin(G.t * 13 + B.x) * .12, 1 + Math.sin(G.t * 17 + B.z) * .22, 1 + Math.cos(G.t * 11 + B.x) * .12);
+    if (SPK.on && Math.random() < dt * 14) { const P = B.g.getWorldPosition(_ghV), t = B.g.userData.top; spk(P.x + (Math.random() - .5) * .5, P.y + t + .1, P.z + (Math.random() - .5) * .5, (Math.random() - .5) * .5, 2 + Math.random() * 2, (Math.random() - .5) * .5, .2 + Math.random() * .15, .55, Math.random() < .5 ? [.45, 1, .82] : [.75, 1, .92]); } } }
+const _ghV = new THREE.Vector3();
 function ghouseFell(G, key) { if (G.fell[key] || GHOUSE.on !== G || !G.rig[key]) return; G.fell[key] = 1; restorePlay(G.rig[key], 0); camShake(.6); const pc = G.pieces[key].position;
   snd('boom', { g: 1.3, r: .4, x: pc.x, z: pc.z }); setTimeout(() => { if (GHOUSE.on !== G) return; snd('thud', { g: 1.4, r: .35, x: pc.x, z: pc.z }); camShake(.5); for (let i = 0; i < 5; i++) spkBurst(pc.x + (Math.random() - .5) * 8, .4, pc.z + (Math.random() - .5) * 6, 16, { col: [.8, .7, .55], spread: 6, size: .5, life: 1.4 }); }, 1500);
   if (key === 'deck') { G.portDead = 1; G.port.rotation.x = Math.PI / 2; G.port.position.set(G.port.position.x, .15, G.port.position.z + 2); G.portB._off = 1; G.balDead = 1; G.balDeadT = 1e9; G.bal.userData.eye.visible = false; G.oilT = 0; G.oil.visible = false;
@@ -21063,9 +21095,10 @@ function ghouseFell(G, key) { if (G.fell[key] || GHOUSE.on !== G || !G.rig[key])
   if (key[0] === 'u' && G.fell.u0 && G.fell.u1) setTimeout(() => ghouseFell(G, 'deck'), 700); }
 function ghouseOilHit(x, y, z, rad) { const G = GHOUSE.on; if (!G || !G.caul || G.oilCd > 0 || (G.fell && G.fell.deck)) return 0; const P = G.caul.position; if (Math.hypot(x - P.x, y - P.y, z - P.z) > 1 + rad) return 0;
   G.oilT = GHOUSE.oilT; G.oilCd = GHOUSE.oilCd; snd('clang', { g: .8, r: .6, x: P.x, z: P.z }); snd('swoosh', { g: .9, r: .5, x: P.x, z: P.z }); return 1; }
-function ghouseStep(dt) { const G = GHOUSE.on; if (!G) return; G.t += dt; if (G.caul) ghouseOil(G, dt); const [cx, cz] = GHOUSE.at, a = -G.t * .3, A = GHOUSE;
+function ghouseStep(dt) { const G = GHOUSE.on; if (!G) return; G.t += dt; if (G.braz) ghouseBraz(G, dt); if (G.caul) ghouseOil(G, dt); const [cx, cz] = GHOUSE.at, a = -G.t * .3, A = GHOUSE;
   if (!G.portDead) { if (G.portT > 0) G.portT -= dt; const want = G.portT > 0 ? 0 : 2.2 * (GHOUSE.scale || 1); G.portY += Math.sign(want - G.portY) * Math.min(Math.abs(want - G.portY), dt * (want < G.portY ? 9 : 1.2));
-    G.port.position.y = G.portY; G.portB._off = G.portY > 1 * (GHOUSE.scale || 1) ? 1 : 0; if (G.abell.userData.sw) { G.abell.userData.sw -= dt; G.abell.rotation.z = Math.sin(G.abell.userData.sw * 18) * G.abell.userData.sw * .5; } }
+    G.port.position.y = G.portY; G.portB._off = G.portY > 1 * (GHOUSE.scale || 1) ? 1 : 0; }
+  if (G.abell.userData.sw) { G.abell.userData.sw -= dt; G.abell.rotation.z = Math.sin(G.abell.userData.sw * 18) * G.abell.userData.sw * .5; }
   // THE BALLISTA: track him inside `balR`, wind (the eye brightens, the bolt pulls back), loose, reload
   if (G.balHC > 0) G.balHC -= dt;
   if (G.balDead) { G.balDeadT -= dt; const B = G.bal, P = B.position; if (Math.random() < dt * 3) smokeAt(P.x + (Math.random() - .5) * .6, P.y + 1.2, P.z + (Math.random() - .5) * .6, 1.2, 1.4, [.25, .24, .23]);

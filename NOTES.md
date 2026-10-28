@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the GATEHOUSE, pass 3 (detail and verticality; its third pass, so the loop moves on)
+**Moves:** the Gatehouse's pass-3 row (detail, verticality). The roofline was flat, so this pass gives it a classical silhouette.
+- **Two YAGURA** on the deck, one over each tower: lacquer posts (solid), a gold beam band, a two-tier black-tile hip roof (`E.roof`, an open
+  4-sided skirt plus a cap), gold ridge finials and up-turned corner tips, and a mint lantern hung inside. `cls` files anything over
+  `S2 + 1.2` near a tower's centre under that tower's piece, so each turret comes down with its storey.
+- **`enemyBrazier(M, s)`** (new, shared, a Group so it can tip): sandstone foot, iron stem, legs and bowl, a gold rim, mint coals and an
+  additive flickering flame (`ENEMY.flame`), with sparks from `ghouseBraz`. There are four: two in front of the sphinxes (solid) and two on
+  the deck's back corners (they ride the deck and go out when it falls). A blow tips one away from the hit; it spills mint coals and goes out.
+- Fixed: the alarm bell's swing was inside the portcullis block that pass 2 turns off, so it froze after the deck fell.
+Render-checked headless (front, deck, a brazier tipped). ~215 meshes under the group counting the chunk walls, ballista and bodies' props;
+the merged static is far fewer, but it is over the ~40 target, as the other big buildings are.
+**Still open:** the sandstone triplanar (`E.stone`) reads as sponge up close on the sphinxes (a shared material, so fixing it touches every
+enemy building); the Sky Bridge beam hangs when the deck falls. Shipped unverified.
+
 ## m1534 -- THE RE-PASS: the GATEHOUSE, pass 2 (DESTRUCTIBLE TO THE GROUND)
 ENEMY RULES: enemy places are for destroying. **Moves:** the Gatehouse's pass-2 row (breakable, alive).
 - The Watchtower's machinery, run backwards, but as FOUR rigs so the pieces fall one at a time: `restorePieces` files every static mesh into
