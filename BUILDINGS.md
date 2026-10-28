@@ -187,7 +187,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
     with height (VERTICALITY: ice shelves, a frozen waterfall, a cliff cave) where the SNOW DRAGON's lair is.
   - [x] **the katana vanished (m1628):** it was BURIED, not mis-rendered -- he wades with his feet on the ground under .55 m of snow, and a low blade
     dips under the surface. Whatever he holds now CUTS the snow (a groove where it passes, powder on a swing)
-  - [x] **pass 2a (m15xx):** WIND-SHAPED DRIFTS and banks (the pack's resting depth is a field stretched along the wind, up to ~1 m; the refill
+  - [x] **pass 2a (m1632):** WIND-SHAPED DRIFTS and banks (the pack's resting depth is a field stretched along the wind, up to ~1 m; the refill
     returns to it; deeper drags harder), SNOWY PINES in seven stands (46, 3 draws) that DROP their snow when struck or slammed into (powder, a thud;
     the caps grow back over half a minute), and his BREATH fogging every ~1.6 s (quicker as he runs)
   - [ ] pass 2 (rest):

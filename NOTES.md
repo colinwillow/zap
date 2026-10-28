@@ -33,7 +33,7 @@ seat, edited -- what he did by hand before.
 - Colliders: every new box sits on a drawn plank, cap or grating (no invisible ledges); the flue-cap coin of the first try was unreachable
   and moved onto the platform.
 Render-checked headless (the ladder, the gangway, the platform and a coin in frame). Next: the Spider-Bot Hangar (ENEMY). Shipped unverified.
-## m15xx -- SNOW pass 2a: wind-shaped drifts, pines that drop their snow, his breath
+## m1632 -- SNOW pass 2a: wind-shaped drifts, pines that drop their snow, his breath
 - **Drifts:** `SNOWZ.depth` 1.1 m (was .55) with a resting field `Z.B`: the base .5 (= the old .55 m pack) plus up to `drift` .42 in ridges stretched
   2.6x ALONG the wind (fbm in wind-aligned coordinates), flat round the spawn and at the field's edge. The refill returns to `Z.B`, not to full;
   the drag reads the depth in METRES (a drift drags harder, the base exactly as before). The far plain sits at the base height.
