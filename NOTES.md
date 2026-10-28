@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE ZEPPELINS, detail pass 6 (the deck, the piers from afar)
+- A WORKED DECK: a bronze helm (`korWheel`) on a timber binnacle at the bow, plank benches on legs along both rails, cargo aft (two crates and
+  one stacked, a bronze-hooped barrel), a chart table with its chart, a bronze ship's bell under the roof. All merged into the ship and none
+  of it solid (the deck stays clear to walk; the hull is the collider).
+- THE PIERS READ FROM AFAR: a tall red `korBanner` on each pier's far corner and bunting from the lantern post up to it.
+Render-checked headless (close on the deck from the pier, and from 35 m away). Shipped unverified.
+
 ## the LADDER REFACTOR, step 1: the LADDER YARD in the forge (Worker B)
 His ask (relayed, then confirmed to me): "the ladder needs a refactor -- we still need to perfect getting onto the ladder and off at the top";
 build a test ground first. History read before touching anything: m170 (latch by pushing in, no button), m180 (turned volumes, the foot
@@ -19,6 +26,7 @@ The chip carries `LAD<OFF|MOUNT|CLIMB|OVER>#<n>` while the yard stands. Nothing 
 baseline to feel. Known from reading the code: mounting FROM THE TOP is not possible at all (`climbFind` latches only from the FRONT side and
 only by pushing INTO the rungs; standing on the top he is on the mark's side), the bottom mount is an instant snap to the rungs (`climbGo`
 zeroes him and `stepClimb` sets x/z the same frame), and the top-out is a .32 s scripted arc onto a point .9 m in. Steps 2-4 next.
+
 ## m1589 -- THE ZEPPELINS, detail pass 5 (the envelope)
 - GORE SEAMS: four meridian rings (a torus turned into the yz-plane, scaled to the envelope and turned about z), so eight tan seams run
   nose to tail.
