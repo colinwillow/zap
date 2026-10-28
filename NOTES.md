@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the RAMPART WALL, pass 3 (silhouette, L3; its third pass, so the loop moves on)
+## m1561 -- THE RE-PASS: the RAMPART WALL, pass 3 (silhouette, L3; its third pass, so the loop moves on)
 **Moves:** detail and verticality. The flat wall got a classical silhouette over its gate.
 - **THE GATE GALLERY** (ENEMY_STYLE's "black gate tower ... a gallery on top"): four solid lacquer posts on the walk over the gateway, gold
   beam bands, a timber ceiling, a two-tier black-tile hip roof (an open 4-sided skirt and a cap, scaled to the gate's rectangle), a gold
