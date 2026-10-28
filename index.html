@@ -64009,7 +64009,7 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 // to the shop front and to the round back door. Built in its OWN frame (local +z = the front, toward the river; `at`/`yaw` are HOME.hut's) and
 // merged per material; every collider a local box turned into the world (the yaw is a quarter turn, so a box stays a box); every walkable
 // surface a triangle. `?hut=glb` (or GHOME.on = 0) puts the GLB back, to compare. Pass 1: the massing and the walkable shell, with the inside.
-const GHOME = { on: 1, pass: 15, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
+const GHOME = { on: 1, pass: 16, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   Rtu: 2.5, door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
@@ -64070,7 +64070,7 @@ function ghomeSmoke(dt, t) { const S = GHOME.smoke; if (S && S.tops.length) { fo
     S.pts.geometry.attributes.position.needsUpdate = true; S.pts.material.size = 1.4; }
   for (const [L, k] of GHOME.lights || []) L.intensity = k * (.88 + .08 * Math.sin(t * 9.3 + k) + .04 * Math.sin(t * 23.7)); }
 function ghomeBuild(at, yaw, y0) {
-  const A = GHOME, g = new THREE.Group(); g.position.set(at[0], y0, at[1]); g.rotation.y = yaw; scene.add(g); A.g = g; A.bellPts = []; A.sw = { z: 0, vz: 0, x: 0, vx: 0, hc: 0 }; A.bellT = 0;
+  const A = GHOME, g = new THREE.Group(); g.position.set(at[0], y0, at[1]); g.rotation.y = yaw; scene.add(g); A.g = g; A.bellPts = []; A.wins = []; A.sw = { z: 0, vz: 0, x: 0, vx: 0, hc: 0 }; A.bellT = 0;
   const c = Math.round(Math.cos(yaw) * 1e6) / 1e6, s = Math.round(Math.sin(yaw) * 1e6) / 1e6, P = A.P;
   const Wx = (x, z) => at[0] + x * c + z * s, Wz = (x, z) => at[1] - x * s + z * c;
   // ---- the buckets: only position + normal (+ colour on the stone) survive, so every piece merges (mixed attribute sets merge to NULL) ----
@@ -64396,7 +64396,7 @@ function ghomeBuild(at, yaw, y0) {
   // ---- PASS 11: THE WINDOWS (refs: round windows everywhere, each sunk in a soft LAVENDER surround) and the TURRET'S LOOKOUT (a brass
   // telescope at its window, cushions) ----
   { const lav = new THREE.MeshStandardMaterial({ color: 0x9a82b8, roughness: .85 }), brassT = bronzeT; const cush = redW;
-    const W2 = (cx, cz, R, a, y, r, bulge = 0) => { const x = cx + Math.sin(a) * (R + bulge + .03), z = cz + Math.cos(a) * (R + bulge + .03);
+    const W2 = (cx, cz, R, a, y, r, bulge = 0) => { A.wins.push([cx, cz, R + bulge, a, y, r]); const x = cx + Math.sin(a) * (R + bulge + .03), z = cz + Math.cos(a) * (R + bulge + .03);
       put(new THREE.CircleGeometry(r * 1.55, 24), lav, at4(x - Math.sin(a) * .01, y, z - Math.cos(a) * .01, a)); put(new THREE.CircleGeometry(r, 20), dark, at4(x + Math.sin(a) * .01, y, z + Math.cos(a) * .01, a));
       put(new THREE.TorusGeometry(r, .07, 6, 20), wood, at4(x + Math.sin(a) * .02, y, z + Math.cos(a) * .02, a)); put(new THREE.BoxGeometry(r * 2, .05, .05), wood, at4(x + Math.sin(a) * .03, y, z + Math.cos(a) * .03, a)); put(new THREE.BoxGeometry(.05, r * 2, .05), wood, at4(x + Math.sin(a) * .03, y, z + Math.cos(a) * .03, a)); };
     const bh = R => R * .075 * .9;     // the walls' swell at window height
@@ -64445,6 +64445,39 @@ function ghomeBuild(at, yaw, y0) {
     const hw = A.door / 2 + .14, zf = -(A.R + .3); for (const sx of [-1, 1]) { vbox(sx * hw - .12, sx * hw + .12, P, P + A.doorH, zf - .12, zf + .12, wood, 0); for (const yy of [P + .5, P + 1.9]) vbox(sx * hw - .15, sx * hw + .15, yy - .05, yy + .05, zf - .15, zf + .15, iron, 0); }
     put(new THREE.TorusGeometry(hw, .14, 6, 18, Math.PI), wood, at4(0, P + A.doorH, zf)); put(new THREE.TorusGeometry(hw + .16, .05, 4, 18, Math.PI), iron, at4(0, P + A.doorH, zf));
     put(new THREE.CircleGeometry(hw - .1, 18, 0, Math.PI), dark, at4(0, P + A.doorH, zf + .08)); }
+  // ---- PASS 16: BREAK UP THE STONE (his note on the back view: "too much open texture cylinder"). Every round window gets a little torn red
+  // cloth HOOD on two struts and a timber SILL; the tower's drum and the store get a timber CAGE (ribs that follow the bulge, iron brackets, a
+  // low rail); the hall and the store get a plank EAVE flaring out where the wall meets the dome ----
+  { const awn = clothM('awning'), TW = (a, l, n) => [Math.cos(a) * l + Math.sin(a) * n, Math.sin(a) * n * 0 - Math.sin(a) * l * 0, -Math.sin(a) * l + Math.cos(a) * n];
+    const hood = (cx, cz, R, a, y, r) => { const W = (l, n, yy) => [cx + Math.cos(a) * l + Math.sin(a) * (R + n), yy, cz - Math.sin(a) * l + Math.cos(a) * (R + n)];
+      const hw = r * 1.45, top = y + r * 1.55 + .12, NU = 6, NV = 3, pos = [], uv = [], at = (u, v) => { const l = (u - .5) * 2 * hw * (1 + .1 * v), n = .02 + v * .62, yy = top - v * .38 - .06 * Math.sin(Math.PI * u) * v; return W(l, n, yy); };
+      for (let i = 0; i < NU; i++) for (let j = 0; j < NV; j++) { const u0 = i / NU, u1 = (i + 1) / NU, v0 = j / NV, v1 = (j + 1) / NV;
+        for (const [u, v] of [[u0, v0], [u1, v0], [u1, v1], [u0, v0], [u1, v1], [u0, v1]]) { pos.push(...at(u, v)); uv.push(u * hw * 2 / 4.2, 1 - v); } }
+      const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); geo.computeVertexNormals(); put(geo, awn);
+      for (const sd of [-1, 1]) { const p0 = W(sd * hw * .9, .02, top - .45), p1 = at(sd > 0 ? 1 : 0, 1), d = new THREE.Vector3(p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]), L = d.length();
+        put(new THREE.BoxGeometry(.05, L, .05), wood, _m4.compose(new THREE.Vector3((p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2, (p0[2] + p1[2]) / 2), _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()), _one)); }
+      const sp = W(0, .1, y - r * 1.55 - .04); put(new THREE.BoxGeometry(r * 2.5, .09, .22), wood, at4(sp[0], sp[1], sp[2], a)); for (const sd of [-1, 1]) { const bp = W(sd * r * 1.05, .05, y - r * 1.55 - .16); put(new THREE.BoxGeometry(.06, .2, .12), iron, at4(bp[0], bp[1], bp[2], a)); } };
+    for (const w of A.wins) hood(...w);
+    // the CAGE: ribs following each wall's swell (rOut, as `shell` builds it), skipping the windows and the side that faces the hall
+    const cage = (cx, cz, R, H, avoid, step, b0 = P, wide = 1.05) => { const B = R * .075, rO = y => R + B * Math.pow(Math.sin(Math.PI * clamp((y - b0) / H, 0, 1)), .8) + .07, n = Math.round(TAU * R / step), wins = A.wins.filter(w => w[0] === cx && w[1] === cz);
+      const ok = q => Math.abs(Math.atan2(Math.sin(q - avoid), Math.cos(q - avoid))) > wide;
+      for (let k = 0; k < n; k++) { const q = k / n * TAU; if (!ok(q) || wins.some(w => Math.abs(Math.atan2(Math.sin(q - w[3]), Math.cos(q - w[3]))) * R < w[5] * 1.6 + .12)) continue; const S = 7;
+        for (let i = 0; i < S; i++) { const ya = b0 + H * i / S, yb = b0 + H * (i + 1) / S, ra = rO(ya), rb = rO(yb), a0 = [cx + Math.sin(q) * ra, ya, cz + Math.cos(q) * ra], a1 = [cx + Math.sin(q) * rb, yb, cz + Math.cos(q) * rb], d = new THREE.Vector3(a1[0] - a0[0], yb - ya, a1[2] - a0[2]), L = d.length();
+          put(new THREE.BoxGeometry(.24, L + .02, .12), wood, _m4.compose(new THREE.Vector3((a0[0] + a1[0]) / 2, (ya + yb) / 2, (a0[2] + a1[2]) / 2), _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), q)), _one)); }
+        for (const f of [.18, .62]) { const y = b0 + H * f, rr = rO(y) + .05; put(new THREE.BoxGeometry(.22, .08, .08), iron, at4(cx + Math.sin(q) * rr, y, cz + Math.cos(q) * rr, q)); } }
+      // the low rail, in arcs between the side that faces the hall
+      const a0 = avoid + wide, len = TAU - 2 * wide, yR = b0 + .9, rr = rO(yR) + .02; put(new THREE.CylinderGeometry(rr, rr, .16, 48, 1, true, a0, len), wood, at4(cx, yR, cz)); };
+    cage(A.T[0], A.T[1], A.Rt, A.Yb - .3, th(A.T[0], A.T[1], 0, 0), 1.15); cage(A.Wc[0], A.Wc[1], A.Rw, A.Hwg - .2, th(A.Wc[0], A.Wc[1], 0, 0), 1.15);
+    cage(A.T[0], A.T[1], A.Rtu, A.Ht - A.Yb - .2, th(A.T[0], A.T[1], 0, 0), 1.3, P + A.Yb, .5);
+    // STRAPS over the domes: timber meridians, iron-studded, from the eave up to the drum (the hall) or a cap (the store, the turret)
+    const strap = (cx, cz, R, yb, Hd, rTop, n, q0) => { for (let k = 0; k < n; k++) { const q = q0 + k / n * TAU, f0 = Math.PI / 2, f1 = Math.asin(Math.min(1, rTop / R)), S = 8;
+        for (let i = 0; i < S; i++) { const fa = f0 + (f1 - f0) * i / S, fb = f0 + (f1 - f0) * (i + 1) / S, P0 = [cx + Math.sin(q) * (R * Math.sin(fa) + .05), yb + Hd * Math.cos(fa) + .04, cz + Math.cos(q) * (R * Math.sin(fa) + .05)], P1 = [cx + Math.sin(q) * (R * Math.sin(fb) + .05), yb + Hd * Math.cos(fb) + .04, cz + Math.cos(q) * (R * Math.sin(fb) + .05)];
+          const d = new THREE.Vector3(P1[0] - P0[0], P1[1] - P0[1], P1[2] - P0[2]), L = d.length(); put(new THREE.BoxGeometry(.26, L + .03, .1), wood, _m4.compose(new THREE.Vector3((P0[0] + P1[0]) / 2, (P0[1] + P1[1]) / 2, (P0[2] + P1[2]) / 2), _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), q)), _one));
+          if (i % 2) put(new THREE.SphereGeometry(.055, 6, 4), iron, at4(P1[0] + Math.sin(q) * .06, P1[1], P1[2] + Math.cos(q) * .06)); } } };
+    strap(0, 0, A.R, P + A.Hw, A.Hd, 3.7, 12, Math.PI / 12); strap(A.Wc[0], A.Wc[1], A.Rw, P + A.Hwg, 2.2, .6, 8, .2); strap(A.T[0], A.T[1], A.Rtu, P + A.Ht, 2.2, .5, 8, .1);
+    // the EAVES: a plank skirt flaring out where the hall's and the store's walls meet their domes
+    for (const [x, z, R, y] of [[0, 0, A.R, P + A.Hw], [A.Wc[0], A.Wc[1], A.Rw, P + A.Hwg]]) { put(new THREE.CylinderGeometry(R * .97, R + .6, .5, 48, 1, true), woodP, at4(x, y + .12, z)); put(new THREE.CylinderGeometry(R + .62, R + .62, .08, 48, 1, true), iron, at4(x, y - .1, z));
+      for (let k = 0; k < Math.round(R * 3); k++) { const q = k / Math.round(R * 3) * TAU; put(new THREE.BoxGeometry(.1, .1, .7), wood, at4(x + Math.sin(q) * (R + .2), y - .05, z + Math.cos(q) * (R + .2), q, -.5)); } } }
   // ---- PASS 12: SMOKE from both stacks -- one point cloud (one draw), each puff rising, drifting downwind and swelling until it is gone;
   // stepped in `ghomeSmoke` ----
   { const N = 40, pos = new Float32Array(N * 3), cv = document.createElement('canvas'); cv.width = cv.height = 64; const q = cv.getContext('2d'), gr = q.createRadialGradient(32, 32, 2, 32, 32, 31);
