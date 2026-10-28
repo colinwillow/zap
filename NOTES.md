@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE ZEPPELINS, detail pass 7 (the envelope walk: a moving climb)
+## m1594 -- THE ZEPPELINS, detail pass 7 (the envelope walk: a moving climb)
 - A rope LADDER from the gondola deck (aft of the chart table) up through a hatch in the roof, and a railed plank CATWALK, 12 m along the
   envelope's spine at local y 11.15, on struts where the spine curves away, with a lantern at each end and three doubloons along it.
 - **A CLIMB THAT RIDES A MOVING SHIP:** `stepClimb` re-centres him on `L.cx/cz` along `L.ux/uz` every frame, so a `KCLIMB` entry whose
