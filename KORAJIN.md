@@ -51,6 +51,34 @@ out of weirdport. Do it when Korajin stops needing Zap's code, or the day he ask
 - **Visual reference:** `images/korajin/ref/jinra_sheet.jpg`. A Jinra refinery-shop (a sandstone dome with a giant glass globe tank, copper pipes, teal banners, a timber deck), bottles and containers, canisters and storage, esoteric items (crystals, a gyroscope orb, a dripping basin, amulets), environment props, an interior shop, a processing station and large storage.
 - **In code:** the colour token is `JIN` / `JINHEX` (mint), and the rule stands: mint is the Jinra's alone. Gold doubloons are money (MONEY, above).
 
+## THE RESTORATION -- the arc of the whole game (his, Oct 28 2026)
+> *"The Korajin are an ancient people whose powers were stolen. They've forgotten they were magical, like Jin, and they're just regular people now --
+> you're liberating them. You bring townspeople artifacts, and the guy who's a regular merchant becomes a mystical Jin. You're trying to restore the
+> flying, magical world in the sky that fell to the ground. It's rusty, old, ancient -- like a Western mixed with broken-down old samurai. When you
+> restore it, the boats start to fly, the buildings start to float and glow, the windmill that didn't run now runs on Jinra, the stream glows
+> green, the central plaza tower shoots up into the sky, and things slowly start to float. You're rebuilding the floating sky people."*
+
+**THE FALL (the start of every place):** rust, dust and dead wood. A Western frontier town grown over broken samurai ruins. Grounded boats, a
+dry windmill, a dull stream, a stunted central tower. The people are ordinary and have FORGOTTEN; nothing glows.
+
+**THE RESTORATION (what the player does):**
+1. **Gather Jinra** (from creatures, springs and wrecks), and win back the stolen power: light the enemy's torch towers (THE JINRA BEACONS).
+2. **Bring the townspeople their ARTIFACTS.** Each one REMEMBERS and AWAKENS. The plain merchant becomes a mystical Jin, the smith a Jin smith.
+   People are the reward you see.
+3. **Restore each PLACE, stage by stage:** the stream glows mint; the windmill turns on Jinra; buildings lift off their foundations and FLOAT
+   and glow; the boats fly; the central plaza tower SHOOTS UP into the sky.
+
+**THE PROGRESSION (regions):**
+- **Region 1, the fallen ground** (the Red Hollows): its levels' Jinra powers YOUR SHIP until it can FLY (the ship's sea-to-air form, built).
+- **Region 2+:** pouring Jinra into a region's heart UNLOCKS A FLOATING SECTION, a whole new world above, and you fly up to explore it. The
+  restored sky world (the dojo's islands are its look) is the destination, rebuilt region by region.
+
+**What it means for building now:**
+- Every place should be designed with TWO STATES, FALLEN and RESTORED, as one build with a switch: the same layout, rust versus Jinra glow,
+  grounded versus floating.
+- **The look of the fallen world:** a Western frontier over ancient samurai ruins. Weathered timber, rusted iron, dry stone, dull colour.
+  **The look of the restored world:** the hero kit, floating islands, mint Jinra, warm lanterns (the dojo).
+
 ## THE JINRA BEACONS -- a spine for the campaign (his idea, Oct 28 2026; open, "we'll figure it out")
 > *"The evil army has giant torch towers. When you defeat a tower you shoot the Jinra into it, and it lights up green and shoots off -- the levels
 > are arranged around a central place, and you're aligning all the Jinra to the central tower, so it becomes one giant powerful thing that powers
