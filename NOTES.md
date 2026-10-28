@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE ZEPPELINS, detail pass 6 (the deck, the piers from afar)
+## m1591 -- THE ZEPPELINS, detail pass 6 (the deck, the piers from afar)
 - A WORKED DECK: a bronze helm (`korWheel`) on a timber binnacle at the bow, plank benches on legs along both rails, cargo aft (two crates and
   one stacked, a bronze-hooped barrel), a chart table with its chart, a bronze ship's bell under the roof. All merged into the ship and none
   of it solid (the deck stays clear to walk; the hull is the collider).
