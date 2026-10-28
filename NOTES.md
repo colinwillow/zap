@@ -5,6 +5,11 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The water-mill tower, pass 4 (Worker B): its revival, live, on the shared chunk rig
+- **The home's method is shared now**: `rsTag(A, geo)` (a builder's `put` tags each piece's chunk by its middle), `rsChunkRig(A, MG, fallen, plate, extra)` (`aChunk` and `uDrain` into every material, a RESTORE stand-in per chunk at its bottom-centre pivot with its FALLEN pose, `restoreMat` rusts, the plate as `R.trig`, plus `extra` real Object3Ds posed directly), and `rsChunkSync(A)` (every frame: the matrices, the drain, a mint burst as each piece lands, the plate breathing). The home still runs its own copy (pass 26); the merchant and the refinery will use the shared one.
+- **The mill's chunks**: base, tower lower, tower upper, top (gallery and lantern), balcony 1, balcony 2, stair. The island, bridges, turrets and wall stairs stay put. **The wheel and the rotor** spin inside new holder groups (`wheelH`, `rotorH`) that the kit poses, because the kit writes a piece's quaternion and the spin would fight it.
+- **FALLEN**: the base settled; the upper tower snapped, toppling 6 m with a twist; the top crashed 12 m down beside it with its sails (the rotor fell 18 m); the balconies hang; the wheel is tilted and dry; no pour, no chute, no pool, no spray. **RESTORED**: the wheel and the sails start only once it is whole (t > .95), and **the water pours mint**: it runs on Jinra.
+- **The plate** is on the island at the stepping stones. Show: 8 s, from the bottom up. The mill is no longer `bldAge`-weathered; the rig owns its colour. Rendered headless at t 0 / .5 / 1.
 ## m1529 -- THE RE-PASS: the GATEHOUSE, pass 1 (an ENEMY gate: the look)
 The Gatehouse is on the ENEMY list, so it gets ENEMY_STYLE.md's "FORTIFIED GATE" and is never restored. **Moves:** its pass-1 row (the look).
 - Palette through `enemyMats()` only: black lacquer timber, upper storeys and torii; `E.iron` for the old black; a dark plank triMat for the
