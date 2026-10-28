@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the ROBOT BARRACKS, pass 1 (ENEMY look)
+- ENEMY_STYLE's BARRACKS, literally: "a long hall where constructs stand dormant in rows behind black pillars, under a black roof with
+  gold trim and lanterns along the eave". The hall's breakable walls are `enemyWallTex` sandstone block; `bldRoof` in black tile under
+  a gold ridge with curled finials and gold eave tips; a VERANDA of seven black pillars along the front (.5 m off the wall: at .9 one
+  stood inside the taiko's dais) with gold bands and stone feet, each solid as drawn, a lacquer head beam, six mint lanterns on iron
+  stems between them. `robotSam` is terracotta, black lacquer and gold (shared `enemyMats`; the eye stays its own material, `barrStep`
+  colours it). The red nobori are black emblem banners (`enemyBanner`), the taiko black with gold hoops, the kerb sandstone block,
+  every lamp mint glass; two mint braziers at the yard's far corners spark in `barrStep`.
+- Statics merged (109 meshes; the straw dummies, the archery butt and the drum stay their own: they are smashed or pulsed). 71
+  children with the seven robots, the bar, cables and drone -- over the ~40 mark, mostly robots.
+Render-checked headless (the yard and veranda from the north, along the veranda). Shipped unverified.
+
 ## m1657 -- THE RE-PASS: the MOATED KEEP, pass 3 (THE EAVE BELT) -- its third pass, DONE; and TWO BUGS IN `restoreRideTris`
 - THE EAVE BELT: a black-tile pent roof round the keep at the skirt's top, 5.4 m at the wall falling to 5.0 at its edge .9 m out, four
   mitred trapezoids (the west run split over the door, |z| < 1.6, so the lamps and the door stay clear). From the island's rim it is a
