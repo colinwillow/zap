@@ -16383,9 +16383,9 @@ function lockMkTex() { const cv = document.createElement('canvas'); cv.width = c
     q.beginPath(); q.moveTo(c + cs * r0 + px * w0 / 2, c + sn * r0 + py * w0 / 2); q.lineTo(c + cs * (r1 + jit) + px * w1 / 2, c + sn * (r1 + jit) + py * w1 / 2); q.lineTo(c + cs * (r1 + jit) - px * w1 / 2, c + sn * (r1 + jit) - py * w1 / 2); q.lineTo(c + cs * r0 - px * w0 / 2, c + sn * r0 - py * w0 / 2); q.closePath(); q.fill();
     if (long) { const cb = 9; q.lineWidth = 5; q.beginPath(); q.moveTo(c + cs * (r1 + jit) + px * cb, c + sn * (r1 + jit) + py * cb); q.lineTo(c + cs * (r1 + jit) - px * cb, c + sn * (r1 + jit) - py * cb); q.stroke(); } }
   const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t; }
-const lockMk = new THREE.Sprite(new THREE.SpriteMaterial({ map: lockMkTex(), color: 0xffffff, transparent: true, opacity: .9, depthTest: false, depthWrite: false, toneMapped: false }));
+const lockMk = new THREE.Sprite(new THREE.SpriteMaterial({ map: lockMkTex(), color: 0xffffff, transparent: true, opacity: .9, depthTest: true, depthWrite: false, toneMapped: false }));     /* m15xx: DEPTH-TESTED (his: "it's overlaid over the character even though it's behind him"); `lockPull` keeps its own target from hiding it */
 lockMk.renderOrder = 61; lockMk.visible = false; lockMk.frustumCulled = false; scene.add(lockMk);     // m1260: the charge's lock, on the target
-const lockGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map: (() => { const cv = document.createElement('canvas'); cv.width = cv.height = 64; const q = cv.getContext('2d'), gr = q.createRadialGradient(32, 32, 8, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(.7, 'rgba(255,255,255,.35)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); q.fillStyle = gr; q.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(cv); })(), transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }));
+const lockGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map: (() => { const cv = document.createElement('canvas'); cv.width = cv.height = 64; const q = cv.getContext('2d'), gr = q.createRadialGradient(32, 32, 8, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(.7, 'rgba(255,255,255,.35)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); q.fillStyle = gr; q.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(cv); })(), transparent: true, depthTest: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }));
 lockGlow.renderOrder = 60; lockGlow.visible = false; scene.add(lockGlow);
 const markRing = new THREE.Mesh(
   new THREE.RingGeometry(.80, 1.0, 40),
@@ -16396,12 +16396,16 @@ markRing.renderOrder = 3;
 markRing.visible = false;
 markRing.frustumCulled = false;
 scene.add(markRing);
+// m15xx: a lock drawn WITH depth sits at its target's middle, inside his body -- so it is pulled toward the lens by about his radius: in front of
+// him, behind anyone (Grumbo) nearer the camera
+const _lpV = new THREE.Vector3();
+function lockPull(o, k) { _lpV.copy(camera.position).sub(o.position); const L = _lpV.length(); if (L > k + .3) o.position.addScaledVector(_lpV, k / L); }
 function markStep(dt, t) {
   lockMk.visible = false; lockGlow.visible = false;
   // m1293: *"When I press up with the launcher, if it's going to catch onto a guy it should show you -- a reticle on him, the camera tilting
   // to show you."* The gun's aim, locked (a body or a machine the shot is going for), wears the charge's own sight
   if (player.aim && aimHas && aimLock && slotNow().aim) { lockMk.position.copy(_aimP); lockMk.material.rotation = 0; lockMk.scale.setScalar(1.05 + Math.sin(t * 6) * .04);
-    lockMk.material.color.setRGB(1, .45, .3); lockMk.material.opacity = .95; lockMk.visible = true; }
+    lockMk.material.color.setRGB(1, .45, .3); lockMk.material.opacity = .95; lockMk.visible = true; lockPull(lockMk, .8); }
   if (!MARK.on) { markRing.visible = false; player.chgTgt = null; return null; }
   const p = player, s = slotNow();
   // ONLY WHILE THE HAMMER IS WINDING. A ring that is always up is a HUD element, and this one
@@ -16448,6 +16452,7 @@ function markStep(dt, t) {
     const fill = full ? .95 : lerp(1.7, 1.1, A.chg01) * (1 + Math.sin(t * 6) * .03), sz = (fill + lockMk.userData.snap * .9) * big;
     lockMk.position.set(P.x, P.y + hh, P.z); lockMk.scale.setScalar(sz); lockMk.material.rotation = 0;
     lockMk.material.color.setRGB(full ? 1 : c[0], full ? .93 : c[1], full ? .7 : c[2]); lockMk.material.opacity = full ? 1 : .55 + A.chg01 * .35; lockMk.visible = true;
+    lockPull(lockMk, (d.K && d.K.r || .5) + .35);
     lockGlow.visible = full; if (full) { lockGlow.position.copy(lockMk.position); lockGlow.scale.setScalar(sz * 1.5 * (1 + Math.sin(t * 9) * .06)); lockGlow.material.color.setRGB(1, .7, .3); } }
   return A;
 }
@@ -19423,7 +19428,7 @@ function paintRetic() {
     hpFill.style.background = k > .6 ? '#46e0ff' : k > .3 ? '#ffc247' : '#ff5470';
   }
   if (mmarkEl) {
-    const show = p.charge > 0 && !p.aim;
+    const show = p.charge > 0 && !p.aim && !slotNow().blade;     // m15xx (his: "I don't like the plain square one"): the katana's charge wears only the sun-wheel (`lockMk`)
     mmarkEl.classList.toggle('on', !!show);
     if (show) {
       const L = p.lock;
@@ -29388,7 +29393,7 @@ function slamGo(dx, dy) {
   p.slamClip = nm;     // m1088: always -- the landing plays the slam clip out (it was the hard-landing ROLL unarmed)
   // ONE PER AIRTIME. Without it a held thumb flicking repeatedly is a man hammering the floor
   // on the way down, which is the flutter-kick shape `p.airKick` refuses one repo over.
-  p.slam = 1; p.slamUsed = 1; p.slamT = 0; p.flip = ''; p.bkHang = 0;
+  p.slam = 1; p.slamUsed = 1; p.slamT = 0; p.flip = ''; p.bkHang = 0; p.slamArc = 0;
   p.melFired = 0; p.melU = 0; p.swPrev = null; p.swRootX = null; p.swRootZ = null;
   triggerStop();                      // the same thumb, and a wound shot has nowhere to go
   // m995: HIS MOMENTUM CARRIES. *"If your vector is going forward, it just cancelled out all your trajectory and you go straight down...
@@ -29663,7 +29668,7 @@ function coverLeap() {
 // above `top` (pushed up, as it charged) 0 = the flat launch forward as before; down to `bot` 1 = the highest leap. Over `min` the release is
 // `aimLeap`: straight up to `h0`..`h1` m and the katana's air slam (`slamGo`), its horizontal solved from the slam's clock to land where the
 // flat launch would have (the man in reach, or the hold's distance). An arc of dots shows the leap before he goes (`KAIM.line`).
-const KAIM = { top: .35, bot: -.8, min: .12, h0: 1.4, h1: 5.2, line: null, n: 28 };
+const KAIM = { top: .35, bot: -.8, min: .12, h0: 1.4, h1: 5.2, line: null, n: 28, dots: 0 };
 function kaimHold() {
   const p = player, R = stick.R; return slotNow().blade && R.down && p.chargeT >= MELEE.charge * .5 && !p.chargeGo && !p.knock && p.grounded;
 }
@@ -29672,7 +29677,7 @@ function kaimStep(dt) {
   p.kAim = on ? clamp((KAIM.top - (-R.y)) / (KAIM.top - KAIM.bot), 0, 1) : 0;
   if (!KAIM.line) { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(KAIM.n * 3), 3));
     KAIM.line = new THREE.Points(g, new THREE.PointsMaterial({ color: 0xff8a2a, size: .22, transparent: true, opacity: .95, depthWrite: false })); KAIM.line.frustumCulled = false; KAIM.line.visible = false; scene.add(KAIM.line); }
-  const show = !!(on && p.kAim > KAIM.min && p.chargeT >= MELEE.charge * .5); KAIM.line.visible = show; if (!show) return;     // !!: three skips only `visible === false` -- a 0 still draws
+  const show = !!(KAIM.dots && on && p.kAim > KAIM.min && p.chargeT >= MELEE.charge * .5); KAIM.line.visible = show; if (!show) return;     /* m15xx (his: "I don't want it to show the arc"): `KAIM.dots` 0 */     // !!: three skips only `visible === false` -- a 0 still draws
   const L = aimLeapPlan(p.chargeT, p.kAim), P = KAIM.line.geometry.attributes.position;
   for (let i = 0; i < KAIM.n; i++) { const u = i / (KAIM.n - 1); P.setXYZ(i, p.pos.x + L.fx * L.d * u, p.pos.y + .1 + 4 * L.H * u * (1 - u), p.pos.z + L.fz * L.d * u); }
   P.needsUpdate = true;
@@ -29688,8 +29693,12 @@ function aimLeap(t0, k) {
   p.vel.set(0, vy, 0); p.grounded = false; p.coyote = 0; p.airT = 0; p.jumps = 2; p.slamUsed = 0; p.melee = 0; p.roll = 0; p.land = 0;
   p.faceH = p.heading = L.h; p.camWant = L.h; swapStop(); triggerStop();
   if (!slamGo(0, 1)) { p.vel.set(L.fx * 4, vy, L.fz * 4); return 1; }
-  const v = L.d / Math.max(.25, p.slamDur);
-  p.cLeap = { vx: L.fx * v, vz: L.fz * v, clearY: -1e9 };     // `coverLeap`'s carrier: across from the first frame
+  // m15xx (his: "he jumps up, then moves forward, then swings down, then comes down -- it should be ONE continuous arc, a parabola, and the
+  // animation should end with him striking the ground, not 10 feet in the air"): the slam's rise / hang / DRIVE (`SLAM.down` 12 m/s) made three
+  // kinks. This leap is BALLISTIC (`p.slamArc`): one parabola, gravity only, the forward speed constant from the first frame (`d / T`), and the
+  // jump attack's clip run from its raise so its STRIKE frame lands at T, the moment his feet do
+  const T = 2 * vy / MOVE.g, v = L.d / T; p.slamArc = 1; p.slamUp = 0; p.slamT = SLAM.hang; p.slamDur = T; p.cLeap = null; p.vel.x = L.fx * v; p.vel.z = L.fz * v;
+  { const A = KATANA.air, nm = rig.actions[A.clip] ? A.clip : null; if (nm) { const len = clipLen(nm); p.slamClip = nm; playOnce(nm, Math.max(.3, (A.strike - A.upFrom) * len / T)); rig.actions[nm].time = A.upFrom * len; } }
   if (KAIM.line) KAIM.line.visible = false;
   snd('swoosh', { r: .85, g: .8 }); return 1;
 }
@@ -32078,10 +32087,11 @@ function stepPlayer(dt) {
     if (!p.slam || p.grounded) p.cLeap = null; else if (p.pos.y >= L.clearY) { const k = Math.exp(SLAM.drag * dt); p.vel.x = L.vx * k; p.vel.z = L.vz * k; } else { p.vel.x = 0; p.vel.z = 0; } }
   if (p.slam) {
     p.slamT += dt;
-    if (p.slamUp) { if (p.vel.y <= 0) { p.slamUp = 0; p.slamT = SLAM.hang; } }     // m995: riding the jump up to its top
+    if (p.slamArc) { /* m15xx: the aimed leap is ballistic -- gravity only, the forward speed kept */ }
+    else if (p.slamUp) { if (p.vel.y <= 0) { p.slamUp = 0; p.slamT = SLAM.hang; } }     // m995: riding the jump up to its top
     else if (p.slamT < SLAM.hang) { p.vel.y = 0; }      // the wind-up: he hangs
     else p.vel.y = Math.min(p.vel.y, -SLAM.down);  // and then he is driven, not dropped
-    p.vel.x *= Math.exp(-SLAM.drag * dt); p.vel.z *= Math.exp(-SLAM.drag * dt);     // m995: his momentum carries (was 4 /s)
+    if (!p.slamArc) { p.vel.x *= Math.exp(-SLAM.drag * dt); p.vel.z *= Math.exp(-SLAM.drag * dt); }     // m995: his momentum carries (was 4 /s)
     // **AND THE SLAM DRAWS ITS SLASH (m99).** *"We needs to put in the slashes for all the melees
     // stuff."* `strikeSweep` is called from exactly ONE site -- inside the `p.roll || p.melee ||
     // p.chargeGo` branch -- and a slam is none of those, so the one strike in the game with a

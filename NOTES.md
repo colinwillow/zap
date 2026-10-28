@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- THE KATANA'S CHARGE: one mark, drawn behind him; and the HIGH LEAP is one parabola that strikes as he lands (DOCKET 9, 10)
+His: *"the plain square one and the new one on top of it -- I don't like the square; and it's overlaid over the character even though it's
+behind him"*; *"I don't want it to show the arc... he jumps up, then moves forward, then swings down, then comes down -- it should be one
+continuous arc, and the animation should end with him striking the ground, not 10 feet in the air."*
+- **The square** was `#mmark`, an HTML diamond (a rotated square) on the whole screen, over everything. It no longer shows for the katana:
+  his charge wears only the sun-wheel (`lockMk`).
+- **The sun-wheel and its glow are DEPTH-TESTED now.** `lockPull` moves them toward the lens by the target's radius + .35 m, so they sit in
+  front of the target and behind anyone nearer the camera (Grumbo draws over it).
+- **The aimed leap (`aimLeap`, charge + stick to the bottom):** the slam's rise / .16 s hang / 12 m/s drive made three kinks. It is
+  BALLISTIC now (`p.slamArc`): one parabola under gravity only, the forward speed `d / T` constant from the first frame, no drag. The
+  katana's jump attack runs from its raise (`upFrom` .22) at the rate that puts its strike frame (.53) at T, the landing.
+  - Measured headless (full charge, stick at the bottom): y rises 0 -> 5.08 m (apex at mid-flight) -> 0 over 1.44 s, z 0 -> 10.8 m in
+    even steps, and the clip at .53 -- the strike -- on the frame he lands.
+- **No arc of dots:** `KAIM.dots` 0 (1 brings them back).
+
 ## m1677 -- THE OSARI SPIDER: rigged by script, walking procedurally (DOCKET 6)
 His Tripo zip (`models/creatures/osari_spider.zip`). Auto-Rig Pro's rig is humanoid, so the skeleton is placed from MEASURED geometry
 (scratchpad `spider/probe*.py`, `rig.py`):
