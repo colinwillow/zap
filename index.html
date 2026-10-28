@@ -24401,7 +24401,7 @@ function barrBuild() {
   // finials, a VERANDA of black pillars with gold bands along the front, mint lanterns hung along the eave, terracotta constructs, black
   // emblem nobori, a black taiko, mint braziers at the yard's far corners; statics merged
   const E = enemyMats(), wood = E.lacquer, stone = triMat('stone_blocks', { scale: 2.5, color: ENEMY.pal.stone }), sand = new THREE.MeshStandardMaterial({ color: 0xd8cdb4, roughness: 1 });
-  const lamp = E.glass, putM = (geo, m) => { const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; g.add(o); return o; };
+  const plank0 = () => BARR._pl || (BARR._pl = triMat('wood_planks', { scale: 2.2, color: 0x5a4c40 })), lamp = E.glass, putM = (geo, m) => { const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; g.add(o); return o; };
   const add = (geo, mat, x, y, z, solid) => { const o = new THREE.Mesh(geo, mat); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; g.add(o);
     if (solid) { geo.computeBoundingBox(); const b = geo.boundingBox; O.boxes.push({ minx: x + b.min.x, maxx: x + b.max.x, miny: y + b.min.y, maxy: y + b.max.y, minz: z + b.min.z, maxz: z + b.max.z }); } return o; };
   // THE HALL along the south (z = cz - 4), its door on the north (+z) onto the yard
@@ -24454,26 +24454,46 @@ function barrBuild() {
     for (const sx of [-1, 1]) { const E = [cx + sx * (hw + 1), H + .3, cz - 4], G = [cx + sx * (hw + 6), .3, cz - 4]; bldCable(g, E, G, 1, 4, lamp); add(new THREE.CylinderGeometry(.08, .1, .8, 6), wood, G[0], .4, G[2], 0); } }
   const drone = bldDrone(g);
   const fires = []; for (const sx of [-1, 1]) { const bz = enemyBrazier(E, 1.2), x = cx + sx * 9.8, z = cz + 9.8; bz.position.set(x, 0, z); g.add(bz); fires.push([x, bz.userData.top, z]); }     // m1659
+  // ---- RE-PASS 3 (m@X4@): THE YAGURA -- a black watch tower off the yard's north-west corner: four lacquer legs, a plank platform at
+  // 5 m (its box the drawn deck) railed on three sides (each rail its box), a LADDER up the yard face (the open side), a black-tile hip
+  // roof on corner posts with a gold finial, a mint lantern hung under it; an ARCHER posted up there over the yard, a doubloon on the deck.
+  // It falls (outward) with the barracks' roof ----
+  const yx = cx - 11.5, yz = cz + 6, yH = 5, yh = 1.2, nb0 = O.boxes.length;
+  for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { add(new THREE.BoxGeometry(.24, yH, .24), wood, yx + sx * yh, yH / 2, yz + sz * yh, 1); add(new THREE.BoxGeometry(.3, .08, .3), E.gold, yx + sx * yh, yH - .5, yz + sz * yh, 0);
+    add(new THREE.BoxGeometry(.12, 2.1, .12), wood, yx + sx * (yh + .05), yH + .15 + 1.05, yz + sz * (yh + .05), 1); }
+  for (const y of [1.6, 3.2]) { add(new THREE.BoxGeometry(yh * 2, .1, .1), wood, yx, y, yz - yh, 0); add(new THREE.BoxGeometry(yh * 2, .1, .1), wood, yx, y, yz + yh, 0); add(new THREE.BoxGeometry(.1, .1, yh * 2), wood, yx - yh, y, yz, 0); }
+  add(new THREE.BoxGeometry(yh * 2 + .5, .15, yh * 2 + .5), plank0(), yx, yH + .075, yz, 1);
+  for (const sz of [-1, 1]) add(new THREE.BoxGeometry(yh * 2 + .5, .9, .08), wood, yx, yH + .6, yz + sz * (yh + .21), 1);
+  add(new THREE.BoxGeometry(.08, .9, yh * 2 + .5), wood, yx - yh - .21, yH + .6, yz, 1);
+  bldRoof(g, yx, yz, yh + .8, yh + .8, 0, yH + 3.3, yH + 2.3, .35, wood); { const n = g.children.length; g.children[n - 2].material = E.roof; g.children[n - 2].userData.mg = g.children[n - 1].userData.mg = 1; }
+  add(new THREE.ConeGeometry(.1, .7, 6), E.gold, yx, yH + 3.65, yz, 0); add(new THREE.BoxGeometry(.26, .34, .26), lamp, yx, yH + 1.85, yz, 0); add(new THREE.CylinderGeometry(.012, .012, .45, 4), E.iron, yx, yH + 2.25, yz, 0);
+  { const lx = yx + yh + .3; for (const e of [-.3, .3]) add(new THREE.BoxGeometry(.07, yH + .15, .07), wood, lx, (yH + .15) / 2, yz + e, 0); for (let y = .3; y < yH; y += .32) add(new THREE.BoxGeometry(.06, .05, .66), wood, lx, y, yz, 0);
+    var yLad = kitClimbAdd({ minx: lx - .12, maxx: lx + .12, miny: 0, maxy: yH + .15, minz: yz - .45, maxz: yz + .45 }, 'barr_yagura', yH + .15); yLad.mark = { x: yx + .5, y: yH + .15, z: yz }; }
+  for (const b2 of O.boxes.slice(nb0)) BOXES.push(b2); boxGrid();     // (built after the hall's boxes went in)
   // ---- RE-PASS 2 (m1663): DESTRUCTIBLE TO THE GROUND. The veranda's six black PILLARS are the keystones (`barrBreak`, 3 blows each): a cut
   // pillar topples out into the yard; FOUR cut and the ROOF comes down into the hall (front first, the eave lanterns with it) and every
   // standing chunk of the hall's walls goes with it, staggered -- razed to its bunks. The yard, the dais, the dummies, the robots stay ----
   const pairs = []; for (const o of g.children.slice()) if (o.isMesh && o.userData.mg) { const m = o.material, tri = m.customProgramCacheKey && String(m.customProgramCacheKey()).startsWith('tri'); if (m.transparent || (m.map && !tri)) continue;
     o.updateMatrix(); pairs.push([(o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()).applyMatrix4(o.matrix), m]); o.removeFromParent(); }
-  const cls = c => { if (c.y > .2 && c.y < H && Math.abs(c.z - vz) < .3) { const i = pxs.findIndex(x => Math.abs(c.x - x) < .25); if (i >= 0) return 'p' + i; }
+  const cls = c => { if (c.y > .1 && Math.hypot(c.x - yx, c.z - yz) < 2.4) return 'yag';
+    if (c.y > .2 && c.y < H && Math.abs(c.z - vz) < .3) { const i = pxs.findIndex(x => Math.abs(c.x - x) < .25); if (i >= 0) return 'p' + i; }
     if (c.y > H + .12 || (c.y > H - 1 && Math.abs(c.z - vz) < .35) || (c.y > H - 1 && Math.abs(c.z - hz - hd) < .3 && Math.abs(c.x - cx) < dw) || (c.y > H - 1 && Math.abs(c.x - cx) < hw && Math.abs(c.z - hz) < hd - .5)) return 'roof'; return null; };
   const fall = (key, c) => { const rn = ((Math.sin(c.x * 12.9898 + c.z * 2.3) * 43758.5453) % 1 + 1) % 1 - .5;
     if (key === 'roof') return { p: [c.x + rn * .4, c.y - (H - .5), c.z + .5], r: [.22, rn * .1, rn * .12], hop: .2, at: .1 };
+    if (key === 'yag') return { p: [yx - (c.y - .3) * .93, .5 + (c.y - .3) * .37 * .3, c.z], r: [0, 0, 1.2], hop: .2, at: 0 };
     return { p: [c.x + rn * .3, .2, c.z + c.y], r: [1.5, 0, rn * .3], hop: .2, at: 0 }; };
   const Rr = restoreRig(g, { lift: 0, dur: 2.4, bob: 0 }), pieces = restorePieces(Rr, g, pairs, cls, fall);
   { const skip = new Set([drone, stick, drum, ...smash.map(S2 => S2.m), ...rb.map(R => R.g), ...O.meshes, ...Object.values(pieces)]), wb = new THREE.Box3(), wc = new THREE.Vector3(), ws = new THREE.Vector3();
     for (const o of g.children.slice()) { if (skip.has(o)) continue; wb.setFromObject(o); if (wb.isEmpty()) continue; wb.getCenter(wc); wb.getSize(ws); const key = cls(wc); if (key && pieces[key]) pieces[key].attach(o); } }
+  const coinsY = [coinDrop(g, yx - .4, yH + 1.05, yz - .4)];
   const nm = bldMergeStatic(g), rig = {}, bkey = b2 => b2.cw ? null : cls(new THREE.Vector3((b2.minx + b2.maxx) / 2, (b2.miny + b2.maxy) / 2, (b2.minz + b2.maxz) / 2));
   for (const key of Object.keys(pieces)) { const Rk = rig[key] = restoreRig(g, { lift: 0, dur: 2.4, bob: 0 }); Rk.pieces = Rr.pieces.filter(P => P.obj === pieces[key]);
-    restoreRide(Rk, { up: { boxes: O.boxes.filter(b2 => bkey(b2) === key), tris: [], climbs: [], bars: [], rings: [], objs: [], coins: [] } });
+    restoreRide(Rk, { up: { boxes: O.boxes.filter(b2 => bkey(b2) === key), tris: [], climbs: key === 'yag' ? [yLad] : [], bars: [], rings: [], objs: [], coins: key === 'yag' ? coinsY : [] } });
     Rk.onSet = R2 => restoreRideSet(R2); Rk.goal = 1; restoreSet(Rk, 1); restoreRideSet(Rk, true); }
   RESTORE.list.splice(RESTORE.list.indexOf(Rr), 1);
   const sup = pxs.map((x, i) => ({ key: 'p' + i, x, z: vz, y0: 0, y1: H, r: .45, hp: 3 }));
-  BARR.on = { g, O, bars: pbars, rb, smash, t: 0, drum, stick, drone, fires, nm, rig, pieces, sup, fell: {} };
+  BARR.on = { g, O, bars: pbars, rb, smash, t: 0, drum, stick, drone, fires, nm, rig, pieces, sup, fell: {}, lad: yLad, coins: coinsY, arch: [] };
+  { const B0 = BARR.on; archerPost(yx - .3, yH + .2, yz).then(d => { if (BARR.on === B0) B0.arch.push(d); else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {}); }     // m@X4@: the yagura's archer
   arenaBeam(cx, cz, [1, .5, .35], 1); snd('clang', { g: .7, r: .55 });
 }
 // RE-PASS 2 (m1663): THE BARRACKS COMES DOWN -- a blow on a veranda pillar chips it; cut, it topples; four down and the roof follows
@@ -24486,6 +24506,7 @@ function barrFell(B, key) { if (B.fell[key] || BARR.on !== B || !B.rig[key]) ret
   snd(key === 'roof' ? 'boom' : 'thud', { g: 1.2, r: key === 'roof' ? .4 : .7, x: pc.x, z: pc.z }); camShake(key === 'roof' ? .6 : .2);
   if (key === 'roof') { jinraEmit(pc.x, 2, pc.z, 30); let k = 0;
     B.sup.forEach((P, i) => { if (!P.cut) { P.cut = 1; setTimeout(() => barrFell(B, P.key), 350 + i * 120); } });     // the pillars still standing go with it
+    setTimeout(() => { barrFell(B, 'yag'); for (const d of B.arch) if (d && d.st !== 'gone') dummyBlow(d, -Math.PI / 2, 1.4, 99); if (player.climb === B.lad) climbOff(); }, 1100);     // m@X4@: and the yagura
     setTimeout(() => { if (BARR.on !== B) return; for (const m of B.O.meshes) if (!m.isInstancedMesh && m.geometry.parameters && m.geometry.parameters.height > .6) m.visible = false;     // the walls' stone end posts go too
       for (const W of B.O.walls) for (const fb of W.frame) if (fb.maxy - fb.miny > .6) { const i = BOXES.indexOf(fb); if (i >= 0) BOXES.splice(i, 1); } boxGrid(); }, 900); for (const W of B.O.walls) for (const ch of W.chunks) { if (!ch.alive) continue; const dly = 300 + (k++) * 25; setTimeout(() => { if (BARR.on === B) wallBreak(W, ch, Math.random() * 6.283, k % 3 !== 0); }, dly); }
     setTimeout(() => { if (BARR.on !== B) return; for (let i = 0; i < 6; i++) spkBurst(pc.x + (Math.random() - .5) * 12, .5, pc.z + (Math.random() - .5) * 5, 16, { col: [.8, .72, .55], spread: 6, size: .5, life: 1.4 }); }, 800); }
@@ -24516,7 +24537,8 @@ function barrHit(x, y, z, rad, dmg) { const B = BARR.on; if (!B) return 0;
     R.cool = .25; if (!(B.halt > 0)) B.fight = Math.max(B.fight || 0, BARR.fightT); R.hp -= Math.max(.5, dmg || 1); spkBurst(P.x, 1.3, P.z, 12, { col: [1, .8, .4], spread: 3, size: .1, life: .35 }); snd('clang', { g: .8, r: 1.2 + Math.random() * .3, x: P.x, z: P.z });
     if (R.hp <= 0) { R.dead = 1; R.t = BARR.rbBack; R.g.scale.set(R.boss ? BARR.bossK : 1, .35, R.boss ? BARR.bossK : 1); if (R.boss) { B.halt = BARR.haltT; B.fight = 0; R.t = BARR.haltT; camShake(.3); } R.g.rotation.z = (Math.random() - .5) * .8; for (let k = 0; k < 3; k++) spkBurst(P.x, 1, P.z, 18, { col: k ? [1, .55, .15] : [.5, .9, 1], spread: 5, size: .16, life: .6 }); smokeAt(P.x, 1, P.z, 1.2, 1.2); snd('boom', { g: .6, r: 1.1, x: P.x, z: P.z }); }
     return 1; } return 0; }
-function barrClear() { const B = BARR.on; if (!B) return; for (const Rk of Object.values(B.rig || {})) { const i = RESTORE.list.indexOf(Rk); if (i >= 0) RESTORE.list.splice(i, 1); if (Rk.ride) { bldTrisDrop(Rk.ride.tb); bldTrisDrop(Rk.ride.tu); } } smashDrop(B.smash); bldClear(B); BARR.on = null; boxGrid(); }
+function barrClear() { const B = BARR.on; if (!B) return; for (const c of B.coins || []) { const i = COIN.list.indexOf(c); if (i >= 0) COIN.list.splice(i, 1); } if (B.lad) { const i = KCLIMB.indexOf(B.lad); if (i >= 0) KCLIMB.splice(i, 1); if (player.climb === B.lad) climbOff(); }
+  for (const d of B.arch || []) if (d && HORDE.list.includes(d)) { bowDrop(d); bodyGone(d); HORDE.list.splice(HORDE.list.indexOf(d), 1); } for (const Rk of Object.values(B.rig || {})) { const i = RESTORE.list.indexOf(Rk); if (i >= 0) RESTORE.list.splice(i, 1); if (Rk.ride) { bldTrisDrop(Rk.ride.tb); bldTrisDrop(Rk.ride.tu); } } smashDrop(B.smash); bldClear(B); BARR.on = null; boxGrid(); }
 
 // m1190: THE JIN LIGHTHOUSE (BUILDINGS.md #18, pass 1) at (-46, 30). A square stone KEEPER'S ROOM (breakable walls, a door east) whose flat
 // roof is reached by a RAMP up the north side; from the roof a SPIRAL STAIR of .3 steps winds 1.8 turns round a slim bronze-banded shaft to a

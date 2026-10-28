@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the ROBOT BARRACKS, pass 3 (THE YAGURA) -- its third pass, DONE
+- How you get UP (and L3): a black YAGURA (watch tower) 11.5 m west of the hall's centre off the yard's north-west corner, clear of the
+  dummies, the cables and the braziers. Four lacquer legs with gold bands and two tiers of cross ties, a 2.9 m plank deck at 5 m, rails on
+  three sides (the yard side open for the ladder), corner posts up to a black-tile hip roof with a gold finial, a mint lantern hung under
+  it. Every leg, post, rail and the deck is its own box (as drawn). A LADDER up the yard face (`kitClimbAdd` `barr_yagura`, top 5.15).
+- An ARCHER (`archerPost`) stands on the deck over the yard; a doubloon on the deck.
+- It is its own piece `yag`: when the roof comes down (four pillars), the yagura TOPPLES outward (1.2 rad about z) 1.1 s later, the archer
+  is knocked off (`dummyBlow`), the ladder and the coin go (`up`), a climber is let go. `barrClear` drops the coin, the climb and the
+  archer.
+- CAUGHT: the yagura's boxes were added after the hall's `BOXES.push` -- the archer spawned through the deck to the ground. They are
+  pushed in now.
+Render-checked headless (the archer on the deck, the ladder; after four pillars: roof down, yagura lying west). Next: Jin Lighthouse.
+Shipped unverified.
+
 ## m1663 -- THE RE-PASS: the ROBOT BARRACKS, pass 2 (DESTRUCTIBLE TO THE GROUND)
 - Keystones: the veranda's six black PILLARS (m1659), each its own piece, 3 blows (`barrBreak`, after `barrHit` so a robot in front of
   one takes the blow first). A cut pillar topples OUT into the yard (1.5 rad about x, its centre swung down to the ground). Four cut and
