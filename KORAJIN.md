@@ -160,6 +160,28 @@ wingsuit (borrow from that), shoot the gun while riding, ride him on the ground 
 - **Open (his):** "Kūkyo" for the empire or a play on it, whether "Osari" stays as the people's name, and whether names show in game at
   all (the SPAWN menu still says OSARI SPIDER / Osari bowmen; nothing has been renamed yet).
 
+## THE STOLEN ONES -- what is inside every guardian (his, Oct 28 2026; open)
+> *"The evil sorceress / evil force takes village people or village animals and freezes them in stone, turning them into the guardians of the
+> places that keep the power source in these ancient temples. When you slay a boss the rock formation crumbles, the power is released, and
+> what's left is what it was -- a bull (an alien bull), or a village person. A farmer: 'I'm missing Betsy.' Help me find Betsy -- you slay the
+> thing at the very end, you get the bull back and give it to the farmer, because the cow had been turned into the watcher of this temple.
+> Or somebody loses their little brother, and he's one of these."*
+- **Every temple guardian (boss) is a STOLEN ONE:** a villager or a village animal the Kūkyo turned to stone and set to guard the stolen Jinra.
+  His bull-headed stone god is Betsy.
+- **The boss fight breaks the stone; the crumble is the reward.** The rock falls away, the Jinra pours out, and the creature or person is
+  standing there, dazed. It is the restoration's own grammar (FALLEN -> RESTORED) on a body.
+- **The quest comes FIRST, in the village:** a farmer missing a bull, a mother missing a son, a smith missing his apprentice. You do not know
+  it's the boss until the stone cracks. **Returning them is the temple's real ending** (the token is the formality): the farmer and Betsy, the
+  brother home. The townsperson you returned them to AWAKENS (THE RESTORATION, step 2), so a temple restores a person as well as a place.
+- **Who they were shapes the guardian:** a bull becomes a bull-headed stone god; a fisherman becomes something of the water temple; a child
+  becomes something small and fast. The temple's look follows from what was stolen.
+- **The small statues are the same thing at a smaller scale:** the stone guardians that wake on the chalice (STATUES.md) can be stolen
+  villagers' animals too. A broken one leaves a chicken, a goat, a dog behind, to be walked home for a reward (the side-quest layer).
+- **Zelda's version:** Ocarina of Time's sages are trapped in its temples and freed when the boss falls. This makes it personal and
+  visible: the one freed is someone the village asked you to find.
+- **Open:** who the "sorceress" is (a Kūkyo figure, the one draining the world), and whether a freed guardian keeps a trace of its stone form
+  (a stone horn, a glowing scar) as a mark of where it was.
+
 ## THE JINRA BEACONS -- a spine for the campaign (his idea, Oct 28 2026; open, "we'll figure it out")
 > *"The evil army has giant torch towers. When you defeat a tower you shoot the Jinra into it, and it lights up green and shoots off -- the levels
 > are arranged around a central place, and you're aligning all the Jinra to the central tower, so it becomes one giant powerful thing that powers

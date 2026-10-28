@@ -108,7 +108,10 @@ special). That is the Link's Awakening count. Each act ends on a world-changing 
 - **3-5 small keys** (one locked door open at a time), **1 boss key**, **3 hidden collectibles**.
 - **The statue beat (STATUES.md):** stone guardians stand in the temple from the start. Taking the temple's relic (the chalice) wakes them for the
   escape or the gauntlet before the boss.
-- **The boss** is a Kūkyo construct (an Utsuro): stone god / temple guardian scale, beaten with the temple's item.
+- **The boss** is a Kūkyo construct (an Utsuro): stone god / temple guardian scale, beaten with the temple's item. **Inside it is a STOLEN
+  ONE** (KORAJIN.md): a villager or village animal the Kūkyo turned to stone. The village asks you to find them before you ever reach the
+  temple ("I'm missing Betsy"); the boss's stone crumbles and they are freed; walking them home is the temple's real ending, and it
+  awakens the one who asked.
 - **The theme** is its new verb (LEVELDESIGN.md layer 4).
 
 ### Progression (powers, evolutions, advancement)

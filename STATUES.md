@@ -19,6 +19,9 @@
 - **Verticality:** statues stand on plinths of different heights, spread out, guarding the lair.
 - **The sphinx is ours:** an alien guardian (wolf- or cat-headed, alien first), and it is a candidate for the first statue-native enemy.
 
+- **What is inside the stone (KORAJIN.md, THE STOLEN ONES):** the guardians are villagers and village animals the Kūkyo petrified. A boss
+  that crumbles leaves the stolen one standing there (his example: the bull-headed god is the farmer's lost bull, Betsy).
+
 ## The sandbox: SPAWN > STATUES (forge)
 Four Osari spiders in stone on plinths of 1.2 / 2.6 / 1.8 / 3.4 m in a wide arc 12 m ahead, with a gold chalice of mint Jinra on a
 black pedestal 6 m ahead. Walk into the chalice and they wake.
