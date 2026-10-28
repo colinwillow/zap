@@ -11,6 +11,12 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 - [ ] plants pass 2: real silhouettes per type (PROPS.md has the ten-pass plan)
 - [ ] rocks, water, courtyard, fences and blocks, household, climbing: each its own sandbox, pass 1 each
 
+## THE GROUND (his, Oct 28 2026: *"the grass is very low quality... flat where it should be flat, a courtyard, but grassy knolls should have variation... paint the grass, add little alien plants, rocks, dirt"*)
+- [x] **pass 1 (mXXXX):** knolls outside what is built (`floatIsland` `knoll`/`flatR`); the painted ground (`isl4Mat`); new grass tufts; flowers, alien fronds and stones; every dressed island in the dojo scattered from the plant library
+- [ ] pass 2: the knolls' FACETS (the icosphere top is coarse: a finer top grid, or a displaced disc), stronger worn dirt paths between built things, moss on the shade side of rocks
+- [ ] pass 3: grass that thins near paths and thickens in hollows; puddles; fallen petals under the cherries
+- [ ] pass 4: the same ground in Grumbo's home and the forge buildings (one shared ground kit)
+
 ## THE CREATURES, PASS BY PASS (his: *"individual passes on the animals themselves, a bunch of passes on each, because the first pass on anything is never good"*)
 - [ ] sky whale (dojo, pass 1 at m1413): pass 2 -- a real silhouette (a heavier head, a jaw line, barnacle and Jin markings, a slower roll)
 - [ ] sky manta (dojo, pass 1 at m1417): pass 2 -- a thicker body, a curled cephalic fin, a proper underside, wings that ripple, not fold

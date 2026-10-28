@@ -10095,9 +10095,23 @@ const PLANTK = {
     p.push(plantPart(new THREE.SphereGeometry(.32, 14, 10).scale(1, 1.3, 1).translate(.22, 2.45, 0), [.48, 1, .85], sw, 0, 1));
     for (const a of [0, 2.1, 4.2]) { const pe = new THREE.PlaneGeometry(.5, .32).translate(.25, 0, 0).rotateZ(.7).rotateY(a).translate(.22, 2.2, 0); p.push(plantPart(pe, 0x5a3a7a, sw, .6)); }
     for (const a of [1, 3.5]) { const lf = new THREE.PlaneGeometry(.7, .25).translate(.35, 0, 0).rotateZ(.3).rotateY(a).translate(.1, .8, 0); p.push(plantPart(lf, 0x4a6a5a, sw, 1)); } return p; } },
-  grass: { h: .6, r: .5, stiff: 1.2, bend: 1, make() { const R = plantRnd(17), p = [], gr = plantMix(0x4f8a34, 0x8ab84a, R);
-    for (let i = 0; i < 26; i++) { const a = R() * 6.28, d = R() * .35, h = .35 + R() * .4, b = new THREE.BufferGeometry(); const x = Math.cos(a) * d, z = Math.sin(a) * d, w = .05, ta = R() * 6.28, lx = Math.cos(ta) * .12, lz = Math.sin(ta) * .12;
-      b.setAttribute('position', new THREE.Float32BufferAttribute([x - w, 0, z, x + w, 0, z, x + lx, h, z + lz], 3)); b.computeVertexNormals(); const c = gr(); p.push(plantPart(b, (X, y) => c.map(v => v * (.7 + y)), (X, y) => y / .75, .3)); } return p; } },
+  grass: { h: .7, r: .5, stiff: 1.2, bend: 1, make() { const R = plantRnd(17), p = [];     // m1436: curved two-segment blades, dark at the root to a light tip, normals tipped UP (soft, not flat cards)
+    for (let i = 0; i < 18; i++) { const a = R() * 6.28, d = Math.sqrt(R()) * .32, h = .3 + R() * .5, x = Math.cos(a) * d, z = Math.sin(a) * d, w = .035 + R() * .03, ta = R() * 6.28, lean = .1 + R() * .25, lx = Math.cos(ta), lz = Math.sin(ta), sx = -lz * w, sz = lx * w;
+      const m1 = [x + lx * lean * .35 * h, h * .55, z + lz * lean * .35 * h], tp = [x + lx * lean * h, h, z + lz * lean * h], b = new THREE.BufferGeometry();
+      b.setAttribute('position', new THREE.Float32BufferAttribute([x - sx, 0, z - sz, x + sx, 0, z + sz, m1[0] + sx * .7, m1[1], m1[2] + sz * .7, x - sx, 0, z - sz, m1[0] + sx * .7, m1[1], m1[2] + sz * .7, m1[0] - sx * .7, m1[1], m1[2] - sz * .7, m1[0] - sx * .7, m1[1], m1[2] - sz * .7, m1[0] + sx * .7, m1[1], m1[2] + sz * .7, ...tp], 3));
+      const N = []; for (let k = 0; k < 9; k++) N.push(lx * .3, 1, lz * .3); b.setAttribute('normal', new THREE.Float32BufferAttribute(N, 3));
+      const tone = .75 + R() * .5, yel = R() < .2 ? .12 : 0; p.push(plantPart(b, (X, y) => { const t = Math.min(1, y / .8); return [(.08 + t * .34 + yel) * tone, (.2 + t * .42 + yel * .6) * tone, (.05 + t * .12) * tone]; }, (X, y) => y / .8, .25)); } return p; } },
+  flowers: { h: .5, r: .4, stiff: 1.1, bend: 1, make() { const R = plantRnd(23), p = [], cols = [[1, .95, .97], [1, .82, .25], [.98, .55, .7], [.7, .6, 1]], cc = cols[Math.floor(R() * 4)];
+    for (let i = 0; i < 9; i++) { const a = R() * 6.28, d = R() * .3, h = .22 + R() * .3, x = Math.cos(a) * d, z = Math.sin(a) * d;
+      p.push(plantPart(new THREE.CylinderGeometry(.008, .012, h, 3).translate(x, h / 2, z), [.2, .4, .12], (X, y) => y / .55));
+      p.push(plantPart(new THREE.IcosahedronGeometry(.05 + R() * .03, 0).scale(1, .6, 1).translate(x, h, z), R() < .7 ? cc : cols[Math.floor(R() * 4)], h / .55)); } return p; } },
+  frond: { h: .9, r: .6, stiff: .9, bend: 1.1, make() { const R = plantRnd(29), p = [];     // alien: curled violet fronds that unroll, Jin-tipped
+    for (let i = 0; i < 7; i++) { const a = i / 7 * 6.28 + R() * .4, L = .6 + R() * .4, pts = []; for (let k = 0; k <= 6; k++) { const t = k / 6, r = t * L * .8, y = Math.sin(t * 2.4) * L * .9; const cu = t > .7 ? (t - .7) * 3 : 0; pts.push([Math.cos(a) * (r - cu * .15), y - cu * .2, Math.sin(a) * (r - cu * .15)]); }
+      p.push(plantPart(plantTube(pts, .045, .018, 5), (x, y) => [.32 + y * .2, .16 + y * .1, .42 + y * .25], (x, y, z) => Math.min(1, Math.hypot(x, z) / .7), .3));
+      const e = pts[6]; p.push(plantPart(new THREE.SphereGeometry(.045, 6, 4).translate(...e), [.48, 1, .85], Math.min(1, Math.hypot(e[0], e[2]) / .7), 0, 1)); } return p; } },
+  stones: { h: .5, r: .6, stiff: 0, bend: 0, make() { const R = plantRnd(31), p = [];
+    for (let i = 0; i < 3; i++) { const s = .18 + R() * .3, b = plantBlob(s, 40 + i, 1); b.scale(1, .6, 1).translate((R() - .5) * .7, s * .25, (R() - .5) * .7); const t = .85 + R() * .3; p.push(plantPart(b, (x, y) => [(.5 + y * .2) * t, (.44 + y * .2) * t, (.4 + y * .15) * t], 0)); }
+    return p; } },
 };
 function plantKind(name) { if (PLANT.kinds[name]) return PLANT.kinds[name]; const K = PLANTK[name], geo = mergeGeometries(K.make()); PLANT.kinds[name] = { K, geo, n: 0, list: [] }; return PLANT.kinds[name]; }
 // put the instanced meshes down for every kind used under `g` (call once after all plantPlant calls for that group)
@@ -10243,11 +10257,16 @@ function isl3Noise(x, y, z) { const xi = Math.floor(x), yi = Math.floor(y), zi =
   const L = (a, b, t) => a + (b - a) * t, h = (i, j, k) => isl3Hash(xi + i, yi + j, zi + k);
   return L(L(L(h(0, 0, 0), h(1, 0, 0), u), L(h(0, 1, 0), h(1, 1, 0), u), v), L(L(h(0, 0, 1), h(1, 0, 1), u), L(h(0, 1, 1), h(1, 1, 1), u), v), w) * 2 - 1; }
 function isl3Fbm(x, y, z, o = 4) { let a = .5, s = 0; for (let i = 0; i < o; i++) { s += a * isl3Noise(x, y, z); x *= 2.03; y *= 2.03; z *= 2.03; a *= .5; } return s; }
-function floatIsland(o) { o = Object.assign({ R: 10, depth: 12, seed: 1, detail: 4, flat: .5, lobes: 2, grass: [.22, .4, .18], grass2: [.34, .5, .2], dirt: [.42, .28, .17], moss: [.26, .38, .16],
+function floatIsland(o) { o = Object.assign({ R: 10, depth: 12, seed: 1, detail: 4, flat: .5, lobes: 2, knoll: 0, flatR: 0, grass: [.22, .4, .18], grass2: [.34, .5, .2], dirt: [.42, .28, .17], moss: [.26, .38, .16],
     bands: [[.66, .44, .27], [.36, .25, .19], [.74, .55, .36], [.28, .2, .16], [.55, .37, .25]] }, o);
   const sd = o.seed * 13.37, g = new THREE.IcosahedronGeometry(1, o.detail).toNonIndexed(), P = g.attributes.position, n = P.count, col = new Float32Array(n * 3), R = o.R;
   const rimR = a => R * (1 + .2 * isl3Fbm(Math.cos(a) * 1.4 + sd, Math.sin(a) * 1.4, sd, 3) + .07 * isl3Noise(Math.cos(a) * 6 + sd, Math.sin(a) * 6, 1));
-  const topAt = (x, z) => o.flat * (R * .05 * isl3Fbm(x * .09 + sd, 0, z * .09, 3) + R * .025 * Math.max(0, 1 - Math.hypot(x, z) / R));
+  // m1436: KNOLLS (his: *"where it should be flat it should be flat -- the centre of a courtyard -- but grassy knolls should have variation"*):
+  // `knoll` (a fraction of R, capped 3.5 m) raises rounded hills outside `flatR` (what is built on stays level) and lets them fall away to the rim
+  const kH = Math.min(3.5, o.knoll * R), sm = (a, b, v) => { const t = Math.max(0, Math.min(1, (v - a) / (b - a))); return t * t * (3 - 2 * t); };
+  const topAt = (x, z) => { const r = Math.hypot(x, z); let h = o.flat * (R * .05 * isl3Fbm(x * .09 + sd, 0, z * .09, 3) + R * .025 * Math.max(0, 1 - r / R));
+    if (kH > 0) { const m = sm(o.flatR, o.flatR + 5, r) * sm(R * 1.02, R * .62, r), k = isl3Fbm(x * .07 + sd * 2, 3.3, z * .07, 3), k2 = isl3Fbm(x * .2 + sd, 9.1, z * .2, 2);
+      h += kH * m * (Math.max(0, k + .15) * 1.6 + k2 * .25); } return h; };
   // the tips: `lobes` points under the island the underside hangs toward (not one centred cone)
   const tips = []; for (let k = 0; k < o.lobes; k++) { const a = sd * 3 + k * (6.283 / o.lobes) + isl3Hash(k, sd, 9) * .8, r = R * (o.lobes > 1 ? .32 + .28 * isl3Hash(k, sd, 2) : .05); tips.push([Math.cos(a) * r, -o.depth * (k ? .45 + .4 * isl3Hash(sd, k, 5) : 1), Math.sin(a) * r]); }
   const c = new THREE.Color();
@@ -10267,6 +10286,22 @@ function floatIsland(o) { o = Object.assign({ R: 10, depth: 12, seed: 1, detail:
       if (s < .2 && isl3Noise(dx * 6 + sd, dy * 2, dz * 6) > -.15 + s * 5) c.setRGB(...o.moss); if (s < .05) c.setRGB(...o.dirt); }
     P.setXYZ(i, x, y, z); col.set([c.r, c.g, c.b], i * 3); }
   g.setAttribute('color', new THREE.BufferAttribute(col, 3)); if (g.attributes.uv) g.deleteAttribute('uv'); g.computeVertexNormals(); return { geo: g, topAt, rimR, R }; }
+// m1436: THE PAINTED GROUND -- the islands' grass is no longer one flat green: in WORLD space, big patches of dark and mid grass, sunny
+// yellow-green drifts, a fine blade speckle, bare dirt where the ground is steep or in worn patches, and tiny flower dots. Only on vertices
+// coloured green (the tops), so the strata and the rims keep their own paint.
+function isl4Mat() { if (ISLE3.mat4) return ISLE3.mat4; const m = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .95, metalness: 0 });
+  m.onBeforeCompile = sh => { sh.vertexShader = 'varying vec3 vGw; varying vec3 vGn;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n vGw = (modelMatrix * vec4(transformed, 1.0)).xyz; vGn = normalize(mat3(modelMatrix) * objectNormal);');
+    sh.fragmentShader = `varying vec3 vGw; varying vec3 vGn;
+      float gh(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); } float gn(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(gh(i), gh(i + vec2(1, 0)), f.x), mix(gh(i + vec2(0, 1)), gh(i + vec2(1, 1)), f.x), f.y); }
+      float gfb(vec2 p) { float a = .5, s = 0.0; for (int i = 0; i < 4; i++) { s += a * gn(p); p *= 2.07; a *= .5; } return s; }
+` + sh.fragmentShader.replace('#include <color_fragment>', `#include <color_fragment>
+      { float gr = max(step(vColor.r * 1.05, vColor.g) * step(vColor.b * 1.1, vColor.g), step(.6, vGn.y)); if (gr > .5) { vec2 p = vGw.xz;
+        float big = gfb(p * .045), mid = gfb(p * .17 + 3.1), fine = gn(p * 2.3), blade = gn(vec2(p.x * 11.0, p.y * 11.0) + gn(p * 1.3) * 5.0);
+        vec3 c = mix(vec3(.11, .24, .07), vec3(.25, .43, .12), smoothstep(.3, .7, big + (mid - .5) * .6)); c = mix(c, vec3(.5, .56, .18), smoothstep(.6, .85, mid) * .55);
+        c *= .78 + .38 * blade; float slope = 1.0 - clamp(vGn.y, 0.0, 1.0); float d = smoothstep(.64, .72, gfb(p * .1 + 9.0)) * .8 + smoothstep(.22, .55, slope);
+        c = mix(c, vec3(.4, .27, .16) * (.75 + .45 * fine), clamp(d, 0.0, 1.0) * .9); float fl = step(.988, gn(p * 6.0 + 11.0)) * (1.0 - d);
+        c = mix(c, mix(vec3(1.0, .92, .96), vec3(1.0, .85, .3), step(.5, gh(floor(p * 6.0)))), fl * .8); diffuseColor.rgb = c; } }`); };
+  m.customProgramCacheKey = () => 'isl4'; return (ISLE3.mat4 = m); }
 function isl3Mat() { return ISLE3.mat || (ISLE3.mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .95, metalness: 0 })); }
 // the dressing: `trees` (cherry/pine), boulders, shrubs, hanging roots -- into the caller's `put` buckets, all vertex-coloured or a shared material
 const ISLE3M = {}; function isl3M() { if (!ISLE3M.trunk) Object.assign(ISLE3M, { trunk: new THREE.MeshStandardMaterial({ color: 0x4a3426, roughness: .9 }), pink: new THREE.MeshStandardMaterial({ color: 0xf2a8c0, roughness: .8, emissive: 0x3a1020, emissiveIntensity: .15 }),
@@ -10365,7 +10400,8 @@ function dojoBuild(g, W) {
     red: new THREE.MeshStandardMaterial({ color: 0xa8201a, roughness: .45 }), gold: triMat('bronze', { scale: 1.5, metal: .75, rough: .35 }), roof: triMat('roof_tiles', { scale: 2.2, side: THREE.DoubleSide }), white: new THREE.MeshStandardMaterial({ color: 0xf1ead8, roughness: .9 }),
     blade: new THREE.MeshStandardMaterial({ color: 0xdfe8f2, metalness: .9, roughness: .15, emissive: 0x3a5a7a, emissiveIntensity: .4 }), lamp: new THREE.MeshStandardMaterial({ color: 0xffb46a, emissive: 0xff8a2a, emissiveIntensity: 1.4 }), dark: new THREE.MeshStandardMaterial({ color: 0x1c1614, roughness: .6 }) };
   const at = (a, r) => [Math.sin(a) * r, Math.cos(a) * r];
-  const ISL = [], isl = (o, x, y, z, dress) => { const I = floatIsland(o); ISL.push(I.geo.translate(x, y, z)); if (dress) islandDress(put, I, x, y, z, dress); return I; };     /* m1404: islands, not cones */
+  const ISL = [], SCAT = [], isl = (o, x, y, z, dress) => { if (dress) { if (o.knoll === undefined) o.knoll = o.R > 8 ? .07 : .04; if (o.flatR === undefined) o.flatR = dress.clear || 0; }     /* m1436: knolls where nothing is built */
+    const I = floatIsland(o); ISL.push(I.geo.translate(x, y, z)); if (dress) { islandDress(put, I, x, y, z, dress); SCAT.push([I, x, y, z, dress.clear || 0, dress.seed || 1]); } return I; };     /* m1404: islands, not cones */
   // SKY and CLOUDS: the sunrise dome, and a sea of cloud far below (soft noise, fading to the horizon)
   const sd = new THREE.Vector3(...D.sun).normalize(), U = { uTime: { value: 0 }, uSun: { value: sd } }; D.U = U;
   const dome = new THREE.Mesh(new THREE.SphereGeometry(880, 48, 24), new THREE.ShaderMaterial({ uniforms: U, side: THREE.BackSide, depthWrite: false, fog: false,
@@ -10518,9 +10554,15 @@ function dojoBuild(g, W) {
     for (const [I, cx, cy, cz] of [SC[0], SC[1]]) { const isJ = I === SC[0][0]; const a = Math.atan2(-cz, -cx) + .35, r = I.rimR(a) * .97, rx = cx + Math.cos(a) * r, rz = cz + Math.sin(a) * r, ty = cy + I.topAt(Math.cos(a) * r, Math.sin(a) * r);
       const L = 70, wf = new THREE.PlaneGeometry(6, L, 1, 24), P = wf.attributes.position; for (let i = 0; i < P.count; i++) { const t = (L / 2 - P.getY(i)) / L; P.setZ(i, Math.sin(Math.min(1, t * 4) * Math.PI / 2) * 3 + t * 4); P.setX(i, P.getX(i) * (1 + t * 1.6)); }
       wf.translate(0, -L / 2, 0); wf.rotateY(Math.PI / 2 - a); const m = new THREE.Mesh(wf, isJ ? jm : fm2); m.position.set(rx, ty + .1, rz); m.rotation.y = 0; m.renderOrder = 1; g.add(m); D.falls.push(m);
-      const sx2 = cx + Math.cos(a) * r * .45, sz2 = cz + Math.sin(a) * r * .45, st = new THREE.PlaneGeometry(r * .55, 2.6).rotateX(-Math.PI / 2).rotateY(-a).translate((sx2 + rx) / 2, ty + .15, (sz2 + rz) / 2);
+      const sx2 = cx + Math.cos(a) * r * .8, sz2 = cz + Math.sin(a) * r * .8, st = new THREE.PlaneGeometry(r * .2, 2.6).rotateX(-Math.PI / 2).rotateY(-a).translate((sx2 + rx) / 2, ty + .15, (sz2 + rz) / 2);
       g.add(new THREE.Mesh(st, isJ ? new THREE.MeshBasicMaterial({ color: 0x7affd8, toneMapped: false }) : new THREE.MeshStandardMaterial({ color: 0x6fb8d8, roughness: .1, metalness: .2, emissive: 0x1a4a66, emissiveIntensity: .4 }))); } }
-  { const o = new THREE.Mesh(mergeGeometries(ISL), isl3Mat()); o.castShadow = o.receiveShadow = true; g.add(o); }
+  { const o = new THREE.Mesh(mergeGeometries(ISL), isl4Mat()); o.castShadow = o.receiveShadow = true; g.add(o); }
+  // m1436: THE GROUND DRESSING -- the plant library's grass, flowers, alien fronds, Jin bulbs and stones scattered over every dressed island
+  // (denser on the near ones; the painted ground carries the far ones), kept off what is built (`clear`). One draw per kind for the lot.
+  { const rec = []; for (const [I, X, Y, Z, clr, sdd] of SCAT) { const Rr = plantRnd(sdd * 977 + 3), far = Math.hypot(X, Z) > 110, n = Math.min(far ? 90 : 380, Math.round(I.R * I.R * (far ? .15 : .85)));
+      const drop = (kind, k, s0, s1) => { for (let i = 0; i < k; i++) { for (let t = 0; t < 6; t++) { const a = Rr() * 6.283, r = Math.sqrt(Rr()) * I.rimR(a) * .86; if (r < clr + .4) continue; const x = Math.cos(a) * r, z = Math.sin(a) * r; plantPlant(rec, kind, X + x, Y + I.topAt(x, z) - .03, Z + z, s0 + Rr() * (s1 - s0), Rr() * 6.28); break; } } };
+      drop('grass', n, 1.2, 2.1); drop('flowers', Math.round(n / 9), .8, 1.3); drop('frond', Math.round(n / 16), .7, 1.3); drop('stones', Math.round(n / 14), .7, 1.8); if (!far) drop('jinbulb', Math.round(n / 60), .5, .8); }
+    D.plantMeshes = plantFlush(g, rec); }
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o !== null; o.receiveShadow = true; g.add(o); }
   // THE DRIFTING PLATFORMS: small stone discs on rock roots, slowly bobbing and circling outside the rim (decor for now)
   D.plats = [];

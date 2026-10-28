@@ -40,6 +40,15 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
+## THE GROUND, PASS 1: KNOLLS, PAINTED GRASS, AND THE PLANT LIBRARY ON EVERY ISLAND (mXXXX)
+*"The grass is just very low quality... where it should be flat it should be flat, but grassy knolls should have variation. Paint the grass textures, add little alien plants, rocks, dirt... it's very flat green."*
+- **`floatIsland({ knoll, flatR })`:** rounded hills (fbm, capped 3.5 m) rise outside `flatR` and fade toward the rim. Both default to 0, so the forge, the home and the Ship are untouched. The dojo's `isl()` sets `knoll` .07 (.04 under R 8) and `flatR` = the dress `clear`, so courtyards, halls and the pagoda plinth stay level.
+- **`isl4Mat()`, the painted ground:** world-space value noise on every UP-facing fragment (`vGn.y > .6`, or anything green). Dark and mid grass patches, sunny drifts, a blade speckle, dirt where it is steep or worn, flower dots.
+- **The bug the first render showed:** the vertex-colour DIRT patches from `floatIsland` were not green, so they escaped the paint and showed as hard polygons. Painting by the normal fixes it.
+- **The plant library on the ground:** the grass kind is rebuilt (18 curved two-segment blades a tuft, dark root to light tip, normals tipped UP so they light soft), plus new kinds `flowers`, `frond` (alien violet, Jin-tipped) and `stones`.
+- **`SCAT`:** every dressed island scatters grass, flowers, fronds, stones and a few Jin bulbs, kept off `clear`. Near islands get up to 380 tufts, far ones (past 110 m) 90, and the paint carries the far ones. One draw per kind.
+- **The knolls are FACETED:** the icosphere top is coarse. That is ground pass 2.
+
 ## THE DOJO, PASS 11: THE ALTARS ANSWER (m1434)
 - **Each altar has a chime, a ring and a glint.** The chime is a bronze wind-chime under the canopy (5 tubes, a striker, a mint tassel) on a spring (`A.sw`). The Jin ring is an additive mint torus that rises 3.2 m and fades over 1.4 s. The glint is a star sprite (`dojoGlintTex`) that runs the top katana in .55 s.
 - **The trigger:** `dojoStep` checks him on the disc (within 2.4 m, |dy| < .7) and calls `dojoBlessing(A)` once. It re-arms past 3.5 m.
