@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- AUDIO THAT COMES UP EVERY TIME (his: "if I go through the menu quickly and get to a game there's no audio; and if I leave the game and
+## m1699 -- AUDIO THAT COMES UP EVERY TIME (his: "if I go through the menu quickly and get to a game there's no audio; and if I leave the game and
 come back, the audio is muted")
 - **No sound after a quick menu:** the first touch built the context and decoded only the files ALREADY fetched. A file landing after that
   first touch was never decoded, so a fast tap through the menu left most of the bank silent for the whole session. Now a file that arrives
