@@ -11147,11 +11147,17 @@ function dojoTrainStep(D, dt) { const p = player;
   else if (down < 4 && D.tgtDown && D.tgts.every(T => T.goal === 1)) D.tgtDown = 0; }
 function dojoHit(x, y, z, rad) { const D = DOJO; if (!D.on || !D.tgts) return 0; let n = 0;
   for (const T of D.tgts) { if (T.goal < 1 || T.up < .7 || T.cool > 0 || y < .3 || y > 2.2 || Math.hypot(T.x - x, T.z - z) > .3 + rad) continue;
-    let ux = T.x - player.pos.x, uz = T.z - player.pos.z; const L = Math.hypot(ux, uz) || 1; ux /= L; uz /= L;
-    T.vx += ux * 4.5; T.vz += uz * 4.5; T.cool = DTRAIN.cool; T.hp--; n++;
-    spkBurst(T.x, Math.max(.8, Math.min(1.7, y)), T.z, 14, { col: [.95, .8, .45], spread: 1.6, up: 1.2, size: .1, life: .7 }); snd('thud', { g: .55, r: 1.3, x: T.x, z: T.z });
-    if (T.hp <= 0) { T.goal = 0; T.t = 0; spkBurst(T.x, 1.3, T.z, 26, { col: [.95, .8, .45], spread: 2.6, up: 2, size: .13, life: 1 }); snd('crack', { g: .5, x: T.x, z: T.z }); } }
+    dojoTgtHit(T, y, T.x - player.pos.x, T.z - player.pos.z, 1); n++; }
   return n; }
+function dojoTgtHit(T, y, ux, uz, dmg) { const L = Math.hypot(ux, uz) || 1; ux /= L; uz /= L;
+  T.vx += ux * 4.5 * Math.min(2, dmg); T.vz += uz * 4.5 * Math.min(2, dmg); T.cool = DTRAIN.cool; T.hp -= dmg;
+  spkBurst(T.x, Math.max(.8, Math.min(1.7, y)), T.z, 14, { col: [.95, .8, .45], spread: 1.6, up: 1.2, size: .1, life: .7 }); snd('thud', { g: .55, r: 1.3, x: T.x, z: T.z });
+  if (T.hp <= 0) { T.goal = 0; T.t = 0; spkBurst(T.x, 1.3, T.z, 26, { col: [.95, .8, .45], spread: 2.6, up: 2, size: .13, life: 1 }); snd('crack', { g: .5, x: T.x, z: T.z }); } }
+// m15xx: a SHOT at a target: the bolt's ball against the straw's cylinder (a rocket knocks it straight down); `stepBolts` asks, and the shot stops
+function dojoShot(b) { const D = DOJO; if (!D.on) return 0; const r = (b.size || .2) * .5, y = b.pos.y;
+  for (const T of D.tgts) { if (T.goal < 1 || T.up < .7 || y < .3 || y > 2.15 || Math.hypot(T.x - b.pos.x, T.z - b.pos.z) > .27 + r) continue;
+    const v = b.vel || b.v; dojoTgtHit(T, y, v ? v.x : T.x - player.pos.x, v ? v.z : T.z - player.pos.z, b.rocket ? DTRAIN.hp : 1); return 1; }
+  return 0; }
 function dojoStep(dt) { const D = DOJO; if (!D.on) return; D.t += dt; D.U.uTime.value = D.t; D.dome.position.copy(camera.position);
   // m1401: OFF THE EDGE. The world has a floor at y 0 everywhere, so past the rim he would stand on the sky. Out there and down at y 0, he has
   // FALLEN: a gust of petals where he went, and he is put back on the floor at his pad, with a beam.
@@ -18397,6 +18403,7 @@ function stepBolts(dt) {
         if (got && !(WEAP.palThru && got.K.pal)) { dead = true; b.onMan = got; }
         // m350: A FLYING TARGET (an orb): a sphere in `AIRT`, on the ball's own size
         if (!dead) for (const T of AIRT) if (T.on && Math.hypot(b.pos.x - T.x, b.pos.y - T.y, b.pos.z - T.z) < T.r + b.size * .5) { dead = true; T.hit(b); break; }
+        if (!dead && DOJO.tgts && dojoShot(b)) dead = true;     /* m15xx: the dojo's straw targets stop a shot */
       }
       // **AND IT REMEMBERS WHAT STOPPED IT, because `boltHit` runs a frame's worth of code
       // later and by then the only thing left is a position.** The ground is its own case and
@@ -67796,7 +67803,7 @@ async function init() {
 
 // the console handle. Every tuning object is live, so a number can be moved on the phone
 // without a rebuild and without a push.
-window.melee = window.mel = { DOJO, DTRAIN, dojoHit, RESTORE, restoreDemoBuild, restoreSet, restorePlay, JINRA, jinraEmit, COIN, coinDrop, GMERCH, GMILL, GPEAK, GJINRA, gjinraBuy, PLANT, plantLibBuild, plantHit, SNOWZ, snowStamp, GHOME, SHIMMY, VAIM, SHIPZ, shipBuild, FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, gaitMeasure, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
+window.melee = window.mel = { DOJO, DTRAIN, dojoHit, dojoShot, RESTORE, restoreDemoBuild, restoreSet, restorePlay, JINRA, jinraEmit, COIN, coinDrop, GMERCH, GMILL, GPEAK, GJINRA, gjinraBuy, PLANT, plantLibBuild, plantHit, SNOWZ, snowStamp, GHOME, SHIMMY, VAIM, SHIPZ, shipBuild, FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, gaitMeasure, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
   // PROGRESS (m276): `mel.SAVE` is the save; the setters write it through; `mel.progReset()` is a new game
   // TALK (m277): `mel.TALK` live; `mel.TALKS` the scripts by kind; `mel.talk` the state
   TALK, TALKS, talk,
