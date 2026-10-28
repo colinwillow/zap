@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the FLYING SHIP HOUSE, pass 2 (rubric 7 for a flyer: AGROUND / AFLOAT)
+## m1606 -- THE RE-PASS: the FLYING SHIP HOUSE, pass 2 (rubric 7 for a flyer: AGROUND / AFLOAT)
 **Moves:** its rubric-7 box. A flyer, so restored is afloat. This is the one place a building rises (`lift`), and it is a ship.
 - One rig over the whole group, `lift` = `drop` = 3.2 m (deck height minus keel depth): FALLEN, the group sits `drop` lower, so the keel
   rests on the grass. `restoreSkin` drains it; the vis group lists (`rotation.x` .035) instead of bobbing; the engines' lift cones are off,
