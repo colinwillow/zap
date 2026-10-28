@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE DOJO, PASS 6: SKY JUNKS AND THE FIRST SKY WHALE (mXXXX)
+*"Flying ships... sea creatures... manta rays... whales"* and, mid-pass, *"we can still use the more classical Japanese architecture... both exist"*.
+- `D.junks`: three hero-kit airships on rings r 150/210/260 at different heights and speeds, bobbing. Each is its own group, about 6 draws.
+- `D.whale`: a lathed 26 m body x3.4 with vertex colours (a dark back, a pale belly, cyan spots), fins, flukes, a dorsal fin and eyes, all merged into one draw. A vertex-shader undulation; it circles at r 165, below the disc.
+- ARCHITECTURE.md: a new section where classical Japanese stays as heritage, the classical FORTRESS is an option for the enemy, and the choice is his.
+- Rendered: the whale still reads a little like a blimp from far off; the junks are silhouettes at that range. Next passes: the manta, the serpent-dragon, waterfalls, his ship.
+
 ## Grumbo's home pass 16 (Worker B): break up the stone
 - He sent the back view: *"too much open texture cylinder looking crap... awnings, framing, roofs."* Every wall and dome was one unbroken run of sandstone.
 - **Window hoods.** `W2` (pass 11) now records each window in `A.wins`. Each of the 18 gets a small torn red cloth hood (`clothM('awning')`, 6 x 3 quads, deliberately NOT walkable so there are no extra `triAdd` tris), two timber struts, a timber sill and two iron brackets.

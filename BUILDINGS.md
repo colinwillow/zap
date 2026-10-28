@@ -45,9 +45,10 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - the paper-lantern strings become BUNTING
   - the altars get tent canopies
   - the floor crest is the ship's SQUARE SPIRAL
-- [ ] pass 6 (his, after m1403):
+- [x] **pass 6 (mXXXX):** three hero-kit sky junks circling (red-banded hulls, square-spiral sails, bronze thrusters, lanterns) and the first SKY WHALE (lathed, undulating, under the disc). Still open from this line: his ship, the manta, the serpent-dragon, waterfalls
+- [ ] pass 6b (his, after m1403):
   - the scene: his SHIP in the background, smaller flying ships, AIR CREATURES (one at a time: an alien whale, a manta, a serpent-dragon), and waterfalls off the big islands
-- [ ] pass 6:
+- [ ] pass 7:
   - the gates as ENTRANCES: bosses walk in through a torii (a DOORS entry for the dojo)
   - something AT the altars: take a katana from the rack, a chime, a glint on the blade
   - lit lanterns at dusk

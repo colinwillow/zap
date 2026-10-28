@@ -10377,6 +10377,37 @@ function dojoBuild(g, W) {
       fragmentShader: 'varying float vT; void main() { vec2 d = gl_PointCoord - .5; d.x *= 1.6; float r = dot(d, d) * 4.0; if (r > 1.0) discard; vec3 c = mix(vec3(1.0, .72, .82), vec3(1.0, .9, .93), fract(vT)); gl_FragColor = vec4(c, .9 * (1.0 - r * r)); }' });
     const pts = new THREE.Points(pg, pm); pts.frustumCulled = false; g.add(pts); D.petals = { P, Ph, pg, pm, N }; }
   for (const b of D.boxes) BOXES.push(b);     /* m1401 */
+  // m1413: THE SKY'S LIFE (his: *"put his flying ship in the background, other smaller flying ships, really building up the scene... air creatures --
+  // big alien whales, mantas, serpent dragons, natural neutral scenery, one at a time"*). SKY JUNKS: three small hero-kit airships (a lacquered hull
+  // with a red band, two battened red sails with the square spiral, a tiled cabin, lanterns, a wake of bronze thrusters) sailing slow loops far out,
+  // each its own group so it can move. And the first creature: THE SKY WHALE -- a long soft body lathed from a profile, a pale belly, glowing spots
+  // along its flank, broad pectoral fins and tail flukes, its whole body UNDULATING in the vertex shader as it swims a wide slow circle through the clouds.
+  D.junks = []; { const K = korMats(), sail = new THREE.MeshStandardMaterial({ map: texGet('red_cloth'), roughness: .85, side: THREE.DoubleSide }), hullM = triMat('wood_planks', { scale: 1.6, color: 0x7a5040 });
+    const spiralTex = (() => { const cv = document.createElement('canvas'); cv.width = cv.height = 256; const c = cv.getContext('2d'); c.fillStyle = '#b3201c'; c.fillRect(0, 0, 256, 256); c.strokeStyle = '#efe2c8'; c.lineWidth = 12; c.beginPath();
+      let x = 128, y = 128, L = 14, dir = 0; c.moveTo(x, y); for (let i = 0; i < 10; i++) { x += [1, 0, -1, 0][dir] * L; y += [0, 1, 0, -1][dir] * L; c.lineTo(x, y); dir = (dir + 1) % 4; if (i % 2) L += 26; } c.stroke(); c.lineWidth = 6; c.beginPath(); c.rect(20, 20, 216, 216); c.stroke();
+      const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t; })(), sailM = new THREE.MeshStandardMaterial({ map: spiralTex, roughness: .85, side: THREE.DoubleSide });
+    for (const [r, y, w, ph, s] of [[150, 18, .035, 0, 1.4], [210, -6, -.024, 2.2, 1.1], [260, 30, .018, 4.1, 1.8]]) { const J = new THREE.Group(), MG2 = new Map(), p2 = (geo, m) => { if (!MG2.has(m)) MG2.set(m, []); const q = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal' && k !== 'uv') q.deleteAttribute(k); if (!q.attributes.uv) q.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(q.attributes.position.count * 2), 2)); MG2.get(m).push(q); };
+      const hull = new THREE.BoxGeometry(3.2, 2, 12, 2, 2, 8); const P = hull.attributes.position; for (let i = 0; i < P.count; i++) { const z = P.getZ(i), yv = P.getY(i), t = Math.abs(z) / 6, tap = 1 - Math.pow(t, 3) * .75; P.setX(i, P.getX(i) * tap * (yv < 0 ? .7 : 1)); P.setY(i, yv + Math.pow(t, 2) * 1.2 * (yv > 0 ? 1 : .4)); } hull.computeVertexNormals(); p2(hull, hullM);
+      p2(new THREE.BoxGeometry(3.3, .35, 11).translate(0, .55, 0), K.redL); p2(new THREE.BoxGeometry(2, 1.4, 2.6).translate(0, 1.7, -3.6), K.timber); p2(dojoRoof(3, .9, .5, .5).translate(0, 2.4, -3.6), K.timber);
+      for (const [mz, mh] of [[1.5, 8], [-1, 6]]) { p2(new THREE.CylinderGeometry(.1, .14, mh, 6).translate(0, 1 + mh / 2, mz), K.timber); p2(new THREE.PlaneGeometry(3.6, mh * .6).translate(0, 1.6 + mh * .55, mz + .2), sailM);
+        for (let k = 0; k < 5; k++) p2(new THREE.BoxGeometry(3.9, .06, .06).translate(0, 1.6 + mh * .25 + k * mh * .15, mz + .24), K.iron); }
+      for (const sd of [-1, 1]) { p2(new THREE.CylinderGeometry(.35, .45, 1.6, 10).rotateX(Math.PI / 2).translate(sd * 1.9, -.2, -5), K.bronze); p2(new THREE.CylinderGeometry(.2, .2, .05, 10).rotateX(Math.PI / 2).translate(sd * 1.9, -.2, -5.85), K.lamp); }
+      for (const z of [-5, 5]) p2(new THREE.BoxGeometry(.3, .4, .3).translate(0, 1.2, z), K.lamp);
+      for (const [m, list] of MG2) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = false; J.add(o); }
+      J.scale.setScalar(s); g.add(J); D.junks.push({ J, r, y, w, a: ph, ph }); } }
+  { const N = 40, prof = []; for (let i = 0; i <= N; i++) { const u = i / N, rr = Math.sin(Math.pow(u, .8) * Math.PI) * (1 - u * .45) * 3.2 + .05; prof.push(new THREE.Vector2(rr, u * 26 - 13)); }
+    const body = new THREE.LatheGeometry(prof, 24).rotateX(Math.PI / 2), BP = body.attributes.position, col = new Float32Array(BP.count * 3), cc = new THREE.Color();
+    for (let i = 0; i < BP.count; i++) { const x = BP.getX(i), y = BP.getY(i), z = BP.getZ(i); BP.setY(i, y * .8); const belly = y < -.4 ? 1 : 0, spot = Math.abs(y) < 1.2 && x > 0 && Math.sin(z * 1.1) > .7 ? 1 : 0;
+      const sh2 = Math.max(0, Math.min(1, (y + .4) / 2.6)); cc.setRGB(...(belly ? [.78, .74, .84] : [.16 + .08 * (1 - sh2), .22 + .06 * (1 - sh2), .38 + .1 * (1 - sh2)])); if (spot) cc.setRGB(.55, .95, 1); col.set([cc.r, cc.g, cc.b], i * 3); }
+    body.setAttribute('color', new THREE.BufferAttribute(col, 3)); body.deleteAttribute('uv');
+    const fin = (sx) => { const f = new THREE.BufferGeometry(); f.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 2, sx * 7, -1.2, -1.5, 0, 0, -2.5], 3)); f.setAttribute('color', new THREE.Float32BufferAttribute([.42, .5, .72, .55, .62, .85, .42, .5, .72], 3)); f.computeVertexNormals(); return f.translate(sx * 2.2, -.8, 5); };
+    const fluke = (sx) => { const f = new THREE.BufferGeometry(); f.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, -11.5, sx * 5.5, .3, -15.5, sx * 1.2, 0, -13.5], 3)); f.setAttribute('color', new THREE.Float32BufferAttribute([.42, .5, .72, .55, .62, .85, .5, .58, .8], 3)); f.computeVertexNormals(); return f; };
+    const dors = new THREE.BufferGeometry(); dors.setAttribute('position', new THREE.Float32BufferAttribute([0, 2.4, 2, 0, 3.6, -2.5, 0, 2.2, -4.5], 3)); dors.setAttribute('color', new THREE.Float32BufferAttribute([.16, .22, .4, .2, .26, .46, .16, .22, .4], 3)); dors.computeVertexNormals();
+    const eyes = [-1, 1].map(sx => { const e = new THREE.SphereGeometry(.32, 8, 6).translate(sx * 2.15, .3, 9.2).toNonIndexed(); e.deleteAttribute('uv'); const n = e.attributes.position.count; e.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(n * 3).fill(1).map((v, i) => i % 3 === 0 ? .6 : 1), 3)); return e; });
+    const geo = mergeGeometries([body.toNonIndexed(), fin(1), fin(-1), fluke(1), fluke(-1), dors, ...eyes]);
+    const wm = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .55, side: THREE.DoubleSide, emissive: 0x112244, emissiveIntensity: .25 });
+    wm.onBeforeCompile = sh => { sh.uniforms.uTime = U.uTime; sh.vertexShader = 'uniform float uTime;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n float wz = (13.0 - transformed.z) / 26.0; transformed.y += sin(uTime * 0.9 - wz * 4.0) * wz * wz * 1.6; transformed.x += sin(uTime * 0.6 - wz * 3.0) * wz * .6;'); };
+    const wh = new THREE.Mesh(geo, wm); wh.scale.setScalar(3.4); g.add(wh); D.whale = { m: wh, r: 165, y: -16, w: .012, a: 1.2 }; }
   D.on = { g }; ARENA.door.entry = 'BEAM'; }
 function dojoStep(dt) { const D = DOJO; if (!D.on) return; D.t += dt; D.U.uTime.value = D.t; D.dome.position.copy(camera.position);
   // m1401: OFF THE EDGE. The world has a floor at y 0 everywhere, so past the rim he would stand on the sky. Out there and down at y 0, he has
@@ -10387,6 +10418,8 @@ function dojoStep(dt) { const D = DOJO; if (!D.on) return; D.t += dt; D.U.uTime.
     for (let i = 0; i < Q.N; i++) { const o = i * 3, ph = Q.Ph[i]; let x = P2[o] + (wx + Math.sin(t * 1.1 + ph) * .7) * dt, y = P2[o + 1] + (-.55 + Math.sin(t * 1.7 + ph) * .35) * dt, z = P2[o + 2] + (wz + Math.cos(t * .9 + ph * 1.3) * .7) * dt;
       if (x - cx > 30) x -= 60; else if (x - cx < -30) x += 60; if (z - cz > 30) z -= 60; else if (z - cz < -30) z += 60; if (y < -1) y = 14 + Math.random() * 4; P2[o] = x; P2[o + 1] = y; P2[o + 2] = z; }
     Q.pg.attributes.position.needsUpdate = true; Q.pm.uniforms.uPx.value = renderer.domElement.height / (2 * Math.tan(camera.fov * Math.PI / 360)); }
+  for (const Jk of D.junks || []) { Jk.a += Jk.w * dt; const x = Math.sin(Jk.a) * Jk.r, z = Math.cos(Jk.a) * Jk.r; Jk.J.position.set(x, Jk.y + Math.sin(D.t * .4 + Jk.ph) * 1.5, z); Jk.J.rotation.set(Math.sin(D.t * .5 + Jk.ph) * .04, Jk.a + (Jk.w > 0 ? Math.PI / 2 : -Math.PI / 2), Math.sin(D.t * .7 + Jk.ph) * .05); }
+  if (D.whale) { const Wh = D.whale; Wh.a += Wh.w * dt; Wh.m.position.set(Math.sin(Wh.a) * Wh.r, Wh.y + Math.sin(D.t * .25) * 6, Math.cos(Wh.a) * Wh.r); Wh.m.rotation.set(Math.cos(D.t * .25) * .08, Wh.a + Math.PI / 2, 0); }
   if (!D.dyn) { D.dyn = 1; for (const P of D.plats) BDYN.push(P.box); }
   for (const P of D.plats) { P.a += P.w * dt; const x = Math.sin(P.a) * P.r, y = P.y + Math.sin(D.t * .6 + P.ph) * .5, z = Math.cos(P.a) * P.r, b = P.box, p = player;
     const on = P.lx !== null && p.grounded && p.pos.x > b.minx - .05 && p.pos.x < b.maxx + .05 && p.pos.z > b.minz - .05 && p.pos.z < b.maxz + .05 && Math.abs(p.pos.y - b.maxy) < .3;

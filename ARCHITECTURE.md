@@ -53,6 +53,15 @@ The factions in KORAJIN.md are a natural split. **These are proposals; the taste
 | **The Dustwalkers** (scavengers, traders) | patched, mismatched: sun-bleached canvas, rust, salvaged ship parts bolted on; ochre and olive |
 | **The Red Order** (discipline, ritual; Grumbo's origin) | the HERO kit made severe: lacquered black and deep red, symmetry, fewer domes and more terraces, gold trim |
 
+## Classical Japanese stays in the world (his, after m1410)
+
+> *"I think we can still use the more classical Japanese architecture -- we just have to weave it together; they can both exist. Or maybe make the enemy
+> stuff classical Japanese fortress architecture. I don't mind using it; I did like the stuff you were building."*
+
+- **Both are in the vocabulary.** Classical pieces (pagoda roofs with layered upturned eaves, torii, paper lanterns, stone lanterns) can stand beside the hero kit as the older, shared culture of the world. The hero kit is Grumbo's own: domes, the tent cone, stacks, scaffold and the ship.
+- **An option for the enemy:** CLASSICAL FORTRESS architecture as an enemy grammar: stone-walled keeps, stacked roofs, black and white plaster, iron-studded gates. This is an alternative to the faction palettes above, and the choice is his.
+- **The dojo can show the weave:** one classical pagoda or torii kept among the hero halls reads as heritage, not borrowing.
+
 ## The plan
 
 1. **The dojo is re-made in the hero kit first** (it is his). Its pagodas, torii and paper lanterns give way to domes, tent cones, scaffold gates, stacks, wheels, bunting and box lanterns.
