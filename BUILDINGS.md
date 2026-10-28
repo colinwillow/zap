@@ -25,7 +25,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 - [ ] sky manta (dojo, pass 1 at m1417): pass 2 -- a thicker body, a curled cephalic fin, a proper underside, wings that ripple, not fold
 - [ ] serpent fish (the Ship, Worker A): its own passes in the Ship's list
 - [x] **sky dragon pass 1 (m1481):** a 64-segment red-and-gold Jin serpent-dragon with a mint mane, gold horns and whiskers, weaving between the islands through the tiers (-30 to +60 m)
-- [x] **sky dragon pass 2 (mXXXX):** a real eastern head (long snout, fat nose, an OPEN jaw with fangs and tongue, gold lips, brow ridges, mint eyes, branching antlers, a gold beard, whiskers, a frill of Jinra flames), four clawed legs that paddle, a Jinra tail tuft
+- [x] **sky dragon pass 2 (m1510):** a real eastern head (long snout, fat nose, an OPEN jaw with fangs and tongue, gold lips, brow ridges, mint eyes, branching antlers, a gold beard, whiskers, a frill of Jinra flames), four clawed legs that paddle, a Jinra tail tuft
 - [ ] sky dragon pass 3: the body rolls into its turns; scales (a texture or bands of plates); the jaw opens and closes; a roar; then the TAMING and RIDING (KORAJIN.md: the first mount)
 
 
