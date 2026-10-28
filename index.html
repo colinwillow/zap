@@ -15310,7 +15310,7 @@ function measureHeight(scene) {
 function katanaScene() {
   const root = new THREE.Group(); root.name = 'weapon_root_right';
   const tip = new THREE.Object3D(); tip.name = 'weapon_tip'; tip.position.set(-14.3102, 0, 0); root.add(tip);
-  const steel = new THREE.MeshStandardMaterial({ color: 0x6b7683, metalness: .55, roughness: .3, envMapIntensity: .6, side: THREE.DoubleSide }), wrap =     /* m15xx: THE BLADE VANISHED IN THE SNOW and it was neither buried (m1628) nor a mirror (m1634/m1637): in the page, red/green unlit or Lambert copies of it DRAW, a FrontSide MeshStandard copy does NOT, a DoubleSide one does. Its faces shade as back faces under the physical BRDF and blow out to the white of the sky. DoubleSide (108 verts) fixes it */
+  const steel = new THREE.MeshStandardMaterial({ color: 0x6b7683, metalness: .55, roughness: .3, envMapIntensity: .6, side: THREE.DoubleSide }), wrap =     /* m1639: THE BLADE VANISHED IN THE SNOW and it was neither buried (m1628) nor a mirror (m1634/m1637): in the page, red/green unlit or Lambert copies of it DRAW, a FrontSide MeshStandard copy does NOT, a DoubleSide one does. Its faces shade as back faces under the physical BRDF and blow out to the white of the sky. DoubleSide (108 verts) fixes it */
     new THREE.MeshStandardMaterial({ color: 0x2b2421, roughness: .85 }),
     iron = new THREE.MeshStandardMaterial({ color: 0x3b342e, metalness: .7, roughness: .45 }), gold = new THREE.MeshStandardMaterial({ color: 0xc9a14a, metalness: 1, roughness: .35 });
   const grip = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.6, 22, 10), wrap); grip.position.y = -3; root.add(grip);

@@ -45,7 +45,7 @@ Render-checked headless: intact, then all three seams cut (walls slumped, roof d
 Merged 137 meshes (38 children). Render-checked headless (outside, from above, at the gate: the first render caught the tie beams and
 the emblem through the roof and frieze, fixed). Next: pass 2 (DESTRUCTIBLE TO THE GROUND). Shipped unverified.
 
-## m15xx -- THE MISSING BLADE, FOUND THIS TIME: its faces shade as BACK faces (m1628 "buried" and m1634/m1637 "mirror" were both WRONG)
+## m1639 -- THE MISSING BLADE, FOUND THIS TIME: its faces shade as BACK faces (m1628 "buried" and m1634/m1637 "mirror" were both WRONG)
 m1637's gunmetal still vanished in a render. So I tested it in the page, swapping the blade's material and nothing else:
 - flat red MeshBasic: DRAWS
 - green MeshLambert: DRAWS
