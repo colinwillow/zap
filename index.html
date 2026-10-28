@@ -10713,8 +10713,15 @@ function dojoBuild(g, W) {
     // Worker A) is factored out, a junk at x3 stands in. It CRUISES a wide loop round the islands (`F.T` s), sails in and parks BROADSIDE beside
     // the north altar with its deck level with the altar's disc (`F.dock` s), then sails off -- jump across from the altar. Its deck is a TURNED
     // dynamic box (`BDYN`, ADOCK's form) and it CARRIES him (the pose delta, turn included, applied to his feet while he stands on it).
-    { const S2 = 3, J = mkJunk(S2, 1); D.flag = { J, s: S2, deckLocal: 1.07 * S2, T: 170, cruise: 120, inn: 15, dock: 25, R: 210, Y: 42, dockR: D.pier.r + D.pier.R + 1.6 * S2 + .4, dockY: D.pier.y - 1.07 * S2, h: Math.PI / 2, t: 112,
-      deckB: { dyn: 1, hx: 1.5 * S2, hz: 2.5 * S2, lz: .2 * S2, y0: 1.07 * S2 - .4, y1: 1.07 * S2, cs: 1, sn: 0, cx: 0, cz: 0, minx: 0, maxx: 0, minz: 0, maxz: 0, miny: 0, maxy: 0 }, last: null }; } }
+    // m1472: HIS SHIP is in (Worker A's `shipModel()`, m1469): its visual, its 165 solid boxes (decks, bulwarks, castles, yards, cargo) as TURNED
+    // dynamic boxes riding with it, its banners' cloth alive (`step`). The junk at x3 stays as the fallback if the model throws.
+    { let SM = null; try { SM = shipModel(); } catch (e) { console.warn('[melee] shipModel', e); note('NO SHIPMODEL'); }
+      const mkBox = b => ({ dyn: 1, hx: (b.maxx - b.minx) / 2, hz: (b.maxz - b.minz) / 2, lx: (b.minx + b.maxx) / 2, lz: (b.minz + b.maxz) / 2, y0: b.miny, y1: b.maxy, cs: 1, sn: 0, cx: 0, cz: 0, minx: 0, maxx: 0, minz: 0, maxz: 0, miny: 0, maxy: 0 });
+      let J, boxes, deckY, step = null; if (SM) { J = SM.g; g.add(J); boxes = SM.deck.map(mkBox); deckY = SM.deckY; step = SM.step; }
+      else { const S2 = 3; J = mkJunk(S2, 1); deckY = 1.07 * S2; boxes = [{ dyn: 1, hx: 1.5 * S2, hz: 2.5 * S2, lx: 0, lz: .2 * S2, y0: deckY - .4, y1: deckY, cs: 1, sn: 0, cx: 0, cz: 0, minx: 0, maxx: 0, minz: 0, maxz: 0, miny: 0, maxy: 0 }]; }
+      let bx0 = 1e9, bx1 = -1e9, bz0 = 1e9, bz1 = -1e9; for (const b of boxes) { bx0 = Math.min(bx0, b.lx - b.hx); bx1 = Math.max(bx1, b.lx + b.hx); bz0 = Math.min(bz0, b.lz - b.hz); bz1 = Math.max(bz1, b.lz + b.hz); }
+      const beam = Math.max(-bx0, bx1);
+      D.flag = { J, boxes, step, deckLocal: deckY, foot: [bx0, bx1, bz0, bz1], T: 170, cruise: 120, inn: 15, dock: 25, R: 210, Y: 42, dockR: D.pier.r + D.pier.R + beam + .4, dockY: D.pier.y - deckY, h: Math.PI / 2, t: 126, last: null }; } }
   { const N = 40, prof = []; for (let i = 0; i <= N; i++) { const u = i / N, rr = Math.sin(Math.pow(u, .8) * Math.PI) * (1 - u * .45) * 3.2 + .05; prof.push(new THREE.Vector2(rr, u * 26 - 13)); }
     const body = new THREE.LatheGeometry(prof, 24).rotateX(Math.PI / 2), BP = body.attributes.position, col = new Float32Array(BP.count * 3), cc = new THREE.Color();
     for (let i = 0; i < BP.count; i++) { const x = BP.getX(i), y = BP.getY(i), z = BP.getZ(i); BP.setY(i, y * .8); const belly = y < -.4 ? 1 : 0, spot = Math.abs(y) < 1.2 && x > 0 && Math.sin(z * 1.1) > .7 ? 1 : 0;
@@ -10850,7 +10857,7 @@ function dojoStep(dt) { const D = DOJO; if (!D.on) return; D.t += dt; D.U.uTime.
   if (D.sunG) D.sunG.m.position.copy(camera.position).addScaledVector(D.sunG.d, 700);
   if (D.manta) { const Mn = D.manta; Mn.a += Mn.w * dt; const rr = Mn.r + Math.sin(Mn.a * 2) * 25; Mn.m.position.set(Math.sin(Mn.a) * rr, Mn.y + Math.sin(D.t * .35) * 5, Math.cos(Mn.a) * rr); Mn.m.rotation.set(Math.cos(D.t * .35) * .1, Mn.a - Math.PI / 2, .35); }
   if (D.whale) { const Wh = D.whale; Wh.a += Wh.w * dt; Wh.m.position.set(Math.sin(Wh.a) * Wh.r, Wh.y + Math.sin(D.t * .25) * 6, Math.cos(Wh.a) * Wh.r); Wh.m.rotation.set(Math.cos(D.t * .25) * .08, Wh.a + Math.PI / 2, 0); }
-  if (!D.dyn) { D.dyn = 1; for (const P of D.plats) BDYN.push(P.box); if (D.flag) BDYN.push(D.flag.deckB); }
+  if (!D.dyn) { D.dyn = 1; for (const P of D.plats) BDYN.push(P.box); if (D.flag) for (const b of D.flag.boxes) BDYN.push(b); }
   if (D.flag) dojoFlagStep(D.flag, dt);
   for (const P of D.plats) { P.a += P.w * dt; const x = Math.sin(P.a) * P.r, y = P.y + Math.sin(D.t * .6 + P.ph) * .5, z = Math.cos(P.a) * P.r, b = P.box, p = player;
     const on = P.lx !== null && p.grounded && p.pos.x > b.minx - .05 && p.pos.x < b.maxx + .05 && p.pos.z > b.minz - .05 && p.pos.z < b.maxz + .05 && Math.abs(p.pos.y - b.maxy) < .3;
@@ -10878,12 +10885,13 @@ function dojoFlagPath(F, t) { const u = ((t % F.T) + F.T) % F.T, sm = v => v * v
   return [Math.sin(a) * r, y, Math.cos(a) * r, u >= F.cruise + F.inn - 4 && u < F.cruise + F.inn + F.dock]; }
 function dojoFlagStep(F, dt) { F.t += dt; const [x, y, z, docked] = dojoFlagPath(F, F.t), [x2, , z2] = dojoFlagPath(F, F.t + .5);
   const want = docked ? Math.PI / 2 : Math.atan2(x2 - x, z2 - z); if (Math.hypot(x2 - x, z2 - z) > .01 || docked) F.h += wrapAngle(want - F.h) * (1 - Math.exp(-dt * .9));
-  const J = F.J, p = player, b = F.deckB, c = Math.cos(F.h), s = Math.sin(F.h);
-  if (F.last && p.grounded && Math.abs(p.pos.y - b.maxy) < .35) { const L = F.last, dx = p.pos.x - L.x, dz = p.pos.z - L.z, lc = Math.cos(-L.h), ls = Math.sin(-L.h), lx = dx * lc + dz * ls, lz = -dx * ls + dz * lc;     // in the deck's frame?
-    if (Math.abs(lx) < b.hx + .1 && Math.abs(lz - b.lz) < b.hz + .1) { const nx = x + lx * c + lz * s, nz = z - lx * s + lz * c; p.pos.x = nx; p.pos.z = nz; p.pos.y += y - L.y; p.heading += F.h - L.h; p.faceH = (p.faceH || 0) + F.h - L.h; } }
-  J.position.set(x, y, z); J.rotation.set(Math.sin(F.t * .5) * .02, F.h, Math.sin(F.t * .7) * .03);
-  b.cs = c; b.sn = -s; b.cx = x + b.lz * s; b.cz = z + b.lz * c; const ex = Math.abs(c) * b.hx + Math.abs(s) * b.hz, ez = Math.abs(s) * b.hx + Math.abs(c) * b.hz;
-  b.minx = b.cx - ex; b.maxx = b.cx + ex; b.minz = b.cz - ez; b.maxz = b.cz + ez; b.miny = y + b.y0; b.maxy = y + b.y1; F.last = { x, y, z, h: F.h }; }
+  const J = F.J, p = player, c = Math.cos(F.h), s = Math.sin(F.h), Fo = F.foot;
+  if (F.last && p.grounded && p.pos.y > F.last.y + 1) { const L = F.last, dx = p.pos.x - L.x, dz = p.pos.z - L.z, lc = Math.cos(L.h), ls = Math.sin(L.h), lx = dx * lc - dz * ls, lz = dx * ls + dz * lc;     // his feet in the ship's OLD frame
+    if (lx > Fo[0] - .2 && lx < Fo[1] + .2 && lz > Fo[2] - .2 && lz < Fo[3] + .2) { p.pos.x = x + lx * c + lz * s; p.pos.z = z - lx * s + lz * c; p.pos.y += y - L.y; p.heading += F.h - L.h; p.faceH = (p.faceH || 0) + F.h - L.h; } }
+  J.position.set(x, y, z); J.rotation.set(Math.sin(F.t * .5) * .02, F.h, Math.sin(F.t * .7) * .03); if (F.step) try { F.step(dt, F.t); } catch (e) { F.step = null; }
+  for (const b of F.boxes) { b.cs = c; b.sn = -s; b.cx = x + b.lx * c + b.lz * s; b.cz = z - b.lx * s + b.lz * c; const ex = Math.abs(c) * b.hx + Math.abs(s) * b.hz, ez = Math.abs(s) * b.hx + Math.abs(c) * b.hz;
+    b.minx = b.cx - ex; b.maxx = b.cx + ex; b.minz = b.cz - ez; b.maxz = b.cz + ez; b.miny = y + b.y0; b.maxy = y + b.y1; }
+  F.last = { x, y, z, h: F.h }; }
 function arenaStage() {
   arenaSky();
   const R = ARENA.r, g = new THREE.Group(), L = ARENA.look; world.add(g);
