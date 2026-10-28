@@ -276,6 +276,22 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
+## THE SHIP, PASS 14: THE AIRSHIP FORM -- WINGS (m@X4@, WORKER A)
+
+His: *"Surprise me... whatever needs the most attention."* The airship form was asked for twice (his first brief: *"I'm going to make it
+transform into an airship later"*; the dojo, which now flies `shipModel` round its islands, asked for "sails or wings out").
+
+- `shipMake(vis, air)`; `shipModel(opts)` builds with `air` ON unless `opts.air === false`. The sea ship (`shipBuild`) has no wings.
+- **WINGS:** per side, a bronze HINGE DRUM in gold rings at the gunwale amidships (z 1.5), SIX dark BATTENS fanning from straight out along
+  X (0 rad) to swept back (1.28 rad), 13.6-22.7 m long, rising .1 m per m (dihedral), each tipped with a gold spike and a hanging lantern;
+  the crested sail CANVAS (`sailM`, one crest per wing, mirrored UVs) between them, its trailing edge scalloped between battens and billowing
+  .55 m down. `step()` ripples the canvas (two travelling sines weighted to 0 at the battens and the root), two draws.
+- **A BEAM:** each wing's leading spar is flat and straight along X at the gunwale's height (+.1), and it is a deck box (.7 m wide, 19.5 m
+  long), so he can walk out over the drop. `deck` is still local-frame `{minx..maxz}` (now 167), so the dojo needs no change.
+- **TAIL FINS:** two crested spined fans (`shipFan`) leaning out off the stern castle.
+- **Measured headless** (a temporary module-scope `shipModel()` in `?w=arena`, not shipped): no errors. At 15 m the wings read modest
+  head-on against a 12 m beam, so they are x1.3 (span ~57 m tip to tip) with the dihedral raised from .07 to .1. Not signed off.
+
 ## THE SHIP AS A MODEL: `shipModel()` FOR THE DOJO (m1469, WORKER A)
 
 His (relayed by the dojo session, then confirmed here: *"Yes"*): the ship flying slowly round the dojo islands in the arena, close enough to

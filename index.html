@@ -24933,9 +24933,11 @@ function shipBuild() { const Z = SHIPZ; Z.want = 2; if (Z.on) return; const S = 
 // Its painted maps are mapped in OBJECT space (`triMat` `local`), so they ride with it instead of crawling as it flies. Returns { g, deckY,
 // deck: every solid box in the group's LOCAL frame, tris: the walkable ramps' triangles (local, flat xyz), flags, step(dt, t): the cloth }.
 // Safe at module scope: it reads SHIPZ, TEXLIB and function declarations only.
-function shipModel(opts) { const S = shipMake(1); return { g: S.g, deckY: SHIPZ.deckY, deck: S.O.boxes, tris: S.tris, flags: S.flags, coreM: S.coreM,
-  step(dt, t) { for (const F of S.flags) shipCloth(F, t); S.coreM.emissiveIntensity = 2.1 + Math.sin(t * 2.4) * .5; } }; }
-function shipMake(vis) {
+function shipModel(opts) { const S = shipMake(1, !opts || opts.air !== false); return { g: S.g, deckY: SHIPZ.deckY, deck: S.O.boxes, tris: S.tris, flags: S.flags, coreM: S.coreM,
+  step(dt, t) { for (const F of S.flags) shipCloth(F, t); S.coreM.emissiveIntensity = 2.1 + Math.sin(t * 2.4) * .5;
+    for (const Wg of S.wings) { const P = Wg.geo.attributes.position.array, B = Wg.base; for (let i = 0, n = Wg.w.length; i < n; i++) { const x = B[i * 3], z = B[i * 3 + 2]; P[i * 3 + 1] = B[i * 3 + 1] + Wg.w[i] * (Math.sin(t * 1.9 + Wg.ph + x * .25 + z * .18) * .35 + Math.sin(t * 3.7 + z * .5) * .08); }
+      Wg.geo.attributes.position.needsUpdate = true; Wg.geo.computeVertexNormals(); } } }; }     // m@X4@: the wings' canvas ripples
+function shipMake(vis, air) {
   const Z = SHIPZ, g = new THREE.Group(), O = { meshes: [], boxes: [], walls: [] }, tris = [], MG = new Map(), climbs = [], triMat = (n, o) => triMatG(n, vis ? Object.assign({ local: 1 }, o) : o);
   const M = (c, r, x) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: r }, x || {}));
   // m1377 (pass 4): REAL SURFACES -- tileable textures authored for the ship (`images/ship_*.jpg`: deck planks, hull timber with rivets, brass
@@ -25155,9 +25157,33 @@ function shipMake(vis) {
   // a banner off the stern (m1378: a real one, on a pole, stirring with the rest)
   { put(new THREE.CylinderGeometry(.08, .08, 7, 6).translate(0, cy + 3.5, cz0 + .6), dark); put(new THREE.CylinderGeometry(.04, .04, 2.6, 4).rotateZ(Math.PI / 2).translate(1.3, cy + 6.8, cz0 + .6), dark);
     const pv = new THREE.Group(); pv.position.set(0, cy + 6.8, cz0 + .6); g.add(pv); const f = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 5, 3, 16).translate(1.3, -2.5, 0), new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 })); f.castShadow = true; pv.add(f); flags.push(shipFlag({ pv, f, ph: 9, len: 5, amp: .45 })); }
+  // m@X4@: THE AIRSHIP FORM (his: *"I'm going to make it transform into an airship later"*; the dojo flies `shipModel` round its islands). Two great
+  // battened WINGS fan out of the hull amidships -- junk sails laid flat, six battens a side from a bronze hinge drum, the crested canvas between them
+  // billowing and rippling -- and two TAIL FINS at the stern. Each wing's leading spar runs straight out along X at the gunwale's height and is a
+  // walkable BEAM (a deck box), so he can walk out over the drop. Only when `air` is set: the sea ship keeps its sails furled to the masts.
+  const wings = []; if (air) { const NR = 8, SUB = 5, A = [0, .28, .55, .82, 1.05, 1.28], LEN = [19.5, 22, 22.7, 21.4, 18.2, 13.6], dih = .1, zR = 1.5;
+    for (const sx of [-1, 1]) { const xR = sx * (halfW(zR / (L / 2)) + .1), yR = Math.max(dY + 1.1, gun(zR / (L / 2))) + .1;
+      put(new THREE.CylinderGeometry(.55, .55, 1.4, 14).translate(xR, yR, zR), bronze); for (const dy of [-.7, .7]) put(new THREE.TorusGeometry(.58, .07, 6, 16).rotateX(Math.PI / 2).translate(xR, yR + dy, zR), gold);
+      const tipOf = (a, l) => [xR + sx * Math.cos(a) * l, yR + (a ? l * dih : 0), zR - Math.sin(a) * l];
+      for (let k = 0; k < A.length; k++) { const [tx, ty, tz] = tipOf(A[k], LEN[k]), d = new THREE.Vector3(tx - xR, ty - yR, tz - zR), q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.clone().normalize());
+        put(new THREE.CylinderGeometry(k ? .09 : .2, k ? .14 : .26, d.length(), 6).applyQuaternion(q).translate((xR + tx) / 2, (yR + ty) / 2, (zR + tz) / 2), dark);
+        put(new THREE.ConeGeometry(.22, .6, 8).applyQuaternion(q).translate(tx + d.x / d.length() * .3, ty + d.y / d.length() * .3, tz + d.z / d.length() * .3), gold);
+        put(new THREE.SphereGeometry(.28, 10, 8).translate(tx, ty - .45, tz), lamp); }
+      // the leading spar is a BEAM: flat, .7 wide, its top at the gunwale's height
+      O.boxes.push({ minx: Math.min(xR, xR + sx * LEN[0]), maxx: Math.max(xR, xR + sx * LEN[0]), miny: yR - .26, maxy: yR + .2, minz: zR - .35, maxz: zR + .35 });
+      // the canvas: radial rows x angular columns (SUB per panel), its trailing edge scalloped between battens, billowing down
+      const P = [], U = [], I = [], W = [], NC = (A.length - 1) * SUB;
+      for (let c = 0; c <= NC; c++) { const k = Math.min(A.length - 2, Math.floor(c / SUB)), f = c / SUB - k, a = A[k] + (A[k + 1] - A[k]) * f, Le = (LEN[k] + (LEN[k + 1] - LEN[k]) * f) * (1 - .1 * Math.sin(Math.PI * f));
+        for (let r = 0; r <= NR; r++) { const rr = .08 + .92 * r / NR, l = Le * rr, bil = Math.sin(Math.PI * f) * Math.sin(Math.PI * Math.min(1, rr * 1.1)) * .55;
+          P.push(xR + sx * Math.cos(a) * l, yR + (a ? l * dih : 0) * (f > 0 || k > 0 ? 1 : 0) + (c === 0 ? 0 : l * dih * 0) - bil + .05, zR - Math.sin(a) * l); U.push(sx > 0 ? c / NC : 1 - c / NC, rr); W.push(rr * Math.sin(Math.PI * f)); } }
+      for (let c = 0; c < NC; c++) for (let r = 0; r < NR; r++) { const a0 = c * (NR + 1) + r, b0 = a0 + NR + 1; I.push(a0, b0, a0 + 1, a0 + 1, b0, b0 + 1); }
+      const wg = new THREE.BufferGeometry(); wg.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); wg.setAttribute('uv', new THREE.Float32BufferAttribute(U, 2)); wg.setIndex(I); wg.computeVertexNormals();
+      const wm = new THREE.Mesh(wg, sailM); wm.castShadow = true; g.add(wm); wings.push({ geo: wg, base: Float32Array.from(P), w: W, ph: sx > 0 ? 0 : 1.7 }); }
+    // the TAIL FINS: two spined fans at the stern, leaning out
+    for (const sx of [-1, 1]) { const f = shipFan(6, 1.4, 5); f.deleteAttribute('color'); f.rotateX(-.35); f.rotateZ(sx * (Math.PI / 2 - .35)); f.translate(sx * (cw - .4), cy + 1.4, cz0 + .4); sails.push(f); } }
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
   { const o = new THREE.Mesh(mergeGeometries(sails.map(q => q.index ? q.toNonIndexed() : q)), sailM); o.castShadow = o.receiveShadow = true; g.add(o); }
-  return { g, O, tris, climbs, rings, gulls, coreM, flags, sparkAt, chimney }; }
+  return { g, O, tris, climbs, rings, gulls, coreM, flags, sparkAt, chimney, wings }; }
 // m1375 (pass 3): the gulls -- wheel round the masts (circles of their own, a glide in every few seconds); the percher bursts off the yard when he is near and comes back
 const _shgM = new THREE.Matrix4(), _shgQ = new THREE.Quaternion(), _shgE = new THREE.Euler(), _shgV = new THREE.Vector3(), _shgU = new THREE.Vector3(1, 1, 1);
 function shipGulls(S, dt) { const G = S.gulls, p = player, t = SHIPZ.U ? SHIPZ.U.uTime.value : 0; if (!G || !G.im) return;
