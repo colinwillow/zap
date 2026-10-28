@@ -30,6 +30,15 @@ discs (3 rings x 18), radial uv so `ghPathMat`'s soft edge is the rim, on a clon
 patch off the peak's trail, which shares the original). First winding was downward; flipped before shipping. +1 draw (the drifts mesh).
 Correction to pass 30's entry: a pot on a FALLEN stall is hit-tested where it stands RESTORED, not where its chunk is drawn.
 Next: the plants' 3rd pass with cliff shrubs.
+## m15xx -- The First Beacon pass 2: the spine crosses itself, and a canyon round it
+- **Steering:** a run can say `go:E` (W/N/S) to turn and hold a heading; without it it steers by its `aim`. A station leaves the way its next run's
+  first `go` says. The rooftops now go WEST from the shrine and then SOUTH, straight over the lantern ruin (D lands just south of A); the zips run
+  EAST past the sunken court to the tower. Stations: S 0 | A 10.9 | B 4.9 | C 22.9 | D 26.9 | T 10.9 | X 33.8, unchanged heights (29 chunks).
+- **The canyon (`BEACON.canyon`):** mesas on an 8 m lattice, jittered, kept `clear` 8 m (plus half their width) from every route box and 8 m from
+  a zip line unless they stay 5 m under it, and 6 m tall at most along the start -> brazier line (the landmark). Near the route (< 26 m): 28%
+  chance, a shoulder at .5-1.2x the nearest route height. Further out: always, 10-15 m wide on the 8 m lattice so they CLOSE into walls 26-50 m.
+  Two or three tiers each, a collider per tier. **First try was a pillar forest** (5-10 m wide, 85% everywhere, tall near the route): it read as
+  skyscrapers, not a canyon. 222 mesas, 710 boxes total.
 
 ## m1552 -- THE RE-PASS: MARKET STALLS, pass 3 (layers, alive; its third pass, so the loop moves on)
 **Moves:** its L3, breakable and alive rows.

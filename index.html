@@ -26300,7 +26300,7 @@ function chunkClear() { const C = CHUNK.on; if (!C) return; for (const Zp of C.z
 // (`CHUNKS`, sized from the measured move table) plus three of its own (`BCH`: a small `hop`, a `walk`, a `chim`ney of any height). The builder
 // CHAINS them: every piece starts at the last one's out port, heading along the axis that points best at the run's `aim`, a corner pad where it
 // turns. So the route is makeable by construction, and a station sits wherever its run arrives. KORAJIN > Level 1 v2 (`?w=forge&lvl=beacon`).
-const BEACON = { at: [-70, -40], want: 0, on: null,
+const BEACON = { at: [-70, -40], want: 0, on: null, canyon: { cell: 8, clear: 8, mid: 22, out: 44, w0: 6, w1: 4, wf0: 10, wf1: 5, pNear: .28, pFar: 1, wall0: 26, wall1: 14 },
   plan: [
     { st: 'S', name: 'START YARD', R: 12 },
     { aim: [25, 14], c: ['hop', 'walk:4', 'hop', 'up_jump', 'up_jump', 'gap_dbl', 'up_dbl'] },     // teach: jump, ledge, double
@@ -26309,13 +26309,14 @@ const BEACON = { at: [-70, -40], want: 0, on: null,
     { st: 'B', name: 'SUNKEN COURT', R: 16 },
     { aim: [64, 44], c: ['chim:4', 'walk:3', 'chimney', 'hop', 'chim:6'] },     // THE BIG CLIMB: the wall jump, taught -> developed -> twisted -> concluded
     { st: 'C', name: 'CLIFF SHRINE', R: 10 },
-    { aim: [120, 58], c: ['gap_dbl', 'walk:6', 'gap_dbl', 'chim:4', 'walk:4'] },     // the rooftops
+    { c: ['go:W', 'gap_dbl', 'gap_dbl', 'go:S', 'walk:4', 'gap_dbl', 'gap_dbl', 'gap_dbl', 'chim:4', 'walk:4'] },     // the rooftops: back WEST and over the lantern ruin (the spine crosses itself)
     { st: 'D', name: 'THE RIM', R: 10 },
-    { aim: [150, 6], c: ['zip', 'zip'] },     // the long ride to the tower
+    { c: ['go:E', 'zip', 'zip'] },     // the long ride to the tower, past the sunken court
     { st: 'T', name: 'TOWER TERRACE', R: 14, tower: 1 },
-    { aim: [260, -30], c: ['chim:12', 'up_jump', 'up_jump', 'up_dbl'] },     // the finale climb (the guardian's sweeps are layer 5)
+    { c: ['go:E', 'chim:12', 'up_jump', 'up_jump', 'up_dbl'] },     // the finale climb (the guardian's sweeps are layer 5)
     { st: 'X', name: 'THE BRAZIER', R: 9, brazier: 1 } ] };
 try { if (/[?&]lvl=beacon\b/.test(location.search)) BEACON.want = 1; } catch (e) {}
+const GODIR = { E: [1, 0], W: [-1, 0], N: [0, 1], S: [0, -1] };     // a run's `go:E` turns it that way and holds it (a run without one steers by its `aim`)
 const BCH = {
   hop:  (P, K) => { const g = 3.5; K.slab(g, g + 4, P.y); return { out: K.out(g + 4, P.y), ask: `hop ${g} m: a run jump, safe (comfy ${MOVEC.jump_run})` }; },
   walk: (P, K, n) => { const L = +n || 6; K.slab(0, L, P.y); return { out: K.out(L, P.y), ask: `walk ${L} m` }; },
@@ -26324,7 +26325,7 @@ const BCH = {
 function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, MG = new Map(), bars = [], climbs = [], zips = [];
   const put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); const q = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal') q.deleteAttribute(k); MG.get(m).push(q); };
   const EM = enemyMats(), M = { slab: triMat('stone_blocks', { scale: 3, color: 0xa9a49c }), land: triMat('stone_blocks', { scale: 2.4, color: 0xc9c4ba }), wall: triMat('sandstone', { scale: 5, color: 0xd88a58 }),
-    step: triMat('wood_timber', { scale: 2 }), mesa: triMat('sandstone', { scale: 7, color: 0xc4764a }), lac: EM.lacquer, gold: EM.gold };
+    step: triMat('wood_timber', { scale: 2 }), mesa: triMat('sandstone', { scale: 14, color: 0xcf8a5c }), lac: EM.lacquer, gold: EM.gold };
   const [ox, oz] = BEACON.at, L = { g, O, bars, climbs, zips, rings: [], st: {}, log: [] };
   // the canyon floor: sand under the whole level, a little past it
   put(new THREE.BoxGeometry(360, .1, 200).translate(ox + 120, .02, oz + 20), triMat('sandstone', { scale: 9, color: 0xe0b48a }));
@@ -26352,16 +26353,33 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
     sign(S.st + '  ' + S.name, (y < .1 ? 0 : y).toFixed(1) + ' m', cx, y + 3.4, cz, 1.1); L.st[S.st] = { x: cx, y, z: cz, R }; L.log.push(S.st + ' ' + y.toFixed(1)); return { x: cx, y, z: cz, h }; };
   let P = { x: ox, y: 0, z: oz, dir: [1, 0] }, cur = null, nChunks = 0;
   for (let i = 0; i < BEACON.plan.length; i++) { const E = BEACON.plan[i];
-    if (E.st) { const C = station(E, P, cur); const nx = BEACON.plan[i + 1]; if (!nx) break; const d = aimDir(C, ox + nx.aim[0], oz + nx.aim[1], null); P = { x: C.x + d[0] * C.h, y: C.y, z: C.z + d[1] * C.h, dir: d }; cur = d; continue; }
-    const ax = ox + E.aim[0], az = oz + E.aim[1];
-    for (const spec of E.c) { const [nm, arg] = spec.split(':'), d = aimDir(P, ax, az, cur);
+    if (E.st) { const C = station(E, P, cur); const nx = BEACON.plan[i + 1]; if (!nx) break; const g0 = /^go:/.test(nx.c[0]) && GODIR[nx.c[0].slice(3)], d = g0 || aimDir(C, ox + nx.aim[0], oz + nx.aim[1], null); P = { x: C.x + d[0] * C.h, y: C.y, z: C.z + d[1] * C.h, dir: d }; cur = d; continue; }
+    const ax = E.aim ? ox + E.aim[0] : 0, az = E.aim ? oz + E.aim[1] : 0; let force = null;
+    for (const spec of E.c) { const [nm, arg] = spec.split(':'); if (nm === 'go') { force = GODIR[arg]; continue; } const d = force || aimDir(P, ax, az, cur);
       if (d[0] !== cur[0] || d[1] !== cur[1]) { const K0 = kit(P); K0.slab(0, 5, P.y); const c = K0.W(2.5, 0); P = { x: c[0] + d[0] * 2.5, y: P.y, z: c[1] + d[1] * 2.5, dir: d }; cur = d; }     // the corner pad
       const K = kit({ ...P, dir: cur }), fn = BCH[nm] || CHUNKS[nm]; if (!fn) { note('BEACON: no chunk ' + nm); continue; } const r = fn({ ...P, dir: cur }, K, arg); nChunks++;
       sign(nm.toUpperCase(), r.ask.length > 34 ? r.ask.slice(0, 33) + '…' : r.ask, P.x, P.y + 2.4, P.z, .55); P = { x: r.out.x, y: r.out.y, z: r.out.z, dir: cur }; } }
+  // m15xx: THE CANYON (pass 2). Sandstone mesas on an 8 m lattice round the route, never within `clear` of it (plan distance to every route box and
+  // zip line), stepped in two or three tiers; near the route they stand a few metres over the route's own height (walls to run between), further
+  // out they are the canyon's walls (22-52 m). Low along the sight line from the start to the brazier, so the tower is seen from S.
+  { const C = BEACON.canyon, R = plantRnd(77), RB = O.boxes.slice(), Z = zips.map(z => [z.A[0], z.A[2], z.B[0], z.B[2], Math.min(z.A[1], z.B[1])]);
+    let x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9; for (const b of RB) { x0 = Math.min(x0, b.minx); x1 = Math.max(x1, b.maxx); z0 = Math.min(z0, b.minz); z1 = Math.max(z1, b.maxz); }
+    const segD = (px, pz, ax, az, bx, bz) => { const vx = bx - ax, vz = bz - az, t = Math.max(0, Math.min(1, ((px - ax) * vx + (pz - az) * vz) / (vx * vx + vz * vz || 1))); return Math.hypot(px - ax - vx * t, pz - az - vz * t); };
+    const Sx = L.st.S.x, Sz = L.st.S.z, Xx = L.brazier ? L.brazier.x : Sx, Xz = L.brazier ? L.brazier.z : Sz, M2 = triMat('sandstone', { scale: 14, color: 0xb86a44 }); let n = 0;
+    for (let x = x0 - C.out; x <= x1 + C.out; x += C.cell) for (let z = z0 - C.out; z <= z1 + C.out; z += C.cell) { const jx = x + (R() - .5) * C.cell * .6, jz = z + (R() - .5) * C.cell * .6;
+      let d = 1e9, yN = 0; for (const b of RB) { const dx = Math.max(b.minx - jx, 0, jx - b.maxx), dz = Math.max(b.minz - jz, 0, jz - b.maxz), dd = Math.hypot(dx, dz); if (dd < d) { d = dd; yN = b.maxy; } }
+      let dz2 = 1e9, zy = 0; for (const q of Z) { const dd = segD(jx, jz, q[0], q[1], q[2], q[3]); if (dd < dz2) { dz2 = dd; zy = q[4]; } }
+      const near = d < C.mid + 4, w = near ? C.w0 + R() * C.w1 : C.wf0 + R() * C.wf1; if (d < C.clear + w / 2 || d > C.out) continue;     /* the far ring is wider than the lattice, so it closes into WALLS */ if (R() > (near ? C.pNear : C.pFar)) continue;
+      let h = near ? Math.min(30, Math.max(4, yN * (.5 + R() * .7))) : C.wall0 + R() * C.wall1 + Math.min(10, (d - C.mid) * .4);     /* near: ledges and shoulders under the route's height; far: the canyon wall, rising outward */
+      if (dz2 < 8 + w / 2) h = Math.min(h, zy - 5); if (segD(jx, jz, Sx, Sz, Xx, Xz) < 7 + w / 2) h = Math.min(h, 6); if (h < 3) continue;
+      const tiers = h > 18 ? 3 : 2; let y = 0, ww = w, wd = w * (.8 + R() * .4);
+      for (let k = 0; k < tiers; k++) { const th = k === tiers - 1 ? h - y : h * (k ? .3 : .5) * (.8 + R() * .3); put(new THREE.BoxGeometry(ww, th, wd).translate(jx, y + th / 2, jz), (k + n) % 2 ? M2 : M.mesa);
+        O.boxes.push({ minx: jx - ww / 2, maxx: jx + ww / 2, miny: y, maxy: y + th, minz: jz - wd / 2, maxz: jz + wd / 2 }); y += th; ww *= .72 + R() * .12; wd *= .72 + R() * .12; } n++; }
+    L.mesas = n; }
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
   for (const b of O.boxes) BOXES.push(b); boxGrid(); BEACON.on = L; bldXrayTag(g);
   { const S = L.st.S, p = player; p.pos.set(S.x, .05, S.z); p.vel.set(0, 0, 0); const n = L.st.A || S; p.faceH = p.heading = Math.atan2(n.x - S.x, n.z - S.z); arenaBeam(S.x, S.z, [.48, 1, .85], 1); }
-  console.log('[melee] the first beacon: ' + nChunks + ' chunks, stations ' + L.log.join(' | ') + ', ' + O.boxes.length + ' boxes, ' + climbs.length + ' ladders, ' + zips.length + ' zips'); }
+  console.log('[melee] the first beacon: ' + nChunks + ' chunks, stations ' + L.log.join(' | ') + ', ' + (L.mesas || 0) + ' mesas, ' + O.boxes.length + ' boxes, ' + climbs.length + ' ladders, ' + zips.length + ' zips'); }
 function beaconStep(dt) { const L = BEACON.on; if (!L || !L.flame) return; const t = performance.now() * .001; L.flame.scale.set(1 + Math.sin(t * 9) * .08, 1 + Math.sin(t * 7.3) * .14, 1 + Math.cos(t * 8.1) * .08); }
 const COURT = { scale: 1.5, at: [0, 150], hw: 28, hd: 32, wallH: 4, walk: 2.6, gate: 6, on: null };
 function courtBuild() {

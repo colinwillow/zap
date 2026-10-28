@@ -15,9 +15,10 @@ then the level is GENERATED from `BEACON.plan` in index.html.
 ## DONE WHEN (layer 1, THE RUN) -- each ticked with evidence in a NOTES entry; the last box is his sign-off on the phone
 - [x] the route exists end to end from the blueprint: S 0 -> A 10.9 -> B 4.9 -> C 22.9 -> D 26.9 -> zips -> T 10.9 -> brazier 33.8 (m1549)
 - [ ] every piece WALKED by the route checker (scripted inputs, the shipped frame), not just sized
-- [ ] the spine crosses itself (C -> D passes over B), stations see each other, the tower seen from S
+- [x] the spine crosses itself (m15xx): the rooftops run C -> D back WEST over the lantern ruin A (23-27 m over its 10.9 top), and the zips pass the sunken court B (`go:E/W/N/S` steering in the plan). Still open: stations seeing each other, checked from each one
+- [ ] the tower seen from S (the canyon is kept to 6 m along the S -> brazier line; not yet checked from S in a render)
 - [ ] verticality and spread checked from a wide render (no one plane)
-- [ ] a canyon to stand in: walls round the floor, the route reading as carved, not boxes on sand
+- [~] a canyon to stand in (m15xx, part 1): 222 stepped sandstone mesas on an 8 m lattice, never within 8 m of the route or under a zip; near ones are shoulders below the route's height, the outer ring (wider than the lattice) closes into canyon WALLS 26-50 m. Open: a canyon material (the sandstone reads spongy up close), carved shapes rather than boxes
 - [ ] the four beats of the wall jump feel right (taught safe, developed, twisted, concluded)
 - [ ] fail forward: every fall lands somewhere with a ladder back up near where you fell
 - [ ] rests and checkpoints at the stations
