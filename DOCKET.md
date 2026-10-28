@@ -2,9 +2,9 @@
 
 1. [x] (m1668) **The landing never blocks a jump.** On the ground = you can jump, at once, even mid-landing clip (his: "if you've jumped and you just hit
        the ground you should be able to jump right back up"). And the landing clip itself clipped / sped up (he doesn't love it).
-2. [x] (m15xx) **The Dragon zone's floating islands spaced for HIS jump** (LEVELDESIGN rules: jump apex, sprint gap, double jump) -- they are so close
+2. [x] (m1669) **The Dragon zone's floating islands spaced for HIS jump** (LEVELDESIGN rules: jump apex, sprint gap, double jump) -- they are so close
        together it is hard to hop between them.
-3. [ ] **The rocket launcher's jump-throw** (his: *"Wanted"* -- bend the bullet): hold UP on the right pad to ready the shot, jump, release in the
+3. [x] (m15xx) **The rocket launcher's jump-throw** (his: *"Wanted"* -- bend the bullet): hold UP on the right pad to ready the shot, jump, release in the
        air -> the rocket leaves with some of his upward velocity, so it climbs at a slight angle. Not exact; you can "throw" rockets up.
 4. [ ] **Dragon riding controls, rebuilt:** no blaster in the saddle (he carries the ROCKET LAUNCHER at the start); RIGHT HOLD = fireballs,
        aimed like RollerGirl's blaster in the air; RIGHT FLICK on the ground = melee (lunge / bite / claw, from his clips); LEFT FLICK in the air

@@ -5,7 +5,12 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- THE DRAGON ZONE'S CLIMB, SIZED FROM HIS JUMP (DOCKET 2)
+## m15xx -- THE ROCKET'S JUMP-THROW (DOCKET 3; his: "you can kind of throw your rockets up -- like that movie where they bend bullets")
+Hold up on the right pad to ready the rocket, jump (left tap), release while he is still RISING: `ROCKET.throwK` (1.6) x his climb speed is
+added to the rocket's upward speed (its own speed kept), so the shot tips up. Released at take-off (10.6 m/s up) that is ~30 deg; near the apex,
+almost level. Falling or on the ground: as aimed, unchanged. `mel.ROCKET.throwK` is live (0 = off). Not tested on a body; the arithmetic only.
+
+## m1669 -- THE DRAGON ZONE'S CLIMB, SIZED FROM HIS JUMP (DOCKET 2)
 His: *"floating little islands you jump from one to the next -- they didn't take into account how far and high he jumps; they're so close together
 it's hard."* Before: nine stones (R 1.5, collider half 1.05) 3.6 m apart centre to centre, so 1.5 m edge to edge, each 1 m up. Every one of
 Grumbo's jumps (`tools/moves.json`: run jump comfortably 5.95 m, walk jump 3.88 m) overshoots that.

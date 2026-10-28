@@ -11393,7 +11393,7 @@ function dragStage(g) { const Z = DRAGZ, sd = new THREE.Vector3(...Z.sun).normal
     for (const sd2 of [-1, 1]) { const px = x + sd2 * 10.5, pz = z - 4; put(new THREE.CylinderGeometry(.22, .28, 4.2, 8).translate(px, 2.1, pz), M.trunk); put(new THREE.BoxGeometry(.9, .9, .9).translate(px, 4.5, pz), gold); box(px, pz, .3, .3, 0, 4.2); Z.obst.push([px, pz, .4]); } }
   // THE CLIMB: stepping stones rising round the side to a high crag (the take-off perch for the flying, later)
   const step = (x, y, z, R2, seed) => { const S = floatIsland({ R: R2, depth: 2.5 + R2, seed, detail: 3, flat: .03, lobes: 1 }); ISL.push(S.geo.translate(x, y, z)); box(x, z, R2 * .7, R2 * .7, y - .6, y + .02); if (y < 5) Z.obst.push([x, z, R2]); };
-  // m15xx (his: "they totally didn't take into account how far and high he jumps -- they're so close together it's hard to jump from one to the next"):
+  // m1669 (his: "they totally didn't take into account how far and high he jumps -- they're so close together it's hard to jump from one to the next"):
   // sized from the MOVE TABLE (tools/moves.json, Grumbo): nine 1.5 m stones 3.6 m apart left 1.5 m edge to edge, under any run jump (comfy
   // 5.95 m), so he overshot. Now SIX bigger stones (R 2.2), 4.1 m edge to edge, each 1.4 m up (comfy jump height 2.18), and the crag 4.1 m on, 1.6 up
   for (let i = 0; i < 6; i++) { const a = .5 + i * (7.2 / 28), r = 28; step(Math.sin(a) * r, 1.4 * (i + 1), Math.cos(a) * r, 2.2, 300 + i); }
@@ -16995,6 +16995,7 @@ const ROCKET = {
   fire: [1, .62, .22], smokeCol: [.62, .60, .58],
   arm: [{ k: 'clang', g: .34, r: .52, dur: .18 }, { k: 'lock', g: .2, r: .85 }],
   home: 0,           // 1 = it curves onto bodies like the bolt does (m258: off -- see `boltHome`)
+  throwK: 1.6,       // m15xx: x his rising speed added to the rocket's climb when it leaves during a jump (MOVE.jump 10.6 m/s at take-off -> ~30 deg up, less as he slows)
 };
 // m1077: THE ROCKET, RE-MODELLED to match the turret -- a red-lacquer LATHE body (nozzle bell, waist, ogive nose), two gold bands, a
 // cyan neon ring behind the nose, four swept fins, and a real FLAME: two open cones (an orange sheath, a white-yellow core) out of the
@@ -17063,6 +17064,11 @@ function fireRocket() {
   const g = rocketBody();
   g.position.copy(m);
   scene.add(g);
+  // m15xx: THE JUMP-THROW (his: "hold up to ready the shot, jump, release while you're going up -- the upward trajectory has a velocity effect, the
+  // rocket goes up at a slight angle; not an exact science, you can kind of THROW your rockets up... like that movie where they bend bullets").
+  // Released while he is RISING, `throwK` of his climb speed is added to the rocket's own upward speed (its speed kept), so the jump tips the
+  // shot up; the higher he is still rising, the steeper. Falling or on the ground: the shot as aimed.
+  const pv = player.vel.y; if (!player.grounded && pv > .5 && ROCKET.throwK) { dir.multiplyScalar(ROCKET.v); dir.y += pv * ROCKET.throwK; dir.normalize(); }
   const b = { g, pos: m, vel: dir.multiplyScalar(ROCKET.v), t: 0, chg: 1, size: ROCKET.r * 2,
               rocket: 1, dna: 0, virus: 0, auto: 0, blast: ROCKET.blast, smokeT: 0 };
   rocketFace(b);
