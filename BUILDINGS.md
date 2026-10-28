@@ -44,7 +44,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 6. **Budget:** about 40 draws per building (merge per material), no new physics, `npm run check` clean.
 7. **Two states, ONE set of pieces -- for HERO / TOWN buildings only (his, m1513):** FALLEN = pieces collapsed, slid, tipped, rust-grey; RESTORED = the pieces fly home and the colour, lamps and Jinra come back IN PLACE. Buildings do NOT fly on their own: a town's GROUND breaks off and rises as a whole (a later town-scale system; the Watchtower test rides its own chunk of earth to show it); only ships fly. ENEMY buildings are not restored. Kit: `restorePieces` / `restoreSkin` / `restoreRide` (the Watchtower is the reference).
 
-**HERO / TOWN versus ENEMY (his pick, m@X4@):**
+**HERO / TOWN versus ENEMY (his pick, m1514):**
 - **HERO / TOWN** (the hero kit; restored IN PLACE -- pieces home, colour, lamps and Jinra back, no lift): Dojo Hall, Shrine, Market Stalls, Bathhouse,
   Forge-Workshop, Teahouse Garden, Lantern Festival Street, Cliff Lodge, Jin Lighthouse, Jin Observatory, Sky Bridges, Floating Islands, Senbon
   Torii, The Courtyard, Pagoda, Great Red Pagoda; and the FLYERS (Airship Dock, Zeppelins, Flying Ship House), which may fly.
