@@ -11561,7 +11561,6 @@ function dragTapR() { const B = DRAGZ.on && DRAGZ.on.B, D = B && B.drive; if (!D
   if (D.air.mode !== 'fly') { D.air = null; D.flapCool = 0; dragFlap(D); return; }     // up from a jump or a hover: the take-off
   dragFlap(D); }
 function dragHoldR(R, dt) { const B = DRAGZ.on && DRAGZ.on.B, D = B && B.drive, S = stick.R; if (!D) return;
-  if (dragArmed()) { R.rHold = 0; R.rHeld = 0; if (D.air && D.air.mode === 'hover') D.air.hold = false; return; }     // m1703: armed, the right pad only aims
   const still = S.down && (S.far || 0) < .3; R.rHold = still ? (R.rHold || 0) + dt : 0;
   if (D.air && D.air.mode === 'hover') D.air.hold = !!S.down;
   if (R.rHold > DRAGZ.holdT && !R.rHeld) { R.rHeld = 1; if (!D.air || D.air.mode === 'hop') { D.air = { mode: 'hover', vy: D.air ? D.air.vy : 3, t: 0, hold: 1 }; D.beat = 0; } }
@@ -11726,36 +11725,28 @@ function dragFxStep(dt) { const Z = DRAGZ, O = Z.on;
     if (hitT || (Fl && P.y < Fl.y + f.r * .5) || boxRay(ox, oy, oz, P.x, P.y, P.z, _tuR) || f.life <= 0 || P.y < Z.cloudY) { O.fb.splice(i, 1); dragBoom(f); } }
   for (const t of O.tg) { if (t.dead > 0) { t.dead -= dt; if (t.dead <= 0) t.G.visible = true; continue; }
     for (const b of BOLTS) if (b.t < 50 && Math.hypot(b.pos.x - t.x, b.pos.y - t.y, b.pos.z - t.z) < t.r + (b.size || .4) * .5) { b.t = 1e9; dragTargetHit(t); break; } } }
-// m1703 (his: "we need a reticle when you're shooting fireballs -- BEHIND the dragon, not on top of him. Work it like RollerGirl's: a button
-// above the right stick toggles the fireball on and off; equipped, as soon as you touch the right stick it COCKS the fireball, you move the
-// reticle with your thumb, and when you release it shoots; un-check it to just steer or turn the camera normally"). THE FIRE TOGGLE: a FIRE
-// button over the right pad, only in the saddle. ARMED, the right pad is the aimer and nothing else -- no camera drag, no hover hold, no
-// flap tap, no breath flick: the reticle rests at `aimHome` (screen fractions: up in the sky AHEAD of him, clear of his body), the thumb
-// carries it up to `aimX`/`aimY` of the screen off that, and the release lobs a fireball down the camera ray through it (`aimFar` m out).
-// Held longer it grows (`fbChargeT` s to `1 + fbChargeK`). Unarmed, the right pad is the camera and the flap again, and nothing shoots.
-Object.assign(DRAGZ, { fbArm: 0, aimHome: [.5, .3], aimX: .4, aimY: .3, aimFar: 90, fbChargeT: .8, fbChargeK: .7 });
-function dragArmed() { const R = player.dragon; return !!(DRAGZ.fbArm && R && R.st === 'sit'); }
-function dragAimUi() { const Z = DRAGZ, R = player.dragon, sit = !!(R && R.st === 'sit');
-  if (!Z.ui) { const b = document.createElement('div'); b.id = 'dragFireBtn'; b.innerHTML = '<span>&#x1F525;</span><b>FIRE</b>';
-    b.style.cssText = 'position:fixed;z-index:30;width:62px;height:62px;margin:-31px 0 0 -31px;border-radius:50%;display:none;flex-direction:column;align-items:center;justify-content:center;font:800 11px system-ui;color:#fff;background:rgba(20,22,30,.55);border:3px solid rgba(255,255,255,.55);touch-action:none;user-select:none;-webkit-user-select:none';
-    const tog = e => { e.preventDefault(); e.stopPropagation(); Z.fbArm = Z.fbArm ? 0 : 1; snd('clang', { g: .35, r: Z.fbArm ? 1.6 : 1.1 }); }; b.addEventListener('pointerdown', tog); b.addEventListener('touchstart', e => { e.stopPropagation(); }, { passive: true });
-    const r = document.createElement('div'); r.id = 'dragReticle'; r.innerHTML = '<i></i>';
+// m15xx (his: "the same as the normal shot: press UP on the right stick to start the shot, let go and it shoots -- and you AIM WITH THE LEFT
+// STICK: the aimer is just in front of the dragon, so you shoot like a FIGHTER PLANE"). m1703's FIRE toggle and thumb-dragged reticle are gone.
+// The right pad pushed UP (the trigger's own arc: `gunUp`, `gunArc`) for `armT` COCKS a fireball; letting it fall back or lifting the thumb
+// LOOSES it straight down his line of flight (heading and pitch, `dragFire`'s own default), grown by how long it was held (`fbChargeT` s to
+// `1 + fbChargeK`). The RETICLE is a ring on the screen where his flight line is `aimFar` m ahead -- dim in the saddle, hot while cocked.
+Object.assign(DRAGZ, { armT: .1, gunKeep: .45, aimFar: 60, fbChargeT: .8, fbChargeK: .7 });
+const _dgA = new THREE.Vector3();
+function dragAimUi() { const Z = DRAGZ, R = player.dragon, sit = !!(R && R.st === 'sit'), B = Z.on && Z.on.B, D = B && B.drive;
+  if (!Z.ui) { const r = document.createElement('div'); r.id = 'dragReticle'; r.innerHTML = '<i></i>';
     r.style.cssText = 'position:fixed;z-index:12;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:3px solid #ffb347;box-shadow:0 0 10px #ff7a1a;display:none;pointer-events:none';
     r.firstChild.style.cssText = 'position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:#fff1b8;box-shadow:0 0 8px #ff7a1a';
-    document.body.appendChild(b); document.body.appendChild(r); Z.ui = { b, r }; }
-  const U = Z.ui; U.b.style.display = sit ? 'flex' : 'none'; U.r.style.display = sit && Z.fbArm ? 'block' : 'none'; if (!sit) return;
-  const pr = padR.getBoundingClientRect(), ok = pr.width > 0 && pr.top > 0; U.b.style.left = (ok ? pr.left + pr.width / 2 : innerWidth - 92) + 'px'; U.b.style.top = (ok ? pr.top - 46 : innerHeight - 250) + 'px';
-  U.b.style.background = Z.fbArm ? 'rgba(255,110,20,.85)' : 'rgba(20,22,30,.55)'; U.b.style.borderColor = Z.fbArm ? '#fff1b8' : 'rgba(255,255,255,.55)';
-  if (Z.fbArm) { U.r.style.left = R.ax + 'px'; U.r.style.top = R.ay + 'px'; const c = R.fbCock ? 1 + Math.min(1, (R.fbHold || 0) / Z.fbChargeT) * Z.fbChargeK : 1; U.r.firstChild.style.transform = 'scale(' + (R.fbCock ? c * 1.6 : .6) + ')'; U.r.style.opacity = R.fbCock ? 1 : .55; } }
+    document.body.appendChild(r); Z.ui = { r }; }
+  const U = Z.ui, hd = sit && B && B.m.getObjectByName('Bip001_Head'); if (!hd) { U.r.style.display = 'none'; return; }
+  const h = dragH(B), pt = D.air ? D.air.pitch : -.12; hd.getWorldPosition(_dgA); _dgA.x += Math.sin(h) * Math.cos(pt) * Z.aimFar; _dgA.y += Math.sin(pt) * Z.aimFar; _dgA.z += Math.cos(h) * Math.cos(pt) * Z.aimFar; _dgA.project(camera);
+  if (_dgA.z > 1) { U.r.style.display = 'none'; return; } _dgA.x = clamp(_dgA.x, -.9, .9); _dgA.y = clamp(_dgA.y, -.85, .88);     // off the edge in a steep climb: held at the edge, never lost
+  const cr = renderer.domElement.getBoundingClientRect(); U.r.style.display = 'block'; U.r.style.left = (cr.left + (_dgA.x + 1) / 2 * cr.width) + 'px'; U.r.style.top = (cr.top + (1 - _dgA.y) / 2 * cr.height) + 'px';
+  const c = R.fbCock ? 1 + Math.min(1, (R.fbHold || 0) / Z.fbChargeT) * Z.fbChargeK : 1; U.r.firstChild.style.transform = 'scale(' + (R.fbCock ? c * 1.6 : .6) + ')'; U.r.style.opacity = R.fbCock ? 1 : .5; }
 function dragGun(dt) { const Z = DRAGZ, R = player.dragon, S = stick.R; R.gunT = Math.max(0, (R.gunT || 0) - dt);
-  const W = innerWidth, H = innerHeight, tx = W * Z.aimHome[0] + (S.down ? clamp(S.x, -1, 1) * W * Z.aimX : 0), ty = H * Z.aimHome[1] + (S.down ? clamp(S.y, -1, 1) * H * Z.aimY : 0);
-  R.ax = R.ax == null ? tx : damp(R.ax, tx, .035, dt); R.ay = R.ay == null ? ty : damp(R.ay, ty, .035, dt);
-  if (!dragArmed()) { R.fbCock = 0; R.fbHold = 0; dragAimUi(); return; }
-  if (S.down) { R.fbHold = (R.fbHold || 0) + dt; if (!R.fbCock) { R.fbCock = 1; snd('swoosh', { g: .35, r: 1.4 }); } }
+  const up = S.down && -S.y > (R.fbCock ? Z.gunKeep : Z.gunUp) && Math.abs(Math.atan2(S.x, -S.y)) < Z.gunArc * (R.fbCock ? 1.6 : 1); R.trig = up ? (R.trig || 0) + dt : 0;     // hysteresis: a thumb rolling in as it lifts does not loose it early
+  if (R.trig >= Z.armT) { R.fbHold = (R.fbHold || 0) + dt; if (!R.fbCock) { R.fbCock = 1; snd('swoosh', { g: .35, r: 1.4 }); } }
   else if (R.fbCock) { R.fbCock = 0; const k = 1 + Math.min(1, (R.fbHold || 0) / Z.fbChargeT) * Z.fbChargeK; R.fbHold = 0;
-    const B = DRAGZ.on && DRAGZ.on.B, hd = B && B.m.getObjectByName('Bip001_Head'); if (hd) { const o = hd.getWorldPosition(new THREE.Vector3()), cr = renderer.domElement.getBoundingClientRect();
-      const ray = new THREE.Vector3(((R.ax - cr.left) / cr.width) * 2 - 1, -((R.ay - cr.top) / cr.height) * 2 + 1, .5).unproject(camera).sub(camera.position).normalize();
-      const tgt = camera.position.clone().addScaledVector(ray, Z.aimFar); dragFire(B, tgt.sub(o).normalize(), k); R.gunT = Z.holdFbT; } }
+    const B = DRAGZ.on && DRAGZ.on.B; if (B) { dragFire(B, null, k); R.gunT = Z.holdFbT; } }
   dragAimUi(); }
 // m1622: TAMING (DRAGON.md box 6; KORAJIN.md: "you fight the dragon, tame it by giving it good Jinra"). WILD is the EVIL look: he will not be
 // ridden, he turns to watch you, growls, and SHOVES you off if you crowd him (`wildR`). On the meadow by the spawn is a JINRA SPRING (a stone
@@ -30020,6 +30011,7 @@ function aimLeap(t0, k) {
   if (KAIM.line) KAIM.line.visible = false;
   snd('swoosh', { r: .85, g: .8 }); return 1;
 }
+const CHARGEBREAK = { n: 0 };
 function chargeRelease() {
   const p = player;
   if (!p.charge) return;
@@ -30374,9 +30366,9 @@ PADS.L = bindStick(padL, stick.L,
 PADS.R = bindStick(padR, stick.R,
   // tap: jump -- and as her, a quick SECOND tap opens / folds the wings (m266)
   // ...unless someone in reach has something to say: then it is TALK (m277), and the left tap still jumps
-  () => { if (aim3Now()) return; /* m1345: 3D AIM owns the whole right pad -- a tap is not a jump */ if (talkTap()) return; if (player.dragon) { if (player.dragon.st === 'sit' && !dragArmed()) dragTapR(); return; } if (dragTap()) return; /* m1614 */ if (pickTap()) return; if (portalTap()) return; if (wingTapR()) return; if (hurdleTap()) return; if (mantleTap()) return; if (wrunTap()) return; player.jump = 1; },     // m1064: a tall face beside / ahead -> wall run     // m1063: pushing into a half block -> hurdle it     // m1039: a ledge in reach -> climb it
+  () => { if (aim3Now()) return; /* m1345: 3D AIM owns the whole right pad -- a tap is not a jump */ if (talkTap()) return; if (player.dragon) { if (player.dragon.st === 'sit') dragTapR(); return; } if (dragTap()) return; /* m1614 */ if (pickTap()) return; if (portalTap()) return; if (wingTapR()) return; if (hurdleTap()) return; if (mantleTap()) return; if (wrunTap()) return; player.jump = 1; },     // m1064: a tall face beside / ahead -> wall run     // m1063: pushing into a half block -> hurdle it     // m1039: a ledge in reach -> climb it
   // flick: a SLAM if he is in the air and it went down, otherwise a strike in that direction
-  (dx, dy) => { if (player.dragon) { if (!dragArmed()) dragBreath(); return; } /* m1621: his fireball */ if (player.wing || aim3Now()) return; /* m1282: in 3D AIM a fast drag moves the cursor, it never swings */ if (tossQuick(dx, dy)) return; if (boardFlick(dx, dy, 0)) return; if (zipKick(dx, dy)) return; if (wrunSwipe(dx, dy)) return; if (runSwipe(dx, dy)) return; if (!slamGo(dx, dy)) { KATANA.dir = katanaDir(dx, dy); meleeGo(KATANA.dir === 'down' ? player.faceH : flickH(dx, dy)); } },     // m1054: DOWN is not a direction -- the strike goes where he faces (a slot kept for a grab / throw / special)     // m1014: the right pad is MELEE, by direction (m1012's down-slide is off it)
+  (dx, dy) => { if (player.dragon) { dragBreath(); return; } /* m1621: his fireball */ if (player.wing || aim3Now()) return; /* m1282: in 3D AIM a fast drag moves the cursor, it never swings */ if (tossQuick(dx, dy)) return; if (boardFlick(dx, dy, 0)) return; if (zipKick(dx, dy)) return; if (wrunSwipe(dx, dy)) return; if (runSwipe(dx, dy)) return; if (!slamGo(dx, dy)) { KATANA.dir = katanaDir(dx, dy); meleeGo(KATANA.dir === 'down' ? player.faceH : flickH(dx, dy)); } },     // m1054: DOWN is not a direction -- the strike goes where he faces (a slot kept for a grab / throw / special)     // m1014: the right pad is MELEE, by direction (m1012's down-slide is off it)
   null,
   // THE RELEASE IS THE SHOT, so this must NOT clear `p.aim` -- `stepKit` sees the pad is no
   // longer held and fires on that edge. Clearing it here would eat every shot in the game.
@@ -45642,6 +45634,11 @@ function playerHurt0(dmg, dirH, push, up, stun, knock) {
   else if (guard) { dmg *= BLOCK.cut; push *= BLOCK.push; stun *= BLOCK.stun; up = 0; }
   if (guard) { blockFx(dirH, parry); p.parryT = parry ? BLOCK.show : 0; }
   if (parry && slotNow().blade) katanaParry(dirH);     // m979: a parry with the katana staggers him
+  // m15xx (his: "when I'm charging up on the right stick and the enemy attacks, it auto-lets-go -- I auto attack them. That's too easy, you'd
+  // charge over and over and never get hurt. If you don't release in time it should just f--- you up"): a blow that LANDS breaks the charge.
+  // The stun / knock stopped the charge's hold branch, and the frame after fell through to `chargeRelease` -- a free counter on every hit.
+  // Now the charge is thrown away (no swing) with a fizzle; a fresh one starts from nothing if the thumb is still up. The counter is the PARRY.
+  if (!guard && p.charge && (dmg > 0 || push > 0)) { p.charge = 0; p.chargeT = 0; p.chLock = null; p.kAim = 0; const m = muzzleWorld(); spkBurst(m.x, m.y, m.z, 10, { col: [.6, .6, .65], spread: 2.5, size: .08, life: .3 }); snd('swoosh', { g: .3, r: .5, x: p.pos.x, z: p.pos.z }); CHARGEBREAK.n++; }
   p.hp = Math.max(0, p.hp - dmg);
   if (p.hp <= 0 && MTIME.on && inTK() && !MTIME.st) MTIME.st = 'white';   // m726 (F3-7): taken -- missing time
   p.hurtT = stun; p.hurtWait = HEALTH.wait;
@@ -65568,7 +65565,7 @@ function stepCam(dt) {
   // m1030: *"when you pull down on the right stick into guard you can turn him by nudging left or right -- I want it inverted."* In the guard
   // the nudge turns the other way (`CAM.guardInv`, 1 = inverted); the ordinary drag is untouched.
   const gInv = p.block && CAM.guardInv ? -1 : 1;
-  if (ax > dz && !p.speedSk && !flyAim && !(stick.R.down && dragArmed())) { cam.az -= gInv * Math.sign(rx) * ((ax - dz) / (1 - dz)) * CAM.yawRate * dt; p.camWant = null; cam.idle = 0; }
+  if (ax > dz && !p.speedSk && !flyAim) { cam.az -= gInv * Math.sign(rx) * ((ax - dz) / (1 - dz)) * CAM.yawRate * dt; p.camWant = null; cam.idle = 0; }
   else cam.idle += dt;
   // **AND THE MOUSE IS THE SAME WRITER, NOT A SECOND ONE (m79).** It is spent HERE rather than
   // in the listener for exactly the reason the line above it exists: `cam.az` has one writer and

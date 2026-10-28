@@ -5,6 +5,28 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- A HIT BREAKS THE CHARGE; THE DRAGON SHOOTS LIKE A FIGHTER PLANE
+**The charge (his: "when I'm charging up on the right stick and the enemy attacks, it auto-lets-go and I auto attack them -- that's too
+easy, you'd charge over and over and never get hurt. If you don't release in time it should just f--- you up. The counter is the parry"):**
+- **The cause:** the charge's hold branch needs `!p.knock`, grounded and so on. A blow that stuns or shoves broke those conditions, and the
+  NEXT frame fell through to `else if (p.charge) chargeRelease()`. Every hit on a full charge was a free counter.
+  It was never the arrow lock (`chLock`), which only acts on a real release.
+- **The fix:** in `playerHurt0`, a blow that lands unguarded (dmg or push > 0) on a charge throws the charge away: no swing, a grey fizzle,
+  `CHARGEBREAK.n`. A thumb still held starts a new charge from zero.
+- **Measured** in the forge with the katana, the right pad held up for 70 frames (full charge):
+  - clean release: swing
+  - `playerHurt(5)` mid-charge, then release: NO swing in 50 frames, hp 100 -> 95
+
+**The dragon (his: "the same as the normal shot -- press UP on the right stick to start it, let go and it shoots, and AIM WITH THE LEFT
+STICK: the aimer is in front of the dragon, shoot like a fighter plane"):**
+- m1703's FIRE toggle and thumb-dragged reticle are REMOVED. The right pad is the camera / flap / breath again.
+- `dragGun`: right pad pushed UP (`gunUp` .72 inside `gunArc`) for `armT` .1 s COCKS a fireball. It stays cocked down to `gunKeep` .45
+  (hysteresis). Dropping below that, or lifting, LOOSES it down his flight line (heading + pitch), grown by hold time to 1.7x.
+- **The reticle** is a ring on the screen where his flight line is `aimFar` 60 m ahead, so the left stick aims it. It is dim in the
+  saddle, hot while cocked, and clamped to the screen edge in a steep climb (it projected off the top at pitch .4 and vanished).
+- **Measured** in flight at pitch .40: cocked after 40 frames, still cocked with the thumb rolled in to -.6, released: one ball, r 1.22,
+  flying (0, .39, -.92) along his heading (0, -1). The reticle was on screen at (479, 32).
+
 ## m1703 -- THE DRAGON BANKS INTO THE TURN, AND A FIRE TOGGLE WITH A RETICLE (his: "every time you build a vehicle you do the banking wrong
 -- press left and instead of tilting his left arm down to bank that way, his whole body leans to the right as if the momentum throws him";
 "a reticle for fireballs BEHIND the dragon, not on top of him; work it like RollerGirl's -- a button above the right stick toggles the
