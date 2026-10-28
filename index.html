@@ -10375,19 +10375,20 @@ function dojoBuild(g, W) {
     put(new THREE.CylinderGeometry(.14, .2, 5.5, 8).translate(cx, y2 + 2.5, cz), M.gold); for (let k = 0; k < 7; k++) put(new THREE.TorusGeometry(.42 - k * .03, .07, 6, 14).rotateX(Math.PI / 2).translate(cx, y2 + .8 + k * .55, cz), M.gold);
     put(new THREE.SphereGeometry(.35, 10, 8).translate(cx, y2 + 5.4, cz), M.gold);
     for (const [sx, sz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) korLantern(put, korMats(), cx + sx * 6.5, ty, cz + sz * 6.5, 1.2); }
-  { const fm2 = new THREE.ShaderMaterial({ uniforms: { uTime: U.uTime }, transparent: true, depthWrite: false, side: THREE.DoubleSide,
+  { const fm2 = new THREE.ShaderMaterial({ uniforms: { uTime: U.uTime, uC: { value: new THREE.Color(.62, .82, .95) } }, transparent: true, depthWrite: false, side: THREE.DoubleSide,
       vertexShader: 'varying vec2 vU; void main() { vU = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
-      fragmentShader: `uniform float uTime; varying vec2 vU; float h(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+      fragmentShader: `uniform float uTime; uniform vec3 uC; varying vec2 vU; float h(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
         void main() { float x = vU.x, y = vU.y; float col = floor(x * 26.0); float s = fract(y * 3.0 + uTime * (1.1 + h(vec2(col, 1.0)) * .6) + h(vec2(col, 2.0)));
           float streak = smoothstep(.0, .5, s) * (1.0 - smoothstep(.55, 1.0, s)); float edge = smoothstep(0.0, .18, x) * smoothstep(1.0, .82, x);
-          float fade = smoothstep(0.0, .45, y); vec3 c = mix(vec3(.62, .82, .95), vec3(1.0), streak * .8);
+          float fade = smoothstep(0.0, .45, y); vec3 c = mix(uC, vec3(1.0), streak * .8);
           gl_FragColor = vec4(c, (.42 + .5 * streak) * edge * fade); }` });
     D.falls = [];
-    for (const [I, cx, cy, cz] of [SC[0], SC[1]]) { const a = Math.atan2(-cz, -cx) + .35, r = I.rimR(a) * .97, rx = cx + Math.cos(a) * r, rz = cz + Math.sin(a) * r, ty = cy + I.topAt(Math.cos(a) * r, Math.sin(a) * r);
+    const jm = fm2.clone(); jm.uniforms.uTime = U.uTime; jm.uniforms.uC.value.setRGB(.12, .95, .62); jm.blending = THREE.AdditiveBlending;     /* m1421: the pagoda island's spring is JIN */
+    for (const [I, cx, cy, cz] of [SC[0], SC[1]]) { const isJ = I === SC[0][0]; const a = Math.atan2(-cz, -cx) + .35, r = I.rimR(a) * .97, rx = cx + Math.cos(a) * r, rz = cz + Math.sin(a) * r, ty = cy + I.topAt(Math.cos(a) * r, Math.sin(a) * r);
       const L = 70, wf = new THREE.PlaneGeometry(6, L, 1, 24), P = wf.attributes.position; for (let i = 0; i < P.count; i++) { const t = (L / 2 - P.getY(i)) / L; P.setZ(i, Math.sin(Math.min(1, t * 4) * Math.PI / 2) * 3 + t * 4); P.setX(i, P.getX(i) * (1 + t * 1.6)); }
-      wf.translate(0, -L / 2, 0); wf.rotateY(Math.PI / 2 - a); const m = new THREE.Mesh(wf, fm2); m.position.set(rx, ty + .1, rz); m.rotation.y = 0; m.renderOrder = 1; g.add(m); D.falls.push(m);
+      wf.translate(0, -L / 2, 0); wf.rotateY(Math.PI / 2 - a); const m = new THREE.Mesh(wf, isJ ? jm : fm2); m.position.set(rx, ty + .1, rz); m.rotation.y = 0; m.renderOrder = 1; g.add(m); D.falls.push(m);
       const sx2 = cx + Math.cos(a) * r * .45, sz2 = cz + Math.sin(a) * r * .45, st = new THREE.PlaneGeometry(r * .55, 2.6).rotateX(-Math.PI / 2).rotateY(-a).translate((sx2 + rx) / 2, ty + .15, (sz2 + rz) / 2);
-      g.add(new THREE.Mesh(st, new THREE.MeshStandardMaterial({ color: 0x6fb8d8, roughness: .1, metalness: .2, emissive: 0x1a4a66, emissiveIntensity: .4 }))); } }
+      g.add(new THREE.Mesh(st, isJ ? new THREE.MeshBasicMaterial({ color: 0x7affd8, toneMapped: false }) : new THREE.MeshStandardMaterial({ color: 0x6fb8d8, roughness: .1, metalness: .2, emissive: 0x1a4a66, emissiveIntensity: .4 }))); } }
   { const o = new THREE.Mesh(mergeGeometries(ISL), isl3Mat()); o.castShadow = o.receiveShadow = true; g.add(o); }
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o !== null; o.receiveShadow = true; g.add(o); }
   // THE DRIFTING PLATFORMS: small stone discs on rock roots, slowly bobbing and circling outside the rim (decor for now)
@@ -10494,12 +10495,21 @@ function dojoBuild(g, W) {
       fragmentShader: 'uniform float uTime; varying vec3 vN; varying vec3 vV; varying vec2 vU; void main() { float e = pow(abs(dot(vN, vV)), 2.5); float along = smoothstep(0.0, .25, vU.y) * smoothstep(1.0, .55, vU.y);' +
         ' float st = .6 + .4 * sin(vU.x * 40.0 + vU.y * 6.0 - uTime * .4) * sin(vU.x * 17.0 + uTime * .2); gl_FragColor = vec4(vec3(1.0, .78, .5) * e * along * st * .3, 1.0); }' });
     const rays = new THREE.Mesh(mergeGeometries(RG), rm); rays.frustumCulled = false; rays.renderOrder = 4; g.add(rays);
+    // m1421: JIN CANDLES -- fat cream candles floating in the air just outside the rail, bobbing, each burning a MINT Jin flame (a teardrop with a
+    // hot white core and a halo) -- the Jin, not fire. Bodies are one InstancedMesh moved in dojoStep; flames one card layer on the same bob
+    { const CN = []; for (let i = 0; i < 30; i++) { const a = i / 30 * 6.283 + rnd() * .12, r = W + 4 + rnd() * 5; CN.push([Math.sin(a) * r, 1.6 + rnd() * 5.5, Math.cos(a) * r, .3 + rnd() * .25, rnd() * 100]); }
+      const cb = new THREE.InstancedMesh(new THREE.CylinderGeometry(.16, .18, 1, 12).translate(0, -.5, 0), new THREE.MeshStandardMaterial({ color: 0xf2e6cc, roughness: .7, emissive: 0x2a6658, emissiveIntensity: .35 }), CN.length);
+      cb.frustumCulled = false; g.add(cb); D.candles = { m: cb, list: CN.map(c => ({ x: c[0], y: c[1], z: c[2], h: .5 + (c[4] % 1) * .7, s: c[4] })) };
+      bbd(CN.map(c => [c[0], c[1] + .35, c[2], c[3] * 3.4, c[4]]), { aspect: '.6', order: 3, add: true, move: 'c.y += sin(uTime * .8 + iS) * .25;', frag: `void main() { vec2 q = (vU - .5) * 2.0; q.y += .25;
+        float fl = .85 + .15 * sin(uTime * 13.0 + vS * 5.0); float tear = length(vec2(q.x * (1.6 + q.y * 1.2), q.y * .8)); float core = smoothstep(.42, .08, tear) * fl, halo = exp(-dot(q, q) * 3.0) * .55;
+        float hot = smoothstep(.22, 0.0, tear); vec3 c = vec3(.2, .95, .7) * (core * .9 + halo) + vec3(.75, 1.0, .9) * hot * .45; gl_FragColor = vec4(c, 1.0); }` }); }
     // THE SUN: a big warm glow round the sky's sun disc, kept on the sun's line from wherever the camera is
     const gc = document.createElement('canvas'); gc.width = gc.height = 256; const gx = gc.getContext('2d'), gr = gx.createRadialGradient(128, 128, 0, 128, 128, 128);
     gr.addColorStop(0, 'rgba(255,240,215,1)'); gr.addColorStop(.12, 'rgba(255,214,160,.85)'); gr.addColorStop(.35, 'rgba(255,160,110,.28)'); gr.addColorStop(1, 'rgba(255,140,120,0)'); gx.fillStyle = gr; gx.fillRect(0, 0, 256, 256);
     const gt = new THREE.CanvasTexture(gc); gt.colorSpace = THREE.SRGBColorSpace; const sg = new THREE.Sprite(new THREE.SpriteMaterial({ map: gt, blending: THREE.AdditiveBlending, depthWrite: false, fog: false, transparent: true }));
     sg.scale.setScalar(320); sg.renderOrder = -1; sg.frustumCulled = false; g.add(sg); D.sunG = { m: sg, d: sd.clone() }; }
   D.on = { g }; ARENA.door.entry = 'BEAM'; }
+let _dcM = null;
 function dojoStep(dt) { const D = DOJO; if (!D.on) return; D.t += dt; D.U.uTime.value = D.t; D.dome.position.copy(camera.position);
   // m1401: OFF THE EDGE. The world has a floor at y 0 everywhere, so past the rim he would stand on the sky. Out there and down at y 0, he has
   // FALLEN: a gust of petals where he went, and he is put back on the floor at his pad, with a beam.
@@ -10510,6 +10520,7 @@ function dojoStep(dt) { const D = DOJO; if (!D.on) return; D.t += dt; D.U.uTime.
       if (x - cx > 30) x -= 60; else if (x - cx < -30) x += 60; if (z - cz > 30) z -= 60; else if (z - cz < -30) z += 60; if (y < -1) y = 14 + Math.random() * 4; P2[o] = x; P2[o + 1] = y; P2[o + 2] = z; }
     Q.pg.attributes.position.needsUpdate = true; Q.pm.uniforms.uPx.value = renderer.domElement.height / (2 * Math.tan(camera.fov * Math.PI / 360)); }
   for (const Jk of D.junks || []) { Jk.a += Jk.w * dt; const x = Math.sin(Jk.a) * Jk.r, z = Math.cos(Jk.a) * Jk.r; Jk.J.position.set(x, Jk.y + Math.sin(D.t * .4 + Jk.ph) * 1.5, z); Jk.J.rotation.set(Math.sin(D.t * .5 + Jk.ph) * .04, Jk.a + (Jk.w > 0 ? Math.PI / 2 : -Math.PI / 2), Math.sin(D.t * .7 + Jk.ph) * .05); }
+  if (D.candles) { const C2 = D.candles, mx = _dcM || (_dcM = new THREE.Matrix4()); C2.list.forEach((c, i) => { mx.makeScale(1, c.h, 1).setPosition(c.x, c.y + Math.sin(D.t * .8 + c.s) * .25, c.z); C2.m.setMatrixAt(i, mx); }); C2.m.instanceMatrix.needsUpdate = true; }
   if (D.sunG) D.sunG.m.position.copy(camera.position).addScaledVector(D.sunG.d, 700);
   if (D.manta) { const Mn = D.manta; Mn.a += Mn.w * dt; const rr = Mn.r + Math.sin(Mn.a * 2) * 25; Mn.m.position.set(Math.sin(Mn.a) * rr, Mn.y + Math.sin(D.t * .35) * 5, Math.cos(Mn.a) * rr); Mn.m.rotation.set(Math.cos(D.t * .35) * .1, Mn.a - Math.PI / 2, .35); }
   if (D.whale) { const Wh = D.whale; Wh.a += Wh.w * dt; Wh.m.position.set(Math.sin(Wh.a) * Wh.r, Wh.y + Math.sin(D.t * .25) * 6, Math.cos(Wh.a) * Wh.r); Wh.m.rotation.set(Math.cos(D.t * .25) * .08, Wh.a + Math.PI / 2, 0); }
@@ -12577,6 +12588,7 @@ function arenaUi() {
       else if (a === 'airlegs') { AIRLEGS.on = AIRLEGS.on ? 0 : 1; try { localStorage.setItem('mel.airlegs', AIRLEGS.on ? '1' : '0'); } catch (err) {} }     // m1098
       else if (a === 'jfloat') { JUGGLE.float = JUGGLE.float ? 0 : 1; try { localStorage.setItem('mel.jfloat', JUGGLE.float ? '1' : '0'); } catch (err) {} }     // m1098
       else if (a === 'runland') { RUNLAND.mode = RUNLAND.mode === 'DIP' ? 'STOP' : 'DIP'; try { localStorage.setItem('mel.runland', RUNLAND.mode); } catch (err) {} }     // m1097
+      else if (a === 'btrail') { BTRAIL.jin = BTRAIL.jin ? 0 : 1; try { localStorage.setItem('mel.btrail', BTRAIL.jin ? 'jin' : 'blue'); } catch (err) {} if (BTRAIL.mat) BTRAIL.mat.uniforms.uC.value.setRGB(...(BTRAIL.jin ? JIN.col : BTRAIL.col)); }     // m1421
       else if (a === 'toprun') { GAIT.topRun = GAIT.topRun ? 0 : 1; try { localStorage.setItem('mel.toprun', GAIT.topRun ? '1' : '0'); } catch (err) {} runSetUse(GAIT.runSet, 0); }     // m1092
       else if (a === 'sprint') { const T = NINJA.looks; NINJA.look = T[(T.indexOf(NINJA.look) + 1) % T.length]; try { localStorage.setItem('mel.sprint', NINJA.look); } catch (err) {} }
       else if (a === 'sideflick') { TORNADO.pick = TORNADO.picks[(TORNADO.picks.indexOf(TORNADO.pick) + 1) % TORNADO.picks.length]; try { localStorage.setItem('mel.sideflick', TORNADO.pick); } catch (err) {} }     // m1088
@@ -12602,7 +12614,7 @@ function arenaUi() {
   if (ARENA.tools === undefined) { try { ARENA.tools = +localStorage.getItem('mel.arena.tools') || 0; } catch (err) { ARENA.tools = 0; } }
   const tools = ARENA.tools && !m;     // a menu open folds the tools away: the screen is not tall enough for both
   let h = '<div class="ar-bar">' + B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('vend', 'VEND') + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
-    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('sample', 'DNA SAMPLE ' + (SAMPLE.on ? 'ON' : 'OFF')) + B('runslash', 'RUN SLASH ' + (RUNSLASH.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
+    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('btrail', 'TRAIL ' + (BTRAIL.jin ? 'JIN' : 'BLUE')) + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('sample', 'DNA SAMPLE ' + (SAMPLE.on ? 'ON' : 'OFF')) + B('runslash', 'RUN SLASH ' + (RUNSLASH.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
   if (m === 'bld') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back');
     for (const E of BLDG.list) h += B('bld', E.t + '<small>' + (E.on() ? 'tap to remove' : E.pass >= 3 ? E.sub : 'IN PROGRESS · pass ' + E.pass + ' of 3') + '</small>', E.key, E.on() ? 'ar-on' : '');
     h += '</div>'; }
@@ -18597,12 +18609,16 @@ const KATANA = { dmgK: 1.6,
 // m984: THE BLADE TRAIL -- a ribbon through the katana's last positions (base -> tip), fading with age, additive, one draw. It is
 // laid while a swing, the lunge or the spin plays and shrinks away after, so every arc the blade cuts is drawn for a moment.
 const BTRAIL = { n: 18, base: 14, tip: 70, col: [.25, .72, 1], k: .7 };     // a cool blue, NORMAL blending: additive white vanished on the white arena
+// m1421: JIN ESSENCE (his, KORAJIN.md "THE JIN GLOW"): the mint glow first seen on the serpent fish's spots is the visible Jin. One colour, used
+// everywhere the Jin shows: the blade trail and the motes it sheds, the dojo's floating candles, a Jin spring. TOOLS > TRAIL: JIN / BLUE
+const JIN = { hex: 0x7affd8, col: [.48, 1, .85], shed: 26 };
+try { BTRAIL.jin = localStorage.getItem('mel.btrail') === 'blue' ? 0 : 1; } catch (e) { BTRAIL.jin = 1; }
 function bladeTrail(dt) {
   const T = BTRAIL;
   if (!T.mesh) {
     const g = new THREE.BufferGeometry(), N = T.n; g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(N * 2 * 3), 3)); g.setAttribute('a', new THREE.BufferAttribute(new Float32Array(N * 2), 1));
     const idx = []; for (let i = 0; i < N - 1; i++) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } g.setIndex(idx);
-    T.mat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide, uniforms: { uC: { value: new THREE.Color(...T.col) } },
+    T.mat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide, uniforms: { uC: { value: new THREE.Color(...(T.jin ? JIN.col : T.col)) } },
       vertexShader: 'attribute float a; varying float vA; void main() { vA = a; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
       fragmentShader: 'uniform vec3 uC; varying float vA; void main() { gl_FragColor = vec4(uC, vA); }' });
     T.mesh = new THREE.Mesh(g, T.mat); T.mesh.frustumCulled = false; scene.add(T.mesh); T.hist = [];
@@ -18611,6 +18627,9 @@ function bladeTrail(dt) {
   const HS = heroSword();
   if (on) { w.group.updateWorldMatrix(true, false); T.hist.unshift([w.group.localToWorld(new THREE.Vector3(0, HS ? HS.base : T.base, 0)), w.group.localToWorld(new THREE.Vector3(0, HS ? HS.tip : T.tip, 0))]); if (T.hist.length > T.n) T.hist.length = T.n; }
   else if (T.hist.length) T.hist.pop();
+  if (on && T.jin && T.hist.length > 1 && SPK.on) { const [b0, t0] = T.hist[0], t1 = T.hist[1][1]; for (let n = JIN.shed * dt; n > 0; n--) { if (n < 1 && Math.random() > n) break;     /* m1421: Jin motes shed along the edge */
+    const f = .35 + Math.random() * .65, x = b0.x + (t0.x - b0.x) * f, y = b0.y + (t0.y - b0.y) * f, z = b0.z + (t0.z - b0.z) * f, k = f / Math.max(dt, 1e-3) * .12;
+    spk(x, y, z, (t0.x - t1.x) * k + (Math.random() - .5) * .4, (t0.y - t1.y) * k - .3 + Math.random() * .3, (t0.z - t1.z) * k + (Math.random() - .5) * .4, .05 + Math.random() * .05, .45 + Math.random() * .4, JIN.col); } }
   const P = T.mesh.geometry.attributes.position, A = T.mesh.geometry.attributes.a, H = T.hist;
   T.mesh.visible = H.length > 1;
   for (let i = 0; i < T.n; i++) { const h = H[Math.min(i, H.length - 1)]; if (!h) break; const f = H.length > 1 ? 1 - i / (H.length - 1) : 0;

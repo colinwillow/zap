@@ -38,6 +38,25 @@ out of weirdport. Do it when Korajin stops needing Zap's code, or the day he ask
   to the Jin, and Grumbo can wake them. Was the Korajin made to guard them, are they descended from their builders, or did the
   structures make the Korajin? Don't answer it early.
 
+## THE JIN GLOW -- the essence you can SEE (his, Oct 28 2026, off the serpent fish's spots)
+
+> *"I really like this green glowing stuff... floating candles with this green glowing fire-liquid, things that should be spewing water but it's
+> this green, weapons that shoot it, his katana makes it as it cuts the air. Maybe this is the stuff he collects -- the ship is in the water and you
+> collect a bunch of it, store it, and then your ship can fly; eventually you get powers. It's the essence of the Jin, the Korajin."*
+
+- **What it is:** the Jin made visible -- a liquid light, MINT (`JIN.hex` 0x7affd8, first drawn as `shipSerpentMake`'s glow spots). It is
+  always the same colour, so the player learns one rule: **mint = Jin = power.** Nothing else in the palette may use that hue.
+- **Where it shows (built so far, m1421):** the katana's trail, and the motes it sheds as it cuts (TOOLS > TRAIL: JIN / BLUE); the dojo's
+  floating JIN CANDLES; the JIN SPRING pouring off the pagoda island.
+- **Where it can show (to build):** Jin springs and fountains in the world in place of water; Jin-fed lanterns; creatures that carry it (the
+  serpent fish, the manta and whale spots -- living sources); Jin weapons that fire it; a beaten enemy releasing it.
+- **THE LOOP (his idea, the game's spine if he wants it):** Grumbo's ship sails the sea and GATHERS Jin -- from the serpents and great
+  creatures, from springs, from wrecks. It is STORED in the ship's core (the tank you can see filling). Enough Jin and **the ship can FLY**
+  (the sea-to-airship transformation he already wants). More Jin unlocks Grumbo's POWERS. So collecting is the progression, and flight is
+  the first big payoff.
+- **Open (his calls):** a name for the stored stuff (Jin / essence / a word of its own); whether you take it by fighting, by fishing or
+  by drinking from springs; whether enemies want it too (a reason for the Hollowed to raid the ship).
+
 ## HIS NEXT BIG IDEA (open)
 
 **What if Korajin isn't a species at all, but what happens when an ordinary living creature becomes bonded with Jin?** It would be

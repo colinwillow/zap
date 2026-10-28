@@ -16,6 +16,15 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
+## THE JIN GLOW: CANDLES, A SPRING, AND THE KATANA (mXXXX)
+*"I really like this green glowing stuff... floating candles... spewing water but green... his katana makes it as it cuts the air... the stuff he collects... the essence of the Jin."* (He saw it on Worker A's serpent fish, whose glow spots are `0x7affd8`.)
+- **`JIN = { hex, col, shed }`** sits beside `BTRAIL` and is the ONE source of the colour. KORAJIN.md "THE JIN GLOW" is the design, and it includes the collect, store and fly loop he described.
+- **Blade:** `BTRAIL.jin` (TOOLS > TRAIL: JIN / BLUE, stored in `mel.btrail`) turns the trail mint and sheds `JIN.shed`/s motes along the edge through `spk`. Each mote is thrown along the tip's motion.
+- **Dojo candles:** 30 fat cream candles (an InstancedMesh, bobbing in dojoStep) float just outside the rail. They burn a mint teardrop flame on one additive card layer that shares the bob.
+- **The first flame was white.** Raw additive colours in a ShaderMaterial clip, because there is no tone mapping. The mint core is now held at .9 and the white core at .45.
+- **Jin spring:** the pagoda island's waterfall is a clone of the fall material (`uC` uniform added). It is additive mint, and so is its stream.
+- **`ShaderMaterial.clone()` CLONES its uniforms.** Re-point `uTime` at the shared `U.uTime`, or the clone freezes.
+
 ## THE DOJO, PASS 8: THE ATMOSPHERE -- CLOUDS, GOD RAYS, SKY LANTERNS, FAIRY FLECKS, SUN, BROKEN FOG (m1419)
 *"Big fluffy clouds, god rays, those floating lanterns, little fairy glowing flecks, a nice sun, a subtle glowing fog... moody, a sunset vibe... with an opacity texture so it's broken up, not 100% one linear section of fog; it has values to it."*
 - **`bbd(list, {frag, move, aspect, add, order})`** inside dojoBuild: ONE instanced camera-facing card per layer (`iC` = centre + size, `iS` = seed). The look is in the fragment shader and the drift is in `move` (vertex). Five layers, five draws.
