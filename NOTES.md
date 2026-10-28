@@ -25,7 +25,7 @@ Render-checked headless (afloat, three-quarter). Shipped unverified. **Its three
 - The plants and the gangplank's foot lanterns are moved to the scene first, so they stay on the ground.
 - Plate by the gangplank's foot; `rig` hook; `fshipClear` drops the rig, the plate and the foot lanterns.
 Render-checked headless: aground (sails gone, drained) and afloat. Shipped unverified.
-## m15xx -- THE FLOATING ISLANDS' ROCK, spiced up (his: "the rock texture on the floating islands needs a more interesting material")
+## m1608 -- THE FLOATING ISLANDS' ROCK, spiced up (his: "the rock texture on the floating islands needs a more interesting material")
 `isl4Mat` painted only the GRASS procedurally; every rock face was flat vertex colour. Now its non-grass branch paints ROCK in the same shader
 (every dressed island in the dojo uses it): sandstone STRATA from world height wobbled by low noise (ochre to cream bands, a rust seam at each
 band's top), vertical water STREAKS, thin CRACKS (a noise contour), a cool lavender UNDERSIDE (faces pointing down) to sit in the sky's palette,
