@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## the LADDER REFACTOR, step 5: the hands meet the rungs (Worker B)
+He said go on the clip pass. `npm run clips models/characters/zap_02.glb`: `climbing_Ladder` 0.792 s, 20 keys, 38 bones. Then MEASURED on the
+shipped hero in the sim (the clip sampled like `mantleCurve`, and the hands' world heights read off the drawn pose while climbing):
+- **WHAT WAS WRONG:** the clip's gripping hand falls past him at ~.44 m/s at 1x (one cycle pulls ~.35 m; m189's .73 was zap.glb), and
+  the old rate (`speed / ref`, capped at 2.2x) drove the hands at ~.97 m/s while the body rose at 2.3 -- every hand SLID ~1.3 m/s up the
+  rails during its grip.
+- **NOW (`CLIMB.lock`): THE CLIP'S TIME IS A FUNCTION OF HIS HEIGHT.** `climbCurve` measures the cycle's rise; it is rounded to whole rungs
+  of the ladder (`L.rung` {y0, s}; the yard's are .30, my Red Hollows ladders' .34; else `CLIMB.rungS` .30) and phased to the rungs. Still
+  = a still pose; no speed can outrun the hands.
+- **AND IT CALIBRATES ON THE DRAWN POSE** (`rig.climbFix`): the offline sample read the hands ~.25 m off where they draw, so each hand's real
+  grip (its world rise turning to a fall) is measured against the nearest rung and the phase nudged until the pair sit evenly. Sim, ladder
+  5 (20 m), after two grips: L +.09, R -.09 m, held for the whole climb. **Both cannot sit on .30 rungs**: on the drawn pose the two hands
+  take hold ~.17 m apart; a per-hand warp (cosine bumps per grip) was tried and saturated -- it needed the clip to run backwards. A clip whose
+  hands grip a whole rung apart would land both.
+- **AND THE SPEED IS NOW THE ANIMATION'S SPEED**: 2.3 m/s would cycle the hands ~6x. TOOLS > CLIMB cycles .9 / 1.4 / 2.3 m/s (`mel.climbspd`),
+  **1.4 by default** -- his pick. Ladder 3 (7 m): bottom to standing on top 5.6 s; top back down 5 s.
+The feet are not locked (they follow the same phase; not measured against the rungs).
 ## m1599 -- THE RE-PASS: the FLYING SHIP HOUSE, pass 1 (a HERO flyer: the look; a collider audit)
 **Moves:** its pass-1 row.
 - Kit materials: `K.timber`, a warm planks deck, a dark warm planks hull, `K.redL` ribs and pennants, `K.bronze` (the figurehead too, its
