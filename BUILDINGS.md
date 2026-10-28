@@ -39,7 +39,13 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - a cliff band, then lobed undersides cracked and banded in strata, with moss at the rim
   - dressed with cherry and pine trees, boulders, shrubs and hanging roots
   - the platform's own island, the altars', the stepping stones', the pagodas' and the drifting platforms', plus twelve art-directed scenery masses (two great ones, a chain of medium, small rocks)
-- [ ] pass 5 (his, after m1403):
+- [x] **pass 5 (m1408): HIS VOCABULARY, not borrowed Japanese** (ARCHITECTURE.md):
+  - the pagodas become HERO HALLS: sandstone domes, the red-and-cream tent cone, bronze stacks, a brass wheel, a scaffold front with an awning and box lanterns, bunting, a banner, portholes, the crane and orb
+  - the torii become timber-and-iron GATES with wheels, banners and lanterns
+  - the paper-lantern strings become BUNTING
+  - the altars get tent canopies
+  - the floor crest is the ship's SQUARE SPIRAL
+- [ ] pass 6 (his, after m1403):
   - the scene: his SHIP in the background, smaller flying ships, AIR CREATURES (one at a time: an alien whale, a manta, a serpent-dragon), and waterfalls off the big islands
 - [ ] pass 6:
   - the gates as ENTRANCES: bosses walk in through a torii (a DOORS entry for the dojo)

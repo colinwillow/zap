@@ -521,6 +521,24 @@ SHIPPED UNVERIFIED. The queue's passes 2 and 3 are done. Next is his call: more 
 
 SHIPPED UNVERIFIED. Next: pass 3, foam and wake, bow spray, the sun on the water, gulls, an island.
 
+## THE DOJO IN HIS VOCABULARY: THE HERO KIT (m1408), AND ARCHITECTURE.md
+
+His (with four screenshots of Worker B's home and Worker A's ship): *"It seems like you're using the architecture of other games rather than the architecture of these images. We have an architecture of our own now... all the buildings we've made get a new set of passes in this style. Enemy bases probably shouldn't be in this style -- this is the hero's, my dojo, my home; the enemy would have different architecture and colours, a similar general style."*
+
+- **ARCHITECTURE.md (new):** the HERO KIT written down. It covers domes, the tent cone, bronze stacks, ship's wheels, timber scaffold with iron bands, red awnings with a cream zigzag, diamond and chevron banners, bunting, box and stone lanterns, the crane and orb, portholes, the ship's parts, the palette, and the motifs (diamond, chevron, SQUARE SPIRAL).
+  - It proposes an ENEMY grammar per faction (Hollowed: black iron and verdigris; Veilborn: bone, violet and membranes; Dustwalkers: patched salvage; Red Order: the hero kit made severe). The taste call is his.
+  - It plans a re-pass of every forge building in the right kit.
+  - His screenshots are saved as `images/korajin/ref/vocab_1..4.jpg`.
+- **The shared code kit:** `korMats` (one shared set), `korDome`, `korTent` (eight alternating red and cream panels, timber ribs, an iron-ringed finial with spokes), `korStack`, `korWheel`, `korPost` (iron-banded), `korLantern` (box), `korBunting`, `korBanner`, `korRod`. All take the caller's `put`.
+- **The dojo, re-made in it:**
+  - **HERO HALLS on the four islands:** a 9 m dome (`hk` 1.15) and two smaller ones, a 10.5 m tent cone, two bronze stacks, a brass wheel over the door, lavender portholes, a scaffold front (posts, a beam, a sagging red awning, three box lanterns, a door), bunting from the cone to the posts, a banner, and a crane with a brass orb and a red tassel. The first render's domes were squat (`hk` .9, r 7.5), so they were enlarged and heightened.
+  - **GATES:** iron-banded timber posts on stone feet, a doubled beam with iron lashings, a brass wheel at the crossing, a red diamond banner, and box lanterns.
+  - **Bunting** instead of paper lanterns, from the banner masts to the gates.
+  - **Altars:** a red/cream tent canopy on posts with a wheel.
+  - **CREST:** his square spiral, cream on red, in a gold ring.
+- **Caught by the gate:** `check:worlds` failed on `c.strokeRect` (the boot stub's canvas has no `strokeRect`; browsers do). It now uses rect + stroke.
+- **Checked headless:** a hall, wide, and the crest. The crest's outer square overran the disc and was shrunk.
+
 ## FLOATING ISLANDS, NOT CONES (m1407): `floatIsland` AND `islandDress`, SHARED
 
 His (to this window and the Ship's): *"The upside-down floating islands -- you take a cone, turn it upside down and call it a floating island, and it looks so goddamn geometric. Break up that shape: erode the outer ridges, break up the line with rocks and dirt and boulders and trees and shrubs, inflate and deflate, take chunks away, add chunks... big land masses, small, medium -- art direct."*
