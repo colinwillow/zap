@@ -5,6 +5,27 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## the Red Hollows: CAVES YOU WALK INTO (Worker B)
+His ask (after m1712): "make the caves something you can go in -- a continuous, actual physical hole; little treasures, maybe animals".
+All five cave mouths (z -30 W, 18 W, -55 E, 40 E, 95 W) are now caves: a 7 m tunnel (5.2 wide, 3.8 high) opening into a chamber
+(12 x 13 m, 5.6 high). How, since the canyon is ONE heightfield:
+- **CARVED out of the height** (`hwHeight` = `caveCarve(hwHeight0)`): the floor runs flat in through the wall (a metre past the shell),
+  so the walk store, the terrain triangles and the wall columns (`colMin` skips them) all follow with nothing special. `caveList`
+  places each mouth off the UNCARVED height (no recursion) and checks the rock is deep enough (all five pass after relaxing it).
+- **THE SHELL**: rings of a squarish noisy arch along the cave, UNLIT (`MeshBasic` + the cliff paint) -- nothing can occlude the sun or
+  the sky, and the first render showed a lit shell as bright as the cliff outside, so the mouth read as solid rock. Darkens inward, a
+  mint pool round the chamber's crystals. **The land shader dims its floor inside every cave and DISCARDS its own coarse 2 m slope
+  wherever it falls inside a cave's volume** (the second render: bright orange lumps inside).
+- **THE CAP**: the original surface over the carve, never lower than the vault (x1.1 + .45, the noise poked through at + .35), reaching
+  5 m past the shell (the 2 m land's dip showed as a gully from above at 1.6 and 3.2), and never in front of the mouth (the first cap
+  hung a curtain across it). It is the lintel over the arch.
+- **COLLISION**: boxes just outside the shell all round and at the back; the chest is solid.
+- **INSIDE**: Jinra crystal clusters (mint and violet) on the floor and hanging from the vault, glowing mushrooms along the foot of the
+  walls, a CHEST at the back (strike it: the lid flies open, gold sparks, six doubloons), three BATS hanging from the vault that scatter
+  round the chamber when he comes in and settle back; one shared mint PointLight in the nearest cave. Doubloons are stepped in the hollows.
+Sim (shipped frame, stick pushed into the z 18 cave from the floor): x -15 -> -34.9 in 3.5 s at floor height y 1.34 (the cave floor),
+stopped by the chest. Renders: outside (the open mouth, crystals glowing inside), inside (the chamber), from above (the plateau whole;
+two small nicks at the rim remain). Draws: ~17 per cave (shell, cap, rim, 4 content meshes, the chest's 6, three bats x3).
 ## the Red Hollows' PAINTED MAPS, pass 3: caves, bridges, poles, lanterns, sky islands, the mill's turrets (Worker B)
 His "Go!" on the next texture pass. `hwPaint` kinds now include the texture library's `planks` / `timber` / `stone` (means measured off
 the webps, linear): the m1113 rope bridges' planks -> planks, the banner poles -> timber, his stone lanterns -> stone; the cave interiors
