@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the GATEHOUSE, pass 3 (detail and verticality; its third pass, so the loop moves on)
+## m1535 -- THE RE-PASS: the GATEHOUSE, pass 3 (detail and verticality; its third pass, so the loop moves on)
 **Moves:** the Gatehouse's pass-3 row (detail, verticality). The roofline was flat, so this pass gives it a classical silhouette.
 - **Two YAGURA** on the deck, one over each tower: lacquer posts (solid), a gold beam band, a two-tier black-tile hip roof (`E.roof`, an open
   4-sided skirt plus a cap), gold ridge finials and up-turned corner tips, and a mint lantern hung inside. `cls` files anything over
