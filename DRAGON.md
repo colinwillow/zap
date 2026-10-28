@@ -14,7 +14,7 @@ dragon into a level (the WHOLE-PIECE RULE).
 
 ## DONE WHEN
 
-- [ ] **1. The zone, and the dragon armoured in it** (m1602): the island, the dais, the climb, the tiers. Pass 2 of the dressing: CAPTURED
+- [ ] **1. The zone, and the dragon armoured in it** (m1607): the island, the dais, the climb, the tiers. Pass 2 of the dressing: CAPTURED
       (red lacquer and gold: head plate, bridle, live reins, cantle and saddle lames, pauldrons, a chest plate with our crest, neck and
       tail plates, tail rings and a crescent blade) and EVIL (blackened iron: mask with horns, spiked plates, spiked collar and chain,
       shackles, stolen red Jinra, his hide darkened). TOOLS > DRAGON switches CAPTURED / EVIL / BARE live. *Open: his look at it.*

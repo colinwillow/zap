@@ -909,7 +909,7 @@ body.kit3 #wepRow text { font-size: 12px; }
   <div class="sub" id="bootSub"></div>
   <div class="msg" id="bootMsg">loading</div>
   <div class="bar"><i id="bootBar"></i></div>
-  <div class="bld">BUILD <span id="bootBuild">m1601</span></div>
+  <div class="bld">BUILD <span id="bootBuild">m1607</span></div>
 </div>
 <script>
 // m1320: THE BOOT CARD SAYS WHICH GAME IS LOADING. *"It still says Weirdport and we're not even on that game. We could stylize the loading
@@ -921,7 +921,7 @@ body.kit3 #wepRow text { font-size: 12px; }
     b.style.backgroundImage = 'linear-gradient(180deg, #0c0706d0 0%, #0c0706a8 40%, #0c0706f2 85%), url(images/korajin/korajin_title_01.webp?b=' + ((document.getElementById('bootBuild') || {}).textContent || '') + ')'; } })();
 </script>
 
-<div class="chip" id="build"><b id="buildN">m1601</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
+<div class="chip" id="build"><b id="buildN">m1607</b><u id="chipMin">&minus;</u><i id="buildI"></i></div>
 <div id="splash" aria-label="tap to start"><img class="blur" alt=""><img class="main" alt="Zap and Clancy"><div class="glow"></div><div class="bn"></div></div>
 <script>
 // m879 (STEER 02:22): THE SPLASH, before the module (so it shows on the first paint, while the boot carries on behind it). The image's
@@ -1031,7 +1031,7 @@ import { KTX2Loader } from './vendor/KTX2Loader.js';
 import { clone as skeletonClone } from './vendor/SkeletonUtils.js';
 import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
 
-const BUILD = 'm1601';
+const BUILD = 'm1607';
 /* ASSETS:START */
 const ASSETS = {"textures/bronze.webp":"bdb5b1c0","textures/marble.webp":"53c3d802","textures/red_cloth.webp":"82877ebd","textures/roof_tiles.webp":"bc0a6ac0","textures/sandstone.webp":"4d991588","textures/sky_sunset_01.webp":"db9645b5","textures/sky_sunset_02.webp":"385ca84e","textures/stone_blocks.webp":"419e5209","textures/wood_planks.webp":"c8b25167","textures/wood_timber.webp":"dc42d865","models/alien_lizard.glb":"faffcf4c","models/alien_lizard_ktx2.glb":"05da2a20","models/skate.glb":"0c612d5e","models/skateboard.glb":"5ba93796","models/characters/alien_antenna_game.glb":"f3ccf328","models/characters/alien_antenna_game_ktx2.glb":"28afac8c","models/characters/alien_female_purple.glb":"1c73eef1","models/characters/alien_female_purple_ktx2.glb":"fc914afb","models/characters/alien_goblin.glb":"3e91bffb","models/characters/alien_goblin_chains.glb":"e72d1550","models/characters/alien_goblin_game.glb":"cfabd926","models/characters/alien_grey_medium.glb":"5a779e8e","models/characters/alien_grey_medium_ktx2.glb":"61600c3e","models/characters/alien_rollerskate_blue.glb":"abf0917c","models/characters/alien_rollerskate_blue_ktx2.glb":"e9a7948a","models/characters/alien_warrior.glb":"f5cc9c49","models/characters/alien_warrior_ktx2.glb":"a13fb7b6","models/characters/beautiful_asian.glb":"910f6565","models/characters/beautiful_asian_ktx2.glb":"35281eef","models/characters/beautiful_blonde.glb":"edddc421","models/characters/beautiful_blonde_ktx2.glb":"89cf3899","models/characters/brute_warboss_armor.glb":"cc5c7936","models/characters/ceo_alien.glb":"844dc3a7","models/characters/ceo_human.glb":"ec289865","models/characters/clancy.glb":"4b9d271f","models/characters/clancy_ktx2.glb":"74edbc6e","models/characters/colin.glb":"99d38b7d","models/characters/colin_ktx2.glb":"35040f87","models/characters/contruction_worker.glb":"8bd3d7ce","models/characters/contruction_worker_ktx2.glb":"3df8c344","models/characters/dummy_officer.glb":"724965ac","models/characters/dummy_officer_ktx2.glb":"db640cda","models/characters/fat_activist_01.glb":"3c566fee","models/characters/fat_activist_01_ktx2.glb":"b9328df4","models/characters/fat_biker_01.glb":"576b7cf5","models/characters/fat_biker_01_ktx2.glb":"7142cfad","models/characters/fat_biker_02.glb":"ab5d7ec7","models/characters/fat_biker_02_ktx2.glb":"28cec6cc","models/characters/fat_hippie.glb":"f09a260d","models/characters/fat_hippie_ktx2.glb":"0be745a4","models/characters/fat_hipster.glb":"9cf45ffb","models/characters/fat_hipster_ktx2.glb":"18106ff3","models/characters/fat_secret_service.glb":"6d546fb0","models/characters/fat_secret_service_ktx2.glb":"a23a304e","models/characters/fat_trump.glb":"5de6bc56","models/characters/fat_trump_ktx2.glb":"a0ddaf4d","models/characters/firefighter.glb":"ebde005d","models/characters/firefighter_ktx2.glb":"ccf93c96","models/characters/goblin_game.glb":"db1cf0e0","models/characters/hick_skinny.glb":"1ebe78e8","models/characters/hick_skinny_ktx2.glb":"1e93f0ed","models/characters/hobo_01.glb":"34e80b1d","models/characters/hobo_01_ktx2.glb":"69497677","models/characters/jack.glb":"ab009b9b","models/characters/jack_ktx2.glb":"1f4c9f7f","models/characters/moussa.glb":"6d80b1cf","models/characters/moussa_ktx2.glb":"66e040f8","models/characters/orc_game.glb":"d9aa816d","models/characters/proxy_ceo.bin":"6eca0c34","models/characters/proxy_ceo.jpg":"fadc9d0a","models/characters/proxy_ceo.json":"e62a7975","models/characters/proxy_ceo_alien.bin":"be247ecc","models/characters/proxy_ceo_alien.jpg":"8f8bf8fc","models/characters/proxy_ceo_alien.json":"eb23e28f","models/characters/proxy_hick.bin":"4485560e","models/characters/proxy_hick.jpg":"8c331965","models/characters/proxy_hick.json":"d85a0d36","models/characters/proxy_zap.bin":"dd7b300e","models/characters/proxy_zap.jpg":"2e7330ae","models/characters/proxy_zap.json":"b3b42754","models/characters/proxy_zap2.bin":"51088f46","models/characters/proxy_zap2.jpg":"a954a815","models/characters/proxy_zap2.json":"5c50abb7","models/characters/rept_heavy_armor.glb":"934661c7","models/characters/samurai_game.glb":"c7940015","models/characters/xray_skeleton.glb":"46480317","models/characters/zap.glb":"5e5cca54","models/characters/zap_02.glb":"4ff12de0","models/characters/zap_02_lib.glb":"e23d91da","models/characters/zap_ktx2.glb":"4b29d886","models/characters/zoar.glb":"423a9de9","models/characters/zoar_game.glb":"d20a3736","models/vehicles/dump_truck.glb":"d870dc18","models/vehicles/dump_truck_ktx2.glb":"21ee7059","models/vehicles/motorcycle_fatboy.glb":"9ed9be28","models/weapons/alien_antenna_blaster_game.glb":"54083b44","models/weapons/alien_antenna_hammer_game.glb":"707b8a27","models/weapons/alien_launcher.glb":"ba8ab96a","models/weapons/hammer.glb":"3335fdf2","models/weapons/shield_brute.glb":"c6e5593f","models/weapons/spikey_mace.glb":"dcd43acd","models/weapons/w_brute_cleaver.glb":"07a97580","models/weapons/w_rept_maul.glb":"84c3a1a4","models/buildings/alien_base_01.glb":"d9b9fd7f","models/buildings/alien_base_01_ktx2.glb":"6cbbfef2","models/buildings/korajin_bld_01.glb":"edf3178e","models/towers/alien_tower_01.glb":"98d23375","models/towers/alien_tower_01_ktx2.glb":"47597651","models/streets/modular_streets_kit.glb":"6a4bcaa5","models/toon_city/impact_marks.json":"2b616620","models/toon_city/impact_marks_atlas.ktx2":"efe0840e","models/toon_city/impact_marks_atlas.png":"490ed049","models/toon_city/toon_city_breakables.glb":"29bddbc8","models/toon_city/toon_city_collision.glb":"fb3a693f","models/toon_city/toon_city_obb.json":"81c18a47","models/toon_city/toon_city_visual.glb":"5df62285","models/toon_city/toon_city_visual_ktx2.glb":"cf080531","models/toon_city/weirdkit_tint.js":"f6e9d802","models/toon_city_kit/toon_city_collision.glb":"5540a364","models/toon_city_kit/toon_city_kit_buildings.glb":"590e53f0","models/toon_city_kit/toon_city_kit_buildings_ktx2.glb":"e6dff3a3","models/toon_city_kit/toon_city_kit_pieces.glb":"8232bd6f","models/toon_city_kit/toon_city_kit_twins.glb":"fcc9fdfc","models/toon_city_kit/toon_city_visual.glb":"45cf2957","models/toon_city_kit/toon_city_visual_ktx2.glb":"f26a6984","models/toon_city_kit/weirdkit_detile.js":"dd05bd70","models/characters/morph/shapes.bin":"4e680384","models/characters/morph/shapes.json":"abfc949d","models/characters/forged/alien_female_purple.glb":"0308860e","models/characters/forged/alien_goblin_game.glb":"4925f5a6","models/characters/forged/alien_rollerskate_blue.glb":"bcccc63f","models/characters/forged/alien_warrior.glb":"a067d5ab","models/characters/forged/beautiful_asian.glb":"f1c7baa5","models/characters/forged/beautiful_blonde.glb":"f83172bd","models/characters/forged/brute_warboss_armor.glb":"dc15dc94","models/characters/forged/ceo_alien.glb":"20659ac3","models/characters/forged/ceo_human.glb":"326d9e7e","models/characters/forged/clancy.glb":"19fabcce","models/characters/forged/contruction_worker.glb":"99fe1a17","models/characters/forged/dummy_officer.glb":"87a11843","models/characters/forged/fat_activist_01.glb":"6546645c","models/characters/forged/fat_biker_01.glb":"943f38ea","models/characters/forged/fat_biker_02.glb":"5d63a0cf","models/characters/forged/fat_hippie.glb":"ff0539ba","models/characters/forged/fat_hipster.glb":"792b92d8","models/characters/forged/fat_secret_service.glb":"7c29d1da","models/characters/forged/firefighter.glb":"20410689","models/characters/forged/goblin_game.glb":"3c813462","models/characters/forged/hick_skinny.glb":"d9232022","models/characters/forged/hobo_01.glb":"37d266c9","models/characters/forged/index.json":"01be89cd","models/characters/forged/jack.glb":"712b6241","models/characters/forged/moussa.glb":"74d19c70","models/characters/forged/orc_game.glb":"7bf3c227","models/characters/forged/rept_heavy_armor.glb":"01e631b0","models/characters/forged/samurai_archer.glb":"04db413e","models/characters/forged/samurai_game.glb":"a946c148","models/characters/forged/zap.glb":"10eda718","models/characters/forged/zap_02.glb":"fd513cea","models/characters/forged/zap_02_lib.glb":"fd513cea","models/characters/forged/zoar_game.glb":"b032a28e","images/crack_sprite_01.ktx2":"4aa55fde","images/crack_sprite_01.png":"16b52e8c","images/fire_sprites_01.ktx2":"922e1191","images/fire_sprites_01.png":"f87e2696","images/fire_sprites_02.ktx2":"e0cbfe1d","images/fire_sprites_02.png":"b373a6fd","images/fire_sprites_03.ktx2":"4fbbb985","images/fire_sprites_03.png":"7eece336","images/geyser_sprites_01.png":"b6325470","images/hdri_game.ktx2":"0feb5c79","images/hdri_game.png":"dac55f41","images/serpent_eye.webp":"b764e90d","images/serpent_fin.webp":"a592c818","images/serpent_skin.webp":"f7e0e45d","images/ship_lacquer.jpg":"51b8e6e5","images/ship_sail.jpg":"9d04714c","images/splash_zap_n_clancy.webp":"52a9d8a4","images/water_sprites_01.ktx2":"326924c5","images/water_sprites_01.png":"31e12659","audio/blaster_sound_01.mp3":"40d99583","audio/blaster_sound_02.mp3":"4bd7bb7c","audio/box_break_01.mp3":"e4127980","audio/electricity_beam_01.mp3":"986db8c9","audio/explosion_small.mp3":"f154a537","audio/metal_clang_01.mp3":"a333bd27","audio/metal_clang_02.mp3":"1e3ebbd6","audio/metal_clang_03.mp3":"afe44812","audio/metal_ping_01.mp3":"8ffca1a0","audio/plasma_canon.mp3":"e32c324d","audio/powerup_01.mp3":"48fbbe08","audio/swoosh_01.mp3":"193db185","audio/swoosh_02.mp3":"19145e70","audio/swoosh_03.mp3":"544fdffb","audio/swoosh_04.mp3":"843bee5d","audio/plasma_sounds/plasma_01.mp3":"e71c010f","audio/plasma_sounds/plasma_02.mp3":"ac3b1c75","audio/plasma_sounds/plasma_03.mp3":"eaa59355","audio/plasma_sounds/plasma_04.mp3":"bc7865e0","audio/plasma_sounds/plasma_05.mp3":"1d821cd0","audio/plasma_sounds/plasma_06.mp3":"cb979fbe","audio/plasma_sounds/plasma_hit.mp3":"30e5af5c","audio/alien_orc_grunt_sounds/alien_orc_grunt_01.mp3":"d6f4b343","audio/alien_orc_grunt_sounds/alien_orc_grunt_02.mp3":"78afc603","audio/alien_orc_grunt_sounds/alien_orc_grunt_03.mp3":"972c524a","audio/alien_orc_grunt_sounds/alien_orc_grunt_04.mp3":"b0ce76eb","audio/alien_orc_grunt_sounds/alien_orc_grunt_05.mp3":"1f0ba1f4","audio/alien_orc_grunt_sounds/alien_orc_grunt_06.mp3":"4f749866","audio/alien_orc_grunt_sounds/alien_orc_grunt_07.mp3":"dcf75925","audio/hit_sounds/hit_sound_01.mp3":"befaa2be","audio/hit_sounds/hit_sound_02.mp3":"73bc4433","audio/hit_sounds/hit_sound_03.mp3":"24b181e4","audio/hit_sounds/hit_sound_gound_01.mp3":"86ee2674","audio/hit_sounds/hit_sound_ground_02.mp3":"8a7cac73","audio/hit_sounds/hit_sound_plasma_01.mp3":"9abc0202","audio/hit_sounds/hit_sound_plasma_02.mp3":"6aaf0fe5","audio/creature_noises/creature_noise_01.mp3":"cbcc6ee7","audio/creature_noises/creature_noise_02.mp3":"201a8247","audio/creature_noises/creature_noise_03.mp3":"97680811","audio/creature_noises/creature_noise_04.mp3":"6f734df2","audio/creature_noises/creature_noise_05.mp3":"6f736441","audio/creature_noises/creature_noise_06.mp3":"992712e9","audio/creature_noises/creature_noise_07.mp3":"d9ad04b3","audio/footsteps/footstep_2_l.mp3":"abeabfbe","audio/footsteps/footstep_2_r.mp3":"7dd16046","audio/footsteps/footstep_l.mp3":"b66e579b","audio/footsteps/footstep_r.mp3":"96e13433","models/props/prop_hydrant.glb":"f157fee9","models/props/prop_hydrant_collision.glb":"0bbfc4d2","models/creatures/3_headed_dog.glb":"9263480a","models/creatures/blue_dragon.glb":"d72f4da7","models/creatures/mech_lightning_dragon.glb":"5935bb67"};
 /* ASSETS:END */
@@ -11239,8 +11239,8 @@ function dojoBeastIdle(B) { const n = B.idles[B.i++ % B.idles.length], c = B.cli
 // Every piece rides one of his own bones (so it moves with his clips). Sizes come from his height; WHERE the skin is comes from RAYCASTS on his
 // posed, skinned mesh (the back's height over the spine, the neck's girth), never guessed. Each piece's turn is solved on the rest pose so it sits
 // upright to him, then it follows the bone. TOOLS > DRAGON: CAPTURED (dressed) / WILD (bare) -- reloads.
-try { const v = localStorage.getItem('mel.dragon'); DOJO.dragonPick = v && v !== 'CAPTURED' ? 'WILD' : 'CAPTURED'; } catch (e) { DOJO.dragonPick = 'CAPTURED'; }     // m1602: the zone's EVIL / BARE read as WILD here
-function dojoDragonDress(B, m, root, P) { const H = (B.hd = (P.h || 3.2) * B.mul), { bone, wq, up, side, fwd, hitAlong, pin, bw } = dragKit(m, root, H, B.bag);     // m1602: the kit is shared with pass 2 (and `bag` collects the pieces for the zone's look switch)
+try { const v = localStorage.getItem('mel.dragon'); DOJO.dragonPick = v && v !== 'CAPTURED' ? 'WILD' : 'CAPTURED'; } catch (e) { DOJO.dragonPick = 'CAPTURED'; }     // m1607: the zone's EVIL / BARE read as WILD here
+function dojoDragonDress(B, m, root, P) { const H = (B.hd = (P.h || 3.2) * B.mul), { bone, wq, up, side, fwd, hitAlong, pin, bw } = dragKit(m, root, H, B.bag);     // m1607: the kit is shared with pass 2 (and `bag` collects the pieces for the zone's look switch)
   const mat = { leather: new THREE.MeshStandardMaterial({ color: 0x5a3220, roughness: .7 }), red: new THREE.MeshStandardMaterial({ color: 0xb3261c, roughness: .6, side: THREE.DoubleSide }), gold: new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .85, roughness: .3 }),
     jin: new THREE.MeshBasicMaterial({ color: JINHEX, toneMapped: false }), iron: new THREE.MeshStandardMaterial({ color: 0x2a2624, metalness: .6, roughness: .5 }) };
   // THE SADDLE on the back over Spine1: a seat, a raised pommel and cantle, a red blanket with a gold edge, stirrups hanging either side
@@ -11288,7 +11288,7 @@ function dojoFlagStep(F, dt) { F.t += dt; const [x, y, z, docked] = dojoFlagPath
   for (const b of F.boxes) { b.cs = c; b.sn = -s; b.cx = x + b.lx * c + b.lz * s; b.cz = z - b.lx * s + b.lz * c; const ex = Math.abs(c) * b.hx + Math.abs(s) * b.hz, ez = Math.abs(s) * b.hx + Math.abs(c) * b.hz;
     b.minx = b.cx - ex; b.maxx = b.cx + ex; b.minz = b.cz - ez; b.maxz = b.cz + ez; b.miny = y + b.y0; b.maxy = y + b.y1; }
   F.last = { x, y, z, h: F.h }; }
-// m1602: THE DRAGON RIDE (DRAGON.md; his: *"build the blue dragon: armour and a mount, a little zone where I can mount it and ride it, for the part
+// m1607: THE DRAGON RIDE (DRAGON.md; his: *"build the blue dragon: armour and a mount, a little zone where I can mount it and ride it, for the part
 // in the game when I tame it, then play with flying it, controlling it on the ground, making it shoot an attack"*). KORAJIN > The Dragon Ride opens
 // the forge as `?w=forge&zone=dragon`: a meadow island over a sea of cloud at sunset, his blue dragon standing armoured on a stone dais at the far
 // end, stepping stones climbing to a high crag (the take-off perch, later), islands spread above and below, and Jinra hoops hung through the
@@ -11384,7 +11384,7 @@ function dragKit(m, root, H, bag) { const bone = n => m.getObjectByName(n), rc =
   // a WORLD turn as the piece's turn in his frame (what `pin` wants)
   const inHis = q => wq.clone().invert().multiply(q);
   return { H, bone, wq, up, side, fwd, hitAlong, pin, bw, inHis }; }
-// m1602: DRESSING PASS 2 (BUILDINGS.md THE DRAGON RIDE; KORAJIN.md THE BLUE DRAGON). On top of pass 1 (saddle, collar, bands, cape) for CAPTURED:
+// m1607: DRESSING PASS 2 (BUILDINGS.md THE DRAGON RIDE; KORAJIN.md THE BLUE DRAGON). On top of pass 1 (saddle, collar, bands, cape) for CAPTURED:
 // a red-lacquer HEAD PLATE with a gold ridge and a Jinra gem, a BRIDLE (brow band, nose band, cheek straps, gold bit rings) and REINS that run
 // live from the bit to the saddle, a tall CANTLE and hanging saddle LAMES, PAULDRONS, a CHEST PLATE with our nested-diamond crest, lacquer PLATES
 // down the neck and tail, gold TAIL RINGS and a crescent blade with red tassels at the tip. EVIL is the enemy's version of the same body: a
@@ -11492,7 +11492,7 @@ function arenaStage() {
   arenaSky();
   const R = ARENA.r, g = new THREE.Group(), L = ARENA.look; world.add(g);
   // m1117: THE BUILDING FORGE -- a clean white floor under the arena's sky, nothing else: the buildings are spawned into it (SPAWN > BUILDINGS)
-  if (inForge() && DRAGZ.want) { dragStage(g); CWALL.g = g; COVER.meshes = []; COVER.boxes = []; ARENA.r = 60; return; }     // m1602: THE DRAGON RIDE's island instead of the white floor
+  if (inForge() && DRAGZ.want) { dragStage(g); CWALL.g = g; COVER.meshes = []; COVER.boxes = []; ARENA.r = 60; return; }     // m1607: THE DRAGON RIDE's island instead of the white floor
   if (inForge() && SNOWZ.want) { snowStage(g); CWALL.g = g; COVER.meshes = []; COVER.boxes = []; ARENA.r = 60; return; }     // m1384: THE SNOWFIELD instead of the white floor
   if (inForge() && SHIPZ.want) { shipSea(g); CWALL.g = g; COVER.meshes = []; COVER.boxes = []; ARENA.r = 60; return; }     // m1373: THE SHIP's sea instead of the white floor
   if (inForge()) { const cv = document.createElement('canvas'); cv.width = cv.height = 512; const c = cv.getContext('2d'); c.fillStyle = '#f2f3f5'; c.fillRect(0, 0, 512, 512);
@@ -12275,7 +12275,8 @@ function stepCart(dt) {
 const WRUN = { on: 1, minH: 1.9, minLen: 1.2, reach: .85, minSp: 2.5, along: .72, into: .7, T: 1.15, v: 7.5, up: 4.2, g: 9, lean: .95, gap: .06,
   kick: 6.5, jumpV: 8.2, keep: .8, cool: .35, upV: 7.2, gUp: 12, upT: .75, offV: 5, offUp: 7.5, torso: .75, footIn: .06,
   auto: 1, autoAir: 3, autoGround: 9, autoReach: .5, autoInto: .9, upK: 1, upMax: 17,
-  slide: 1, slideReach: .35, hold: .28, slideG: 7, slideV: 3.2, slideT: 2.2, slideMaxFall: 9, wjOut: 6.2, wjUp: 8.8 };     /* m1372: the WALL SLIDE and the wall jump */     // m1251: the run-up with no tap, its height from his speed     // m1072: torso, footIn
+  slide: 1, slideReach: .35, hold: .28, slideG: 7, slideV: 3.2, slideT: 2.2, slideMaxFall: 9, wjOut: 6.2, wjUp: 8.8,
+  swipe: 1, swipeReach: .7, upLeg: 1.35, upLegIn: .12 };     /* m1604: runs START from a right-pad SWIPE at the wall (`swipe` 0 = the old tap / auto); `upLeg` the run-up's legs swung out to the wall (rad) */     /* m1372: the WALL SLIDE and the wall jump */     // m1251: the run-up with no tap, its height from his speed     // m1072: torso, footIn
 const _wrN = { d: 0, nx: 0, nz: 0, cx: 0, cz: 0 }, _wrB = [];
 // m1250: *"you should be able to wall run on pretty much any wall, even the destructible ones."* A breakable wall (`cwallBuild`) is in
 // `BOXES` as its .6 x .3 m chunks and its posts, and every one failed `minLen` (a post is not a wall) -- so the whole wall refused. A piece
@@ -12295,6 +12296,7 @@ function wrunFind(px, py, pz, R, not) {
 function wrunTap() {
   const p = player; if (!WRUN.on || p.knock || p.riding || p.wing || p.bar || p.ledge || p.mantle || p.vault || mphBare()) return 0;
   if (p.wrun) return wrunJump();
+  if (WRUN.swipe) return 0;     /* m1604: a tap by a wall is the ordinary jump; the runs are swiped */
   const sp = Math.hypot(p.vel.x, p.vel.z), S = stickWorld();
   // which way he means to go: his speed, or the stick when he is barely moving
   const mx = sp > 1 ? p.vel.x / sp : S.mag > .3 ? S.x : Math.sin(p.faceH), mz = sp > 1 ? p.vel.z / sp : S.mag > .3 ? S.z : Math.cos(p.faceH);
@@ -12318,13 +12320,25 @@ function wrunAuto() {
   // a little friction -- so you can jump, purchase, wall jump to the opposing wall, jump, jump, back and forth like Prince of Persia."* In the air
   // with the left stick at rest, a tall face within `slideReach` catches him: a moment's hold (`hold` s), then a slide down at up to `slideV`
   // m/s; a tap kicks him off it, away and up (`wjOut`, `wjUp`), and the facing wall catches him the same way. Holding the stick keeps the runs.
-  if (WRUN.slide && !p.grounded && stickWorld().mag < .3 && p.vel.y > -WRUN.slideMaxFall) { const W = wrunFind(p.pos.x, p.pos.y, p.pos.z, p.r + WRUN.slideReach, p.wrunCoolB && p.wrunCool > 0 ? p.wrunCoolB : null);
+  if (WRUN.slide && !p.grounded && (WRUN.swipe || stickWorld().mag < .3) && p.vel.y > -WRUN.slideMaxFall) {     /* m1604: with swipe on, ANY touch of a wall in the air is the perch-and-slide, stick or no stick */ const W = wrunFind(p.pos.x, p.pos.y, p.pos.z, p.r + WRUN.slideReach, p.wrunCoolB && p.wrunCool > 0 ? p.wrunCoolB : null);
     if (W && -(p.vel.x * W.nx + p.vel.z * W.nz) > -.5) return wrunGo(W, 'slide', 0, 0); }
+  if (WRUN.swipe) return 0;     /* m1604: no run starts by itself */
   const sp = Math.hypot(p.vel.x, p.vel.z), need = p.grounded ? WRUN.autoGround : WRUN.autoAir; if (sp < need || (!p.grounded && p.vel.y < -6)) return 0;
   const W = wrunFind(p.pos.x, p.pos.y, p.pos.z, p.r + WRUN.autoReach, p.wrunCoolB && p.wrunCool > 0 ? p.wrunCoolB : null); if (!W) return 0;
   const into = -(p.vel.x * W.nx + p.vel.z * W.nz); if (into < need || into < sp * WRUN.autoInto) return 0;     // squarely head-on: a wall-to-wall jump crosses at ~45 deg and must stay a SIDE run
   return wrunGo(W, 'up', 0, 0, Math.min(WRUN.upMax, into * WRUN.upK));
 }
+// m1604 (his: *"we need a way to initiate the wall runs so he doesn't just automatically wall run: if you're touching a wall and you swipe the right
+// stick, he runs that way -- hit it at an angle and swipe sideways, a horizontal run; straight on and swipe up, he runs up it; no swipe, he just
+// perches on the wall and can jump off or slide down"*). A right-pad FLICK with a tall face in reach (or while perched on one): UP the screen = the
+// RUN UP; left / right = a SIDE RUN that way along the face (the flick's world heading onto the wall's tangent); DOWN = let go. No wall: the
+// flick is the strike, as before.
+function wrunSwipe(dx, dy) { const p = player; if (!WRUN.on || !WRUN.swipe || p.knock || p.riding || p.wing || p.bar || p.ledge || p.mantle || p.vault || p.climb || p.zip || p.rope || mphBare()) return 0;
+  if (p.wrun && p.wrun.kind !== 'slide') return 0;
+  const W = p.wrun ? { b: p.wrun.b, nx: p.wrun.nx, nz: p.wrun.nz, d: p.r + WRUN.gap } : wrunFind(p.pos.x, p.pos.y, p.pos.z, p.r + WRUN.swipeReach, null); if (!W) return 0;
+  if (dy > Math.abs(dx) * 1.2) { if (p.wrun) { wrunEnd(1.2); return 1; } return 0; }     // DOWN: drop off the perch (on the ground it is still the strike)
+  if (-dy >= Math.abs(dx)) { const into = Math.max(0, -(p.vel.x * W.nx + p.vel.z * W.nz)); return wrunGo(W, 'up', 0, 0, Math.min(WRUN.upMax, Math.max(WRUN.upV, into * WRUN.upK))); }
+  const h = flickH(dx, dy), mx = Math.sin(h), mz = Math.cos(h); return wrunGo(W, 'side', mx, mz); }
 function wrunGo(W, kind, mx, mz, upV) {
   const p = player, tx = -W.nz, tz = W.nx, s = kind === 'side' ? (mx * tx + mz * tz >= 0 ? 1 : -1) : 0;
   p.melee = 0; p.roll = 0; p.land = 0; p.slide = null; p.aflip = null; p.cart = null; p.hook = null; p.rope = null; p.zip = null; p.flip = ''; p.slam = 0; p.jump = 0; swapStop(); triggerStop();
@@ -12366,7 +12380,15 @@ function stepWrun(dt) {
 }
 const _wrQ = new THREE.Quaternion(), _wrA = new THREE.Vector3();
 function wrunPose() {
-  const p = player, R = p.wrun; if (!R || R.kind !== 'side' || p.bar || p.ledge) return;
+  const p = player, R = p.wrun; if (!R || p.bar || p.ledge) return;
+  // m1604 (his: *"the vertical wall run: his feet more forward, out in front, as if his hips are at 90 degrees -- torso straight up and down, feet
+  // parallel to the wall"*): both thighs swung `upLeg` rad forward about his own right axis (the run clip keeps stepping on top of it), and the
+  // drawn body held a leg's length off the face so the soles land ON it; ramps in over `upLegIn` s
+  if (R.kind === 'up') { if (!rig.bones || !WRUN.upLeg) return; const k = Math.min(1, R.t / WRUN.upLegIn), fx = -R.nx, fz = -R.nz; _wrA.set(-fz, 0, fx);     // his right is (-fz, fx)
+    rig.root.updateMatrixWorld(true); for (const n of ['mixamorig_LeftUpLeg', 'mixamorig_RightUpLeg']) { const b = rig.bones[n]; if (!b) continue;
+      b.getWorldQuaternion(_wrQ2); _wrQ.setFromAxisAngle(_wrA, -WRUN.upLeg * k).multiply(_wrQ2); b.parent.getWorldQuaternion(_wrQ3).invert(); b.quaternion.copy(_wrQ3.multiply(_wrQ)); b.updateMatrixWorld(true); }
+    const off = Math.max(0, (rig.hipY || .77) * .82 * bodyK() - (p.r + WRUN.gap)) * k; rig.root.position.x += R.nx * off; rig.root.position.z += R.nz * off; return; }
+  if (R.kind !== 'side') return;
   // rolled about his forward axis so his head leans OFF the wall and his feet stay on it; ramps in and out over .12 s
   const fx = R.dx, fz = R.dz, right = R.nx * -fz + R.nz * fx, k = Math.min(1, R.t / .12), sg = Math.sign(right);     // his right is (-fz, fx)
   _wrA.set(fx, 0, fz); _wrQ.setFromAxisAngle(_wrA, sg * WRUN.lean * k); rig.root.quaternion.premultiply(_wrQ);
@@ -13556,6 +13578,7 @@ function arenaUi() {
       else if (a === 'swseg') { SWSEG.on = SWSEG.on ? 0 : 1; try { localStorage.setItem('mel.swseg', SWSEG.on ? '1' : '0'); } catch (err) {} }     // m1101
       else if (a === 'airlegs') { AIRLEGS.on = AIRLEGS.on ? 0 : 1; try { localStorage.setItem('mel.airlegs', AIRLEGS.on ? '1' : '0'); } catch (err) {} }     // m1098
       else if (a === 'jfloat') { JUGGLE.float = JUGGLE.float ? 0 : 1; try { localStorage.setItem('mel.jfloat', JUGGLE.float ? '1' : '0'); } catch (err) {} }     // m1098
+      else if (a === 'climbspd') { const L = CLIMB.speeds, i = L.indexOf(CLIMB.speed); CLIMB.speed = L[(i + 1) % L.length]; try { localStorage.setItem('mel.climbspd', String(CLIMB.speed)); } catch (err) {} }     // the ladder refactor: his pick
       else if (a === 'runland') { RUNLAND.mode = RUNLAND.mode === 'DIP' ? 'STOP' : 'DIP'; try { localStorage.setItem('mel.runland', RUNLAND.mode); } catch (err) {} }     // m1097
       else if (a === 'btrail') { BTRAIL.jin = BTRAIL.jin ? 0 : 1; try { localStorage.setItem('mel.btrail', BTRAIL.jin ? 'jin' : 'blue'); } catch (err) {} if (BTRAIL.mat) BTRAIL.mat.uniforms.uC.value.setRGB(...(BTRAIL.jin ? JIN.col : BTRAIL.col)); }     // m1421
       else if (a === 'toprun') { GAIT.topRun = GAIT.topRun ? 0 : 1; try { localStorage.setItem('mel.toprun', GAIT.topRun ? '1' : '0'); } catch (err) {} runSetUse(GAIT.runSet, 0); }     // m1092
@@ -13567,7 +13590,7 @@ function arenaUi() {
       else if (a === 'grip') { gripSet({ HIGH: 'MID', MID: 'OFF', OFF: 'HIGH' }[MOVE.gripPick]); try { localStorage.setItem('mel.grip', MOVE.gripPick); } catch (err) {} }
       else if (a === 'rhue') { const k = Object.keys(RIVAL.hues), n = k[(k.indexOf(RIVAL.pick) + 1) % k.length]; RIVAL.pick = n; RIVAL.u.value = RIVAL.hues[n] * Math.PI / 180; try { localStorage.setItem('mel.rival.hue', n); } catch (err) {} }
       else if (a === 'tlie') { TAIL.lie = { FLAT: 'BELLY', BELLY: 'OFF', OFF: 'FLAT' }[TAIL.lie]; try { localStorage.setItem('mel.tail.lie', TAIL.lie); } catch (err) {} }
-      else if (a === 'dragon' && DRAGZ.on) { const T = DRAGZ.looks; DRAGZ.look = T[(T.indexOf(DRAGZ.look) + 1) % T.length]; try { localStorage.setItem('mel.dragon', DRAGZ.look); } catch (err) {} dragLook(); }     // m1602: live in the zone
+      else if (a === 'dragon' && DRAGZ.on) { const T = DRAGZ.looks; DRAGZ.look = T[(T.indexOf(DRAGZ.look) + 1) % T.length]; try { localStorage.setItem('mel.dragon', DRAGZ.look); } catch (err) {} dragLook(); }     // m1607: live in the zone
       else if (a === 'dragon') { try { localStorage.setItem('mel.dragon', DOJO.dragonPick === 'WILD' ? 'CAPTURED' : 'WILD'); } catch (err) {} location.reload(); }     // m1518
       else if (a === 'rwsky') { try { localStorage.setItem('mel.rwsky', RWSKYS[(RWSKYS.indexOf(RW.skyPick) + 1) % RWSKYS.length]); } catch (err) {} location.reload(); }     // his panorama over the Red Hollows
       else if (a === 'dsky') { try { localStorage.setItem('mel.dojo.sky', SKYPICKS[(SKYPICKS.indexOf(DOJO.skyPick) + 1) % SKYPICKS.length]); } catch (err) {} location.reload(); }     // m1446
@@ -13587,7 +13610,7 @@ function arenaUi() {
   if (ARENA.tools === undefined) { try { ARENA.tools = +localStorage.getItem('mel.arena.tools') || 0; } catch (err) { ARENA.tools = 0; } }
   const tools = ARENA.tools && !m;     // a menu open folds the tools away: the screen is not tall enough for both
   let h = '<div class="ar-bar">' + B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('vend', 'VEND') + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
-    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('btrail', 'TRAIL ' + (BTRAIL.jin ? 'JIN' : 'BLUE')) + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('sample', 'DNA SAMPLE ' + (SAMPLE.on ? 'ON' : 'OFF')) + B('runslash', 'RUN SLASH ' + (RUNSLASH.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('dsky', 'SKY ' + DOJO.skyPick) + B('rwsky', 'HOLLOWS SKY ' + RW.skyPick) + B('dragon', 'DRAGON ' + (DRAGZ.on ? DRAGZ.look : DOJO.dragonPick)) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
+    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('climbspd', 'CLIMB ' + CLIMB.speed.toFixed(1) + ' m/s') + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('btrail', 'TRAIL ' + (BTRAIL.jin ? 'JIN' : 'BLUE')) + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('sample', 'DNA SAMPLE ' + (SAMPLE.on ? 'ON' : 'OFF')) + B('runslash', 'RUN SLASH ' + (RUNSLASH.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('dsky', 'SKY ' + DOJO.skyPick) + B('rwsky', 'HOLLOWS SKY ' + RW.skyPick) + B('dragon', 'DRAGON ' + (DRAGZ.on ? DRAGZ.look : DOJO.dragonPick)) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
   if (m === 'bld') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back') + B('age', 'STATE: ' + (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + '<small>tap to switch -- rebuilds what stands</small>', '', AGE.st === 'fallen' ? '' : 'ar-on');
     for (const E of BLDG.list) h += B('bld', E.t + '<small>' + (E.on() ? 'tap to remove' : E.pass >= 3 ? E.sub : 'IN PROGRESS · pass ' + E.pass + ' of 3') + '</small>', E.key, E.on() ? 'ar-on' : '');
     h += '</div>'; }
@@ -22858,7 +22881,7 @@ function fshipBuild() {
     const o = new THREE.Mesh(new THREE.SphereGeometry(.55, 14, 10), glow); e.add(o); const r = new THREE.Mesh(new THREE.TorusGeometry(.8, .1, 8, 24), bronze); r.rotation.x = Math.PI / 2; e.add(r);
     const cg = new THREE.ConeGeometry(1.4, 2.8, 16, 1, true); cg.translate(0, -1.4, 0); const c = new THREE.Mesh(cg, new THREE.MeshBasicMaterial({ color: 0x7affd8, transparent: true, opacity: .12, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, toneMapped: false })); e.add(c); engines.push(e); }
   // THE RIG: two masts, junk sails (cream panels between dark battens), a red pennant at each masthead; grapple rings at the mastheads
-  const rings = []; { const sail = new THREE.MeshStandardMaterial({ color: 0xe8dcc0, roughness: .9, side: THREE.DoubleSide });
+  const rings = []; { const sail = FSHIP.sailM = new THREE.MeshStandardMaterial({ color: 0xe8dcc0, roughness: .9, side: THREE.DoubleSide });
     for (const [mx, mh] of [[-5.2, 11], [1, 13]]) { add(new THREE.CylinderGeometry(.16, .22, mh, 10), wood, cx + mx, Y + mh / 2, cz, 1);
       const sw = mh * .55, shh = mh * .62; add(new THREE.PlaneGeometry(sw, shh), sail, cx + mx + sw / 2 - .4, Y + mh - shh / 2 - .6, cz + .25, 0);
       for (let k = 0; k <= 5; k++) add(new THREE.BoxGeometry(sw + .3, .08, .08), wood, cx + mx + sw / 2 - .4, Y + mh - .6 - k * shh / 5, cz + .3, 0);
@@ -22940,20 +22963,37 @@ function fshipBuild() {
   for (const b of O.boxes) if (!BOXES.includes(b)) BOXES.push(b); boxGrid();
   // m1599: lanterns on posts at the gangplank's foot, bunting from the masts' heads down the stays, plants on the ground under her
   const MG = new Map(), put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); }, plants = [];
-  { const xa = gx1 - Y / .3, z1 = cz + W + .35 + 1.5; for (const zz of [cz + W + .2, z1 + .15]) { korPost(put, K, xa - .4, 0, zz, 2.2, .1); korLantern(put, K, xa - .4, 2.45, zz, .7); } }
+  const fsFoot = [], putF = (geo, m) => { const o = new THREE.Mesh(geo, m); o.castShadow = true; g.add(o); fsFoot.push(o); };     // the gangplank's foot stands on the ground, not on the ship
+  { const xa = gx1 - Y / .3, z1 = cz + W + .35 + 1.5; for (const zz of [cz + W + .2, z1 + .15]) { korPost(putF, K, xa - .4, 0, zz, 2.2, .1); korLantern(putF, K, xa - .4, 2.45, zz, .7); } }
   for (const [mx, mh] of [[-5.2, 11], [1, 13]]) for (const sz of [-1, 1]) korBunting(put, K, [cx + mx, Y + mh - 1.2, cz], [cx + mx + (mx < 0 ? -2.5 : 2.5), Y + .8, cz + sz * (W + .1)], 8, .4);
   { let sd = 13; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647; for (let i = 0; i < 36; i++) { const x = cx + (rnd() - .5) * (L * 2 + 8), z = cz + (rnd() - .5) * (W * 2 + 9); if (z > cz + W && z < cz + W + 2.5 && x > gx1 - Y / .3 - 1 && x < gx1 + 1) continue; plantPlant(plants, ['grass', 'fern', 'stones', 'flowers', 'tallgrass'][i % 5], x, 0, z, .8 + rnd() * .5, rnd() * 6); } }
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list.map(q => { const n = q.index ? q.toNonIndexed() : q; for (const a2 of Object.keys(n.attributes)) if (a2 !== 'position' && a2 !== 'normal') n.deleteAttribute(a2); if (!n.attributes.normal) n.computeVertexNormals(); return n; })), m); o.castShadow = o.receiveShadow = true; g.add(o); }
   bldMergeStatic(vis); bldMergeStatic(g); const plantMs = plantFlush(g, plants);
-  FSHIP.on = { plantMs, g, O, bars: [bar], rings, vis, engines, t: 0, smash, helm, tur, drone, moteT: 0, cans, climbs };
+  // ---- RE-PASS 2 (m1606): RESTORABLE (rubric 7; a FLYER, so restored means AFLOAT). FALLEN: she rests on her keel in the grass (the whole
+  // group `drop` m lower), engines dead and dark, sails gone, cannons and the bow gun silent, the climbs dead, the colour drained. RESTORE (the
+  // mint plate by the gangplank, or SPAWN > BUILDINGS > STATE): she rises `drop` m onto her engines and comes alive. Every collider rides:
+  // the collider data is shifted down by `drop` and `restoreRide` lifts it back with her ----
+  plantMs.forEach(m => scene.attach(m)); for (const o of fsFoot) scene.attach(o); const drop = Y - 2.8, Rr = restoreRig(g, { lift: drop, dur: 9, bob: 0 }); Rr.baseY = -drop; g.position.y = -drop;
+  const sails = vis.children.filter(o => o.material === FSHIP.sailM); restoreSkin(Rr);     // (found before the skin clones the materials)
+  const dn = b2 => { b2.miny -= drop; b2.maxy -= drop; }; O.boxes.forEach(dn); smash.forEach(S2 => dn(S2.b));
+  const tb = []; for (const q of O.tri || []) { const t3 = q.split(',').map(Number); t3[1] -= drop; t3[4] -= drop; t3[7] -= drop; tb.push(t3); } bldTrisDrop(O);
+  for (const L of climbs) { L.miny -= drop; L.maxy -= drop; L.top -= drop; if (L.mark) L.mark.y -= drop; }
+  bar.y -= drop; bar.top -= drop; bar.g.position.y -= drop; bar.boxes.forEach(dn); for (const G2 of rings) G2.y -= drop;
+  restoreRide(Rr, { base: { boxes: [...O.boxes, ...smash.map(S2 => S2.b)], tris: tb }, up: { boxes: [], tris: [], climbs, bars: [bar], rings, coins: [], objs: [drone, ...sails] } });
+  Rr.onSet = R2 => restoreRideSet(R2);
+  const ground = []; { const px = gx1 - Y / .3 - 3.5, pz = cz + W + 4.5, plate = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, .12, 24), new THREE.MeshStandardMaterial({ color: 0x3a4a46, emissive: 0x7affd8, emissiveIntensity: .7 })); plate.position.set(px, .06, pz); scene.add(plate); ground.push(plate); Rr.trig = { x: px, y: 0, z: pz, armed: 1 }; }
+  { const t0 = AGE.st === 'fallen' ? 0 : 1; Rr.goal = t0; restoreSet(Rr, t0); restoreRideSet(Rr, true); }
+  ground.push(...fsFoot); FSHIP.on = { R: Rr, drop, ground, plantMs, g, O, bars: [bar], rings, vis, engines, t: 0, smash, helm, tur, drone, moteT: 0, cans, climbs };
   arenaBeam(cx, cz, [.5, .9, 1], 1); snd('swoosh', { g: .7, r: .4 });
 }
-function fshipStep(dt) { const F = FSHIP.on; if (!F) return; F.t += dt;
+function fshipStep(dt) { const F = FSHIP.on; if (!F) return; F.t += dt; const whole = !F.R || F.R.t >= 1, lf = F.R ? F.g.position.y - F.R.baseY : F.drop || 0;
+  if (F.tur && !F.tur.dead) { const T = F.tur; T.y = whole ? FSHIP.deck : -600; T.g.position.y = T.y; T.box.miny = T.y; T.box.maxy = T.y + TURRET.h; }     // RE-PASS 2: the bow gun only on a ship afloat
+  for (const e of F.engines) e.children[2].visible = whole;
   // m1224 (pass 5): TAKE THE HELM -- stand at the wheel on the deck and the broadside is YOURS: each cannon turns on the nearest body on its
   // side instead of you (its balls are yours: they strike bodies), and fires a beat faster; the wheel spins with you on it
   { const pl = player, [hx, hz] = FSHIP.at; F.manned = Math.hypot(pl.pos.x - (hx + 2.5), pl.pos.z - hz) < 1.4 && Math.abs(pl.pos.y - FSHIP.deck) < 1.3;
     if (F.manned !== F.wasManned) { F.wasManned = F.manned; if (F.manned) { snd('clang', { g: .6, r: 1.2, x: hx, z: hz }); arenaBeam(hx + 2.5, hz, [1, .8, .35], .4); } } }
-  if (F.cans) for (const C of F.cans) { if (C.hc > 0) C.hc -= dt; const W = new THREE.Vector3(); C.g.getWorldPosition(W);
+  if (F.cans && whole) for (const C of F.cans) { if (C.hc > 0) C.hc -= dt; const W = new THREE.Vector3(); C.g.getWorldPosition(W);
     if (C.dead) { C.t -= dt; if (Math.random() < dt * 3) smokeAt(W.x, W.y + .5, W.z, .8, 1.2, [.3, .29, .28]); if (C.t <= 0) { C.dead = 0; C.hp = FSHIP.canHp; C.bar.rotation.x = 0; } continue; }
     let p = player; if (F.manned) { let best = FSHIP.canR, tg = null; for (const b of DUMMIES) { if (b.st === 'gone' || b.st === 'down' || !b.root.visible) continue; const R = b.root.position; if (Math.sign(R.z - W.z) !== C.sz) continue; const q = Math.hypot(R.x - W.x, R.z - W.z); if (q > 3 && q < best) { best = q; tg = b; } } p = tg ? { pos: tg.root.position } : { pos: new THREE.Vector3(W.x, -99, W.z + C.sz * 999) }; }
     const dx = p.pos.x - W.x, dz = p.pos.z - W.z, d = Math.hypot(dx, dz), side = Math.sign(dz) === C.sz;
@@ -22964,12 +23004,12 @@ function fshipStep(dt) { const F = FSHIP.on; if (!F) return; F.t += dt;
         ARROWS.push({ m, v: new THREE.Vector3((p.pos.x - o.x) / T, (ty - o.y) / T + .5 * gr * T, (p.pos.z - o.z) / T), t: 0, stuck: 0, from: null, mine: F.manned ? 1 : 0 });
         snd('boom', { g: .9, r: .7, x: o.x, z: o.z }); for (let k = 0; k < 4; k++) smokeAt(o.x, o.y, o.z, 1, 1, [.55, .53, .5]); spkBurst(o.x, o.y, o.z, 14, { col: [1, .7, .3], spread: 3, size: .14, life: .3 }); camShake(.08); } }
     else { C.bar.rotation.y *= Math.exp(-2 * dt); C.cool = Math.max(C.cool, .8); } }
-  F.vis.position.y = Math.sin(F.t * .8) * .1; F.vis.rotation.x = Math.sin(F.t * .55) * .012;     // the bob is the picture's alone
+  F.vis.position.y = whole ? Math.sin(F.t * .8) * .1 : 0; F.vis.rotation.x = whole ? Math.sin(F.t * .55) * .012 : .035;     // the bob is the picture's alone; aground, she lists
   for (let i = 0; i < F.engines.length; i++) F.engines[i].children[1].rotation.z = F.t * (1.2 + i * .3);
   F.helm.rotation.z = F.manned ? F.helm.rotation.z + dt * 2.5 : Math.sin(F.t * .3) * 1.2;
-  { const [cx, cz] = FSHIP.at; if ((F.moteT -= dt) <= 0) { F.moteT = .08; const e = F.engines[(Math.random() * 3) | 0].position; spk(e.x + (Math.random() - .5) * .8, e.y + F.vis.position.y - .4, e.z + (Math.random() - .5) * .8, (Math.random() - .5) * .3, -1.2 - Math.random(), (Math.random() - .5) * .3, .08, 1.2, [.4, .95, 1]); }
+  { const [cx, cz] = FSHIP.at; if (whole && (F.moteT -= dt) <= 0) { F.moteT = .08; const e = F.engines[(Math.random() * 3) | 0].position; spk(e.x + (Math.random() - .5) * .8, e.y + F.vis.position.y - .4, e.z + (Math.random() - .5) * .8, (Math.random() - .5) * .3, -1.2 - Math.random(), (Math.random() - .5) * .3, .08, 1.2, [.4, .95, 1]); }
     const a = F.t * .32; F.drone.position.set(cx + Math.cos(a) * 13, FSHIP.deck + 6 + Math.sin(F.t * 1.3) * .4, cz + Math.sin(a) * 8); F.drone.rotation.y = -a; F.drone.children[1].rotation.z = F.t * .6; } }
-function fshipClear() { const F = FSHIP.on; if (!F) return; if (F.plantMs) plantDrop(F.plantMs); for (const L of F.climbs || []) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && (F.climbs || []).includes(player.climb.L || player.climb)) climbOff(); smashDrop(F.smash); turretDrop(F.tur); bldClear(F); FSHIP.on = null; }
+function fshipClear() { const F = FSHIP.on; if (!F) return; if (F.R) { const i = RESTORE.list.indexOf(F.R); if (i >= 0) RESTORE.list.splice(i, 1); if (F.R.ride) { bldTrisDrop(F.R.ride.tb); bldTrisDrop(F.R.ride.tu); } } for (const o of F.ground || []) o.removeFromParent(); if (F.plantMs) plantDrop(F.plantMs); for (const L of F.climbs || []) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && (F.climbs || []).includes(player.climb.L || player.climb)) climbOff(); smashDrop(F.smash); turretDrop(F.tur); bldClear(F); FSHIP.on = null; }
 // m1155: THE BATHHOUSE (BUILDINGS.md #11, pass 1) at (-30, 24). A low timber-and-plaster bathhouse, 12 x 10 m: breakable walls on three
 // sides (cwallBuild), the courtyard side (+x) open between posts onto a raised ENGAWA (veranda), a curved roof, and inside a big steaming
 // POOL in a low stone rim (step over it, wade in), a cold plunge tub, benches; a tall stone CHIMNEY smoking at the back corner.
@@ -27564,7 +27604,7 @@ function ladyBuild() {
     for (const lx of [-.36, .36]) obox(lx - .04, lx + .04, y0, h + .9, -.04, .04, railM, 0); for (let y = y0 + .3; y < h + .05; y += .3) obox(-.36, .36, y - .025, y + .025, -.03, .03, railM, 0);
     const [lx, lz] = W(0, 0), ex = Math.abs(c) * .45 + Math.abs(sn) * .12, ez = Math.abs(sn) * .45 + Math.abs(c) * .12, vb = { minx: lx - ex, maxx: lx + ex, miny: y0, maxy: h, minz: lz - ez, maxz: lz + ez };
     if (Math.abs(sn) > 1e-3 && Math.abs(c) > 1e-3) Object.assign(vb, { cx: lx, cz: lz, hx: .45, hz: .12, cs: c, sn: -sn });
-    const L = kitClimbAdd(vb, 'lady_' + n, h); L.mark = { x: mark[0], y: h, z: mark[1] }; L.lady = n; climbs.push(L);
+    const L = kitClimbAdd(vb, 'lady_' + n, h); L.mark = { x: mark[0], y: h, z: mark[1] }; L.lady = n; L.rung = { y0: y0 + .3, s: .3 }; climbs.push(L);
     // the NUMBER, on a post in front and to the left, facing the way he comes
     { const cv = document.createElement('canvas'); cv.width = 256; cv.height = 160; const q = cv.getContext('2d'); q.fillStyle = '#1b2430'; q.fillRect(0, 0, 256, 160); q.fillStyle = '#ffd040'; q.font = 'bold 96px sans-serif'; q.textAlign = 'center'; q.fillText(String(n), 128, 92); q.fillStyle = '#e8eef4'; q.font = 'bold 26px sans-serif'; q.fillText(label, 128, 140);
       const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; const pl = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1), new THREE.MeshBasicMaterial({ map: t, toneMapped: false })); const [sx, sz] = W(-1.6, 2.6); pl.position.set(sx, 1.9, sz); pl.rotation.y = yaw; g.add(pl); obox(-1.64, -1.56, 0, 1.4, 2.56, 2.64, railM, 0); } };
@@ -27586,7 +27626,7 @@ const BLDG = { list: [
   { key: 'rampart', t: 'Rampart Wall', sub: 'a 40 m wall, a gateway to smash, archers, sentry guns, bars on top, rocks dropped on you, robot sentries on the walk, a war horn that summons a raid', pass: 6, build: () => rampBuild(), clear: () => rampClear(), on: () => !!RAMP.on, step: dt => rampStep(dt) },
   { key: 'adock', t: 'Airship Dock', sub: 'a 20 m tower, a lift, an airship that flies you round (ring the bell to cast off; grapple it); kites to glide off the deck; sky pirates raid the flight', pass: 6, build: () => adockBuild(), rig: () => ADOCK.on && ADOCK.on.R, clear: () => adockClear(), on: () => !!ADOCK.on, step: dt => adockStep(dt) },
   { key: 'zep', t: 'Zeppelins', sub: 'two zeppelins: land on a gondola, swing from its trapeze, grapple it, kill its gun, supply drops; hole the envelope and it sinks low; strike the bow lever to bomb the forge below', pass: 6, build: () => zepBuild(), rig: () => ZEP.on && ZEP.on.R, clear: () => zepClear(), on: () => !!ZEP.on, step: dt => zepStep(dt) },
-  { key: 'fship', t: 'Flying Ship House', sub: 'a junk ship on Jin engines: broadside cannons, a bowsprit, a bar, cargo to smash, a sentry gun; take the helm and the broadside fires for you; climb the cargo net and the mast to the crow\'s nest', pass: 6, build: () => fshipBuild(), clear: () => fshipClear(), on: () => !!FSHIP.on, step: dt => fshipStep(dt) },
+  { key: 'fship', t: 'Flying Ship House', sub: 'a junk ship on Jin engines: broadside cannons, a bowsprit, a bar, cargo to smash, a sentry gun; take the helm and the broadside fires for you; climb the cargo net and the mast to the crow\'s nest', pass: 6, build: () => fshipBuild(), rig: () => FSHIP.on && FSHIP.on.R, clear: () => fshipClear(), on: () => !!FSHIP.on, step: dt => fshipStep(dt) },
   { key: 'bath', t: 'Bathhouse', sub: 'sliding shoji to tear through, a pool that heals and erupts when you strike the boiler valve, a veranda, a smoking chimney', pass: 4, build: () => bathBuild(), clear: () => bathClear(), on: () => !!BATH.on, step: dt => bathStep(dt) },
   { key: 'fwork', t: 'Forge-Workshop', sub: 'a furnace that breathes fire when you strike the bellows, a trip-hammer that flattens you, a loft, a crane that swings a bar round', pass: 4, build: () => fworkBuild(), clear: () => fworkClear(), on: () => !!FWORK.on, step: dt => fworkStep(dt) },
   { key: 'sphang', t: 'Spider-Bot Hangar', sub: 'a vaulted bunker, spider bots that climb every building and pounce on you from walls and roofs, hatching from their pods (smash them)', pass: 4, build: () => sphangBuild(), clear: () => sphangClear(), on: () => !!SPHANG.on, step: dt => sphangStep(dt) },
@@ -28992,7 +29032,7 @@ PADS.R = bindStick(padR, stick.R,
   // ...unless someone in reach has something to say: then it is TALK (m277), and the left tap still jumps
   () => { if (aim3Now()) return; /* m1345: 3D AIM owns the whole right pad -- a tap is not a jump */ if (talkTap()) return; if (pickTap()) return; if (portalTap()) return; if (wingTapR()) return; if (hurdleTap()) return; if (mantleTap()) return; if (wrunTap()) return; player.jump = 1; },     // m1064: a tall face beside / ahead -> wall run     // m1063: pushing into a half block -> hurdle it     // m1039: a ledge in reach -> climb it
   // flick: a SLAM if he is in the air and it went down, otherwise a strike in that direction
-  (dx, dy) => { if (player.wing || aim3Now()) return; /* m1282: in 3D AIM a fast drag moves the cursor, it never swings */ if (tossQuick(dx, dy)) return; if (boardFlick(dx, dy, 0)) return; if (runSwipe(dx, dy)) return; if (!slamGo(dx, dy)) { KATANA.dir = katanaDir(dx, dy); meleeGo(KATANA.dir === 'down' ? player.faceH : flickH(dx, dy)); } },     // m1054: DOWN is not a direction -- the strike goes where he faces (a slot kept for a grab / throw / special)     // m1014: the right pad is MELEE, by direction (m1012's down-slide is off it)
+  (dx, dy) => { if (player.wing || aim3Now()) return; /* m1282: in 3D AIM a fast drag moves the cursor, it never swings */ if (tossQuick(dx, dy)) return; if (boardFlick(dx, dy, 0)) return; if (wrunSwipe(dx, dy)) return; if (runSwipe(dx, dy)) return; if (!slamGo(dx, dy)) { KATANA.dir = katanaDir(dx, dy); meleeGo(KATANA.dir === 'down' ? player.faceH : flickH(dx, dy)); } },     // m1054: DOWN is not a direction -- the strike goes where he faces (a slot kept for a grab / throw / special)     // m1014: the right pad is MELEE, by direction (m1012's down-slide is off it)
   null,
   // THE RELEASE IS THE SHOT, so this must NOT clear `p.aim` -- `stepKit` sees the pad is no
   // longer held and fires on that edge. Clearing it here would eat every shot in the game.
@@ -32422,7 +32462,25 @@ function rigAnim(dt) {
     const nm = real ? CLIMB.clip : CLIPS.walk;
     t[nm] = 1;
     // the real clip on its own measured rate (m189); the walk stand-in as it always was
-    if (real) setScale(nm, clamp(p.speed / (CLIMB.ref * (rig.scale || GAIT.refScale) / GAIT.refScale * (rig.gaitK || 1)), 0, CLIMB.hi));
+    // THE HANDS ON THE RUNGS (the ladder refactor, step 5): the clip's time is a function of his HEIGHT, so every grip lands on a rung --
+    // `climbCurve` measured how far one cycle pulls him (zap_02: ~.36 m -- one .30 rung, each hand regripping a rung up) and where in the
+    // cycle each hand takes hold; the cycle's rise is rounded to whole rungs of this ladder (`L.rung`, else `CLIMB.rungS`) and phased so the
+    // left hand starts near one (each hand is then trimmed onto its rung below). No height change, no hand motion: hanging still is a still pose, and the speed never outruns the hands
+    const C = real && CLIMB.lock && climbCurve(), Lc = p.climb;
+    if (C && !p.climbOver) { const sp = Lc.rung ? Lc.rung.s : CLIMB.rungS, y1 = Lc.rung ? Lc.rung.y0 : Lc.miny + sp, Rc = Math.max(1, Math.round(C.R / sp)) * sp, a = rig.actions[nm];
+      const ph0 = y1 - C.hg - C.tg * Rc;
+      // AND IT CALIBRATES ITSELF ON THE REAL POSE: where each hand actually stops in the world (its rise turning to a fall) is measured against
+      // the nearest rung, and the phase (`rig.climbFix`, metres) is nudged until the two sit evenly either side of their rungs. MEASURED in the
+      // sim: the offline sample of the clip read the hands ~.25 m off the drawn pose, and on the drawn pose the two hands take hold ~.17 m apart
+      // -- a .30 ladder cannot carry both (a per-hand warp needed the clip to run backwards), so each settles ~8 cm off its rung, evenly. Kept
+      // per hero, so the next ladder starts calibrated. A clip whose hands grip a whole rung apart would land both
+      const G = rig.climbG || (rig.climbG = { eL: null, eR: null }), v = _clV;
+      for (const [k, b] of [['L', rig.bones.mixamorig_LeftHand], ['R', rig.bones.mixamorig_RightHand]]) { if (!b) continue; const y = b.getWorldPosition(v).y, q = G[k];
+        if (q && q.up > 0 && y < q.y - 1e-4 && y > Lc.miny + .4 && y < Lc.top - .2) { let e = ((y - y1) % sp + sp) % sp; if (e > sp / 2) e -= sp; G['e' + k] = e;
+          if (G.eL !== null && G.eR !== null) rig.climbFix = (rig.climbFix || 0) - clamp((G.eL + G.eR) / 4, -.03, .03); }
+        G[k] = { y, up: y > (q ? q.y : y) + 1e-4 ? 1 : y < (q ? q.y : y) - 1e-4 ? -1 : (q ? q.up : 0) }; }
+      let u = ((p.pos.y - ph0 - (rig.climbFix || 0)) / Rc) % 1; if (u < 0) u += 1; setScale(nm, 0); a.time = u * C.dur; }
+    else if (real) setScale(nm, clamp(p.speed / (CLIMB.ref * (rig.scale || GAIT.refScale) / GAIT.refScale * (rig.gaitK || 1)), 0, CLIMB.hi));
     else setScale(nm, Math.max(0, p.speed / Math.max(.3, GAIT.walkRef)) * CLIMB.rate);
     setWeights(t, dt); return;
   }
@@ -35649,7 +35707,7 @@ function buildKit(g) {
 // backwards on one ladder and right on the other, and no extra field is asked of his export.
 const CLIMB = {
   on: 1,
-  speed: 2.3,       // m/s at a full thumb (m1316: 3.4 drove the hands at 3.2x -- *"the animation is kind of ridiculous"*)
+  speed: (() => { let v = 1.4; try { const k = parseFloat(localStorage.getItem('mel.climbspd')); if ([.9, 1.4, 2.3].includes(k)) v = k; } catch (e) {} return v; })(), speeds: [.9, 1.4, 2.3],       // m/s at a full thumb (m1316: 3.4 drove the hands at 3.2x -- *"the animation is kind of ridiculous"*)
   grab: .30,        // how much thumb INTO the ladder latches one
   off: .55,         // and how far the thumb has to be pulled away to let go
   out: .30,         // how far off the rungs his root hangs
@@ -35662,6 +35720,11 @@ const CLIMB = {
   // the ledge CLIMB-OVER clip with his hands pinned to the lip (`stepMantle`), 0 = m1316's scripted arc; `topIn` how far in on the top it
   // sets him down; `topR` how far back from the edge a push toward it still mounts from the top
   inT: .22, downT: .8, mantle: 1, topIn: .65, topR: 1.3,
+  // step 5: `lock` 1 = the clip's time follows his height so the hands meet the rungs (`climbCurve`); `rungS` the spacing a ladder without its
+  // own `rung` is assumed to have (the forge's and the kit's are .30)
+  lock: 1, rungS: .3,
+  // and with the hands locked to the rungs the SPEED is the animation's speed too: the clip pulls ~.35 m a cycle at 1x (.44 m/s), so 2.3 m/s
+  // would cycle the hands ~6x. TOOLS > CLIMB cycles `speeds`; 1.4 (~3.7x) is the default until he picks
   rate: 1.9,        // the walk clip, quickened -- there is no climb clip in this export and a
                     // walk cycle facing a wall IS legs on rungs and arms reaching (the grind's
                     // and the hang's own stand-in rule)
@@ -35764,6 +35827,26 @@ function climbGo(L, into) {
 }
 // ONTO A LADDER FROM ITS TOP (the refactor; there was no way at all): standing on the top behind its rungs (within `topR` of the edge, his feet
 // at the top) and walking toward the edge it hangs from -> he turns round and lowers himself onto it (`climbDown` in `stepClimb`)
+// the climb clip MEASURED on this hero (`mantleCurve`'s pattern): both hands' height over his root through one cycle; `R` = the rise one cycle
+// pulls (the gripping hand's speed down past him x the cycle), `tg` / `hg` = the cycle fraction and hand height where the LEFT hand takes hold
+const _clV = new THREE.Vector3();
+function climbCurve() {
+  if (rig.climbC !== undefined) return rig.climbC;
+  const nm = CLIMB.clip, a = rig.actions[nm], c = rig.clips[nm], bn = rig.bones, LH = bn.mixamorig_LeftHand, RH = bn.mixamorig_RightHand;
+  if (!a || !c || !LH || !RH) return (rig.climbC = null);
+  const N = 40, HL = [], HR = [], o = new THREE.Vector3(), v = new THREE.Vector3(), qi = new THREE.Quaternion();
+  const was = []; for (const k in rig.actions) { const x = rig.actions[k]; was.push([x, x.getEffectiveWeight(), x.time, x.enabled, x.paused]); x.setEffectiveWeight(0); }
+  const mxr = rig.mixer; a.enabled = true; a.paused = false; if (!a.isRunning()) a.play(); a.setEffectiveWeight(1);     // a measuring pass, `mantleCurve`'s pattern
+  for (let i = 0; i <= N; i++) { a.time = c.duration * i / N; mxr.update(0); rig.root.updateMatrixWorld(true); rig.root.getWorldPosition(o); rig.root.getWorldQuaternion(qi).invert();
+    const dy = o.y - player.pos.y; HL.push(LH.getWorldPosition(v).sub(o).applyQuaternion(qi).y + dy); HR.push(RH.getWorldPosition(v).sub(o).applyQuaternion(qi).y + dy); }     // over his FEET (`p.pos`), not the model's root: in the climb they sit ~.3 m apart
+  for (const [x, wt, t, en, pz] of was) { x.setEffectiveWeight(wt); x.time = t; x.enabled = en; x.paused = pz; } mxr.update(0);
+  // the stance: from each hand's highest frame forward (wrapping) to its lowest; its slope is how fast the body rises at 1x
+  const stance = H => { let hi = 0, lo = 0; for (let i = 0; i < N; i++) { if (H[i] > H[hi]) hi = i; if (H[i] < H[lo]) lo = i; } const fr = ((lo - hi + N) % N) || N; return { hi, d: H[hi] - H[lo], T: fr / N * c.duration }; };
+  const A = stance(HL), B = stance(HR), vel = (A.d + B.d) / (A.T + B.T), R = vel * c.duration;
+  // the GRIP is where the hand stops in the WORLD, not where it tops out against him: the first frame after its top whose fall past him matches
+  // his rise (R / N a frame) -- measured in the sim, the top-of-clip moment put the left hand 15 cm off its rung
+  const grip = (H, hi) => { for (let k = 0; k < N; k++) { const i = (hi + k) % N, j = (i + 1) % N; if (H[j] - H[i] <= -R / N) return i; } return hi; }, gL = grip(HL, A.hi), gR = grip(HR, B.hi);
+  return (rig.climbC = { R, tg: gL / N, hg: HL[gL], tgR: gR / N, hgR: HR[gR], dur: c.duration, vel }); }
 function climbTopTry(s) {
   const p = player; if (!(s.mag > .45)) return 0;
   for (const L of KCLIMB) { if (Math.abs(p.pos.y - L.top) > .45) continue; const dx = p.pos.x - L.cx, dz = p.pos.z - L.cz; if (Math.abs(dx) > 4 || Math.abs(dz) > 4) continue;
@@ -66707,7 +66790,7 @@ function ghomeBuild(at, yaw, y0) {
       for (let y = ya + .3; y < yb + .3; y += .34) vbox(lx - .32, lx + .32, y - .03, y + .03, lz - .03, lz + .03, wood, 0);
       const nx = s, nz = c, cxw = Wx(lx, lz), czw = Wz(lx, lz), hx = .12, hz = .45;     // the local +z normal in the world
       const ex = Math.abs(nx) * hx + Math.abs(nz) * hz, ez = Math.abs(nz) * hx + Math.abs(nx) * hz;
-      const Lb = kitClimbAdd({ cs: nx, sn: nz, hx, hz, cx: cxw, cz: czw, minx: cxw - ex, maxx: cxw + ex, miny: y0 + ya, maxy: y0 + yb, minz: czw - ez, maxz: czw + ez }, 'ghome_ladder', y0 + P + A.Hwg);
+      const Lb = kitClimbAdd({ cs: nx, sn: nz, hx, hz, cx: cxw, cz: czw, minx: cxw - ex, maxx: cxw + ex, miny: y0 + ya, maxy: y0 + yb, minz: czw - ez, maxz: czw + ez }, 'ghome_ladder', y0 + P + A.Hwg); Lb.rung = { y0: y0 + ya + .3, s: .34 };
       const mr = A.Rw - 1, my = P + A.Hwg + 2.2 * Math.cos(Math.asin(mr / A.Rw)); Lb.mark = { x: Wx(A.Wc[0], A.Wc[1] + mr), y: y0 + my, z: Wz(A.Wc[0], A.Wc[1] + mr) }; A.climbs = [Lb]; }
     // the long RAMP off the right deck down to the ground, railed (noCam)
     { const x0 = 9.8, x1 = 16.2, z0 = 4.5, z1 = 6.6, n = Math.ceil((x1 - x0) / .34);
@@ -67289,7 +67372,7 @@ function gpeakBuild() {
   A.climbs = [];
   const ladder = (x, z, ya, yb, nx, nz, mark, name) => { const ux = nz, uz = -nx, ry = Math.atan2(nx, nz);
       for (const o of [-.34, .34]) put(new THREE.BoxGeometry(.09, yb - ya + .6, .09), wood, at4(x + ux * o, (ya + yb + .6) / 2, z + uz * o, ry)); for (let y = ya + .3; y < yb + .4; y += .34) put(new THREE.BoxGeometry(.7, .06, .06), wood, at4(x, y, z, ry));
-      const hx = .12, hz = .45, ex = Math.abs(nx) * hx + Math.abs(nz) * hz, ez = Math.abs(nz) * hx + Math.abs(nx) * hz, L = kitClimbAdd({ cs: nx, sn: nz, hx, hz, cx: x, cz: z, minx: x - ex, maxx: x + ex, miny: ya, maxy: yb, minz: z - ez, maxz: z + ez }, name, yb);
+      const hx = .12, hz = .45, ex = Math.abs(nx) * hx + Math.abs(nz) * hz, ez = Math.abs(nz) * hx + Math.abs(nx) * hz, L = kitClimbAdd({ cs: nx, sn: nz, hx, hz, cx: x, cz: z, minx: x - ex, maxx: x + ex, miny: ya, maxy: yb, minz: z - ez, maxz: z + ez }, name, yb); L.rung = { y0: ya + .3, s: .34 };
       L.mark = { x: mark[0], y: mark[1], z: mark[2] }; A.climbs.push(L); };
   // ---- THE PINNACLE: a stratified noisy lathe out of the mountain's top, ledged, its flat cap the lookout's PAD ----
   const mt = gH(px, pz), base = mt - 8, top = mt + A.pin, Rp = 8.5; A.top = top;
@@ -67522,7 +67605,7 @@ function gmillBuild() {
       vbox(tx - .08, tx + .08, top, top + 5, tz - .08, tz + .08, wood, 0); put(new THREE.PlaneGeometry(1.8, 1.2, 4, 2), banM, at4(tx + .95 * -sd, top + 4.3, tz, 0));
       { const a2 = sd < 0 ? .55 : -.55, lx = tx + Math.sin(a2) * (R + .45), lz = tz + Math.cos(a2) * (R + .45), nx = Math.sin(a2), nz = Math.cos(a2), ux = Math.cos(a2), uz = -Math.sin(a2);
         for (const o of [-.34, .34]) put(new THREE.BoxGeometry(.09, top - ya + .6, .09), wood, at4(lx + ux * o, (ya + top + .6) / 2, lz + uz * o, a2)); for (let y = ya + .3; y < top + .4; y += .34) put(new THREE.BoxGeometry(.7, .06, .06), wood, at4(lx, y, lz, a2));
-        const hx = .12, hz = .45, ex = Math.abs(nx) * hx + Math.abs(nz) * hz, ez = Math.abs(nz) * hx + Math.abs(nx) * hz, L = kitClimbAdd({ cs: nx, sn: nz, hx, hz, cx: cx + lx, cz: cz + lz, minx: cx + lx - ex, maxx: cx + lx + ex, miny: ya, maxy: top, minz: cz + lz - ez, maxz: cz + lz + ez }, 'gmill_turret', top);
+        const hx = .12, hz = .45, ex = Math.abs(nx) * hx + Math.abs(nz) * hz, ez = Math.abs(nz) * hx + Math.abs(nx) * hz, L = kitClimbAdd({ cs: nx, sn: nz, hx, hz, cx: cx + lx, cz: cz + lz, minx: cx + lx - ex, maxx: cx + lx + ex, miny: ya, maxy: top, minz: cz + lz - ez, maxz: cz + lz + ez }, 'gmill_turret', top); L.rung = { y0: ya + .3, s: .34 };
         L.mark = { x: cx + tx + Math.sin(a2) * (R - th - .6), y: top + .05, z: cz + tz + Math.cos(a2) * (R - th - .6) }; A.climbs.push(L); }
       return [tx, tz, top]; };
   A.turrets = [turret(A.landW, -1), turret(A.landE, 1)];

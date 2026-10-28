@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m1602 -- THE DRAGON RIDE, build 1: the zone and the armour (DRAGON.md box 1)
+## m1607 -- THE DRAGON RIDE, build 1: the zone and the armour (DRAGON.md box 1)
 His: *"build the blue dragon: armour and a mount, a little zone where I can mount it and ride it... flying it, controlling it on the ground,
 an attack."* A new sandbox with its own DONE WHEN (`DRAGON.md`); KORAJIN > The Dragon Ride opens `?w=forge&zone=dragon` (`DRAGZ`).
 - **The zone** (`dragStage`): the dojo's sunset dome and cloud sea, a 52 m flat meadow island (`floatIsland`, `flat: 0`, so the forge's
@@ -28,6 +28,51 @@ an attack."* A new sandbox with its own DONE WHEN (`DRAGON.md`); KORAJIN > The D
 **Moves:** DRAGON.md box 1 (his look still open). **Still open:** boxes 2-6 and his sign-off; no fly clip in his file (asked for).
 Gates: `npm run check` ok, and a boot of `MEL_WORLD='forge&zone=dragon'` ok (the dragon itself loads after boot, so a throw in the
 dressing is only visible on the phone, as the chip line above). Shipped unverified.
+## m1606 -- THE RE-PASS: the FLYING SHIP HOUSE, pass 2 (rubric 7 for a flyer: AGROUND / AFLOAT)
+**Moves:** its rubric-7 box. A flyer, so restored is afloat. This is the one place a building rises (`lift`), and it is a ship.
+- One rig over the whole group, `lift` = `drop` = 3.2 m (deck height minus keel depth): FALLEN, the group sits `drop` lower, so the keel
+  rests on the grass. `restoreSkin` drains it; the vis group lists (`rotation.x` .035) instead of bobbing; the engines' lift cones are off,
+  no motes; the SAILS are gone (found before the skin cloned their material, and an `up.obj`); the broadside cannons do not fire and the
+  bow gun is parked; the high bar, the grapple rings, the cargo net and the crow's-nest ladder are `up`.
+- **EVERY COLLIDER RIDES:** the hull, bulwark, deckhouse, mast, cannon and crow's-nest boxes, the smash props' boxes and the gangplank and
+  bowsprit triangles are all shifted down by `drop`, then `restoreRide` carries them up with her as `base` (measured: the hull box spans
+  0-2.8 m aground and 3.2-6 afloat; the mast 2.8-15.8 and 6-19). The bar, rings and climbs are shifted the same way and are `up`.
+- The plants and the gangplank's foot lanterns are moved to the scene first, so they stay on the ground.
+- Plate by the gangplank's foot; `rig` hook; `fshipClear` drops the rig, the plate and the foot lanterns.
+Render-checked headless: aground (sails gone, drained) and afloat. Shipped unverified.
+
+## the LADDER REFACTOR, step 5: the hands meet the rungs (Worker B)
+He said go on the clip pass. `npm run clips models/characters/zap_02.glb`: `climbing_Ladder` 0.792 s, 20 keys, 38 bones. Then MEASURED on the
+shipped hero in the sim (the clip sampled like `mantleCurve`, and the hands' world heights read off the drawn pose while climbing):
+- **WHAT WAS WRONG:** the clip's gripping hand falls past him at ~.44 m/s at 1x (one cycle pulls ~.35 m; m189's .73 was zap.glb), and
+  the old rate (`speed / ref`, capped at 2.2x) drove the hands at ~.97 m/s while the body rose at 2.3 -- every hand SLID ~1.3 m/s up the
+  rails during its grip.
+- **NOW (`CLIMB.lock`): THE CLIP'S TIME IS A FUNCTION OF HIS HEIGHT.** `climbCurve` measures the cycle's rise; it is rounded to whole rungs
+  of the ladder (`L.rung` {y0, s}; the yard's are .30, my Red Hollows ladders' .34; else `CLIMB.rungS` .30) and phased to the rungs. Still
+  = a still pose; no speed can outrun the hands.
+- **AND IT CALIBRATES ON THE DRAWN POSE** (`rig.climbFix`): the offline sample read the hands ~.25 m off where they draw, so each hand's real
+  grip (its world rise turning to a fall) is measured against the nearest rung and the phase nudged until the pair sit evenly. Sim, ladder
+  5 (20 m), after two grips: L +.09, R -.09 m, held for the whole climb. **Both cannot sit on .30 rungs**: on the drawn pose the two hands
+  take hold ~.17 m apart; a per-hand warp (cosine bumps per grip) was tried and saturated -- it needed the clip to run backwards. A clip whose
+  hands grip a whole rung apart would land both.
+- **AND THE SPEED IS NOW THE ANIMATION'S SPEED**: 2.3 m/s would cycle the hands ~6x. TOOLS > CLIMB cycles .9 / 1.4 / 2.3 m/s (`mel.climbspd`),
+  **1.4 by default** -- his pick. Ladder 3 (7 m): bottom to standing on top 5.6 s; top back down 5 s.
+The feet are not locked (they follow the same phase; not measured against the rungs).
+## m1604 -- WALL RUNS START FROM A SWIPE; the run-up's legs out to the wall
+His (playing Level 1 v2): *"we need a way to initiate the wall runs so he doesn't just automatically wall run. If you're touching a wall and you swipe
+the right stick directionally, he'll run that direction -- hit the wall at an angle and swipe for a horizontal run; straight on, swipe up, he runs up
+the wall. If you don't swipe he does the thing where he's perched on the wall, can jump off or slide down -- it gets confused which one you're
+trying to do."* And: *"the vertical wall run: his feet more forward, out in front, as if his hips are at 90 degrees, the torso straight up and down,
+feet parallel to the wall."*
+- **`WRUN.swipe` (1; 0 = the old tap / auto, the A/B):** `wrunTap` no longer starts a run (a tap by a wall is the jump; a tap ON a wall is still the
+  wall jump); `wrunAuto` starts NO run by itself, and ANY touch of a tall face in the air is the perch-and-slide (m1372), stick or no stick.
+  **`wrunSwipe`**, first in the right pad's flick chain after the board: a tall face within `swipeReach` .7 (or the one he is perched on): flick UP
+  = the RUN UP (`upV`, or faster if he hit it fast), LEFT / RIGHT = a SIDE RUN along the face that way (the flick's world heading, `flickH`, onto
+  the wall's tangent), DOWN = let go of the perch. No wall in reach: the flick is the strike, unchanged.
+- **The run-up pose (`wrunPose`, kind `up`):** both `UpLeg` bones swung `upLeg` 1.35 rad forward about his own right axis (world space, on top of
+  the run clip, so the legs keep stepping), and the drawn body held hipY x .82 off the face so the soles land on it; ramps in over .12 s. **The
+  first sign was backwards** (headless render: legs swung out BEHIND him, away from the wall); flipped, the render shows the legs level into the
+  wall and the torso upright.
 
 ## m1599 -- THE RE-PASS: the FLYING SHIP HOUSE, pass 1 (a HERO flyer: the look; a collider audit)
 **Moves:** its pass-1 row.
