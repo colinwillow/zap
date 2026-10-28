@@ -16,6 +16,15 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The raider skiff is lifted out of the group for `restoreSkin` (not ours: its colours stay).
 - Plate west of the foot (`R.trig`); `rig` hook; `adockClear` drops the rig and the plate.
 Render-checked headless: fallen and restored. The wreck's three bronze bands stuck out as stray arcs and are gone. Shipped unverified.
+## m15xx -- The First Beacon pass 5: the tower seen from every station, and canyon STRATA
+- **Sight lines, measured:** the audit casts a segment from each station's eye (+1.6 m) to the beacon and slab-tests it against every box. First
+  result: S, D, Z blocked. D was the tower's own top (excluded now). S and then A were blocked by the shrine climb's 24 m landing, by under a metre.
+  The fix is the landmark, not the climb: the stolen Jinra burns MINT (ENEMY_STYLE: the brazier's fire is mint; the orange cone was wrong), a 7 m
+  flame and a **16 m column of light** over it, and the check aims at the column (+13). Now S A B C D see it; Z is at the foot of the finale climb
+  and is hidden by it on purpose. Mesas are capped under EVERY station's line to the beacon (was only S's).
+- **`beaconRock`:** the canyon's material is a shader, not a texture: horizontal strata from world y, wobbled by the plan, a dark seam per band,
+  faint vertical water streaks. Three tints: the mesas (two reds) and the route's own climbing faces (a pale cream, so the wall-jump chimneys and
+  raised landings read as THE way up from across the canyon). The tiled sandstone read as sponge up close.
 
 ## m1564 -- THE RE-PASS: the AIRSHIP DOCK, pass 1 (a HERO flyer: the look)
 **Moves:** its pass-1 row. It is on the HERO list as a FLYER (it may fly; the airship already does).

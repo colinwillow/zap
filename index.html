@@ -26438,11 +26438,20 @@ const BCH = {
   chim: (P, K, n) => { const H = +n || 8, kicks = Math.ceil(H / MOVEC.wall_chain); for (const s of [-1, 1]) K.B(1, 6, s * 2.3, s * 2.3 + s * .5, P.y - .5, P.y + H + .4, K.M.wall, 1); K.slab(6, 11, P.y + H, P.y);
     return { out: K.out(11, P.y + H), ask: `chimney +${H} m: WALL JUMP, ~${kicks} kicks` }; } };
 // a leg's slack is not a bare walkway (his rule: something to do every 2-3 s): safe 3.5 m HOPS (7.5 m a piece) with even walks between them
+// m15xx: the canyon's ROCK -- horizontal strata (a red canyon is read by its bands), wobbling with the plan so the bands are not ruled lines, a
+// darker vertical streak (water staining), all from WORLD position in the shader: no texture, so no sponge at any distance. (lo, dark, hi)
+function beaconRock(lo, dk, hi) { const m = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .92 });
+  m.onBeforeCompile = sh => { sh.uniforms.uLo = { value: new THREE.Color(lo) }; sh.uniforms.uDk = { value: new THREE.Color(dk) }; sh.uniforms.uHi = { value: new THREE.Color(hi) };
+    sh.vertexShader = 'varying vec3 vRW;\n' + sh.vertexShader.replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\n vRW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+    sh.fragmentShader = 'uniform vec3 uLo; uniform vec3 uDk; uniform vec3 uHi; varying vec3 vRW;\n' + sh.fragmentShader.replace('#include <map_fragment>',
+      'float sb = vRW.y * .23 + sin(vRW.x * .061 + vRW.z * .043) * .9 + sin(vRW.x * .21 - vRW.z * .17) * .18; float band = fract(sb); vec3 rc = mix(uLo, uHi, smoothstep(.15, .55, band) * (1.0 - smoothstep(.75, .95, band)));' +
+      ' rc = mix(rc, uDk, smoothstep(.88, .98, band) * .8); float st = sin(vRW.x * 1.7 + sin(vRW.z * .9) * 2.0) * sin(vRW.z * 1.3 + vRW.y * .05); rc *= 1.0 - smoothstep(.6, 1.0, st) * .12; diffuseColor.rgb *= rc;'); };
+  m.customProgramCacheKey = () => 'brock' + lo + dk + hi; return m; }
 function beaconFill(f) { if (f < .05) return []; const n = Math.floor(f / 12), w = (f - n * 7.5) / (n + 1), out = []; for (let i = 0; i <= n; i++) { if (w > .05) out.push('walk:' + w.toFixed(2)); if (i < n) out.push('hop'); } return out; }
 function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, MG = new Map(), bars = [], climbs = [], zips = [];
   const put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); const q = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal') q.deleteAttribute(k); MG.get(m).push(q); };
-  const EM = enemyMats(), M = { slab: triMat('stone_blocks', { scale: 3, color: 0xa9a49c }), land: triMat('stone_blocks', { scale: 2.4, color: 0xc9c4ba }), wall: triMat('sandstone', { scale: 5, color: 0xd88a58 }),
-    step: triMat('wood_timber', { scale: 2 }), mesa: triMat('sandstone', { scale: 14, color: 0xcf8a5c }), lac: EM.lacquer, gold: EM.gold };
+  const EM = enemyMats(), M = { slab: triMat('stone_blocks', { scale: 3, color: 0xa9a49c }), land: triMat('stone_blocks', { scale: 2.4, color: 0xc9c4ba }), wall: beaconRock(0xe8c49a, 0xc79a70, 0xf3dcbc),
+    step: triMat('wood_timber', { scale: 2 }), mesa: beaconRock(0xc8744a, 0x94452c, 0xe0a070), lac: EM.lacquer, gold: EM.gold };
   const [ox, oz] = BEACON.at, L = { g, O, bars, climbs, zips, rings: [], st: {}, log: [] };
   const sign = (txt, sub, x, y, z, s = 1) => { const cv = document.createElement('canvas'); cv.width = 512; cv.height = 150; const c = cv.getContext('2d'); c.fillStyle = 'rgba(10,12,18,.85)'; c.fillRect(0, 0, 512, 150);
     c.fillStyle = '#7affd8'; c.font = 'bold 50px sans-serif'; c.fillText(txt, 18, 60); c.fillStyle = '#fff'; c.font = '28px sans-serif'; c.fillText(sub, 18, 116);
@@ -26464,7 +26473,9 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
     const mm = S.brazier ? M.lac : M.mesa; if (y > .3) { put(new THREE.BoxGeometry(R, y, R).translate(cx, y / 2, cz), mm); O.boxes.push({ minx: cx - h, maxx: cx + h, miny: 0, maxy: y, minz: cz - h, maxz: cz + h, top: 1, st: 1 }); }
     put(new THREE.BoxGeometry(R + .2, .3, R + .2).translate(cx, y + .01 - .15 + .02, cz), S.brazier ? M.gold : M.land);
     if (S.brazier) { for (let k = 1; k * 6 < y; k++) put(new THREE.BoxGeometry(R + .3, .35, R + .3).translate(cx, k * 6, cz), M.gold);     // the tower's gold bands
-      put(new THREE.CylinderGeometry(1.6, 1.1, 1.2, 10).translate(cx, y + .6, cz), EM.iron); const fl = new THREE.Mesh(new THREE.ConeGeometry(1.2, 3.2, 10).translate(0, 1.6, 0), new THREE.MeshBasicMaterial({ color: 0xff8a3a }));
+      put(new THREE.CylinderGeometry(1.6, 1.1, 1.2, 10).translate(cx, y + .6, cz), EM.iron); const fl = new THREE.Mesh(new THREE.ConeGeometry(1.4, 7, 12).translate(0, 3.5, 0), new THREE.MeshBasicMaterial({ color: 0x7affd8, transparent: true, opacity: .9 }));     /* m15xx: the stolen Jinra burns MINT (ENEMY_STYLE), 7 m: the landmark */
+      { const gw = new THREE.Sprite(new THREE.SpriteMaterial({ map: dojoGlintTex(), color: 0x7affd8, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true })); gw.scale.setScalar(16); gw.position.set(cx, y + 4, cz); g.add(gw);
+        const bm = new THREE.Mesh(new THREE.CylinderGeometry(.5, 1.1, 16, 12, 1, true).translate(0, 8, 0), new THREE.MeshBasicMaterial({ color: 0x7affd8, transparent: true, opacity: .35, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); bm.position.set(cx, y + 2, cz); g.add(bm); }     /* a 16 m column of light off the fire: seen over the shrine's climb from S and A */
       fl.position.set(cx, y + 1.2, cz); g.add(fl); L.flame = fl; L.brazier = { x: cx, y, z: cz }; O.boxes.push({ minx: cx - 1.6, maxx: cx + 1.6, miny: y, maxy: y + 1.2, minz: cz - 1.6, maxz: cz + 1.6, prop: 1 }); }
     const side = inDir ? [-inDir[1], inDir[0]] : [1, 0]; ladderUp(cx + side[0] * (h + .15), cz + side[1] * (h + .15), y, side);
     const id = S.id || S.st; sign(id + '  ' + S.name, (y < .1 ? 0 : y).toFixed(1) + ' m' + (S.want !== undefined ? '  (sheet ' + S.want + ')' : ''), cx, y + 3.4, cz, 1.1); L.st[id] = { x: cx, y, z: cz, R }; L.log.push(id + ' ' + y.toFixed(1)); if (S.brazier) L.st.X = L.st[id]; return { x: cx, y, z: cz, h }; };
@@ -26499,13 +26510,13 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
   { const C = BEACON.canyon, R = plantRnd(77), RB = O.boxes.slice(), Z = zips.map(z => [z.A[0], z.A[2], z.B[0], z.B[2], Math.min(z.A[1], z.B[1])]);
     let x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9; for (const b of RB) { x0 = Math.min(x0, b.minx); x1 = Math.max(x1, b.maxx); z0 = Math.min(z0, b.minz); z1 = Math.max(z1, b.maxz); }
     const segD = (px, pz, ax, az, bx, bz) => { const vx = bx - ax, vz = bz - az, t = Math.max(0, Math.min(1, ((px - ax) * vx + (pz - az) * vz) / (vx * vx + vz * vz || 1))); return Math.hypot(px - ax - vx * t, pz - az - vz * t); };
-    const Sx = L.st.S.x, Sz = L.st.S.z, Xx = L.brazier ? L.brazier.x : Sx, Xz = L.brazier ? L.brazier.z : Sz, M2 = triMat('sandstone', { scale: 14, color: 0xb86a44 }); let n = 0;
+    const Sx = L.st.S.x, Sz = L.st.S.z, Xx = L.brazier ? L.brazier.x : Sx, Xz = L.brazier ? L.brazier.z : Sz, M2 = beaconRock(0xb8623e, 0x83392a, 0xd48a5c); let n = 0; const sight = L.brazier ? Object.values(L.st).filter(q => q !== L.st.X).map(q => [q.x, q.y + 1.6, q.z, L.brazier.x, L.brazier.y + 13, L.brazier.z]) : [];
     for (let x = x0 - C.out; x <= x1 + C.out; x += C.cell) for (let z = z0 - C.out; z <= z1 + C.out; z += C.cell) { const jx = x + (R() - .5) * C.cell * .6, jz = z + (R() - .5) * C.cell * .6;
       let d = 1e9, yN = 0; for (const b of RB) { const dx = Math.max(b.minx - jx, 0, jx - b.maxx), dz = Math.max(b.minz - jz, 0, jz - b.maxz), dd = Math.hypot(dx, dz); if (dd < d) { d = dd; yN = b.maxy; } }
       let dz2 = 1e9, zy = 0; for (const q of Z) { const dd = segD(jx, jz, q[0], q[1], q[2], q[3]); if (dd < dz2) { dz2 = dd; zy = q[4]; } }
       const near = d < C.mid + 4, w = near ? C.w0 + R() * C.w1 : C.wf0 + R() * C.wf1; if (d < C.clear + w / 2 || d > C.out) continue;     /* the far ring is wider than the lattice, so it closes into WALLS */ if (R() > (near ? C.pNear : C.pFar)) continue;
       let h = near ? Math.min(30, Math.max(4, yN * (.5 + R() * .7))) : C.wall0 + R() * C.wall1 + Math.min(10, (d - C.mid) * .4);     /* near: ledges and shoulders under the route's height; far: the canyon wall, rising outward */
-      if (dz2 < 8 + w / 2) h = Math.min(h, zy - 5); if (segD(jx, jz, Sx, Sz, Xx, Xz) < 7 + w / 2) h = Math.min(h, 6); if (h < 3) continue;
+      if (dz2 < 8 + w / 2) h = Math.min(h, zy - 5); for (const V of sight) { const vx = V[3] - V[0], vz = V[5] - V[2], t = Math.max(0, Math.min(1, ((jx - V[0]) * vx + (jz - V[2]) * vz) / (vx * vx + vz * vz || 1))); if (Math.hypot(jx - V[0] - vx * t, jz - V[2] - vz * t) < 3 + w * .75) h = Math.min(h, V[1] + (V[4] - V[1]) * t - 2); }     /* m15xx: under every station's line to the brazier */ if (h < 3) continue;
       const tiers = h > 18 ? 3 : 2; let y = 0, ww = w, wd = w * (.8 + R() * .4);
       for (let k = 0; k < tiers; k++) { const th = k === tiers - 1 ? h - y : h * (k ? .3 : .5) * (.8 + R() * .3); put(new THREE.BoxGeometry(ww, th, wd).translate(jx, y + th / 2, jz), (k + n) % 2 ? M2 : M.mesa);
         O.boxes.push({ minx: jx - ww / 2, maxx: jx + ww / 2, miny: y, maxy: y + th, minz: jz - wd / 2, maxz: jz + wd / 2 }); y += th; ww *= .72 + R() * .12; wd *= .72 + R() * .12; } n++; }
@@ -26520,11 +26531,17 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
       const along = (t.maxx - t.minx) >= (t.maxz - t.minz), y = t.maxy, b = along ? { minx: cx - .4, maxx: cx + .4, miny: 0, maxy: y, minz: t.minz - .15, maxz: t.minz } : { minx: t.minx - .15, maxx: t.minx, miny: 0, maxy: y, minz: cz - .4, maxz: cz + .4 };
       const Lc = kitClimbAdd(b, 'beacon_ladder', y); Lc.mark = { x: cx, y, z: cz }; climbs.push(Lc); added++;
       put(new THREE.BoxGeometry(along ? .8 : .12, y, along ? .12 : .8).translate((b.minx + b.maxx) / 2, y / 2, (b.minz + b.maxz) / 2), M.step); }
-    L.audit = { headroom: bad, laddersAdded: added }; if (bad.length) note('BEACON: no headroom over ' + bad.length + ' surfaces: ' + bad.slice(0, 6).join(' ')); }
+    const sees = []; if (L.brazier) for (const [id, q] of Object.entries(L.st)) { if (id === 'X' || q === L.st.T) continue; const a0 = [q.x, q.y + 1.6, q.z], a1 = [L.brazier.x, L.brazier.y + 13, L.brazier.z];     /* to the column of light */ let hit = null;
+      for (const bx of O.boxes) { if (bx.prop || (bx.st && (bx.maxy === q.y || bx.maxy === L.brazier.y))) continue; let t0 = 0, t1 = 1, ok = true;     /* the segment against the box, by slabs */
+        for (const [k, lo, hi] of [[0, bx.minx, bx.maxx], [1, bx.miny, bx.maxy], [2, bx.minz, bx.maxz]]) { const d = a1[k] - a0[k]; if (Math.abs(d) < 1e-6) { if (a0[k] < lo || a0[k] > hi) { ok = false; break; } continue; }
+          let u = (lo - a0[k]) / d, v = (hi - a0[k]) / d; if (u > v) [u, v] = [v, u]; t0 = Math.max(t0, u); t1 = Math.min(t1, v); if (t0 > t1) { ok = false; break; } }
+        if (ok && t1 < .97) { hit = bx; break; } }
+      sees.push(id + (hit ? ' NO(' + ((hit.minx + hit.maxx) / 2).toFixed(0) + ',' + ((hit.minz + hit.maxz) / 2).toFixed(0) + '^' + hit.maxy.toFixed(0) + (hit.pil ? 'P' : hit.top ? 'T' : 'm') + ')' : ' yes')); }
+    L.audit = { headroom: bad, laddersAdded: added, sees }; if (bad.length) note('BEACON: no headroom over ' + bad.length + ' surfaces: ' + bad.slice(0, 6).join(' ')); }
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
   for (const b of O.boxes) BOXES.push(b); boxGrid(); BEACON.on = L; bldXrayTag(g);
   { const S = L.st.S, p = player; p.pos.set(S.x, .05, S.z); p.vel.set(0, 0, 0); const n = L.st.A || S; p.faceH = p.heading = Math.atan2(n.x - S.x, n.z - S.z); arenaBeam(S.x, S.z, [.48, 1, .85], 1); }
-  console.log('[melee] the first beacon: ' + nChunks + ' chunks, stations ' + L.log.join(' | ') + ', runs ' + (L.fit || []).join(', ') + ', ' + (L.mesas || 0) + ' mesas, ' + O.boxes.length + ' boxes, ' + climbs.length + ' ladders (' + (L.audit ? L.audit.laddersAdded : 0) + ' for falls), headroom ' + (L.audit && L.audit.headroom.length ? L.audit.headroom.length + ' BAD' : 'ok') + ', ' + zips.length + ' zips'); }
+  console.log('[melee] the first beacon: ' + nChunks + ' chunks, stations ' + L.log.join(' | ') + ', runs ' + (L.fit || []).join(', ') + ', ' + (L.mesas || 0) + ' mesas, ' + O.boxes.length + ' boxes, ' + climbs.length + ' ladders (' + (L.audit ? L.audit.laddersAdded : 0) + ' for falls), headroom ' + (L.audit && L.audit.headroom.length ? L.audit.headroom.length + ' BAD' : 'ok') + ', sees the tower: ' + (L.audit ? L.audit.sees.join(' ') : '?') + ', ' + zips.length + ' zips'); }
 function beaconStep(dt) { const L = BEACON.on; if (!L || !L.flame) return; const t = performance.now() * .001; L.flame.scale.set(1 + Math.sin(t * 9) * .08, 1 + Math.sin(t * 7.3) * .14, 1 + Math.cos(t * 8.1) * .08); }
 const COURT = { scale: 1.5, at: [0, 150], hw: 28, hd: 32, wallH: 4, walk: 2.6, gate: 6, on: null };
 function courtBuild() {
