@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## mDRG -- THE DRAGON RIDE: GRUMBO'S RIDING CLIPS (Forge-baked from his Mixamo library) and THE STRADDLE
+## m1631 -- THE DRAGON RIDE: GRUMBO'S RIDING CLIPS (Forge-baked from his Mixamo library) and THE STRADDLE
 His go-ahead on the plan: the library (`colinwillow/retarget-anims`, cloned beside zap, nothing raw committed here) has no riding clips, so a car
 seat, edited -- what he did by hand before.
 - **The bake**: `tools/agoblin_forge_prof.json` (the goblin profile's layers and adjust, `character` = alien_goblin_game.glb) ->
