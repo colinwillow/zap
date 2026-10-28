@@ -5,6 +5,11 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home pass 22 (Worker B): the rocks, second pass -- desert sandstone
+- The rocks were in `stoneM`, the HOUSE's cream-and-lavender sandstone, so they read as more house. They now have their own `rockM` (vertex colours, no map; the repo's textures are all building materials).
+- **`ghStrata(x, y, z, nx, ny, nz)`**, linear colour. Bands by height (y * 4.2, warped by noise, six-colour rust / ochre / cream palette, soft edges), so the layers stay level across neighbouring rocks. Dark VARNISH streaks (noise stretched down y) where the face is steep (ny < .5). Bleached tops above ny .8. A fine speckle. `put` calls `ghStrataCol` for any material with `userData.strata`. `hollowDress`'s boulders, hoodoos and rim lumps use it in place of one flat colour per rock.
+- **First try was too pale and too wide:** bands every 0.6 m on rocks about a metre tall, in colours close to the sand, so the rocks vanished into the floor. Now bands are every .24 m and the palette is darker. The home's rocks still read soft: that is the third pass's job (more contrast, chipped edges).
+- One new material: **35 draws**.
 ## Grumbo's home pass 21 (Worker B): the pier and the canoe, second pass
 - **His rule:** *"we'll do a few passes on everything we do. Minimum 3 passes, max a million."* It is written at the top of the BUILDINGS section with a tally of which elements are at which pass.
 - **Pier.** Planks are now individually placed boxes: about one in four is darker timber, each has a little offset, twist and sag, and one is missing. The walkable quad is unchanged. X-braces between each post pair where the deck clears the bed by .35 m, plus diagonals under the T-head's sides. Four iron bollards. A ladder from the T-head's end down into the water. A drying rack (two A-frames and a pole) with a catch hung by the tails, and a crate of fish (one collider). A **bell** on a post at the pier's foot, added to `A.bellPts`, so it rings like the stall bells.
