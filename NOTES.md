@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the CLIFF LODGE, pass 1 (HERO look)
+## m1648 -- THE RE-PASS: the CLIFF LODGE, pass 1 (HERO look)
 - The hero kit: `korMats` timber for every beam and post (the lodge, the perch, the cradle, the lever), warm plaster walls, a `roof_tiles`
   roof (bldRoof's own tile map was the grey kit default), the kit lamp. Kit lanterns on posts either side of the path's foot, red-and-cream
   bunting under the lodge's front eave, 34 plants (grass, ferns, stones, tall grass, boulders) round the crag, kept off the path's lanes
