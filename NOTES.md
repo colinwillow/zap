@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## the Red Hollows: the STATE button on screen, no more floating rocks, and FALLEN has no floating world (Worker B)
+His report (m1704, phone): "a hybrid of halfway built, floating, and halfway demolished -- I can't tell which it is"; "I need the debug menu
+in there so I can transform it between the two states"; "these rocks are kind of floating".
+- **THE BAR** (`arenaUi`, the forge's SPAWN column) now shows in the Red Hollows too, as the STATE button (FALLEN / RESTORED, tap: reload into
+  the other, dropping any `?hs=`) and TOOLS. Built when the world goes live. (m1682's GOD > SWITCHES button stays.)
+- **THE FLOATING ROCKS** were the valley's stacked hoodoos (m1113's formations): stacked by a SPHERE's numbers (`y + R*.7 + k*R*1.15`) after
+  pass 18 made them flattened rocks, so every piece hung ~a metre over the one below. Now each sits on the measured top of the one under it
+  (sunk 12%), the first sunk 18% into the ground, the collider at the stack's real top; the rim lumps sink 20%. Cliff shrubs hug the face.
+- **THE HYBRID:** the sky islands over the rim (m1113) showed in FALLEN. KORAJIN: the floating world is what restoration raises -> hidden
+  while fallen. (The refinery already sits on the flank when fallen.)
+Next: the painted textures (rock, sand, cliff), his ask in the same message.
 ## m1705 -- STATUES: THE ENEMY'S STONE TWIN AND THE CHALICE (his: "every time we make a new enemy we should first make the statue version --
 pose the rigged model, texture it with no green glowing parts, then the one that does; they guard the lairs; at the end you take a chalice
 and a cut scene shows them all coming to life")
