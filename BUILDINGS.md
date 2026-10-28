@@ -179,12 +179,13 @@ with big red SAILS on spars round it; timber BALCONIES clinging at two heights u
 STAIRS; ROPE BRIDGES with red banners from the tower to both canyon walls; lanterns hanging off it; an interior round room with a central
 shaft. Placement: the layout test's spot, in the stream 66 m below the home (z 62), in a POND carved round it.
 - **Passes:**
-  - [x] **pass 1 (next tick):** the pond, the island and three stepping stones from the west bank; the cream base (stone quoins) with
+  - [x] **pass 1 (m1472):** the pond, the island and three stepping stones from the west bank; the cream base (stone quoins) with
     the race through it and the WATERWHEEL facing out of its front arch, turning, water pouring over it from a timber chute into a pool;
     the tapering tower (40 m to the gallery) with two painted sun-spirals and small windows; the gallery, the lantern with its red cap and
     finial, and the ROTOR of six big red sails turning round it; two balconies with red awnings, the outside stair from the base's roof,
     ladders from the island to the roof, between the balconies and up to the gallery; ROPE BRIDGES from the lower balcony to both walls
     (21.9 m west, 11.4 m east) with banners and landings
+  - [x] **pass 2 (next tick):** the WEST STAIR (48 steps of .3 beside the long bridge, from its landing on the wall down to the shore by the stepping stones, railed, on posts) so the bank walks to the mill; strike the WHEEL and it jams to a stop (strike again, it turns); spray where the water lands; crates, barrels and sacks on the balconies, lanterns hung on ropes off the gallery, a tall red banner down the upper tower, a rope coil and red pots by the base
 - **DONE WHEN:**
   - [ ] the four views match the ref in silhouette (tower proportions, sails, balconies, base)
   - [ ] the waterwheel and the sails turn, the water reads as water (pour, foam, the pond)
