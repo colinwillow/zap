@@ -158,6 +158,32 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
+## THE SHIP, PASS 12d: THE SEA DRAGON, FROM HIS REFERENCE SHEET (m@X4@, WORKER A)
+
+His (a concept sheet: a horned sea dragon, mosaic scales, cream belly, torn red-orange fins, rearing out of the sea): *"you could use
+this to create the sea dragon monster thing."* The serpent becomes that dragon:
+
+- **TEXTURES FROM HIS SHEET:** `images/serpent_skin.webp` regenerated through the images EDITS endpoint with his sheet as the input image
+  (`gpt-image-1.5`): purple-blue spine with a row of orange scutes at the top, teal/green/violet mosaic scales with orange flecks, cream
+  ribbed belly plates at the bottom. `serpent_fin.webp` is a TRANSPARENT torn membrane (dark spines, red-orange fading to gold, holes),
+  cropped from the band the model drew it in to a solid root, and used with `alphaTest` .4 (no sorting, crisp tatters). The eye is the
+  pass 12c iris re-hued GOLD. `serpent_glow.webp` is DELETED (the new skin has no lateral line).
+- **THE BODY:** 120 rings (54 m), thicker (1.7 m at the shoulders), arches every 18 m at +/-3.4. The dorsal ribbon is ~2 m tall and leans
+  back, and the fin map's torn top edge is its silhouette.
+- **THE HEAD** (scaled x1.3): a broad blunt snout with NOSTRIL bumps and a ridge of four nose spikes, a heavy BROW over each eye, upper and
+  lower FANGS among rows of teeth, a red PALATE and TONGUE (`mouthM`) inside the open jaw, main horns swept back and cheek horns, long
+  whiskers, three chin tendrils, and torn fins at the cheeks, on the crest and under the jaw. `shipFan` is now a ribbon from an inner row
+  to the edge (it was a fan of triangles from one root vertex, which smeared the fin map into zigzag stars).
+- **THE REAR**, the sheet's pose: once the head is near the surface, every 14-24 s for 7.5 s, the first 17% of the body is pulled in over its
+  base (to 22% of its spread) and lifted on a QUARTER SINE to 9.2 m, so the neck climbs VERTICALLY out of the water and arrives LEVEL at the
+  head. A burst of spray at the base. The jaw opens wider while it is up. Frames are now built from the BENT positions with PARALLEL
+  TRANSPORT from the head back (not from the path's tangent and world up, which flips on a vertical neck), so the upright neck keeps its
+  dorsal fin at the back and its cream belly to the front, like the sheet.
+- **Measured headless:** the first rear pointed the head straight UP (forward y .95): the lift was blended by `w` as well as `R`, so
+  the top of the neck stayed steep. Blended by `R` only, forward reads y .23 and the head is level. The first horns were 3.4 m white tusks
+  standing up out of the water; they are thinner, swept back and tinted.
+- `mel.SHIPZ.on.serpent`: `rearT = 7.5` rears it now (if the head is up); `rear` is the live 0..1. Not signed off.
+
 ## THE SHIP, PASS 12c: THE SERPENT IN PAINTED TEXTURES (m1439, WORKER A)
 
 His: *"We might need custom textures."* Four generated, hand-painted textures in `images/` (OpenAI images API: `gpt-image-2` returned
