@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE ZEPPELINS, detail pass 10 (a COLLIDER AUDIT; the last of the zeppelin passes)
+## m1598 -- THE ZEPPELINS, detail pass 10 (a COLLIDER AUDIT; the last of the zeppelin passes)
 His first complaint was an invisible collider, so the last pass measures every zeppelin collider against what is drawn:
 - **The deck**, against the hull's own half-width `zw(z)`: the single 1.7 x 3.4 m box overhung the bow and stern corners by **0.26 m** (an
   invisible ledge past the prow) and fell **0.2 m** short of the drawn deck midships (a strip you could fall through). It is THREE turned
