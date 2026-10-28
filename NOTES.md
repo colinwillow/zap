@@ -5,6 +5,12 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home pass 20 (Worker B): plants and ground
+- His ask: *"shrubs, plants and land masses, breaking up the circular spherical rocks."*
+- **Shelves.** Wide, flat, stratified `ghRockGeo` slabs sunk into the sand, each with two smaller ones beside it, plus a collider box. **A shelf on the canyon wall's slope read as a slab floating in the air** on the first render. `flat(x, z, r)` now requires the ground to vary less than .45 m across the shelf's span.
+- **Plants.** 520 scatter tries, dense near the mound and thinning out to 3.5x its ellipse. They avoid the steps and pier line, the decks, the ramp, the signboard and the water. The mix: sagebrush, golden grass tufts (crossed thin cones), yuccas (a 16-blade rosette, often a cream flower spike), and lavender ALIEN BULBS (faintly emissive, on bezier-tube stalks). **Sagebrush built from `ghRockGeo` came out as flat green lily pads**, because the rock generator flattens tops and bases. Bushes have their own lumpy faceted icosphere (`bush`).
+- **Reeds and cattails** on a grid where the ground sits within -.35..+.32 of the water, so only at the bank.
+- Seven new materials, one draw each: the home is **33 draws** (+5 for the canoe = 38), inside main's ~40. The next look should merge or drop one before adding more.
 ## Grumbo's home pass 19 (Worker B): the fishing pier and the alien canoe
 - His ask: *"a pier, maybe a fishing dock, maybe a little canoe, an alien canoe -- it looks like it could also fly, but it's stuck in the water in the stream."*
 - **The pier** runs along the home's local +z (toward the river) from the shop steps' axis. Planks at .34 m. Each row is at `max(water + .62, ground + .06)`, so the deck follows the bank down and then runs level. Walkable through `quad`. Posts go down to the bed with an iron band at the waterline. A rail on the left with a noCam box. A **T-head** mid-stream (6.4 x 2.8) with two lantern posts, a stool, a bait barrel, rope coils, and a rod with its line and a red float.
