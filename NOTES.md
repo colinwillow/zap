@@ -5,6 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+<<<<<<< HEAD
 ## mDRG -- THE DRAGON RIDE, build 2: MOUNT / DISMOUNT (DRAGON.md box 2)
 - **The mount spot** (`dragSeat`): a mint ring at his LEFT flank, stepped out along his side until it is clear of his body box (+1.1 m),
   level with the dais. It pulses, brightens when you stand on it, and a tip says what to do (or, not CAPTURED, that he will not be ridden).
@@ -20,6 +21,18 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - **The lens** (`stepCam`, the one writer of `cam.az`): comes round behind his heading after `camIdle` .8 s of no drag, pulled back `camPull`
   6 m and lifted `camLift` .4 m.
 **Moves:** DRAGON.md box 2 (his look open). **Still open:** 3-6 and his sign-off. Gates: check ok, zone boot ok. Shipped unverified.
+=======
+## m1611 -- THE RE-PASS: the BATHHOUSE, pass 1 (a HERO / TOWN place: the look; a collider audit)
+- Kit materials: `K.timber`, a warm planks triMat, a `stone_blocks` triMat in two tones, `K.lamp`, `K.bronze` (chimney cap, boiler, pipe).
+- The cold plunge tub gets bronze hoops and **its own** double-sided material: `.material.side = DoubleSide` on it had been flipping the
+  SHARED plank material (every plank in the build) to double-sided.
+- The side garden planted (ferns, flowers, grass, stones), bamboo along the fence, a cherry outside it, grass round the outside (the open
+  front kept clear); `korLantern`s on posts at the engawa's two ends; bunting along the front eave. Statics merged except the smash buckets.
+- **COLLIDER AUDIT:** the tub (r .9) and the boiler (r .75) were round meshes with full-square boxes, so .26 m and .31 m of each corner
+  diagonal was solid air. Their boxes are .85 r half-size now (a corner within .2 r, a flat face .15 r inside). Everything else (walls,
+  posts, engawa, rim, benches, chimney, fence) sits on drawn geometry.
+Render-checked headless (three-quarter, garden). Shipped unverified.
+>>>>>>> origin/main
 
 ## m1610 -- THE DRAGON RIDE, build 1: the zone and the armour (DRAGON.md box 1)
 His: *"build the blue dragon: armour and a mount, a little zone where I can mount it and ride it... flying it, controlling it on the ground,
@@ -44,6 +57,15 @@ an attack."* A new sandbox with its own DONE WHEN (`DRAGON.md`); KORAJIN > The D
 **Moves:** DRAGON.md box 1 (his look still open). **Still open:** boxes 2-6 and his sign-off; no fly clip in his file (asked for).
 Gates: `npm run check` ok, and a boot of `MEL_WORLD='forge&zone=dragon'` ok (the dragon itself loads after boot, so a throw in the
 dressing is only visible on the phone, as the chip line above). Shipped unverified.
+## m1612 -- THE BEACON'S FLOOR IS DISPLACED GEOMETRY (his: "how do displacement maps work in three.js -- geometric or pixel? make this ground not flat")
+The answer, for the record: three's `displacementMap` is GEOMETRIC (it moves vertices in the vertex shader, so it needs a dense mesh, and it never
+touches collision); `bumpMap` / `normalMap` are PER-PIXEL (lighting only, the silhouette stays flat); parallax mapping is a per-pixel fake depth.
+- **Geometric:** the canyon floor (was one .1 m box) is a 2.5 m grid lifted on the CPU into dunes and mounds (`isl3Fbm` + a smaller noise, 0 to ~2.5 m,
+  never below the world's floor at 0). It stays FLAT within 3-8 m of the route's LOW pieces (tops under 3.2 m -- a dune cannot reach the rest), so
+  no dune fills a gap or buries a slab. **Its triangles are walkable** (`bldTris`, 21,630 of them), so he runs over the bumps, not through them.
+- **Per-pixel:** the sandstone's relief (m1600's triplanar bump) carries the cracks the vertices are too far apart for.
+- First try flattened within 4-10 m of EVERY route piece: in a narrow canyon that was nearly all of it (no visible dunes). Route check still 63 ok.
+
 ## m1607 -- THE RE-PASS: the FLYING SHIP HOUSE, pass 3 (alive, L3; its third pass, so the loop moves on)
 - THE SAILS BILLOW: each junk sail is an 8 x 6 grid now, merged; every vertex carries its (u, v) inside its own sail (from `FSHIP.sailR`)
   and is pushed forward by sin(pi u) sin(pi v), a belly that breathes. Afloat only. A deeper belly lifted the sail off its battens.
