@@ -26343,7 +26343,7 @@ function chunkClear() { const C = CHUNK.on; if (!C) return; for (const Zp of C.z
 // (`CHUNKS`, sized from the measured move table) plus three of its own (`BCH`: a small `hop`, a `walk`, a `chim`ney of any height). The builder
 // CHAINS them: every piece starts at the last one's out port, heading along the axis that points best at the run's `aim`, a corner pad where it
 // turns. So the route is makeable by construction, and a station sits wherever its run arrives. KORAJIN > Level 1 v2 (`?w=forge&lvl=beacon`).
-const BEACON = { at: [-70, -40], want: 0, on: null, canyon: { cell: 8, clear: 8, mid: 22, out: 44, w0: 6, w1: 4, wf0: 10, wf1: 5, pNear: .28, pFar: 1, wall0: 26, wall1: 14 },
+const BEACON = { at: [150, 110], want: 0, on: null, canyon: { cell: 8, clear: 8, mid: 22, out: 44, w0: 6, w1: 4, wf0: 10, wf1: 5, pNear: .28, pFar: 1, wall0: 26, wall1: 14 },
   plan: [
     { st: 'S', name: 'START YARD', R: 12 },
     { aim: [25, 14], c: ['hop', 'walk:4', 'hop', 'up_jump', 'up_jump', 'gap_dbl', 'up_dbl'] },     // teach: jump, ledge, double
@@ -26359,19 +26359,40 @@ const BEACON = { at: [-70, -40], want: 0, on: null, canyon: { cell: 8, clear: 8,
     { c: ['go:E', 'chim:12', 'up_jump', 'up_jump', 'up_dbl'] },     // the finale climb (the guardian's sweeps are layer 5)
     { st: 'X', name: 'THE BRAZIER', R: 9, brazier: 1 } ] };
 try { if (/[?&]lvl=beacon\b/.test(location.search)) BEACON.want = 1; } catch (e) {}
+// m15xx: his third sheet's stations (x, z off its top-down grid, x MIRRORED into the world because +X is his left: facing north, the sheet's east is
+// on his right; `want` = its height) and the runs between them, in order
+BEACON.sheet = { k: 1.5, st: [     // `k`: the sheet's metres are ~2/3 of what the measured moves need (at 1.0, S->A, B->C, C->D came up 16, 6, 11 m SHORT)
+    { id: 'S', name: 'START YARD', g: [10, 92], R: 12, want: 0 },
+    { id: 'A', name: 'LANTERN RUIN', g: [30, 63], R: 10, want: 9 },
+    { id: 'B', name: 'SUNKEN COURT', g: [55, 88], R: 14, want: 4 },
+    { id: 'C', name: 'CLIFF SHRINE', g: [55, 40], R: 12, want: 24 },
+    { id: 'D', name: 'THE RIM', g: [80, 30], R: 12, want: 28 },
+    { id: 'Z', name: 'ZIP LANDING', g: [102, 74], R: 10, want: 14 },
+    { id: 'T', name: 'THE BRAZIER', g: [97, 22], R: 10, want: 40, brazier: 1 } ],
+  runs: [
+    { c: ['hop', 'ledge:3.3', 'ledge:3.3', 'gap_dbl', 'ledge:2.4'], first: 'z' },     // S->A teach: hop, jump-and-catch, the double; +9
+    { c: ['drop:5'], first: 'x' },     // A->B the drop into the court (one way)
+    { c: ['chim:4', 'chimney', 'hop', 'chim:8'] },     // B->C THE BIG CLIMB: the wall jump in four beats, +20
+    { c: ['gap_dbl', 'ledge:4'], first: 'x' },     // C->D the rooftops, +4
+    { c: ['zip', 'drop:6'], first: 'z' },     // D->Z zip line 1 down the canyon to the east (28 -> 14)
+    { c: ['chim:10', 'ledge:3.3', 'chim:8', 'ledge:4.3'], first: 'x' } ] };     // Z->T the finale climb, +26 to the brazier
+
 const GODIR = { E: [1, 0], W: [-1, 0], N: [0, 1], S: [0, -1] };     // a run's `go:E` turns it that way and holds it (a run without one steers by its `aim`)
 const BCH = {
   hop:  (P, K) => { const g = 3.5; K.slab(g, g + 4, P.y); return { out: K.out(g + 4, P.y), ask: `hop ${g} m: a run jump, safe (comfy ${MOVEC.jump_run})` }; },
+  ledge: (P, K, n) => { const r = Math.min(+n || 3, +(MOVEC.ledge_dbl * MOVEC.ask).toFixed(1)), dbl = r > +(MOVEC.ledge_jump * MOVEC.ask).toFixed(1); K.slab(1.5, 7, P.y + r, P.y);
+    return { out: K.out(7, P.y + r), ask: `ledge +${r} m: ${dbl ? 'DOUBLE JUMP' : 'JUMP'} and catch` }; },
+  drop: (P, K, n) => { const D = +n || 6; K.slab(1, 7, P.y - D); return { out: K.out(7, P.y - D), ask: `drop -${D} m` }; },
   walk: (P, K, n) => { const L = +n || 6; K.slab(0, L, P.y); return { out: K.out(L, P.y), ask: `walk ${L} m` }; },
   chim: (P, K, n) => { const H = +n || 8, kicks = Math.ceil(H / MOVEC.wall_chain); for (const s of [-1, 1]) K.B(1, 6, s * 2.3, s * 2.3 + s * .5, P.y - .5, P.y + H + .4, K.M.wall, 1); K.slab(6, 11, P.y + H, P.y);
     return { out: K.out(11, P.y + H), ask: `chimney +${H} m: WALL JUMP, ~${kicks} kicks` }; } };
+// a leg's slack is not a bare walkway (his rule: something to do every 2-3 s): safe 3.5 m HOPS (7.5 m a piece) with even walks between them
+function beaconFill(f) { if (f < .05) return []; const n = Math.floor(f / 12), w = (f - n * 7.5) / (n + 1), out = []; for (let i = 0; i <= n; i++) { if (w > .05) out.push('walk:' + w.toFixed(2)); if (i < n) out.push('hop'); } return out; }
 function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, MG = new Map(), bars = [], climbs = [], zips = [];
   const put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); const q = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal') q.deleteAttribute(k); MG.get(m).push(q); };
   const EM = enemyMats(), M = { slab: triMat('stone_blocks', { scale: 3, color: 0xa9a49c }), land: triMat('stone_blocks', { scale: 2.4, color: 0xc9c4ba }), wall: triMat('sandstone', { scale: 5, color: 0xd88a58 }),
     step: triMat('wood_timber', { scale: 2 }), mesa: triMat('sandstone', { scale: 14, color: 0xcf8a5c }), lac: EM.lacquer, gold: EM.gold };
   const [ox, oz] = BEACON.at, L = { g, O, bars, climbs, zips, rings: [], st: {}, log: [] };
-  // the canyon floor: sand under the whole level, a little past it
-  put(new THREE.BoxGeometry(360, .1, 200).translate(ox + 120, .02, oz + 20), triMat('sandstone', { scale: 9, color: 0xe0b48a }));
   const sign = (txt, sub, x, y, z, s = 1) => { const cv = document.createElement('canvas'); cv.width = 512; cv.height = 150; const c = cv.getContext('2d'); c.fillStyle = 'rgba(10,12,18,.85)'; c.fillRect(0, 0, 512, 150);
     c.fillStyle = '#7affd8'; c.font = 'bold 50px sans-serif'; c.fillText(txt, 18, 60); c.fillStyle = '#fff'; c.font = '28px sans-serif'; c.fillText(sub, 18, 116);
     const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(cv), depthWrite: false })); sp.scale.set(5 * s, 1.46 * s, 1); sp.position.set(x, y, z); g.add(sp); };
@@ -26393,15 +26414,32 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
       put(new THREE.CylinderGeometry(1.6, 1.1, 1.2, 10).translate(cx, y + .6, cz), EM.iron); const fl = new THREE.Mesh(new THREE.ConeGeometry(1.2, 3.2, 10).translate(0, 1.6, 0), new THREE.MeshBasicMaterial({ color: 0xff8a3a }));
       fl.position.set(cx, y + 1.2, cz); g.add(fl); L.flame = fl; L.brazier = { x: cx, y, z: cz }; O.boxes.push({ minx: cx - 1.6, maxx: cx + 1.6, miny: y, maxy: y + 1.2, minz: cz - 1.6, maxz: cz + 1.6 }); }
     const side = inDir ? [-inDir[1], inDir[0]] : [1, 0]; ladderUp(cx + side[0] * (h + .15), cz + side[1] * (h + .15), y, side);
-    sign(S.st + '  ' + S.name, (y < .1 ? 0 : y).toFixed(1) + ' m', cx, y + 3.4, cz, 1.1); L.st[S.st] = { x: cx, y, z: cz, R }; L.log.push(S.st + ' ' + y.toFixed(1)); return { x: cx, y, z: cz, h }; };
-  let P = { x: ox, y: 0, z: oz, dir: [1, 0] }, cur = null, nChunks = 0;
-  for (let i = 0; i < BEACON.plan.length; i++) { const E = BEACON.plan[i];
-    if (E.st) { const C = station(E, P, cur); const nx = BEACON.plan[i + 1]; if (!nx) break; const g0 = /^go:/.test(nx.c[0]) && GODIR[nx.c[0].slice(3)], d = g0 || aimDir(C, ox + nx.aim[0], oz + nx.aim[1], null); P = { x: C.x + d[0] * C.h, y: C.y, z: C.z + d[1] * C.h, dir: d }; cur = d; continue; }
-    const ax = E.aim ? ox + E.aim[0] : 0, az = E.aim ? oz + E.aim[1] : 0; let force = null;
-    for (const spec of E.c) { const [nm, arg] = spec.split(':'); if (nm === 'go') { force = GODIR[arg]; continue; } const d = force || aimDir(P, ax, az, cur);
-      if (d[0] !== cur[0] || d[1] !== cur[1]) { const K0 = kit(P); K0.slab(0, 5, P.y); const c = K0.W(2.5, 0); P = { x: c[0] + d[0] * 2.5, y: P.y, z: c[1] + d[1] * 2.5, dir: d }; cur = d; }     // the corner pad
-      const K = kit({ ...P, dir: cur }), fn = BCH[nm] || CHUNKS[nm]; if (!fn) { note('BEACON: no chunk ' + nm); continue; } const r = fn({ ...P, dir: cur }, K, arg); nChunks++;
-      sign(nm.toUpperCase(), r.ask.length > 34 ? r.ask.slice(0, 33) + '…' : r.ask, P.x, P.y + 2.4, P.z, .55); P = { x: r.out.x, y: r.out.y, z: r.out.z, dir: cur }; } }
+    const id = S.id || S.st; sign(id + '  ' + S.name, (y < .1 ? 0 : y).toFixed(1) + ' m' + (S.want !== undefined ? '  (sheet ' + S.want + ')' : ''), cx, y + 3.4, cz, 1.1); L.st[id] = { x: cx, y, z: cz, R }; L.log.push(id + ' ' + y.toFixed(1)); if (S.brazier) L.st.X = L.st[id]; return { x: cx, y, z: cz, h }; };
+  // m15xx: THE SHEET'S LAYOUT (his third sheet, `beacon_grid.jpg`, the first with a metre grid). Stations sit at the sheet's (x, z) -- `g`, read
+  // off its top-down plan, north up, z counted DOWN the page -- and each run is FITTED between two of them: an L (the longer axis first, unless
+  // `first`), a corner pad at the bend, its pieces laid in order with each leg's slack taken up by a walkway at the leg's end. The pieces' sizes
+  // are the measured ones, so a run that cannot fit is reported (`SHORT`) and the station moves to where it arrives, never stretched.
+  // The HEIGHTS still come from the moves: a station's top is wherever its run arrives (logged beside the sheet's number).
+  let nChunks = 0; const SH = BEACON.sheet, SC = SH.st.map(s => ({ ...s, x: ox - s.g[0] * SH.k, z: oz - s.g[1] * SH.k })), dry = (nm, arg) => { const P0 = { x: 0, y: 0, z: 0, dir: [1, 0] }, F = chunkFrame(P0, () => {}, { boxes: [] }), fn = BCH[nm] || CHUNKS[nm];
+    if (!fn) return null; const r = fn(P0, { ...F, M, O: { boxes: [] }, slab() {}, bar() {}, ladder() {}, zip() {} }, arg); return { L: r.out.x, dy: r.out.y }; };
+  const lay = (P, list) => { for (const spec of list) { const [nm, arg] = spec.split(':'), K = kit(P), fn = BCH[nm] || CHUNKS[nm]; if (!fn) { note('BEACON: no chunk ' + nm); continue; }
+      const r = fn(P, K, arg); nChunks++; if (nm !== 'walk') sign(nm.toUpperCase(), r.ask.length > 34 ? r.ask.slice(0, 33) + '…' : r.ask, P.x, P.y + 2.4, P.z, .55); P = { x: r.out.x, y: r.out.y, z: r.out.z, dir: P.dir }; } return P; };
+  let y = 0, inDir = null; const fit = [];
+  for (let i = 0; i < SC.length; i++) { const S = SC[i]; station(S, { x: S.x, y, z: S.z }, null); if (i === SC.length - 1) break;
+    const T = SC[i + 1], run = SH.runs[i], dx = T.x - S.x, dz = T.z - S.z, xFirst = run.first ? run.first === 'x' : Math.abs(dx) >= Math.abs(dz);
+    const d1 = xFirst ? [Math.sign(dx) || 1, 0] : [0, Math.sign(dz) || 1], d2 = xFirst ? [0, Math.sign(dz) || 1] : [Math.sign(dx) || 1, 0], one = Math.abs(xFirst ? dz : dx) < 1.5;
+    let P = { x: S.x + d1[0] * S.R / 2, y, z: S.z + d1[1] * S.R / 2, dir: d1 };
+    const L1 = one ? Math.abs(xFirst ? dx : dz) - S.R / 2 - T.R / 2 : Math.abs(xFirst ? dx : dz) - S.R / 2 - 2.5, L2 = one ? 0 : Math.abs(xFirst ? dz : dx) - T.R / 2 - 2.5;
+    const parts = run.c.map(sp => { const [nm, arg] = sp.split(':'); return { sp, ...(dry(nm, arg) || { L: 0, dy: 0 }) }; }); let a = [], b = [], s1 = 0, s2 = 0;
+    for (const q of parts) { if (!b.length && s1 + q.L <= L1 + .01) { a.push(q.sp); s1 += q.L; } else { b.push(q.sp); s2 += q.L; } }
+    if (one && b.length) { a = a.concat(b); s1 += s2; b = []; s2 = 0; }
+    const f1 = L1 - s1, f2 = L2 - s2, short = Math.min(f1, one ? 0 : f2); a.push(...beaconFill(f1)); if (!one) b.push(...beaconFill(f2));
+    P = lay(P, a); if (!one) { const K0 = kit(P); K0.slab(0, 5, P.y); const c = K0.W(2.5, 0); P = lay({ x: c[0] + d2[0] * 2.5, y: P.y, z: c[1] + d2[1] * 2.5, dir: d2 }, b); }
+    y = P.y; inDir = one ? d1 : d2; if (short < -.05) { note('BEACON: run ' + S.id + '->' + T.id + ' SHORT by ' + (-short).toFixed(1) + ' m'); T.x = P.x + inDir[0] * T.R / 2; T.z = P.z + inDir[1] * T.R / 2; }
+    fit.push(S.id + T.id + ' ' + (L1 + L2).toFixed(0) + 'm/' + (s1 + s2).toFixed(0) + (short < -.05 ? ' SHORT' : '')); }
+  L.fit = fit;
+  { const xs = Object.values(L.st).map(q => q.x), zs = Object.values(L.st).map(q => q.z), x0 = Math.min(...xs) - 75, x1 = Math.max(...xs) + 75, z0 = Math.min(...zs) - 75, z1 = Math.max(...zs) + 75;     // the canyon floor, under it all
+    put(new THREE.BoxGeometry(x1 - x0, .1, z1 - z0).translate((x0 + x1) / 2, .02, (z0 + z1) / 2), triMat('sandstone', { scale: 9, color: 0xe0b48a })); }
   // m1555: THE CANYON (pass 2). Sandstone mesas on an 8 m lattice round the route, never within `clear` of it (plan distance to every route box and
   // zip line), stepped in two or three tiers; near the route they stand a few metres over the route's own height (walls to run between), further
   // out they are the canyon's walls (22-52 m). Low along the sight line from the start to the brazier, so the tower is seen from S.
@@ -26422,7 +26460,7 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
   for (const b of O.boxes) BOXES.push(b); boxGrid(); BEACON.on = L; bldXrayTag(g);
   { const S = L.st.S, p = player; p.pos.set(S.x, .05, S.z); p.vel.set(0, 0, 0); const n = L.st.A || S; p.faceH = p.heading = Math.atan2(n.x - S.x, n.z - S.z); arenaBeam(S.x, S.z, [.48, 1, .85], 1); }
-  console.log('[melee] the first beacon: ' + nChunks + ' chunks, stations ' + L.log.join(' | ') + ', ' + (L.mesas || 0) + ' mesas, ' + O.boxes.length + ' boxes, ' + climbs.length + ' ladders, ' + zips.length + ' zips'); }
+  console.log('[melee] the first beacon: ' + nChunks + ' chunks, stations ' + L.log.join(' | ') + ', runs ' + (L.fit || []).join(', ') + ', ' + (L.mesas || 0) + ' mesas, ' + O.boxes.length + ' boxes, ' + climbs.length + ' ladders, ' + zips.length + ' zips'); }
 function beaconStep(dt) { const L = BEACON.on; if (!L || !L.flame) return; const t = performance.now() * .001; L.flame.scale.set(1 + Math.sin(t * 9) * .08, 1 + Math.sin(t * 7.3) * .14, 1 + Math.cos(t * 8.1) * .08); }
 const COURT = { scale: 1.5, at: [0, 150], hw: 28, hd: 32, wallH: 4, walk: 2.6, gate: 6, on: null };
 function courtBuild() {

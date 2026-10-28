@@ -25,6 +25,20 @@ re-found on the wall .55 m lower) as a tube with leaf cones; 12% hang a bulb. De
 heads where `free()` allows. Same buckets (one new: orange) -> 37 draws. 134 shrubs, 57 vines. Own rng (3232), nothing else moves.
 The loop's queue (mill, merchant, refinery, peak, home's list) is done; the home's still-open list is down to the back ladder and stall
 rack (ref 2) and his sign-off.
+## m15xx -- The First Beacon on HIS SHEET's layout (his third sheet, `beacon_grid.jpg`)
+His: *"these don't really look the same -- is it hard for you to draw in reference from this photo?"*, then a sheet with a metre grid. The first two
+sheets had no scale, so pass 1 took only the blueprint's heights and let each station land wherever its run arrived. This one has a grid, so:
+- **`BEACON.sheet`:** the stations at the sheet's (x, z) and its heights; `beaconBuild` FITS each run between two of them: an L (the longer axis
+  first unless `first`), a corner pad at the bend, the pieces in order (each piece's length found by a DRY run of the chunk function), a leg's slack
+  filled by `beaconFill` with safe 3.5 m HOPS and even walks (never a bare 50 m walkway), and a run that cannot fit reported `SHORT` (the station
+  then moves to where it arrives). New pieces: `ledge:H` (jump or double-jump catch, capped at the double's 4.3) and `drop:D`, so every height is
+  the sheet's exactly: **S 0 | A 9 | B 4 | C 24 | D 28 | Z 14 | brazier 39.6**.
+- **The sheet is ~2/3 of the size the moves need:** at 1.0, S->A, B->C and C->D came up 16, 6 and 11 m SHORT. `sheet.k` = 1.5 fits all of them
+  (SA 58 m for 43 of pieces, BC 59/41, CD 36/21...). No jump was shrunk to fit.
+- **The sheet's x is MIRRORED into the world:** +X is his LEFT (CLAUDE.md), so facing north the sheet's east has to be -x. The first top-down render
+  came out mirrored against the sheet; flipped.
+- The sheet's zip runs into the tower from 14 m, which no zip can do (they only go down), so: zip D -> a ZIP LANDING east at 14 m (`Z`), then the
+  finale climb to the brazier. The old `plan` / `aim` / `go:` steering stays for reference but the build reads `sheet`.
 
 ## m1554 -- THE RE-PASS: the RAMPART WALL, pass 1 (an ENEMY wall: the look)
 **Moves:** its pass-1 row (the look). Destructible to the ground is pass 2.
