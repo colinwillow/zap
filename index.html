@@ -11284,7 +11284,7 @@ function dojoBeastIdle(B) { const n = B.idles[B.i++ % B.idles.length], c = B.cli
 // posed, skinned mesh (the back's height over the spine, the neck's girth), never guessed. Each piece's turn is solved on the rest pose so it sits
 // upright to him, then it follows the bone. TOOLS > DRAGON: CAPTURED (dressed) / WILD (bare) -- reloads.
 try { const v = localStorage.getItem('mel.dragon'); DOJO.dragonPick = v && v !== 'CAPTURED' ? 'WILD' : 'CAPTURED'; } catch (e) { DOJO.dragonPick = 'CAPTURED'; }     // m1610: the zone's EVIL / BARE read as WILD here
-// m15xx: THE SADDLE AT THE RIDER'S SIZE (his: "he needs to be sitting on a saddle on top of the very wide dragon's body"). Built off the
+// m1655: THE SADDLE AT THE RIDER'S SIZE (his: "he needs to be sitting on a saddle on top of the very wide dragon's body"). Built off the
 // dragon's height it was ~2 m wide with a pommel taller than Grumbo, and hid him; `k` scales the saddle (both passes), its rein rings and the seat.
 const SADDLE = { k: .4 };
 function dojoDragonDress(B, m, root, P) { const H = (B.hd = (P.h || 3.2) * B.mul), K1 = dragKit(m, root, H, B.bag), { bone, wq, up, side, fwd, hitAlong, pin, bw } = K1;     // m1610: the kit is shared with pass 2 (and `bag` collects the pieces for the zone's look switch)
@@ -11748,7 +11748,7 @@ function dragKit(m, root, H, bag) { const bone = n => m.getObjectByName(n), rc =
   // level side to side -- for anything that sits on his back; his root's frame only matches it when the spine is straight
   const backQ = () => { const a = bw('Bip001_Spine'), b = bw('Bip001_Spine2'); if (!a || !b) return wq.clone(); const f = b.sub(a).normalize(), sd = new THREE.Vector3().crossVectors(up, f).normalize(), u2 = new THREE.Vector3().crossVectors(f, sd);
     return new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(sd, u2, f)); };
-  // m15xx (his: "the rider is INSIDE the dragon's body -- he needs to sit on a saddle on top of the very wide body"): THE OUTER TOP of his back.
+  // m1655 (his: "the rider is INSIDE the dragon's body -- he needs to sit on a saddle on top of the very wide body"): THE OUTER TOP of his back.
   // `hitAlong`'s "nearest hit above the bone" lands on an INNER surface (measured: 3.72 m under a carapace whose top is ~4.8-5.0), so the saddle and
   // the seat sat ~.7 m inside him. Five rays straight down from well above (the point and a cross of `H * .035` round it), the FIRST hit of each
   // (the outside), and the MEDIAN -- so one crystal spike or one gap in the cross cannot move it.
