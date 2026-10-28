@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the BATHHOUSE, pass 1 (a HERO / TOWN place: the look; a collider audit)
+## m1611 -- THE RE-PASS: the BATHHOUSE, pass 1 (a HERO / TOWN place: the look; a collider audit)
 - Kit materials: `K.timber`, a warm planks triMat, a `stone_blocks` triMat in two tones, `K.lamp`, `K.bronze` (chimney cap, boiler, pipe).
 - The cold plunge tub gets bronze hoops and **its own** double-sided material: `.material.side = DoubleSide` on it had been flipping the
   SHARED plank material (every plank in the build) to double-sided.
