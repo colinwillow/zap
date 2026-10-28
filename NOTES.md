@@ -35,6 +35,21 @@ zeroes him and `stepClimb` sets x/z the same frame), and the top-out is a .32 s 
 - A bronze NOSE CAP (a flattened hemisphere) with a mooring ring, and a bronze TAIL CONE behind the propeller.
 - A red PENNANT on the stern staff, its vertices rippled every frame (`zepStep`).
 Render-checked headless (three-quarter, side). Shipped unverified.
+## m15xx -- THE SHIP, COLLIDERS part 1 (main session; Worker A is on the buildings): the hidden lip in the pagoda's eave
+His: *"weird collider all over it. I try to climb it, I get stuck in this pose... stuck to walls."* (screenshot: hanging mid-wall under the tiled
+roof tiers on the quarterdeck)
+- **Measured, not eyeballed:** an audit in the headless page (scratchpad `shipaudit.js`): for every face of every ship box, 9 samples, a ray from .6 m
+  outside inward against the ship's opaque meshes; a face is "invisible" where no visible surface is within .3 m of it (faces touching another box
+  are skipped). 73 of 165 boxes had invisible faces. The ship and its boxes ARE aligned at the origin (g at identity; a depth-test-off wireframe
+  render made them look offset -- it is not).
+- **The screenshot's cause:** `tierRoof` (the two-tier pagoda on the quarterdeck) was DECOR ONLY, and the solid house box under it topped out .56 m
+  below the visible tiers. So a jump at it caught the house box's lip INSIDE the eave and hung him there, mid-wall, under a roof he could not reach.
+  The tiers and the cap stack are solid now: stepped eaves .28 m apart, to hang on and climb (the jungle gym he asked for).
+- **The bulwark guards** were one invisible box per 2.9 m deck strip, as wide as the narrower end, along a CURVED hull: stair-step corners to catch
+  on. Now three per strip, each as wide as the hull at its own ends, tagged `rail`, with a visible timber CAP RAIL at the collider's exact top -- the
+  hull's top edge is a thin skin, so before this the hang edge had nothing visible on it.
+- Audit after: 90 of 231 boxes flagged, most of them the guards' tops reading "invisible" only because the cap rail is narrower than the .35 m box,
+  and the hold's side walls (below the deck, out of reach). Next: his notes on where else he sticks, then the rope test grounds.
 
 ## the Red Hollows' sky and water, pass 1: his panorama over the valley, and a stream that flows (Worker B)
 His ask: "work on the water shader, and apply the HDR from the other window". Only three 8-bit panoramas are in the repo (no .hdr/.exr);
