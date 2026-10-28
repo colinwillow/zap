@@ -48,6 +48,13 @@ Render-checked headless (afloat, three-quarter). Shipped unverified. **Its three
 - The plants and the gangplank's foot lanterns are moved to the scene first, so they stay on the ground.
 - Plate by the gangplank's foot; `rig` hook; `fshipClear` drops the rig, the plate and the foot lanterns.
 Render-checked headless: aground (sails gone, drained) and afloat. Shipped unverified.
+## m15xx -- THE FLOATING ISLANDS' ROCK, spiced up (his: "the rock texture on the floating islands needs a more interesting material")
+`isl4Mat` painted only the GRASS procedurally; every rock face was flat vertex colour. Now its non-grass branch paints ROCK in the same shader
+(every dressed island in the dojo uses it): sandstone STRATA from world height wobbled by low noise (ochre to cream bands, a rust seam at each
+band's top), vertical water STREAKS, thin CRACKS (a noise contour), a cool lavender UNDERSIDE (faces pointing down) to sit in the sky's palette,
+and RELIEF from the same pattern (screen-derivative bump, clamped). Two misses on the way, both from the headless render: the first palette read
+WHITE-PINK under the dojo's sky (darkened and saturated twice), and the relief used `fract()` bands whose edges spiked the slope and tipped the
+normals at the sun -- the relief is a smooth sine now, its slope clamped to .2.
 
 ## the LADDER REFACTOR, step 5: the hands meet the rungs (Worker B)
 He said go on the clip pass. `npm run clips models/characters/zap_02.glb`: `climbing_Ladder` 0.792 s, 20 keys, 38 bones. Then MEASURED on the
