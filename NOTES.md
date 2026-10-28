@@ -52,7 +52,7 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
-## THE GROUND, PASS 3: BREAK THE LANDMASSES UP (mXXXX)
+## THE GROUND, PASS 3: BREAK THE LANDMASSES UP (m1451)
 *"The grass very obviously looks like a texture... break the landmasses up a little better... the grass, the trees, the shrubs, the dirt -- sticks, rocks, plants, different grass."*
 - **New plant kinds:**
   - `carpet`: 24 single-triangle blades (72 verts), up to 700 a near island. It hides the paint up close. `nohit`, so it skips the springs and the per-frame brush loop.

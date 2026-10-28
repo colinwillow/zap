@@ -14,7 +14,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 ## THE GROUND (his, Oct 28 2026: *"the grass is very low quality... flat where it should be flat, a courtyard, but grassy knolls should have variation... paint the grass, add little alien plants, rocks, dirt"*)
 - [x] **pass 1 (m1437):** knolls outside what is built (`floatIsland` `knoll`/`flatR`); the painted ground (`isl4Mat`); new grass tufts; flowers, alien fronds and stones; every dressed island in the dojo scattered from the plant library
 - [x] **pass 2a (m1440):** the knolls' facets: the island tops are shaded SMOOTH (shared normals, `smoothTop`); the undersides keep their rock facets
-- [x] **pass 3 (mXXXX):** the landmasses broken up: a dense blade carpet, tall seed grass, leafy shrubs (some in bloom), mossy boulders, fallen sticks, grassy mounds, the library's swaying cherry and pine, and a FRINGE round every rim (grass, fronds, rocks sunk in the lip)
+- [x] **pass 3 (m1451):** the landmasses broken up: a dense blade carpet, tall seed grass, leafy shrubs (some in bloom), mossy boulders, fallen sticks, grassy mounds, the library's swaying cherry and pine, and a FRINGE round every rim (grass, fronds, rocks sunk in the lip)
 - [ ] pass 2b: the knolls' FACETS (the icosphere top is coarse: a finer top grid, or a displaced disc), stronger worn dirt paths between built things, moss on the shade side of rocks
 - [ ] pass 3: grass that thins near paths and thickens in hollows; puddles; fallen petals under the cherries
 - [ ] pass 4: the same ground in Grumbo's home and the forge buildings (one shared ground kit)
