@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the CLIFF LODGE, pass 2 (rubric 7: RESTORES IN PLACE)
+- Base (stays): the crag, the path slabs and lips, its stone lanterns, the foot boulders, the pines, the pool's stone rim. Pieces:
+  `walls` (the lodge's frame, plaster, irori, bonsai; its wall boxes ride it), `roof` (roof, fascia, bunting, eave lamps), `perch` (the beam
+  and ring post; its walk tris ride it, and the ring is `up`), `cradle` (cradle and the lever's post) and `lamps` (the foot lanterns).
+- FALLEN: the lodge leans over (.38 rad) with its roof slid down onto the summit; the perch HANGS off the north face, rotated 1.1 rad
+  about its root at the crag edge; cradle and lanterns tipped. The waterfall is DRY (sheet and pool are `up.objs`, `cliffStep` skips the
+  mist), no boulder is tipped and the cradle rock is hidden, the lever does nothing (`bldHit` checks `R.t`), cables and drone gone.
+- `bldTris` now takes only the path (`tris.slice(0, nP)`); the perch's tris are its piece's. Mint plate 3.4 m off the path's foot.
+  `cliffClear` drops the rig, its ride tris and the plate; BLDG `rig` hook.
+Render-checked headless: fallen and restored. Shipped unverified.
+
 ## m1648 -- THE RE-PASS: the CLIFF LODGE, pass 1 (HERO look)
 - The hero kit: `korMats` timber for every beam and post (the lodge, the perch, the cradle, the lever), warm plaster walls, a `roof_tiles`
   roof (bldRoof's own tile map was the grey kit default), the kit lamp. Kit lanterns on posts either side of the path's foot, red-and-cream

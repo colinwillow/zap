@@ -21802,7 +21802,7 @@ function bldHit(x, y, z, rad, dmg) {
   if (keepGong(x, y, z, rad)) return 1;     // m1178: the Keep's gong works the drawbridge
   if (shrineKuji(x, y, z, rad)) return 1;     // m1240: the omikuji box
   if (SHRINE.on && SHRINE.on.obox && SHRINE.on.obT <= 0) { const S = SHRINE.on, P = S.obox.position; if (Math.hypot(x - P.x, z - P.z) < 1 + rad && Math.abs(y - P.y - .4) < .9 + rad) { S.obT = .6; for (let k = 0; k < 2; k++) spkBurst(P.x, P.y + .9, P.z, 20, { col: [1, .85, .3], spread: 4, size: .1, life: .7 }); snd('clang', { g: .5, r: 2.2, x: P.x, z: P.z }); snd('clang', { g: .4, r: 2.6, x: P.x, z: P.z }); return 1; } }     // m1177: the offering box
-  if (CLIFF.on && !(CLIFF.on.lvT > 0)) { const C = CLIFF.on, P = new THREE.Vector3(); C.lever.children[1].getWorldPosition(P); if (Math.hypot(x - P.x, y - P.y, z - P.z) < 1 + rad) { C.lvT = 1.2; C.force = 1; C.rockT = 0; snd('clang', { g: .7, r: .9, x: P.x, z: P.z }); snd('thud', { g: .6, r: .5, x: P.x, z: P.z }); return 1; } }     // m1195: the cradle lever
+  if (CLIFF.on && !(CLIFF.on.lvT > 0) && !(CLIFF.on.R && CLIFF.on.R.t < 1)) { const C = CLIFF.on, P = new THREE.Vector3(); C.lever.children[1].getWorldPosition(P); if (Math.hypot(x - P.x, y - P.y, z - P.z) < 1 + rad) { C.lvT = 1.2; C.force = 1; C.rockT = 0; snd('clang', { g: .7, r: .9, x: P.x, z: P.z }); snd('thud', { g: .6, r: .5, x: P.x, z: P.z }); return 1; } }     // m1195: the cradle lever
   if (CLIFF.on) for (let i = CLIFF.on.rocks.length - 1; i >= 0; i--) { const R = CLIFF.on.rocks[i], P = R.m.position; if (R.cool > 0 || Math.hypot(x - P.x, y - P.y, z - P.z) > .9 + rad) continue; R.cool = .2; R.hp -= Math.max(.5, dmg || 1); spkBurst(P.x, P.y, P.z, 10, { col: [.7, .65, .6], spread: 3, size: .12, life: .4 }); snd('thud', { g: .7, r: 1.1, x: P.x, z: P.z });
     if (R.hp <= 0) { for (let q = 0; q < 3; q++) spkBurst(P.x, P.y, P.z, 18, { col: [.55, .5, .45], spread: 6, size: .22, life: .7 }); smokeAt(P.x, P.y, P.z, 1.3, 1); snd('boom', { g: .6, r: .9, x: P.x, z: P.z }); R.m.removeFromParent(); CLIFF.on.rocks.splice(i, 1); } return 1; }     // m1174: a boulder cut apart
   if (mktFireHit(x, y, z, rad)) return 1;     // m1238: the fireworks stall
@@ -24049,17 +24049,17 @@ function cliffBuild() {
     korBunting(put, K, [cx - lw - 1.5, Y + wh + .05, cz - ld - 1.5], [cx + lw + 1.5, Y + wh + .05, cz - ld - 1.5], 12, .35);     // m1648: bunting under the front eave
     for (const sx of [-1, 1]) add(new THREE.BoxGeometry(.28, .36, .28), lamp, cx + sx * 1.2, Y + wh - .5, cz - ld - .3, 0); }
   // THE PERCH: a beam out over the -z face, a ring above its tip
-  const rings = []; { const pz0 = cz - hz, pz1 = pz0 - 4.5, x = cx - 3.6, Y = H, w2 = .17;
+  const nP = tris.length, rings = []; { const pz0 = cz - hz, pz1 = pz0 - 4.5, x = cx - 3.6, Y = H, w2 = .17;
     tris.push(x - w2, Y, pz1, x + w2, Y, pz1, x + w2, Y, pz0 + .2, x - w2, Y, pz1, x + w2, Y, pz0 + .2, x - w2, Y, pz0 + .2);
     add(new THREE.BoxGeometry(.34, .25, pz0 - pz1 + .2), wood, x, Y - .125, (pz0 + pz1) / 2, 0); rings.push(gringAdd(g, x, Y + 3.2, pz1 + .2)); add(new THREE.CylinderGeometry(.03, .03, 3, 4), wood, x, Y + 1.6, pz1 + .2, 0); }
   // THE WATERFALL off the east face, a pool at its foot
   const wcv = document.createElement('canvas'); wcv.width = 32; wcv.height = 128; const wq = wcv.getContext('2d');
   for (let i = 0; i < 128; i += 4) { wq.fillStyle = `rgba(${200 + (i * 7) % 55},${230 + (i * 3) % 25},255,${.55 + ((i * 13) % 40) / 100})`; wq.fillRect(0, i, 32, 4); for (let k = 0; k < 6; k++) { wq.fillStyle = 'rgba(255,255,255,.7)'; wq.fillRect((i * 5 + k * 7) % 32, i, 2, 4); } }
   const wt = new THREE.CanvasTexture(wcv); wt.wrapT = THREE.RepeatWrapping; wt.repeat.set(1, 3);
-  const fall = add(new THREE.PlaneGeometry(2.2, H + .2), new THREE.MeshBasicMaterial({ map: wt, transparent: true, opacity: .8, side: THREE.DoubleSide, depthWrite: false }), cx + hx + .55, H / 2, cz + 1.2, 0); fall.rotation.y = Math.PI / 2; fall.castShadow = false;
-  add(new THREE.CylinderGeometry(2.6, 2.6, .1, 22), new THREE.MeshStandardMaterial({ color: 0x3a8aaa, roughness: .1, metalness: .2 }), cx + hx + 3.4, .06, cz + 1.2, 0).castShadow = false;
+  const fall0 = add(new THREE.PlaneGeometry(2.2, H + .2), new THREE.MeshBasicMaterial({ map: wt, transparent: true, opacity: .8, side: THREE.DoubleSide, depthWrite: false }), cx + hx + .55, H / 2, cz + 1.2, 0); fall0.rotation.y = Math.PI / 2; fall0.castShadow = false; fall0.userData.mg = 0;
+  const pool = add(new THREE.CylinderGeometry(2.6, 2.6, .1, 22), new THREE.MeshStandardMaterial({ color: 0x3a8aaa, roughness: .1, metalness: .2 }), cx + hx + 3.4, .06, cz + 1.2, 0); pool.castShadow = false; pool.userData.mg = 0;
   add(new THREE.TorusGeometry(2.7, .3, 6, 24).rotateX(Math.PI / 2), rockD, cx + hx + 3.4, .15, cz + 1.2, 0);
-  bldTris(O, tris);
+  bldTris(O, tris.slice(0, nP));     // m@X4@: the path; the perch's tris ride its piece
   for (const b of O.boxes) BOXES.push(b); boxGrid();
   // ---- PASS 2 (m1174): BOULDERS ROLL DOWN THE PATH -- every `rockEvery` s one is tipped off the summit and rolls the whole path down,
   // bouncing, faster as it goes: it bowls him over (and any body) -- jump it, dodge it, or cut it to pieces (`rockHp` hits) ----
@@ -24078,8 +24078,8 @@ function cliffBuild() {
   for (let k = 1; k <= 3; k++) { const c = C[k]; add(new THREE.BoxGeometry(.22, .3, .22), lamp, cx + c[0] + Math.sign(c[0]) * .55, k * rise + .4, cz + c[1] + Math.sign(c[1]) * .55, 0); }
   { const bx = cx + 1.8, bz = cz - 3.3; add(new THREE.CylinderGeometry(.3, .25, .3, 10), new THREE.MeshStandardMaterial({ color: 0x5a3a2a, roughness: .7 }), bx, H + .15, bz, 0);
     add(new THREE.SphereGeometry(.35, 8, 6), new THREE.MeshStandardMaterial({ color: 0x3a6a3a, roughness: .8, flatShading: true }), bx + .15, H + .65, bz, 0).scale.set(1.3, .6, 1); }
-  for (const [sx, sz] of [[-1, 1], [1, 1]]) { const E = [cx + sx * 3.6, H + 2.8, cz + 2.8], G2 = [cx + sx * (hx + 9), .3, cz + hz + 7]; bldCable(g, E, G2, 1.6, 5, lamp); add(new THREE.CylinderGeometry(.08, .1, .8, 6), wood, G2[0], .4, G2[2], 0); }
-  const drone = bldDrone(g);
+  const c0 = g.children.length; for (const [sx, sz] of [[-1, 1], [1, 1]]) { const E = [cx + sx * 3.6, H + 2.8, cz + 2.8], G2 = [cx + sx * (hx + 9), .3, cz + hz + 7]; bldCable(g, E, G2, 1.6, 5, lamp); add(new THREE.CylinderGeometry(.08, .1, .8, 6), wood, G2[0], .4, G2[2], 0); }
+  const cables = g.children.slice(c0).filter(o => !o.userData.mg), drone = bldDrone(g);
   // ---- PASS 4 (m1195): THE BOULDER CRADLE -- a timber cradle at the head of the path with a boulder waiting in it, and a LEVER beside it:
   // strike the lever (a blade, an arrow) and the boulder is tipped NOW, so the trap is his to spring on whoever is climbing up behind him ----
   let lever; { const lx = cx - hx + 1, lz = cz - hz + 1.1; add(new THREE.BoxGeometry(.25, 1, .25), wood, lx, H + .5, lz, 1);
@@ -24093,15 +24093,42 @@ function cliffBuild() {
     if (x > cx + hx + .5 && Math.abs(z - cz - 1.2) < 4.2) continue; if (Math.abs(x - cx) < hx + A.lane + .3 && Math.abs(z - cz) < hz + A.lane + .3) continue;
     plantPlant(plants, ['grass', 'fern', 'stones', 'tallgrass', 'boulder', 'fern'][i % 6], x, 0, z, .8 + rnd() * .6, a2); }
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list.map(q => q.index ? q.toNonIndexed() : q)), m); o.castShadow = o.receiveShadow = true; g.add(o); }
-  const nm = bldMergeStatic(g), plantMs = plantFlush(g, plants) || [];
-  CLIFF.on = { g, O, bars: [], rings, wt, fallAt: [cx + hx + .6, cz + 1.2], t: 0, path, rocks: [], rockT: 4, drone, lever, lvT: 0, cradleRock, nm, plantMs };
+  for (const o of g.children.slice(-MG.size)) o.userData.mg = 1;
+  // ---- RE-PASS 2 (m@X4@): RESTORES IN PLACE (rubric 7). The crag, the path, its stone lanterns, the boulders round the foot and the pines
+  // stay; pieces: `walls` (the lodge's frame and plaster, the irori, the bonsai), `roof` (roof, fascia, bunting, its lamps), `perch` (the
+  // beam out over the face and its ring post), `cradle` (the boulder cradle and the lever's post) and `lamps` (the kit lanterns at the
+  // path's foot). FALLEN: the lodge leans over with its roof slid down onto the summit, the perch hangs off the face, the cradle and the
+  // lanterns are tipped; the waterfall is DRY (no sheet, no pool, no mist), no boulder rolls and the lever is dead; cables and drone gone ----
+  const lw = 3.6, ld = 2.8, wh = 2.8, k0 = C[0], lvx = cx - hx + 1, lvz = cz - hz + 1.1;
+  const pairs = []; for (const o of g.children.slice()) if (o.isMesh && o.userData.mg) { const m = o.material, tri = m.customProgramCacheKey && String(m.customProgramCacheKey()).startsWith('tri'); if (m.transparent || (m.map && !tri)) continue;
+    o.updateMatrix(); pairs.push([(o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()).applyMatrix4(o.matrix), m]); o.removeFromParent(); }
+  const cls = c => { if (c.y > H - .3 && (Math.hypot(c.x - cx - k0[0], c.z - cz - k0[1]) < 1.6 || Math.hypot(c.x - lvx, c.z - lvz) < .6)) return 'cradle';
+    if (c.y > H - .4 && c.z < cz - hz + .3 && Math.abs(c.x - (cx - 3.6)) < .5) return 'perch';
+    if (c.y > H + .05 && Math.abs(c.x - cx) < lw + 2 && Math.abs(c.z - cz) < ld + 2) return c.y > H + wh - .1 ? 'roof' : 'walls';
+    if (c.y < 3 && c.y > .2 && Math.hypot(c.x - cx - k0[0] + 1.3, c.z - cz - k0[1] - .4) < 1.8) return 'lamps'; return null; };
+  const fall = (key, c) => { const rn = ((Math.sin(c.x * 12.9898 + c.z * 3.7) * 43758.5453) % 1 + 1) % 1 - .5;
+    if (key === 'roof') return { p: [c.x + .5, H + 1.3, c.z - .7], r: [-.22, .12, .2], hop: .3, at: .2 };
+    if (key === 'walls') return { p: [c.x, c.y - .9, c.z + .4], r: [.38, 0, .12], hop: .3, at: 0 };
+    if (key === 'perch') { const r0 = cz - hz, d = c.z - r0, th = 1.1; return { p: [c.x, H - .125 + d * Math.sin(th), r0 + d * Math.cos(th)], r: [-th, 0, 0], hop: 0, at: .1 }; }
+    if (key === 'cradle') return { p: [c.x + .6, c.y - .4, c.z], r: [0, rn, -1.15], hop: .3, at: .1 };
+    return { p: [c.x + .9, .35, c.z + rn], r: [0, rn, 1.35], hop: .3, at: .3 }; };
+  const R = restoreRig(g, { lift: 0, dur: 6, bob: 0 }), pieces = restorePieces(R, g, pairs, cls, fall);
+  { const skip = new Set([drone, lever, cradleRock, fall0, pool, ...cables, ...rings.map(G => G.o), ...Object.values(pieces)]), wb = new THREE.Box3(), wc = new THREE.Vector3(), ws = new THREE.Vector3();
+    for (const o of g.children.slice()) { if (skip.has(o) || o.userData.keep) continue; wb.setFromObject(o); if (wb.isEmpty()) continue; wb.getCenter(wc); wb.getSize(ws); const key = cls(wc, ws); if (key && pieces[key]) pieces[key].attach(o); } }
+  restoreSkin(R); const nm = bldMergeStatic(g), plantMs = plantFlush(g, plants) || [];
+  const bkey = b2 => cls(new THREE.Vector3((b2.minx + b2.maxx) / 2, (b2.miny + b2.maxy) / 2, (b2.minz + b2.maxz) / 2)), ptris = []; for (let i = nP; i < tris.length; i += 9) ptris.push(tris.slice(i, i + 9));
+  restoreRide(R, { up: { boxes: O.boxes.filter(b2 => bkey(b2)), tris: ptris, climbs: [], bars: [], rings, objs: [drone, fall0, pool, ...cables], coins: [] } }); R.onSet = R2 => restoreRideSet(R2);
+  const ground = []; { const px = cx + k0[0] - 3.4, pz = cz + k0[1] - 1.5, plate = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, .12, 24), new THREE.MeshStandardMaterial({ color: 0x3a4a46, emissive: 0x7affd8, emissiveIntensity: .7 }));
+    plate.position.set(px, .06, pz); scene.add(plate); ground.push(plate); R.trig = { x: px, y: 0, z: pz, armed: 1 }; }
+  { const t0 = AGE.st === 'fallen' ? 0 : 1; R.goal = t0; restoreSet(R, t0); restoreRideSet(R, true); }
+  CLIFF.on = { g, O, bars: [], rings, wt, fallAt: [cx + hx + .6, cz + 1.2], t: 0, path, rocks: [], rockT: 4, drone, lever, lvT: 0, cradleRock, nm, plantMs, R, ground, pieces };
   arenaBeam(cx, cz, [.7, .9, 1], 1); snd('clang', { g: .6, r: .7 });
 }
 function cliffStep(dt) { const C = CLIFF.on; if (!C) return; C.t += dt; C.wt.offset.y -= dt * 1.4;
   { const [cx, cz] = CLIFF.at, a = C.t * .25; C.drone.position.set(cx + Math.cos(a) * 10, CLIFF.H + 7 + Math.sin(C.t * 1.2) * .4, cz + Math.sin(a) * 9); C.drone.rotation.y = -a; C.drone.children[1].rotation.z = C.t * .6; }
   if (C.lvT > 0) { C.lvT -= dt; C.lever.rotation.z = -.9 * Math.min(1, C.lvT / .4); }
-  C.cradleRock.visible = !C.rocks.some(R => R.d < 3);
-  if ((C.rockT -= dt) <= 0 && (C.rocks.length < 2 || C.force) && C.rocks.length < 4) { C.rockT = CLIFF.rockEvery; C.force = 0; const m = new THREE.Mesh(new THREE.DodecahedronGeometry(.75, 0), new THREE.MeshStandardMaterial({ color: 0x6a645c, roughness: 1, flatShading: true })); m.castShadow = true; C.g.add(m);
+  const whole = !C.R || C.R.t >= 1; C.cradleRock.visible = whole && !C.rocks.some(R => R.d < 3);
+  if (whole && (C.rockT -= dt) <= 0 && (C.rocks.length < 2 || C.force) && C.rocks.length < 4) { C.rockT = CLIFF.rockEvery; C.force = 0; const m = new THREE.Mesh(new THREE.DodecahedronGeometry(.75, 0), new THREE.MeshStandardMaterial({ color: 0x6a645c, roughness: 1, flatShading: true })); m.castShadow = true; C.g.add(m);
     C.rocks.push({ m, d: 0, v: 2, hp: CLIFF.rockHp, cool: 0 }); snd('thud', { g: .6, r: .5, x: C.path[4][0], z: C.path[4][2] }); }
   { const P = C.path, segL = []; let tot = 0; for (let k = 4; k > 0; k--) { const a = P[k], b = P[k - 1], l = Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]); segL.push(l); tot += l; }
     for (let i = C.rocks.length - 1; i >= 0; i--) { const R = C.rocks[i]; R.v = Math.min(9, R.v + 2.2 * dt); R.d += R.v * dt; if (R.cool > 0) R.cool -= dt;
@@ -24111,8 +24138,10 @@ function cliffStep(dt) { const C = CLIFF.on; if (!C) return; C.t += dt; C.wt.off
       R.m.position.set(x, y, z); const dx = b[0] - a[0], dz = b[2] - a[2], L = Math.hypot(dx, dz) || 1; R.m.rotation.x += (dz / L) * R.v * dt / .75; R.m.rotation.z -= (dx / L) * R.v * dt / .75;
       const p = player; if (Math.hypot(p.pos.x - x, p.pos.z - z) < 1.1 && p.pos.y < y + .6 && p.pos.y > y - 1.6 && !p.rockCool) { p.rockCool = 1; setTimeout(() => { p.rockCool = 0; }, 900); camShake(.3); playerHurt(CLIFF.rockDmg, Math.atan2(dx, dz), 8, 1.5, .25, 0); snd('thud', { g: 1, r: .7, x, z }); }
       for (const dd of DUMMIES) { if (dd.st === 'gone' || dd.st === 'down' || !dd.root.visible) continue; const Q = dd.root.position; if (Math.hypot(Q.x - x, Q.z - z) < 1.2 && Math.abs(Q.y - (y - .75)) < 1.5) dummyBlow(dd, Math.atan2(dx, dz), 1.3, 4); } } }
-  if ((C.mT = (C.mT || 0) - dt) <= 0) { C.mT = .1; const [x, z] = C.fallAt; smokeAt(x + 2.8 + (Math.random() - .5) * 2, .3, z + (Math.random() - .5) * 2, .8, 1.2, [.92, .95, 1]); } }
-function cliffClear() { const C = CLIFF.on; if (!C) return; for (const R of C.rocks) R.m.removeFromParent(); if (C.plantMs) plantDrop(C.plantMs); bldClear(C); CLIFF.on = null; }
+  if (whole && (C.mT = (C.mT || 0) - dt) <= 0) { C.mT = .1; const [x, z] = C.fallAt; smokeAt(x + 2.8 + (Math.random() - .5) * 2, .3, z + (Math.random() - .5) * 2, .8, 1.2, [.92, .95, 1]); } }
+function cliffClear() { const C = CLIFF.on; if (!C) return; for (const R of C.rocks) R.m.removeFromParent(); if (C.plantMs) plantDrop(C.plantMs);
+  if (C.R) { const i = RESTORE.list.indexOf(C.R); if (i >= 0) RESTORE.list.splice(i, 1); if (C.R.ride) { bldTrisDrop(C.R.ride.tb); bldTrisDrop(C.R.ride.tu); } } for (const o of C.ground || []) o.removeFromParent();     // m@X4@
+  bldClear(C); CLIFF.on = null; }
 // m1178: THE MOATED KEEP (Set 2 #16, pass 1) at (46, 0). A stone KEEP on a 3 m ISLAND in a MOAT, ringed by a 2.8 m CURB wall you climb by
 // a flight of steps on the courtyard side. A DRAWBRIDGE spans the moat from the curb to the island: it starts RAISED -- strike the GONG
 // on the curb beside it and it comes down (strike again and it goes up). Or don't: drop into the moat and climb the island (a ledge grab).
@@ -28278,7 +28307,7 @@ const BLDG = { list: [
   { key: 'fwork', t: 'Forge-Workshop', sub: 'a furnace that breathes fire when you strike the bellows, a trip-hammer that flattens you, a loft, a crane that swings a bar round', pass: 4, build: () => fworkBuild(), rig: () => FWORK.on && FWORK.on.R, clear: () => fworkClear(), on: () => !!FWORK.on, step: dt => fworkStep(dt) },
   { key: 'sphang', t: 'Spider-Bot Hangar', sub: 'an enemy hall of sandstone and black tile, spider bots that climb every building and pounce on you from walls and roofs, hatching from their pods (smash them)', pass: 4, build: () => sphangBuild(), clear: () => sphangClear(), on: () => !!SPHANG.on, step: dt => sphangStep(dt) },
   { key: 'skyb', t: 'Sky Bridges', sub: 'rope bridges and ziplines linking the buildings up high (they appear as the buildings do); pull back on a zip to brake', pass: 4, build: () => skybBuild(), rig: () => SKYB.on && SKYB.on.R, clear: () => skybClear(), on: () => !!SKYB.on, step: dt => skybStep(dt) },
-  { key: 'cliff', t: 'Cliff Lodge', sub: 'a rock crag, a path up it with boulders rolling down (strike the cradle lever to tip one yourself), a lodge, a waterfall, pines', pass: 4, build: () => cliffBuild(), clear: () => cliffClear(), on: () => !!CLIFF.on, step: dt => cliffStep(dt) },
+  { key: 'cliff', t: 'Cliff Lodge', sub: 'a rock crag, a path up it with boulders rolling down (strike the cradle lever to tip one yourself), a lodge, a waterfall, pines', pass: 4, build: () => cliffBuild(), rig: () => CLIFF.on && CLIFF.on.R, clear: () => cliffClear(), on: () => !!CLIFF.on, step: dt => cliffStep(dt) },
   { key: 'keep', t: 'Moated Keep', sub: 'a keep in a moat with a bronze eel in it, a drawbridge (gong outside, winch inside), archers, a sentry gun', pass: 4, build: () => keepBuild(), clear: () => keepClear(), on: () => !!KEEP.on, step: dt => keepStep(dt) },
   { key: 'barr', t: 'Robot Barracks', sub: 'a barracks, robot samurai drilling in step to the drill master\'s taiko -- step into the yard and they come for you; cut down the big drill master and the drill stops', pass: 4, build: () => barrBuild(), clear: () => barrClear(), on: () => !!BARR.on, step: dt => barrStep(dt) },
   { key: 'lhouse', t: 'Jin Lighthouse', sub: 'a keeper\'s room, a ramp to its roof, a spiral stair 18 m up round a slim shaft, a gallery, a Jin searchlight that locks on and zaps you (shoot its crystal dark, or strike the drive inside and it hunts your enemies), a ring on top', pass: 4, build: () => lhouseBuild(), clear: () => lhouseClear(), on: () => !!LHOUSE.on, step: dt => lhouseStep(dt) },
