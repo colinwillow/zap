@@ -24,7 +24,7 @@ dragon into a level (the WHOLE-PIECE RULE).
 - [ ] **3. Ground riding** (m1618): the left pad steers him camera-relative (turns at `turn`, on the spot when still), `idle` + `run` blended
       and sped by his speed (`runRef` 7 is a dial: his run is not measured), leans into turns, keeps in the rim, walks round the posts and low
       stones; the lens behind and above. *Open: his feel of it (speed, turn, the run's rate).*
-- [ ] **4. Flying** (mDRG): the LEFT TAP takes off (a leap and a beat) and beats the wings in the air; the left pad flies him like
+- [ ] **4. Flying** (m1619): the LEFT TAP takes off (a leap and a beat) and beats the wings in the air; the left pad flies him like
       RollerGirl's wingsuit (sideways turns and banks, up climbs, down dives; a dive gains speed, a climb spends it; under `stall` his nose
       drops); run off any edge and he glides; he lands on whatever is under him (meadow, dais, crag, the six islands) and rides on from there.
       Get off only on the meadow. **No fly clip in his file**: `attack_air` is his base pose aloft and his wing fingers are fanned and beaten in

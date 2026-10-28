@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## mDRG -- THE DRAGON RIDE, build 4: FLYING (DRAGON.md box 4)
+## m1619 -- THE DRAGON RIDE, build 4: FLYING (DRAGON.md box 4)
 - **The model is `wingFly`'s** (RollerGirl's wingsuit) on the beast, in `dragDrive`'s air branch (`B.drive.air = { v, pitch, bank }`): stick X
   turns (`fturn`, negated -- heading grows toward his LEFT) and banks him (`bank`); stick UP climbs, DOWN dives (her game's way round), centred
   it levels (`levelHL`); `v += thrust (cruise - v) - g sin(pitch)`, so a dive gains speed and a climb spends it; under `stall` 8 m/s the nose
