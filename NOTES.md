@@ -132,7 +132,7 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
-## HIS BLUE DRAGON AND HIS THREE-HEADED DOG IN THE DOJO (mXXXX)
+## HIS BLUE DRAGON AND HIS THREE-HEADED DOG IN THE DOJO (m1515)
 *"I don't think you understood what I meant by dragon -- I have models. The blue dragon GLB and the three-headed dog... unlock animals along the way."* His `models/creatures/blue_dragon.glb` and `3_headed_dog.glb` (already arena beasts: DRAGON / DOG).
 - **`dojoBeast(D, B)`** goes through `arenaLoad(key)`, so the padding is trimmed (`beastPrep`), the scale and facing are measured, and `skeletonClone(P.proto)` is scaled `mul` and faced at the dojo. Its own mixer cross-fades the idles in turn (`dojoBeastIdle`). Called on the FIRST dojo frame, because `arenaLoad` must not run at module scope.
 - **The dragon (x2.2)** is on a new high CRAG (R 8, deep, y 40) at (-66, 34), cycling idle / casual / wake_up.
