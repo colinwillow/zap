@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home, pass 29: the rope lift to the balcony (Worker B, loop tick 6)
+His queue item. First placement (r = Rt + 1.15) rose INTO the balcony's mushroom ledge -- the balcony is a lathe out to Rt + 2.4 over
+-.7..2.9 rad, not the shoulder ring at Rt; the render showed it. Now at `GHOME.liftA` 1.4 rad, r = Rt + 3.15, with the rail's posts
+(|a - liftA| < .15) and segments (mid within .25) left out for the gap. Gantry beams from the turret at yt + 3.9, a pulley, two ropes
+(unit cylinders hung from the pulley, scale.y = the drop). The cage is its own group in the home's frame; its floor is a `BDYN` box
+(world AABB half .6) moved each frame; `ghomeLift` carries him by the cage's dy while he stands on it (the dojo platforms' method).
+Rides at 1.8 m/s after .6 s standing at an end; calls itself to the end he stands near (within 2.6 m, his height within 1.5 m of that
+end). FALLEN (RT < .99): parked at the foot, tilted, ropes hidden. +2 draws (cage, ropes) beside the merged 36.
+Box moved: the home's "still open" list (rope lift). Next: breakable pots.
 ## m1545 -- the clouds move under you (dojo pass 21, the old "pass 4: life" line)
 - **Wisps:** a third `bbd` layer, 46 single puffs at y -8 to -34, out to 110 m. The `move` hook blows them along +x at 2.4 m/s and wraps them in a
   220 m box (`mod`), and the frag fades them by 70-110 m on both axes, so a wrap happens where nothing is drawn. **Every card also fades to zero at
