@@ -5,6 +5,24 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- THE CHARGE'S THREE RELEASES BY THE LEFT STICK; and the charge MEETS a locked arrow or rocket in the air (DOCKET 15, 16)
+His: *"initiate with pull up on the right stick; if you're holding FORWARD on the left stick when you release, the forward slash charge attack;
+holding DOWN, the leap in the air and slam down; neither, the spin."* And: *"charge, an arrow or rocket shoots at you, the crosshair locks
+on it, release -- he should perfectly meet it where it flies and slash it, which sends it back at the shooter."*
+- **`CHARGE3`** (on): the LEFT stick at the release picks the move (pad up = forward, pad down = back, past `dead` .3 and mostly along that
+  axis):
+  - FORWARD = the launch / forward slash (as before)
+  - DOWN = the aimed leap and slam (m1679's parabola), at the right thumb's aimed height if it was aimed, else `leapK` .75
+  - anything else = the whirl (spin)
+  - `CHARGE3.on = 0` is the old reading.
+- **`chargeIntercept`:** on the release with a projectile locked (the existing ring, `p.chLock`):
+  - its path is solved forward (an arrow drops at .55 g, a turret shot flies straight) for the first moment `t` (.12-1.3 s) he can reach it
+    at no more than `INTER.v` 16 m/s across
+  - he LEAPS on a ballistic arc that puts his middle on it at `t`, the katana's jump attack timed to strike at `t`
+  - the lock stays live while he flies (`p.inter`), and reaching it is the PERFECT deflection, home to the shooter (`deflectThreat`)
+- **Measured headless:** an Osari bowman at 13 m loosed; the arrow was locked at 12.2 m, closing at 26 m/s; the release -> an intercept
+  .30 s out (vel 14.6 across, 4.1 up). Caught, `mine`, flew home and hit the bowman (`ARCH.stat.back` 1).
+
 ## m1686 -- THE SUN-WHEEL BEHIND HIM, even up close (his m1679 screenshot: "way better -- but still on top of my player")
 m1679 depth-tested the mark and pulled it toward the lens by the target's radius + .35 (~.85 m), so the target's own body would not hide
 it. His screenshot: Grumbo standing right in front of an Osari bowman, closer than that, so the pull carried the mark IN FRONT of Grumbo.

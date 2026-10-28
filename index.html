@@ -29645,6 +29645,22 @@ function threatFind(h, cone, maxD, maxT) {
     const sc = d + off * 3; if (sc < bs) { bs = sc; best = T; } }
   return best;
 }
+// m15xx (his: "charge, an arrow or rocket shoots at you, the crosshair locks on it, release -- he should perfectly MEET it where it flies and slash
+// it, which sends it back at the shooter"). On the release with a projectile locked (`p.chLock`), its path is solved forward (an arrow drops at
+// .55 g, a turret shot flies straight) for the first moment `t` he can reach it -- horizontal speed no more than `INTER.v` -- and he LEAPS on a
+// ballistic arc that arrives at that point (his middle on it) at `t`, the katana's jump attack timed so its strike lands at `t`. While he flies
+// the lock is live (`deflStep`): reaching it is the PERFECT deflection, home to whoever loosed it.
+const INTER = { v: 16, tMin: .12, tMax: 1.3, mid: .9 };
+function chargeIntercept(T) { const p = player, g = MOVE.g, ga = T.A ? MOVE.g * .55 : 0, P0 = T.p.clone(), V = T.v.clone();
+  for (let t = INTER.tMin; t <= INTER.tMax; t += .02) { const qx = P0.x + V.x * t, qy = P0.y + V.y * t - .5 * ga * t * t, qz = P0.z + V.z * t, dx = qx - p.pos.x, dz = qz - p.pos.z;
+    if (Math.hypot(dx, dz) / t > INTER.v) continue;
+    const vy = (qy - (p.pos.y + INTER.mid) + .5 * g * t * t) / t;
+    p.vel.set(0, Math.max(vy, 1), 0); p.grounded = false; p.coyote = 0; p.airT = 0; p.jumps = 2; p.slamUsed = 0; p.melee = 0; p.roll = 0; p.land = 0; swapStop(); triggerStop();
+    if (!slamGo(0, 1)) return 0;
+    p.vel.set(dx / t, vy, dz / t); p.slamArc = 1; p.slamUp = 0; p.slamT = SLAM.hang; p.slamDur = t; p.cLeap = null; p.faceH = p.heading = Math.atan2(dx, dz); p.camWant = p.faceH;
+    { const A = KATANA.air, nm = rig.actions[A.clip] ? A.clip : null; if (nm) { const len = clipLen(nm); p.slamClip = nm; playOnce(nm, Math.max(.3, (A.strike - A.upFrom) * len / t)); rig.actions[nm].time = A.upFrom * len; } }
+    p.inter = { T, t: 0, until: t + .25 }; snd('swoosh', { r: .8, g: .8 }); DEFL.stat.inter = (DEFL.stat.inter || 0) + 1; return 1; }
+  return 0; }
 function deflectThreat(T, perfect) {
   const p = player, P = T.p;
   if (T.S) { const S = T.S, tg = S.src && !S.src.dead ? S.src : TURRET.list.find(q => !q.dead);
@@ -29662,17 +29678,18 @@ function deflectThreat(T, perfect) {
 // every frame: a live swipe or charge dash catches what reaches him in front; the charge's lock is chosen and ringed
 function deflStep(dt) {
   const p = player; if (!DEFL.on) { if (DEFL.ring) DEFL.ring.visible = false; return; }
-  const live = (p.melee && p.defl) || (p.chargeGo && p.chLock);
+  if (p.inter) { p.inter.t += dt; if (p.inter.t > p.inter.until || p.grounded) p.inter = null; }
+  const live = (p.melee && p.defl) || (p.chargeGo && p.chLock) || (p.inter && p.chLock);
   if (live) { const T = p.melee ? p.defl : p.chLock;
     if (threatAlive(T)) { const dx = T.p.x - p.pos.x, dz = T.p.z - p.pos.z, dy = T.p.y - (p.pos.y + .9);
-      if (Math.hypot(dx, dz, dy * .6) < DEFL.catchR && Math.cos(Math.atan2(dx, dz) - p.faceH) > -.2) { deflectThreat(T, !!p.chargeGo); if (p.chargeGo) DEFL.stat.lockHits++; p.defl = null; p.chLock = null; } }
-    else { p.defl = null; if (!p.chargeGo) p.chLock = null; } }
+      if (Math.hypot(dx, dz, dy * .6) < DEFL.catchR && Math.cos(Math.atan2(dx, dz) - p.faceH) > -.2) { deflectThreat(T, !!(p.chargeGo || p.inter)); if (p.chargeGo || p.inter) DEFL.stat.lockHits++; p.defl = null; p.chLock = null; p.inter = null; } }
+    else { p.defl = null; if (!p.chargeGo && !p.inter) p.chLock = null; } }
   // the charge's lock
   const charging = p.charge && slotNow().blade && p.chargeT >= MELEE.charge * .3;
   if (charging) { const S = stickWorld(), h = S.mag > .3 ? Math.atan2(S.x, S.z) : p.faceH, T = threatFind(h, DEFL.lockCone, DEFL.lockR, 0);
     if (T && (!p.chLock || p.chLock.S !== T.S || p.chLock.A !== T.A)) DEFL.stat.locks++;
     p.chLock = T; }
-  else if (!p.chargeGo) p.chLock = null;
+  else if (!p.chargeGo && !p.inter) p.chLock = null;
   if (!DEFL.ring) { DEFL.ring = new THREE.Mesh(new THREE.RingGeometry(.42, .55, 32), new THREE.MeshBasicMaterial({ color: 0xffc04a, transparent: true, opacity: .9, depthTest: false, toneMapped: false, side: THREE.DoubleSide }));
     DEFL.ring.renderOrder = 60; scene.add(DEFL.ring); }
   const R = DEFL.ring, T = p.chLock && threatAlive(p.chLock) ? p.chLock : null; R.visible = !!T;
@@ -29718,6 +29735,7 @@ function coverLeap() {
 // above `top` (pushed up, as it charged) 0 = the flat launch forward as before; down to `bot` 1 = the highest leap. Over `min` the release is
 // `aimLeap`: straight up to `h0`..`h1` m and the katana's air slam (`slamGo`), its horizontal solved from the slam's clock to land where the
 // flat launch would have (the man in reach, or the hold's distance). An arc of dots shows the leap before he goes (`KAIM.line`).
+const CHARGE3 = { on: 1, dead: .3, leapK: .75 };
 const KAIM = { top: .35, bot: -.8, min: .12, h0: 1.4, h1: 5.2, line: null, n: 28, dots: 0 };
 function kaimHold() {
   const p = player, R = stick.R; return slotNow().blade && R.down && p.chargeT >= MELEE.charge * .5 && !p.chargeGo && !p.knock && p.grounded;
@@ -29759,15 +29777,22 @@ function chargeRelease() {
   const full = t0 >= MELEE.charge * .5;
   p.charge = 0; p.chargeT = 0;
   if (!full) return;                                   // a short hold is not a swing
+  if (slotNow().blade && p.chLock && threatAlive(p.chLock) && chargeIntercept(p.chLock)) return;     // m15xx: the lock is an ARROW or a ROCKET
   // m1065: *"in cover with the katana, I charged and let go and it got stuck in the animation against the wall."* Cover owns the body and returns
   // before the release is ever stepped (m1009's swing bug, the charge's turn). With the blade in HALF cover the release is now the COVER LEAP;
   // with anything else (or full cover) he leaves cover first, so the release runs.
-  if (!p.wall && slotNow().blade && p.kAim > KAIM.min && aimLeap(t0, p.kAim)) return;     // m1071: the thumb held low aimed it UP
+  // m15xx (his: "if you are holding FORWARD on the left stick when you release, the forward slash; holding DOWN, the leap in the air and slam down;
+  // neither, the spin"): the LEFT stick at the release picks the move. Up the pad = forward, down the pad = the leap (at the right thumb's aimed
+  // height if it was aimed, else `CHARGE3.leapK`), anything else = the spin. `CHARGE3.on` 0 is the old reading (right-thumb height, world dot)
+  if (!p.wall && slotNow().blade && CHARGE3.on) { const L = stick.L, m = L.down ? Math.hypot(L.x, L.y) : 0, fwd = m > CHARGE3.dead && -L.y > Math.abs(L.x) * .8, back = m > CHARGE3.dead && L.y > Math.abs(L.x) * .8;
+    if (back && aimLeap(t0, p.kAim > KAIM.min ? p.kAim : CHARGE3.leapK)) return;
+    if (!fwd && WHIRL.on && rig.actions[TORNADO.sword]) { whirlGo(clamp(t0 / MELEE.charge, 0, 1)); return; } }
+  else if (!p.wall && slotNow().blade && p.kAim > KAIM.min && aimLeap(t0, p.kAim)) return;     // m1071: the thumb held low aimed it UP
   // m1279: THE WHIRLWIND. *"A full 360 Link-style whirlwind... if you charge it up and you're pressing FORWARD on the left stick when you release,
   // he does the launch; if you DON'T, he spin-attacks."* The left stick at rest (or pulled BACK) on the release = `whirlGo`: 1-3 full spins of
   // the katana's 360 by the hold, a wider reach than the swing, everyone round him struck (a charge's blow: peons shatter), the stick steering
   // him slowly through it. Pressing it any way but back = the launch, as before. (Back has its own move later; for now it whirls too.)
-  if (!p.wall && slotNow().blade && WHIRL.on && rig.actions[TORNADO.sword]) { const S = stickWorld(), dot = S.mag > .3 ? (S.x * Math.sin(p.faceH) + S.z * Math.cos(p.faceH)) : 0;
+  if (!CHARGE3.on && !p.wall && slotNow().blade && WHIRL.on && rig.actions[TORNADO.sword]) { const S = stickWorld(), dot = S.mag > .3 ? (S.x * Math.sin(p.faceH) + S.z * Math.cos(p.faceH)) : 0;
     if (S.mag < WHIRL.idle || dot < -.5) { whirlGo(clamp(t0 / MELEE.charge, 0, 1)); return; } }
   if (p.wall) { if (slotNow().blade && p.wallLow && coverLeap()) return; p.wall = null; p.wallSt = ''; p.wallLow = 0; p.wallPop = 0; p.wallCool = WALL.cool; }
   p.chargeGo = 1; p.chargeGoT = 0; p.melWall = 0; p.melFist = 0; p.melFired = 0; p.melU = 0; p.swPrev = null; p.swRootX = null; p.swRootZ = null;
