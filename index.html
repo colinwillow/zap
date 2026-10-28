@@ -65631,7 +65631,7 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 try { const q = new URLSearchParams(location.search).get('hs'); if (q === 'restored' || q === 'fallen') AGE.st = q; } catch (e) {}     // the state is main's AGE (m1501); `?hs=` overrides for a look
 const hsF = () => AGE.st === 'fallen';
 function hsFallen(g) { if (!g || !hsF()) return; bldAge(g); }     // main's weathering (`bldAge`, m1501): the paint drained in the shader, metal to rust, glows out
-const GHOME = { on: 1, pass: 31, liftA: 1.4, potFix: 25, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
+const GHOME = { on: 1, pass: 32, liftA: 1.4, potFix: 25, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   Rtu: 2.5, door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
@@ -66407,6 +66407,19 @@ function ghomeBuild(at, yaw, y0) {
     let nP = 0; for (let i = 0; i < 520; i++) { const a = rnd() * TAU, rr = 1.15 + Math.pow(rnd(), 1.6) * 2.4, x = Math.sin(a) * A.rx * rr, z = Math.cos(a) * A.rz * rr; if (!free(x, z)) continue; const y = gH(x, z), k = rnd();
       if (k < .32) grass(x, y, z, .8 + rnd() * .6); else if (k < .58) sagebrush(x, y, z, .8 + rnd() * .9); else if (k < .7) yucca(x, y, z); else if (k < .8) bulbs(x, y, z); else if (k < .9) grass(x, y, z, .6); nP++; }
     let nR = 0; for (let x = -26; x < 26; x += .9) for (let z = 6; z < 20; z += .7) { if (Math.abs(x) < 4 && z < 17) continue; const y = gH(x + (rnd() - .5) * .5, z); if (y < wY + .32 && y > wY - .35 && rnd() < .3) { reeds(x, Math.max(y, wY - .2), z); nR++; } }
+    // ---- PASS 32 (the plants' third pass, his "cliff shrubs"): SHRUBS CLINGING TO THE CANYON WALLS at every height from 3 to 34 m over the
+    // floor (verticality), some trailing VINES down the rock with leaves along them, the odd lavender bulb hanging off a ledge; and DESERT
+    // FLOWERS (cream and orange heads on thin stalks) through the grass round the mound. Same buckets as the rest of the planting ----
+    { const R4 = rwRng(3232), L = (wx, wz) => { const dx = wx - at[0], dz = wz - at[1]; return [dx * c - dz * s, dx * s + dz * c]; }, orange = new THREE.MeshStandardMaterial({ color: 0xe8843a, roughness: .8 }); let nC = 0, nV = 0;
+      for (let zw = at[1] - 46; zw < at[1] + 46; zw += 2.6) for (const side of [-1, 1]) { const fl = hwHeight(hwRc(zw), zw);
+        for (let t = 0; t < 3; t++) { if (R4() < .35) continue; const yw = fl + 3 + Math.pow(R4(), 1.3) * 31, z2 = zw + (R4() - .5) * 2, xw = hwWallAt(z2, side, yw, .25);
+          if (Math.abs(xw - hwRc(z2)) > 39) continue; const [lx, lz] = L(xw, z2), ly = yw - y0, k = 1.2 + R4() * 1.4; sagebrush(lx, ly - .2, lz, k); nC++;
+          if (R4() < .45) { const pts = []; let n = 3 + ((R4() * 5) | 0); for (let j = 0; j <= n; j++) { const yy = yw - j * .55, xx = hwWallAt(z2 + Math.sin(j * 1.3) * .2, side, yy, .12), [qx, qz] = L(xx, z2 + Math.sin(j * 1.3) * .2); pts.push(new THREE.Vector3(qx, yy - y0, qz)); }
+            const cv = new THREE.CatmullRomCurve3(pts); put(new THREE.TubeGeometry(cv, n * 3, .035, 3), olive); for (let j = 1; j < n * 2; j++) { const q = cv.getPoint(j / (n * 2)); put(new THREE.ConeGeometry(.09, .28, 3), R4() < .5 ? sage : olive, at4(q.x, q.y, q.z, R4() * 6, (R4() - .5) * 2.4, (R4() - .5) * 2.4)); } nV++; }
+          if (R4() < .12) { const tip = [lx, ly - .35, lz]; put(new THREE.CylinderGeometry(.012, .012, .35, 3), reedM, at4(tip[0], tip[1] + .17, tip[2])); put(new THREE.SphereGeometry(.1, 8, 6), bulbM, at4(tip[0], tip[1], tip[2], 0, 0, 0, 1, 1.3, 1)); } } }
+      let nF = 0; for (let i = 0; i < 90; i++) { const a = R4() * TAU, rr = 1.2 + Math.pow(R4(), 1.4) * 2.2, x = Math.sin(a) * A.rx * rr, z = Math.cos(a) * A.rz * rr; if (!free(x, z)) continue; const y = gH(x, z), m = R4() < .55 ? creamM : orange;
+        for (let k = 0; k < 3 + ((R4() * 3) | 0); k++) { const b = R4() * 6, h = .25 + R4() * .3, fx = x + Math.sin(b) * .12, fz = z + Math.cos(b) * .12; put(new THREE.CylinderGeometry(.006, .008, h, 3), reedM, at4(fx, y + h / 2, fz)); put(new THREE.CylinderGeometry(.055, .02, .05, 6), m, at4(fx, y + h, fz)); } nF++; }
+      A.stat.cliffShrubs = nC; A.stat.vines = nV; A.stat.flowers = nF; }
     // ---- PASS 23 (the plants' second pass): the grass and the reeds SWAY (a per-vertex height above each blade's own foot, `sway`, drives
     // the wind in the vertex shader); fuller golden GRASS drifts; GRAVEL patches of sandstone chips; and a TUMBLEWEED that rolls down the
     // floor on the wind now and then (`GHOME.tumble`) ----
@@ -66483,7 +66496,7 @@ function ghomeBuild(at, yaw, y0) {
   for (const b of boxes) BOXES.push(b);
   for (let i = 0; i < tris.length; i += 9) { const q = tris.slice(i, i + 9); triAdd(...q); triAdd(q[0], q[1], q[2], q[6], q[7], q[8], q[3], q[4], q[5]); }
   A.stat.draws = draws; A.stat.boxes = boxes.length; A.stat.tris = tris.length / 9;
-  console.log('[melee] grumbo home (procedural): ' + draws + ' draws, ' + boxes.length + ' boxes, ' + tris.length / 9 + ' walkable tris, stair ' + A.stat.stair + ', ' + A.stat.pots + ' breakable pots');
+  console.log('[melee] grumbo home (procedural): ' + draws + ' draws, ' + boxes.length + ' boxes, ' + tris.length / 9 + ' walkable tris, stair ' + A.stat.stair + ', ' + A.stat.pots + ' breakable pots, ' + A.stat.cliffShrubs + ' cliff shrubs, ' + A.stat.vines + ' vines, ' + A.stat.flowers + ' flower clumps');
 }
 // THE JINRA VESSELS (PROPS.md "JINRA VESSELS", his sheet `images/korajin/ref/jinra_sheet.jpg`): a small SHARED kit -- glowing bottles and
 // flasks (round, gourd, spiral-bellied, tall), iron-banded canisters with a glass window, a globe tank on legs, crystal clusters. `jvesMats()`
