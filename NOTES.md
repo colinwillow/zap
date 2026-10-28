@@ -5,6 +5,34 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- THE SPIDER FIGHTS (his: "animate the spider attacks and hit reactions, maybe a jump and a block -- keep their current size --
+let them take damage so I can beat them up, then an explosion of them; have them lose limbs... maybe they spit or shoot at you")
+- **All procedural, on the same rig and planted-foot IK as the walk.** An attack moves the feet and body somewhere else for a moment.
+  The body's pitch, lift and sag sit on `S.m` (the inner model). The root stays on the ground.
+- **BITE** (inside `bite.r` 3.4 m): it rears up with the front pair lifted, then lunges `bite.lunge` 1.3 m with the front feet stabbing
+  ahead. At the strike frame, anything within `bite.R` of the point 1.2 m in front of it takes `playerHurt(11)`. A guard blunts it and a
+  roll clears it.
+- **POUNCE** (7-13 m, 45% of the time): a crouch, then one ballistic arc to 1.4 m short of where he will be, legs tucked. Landing within
+  `R`+.6 of him: 14 damage and a big push.
+- **SPIT** (5-18 m): the abdomen cocks and a green-fire glob is lobbed at his lead. A direct hit does 8; a splash within 1.1 m does half.
+- **GUARD:** after a stagger, a 30% chance (`guardP`) to raise both front legs for ~1 s. A blow on its front is then a clang and no damage.
+  A full katana charge goes through it.
+- **A BLOW** (sweep, bolt, rocket splash, slam, charged slam, whirl): a green flash (cloned materials' emissive), a knock along the
+  blow, the body thrown back, any wind-up cancelled (`stag`).
+- **LEGS:** every `cutEvery` 2.2 damage (or every full katana charge), the leg nearest the blow comes off. It is baked out of the skin by
+  `limbBake` and thrown, and that leg's first bone shrinks away. The gait carries on without it: with fewer than 4 legs, one leg steps at
+  a time. The body sags toward the gap and slows. With `minLegs` (2) left, the next blow bursts it.
+- **DEATH** (no hp, or the blow at 2 legs): body, head, abdomen and the remaining legs are each lifted out as pieces (`spiderTris` sorts
+  every triangle by its dominant bone once per proto) and thrown in a 1.25x green `killBlast`.
+- `hp` 9. Everything is live on `mel`'s SPIDER table. **The SIZE is unchanged**, as he asked.
+- **Checked headless** (forge, scripted frames through `frameBody`):
+  - The bite took him 100 -> 89.
+  - Blows of 1.3: legs 4 -> 3 -> 2, then the next blow burst it into 7 pieces.
+  - The spit took 8 (apex 1.78 m).
+  - The pounce landed 1.38 m from him and took 14. Its first version computed the flight time apart from gravity and landed 5 m
+    short; the time is now `2*up/g`.
+- **NOT checked:** any of it on his phone; whether the IK legs read well mid-lunge.
+
 ## m1699 -- AUDIO THAT COMES UP EVERY TIME (his: "if I go through the menu quickly and get to a game there's no audio; and if I leave the game and
 come back, the audio is muted")
 - **No sound after a quick menu:** the first touch built the context and decoded only the files ALREADY fetched. A file landing after that
