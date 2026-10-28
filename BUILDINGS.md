@@ -250,9 +250,10 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 - **His clarification (after m1508):** restoration is NOT every building flying. Most REVIVE in place (pieces fly back, colour floods back,
   glow and machines come on); whole CHUNKS OF EARTH break off and float with what stands on them; ship-like buildings fly. So: the home, the
   mill and the merchant revive; the Jinra refinery's piece of mountain is the earth chunk that lifts.
-- [x] **the home, live (next tick):** ONE set of pieces, animated by main's RESTORE kit -- nine chunks (hall, crown, tower, turret, store,
+- [x] **the home, live (m1509):** ONE set of pieces, animated by main's RESTORE kit -- nine chunks (hall, crown, tower, turret, store,
   both stalls, the front frame, the crane) slumped, tilted and toppled when FALLEN; step on the MINT PLATE by the steps and they fly home
   one after another, the colour comes back, the lanterns light and the smoke starts (step again: it falls). Still one draw per look.
+- [x] **the home, pass 2 (next tick):** FALLEN drains the paint in the shader (desaturated, dusted, darkened, the pier and plants with it) and the show FLOODS it back; a mint Jinra burst and a thud as each piece lands; mint motes swirling up round him while it plays; the plate breathes while it is ready
 - [ ] pass 2: real ruin in FALLEN (broken and missing boards, torn cloth, rust streaks, collapsed bits, dust) and the RESTORED extras
   (the stream glowing mint, the mill turning on Jinra, the floating pieces bobbing, warm lanterns)
 - [ ] pass 3: the TURN between them as a moment (the restoration happening, not a reload), when he says how it is earned
