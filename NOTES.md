@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the ZEPPELINS, pass 3 (L3, alive) -- AND DOUBLOONS NOW WORK OUTSIDE THE DOJO
+## m1575 -- THE RE-PASS: the ZEPPELINS, pass 3 (L3, alive) -- AND DOUBLOONS NOW WORK OUTSIDE THE DOJO
 **Moves:** the Zeppelins' L3 and alive rows; its third pass, so the loop moves on.
 - **THE BUG (worth more than the pass): `coinStep` was only ever called from `dojoStep`.** Outside the dojo world, every doubloon sat still
   where `coinDrop` put it and COULD NOT BE PICKED UP: every forge doubloon from the RE-PASS (Pagoda, Great Red Pagoda, Watchtower, Shrine,
