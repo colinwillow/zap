@@ -35,6 +35,32 @@ in there so I can transform it between the two states"; "these rocks are kind of
 - **THE HYBRID:** the sky islands over the rim (m1113) showed in FALLEN. KORAJIN: the floating world is what restoration raises -> hidden
   while fallen. (The refinery already sits on the flank when fallen.)
 Next: the painted textures (rock, sand, cliff), his ask in the same message.
+## m15xx -- ARENA SPEED, THE INTERCEPT YOU EARNED, SWINGS THAT LAND, THE CHARGE SWAP (his arena report, 20 fps)
+- **20 fps / chugging -- MEASURED (`?w=arena`, the game camera):** 1,033k triangles rendered and 104 calls.
+  - ~900k of the triangles were the PLANTS: one InstancedMesh per kind over the whole world with `frustumCulled = false`, so every blade
+    behind the lens and 80 m off was drawn every frame. Tallgrass 214k, frond 119k, grass 101k, shrub 98k, carpet 90k.
+  - `plantFlush` now cuts each kind into `PLANT.cell` 32 m squares, each its own mesh with a real bounding sphere (plus a sway margin),
+    so the lens culls it. `plantCull` hides small cover past `PLANT.far[kind]` (carpet 22 ... mound 45 m).
+  - Result: **220-250k triangles**, 134-138 calls (the cells add calls; 28 m and 40 m cells measured either side of 32).
+  - Every world using `plantFlush` gets this. `PLANT.cell = 0` before a load is the old way.
+  - Not touched: 258 other arena meshes (164k) that are not merged. That is the next candidate if it still chugs.
+- **The intercept still got hit (his: "I'd release at the right time and as I flew through the air the arrows would still hit me"):**
+  - `deflStep` catches the locked arrow by a POINT distance once a frame. At 20 fps an arrow covers 1.3 m a frame and can pass between
+    two checks, and any OTHER arrow was never covered at all.
+  - Now `arrowStep` itself, while `p.inter` / `interHold` / a locked dash is live, CUTS every arrow whose path reaches him (1.1 m, 0.8
+    of his height) and sends it back, with the same stop-dead beat.
+  - **Not released in time, it still hurts and breaks the charge (m1704)** -- what he asked.
+- **Swings that didn't land:**
+  - **(a)** The spiders were not in `meleeLock`, so no tracking or lunge to them. They are now proxies in `mechTargets`.
+  - **(b)** Their hit radius was the BODY (.38 of the width). Measured through real `meleeGo` swings with the katana: at 60 fps 4 of 5
+    landed; **at 20 fps (50 ms frames) 0 of 5** -- the blade passed over a leg just outside the circle. `SPIDER.hitR` is now .48 (the
+    leg span): 20 fps lands.
+  - **(c)** The spider GUARDED 30% of the time after every stagger, for 1.1 s, so swipe after swipe clanged. Now `guardP` .12, for .5 s,
+    or after `guardEvery` 3 hits in a row.
+  - Osari bowmen measured fine: the first swing throws them 6-11 m, out of reach of the next.
+- **The charge release, swapped (his: "I keep trying to do the lunge and it does the spiral"):** `CHARGE3.swap` 1 -- NEUTRAL lunges
+  forward, FORWARD spins, DOWN is still the high leap. `swap 0` is m1688's way.
+
 ## m1705 -- STATUES: THE ENEMY'S STONE TWIN AND THE CHALICE (his: "every time we make a new enemy we should first make the statue version --
 pose the rigged model, texture it with no green glowing parts, then the one that does; they guard the lairs; at the end you take a chalice
 and a cut scene shows them all coming to life")
