@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The Jinra refinery-shop, pass 1 (Worker B): a floating island over the peak
+- His sheet (`images/korajin/ref/jinra_sheet.jpg`), relayed by main, confirmed by him here: *"I put it high up in a mountain... it might be floating, because that's the whole idea, it's magical... its own floating island above a mountain."* On what it sells: Jinra, refined Jinra, powers, special weapons, *"to be fully fleshed out."*
+- **`GJINRA` / `gjinraBuild()`**, after the peak (it needs the lookout), in its own try (JINRA BUILD THREW fails the gate). The island is 30 m east and 26 m north of the pinnacle, its top at **124 m** (the lookout's deck is 96). Yaw -1.95 turns the shop's front toward the lookout and the valley.
+- **The island**: a flattened `ghRockGeo` top, an inverted cone, five hanging crags (all strata-coloured), a grass cap (walkable, cell boxes), and a falling sheet of Jinra off one edge whose opacity breathes, with motes drifting down it.
+- **The shop**: a 16 x 13 plank deck on stilts with three front steps and a rail; a sandstone half-dome (R 5.4, H 5.2, cell-box collider) with a mint-lit doorway and a counter lined with vessels; the **globe** (glass R 2.8, Jinra inside, three copper rings, four legs onto the crown, a stack); copper pipes (catmull tubes) down the dome; a banded copper chimney breathing mint motes; two teal awnings with the Jinra diamond-and-spiral; the banner on its pole; four mint lanterns; ten vessels along the front.
+- **The shared JINRA VESSELS kit** (PROPS.md): `jvesMats()` makes the looks once (glass, the Jinra, copper, iron, cork, wood). `jvesPut(put, M, kind, x, y, z, s, ry)` drops a round / gourd / tall / spiral flask, a canister, a globe tank or a crystal cluster into any builder's own `put`, so it merges into that builder's buckets.
+- **The way up**: 14 flat-topped **floating stones** spiralling (a sine sideways) from the lookout's deck corner up to the front of the steps, about 2 m up per stone. Each is a jump. Static colliders: they do not bob yet.
+- **The hook**: `GJINRA.goods` (three things on display, `price: null`) and `gjinraBuy(item)` (a clang and a log). Nothing is taken: what it sells and for what is his call, and `COIN` is main's.
+- 15 draws.
 ## The peak, pass 1 (Worker B): a mountain, a pinnacle, a lookout, a zipline home
 - His ask (with the bridge turrets): *"another element of height... a mountain on the top up there... a lookout tower at the very top."*
 - **The mountain is terrain.** `gpeakLift(x, z)` is added in `hwHeight`: 38 m over the east plateau, `(1 - smooth(5, 58, m))^1.25`, with fbm. The ground's triangles carry it, so it is walkable (his step limit makes any slope short of a cliff walkable). Top at **64.2 m**, centred 78 m east of the river line at z 20, between the home and the mill. `GPEAK.on = 0` takes it out.
