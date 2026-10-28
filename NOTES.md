@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the SKY BRIDGES, pass 1 (HERO look, merged)
+## m1642 -- THE RE-PASS: the SKY BRIDGES, pass 1 (HERO look, merged)
 - The hero kit (`korMats`): painted warm planks (`wood_planks`), kit timber, kit bronze and red, the kit lamp. The zip cables are bronze.
 - Each span gets a small GATE 1.2 m in from each end (an end sits inside its building, so a gate at the end stood in the Watchtower's
   lookout): two 2.3 m timber posts with bronze foot caps, a red lacquer kasagi with upturned bronze tips, a tie beam, a lantern hung on
