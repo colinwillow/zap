@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the RAMPART WALL, pass 1 (an ENEMY wall: the look)
+## m1554 -- THE RE-PASS: the RAMPART WALL, pass 1 (an ENEMY wall: the look)
 **Moves:** its pass-1 row (the look). Destructible to the ground is pass 2.
 - Masonry is a `stone_blocks` triMat tinted `ENEMY.pal.stone` (and a darker tone for footings, coping and steps), not `E.stone`'s sandstone
   map, which reads as sponge over a 60 m wall. Timber, jambs and the grapple poles are `E.lacquer`; gold bands on the jambs and the
