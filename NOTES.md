@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1534 -- the Jinra refinery, pass 2: its chunk of mountain lifts live (Worker B, loop tick 3)
+His correction (the buildings do not go up on jets; the ground under them breaks off and floats). The refinery's island is that ground:
+the whole builder is ONE chunk on the shared `rsChunkRig`, and the RESTORE kit's own `lift` carries the group (`R.g = g`, `R.baseY = -L`,
+`R.lift = L`, L = island y minus the flank height + 1, ~83 m). FALLEN: grounded on the flank, drained and rusted; the mint plate at its door
+plays a 10 s show and it rises to 124 m. The 14 lookout stepping stones are built into their own bucket set (`A._mg` swap) so they stay put
+in the sky and only show once it is up (t > .99); the smoke and falls show past .95. Colliders: three sets (`bR` sky, `bS` stones, `bF` the
+sky set shifted down by L) and `gjinraBoxes` swaps them at the ends -- nothing collides mid-flight (riding colliders are still not in the kit).
+The refinery's triangle floors are gone: its boxes are its floors now. Render: fallen / mid / restored from the south-east, all three right.
+Box moved: refinery pass 2. Open: pass 3 (interior, the vendor), the fallen ruin pass. Shipped unverified on the phone.
 ## m1535 -- THE RE-PASS: the GATEHOUSE, pass 3 (detail and verticality; its third pass, so the loop moves on)
 **Moves:** the Gatehouse's pass-3 row (detail, verticality). The roofline was flat, so this pass gives it a classical silhouette.
 - **Two YAGURA** on the deck, one over each tower: lacquer posts (solid), a gold beam band, a two-tier black-tile hip roof (`E.roof`, an open
