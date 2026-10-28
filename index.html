@@ -11340,7 +11340,7 @@ function dojoFlagStep(F, dt) { F.t += dt; const [x, y, z, docked] = dojoFlagPath
 const DRAGZ = { want: 0, on: null, R: 52, mul: 1.8, at: [0, 16], spawn: [0, -14], sun: [.5, .2, .84], cloudY: -60, look: 'CAPTURED', looks: ['CAPTURED', 'EVIL', 'BARE'],
   evilTint: 0x6f5f8f, idles: ['idle', 'casual', 'idle', 'wake_up'] };
 try { if (/[?&]zone=dragon\b/.test(location.search)) DRAGZ.want = 1; } catch (e) {}
-try { const v = localStorage.getItem('mel.dragon'); DRAGZ.look = !v || v === 'WILD' || v === 'EVIL' ? 'EVIL' : v === 'BARE' ? 'BARE' : 'CAPTURED'; } catch (e) { DRAGZ.look = 'EVIL'; }     // m1622: unvisited, he is WILD
+try { const v = localStorage.getItem('mel.dragz'); DRAGZ.look = v === 'EVIL' ? 'EVIL' : v === 'BARE' ? 'BARE' : 'CAPTURED'; } catch (e) { DRAGZ.look = 'CAPTURED'; }     // mDRG: READY TO RIDE by default, on its own key (his: "I can't even begin to get on him" -- m1622 started him wild, and the dojo's old WILD pick carried in); TOOLS > DRAGON: EVIL is the wild one to tame
 function dragStage(g) { const Z = DRAGZ, sd = new THREE.Vector3(...Z.sun).normalize(), U = { uTime: { value: 0 }, uSun: { value: sd } }; Z.U = U;
   const dome = new THREE.Mesh(new THREE.SphereGeometry(880, 48, 24), new THREE.ShaderMaterial({ uniforms: U, side: THREE.BackSide, depthWrite: false, fog: false,
     vertexShader: 'varying vec3 vD; void main() { vD = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
@@ -11702,7 +11702,7 @@ function dragTameStep(B, dt) { const Z = DRAGZ, T = B.tame; T.t += dt; const P =
   if (T.st === 'dizzy') { const k = clamp(T.t / Math.max(.5, T.T), 0, 1); _dtE.set(Z.evilTint).lerp(_dtW, k); for (const q of B.mats) q.m.color.copy(q.c).multiply(_dtE); }     // his hide clears
   if (T.st === 'dizzy' && T.t > .2 && Math.random() < dt * 8) { const hd = B.m.getObjectByName('Bip001_Head'), h = hd ? hd.getWorldPosition(_drV2) : P; spkBurst(h.x, h.y, h.z, 6, { col: [1, .2, .1], spread: 3, size: .22, life: .5 }); }
   if (T.st === 'dizzy' && T.t >= T.T) { T.st = 'wake'; T.t = 0; const w = B.clips.wake_up && B.mx.clipAction(B.clips.wake_up); if (w) { w.reset().setLoop(THREE.LoopOnce, 1).play(); w.clampWhenFinished = true; if (B.cur && B.cur !== w) B.cur.crossFadeTo(w, .3, false); B.cur = w; }
-    T.T = w ? w.getClip().duration : 2; Z.look = 'CAPTURED'; try { localStorage.setItem('mel.dragon', 'CAPTURED'); } catch (e) {} dragLook(); B.sets.EVIL.forEach(o => o.visible = false);
+    T.T = w ? w.getClip().duration : 2; Z.look = 'CAPTURED'; try { localStorage.setItem('mel.dragz', 'CAPTURED'); } catch (e) {} dragLook(); B.sets.EVIL.forEach(o => o.visible = false);
     spkBurst(P.x, P.y + B.hd * .6, P.z, 60, { col: [.5, 1, .85], spread: 9, size: .35, life: 1 }); slamRing(P.x, P.y + .05, P.z); snd('ready', { g: .9, r: .8 }); camShake(.12); }
   else if (T.st === 'wake' && T.t >= T.T) { B.tame = null; B.t = 0; dojoBeastIdle(B); Z.tipped = 0; tipShow('He is yours. The ring at his left side: climb on.', 5); }
 }
@@ -13950,7 +13950,7 @@ function arenaUi() {
       else if (a === 'rhue') { const k = Object.keys(RIVAL.hues), n = k[(k.indexOf(RIVAL.pick) + 1) % k.length]; RIVAL.pick = n; RIVAL.u.value = RIVAL.hues[n] * Math.PI / 180; try { localStorage.setItem('mel.rival.hue', n); } catch (err) {} }
       else if (a === 'tlie') { TAIL.lie = { FLAT: 'BELLY', BELLY: 'OFF', OFF: 'FLAT' }[TAIL.lie]; try { localStorage.setItem('mel.tail.lie', TAIL.lie); } catch (err) {} }
       else if (a === 'dwing') { DRAGZ.wingPick = DRAGZ.wingPick === 'CODE' ? 'CLIP' : 'CODE'; try { localStorage.setItem('mel.dwing', DRAGZ.wingPick); } catch (err) {} }     // m1619
-      else if (a === 'dragon' && DRAGZ.on) { const T = DRAGZ.looks; DRAGZ.look = T[(T.indexOf(DRAGZ.look) + 1) % T.length]; try { localStorage.setItem('mel.dragon', DRAGZ.look); } catch (err) {} dragLook(); }     // m1610: live in the zone
+      else if (a === 'dragon' && DRAGZ.on) { const T = DRAGZ.looks; DRAGZ.look = T[(T.indexOf(DRAGZ.look) + 1) % T.length]; try { localStorage.setItem('mel.dragz', DRAGZ.look); } catch (err) {} dragLook(); }     // m1610: live in the zone
       else if (a === 'dragon') { try { localStorage.setItem('mel.dragon', DOJO.dragonPick === 'WILD' ? 'CAPTURED' : 'WILD'); } catch (err) {} location.reload(); }     // m1518
       else if (a === 'rwsky') { try { localStorage.setItem('mel.rwsky', RWSKYS[(RWSKYS.indexOf(RW.skyPick) + 1) % RWSKYS.length]); } catch (err) {} location.reload(); }     // his panorama over the Red Hollows
       else if (a === 'dfx') { const L = ['FULL', 'NO SKY FX', 'NO PLANTS', 'NO SHADOWS']; DOJO.fx = L[(L.indexOf(DOJO.fx || 'FULL') + 1) % L.length]; dojoFxApply(); }     // m1615: find what costs the frames, one layer at a time

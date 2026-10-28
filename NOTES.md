@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## mDRG -- THE DRAGON RIDE: READY TO RIDE BY DEFAULT (his: "I can't even begin to get on him; I run into him and he hits me back")
+What he saw was m1622's WILD start: the EVIL look (no saddle, no lacquer -- "his saddle is gone, his armour is gone" -- the spiked iron collar
+with its chain), the shove inside `wildR`, and no mount until the Jinra spring's taming -- with nothing on screen saying so before the shove.
+A sandbox for RIDING must open ready to ride: the zone's look has its OWN key now (`mel.dragz`; it read the dojo's `mel.dragon`, so an old
+dojo WILD pick also made him wild here) and defaults to CAPTURED. The taming is TOOLS > DRAGON: EVIL, as before.
+**Still open, his:** "the collar's pieces are pointing the wrong direction" -- that is the EVIL collar (spikes, chain) and it is not fixed:
+reading the code has not found it, and a headless render of the zone (the preinstalled Chromium) would settle it -- asked, not run.
+Gates: check ok, zone boot ok. Shipped unverified.
+
 ## m15xx -- THE SWORD TASSEL (his: *"a little rope off the end of the handle with a fluffy ball on it, like Chinese swords"*)
 A red cord off the katana's pommel, a gold bead, and a fluffy red pompom with a ragged fringe. It is a 5-point VERLET chain in world space
 (`tasselStep`, `TASSEL`: seg .038 m, gravity, damping 2.2, 6 constraint passes), anchored to the pommel every frame, so it swings with every
