@@ -64,7 +64,7 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
-## THE DOJO, PASS 14: SWALLOWS AND CRANES (mXXXX)
+## THE DOJO, PASS 14: SWALLOWS AND CRANES (m1460)
 - **One InstancedMesh per flock.** Each bird is a few triangles (body, two wings, and for the cranes a neck, a red crown and trailing legs) with `aW` (0 at the body, ±1 at the wingtips). The flap is in the vertex shader: per-instance `iF` = phase and rate, and the span narrows a touch on the downstroke.
 - **Swallows (30):** follow a leader on a looping path (r ~70, y 9-27), each on its own offset that drifts, banking with the turn (`dojoBirds`).
 - **Cranes (7):** a V on a slow circle at r 150, y 40, white with black tips.
