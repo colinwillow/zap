@@ -5,6 +5,11 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home pass 27 (Worker B): the restoration's colour, its bursts and its motes
+- Pass 26's colour flood was faint: `restoreMat` tints a material's colour, and over still-saturated maps a tint barely shows. Every home material's shader now also takes **`uDrain`** (`GHOME.drain`) after `color_fragment`, the recipe of main's AGE: pulled 78% to its own luminance with a dust tint, darkened 20%. `uDrain = 1 - rsEase((t - .15) / .6)`, the kit's own colour curve. The rust colours went milder (35% to dust, x .85), because the drain does the work. Rendered headless: FALLEN is a dusty grey-brown ruin (pier and plants too); RESTORED is the full colour.
+- **Landings**: as each chunk's own progress passes .985 on the way up, a mint `spkBurst` at its pivot, a thud, a small shake. It re-arms below .5. On a RESTORED start every piece is marked landed, so nothing bursts at load.
+- **Motes**: during the show, mint sparks rise in a 6-12 m ring round him.
+- **The plate**: emissive breathes while armed, dim while it waits to re-arm.
 ## Grumbo's home pass 26 (Worker B): the RESTORATION, live -- one set of pieces, fallen to restored on a plate
 - His (relayed, and here): *"the opposite of fallen... the same pieces, so we can animate it... pieces moving in and fixing themselves"*, then the correction: *"not every building flies... the ground will be flying"*. Most buildings REVIVE in place, chunks of earth lift, ship-like buildings fly. So the home revives in place.
 - **Chunks by vertex attribute, so the merges stay.** `put` tags every piece with `aChunk` (0 to 9, by where its bounding-box middle lands: `A.chunkOf`) and grows that chunk's bounds. Every home material gets an `onBeforeCompile` (its own kept: triplanar, wind, sway) that moves `transformed` and `objectNormal` by `uCh[aChunk]`. **Still 35 draws.** Chunk 0 (the mound, rocks, plants, paths, pier) never moves.
