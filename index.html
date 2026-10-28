@@ -22463,8 +22463,9 @@ function zepMake(g) {
     const st = new THREE.Mesh(new THREE.CylinderGeometry(.06, .1, .8, 8), wood); st.position.y = -.95; core.add(st); }
   const Z = { ship, prop, pen, cho, noren, core, rings: [], sh: 0,
     walkB: { dyn: 1, hx: .55, hz: 6, lz: 0, y0: 11.05, y1: 11.2, cs: 1, sn: 0, cx: 0, cz: 0, minx: 0, maxx: 0, minz: 0, maxz: 0, miny: 0, maxy: 0 },
-    deckB: { dyn: 1, hx: 1.7, hz: 3.4, lz: 0, y0: -1.3, y1: 0,     /* m1586: the whole hull is solid (it was a .3 m slab at deck height: an invisible ledge at chest height) */ cs: 1, sn: 0, cx: 0, cz: 0, minx: 0, maxx: 0, minz: 0, maxz: 0, miny: 0, maxy: 0 } };
-  BDYN.push(Z.deckB, Z.walkB);
+    deckB: { dyn: 1, hx: 1.85, hz: 1.8, lz: 0, y0: -1.3, y1: 0,     /* m@X4@ (pass 10): the midships third; `ends` below take the taper */     /* m1586: the whole hull is solid (it was a .3 m slab at deck height: an invisible ledge at chest height) */ cs: 1, sn: 0, cx: 0, cz: 0, minx: 0, maxx: 0, minz: 0, maxz: 0, miny: 0, maxy: 0 } };
+  Z.ends = [-1, 1].map(e => ({ dyn: 1, hx: 1.5, hz: .85, lz: e * 2.6, y0: -1.3 + .15, y1: .1, cs: 1, sn: 0, cx: 0, cz: 0, minx: 0, maxx: 0, minz: 0, maxz: 0, miny: 0, maxy: 0 }));
+  BDYN.push(Z.deckB, Z.walkB, ...Z.ends);
   for (const lz of [-2.6, 2.6]) { const R = gringAdd(ship, 0, -1.6, lz); R.lz = lz; R.ly = -1.6; Z.rings.push(R); }
   return Z;
 }
@@ -22474,6 +22475,7 @@ function zepPose(Z, x, y, z, h) {
   S.position.set(x, y, z); S.rotation.y = h; Z.posed = 1; const c = Math.cos(h), s = Math.sin(h), b = Z.deckB;
   b.cs = c; b.sn = -s; b.cx = x; b.cz = z; const ex = Math.abs(c) * b.hx + Math.abs(s) * b.hz, ez = Math.abs(s) * b.hx + Math.abs(c) * b.hz;
   b.minx = x - ex; b.maxx = x + ex; b.minz = z - ez; b.maxz = z + ez; b.miny = y + b.y0; b.maxy = y + b.y1;
+  for (const w of Z.ends || []) { const ex2 = Math.abs(c) * w.hx + Math.abs(s) * w.hz, ez2 = Math.abs(s) * w.hx + Math.abs(c) * w.hz; w.cs = c; w.sn = -s; w.cx = x + w.lz * s; w.cz = z + w.lz * c; w.minx = w.cx - ex2; w.maxx = w.cx + ex2; w.minz = w.cz - ez2; w.maxz = w.cz + ez2; w.miny = y + w.y0; w.maxy = y + w.y1; }     // m@X4@: bow and stern, narrower and a touch higher (the sheer)
   if (Z.walkB) { const w = Z.walkB, wx = Math.abs(c) * w.hx + Math.abs(s) * w.hz, wz = Math.abs(s) * w.hx + Math.abs(c) * w.hz; w.cs = c; w.sn = -s; w.cx = x; w.cz = z; w.minx = x - wx; w.maxx = x + wx; w.minz = z - wz; w.maxz = z + wz; w.miny = y + w.y0; w.maxy = y + w.y1; }     // m1594: the catwalk rides
   if (Z.lad) { const L = Z.lad, lx = x + -1.9 * s, lz = z + -1.9 * c; L.cx = lx; L.cz = lz; L.ux = c; L.uz = -s; L.nx = s; L.nz = c; L.minx = lx - .6; L.maxx = lx + .6; L.minz = lz - .6; L.maxz = lz + .6; L.miny = y; L.maxy = L.top = y + 4.1; L.mark = { x: x - 1.9 * s + .0, y: y + 11.2, z: z - 1.9 * c }; }     // m1594: the ladder rides; its top steps out onto the catwalk
   for (const R of Z.rings) { R.x = x + R.lz * s; R.z = z + R.lz * c; R.y = y + R.ly; }
@@ -22613,7 +22615,7 @@ function zepHit(x, y, z, rad, dmg) { const Q = ZEP.on; if (!Q) return 0;
     Z.hc = Q.t + .25; Z.hp = (Z.hp == null ? ZEP.hp : Z.hp) - Math.max(.5, dmg || 1); spkBurst(x, y, z, 12, { col: [1, .8, .4], spread: 3, size: .1, life: .35 }); snd('thud', { g: .7, r: .7, x, z });
     if (Z.hp <= 0) { Z.hp = ZEP.hp; Z.downT = ZEP.downT; for (let k = 0; k < 4; k++) spkBurst(x, y, z, 24, { col: k % 2 ? [1, .55, .15] : [.9, .9, .85], spread: 7, size: .22, life: .8 }); snd('boom', { g: 1, r: .6, x, z }); camShake(.3); }
     return 1; } return 0; }
-function zepClear() { const Q = ZEP.on; if (!Q) return; if (Q.plantMs) plantDrop(Q.plantMs); for (const Z of Q.zs) { if (Z.lad) { const i = KCLIMB.indexOf(Z.lad); if (i >= 0) KCLIMB.splice(i, 1); if (player.climb === Z.lad) climbOff(); } const j = BDYN.indexOf(Z.walkB); if (j >= 0) BDYN.splice(j, 1); } for (const Z of Q.zs) for (const c of Z.coins || []) { const i = COIN.list.indexOf(c); if (i >= 0) COIN.list.splice(i, 1); } if (Q.R) { const i = RESTORE.list.indexOf(Q.R); if (i >= 0) RESTORE.list.splice(i, 1); } for (const o of Q.ground || []) o.removeFromParent(); smashDrop(Q.landed); for (const Z of Q.zs) { const j = BDYN.indexOf(Z.deckB); if (j >= 0) BDYN.splice(j, 1); if (Z.tur) turretDrop(Z.tur); if (player.bar && player.bar.B === Z.bar) player.bar = null; } if (player.rope && Q.rings.includes(player.rope.R)) player.rope = null; bldClear(Q); ZEP.on = null; }
+function zepClear() { const Q = ZEP.on; if (!Q) return; if (Q.plantMs) plantDrop(Q.plantMs); for (const Z of Q.zs) { if (Z.lad) { const i = KCLIMB.indexOf(Z.lad); if (i >= 0) KCLIMB.splice(i, 1); if (player.climb === Z.lad) climbOff(); } for (const b of [Z.walkB, ...(Z.ends || [])]) { const j = BDYN.indexOf(b); if (j >= 0) BDYN.splice(j, 1); } } for (const Z of Q.zs) for (const c of Z.coins || []) { const i = COIN.list.indexOf(c); if (i >= 0) COIN.list.splice(i, 1); } if (Q.R) { const i = RESTORE.list.indexOf(Q.R); if (i >= 0) RESTORE.list.splice(i, 1); } for (const o of Q.ground || []) o.removeFromParent(); smashDrop(Q.landed); for (const Z of Q.zs) { const j = BDYN.indexOf(Z.deckB); if (j >= 0) BDYN.splice(j, 1); if (Z.tur) turretDrop(Z.tur); if (player.bar && player.bar.B === Z.bar) player.bar = null; } if (player.rope && Q.rings.includes(player.rope.R)) player.rope = null; bldClear(Q); ZEP.on = null; }
 // m1152: THE FLYING SHIP HOUSE (BUILDINGS.md #10, pass 1) at (0, -40), floating. A junk-ship hull 21 m long hanging 3 m off the ground on three
 // glowing Jin engines, its deck at 6 m, a two-masted junk rig with battened sails, a DECKHOUSE at the stern (a door on its bow side, a curved
 // roof), and a long GANGPLANK up the starboard side from the ground. The hull bobs gently (picture only; the deck you stand on holds still).

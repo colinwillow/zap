@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE ZEPPELINS, detail pass 10 (a COLLIDER AUDIT; the last of the zeppelin passes)
+His first complaint was an invisible collider, so the last pass measures every zeppelin collider against what is drawn:
+- **The deck**, against the hull's own half-width `zw(z)`: the single 1.7 x 3.4 m box overhung the bow and stern corners by **0.26 m** (an
+  invisible ledge past the prow) and fell **0.2 m** short of the drawn deck midships (a strip you could fall through). It is THREE turned
+  boxes now: midships (half 1.85 x 1.8, within 0.08 m of the hull) and bow and stern (half 1.5 x 0.85 at +/-2.6 m, within 0.07 m on the
+  outside; a touch higher, for the sheer). All in `BDYN`, posed in `zepPose`, removed in `zepClear`. Measured posed: the ends sit +/-2.6 m
+  along the heading.
+- **The catwalk** (`walkB`, half 0.55 x 6) is the plank (1.1 x 12) exactly. **The piers** are built from the same geometry as their meshes;
+  of the props only the lower crate and the barrel are solid. **Nothing else on the ship is solid**: the posts, rails, roof, cargo and helm
+  are walk-through, and no box exists where nothing is drawn.
+The zeppelin detail passes end here (4-10); the loop resumes the table at the Flying Ship House. Shipped unverified.
+
 ## m1597 -- THE ZEPPELINS, detail pass 9 (the Jinra core; the piers grounded)
 - THE JINRA LIFT-CORE: a mint crystal turning and breathing in a bronze cage on a post under the roof, shedding mint motes while it flies.
   Jinra is the one mint thing, and this is what holds the ship up. Fallen, it shrinks to a dim ember (`restoreSkin` drains it too).
