@@ -239,8 +239,9 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - [x] **pass 23 (m1442):** THE PLANTS, second pass: the grass and reeds SWAY in the wind (a per-blade height attribute drives the shader), fuller drifts of golden grass, gravel patches of sandstone chips, and a TUMBLEWEED that rolls and hops along the beach every so often
   - [x] **pass 24 (m1443):** THE PIER AND CANOE, third pass: the hung catch slimmed into fish (tails, eyes), a red cloth canopy over the T-head's shore half, a fishing net draped over the rail with floats; every 18-38 s the CANOE LIFTS half a metre on its discs, hangs dripping with its runes blazing, and settles with a splash. **Also fixes m1442, which threw on every frame in the home** (see NOTES)
   - [x] **pass 25 (next tick):** PATHS AND TRAILS (his ask): worn tracks of trodden sand with footprints and pebbled edges -- shop steps to the pier and along the strip under the stalls, round both sides of the mound to the back door, out to the two cave mouths, and up and down the bank; every rock, cactus, shelf and plant keeps off them
+  - [x] **pass 28 (next build):** the stall SHUTTERS (his queue): a roll-up tin curtain on each stall's front, from a drum under the outer beam down to the deck, between iron guides; strike one and it rolls up or down (solid while down). FALLEN they are down and stuck (a blow only rattles them), RESTORED up, and the show rolls them up as it ends. They fall with their stall
   - [ ] then more passes, each one closer to the four views
-  - **Still open on the home** (agreed after m1459): the shop SHUTTERS (roll up / down), the rocks' 3rd pass, the plants' 3rd pass with
+  - **Still open on the home** (agreed after m1459): ~~the shop SHUTTERS~~ (pass 28), the rocks' 3rd pass, the plants' 3rd pass with
     cliff shrubs, the rope LIFT to the balcony, BREAKABLE pots, the back ladder and stall rack (ref 2) -- then his sign-off.
 
 ## FALLEN / RESTORED (his, after m1495; KORAJIN.md "THE RESTORATION") -- every Red Hollows piece has two states, default FALLEN
@@ -305,7 +306,7 @@ mountain. Maybe there's a lookout tower at the very top... anchoring those drawb
     a flag), its signal BELL (rings when struck) and a BRAZIER (sparks); a 134 m ZIPLINE from the lookout down to a post beside the
     home; a marked TRAIL (cairns and red-capped posts) from the rim above the mill's east turret up to the pinnacle's foot; a plank and
     a ladder from the east turret's roof up to where the wall eases off to the rim
-  - [x] **pass 2 (next build):** RIDGES -- six spurs down from the top with gullies between (`gpeakRidge`, in the height itself, so they are ground you walk); 26 OUTCROPS on the spurs, each a ledge of two or three stacked stratified slabs stepping back up the slope (the big ones solid); SCREE fanned below each down the gully; the trail is a WORN PATH now (the home's trodden-sand look, shared as `ghPathMat`) with 41 log STEPS where it climbs steeply
+  - [x] **pass 2 (m1541):** RIDGES -- six spurs down from the top with gullies between (`gpeakRidge`, in the height itself, so they are ground you walk); 26 OUTCROPS on the spurs, each a ledge of two or three stacked stratified slabs stepping back up the slope (the big ones solid); SCREE fanned below each down the gully; the trail is a WORN PATH now (the home's trodden-sand look, shared as `ghPathMat`) with 41 log STEPS where it climbs steeply
 - **DONE WHEN:**
   - [ ] the mountain reads as a mountain (ridges, outcrops, scree, not a smooth bump) from the home and the mill
   - [ ] the trail is a real path (the worn ribbon, switchbacks, steps where it is steep) and the climb is fun

@@ -65458,7 +65458,7 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 try { const q = new URLSearchParams(location.search).get('hs'); if (q === 'restored' || q === 'fallen') AGE.st = q; } catch (e) {}     // the state is main's AGE (m1501); `?hs=` overrides for a look
 const hsF = () => AGE.st === 'fallen';
 function hsFallen(g) { if (!g || !hsF()) return; bldAge(g); }     // main's weathering (`bldAge`, m1501): the paint drained in the shader, metal to rust, glows out
-const GHOME = { on: 1, pass: 27, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
+const GHOME = { on: 1, pass: 28, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   Rtu: 2.5, door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
@@ -65549,8 +65549,24 @@ function ghomeHit(x, y, z, rad) { if (!GHOME.g || !inHome()) return 0; const w0h
       const lx = (dx * c - dz * s) / n, lz = (dx * s + dz * c) / n; w.vz += lx * 1.9; w.vx -= lz * 1.9; w.hc = .25;
       snd('clang', { g: 1, r: .7, x: P.x, z: P.z }); spkBurst(x, y, z, 18, { col: [1, .8, .35], spread: 4, size: .12, life: .5 }); camShake(.06); return 1; } }
   { const C = GHOME.canoe; if (C && GHOME.sw && GHOME.sw.hc <= 0 && Math.hypot(x - C.x, z - C.z) < 2.6 + rad && y < GHOME.g.position.y + C.y + 2) { C.kv += (Math.random() < .5 ? -1 : 1) * 1.1; GHOME.sw.hc = .3; snd('thud', { g: .7, r: 1.1, x: C.x, z: C.z }); spkBurst(x, y, z, 10, { col: [.85, .93, 1], spread: 3, size: .08, life: .4 }); return 1; } }     // pass 21: a blow rocks the canoe
+  for (const S of GHOME.shut || []) { if (!w0hc()) break; const G = GHOME.g, dx = x - G.position.x, dz = z - G.position.z, c = Math.cos(G.rotation.y), sn = Math.sin(G.rotation.y), lx = dx * c - dz * sn, lz = dx * sn + dz * c, ly = y - G.position.y;
+    if (lx < S.xa - .2 || lx > S.xb + .2 || Math.abs(lz - S.z) > .6 + rad || ly < S.yb - .2 || ly > S.yt + .5) continue; GHOME.sw.hc = .4;
+    if ((GHOME.R_ ? GHOME.R_.t : 1) < .99) { snd('thud', { g: .6, r: .6, x, z }); spkBurst(x, y, z, 8, { col: [.6, .4, .3], spread: 2, size: .08, life: .4 }); return 1; }
+    S.want = S.want > .5 ? 0 : 1; snd('clang', { g: .7, r: .5, x, z }); spkBurst(x, y, z, 10, { col: [1, .7, .4], spread: 2.5, size: .08, life: .4 }); return 1; }
   if (GHOME.bellT <= 0) for (const B of GHOME.bellPts || []) if (Math.hypot(x - B[0], y - B[1], z - B[2]) < .4 + rad) { GHOME.bellT = .15; snd('clang', { g: .55, r: 2.1 + Math.random() * .4, x: B[0], z: B[2] }); spkBurst(B[0], B[1], B[2], 8, { col: [1, .85, .4], spread: 2, size: .07, life: .35 }); return 1; }
   return 0; }
+// pass 28: the shutters' slats, laid from the curtain's bottom edge (yt - showing) up to the drum; a slat past the drum is folded into it
+function ghomeShutFill() { const A = GHOME, pa = A.shutMesh.geometry.attributes.position, T = A.shutTpl, nv = T.length / 3;
+  for (const S of A.shut) { if (!S.dirty) continue; S.dirty = 0; const L = (1 - S.u) * (S.yt - S.yb), w = S.xb - S.xa, cx = (S.xa + S.xb) / 2;
+    for (let i = 0; i < S.n; i++) { const yb = S.yt - L + i * S.h, gone = yb >= S.yt - .02, hh = Math.min(S.h - .012, S.yt - yb), th = i === 0 ? .07 : .025, dz = i % 2 ? .012 : -.012, base = (S.o + i) * nv * 3;
+      for (let v = 0; v < nv; v++) { const q = base + v * 3; if (gone) { pa.array[q] = cx + T[v * 3] * w; pa.array[q + 1] = S.yt; pa.array[q + 2] = S.z; continue; }
+        pa.array[q] = cx + T[v * 3] * w; pa.array[q + 1] = yb + (T[v * 3 + 1] + .5) * hh; pa.array[q + 2] = S.z + dz + T[v * 3 + 2] * th; } } }
+  pa.needsUpdate = true; }
+function ghomeShut(dt) { const A = GHOME; if (!A.shut) return; const RT = A.R_ ? A.R_.t : 1; let grid = 0;
+  for (const S of A.shut) { if (RT > .99 && !S.woke) { S.woke = 1; if (A.R_.goal === 1 && S.u < .5) S.want = 1; } if (RT < .01) { S.woke = 0; S.want = S.u = 0; S.dirty = 1; }
+    if (S.u !== S.want) { const was = S.u; S.u = S.want > S.u ? Math.min(S.want, S.u + dt * .55) : Math.max(S.want, S.u - dt * .8); S.dirty = 1; if (S.u === S.want && was !== S.u) snd('thud', { g: .5, r: .8, x: S.box.minx, z: S.box.minz }); }
+    const on = S.u < .55 && RT > .99; if (on !== !!S.on) { S.on = on; if (on) BOXES.push(S.box); else { const i = BOXES.indexOf(S.box); if (i >= 0) BOXES.splice(i, 1); } grid = 1; } }
+  if (grid) boxGrid(); if (A.shut.some(S => S.dirty)) ghomeShutFill(); }
 // THE RESTORATION's rig for him: a stand-in Object3D per chunk (the RESTORE kit poses those), copied every frame into `chU` as
 // T(stand-in) R(stand-in) T(-pivot); every material learns `aChunk` (its own onBeforeCompile kept); colour floods from rust; the plate by the steps
 function ghomeRestoreRig(MG) { const A = GHOME, N = A.chNames.length, U = A.chU = { value: [] }, DR = A.drain = { value: 0 }; for (let k = 0; k < N; k++) U.value.push(new THREE.Matrix4());
@@ -66213,6 +66229,18 @@ function ghomeBuild(at, yaw, y0) {
     const puffs = []; for (let i = 0; i < N; i++) puffs.push({ s: i % 2, age: (i / N) * 4.5, life: 4.5, x: 0, y: 0, z: 0, vx: 0, vz: 0 });
     GHOME.smoke = { pts, pos, puffs, tops: A.tops || [] }; }
   // ---- merge, and the world gets the boxes and the floors ----
+  // ---- PASS 28 (his queue): the stall SHUTTERS -- a roll-up tin curtain on each stall's front, from a drum under the outer beam down to the
+  // deck. Strike one and it rolls up (or down); FALLEN they are down and stuck, RESTORED up, and the show rolls them up at its end. The slats
+  // are ONE mesh (both shutters) rewritten only while one moves (`ghomeShut`); it is chunked like the rest, so it falls with its stall ----
+  { const shutM = new THREE.MeshStandardMaterial({ color: 0x9c5c3a, metalness: .45, roughness: .58 }), h = .16, tpl = new THREE.BoxGeometry(1, 1, 1).toNonIndexed(); A.shut = []; A.shutM = shutM;
+    for (const sx of [-1, 1]) { const xa = sx < 0 ? -9.75 : 2.45, xb = sx < 0 ? -2.45 : 9.75, z = 7.68, yt = P + 2.55, yb = P + .02, n = Math.ceil((yt - yb) / h);
+      put(new THREE.CylinderGeometry(.17, .17, xb - xa + .12, 12), shutM, at4((xa + xb) / 2, yt, z, 0, 0, Math.PI / 2));
+      for (const x of [xa - .02, xb + .02]) vbox(x - .05, x + .05, yb, yt, z - .09, z + .09, iron, 0);
+      const b = box(xa, xb, yb, yt, z - .1, z + .1, { noCam: 1 }); boxes.pop(); A.shut.push({ xa, xb, z, yt, yb, n, h, k: A.chunkOf((xa + xb) / 2, P + 1.3, z), u: hsF() ? 0 : 1, want: hsF() ? 0 : 1, box: b, on: 0, dirty: 1 }); }
+    const nv = tpl.attributes.position.count, N = A.shut.reduce((a, S) => a + S.n, 0), geo = new THREE.BufferGeometry(), nrm = new Float32Array(N * nv * 3), ch = new Float32Array(N * nv); let o = 0;
+    for (const S of A.shut) { S.o = o; for (let i = 0; i < S.n; i++, o++) { nrm.set(tpl.attributes.normal.array, o * nv * 3); ch.fill(S.k, o * nv, (o + 1) * nv); } }
+    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(N * nv * 3), 3)); geo.setAttribute('normal', new THREE.BufferAttribute(nrm, 3)); geo.setAttribute('aChunk', new THREE.BufferAttribute(ch, 1));
+    const sm = new THREE.Mesh(geo, shutM); sm.frustumCulled = false; sm.castShadow = sm.receiveShadow = true; g.add(sm); A.shutMesh = sm; A.shutTpl = tpl.attributes.position.array; ghomeShutFill(); }
   let draws = 0; for (const [m, list] of MG) { if (m.map && !m.userData.tri) m.map.wrapS = THREE.RepeatWrapping; const geo = mergeGeometries(list); if (!geo) { console.warn('[melee] ghome: a bucket would not merge', m.name || m.color); continue; } const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; g.add(o); draws++; }
   ghomeRestoreRig(MG);
   for (const b of boxes) BOXES.push(b);
@@ -67022,7 +67050,7 @@ function homeLanterns() {
 function homeStep(dt) {
   const H = HOME; H.t += dt; if (RW.U) RW.U.uTime.value = H.t;
   gmillStep(dt, H.t); gpeakStep(dt); gjinraStep(dt, H.t); if (GMERCH.g) rsChunkSync(GMERCH);
-  if (GHOME.U) GHOME.U.uWind.value = H.t; ghomeSmoke(dt, H.t); for (const G of GHOME.gates || []) bgateStep(G, dt);     // pass 9: his back door
+  if (GHOME.U) GHOME.U.uWind.value = H.t; ghomeSmoke(dt, H.t); ghomeShut(dt); for (const G of GHOME.gates || []) bgateStep(G, dt);     // pass 9: his back door
   if (GHOME.canoe) { const C = GHOME.canoe, t = H.t; C.g.position.y = C.y + rwWaveAt(C.x, C.z, t) * .8 * (1 - Math.min(1, (C.lift || 0) * 2)) + .02 + (C.lift || 0); C.ht = (C.ht == null ? 12 : C.ht) - dt; if (C.ht <= 0 && !C.hu) { C.hu = 1e-3; } if (C.hu) { C.hu += dt; if (C.hu > 6) { C.hu = 0; C.ht = 18 + Math.random() * 20; const P = C.g.getWorldPosition(new THREE.Vector3()); spkBurst(P.x, GHOME.g.position.y + C.y + .05, P.z, 30, { col: [.85, .93, 1], spread: 4, size: .09, life: .6 }); snd('thud', { g: .5, r: .7, x: P.x, z: P.z }); } }     // pass 24: now and then it LIFTS on its discs, hangs dripping, and settles
   const lift = C.hu ? .5 * Math.min(1, C.hu / 1.4) * Math.min(1, Math.max(0, (6 - C.hu) / 1.2)) : 0; if (lift > .05 && Math.random() < dt * 14) { const P = C.g.localToWorld(new THREE.Vector3((Math.random() - .5) * .8, -.4, (Math.random() - .5) * 4)); spkBurst(P.x, P.y, P.z, 2, { col: [.8, .9, 1], spread: .4, size: .05, life: .5 }); }
   C.kv = (C.kv - 9 * C.roll * dt) * Math.exp(-1.2 * dt); C.roll += C.kv * dt; C.g.rotation.set(Math.sin(t * .9) * .03, C.ry + Math.sin(t * .23) * .04, Math.sin(t * 1.1 + 1) * .05 + C.roll); C.rune.emissiveIntensity = 1.2 + .8 * Math.sin(t * 2.2) ** 2 + lift * 5; C.lift = lift; }     // pass 21: struck, it rocks; the runes breathe

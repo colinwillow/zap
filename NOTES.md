@@ -17,7 +17,7 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 Render-checked headless (west, east). Not checked: whether the launch bar's swing actually clears the 4.8 m terrace edge. It is the Pagoda's
 pattern, but that terrace is lower. Shipped unverified. **The Shrine's three passes are done; next in the table: Market Stalls.**
 
-## the peak, pass 2: ridges, outcrops, scree, a worn trail (Worker B, loop tick 4)
+## m1541 -- the peak, pass 2: ridges, outcrops, scree, a worn trail (Worker B, loop tick 4)
 DONE WHEN box "the mountain reads as a mountain" moved (not ticked: his phone). `gpeakLift` multiplies the old bump by
 `1 + GPEAK.ridge * smooth(6, 20, m) * (gpeakRidge^2 - .4)`, gpeakRidge = 1 - |sin(3θ + noise)|: six warped spurs, gullies between, faded
 out near the top (θ is undefined at m = 0) and zero at the rim like before. Outcrops are sampled only where the ridge value > .55, kept 4.5 m
