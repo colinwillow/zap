@@ -5,6 +5,12 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home pass 18 (Worker B): rocks, not eggs
+- His note: *"those egg looking rock things... they just look like squash balls... breaking up the circular spherical rocks."* Every boulder was a scaled icosphere.
+- **`ghRockGeo(seed, sx, sy, sz, det)`** (top level, next to `ghNoise3`). An icosphere pushed by two octaves of noise (±.31, ±.11). The top is flattened above a noisy line (x .3). The base is sunk flat below -.15. Horizontal strata come from a sine on y. A noise-driven lean. Smooth normals, averaged per position: there is no `mergeVertices` in vendor, and a non-indexed icosphere's duplicates share positions, so the noise cannot crack it.
+- **The home.** `A.rockC(x, z, k, rnd)` places a cluster: one stone, one to three smaller ones leaning into it, and four pebbles, all sunk. It is used by the mound's foot (pass 1) and the outer boulders (pass 4). Colliders unchanged.
+- **The valley.** `hollowDress`'s floor boulders, hoodoo stacks and rim lumps use `ghRockGeo` too. They keep their flat vertex colours and `rwMesh`'s faceted normals, which suit the low-poly cliffs.
+- Draws unchanged (26). The pass-9 BLOBS (the small swollen domes with windows) are architecture and are left as they are. Next: the fishing pier and the alien canoe, then plants.
 ## Grumbo's home pass 17 (Worker B): the winch lowers and raises the orb
 - His list: *"breakable, ring, ball swingable, shoppable, openable, buildable... raise things, lower things."* This pass is the first raise/lower.
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
