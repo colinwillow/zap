@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## mDRG -- THE DRAGON RIDE: HIS CONTROL MAP (the right pad jumps and flies, the left pad moves, the camera stays on the right drag)
+## m1625 -- THE DRAGON RIDE: HIS CONTROL MAP (the right pad jumps and flies, the left pad moves, the camera stays on the right drag)
 His: *"Tapping the right stick should have the dragon jump; double tapping has him take flight. If you tap and hold, he kind of jump-flies up
 into the air and then slowly comes back down to the ground; double tap, he takes off and is actually flying like RollerGirl. Left stick
 controls locomotion on the ground and in the air; right stick still controls the camera."*
