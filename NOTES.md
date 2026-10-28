@@ -18,7 +18,7 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - Plate beside the first wreck; `rig` hook; `zepClear` drops the rig and the plate.
 Render-checked headless: fallen (grounded, deflated) and restored (flying). A first restored shot rendered the planks black: that is
 the headless same-tick shader compile, and it renders correctly after a wait. Shipped unverified.
-## m15xx -- The First Beacon pass 7: the wall jump taught in four beats (and a silent build failure caught)
+## m1573 -- The First Beacon pass 7: the wall jump taught in four beats (and a silent build failure caught)
 - B -> C is now `chim:3|1 TEACH`, `chim:6|2 DEVELOP`, `chimjump:4|3 TWIST`, `chim:7|4 CONCLUDE` (+20, B 4 -> C 24). A spec's `|label` puts the beat on
   its sign. Kicks per chimney from the move table: the first catch off a run jump is at 2.82 m, then +2.07 a kick (`MOVEC.wall_chain` comfy 1.66).
 - **`chim` has a FLOOR at its foot now** (between the walls, 2.25 m each side, so the walls do not stand on it -- the audit flagged the first, 4.6 m

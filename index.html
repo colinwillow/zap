@@ -26453,7 +26453,7 @@ BEACON.sheet = { k: 1.5, st: [     // `k`: the sheet's metres are ~2/3 of what t
   runs: [
     { c: ['hop', 'ledge:3.3', 'ledge:3.3', 'gap_dbl', 'ledge:2.4'], first: 'z' },     // S->A teach: hop, jump-and-catch, the double; +9
     { c: ['drop:5'], first: 'z' },     // A->B the drop into the court (one way); south first, in from the EAST, so it never shares the climb's line north of B (m1562 audit)
-    { c: ['chim:3|1 TEACH', 'chim:6|2 DEVELOP', 'chimjump:4|3 TWIST', 'chim:7|4 CONCLUDE'] },     // B->C THE BIG CLIMB: the wall jump in four beats, +20 (m15xx)
+    { c: ['chim:3|1 TEACH', 'chim:6|2 DEVELOP', 'chimjump:4|3 TWIST', 'chim:7|4 CONCLUDE'] },     // B->C THE BIG CLIMB: the wall jump in four beats, +20 (m1573)
     { c: ['gap_dbl', 'ledge:4'], first: 'x' },     // C->D the rooftops, +4
     { c: ['zip', 'drop:6'], first: 'z' },     // D->Z zip line 1 down the canyon to the east (28 -> 14)
     { c: ['chim:10', 'ledge:3.3', 'chim:8', 'ledge:4.3'] } ] };     // Z->T the finale climb, +26 to the brazier
@@ -26465,10 +26465,10 @@ const BCH = {
     return { out: K.out(7, P.y + r), ask: `ledge +${r} m: ${dbl ? 'DOUBLE JUMP' : 'JUMP'} and catch` }; },
   drop: (P, K, n) => { const D = +n || 6; K.slab(1, 7, P.y - D); return { out: K.out(7, P.y - D), ask: `drop -${D} m` }; },
   walk: (P, K, n) => { const L = +n || 6; K.slab(0, L, P.y); return { out: K.out(L, P.y), ask: `walk ${L} m` }; },
-  chim: (P, K, n) => { const H = +n || 8, kicks = Math.max(1, Math.ceil((H - 2.82) / MOVEC.wall_chain)); K.B(0, 6, -2.25, 2.25, P.y - .5, P.y, K.M.land, 1); K.O.boxes[K.O.boxes.length - 1].top = 1; if (P.y > 1) K.B(2.5, 3.5, -.5, .5, 0, P.y - .5, K.M.slab, 1);     /* m15xx: a FLOOR at its foot: a missed kick drops him back to try again */
+  chim: (P, K, n) => { const H = +n || 8, kicks = Math.max(1, Math.ceil((H - 2.82) / MOVEC.wall_chain)); K.B(0, 6, -2.25, 2.25, P.y - .5, P.y, K.M.land, 1); K.O.boxes[K.O.boxes.length - 1].top = 1; if (P.y > 1) K.B(2.5, 3.5, -.5, .5, 0, P.y - .5, K.M.slab, 1);     /* m1573: a FLOOR at its foot: a missed kick drops him back to try again */
     for (const s of [-1, 1]) K.B(1, 6, s * 2.3, s * 2.3 + s * .5, P.y - .5, P.y + H + .4, K.M.wall, 1); K.slab(6, 11, P.y + H, P.y);
     return { out: K.out(11, P.y + H), ask: `chimney +${H} m: WALL JUMP, ~${kicks} kicks` }; },
-  // m15xx: the TWIST -- a chimney with no floor, its mouth across a 4 m gap: run, jump INTO it and catch the walls in the air (a run jump's first
+  // m1573: the TWIST -- a chimney with no floor, its mouth across a 4 m gap: run, jump INTO it and catch the walls in the air (a run jump's first
   // catch is at 2.82 m, measured), then kick up. A miss is the canyon floor and the nearest ladder.
   chimjump: (P, K, n) => { const H = +n || 5, g = 4, kicks = Math.max(1, Math.ceil((H - 2.82) / MOVEC.wall_chain)); for (const s of [-1, 1]) K.B(g, g + 5, s * 2.3, s * 2.3 + s * .5, P.y - 3, P.y + H + .4, K.M.wall, 1);
     K.slab(g + 5, g + 10, P.y + H, P.y); return { out: K.out(g + 10, P.y + H), ask: `jump ${g} m INTO a chimney, +${H}: ~${kicks} kicks` }; } };
