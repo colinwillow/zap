@@ -23982,12 +23982,18 @@ function skybBuild() {
     _v.set(c.x - E[0], c.y - E[1], c.z - E[2]).applyQuaternion(_q); _e.setFromQuaternion(_q); return { p: [E[0] + _v.x, E[1] + _v.y, E[2] + _v.z], r: [_e.x, _e.y, _e.z], hop: .25, at: rn * .5 }; };
   const R = restoreRig(g, { lift: 0, dur: 5, bob: 0 }), pieces = restorePieces(R, g, pairs, cls, fall); restoreSkin(R);
   const nm = bldMergeStatic(g), rtris = []; for (let i = 0; i < tris.length; i += 9) rtris.push(tris.slice(i, i + 9));
-  restoreRide(R, { up: { boxes: [], tris: rtris, climbs: [], bars: [], rings: [], objs: whole, coins: [] } });
+  // ---- RE-PASS 3 (m@X4@): THE RUN ACROSS -- three doubloons down each deck (a quarter, the middle, three quarters, on the sag) and a
+  // bronze GRAPPLE RING hung 1.4 m under each span's middle: the way across from BELOW (swing under it from one building toward the other)
+  // and a catch if he falls off. Both exist only while restored (`up`) ----
+  const coins = [], rings = []; for (const G of seg) { const S = G.S, at = u => [S.A[0] + G.dx * u, S.A[1] + (S.B[1] - S.A[1]) * u - Math.sin(u * Math.PI) * S.sag, S.A[2] + G.dz * u];
+    for (const u of [.25, .5, .75]) { const q = at(u); coins.push(coinDrop(g, q[0], q[1] + .9, q[2])); }
+    const m = at(.5); rings.push(gringAdd(g, m[0], m[1] - 1.4, m[2])); const rp = new THREE.Mesh(new THREE.CylinderGeometry(.025, .025, 1.1, 5), mats.rope); rp.position.set(m[0], m[1] - .6, m[2]); g.add(rp); whole.push(rp); }     // its rope up to the deck
+  restoreRide(R, { up: { boxes: [], tris: rtris, climbs: [], bars: [], rings, objs: whole, coins } });
   R.onSet = R2 => { restoreRideSet(R2); const on = R2.t >= 1; for (const z of zips) { const i = ZIPS.indexOf(z); if (on && i < 0) ZIPS.push(z); else if (!on && i >= 0) { ZIPS.splice(i, 1); if (player.zip === z) player.zip = null; } } };
   const ground = []; if (seg.length) { const G = seg[0], px = G.S.A[0] + G.dx * .5 + G.nx * 4, pz = G.S.A[2] + G.dz * .5 + G.nz * 4, plate = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, .12, 24), new THREE.MeshStandardMaterial({ color: 0x3a4a46, emissive: 0x7affd8, emissiveIntensity: .7 }));
     plate.position.set(px, .06, pz); scene.add(plate); ground.push(plate); R.trig = { x: px, y: 0, z: pz, armed: 1 }; }
   { const t0 = AGE.st === 'fallen' ? 0 : 1; R.goal = t0; restoreSet(R, t0); restoreRideSet(R, true); }
-  SKYB.on = { g, O, bars: [], n, zips, uT, nm, R, ground, pieces, sig: skybSig(), t: 0 };
+  SKYB.on = { g, O, bars: [], n, zips, uT, nm, R, ground, pieces, coins, rings, sig: skybSig(), t: 0 };
   if (!n) { snd('thud', { g: .5, r: .6 }); } else { snd('clang', { g: .6, r: .9 }); }
 }
 // m1170: which spans and zips can stand right now (a string) -- when it changes (a building spawned or removed after the bridges), the
@@ -23997,7 +24003,7 @@ function skybStep(dt) { const S = SKYB.on; if (!S) return; S.t += dt;
   S.uT.value = S.t;
   if ((S.chk = (S.chk || 0) - dt) <= 0) { S.chk = .5; if (skybSig() !== S.sig && !player.zip) { skybClear(); skybBuild(); } } }
 function skybClear() { const S = SKYB.on; if (!S) return; for (const z of S.zips || []) { const i = ZIPS.indexOf(z); if (i >= 0) ZIPS.splice(i, 1); } if (player.zip) player.zip = null;
-  if (S.R) { const i = RESTORE.list.indexOf(S.R); if (i >= 0) RESTORE.list.splice(i, 1); if (S.R.ride) { bldTrisDrop(S.R.ride.tb); bldTrisDrop(S.R.ride.tu); } } for (const o of S.ground || []) o.removeFromParent();     // m1643
+  if (S.R) { const i = RESTORE.list.indexOf(S.R); if (i >= 0) RESTORE.list.splice(i, 1); if (S.R.ride) { bldTrisDrop(S.R.ride.tb); bldTrisDrop(S.R.ride.tu); } } for (const o of S.ground || []) o.removeFromParent(); for (const c of S.coins || []) { const i = COIN.list.indexOf(c); if (i >= 0) COIN.list.splice(i, 1); }
   bldClear(S); SKYB.on = null; }
 // m1172: THE CLIFF LODGE (Set 2 #15, pass 1) at (0, 47). The zen mountain samurai lodge: a 12 m ROCK CRAG (a jittered block, flat on top), a
 // PATH cut round its four faces climbing 3 m a face to the top (one lap, landings at the corners), a timber LODGE with deep eaves on the

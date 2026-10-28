@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the SKY BRIDGES, pass 3 (L1/L3: THE RUN ACROSS) -- its third pass, DONE
+- Three doubloons down each deck at a quarter, the middle and three quarters, set on the deck's own sag (the same curve `bridgeSpan`
+  lays the planks on) .9 m up.
+- A bronze GRAPPLE RING (`gringAdd`) on a rope 1.4 m under each span's middle: the way across from BELOW (swing from one building toward
+  the other) and a catch for a fall off the deck. Ring heights with the four buildings up: 12.5, 6.8, 8.1 m.
+- Coins and rings are `up` on the set's rig (the rope is an `up.obj`): hidden and parked while fallen (rings measured at -588 m),
+  back when restored. `skybClear` takes the coins out of COIN.list; `bldClear` drops the rings.
+Render-checked headless (restored: ring, rope and doubloon under and on span 1; fallen: rings parked). Next: the Cliff Lodge.
+Shipped unverified.
+
 ## m1646 -- THE DRAGON RIDE: READY TO RIDE BY DEFAULT (his: "I can't even begin to get on him; I run into him and he hits me back")
 What he saw was m1622's WILD start: the EVIL look (no saddle, no lacquer -- "his saddle is gone, his armour is gone" -- the spiked iron collar
 with its chain), the shove inside `wildR`, and no mount until the Jinra spring's taming -- with nothing on screen saying so before the shove.
