@@ -11360,6 +11360,8 @@ function dragStep(dt) { const Z = DRAGZ, O = Z.on; O.t += dt; Z.U.uTime.value = 
   if (!O.go) { O.go = 1; dragHome(); dragBeast(); }
   const B = O.B; if (B && B.mx) { B.mx.update(dt); B.t -= dt; if (B.t <= 0) dojoBeastIdle(B); if (B.reins && B.reins.m.visible) dragReins(B.reins); }
   for (const h of O.hoops) h.m.rotation.y += h.w * dt;
+  if (B && B.ring) { const near = dragNear(); B.ring.visible = !player.dragon && Z.look === 'CAPTURED'; B.ring.material.opacity = near ? 1 : .45 + .3 * Math.sin(O.t * 3); B.ring.scale.setScalar(near ? 1.15 : 1);
+    if (near && !Z.tipped) { Z.tipped = 1; tipShow(Z.look === 'CAPTURED' ? 'Tap the right pad to climb on.' : 'He is wild -- he will not be ridden. (TOOLS > DRAGON)', 4); } else if (!near) Z.tipped = 0; }
   const p = player.pos; if (Math.hypot(p.x, p.z) > Z.I.rimR(Math.atan2(p.z, p.x)) && p.y < 2) dragHome(); }     // off the edge: back to the start
 // HIS DRAGON in the zone: the arena's prototype cloned (scale and facing measured there), his own material per instance so the EVIL tint stays
 // here, the two armour sets built once on his posed bones and switched by visibility, a body box so he is not walked through
@@ -11372,12 +11374,54 @@ async function dragBeast() { const Z = DRAGZ, O = Z.on; try { const K = await ar
     try { dojoDragonDress(B, m, root, P); dragDress2(B, m, root, P); } catch (e) { console.warn('[melee] dragon dress', e); note('DRAGON DRESS ' + e.message); }
     { const bb = new THREE.Box3(); for (const n of ['Bip001_Pelvis', 'Bip001_Spine2', 'Bip001_Neck', 'Bip001_L_UpperArm', 'Bip001_R_UpperArm', 'Bip001_L_Thigh', 'Bip001_R_Thigh']) { const b = m.getObjectByName(n); if (b) bb.expandByPoint(b.getWorldPosition(new THREE.Vector3())); }
       const pd = B.hd * .1; B.box = { minx: bb.min.x - pd, maxx: bb.max.x + pd, miny: 0, maxy: bb.max.y, minz: bb.min.z - pd, maxz: bb.max.z + pd, noCam: 1 }; BOXES.push(B.box); boxGrid(); }
+    dragSeat(B, m, root, P);
     dragLook();
   } catch (e) { console.warn('[melee] dragon zone', e); note('NO DRAGON ' + e.message); } }
 function dragLook() { const B = DRAGZ.on && DRAGZ.on.B; if (!B) return; const L = DRAGZ.look;
   for (const k in B.sets) for (const o of B.sets[k]) o.visible = k === L;
   if (B.reins) B.reins.m.visible = L === 'CAPTURED';
   for (const q of B.mats) { q.m.color.copy(q.c); if (L === 'EVIL') q.m.color.multiply(new THREE.Color(DRAGZ.evilTint)); } }
+// mDRG: MOUNT / DISMOUNT (DRAGON.md box 2). A mint ring on the ground at his LEFT flank (outside his body box, level with the saddle) is the
+// mount spot; standing on it a tap of the right pad climbs on: an arc from where you stand up into the saddle (`in_air`), turning to his
+// heading, then Grumbo sits in his own `driving` clip -- the seated pose with the hands forward, the nearest thing his file has to a rider (no
+// riding clip: asked for). In the saddle the seat is pinned to his Spine1 bone, so the rider moves with every clip; Grumbo's root is the seat
+// less his seated HIP height, MEASURED live off his hips bone in that pose (so the seat is under his hips, not his feet). Tap again: an arc back
+// down to the ring. Only CAPTURED lets you on (the taming, box 6, is what makes him CAPTURED in the story). While mounted the pads are the
+// dragon's: no jump, no roll, no strike; the lens follows behind him after `camIdle` s and pulls back `camPull` m for his size.
+Object.assign(DRAGZ, { reach: 2.6, mountT: .85, offT: .7, arc: 1.8, camIdle: .8, camFollow: 2.2, camPull: 6, camLift: .4 });
+const _drV = new THREE.Vector3(), _drV2 = new THREE.Vector3();
+const dragH = B => B.root.rotation.y - (B.faceOff || 0);
+function dragSeat(B, m, root, P) { const K = dragKit(m, root, B.hd), sp = K.bw('Bip001_Spine1'); B.faceOff = P.faceOff || 0; if (!sp) return;
+  const top = K.hitAlong(sp, K.up.clone().negate(), B.hd * 1.2, sp) || sp.clone().addScaledVector(K.up, B.hd * .15);
+  B.seat = new THREE.Group(); K.pin('Bip001_Spine1', B.seat, top.clone().addScaledVector(K.up, B.hd * .055));
+  const g = top.clone(); g.y = DRAGZ.daisY; let d = 0; const inBox = v => v.x > B.box.minx && v.x < B.box.maxx && v.z > B.box.minz && v.z < B.box.maxz;
+  while (d < 20 && inBox(_drV.copy(g).addScaledVector(K.side, d))) d += .25; B.mountAt = g.addScaledVector(K.side, d + 1.1);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(.9, .06, 6, 32).rotateX(Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0x7affd8, toneMapped: false, transparent: true }));
+  ring.position.copy(B.mountAt).y += .03; DRAGZ.on.g.add(ring); B.ring = ring; }
+function dragNear() { const B = DRAGZ.on && DRAGZ.on.B, p = player; if (!B || !B.mountAt || p.dragon) return 0;
+  return Math.hypot(p.pos.x - B.mountAt.x, p.pos.z - B.mountAt.z) < DRAGZ.reach && Math.abs(p.pos.y - B.mountAt.y) < 1.5; }
+function dragTap() { if (!DRAGZ.on) return false; const p = player, R = p.dragon;
+  if (R) { if (R.st === 'sit') { R.st = 'off'; R.t = 0; R.from = p.pos.clone(); snd('swoosh', { g: .4, r: 1.1 }); } return true; }
+  if (!dragNear() || !p.grounded) return false;
+  if (DRAGZ.look !== 'CAPTURED') { tipShow('He will not be ridden -- not yet. (TOOLS > DRAGON: CAPTURED. The taming comes later.)', 4); return true; }
+  const B = DRAGZ.on.B; if (!B.seat) return false;
+  p.dragon = { st: 'on', t: 0, from: p.pos.clone(), h0: p.faceH, hip: (rig.hipY || .6) * .6 }; p.vel.set(0, 0, 0); snd('swoosh', { g: .5, r: .9 }); return true; }
+// the body while mounted: called from the top of `stepPlayer`, which it replaces
+function dragRide(dt) { const p = player, R = p.dragon, B = DRAGZ.on && DRAGZ.on.B; if (!B || !B.seat) { p.dragon = null; return; }
+  R.t += dt; p.vel.set(0, 0, 0); p.speed = 0; p.grounded = true; p.jump = 0; p.stepOff = 0; p.roll = null; p.melee = null;
+  const hb = rig.bones.mixamorig_Hips; if (hb && R.st === 'sit' && R.t > .3) { const hy = hb.getWorldPosition(_drV2).y - rig.root.position.y; if (hy > .1 && hy < 1.5) R.hip = damp(R.hip, hy, .12, dt); }
+  const seat = B.seat.getWorldPosition(_drV), sx = seat.x, sy = seat.y - R.hip, sz = seat.z, h = dragH(B);
+  if (R.st === 'on') { const u = Math.min(1, R.t / DRAGZ.mountT), k = smooth(0, 1, u);
+    p.pos.set(R.from.x + (sx - R.from.x) * k, R.from.y + (sy - R.from.y) * k + Math.sin(u * Math.PI) * DRAGZ.arc, R.from.z + (sz - R.from.z) * k);
+    p.faceH = p.heading = R.h0 + wrapAngle(h - R.h0) * k; if (u >= 1) { R.st = 'sit'; R.t = 0; tipShow('In the saddle. Tap the right pad to get off.', 4); } }
+  else if (R.st === 'sit') { p.pos.set(sx, sy, sz); p.faceH = p.heading = h; }
+  else { const u = Math.min(1, R.t / DRAGZ.offT), k = smooth(0, 1, u), to = B.mountAt;
+    p.pos.set(R.from.x + (to.x - R.from.x) * k, R.from.y + (to.y - R.from.y) * k + Math.sin(u * Math.PI) * DRAGZ.arc * .6, R.from.z + (to.z - R.from.z) * k);
+    if (u >= 1) { p.pos.y = to.y + .05; p.dragon = null; p.grounded = false; } } }
+// his clips while mounted: in the air on the way up and down, `driving` in the saddle
+function dragAnim(dt, t) { const R = player.dragon, has = n => !!(n && rig.actions[n]);
+  const air = R.st === 'on' ? true : R.st === 'off' && R.t < DRAGZ.offT * .8;
+  const nm = air ? (has('in_air') ? 'in_air' : CLIPS.idle) : R.st === 'off' ? CLIPS.idle : has('driving') ? 'driving' : CLIPS.idle; t[nm] = 1; setWeights(t, dt); }
 // the measuring kit both dressing passes use: his bones by name, raycasts on his posed skinned mesh, and `pin` (an object built in WORLD metres,
 // upright to him, centred at `at`, parented to a bone with the bone's world scale and turn undone). `bag` collects every pinned piece.
 function dragKit(m, root, H, bag) { const bone = n => m.getObjectByName(n), rc = new THREE.Raycaster(), meshes = []; m.traverse(o => { if (o.isSkinnedMesh) meshes.push(o); });
@@ -29034,24 +29078,24 @@ PADS.L = bindStick(padL, stick.L,
   // left wheel (`kitPick`).
   // tap: jump -- flying, a double tap is her BOOST (m266); on her skates on the ground, her SWIVEL (m268)
   () => {     // m1327: the left tap is the jump again in 3D AIM too (m1282's left-tap trigger is gone)
-    if (wingTapL()) return; if (fakieSwivel()) return; if (player.wall && player.wallLow && player.wallSt === 'hold') { wallDrop(0); return; } if (coverTap()) return; player.jump = 1; },     // m1009: in cover, a left tap stands him up out of it; m1012: near a half block, takes it
+    if (player.dragon) return;     /* mDRG: no jump from the saddle */ if (wingTapL()) return; if (fakieSwivel()) return; if (player.wall && player.wallLow && player.wallSt === 'hold') { wallDrop(0); return; } if (coverTap()) return; player.jump = 1; },     // m1009: in cover, a left tap stands him up out of it; m1012: near a half block, takes it
   // flick: a BODY FLIP on the board, otherwise the dodge roll in the flicked direction. The
   // board takes it first and says so, because a dodge roll on a moving deck is nothing.
   // Flying (m266) it is her loop / barrel roll.
-  (dx, dy) => { if (player.wing) { wingTrick(dx, dy); return; }
+  (dx, dy) => { if (player.dragon) return; if (player.wing) { wingTrick(dx, dy); return; }
                 if (boardMount(dx, dy)) return;
                 if (!boardFlick(dx, dy, 1)) leftFlick(dx, dy); },     // m1014: cover in range -> slide in; else Zap's acrobatics (TOOLS > LEFT)
   null, null, zoneL);
 PADS.R = bindStick(padR, stick.R,
   // tap: jump -- and as her, a quick SECOND tap opens / folds the wings (m266)
   // ...unless someone in reach has something to say: then it is TALK (m277), and the left tap still jumps
-  () => { if (aim3Now()) return; /* m1345: 3D AIM owns the whole right pad -- a tap is not a jump */ if (talkTap()) return; if (pickTap()) return; if (portalTap()) return; if (wingTapR()) return; if (hurdleTap()) return; if (mantleTap()) return; if (wrunTap()) return; player.jump = 1; },     // m1064: a tall face beside / ahead -> wall run     // m1063: pushing into a half block -> hurdle it     // m1039: a ledge in reach -> climb it
+  () => { if (aim3Now()) return; /* m1345: 3D AIM owns the whole right pad -- a tap is not a jump */ if (talkTap()) return; if (dragTap()) return; /* mDRG */ if (pickTap()) return; if (portalTap()) return; if (wingTapR()) return; if (hurdleTap()) return; if (mantleTap()) return; if (wrunTap()) return; player.jump = 1; },     // m1064: a tall face beside / ahead -> wall run     // m1063: pushing into a half block -> hurdle it     // m1039: a ledge in reach -> climb it
   // flick: a SLAM if he is in the air and it went down, otherwise a strike in that direction
-  (dx, dy) => { if (player.wing || aim3Now()) return; /* m1282: in 3D AIM a fast drag moves the cursor, it never swings */ if (tossQuick(dx, dy)) return; if (boardFlick(dx, dy, 0)) return; if (wrunSwipe(dx, dy)) return; if (runSwipe(dx, dy)) return; if (!slamGo(dx, dy)) { KATANA.dir = katanaDir(dx, dy); meleeGo(KATANA.dir === 'down' ? player.faceH : flickH(dx, dy)); } },     // m1054: DOWN is not a direction -- the strike goes where he faces (a slot kept for a grab / throw / special)     // m1014: the right pad is MELEE, by direction (m1012's down-slide is off it)
+  (dx, dy) => { if (player.wing || player.dragon || aim3Now()) return; /* m1282: in 3D AIM a fast drag moves the cursor, it never swings */ if (tossQuick(dx, dy)) return; if (boardFlick(dx, dy, 0)) return; if (wrunSwipe(dx, dy)) return; if (runSwipe(dx, dy)) return; if (!slamGo(dx, dy)) { KATANA.dir = katanaDir(dx, dy); meleeGo(KATANA.dir === 'down' ? player.faceH : flickH(dx, dy)); } },     // m1054: DOWN is not a direction -- the strike goes where he faces (a slot kept for a grab / throw / special)     // m1014: the right pad is MELEE, by direction (m1012's down-slide is off it)
   null,
   // THE RELEASE IS THE SHOT, so this must NOT clear `p.aim` -- `stepKit` sees the pad is no
   // longer held and fires on that edge. Clearing it here would eat every shot in the game.
-  (far, held, fired) => { if (aim3Now()) return; backGo(far, fired); chargeRelease(); }, zoneR);
+  (far, held, fired) => { if (aim3Now() || player.dragon) return; backGo(far, fired); chargeRelease(); }, zoneR);
 
 // AND THE BADGE TOGGLES THE PADS. One tap, no menu, and the pads themselves say which mode it
 // is in by floating or not -- so this is not a mode you can be in without knowing it, which is
@@ -29443,7 +29487,7 @@ addEventListener('keydown', e => {
   if ('wasd'.includes(k) || k.startsWith('arrow')) deskMode(1);
   if (!DESK.on || e.repeat) return;
   if (k === ' ') { player.jump = 1; e.preventDefault(); }
-  if (k === 'e') { if (!talkTap() && !pickTap()) portalTap(); }   // talk / next line (m277), or travel (m286)
+  if (k === 'e') { if (!talkTap() && !dragTap() && !pickTap()) portalTap(); }   // talk / next line (m277), or travel (m286)
   if (k === 'm') mapOpen(!map.open);                       // the full map (m287)
   if (k === 'f' && SAVE.forms.length > 1) { if (form.open) formClose(); else formOpen(); }   // the form wheel (m283)
   if (k === 'v') wingSet(!player.wing);      // her wings (m266)
@@ -30966,6 +31010,7 @@ function stepPlayer(dt) {
   if (PLANT.list.length) plantStep(dt);     // m1424
   if (RESTORE.list.length) restoreStep(dt);     // m1505     // m1105; m1119; m1120: each building's own life
   const p = player;
+  if (p.dragon) { dragRide(dt); return; }     // mDRG: on his dragon, the dragon owns the body
   stepFeet(dt);
   const hadLock = p.lock;
   p.lock = findLock();
@@ -32462,6 +32507,7 @@ function rigAnim(dt) {
   // clips a kind carries of its own; once `mphBorrow` has put zap's 50-odd on the skin, every
   // name below resolves and there is nothing left for a second animation path to do.
   if (p.mphK && !rig.borrowed) { morphAnim(dt); return; }
+  if (p.dragon) { dragAnim(dt, t); return; }     // mDRG: climbing on, seated, climbing off
 
   // THE BOARD, ABOVE EVERYTHING THAT ASKS ABOUT THE GROUND -- he is riding, not walking, and
   // the gait below has no idea. Two pairs blended on the CROUCH, which is how hard he is
@@ -64262,7 +64308,8 @@ function stepCam(dt) {
   //   the AIR     a spin is unreadable if the lens comes round with him -- he turns, the shot
   //               turns, and nothing appears to have happened except that you are dizzy
   // FLYING (m266) the lens comes in behind her like a ship's -- once the thumb has let it be
-  if (p.wing) {
+  if (p.dragon) { if (p.dragon.st === 'sit' && cam.idle > DRAGZ.camIdle && !p.lock && p.camWant == null) cam.az += wrapAngle(p.heading - cam.az) * Math.min(1, DRAGZ.camFollow * dt); }     // mDRG: behind his dragon
+  else if (p.wing) {
     if ((flyAim || cam.idle > WING.camIdle) && !p.lock && p.camWant == null)      // and the lens keeps following while she aims (her r146)
       cam.az += wrapAngle(p.heading - cam.az) * Math.min(1, WING.camFollow * dt * clamp(p.speed / 5, .3, 1.4));
   }
@@ -64295,13 +64342,13 @@ function stepCam(dt) {
   // one term the morph moves -- the collider and every speed stay his, deliberately.
   // + the kerb ease (m234): the LOOK POINT has to ride it too, or the whole view jumps up the kerb
   // on the frame he does while his body eases -- which reads as exactly the teleport it replaced
-  cam.tgt.set(p.pos.x - Math.cos(cam.az) * AIM3.cam.side * a3, p.pos.y + (p.stepOff || 0) + CAM.look * bodyK() + UPLOOK.lift * (cam.up || 0) + AIM3.cam.lift * a3, p.pos.z + Math.sin(cam.az) * AIM3.cam.side * a3);
+  cam.tgt.set(p.pos.x - Math.cos(cam.az) * AIM3.cam.side * a3, p.pos.y + (p.stepOff || 0) + CAM.look * bodyK() + UPLOOK.lift * (cam.up || 0) + AIM3.cam.lift * a3 + (p.dragon ? DRAGZ.camLift : 0), p.pos.z + Math.sin(cam.az) * AIM3.cam.side * a3);
   const ce = Math.cos(cam.el);
   const bx = -Math.sin(cam.az) * ce, by = Math.sin(cam.el), bz = -Math.cos(cam.az) * ce;
   // HER BOOST'S LENS (m267) -- in fast, out slowly, so it reads as a kick and not a zoom
   cam.boost = damp(cam.boost || 0, p.boostFx > 0 ? 1 : 0, p.boostFx > 0 ? .05 : .35, dt);
   const want0 = kit.inside === 'cut' ? KIT.cutDist : kit.inside === 'close' ? KIT.closeDist
-             : (CAM.dist + p.speed * CAM.distV) * (1 + (KIT.highK - 1) * (kit.high || 0)) + cam.boost * SKBOOST.pull;
+             : (CAM.dist + p.speed * CAM.distV) * (1 + (KIT.highK - 1) * (kit.high || 0)) + cam.boost * SKBOOST.pull + (p.dragon ? DRAGZ.camPull : 0);     // mDRG: out for the dragon
   const want = acamFrame(want0) * (1 - (1 - AIM3.cam.dist) * a3);     // m1083: the look point toward the event, the lens out to fit both
   const free = camFree(cam.tgt.x, cam.tgt.y, cam.tgt.z, bx, by, bz, want);
   // SNAP IN, EASE OUT. Easing IN is time spent inside the wall; easing OUT is what stops every

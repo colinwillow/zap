@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## mDRG -- THE DRAGON RIDE, build 2: MOUNT / DISMOUNT (DRAGON.md box 2)
+- **The mount spot** (`dragSeat`): a mint ring at his LEFT flank, stepped out along his side until it is clear of his body box (+1.1 m),
+  level with the dais. It pulses, brightens when you stand on it, and a tip says what to do (or, not CAPTURED, that he will not be ridden).
+- **`p.dragon`** is the state, `{ st: on | sit | off }`. `dragTap` (the right pad's tap, after TALK; `e` on a keyboard) climbs on or off.
+  `dragRide` replaces `stepPlayer` while it is set (the dragon owns the body): an arc into the seat over `mountT` .85 s turning to his heading,
+  then pinned; off is an arc back to the ring over `offT` .7 s.
+- **The seat** is a marker pinned to `Bip001_Spine1` at the saddle's top (.055 H over the skin top `dojoDragonDress` measures), so the rider
+  moves with every clip he plays. Grumbo's ROOT goes at the seat less his SEATED HIP HEIGHT, measured live off `mixamorig_Hips` in the
+  `driving` pose (damped; starts at .6 x `rig.hipY`) -- his hips on the saddle, not his feet.
+- **The clips**: `in_air` up and down, `driving` in the saddle (`dragAnim`, the top of `rigAnim`). His file has no riding clip -- `driving`
+  has the hands forward like holding reins but the legs bent in front, not astride. A straddle pose or clip is his to make (asked).
+- **The pads** while mounted: the left tap, both flicks and the right release do nothing (no jump, roll, strike or shot from the saddle yet).
+- **The lens** (`stepCam`, the one writer of `cam.az`): comes round behind his heading after `camIdle` .8 s of no drag, pulled back `camPull`
+  6 m and lifted `camLift` .4 m.
+**Moves:** DRAGON.md box 2 (his look open). **Still open:** 3-6 and his sign-off. Gates: check ok, zone boot ok. Shipped unverified.
+
 ## m1610 -- THE DRAGON RIDE, build 1: the zone and the armour (DRAGON.md box 1)
 His: *"build the blue dragon: armour and a mount, a little zone where I can mount it and ride it... flying it, controlling it on the ground,
 an attack."* A new sandbox with its own DONE WHEN (`DRAGON.md`); KORAJIN > The Dragon Ride opens `?w=forge&zone=dragon` (`DRAGZ`).
