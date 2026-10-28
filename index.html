@@ -20870,11 +20870,21 @@ function pagodaBuild() {
     for (let k = 0; k < 30; k++) { const a2 = rnd() * 6.283, d = A.hs0 + 2.2 + rnd() * 6, x = cx + Math.cos(a2) * d, z = cz + Math.sin(a2) * d; if (z > cz + A.hs0 && Math.abs(x - cx) < 3) continue;
       const q = rnd(), kd = q < .32 ? 'grass' : q < .5 ? 'fern' : q < .64 ? 'stones' : q < .8 ? 'boulder' : q < .93 ? 'flowers' : 'cherry'; plantPlant(rec, kd, x, 0, z, kd === 'cherry' ? .55 : .8 + rnd() * .6, rnd() * 6.283); }
     plantFlush(g, rec); }
+  // RE-PASS 3 (m@X4@): THE LAYERS. L1 -- a low BAR at the front foot launches him at the first gutter, and a DOUBLOON sits on the front of
+  // every gutter up the outside climb (the roof archers watch that climb: L3). L2 -- the bell is a KEY: toll it and a long iron RAIN CHAIN
+  // (kusari-doi) unfurls from a boom off the belfry, clear of every skirt, down to the ground; from then on it is a climb, the shortcut.
+  const P0 = PAGODA.on; { const Bb = hbarMake(cx + 4.2, cz + A.hs0 + 4.6, 0, 0); HBAR.list.push(Bb); P0.bars.push(Bb); }
+  P0.coins = []; for (let q = 0; q < S - 1; q++) { const R = hsOf(q) + 1.9 * KS; P0.coins.push(coinDrop(g, cx, q * Hh + Hh - .85 * KS + .9, cz + R + .2)); }
+  { const bx = cx + (A.hs0 + 1.9 * KS + 1.2), y0 = top + bH - .3, ch = { x: bx, z: cz, top: y0, open: 0, k: 0, L: null };
+    put(new THREE.BoxGeometry(bx - (cx + hT) + .4, .3, .3).translate((bx + cx + hT) / 2, y0 + .2, cz), wood); put(new THREE.CylinderGeometry(.12, .12, .5, 8).rotateX(Math.PI / 2).translate(bx, y0, cz), K.iron);
+    const parts = []; for (let y = 0; y < y0; y += .5) { const cup = new THREE.CylinderGeometry(.16, .1, .26, 7, 1, true).translate(0, -y - .2, 0).toNonIndexed(); cup.deleteAttribute('uv'); parts.push(cup); const lk = new THREE.TorusGeometry(.07, .025, 4, 8).translate(0, -y - .42, 0).toNonIndexed(); lk.deleteAttribute('uv'); parts.push(lk); }
+    ch.m = new THREE.Mesh(mergeGeometries(parts), K.bronze); ch.m.position.set(bx, y0, cz); ch.m.scale.y = .01; g.add(ch.m); P0.rain = ch; }
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
   PAGODA.on.folded = bldMergeStatic(g); PAGODA.on.roof = roof; PAGODA.on.doors = doors;
   arenaBeam(cx, cz, [1, .6, .35], 1); snd('clang', { g: .7, r: .5 });
 }
 function pagodaStep(dt) { const P = PAGODA.on; if (!P) return; P.t += dt; if (P.roof) korTentStep(P.roof, dt); bldDoorsStep(P.doors, dt);
+  if (P.rain && P.rain.open && P.rain.k < 1) { const C = P.rain; C.k = Math.min(1, C.k + dt * .8); C.m.scale.y = Math.max(.01, C.k * C.k); }
   // the bell is a pendulum: a toll kicks it, it swings and settles
   P.bv += (-9 * P.bw - .9 * P.bv) * dt; P.bw += P.bv * dt; P.bell.rotation.z = P.bw + Math.sin(P.t * .8) * .03; P.bell.rotation.x = P.bw * .3;
   if (P.tollC > 0) P.tollC -= dt;
@@ -20895,6 +20905,8 @@ function pagodaBell(x, y, z, rad) {
   const P = PAGODA.on; if (!P || P.tollC > 0) return 0; const B = P.bell.position;
   if (Math.hypot(x - B.x, y - (B.y - .75), z - B.z) > 1.3 + rad) return 0;
   P.tollC = .6; P.bv += 2.2 * (Math.random() < .5 ? -1 : 1);
+  if (P.rain && !P.rain.open) { const C = P.rain; C.open = 1; snd('swoosh', { g: .9, r: .5, x: C.x, z: C.z }); setTimeout(() => snd('clang', { g: .6, r: 1.6, x: C.x, z: C.z }), 900);     // RE-PASS 3: the rain chain unfurls -- a climb from now on
+    C.L = kitClimbAdd({ minx: C.x - .2, maxx: C.x + .2, miny: 0, maxy: C.top, minz: C.z - .2, maxz: C.z + .2 }, 'pagoda_chain', C.top); C.L.mark = { x: C.x - 1.4, y: C.top, z: C.z }; }
   snd('boom', { g: .9, r: .35, x: B.x, z: B.z }); snd('clang', { g: 1.1, r: .3, x: B.x, z: B.z }); camShake(.3);
   spkBurst(B.x, B.y - .75, B.z, 20, { col: [1, .85, .5], spread: 4, size: .14, life: .5 });
   if (!P.toll) { const m = new THREE.Mesh(new THREE.TorusGeometry(1, .08, 6, 48), new THREE.MeshBasicMaterial({ color: 0xffe0a0, transparent: true, opacity: .7, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }));
@@ -20913,7 +20925,8 @@ function pagodaChain(x, y, z, rad) { const P = PAGODA.on; if (!P || !P.chain || 
   P.chain.geometry.setDrawRange(0, n); PA.needsUpdate = true; P.chain.visible = true; P.chainT = .3;
   for (const d of hit) { const Q = d.root.position; dummyBlow(d, Math.atan2(Q.x - sx, Q.z - sz), 1.6, A.chainDmg); spkBurst(Q.x, Q.y + 1, Q.z, 18, { col: [.7, .95, 1], spread: 4, size: .14, life: .5 }); }
   return 1; }
-function pagodaClear() { const P = PAGODA.on; if (!P) return; for (const d of P.arch || []) if (d && HORDE.list.includes(d)) { bowDrop(d); bodyGone(d); HORDE.list.splice(HORDE.list.indexOf(d), 1); } bldClear(P); PAGODA.on = null; }
+function pagodaClear() { const P = PAGODA.on; if (!P) return; if (P.rain && P.rain.L) { const i = KCLIMB.indexOf(P.rain.L); if (i >= 0) KCLIMB.splice(i, 1); if (player.climb === P.rain.L) climbOff(); }
+  for (const c of P.coins || []) { const i = COIN.list.indexOf(c); if (i >= 0) COIN.list.splice(i, 1); } for (const d of P.arch || []) if (d && HORDE.list.includes(d)) { bowDrop(d); bodyGone(d); HORDE.list.splice(HORDE.list.indexOf(d), 1); } bldClear(P); PAGODA.on = null; }
 // m1136: THE MARKET STALL ROW (BUILDINGS.md #5, pass 1) at (16, 12). Four open-front stalls in a row (4.5 m each, 18 m in all) facing the
 // courtyard (-z): a breakable back wall and partitions (cwallBuild), counters with goods, striped AWNINGS on two stalls and a HIGH BAR hung in
 // the front frame of the other two (no posts: m1122's `y`), a flat ROOF you can walk the length of (a bar on it too), a ramp up the back,

@@ -321,6 +321,19 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
+## THE RE-PASS: THE PAGODA, PASS 3 -- THE LAYERS (m@X4@, WORKER A)
+
+Rubric 3. With this the Pagoda has its three passes; the last box is his OK.
+
+- **L1:** the run up the OUTSIDE is the gutter climb (m1173, a ledge grab per storey). Now a low BAR at the front foot (`hbarMake`, in `bars`)
+  launches him at the first gutter, and a DOUBLOON sits on the front of every gutter (4, cleared from `COIN.list` with the pagoda). The run up
+  the INSIDE stays the spiral.
+- **L2:** the BELL is a key. Its first toll (`pagodaBell`) unfurls a long iron RAIN CHAIN (kusari-doi: bronze cups and links, one mesh) from a
+  timber boom off the belfry's +x side, out past every skirt, down to the ground (it grows down over ~1.2 s), and registers it as a climb
+  (`kitClimbAdd`, its mark back on the belfry). From then on the top is one climb away: a shortcut back, the loop.
+- **L3:** the two roof archers (m1212) sit on the skirts the gutter climb passes; the chain is the way round them.
+- **Measured headless:** a hit on the bell tolled it, opened the chain and registered the climb; 4 coins, the bar, 94 draws. Not signed off.
+
 ## THE RE-PASS: THE PAGODA, PASS 2 -- THE CAP BREAKS, DOORS, AND TWO SHARED PIECES (m1497, WORKER A)
 
 Rubric 4 (breakable and alive).
