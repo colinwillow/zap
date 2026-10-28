@@ -22385,8 +22385,10 @@ function adockClear() { const D = ADOCK.on; if (!D) return; for (const c of D.co
 // round the Pagoda and passes 3-4 m off the Watchtower's lookout a metre below it (a running jump across); the second loops the east side
 // over the Gatehouse and the Market.
 const ZEP = { trap: 4.2, dropEvery: 22, hp: 10, downT: 30, bomb: { cd: 4, r: 4.5, dmg: 6, g: 14 }, list: [
-  { c: [-24, 22.5], rx: 39, rz: 21, y: 16.5, T: 140, ph: 0, rest: [-24, 1.5] },     /* m1572: `rest` = where it lies when FALLEN */     /* m1341: the forge's layout spread x1.5 (STEER S2) -- the circuits with it */
-  { c: [36, -6], rx: 15, rz: 27, y: 21, T: 115, ph: .5, rest: [52, -6] } ], on: null };
+  { c: [-24, 22.5], rx: 39, rz: 21, y: 16.5, T: 140, ph: 0, dip: 0 },     /* m@X4@: `dip` = the loop angle where it comes down to its PIER (and lies moored when FALLEN) */     /* m1341: the forge's layout spread x1.5 (STEER S2) -- the circuits with it */
+  { c: [36, -6], rx: 15, rz: 27, y: 21, T: 115, ph: .5, dip: Math.PI / 2 } ], on: null, pier: { top: 2.8, off: 3.7, deck: 2.95, w: .3, slow: .78 } };
+// m@X4@: the loop's pose at angle `th`: position, heading, and its height -- cruise, except over the PIER, where it sinks to deck height
+function zepPath(P, th) { const b = Math.exp(-((wrapAngle(th - P.dip) / ZEP.pier.w) ** 2)); return { x: P.c[0] + P.rx * Math.sin(th), z: P.c[1] - P.rz * Math.cos(th), h: Math.atan2(P.rx * Math.cos(th), P.rz * Math.sin(th)), b, y: (P.y + Math.sin(th * 2) * .6) * (1 - b) + ZEP.pier.deck * b }; }
 function zepMake(g) {
   const ship = new THREE.Group(); g.add(ship);
   // m1571 (the RE-PASS, pass 1): HERO flyers -- the hero kit (warm planks, timber, the kit red and bronze), a cream envelope with red lacquer
@@ -22394,20 +22396,32 @@ function zepMake(g) {
   const K = korMats(), plank = ZEP.plank || (ZEP.plank = triMat('wood_planks', { scale: 2.2, color: 0xc8a68a })), wood = K.timber, lq = K.redL;
   const bronze = K.bronze, lamp = K.lamp, tile = ZEP.tile || (ZEP.tile = triMat('roof_tiles', { scale: 1.8, rough: .55, side: THREE.DoubleSide })), envM = ZEP.env || (ZEP.env = new THREE.MeshStandardMaterial({ color: 0xf0e2c8, roughness: .75 }));
   const sb = (geo, m, x, y, z) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; ship.add(o); return o; };
-  sb(new THREE.BoxGeometry(3.6, .3, 7), plank, 0, -.15, 0); sb(new THREE.BoxGeometry(3.8, 1, 7.2), lq, 0, -.8, 0);
-  for (const sx of [-1, 1]) sb(new THREE.BoxGeometry(.1, .55, 7), wood, sx * 1.8, .28, 0);
-  for (const [x, z] of [[-1.6, -3.3], [1.6, -3.3], [-1.6, 3.3], [1.6, 3.3]]) { sb(new THREE.BoxGeometry(.12, 2.4, .12), wood, x, 1.2, z); sb(new THREE.BoxGeometry(.22, .28, .22), lamp, x, .7, z); }
-  const roof = sb(new THREE.CylinderGeometry(1.2, 3.2, 1, 4, 1), tile, 0, 2.7, 0); roof.rotation.y = Math.PI / 4; roof.scale.z = 1.9; sb(new THREE.ConeGeometry(.12, .6, 6), bronze, 0, 3.5, 0);
+  // m@X4@: THE GONDOLA IS A BOAT (his: *"I don't really like the way that looks"* -- it was a red box): a lacquered hull that tapers to bow and
+  // stern and rises at both ends (`zw` is its half-width at z), a tapered plank deck, a rail on posts round the edge, four lacquer posts holding a
+  // CURVED pagoda roof with upturned eaves, and a bronze prow
+  const zw = z => 1.9 * (1 - .3 * Math.min(1, (z / 3.8) ** 2)), boat = (geo, top) => { const P = geo.attributes.position; for (let i = 0; i < P.count; i++) { const z = P.getZ(i), u = Math.min(1, (z / 3.8) ** 2), y = P.getY(i);
+      P.setX(i, P.getX(i) / 1.9 * zw(z) * (y < top - .05 ? .78 : 1)); P.setY(i, y + .32 * u * (y < top - .05 ? 1.4 : 1)); } geo.computeVertexNormals(); return geo; };
+  sb(boat(new THREE.BoxGeometry(3.8, .3, 7.4, 1, 1, 10), .15), plank, 0, -.15, 0); sb(boat(new THREE.BoxGeometry(3.9, 1.15, 7.7, 2, 2, 12), .575), lq, 0, -.75, 0);
+  sb(boat(new THREE.BoxGeometry(4, .12, 7.8, 1, 1, 12), .06), bronze, 0, -.08, 0);     // a bronze gunwale band
+  for (let i = -3; i <= 3; i++) { const z = i * 1.15, x = zw(z) - .08, y = .32 * Math.min(1, (z / 3.8) ** 2); for (const sx of [-1, 1]) sb(new THREE.BoxGeometry(.08, .6, .08), wood, sx * x, y + .3, z); }
+  for (let i = -3; i < 3; i++) { const za = i * 1.15, zb = za + 1.15; for (const sx of [-1, 1]) { const xa = sx * (zw(za) - .08), xb = sx * (zw(zb) - .08), ya = .32 * Math.min(1, (za / 3.8) ** 2) + .6, yb = .32 * Math.min(1, (zb / 3.8) ** 2) + .6, L = Math.hypot(xb - xa, yb - ya, zb - za);
+      const r = sb(new THREE.BoxGeometry(.07, .07, L), wood, (xa + xb) / 2, (ya + yb) / 2, (za + zb) / 2); r.lookAt(new THREE.Vector3(xb, yb, zb).add(ship.position)); } }
+  for (const [x, z] of [[-1.25, -2.5], [1.25, -2.5], [-1.25, 2.5], [1.25, 2.5]]) { sb(new THREE.BoxGeometry(.16, 2.6, .16), lq, x, 1.3, z); sb(new THREE.BoxGeometry(.24, .1, .24), bronze, x, 2.55, z); }
+  for (const [x, z] of [[-1.25, 0], [1.25, 0]]) sb(new THREE.BoxGeometry(.26, .32, .26), lamp, x, 2.1, z);
+  bldRoof(ship, 0, 0, 2.1, 3.5, .9, 3.55, 2.6, .5, wood); { const n = ship.children.length; for (const o of [ship.children[n - 2], ship.children[n - 1]]) o.castShadow = true; }
+  sb(new THREE.ConeGeometry(.1, .5, 6), bronze, -.9, 3.55, 0); sb(new THREE.ConeGeometry(.1, .5, 6), bronze, .9, 3.55, 0);
+  { const pr = sb(new THREE.ConeGeometry(.22, 1.3, 8), bronze, 0, .55, 4.25); pr.rotation.x = Math.PI / 2 - .5; sb(new THREE.SphereGeometry(.2, 10, 8), bronze, 0, .35, 3.8); }     // the prow
+  { const pole = sb(new THREE.CylinderGeometry(.04, .05, 2.2, 6), wood, 0, 1.4, -4.1); pole.rotation.x = -.35; }     // a pennant staff at the stern
   const hull = sb(new THREE.SphereGeometry(1, 28, 16), envM, 0, 7.5, 0); hull.scale.set(3.6, 3.6, 12);
   for (const zz of [-7, -2.5, 2.5, 7]) { const k = Math.sqrt(1 - (zz / 12) ** 2); sb(new THREE.TorusGeometry(1, .06, 6, 28), bronze, 0, 7.5, zz).scale.set(3.65 * k, 3.65 * k, 1); }
   sb(new THREE.BoxGeometry(.08, .5, 18), lq, 3.56, 7.5, 0); sb(new THREE.BoxGeometry(.08, .5, 18), lq, -3.56, 7.5, 0);
-  for (const e of [-1, 1]) korBunting((geo, m) => { const o = new THREE.Mesh(geo, m); o.userData.mg = 1; ship.add(o); }, K, [0, 3.2, e * 3.3], [0, 5.2, e * 9.5], 7, .5);
+  for (const e of [-1, 1]) korBunting((geo, m) => { const o = new THREE.Mesh(geo, m); o.userData.mg = 1; ship.add(o); }, K, [0, 3.5, e * 3.4], [0, 5.2, e * 9.5], 7, .5);
   for (const [fx, fy, rz] of [[0, 3, 0], [0, -3, 0], [3, 0, Math.PI / 2], [-3, 0, Math.PI / 2]]) { const f = sb(new THREE.BoxGeometry(.12, 2.6, 3.4), lq, fx, 7.5 + fy, -10.6); f.rotation.z = rz; }
   for (const [x, z] of [[-1.7, -3], [1.7, -3], [-1.7, 3], [1.7, 3]]) { const r = sb(new THREE.CylinderGeometry(.025, .025, 4.6, 4), wood, x * 1.2, 4.6, z * 1.2); r.rotation.z = x > 0 ? -.25 : .25; }
   const prop = new THREE.Group(); prop.position.set(0, 7.5, -12.3); ship.add(prop);
   for (let k = 0; k < 3; k++) { const b = new THREE.Mesh(new THREE.BoxGeometry(.25, 2, .08), bronze); b.rotation.z = k * 2.094; b.position.set(Math.sin(k * 2.094) * 1, Math.cos(k * 2.094) * 1, 0); prop.add(b); }
   const Z = { ship, prop, rings: [], sh: 0,
-    deckB: { dyn: 1, hx: 1.8, hz: 3.5, lz: 0, y0: -.3, y1: 0, cs: 1, sn: 0, cx: 0, cz: 0, minx: 0, maxx: 0, minz: 0, maxz: 0, miny: 0, maxy: 0 } };
+    deckB: { dyn: 1, hx: 1.7, hz: 3.4, lz: 0, y0: -1.3, y1: 0,     /* m@X4@: the whole hull is solid (it was a .3 m slab at deck height: an invisible ledge at chest height) */ cs: 1, sn: 0, cx: 0, cz: 0, minx: 0, maxx: 0, minz: 0, maxz: 0, miny: 0, maxy: 0 } };
   BDYN.push(Z.deckB);
   for (const lz of [-2.6, 2.6]) { const R = gringAdd(ship, 0, -1.6, lz); R.lz = lz; R.ly = -1.6; Z.rings.push(R); }
   return Z;
@@ -22460,14 +22474,29 @@ function zepBuild() {
       const st = new THREE.Mesh(new THREE.CylinderGeometry(.16, .2, 1.4, 10), K.bronze); st.position.set(.9, .7, -3.3); st.castShadow = true; st.userData.mg = 1; Z.ship.add(st); Z.stack = new THREE.Vector3(.9, 1.6, -3.3);
       Z.tails = []; for (let k = 0; k < 3; k++) { const t = new THREE.Mesh(new THREE.PlaneGeometry(.28, 3.2, 1, 6).translate(0, -1.6, 0), clothM[k % 2]); t.position.set((k - 1) * .6, 7.5 - 2.6, -11.6); Z.ship.add(t); Z.tails.push(t); } } }
   for (const Z of zs) { const env = new THREE.Group(); Z.ship.add(env); for (const o2 of Z.ship.children.slice()) if (o2 !== env && o2.position.y > 3.6) env.attach(o2);     // m1572: the ENVELOPE assembly (hull, hoops, bands, fins, rigging, prop, banners, keel lamps) -- it deflates as one
-    bldMergeStatic(Z.ship); bldMergeStatic(env); Z.hull = env; Z.clock = 0; }     // m1571
+    bldMergeStatic(Z.ship); bldMergeStatic(env); Z.hull = env; }     // m1571
   // ---- RE-PASS 2 (m1572): RESTORABLE (rubric 7, flyers): FALLEN, each lies grounded at its `rest` spot, its envelope slumped over the gondola,
   // drained; it does not fly, its trapeze, rings and gun are dead, no drops, no bombs. RESTORE (the mint plate by the first wreck, or
   // SPAWN > BUILDINGS > STATE): the envelope fills, the ship rises to cruise and glides back onto its loop (`zepStep`) ----
+  // ---- m@X4@: THE BOARDING PIERS (his: *"need a better way to get up to it, I wasn't able to"*). Each loop comes down at its `dip` to a stone
+  // PIER beside the path -- stairs up to a timber deck at `pier.top`, a lantern post, mooring bollards -- slowing as it passes, its deck a
+  // step above the pier's; walk the stairs and step aboard. FALLEN, it lies moored beside its pier ----
+  const piers = []; { const K = korMats(), st = triMat('stone_blocks', { scale: 2.5, color: 0xe2d8c8 }), Q0 = ZEP.pier, put = (geo, m, solid) => { const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; g.add(o);
+      if (solid) { geo.computeBoundingBox(); const b = geo.boundingBox, bb = { minx: b.min.x, maxx: b.max.x, miny: b.min.y, maxy: b.max.y, minz: b.min.z, maxz: b.max.z }; O.boxes.push(bb); BOXES.push(bb); } };
+    for (const Z of zs) { const P = Z.P, W = zepPath(P, P.dip), tl = Math.hypot(P.rx * Math.cos(P.dip), P.rz * Math.sin(P.dip)), tx = P.rx * Math.cos(P.dip) / tl, tz = P.rz * Math.sin(P.dip) / tl;
+      let nx = tz, nz = -tx; if (nx * (W.x - P.c[0]) + nz * (W.z - P.c[1]) < 0) { nx = -nx; nz = -nz; } if (Math.abs(nx) > Math.abs(nz)) { nx = Math.sign(nx); nz = 0; } else { nz = Math.sign(nz); nx = 0; }
+      const px = W.x + nx * Q0.off, pz = W.z + nz * Q0.off, T = Q0.top; piers.push([px, pz, nx, nz]);
+      put(new THREE.BoxGeometry(3, T - .15, 3).translate(px, (T - .15) / 2, pz), st, 1); put(new THREE.BoxGeometry(3.3, .15, 3.3).translate(px, T - .075, pz), ZEP.plank, 1);
+      for (let k = 0; k < 10; k++) { const top = T - .28 * (k + 1) + .28 * 0, d = 1.5 + .25 + k * .5, sx = px + nx * d, sz = pz + nz * d, w = nx ? .52 : 1.8, dz = nx ? 1.8 : .52; if (top <= .05) break;
+        put(new THREE.BoxGeometry(w, top, dz).translate(sx, top / 2, sz), k % 2 ? st : ZEP.plank, 1); }
+      for (const e of [-1, 1]) { const bx = px - nx * 1.35 + (nz ? e : 0) * 1.2, bz = pz - nz * 1.35 + (nx ? e : 0) * 1.2; put(new THREE.CylinderGeometry(.14, .18, .5, 8).translate(bx, T + .25, bz), K.iron, 0); }     // bollards on the ship side
+      { const lx = px + nx * 1.3 + (nz ? 1.3 : 0), lz = pz + nz * 1.3 + (nx ? 1.3 : 0); put(new THREE.BoxGeometry(.16, 2.4, .16).translate(lx, T + 1.2, lz), K.timber, 0); korLantern((geo, m) => put(geo, m, 0), K, lx, T + 2.1, lz, .8);
+        put(new THREE.BoxGeometry(1.2, .1, .1).translate(lx - (nz ? .6 : 0), T + 2.4, lz - (nx ? .6 : 0)), K.timber, 0); } }
+    bldMergeStatic(g); boxGrid(); }
   const R = restoreRig(g, { lift: 0, dur: 10, bob: 0 }); restoreSkin(R); const ground = [];
-  { const [px, pz] = [ZEP.list[0].rest[0] + 6, ZEP.list[0].rest[1] + 5], plate = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, .12, 24), new THREE.MeshStandardMaterial({ color: 0x3a4a46, emissive: 0x7affd8, emissiveIntensity: .7 })); plate.position.set(px, .06, pz); scene.add(plate); ground.push(plate); R.trig = { x: px, y: 0, z: pz, armed: 1 }; }
+  { const [qx, qz, qnx, qnz] = piers[0], [px, pz] = [qx + qnx * 7 + qnz * 3, qz + qnz * 7 + qnx * 3], plate = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, .12, 24), new THREE.MeshStandardMaterial({ color: 0x3a4a46, emissive: 0x7affd8, emissiveIntensity: .7 })); plate.position.set(px, .06, pz); scene.add(plate); ground.push(plate); R.trig = { x: px, y: 0, z: pz, armed: 1 }; }
   { const t0 = AGE.st === 'fallen' ? 0 : 1; R.goal = t0; restoreSet(R, t0); }
-  ZEP.on = { R, ground, g, O, bars, rings: zs.flatMap(Z => Z.rings), zs, t: 0, drops: [], landed: [], dropT: 8, bombs: [] };
+  ZEP.on = { piers, R, ground, g, O, bars, rings: zs.flatMap(Z => Z.rings), zs, t: 0, drops: [], landed: [], dropT: 8, bombs: [] };
   zepStep(0); snd('swoosh', { g: .6, r: .4 });
 }
 function zepStep(dt) { const Q = ZEP.on; if (!Q) return; Q.t += dt; const k = Q.R ? Q.R.t : 1, whole = k >= 1; if (!whole) Q.dropT = Math.max(Q.dropT, 3);
@@ -22481,17 +22510,17 @@ function zepStep(dt) { const Q = ZEP.on; if (!Q) return; Q.t += dt; const k = Q.
     const gy = groundAt(P.x, P.z, P.y, 1); if (P.y - .45 <= gy) { P.y = gy + .45; D.m.remove(D.ch); Q.drops.splice(i, 1); snd('thud', { g: .6, r: 1, x: P.x, z: P.z });
       const S = smashAdd(Q.landed, D.m, { minx: P.x - .45, maxx: P.x + .45, miny: gy, maxy: gy + .9, minz: P.z - .45, maxz: P.z + .45 }, 2, 1e9, [.7, .5, .3]); boxGrid();
       while (Q.landed.length > 3) { const old = Q.landed.shift(); smashDrop([old]); old.m.removeFromParent(); boxGrid(); } } }
-  for (const Z of Q.zs) { const P = Z.P; if (whole) Z.clock = (Z.clock || 0) + dt; const th = ((Z.clock || 0) / P.T + P.ph) * Math.PI * 2;
+  for (const Z of Q.zs) { const P = Z.P; if (Z.clock === undefined) Z.clock = ((((P.dip || 0) / (Math.PI * 2) - P.ph) % 1 + 1) % 1) * P.T;     // m@X4@: the clock starts at the pier
+    const th0 = (Z.clock / P.T + P.ph) * Math.PI * 2; if (whole) Z.clock += dt * (1 - ZEP.pier.slow * zepPath(P, th0).b); const th = (Z.clock / P.T + P.ph) * Math.PI * 2;     // it slows over the pier
     // round the loop: position on the ellipse, the nose along the tangent, a slow rise and fall
     // m1222 (pass 5): A ZEPPELIN CAN BE BROUGHT DOWN -- `hp` hits on its envelope (blade from the deck, arrows, parried shots) and it is
     // HOLED: it sinks, listing and trailing smoke, down to a few metres off the ground and limps round its loop low for `downT` s, then
     // patches itself and climbs back to cruise
     if (Z.downT > 0) { Z.downT -= dt; Z.sink = Math.min(P.y - 3.5, (Z.sink || 0) + 1.6 * dt); } else if (Z.sink > 0) Z.sink = Math.max(0, Z.sink - 1.1 * dt);
-    let x = P.c[0] + P.rx * Math.sin(th), z = P.c[1] - P.rz * Math.cos(th), y = P.y + Math.sin(th * 2) * .6 - (Z.sink || 0), h = Math.atan2(P.rx * Math.cos(th), P.rz * Math.sin(th));
-    if (!whole && P.rest) { const [rx, rz] = P.rest, gy = Z.gy !== undefined ? Z.gy : (Z.gy = groundAt(rx, rz, 60, 1) || 0), e = u => u * u * (3 - 2 * u), hr = .4;     // RE-PASS 2: lying, rising, gliding home
-      if (k < .5) { x = rx; z = rz; h = hr; y = gy + 1.1 + (P.y - gy - 1.1) * e(Math.max(0, k - .2) / .3); }
-      else { const u = e((k - .5) * 2); x = rx + (x - rx) * u; z = rz + (z - rz) * u; y = P.y + (y - P.y) * u; h = hr + wrapAngle(h - hr) * u; } }
-    if (Z.hull) { const sI = .25 + .75 * Math.min(1, k / .3), ctr = 2.6 + 4.9 * Math.min(1, k / .3); Z.hull.scale.y = sI; Z.hull.position.y = ctr - 7.5 * sI; }     // the envelope fills
+    const W = zepPath(P, th); let x = W.x, z = W.z, h = W.h, y = W.y - (Z.sink || 0) * (1 - W.b);
+    if (!whole) { const gy = Z.gy !== undefined ? Z.gy : (Z.gy = groundAt(x, z, 60, 1) || 0), e = u => u * u * (3 - 2 * u);     // RE-PASS 2 (m@X4@): moored at its pier; it lifts to the pier's deck height as it fills
+      y = gy + 1.35 + (W.y - gy - 1.35) * e(Math.max(0, Math.min(1, (k - .35) / .55))); }
+    if (Z.hull) { const sI = .25 + .75 * Math.min(1, k / .3), ctr = 4.45 + 3.05 * Math.min(1, k / .3); Z.hull.scale.y = sI; Z.hull.position.y = ctr - 7.5 * sI; }     // the envelope fills
     zepPose(Z, x, y, z, h);
     for (const c of Z.coins || []) { if (c.t >= 0) continue; if (!whole) { c.y = -600; c.m.visible = false; continue; } const v = c.lp.clone(); Z.ship.localToWorld(v); c.x = v.x; c.y = v.y; c.z = v.z; c.m.position.set(v.x, v.y + Math.sin((c.ph || 0) * 2) * .12, v.z); c.m.visible = true; }
     if (Z.tails) for (let k = 0; k < Z.tails.length; k++) Z.tails[k].rotation.x = .25 + Math.sin(Q.t * 3 + k * 1.3) * .25;     // RE-PASS 3: the streamers wave

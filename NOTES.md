@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE ZEPPELINS, detail pass 4 (his report: an invisible collider, no way up, "I don't really like the way that looks")
+His words: *"There was an invisible collider on there ... Need a better way to get up to it cause I wasn't able to ... it needs a bunch of
+detail passes."* The re-pass loop stays on the zeppelins for more detail passes before moving on.
+- **THE INVISIBLE COLLIDER, measured:** the gondola's `deckB` was a 0.3 m slab at deck height (y0 -.3) while the red hull hung 1.3 m below it,
+  with nothing solid there. Walk up to a grounded gondola and your legs pass into the hull while the slab stops you at chest height. It is
+  the whole hull now (y0 -1.3), 1.7 x 3.4 m half-size to fit the new taper.
+- **THE WAY UP: BOARDING PIERS.** Each loop has a `dip` angle (`zepPath`): there it sinks to `pier.deck` (2.95) on a Gaussian bump (`pier.w`)
+  and its clock slows by `pier.slow` (78%), passing a stone PIER `pier.off` (3.5 m) beside the path: a block to `pier.top` (2.8) with a plank
+  cap, nine .28 m stairs up from the outside, iron bollards on the ship side and a lantern post. Walk up, wait, step aboard. FALLEN, the ship
+  lies moored beside its pier (the old `rest` spots are gone), and restoring lifts it to the pier's deck height, where its loop resumes.
+  The clocks start AT the pier. The first pier is between the Watchtower and the Pagoda; the second is east of the Gatehouse.
+- **THE GONDOLA IS A BOAT:** the red box is a lacquered hull that tapers to bow and stern and rises at both ends (a vertex-warped box, `zw` its
+  half-width), with a tapered plank deck, a bronze gunwale band, a timber rail on posts following the sheer, four lacquer posts with bronze
+  caps, lanterns, a CURVED pagoda roof with upturned eaves (`bldRoof` inside the ship) with bronze finials, a bronze prow and a pennant staff.
+  The deflated envelope rests above the new roof when fallen.
+Render-checked headless: restored at its pier, close on the deck, fallen and moored. Shipped unverified.
+
 ## m1584 -- THE X-RAY ONLY WHEN SOMETHING IS IN THE WAY (his: "it just looks like a sphere... things won't even be in front of the camera and they'll be see-through")
 What was wrong: the x-ray (`kitCutMat`'s `uKXOn` block, m181 / m1352) thinned every tagged surface inside a 1.6 m world tube round the lens->him
 line, ALL THE TIME it was switched on (kit worlds, the forge's buildings). In the open nothing occludes him, but a lamp, a post, a crate beside the
