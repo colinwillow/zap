@@ -405,6 +405,20 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
+## THE RE-PASS: THE GREAT RED PAGODA, PASS 2 -- RESTORES IN PLACE (m@X4@, WORKER A)
+
+A HERO building (his split), so rubric 7 the Pagoda's way: no lift, one set of pieces.
+
+- Its per-material buckets (`MG`, pass 10's batching) now go through `restorePieces` instead of straight into meshes. BASE: the plinth, the
+  GROUND STOREY and its roof, the pavilion and the fence (anything outside the tower's footprint, `hbT`). PIECES: storeys 2-5 (with balconies,
+  eaves and inner ladders) and the SPIRE. Everything else (the bell, lanterns, streamers, halos...) rides the piece it stands in. FALLEN: the
+  storeys lie in a ring of red wreckage round the base, the spire flat beyond; RESTORE (the mint plate, or SPAWN > BUILDINGS > STATE, `rig`):
+  the storeys fly home one by one, the spire last, the colour back (`restoreSkin`).
+- **Colliders:** boxes and tris above the ground storey inside the footprint (127 boxes), the ladders above it (3) and the upper ring are the
+  ride's up set; solid only when whole. The bell takes its position from its piece (`getWorldPosition`). m1507's static `bldAge` is gone.
+- **Measured headless:** pieces s1-s4 and the spire (a first cut also took the ground storey's roof as a piece -- fixed, it stays); renders of
+  the wreckage, mid-show and whole. 169 draws (pieces x materials; to trim in pass 3). Not signed off.
+
 ## THE RE-PASS: THE WATCHTOWER IS AN ENEMY TOWER -- CLASSICAL AGAIN, AND IT COMES DOWN (m1521, WORKER A)
 
 His steer (relayed, then confirmed here): enemy buildings are FOR DESTROYING -- never fallen/restored, never floating; they keep their CLASSICAL
