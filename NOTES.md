@@ -24,6 +24,16 @@ seat, edited -- what he did by hand before.
   clip's car-seat legs). The upper body is the clip's. Directions guessed, not rendered.
 **Moves:** nothing ticked (box 2's look). Gates: check ok, zone boot ok. Shipped unverified.
 
+## m1630 -- THE RE-PASS: the FORGE-WORKSHOP, pass 3 (L3: UP ON THE ROOF) -- its third pass, DONE
+- An outside ladder up the back wall (`fwork_roof`, its mark on the gangway), a plank gangway with iron rails across the roof from the
+  ladder head, the bronze ridge cap now a walkable box (measured to the drawn cap, .32 wide), and an iron 2x2 platform round the flue with
+  rails on three sides. Doubloons: two along the ridge, two on the flue platform.
+- The gangway, the platform, the ladder and the coins ride the `roof` piece (`restoreRide` up: climbs + coins), so while fallen there is no
+  roof walk and no ladder; `fworkClear` drops the climb and the coins.
+- Colliders: every new box sits on a drawn plank, cap or grating (no invisible ledges); the flue-cap coin of the first try was unreachable
+  and moved onto the platform.
+Render-checked headless (the ladder, the gangway, the platform and a coin in frame). Next: the Spider-Bot Hangar (ENEMY). Shipped unverified.
+
 ## m1627 -- THE DRAGON RIDE: THE RIDER SAT INSIDE THE DRAGON
 His: *"he was sitting inside the dragon -- that's why"* (he could not see himself). The rider's root went at the seat less a HIP HEIGHT that was
 an estimate (.6 x `rig.hipY`) corrected by a lagged measurement that only ran inside a sane range -- so wherever the `driving` clip actually put
@@ -56,7 +66,7 @@ controls locomotion on the ground and in the air; right stick still controls the
 - In `hop` / `hover` the left pad steers as on the ground, gentler (`airSp` 7); in `fly` it is the wingsuit stick as before.
 - **Getting off** moved to the LEFT pad's double tap (`dragTapL` -> `dragTap`); the left tap no longer beats the wings.
 **Moves:** nothing ticked -- his feel of the new map. Gates: check ok, zone boot ok. Shipped unverified.
-## m15xx -- THE SNOWFIELD: the katana was buried, now it cuts the snow
+## m1628 -- THE SNOWFIELD: the katana was buried, now it cuts the snow
 His (first time in the snowfield: *"might be my favorite thing of all time... expand on that"*): *"the katana -- it's not showing the sword, a weird
 rendering issue."* Measured headless: the hero stands at y 0 and the snow surface is at `SNOWZ.depth` .55 (he WADES; that is the design), and the
 katana's meshes sat at .38-.48 m in his hand at rest -- under the surface. Nothing was mis-rendered; the blade was in the snow.
