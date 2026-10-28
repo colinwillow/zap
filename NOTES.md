@@ -243,7 +243,7 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
-## THE SHIP AS A MODEL: `shipModel()` FOR THE DOJO (m@X4@, WORKER A)
+## THE SHIP AS A MODEL: `shipModel()` FOR THE DOJO (m1469, WORKER A)
 
 His (relayed by the dojo session, then confirmed here: *"Yes"*): the ship flying slowly round the dojo islands in the arena, close enough to
 jump aboard. The dojo session owns the placing, the flight and the moving deck; this build only makes the ship reusable.
