@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the SPIDER-BOT HANGAR, pass 2 (DESTRUCTIBLE TO THE GROUND)
+## m1636 -- THE RE-PASS: the SPIDER-BOT HANGAR, pass 2 (DESTRUCTIBLE TO THE GROUND)
 - The Rampart's machinery (`restorePieces` into per-piece rigs run BACKWARDS, `restoreRide` parking each piece's boxes, a `sup` list hit
   through `bldHit` -> `sphangBreak`). Pieces: `wW` / `wE` (long walls, frieze, studs, banners, seam), `back`, `roof` (roof, fascia, ridge,
   finials, tie beams and king posts, the beacon and the mirror; the roof's walkable tris ride it) and `gate` (jambs, lintel, front frieze,
