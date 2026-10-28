@@ -5,7 +5,6 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-<<<<<<< HEAD
 ## m1614 -- THE DRAGON RIDE, build 2: MOUNT / DISMOUNT (DRAGON.md box 2)
 - **The mount spot** (`dragSeat`): a mint ring at his LEFT flank, stepped out along his side until it is clear of his body box (+1.1 m),
   level with the dais. It pulses, brightens when you stand on it, and a tip says what to do (or, not CAPTURED, that he will not be ridden).
@@ -21,7 +20,7 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - **The lens** (`stepCam`, the one writer of `cam.az`): comes round behind his heading after `camIdle` .8 s of no drag, pulled back `camPull`
   6 m and lifted `camLift` .4 m.
 **Moves:** DRAGON.md box 2 (his look open). **Still open:** 3-6 and his sign-off. Gates: check ok, zone boot ok. Shipped unverified.
-=======
+
 ## m1611 -- THE RE-PASS: the BATHHOUSE, pass 1 (a HERO / TOWN place: the look; a collider audit)
 - Kit materials: `K.timber`, a warm planks triMat, a `stone_blocks` triMat in two tones, `K.lamp`, `K.bronze` (chimney cap, boiler, pipe).
 - The cold plunge tub gets bronze hoops and **its own** double-sided material: `.material.side = DoubleSide` on it had been flipping the
@@ -32,7 +31,6 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
   diagonal was solid air. Their boxes are .85 r half-size now (a corner within .2 r, a flat face .15 r inside). Everything else (walls,
   posts, engawa, rim, benches, chimney, fence) sits on drawn geometry.
 Render-checked headless (three-quarter, garden). Shipped unverified.
->>>>>>> origin/main
 
 ## m1610 -- THE DRAGON RIDE, build 1: the zone and the armour (DRAGON.md box 1)
 His: *"build the blue dragon: armour and a mount, a little zone where I can mount it and ride it... flying it, controlling it on the ground,
