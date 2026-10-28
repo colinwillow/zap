@@ -13769,7 +13769,7 @@ function osariVanish(d) { const P = d.root.position; HORDE.stat.kills++; bowDrop
 function osariStep(dt) { for (let i = OSARI.fades.length - 1; i >= 0; i--) { const F = OSARI.fades[i], u = (F.t += dt) / OSARI.fadeT;
     for (const m of F.mats) m.opacity = Math.max(0, 1 - u); F.d.root.scale.setScalar(F.s0 * (1 + .25 * Math.min(1, u))); F.d.root.position.y += dt * .6;
     if (u >= 1) { F.d.root.visible = false; OSARI.fades.splice(i, 1); setTimeout(() => bodyGone(F.d), 0); } } }
-// m15xx: THE OSARI SPIDER (his Tripo model; "I'm working on a four-legged spider... we're gonna need to hand-rig the spider"). RIGGED HERE, BY
+// m1677: THE OSARI SPIDER (his Tripo model; "I'm working on a four-legged spider... we're gonna need to hand-rig the spider"). RIGGED HERE, BY
 // SCRIPT (scratchpad spider/rig.py, Blender): Auto-Rig Pro is a humanoid rig, so the skeleton is placed from MEASURED geometry -- the four feet
 // at the corners (+/-.48, +/-.37 of a 1 m body), each leg rising from the body (+/-.2, +/-.2) to a knee .45 up -- root, body, head, fangs,
 // abdomen and per leg three bones and a tip; weights by distance to each bone segment, the nearest two blended over 3 cm (an armoured
@@ -14056,7 +14056,7 @@ function arenaUi() {
       else if (a === 'beam') { ARENA.menu = ''; if (BEAM.list.length) beamClear(); else beamSpawn(); }     // m1037; m1072
       else if (a === 'horde') { hordeAdd(); }     // m1084
       else if (a === 'archers') { archerAdd(); }     // m1103
-      else if (a === 'spider') { ARENA.menu = ''; if (SPIDER.list.length) spiderClear(); else spiderAdd(); }     // m15xx
+      else if (a === 'spider') { ARENA.menu = ''; if (SPIDER.list.length) spiderClear(); else spiderAdd(); }     // m1677
       else if (a === 'hall') { ARENA.menu = ''; if (HALL.on) hallClear(); else hallBuild(); }     // m1116
       else if (a === 'age') { AGE.st = AGE.st === 'fallen' ? 'restored' : 'fallen'; try { localStorage.setItem('mel.age', AGE.st); } catch (err) {} for (const E of BLDG.list) if (E.on()) { const rg = E.rig && E.rig(); if (rg) restorePlay(rg, AGE.st === 'fallen' ? 0 : 1); else { E.clear(); E.build(); } } if (inHome()) location.reload(); }     // m1501: FALLEN / RESTORED; a restorable building PLAYS it (m1512); the Red Hollows' pieces read it as they build: reload (Worker B)
       else if (a === 'bld') { ARENA.menu = ''; const E = BLDG.list.find(q => q.key === b.dataset.k); if (E) { if (E.on()) E.clear(); else E.build(); } }     // m1117
@@ -65077,7 +65077,7 @@ function stepDummies(dt) {
   }
   if (ARROWS.length) arrowStep(dt);
   if (OSARI.fades.length) osariStep(dt);     // m1675
-  if (SPIDER.list.length) spiderStep(dt);     // m15xx
+  if (SPIDER.list.length) spiderStep(dt);     // m1677
 }
 
 // ============================================================================================

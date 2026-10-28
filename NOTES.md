@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- THE OSARI SPIDER: rigged by script, walking procedurally (DOCKET 6)
+## m1677 -- THE OSARI SPIDER: rigged by script, walking procedurally (DOCKET 6)
 His Tripo zip (`models/creatures/osari_spider.zip`). Auto-Rig Pro's rig is humanoid, so the skeleton is placed from MEASURED geometry
 (scratchpad `spider/probe*.py`, `rig.py`):
 - **The mesh:** 14,807 verts, a 1 m body (x +/-.5, y +/-.41, z 0..0.65), the front at -Y (fangs low at y -.4), a tall dome on the back.
