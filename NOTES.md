@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## the Red Hollows' PAINTED MAPS, pass 2: the river bed, the ledge paths, the caves (Worker B)
+His "do another pass" on the textures. A fourth map, `textures/hollows_pebble.webp` (rounded river pebbles in grit, a little algae;
+gpt-image-2 streamed, made seamless the same way, linear mean .211/.160/.091). `hwPaint` takes any map by kind now ('cliff', 'sand',
+'rock', or 'land'); on 'land' the flats below the waterline (world y < .4, fading out by 0) carry the PEBBLES -- the bed seen through
+the water now reads as a stony stream bed. The m1114 ledge paths up to the bridges: the walkway tops 'sand', the retaining faces (the
+flat brown walls) 'cliff', the stone treads 'rock'; the cave mouths' rims 'rock'. Render: restored, the bed's pebbles under the stream
+and the path faces carrying the strata. Still flat: the cave interiors (black), the bridges' planks, the grey slabs on the walls by the
+mill (to identify).
 ## the Red Hollows' PAINTED MAPS, pass 1: sand, rock, cliff (Worker B)
 His ask (m1704 photo): "look at how much of this is just plain orange -- we need nice painted texture maps; really develop these textures".
 Three tileable 1024 maps generated with his OpenAI key (gpt-image-2, medium). **The proxy drops a long silent request** ("upstream request
