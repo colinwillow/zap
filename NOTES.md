@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the GATEHOUSE, pass 2 (DESTRUCTIBLE TO THE GROUND)
+## m1534 -- THE RE-PASS: the GATEHOUSE, pass 2 (DESTRUCTIBLE TO THE GROUND)
 ENEMY RULES: enemy places are for destroying. **Moves:** the Gatehouse's pass-2 row (breakable, alive).
 - The Watchtower's machinery, run backwards, but as FOUR rigs so the pieces fall one at a time: `restorePieces` files every static mesh into
   `u0` / `u1` (each tower's upper storey), `deck` and `torii`; each key then gets its own `restoreRig` (lift 0) and `restoreRide` (its boxes,
