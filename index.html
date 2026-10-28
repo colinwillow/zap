@@ -65429,7 +65429,7 @@ function ghomeRestoreSync() { const A = GHOME; if (!A.chU || !A.stand) return; c
 // (`rsTag(A, geo)` inside its `put`, using `A.chunkOf` and `A.chNames`), merges per material as always, then `rsChunkRig(A, MG, fallen, plate,
 // extra)` -- each material learns `aChunk` (moved by `A.chU`) and `uDrain`; a stand-in per chunk is a RESTORE piece with its FALLEN pose; the
 // plate is the trigger; `extra` are real Object3Ds (a wheel's holder) posed by the kit directly. `rsChunkSync(A)` every frame ----
-function rsTag(A, geo) { geo.computeBoundingBox(); const bb = geo.boundingBox, k = A.chunkOf((bb.min.x + bb.max.x) / 2, (bb.min.y + bb.max.y) / 2, (bb.min.z + bb.max.z) / 2); geo.setAttribute('aChunk', new THREE.BufferAttribute(new Float32Array(geo.attributes.position.count).fill(k), 1)); if (k) A.chBox[k].union(bb); }
+function rsTag(A, geo) { geo.computeBoundingBox(); const bb = geo.boundingBox, k = A.forceChunk ? A.forceChunk : A.chunkOf((bb.min.x + bb.max.x) / 2, (bb.min.y + bb.max.y) / 2, (bb.min.z + bb.max.z) / 2); geo.setAttribute('aChunk', new THREE.BufferAttribute(new Float32Array(geo.attributes.position.count).fill(k), 1)); if (k) A.chBox[k].union(bb); }
 function rsChunkRig(A, MG, fallen, plate, extra) { const N = A.chNames.length, U = A.chU = { value: [] }, DR = A.drain = { value: 0 }; for (let k = 0; k < N; k++) U.value.push(new THREE.Matrix4());
   for (const m of MG.keys()) { const ob = m.onBeforeCompile, ok = m.customProgramCacheKey, key = A.rsKey || 'rsch';
     m.onBeforeCompile = (sh, r) => { if (ob) ob.call(m, sh, r); sh.uniforms.uCh = U; sh.uniforms.uDrain = DR; sh.vertexShader = 'attribute float aChunk;\nuniform mat4 uCh[' + N + '];\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n  transformed = (uCh[int(aChunk + .5)] * vec4(transformed, 1.)).xyz;');
@@ -66468,7 +66468,7 @@ function gmillStep(dt, t) { const A = GMILL; if (!A.g) return; const RT = rsChun
 // under two huge curved BONE ARCHES holding a red SAIL canopy; teal and pink awnings; the round target SIGN in a wheel; the tall target
 // BANNER; rope rails and lanterns. Reached (pass 1) by a scaffold of ladders and landings up the canyon wall, then a ladder up the butte's
 // face. Built in its own frame (local +z = the deck's front, toward the canyon); one draw per look. `GMERCH` holds the numbers ----
-const GMERCH = { on: 1, pass: 1, z: -60, back: 48, R: 13, H: 20, yaw: .93, g: null, stat: {} };
+const GMERCH = { on: 1, pass: 2, z: -60, back: 48, R: 13, H: 20, yaw: .93, g: null, stat: {} };
 function gmTex(kind) { const cv = document.createElement('canvas'), W = cv.width = 256, Hh = cv.height = kind === 'banner' ? 512 : 256, q = cv.getContext('2d'), r = rwRng(kind.length * 31);
   if (kind === 'sail') { q.fillStyle = '#c4492c'; q.fillRect(0, 0, W, Hh); for (let i = 0; i < 40; i++) { q.fillStyle = 'rgba(120,30,20,' + (.08 + r() * .12) + ')'; q.beginPath(); q.ellipse(r() * W, r() * Hh, 10 + r() * 40, 6 + r() * 20, r() * 3, 0, 7); q.fill(); }
     q.strokeStyle = 'rgba(240,200,150,.35)'; q.lineWidth = 3; for (let y = 30; y < Hh; y += 60) { q.beginPath(); for (let x = 0; x <= W; x += 16) q.lineTo(x, y + Math.sin(x * .05) * 6); q.stroke(); } }
@@ -66488,6 +66488,7 @@ function gmerchBuild() {
   const MG = new Map(), _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _v = new THREE.Vector3(), _one = new THREE.Vector3(1, 1, 1), boxes = [], tris = [];
   const put = (geo, m, mat4) => { geo = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(geo.attributes)) if (k !== 'position' && k !== 'normal' && !(k === 'uv' && m.map && !m.userData.tri)) geo.deleteAttribute(k);
     if (mat4) geo.applyMatrix4(mat4); if (!geo.attributes.normal) geo.computeVertexNormals(); if (m.userData.strata) { const gg = geo.clone(); gg.rotateY(A.yaw); gg.translate(cxW, 0, czW); ghStrataCol(gg); geo.setAttribute('color', gg.attributes.color); }
+    if (A.chunkOf) rsTag(A, geo);
     if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); };
   const at4 = (x, y, z, ry = 0, rx = 0, rz = 0, sx = 1, sy = 1, sz = 1) => _m4.compose(_v.set(x, y, z), _q.setFromEuler(_e.set(rx, ry, rz)), new THREE.Vector3(sx, sy, sz));
   const box = (x0, x1, y0b, y1, z0, z1, ex) => { const xs = [Wx(x0, z0), Wx(x1, z0), Wx(x0, z1), Wx(x1, z1)], zs = [Wz(x0, z0), Wz(x1, z0), Wz(x0, z1), Wz(x1, z1)]; boxes.push(Object.assign({ minx: Math.min(...xs), maxx: Math.max(...xs), miny: y0b, maxy: y1, minz: Math.min(...zs), maxz: Math.max(...zs) }, ex || {})); };
@@ -66518,6 +66519,11 @@ function gmerchBuild() {
         if (h == null) { flush(); continue; } if (run && run.h === h) run.x1 = gx + cell; else { flush(); run = { x0: gx, x1: gx + cell, h }; } } flush(); } }
   // ---- THE DECK: a plank floor over the cap, its front run out past the lip on struts into the face; rope rails, lantern posts ----
   const Y = top + .8, dx0 = -10, dx1 = 10, dz0 = -6, dz1 = 15; A.deckY = Y;
+  // the RESTORATION's chunks: the butte and the climb stay put (0); the deck, the ground floor, the upper storey, each arch, the sail, the
+  // banner pole, the palm fans move
+  A.chNames = ['ground', 'deck', 'shop', 'upper', 'archA', 'archB', 'sail', 'pole', 'fans']; A.chBox = A.chNames.map(() => new THREE.Box3()); A.rsKey = 'rsmerch';
+  A.chunkOf = (x, y, z) => { if (y < top - .2) return 0; if (y >= Y + 9) return 6; if (Math.abs(x - 8) < 2.6 && Math.abs(z - 13.6) < 2.2 && y > Y + .4) return 7; if (Math.abs(x) > 7.6 && z < -1.5 && y > Y + .4) return 8;
+    if (y > Y + 3.95 && Math.abs(x) < 7.5 && z < 10) return 3; if (y > Y + .3 && Math.abs(x) < 6.2 && z > -2.6 && z < 9.6) return 2; return 1; };
   for (let z = dz0; z < dz1 - .01; z += .34) vbox(dx0, dx1, Y - .12, Y, z + .015, z + .325, woodP, 0); box(dx0, dx1, top - 1, Y, dz0, dz1); quad([dx0, Y + .01, dz0], [dx1, Y + .01, dz0], [dx1, Y + .01, dz1], [dx0, Y + .01, dz1]);
   for (const x of [dx0, dx1]) vbox(x - .12, x + .12, Y - .45, Y - .1, dz0, dz1, wood, 0); for (const z of [dz0, dz1]) vbox(dx0, dx1, Y - .45, Y - .1, z - .12, z + .12, wood, 0);
   for (let x = dx0 + 1; x < dx1; x += 3) for (const z of [dz1 - .3, 9]) { const rr = Math.hypot(x, z); if (rr < A.R - 1 && z < 12) continue; rod([x, Y - .4, z], [x * .8, top - 7, Math.min(z, A.R * .7) - 1], .3, wood); }
@@ -66555,7 +66561,7 @@ function gmerchBuild() {
   const arch = (a, m, b) => { const cv = new THREE.QuadraticBezierCurve3(new THREE.Vector3(...a), new THREE.Vector3(...m), new THREE.Vector3(...b)); const tg = new THREE.TubeGeometry(cv, 28, .55, 10); const q = tg.attributes.position;
       put(tg, bone); for (let k = 1; k < 7; k++) { const p = cv.getPoint(k / 7), d = cv.getTangent(k / 7); put(new THREE.TorusGeometry(.6, .1, 6, 14), boneD, _m4.compose(p, _q.setFromUnitVectors(new THREE.Vector3(0, 0, 1), d), _one)); }
       for (const P0 of [a, b]) { put(new THREE.CylinderGeometry(.9, 1.2, .6, 10), boneD, at4(P0[0], Y + .3, P0[2])); box(P0[0] - .8, P0[0] + .8, Y, Y + 3, P0[2] - .8, P0[2] + .8, NC); } return cv; };
-  const A1 = arch([-8.2, Y, 11.5], [-2, Y + 22, 4], [5.5, Y, -4.5]), A2 = arch([8.4, Y, 10], [1.5, Y + 20, 3], [-6.5, Y, -4.8]);
+  A.forceChunk = 4; const A1 = arch([-8.2, Y, 11.5], [-2, Y + 22, 4], [5.5, Y, -4.5]); A.forceChunk = 5; const A2 = arch([8.4, Y, 10], [1.5, Y + 20, 3], [-6.5, Y, -4.8]); A.forceChunk = 0;
   { const NU = 16, NV = 10, pos = [], uv = [], yS = Y + 9.6, at = (u, v) => { const x = -9.5 + 19 * u, z = -5 + 16.5 * v; return [x, yS + 1.7 * Math.sin(Math.PI * v) - 1.3 * (v * v) + .9 * Math.sin(Math.PI * u) - .8 * Math.abs(u - .5) * v, z]; };
     for (let i = 0; i < NU; i++) for (let j = 0; j < NV; j++) { const u0 = i / NU, u1 = (i + 1) / NU, v0 = j / NV, v1 = (j + 1) / NV; for (const [u, v] of [[u0, v0], [u1, v0], [u1, v1], [u0, v0], [u1, v1], [u0, v1]]) { pos.push(...at(u, v)); uv.push(u * 3, v * 3); } }
     const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); geo.computeVertexNormals(); put(geo, sailM); }
@@ -66564,7 +66570,7 @@ function gmerchBuild() {
     put(new THREE.PlaneGeometry(2, 4.4, 2, 8), banM, at4(px - 1.15, Y + ph - 2.85, pz + .05)); }
   for (const [fx, fz, ry] of [[-8.5, -3.5, -.6], [8.2, -3, .7]]) { put(new THREE.CylinderGeometry(.14, .2, 6.5, 6), wood, at4(fx, Y + 3.25, fz)); for (let k = 0; k < 7; k++) { const a = -1.2 + k * .4, sh = new THREE.Shape(); sh.moveTo(0, 0); sh.quadraticCurveTo(.9, 1.8, 0, 4.2); sh.quadraticCurveTo(-.9, 1.8, 0, 0);
       const lg = new THREE.ShapeGeometry(sh, 6); lg.rotateX(-.9); lg.rotateZ(a); lg.rotateY(ry); lg.translate(fx, Y + 6.3, fz); put(lg, leaf); } }
-  { const rnd = rwRng(4141); for (const cv of [A1, A2]) for (let k = 2; k < 9; k++) { const p = cv.getPoint(k / 10); if (p.y < Y + 4) continue; const L = .8 + rnd() * 1.4; put(new THREE.CylinderGeometry(.01, .01, L, 3), boneD, at4(p.x, p.y - L / 2 - .5, p.z)); put(rnd() < .5 ? new THREE.OctahedronGeometry(.15, 0) : new THREE.SphereGeometry(.1, 6, 4), rnd() < .5 ? crystal : bronze, at4(p.x, p.y - L - .55, p.z)); } }
+  A.forceChunk = 4; { const rnd = rwRng(4141); for (const cv of [A1, A2]) for (let k = 2; k < 9; k++) { const p = cv.getPoint(k / 10); if (p.y < Y + 4) continue; const L = .8 + rnd() * 1.4; put(new THREE.CylinderGeometry(.01, .01, L, 3), boneD, at4(p.x, p.y - L / 2 - .5, p.z)); put(rnd() < .5 ? new THREE.OctahedronGeometry(.15, 0) : new THREE.SphereGeometry(.1, 6, 4), rnd() < .5 ? crystal : bronze, at4(p.x, p.y - L - .55, p.z)); } } A.forceChunk = 0;
   // ---- THE WAY UP (pass 1): a ladder up the butte's face from the rim, its mark on the deck; the rest of the route is the next passes ----
   A.climbs = []; const ladder = (lx, lz, ya, yb, ry, markL) => { const nx = Math.sin(ry), nz = Math.cos(ry), tx = Math.cos(ry), tz = -Math.sin(ry);
       for (const o of [-.34, .34]) put(new THREE.BoxGeometry(.09, yb - ya + .6, .09), wood, at4(lx + tx * o, (ya + yb + .6) / 2, lz + tz * o, ry)); for (let y = ya + .3; y < yb + .4; y += .34) put(new THREE.BoxGeometry(.7, .06, .06), wood, at4(lx, y, lz, ry));
@@ -66589,6 +66595,14 @@ function gmerchBuild() {
     A.stat.scaffold = n; A.stat.wallTop = +y.toFixed(1); }
   // ---- merge; the world gets the boxes and the floors ----
   let draws = 0; for (const [m, list] of MG) { if (m.map && !m.userData.tri) m.map.wrapS = m.map.wrapT = THREE.RepeatWrapping; const geo = mergeGeometries(list); if (!geo) { console.warn('[melee] gmerch: a bucket would not merge', m.color); continue; } const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; g.add(o); draws++; }
+  { const pl = [Wx(0, dz0 + 1.6), Y + .06, Wz(0, dz0 + 1.6)];
+    rsChunkRig(A, MG, { 1: { p: [0, -.9, .6], r: [.09, 0, -.05], hop: 1, at: 0 }, 2: { p: [.3, -1.4, .2], r: [.06, 0, .08], hop: 1.5, at: .15 }, 3: { p: [3.2, -4.4, 1.2], r: [0, .35, .5], hop: 4, at: .35 },
+      4: { p: [-2, -4, 2], r: [0, 0, 1.15], hop: 5, at: .5 }, 5: { p: [2, -4, 1.5], r: [0, 0, -1.1], hop: 5, at: .6 }, 6: { p: [0, -8.6, 1], r: [.25, 0, .12], hop: 6, at: .72 }, 7: { p: [0, -.2, 2.5], r: [1.35, 0, 0], hop: 3, at: .82 }, 8: { p: [0, -2.5, 0], r: [.6, 0, .35], hop: 2, at: .9 } }, pl, []); }
+  // ROUTE pass 2: a ZIPLINE off the deck's front corner, over the west wall, down to the home's back -- the long climb's fast way down
+  { const zA = [Wx(dx1 - .6, dz1 - .6), Y + 2.4, Wz(dx1 - .6, dz1 - .6)], HA = HOME.hut.at, zB = [HA[0] - 9, rwHeight(HA[0] - 9, HA[1] - 12) + 1.9, HA[1] - 12];
+    const c2 = new THREE.Mesh(new THREE.TubeGeometry(new THREE.LineCurve3(new THREE.Vector3(...zA), new THREE.Vector3(...zB)), 16, .045, 5), new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .7, roughness: .35 })); scene.add(c2); A.zipMesh = c2;
+    for (const E of [zA, zB]) { const k = new THREE.Mesh(new THREE.SphereGeometry(.16, 8, 6), glow); k.position.set(...E); scene.add(k); } const pB = new THREE.Mesh(new THREE.CylinderGeometry(.12, .15, zB[1] + .5 - rwHeight(zB[0], zB[2]), 8), wood); pB.position.set(zB[0] + .3, (zB[1] + .5 + rwHeight(zB[0], zB[2])) / 2, zB[2]); scene.add(pB);
+    A.zip = { A: zA, B: zB }; ZIPS.push(A.zip); A.stat.zip = +Math.hypot(zA[0] - zB[0], zA[1] - zB[1], zA[2] - zB[2]).toFixed(0); }
   for (const b of boxes) BOXES.push(b);
   for (let i = 0; i < tris.length; i += 9) { const q = tris.slice(i, i + 9); triAdd(...q); triAdd(q[0], q[1], q[2], q[6], q[7], q[8], q[3], q[4], q[5]); }
   A.stat.draws = draws; A.stat.boxes = boxes.length; A.stat.top = +top.toFixed(1); A.stat.deckY = +Y.toFixed(1);
@@ -66606,7 +66620,7 @@ async function buildHome() {
   if (GMILL.on && H.style !== 'lake') try { gmillBuild(); } catch (e) { console.error('[melee] water mill', e); note('MILL BUILD THREW'); }
   if (GPEAK.on && H.style !== 'lake') try { gpeakBuild(); } catch (e) { console.error('[melee] the peak', e); note('PEAK BUILD THREW'); }
   if (GJINRA.on && GPEAK.on && H.style !== 'lake') try { gjinraBuild(); } catch (e) { console.error('[melee] jinra refinery', e); note('JINRA BUILD THREW'); }
-  if (H.style !== 'lake') { for (const P of [GMERCH, GPEAK, GJINRA]) hsFallen(P.g); }     // FALLEN: weathered, unlit
+  if (H.style !== 'lake') { for (const P of [GPEAK, GJINRA]) hsFallen(P.g); }     // FALLEN: weathered, unlit
   else try { const g = await loadGLB(H.hut.file, 'loading the refuge');
     const m = g.scene, drop = []; m.traverse(o => { if (o.isLight) drop.push(o); }); for (const o of drop) o.removeFromParent();
     m.updateMatrixWorld(true); const bb = new THREE.Box3(); m.traverse(o => { if (o.isMesh && o.name !== 'collider' && o.geometry) { o.geometry.computeBoundingBox(); bb.union(o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld)); } });
@@ -66830,7 +66844,7 @@ function homeLanterns() {
 }
 function homeStep(dt) {
   const H = HOME; H.t += dt; if (RW.U) RW.U.uTime.value = H.t;
-  gmillStep(dt, H.t); gpeakStep(dt); gjinraStep(dt, H.t);
+  gmillStep(dt, H.t); gpeakStep(dt); gjinraStep(dt, H.t); if (GMERCH.g) rsChunkSync(GMERCH);
   if (GHOME.U) GHOME.U.uWind.value = H.t; ghomeSmoke(dt, H.t); for (const G of GHOME.gates || []) bgateStep(G, dt);     // pass 9: his back door
   if (GHOME.canoe) { const C = GHOME.canoe, t = H.t; C.g.position.y = C.y + rwWaveAt(C.x, C.z, t) * .8 * (1 - Math.min(1, (C.lift || 0) * 2)) + .02 + (C.lift || 0); C.ht = (C.ht == null ? 12 : C.ht) - dt; if (C.ht <= 0 && !C.hu) { C.hu = 1e-3; } if (C.hu) { C.hu += dt; if (C.hu > 6) { C.hu = 0; C.ht = 18 + Math.random() * 20; const P = C.g.getWorldPosition(new THREE.Vector3()); spkBurst(P.x, GHOME.g.position.y + C.y + .05, P.z, 30, { col: [.85, .93, 1], spread: 4, size: .09, life: .6 }); snd('thud', { g: .5, r: .7, x: P.x, z: P.z }); } }     // pass 24: now and then it LIFTS on its discs, hangs dripping, and settles
   const lift = C.hu ? .5 * Math.min(1, C.hu / 1.4) * Math.min(1, Math.max(0, (6 - C.hu) / 1.2)) : 0; if (lift > .05 && Math.random() < dt * 14) { const P = C.g.localToWorld(new THREE.Vector3((Math.random() - .5) * .8, -.4, (Math.random() - .5) * 4)); spkBurst(P.x, P.y, P.z, 2, { col: [.8, .9, 1], spread: .4, size: .05, life: .5 }); }
