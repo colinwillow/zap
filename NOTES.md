@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the FORGE-WORKSHOP, pass 2 (rubric 7: RESTORES IN PLACE)
+## m1626 -- THE RE-PASS: the FORGE-WORKSHOP, pass 2 (rubric 7: RESTORES IN PLACE)
 - Base (stays): the floor, the breakable walls, the furnace and its plinth, the anvil, the trip-hammer, the quench trough, the gears, the
   loft's stone stairs, the crane and its bar, the ingot rack, the ore crates. Pieces: `roof` (with the bunting and a new bronze ridge cap
   and finials), `flue`, `front` (posts, beam, lanterns, banner) and `loft` (platform, rail, weapon rack).
