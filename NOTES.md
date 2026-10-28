@@ -378,6 +378,37 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
+## THE RE-PASS: THE WATCHTOWER IS RESTORABLE -- ONE SET OF PIECES, ANIMATED, AND IT FLOATS (m@X4@, WORKER A)
+
+His (relayed, then confirmed here): FALLEN versus RESTORED is PHYSICAL -- *"the opposite of fallen is literally lifted into the air, floating on
+jets... made of the SAME PIECES so we can animate it going up, pieces moving in and fixing themselves, very cinematic"* (KORAJIN.md, THE
+TRANSFORMATION IS THE SHOW). He chose: animate each building now, and it must stay WALKABLE while it floats. m1501's rebuild-weathered switch
+was the wrong shape; this is the first building done the right way, on the shared `RESTORE` kit.
+
+- **Three new kit tools** (beside `restoreRig`): **`restorePieces(R, g, pairs, classify, fallOf)`** files every [world geometry, material]
+  pair a building made (its `put` buckets and its flagged `add` meshes) into PIECES (Groups pivoted on their own centres, merged per
+  material) or the BASE, and gives each piece its fallen pose. **`restoreSkin(R)`** clones every material under the rig and drains it to
+  dust-grey in the shader by one uniform (`R.uAge`), so the colour flood never touches the shared kit materials (`restoreMat` would recolour
+  K.timber for every building). **`restoreRide(R, spec)` / `restoreRideSet`**: colliders that RIDE the lift -- `base` boxes and ramp tris move
+  with it all the time; `up` boxes, tris, climbs, bars, rings, coins and objects exist only when it is fully restored (parked 600 m down and
+  hidden otherwise). Boxes move IN PLACE (the box grid is x/z only); tris are re-registered (throttled to ~3/s while moving). `restoreSet`
+  gained an `onSet` hook, and `restoreRig` a `bob` (0 for a place you walk on).
+- **The Watchtower's pieces:** the BASE (plinth -- now solid, the floor when it floats -- breakable ground floor, doors, the first two flights;
+  it lifts), DECKS 1-3 (with their perches, flights, drum, canister, searchlight), the four corner POSTS, the CROWN (panels, skeleton, core,
+  rings). Low things outside the footprint (the bunting posts, fire pit, stakes, plants) stay on the GROUND, and so does the basket lift with
+  its ropes and counterweight. FALLEN: posts flat in the dirt, decks slid off and tipped, the crown down beside it, every colour drained.
+  RESTORE (the mint PLATE by the west corner, or SPAWN > BUILDINGS > STATE, which now PLAYS a restorable building instead of rebuilding it):
+  posts fly home first, then the decks, then the crown, the colour floods back, four bronze JET pods under the plinth ignite mint, and it rises
+  4.5 m and HOLDS. Getting up when it floats: the basket hauls from the ground to the floating lookout, the dropped shortcut ladder stretches to
+  the ground, the east bar launches you.
+- **Measured headless:** fallen, the deck/bar/ring colliders read -594/-585/-580 (parked) and the base 0; restored, 10.3 (deck 1 = 5.8 + 4.5),
+  19.1, 24.6, the base 4.5, 28 up-tris registered. The fallen, mid-show and restored renders read as rubble, pieces flying home, and the tower
+  on its jets. 124 draws.
+- **Open:** the sentry gun and the archers are placed for the state the tower was BUILT in (they do not follow a later toggle); the doors'
+  approach test and the beacon/drum work only once whole. A pose in the same tick as the build rendered the timber black once in headless (a
+  real restore, later, renders right). The Pagoda and the Great Red Pagoda still use m1501's static weathering until their restoration pass.
+  Not signed off.
+
 ## THE RE-PASS: THE GREAT RED PAGODA, PASS 1 -- PAINTED MAPS AND BOTH STATES (m1507, WORKER A)
 
 Classical heritage like the Pagoda; it was already batched (its pass 10 put every plain box in per-material buckets), so this pass is materials,

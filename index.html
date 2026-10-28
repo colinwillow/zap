@@ -10191,7 +10191,8 @@ function restoreSet(R, t) { R.t = t;
   for (const P of R.pieces) { const u = Math.min(1, Math.max(0, (t - P.at * .55) / .45)); P.obj.position.lerpVectors(P.p0, P.p1, rsBack(u)); P.obj.position.y += Math.sin(u * Math.PI) * P.hop; P.obj.quaternion.slerpQuaternions(P.q0, P.q1, rsEase(u)); }
   const col = rsEase((t - .15) / .6); for (const M of R.mats) { M.m.color.lerpColors(M.c0, M.c1, col); if (M.e1) M.m.emissive.copy(M.e1).multiplyScalar(col); }
   R.g.position.y = R.baseY + R.lift * rsEase((t - .45) / .55);
-  const on = rsEase((t - .3) / .2); for (const J of R.jets) { J.visible = on > .01; J.scale.set(on, on, on); } }
+  const on = rsEase((t - .3) / .2); for (const J of R.jets) { J.visible = on > .01; J.scale.set(on, on, on); }
+  if (R.onSet) R.onSet(R, t); }
 function restorePlay(R, goal) { R.goal = goal; }
 function restoreStep(dt) { const p = player.pos;
   for (const R of RESTORE.list) { if (R.trig) { const T = R.trig, d = Math.hypot(p.x - T.x, p.z - T.z); if (d < 1.4 && Math.abs(p.y - T.y) < 1.2) { if (T.armed) { T.armed = 0; restorePlay(R, R.goal > .5 ? 0 : 1); snd('ready', { g: .6 }); } } else if (d > 2.4) T.armed = 1; }
@@ -10199,8 +10200,50 @@ function restoreStep(dt) { const p = player.pos;
       const B = R.g.position;
       if (R.goal === 1 && was < .45 && R.t >= .45) { camShake(.4); snd('thud', { g: 1.2, r: .5, x: B.x, z: B.z }); for (let i = 0; i < 4; i++) spkBurst(B.x, R.baseY + .3, B.z, 18, { col: [.72, .62, .5], spread: 7, size: .55, life: 1.3 }); }
       if (R.goal === 0 && was > .45 && R.t <= .45) { camShake(.5); snd('thud', { g: 1.4, r: .4, x: B.x, z: B.z }); for (let i = 0; i < 4; i++) spkBurst(B.x, R.baseY + .3, B.z, 18, { col: [.72, .62, .5], spread: 7, size: .55, life: 1.3 }); } }
-    else if (R.t === 1) R.g.position.y = R.baseY + R.lift + Math.sin(performance.now() * .0011 + R.hov) * .28;     // it HOVERS
+    else if (R.t === 1) R.g.position.y = R.baseY + R.lift + Math.sin(performance.now() * .0011 + R.hov) * (R.bob === undefined ? .28 : R.bob);     // it HOVERS (`bob` 0 for a place you walk on)
     if (R.t > .3 && SPK.on) for (const J of R.jets) if (Math.random() < .6) { J.getWorldPosition(_rsV); spk(_rsV.x + (Math.random() - .5) * .3, _rsV.y - .4, _rsV.z + (Math.random() - .5) * .3, (Math.random() - .5) * .8, -2 - Math.random() * 2, (Math.random() - .5) * .8, .14, .7, [.48, 1, .85]); } } }
+// m@X4@ (THE RE-PASS): THREE MORE TOOLS FOR A REAL BUILDING -- a building built by `add`/`put` into material buckets becomes a restorable rig:
+//   restorePieces(R, g, pairs, classify, fallOf) -- every [geometry (world frame), material] pair is filed by `classify(center, size)` into a PIECE
+//                                       (a Group pivoted on its own centre, merged per material) or, for null, into the BASE (merged into `g`); each
+//                                       piece gets its fallen pose from `fallOf(key, center, size)` = { p, r, hop, at }
+//   restoreSkin(R)                    -- every material under the rig is CLONED for this rig and drains to dust-grey in the shader by one uniform,
+//                                       so the colour flood never touches the shared kit materials (`restoreMat` recolours in place)
+//   restoreRide(R, spec)              -- colliders that RIDE: `base` boxes/tris move with the lift all the time; `up` boxes, tris, climbs, bars,
+//                                       rings and objects exist only when fully restored (parked far below and hidden otherwise)
+function restorePieces(R, g, pairs, classify, fallOf) { const by = new Map(), base = new Map(), bb = new THREE.Box3(), c = new THREE.Vector3(), sz = new THREE.Vector3();
+  for (const [q, m] of pairs) { q.computeBoundingBox(); bb.copy(q.boundingBox); bb.getCenter(c); bb.getSize(sz); const k = classify(c, sz);
+    const M = k == null ? base : (by.get(k) || by.set(k, new Map()).get(k)); if (!M.has(m)) M.set(m, []); M.get(m).push(q); }
+  const merge = list => mergeGeometries(list.map(q => { const n = q.index ? q.toNonIndexed() : q; for (const a of Object.keys(n.attributes)) if (a !== 'position' && a !== 'normal') n.deleteAttribute(a); if (!n.attributes.normal) n.computeVertexNormals(); return n; }));
+  for (const [m, list] of base) { const o = new THREE.Mesh(merge(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
+  const pieces = {};
+  for (const [k, M] of by) { const grp = new THREE.Group(), all = new THREE.Box3(); for (const list of M.values()) for (const q of list) all.union(q.boundingBox); all.getCenter(c); all.getSize(sz);
+    for (const [m, list] of M) { const geo = merge(list); geo.translate(-c.x, -c.y, -c.z); const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; grp.add(o); }
+    grp.position.copy(c); g.add(grp); const F = fallOf(k, c.clone(), sz.clone()); restorePiece(R, grp, F, F.at); pieces[k] = grp; }
+  return pieces; }
+function restoreSkin(R) { const map = new Map(); R.uAge = { value: 0 }; R.emis = [];
+  const skin = m => { if (map.has(m)) return map.get(m); let n = m;
+    if (m.isMeshStandardMaterial || m.isMeshBasicMaterial) { n = m.clone(); const ob = m.onBeforeCompile, ok = m.customProgramCacheKey, metal = m.metalness > .4, U = R.uAge;
+      n.onBeforeCompile = (sh, r) => { ob.call(m, sh, r); sh.uniforms.uAge = U; sh.fragmentShader = 'uniform float uAge;\n' + sh.fragmentShader.replace('#include <color_fragment>', '#include <color_fragment>\n  { float L = dot(diffuseColor.rgb, vec3(.3, .59, .11)); diffuseColor.rgb = mix(diffuseColor.rgb, vec3(L) * ' + (metal ? 'vec3(1.1, .66, .42)' : 'vec3(.92, .86, .76)') + ', uAge * ' + (m.isMeshBasicMaterial ? '.9' : '.8') + ') * (1.0 - uAge * .25); }'); };
+      n.customProgramCacheKey = () => String(ok.call(m)) + 'RSK';
+      if (n.emissive && n.emissiveIntensity > 0) R.emis.push({ m: n, e: n.emissiveIntensity }); }
+    map.set(m, n); return n; };
+  R.g.traverse(o => { if ((o.isMesh && !o.isInstancedMesh) || o.isLine) o.material = Array.isArray(o.material) ? o.material.map(skin) : skin(o.material); }); return map; }
+function restoreRide(R, spec) { const S = R.ride = Object.assign({ base: { boxes: [], tris: [] }, up: { boxes: [], tris: [], climbs: [], bars: [], rings: [], objs: [], coins: [] }, d: NaN, triT: 0, tb: { tri: new Set() }, tu: { tri: new Set() } }, spec);
+  for (const set of [S.base, S.up]) for (const b of set.boxes) { b._y0 = b.miny; b._y1 = b.maxy; }
+  for (const L of S.up.climbs) { L._y0 = L.miny; L._y1 = L.maxy; L._t = L.top; if (L.mark) L.mark._y = L.mark.y; }
+  for (const B of S.up.bars) { B._y = B.y; B._t = B.top; B._g = B.g.position.y; for (const b of B.boxes) { b._y0 = b.miny; b._y1 = b.maxy; } }
+  for (const G of S.up.rings) G._y = G.y; for (const C of S.up.coins) C._y = C.y; return S; }
+function restoreRideTris(set, list, d) { bldTrisDrop(set); if (d < -100) return; for (const t of list) if (triAdd(t[0], t[1] + d, t[2], t[3], t[4] + d, t[5], t[6], t[7] + d, t[8])) set.tri.add([t[0], t[1] + d, t[2], t[3], t[4] + d, t[5], t[6], t[7] + d, t[8]].map(Math.fround).join(',')); triBuild(); }
+function restoreRideSet(R, force) { const S = R.ride; if (!S) return; const lf = R.g.position.y - R.baseY, up = R.t >= 1 ? lf : -600, now = performance.now();
+  for (const b of S.base.boxes) { b.miny = b._y0 + lf; b.maxy = b._y1 + lf; }
+  if (up !== S.d || force) { S.d = up;
+    for (const b of S.up.boxes) { b.miny = b._y0 + up; b.maxy = b._y1 + up; }
+    for (const L of S.up.climbs) { L.miny = L._y0 + up; L.maxy = L._y1 + up; L.top = L._t + up; if (L.mark) L.mark.y = L.mark._y + up; }
+    for (const B of S.up.bars) { B.y = B._y + up; B.top = B._t + up; B.g.position.y = B._g + up; B.g.visible = up > -100; for (const b of B.boxes) { b.miny = b._y0 + up; b.maxy = b._y1 + up; } }
+    for (const G of S.up.rings) { G.y = G._y + up; if (G.o) G.o.visible = up > -100; } for (const C of S.up.coins) { C.y = C._y + up; C.m.visible = up > -100; } for (const o of S.up.objs) o.visible = up > -100;
+    restoreRideTris(S.tu, S.up.tris, up); }
+  if (S.base.tris.length && (force || (Math.abs(lf - (S.tbD || 0)) > .02 && now - S.triT > 300) || ((R.t === 0 || R.t === 1) && Math.abs(lf - (S.tbD || 0)) > 1e-3))) { S.tbD = lf; S.triT = now; restoreRideTris(S.tb, S.base.tris, lf); }
+  if (R.uAge) { const col = rsEase((R.t - .15) / .6); R.uAge.value = 1 - col; for (const E of R.emis) E.m.emissiveIntensity = E.e * col; } }
 function restoreDemoBuild() { if (RESTORE.on) return; const [x0, z0] = RESTORE.at, root = new THREE.Group(); root.position.set(x0, 0, z0); scene.add(root);
   const g = new THREE.Group(); root.add(g); const R = restoreRig(g, { lift: 9, dur: 7 });
   const timber = restoreMat(R, triMat('wood_timber', { scale: 2 }), 0x4a4440), plaster = restoreMat(R, new THREE.MeshStandardMaterial({ color: 0xf1e4cc, roughness: .9 }), 0x7a7268), red = restoreMat(R, new THREE.MeshStandardMaterial({ color: 0xb3261c, roughness: .5 }), 0x5a3a30),
@@ -13086,7 +13129,7 @@ function arenaUi() {
       else if (a === 'horde') { hordeAdd(); }     // m1084
       else if (a === 'archers') { archerAdd(); }     // m1103
       else if (a === 'hall') { ARENA.menu = ''; if (HALL.on) hallClear(); else hallBuild(); }     // m1116
-      else if (a === 'age') { AGE.st = AGE.st === 'fallen' ? 'restored' : 'fallen'; try { localStorage.setItem('mel.age', AGE.st); } catch (err) {} for (const E of BLDG.list) if (E.on()) { E.clear(); E.build(); } if (inHome()) location.reload(); }     // m1501: FALLEN / RESTORED (the Red Hollows' pieces read it as they build: reload, Worker B)
+      else if (a === 'age') { AGE.st = AGE.st === 'fallen' ? 'restored' : 'fallen'; try { localStorage.setItem('mel.age', AGE.st); } catch (err) {} for (const E of BLDG.list) if (E.on()) { const rg = E.rig && E.rig(); if (rg) restorePlay(rg, AGE.st === 'fallen' ? 0 : 1); else { E.clear(); E.build(); } } if (inHome()) location.reload(); }     // m1501: FALLEN / RESTORED; a restorable building PLAYS it (m@X4@); the Red Hollows' pieces read it as they build: reload (Worker B)
       else if (a === 'bld') { ARENA.menu = ''; const E = BLDG.list.find(q => q.key === b.dataset.k); if (E) { if (E.on()) E.clear(); else E.build(); } }     // m1117
       else if (a === 'slice') { ARENA.menu = ''; sliceDummy(); }     // m1090
       else if (a === 'course') { ARENA.menu = ''; if (COURSE.on) courseClear(); else courseBuild('ACRO'); }     // m1078
@@ -20404,7 +20447,7 @@ function bldDrone(g) {
 // lifted). A plank RAMP wraps the OUTSIDE, one side at a time, 1.6 m up each side, a landing at each corner: two sides to the first deck,
 // four to the second, six to the lookout (walkable surfaces, `bldTris`). A drone orb circles the cap; cables run from the eaves down to
 // stakes in the ground, lamps hung on them; lanterns at the deck corners.
-const WTOWER = { at: [-24, -12], scale: 1.5, hs: 3, storey: 4, ro: 3.95, rw: .65, beaconT: 40, on: null };     // m1121: bigger (his: *"large scale, everything is big"*)
+const WTOWER = { at: [-24, -12], scale: 1.5, hs: 3, storey: 4, ro: 3.95, rw: .65, beaconT: 40, lift: 4.5, on: null };     // m@X4@: `lift` m it floats when restored     // m1121: bigger (his: *"large scale, everything is big"*)
 function wtowerBuild() {
   // STEER S2 (x1.5, m1342): the plan, the storeys, the ramp's ring and width scale (hs 4.5, storeys 6 m -- the lookout at 18 -- the ramp a
   // 2 m wide spiral at 5.9 m out, each flight 3 m up over ~9.8 m, about 17 deg); the door 2.4 m; what is his size stays.
@@ -20425,7 +20468,7 @@ function wtowerBuild() {
   // RE-PASS 2 (m1489): DOORS -- two timber leaves (battens, iron straps) hung in the gap; they swing IN as he comes near and close behind him,
   // and a blow breaks a leaf off its hinges
   const doors = bldDoors(g, wood, K.iron, cx, cz + hs + .05, dw, S - .55);
-  add(new THREE.BoxGeometry(hs * 2 + 1.4, .18, hs * 2 + 1.4), stone, cx, .09, cz, 0);
+  add(new THREE.BoxGeometry(hs * 2 + 1.4, .18, hs * 2 + 1.4), stone, cx, .09, cz, 1);     // m@X4@: solid -- the floor when it floats
   // the decks (solid slabs: stand on them), the corner posts all the way up, lanterns and a neon line on each deck's edge
   for (const y of [S, S * 2, S * 3]) { add(new THREE.BoxGeometry(hs * 2 + .5, .22, hs * 2 + .5), plank, cx, y - .11, cz, 1);
     for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) korLantern(put, K, cx + sx * (hs + .55), y - .75, cz + sz * (hs + .55), 1.1);
@@ -20514,7 +20557,7 @@ function wtowerBuild() {
     add(new THREE.CylinderGeometry(.06, .08, 1.1, 6), wood, sl.position.x, S * 3 + .55, sl.position.z, 0); }
   const core = add(new THREE.SphereGeometry(.26, 16, 12), new THREE.MeshBasicMaterial({ color: 0x5ff2ff, toneMapped: false }), cx, crownTop + .35, cz, 0); core.castShadow = false; core.userData.mg = 0;
   // MANNED: a sentry gun on the second deck, and a red archer posted on the lookout
-  const tur = turretAt(cx + hs - .9, S * 2, cz + hs - .9, Math.atan2(ARENA.youAt[0] - cx, ARENA.youAt[1] - cz)); boxGrid();
+  const lf0 = AGE.st === 'fallen' ? 0 : WTOWER.lift, tur = AGE.st === 'fallen' ? null : turretAt(cx + hs - .9, S * 2 + lf0, cz + hs - .9, Math.atan2(ARENA.youAt[0] - cx, ARENA.youAt[1] - cz)); boxGrid();
   const rings = []; for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) rings.push(gringAdd(g, cx + sx * (hs + 1.7), S * 3 + 2.1, cz + sz * (hs + 1.7)));     // m1129: grapple rings
   // ---- PASS 5 (m1208): THE PULLEY BASKET -- a timber jib out from the lookout on the west, a pulley, a rope and a wicker BASKET at its foot
   // with a stone counterweight on the far rope: step in and it hauls you up to the lookout (and sets you on the deck); empty, it sinks back ----
@@ -20541,10 +20584,9 @@ function wtowerBuild() {
     for (let k = 0; k < 26; k++) { const a = rnd() * 6.283, d = hs + 2.2 + rnd() * 5, x = cx + Math.cos(a) * d, z = cz + Math.sin(a) * d;
       if (z > cz + hs - .5 && Math.abs(x - cx) < 3.5) continue; if (x > cx + hs - 1 && z > cz + hs - 1) continue;     // the door and the ramp's foot
       const q = rnd(), kd = q < .38 ? 'grass' : q < .6 ? 'fern' : q < .76 ? 'stones' : q < .94 ? 'boulder' : 'pine'; plantPlant(rec, kd, x, 0, z, kd === 'pine' ? .5 : .8 + rnd() * .6, rnd() * 6.283); } }
-  plantFlush(g, rec);
+  const plantMs = plantFlush(g, rec) || [];
   { const Bb = hbarMake(cx + hs + 3.2, cz - 1.2, Math.PI / 2, 0); HBAR.list.push(Bb); wbars.push(Bb); }
-  for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
-  const folded = bldMergeStatic(g);
+  let folded = 0;     // m@X4@: merged below, piece by piece, by the restoration
   // RE-PASS 3 (m1490): THE LAYERS. L2 -- a SHORTCUT: a rope ladder rolled up on the north perch of the second deck; reach the perch (or strike
   // the roll) and it drops to the ground and is climbable from then on, so the next climb skips the ramp (a loop back). L1 -- DOUBLOONS out on
   // the perch tips beyond the bars, the reward for the risky line. L3 -- the PRIZE on the lookout: a JINRA canister (mint, the only mint here),
@@ -20560,12 +20602,10 @@ function wtowerBuild() {
     for (const dy of [.15, 1.15]) { const c = new THREE.Mesh(new THREE.CylinderGeometry(.4, .4, .2, 14), bronzeM); c.position.set(jx, jy + dy, jz); g.add(c); }
     lad.jin = can; }
   WTOWER.on = { A, rings, g, O, bars: wbars, drone, t: 0, tur, fire, arch: null, sl, core, lift, beacon, folded, roof, doors, lad, coins }; const W = WTOWER.on;
-  if (AGE.st === 'fallen') {     // m1501: FALLEN -- the crown down to its rafters in places, a door off, the fire cold, no searchlight, no drone, no kites
-    korTentRuin(roof, .45, 5); bldDoorsRuin(doors, 1); W.fire = null; sl.visible = false; drone.visible = false; core.visible = false; W.fallen = 1; }
-  archerPost(cx - hs + 1, S * 3 + .05, cz + hs - 1).then(d => { if (WTOWER.on === W) W.arch = d; else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {});
+  archerPost(cx - hs + 1, S * 3 + .05 + lf0, cz + hs - 1).then(d => { if (WTOWER.on === W) W.arch = d; else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {});
   // ---- PASS 4 (m1169): a second archer on deck 2, the WAR DRUM (taiko) on deck 1 -- strike it and the alarm goes up: every archer and sentry
   // gun in the forge looses at once -- and two carp KITES flying off the lookout on long lines ----
-  archerPost(cx - hs + 1, S * 2 + .05, cz - hs + 1).then(d => { if (WTOWER.on === W) W.arch2 = d; else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {});
+  archerPost(cx - hs + 1, S * 2 + .05 + lf0, cz - hs + 1).then(d => { if (WTOWER.on === W) W.arch2 = d; else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {});
   { const drum = new THREE.Group(); drum.position.set(cx + 1.2, S + 1.05, cz - hs + 1.2); g.add(drum); const body = new THREE.Mesh(new THREE.CylinderGeometry(.75, .75, .9, 18), new THREE.MeshStandardMaterial({ color: 0x8a3a1a, roughness: .5 })); body.rotation.x = Math.PI / 2; drum.add(body);
     for (const sz of [-1, 1]) { const hd = new THREE.Mesh(new THREE.CircleGeometry(.72, 18), new THREE.MeshStandardMaterial({ color: 0xe8dcc0, roughness: .8, side: THREE.DoubleSide })); hd.position.z = sz * .46; drum.add(hd);
       const rim = new THREE.Mesh(new THREE.TorusGeometry(.74, .04, 6, 20), new THREE.MeshStandardMaterial({ color: 0x17130f })); rim.position.z = sz * .44; drum.add(rim); }
@@ -20573,8 +20613,46 @@ function wtowerBuild() {
     O.boxes.push({ minx: cx + .4, maxx: cx + 2, miny: S, maxy: S + 1.8, minz: cz - hs + .7, maxz: cz - hs + 1.7 }); BOXES.push(O.boxes[O.boxes.length - 1]); boxGrid(); W.drum = drum; }
   { const kc = [0xc8341f, 0x2a6ac8]; W.kites = []; for (let k = 0; k < 2; k++) { const kt = new THREE.Group(); g.add(kt); const b2 = new THREE.Mesh(new THREE.ConeGeometry(.6, 2.4, 10, 1, true), new THREE.MeshStandardMaterial({ color: kc[k], side: THREE.DoubleSide, roughness: .8 })); b2.rotation.x = -Math.PI / 2; kt.add(b2);
       const ln = new THREE.Line(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3)), new THREE.LineBasicMaterial({ color: 0x2a2622 })); ln.frustumCulled = false; g.add(ln); W.kites.push({ kt, ln, k }); } }
-  if (W.fallen) for (const K2 of W.kites || []) { K2.kt.visible = false; K2.ln.visible = false; }
-  bldAge(g);
+  // RE-PASS 4 (m@X4@): RESTORABLE (his: *"the opposite of fallen is literally lifted into the air, floating on jets -- the SAME PIECES, animated"*).
+  // The tower is filed into PIECES by height -- the BASE (plinth, breakable ground floor, the first two flights: it is what lifts), each of the
+  // three DECKS with its perches and flights, the four corner POSTS, and the CROWN. FALLEN: the posts lie in the dirt, the decks have slid off
+  // and tipped, the crown is down beside it, rust-grey. RESTORE (the mint plate by the west corner, or SPAWN > BUILDINGS > STATE): the posts fly
+  // home, then the decks, then the crown, the colour floods back, four Jinra JETS ignite under the plinth and it rises `lift` m and HOLDS
+  // (no bob: it is walked on). Colliders ride it (`restoreRide`): the base's always, the rest only once it is whole. The basket lift stays on
+  // the ground and hauls to the floating lookout; the shortcut ladder, once dropped, reaches the ground.
+  const R = restoreRig(g, { lift: WTOWER.lift, dur: 9, bob: 0 }); W.R = R;
+  W.ground = [lift.bk, lift.rope, lift.rope2, lift.cw]; for (const o of W.ground) scene.attach(o); lift.top0 = lift.top;
+  const pairs = []; for (const [m, list] of MG) for (const q of list) pairs.push([q, m]);
+  for (const o of g.children.slice()) if (o.isMesh && o.userData.mg) { const m = o.material, tri = m.customProgramCacheKey && String(m.customProgramCacheKey()).startsWith('tri'); if (m.transparent || (m.map && !tri)) continue;
+    o.updateMatrix(); pairs.push([(o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()).applyMatrix4(o.matrix), m]); o.removeFromParent(); }
+  const cls = (c, sz) => { if (c.y < 2.6 && sz.y < 3 && Math.hypot(c.x - cx, c.z - cz) > hs + 1.6) return 'gnd'; if (sz.y > S * 2.2) return 'p' + (c.x > cx ? 1 : 0) + (c.z > cz ? 1 : 0); if (c.y < S - .3) return null; if (c.y < S * 2 - .8) return 'd1'; if (c.y < S * 3 - .8) return 'd2'; if (c.y < S * 3 + 2.2) return 'd3'; return 'crown'; };
+  const fall = (k, c, sz) => { if (k === 'gnd') return { p: [c.x, c.y, c.z], r: [0, 0, 0], hop: 0, at: 0 }; let h = 7; for (const ch of k) h = h * 31 + ch.charCodeAt(0); const r = i => ((Math.sin(h * 12.9898 + i * 78.233) * 43758.5453) % 1 + 1) % 1;
+    if (k[0] === 'p') { const dx = k[1] === '1' ? 1 : -1, dz = k[2] === '1' ? 1 : -1; return { p: [c.x + dx * (2 + r(1) * 3), .4, c.z + dz * (2 + r(2) * 3)], r: [Math.PI / 2, r(3) * 6.28, 0], hop: 3, at: .06 + r(4) * .14 }; }
+    const T = { d1: [3, -2, .7, .3], d2: [-5, 3.5, 1.3, .42], d3: [5.5, 4.5, 1, .54], crown: [-7, -6, 2.6, .7] }[k];
+    return { p: [c.x + T[0], T[2], c.z + T[1]], r: [(r(1) - .5) * .7, (r(2) - .5) * 1.4, (r(3) - .5) * .6], hop: k === 'crown' ? 6 : 3, at: T[3] }; };
+  const pieces = W.pieces = restorePieces(R, g, pairs, cls, fall); folded = pairs.length; W.folded = folded;
+  // what stands on the GROUND stays there: the bunting posts, the fire pit, the stakes, the plants
+  if (pieces.gnd) { scene.attach(pieces.gnd); R.pieces = R.pieces.filter(P => P.obj !== pieces.gnd); W.ground.push(pieces.gnd); delete pieces.gnd; }
+  for (const m of plantMs) { scene.attach(m); W.ground.push(m); }
+  // everything else above the base rides the piece it stands in (the searchlight, the crown's panels and core, the drum, the canister, the rings...)
+  const skip = new Set([drone, ...Object.values(pieces), ...(W.kites || []).flatMap(K2 => [K2.kt, K2.ln]), ...coins.map(c2 => c2.m), lad.m, lad.roll]), wb = new THREE.Box3(), wc = new THREE.Vector3(), ws = new THREE.Vector3();
+  for (const o of g.children.slice()) { if (skip.has(o)) continue; wb.setFromObject(o); if (wb.isEmpty()) continue; wb.getCenter(wc); wb.getSize(ws); const k = cls(wc, ws); if (k && pieces[k]) pieces[k].attach(o); }
+  if (pieces.d2) { pieces.d2.attach(lad.m); pieces.d2.attach(lad.roll); }
+  // the JETS: four bronze pods under the plinth, a mint flame each
+  { const pod = new THREE.MeshStandardMaterial({ color: 0xc8963c, metalness: .8, roughness: .35, emissive: 0x3aa088, emissiveIntensity: .9 }), glowM = new THREE.MeshBasicMaterial({ color: 0x7affd8, toneMapped: false, transparent: true, opacity: .9, blending: THREE.AdditiveBlending, depthWrite: false });
+    for (const [sx, sz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) { const pd = new THREE.Mesh(new THREE.CylinderGeometry(.7, .95, 1.3, 14), pod); pd.position.set(cx + sx * (hs - .6), -.55, cz + sz * (hs - .6)); g.add(pd);
+      const f = new THREE.Mesh(new THREE.ConeGeometry(.6, 3.2, 12, 1, true).rotateX(Math.PI).translate(0, -2.8, 0), glowM); f.position.set(cx + sx * (hs - .6), 0, cz + sz * (hs - .6)); g.add(f); R.jets.push(f); } }
+  restoreSkin(R);
+  // the colliders that ride
+  const tb = [], tu = []; for (const k of O.tri || []) { const t = k.split(',').map(Number); (Math.max(t[1], t[4], t[7]) <= S + .02 ? tb : tu).push(t); } bldTrisDrop(O);
+  const onGround = b2 => Math.hypot((b2.minx + b2.maxx) / 2 - cx, (b2.minz + b2.maxz) / 2 - cz) > hs + 1.6 && b2.maxy < 2.6, isBase = b2 => b2.maxy <= S - .15 && b2.maxy - b2.miny < S * 2;
+  restoreRide(R, { base: { boxes: O.boxes.filter(b2 => isBase(b2) && !onGround(b2)), tris: tb },
+    up: { boxes: O.boxes.filter(b2 => !isBase(b2) && !onGround(b2)), tris: tu, climbs: [], bars: wbars.slice(0, 3), rings, coins, objs: [drone, sl, core, ...(W.kites || []).flatMap(K2 => [K2.kt, K2.ln])] } });
+  R.onSet = R2 => restoreRideSet(R2);
+  // the PLATE that starts it, on the ground by the west corner
+  { const plate = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, .12, 24), new THREE.MeshStandardMaterial({ color: 0x3a4a46, emissive: 0x7affd8, emissiveIntensity: .7 })); plate.position.set(cx - hs - 6, .06, cz + hs + 4); scene.add(plate); W.ground.push(plate);
+    R.trig = { x: cx - hs - 6, y: 0, z: cz + hs + 4, armed: 1 }; }
+  const t0 = AGE.st === 'fallen' ? 0 : 1; R.goal = t0; restoreSet(R, t0); restoreRideSet(R, true);
   arenaBeam(cx, cz, [1, .7, .4], 1); snd('clang', { g: .7, r: .6 });
 }
 function wtowerLift(W, dt) { const L = W.lift, p = player, [cx, cz] = WTOWER.at, d = Math.hypot(p.pos.x - L.x, p.pos.z - L.z);
@@ -20585,9 +20663,11 @@ function wtowerLift(W, dt) { const L = W.lift, p = player, [cx, cz] = WTOWER.at,
   L.bk.position.y = L.y; L.pul.rotation.z = -L.y * 4; const ry = L.top + 1.35, len = Math.max(.1, ry - (L.y + 1.9)); L.rope.scale.y = len; L.rope.position.set(L.x, ry - len / 2, L.z);
   const cy = Math.max(.3, L.top - L.y), len2 = Math.max(.1, ry - (cy + .3)); L.cw.position.y = cy; L.rope2.scale.y = len2; L.rope2.position.set(L.x - .3, ry - len2 / 2, L.z - .4); }
 function wtowerStep(dt) { const W = WTOWER.on; if (!W) return; W.t += dt; const [cx, cz] = WTOWER.at, a = W.t * .35; if (W.lift) wtowerLift(W, dt);
-  if (W.roof) korTentStep(W.roof, dt); bldJinraMotes(cx, cz, W.A.hs + 2, dt);
-  if (W.lad) { const L = W.lad, p = player.pos; if (!L.open && Math.hypot(p.x - cx, p.z - (cz - W.A.hs - 1.8)) < 2.2 && Math.abs(p.y - L.top) < 1.2) wtowerLadder(W);
-    if (L.open && L.k < 1) { L.k = Math.min(1, L.k + dt * 1.4); L.m.scale.y = Math.max(.02, L.k * L.k); L.roll.position.y = L.top - .1 - L.top * L.k * L.k; L.roll.scale.setScalar(Math.max(.05, 1 - L.k)); }
+  if (W.roof) korTentStep(W.roof, dt); const lf = W.R ? W.R.g.position.y - W.R.baseY : 0, whole = !W.R || W.R.t >= 1; if (whole) bldJinraMotes(cx, cz, W.A.hs + 2, dt);
+  if (W.R) { if (W.roof) W.roof.y = W.roof.y0 === undefined ? (W.roof.y0 = W.roof.y) : (whole ? W.roof.y0 + lf : -600); if (W.beacon) { if (W.beacon.y0 === undefined) W.beacon.y0 = W.beacon.y; W.beacon.y = whole ? W.beacon.y0 + lf : -600; } if (W.lift) W.lift.top = whole ? W.lift.top0 + lf : .1; }
+  if (W.lad) { const L = W.lad, p = player.pos, reach = (L.top + lf) / L.top; if (whole && !L.open && Math.hypot(p.x - cx, p.z - (cz - W.A.hs - 1.8)) < 2.2 && Math.abs(p.y - L.top - lf) < 1.2) wtowerLadder(W);
+    if (L.open && (L.k < 1 || L.reach !== reach)) { L.k = Math.min(1, L.k + dt * 1.4); L.reach = reach; L.m.scale.y = Math.max(.02, L.k * L.k * reach); L.roll.position.y = L.roll.userData.y0 === undefined ? (L.roll.userData.y0 = L.roll.position.y) : L.roll.userData.y0 - L.top * reach * L.k * L.k; L.roll.scale.setScalar(Math.max(.05, 1 - L.k)); }
+    if (L.L) { if (whole) { L.L.miny = 0; L.L.maxy = L.top + lf; L.L.top = L.top + lf; L.L.mark.y = L.top + lf; } else { L.L.miny = L.L.maxy = L.L.top = -600; } }
     if (L.jin) { L.jin.material.emissiveIntensity = 1.3 + Math.sin(W.t * 2.6) * .5; L.jin.rotation.y = W.t * .4; } }
   bldDoorsStep(W.doors, dt);
   if (W.beacon) { const B = W.beacon; if (B.t > 0) { B.t -= dt; B.coal.material.color.setRGB(1, .45 + Math.random() * .15, .1);
@@ -20597,9 +20677,9 @@ function wtowerStep(dt) { const W = WTOWER.on; if (!W) return; W.t += dt; const 
     const x = ax - 10 - K.k * 4 + Math.sin(ph) * 3, y = ay + 9 + K.k * 3 + Math.sin(ph * 1.7) * 1.5, z = az - 6 + Math.cos(ph * .8) * 4; K.kt.position.set(x, y, z); K.kt.lookAt(ax, ay, az); K.kt.rotateZ(Math.sin(W.t * 4 + K.k) * .3);
     K.ln.geometry.attributes.position.array.set([ax, ay, az, x, y, z]); K.ln.geometry.attributes.position.needsUpdate = true; }
   if (W.drum && W.drumT > 0) { W.drumT -= dt; W.drum.scale.setScalar(1 + Math.sin(W.drumT * 40) * W.drumT * .08); }
-  if (W.fire) { const [fx, fz] = W.fire; W.fT = (W.fT || 0) - dt; if (W.fT <= 0) { W.fT = .045;     // the fire: flames leaping, sparks, a little smoke
-      spk(fx + (Math.random() - .5) * 1.2, 1.55, fz + (Math.random() - .5) * 1.2, (Math.random() - .5) * .6, 2.6 + Math.random() * 2.4, (Math.random() - .5) * .6, .32 + Math.random() * .25, .55, Math.random() < .5 ? [1, .55, .12] : [1, .82, .3]);
-      if (Math.random() < .12) smokeAt(fx + (Math.random() - .5) * .6, 2.6, fz + (Math.random() - .5) * .6, 1.2, 1.6, [.3, .28, .26]); } }
+  if (W.fire && whole) { const [fx, fz] = W.fire; W.fT = (W.fT || 0) - dt; if (W.fT <= 0) { W.fT = .045;     // the fire: flames leaping, sparks, a little smoke
+      spk(fx + (Math.random() - .5) * 1.2, 1.55 + lf, fz + (Math.random() - .5) * 1.2, (Math.random() - .5) * .6, 2.6 + Math.random() * 2.4, (Math.random() - .5) * .6, .32 + Math.random() * .25, .55, Math.random() < .5 ? [1, .55, .12] : [1, .82, .3]);
+      if (Math.random() < .12) smokeAt(fx + (Math.random() - .5) * .6, 2.6 + lf, fz + (Math.random() - .5) * .6, 1.2, 1.6, [.3, .28, .26]); } }
   if (W.sl && !W.fallen) { W.sl.rotation.y = Math.PI * .75 + Math.sin(W.t * .32) * 1.1; W.sl.rotation.x = .32 + Math.sin(W.t * .21) * .08; }     // m1123: the searchlight sweeps
   if (W.core) W.core.scale.setScalar(1 + Math.sin(W.t * 2.4) * .14);
   W.drone.position.set(cx + Math.cos(a) * 6.5 * (WTOWER.scale || 1), W.A.storey * 3 + 3.2 + Math.sin(W.t * 1.3) * .35, cz + Math.sin(a) * 6.5); W.drone.rotation.y = -a; W.drone.children[1].rotation.z = W.t * .6; }
@@ -20618,16 +20698,17 @@ function wtowerLadder(W) { const L = W.lad; if (L.open) return; L.open = 1; snd(
   L.L = kitClimbAdd({ minx: L.lx - .12, maxx: L.lx + .12, miny: 0, maxy: L.top, minz: L.lz - .45, maxz: L.lz + .45 }, 'wtower_ladder', L.top); L.L.mark = { x: WTOWER.at[0], y: L.top, z: L.lz + .6 }; }
 // RE-PASS 2 (m1489): a blow on the crown takes a panel (two hits), on a door a leaf
 function wtowerBreak(x, y, z, rad) { const W = WTOWER.on; if (!W) return 0;
-  if (W.lad && !W.lad.open && Math.hypot(x - W.lad.lx, y - W.lad.top, z - W.lad.lz) < .9 + rad) { wtowerLadder(W); return 1; }
+  if (W.lad && !W.lad.open && (!W.R || W.R.t >= 1) && Math.hypot(x - W.lad.lx, y - W.lad.top - (W.R ? W.R.g.position.y - W.R.baseY : 0), z - W.lad.lz) < .9 + rad) { wtowerLadder(W); return 1; }
   if (W.roof) { const i = korTentAt(W.roof, x, y, z, rad); if (i >= 0 && !W.roof.panels[i].dead) { const P = W.roof.panels[i]; if (--P.hp <= 0) korTentBreak(W.roof, i, W.g); else { snd('thud', { g: .6, r: 1.2, x, z }); spkBurst(x, y, z, 6, { col: [.8, .4, .3], spread: 1, size: .1, life: .4 }); } return 1; } }
   if (bldDoorsHit(W.doors, x, y, z, rad)) return 1;
   return 0; }
-function wtowerDrum(x, y, z, rad) { const W = WTOWER.on; if (!W || !W.drum || W.drumT > .3) return 0; const D = W.drum.position;
+function wtowerDrum(x, y, z, rad) { const W = WTOWER.on; if (!W || !W.drum || W.drumT > .3 || (W.R && W.R.t < 1)) return 0; const D = W.drum.getWorldPosition(new THREE.Vector3());     // m@X4@: it rides a piece now
   if (Math.hypot(x - D.x, y - D.y, z - D.z) > 1 + rad) return 0; W.drumT = .8;
   snd('boom', { g: 1, r: .45, x: D.x, z: D.z }); snd('thud', { g: 1, r: .5, x: D.x, z: D.z }); camShake(.2); spkBurst(D.x, D.y, D.z, 14, { col: [1, .8, .5], spread: 3, size: .1, life: .4 });
   for (const d of HORDE.list) if (d.archer && d.st !== 'gone') d.arCool = 0; for (const T of TURRET.list) if (!T.dead) { T.cool = 0; T.see = 1; }
   ghouseAlarm(); return 1; }
-function wtowerClear() { const W = WTOWER.on; if (!W) return; bldClear(W); turretDrop(W.tur);
+function wtowerClear() { const W = WTOWER.on; if (!W) return; if (W.R) { const i = RESTORE.list.indexOf(W.R); if (i >= 0) RESTORE.list.splice(i, 1); if (W.R.ride) { bldTrisDrop(W.R.ride.tb); bldTrisDrop(W.R.ride.tu); } } for (const o of W.ground || []) o.removeFromParent();
+  bldClear(W); if (W.tur) turretDrop(W.tur);
   if (W.lad && W.lad.L) { const i = KCLIMB.indexOf(W.lad.L); if (i >= 0) KCLIMB.splice(i, 1); if (player.climb === W.lad.L) climbOff(); }
   for (const c of W.coins || []) { const i = COIN.list.indexOf(c); if (i >= 0) COIN.list.splice(i, 1); }
   if (W.arch2 && HORDE.list.includes(W.arch2)) { bowDrop(W.arch2); bodyGone(W.arch2); HORDE.list.splice(HORDE.list.indexOf(W.arch2), 1); }
@@ -26389,7 +26470,7 @@ function gpagClear() { const G = GPAG.on; if (!G) return; for (const d of (G.arc
 // forge's SPAWN > BUILDINGS; the one in progress shows there too, marked with its pass. `at` is where it stands in the forge.
 const BLDG = { list: [
   { key: 'hall', t: 'Dojo Hall', sub: 'breakable walls, a roof to run on, bars, a gong that calls a sparring robot out of the Jin panel (beat it to rank it up: five belts, then a trophy)', pass: 6, build: () => hallBuild(), clear: () => hallClear(), on: () => !!HALL.on },
-  { key: 'wtower', t: 'Watchtower', sub: 'three big storeys, a ramp round, perches with bars, a sentry gun, two archers, a war drum, a searchlight, a pulley basket up to the lookout, a signal beacon that calls the airship, a zip to the hall roof', pass: 6, build: () => wtowerBuild(), clear: () => wtowerClear(), on: () => !!WTOWER.on, step: dt => wtowerStep(dt) },
+  { key: 'wtower', t: 'Watchtower', sub: 'three big storeys, a ramp round, perches with bars, a sentry gun, two archers, a war drum, a searchlight, a pulley basket up to the lookout, a signal beacon that calls the airship, a zip to the hall roof', pass: 6, build: () => wtowerBuild(), clear: () => wtowerClear(), on: () => !!WTOWER.on, rig: () => WTOWER.on && WTOWER.on.R, step: dt => wtowerStep(dt) },
   { key: 'gate', t: 'Gatehouse', sub: 'a torii, a ballista you can man (stand at its breech), a drawbridge, archers, an alarm bell that drops the portcullis, a murder-hole cauldron', pass: 6, build: () => ghouseBuild(), clear: () => ghouseClear(), on: () => !!GHOUSE.on, step: dt => ghouseStep(dt) },
   { key: 'pagoda', t: 'Pagoda', sub: 'five storeys, a spiral ramp, gutters to climb the outside, a bell that knocks everyone down, shinobi archers on the roofs, an altar core that calls chain lightning off the spire', pass: 6, build: () => pagodaBuild(), clear: () => pagodaClear(), on: () => !!PAGODA.on, step: dt => pagodaStep(dt) },
   { key: 'market', t: 'Market Stalls', sub: 'four stalls, a noodle bar, a rooftop teahouse, a robot merchant, bars, crates and fruit to smash, a pickpocket to catch, a fireworks stall that launches at enemies', pass: 6, build: () => mktBuild(), clear: () => mktClear(), on: () => !!MKT.on, step: dt => mktStep(dt) },

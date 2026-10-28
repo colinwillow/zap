@@ -42,13 +42,13 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 4. **Breakable and alive:** doors open or break; roofs have a SKELETON (rafters and beams) so a broken roof reads; something to smash; lanterns, cloth and smoke moving.
 5. **Detail and embellishment:** silhouettes that read from the game camera, plants and rocks round the base, signs of use.
 6. **Budget:** about 40 draws per building (merge per material), no new physics, `npm run check` clean.
-7. **Two states (his, m1501: THE RESTORATION):** FALLEN and RESTORED, one build, the SPAWN > BUILDINGS > STATE switch. Fallen = `bldAge(g)` plus the building's own ruin (`korTentRuin`, `bldDoorsRuin`, lamps and machines dead); restored = the hero kit plus `bldJinraMotes`.
+7. **Two states, ONE set of pieces (his: THE TRANSFORMATION IS THE SHOW):** every building is a `RESTORE` rig -- FALLEN = its pieces collapsed, slid and tipped, rust-grey; RESTORED = assembled, glowing, LIFTED on Jinra jets and still walkable. Built with `restorePieces` / `restoreSkin` / `restoreRide` (the Watchtower is the reference, m@X4@); the transformation plays from a mint plate or SPAWN > BUILDINGS > STATE.
 
 **The buildings** (SPAWN > BUILDINGS), at least 3 passes each:
 | building | p1 | p2 | p3 | his OK |
 |---|---|---|---|---|
 | Dojo Hall |  |  |  |  |
-| Watchtower | m1487 hero kit: tent-cone crown, box lanterns, bunting, wheel winch, plants, a low bar; ~180 -> 87 draws | m1489 the crown breaks panel by panel to a rafter skeleton; doors swing open and break | m1490 layers: a rope-ladder SHORTCUT that drops from deck 2, doubloons on the perch tips, a guarded Jinra canister on the lookout |  |
+| Watchtower | m1487 hero kit: tent-cone crown, box lanterns, bunting, wheel winch, plants, a low bar; ~180 -> 87 draws | m1489 the crown breaks panel by panel to a rafter skeleton; doors swing open and break | m1490 layers: a rope-ladder SHORTCUT that drops from deck 2, doubloons on the perch tips, a guarded Jinra canister on the lookout; **m@X4@ RESTORABLE: one set of pieces, animated home, floats on Jinra jets, walkable** |  |
 | Gatehouse |  |  |  |  |
 | Pagoda | m1494 classical heritage in painted maps (roof tiles, timber, sandstone), Jinra core, bunting, plants; ~270 -> 85 draws | m1497 the belfry cap breaks panel by panel to a rafter skeleton; doors open and break (shared `bldDoors`) | m1500 layers: a launch bar at the foot, doubloons up the gutter climb, the bell unfurls a climbable RAIN CHAIN shortcut |  |
 | Great Red Pagoda | m1507 painted floors, roof tiles and sandstone (the lacquer kept bright), Jinra core, plants, fallen/restored |  |  |  |
