@@ -64471,7 +64471,7 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 // to the shop front and to the round back door. Built in its OWN frame (local +z = the front, toward the river; `at`/`yaw` are HOME.hut's) and
 // merged per material; every collider a local box turned into the world (the yaw is a quarter turn, so a box stays a box); every walkable
 // surface a triangle. `?hut=glb` (or GHOME.on = 0) puts the GLB back, to compare. Pass 1: the massing and the walkable shell, with the inside.
-const GHOME = { on: 1, pass: 23, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
+const GHOME = { on: 1, pass: 24, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   Rtu: 2.5, door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
@@ -64558,7 +64558,8 @@ function ghomeHit(x, y, z, rad) { if (!GHOME.g || !inHome()) return 0; const w0h
   return 0; }
 // pass 21: a fish leaps off the T-head now and then -- a short arc out of the water and back, a splash at both ends
 // pass 23: the tumbleweed -- every 8-20 s it comes in from upwind (local +x), rolls and hops across the floor in front of the home, and goes
-function ghomeTumble(dt) {     // the beach between the shop and the water; it hops over the pier's foot const T = GHOME.tumble; if (!T) return; const m = T.m; T.t -= dt;
+// (the beach between the shop and the water; it hops over the pier's foot)
+function ghomeTumble(dt) { const T = GHOME.tumble; if (!T) return; const m = T.m; T.t -= dt;
   if (!T.on && T.t <= 0) { T.on = 1; T.x = 34; T.z = 9.8 + Math.random() * .8; T.v = 2.6 + Math.random() * 1.6; T.hop = 0; T.vy = 0; T.y = 0; m.visible = true; }
   if (T.on) { T.x -= T.v * dt; T.z += Math.sin(T.x * .3) * dt * .25; T.vy -= 9.8 * dt; T.y += T.vy * dt; if (T.y <= 0) { T.y = 0; T.vy = Math.abs(T.x) < 3.2 ? 4.2 : Math.random() < .5 ? 1.2 + Math.random() * 1.8 : 0; }
     let gy; try { gy = T.gH(T.x, T.z); } catch (e) { gy = 0; } m.position.set(T.x, gy + .45 + T.y, T.z); m.rotation.z += T.v * dt / .45; m.rotation.x += dt * .4;
@@ -65030,7 +65031,7 @@ function ghomeBuild(at, yaw, y0) {
       // the drying rack: two A-frames, a pole, the catch hung by the tail
       { const rx0 = 1.0, rx1 = 3.2, rz = tz0 + .55, top = dY + 1.55; for (const x of [rx0, rx1]) for (const sd of [-1, 1]) { const a = [x, dY, rz + sd * .45], b = [x, top, rz], d = new THREE.Vector3(0, top - dY, -sd * .45), L = d.length(); put(new THREE.BoxGeometry(.06, L, .06), wood, _m4.compose(new THREE.Vector3(x, (dY + top) / 2, rz + sd * .225), _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()), _one)); }
         put(new THREE.CylinderGeometry(.03, .03, rx1 - rx0 + .2, 6), wood, at4((rx0 + rx1) / 2, top - .02, rz, 0, 0, Math.PI / 2));
-        for (let x = rx0 + .25; x < rx1 - .1; x += .3) { const h = .34 + rnd2() * .14; put(new THREE.CylinderGeometry(.004, .004, .18, 3), iron, at4(x, top - .1, rz)); put(new THREE.SphereGeometry(1, 8, 6), fishM, at4(x, top - .2 - h / 2, rz, rnd2() * .6, 0, 0, .05, h / 2, .1)); put(new THREE.ConeGeometry(.07, .12, 4), fishM, at4(x, top - .2, rz, 0, 0, Math.PI)); } }
+        for (let x = rx0 + .25; x < rx1 - .1; x += .3) { const h = .34 + rnd2() * .14; put(new THREE.CylinderGeometry(.004, .004, .18, 3), iron, at4(x, top - .1, rz)); put(new THREE.SphereGeometry(1, 10, 6), fishM, at4(x, top - .26 - h / 2, rz, rnd2() * .6, 0, 0, .022, h / 2, .075)); put(new THREE.ConeGeometry(.08, .14, 4), fishM, at4(x, top - .22, rz, rnd2() * .6, 0, Math.PI, 1, 1, .25)); put(new THREE.SphereGeometry(.012, 4, 3), iron, at4(x + .02, top - .3 - h + .1, rz)); } }     // pass 24: slim, a tail, an eye: fish, not pods
       { const cx2 = -2.9, cz2 = tz0 + .5; vbox(cx2 - .35, cx2 + .35, dY, dY + .36, cz2 - .25, cz2 + .25, wood, 1, NC); for (let k = 0; k < 6; k++) put(new THREE.SphereGeometry(1, 7, 5), fishM, at4(cx2 - .22 + (k % 3) * .22, dY + .38, cz2 - .08 + ((k / 3) | 0) * .16, .3 * k, Math.PI / 2, 0, .05, .14, .08)); }
       // the BELL at the pier's foot: a post, a bracket, a bronze bell -- strike it and it rings
       { const bx = hw + .35, bz = z0 + .25, by = gH(bx, bz); vbox(bx - .08, bx + .08, by, by + 2.2, bz - .08, bz + .08, wood, 1, NC); vbox(bx - .06, bx + .55, by + 2.1, by + 2.2, bz - .05, bz + .05, wood, 0);
@@ -65039,6 +65040,16 @@ function ghomeBuild(at, yaw, y0) {
       // the jumping FISH: one mesh, hidden until it leaps
       { const fg = [new THREE.SphereGeometry(1, 10, 6).scale(.07, .1, .26).toNonIndexed(), new THREE.ConeGeometry(.1, .16, 4).rotateX(-Math.PI / 2).translate(0, 0, -.3).toNonIndexed()]; for (const q of fg) q.deleteAttribute('uv');
         const fm = new THREE.Mesh(mergeGeometries(fg), fishM); fm.visible = false; g.add(fm); GHOME.fish = { m: fm, t: 3, d: .9, on: 0, wY, zr: [tz1 + .6, tz1 + 2.8] }; } }
+    // ---- PASS 24 (the pier's third pass): a red cloth CANOPY over the T-head's shore half on four posts (the awning cloth: no new draw), and
+    // a fishing NET draped over the rail, sagging between two posts, floats along its top ----
+    { const cx0 = -tx + .2, cx1 = .6, cz0 = tz0 + .05, cz1 = tz1 - .35, yt = dY + 2.35, yl = dY + 2.0; for (const [x, z] of [[cx0, cz0], [cx1, cz0], [cx0, cz1], [cx1, cz1]]) vbox(x - .07, x + .07, dY, (z === cz0 ? yt : yl) + .05, z - .07, z + .07, wood, 1, NC);
+      awning([cx0 - .15, yt, cz0 - .1], [cx1 + .15, yt, cz0 - .1], [cx1 + .2, yl, cz1 + .25], [cx0 - .2, yl, cz1 + .25], clothM('awning'), .14);
+      for (const z of [cz0, cz1]) vbox(cx0 - .1, cx1 + .1, (z === cz0 ? yt : yl) - .06, (z === cz0 ? yt : yl) + .04, z - .05, z + .05, wood, 0); }
+    { const za = z0 + 2.5, zb = z0 + 4.2, ytop = Math.max(dY, gH(0, (za + zb) / 2) + .06) + .95, NU = 9, NV = 6, xo = -hw - .08;
+      const at = (u, v) => [xo - .05 - .12 * Math.sin(Math.PI * v) - .04 * Math.sin(u * 11), ytop - v * .85 - .12 * Math.sin(Math.PI * u) * v, za + (zb - za) * u];
+      const cord = (a, b) => { const d = new THREE.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]), L = d.length(); put(new THREE.CylinderGeometry(.007, .007, L, 3), wood, _m4.compose(new THREE.Vector3((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2), _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()), _one)); };
+      for (let i = 0; i <= NU; i++) for (let j = 0; j < NV; j++) cord(at(i / NU, j / NV), at(i / NU, (j + 1) / NV)); for (let j = 0; j <= NV; j++) for (let i = 0; i < NU; i++) cord(at(i / NU, j / NV), at((i + 1) / NU, j / NV));
+      for (let i = 0; i <= NU; i += 3) { const p0 = at(i / NU, 0); put(new THREE.SphereGeometry(.05, 6, 4), redW, at4(p0[0], p0[1], p0[2], 0, 0, 0, 1.4, 1, 1)); } }
     // the CANOE: his alien skiff -- a long bowl of a hull with an upswept prow and stern, brass gunwales, swept fins at its waist and a tail
     // fin (it looks as if it flies), lavender runes along its flank and two glowing hover discs under it. Its own group: it rides the water
     { const cg = new THREE.Group(), cx = -.4, cz = tz1 + 1.55; cg.position.set(cx, wY, cz); cg.rotation.y = Math.PI / 2; g.add(cg);     // alongside the T-head, along the current
@@ -65361,7 +65372,9 @@ function homeLanterns() {
 function homeStep(dt) {
   const H = HOME; H.t += dt; if (RW.U) RW.U.uTime.value = H.t;
   if (GHOME.U) GHOME.U.uWind.value = H.t; ghomeSmoke(dt, H.t); for (const G of GHOME.gates || []) bgateStep(G, dt);     // pass 9: his back door
-  if (GHOME.canoe) { const C = GHOME.canoe, t = H.t; C.g.position.y = C.y + rwWaveAt(C.x, C.z, t) * .8 + .02; C.kv = (C.kv - 9 * C.roll * dt) * Math.exp(-1.2 * dt); C.roll += C.kv * dt; C.g.rotation.set(Math.sin(t * .9) * .03, C.ry + Math.sin(t * .23) * .04, Math.sin(t * 1.1 + 1) * .05 + C.roll); C.rune.emissiveIntensity = 1.2 + .8 * Math.sin(t * 2.2) ** 2; }     // pass 21: struck, it rocks; the runes breathe
+  if (GHOME.canoe) { const C = GHOME.canoe, t = H.t; C.g.position.y = C.y + rwWaveAt(C.x, C.z, t) * .8 * (1 - Math.min(1, (C.lift || 0) * 2)) + .02 + (C.lift || 0); C.ht = (C.ht == null ? 12 : C.ht) - dt; if (C.ht <= 0 && !C.hu) { C.hu = 1e-3; } if (C.hu) { C.hu += dt; if (C.hu > 6) { C.hu = 0; C.ht = 18 + Math.random() * 20; const P = C.g.getWorldPosition(new THREE.Vector3()); spkBurst(P.x, GHOME.g.position.y + C.y + .05, P.z, 30, { col: [.85, .93, 1], spread: 4, size: .09, life: .6 }); snd('thud', { g: .5, r: .7, x: P.x, z: P.z }); } }     // pass 24: now and then it LIFTS on its discs, hangs dripping, and settles
+  const lift = C.hu ? .5 * Math.min(1, C.hu / 1.4) * Math.min(1, Math.max(0, (6 - C.hu) / 1.2)) : 0; if (lift > .05 && Math.random() < dt * 14) { const P = C.g.localToWorld(new THREE.Vector3((Math.random() - .5) * .8, -.4, (Math.random() - .5) * 4)); spkBurst(P.x, P.y, P.z, 2, { col: [.8, .9, 1], spread: .4, size: .05, life: .5 }); }
+  C.kv = (C.kv - 9 * C.roll * dt) * Math.exp(-1.2 * dt); C.roll += C.kv * dt; C.g.rotation.set(Math.sin(t * .9) * .03, C.ry + Math.sin(t * .23) * .04, Math.sin(t * 1.1 + 1) * .05 + C.roll); C.rune.emissiveIntensity = 1.2 + .8 * Math.sin(t * 2.2) ** 2 + lift * 5; C.lift = lift; }     // pass 21: struck, it rocks; the runes breathe
   ghomeFish(dt); ghomeTumble(dt);     // pass 19: the canoe rides the waves
   if (GHOME.sw) GHOME.sw.hc -= dt; GHOME.bellT -= dt; ghomeOrb(dt, H.t);     // pass 6 / pass 14: the orb swings (that line had been inside the comment above since pass 9)
   // the boat rides the waves

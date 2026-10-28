@@ -109,7 +109,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 - **AIR:** (later) floating islands, zeppelins and wind currents to ride.
 
 ## GRUMBO'S HOME, PROCEDURAL (his, after m1376) -- its own track, many passes
-**HIS RULE (after m1429): every element gets a MINIMUM OF THREE PASSES** (*"we'll do a few passes on everything we do. Minimum 3 passes, max a million"*). The tally so far: the house 1-17 (many), the rocks 18, 22 (2 of 3), the pier and canoe 19, 21 (2 of 3), the plants and ground 20, 23 (2 of 3).
+**HIS RULE (after m1429): every element gets a MINIMUM OF THREE PASSES** (*"we'll do a few passes on everything we do. Minimum 3 passes, max a million"*). The tally so far: the house 1-17 (many), the rocks 18, 22 (2 of 3), the pier and canoe 19, 21, 24 (3 of 3), the plants and ground 20, 23 (2 of 3).
 
 > *"These are the images I used to make the Tripo model of his home, but building it procedurally is going to be better, so we can go inside and add
 > stuff and it's all in the same game style. Dedicate one of the context windows to it; a ton of passes to make it really cool, as true to the design
@@ -150,7 +150,8 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - [x] **pass 20 (m1429):** PLANTS AND GROUND (his ask): low sandstone shelves half-buried round the home (flat ground only), and a planting thinning out from the mound -- sagebrush, golden grass, yuccas with cream flower spikes, lavender alien bulbs on curling stalks -- with reeds and cattails along the waterline
   - [x] **pass 21 (m1432):** THE PIER AND CANOE, second pass: weathered planks (mixed timber, each a little off, one missing), X-braces and bracing under the deck, bollards, a ladder into the water, a fish drying rack and a crate of fish, a BELL at the pier's foot that rings, a fish that leaps off the T-head now and then; the canoe gets a brass engine pod with a glowing exhaust, a prow lantern, a furled wing-sail on a mast, a basket and a rug, breathing runes, and it ROCKS when struck
   - [x] **pass 22 (m1436):** THE ROCKS, second pass: their own desert-sandstone colour (`ghStrata`, per vertex) instead of the house's stone -- rust / ochre / cream strata bands that stay level across neighbours, dark varnish streaks down the steep faces, sun-bleached tops, speckle; the valley's boulders and hoodoos take it too
-  - [x] **pass 23 (next tick):** THE PLANTS, second pass: the grass and reeds SWAY in the wind (a per-blade height attribute drives the shader), fuller drifts of golden grass, gravel patches of sandstone chips, and a TUMBLEWEED that rolls and hops along the beach every so often
+  - [x] **pass 23 (m1442):** THE PLANTS, second pass: the grass and reeds SWAY in the wind (a per-blade height attribute drives the shader), fuller drifts of golden grass, gravel patches of sandstone chips, and a TUMBLEWEED that rolls and hops along the beach every so often
+  - [x] **pass 24 (next tick):** THE PIER AND CANOE, third pass: the hung catch slimmed into fish (tails, eyes), a red cloth canopy over the T-head's shore half, a fishing net draped over the rail with floats; every 18-38 s the CANOE LIFTS half a metre on its discs, hangs dripping with its runes blazing, and settles with a splash. **Also fixes m1442, which threw on every frame in the home** (see NOTES)
   - [ ] then more passes, each one closer to the four views
 
 ## THE SHIP (his, after m1372) -- its own track, alongside the blueprint work
