@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the FORGE-WORKSHOP, pass 3 (L3: UP ON THE ROOF) -- its third pass, DONE
+## m1630 -- THE RE-PASS: the FORGE-WORKSHOP, pass 3 (L3: UP ON THE ROOF) -- its third pass, DONE
 - An outside ladder up the back wall (`fwork_roof`, its mark on the gangway), a plank gangway with iron rails across the roof from the
   ladder head, the bronze ridge cap now a walkable box (measured to the drawn cap, .32 wide), and an iron 2x2 platform round the flue with
   rails on three sides. Doubloons: two along the ridge, two on the flue platform.
