@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The merchant shop, pass 1 (Worker B): a butte on the rim, the shop on top, a first way up
+- His ask, with a canyon-city layout reference and a shop reference (`images/korajin/ref/merchant_shop_1.jpg`): *"a merchant shop... up on a cliff... exaggerated height... framed in the same shot with a wide-angle lens... kind of hard to get to."* The layout test's spire in the stream is now held for **his water-mill tower** (his image to come). **VERTICALITY** is written into BUILDINGS.md as his rule.
+- **`GMERCH` / `gmerchBuild()`**, called from `buildHome` after the home (canyon style only), in its own try: **MERCHANT BUILD THREW** fails the boot gate. The butte is centred `back` 48 m west of the river line at z -60, so its east lip sits just behind the west wall's top. Base 6 m under the lowest ring sample; cap `A.H` 20 m over the rim's height there: **top 51.7, deck 52.5**. Yaw .93 points the deck's front mostly east and toward the home.
+- **The butte**: a noisy lathe (48 x 24), its radius tapering 1.28R to R, ledged every 3.1 m, coloured by `ghStrataCol` (the rocks' strata). The flat cap is walkable (`triAdd`). The collider is cell runs: solid to the cap inside its radius, stepping down with the profile outside it.
+- **The shop**:
+  - a 20 x 21 plank deck, its front past the lip on struts, rope rails on posts, four lantern posts;
+  - a stone ground floor 11 x 9 x 4.2 (open 6.8 m front, counter, three shelves of pots and crystals), the timber upper storey 7.2 x 6 x 3.2 with a walkable roof and a 2 m balcony round it (railed, noCam);
+  - two **bone arches** (bezier tubes, knuckle rings, feet with colliders) crossing over it, the **red sail** on them;
+  - the target **sign** in a bronze wheel, teal and pink scalloped **awnings**, the target **banner** on a 15 m banded pole, two teal palm fans, charms hung off the arches.
+- **The way up (pass 1 of the route)**: a scaffold up the west wall at z -51 (four ~6 m ladders, each to a plank landing running back to where the slope reaches it, `kitClimbAdd` with marks), to 25.4 m where the wall eases off to the rim. Then a **19.2 m ladder** up the butte's back (it latches from the front, marked onto the cap), and two steps onto the deck. **Not yet hard or varied**: the rope bridge, floating platforms and lift are the route's next passes.
+- **16 draws.** `TAU` is not module-scope (the home's builder defines its own); the first build threw on it and the gate caught it.
 ## Grumbo's home pass 25 (Worker B): paths and trails
 - His list: *"path textures, trails, mountain shrubs, plants."* The plan he agreed to: paths, shutters, rocks 3, plants 3 (with cliff shrubs), the rope lift, breakable pots, then his sign-off.
 - **`A.paths`** (home-local polylines, defined BEFORE pass 1 so everything after can avoid them) and `A.onPath(x, z, r)`, sampled every .5 m. Routes:
