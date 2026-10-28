@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the FORGE-WORKSHOP, pass 3 (L3: UP ON THE ROOF) -- its third pass, DONE
+- An outside ladder up the back wall (`fwork_roof`, its mark on the gangway), a plank gangway with iron rails across the roof from the
+  ladder head, the bronze ridge cap now a walkable box (measured to the drawn cap, .32 wide), and an iron 2x2 platform round the flue with
+  rails on three sides. Doubloons: two along the ridge, two on the flue platform.
+- The gangway, the platform, the ladder and the coins ride the `roof` piece (`restoreRide` up: climbs + coins), so while fallen there is no
+  roof walk and no ladder; `fworkClear` drops the climb and the coins.
+- Colliders: every new box sits on a drawn plank, cap or grating (no invisible ledges); the flue-cap coin of the first try was unreachable
+  and moved onto the platform.
+Render-checked headless (the ladder, the gangway, the platform and a coin in frame). Next: the Spider-Bot Hangar (ENEMY). Shipped unverified.
+
 ## m1627 -- THE DRAGON RIDE: THE RIDER SAT INSIDE THE DRAGON
 His: *"he was sitting inside the dragon -- that's why"* (he could not see himself). The rider's root went at the seat less a HIP HEIGHT that was
 an estimate (.6 x `rig.hipY`) corrected by a lagged measurement that only ran inside a sane range -- so wherever the `driving` clip actually put

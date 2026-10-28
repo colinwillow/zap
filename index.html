@@ -23579,6 +23579,18 @@ function fworkBuild() {
   korBunting(put, K, [cx - hw - .3, H - .05, cz - hd - .3], [cx - hw - .3, H - .05, cz + hd + .3], 14, .4);
   { let sd = 31; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647; for (let i = 0; i < 30; i++) { const a2 = rnd() * 6.28, rr = Math.max(hw, hd) + 2 + rnd() * 3.5, x = cx + Math.cos(a2) * rr * 1.1, z = cz + Math.sin(a2) * rr;
       if (x < cx - hw && Math.abs(z - cz) < hd + 1.5) continue; if (Math.hypot(x - kx, z - kz) < 2) continue; plantPlant(plants, ['grass', 'stones', 'tallgrass', 'fern', 'boulder'][i % 5], x, 0, z, .8 + rnd() * .5, a2); } }
+  // ---- RE-PASS 3 (m@X4@): UP ON THE ROOF -- a LADDER up the outside of the back wall, a plank GANGWAY on posts over the roof to the ridge, the
+  // bronze RIDGE made walkable (a balance beam), an iron PLATFORM round the flue; doubloons along the ridge, on the platform and on the flue cap.
+  // All but the ladder's foot ride the roof piece (gone while fallen) ----
+  const rY = H + 3.13, nb0 = O.boxes.length, coinsU = [], gx1 = cx + hw + 1.7, gx0 = cx + hw / 2 + .15;
+  O.boxes.push({ minx: cx - hw / 2 - .15, maxx: gx0, miny: rY - .16, maxy: rY, minz: cz - .16, maxz: cz + .16 });     // the ridge cap, walkable
+  add(new THREE.BoxGeometry(gx1 - gx0, .12, .7), wood, (gx0 + gx1) / 2, rY - .06, cz, 1); for (const sz of [-1, 1]) add(new THREE.BoxGeometry(gx1 - gx0, .05, .05), K.iron, (gx0 + gx1) / 2, rY + .8, cz + sz * .35, 0);
+  add(new THREE.BoxGeometry(.14, rY, .14), wood, gx1 - .1, rY / 2, cz - .3, 0); add(new THREE.BoxGeometry(.14, rY, .14), wood, gx1 - .1, rY / 2, cz + .3, 0);
+  add(new THREE.BoxGeometry(2, .1, 2), K.iron, fx, rY - .05, fz, 1); for (const [w, d, x, z] of [[2, .05, fx, fz - 1], [2, .05, fx, fz + 1], [.05, 2, fx - 1, fz]]) add(new THREE.BoxGeometry(w, .05, d), K.iron, x, rY + .85, z, 0);
+  { const lx = gx1 + .25; for (const e of [-.3, .3]) add(new THREE.BoxGeometry(.07, rY, .07), wood, lx, rY / 2, cz + e, 0); for (let y = .3; y < rY; y += .32) add(new THREE.BoxGeometry(.06, .05, .66), wood, lx, y, cz, 0);
+    var rLad = kitClimbAdd({ minx: lx - .12, maxx: lx + .12, miny: 0, maxy: rY, minz: cz - .45, maxz: cz + .45 }, 'fwork_roof', rY); rLad.mark = { x: gx1 - .8, y: rY, z: cz }; }
+  for (const dx of [-2, 0]) coinsU.push(coinDrop(g, cx + dx, rY + .9, cz)); coinsU.push(coinDrop(g, fx + .6, rY + .9, fz + .6), coinDrop(g, fx - .6, rY + .9, fz - .6));     // (none on the flue cap: nothing climbs it)
+  for (const b2 of O.boxes.slice(nb0)) BOXES.push(b2); boxGrid();
   // ---- RE-PASS 2 (m1626): RESTORABLE IN PLACE (rubric 7). The floor, the breakable walls, the furnace, the anvil, the trip-hammer, the trough,
   // the gears, the loft's stairs and the crane stay. The ROOF (and the bunting under its eave), the FLUE, the FRONT posts and beam and the
   // LOFT (platform, rail, weapon rack) are pieces. FALLEN: the roof has sagged in, the flue lies in the yard, the front posts are down, the
@@ -23594,16 +23606,16 @@ function fworkBuild() {
   const fall = (key, c) => key === 'roof' ? { p: [c.x + .5, c.y - 2.6, c.z - .3], r: [-.15, .05, .16], hop: .6, at: .55 } : key === 'flue' ? { p: [c.x + 4, .5, c.z + 1], r: [0, .4, -Math.PI / 2 * .95], hop: 1, at: .1 }
     : key === 'front' ? { p: [c.x - H / 2, .3, c.z], r: [0, 0, Math.PI / 2 * .93], hop: .8, at: .3 } : { p: [c.x, 1, c.z - .3], r: [.25, 0, .06], hop: .5, at: .2 };
   const pieces = restorePieces(Rr, g, pairs, cls, fall); bldMergeStatic(g); const plantMs = plantFlush(g, plants);
-  { const skip = new Set([drone, arm, hm, bel, mouth, ...gears, ...ingots, ...cables, ...plantMs, ...smash.map(S2 => S2.m), ...Object.values(pieces)]), wb = new THREE.Box3(), wc = new THREE.Vector3(), ws = new THREE.Vector3();
+  { const skip = new Set([drone, arm, hm, bel, mouth, ...coinsU.map(c2 => c2.m), ...gears, ...ingots, ...cables, ...plantMs, ...smash.map(S2 => S2.m), ...Object.values(pieces)]), wb = new THREE.Box3(), wc = new THREE.Vector3(), ws = new THREE.Vector3();
     for (const o of g.children.slice()) { if (skip.has(o) || O.meshes.includes(o)) continue; wb.setFromObject(o); if (wb.isEmpty()) continue; wb.getCenter(wc); wb.getSize(ws); const key = cls(wc, ws); if (key && pieces[key]) pieces[key].attach(o); } }
   restoreSkin(Rr);
-  for (const b of O.boxes) BOXES.push(b); boxGrid();
+  for (const b of O.boxes) if (!BOXES.includes(b)) BOXES.push(b); boxGrid();
   const bk = b2 => b2.cw ? null : cls(new THREE.Vector3((b2.minx + b2.maxx) / 2, (b2.miny + b2.maxy) / 2, (b2.minz + b2.maxz) / 2), new THREE.Vector3(b2.maxx - b2.minx, b2.maxy - b2.miny, b2.maxz - b2.minz));
-  restoreRide(Rr, { base: { boxes: [], tris: [] }, up: { boxes: O.boxes.filter(b2 => bk(b2)), tris: [], climbs: [], bars: [], rings: [], coins: [], objs: [drone, ...cables] } });
+  restoreRide(Rr, { base: { boxes: [], tris: [] }, up: { boxes: O.boxes.filter(b2 => bk(b2)), tris: [], climbs: [rLad], bars: [], rings: [], coins: coinsU, objs: [drone, ...cables] } });
   Rr.onSet = R2 => restoreRideSet(R2);
   const ground = []; { const px2 = cx - hw - 4, pz2 = cz + hd + 3, plate = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, .12, 24), new THREE.MeshStandardMaterial({ color: 0x3a4a46, emissive: 0x7affd8, emissiveIntensity: .7 })); plate.position.set(px2, .06, pz2); scene.add(plate); ground.push(plate); Rr.trig = { x: px2, y: 0, z: pz2, armed: 1 }; }
   { const t0 = AGE.st === 'fallen' ? 0 : 1; Rr.goal = t0; restoreSet(Rr, t0); restoreRideSet(Rr, true); }
-  FWORK.on = { R: Rr, pieces, ground, plantMs, g, O, bars: [bar], gears, arm, bar, flue: [fx, 11.5, fz], mouth, t: 0, hm, anvil: [ax0, az0], smash, hp: 0, bel, ingots, drone };
+  FWORK.on = { lad: rLad, coins: coinsU, R: Rr, pieces, ground, plantMs, g, O, bars: [bar], gears, arm, bar, flue: [fx, 11.5, fz], mouth, t: 0, hm, anvil: [ax0, az0], smash, hp: 0, bel, ingots, drone };
   fworkStep(0); arenaBeam(cx, cz, [1, .6, .3], 1); snd('clang', { g: .8, r: .5 });
 }
 function fworkStep(dt) { const W = FWORK.on; if (!W) return; W.t += dt; const C = FWORK.crane, whole = !W.R || W.R.t >= 1; if (whole) bldJinraMotes(FWORK.at[0], FWORK.at[1], FWORK.hw + 1, dt);
@@ -23632,7 +23644,7 @@ function fworkStep(dt) { const W = FWORK.on; if (!W) return; W.t += dt; const C 
     const [cx, cz] = FWORK.at, a2 = W.t * .3; W.drone.position.set(cx + Math.cos(a2) * 9, 11 + Math.sin(W.t * 1.2) * .4, cz + Math.sin(a2) * 8); W.drone.rotation.y = -a2; W.drone.children[1].rotation.z = W.t * .6; }
   if (whole && (W.sT = (W.sT || 0) - dt) <= 0) { W.sT = .08; const [x, y, z] = W.flue; spk(x + (Math.random() - .5) * .5, y, z + (Math.random() - .5) * .5, (Math.random() - .5) * .6, 2 + Math.random() * 2, (Math.random() - .5) * .6, .12, .9, [1, .6, .2]);
     if (Math.random() < .3) smokeAt(x, y + .5, z, 1.4, 2, [.35, .33, .31]); } }
-function fworkClear() { const W = FWORK.on; if (!W) return; if (W.R) { const i = RESTORE.list.indexOf(W.R); if (i >= 0) RESTORE.list.splice(i, 1); if (W.R.ride) { bldTrisDrop(W.R.ride.tb); bldTrisDrop(W.R.ride.tu); } } for (const o of W.ground || []) o.removeFromParent(); if (W.plantMs) plantDrop(W.plantMs); smashDrop(W.smash); if (player.bar && player.bar.B === W.bar) player.bar = null; bldClear(W); FWORK.on = null; }
+function fworkClear() { const W = FWORK.on; if (!W) return; for (const c of W.coins || []) { const i = COIN.list.indexOf(c); if (i >= 0) COIN.list.splice(i, 1); } if (W.lad) { const i = KCLIMB.indexOf(W.lad); if (i >= 0) KCLIMB.splice(i, 1); if (player.climb === W.lad) climbOff(); } if (W.R) { const i = RESTORE.list.indexOf(W.R); if (i >= 0) RESTORE.list.splice(i, 1); if (W.R.ride) { bldTrisDrop(W.R.ride.tb); bldTrisDrop(W.R.ride.tu); } } for (const o of W.ground || []) o.removeFromParent(); if (W.plantMs) plantDrop(W.plantMs); smashDrop(W.smash); if (player.bar && player.bar.B === W.bar) player.bar = null; bldClear(W); FWORK.on = null; }
 // m1161: THE SPIDER-BOT HANGAR (BUILDINGS.md #13, pass 1) at (-32, -24) (2 m west of its slot: the Rampart's bastion stands at -25). A low
 // vaulted bunker of grey concrete-stone, its long axis north-south, a HANGAR DOOR in its +z end between breakable wall panels (cwallBuild),
 // a flat walkable crown, warning stripes and red lamps -- and the SPIDER BOTS: three six-legged bronze crawlers (`spiderMake`: a body, a
