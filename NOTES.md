@@ -5,6 +5,24 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the MOATED KEEP, pass 3 (THE EAVE BELT) -- its third pass, DONE; and TWO BUGS IN `restoreRideTris`
+- THE EAVE BELT: a black-tile pent roof round the keep at the skirt's top, 5.4 m at the wall falling to 5.0 at its edge .9 m out, four
+  mitred trapezoids (the west run split over the door, |z| < 1.6, so the lamps and the door stay clear). From the island's rim it is a
+  2.0 m jump (his apex is 2.81) and a walk all the way round. Gold eave tips and a gold band along its foot, a doubloon on each corner,
+  and a GRAPPLE RING 2.2 m over the roof line beside the north and south runs: swing up onto the merlons. Each run's walk tris, its ring and its
+  coins ride its WALL's rig, so a slumped wall takes them. The three face banners shortened (2.6 -> 1.75 m) to clear it.
+- **SHARED BUG 1 -- a ride's first walk set WIPED THE STORE.** `triBuild` rebuilds `TRI.v` from `_triRaw` alone; `bldTris` seeds
+  `_triRaw` with the store first, and `bldTrisDrop` re-pushes what it keeps -- but `restoreRideTris` with an EMPTY set skipped the
+  drop's re-push and built from only its own triangles. Every building whose rig had walk tris (the Hangar roof, the Sky Bridges, the
+  Cliff Lodge perch, this belt) erased every walkable surface loaded before it. Measured: the belt alone left 4 of 10 tris (the last
+  rig won); Hangar + Cliff + Keep in a row gave 0 / 18 / 28 for an expected ~270. Now it seeds `_triRaw` from the store when nothing
+  is pending, and returns early for an empty list.
+- **SHARED BUG 2 -- a set wound DOWNWARD was thrown away whole.** `triAdd` keeps only up-facing triangles and `restoreRideTris` tried
+  one winding (`bldTris` tries both). The Hangar's roof samples are wound downward: **its roof walk has had 0 triangles since m1636**
+  (m1635's 240 were through `bldTris`). It now tries the second winding when the first is rejected. After both: 240 / 258 / 268.
+Render-checked headless (the belt from the south-west: the runs, the door gap, the corner doubloons, the rings). Next: the Robot
+Barracks (ENEMY). Shipped unverified.
+
 ## m1654 -- THE RE-PASS: the MOATED KEEP, pass 2 (DESTRUCTIBLE TO THE GROUND)
 - The Hangar's machinery (per-piece rigs run backwards, `restoreRide` parking each piece's boxes, a `sup` list hit through `bldHit` ->
   `keepBreak`). Pieces: `wN` / `wS` / `wE` / `wW` (a wall with its skirt, gold band, banner, seam and the corner posts on its side; the

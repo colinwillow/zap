@@ -10244,7 +10244,10 @@ function restoreRide(R, spec) { const S = R.ride = Object.assign({ base: { boxes
   for (const L of S.up.climbs) { L._y0 = L.miny; L._y1 = L.maxy; L._t = L.top; if (L.mark) L.mark._y = L.mark.y; }
   for (const B of S.up.bars) { B._y = B.y; B._t = B.top; B._g = B.g.position.y; for (const b of B.boxes) { b._y0 = b.miny; b._y1 = b.maxy; } }
   for (const G of S.up.rings) G._y = G.y; for (const C of S.up.coins) C._y = C.y; return S; }
-function restoreRideTris(set, list, d) { bldTrisDrop(set); if (d < -100) return; for (const t of list) if (triAdd(t[0], t[1] + d, t[2], t[3], t[4] + d, t[5], t[6], t[7] + d, t[8])) set.tri.add([t[0], t[1] + d, t[2], t[3], t[4] + d, t[5], t[6], t[7] + d, t[8]].map(Math.fround).join(',')); triBuild(); }
+function restoreRideTris(set, list, d) { bldTrisDrop(set); if (d < -100 || !list.length) return;
+  if (TRI.v && !_triRaw.length) for (let i = 0; i < TRI.v.length; i++) _triRaw.push(TRI.v[i]);     // m@X4@: triBuild REPLACES the store with _triRaw -- seed it with what is there, or a ride's first set wipes every other walk
+  for (const t of list) for (const q of [[t[0], t[1] + d, t[2], t[3], t[4] + d, t[5], t[6], t[7] + d, t[8]], [t[0], t[1] + d, t[2], t[6], t[7] + d, t[8], t[3], t[4] + d, t[5]]]) if (triAdd(...q)) { set.tri.add(q.map(Math.fround).join(',')); break; }     // m@X4@: either winding (as bldTris), or a set wound downward is thrown away whole
+  triBuild(); }
 function restoreRideSet(R, force) { const S = R.ride; if (!S) return; const lf = R.g.position.y - R.baseY, up = R.t >= 1 ? lf : -600, now = performance.now();
   for (const b of S.base.boxes) { b.miny = b._y0 + lf; b.maxy = b._y1 + lf; }
   if (up !== S.d || force) { S.d = up;
@@ -24242,8 +24245,23 @@ function keepBuild() {
       smashAdd(smash, m, { minx: X - .36, maxx: X + .36, miny: Y0, maxy: Y0 + .8, minz: Z - .36, maxz: Z + .36 }, 2, 15, [.45, .32, .22]); } }
   { for (const [sx, sz] of [[1, 1], [-1, -1]]) { add(new THREE.CylinderGeometry(.05, .06, 3.2, 6), wood, cx + sx * (kh - .4), RY + 1.6, cz + sz * (kh - .4), 0); add(new THREE.SphereGeometry(.1, 8, 6), E.gold, cx + sx * (kh - .4), RY + 3.25, cz + sz * (kh - .4), 0); enemyBanner(putM, E, cx + sx * (kh - .4) + .55, RY + 3, cz + sz * (kh - .4), 0, .9, 1.8); } }     // m1653: black emblem banners
   // m1653: tall emblem banners down the keep's three closed faces, under the merlons
-  for (const sz of [-1, 1]) enemyBanner(putM, E, cx + 1.4, RY - .2, cz + sz * (kh + .06), sz > 0 ? 0 : Math.PI, 1.1, 2.6);
-  enemyBanner(putM, E, cx + kh + .06, RY - .2, cz, Math.PI / 2, 1.1, 2.6);
+  for (const sz of [-1, 1]) enemyBanner(putM, E, cx + 1.4, RY - .2, cz + sz * (kh + .06), sz > 0 ? 0 : Math.PI, 1.1, 1.75);     // m@X4@: shortened to clear the eave belt
+  enemyBanner(putM, E, cx + kh + .06, RY - .2, cz, Math.PI / 2, 1.1, 1.75);
+  // ---- RE-PASS 3 (m@X4@): THE EAVE BELT -- a black-tile PENT ROOF round the keep at the skirt's top (5.4 at the wall, 5.0 at its edge,
+  // .9 out), split over the door: a 2.0 m jump from the island's rim lands you on it (his apex is 2.81), a walk all the way round; gold
+  // tips at its corners, a gold band along its foot, a doubloon on each corner, and a GRAPPLE RING over the middle of the north and south
+  // runs that swings you up onto the merlons. Each run rides its wall (`beltT`), so a slumped wall takes its run, ring and coins ----
+  const eo = .9, yi = Y0 + KH * .45 + .4, yo = Y0 + KH * .45, beltT = { wN: [], wS: [], wE: [], wW: [] }, beltG = [], ringK = [], coinK = [];
+  const up = (a, b, c2) => ((b[2] - a[2]) * (c2[0] - a[0]) - (b[0] - a[0]) * (c2[2] - a[2])) > 0 ? [...a, ...b, ...c2] : [...a, ...c2, ...b];     // the ride store keeps ONE winding, up-facing
+  const quad = (key, a, b, c2, d) => { beltT[key].push(up(a, b, c2), up(a, c2, d)); beltG.push(a, b, c2, a, c2, d); };
+  for (const sz of [-1, 1]) quad(sz > 0 ? 'wS' : 'wN', [cx - kh, yi, cz + sz * kh], [cx + kh, yi, cz + sz * kh], [cx + kh + eo, yo, cz + sz * (kh + eo)], [cx - kh - eo, yo, cz + sz * (kh + eo)]);
+  quad('wE', [cx + kh, yi, cz - kh], [cx + kh, yi, cz + kh], [cx + kh + eo, yo, cz + kh + eo], [cx + kh + eo, yo, cz - kh - eo]);
+  for (const sz of [-1, 1]) { const g0 = 1.6, f = (kh - g0) / kh; quad('wW', [cx - kh, yi, cz + sz * kh], [cx - kh, yi, cz + sz * g0], [cx - kh - eo, yo, cz + sz * g0], [cx - kh - eo, yo, cz + sz * (kh + eo)]); }
+  { const bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.Float32BufferAttribute(beltG.flat(), 3)); bg.computeVertexNormals(); putM(bg, E.roof); }
+  for (const sz of [-1, 1]) add(new THREE.BoxGeometry((kh + eo) * 2, .06, .06), E.gold, cx, yo - .03, cz + sz * (kh + eo), 0);
+  add(new THREE.BoxGeometry(.06, .06, (kh + eo) * 2), E.gold, cx + kh + eo, yo - .03, cz, 0);
+  for (const sz of [-1, 1]) add(new THREE.BoxGeometry(.06, .06, kh + eo - 1.6), E.gold, cx - kh - eo, yo - .03, cz + sz * (1.6 + (kh + eo - 1.6) / 2), 0);
+  for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const e = add(new THREE.ConeGeometry(.09, .5, 4), E.gold, cx + sx * (kh + eo + .05), yo + .15, cz + sz * (kh + eo + .05), 0); e.rotation.set(sz * .9, 0, -sx * .9); }
   // ---- PASS 3 (m1182): the polish -- CHAINS from the drawbridge's tip to the keep, an ONI MASK over the keep door, lanterns round the
   // curb, koi in the moat, cables and a drone ----
   const chains = []; for (const sz of [-1, 1]) { const ln = new THREE.Line(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3)), new THREE.LineBasicMaterial({ color: 0x2a2622 })); ln.frustumCulled = false; g.add(ln); chains.push({ ln, sz }); }
@@ -24277,8 +24295,10 @@ function keepBuild() {
   { const skip = new Set([drone, db, gong, winch, ...chains.map(C2 => C2.ln), ...koi, ...smash.map(S2 => S2.m), ...Object.values(pieces)]), wb = new THREE.Box3(), wc = new THREE.Vector3(), ws = new THREE.Vector3();
     for (const o of g.children.slice()) { if (skip.has(o)) continue; wb.setFromObject(o); if (wb.isEmpty()) continue; wb.getCenter(wc); wb.getSize(ws); const key = cls(wc); if (key && pieces[key]) pieces[key].attach(o); } }
   const nm = bldMergeStatic(g), rig = {}, bkey = b2 => cls(new THREE.Vector3((b2.minx + b2.maxx) / 2, (b2.miny + b2.maxy) / 2, (b2.minz + b2.maxz) / 2));
+  const rings = [], coins = []; for (const sz of [-1, 1]) { const G = gringAdd(g, cx + 1.6, RY + 2.2, cz + sz * (kh + .5)); G.key = sz > 0 ? 'wS' : 'wN'; rings.push(G); }     // m@X4@
+  for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const c = coinDrop(g, cx + sx * (kh + .45), (yi + yo) / 2 + .9, cz + sz * (kh + .45)); c.key = sz > 0 ? 'wS' : 'wN'; coins.push(c); }
   for (const key of Object.keys(pieces)) { const Rk = rig[key] = restoreRig(g, { lift: 0, dur: 2.4, bob: 0 }); Rk.pieces = Rr.pieces.filter(P => P.obj === pieces[key]);
-    restoreRide(Rk, { up: { boxes: O.boxes.filter(b2 => bkey(b2) === key), tris: [], climbs: [], bars: [], rings: [], objs: [], coins: [] } });
+    restoreRide(Rk, { up: { boxes: O.boxes.filter(b2 => bkey(b2) === key), tris: beltT[key] || [], climbs: [], bars: [], rings: rings.filter(G => G.key === key), objs: [], coins: coins.filter(c => c.key === key) } });
     Rk.onSet = R2 => restoreRideSet(R2); Rk.goal = 1; restoreSet(Rk, 1); restoreRideSet(Rk, true); }
   RESTORE.list.splice(RESTORE.list.indexOf(Rr), 1);
   const sup = [{ key: 'wN', x: cx - 1.6, z: cz - kh - .1, y0: Y0, y1: Y0 + 2.6, r: .9, hp: 6 }, { key: 'wS', x: cx - 1.6, z: cz + kh + .1, y0: Y0, y1: Y0 + 2.6, r: .9, hp: 6 }, { key: 'wE', x: cx + kh + .1, z: cz - 1.6, y0: Y0, y1: Y0 + 2.6, r: .9, hp: 6 }];
@@ -24290,7 +24310,7 @@ function keepBuild() {
       if (!k) { for (const sx of [-1, 1]) { const e = new THREE.Mesh(new THREE.SphereGeometry(.07, 6, 5), eyeM); e.position.set(sx * .2, .14, .25); m.add(e); } const jaw = new THREE.Mesh(new THREE.ConeGeometry(.2, .5, 6), bm); jaw.rotation.x = Math.PI / 2; jaw.position.z = .45; m.add(jaw); }
       else { const fin = new THREE.Mesh(new THREE.BoxGeometry(.04, .25, .3), bm); fin.position.y = .25; m.add(fin); }
       m.position.set(cx - (A.isl + A.cin) / 2, .3, cz + k * .5); eel.segs.push(m); } }
-  KEEP.on = { g, O, bars: [], db, dbB, gong, down: 0, ang: Math.PI / 2, tur, t: 0, gT: 0, winch, wT: 0, smash, arch: [], chains, koi, drone, eel, fires, nm, rig, pieces, sup, fell: {} }; db.rotation.z = Math.PI / 2;
+  KEEP.on = { g, O, bars: [], db, dbB, gong, down: 0, ang: Math.PI / 2, tur, t: 0, gT: 0, winch, wT: 0, smash, arch: [], chains, koi, drone, eel, fires, nm, rig, pieces, sup, fell: {}, rings, coins }; db.rotation.z = Math.PI / 2;
   { const K0 = KEEP.on; for (const [sx, sz] of [[1, 1], [1, -1]]) archerPost(cx + sx * (A.cout - 1), A.ch + .1, cz + sz * (A.cout - 1)).then(d => { if (KEEP.on === K0) K0.arch.push(d); else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {}); }
   arenaBeam(cx, cz, [1, .6, .35], 1); snd('clang', { g: .7, r: .5 });
 }
@@ -24346,7 +24366,7 @@ function keepFell(K, key) { if (K.fell[key] || KEEP.on !== K || !K.rig[key]) ret
   if (K.fell.wN && K.fell.wS && K.fell.wE && !K.fell.wW) setTimeout(() => keepFell(K, 'wW'), 1300);
   if (walls === 4 && !K.razed) { K.razed = 1; const [cx, cz] = KEEP.at; setTimeout(() => { if (KEEP.on === K) { jinraEmit(cx, KEEP.ih + 1, cz, 60); snd('crack', { g: 1.2, r: .5, x: cx, z: cz }); } }, 1200); }
   boxGrid(); }
-function keepClear() { const K = KEEP.on; if (!K) return; for (const Rk of Object.values(K.rig || {})) { const i = RESTORE.list.indexOf(Rk); if (i >= 0) RESTORE.list.splice(i, 1); if (Rk.ride) { bldTrisDrop(Rk.ride.tb); bldTrisDrop(Rk.ride.tu); } } smashDrop(K.smash); for (const d of K.arch || []) if (d && HORDE.list.includes(d)) { bowDrop(d); bodyGone(d); HORDE.list.splice(HORDE.list.indexOf(d), 1); } const i = BDYN.indexOf(K.dbB); if (i >= 0) BDYN.splice(i, 1); turretDrop(K.tur); bldClear(K); KEEP.on = null; boxGrid(); }
+function keepClear() { const K = KEEP.on; if (!K) return; for (const c of K.coins || []) { const i = COIN.list.indexOf(c); if (i >= 0) COIN.list.splice(i, 1); } for (const Rk of Object.values(K.rig || {})) { const i = RESTORE.list.indexOf(Rk); if (i >= 0) RESTORE.list.splice(i, 1); if (Rk.ride) { bldTrisDrop(Rk.ride.tb); bldTrisDrop(Rk.ride.tu); } } smashDrop(K.smash); for (const d of K.arch || []) if (d && HORDE.list.includes(d)) { bowDrop(d); bodyGone(d); HORDE.list.splice(HORDE.list.indexOf(d), 1); } const i = BDYN.indexOf(K.dbB); if (i >= 0) BDYN.splice(i, 1); turretDrop(K.tur); bldClear(K); KEEP.on = null; boxGrid(); }
 // m1184: THE ROBOT SAMURAI BARRACKS (Set 2 #17, pass 1) at (30, -42). A long BARRACKS HALL (breakable walls, a door onto the yard, a curved
 // roof) along the south of a DRILL YARD where six ROBOT SAMURAI drill in step -- raise, cut, return, all together, a stamp on the cut --
 // straw TRAINING DUMMIES and an ARCHERY BUTT at the yard's ends, a WEAPON RACK by the door. The robots are killable (`bldHit`, `rbHp` hits:
