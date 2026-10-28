@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- The First Beacon pass 10: each station sees the next (local landmarks)
+- **Banners:** every station but the brazier gets a hero-kit banner pole (`korBanner`, 10.6 m, the red diamond cloth) on the corner FURTHEST from the
+  next station, so the next run never stands between them. The beacon is the GLOBAL landmark (seen from every station, m1566); the banners are the
+  LOCAL ones (LEVELDESIGN.md's three tiers).
+- **`L.audit.next`:** a ray from each station's eye to the next station's banner top (the brazier's: its column of light), slab-tested against every
+  box. First: B>C NO (the 13 m DEVELOP landing between the court and the shrine) and Z>T NO. With 7.6 m banners: D>Z NO (the finale chimney's
+  24 m wall right by Z); the furthest-corner rule did not clear it, 10.6 m poles did. Now S>A A>B B>C C>D D>Z yes. Z>T stays NO: Z is the foot of
+  the 24 m finale face, and the face is what you see. The canyon also stays under every station-to-next line.
+- Headroom ok, route check 63 pairs ok.
+
 ## m1578 -- The First Beacon pass 9: carved rock
 - **`beaconCarve`:** each mesa tier is `arenaBevelBox` (rounded vertical edges, chamfered lip) with its shape shrunk by the bevel's outward 1.2 r so
   the flats lie on the collider's faces, then tapered 8% toward the top. The colliders stay the full boxes: the only mismatch is at the top edge
