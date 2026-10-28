@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the SHRINE, pass 3 (layers, breakables, alive; its third pass, so the loop moves on)
+## m1542 -- THE RE-PASS: the SHRINE, pass 3 (layers, breakables, alive; its third pass, so the loop moves on)
 **Moves:** the Shrine's L1/L2/L3 and breakable rows.
 - L1, the courtyard: a LAUNCH BAR (`hbarMake`, yaw pi/2 so the swing carries toward the wall) 3 m off the terrace's west wall; three straw
   barrels and three clay pots at the foot of the steps (`smashAdd`, they break and come back), clear of the torii, the lanterns and the pond.
