@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## mDRG -- THE DRAGON RIDE, build 6: TAMING (DRAGON.md box 6; the last box before his sign-off)
+- **Wild = the EVIL look**, and an unvisited zone starts there (`mel.dragon` unset -> EVIL; the dojo still reads unset as CAPTURED). Wild
+  (`dragWild`, not ridden, not taming): he turns to face you inside `watchR` 16 m, growls every ~`growlT` s, and inside `wildR` 6.5 m SHOVES you
+  off (9 m/s out, 4 up; a tip the first time) -- unless you carry the orb.
+- **The Jinra spring** (`dragSpring`): a stone pedestal, a gold basin with a mint pool, an orb floating over it at (-12, -4) by the spawn, one
+  box. Walk into it while he is wild and the orb rides Grumbo's right hand (`dragOrbStep`). Tap the right pad within `giveR` 8 m of him
+  (`dragGive`, ahead of the mount in `dragTap`): it arcs into his head over `orbT` .9 s.
+- **The turn** (`dragTameGo` / `dragTameStep`): `dizzy` once (crossfaded from his idle; the idle cycle held off), red sparks off his head,
+  his hide tint easing from `evilTint` back to his own, and EVERY visible EVIL piece COPIED into the world where it hangs (`clone` +
+  `matrixWorld.decompose`) and thrown outward one after another with a clang and a red burst, bouncing and gone after ~3 s -- the originals are
+  only hidden, so TOOLS > DRAGON: EVIL brings the whole set back. Then `wake_up`, the look CAPTURED (saved), a mint burst and a ring, and back
+  to his idles with "He is yours" -- the ring at his side now lets you on. Switching the look mid-turn cancels it cleanly.
+- His file has no KNEEL; the mount stays the hop from the ring.
+**Moves:** DRAGON.md box 6 (his look open). **All six boxes are built; every one waits on his play on the phone and his sign-off.**
+Gates: check ok, zone boot ok. Shipped unverified.
+
 ## m1621 -- THE DRAGON RIDE, build 5: ATTACKS (DRAGON.md box 5)
 - **His breath** (`dragBreath` on the right flick in the saddle; `fbCool` .6 s): on the ground `attack_ground` plays once (weighted in over
   idle / run, `wA`, still summing to 1) and the ball leaves `breathAt` .38 into it; aloft (`attack_air` already playing) it leaves at once.

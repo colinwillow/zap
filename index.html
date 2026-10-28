@@ -11315,7 +11315,7 @@ function dojoFlagStep(F, dt) { F.t += dt; const [x, y, z, docked] = dojoFlagPath
 const DRAGZ = { want: 0, on: null, R: 52, mul: 1.8, at: [0, 16], spawn: [0, -14], sun: [.5, .2, .84], cloudY: -60, look: 'CAPTURED', looks: ['CAPTURED', 'EVIL', 'BARE'],
   evilTint: 0x6f5f8f, idles: ['idle', 'casual', 'idle', 'wake_up'] };
 try { if (/[?&]zone=dragon\b/.test(location.search)) DRAGZ.want = 1; } catch (e) {}
-try { const v = localStorage.getItem('mel.dragon'); DRAGZ.look = v === 'WILD' || v === 'EVIL' ? 'EVIL' : v === 'BARE' ? 'BARE' : 'CAPTURED'; } catch (e) {}
+try { const v = localStorage.getItem('mel.dragon'); DRAGZ.look = !v || v === 'WILD' || v === 'EVIL' ? 'EVIL' : v === 'BARE' ? 'BARE' : 'CAPTURED'; } catch (e) { DRAGZ.look = 'EVIL'; }     // mDRG: unvisited, he is WILD
 function dragStage(g) { const Z = DRAGZ, sd = new THREE.Vector3(...Z.sun).normalize(), U = { uTime: { value: 0 }, uSun: { value: sd } }; Z.U = U;
   const dome = new THREE.Mesh(new THREE.SphereGeometry(880, 48, 24), new THREE.ShaderMaterial({ uniforms: U, side: THREE.BackSide, depthWrite: false, fog: false,
     vertexShader: 'varying vec3 vD; void main() { vD = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
@@ -11363,16 +11363,17 @@ function dragStage(g) { const Z = DRAGZ, sd = new THREE.Vector3(...Z.sun).normal
   // THE HOOPS: Jinra rings hung through the tiers
   const hoops = [], hm = new THREE.MeshBasicMaterial({ color: 0x7affd8, toneMapped: false });
   for (const [x, y, z, w] of [[0, 22, 64, .25], [-46, 34, 22, -.2], [42, 48, -42, .3], [-22, 14, -62, -.15], [70, 26, 40, .2]]) { const m = new THREE.Mesh(new THREE.TorusGeometry(4.5, .22, 8, 40), hm); m.position.set(x, y, z); m.rotation.y = Math.atan2(x, z); g.add(m); hoops.push({ m, w }); }
-  Z.on = { g, t: 0, go: 0, hoops, B: null, fb: [], tg: dragTargets(g) }; }
+  Z.on = { g, t: 0, go: 0, hoops, B: null, fb: [], tg: dragTargets(g), spring: dragSpring(g) }; }
 function dragHome() { const p = player, Z = DRAGZ; p.pos.set(Z.spawn[0], .05, Z.spawn[1]); p.vel.set(0, 0, 0); p.faceH = p.heading = 0; p.grounded = false; }
 function dragStep(dt) { const Z = DRAGZ, O = Z.on; O.t += dt; Z.U.uTime.value = O.t;
   if (!O.go) { O.go = 1; dragHome(); dragBeast(); }
   const B = O.B; if (B && B.mx) { if (B.drive) dragDrive(B, dt); else { B.t -= dt; if (B.t <= 0) dojoBeastIdle(B); } B.mx.update(dt); dragWings(B); if (B.reins && B.reins.m.visible) dragReins(B.reins);
     if (B.ring && !B.drive && B.mountL) { B.root.updateMatrixWorld(true); B.mountAt.copy(B.mountL); B.root.localToWorld(B.mountAt); B.mountAt.y = dragGround(B.mountAt.x, B.mountAt.z); B.ring.position.copy(B.mountAt).y += .03; } }
   for (const h of O.hoops) h.m.rotation.y += h.w * dt;
-  dragFxStep(dt);
+  dragFxStep(dt); dragOrbStep(dt);
+  if (B && B.mx && !B.drive) { if (B.tame) dragTameStep(B, dt); else if (Z.look === 'EVIL') dragWild(B, dt); }
   if (B && B.ring) { const near = dragNear(); B.ring.visible = !player.dragon && Z.look === 'CAPTURED'; B.ring.material.opacity = near ? 1 : .45 + .3 * Math.sin(O.t * 3); B.ring.scale.setScalar(near ? 1.15 : 1);
-    if (near && !Z.tipped) { Z.tipped = 1; tipShow(Z.look === 'CAPTURED' ? 'Tap the right pad to climb on.' : 'He is wild -- he will not be ridden. (TOOLS > DRAGON)', 4); } else if (!near) Z.tipped = 0; }
+    if (near && !Z.tipped) { Z.tipped = 1; tipShow(Z.look === 'CAPTURED' ? 'Tap the right pad to climb on.' : 'He is wild -- bring him good Jinra (the spring by the start).', 4); } else if (!near) Z.tipped = 0; }
   const p = player.pos; if (!player.dragon && Math.hypot(p.x, p.z) > Z.I.rimR(Math.atan2(p.z, p.x)) && p.y < 2) dragHome(); }     // off the edge: back to the start
 // HIS DRAGON in the zone: the arena's prototype cloned (scale and facing measured there), his own material per instance so the EVIL tint stays
 // here, the two armour sets built once on his posed bones and switched by visibility, a body box so he is not walked through
@@ -11394,7 +11395,7 @@ function dragBox(B, park) { if (!B.box) { B.box = { minx: 0, maxx: 0, miny: 0, m
   else { const bb = new THREE.Box3(); B.root.updateMatrixWorld(true); for (const n of ['Bip001_Pelvis', 'Bip001_Spine2', 'Bip001_Neck', 'Bip001_L_UpperArm', 'Bip001_R_UpperArm', 'Bip001_L_Thigh', 'Bip001_R_Thigh']) { const b = B.m.getObjectByName(n); if (b) bb.expandByPoint(b.getWorldPosition(new THREE.Vector3())); }
     const pd = B.hd * .1; Object.assign(B.box, { minx: bb.min.x - pd, maxx: bb.max.x + pd, miny: 0, maxy: bb.max.y, minz: bb.min.z - pd, maxz: bb.max.z + pd }); }
   boxGrid(); }
-function dragLook() { const B = DRAGZ.on && DRAGZ.on.B; if (!B) return; const L = DRAGZ.look;
+function dragLook() { const B = DRAGZ.on && DRAGZ.on.B; if (!B) return; const L = DRAGZ.look; if (B.tame && L !== 'CAPTURED') { for (const D of B.tame.deb) DRAGZ.on.g.remove(D.k); B.tame = null; B.t = 0; dojoBeastIdle(B); }
   for (const k in B.sets) for (const o of B.sets[k]) o.visible = k === L;
   if (B.reins) B.reins.m.visible = L === 'CAPTURED';
   for (const q of B.mats) { q.m.color.copy(q.c); if (L === 'EVIL') q.m.color.multiply(new THREE.Color(DRAGZ.evilTint)); } }
@@ -11417,10 +11418,10 @@ function dragSeat(B, m, root, P) { const K = dragKit(m, root, B.hd), sp = K.bw('
   ring.position.copy(B.mountAt).y += .03; DRAGZ.on.g.add(ring); B.ring = ring; }
 function dragNear() { const B = DRAGZ.on && DRAGZ.on.B, p = player; if (!B || !B.mountAt || p.dragon) return 0;
   return Math.hypot(p.pos.x - B.mountAt.x, p.pos.z - B.mountAt.z) < DRAGZ.reach && Math.abs(p.pos.y - B.mountAt.y) < 1.5; }
-function dragTap() { if (!DRAGZ.on) return false; const p = player, R = p.dragon;
+function dragTap() { if (!DRAGZ.on) return false; const p = player, R = p.dragon; if (!R && dragGive()) return true;
   if (R) { if (R.st === 'sit') { const B = DRAGZ.on.B; if (B.drive && (B.drive.air || B.drive.pad)) { tipShow(B.drive.air ? 'Land first.' : 'Land on the meadow to get off.', 2.5); return true; } dragDriveEnd(B); R.st = 'off'; R.t = 0; R.from = p.pos.clone(); snd('swoosh', { g: .4, r: 1.1 }); } return true; }
   if (!dragNear() || !p.grounded) return false;
-  if (DRAGZ.look !== 'CAPTURED') { tipShow('He will not be ridden -- not yet. (TOOLS > DRAGON: CAPTURED. The taming comes later.)', 4); return true; }
+  if (DRAGZ.look !== 'CAPTURED' || DRAGZ.on.B.tame) { tipShow(DRAGZ.look === 'EVIL' ? 'He is wild. Bring him good Jinra -- the spring by the start.' : 'He will not be ridden like that. (TOOLS > DRAGON)', 4); return true; }
   const B = DRAGZ.on.B; if (!B.seat) return false;
   p.dragon = { st: 'on', t: 0, from: p.pos.clone(), h0: p.faceH, hip: (rig.hipY || .6) * .6 }; p.vel.set(0, 0, 0); snd('swoosh', { g: .5, r: .9 }); return true; }
 // the body while mounted: called from the top of `stepPlayer`, which it replaces
@@ -11588,6 +11589,62 @@ function dragGun(dt) { const Z = DRAGZ, R = player.dragon, S = stick.R; R.gunT =
   const o = rig.root.position.clone(); o.y += 1.0; const d = camera.getWorldDirection(new THREE.Vector3()), tgt = camera.position.clone().addScaledVector(d, 90), dir = tgt.sub(o).normalize();
   o.addScaledVector(dir, .8); const size = WEAP.ball0, gb = glowBall(size); gb.position.copy(o); scene.add(gb);
   BOLTS.push({ g: gb, pos: o, vel: dir.multiplyScalar(WEAP.boltV), t: 0, chg: 0, size, dna: 0, virus: 0, auto: 1, blast: WEAP.blast0 }); snd('shot', { g: .5, r: 1.2 }); }
+// mDRG: TAMING (DRAGON.md box 6; KORAJIN.md: "you fight the dragon, tame it by giving it good Jinra"). WILD is the EVIL look: he will not be
+// ridden, he turns to watch you, growls, and SHOVES you off if you crowd him (`wildR`). On the meadow by the spawn is a JINRA SPRING (a stone
+// basin with a mint orb floating over it): walk into it and Grumbo carries the orb in his right hand. Take it to the dragon and tap the right
+// pad: the orb floats into his mouth, he goes `dizzy` -- his stolen red Jinra bursts out of the crystals, the iron FALLS OFF him piece by
+// piece, his hide clears -- then `wake_up`, and he is CAPTURED (a mint burst; the saddle, the bridle and the lacquer appear) and the ring at
+// his side lets you on. TOOLS > DRAGON back to EVIL makes him wild again to play it over; the spring fills again whenever he is wild.
+Object.assign(DRAGZ, { spring: [-12, -4], wildR: 6.5, watchR: 16, growlT: 4, giveR: 8, orbT: .9 });
+const _dtW = new THREE.Color(1, 1, 1), _dtE = new THREE.Color();
+function dragSpring(g) { const Z = DRAGZ, [x, z] = Z.spring, M = isl3M(), G = new THREE.Group(); G.position.set(x, 0, z);
+  const st = new THREE.Mesh(new THREE.CylinderGeometry(.55, .75, 1.0, 10), M.stone); st.position.y = .5; G.add(st);
+  const bowl = new THREE.Mesh(new THREE.CylinderGeometry(.85, .45, .32, 16, 1, true), new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .85, roughness: .3, side: THREE.DoubleSide })); bowl.position.y = 1.15; G.add(bowl);
+  const pool = new THREE.Mesh(new THREE.CircleGeometry(.78, 20).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0x7affd8, toneMapped: false, transparent: true, opacity: .7 })); pool.position.y = 1.2; G.add(pool);
+  const orb = new THREE.Mesh(new THREE.IcosahedronGeometry(.28, 2), new THREE.MeshBasicMaterial({ color: 0x7affd8, toneMapped: false })), halo = new THREE.Mesh(new THREE.IcosahedronGeometry(.42, 2), new THREE.MeshBasicMaterial({ color: 0x7affd8, toneMapped: false, transparent: true, opacity: .3, depthWrite: false }));
+  orb.add(halo); orb.position.set(x, 1.9, z); g.add(G); g.add(orb); BOXES.push({ minx: x - .5, maxx: x + .5, miny: 0, maxy: 1.3, minz: z - .5, maxz: z + .5 });
+  return { G, orb, home: new THREE.Vector3(x, 1.9, z), st: 'home', t: 0 }; }
+function dragOrbStep(dt) { const Z = DRAGZ, O = Z.on, S = O.spring, B = O.B, p = player, o = S.orb; if (!S) return; S.t += dt;
+  const wild = Z.look === 'EVIL';
+  if (S.st === 'home') { o.visible = wild; o.position.copy(S.home); o.position.y += Math.sin(O.t * 2) * .15; o.rotation.y += dt;
+    if (wild && !p.dragon && Math.hypot(p.pos.x - S.home.x, p.pos.z - S.home.z) < 1.6) { S.st = 'held'; snd('ready', { g: .6, r: 1.2 }); spkBurst(o.position.x, o.position.y, o.position.z, 16, { col: [.5, 1, .85], spread: 3, size: .2, life: .5 });
+      tipShow('Good Jinra. Take it to the dragon and tap the right pad.', 4); } }
+  else if (S.st === 'held') { const hb = rig.bones.mixamorig_RightHand; if (hb) hb.getWorldPosition(o.position); else o.position.copy(p.pos).y += 1; o.position.y += .15;
+    if (!wild) S.st = 'home'; }
+  else if (S.st === 'give' && B) { const u = Math.min(1, S.t / Z.orbT), hd = B.m.getObjectByName('Bip001_Head'), to = hd ? hd.getWorldPosition(_drV2) : B.root.position;
+    o.position.lerpVectors(S.from, to, smooth(0, 1, u)); o.position.y += Math.sin(u * Math.PI) * 1.5;
+    if (u >= 1) { S.st = 'gone'; o.visible = false; dragTameGo(B); } }
+  else if (S.st === 'gone' && wild && !(B && B.tame)) { S.st = 'home'; } }
+// the offering: the right tap with the orb in hand, near him
+function dragGive() { const Z = DRAGZ, O = Z.on, S = O && O.spring, B = O && O.B, p = player; if (!S || S.st !== 'held' || !B || B.tame || Z.look !== 'EVIL') return false;
+  if (Math.hypot(p.pos.x - B.root.position.x, p.pos.z - B.root.position.z) > Z.giveR) return false;
+  S.st = 'give'; S.t = 0; S.from = S.orb.position.clone(); snd('swoosh', { g: .5, r: 1.3 }); return true; }
+function dragTameGo(B) { const Z = DRAGZ; B.tame = { st: 'dizzy', t: 0, deb: [] }; snd('creature', { g: 1, r: .7 });
+  const d = B.clips.dizzy && B.mx.clipAction(B.clips.dizzy); if (d) { d.reset().setLoop(THREE.LoopOnce, 1).play(); d.clampWhenFinished = true; if (B.cur && B.cur !== d) B.cur.crossFadeTo(d, .3, false); B.cur = d; }
+  B.tame.T = d ? d.getClip().duration : 2.5; B.t = 99;
+  // the iron comes off: every EVIL piece copied into the world where it hangs and thrown off him; the originals stay (TOOLS can bring him back)
+  B.root.updateMatrixWorld(true); const c = B.root.position;
+  B.sets.EVIL.forEach((o, i) => { if (!o.visible) return; const k = o.clone(true); o.matrixWorld.decompose(k.position, k.quaternion, k.scale); Z.on.g.add(k); o.visible = false;
+    const out = k.position.clone().sub(c); out.y = 0; out.normalize(); B.tame.deb.push({ k, v: new THREE.Vector3(out.x * (3 + Math.random() * 3), 3 + Math.random() * 4, out.z * (3 + Math.random() * 3)), w: new THREE.Vector3(Math.random() - .5, Math.random() - .5, Math.random() - .5).multiplyScalar(8), at: .15 + i * .07 }); });
+  B.tame.deb.forEach(D => D.k.visible = false); }
+function dragTameStep(B, dt) { const Z = DRAGZ, T = B.tame; T.t += dt; const P = B.root.position;
+  for (let i = T.deb.length - 1; i >= 0; i--) { const D = T.deb[i]; if (T.t < D.at) continue; if (!D.k.visible) { D.k.visible = true; spkBurst(D.k.position.x, D.k.position.y, D.k.position.z, 18, { col: [1, .25, .15], spread: 5, size: .25, life: .6 }); snd('clang', { g: .5, r: .8 + Math.random() * .4, x: D.k.position.x, z: D.k.position.z }); }
+    D.v.y -= 14 * dt; D.k.position.addScaledVector(D.v, dt); D.k.rotation.x += D.w.x * dt; D.k.rotation.y += D.w.y * dt; D.k.rotation.z += D.w.z * dt;
+    if (D.k.position.y < .1) { D.k.position.y = .1; D.v.multiplyScalar(.4); D.v.y = Math.abs(D.v.y) * .3; D.w.multiplyScalar(.5); }
+    if (T.t > D.at + 3.2) { Z.on.g.remove(D.k); T.deb.splice(i, 1); } }
+  if (T.st === 'dizzy') { const k = clamp(T.t / Math.max(.5, T.T), 0, 1); _dtE.set(Z.evilTint).lerp(_dtW, k); for (const q of B.mats) q.m.color.copy(q.c).multiply(_dtE); }     // his hide clears
+  if (T.st === 'dizzy' && T.t > .2 && Math.random() < dt * 8) { const hd = B.m.getObjectByName('Bip001_Head'), h = hd ? hd.getWorldPosition(_drV2) : P; spkBurst(h.x, h.y, h.z, 6, { col: [1, .2, .1], spread: 3, size: .22, life: .5 }); }
+  if (T.st === 'dizzy' && T.t >= T.T) { T.st = 'wake'; T.t = 0; const w = B.clips.wake_up && B.mx.clipAction(B.clips.wake_up); if (w) { w.reset().setLoop(THREE.LoopOnce, 1).play(); w.clampWhenFinished = true; if (B.cur && B.cur !== w) B.cur.crossFadeTo(w, .3, false); B.cur = w; }
+    T.T = w ? w.getClip().duration : 2; Z.look = 'CAPTURED'; try { localStorage.setItem('mel.dragon', 'CAPTURED'); } catch (e) {} dragLook(); B.sets.EVIL.forEach(o => o.visible = false);
+    spkBurst(P.x, P.y + B.hd * .6, P.z, 60, { col: [.5, 1, .85], spread: 9, size: .35, life: 1 }); slamRing(P.x, P.y + .05, P.z); snd('ready', { g: .9, r: .8 }); camShake(.12); }
+  else if (T.st === 'wake' && T.t >= T.T) { B.tame = null; B.t = 0; dojoBeastIdle(B); Z.tipped = 0; tipShow('He is yours. The ring at his left side: climb on.', 5); }
+}
+// wild: he watches you, growls, and shoves you off if you crowd him
+function dragWild(B, dt) { const Z = DRAGZ, p = player, P = B.root.position, dx = p.pos.x - P.x, dz = p.pos.z - P.z, d = Math.hypot(dx, dz);
+  if (d < Z.watchR) { const want = Math.atan2(dx, dz), h = dragH(B); B.root.rotation.y = h + wrapAngle(want - h) * (1 - Math.exp(-1.5 * dt)) + (B.faceOff || 0);
+    B.growl = (B.growl || 0) - dt; if (B.growl <= 0) { B.growl = Z.growlT * (.7 + Math.random() * .6); snd('creature', { g: .6, r: .6 + Math.random() * .2, x: P.x, z: P.z }); } }
+  if (d < Z.wildR && d > .1 && p.grounded && !(Z.on.spring && Z.on.spring.st === 'held')) { p.vel.x = dx / d * 9; p.vel.z = dz / d * 9; p.vel.y = 4; p.grounded = false; camShake(.1); snd('thud', { g: .6, r: .7 });
+    if (!B.shoved) { B.shoved = 1; tipShow('He is wild. Bring him good Jinra -- the spring by the start.', 4); } } }
 // his clips while mounted: in the air on the way up and down, `driving` in the saddle
 function dragAnim(dt, t) { const R = player.dragon, has = n => !!(n && rig.actions[n]);
   const air = R.st === 'on' ? true : R.st === 'off' && R.t < DRAGZ.offT * .8;

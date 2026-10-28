@@ -33,8 +33,10 @@ dragon into a level (the WHOLE-PIECE RULE).
       the ball leaving partway in; aloft at once); the RIGHT PAD HELD UP fires Grumbo's blaster from the saddle toward the middle of the
       screen; 12 archery butts on posts and ropes over the meadow, the crag, four islands and by the hoops burst when hit and come back.
       *Open: his feel of it.*
-- [ ] **6. Taming**: he starts WILD (the EVIL look, will not be mounted); give him good Jinra and he goes `dizzy`, `wake_up`, turns CAPTURED and
-      kneels to be mounted.
+- [ ] **6. Taming** (mDRG): the first visit he is WILD (EVIL): he watches you, growls, shoves you off if you crowd him. The JINRA SPRING by
+      the start gives Grumbo an orb to carry; tap the right pad near the dragon and it floats into his mouth: `dizzy` (stolen red Jinra
+      bursting out, the iron falling off piece by piece, his hide clearing), `wake_up`, CAPTURED, and the ring lets you on. TOOLS > DRAGON:
+      EVIL makes him wild again to replay it. (No kneel clip.) *Open: his look at it.*
 - [ ] **He played it on his phone and signed it off.**
 
 ## Needs from him
