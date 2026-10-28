@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m1607 -- THE DRAGON RIDE, build 1: the zone and the armour (DRAGON.md box 1)
+## m1608 -- THE DRAGON RIDE, build 1: the zone and the armour (DRAGON.md box 1)
 His: *"build the blue dragon: armour and a mount, a little zone where I can mount it and ride it... flying it, controlling it on the ground,
 an attack."* A new sandbox with its own DONE WHEN (`DRAGON.md`); KORAJIN > The Dragon Ride opens `?w=forge&zone=dragon` (`DRAGZ`).
 - **The zone** (`dragStage`): the dojo's sunset dome and cloud sea, a 52 m flat meadow island (`floatIsland`, `flat: 0`, so the forge's
