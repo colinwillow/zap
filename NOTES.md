@@ -46,8 +46,8 @@ dojo WILD pick also made him wild here) and defaults to CAPTURED. The taming is 
 reading the code has not found it, and a headless render of the zone (the preinstalled Chromium) would settle it -- asked, not run.
 Gates: check ok, zone boot ok. Shipped unverified.
 
-## m15xx -- THE SWORD TASSEL (his: *"a little rope off the end of the handle with a fluffy ball on it, like Chinese swords"*)
-## m15xx -- THE KATANA IN THE SNOW, ACTUALLY FIXED: a shader PROGRAM-CACHE COLLISION (every earlier diagnosis superseded)
+## m1650 -- THE SWORD TASSEL (his: *"a little rope off the end of the handle with a fluffy ball on it, like Chinese swords"*)
+## m1650 -- THE KATANA IN THE SNOW, ACTUALLY FIXED: a shader PROGRAM-CACHE COLLISION (every earlier diagnosis superseded)
 His report after m1641: *"the sword blade is there but now the hilt is gone."* Isolated in the page with five boxes in the snowfield, each a
 different material: Physical, Lambert, Phong and DoubleSide Standard all drew right, but the plain FrontSide **MeshStandard box came out
 TALL and in the wrong place.** The cause: `MeshStandardMaterial.prototype.customProgramCacheKey` returns `'paint:1'` for every Standard
