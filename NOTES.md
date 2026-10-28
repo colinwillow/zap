@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the RAMPART WALL, pass 2 (DESTRUCTIBLE TO THE GROUND)
+## m1558 -- THE RE-PASS: the RAMPART WALL, pass 2 (DESTRUCTIBLE TO THE GROUND)
 **Moves:** its breakable row (ENEMY RULES: for destroying). The Gatehouse's machinery: one rig per piece, run backwards.
 - Each wall run is FOUR SEGMENTS now (a box, a footing and a coping each, 6.4 m), not one 25 m box, so each can fall alone. Pieces: `wL0..3`,
   `wR0..3` (0 at the gate), `bL`/`bR` (the bastions, with their steps, merlons, emblems, brazier, pole and ring) and `gate` (the lintel,
