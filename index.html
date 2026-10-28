@@ -26493,7 +26493,7 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
         const bm = new THREE.Mesh(new THREE.CylinderGeometry(.5, 1.1, 16, 12, 1, true).translate(0, 8, 0), new THREE.MeshBasicMaterial({ color: 0x7affd8, transparent: true, opacity: .35, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); bm.position.set(cx, y + 2, cz); g.add(bm); }     /* a 16 m column of light off the fire: seen over the shrine's climb from S and A */
       fl.position.set(cx, y + 1.2, cz); g.add(fl); L.flame = fl; L.brazier = { x: cx, y, z: cz }; O.boxes.push({ minx: cx - 1.6, maxx: cx + 1.6, miny: y, maxy: y + 1.2, minz: cz - 1.6, maxz: cz + 1.6, prop: 1 }); }
     const side = inDir ? [-inDir[1], inDir[0]] : [1, 0]; ladderUp(cx + side[0] * (h + .15), cz + side[1] * (h + .15), y, side);
-    if (!S.brazier) { const px = cx + side[0] * (h - 1.1) + side[1] * (h - 1.1), pz = cz + side[1] * (h - 1.1) - side[0] * (h - 1.1);     /* m15xx: the REST -- a stone bench and a checkpoint lantern on a post */
+    if (!S.brazier) { const px = cx + side[0] * (h - 1.1) + side[1] * (h - 1.1), pz = cz + side[1] * (h - 1.1) - side[0] * (h - 1.1);     /* m1569: the REST -- a stone bench and a checkpoint lantern on a post */
       put(new THREE.BoxGeometry(.3, 1.6, .3).translate(px, y + .8, pz), M.step); put(new THREE.BoxGeometry(.7, .12, .7).translate(px, y + 1.66, pz), M.slab);
       const bx = cx + side[0] * (h - 1.1), bz = cz + side[1] * (h - 1.1); put(new THREE.BoxGeometry(side[0] ? .6 : 2, .45, side[0] ? 2 : .6).translate(bx, y + .22, bz), M.slab);
       const lm = new THREE.Mesh(new THREE.SphereGeometry(.3, 12, 8), new THREE.MeshStandardMaterial({ color: 0x55605c, roughness: .4, emissive: 0x000000 })); lm.position.set(px, y + 2.02, pz); g.add(lm);
@@ -26562,7 +26562,7 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
   for (const b of O.boxes) BOXES.push(b); boxGrid(); BEACON.on = L; bldXrayTag(g);
   { const S = L.st.S, p = player; p.pos.set(S.x, .05, S.z); p.vel.set(0, 0, 0); const n = L.st.A || S; p.faceH = p.heading = Math.atan2(n.x - S.x, n.z - S.z); arenaBeam(S.x, S.z, [.48, 1, .85], 1); }
   console.log('[melee] the first beacon: ' + nChunks + ' chunks, stations ' + L.log.join(' | ') + ', runs ' + (L.fit || []).join(', ') + ', ' + (L.mesas || 0) + ' mesas, ' + O.boxes.length + ' boxes, ' + climbs.length + ' ladders (' + (L.audit ? L.audit.laddersAdded : 0) + ' for falls), headroom ' + (L.audit && L.audit.headroom.length ? L.audit.headroom.length + ' BAD' : 'ok') + ', sees the tower: ' + (L.audit ? L.audit.sees.join(' ') : '?') + ', ' + zips.length + ' zips'); }
-// m15xx: CHECKPOINTS. Standing on a station lights its lantern mint (a chime, a burst) and makes it the checkpoint; leaving the canyon (out past its
+// m1569: CHECKPOINTS. Standing on a station lights its lantern mint (a chime, a burst) and makes it the checkpoint; leaving the canyon (out past its
 // walls, or below the floor) puts him back on the last one lit. The start is lit from the first frame.
 function beaconStep(dt) { const L = BEACON.on; if (!L) return; const t = performance.now() * .001, p = player;
   if (L.flame) L.flame.scale.set(1 + Math.sin(t * 9) * .08, 1 + Math.sin(t * 7.3) * .14, 1 + Math.cos(t * 8.1) * .08);

@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- The First Beacon pass 6: rests and checkpoints
+## m1569 -- The First Beacon pass 6: rests and checkpoints
 - Each station (not the brazier) gets a REST: a stone bench and a lantern on a post at its corner (`L.cps`). Standing on the station top (within its
   half-size, feet within .8 m of the top) lights the lantern mint with a chime and a burst, and makes it `L.cp`. The start is lit on the first frame
   (no chime then). `beaconStep` returns him to `L.cp` with a beam if he leaves `L.bounds` (the floor's rectangle less 25 m, i.e. out past the
