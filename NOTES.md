@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The peak, pass 1 (Worker B): a mountain, a pinnacle, a lookout, a zipline home
+- His ask (with the bridge turrets): *"another element of height... a mountain on the top up there... a lookout tower at the very top."*
+- **The mountain is terrain.** `gpeakLift(x, z)` is added in `hwHeight`: 38 m over the east plateau, `(1 - smooth(5, 58, m))^1.25`, with fbm. The ground's triangles carry it, so it is walkable (his step limit makes any slope short of a cliff walkable). Top at **64.2 m**, centred 78 m east of the river line at z 20, between the home and the mill. `GPEAK.on = 0` takes it out.
+- **The pinnacle** (the hard part): a noisy stratified lathe (`ghStrataCol`), 24 m from 8 m below the mountain's top, with a cell-box collider. Its west face is climbed by a ladder to a timber ledge half way, then a second ladder to the **pad at 88.2 m**.
+- **The lookout**: four raked timber legs braced twice, a 8.4 m deck at **96.2 m** with a hatch (ladder up the middle), rails (noCam), a red pyramid roof, a flag, the signal **bell** (`gpeakHit` in `bldHit`) and a brazier throwing sparks (`gpeakStep`).
+- **The zipline** (`ZIPS`): **134 m** from the deck's corner, over the canyon (it clears the wall: about 44 m up where it crosses the rim), to a lit post beside the home's north side.
+- **The trail**: cairns and red-capped posts every 7 m, staggered either side of a catmull path from the rim above the mill's east turret, switchbacking to the pinnacle's foot (83 m). **The east turret's roof now opens east** (no merlon, wall boxes roof-high there) onto a plank to the slope and one 6 m ladder, after which the wall eases off into walkable ground to the rim.
+- 9 draws. Pass 2: ridges, outcrops and scree so it reads as a mountain; a real worn path.
 ## The water-mill tower, pass 3 (Worker B): gate turrets, a drawbridge, the east stair
 - His ask: *"the bridge is not connecting to anything... castle turret, towers, drawbridge... anchoring those drawbridges to buildings, dedicated pads, paths."* Also asked, for a later pass: **another element of height**, a hill or mountain or plateau above the rim with a lookout tower at the top.
 - **Gate turrets** (`turret(land, sd)`): a round stone tower (R 3.1, wall .6) on each wall's bridge end. It has a doorway (2.3 x 3 with an arch) the bridge runs into, a timber floor, a walkable roof at +6.2 with seven merlons, a flag, and a ladder up the outside beside the stair's head. Its base reaches down to the lowest point of the slope round it. Collider: twenty wall boxes round the ring with the doorway left open, plus floor and roof boxes.
