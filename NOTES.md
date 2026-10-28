@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the FORGE-WORKSHOP, pass 2 (rubric 7: RESTORES IN PLACE)
+- Base (stays): the floor, the breakable walls, the furnace and its plinth, the anvil, the trip-hammer, the quench trough, the gears, the
+  loft's stone stairs, the crane and its bar, the ingot rack, the ore crates. Pieces: `roof` (with the bunting and a new bronze ridge cap
+  and finials), `flue`, `front` (posts, beam, lanterns, banner) and `loft` (platform, rail, weapon rack).
+- **A piece needs a SEED:** `bldRoof`'s meshes are not `mg` (mapped tiles), so nothing classified `roof` and the leftover pass had no piece
+  to attach them to. The roof stayed up while fallen in the first render. The ridge cap is a real detail and the seed.
+- FALLEN: the roof caves into the hall, the flue lies in the yard, the front posts lie outward, the loft drops; the furnace is COLD (its
+  mouth dark, no flue sparks or smoke, and striking the bellows does nothing); drained; the drone and cables are gone.
+- Plate before the open front; `rig` hook; `fworkClear` drops the rig and the plate.
+Render-checked headless: fallen and restored. Shipped unverified.
+
 ## m1625 -- THE DRAGON RIDE: HIS CONTROL MAP (the right pad jumps and flies, the left pad moves, the camera stays on the right drag)
 His: *"Tapping the right stick should have the dragon jump; double tapping has him take flight. If you tap and hold, he kind of jump-flies up
 into the air and then slowly comes back down to the ground; double tap, he takes off and is actually flying like RollerGirl. Left stick

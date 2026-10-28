@@ -21745,7 +21745,7 @@ function bldHit(x, y, z, rad, dmg) {
   if (npilHit(x, y, z, rad)) return 1;     // m1202: the pillars' bell
   if (fislHit(x, y, z, rad)) return 1;     // m1198: the island shrine's bell
   if (lhouseHit(x, y, z, rad, dmg)) return 1;     // m1192: the lighthouse's Jin crystal
-  if (FWORK.on && !(FWORK.on.belT > 0)) { const W = FWORK.on, P = W.bel.position; if (Math.hypot(x - P.x, y - P.y, z - P.z) < .9 + rad) { W.belT = FWORK.jet.cool; W.jet = FWORK.jet.t; snd('boom', { g: .7, r: .7, x: P.x, z: P.z }); snd('swoosh', { g: .8, r: .5, x: P.x, z: P.z }); camShake(.15); return 1; } }     // m1189: the bellows stoke the furnace
+  if (FWORK.on && !(FWORK.on.belT > 0) && !(FWORK.on.R && FWORK.on.R.t < 1)) { const W = FWORK.on, P = W.bel.position; if (Math.hypot(x - P.x, y - P.y, z - P.z) < .9 + rad) { W.belT = FWORK.jet.cool; W.jet = FWORK.jet.t; snd('boom', { g: .7, r: .7, x: P.x, z: P.z }); snd('swoosh', { g: .8, r: .5, x: P.x, z: P.z }); camShake(.15); return 1; } }     // m1189: the bellows stoke the furnace
   if (BATH.on && BATH.on.vT <= 0 && !(BATH.on.R && BATH.on.R.t < 1)) {     /* m1617: a cold pool does not erupt */ const B = BATH.on, P = new THREE.Vector3(); B.valve.getWorldPosition(P); if (Math.hypot(x - P.x, y - P.y, z - P.z) < .7 + rad) { B.vT = 3.4; B.gey = 2.6; snd('clang', { g: .9, r: 1.2, x: P.x, z: P.z }); spkBurst(P.x, P.y, P.z, 12, { col: [1, .8, .4], spread: 3, size: .1, life: .4 }); return 1; } }     // m1187: the boiler valve
   if (BATH.on) { for (const S of BATH.on.shoji) { if (S.torn || S.open > .5) continue; const b = S.box; if (x > b.minx - rad && x < b.maxx + rad && z > b.minz - rad && z < b.maxz + rad && y < b.maxy + rad) { S.torn = 1; S.t = BATH.shojiFix; S.paper.visible = false; spkBurst(x, y, z, 18, { col: [.95, .93, .86], spread: 4, size: .12, life: .6 }); snd('swoosh', { g: .7, r: 1.9, x, z }); return 1; } } }     // m1156: shoji tear
   const G = GHOUSE.on; if (!G || G.balDead || (G.balHC || 0) > 0) return 0; const B = G.bal, P = B.position;
@@ -23509,6 +23509,7 @@ function fworkBuild() {
   for (const z of [-hd, 0, hd]) add(new THREE.BoxGeometry(.4, H, .4), wood, cx - hw, H / 2, cz + z, 1);
   add(new THREE.BoxGeometry(.4, .4, hd * 2 + .4), wood, cx - hw, H - .2, cz, 0);
   bldRoof(g, cx, cz, hw + 1.4, hd + 1.4, hw * .5, H + 3, H + .2, .5, wood);
+  add(new THREE.BoxGeometry(hw + .3, .16, .32), bronze, cx, H + 3.05, cz, 0); for (const sx of [-1, 1]) add(new THREE.ConeGeometry(.12, .5, 6), bronze, cx + sx * (hw / 2 + .15), H + 3.35, cz, 0);     // m@X4@: a bronze ridge cap and finials (and the seed of the `roof` piece)
   // THE FURNACE: a pot-bellied bronze body on a stone plinth, a glowing mouth toward the open front, a flue up through the roof
   const fx = cx + 2.6, fz = cz; add(new THREE.CylinderGeometry(2, 2.2, .6, 16), stone, fx, .3, fz, 0); roundBox(fx, fz, 2.1, 0, .6);
   add(new THREE.SphereGeometry(1.7, 18, 14), bronze, fx, 2, fz, 0); roundBox(fx, fz, 1.6, .6, 3.4);
@@ -23559,20 +23560,41 @@ function fworkBuild() {
     for (let k = 0; k < 4; k++) { const m = new THREE.MeshStandardMaterial({ color: 0x8a4a2a, emissive: 0xff5a10, emissiveIntensity: 1.5 - k * .35, metalness: .6, roughness: .5 }); const io = add(new THREE.BoxGeometry(.3, .12, .5), m, cx + 4.05 + k * .38, .96, cz - 3.6, 0); io.userData.mg = 0; ingots.push(io); } }
   for (let k = 0; k < 5; k++) { const tl = add(new THREE.BoxGeometry(.06, .8 + (k % 2) * .3, .06), iron, cx - 3 + k * .5, 2.8, cz - hd + .3, 0); add(new THREE.BoxGeometry(.25, .12, .08), iron, cx - 3 + k * .5, 2.35 - (k % 2) * .15, cz - hd + .3, 0); }
   { const ban = new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 }); const bm = add(new THREE.PlaneGeometry(1.3, 2.6), ban, cx - hw - .25, H - 1.6, cz, 0); bm.rotation.y = Math.PI / 2; bm.castShadow = false; }
-  for (const sz of [-1, 1]) { const E = [cx - hw, H + .3, cz + sz * hd], G2 = [cx - hw - 7, .3, cz + sz * (hd + 4)]; bldCable(g, E, G2, 1, 4, lamp); add(new THREE.CylinderGeometry(.08, .1, .8, 6), wood, G2[0], .4, G2[2], 0); }
-  const drone = bldDrone(g);
+  const c0 = g.children.length; for (const sz of [-1, 1]) { const E = [cx - hw, H + .3, cz + sz * hd], G2 = [cx - hw - 7, .3, cz + sz * (hd + 4)]; bldCable(g, E, G2, 1, 4, lamp); add(new THREE.CylinderGeometry(.08, .1, .8, 6), wood, G2[0], .4, G2[2], 0); }
+  const cables = g.children.slice(c0).filter(o => !o.userData.mg); const drone = bldDrone(g);
   // m1623: LANTERNS on posts at the open front, BUNTING along the front beam, plants round the outside (the front and the crane kept clear)
   for (const sz of [-1, 1]) { korPost(put, K, cx - hw - 1.6, 0, cz + sz * (hd + .4), 2.2, .1); korLantern(put, K, cx - hw - 1.6, 2.45, cz + sz * (hd + .4), .75); }
   korBunting(put, K, [cx - hw - .3, H - .05, cz - hd - .3], [cx - hw - .3, H - .05, cz + hd + .3], 14, .4);
   { let sd = 31; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647; for (let i = 0; i < 30; i++) { const a2 = rnd() * 6.28, rr = Math.max(hw, hd) + 2 + rnd() * 3.5, x = cx + Math.cos(a2) * rr * 1.1, z = cz + Math.sin(a2) * rr;
       if (x < cx - hw && Math.abs(z - cz) < hd + 1.5) continue; if (Math.hypot(x - kx, z - kz) < 2) continue; plantPlant(plants, ['grass', 'stones', 'tallgrass', 'fern', 'boulder'][i % 5], x, 0, z, .8 + rnd() * .5, a2); } }
-  for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list.map(q => { const n = q.index ? q.toNonIndexed() : q; for (const a2 of Object.keys(n.attributes)) if (a2 !== 'position' && a2 !== 'normal') n.deleteAttribute(a2); if (!n.attributes.normal) n.computeVertexNormals(); return n; })), m); o.castShadow = o.receiveShadow = true; g.add(o); }
-  bldMergeStatic(g); const plantMs = plantFlush(g, plants);
+  // ---- RE-PASS 2 (m@X4@): RESTORABLE IN PLACE (rubric 7). The floor, the breakable walls, the furnace, the anvil, the trip-hammer, the trough,
+  // the gears, the loft's stairs and the crane stay. The ROOF (and the bunting under its eave), the FLUE, the FRONT posts and beam and the
+  // LOFT (platform, rail, weapon rack) are pieces. FALLEN: the roof has sagged in, the flue lies in the yard, the front posts are down, the
+  // loft has dropped; the furnace is COLD (no glow, no flue smoke, the bellows do nothing), drained. RESTORE: the mint plate, or STATE ----
+  const Rr = restoreRig(g, { lift: 0, dur: 8, bob: 0 });
+  const pairs = []; for (const [m, list] of MG) for (const q of list) pairs.push([q, m]);
+  for (const o of g.children.slice()) if (o.isMesh && o.userData.mg) { const m = o.material, tri = m.customProgramCacheKey && String(m.customProgramCacheKey()).startsWith('tri'); if (m.transparent || (m.map && !tri)) continue;
+    o.updateMatrix(); pairs.push([(o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()).applyMatrix4(o.matrix), m]); o.removeFromParent(); }
+  const cls = (c, sz) => { if (Math.abs(c.x - fx) < .8 && Math.abs(c.z - fz) < .8 && c.y > 4) return 'flue';
+    if (c.y > H + .05 && Math.abs(c.x - cx) < hw + 2.2 && Math.abs(c.z - cz) < hd + 2.2) return 'roof';
+    if (c.x < cx - hw + .5 && c.x > cx - hw - .6 && c.y > .5 && Math.abs(c.z - cz) < hd + .5) return 'front';
+    if (c.y > ly - .35 && c.y < ly + 2 && c.z > lz0 - .25 && c.x > lx0 - .2 && c.x < lx1 + .2) return 'loft'; return null; };
+  const fall = (key, c) => key === 'roof' ? { p: [c.x + .5, c.y - 2.6, c.z - .3], r: [-.15, .05, .16], hop: .6, at: .55 } : key === 'flue' ? { p: [c.x + 4, .5, c.z + 1], r: [0, .4, -Math.PI / 2 * .95], hop: 1, at: .1 }
+    : key === 'front' ? { p: [c.x - H / 2, .3, c.z], r: [0, 0, Math.PI / 2 * .93], hop: .8, at: .3 } : { p: [c.x, 1, c.z - .3], r: [.25, 0, .06], hop: .5, at: .2 };
+  const pieces = restorePieces(Rr, g, pairs, cls, fall); bldMergeStatic(g); const plantMs = plantFlush(g, plants);
+  { const skip = new Set([drone, arm, hm, bel, mouth, ...gears, ...ingots, ...cables, ...plantMs, ...smash.map(S2 => S2.m), ...Object.values(pieces)]), wb = new THREE.Box3(), wc = new THREE.Vector3(), ws = new THREE.Vector3();
+    for (const o of g.children.slice()) { if (skip.has(o) || O.meshes.includes(o)) continue; wb.setFromObject(o); if (wb.isEmpty()) continue; wb.getCenter(wc); wb.getSize(ws); const key = cls(wc, ws); if (key && pieces[key]) pieces[key].attach(o); } }
+  restoreSkin(Rr);
   for (const b of O.boxes) BOXES.push(b); boxGrid();
-  FWORK.on = { plantMs, g, O, bars: [bar], gears, arm, bar, flue: [fx, 11.5, fz], mouth, t: 0, hm, anvil: [ax0, az0], smash, hp: 0, bel, ingots, drone };
+  const bk = b2 => b2.cw ? null : cls(new THREE.Vector3((b2.minx + b2.maxx) / 2, (b2.miny + b2.maxy) / 2, (b2.minz + b2.maxz) / 2), new THREE.Vector3(b2.maxx - b2.minx, b2.maxy - b2.miny, b2.maxz - b2.minz));
+  restoreRide(Rr, { base: { boxes: [], tris: [] }, up: { boxes: O.boxes.filter(b2 => bk(b2)), tris: [], climbs: [], bars: [], rings: [], coins: [], objs: [drone, ...cables] } });
+  Rr.onSet = R2 => restoreRideSet(R2);
+  const ground = []; { const px2 = cx - hw - 4, pz2 = cz + hd + 3, plate = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, .12, 24), new THREE.MeshStandardMaterial({ color: 0x3a4a46, emissive: 0x7affd8, emissiveIntensity: .7 })); plate.position.set(px2, .06, pz2); scene.add(plate); ground.push(plate); Rr.trig = { x: px2, y: 0, z: pz2, armed: 1 }; }
+  { const t0 = AGE.st === 'fallen' ? 0 : 1; Rr.goal = t0; restoreSet(Rr, t0); restoreRideSet(Rr, true); }
+  FWORK.on = { R: Rr, pieces, ground, plantMs, g, O, bars: [bar], gears, arm, bar, flue: [fx, 11.5, fz], mouth, t: 0, hm, anvil: [ax0, az0], smash, hp: 0, bel, ingots, drone };
   fworkStep(0); arenaBeam(cx, cz, [1, .6, .3], 1); snd('clang', { g: .8, r: .5 });
 }
-function fworkStep(dt) { const W = FWORK.on; if (!W) return; W.t += dt; const C = FWORK.crane;
+function fworkStep(dt) { const W = FWORK.on; if (!W) return; W.t += dt; const C = FWORK.crane, whole = !W.R || W.R.t >= 1; if (whole) bldJinraMotes(FWORK.at[0], FWORK.at[1], FWORK.hw + 1, dt);
   W.gears[0].rotation.x += dt * .6; W.gears[1].rotation.x -= dt * .6 * 1.3 / .8;
   // THE TRIP-HAMMER: lifts over `lift` s, drops in `drop`, slams; a body under it is knocked down, him included
   { const L = FWORK.hammer, cyc = L.lift + L.drop + L.rest, u = (W.t % cyc), prev = W.hp; W.hp = u;
@@ -23584,7 +23606,7 @@ function fworkStep(dt) { const W = FWORK.on; if (!W) return; W.t += dt; const C 
   const a = W.t * .22; W.arm.rotation.y = a; const ax = W.arm.position.x + Math.cos(a) * C.arm, az = W.arm.position.z - Math.sin(a) * C.arm, B = W.bar;
   B.x = ax; B.z = az; B.top = C.top; B.y = C.top - HBAR.h; const yaw = a + Math.PI / 2; B.yaw = yaw; B.ax = Math.cos(yaw); B.az = -Math.sin(yaw); B.nx = -B.az; B.nz = B.ax;
   B.g.position.set(ax, C.top - HBAR.h, az); B.g.rotation.y = yaw;
-  W.mouth.material.color.setRGB(1, .45 + Math.sin(W.t * 7) * .08 + Math.random() * .05, .1);
+  if (whole) W.mouth.material.color.setRGB(1, .45 + Math.sin(W.t * 7) * .08 + Math.random() * .05, .1); else W.mouth.material.color.setRGB(.12, .08, .06);     // RE-PASS 2: a cold furnace
   // m1189: THE FURNACE BREATHES -- the bellows were struck: the mouth roars a jet of flame out of the open front for `jet` s; anybody in it
   // (him, a body) is burned and shoved back. The bellows pump hard while it lasts
   if (W.belT > 0) W.belT -= dt;
@@ -23596,9 +23618,9 @@ function fworkStep(dt) { const W = FWORK.on; if (!W) return; W.t += dt; const C 
     for (const d of DUMMIES) { if (d.st === 'gone' || d.st === 'down' || !d.root.visible || (d._fwT || 0) > W.t) continue; const R = d.root.position; if (inJet(R.x, R.y, R.z)) { d._fwT = W.t + .5; dummyBlow(d, -Math.PI / 2, 1.1, J.dmg); } } }
   { const b = W.jet > 0 ? .7 + Math.sin(W.t * 14) * .3 : .75 + Math.sin(W.t * 2.4) * .25; W.bel.scale.set(1, b, 1); for (let k = 0; k < W.ingots.length; k++) W.ingots[k].material.emissiveIntensity = Math.max(.1, 1.5 - k * .35 + Math.sin(W.t * 1.5 + k) * .15);
     const [cx, cz] = FWORK.at, a2 = W.t * .3; W.drone.position.set(cx + Math.cos(a2) * 9, 11 + Math.sin(W.t * 1.2) * .4, cz + Math.sin(a2) * 8); W.drone.rotation.y = -a2; W.drone.children[1].rotation.z = W.t * .6; }
-  if ((W.sT = (W.sT || 0) - dt) <= 0) { W.sT = .08; const [x, y, z] = W.flue; spk(x + (Math.random() - .5) * .5, y, z + (Math.random() - .5) * .5, (Math.random() - .5) * .6, 2 + Math.random() * 2, (Math.random() - .5) * .6, .12, .9, [1, .6, .2]);
+  if (whole && (W.sT = (W.sT || 0) - dt) <= 0) { W.sT = .08; const [x, y, z] = W.flue; spk(x + (Math.random() - .5) * .5, y, z + (Math.random() - .5) * .5, (Math.random() - .5) * .6, 2 + Math.random() * 2, (Math.random() - .5) * .6, .12, .9, [1, .6, .2]);
     if (Math.random() < .3) smokeAt(x, y + .5, z, 1.4, 2, [.35, .33, .31]); } }
-function fworkClear() { const W = FWORK.on; if (!W) return; if (W.plantMs) plantDrop(W.plantMs); smashDrop(W.smash); if (player.bar && player.bar.B === W.bar) player.bar = null; bldClear(W); FWORK.on = null; }
+function fworkClear() { const W = FWORK.on; if (!W) return; if (W.R) { const i = RESTORE.list.indexOf(W.R); if (i >= 0) RESTORE.list.splice(i, 1); if (W.R.ride) { bldTrisDrop(W.R.ride.tb); bldTrisDrop(W.R.ride.tu); } } for (const o of W.ground || []) o.removeFromParent(); if (W.plantMs) plantDrop(W.plantMs); smashDrop(W.smash); if (player.bar && player.bar.B === W.bar) player.bar = null; bldClear(W); FWORK.on = null; }
 // m1161: THE SPIDER-BOT HANGAR (BUILDINGS.md #13, pass 1) at (-32, -24) (2 m west of its slot: the Rampart's bastion stands at -25). A low
 // vaulted bunker of grey concrete-stone, its long axis north-south, a HANGAR DOOR in its +z end between breakable wall panels (cwallBuild),
 // a flat walkable crown, warning stripes and red lamps -- and the SPIDER BOTS: three six-legged bronze crawlers (`spiderMake`: a body, a
@@ -28018,7 +28040,7 @@ const BLDG = { list: [
   { key: 'zep', t: 'Zeppelins', sub: 'two zeppelins: land on a gondola, swing from its trapeze, grapple it, kill its gun, supply drops; hole the envelope and it sinks low; strike the bow lever to bomb the forge below', pass: 6, build: () => zepBuild(), rig: () => ZEP.on && ZEP.on.R, clear: () => zepClear(), on: () => !!ZEP.on, step: dt => zepStep(dt) },
   { key: 'fship', t: 'Flying Ship House', sub: 'a junk ship on Jin engines: broadside cannons, a bowsprit, a bar, cargo to smash, a sentry gun; take the helm and the broadside fires for you; climb the cargo net and the mast to the crow\'s nest', pass: 6, build: () => fshipBuild(), rig: () => FSHIP.on && FSHIP.on.R, clear: () => fshipClear(), on: () => !!FSHIP.on, step: dt => fshipStep(dt) },
   { key: 'bath', t: 'Bathhouse', sub: 'sliding shoji to tear through, a pool that heals and erupts when you strike the boiler valve, a veranda, a smoking chimney', pass: 4, build: () => bathBuild(), rig: () => BATH.on && BATH.on.R, clear: () => bathClear(), on: () => !!BATH.on, step: dt => bathStep(dt) },
-  { key: 'fwork', t: 'Forge-Workshop', sub: 'a furnace that breathes fire when you strike the bellows, a trip-hammer that flattens you, a loft, a crane that swings a bar round', pass: 4, build: () => fworkBuild(), clear: () => fworkClear(), on: () => !!FWORK.on, step: dt => fworkStep(dt) },
+  { key: 'fwork', t: 'Forge-Workshop', sub: 'a furnace that breathes fire when you strike the bellows, a trip-hammer that flattens you, a loft, a crane that swings a bar round', pass: 4, build: () => fworkBuild(), rig: () => FWORK.on && FWORK.on.R, clear: () => fworkClear(), on: () => !!FWORK.on, step: dt => fworkStep(dt) },
   { key: 'sphang', t: 'Spider-Bot Hangar', sub: 'a vaulted bunker, spider bots that climb every building and pounce on you from walls and roofs, hatching from their pods (smash them)', pass: 4, build: () => sphangBuild(), clear: () => sphangClear(), on: () => !!SPHANG.on, step: dt => sphangStep(dt) },
   { key: 'skyb', t: 'Sky Bridges', sub: 'rope bridges and ziplines linking the buildings up high (they appear as the buildings do); pull back on a zip to brake', pass: 4, build: () => skybBuild(), clear: () => skybClear(), on: () => !!SKYB.on, step: dt => skybStep(dt) },
   { key: 'cliff', t: 'Cliff Lodge', sub: 'a rock crag, a path up it with boulders rolling down (strike the cradle lever to tip one yourself), a lodge, a waterfall, pines', pass: 4, build: () => cliffBuild(), clear: () => cliffClear(), on: () => !!CLIFF.on, step: dt => cliffStep(dt) },
