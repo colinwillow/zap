@@ -13,7 +13,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 
 ## THE GROUND (his, Oct 28 2026: *"the grass is very low quality... flat where it should be flat, a courtyard, but grassy knolls should have variation... paint the grass, add little alien plants, rocks, dirt"*)
 - [x] **pass 1 (m1437):** knolls outside what is built (`floatIsland` `knoll`/`flatR`); the painted ground (`isl4Mat`); new grass tufts; flowers, alien fronds and stones; every dressed island in the dojo scattered from the plant library
-- [x] **pass 2a (mXXXX):** the knolls' facets: the island tops are shaded SMOOTH (shared normals, `smoothTop`); the undersides keep their rock facets
+- [x] **pass 2a (m1440):** the knolls' facets: the island tops are shaded SMOOTH (shared normals, `smoothTop`); the undersides keep their rock facets
 - [ ] pass 2b: the knolls' FACETS (the icosphere top is coarse: a finer top grid, or a displaced disc), stronger worn dirt paths between built things, moss on the shade side of rocks
 - [ ] pass 3: grass that thins near paths and thickens in hollows; puddles; fallen petals under the cherries
 - [ ] pass 4: the same ground in Grumbo's home and the forge buildings (one shared ground kit)
@@ -77,7 +77,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - ~~something AT the altars~~ -> **pass 11 (m1434):** step onto an altar and it ANSWERS: the bronze wind-chime swings and rings, a Jin ring rises off the disc, a glint runs the top blade, the katana comes out, and the blade is Jin-blessed for 20 s (4x the motes). It re-arms when you step off
   - (was) something AT the altars: take a katana from the rack, a chime, a glint on the blade
   - lit lanterns at dusk
-- [x] **pass 12 (mXXXX):** TRAINING MARKS painted on the floor: stance footprints in a ring, chalk drill rings, dark scuff swirls, four numbered start marks (一 to 四) by the gates
+- [x] **pass 12 (m1440):** TRAINING MARKS painted on the floor: stance footprints in a ring, chalk drill rings, dark scuff swirls, four numbered start marks (一 to 四) by the gates
 - [ ] pass 4: life: birds, the clouds moving under you
 - [ ] later: the training-dojo function (racks you take weapons from, targets that pop up, a sparring master), the music
 
