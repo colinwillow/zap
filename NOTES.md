@@ -5,6 +5,11 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home pass 23 (Worker B): the plants, second pass -- wind, grass, gravel, a tumbleweed
+- **Sway.** `put` writes a `sway` attribute (each vertex's height above its own piece's lowest point) for any material with `userData.sway`. The grass (`straw`) and the reeds (`reedM`) bend in the vertex shader on `uWind` (two sines in x, one in z, scaled by sway^1.5). **The flag must be set before the first piece goes in.** Pass 20 had already put grass by the time pass 23 marked the material, the bucket mixed attribute sets, and `mergeGeometries` returned null ("a bucket would not merge"). It is set where the materials are made.
+- **More grass**: 70 drifts of 4-8 tufts, bigger (1-1.7x). **Gravel**: 26 patches of 14 sandstone chips in `rockM`.
+- **Tumbleweed** (`GHOME.tumble`, `ghomeTumble`): 26 random-walk tubes merged into one ball (one mesh, one draw). Every 8-20 s it comes in from local +x and rolls along the beach strip between the shop and the water (z 9.8-10.6), hopping at random and always over the pier's foot (|x| < 3.2).
+- **A syntax slip, caught by `check` before the push:** two `//` comments put inside a one-line statement commented out the rest of it. That is the CLAUDE.md landmine about comments, and it cost one render.
 ## Grumbo's home pass 22 (Worker B): the rocks, second pass -- desert sandstone
 - The rocks were in `stoneM`, the HOUSE's cream-and-lavender sandstone, so they read as more house. They now have their own `rockM` (vertex colours, no map; the repo's textures are all building materials).
 - **`ghStrata(x, y, z, nx, ny, nz)`**, linear colour. Bands by height (y * 4.2, warped by noise, six-colour rust / ochre / cream palette, soft edges), so the layers stay level across neighbouring rocks. Dark VARNISH streaks (noise stretched down y) where the face is steep (ny < .5). Bleached tops above ny .8. A fine speckle. `put` calls `ghStrataCol` for any material with `userData.strata`. `hollowDress`'s boulders, hoodoos and rim lumps use it in place of one flat colour per rock.
