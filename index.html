@@ -26359,7 +26359,7 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
       if (d[0] !== cur[0] || d[1] !== cur[1]) { const K0 = kit(P); K0.slab(0, 5, P.y); const c = K0.W(2.5, 0); P = { x: c[0] + d[0] * 2.5, y: P.y, z: c[1] + d[1] * 2.5, dir: d }; cur = d; }     // the corner pad
       const K = kit({ ...P, dir: cur }), fn = BCH[nm] || CHUNKS[nm]; if (!fn) { note('BEACON: no chunk ' + nm); continue; } const r = fn({ ...P, dir: cur }, K, arg); nChunks++;
       sign(nm.toUpperCase(), r.ask.length > 34 ? r.ask.slice(0, 33) + '…' : r.ask, P.x, P.y + 2.4, P.z, .55); P = { x: r.out.x, y: r.out.y, z: r.out.z, dir: cur }; } }
-  // m15xx: THE CANYON (pass 2). Sandstone mesas on an 8 m lattice round the route, never within `clear` of it (plan distance to every route box and
+  // m1555: THE CANYON (pass 2). Sandstone mesas on an 8 m lattice round the route, never within `clear` of it (plan distance to every route box and
   // zip line), stepped in two or three tiers; near the route they stand a few metres over the route's own height (walls to run between), further
   // out they are the canyon's walls (22-52 m). Low along the sight line from the start to the brazier, so the tower is seen from S.
   { const C = BEACON.canyon, R = plantRnd(77), RB = O.boxes.slice(), Z = zips.map(z => [z.A[0], z.A[2], z.B[0], z.B[2], Math.min(z.A[1], z.B[1])]);
