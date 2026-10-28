@@ -11284,18 +11284,21 @@ function dojoBeastIdle(B) { const n = B.idles[B.i++ % B.idles.length], c = B.cli
 // posed, skinned mesh (the back's height over the spine, the neck's girth), never guessed. Each piece's turn is solved on the rest pose so it sits
 // upright to him, then it follows the bone. TOOLS > DRAGON: CAPTURED (dressed) / WILD (bare) -- reloads.
 try { const v = localStorage.getItem('mel.dragon'); DOJO.dragonPick = v && v !== 'CAPTURED' ? 'WILD' : 'CAPTURED'; } catch (e) { DOJO.dragonPick = 'CAPTURED'; }     // m1610: the zone's EVIL / BARE read as WILD here
+// m15xx: THE SADDLE AT THE RIDER'S SIZE (his: "he needs to be sitting on a saddle on top of the very wide dragon's body"). Built off the
+// dragon's height it was ~2 m wide with a pommel taller than Grumbo, and hid him; `k` scales the saddle (both passes), its rein rings and the seat.
+const SADDLE = { k: .4 };
 function dojoDragonDress(B, m, root, P) { const H = (B.hd = (P.h || 3.2) * B.mul), K1 = dragKit(m, root, H, B.bag), { bone, wq, up, side, fwd, hitAlong, pin, bw } = K1;     // m1610: the kit is shared with pass 2 (and `bag` collects the pieces for the zone's look switch)
   const mat = { leather: new THREE.MeshStandardMaterial({ color: 0x5a3220, roughness: .7 }), red: new THREE.MeshStandardMaterial({ color: 0xb3261c, roughness: .6, side: THREE.DoubleSide }), gold: new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .85, roughness: .3 }),
     jin: new THREE.MeshBasicMaterial({ color: JINHEX, toneMapped: false }), iron: new THREE.MeshStandardMaterial({ color: 0x2a2624, metalness: .6, roughness: .5 }) };
   // THE SADDLE on the back over Spine1: a seat, a raised pommel and cantle, a red blanket with a gold edge, stirrups hanging either side
-  { const sp = bw('Bip001_Spine1'), top = sp && (hitAlong(sp, up.clone().negate(), H * 1.2, sp) || sp.clone().addScaledVector(up, H * .15));
+  { const sp = bw('Bip001_Spine1'), top = sp && (K1.backTop(sp) || hitAlong(sp, up.clone().negate(), H * 1.2, sp) || sp.clone().addScaledVector(up, H * .15));
     if (top) { const S = new THREE.Group(), w = H * .34, l = H * .38;
       const bl = new THREE.Mesh(new THREE.BoxGeometry(w * 1.7, H * .02, l * 1.3), mat.red); S.add(bl); const be = new THREE.Mesh(new THREE.BoxGeometry(w * 1.54, H * .01, l * 1.29), mat.gold); be.position.y = -H * .006; S.add(be);
       const seat = new THREE.Mesh(new THREE.BoxGeometry(w, H * .05, l), mat.leather); seat.position.y = H * .03; S.add(seat);
       const pom = new THREE.Mesh(new THREE.CylinderGeometry(w * .18, w * .24, H * .09, 10), mat.leather); pom.position.set(0, H * .08, l * .48); S.add(pom); const pk = new THREE.Mesh(new THREE.SphereGeometry(w * .14, 10, 8), mat.gold); pk.position.set(0, H * .13, l * .48); S.add(pk);
       const can = new THREE.Mesh(new THREE.BoxGeometry(w * .9, H * .07, H * .02), mat.leather); can.position.set(0, H * .07, -l * .48); S.add(can);
       for (const sd of [-1, 1]) { const st = new THREE.Mesh(new THREE.BoxGeometry(H * .006, H * .16, H * .02), mat.leather); st.position.set(sd * w * .78, -H * .07, 0); S.add(st); const ri = new THREE.Mesh(new THREE.TorusGeometry(H * .025, H * .006, 6, 14), mat.gold); ri.position.set(sd * w * .78, -H * .16, 0); S.add(ri); }
-      S.quaternion.copy(K1.inHis(K1.backQ())); pin('Bip001_Spine1', S, top); } }
+      S.quaternion.copy(K1.inHis(K1.backQ())); pin('Bip001_Spine1', S, top); S.scale.multiplyScalar(SADDLE.k); } }
   // THE COLLAR round Neck1: a bronze band with a glowing JINRA ring and studs (the bond of the taming)
   { const nk = bw('Bip001_Neck1'), n2 = bw('Bip001_Neck2'); if (nk) { const e = hitAlong(nk, side.clone().negate(), H * .6, nk), r = Math.min(H * .11, e ? Math.max(H * .075, e.distanceTo(nk) * 1.15) : H * .08), C = new THREE.Group();
       const band = new THREE.Mesh(new THREE.CylinderGeometry(r, r, H * .05, 24, 1, true), mat.gold); band.rotation.x = Math.PI / 2; C.add(band);
@@ -11310,7 +11313,7 @@ function dojoDragonDress(B, m, root, P) { const H = (B.hd = (P.h || 3.2) * B.mul
     const ring = new THREE.Mesh(new THREE.CylinderGeometry(r, r * 1.05, H * .05, 16, 1, true), mat.gold); Bd.add(ring); const ed = new THREE.Mesh(new THREE.TorusGeometry(r * 1.03, H * .006, 6, 18), mat.iron); ed.rotation.x = Math.PI / 2; ed.position.y = H * .025; Bd.add(ed);
     Bd.quaternion.setFromUnitVectors(up, dir); const inv = wq.clone().invert(); Bd.quaternion.premultiply(inv); pin(bn, Bd, at); }
   // THE CAPE: our red banner with the nested-diamond crest, hung from the shoulders over the haunches
-  { const sh = bw('Bip001_Spine2'), top = sh && (hitAlong(sh, up.clone().negate(), H * 1.2, sh) || sh.clone().addScaledVector(up, H * .15)); if (top) {
+  { const sh = bw('Bip001_Spine2'), top = sh && (K1.backTop(sh) || hitAlong(sh, up.clone().negate(), H * 1.2, sh) || sh.clone().addScaledVector(up, H * .15)); if (top) {
     const cv = document.createElement('canvas'); cv.width = 128; cv.height = 256; const c = cv.getContext('2d'); c.fillStyle = '#b3261c'; c.fillRect(0, 0, 128, 256); c.strokeStyle = '#efe2c8'; c.lineWidth = 9;
     for (const r of [44, 28, 12]) { c.beginPath(); c.moveTo(64, 110 - r); c.lineTo(64 + r, 110); c.lineTo(64, 110 + r); c.lineTo(64 - r, 110); c.closePath(); c.stroke(); } c.fillStyle = '#d9a441'; c.fillRect(0, 0, 128, 10); c.fillRect(0, 246, 128, 10);
     const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; const cape = new THREE.Mesh(new THREE.PlaneGeometry(H * .42, H * .7, 4, 8), new THREE.MeshStandardMaterial({ map: t, side: THREE.DoubleSide, roughness: .8 }));
@@ -11438,8 +11441,8 @@ Object.assign(DRAGZ, { reach: 2.6, mountT: .85, offT: .7, arc: 1.8, camIdle: .8,
 const _drV = new THREE.Vector3(), _drV2 = new THREE.Vector3();
 const dragH = B => B.root.rotation.y - (B.faceOff || 0);
 function dragSeat(B, m, root, P) { const K = dragKit(m, root, B.hd), sp = K.bw('Bip001_Spine1'); B.faceOff = P.faceOff || 0; if (!sp) return;
-  const top = K.hitAlong(sp, K.up.clone().negate(), B.hd * 1.2, sp) || sp.clone().addScaledVector(K.up, B.hd * .15);
-  B.seat = new THREE.Group(); K.pin('Bip001_Spine1', B.seat, top.clone().addScaledVector(K.up, B.hd * .055));
+  const top = K.backTop(sp) || K.hitAlong(sp, K.up.clone().negate(), B.hd * 1.2, sp) || sp.clone().addScaledVector(K.up, B.hd * .15);
+  B.seat = new THREE.Group(); K.pin('Bip001_Spine1', B.seat, top.clone().addScaledVector(K.up, B.hd * .055 * SADDLE.k));
   const g = top.clone(); g.y = DRAGZ.daisY; let d = 0; const inBox = v => v.x > B.box.minx && v.x < B.box.maxx && v.z > B.box.minz && v.z < B.box.maxz;
   while (d < 20 && inBox(_drV.copy(g).addScaledVector(K.side, d))) d += .25; B.mountAt = g.addScaledVector(K.side, d + 1.1); B.mountL = root.worldToLocal(B.mountAt.clone());
   const ring = new THREE.Mesh(new THREE.TorusGeometry(.9, .06, 6, 32).rotateX(Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0x7affd8, toneMapped: false, transparent: true }));
@@ -11745,7 +11748,14 @@ function dragKit(m, root, H, bag) { const bone = n => m.getObjectByName(n), rc =
   // level side to side -- for anything that sits on his back; his root's frame only matches it when the spine is straight
   const backQ = () => { const a = bw('Bip001_Spine'), b = bw('Bip001_Spine2'); if (!a || !b) return wq.clone(); const f = b.sub(a).normalize(), sd = new THREE.Vector3().crossVectors(up, f).normalize(), u2 = new THREE.Vector3().crossVectors(f, sd);
     return new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(sd, u2, f)); };
-  return { H, bone, wq, up, side, fwd, hitAlong, pin, bw, inHis, backQ }; }
+  // m15xx (his: "the rider is INSIDE the dragon's body -- he needs to sit on a saddle on top of the very wide body"): THE OUTER TOP of his back.
+  // `hitAlong`'s "nearest hit above the bone" lands on an INNER surface (measured: 3.72 m under a carapace whose top is ~4.8-5.0), so the saddle and
+  // the seat sat ~.7 m inside him. Five rays straight down from well above (the point and a cross of `H * .035` round it), the FIRST hit of each
+  // (the outside), and the MEDIAN -- so one crystal spike or one gap in the cross cannot move it.
+  const backTop = p => { const ys = []; for (const [a, b] of [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]]) { const o = p.clone().addScaledVector(side, a * H * .035).addScaledVector(fwd, b * H * .035);
+      rc.set(o.addScaledVector(up, H * .7), up.clone().negate()); rc.far = H * .7; const h = rc.intersectObjects(meshes, false); if (h.length && h[0].point.y > p.y) ys.push(h[0].point.y); }
+    if (ys.length < 2) return null; ys.sort((a, b) => a - b); const q = p.clone(); q.y = ys[ys.length >> 1]; return q; };
+  return { H, bone, wq, up, side, fwd, hitAlong, pin, bw, inHis, backQ, backTop }; }
 // m1610: DRESSING PASS 2 (BUILDINGS.md THE DRAGON RIDE; KORAJIN.md THE BLUE DRAGON). On top of pass 1 (saddle, collar, bands, cape) for CAPTURED:
 // a red-lacquer HEAD PLATE with a gold ridge and a Jinra gem, a BRIDLE (brow band, nose band, cheek straps, gold bit rings) and REINS that run
 // live from the bit to the saddle, a tall CANTLE and hanging saddle LAMES, PAULDRONS, a CHEST PLATE with our nested-diamond crest, lacquer PLATES
@@ -11795,16 +11805,16 @@ function dragDress2(B, m, root, P) { const H = B.hd, cap = B.sets.CAPTURED, evil
       const s = new THREE.Mesh(new THREE.BoxGeometry(H * .006, H * .014, L), mt.leather); s.quaternion.copy(inHis(qTo(Zv, b.clone().sub(a).normalize()))); KC.pin('Bip001_Head', s, a.clone().lerp(b, .5));
       const ring = new THREE.Mesh(new THREE.TorusGeometry(H * .016, H * .004, 6, 14), mt.gold); ring.quaternion.copy(inHis(qTo(Zv, sideW.clone().multiplyScalar(sd2)))); const rp = b.clone().addScaledVector(sideW, sd2 * H * .008).addScaledVector(up, -nb.r * .25); KC.pin('Bip001_Head', ring, rp); B.bits.push(ring); } }
   // THE SADDLE, finished: a tall lacquer CANTLE behind the seat, hanging LAMES either side, two gold REIN RINGS at the pommel
-  const sp = bw('Bip001_Spine1'), stop = sp && topOf(sp);
+  const sp = bw('Bip001_Spine1'), stop = sp && (KC.backTop(sp) || topOf(sp));
   if (stop) { const w = H * .34, l = H * .38, G = new THREE.Group();
     const back = new THREE.Mesh(new THREE.BoxGeometry(w * .95, H * .13, H * .022), mt.lac); back.position.set(0, H * .1, -l * .5); back.rotation.x = -.2; G.add(back);
     const bar = new THREE.Mesh(new THREE.CylinderGeometry(H * .009, H * .009, w, 8).rotateZ(Math.PI / 2), mt.gold); bar.position.set(0, H * .165, -l * .52); G.add(bar);
     const crest = new THREE.Mesh(new THREE.TorusGeometry(H * .03, H * .005, 3, 4), mt.gold); crest.position.set(0, H * .1, -l * .5 + H * .013); crest.rotation.x = -.2; G.add(crest);
     for (const sd2 of [-1, 1]) for (let k = 0; k < 3; k++) { const lm = new THREE.Mesh(new THREE.BoxGeometry(H * .012, H * .05, l * .8), k % 2 ? mt.blk : mt.lac); lm.position.set(sd2 * (w * .86 + k * H * .006), -H * .02 - k * H * .045, 0); lm.rotation.z = sd2 * .25; G.add(lm);
       const tr = new THREE.Mesh(new THREE.BoxGeometry(H * .013, H * .006, l * .81), mt.gold); tr.position.set(lm.position.x, lm.position.y - H * .025, 0); tr.rotation.z = sd2 * .25; G.add(tr); }
-    G.quaternion.copy(inHis(KC.backQ())); KC.pin('Bip001_Spine1', G, stop);
+    G.quaternion.copy(inHis(KC.backQ())); KC.pin('Bip001_Spine1', G, stop); G.scale.multiplyScalar(SADDLE.k);
     B.reinAt = [];
-    for (const sd2 of [-1, 1]) { const rr = new THREE.Mesh(new THREE.TorusGeometry(H * .014, H * .004, 6, 12), mt.gold); rr.rotation.y = Math.PI / 2; const at2 = stop.clone().addScaledVector(up, H * .1).addScaledVector(fwd, l * .5).addScaledVector(side, sd2 * w * .2); KC.pin('Bip001_Spine1', rr, at2); B.reinAt.push(rr); } }
+    for (const sd2 of [-1, 1]) { const rr = new THREE.Mesh(new THREE.TorusGeometry(H * .014, H * .004, 6, 12), mt.gold); rr.rotation.y = Math.PI / 2; const at2 = stop.clone().addScaledVector(up, H * .1 * SADDLE.k).addScaledVector(fwd, l * .5 * SADDLE.k).addScaledVector(side, sd2 * w * .2 * SADDLE.k); KC.pin('Bip001_Spine1', rr, at2); B.reinAt.push(rr); } }
   if (B.bits && B.bits.length === 2 && B.reinAt && B.reinAt.length === 2) B.reins = dragReinsMake(B, H, mt.leather);
   // PAULDRONS (CAPTURED: lacquer lames with gold; EVIL: iron with a red crystal) over each shoulder
   for (const [bn, sd2] of [['Bip001_L_UpperArm', 1], ['Bip001_R_UpperArm', -1]]) { const pa = bw(bn); if (!pa) continue; const S = side.clone().multiplyScalar(sd2).addScaledVector(up, .8).normalize(), p = hitAlong(pa, S.clone().negate(), H * .6, pa) || pa.clone().addScaledVector(S, H * .05), q = inHis(qTo(up, S));

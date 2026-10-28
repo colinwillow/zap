@@ -41,6 +41,21 @@ Render-checked headless (from the south-west over the curb, and along the curb a
 - `cliffClear` drops the coins and the climb.
 Render-checked headless (the ladder up the north face to the perch; fallen: ladder gone, perch hanging). Next: the Moated Keep (ENEMY).
 Shipped unverified.
+## m15xx -- THE DRAGON RIDE: THE RIDER ON TOP OF HIM, ON A SADDLE HIS SIZE (I took the dragon over from Worker C)
+His: *"when he mounts the dragon he is INSIDE the dragon's body; he needs to sit on a saddle on top of the very wide body."* Measured with
+him mounted in the page (`dragTap` from the ring, 150 frames):
+- seat marker y 4.04, his hips 4.18
+- a vertical ray down through the seat hits the skin at 5.01 / 4.84 / 4.79 / 4.70 / 3.72 / 2.16; the top of the carapace is ~4.8-5.0
+
+`hitAlong`'s "nearest hit above the bone" had taken 3.72, an INNER surface, so the saddle and the seat sat ~.7 m inside him. A see-through
+render showed Grumbo's legs inside the back plates.
+- **`backTop`** (in `dragKit`): five rays straight down from well above (the point and a cross of `H * .035`), the FIRST hit of each, the
+  MEDIAN. Used for the seat, both saddle passes, and the Spine2 piece.
+- **`SADDLE.k` .4**: the saddle was built off the dragon's height (~2 m wide, a pommel taller than him) and hid him. Both saddle passes,
+  the rein rings and the seat height scale by it.
+- Rendered mounted: the seat at 5.13, his hips 5.27, sitting on the saddle and visible from the side and from behind.
+
+Still wrong (next): the red CAPE sticks up as a flat sheet; the dragon's resting pose pitches nose-down; no fly clip; his control notes.
 
 ## m1649 -- THE RE-PASS: the CLIFF LODGE, pass 2 (rubric 7: RESTORES IN PLACE)
 - Base (stays): the crag, the path slabs and lips, its stone lanterns, the foot boulders, the pines, the pool's stone rim. Pieces:
