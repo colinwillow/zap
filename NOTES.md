@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home, pass 31: the rocks' third pass (Worker B, loop tick 8)
+`A.rockC` keeps every rnd() call it made (so nothing else in the valley moves) and takes its new decisions from its own `R3 = rwRng(7300 +
+seed * 13)`: k > 1.05 and 40% -> the main stone is two halves (x .55 each) set apart along its own axis by a .06-.16 m crack and tilted
+away; 30% -> a flat cap slab on top; k > 1.25 -> icosphere detail 4. Each cluster records a DRIFT (x, z, r 1.9-2.7k): one mesh of lumpy
+discs (3 rings x 18), radial uv so `ghPathMat`'s soft edge is the rim, on a clone of that material (the clone keeps the home's restoration
+patch off the peak's trail, which shares the original). First winding was downward; flipped before shipping. +1 draw (the drifts mesh).
+Correction to pass 30's entry: a pot on a FALLEN stall is hit-tested where it stands RESTORED, not where its chunk is drawn.
+Next: the plants' 3rd pass with cliff shrubs.
 ## m1552 -- THE RE-PASS: MARKET STALLS, pass 3 (layers, alive; its third pass, so the loop moves on)
 **Moves:** its L3, breakable and alive rows.
 - **L3: a FIRE-WATCH LOOKOUT** (hinomi yagura) on the roof's east end, clear of the roof bar and the ring pole: four solid posts, a railed
