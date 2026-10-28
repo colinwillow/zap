@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home pass 16 (Worker B): break up the stone
+- He sent the back view: *"too much open texture cylinder looking crap... awnings, framing, roofs."* Every wall and dome was one unbroken run of sandstone.
+- **Window hoods.** `W2` (pass 11) now records each window in `A.wins`. Each of the 18 gets a small torn red cloth hood (`clothM('awning')`, 6 x 3 quads, deliberately NOT walkable so there are no extra `triAdd` tris), two timber struts, a timber sill and two iron brackets.
+- **The cage.** Timber ribs follow each wall's swell, using the same `rOut` as `shell`, with iron brackets at .18 and .62 of the height and a low timber rail. Ribs skip windows and the side that faces the hall. On the tower's drum, the store and the turret. Ribs .24 wide every 1.15 m. The first try was .16 every 1.5 m, and on the render it was too thin to break anything up.
+- **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
+- **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
+- Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
 ## THE SHIP: THE SEA STOPS TILING FROM AFAR (m1411, WORKER A)
 
 His (screenshot from far out, zoomed): *"you can see the repetition -- is there any way to break that up with a few different sizes of
