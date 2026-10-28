@@ -24579,10 +24579,15 @@ function barrClear() { const B = BARR.on; if (!B) return; for (const c of B.coin
 const LHOUSE = { at: [-69, 45], hw: 4, H: 3.6, shR: 2, stR: 2.8, rise: .3, steps: 48, galR: 4.2, beamRate: .35, seeR: 55, lockT: .9, zapDmg: 12, zapCool: 5, crysHp: 4, crysFix: 25, ownT: 30, on: null };
 function lhouseBuild() {
   if (LHOUSE.on) return; const A = LHOUSE, [cx, cz] = A.at, hw = A.hw, H = A.H, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex();
-  const wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 }), stone = new THREE.MeshStandardMaterial({ color: 0x8a8580, roughness: .95 }), stoneD = new THREE.MeshStandardMaterial({ color: 0x5a5550, roughness: .95 });
-  const bronze = new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 }), red = new THREE.MeshStandardMaterial({ color: 0xa8231e, roughness: .6 });
-  const lamp = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false }), jin = new THREE.MeshBasicMaterial({ color: 0x7ff0ff, toneMapped: false });
-  const add = (geo, m, x, y, z, solid) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; g.add(o);
+  // m@X4@ (the RE-PASS, pass 1): a HERO place -- the hero kit (painted timber, warm stone block, the kit bronze and red, the kit lamp), the
+  // Jin in true mint (it was cyan), red-and-cream bunting from the roof's corners to the shaft, plants round the foot; statics merged.
+  // COLLIDER AUDIT: the round shaft, the lantern drum and the crank's drum had full-square boxes (up to .52 m of solid air at the shaft's
+  // top corners) -- crossed box pairs now (corners within .17 r)
+  const K = korMats(), wood = K.timber, stone = triMat('stone_blocks', { scale: 2.5, color: 0xe2d8c8 }), stoneD = triMat('stone_blocks', { scale: 2.5, color: 0x8c8274 });
+  const bronze = K.bronze, red = K.redL, MG = new Map(), put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); }, plants = [];
+  const lamp = K.lamp, jin = new THREE.MeshBasicMaterial({ color: 0x7affd8, toneMapped: false });
+  const roundBox = (x, z, rr, y0, y1) => O.boxes.push({ minx: x - rr, maxx: x + rr, miny: y0, maxy: y1, minz: z - rr * .6, maxz: z + rr * .6 }, { minx: x - rr * .6, maxx: x + rr * .6, miny: y0, maxy: y1, minz: z - rr, maxz: z + rr });
+  const add = (geo, m, x, y, z, solid) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; g.add(o);
     if (solid) { geo.computeBoundingBox(); const b = geo.boundingBox; O.boxes.push({ minx: x + b.min.x, maxx: x + b.max.x, miny: y + b.min.y, maxy: y + b.max.y, minz: z + b.min.z, maxz: z + b.max.z }); } return o; };
   // THE KEEPER'S ROOM: three full walls, the east one split round a door; a stone floor; a flat roof slab (walkable) with a low kerb
   const t = .35, dw = 1.6; add(new THREE.BoxGeometry(hw * 2, .06, hw * 2), stoneD, cx, .03, cz, 0);
@@ -24593,7 +24598,7 @@ function lhouseBuild() {
   for (const sx of [-1, 1]) add(new THREE.BoxGeometry(.28, .36, .28), lamp, cx + hw + .3, H - .6, cz + sx * 1.3, 0);
   // THE SHAFT: a slim stone column from the roof to the gallery, bronze bands every 3 m
   const R0 = H + .25, top = R0 + A.steps * A.rise, sh = A.shR;
-  add(new THREE.CylinderGeometry(sh * .9, sh, top - R0, 16), stone, cx, (R0 + top) / 2, cz, 0); O.boxes.push({ minx: cx - sh * .82, maxx: cx + sh * .82, miny: R0, maxy: top, minz: cz - sh * .82, maxz: cz + sh * .82 });
+  add(new THREE.CylinderGeometry(sh * .9, sh, top - R0, 16), stone, cx, (R0 + top) / 2, cz, 0); roundBox(cx, cz, sh * .9, R0, top);
   for (let y = R0 + 2; y < top - 1; y += 3) add(new THREE.TorusGeometry(sh * .97 - (y - R0) / (top - R0) * sh * .1, .08, 6, 24).rotateX(Math.PI / 2), bronze, cx, y, cz, 0);
   // THE SPIRAL: `steps` treads of `rise`, winding counter-clockwise from the ramp's landing (north-east); each tread is a thin slab so the
   // turn below has its headroom. Visual treads merged into one mesh; the colliders are small squares on the tread's centre line
@@ -24616,9 +24621,9 @@ function lhouseBuild() {
     for (let k = 0; k < 8; k++) { const a = k / 8 * Math.PI * 2, po = new THREE.Mesh(new THREE.BoxGeometry(.12, 2.6, .12), bronze); po.position.set(Math.sin(a) * 1.7, 1.5, Math.cos(a) * 1.7); lan.add(po); }
     const cap = new THREE.Mesh(new THREE.ConeGeometry(2.2, 1.6, 16), bronze); cap.position.y = 3.6; cap.castShadow = true; lan.add(cap); const fin = new THREE.Mesh(new THREE.SphereGeometry(.25, 10, 8), bronze); fin.position.y = 4.5; lan.add(fin);
     const crys = new THREE.Mesh(new THREE.OctahedronGeometry(.55, 0), jin); crys.position.y = 1.5; lan.add(crys); lan.userData.crys = crys; }
-  O.boxes.push({ minx: cx - 1.6, maxx: cx + 1.6, miny: top, maxy: top + 2.8, minz: cz - 1.6, maxz: cz + 1.6 });
+  roundBox(cx, cz, 1.7, top, top + 2.8);
   const beam = new THREE.Group(); beam.position.set(cx, top + 1.5, cz); g.add(beam);
-  { const bm = new THREE.MeshBasicMaterial({ color: 0x7ff0ff, transparent: true, opacity: .16, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, toneMapped: false });
+  { const bm = new THREE.MeshBasicMaterial({ color: 0x7affd8, transparent: true, opacity: .16, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, toneMapped: false });
     for (const s of [1, -1]) { const c = new THREE.Mesh(new THREE.ConeGeometry(3.5, 60, 20, 1, true), bm); c.geometry.translate(0, -30, 0); c.rotation.z = s * (Math.PI / 2 - .1); beam.add(c); } }
   const rings = [gringAdd(g, cx, top + 6.5, cz)];
   // the ramp up the NORTH side to the roof: ground at the east end, the roof's edge at the west, then a landing onto the slab
@@ -24636,16 +24641,16 @@ function lhouseBuild() {
   { add(new THREE.BoxGeometry(1.6, .8, .8), wood, cx - hw + 1.1, .4, cz - 2.4, 1); add(new THREE.BoxGeometry(.5, .06, .36), new THREE.MeshStandardMaterial({ color: 0xa8231e }), cx - hw + 1, .83, cz - 2.4, 0);
     add(new THREE.BoxGeometry(.3, .4, .3), lamp, cx - hw + 1.6, 1, cz - 2.4, 0); add(new THREE.BoxGeometry(2, .45, .9), wood, cx - hw + 1.2, .22, cz + 2.6, 1); add(new THREE.BoxGeometry(1.8, .14, .7), new THREE.MeshStandardMaterial({ color: 0x2a4a7a }), cx - hw + 1.2, .52, cz + 2.6, 0);
     const gm = gearMesh(.7, .2, 9, bronze); gm.position.set(cx, 1.6, cz - hw + .3); g.add(gm); add(new THREE.BoxGeometry(.12, .9, .12), wood, cx + .6, 1.6, cz - hw + .45, 0);
-    add(new THREE.CylinderGeometry(.6, .7, .5, 12), bronze, cx, .25, cz, 1); add(new THREE.CylinderGeometry(.12, .12, H - .5, 8), bronze, cx, .5 + (H - .5) / 2, cz, 0); }
+    add(new THREE.CylinderGeometry(.6, .7, .5, 12), bronze, cx, .25, cz, 0); roundBox(cx, cz, .7, 0, .5); add(new THREE.CylinderGeometry(.12, .12, H - .5, 8), bronze, cx, .5 + (H - .5) / 2, cz, 0); }
   // ---- PASS 3 (m1194): the polish -- the gallery rail is SOLID now (posts you cannot walk through; a gap left where the zipline leaves),
   // long red NOBORI hanging from the gallery, glowing Jin RUNE bands on the shaft that pulse, a SHIMENAWA rope with paper shide round the
   // roof, stone lanterns at the ramp's foot, a pull-up bar on the roof, cables to stakes and a drone ----
   { const za = Math.atan2(3.65, -1.37); for (let k = 0; k < 24; k++) { const a = k / 24 * Math.PI * 2, d = Math.atan2(Math.sin(a - za), Math.cos(a - za)); if (Math.abs(d) < .4) continue;
-      const x = cx + Math.sin(a) * A.galR, z = cz + Math.cos(a) * A.galR; const b = { minx: x - .25, maxx: x + .25, miny: top, maxy: top + 1.05, minz: z - .25, maxz: z + .25 }; O.boxes.push(b); }
-    const redC = new THREE.MeshStandardMaterial({ color: 0xb3202a, roughness: .7, side: THREE.DoubleSide }), mon = new THREE.MeshBasicMaterial({ color: 0x7ff0ff, side: THREE.DoubleSide, toneMapped: false });
+      const x = cx + Math.sin(a) * A.galR, z = cz + Math.cos(a) * A.galR; const b = { minx: x - .15, maxx: x + .15, miny: top, maxy: top + 1.05, minz: z - .15, maxz: z + .15 }; O.boxes.push(b); }     // m@X4@: .5 -> .3 (the drawn rail is a .05 tube on .07 posts)
+    const redC = K.red, mon = new THREE.MeshBasicMaterial({ color: 0x7affd8, side: THREE.DoubleSide, toneMapped: false });
     for (let k = 0; k < 4; k++) { const a = Math.PI / 4 + k * Math.PI / 2 + .3, r = A.galR + .12, x = cx + Math.sin(a) * r, z = cz + Math.cos(a) * r;
       const f = add(new THREE.PlaneGeometry(1, 5), redC, x, top - 2.6, z, 0); f.rotation.y = a; f.castShadow = false; const m2 = add(new THREE.CircleGeometry(.3, 6), mon, x + Math.sin(a) * .02, top - 1.2, z + Math.cos(a) * .02, 0); m2.rotation.y = a; }
-    const runeM = new THREE.MeshBasicMaterial({ color: 0x7ff0ff, toneMapped: false, transparent: true, opacity: .8 }); var runeMat = runeM;
+    const runeM = new THREE.MeshBasicMaterial({ color: 0x7affd8, toneMapped: false, transparent: true, opacity: .8 }); var runeMat = runeM;
     for (let y = R0 + 3.5; y < top - 1; y += 3) add(new THREE.CylinderGeometry(sh * .96 - (y - R0) / (top - R0) * sh * .1 + .02, sh * .96 - (y - R0) / (top - R0) * sh * .1 + .02, .12, 24, 1, true), runeM, cx, y, cz, 0).castShadow = false;
     const rope = new THREE.MeshStandardMaterial({ color: 0xd8c08a, roughness: 1 }), paper = new THREE.MeshStandardMaterial({ color: 0xf4f1ea, side: THREE.DoubleSide });
     add(new THREE.TorusGeometry(sh * 1.02, .1, 6, 32).rotateX(Math.PI / 2), rope, cx, R0 + 1.2, cz, 0);
@@ -24656,12 +24661,18 @@ function lhouseBuild() {
   for (const b of O.boxes) if (!BOXES.includes(b)) BOXES.push(b); boxGrid();     // pass 2's furniture and the rail
   const rbar = hbarMake(cx - 2.9, cz - 2.9, Math.PI / 4, H + .25); HBAR.list.push(rbar);
   const drone = bldDrone(g);
-  LHOUSE.on = { g, O, bars: [rbar], rings, beam, lan, t: 0, ang: 0, rune: runeMat, drone, lockT: 0, cool: 0, zap, zapT: 0, crysHp: A.crysHp, crysT: 0, top };
+  // m@X4@: BUNTING from the roof's four corners up to the shaft, PLANTS round the foot (the ramp and its lanterns kept clear)
+  for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) korBunting(put, K, [cx + sx * (hw + .2), H + .5, cz + sz * (hw + .2)], [cx + sx * sh * .7, R0 + 4.2, cz + sz * sh * .7], 10, .3);
+  { let sd = 47; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647; for (let i = 0; i < 28; i++) { const a2 = rnd() * 6.28, rr = hw + 1.5 + rnd() * 3.5, x = cx + Math.cos(a2) * rr, z = cz + Math.sin(a2) * rr;
+      if (z > cz + hw - .2 && z < cz + hw + 2.6 && x > cx - 5.5 && x < cx + 10.5) continue; if (x > cx + hw - .2 && Math.abs(z - cz) < 1.6) continue; plantPlant(plants, ['grass', 'fern', 'stones', 'tallgrass', 'boulder', 'fern'][i % 6], x, 0, z, .8 + rnd() * .5, a2); } }
+  for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list.map(q => q.index ? q.toNonIndexed() : q)), m); o.castShadow = o.receiveShadow = true; g.add(o); }
+  const nm = bldMergeStatic(g), plantMs = plantFlush(g, plants) || [];
+  LHOUSE.on = { g, O, bars: [rbar], rings, beam, lan, t: 0, ang: 0, rune: runeMat, drone, lockT: 0, cool: 0, zap, zapT: 0, crysHp: A.crysHp, crysT: 0, top, nm, plantMs };
   arenaBeam(cx, cz, [.5, .95, 1], 1); snd('clang', { g: .7, r: .7 });
 }
 function lhouseStep(dt) { const L = LHOUSE.on; if (!L) return; L.t += dt; const A = LHOUSE, c = L.lan.userData.crys, p = player, [cx, cz] = A.at, bm = L.beam.children[0].material;
   c.rotation.y = L.t * 1.3; c.position.y = 1.5 + Math.sin(L.t * 2) * .12;
-  L.rune.opacity = L.crysT > 0 ? .1 : L.lockT > 0 ? .95 : .45 + Math.sin(L.t * 2.4) * .3; L.rune.color.setHex(L.lockT > 0 ? 0xff4a3a : 0x7ff0ff);
+  L.rune.opacity = L.crysT > 0 ? .1 : L.lockT > 0 ? .95 : .45 + Math.sin(L.t * 2.4) * .3; L.rune.color.setHex(L.lockT > 0 ? 0xff4a3a : 0x7affd8);
   { const a = L.t * .2; L.drone.position.set(cx + Math.cos(a) * 12, 13 + Math.sin(L.t * 1.1) * .5, cz + Math.sin(a) * 12); L.drone.rotation.y = -a; L.drone.children[1].rotation.z = L.t * .6; }
   if (L.crysT > 0) { L.crysT -= dt; c.material.color.setRGB(.15, .2, .22); L.beam.visible = false; if (L.crysT <= 0) { L.crysHp = A.crysHp; L.beam.visible = true; arenaBeam(cx, cz, [.5, .95, 1], .5); } return; }
   if (L.cool > 0) L.cool -= dt; if (L.zapT > 0 && (L.zapT -= dt) <= 0) L.zap.visible = false;
@@ -24671,16 +24682,16 @@ function lhouseStep(dt) { const L = LHOUSE.on; if (!L) return; L.t += dt; const 
   if (own && !L.tgt && L.cool <= 0 && L.lockT <= 0) { let best = A.seeR; for (const b of DUMMIES) { if (b.st === 'gone' || b.st === 'down' || !b.root.visible) continue; const q = Math.hypot(b.root.position.x - cx, b.root.position.z - cz); if (q > 4 && q < best) { best = q; L.tgt = b; } }
     if (L.tgt) { L.lockT = A.lockT; snd('clang', { g: .5, r: 2.2, x: cx, z: cz }); } }
   const T = own ? (L.tgt ? L.tgt.root.position : null) : p.pos, tx = T ? T.x : 0, ty = T ? T.y : 0, tz = T ? T.z : 0, dx = tx - cx, dz = tz - cz, d = Math.hypot(dx, dz);
-  L.rune.color.setRGB(...(own ? gold : L.lockT > 0 ? [1, .29, .23] : [.5, .94, 1]));
+  L.rune.color.setRGB(...(own ? gold : L.lockT > 0 ? [1, .29, .23] : [.48, 1, .85]));
   if (L.lockT > 0 && T) { L.ang = Math.atan2(-dz, dx); L.lockT -= dt; if (own) { bm.color.setRGB(...gold); c.material.color.setRGB(...gold); } else { bm.color.setRGB(1, .25 + L.lockT * .3, .2); c.material.color.setRGB(1, .3, .25); }
-    if (L.lockT <= 0) { L.cool = own ? A.zapCool * .5 : A.zapCool; bm.color.setHex(own ? 0xffc84a : 0x7ff0ff); c.material.color.setHex(own ? 0xffc84a : 0x7ff0ff);     // THE BOLT: a jagged line from the crystal to the target
+    if (L.lockT <= 0) { L.cool = own ? A.zapCool * .5 : A.zapCool; bm.color.setHex(own ? 0xffc84a : 0x7affd8); c.material.color.setHex(own ? 0xffc84a : 0x7affd8);     // THE BOLT: a jagged line from the crystal to the target
       const P = L.zap.geometry.attributes.position, s0 = [cx, L.top + 1.5, cz], s1 = [tx, ty + 1, tz], n = P.count;
       for (let i = 0; i < n; i++) { const u = i / (n - 1), j = i && i < n - 1 ? 1 : 0; P.setXYZ(i, s0[0] + (s1[0] - s0[0]) * u + (Math.random() - .5) * 1.4 * j, s0[1] + (s1[1] - s0[1]) * u + (Math.random() - .5) * 1.4 * j, s0[2] + (s1[2] - s0[2]) * u + (Math.random() - .5) * 1.4 * j); }
       P.needsUpdate = true; L.zap.visible = true; L.zapT = .18; snd('boom', { g: .7, r: 1.6, x: tx, z: tz }); camShake(own ? .1 : .25);
       if (own) { const b = L.tgt; L.tgt = null; dummyBlow(b, Math.atan2(dx, dz), 1.6, A.zapDmg * 1.5); spkBurst(tx, ty + 1, tz, 20, { col: gold, spread: 5, size: .14, life: .5 }); }
       else if (d < A.seeR + 4) { playerHurt(A.zapDmg, Math.atan2(dx, dz), 5, 1.5, .25, 0); spkBurst(p.pos.x, p.pos.y + 1, p.pos.z, 20, { col: [.7, .95, 1], spread: 5, size: .14, life: .5 }); } } }
   else { L.lockT = 0; L.ang += A.beamRate * dt * (own ? 2 : 1); if (!own && L.cool <= 0 && d > 5 && d < A.seeR && p.pos.y < L.top - 1) { const k = Math.abs((Math.cos(L.ang) * dx - Math.sin(L.ang) * dz) / d); if (k > Math.cos(.09)) { L.lockT = A.lockT; snd('clang', { g: .5, r: 2, x: cx, z: cz }); } } }
-  if (!own && L.ownWas) { bm.color.setHex(0x7ff0ff); c.material.color.setHex(0x7ff0ff); } L.ownWas = own;
+  if (!own && L.ownWas) { bm.color.setHex(0x7affd8); c.material.color.setHex(0x7affd8); } L.ownWas = own;
   L.beam.rotation.y = L.ang; }
 function lhouseHit(x, y, z, rad, dmg) { const L = LHOUSE.on; if (!L) return 0; const [hx, hz] = LHOUSE.at;
   if (!(L.own > 0) && L.crysT <= 0 && y < 2.6 && Math.hypot(x - hx, z - hz) < 1.1 + rad) { L.own = LHOUSE.ownT; L.lockT = 0; L.tgt = null; L.cool = 0; snd('clang', { g: .8, r: .7, x: hx, z: hz }); snd('thud', { g: .6, r: .6, x: hx, z: hz }); arenaBeam(hx, hz, [1, .8, .3], .6); return 1; }     // m1201: the drive
@@ -24688,7 +24699,7 @@ function lhouseHit(x, y, z, rad, dmg) { const L = LHOUSE.on; if (!L) return 0; c
   if (Math.hypot(x - P.x, y - P.y, z - P.z) > 1.2 + rad) return 0; L.hc = L.t + .25; L.crysHp -= Math.max(.5, dmg || 1); spkBurst(P.x, P.y, P.z, 14, { col: [.6, .95, 1], spread: 4, size: .12, life: .4 }); snd('clang', { g: .8, r: 1.7, x: P.x, z: P.z });
   if (L.crysHp <= 0) { L.crysT = LHOUSE.crysFix; L.lockT = 0; L.zap.visible = false; for (let k = 0; k < 3; k++) spkBurst(P.x, P.y, P.z, 24, { col: k ? [.5, .9, 1] : [1, 1, 1], spread: 7, size: .2, life: .8 }); snd('boom', { g: .9, r: 1.2, x: P.x, z: P.z }); camShake(.3); }
   return 1; }
-function lhouseClear() { const L = LHOUSE.on; if (!L) return; bldClear(L); LHOUSE.on = null; }
+function lhouseClear() { const L = LHOUSE.on; if (!L) return; if (L.plantMs) plantDrop(L.plantMs); bldClear(L); LHOUSE.on = null; }
 
 // m1196: THE FLOATING ISLANDS (BUILDINGS.md #19, pass 1) at (44, 32). Three rock islands hang in the air, tethered to the ground by chains:
 // a jagged rock cone under each, a flat grassy top (walkable triangles, a slab collider under them), a waterfall off each one's edge. Rope
