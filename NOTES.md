@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- THE DRAGON FLAPS WITH HIS ARMS (a wyvern), and his legs sweep back in flight (DOCKET 11)
+## m1680 -- THE DRAGON FLAPS WITH HIS ARMS (a wyvern), and his legs sweep back in flight (DOCKET 11)
 His: *"in the sequence where he jumps up and flaps, he relies on his ARMS to flap the wings -- with our edit the arms are stationary, as though
 he's standing, and the wings flap without them. It's basically a wyvern. And in the air his legs look like he's standing rather than back."*
 - **Measured in `attack_air`:** his upper arm is held up ~+70 deg (.33-.73 s), DOWNSTROKES to -50 deg by .85 s, and is back up ~+75 by 1.4 s.

@@ -11528,7 +11528,7 @@ async function dragFlyLoad(B, P) { try { const K = await arenaLoad('MECH'), M = 
         const A = rB[bn], Bi = rM[bn].clone().invert(), v = Float32Array.from(t.values); for (let i = 0; i < v.length; i += 4) { q.fromArray(v, i).premultiply(Bi).premultiply(A); q.toArray(v, i); }
         tracks.push(new THREE.QuaternionKeyframeTrack(t.name, Float32Array.from(t.times), v)); }
       if (tracks.length) B.clips[dst] = new THREE.AnimationClip(dst, c.duration, tracks); }
-    // m15xx (his: "it heavily relies on its ARMS to flap -- with our edit the arms are stationary and the wings flap without them; it's basically a
+    // m1680 (his: "it heavily relies on its ARMS to flap -- with our edit the arms are stationary and the wings flap without them; it's basically a
     // wyvern"): HIS OWN WINGBEAT, cut out of `attack_air` -- measured: the upper arm held up ~+70 deg (.33-.73 s), the DOWNSTROKE to -50 deg by
     // .85, back up ~+75 by 1.4 -- so one beat is `flapCut` [.70, 1.40]. Every bone of both arms and everything hanging off them (the wings) is
     // sampled at 30 fps over that window and the last `flapBlend` s crossfaded into the first, so it LOOPS (`wing_flap`, arms and wings only).
@@ -11614,10 +11614,10 @@ function dragDrive(B, dt) { const Z = DRAGZ, D = B.drive, p = player, sit = p.dr
   if (D.aAtk) D.aAtk.setEffectiveWeight((1 - D.wF) * D.wA);
   if (D.aRun) { D.aRun.setEffectiveWeight(run * rest); D.aRun.setEffectiveTimeScale(clamp(D.v / Z.runRef, .7, 1.6)); } D.aIdle.setEffectiveWeight((D.aRun ? 1 - run : 1) * rest);
   // m1673: FAST flight is the lightning dragon's `fly_fast`, eased in with his airspeed past `cruise` x .6 (a hover and a slow glide stay `fly_idle`)
-  const fast = DRAGZ.flyPick === 'MECH' && B.clips.fly_fast && D.air && D.air.mode === 'fly' ? clamp(.7 + (D.air.v - Z.stall) / 6, 0, 1) : 0;     // m15xx (his: "in the air his legs look like he's standing"): the legs-back pose for any real flight
+  const fast = DRAGZ.flyPick === 'MECH' && B.clips.fly_fast && D.air && D.air.mode === 'fly' ? clamp(.7 + (D.air.v - Z.stall) / 6, 0, 1) : 0;     // m1680 (his: "in the air his legs look like he's standing"): the legs-back pose for any real flight
   if (fast > 0 && !D.aFast) { D.aFast = B.mx.clipAction(B.clips.fly_fast); D.aFast.reset().setLoop(THREE.LoopRepeat).setEffectiveWeight(0).play(); }
   D.wFast = damp(D.wFast || 0, fast, .3, dt); if (D.aFast) D.aFast.setEffectiveWeight(D.wF * D.wFast);
-  // m15xx: HIS ARMS BEAT THE WINGS (`wing_flap`, arms + wings only) whenever he is up -- faster on a tapped beat; the body clips keep the rest of him
+  // m1680: HIS ARMS BEAT THE WINGS (`wing_flap`, arms + wings only) whenever he is up -- faster on a tapped beat; the body clips keep the rest of him
   if (B.clips.wing_flap && !D.aFlap && D.air) { D.aFlap = B.mx.clipAction(B.clips.wing_flap); D.aFlap.reset().setLoop(THREE.LoopRepeat).setEffectiveWeight(0).play(); }
   if (D.aFlap) { D.aFlap.setEffectiveWeight(D.wF); D.aFlap.setEffectiveTimeScale(D.beat !== null && D.beat !== undefined ? Z.flapRateBeat : Z.flapRate); }
   if (D.aFly) { D.aFly.setEffectiveWeight(D.wF * (D.aFast ? 1 - D.wFast : 1)); D.aFly.setEffectiveTimeScale(D.beat !== null && D.beat !== undefined ? 1.4 : .8); } }
@@ -11630,7 +11630,7 @@ function dragWingsInit(B) { const W = []; B.root.updateMatrixWorld(true);
       const a = B.root.worldToLocal(c.getWorldPosition(new THREE.Vector3())), b = B.root.worldToLocal(t.getWorldPosition(new THREE.Vector3())); side.push({ b: c, tip: t, sd, rz: b.sub(a).normalize().z }); }
     side.sort((u, v) => v.rz - u.rz); side.forEach((w, i) => { w.a = .12 + i * (1.25 / Math.max(1, side.length - 1)); W.push(w); }); }
   return W; }
-function dragWings(B) { const D = B.drive, S = D ? D.spread || 0 : 0; if (S < .01 || DRAGZ.wingPick !== 'CODE' || (D && D.aFlap)) return;     /* m15xx: his own wingbeat (`wing_flap`) owns the wings */ if (!B.wings) B.wings = dragWingsInit(B);
+function dragWings(B) { const D = B.drive, S = D ? D.spread || 0 : 0; if (S < .01 || DRAGZ.wingPick !== 'CODE' || (D && D.aFlap)) return;     /* m1680: his own wingbeat (`wing_flap`) owns the wings */ if (!B.wings) B.wings = dragWingsInit(B);
   const beat = D.beat !== null && D.beat !== undefined ? Math.sin(D.beat * Math.PI * 2) : 0, glide = Math.sin(DRAGZ.on.t * 2.2) * .06, rq = B.root.getWorldQuaternion(_dwQ3);
   // m1673: the CONTINUOUS flap in the air (stilled and swept back as he dives), and the inside wing tucked in a bank
   const A = D.air, fly = A && A.mode === 'fly', pitch = fly ? A.pitch || 0 : 0, dive = clamp(-pitch / .9, 0, 1), cont = A ? DRAGZ.flyAmp * (1 - dive) * Math.sin(DRAGZ.on.t * DRAGZ.flyHz * Math.PI * 2) : 0, bank = fly ? A.bank || 0 : 0;
