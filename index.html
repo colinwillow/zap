@@ -12083,7 +12083,7 @@ const WRUN = { on: 1, minH: 1.9, minLen: 1.2, reach: .85, minSp: 2.5, along: .72
   kick: 6.5, jumpV: 8.2, keep: .8, cool: .35, upV: 7.2, gUp: 12, upT: .75, offV: 5, offUp: 7.5, torso: .75, footIn: .06,
   auto: 1, autoAir: 3, autoGround: 9, autoReach: .5, autoInto: .9, upK: 1, upMax: 17,
   slide: 1, slideReach: .35, hold: .28, slideG: 7, slideV: 3.2, slideT: 2.2, slideMaxFall: 9, wjOut: 6.2, wjUp: 8.8,
-  swipe: 1, swipeReach: .7, upLeg: 1.35, upLegIn: .12 };     /* m15xx: runs START from a right-pad SWIPE at the wall (`swipe` 0 = the old tap / auto); `upLeg` the run-up's legs swung out to the wall (rad) */     /* m1372: the WALL SLIDE and the wall jump */     // m1251: the run-up with no tap, its height from his speed     // m1072: torso, footIn
+  swipe: 1, swipeReach: .7, upLeg: 1.35, upLegIn: .12 };     /* m1604: runs START from a right-pad SWIPE at the wall (`swipe` 0 = the old tap / auto); `upLeg` the run-up's legs swung out to the wall (rad) */     /* m1372: the WALL SLIDE and the wall jump */     // m1251: the run-up with no tap, its height from his speed     // m1072: torso, footIn
 const _wrN = { d: 0, nx: 0, nz: 0, cx: 0, cz: 0 }, _wrB = [];
 // m1250: *"you should be able to wall run on pretty much any wall, even the destructible ones."* A breakable wall (`cwallBuild`) is in
 // `BOXES` as its .6 x .3 m chunks and its posts, and every one failed `minLen` (a post is not a wall) -- so the whole wall refused. A piece
@@ -12103,7 +12103,7 @@ function wrunFind(px, py, pz, R, not) {
 function wrunTap() {
   const p = player; if (!WRUN.on || p.knock || p.riding || p.wing || p.bar || p.ledge || p.mantle || p.vault || mphBare()) return 0;
   if (p.wrun) return wrunJump();
-  if (WRUN.swipe) return 0;     /* m15xx: a tap by a wall is the ordinary jump; the runs are swiped */
+  if (WRUN.swipe) return 0;     /* m1604: a tap by a wall is the ordinary jump; the runs are swiped */
   const sp = Math.hypot(p.vel.x, p.vel.z), S = stickWorld();
   // which way he means to go: his speed, or the stick when he is barely moving
   const mx = sp > 1 ? p.vel.x / sp : S.mag > .3 ? S.x : Math.sin(p.faceH), mz = sp > 1 ? p.vel.z / sp : S.mag > .3 ? S.z : Math.cos(p.faceH);
@@ -12127,15 +12127,15 @@ function wrunAuto() {
   // a little friction -- so you can jump, purchase, wall jump to the opposing wall, jump, jump, back and forth like Prince of Persia."* In the air
   // with the left stick at rest, a tall face within `slideReach` catches him: a moment's hold (`hold` s), then a slide down at up to `slideV`
   // m/s; a tap kicks him off it, away and up (`wjOut`, `wjUp`), and the facing wall catches him the same way. Holding the stick keeps the runs.
-  if (WRUN.slide && !p.grounded && (WRUN.swipe || stickWorld().mag < .3) && p.vel.y > -WRUN.slideMaxFall) {     /* m15xx: with swipe on, ANY touch of a wall in the air is the perch-and-slide, stick or no stick */ const W = wrunFind(p.pos.x, p.pos.y, p.pos.z, p.r + WRUN.slideReach, p.wrunCoolB && p.wrunCool > 0 ? p.wrunCoolB : null);
+  if (WRUN.slide && !p.grounded && (WRUN.swipe || stickWorld().mag < .3) && p.vel.y > -WRUN.slideMaxFall) {     /* m1604: with swipe on, ANY touch of a wall in the air is the perch-and-slide, stick or no stick */ const W = wrunFind(p.pos.x, p.pos.y, p.pos.z, p.r + WRUN.slideReach, p.wrunCoolB && p.wrunCool > 0 ? p.wrunCoolB : null);
     if (W && -(p.vel.x * W.nx + p.vel.z * W.nz) > -.5) return wrunGo(W, 'slide', 0, 0); }
-  if (WRUN.swipe) return 0;     /* m15xx: no run starts by itself */
+  if (WRUN.swipe) return 0;     /* m1604: no run starts by itself */
   const sp = Math.hypot(p.vel.x, p.vel.z), need = p.grounded ? WRUN.autoGround : WRUN.autoAir; if (sp < need || (!p.grounded && p.vel.y < -6)) return 0;
   const W = wrunFind(p.pos.x, p.pos.y, p.pos.z, p.r + WRUN.autoReach, p.wrunCoolB && p.wrunCool > 0 ? p.wrunCoolB : null); if (!W) return 0;
   const into = -(p.vel.x * W.nx + p.vel.z * W.nz); if (into < need || into < sp * WRUN.autoInto) return 0;     // squarely head-on: a wall-to-wall jump crosses at ~45 deg and must stay a SIDE run
   return wrunGo(W, 'up', 0, 0, Math.min(WRUN.upMax, into * WRUN.upK));
 }
-// m15xx (his: *"we need a way to initiate the wall runs so he doesn't just automatically wall run: if you're touching a wall and you swipe the right
+// m1604 (his: *"we need a way to initiate the wall runs so he doesn't just automatically wall run: if you're touching a wall and you swipe the right
 // stick, he runs that way -- hit it at an angle and swipe sideways, a horizontal run; straight on and swipe up, he runs up it; no swipe, he just
 // perches on the wall and can jump off or slide down"*). A right-pad FLICK with a tall face in reach (or while perched on one): UP the screen = the
 // RUN UP; left / right = a SIDE RUN that way along the face (the flick's world heading onto the wall's tangent); DOWN = let go. No wall: the
@@ -12188,7 +12188,7 @@ function stepWrun(dt) {
 const _wrQ = new THREE.Quaternion(), _wrA = new THREE.Vector3();
 function wrunPose() {
   const p = player, R = p.wrun; if (!R || p.bar || p.ledge) return;
-  // m15xx (his: *"the vertical wall run: his feet more forward, out in front, as if his hips are at 90 degrees -- torso straight up and down, feet
+  // m1604 (his: *"the vertical wall run: his feet more forward, out in front, as if his hips are at 90 degrees -- torso straight up and down, feet
   // parallel to the wall"*): both thighs swung `upLeg` rad forward about his own right axis (the run clip keeps stepping on top of it), and the
   // drawn body held a leg's length off the face so the soles land ON it; ramps in over `upLegIn` s
   if (R.kind === 'up') { if (!rig.bones || !WRUN.upLeg) return; const k = Math.min(1, R.t / WRUN.upLegIn), fx = -R.nx, fz = -R.nz; _wrA.set(-fz, 0, fx);     // his right is (-fz, fx)

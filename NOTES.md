@@ -22,7 +22,7 @@ shipped hero in the sim (the clip sampled like `mantleCurve`, and the hands' wor
 - **AND THE SPEED IS NOW THE ANIMATION'S SPEED**: 2.3 m/s would cycle the hands ~6x. TOOLS > CLIMB cycles .9 / 1.4 / 2.3 m/s (`mel.climbspd`),
   **1.4 by default** -- his pick. Ladder 3 (7 m): bottom to standing on top 5.6 s; top back down 5 s.
 The feet are not locked (they follow the same phase; not measured against the rungs).
-## m15xx -- WALL RUNS START FROM A SWIPE; the run-up's legs out to the wall
+## m1604 -- WALL RUNS START FROM A SWIPE; the run-up's legs out to the wall
 His (playing Level 1 v2): *"we need a way to initiate the wall runs so he doesn't just automatically wall run. If you're touching a wall and you swipe
 the right stick directionally, he'll run that direction -- hit the wall at an angle and swipe for a horizontal run; straight on, swipe up, he runs up
 the wall. If you don't swipe he does the thing where he's perched on the wall, can jump off or slide down -- it gets confused which one you're
