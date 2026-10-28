@@ -25,5 +25,5 @@
 12. [x] (m1683; the camera's help still open) **Wall run, sound:** the SIDE run hardly ever starts (a sideways flick reads as UP); touching a wall in the air PERCHES at once, FACING
        AWAY, skimming down, ready to jump off (Prince of Persia) -- no flail first; jumping wall to wall easy and smooth; the wall's friction
        only on the way DOWN (a jump beside a wall is not cut short); the camera helps.
-13. [x] (m15xx) **The zip line:** you can drop off mid-line; slow; the hands are off the line; the sword is not out; no sparks. Wanted: speed, a swing
+13. [x] (m1684) **The zip line:** you can drop off mid-line; slow; the hands are off the line; the sword is not out; no sparks. Wanted: speed, a swing
        (rotational, with velocity), maybe loops; keep the engage / disengage.

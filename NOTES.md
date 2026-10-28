@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- THE ZIP LINE, rebuilt: fast, on the katana with sparks, hands on the cable, a swing you can loop (DOCKET 13)
+## m1684 -- THE ZIP LINE, rebuilt: fast, on the katana with sparks, hands on the cable, a swing you can loop (DOCKET 13)
 His: *"you can disengage without reaching the ends; it doesn't go very fast; the hand placement is off; the sword isn't out and there's no
 sparks. There should be some rotational swing and velocity -- maybe loops for fun. The engage / disengage is good."*
 - **Off only by a tap or at an end:** the hard-down stick for .45 s dropped him -- the same gesture as the brake, pushed further. Gone.

@@ -13138,7 +13138,7 @@ function stepRope(dt) {
 // m1168: ZIPLINES (Sky Bridges pass 2). A cable from a high point to a low one (`ZIPS`: {A, B}). In the air, his hands within `grab` m of
 // the cable (and inside its length) CATCH it: he hangs and slides down it, gravity along the slope against a little drag, up to `max`
 // m/s, and drops off at the bottom end with the speed he has. TAP to let go anywhere on the way.
-const ZIP = { brake: 14, grab: .7, max: 28, drag: .1, v0: 9, up: 2.6, dropT: .45, pull: 5, swDamp: .6, kick: 9, sparkK: .25, katana: 1 }, ZIPS = [];     /* m15xx: faster (max 17 -> 28, drag .25 -> .1, a constant `pull`, caught at `v0` 9), the swing, the katana */
+const ZIP = { brake: 14, grab: .7, max: 28, drag: .1, v0: 9, up: 2.6, dropT: .45, pull: 5, swDamp: .6, kick: 9, sparkK: .25, katana: 1 }, ZIPS = [];     /* m1684: faster (max 17 -> 28, drag .25 -> .1, a constant `pull`, caught at `v0` 9), the swing, the katana */
 function zipCatch() {
   const p = player, H = hbarH(), hx = p.pos.x, hy = p.pos.y + H * 1.15, hz = p.pos.z;
   for (const Z of ZIPS) { const A = Z.A, B = Z.B, dx = B[0] - A[0], dy = B[1] - A[1], dz = B[2] - A[2], L2 = dx * dx + dy * dy + dz * dz, u = ((hx - A[0]) * dx + (hy - A[1]) * dy + (hz - A[2]) * dz) / L2;
@@ -13146,14 +13146,14 @@ function zipCatch() {
     if (Math.hypot(qx, qy, qz) > ZIP.grab) continue;
     p.zip = { Z, u, v: Math.max(ZIP.v0, (p.vel.x * dx + p.vel.y * dy + p.vel.z * dz) / Math.sqrt(L2)), L: Math.sqrt(L2) }; p.melee = 0; p.flip = ''; p.aflip = null; p.barFly = null;
     p.faceH = p.heading = Math.atan2(dx, dz); snd('clang', { g: .4, r: 1.8, x: hx, z: hz });
-    // m15xx (his: "the sword isn't out and there's no sparks"): he rides the line on his KATANA, hooked over the cable -- it comes out on the catch and
+    // m1684 (his: "the sword isn't out and there's no sparks"): he rides the line on his KATANA, hooked over the cable -- it comes out on the catch and
     // goes back on the way off
     if (ZIP.katana) { const k = WEAP.slots.findIndex(q => q.melee === 'katana'); if (k >= 0 && player.slot !== k && (GEAR.mask & (1 << k))) { p.zip.prev = player.slot; applySlot(k); } }
     p.zip.sw = 0; p.zip.sww = 0; return 1; }
   return 0;
 }
-function zipKick(dx, dy) { const K = player.zip; if (!K) return 0; K.sww += (dy < 0 ? 1 : -1) * ZIP.kick; snd('swoosh', { g: .5, r: .8 }); return 1; }     // m15xx: up = feet forward and over
-// m15xx: the drawn body on the line -- turned so it hangs from the hands along `K.down`, both hands IK'd onto the cable (the right one on the
+function zipKick(dx, dy) { const K = player.zip; if (!K) return 0; K.sww += (dy < 0 ? 1 : -1) * ZIP.kick; snd('swoosh', { g: .5, r: .8 }); return 1; }     // m1684: up = feet forward and over
+// m1684: the drawn body on the line -- turned so it hangs from the hands along `K.down`, both hands IK'd onto the cable (the right one on the
 // katana's grip just under it), elbows out
 const _zpU = new THREE.Vector3(0, 1, 0), _zpQ = new THREE.Quaternion(), _zpT = new THREE.Vector3();
 function zipPose() { const p = player, K = p.zip; if (!K || !K.down || !rig.bones) return; const A = K.Z.A, B = K.Z.B, L = K.L, u = Math.min(1, K.u), dx = (B[0] - A[0]) / L, dy = (B[1] - A[1]) / L, dz = (B[2] - A[2]) / L;
@@ -13169,14 +13169,14 @@ function stepZip(dt) {
   if (stick.L.down && stick.L.y < -.35) K.v = sn > 0 ? -ZIP.up : ZIP.up;
   // m1352: *"I got onto a zipline by accident and couldn't get off, he was moving really slow."* A tap (either pad) still lets go; now so does the
   // left stick held hard DOWN for `dropT` s (the obvious "get me off this" gesture), and the shimmy is quicker (`up` 1.6 -> 2.6)
-  // m15xx (his: "you can disengage from it without reaching the ends"): the hard-down stick no longer drops him (it is the BRAKE's own gesture,
+  // m1684 (his: "you can disengage from it without reaching the ends"): the hard-down stick no longer drops him (it is the BRAKE's own gesture,
   // pushed further); a TAP lets go, nothing else
   const v0 = K.v; K.v = Math.min(ZIP.max, K.v + (sn > 0 ? ZIP.pull : 0) * dt);
   K.u += K.v / K.L * dt; p.grounded = false;     // m1293: THIS LINE WAS INSIDE THE COMMENT ABOVE SINCE m1193 -- every zipline froze where you caught it
   if (K.u < 0) K.u = 0;
   const u = Math.min(1, K.u), dx = (B[0] - A[0]) / K.L, dy = (B[1] - A[1]) / K.L, dz = (B[2] - A[2]) / K.L;
   p.pos.set(A[0] + (B[0] - A[0]) * u, A[1] + (B[1] - A[1]) * u - H * 1.15, A[2] + (B[2] - A[2]) * u); p.vel.set(dx * K.v, dy * K.v, dz * K.v);
-  // m15xx: THE SWING. He hangs from his hands on a pendulum (`sw`, + = feet forward along the line): speeding up leaves his body BEHIND, braking
+  // m1684: THE SWING. He hangs from his hands on a pendulum (`sw`, + = feet forward along the line): speeding up leaves his body BEHIND, braking
   // throws it forward, and a right-pad flick UP kicks it round (`zipKick`) -- hard enough and he goes right over the cable, LOOPS
   { const Lp = H * 1.15, acc = (K.v - v0) / Math.max(1e-4, dt); K.sww += (-(MOVE.g / Lp) * Math.sin(K.sw) - ZIP.swDamp * K.sww - (acc / Lp) * Math.cos(K.sw)) * dt; K.sw += K.sww * dt;
     const hx = A[0] + (B[0] - A[0]) * u, hy = A[1] + (B[1] - A[1]) * u, hz = A[2] + (B[2] - A[2]) * u, dh = Math.hypot(dx, dz) || 1;
@@ -66306,7 +66306,7 @@ function frameBody() {
     else if (player.vaultRes) { const R = player.vaultRes; R.t += dt; const k = 1 - smooth(0, VAULT.resT, R.t); rig.root.position.x -= R.ox * k; rig.root.position.z -= R.oz * k; if (k <= 0) player.vaultRes = null; }     // and eased out as the clip fades
     airFlipPose();                     // m1050: the left stick's air flips, turned about his middle
     wrunPose();                        // m1064: rolled off the wall on a side run
-    zipPose();                         // m15xx: hanging from the zip line, swung, hands on the cable
+    zipPose();                         // m1684: hanging from the zip line, swung, hands on the cable
     duckPose(dt);                      // m1070: the cover duck (right pad down in half cover)
     gsidePose();                       // m1073: the mirrored guard's blade, laid along the reflection of his own
     beamPose();                        // m1037: on the beam, tilted with the balance, arms out
