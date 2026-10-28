@@ -103,7 +103,7 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
-## THE SKY WHALE, PASS 2 (mXXXX)
+## THE SKY WHALE, PASS 2 (m1491)
 - **Pass 1's lathe profile was BACKWARDS.** The fat end was at -z (where the flukes were) and the thin end at +z (where the eyes were), so it read as a pale shark-blimp. Rebuilt: tail at z -15, head at +13, a slow swell to a max at t .68 and then a ROUNDED, blunt head (`radAt`), the belly flattened (.72) under the back (.86).
 - **Paint (per vertex):**
   - a dark mouth line along the head

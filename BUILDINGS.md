@@ -20,7 +20,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 - [ ] pass 4: the same ground in Grumbo's home and the forge buildings (one shared ground kit)
 
 ## THE CREATURES, PASS BY PASS (his: *"individual passes on the animals themselves, a bunch of passes on each, because the first pass on anything is never good"*)
-- [x] **sky whale pass 2 (mXXXX):** the profile was BACKWARDS (fat tail, thin head = a shark-blimp); now a blunt-headed humpback: a mouth line, barnacles, a violet-navy back over pale throat pleats, glowing Jinra spots along the flanks, long swept pectoral paddles, a dorsal hump, a broad fluke
+- [x] **sky whale pass 2 (m1491):** the profile was BACKWARDS (fat tail, thin head = a shark-blimp); now a blunt-headed humpback: a mouth line, barnacles, a violet-navy back over pale throat pleats, glowing Jinra spots along the flanks, long swept pectoral paddles, a dorsal hump, a broad fluke
 - [ ] sky whale pass 3: the fins' knobbly leading edges and a real flipper outline (not a capsule), an eye with a lid, a breath plume of Jinra vapour from a blowhole
 - [ ] sky manta (dojo, pass 1 at m1417): pass 2 -- a thicker body, a curled cephalic fin, a proper underside, wings that ripple, not fold
 - [ ] serpent fish (the Ship, Worker A): its own passes in the Ship's list
