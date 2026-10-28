@@ -5,6 +5,25 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## mDRG -- THE DRAGON RIDE: GRUMBO'S RIDING CLIPS (Forge-baked from his Mixamo library) and THE STRADDLE
+His go-ahead on the plan: the library (`colinwillow/retarget-anims`, cloned beside zap, nothing raw committed here) has no riding clips, so a car
+seat, edited -- what he did by hand before.
+- **The bake**: `tools/agoblin_forge_prof.json` (the goblin profile's layers and adjust, `character` = alien_goblin_game.glb) ->
+  `node tools/forge.cjs models/characters/alien_goblin_game.glb tools/agoblin_forge_prof.json models/characters/forged/alien_goblin_game.glb
+  --lib ../retarget-anims/library/clips`. It REBUILDS his whole bake, so the profile carries his eight knock clips too (Colin's six from
+  colin.glb + `Kip_Up` / `Corkscrew_Kip_Up`) -- **checked bit-identical to the old file, track by track** (max diff 0.000000 on 5 of them, all
+  50 tracks). Library clips need `stem` + `name` in a profile entry; with `clip` alone the Forge drops them silently (it said "14 clips" and
+  wrote 6 -- caught by reading the output back). .77 MB -> 1.31 MB, fetched only while he is the hero.
+- **The clips**: `ride_seat` = Driving (hips still, hands forward: the reins); `ride_on` = Entering_Car 1.6-3.4 s, `inPlace`, x1.4 (1.29 s:
+  the swing in and the sit); `ride_off` = Exiting_Car 1.3-3.6 s, `inPlace`, x2 (1.15 s); `ride_gun` = Sitting_Gun_Motion while the gun is held.
+  (Measured first: Entering_Car's hips travel 90 units forward at a near-constant height -- a car seat, not a climb -- hence in place and only
+  the middle.) The mount and dismount arcs now take the clips' own lengths (`dragClipGo`); `ride_seat` / `ride_gun` are taken off `ONCE` and
+  RESET to loop (a ONCE clip that already ran sits paused on its last frame). Each falls back to `driving` / `in_air` without the bake.
+- **The straddle** (`dragStraddle`, last in `dragRiderPose`): each thigh AIMED hip-to-knee at `thigh` (.5 out, -.8 down, .32 forward) and
+  each shin knee-to-ankle at `shin` (.12 out, -.8 down, -.5 back) in the DRAGON's frame, on top of the clip, blended by `straddle` (0 = the
+  clip's car-seat legs). The upper body is the clip's. Directions guessed, not rendered.
+**Moves:** nothing ticked (box 2's look). Gates: check ok, zone boot ok. Shipped unverified.
+
 ## m1627 -- THE DRAGON RIDE: THE RIDER SAT INSIDE THE DRAGON
 His: *"he was sitting inside the dragon -- that's why"* (he could not see himself). The rider's root went at the seat less a HIP HEIGHT that was
 an estimate (.6 x `rig.hipY`) corrected by a lagged measurement that only ran inside a sane range -- so wherever the `driving` clip actually put

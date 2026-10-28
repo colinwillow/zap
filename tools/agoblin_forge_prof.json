@@ -1,0 +1,112 @@
+{
+ "v": 1,
+ "character": "models/characters/alien_goblin_game.glb",
+ "exclude": [],
+ "layers": {
+  "feet": 1,
+  "ground": 1,
+  "clear": 0,
+  "toes": 1,
+  "handAlign": 1
+ },
+ "adjust": {
+  "stance": 1,
+  "arms": 0,
+  "elbows": 0,
+  "lean": 0,
+  "toeIn": 0,
+  "knees": 0,
+  "wrists": 45
+ },
+ "hands": {
+  "Right": {
+   "pose": "relaxed"
+  },
+  "Left": {
+   "pose": "relaxed"
+  },
+  "amt": 0.35,
+  "noise": {
+   "amt": 3,
+   "hz": 0.5
+  }
+ },
+ "clips": [
+  {
+   "role": "flying_backwards",
+   "donor": "models/characters/colin.glb",
+   "clip": "flying_backwards"
+  },
+  {
+   "role": "flying_forwards",
+   "donor": "models/characters/colin.glb",
+   "clip": "flying_forwards"
+  },
+  {
+   "role": "fall_to_back",
+   "donor": "models/characters/colin.glb",
+   "clip": "fall_to_back"
+  },
+  {
+   "role": "fall_to_face_down",
+   "donor": "models/characters/colin.glb",
+   "clip": "fall_to_face_down"
+  },
+  {
+   "role": "get_up_from_back",
+   "donor": "models/characters/colin.glb",
+   "clip": "get_up_from_back"
+  },
+  {
+   "role": "get_up_from_face",
+   "donor": "models/characters/colin.glb",
+   "clip": "get_up_from_face"
+  },
+  {
+   "role": "kip_up",
+   "stem": "Kip_Up",
+   "name": "Kip_Up"
+  },
+  {
+   "role": "kip_cork",
+   "stem": "Corkscrew_Kip_Up",
+   "name": "Corkscrew_Kip_Up"
+  },
+  {
+   "role": "ride_seat",
+   "stem": "Driving",
+   "name": "Driving"
+  },
+  {
+   "role": "ride_on",
+   "stem": "Entering_Car",
+   "name": "Entering_Car",
+   "edit": {
+    "inPlace": 1,
+    "trim": [
+     1.6,
+     3.4
+    ],
+    "speed": 1.4
+   }
+  },
+  {
+   "role": "ride_off",
+   "stem": "Exiting_Car",
+   "name": "Exiting_Car",
+   "edit": {
+    "inPlace": 1,
+    "trim": [
+     1.3,
+     3.6
+    ],
+    "speed": 2.0
+   }
+  },
+  {
+   "role": "ride_gun",
+   "stem": "Sitting_Gun_Motion",
+   "name": "Sitting_Gun_Motion"
+  }
+ ]
+}
