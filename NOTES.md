@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## the Red Hollows' PAINTED MAPS, pass 3: caves, bridges, poles, lanterns, sky islands, the mill's turrets (Worker B)
+His "Go!" on the next texture pass. `hwPaint` kinds now include the texture library's `planks` / `timber` / `stone` (means measured off
+the webps, linear): the m1113 rope bridges' planks -> planks, the banner poles -> timber, his stone lanterns -> stone; the cave interiors
+were flat BLACK `MeshBasic` -> a dark (0x2a120a) lit rock-painted surface, so a cave reads deep rather than as a hole cut in the picture;
+the sky islands (restored only) -> cliff on their cones, sand on their tops. The "grey slabs" on the walls by the mill were its GATE
+TURRETS in the grey `stone_blocks` map -> the same map tinted sandstone (0xe6aa84), so they sit in the red rock. Render: restored, from
+the home toward the mill: the bridges, both caves, both turrets.
 ## the Red Hollows' PAINTED MAPS, pass 2: the river bed, the ledge paths, the caves (Worker B)
 His "do another pass" on the textures. A fourth map, `textures/hollows_pebble.webp` (rounded river pebbles in grit, a little algae;
 gpt-image-2 streamed, made seamless the same way, linear mean .211/.160/.091). `hwPaint` takes any map by kind now ('cliff', 'sand',
