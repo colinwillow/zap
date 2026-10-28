@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- THE KATANA'S CHARGE: one mark, drawn behind him; and the HIGH LEAP is one parabola that strikes as he lands (DOCKET 9, 10)
+## m1679 -- THE KATANA'S CHARGE: one mark, drawn behind him; and the HIGH LEAP is one parabola that strikes as he lands (DOCKET 9, 10)
 His: *"the plain square one and the new one on top of it -- I don't like the square; and it's overlaid over the character even though it's
 behind him"*; *"I don't want it to show the arc... he jumps up, then moves forward, then swings down, then comes down -- it should be one
 continuous arc, and the animation should end with him striking the ground, not 10 feet in the air."*

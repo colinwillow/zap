@@ -16,9 +16,9 @@
 7. [x] (m1675; the inner-green version is his model, open) **The Osari bowman, the race's look:** limbs that chop off (as the samurai), and his DEATH = green smoke: he bursts and evaporates.
        Later: an "inner green" version of him as the war-boss-style reveal under armour.
 8. [ ] (his, last) the saddle is HIS (he will cut it from the mesh); the dragon's other bugs -- he will describe them.
-9. [x] (m15xx) **The katana charge reticle:** the plain SQUARE one is still drawn under the new one -- drop it (something more interesting if a second
+9. [x] (m1679) **The katana charge reticle:** the plain SQUARE one is still drawn under the new one -- drop it (something more interesting if a second
        mark is wanted at all), and the mark must draw BEHIND him (he is drawn over it when it is behind him).
-10. [x] (m15xx) **The katana high jump (charge up, then the stick to the bottom):** no ARC preview (a lean back or nothing). The jump itself is one smooth
+10. [x] (m1679) **The katana high jump (charge up, then the stick to the bottom):** no ARC preview (a lean back or nothing). The jump itself is one smooth
        parabola (it rises, then moves forward, then swings, then drops), and the strike lands WITH him on the ground, not 3 m up.
 11. [ ] **The dragon's wings are his ARMS (a wyvern):** in his own up-and-flap clip the ARMS beat and the wings follow; ours holds the arms still
        and flaps only the fingers. Drive the arms (from that clip's flap, looped). And in the air his LEGS stand: sweep them back.
