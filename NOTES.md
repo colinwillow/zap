@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home pass 24 (Worker B): the pier and canoe, third pass -- and m1442 threw every frame
+- **m1442 WAS BROKEN IN THE HOME.** In pass 23 I appended a `//` comment to `function ghomeTumble(dt) {`, a one-line function, so its whole body was commented out. The next line's code then used `T` undeclared, `homeStep` threw `ReferenceError: T is not defined` on every frame, and `npm run check` passed it: the gate builds the home but never steps a frame. A stepped headless frame (this pass's canoe test) found it. **Fixed here.** This is the THIRD time this session that a comment appended to a one-line statement swallowed code (pass 9's orb sway, pass 23's lantern line, this). **Rule for this file: never append `//` to a line that is a whole statement or block; put the comment on its own line above.**
+- **Fish.** Slim (.022 x h x .075), a flattened tail, an eye. They read as fish instead of pods.
+- **Canopy.** Red awning cloth over the T-head's shore half on four posts (`awning`, so it is also walkable), sloping toward the water.
+- **Net.** A 9 x 6 cord mesh draped over the rail between two posts, sagging and bellied, with red floats along the top.
+- **The canoe lifts** (`C.hu`). Every 18-38 s it rises .5 m over 1.4 s, holds, and settles over 1.2 s: 6 s in all. The waves fade out of its bob while it is up. Drips fall from the hull. The runes go up to x5 brightness. A splash and a thud when it lands.
+- Draws 35, walkable tris 5,868 (the canopy).
 ## Grumbo's home pass 23 (Worker B): the plants, second pass -- wind, grass, gravel, a tumbleweed
 - **Sway.** `put` writes a `sway` attribute (each vertex's height above its own piece's lowest point) for any material with `userData.sway`. The grass (`straw`) and the reeds (`reedM`) bend in the vertex shader on `uWind` (two sines in x, one in z, scaled by sway^1.5). **The flag must be set before the first piece goes in.** Pass 20 had already put grass by the time pass 23 marked the material, the bucket mixed attribute sets, and `mergeGeometries` returned null ("a bucket would not merge"). It is set where the materials are made.
 - **More grass**: 70 drifts of 4-8 tufts, bigger (1-1.7x). **Gravel**: 26 patches of 14 sandstone chips in `rockM`.
