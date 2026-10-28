@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the FORGE-WORKSHOP, pass 1 (a HERO / TOWN place: the look; a collider audit)
+## m1623 -- THE RE-PASS: the FORGE-WORKSHOP, pass 1 (a HERO / TOWN place: the look; a collider audit)
 - Kit materials: `K.timber`, a `stone_blocks` triMat in two tones, `K.bronze`, `K.iron`, `K.lamp`; the furnace fire stays fire-orange
   (it is a forge, not Jinra). `korLantern`s on posts at the open front, bunting along the front beam, grass, stones, tall grass, ferns
   and boulders round the outside (the open front and the crane kept clear). Statics merged except the forge mouth (it glows in
