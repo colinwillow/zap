@@ -276,7 +276,7 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
-## THE SHIP, PASS 14: THE AIRSHIP FORM -- WINGS (m@X4@, WORKER A)
+## THE SHIP, PASS 14: THE AIRSHIP FORM -- WINGS (m1479, WORKER A)
 
 His: *"Surprise me... whatever needs the most attention."* The airship form was asked for twice (his first brief: *"I'm going to make it
 transform into an airship later"*; the dojo, which now flies `shipModel` round its islands, asked for "sails or wings out").

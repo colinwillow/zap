@@ -296,7 +296,7 @@ the home in a wide shot from the valley floor.
   - [x] **pass 12d (m1448):** the SEA DRAGON from his reference sheet -- textures generated from the sheet (mosaic scales, cream belly, torn red-orange fins, gold eye), a horned fanged head with a red mouth, and the REAR: the neck rises straight out of the sea, head level on top
   - [x] **pass 12e (m1457):** the dragon made INVITING -- a big round Chinese-dragon head (bulbous nose, big gentle blinking eyes, glowing antlers, flowing whiskers, mane, beard, brows), silky koi fins, bigger, and it turns to look at you when it rears
   - [x] **pass 12f (m1464):** the body stops being a tube -- swells and pinches, fuller hips, dark saddles across the back, five pairs of silky flank tufts that flutter down its length
-  - [x] **pass 14 (m@X4@):** the AIRSHIP FORM for `shipModel` (the dojo's flying ship): two great battened junk-sail wings that ripple, a walkable spar out along each, lantern tips, tail fins
+  - [x] **pass 14 (m1479):** the AIRSHIP FORM for `shipModel` (the dojo's flying ship): two great battened junk-sail wings that ripple, a walkable spar out along each, lantern tips, tail fins
   - [ ] pass 13: manta rays that swim AND fly (for the airship sky too)
   - [ ] later: other ships about (junks under sail), a bigger land harbour; air creatures for the airship (his: flying fish, serpent-dragons, pterodactyls)
   - [ ] later: swimming here; the AIRSHIP transform (his)
