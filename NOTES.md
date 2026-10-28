@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the SKY BRIDGES, pass 2 (rubric 7: RESTORES IN PLACE)
+- One rig for the set (`SKYB.on.R`, BLDG `rig`). Each built span is two pieces, `s<i>a` / `s<i>b`: its planks, hangers and gate on that
+  side of the middle (filed by projecting the piece's centre onto the span). The whole-length meshes -- the two rope rails, the flag line
+  and the bunting -- cannot be halved, so they are `up.objs` (gone while fallen).
+- FALLEN: snapped in the middle, each half HANGS from its own end, swung ~72 deg down about the deck's cross axis (the sign picked so its
+  free end goes DOWN; the fallen centre is the end plus the rotated offset). No walk (the plank tris are `up.tris`), and the zips are dead:
+  cables hidden, and `onSet` takes them out of ZIPS (and drops a rider). RESTORED: the halves swing home over 5 s, the colour floods back
+  (`restoreSkin`), the zips go back in ZIPS.
+- Mint plate on the ground 4 m off the first span's middle. The set still REBUILDS when a building comes or goes (`skybSig`), starting
+  from `AGE.st`; `skybClear` drops the rig, its ride tris and the plate.
+Render-checked headless with the Watchtower, Gatehouse, Market and Rampart: fallen (halves hanging off the Watchtower and the Gatehouse,
+268 walk tris -> 12) and restored. Shipped unverified.
+
 ## m1642 -- THE RE-PASS: the SKY BRIDGES, pass 1 (HERO look, merged)
 - The hero kit (`korMats`): painted warm planks (`wood_planks`), kit timber, kit bronze and red, the kit lamp. The zip cables are bronze.
 - Each span gets a small GATE 1.2 m in from each end (an end sits inside its building, so a gate at the end stood in the Watchtower's

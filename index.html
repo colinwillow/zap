@@ -23931,15 +23931,33 @@ function skybBuild() {
   flag.customProgramCacheKey = () => 'skyflag';
   const mats = { plank: triMat('wood_planks', { scale: 2.2, color: 0xc8a68a }), rope: new THREE.MeshStandardMaterial({ color: 0xc9b07a, roughness: 1 }), wood: K.timber, lamp: K.lamp, red: K.redL, bronze: K.bronze, flag };
   for (const S of SKYB.spans.concat(SKYB.zips)) { S.A = skAt(S.a[0], S.a[1]); S.B = skAt(S.b[0], S.b[1]); }     // m1341: where the buildings stand now
-  let n = 0; for (const S of SKYB.spans) if (S.need()) { bridgeSpan(g, S.A, S.B, S.w, S.sag, tris, mats); n++; }
+  let n = 0; const built = []; for (const S of SKYB.spans) if (S.need()) { const c0 = g.children.length; bridgeSpan(g, S.A, S.B, S.w, S.sag, tris, mats); for (const o of g.children.slice(c0)) o.userData.span = 1; built.push(S); n++; }
   // m1168: ZIPLINES -- a bronze cable from a high anchor down to a low one, a post with a lamp at each end
   const zips = []; for (const Z of SKYB.zips) if (Z.need()) { const A = Z.A, B = Z.B, c = new THREE.Mesh(new THREE.TubeGeometry(new THREE.LineCurve3(new THREE.Vector3(...A), new THREE.Vector3(...B)), 8, .04, 5), mats.bronze); g.add(c);
     for (const E of [A, B]) { const k = new THREE.Mesh(new THREE.SphereGeometry(.14, 8, 6), mats.lamp); k.position.set(...E); g.add(k); }
     if (Z.foot) { const p2 = new THREE.Mesh(new THREE.CylinderGeometry(.1, .13, B[1] + .4, 8), mats.wood); p2.position.set(B[0] + .3, (B[1] + .4) / 2, B[2]); g.add(p2); }     // m1193: a post at a street end
-    const z = { A, B }; ZIPS.push(z); zips.push(z); n++; }
-  if (tris.length) bldTris(O, tris);
-  for (const o of g.children) if (o.isMesh && o.material !== flag) o.userData.mg = 1; const nm = bldMergeStatic(g);     // m1642
-  SKYB.on = { g, O, bars: [], n, zips, uT, nm, sig: skybSig(), t: 0 };
+    c.userData.zip = 1; const z = { A, B }; zips.push(z); n++; }
+  // ---- RE-PASS 2 (m@X4@): RESTORES IN PLACE (rubric 7). Each span is two pieces, its halves (`s<i>a` from A, `s<i>b` from B: planks,
+  // hangers, the gate); FALLEN the span is snapped in the middle and each half HANGS from its own end, swung 72 deg down about the deck's
+  // cross axis; the rope rails, the flag line and the bunting (whole-length meshes) are gone, there is no walk (the plank tris ride `up`),
+  // and the zips are dead (cables hidden, out of ZIPS). RESTORED the halves swing home, colour and lamps back. Mint plate under span 1 ----
+  const whole = [], pairs = [], seg = built.map(S => { const dx = S.B[0] - S.A[0], dz = S.B[2] - S.A[2], L = Math.hypot(dx, dz); return { S, dx, dz, L, nx: -dz / L, nz: dx / L }; });
+  for (const o of g.children.slice()) { if (!o.isMesh) continue; if (o.userData.zip || (o.userData.span && (o.geometry.type === 'TubeGeometry' || o.material === flag))) { whole.push(o); continue; }
+    if (!o.userData.span) { o.userData.mg = 1; continue; } o.updateMatrix(); pairs.push([(o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()).applyMatrix4(o.matrix), o.material]); o.removeFromParent(); }
+  const near = c => { let best = null, bd = 1e9; seg.forEach((G, i) => { const u = clamp(((c.x - G.S.A[0]) * G.dx + (c.z - G.S.A[2]) * G.dz) / (G.L * G.L), 0, 1), d = Math.hypot(c.x - G.S.A[0] - G.dx * u, c.z - G.S.A[2] - G.dz * u); if (d < bd) { bd = d; best = { i, u }; } }); return bd < 3 ? best : null; };
+  const cls = c => { const h = near(c); return h ? 's' + h.i + (h.u < .5 ? 'a' : 'b') : null; };
+  const _q = new THREE.Quaternion(), _v = new THREE.Vector3(), _ax = new THREE.Vector3(), _e = new THREE.Euler();
+  const fall = (key, c) => { const G = seg[+key.slice(1, -1)], a = key.endsWith('a'), E = a ? G.S.A : G.S.B, rn = ((Math.sin(c.x * 12.9898 + c.z * 4.1) * 43758.5453) % 1 + 1) % 1;
+    _ax.set(G.nx, 0, G.nz); let th = 1.25 + rn * .12; _v.set(G.dx, 0, G.dz).multiplyScalar(a ? 1 : -1).normalize(); _q.setFromAxisAngle(_ax, th); if (_v.clone().applyQuaternion(_q).y > 0) { th = -th; _q.setFromAxisAngle(_ax, th); }
+    _v.set(c.x - E[0], c.y - E[1], c.z - E[2]).applyQuaternion(_q); _e.setFromQuaternion(_q); return { p: [E[0] + _v.x, E[1] + _v.y, E[2] + _v.z], r: [_e.x, _e.y, _e.z], hop: .25, at: rn * .5 }; };
+  const R = restoreRig(g, { lift: 0, dur: 5, bob: 0 }), pieces = restorePieces(R, g, pairs, cls, fall); restoreSkin(R);
+  const nm = bldMergeStatic(g), rtris = []; for (let i = 0; i < tris.length; i += 9) rtris.push(tris.slice(i, i + 9));
+  restoreRide(R, { up: { boxes: [], tris: rtris, climbs: [], bars: [], rings: [], objs: whole, coins: [] } });
+  R.onSet = R2 => { restoreRideSet(R2); const on = R2.t >= 1; for (const z of zips) { const i = ZIPS.indexOf(z); if (on && i < 0) ZIPS.push(z); else if (!on && i >= 0) { ZIPS.splice(i, 1); if (player.zip === z) player.zip = null; } } };
+  const ground = []; if (seg.length) { const G = seg[0], px = G.S.A[0] + G.dx * .5 + G.nx * 4, pz = G.S.A[2] + G.dz * .5 + G.nz * 4, plate = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, .12, 24), new THREE.MeshStandardMaterial({ color: 0x3a4a46, emissive: 0x7affd8, emissiveIntensity: .7 }));
+    plate.position.set(px, .06, pz); scene.add(plate); ground.push(plate); R.trig = { x: px, y: 0, z: pz, armed: 1 }; }
+  { const t0 = AGE.st === 'fallen' ? 0 : 1; R.goal = t0; restoreSet(R, t0); restoreRideSet(R, true); }
+  SKYB.on = { g, O, bars: [], n, zips, uT, nm, R, ground, pieces, sig: skybSig(), t: 0 };
   if (!n) { snd('thud', { g: .5, r: .6 }); } else { snd('clang', { g: .6, r: .9 }); }
 }
 // m1170: which spans and zips can stand right now (a string) -- when it changes (a building spawned or removed after the bridges), the
@@ -23948,7 +23966,9 @@ function skybSig() { return SKYB.spans.map(S => S.need() ? 1 : 0).join('') + SKY
 function skybStep(dt) { const S = SKYB.on; if (!S) return; S.t += dt;
   S.uT.value = S.t;
   if ((S.chk = (S.chk || 0) - dt) <= 0) { S.chk = .5; if (skybSig() !== S.sig && !player.zip) { skybClear(); skybBuild(); } } }
-function skybClear() { const S = SKYB.on; if (!S) return; for (const z of S.zips || []) { const i = ZIPS.indexOf(z); if (i >= 0) ZIPS.splice(i, 1); } if (player.zip) player.zip = null; bldClear(S); SKYB.on = null; }
+function skybClear() { const S = SKYB.on; if (!S) return; for (const z of S.zips || []) { const i = ZIPS.indexOf(z); if (i >= 0) ZIPS.splice(i, 1); } if (player.zip) player.zip = null;
+  if (S.R) { const i = RESTORE.list.indexOf(S.R); if (i >= 0) RESTORE.list.splice(i, 1); if (S.R.ride) { bldTrisDrop(S.R.ride.tb); bldTrisDrop(S.R.ride.tu); } } for (const o of S.ground || []) o.removeFromParent();     // m@X4@
+  bldClear(S); SKYB.on = null; }
 // m1172: THE CLIFF LODGE (Set 2 #15, pass 1) at (0, 47). The zen mountain samurai lodge: a 12 m ROCK CRAG (a jittered block, flat on top), a
 // PATH cut round its four faces climbing 3 m a face to the top (one lap, landings at the corners), a timber LODGE with deep eaves on the
 // summit, a WATERFALL pouring off the east face (you walk through it on the path) into a pool at its foot, and a PERCH beam out over the
@@ -28211,7 +28231,7 @@ const BLDG = { list: [
   { key: 'bath', t: 'Bathhouse', sub: 'sliding shoji to tear through, a pool that heals and erupts when you strike the boiler valve, a veranda, a smoking chimney', pass: 4, build: () => bathBuild(), rig: () => BATH.on && BATH.on.R, clear: () => bathClear(), on: () => !!BATH.on, step: dt => bathStep(dt) },
   { key: 'fwork', t: 'Forge-Workshop', sub: 'a furnace that breathes fire when you strike the bellows, a trip-hammer that flattens you, a loft, a crane that swings a bar round', pass: 4, build: () => fworkBuild(), rig: () => FWORK.on && FWORK.on.R, clear: () => fworkClear(), on: () => !!FWORK.on, step: dt => fworkStep(dt) },
   { key: 'sphang', t: 'Spider-Bot Hangar', sub: 'an enemy hall of sandstone and black tile, spider bots that climb every building and pounce on you from walls and roofs, hatching from their pods (smash them)', pass: 4, build: () => sphangBuild(), clear: () => sphangClear(), on: () => !!SPHANG.on, step: dt => sphangStep(dt) },
-  { key: 'skyb', t: 'Sky Bridges', sub: 'rope bridges and ziplines linking the buildings up high (they appear as the buildings do); pull back on a zip to brake', pass: 4, build: () => skybBuild(), clear: () => skybClear(), on: () => !!SKYB.on, step: dt => skybStep(dt) },
+  { key: 'skyb', t: 'Sky Bridges', sub: 'rope bridges and ziplines linking the buildings up high (they appear as the buildings do); pull back on a zip to brake', pass: 4, build: () => skybBuild(), rig: () => SKYB.on && SKYB.on.R, clear: () => skybClear(), on: () => !!SKYB.on, step: dt => skybStep(dt) },
   { key: 'cliff', t: 'Cliff Lodge', sub: 'a rock crag, a path up it with boulders rolling down (strike the cradle lever to tip one yourself), a lodge, a waterfall, pines', pass: 4, build: () => cliffBuild(), clear: () => cliffClear(), on: () => !!CLIFF.on, step: dt => cliffStep(dt) },
   { key: 'keep', t: 'Moated Keep', sub: 'a keep in a moat with a bronze eel in it, a drawbridge (gong outside, winch inside), archers, a sentry gun', pass: 4, build: () => keepBuild(), clear: () => keepClear(), on: () => !!KEEP.on, step: dt => keepStep(dt) },
   { key: 'barr', t: 'Robot Barracks', sub: 'a barracks, robot samurai drilling in step to the drill master\'s taiko -- step into the yard and they come for you; cut down the big drill master and the drill stops', pass: 4, build: () => barrBuild(), clear: () => barrClear(), on: () => !!BARR.on, step: dt => barrStep(dt) },
