@@ -18,6 +18,16 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - Plate beside the first wreck; `rig` hook; `zepClear` drops the rig and the plate.
 Render-checked headless: fallen (grounded, deflated) and restored (flying). A first restored shot rendered the planks black: that is
 the headless same-tick shader compile, and it renders correctly after a wait. Shipped unverified.
+## m15xx -- The First Beacon pass 7: the wall jump taught in four beats (and a silent build failure caught)
+- B -> C is now `chim:3|1 TEACH`, `chim:6|2 DEVELOP`, `chimjump:4|3 TWIST`, `chim:7|4 CONCLUDE` (+20, B 4 -> C 24). A spec's `|label` puts the beat on
+  its sign. Kicks per chimney from the move table: the first catch off a run jump is at 2.82 m, then +2.07 a kick (`MOVEC.wall_chain` comfy 1.66).
+- **`chim` has a FLOOR at its foot now** (between the walls, 2.25 m each side, so the walls do not stand on it -- the audit flagged the first, 4.6 m
+  wide floor as 10 headroom BAD): a missed kick drops him back to the start of that chimney, not to the canyon floor.
+- **`chimjump`, the twist:** no floor, the mouth 4 m across a gap; run, jump INTO it, catch a wall in the air, kick up. A miss is the canyon floor
+  and a ladder (the audit's fail-forward rule covers it).
+- **A BUILD THAT THROWS WAS SILENT:** `dry()` gave the chunk a different box list from the one its kit pushed into, so `chim` tagging its floor
+  threw, `beaconBuild` died, and nothing said so (no level, no error, the headless wait timed out). The frame's call is wrapped now: a throw
+  says `BEACON THREW <message>` (note -> the chip) and stops retrying.
 
 ## m1571 -- THE RE-PASS: the ZEPPELINS, pass 1 (HERO flyers: the look)
 **Moves:** its pass-1 row.
