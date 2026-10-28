@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the SHRINE, pass 1 (a HERO / TOWN place: the look)
+The Shrine is on the HERO / TOWN list (hero kit, restored in place later). **Moves:** its pass-1 row (the look). Restoring in place is pass 2.
+- Materials: a stone-block triMat for the terrace, steps and coping (two tones); plain warm plaster on the honden; `K.timber`, `K.redL`,
+  `K.iron`, `K.lamp`; `bldRoof`'s flat blue tiles swapped for the `roof_tiles` triMat, with bronze ridge finials; the suzu bell is `K.bronze`.
+  **`K.cream` (the sandstone map) was tried first and read as purple-spotted sponge over a 21 m terrace**; it is fine at trim scale and not
+  as a floor or a wall.
+- The core, its pool and the kitsune eyes are Jinra mint (`0x7affd8`), not cyan.
+- The pink alien tree (a tube plus glowing pods) is gone; a CHERRY stands on its collider. Plus a row of bamboo behind the honden, a cherry
+  and a pine off the corners, grass, ferns, stones, flowers and tall grass round the foot (the steps' approach kept clear), and a ring round
+  the pond. One `plantFlush`; `plantDrop` on clear.
+- Bunting (`korBunting`) from the honden's front eaves to the top lanterns, and across the torii.
+- Every static `add` is `mg` and merged; the smash barrels and pots are un-flagged (they hide and come back). 114 meshes under the group.
+Render-checked headless (front, terrace). **Still open:** fallen/restored in place (pass 2); the drone is still the sci-fi one. Shipped unverified.
+
 ## m1537 -- the straw targets stop a shot (dojo pass 20)
 m1531's targets had no box, so a bolt flew through them. `stepBolts` now asks `dojoShot(b)` beside the `AIRT` orbs: the bolt's ball against the straw's
 cylinder (r .27, y .3-2.15, only while the target is up), and the shot dies there. A bolt is one blow, knocked along `b.vel`; a rocket is `DTRAIN.hp`
@@ -20,6 +34,7 @@ in the sky and only show once it is up (t > .99); the smoke and falls show past 
 sky set shifted down by L) and `gjinraBoxes` swaps them at the ends -- nothing collides mid-flight (riding colliders are still not in the kit).
 The refinery's triangle floors are gone: its boxes are its floors now. Render: fallen / mid / restored from the south-east, all three right.
 Box moved: refinery pass 2. Open: pass 3 (interior, the vendor), the fallen ruin pass. Shipped unverified on the phone.
+
 ## m1535 -- THE RE-PASS: the GATEHOUSE, pass 3 (detail and verticality; its third pass, so the loop moves on)
 **Moves:** the Gatehouse's pass-3 row (detail, verticality). The roofline was flat, so this pass gives it a classical silhouette.
 - **Two YAGURA** on the deck, one over each tower: lacquer posts (solid), a gold beam band, a two-tier black-tile hip roof (`E.roof`, an open

@@ -21683,10 +21683,12 @@ function shrineBuild() {
   if (SHRINE.on) return; const k = SHRINE.scale || 1, A = Object.assign({}, SHRINE, { W: SHRINE.W * k, D: SHRINE.D * k, H: SHRINE.H * k }), [cx, cz] = A.at;
   A.steps = Math.max(SHRINE.steps, Math.ceil(A.H / .3)); const H = A.H, hw = A.W / 2, hd = A.D / 2, g = new THREE.Group(); scene.add(g);
   const O = { meshes: [], boxes: [], walls: [] };
-  const stone = new THREE.MeshStandardMaterial({ color: 0x9a948c, roughness: .95 }), stoneD = new THREE.MeshStandardMaterial({ color: 0x77726b, roughness: .95 }), wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 });
-  const verm = new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .45 }), black = new THREE.MeshStandardMaterial({ color: 0x17130f, roughness: .6 }), plaster = new THREE.MeshStandardMaterial({ color: 0xeae6de, roughness: .9 });
-  const lamp = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false });
-  const add = (geo, m, x, y, z, solid) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; g.add(o);
+  // m@X4@ (the RE-PASS, pass 1): a HERO / TOWN place -- the hero kit in painted maps: sandstone terrace, stone-block steps and coping, timber,
+  // tiled roof, the kit's red and bronze; the core is Jinra mint; every static piece merges (`mg`)
+  const K = korMats(), stone = triMat('stone_blocks', { scale: 4, color: 0xeee4d4 }), stoneD = triMat('stone_blocks', { scale: 2.5, color: 0xb0a698 }), wood = K.timber;     /* the sandstone map reads as sponge at this size */
+  const verm = K.redL, black = K.iron, plaster = new THREE.MeshStandardMaterial({ color: 0xf3ead8, roughness: .9 }), tile = triMat('roof_tiles', { scale: 1.8, rough: .55, side: THREE.DoubleSide });
+  const lamp = K.lamp, MG = new Map(), put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); }, plants = [];
+  const add = (geo, m, x, y, z, solid) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; g.add(o);
     if (solid) { geo.computeBoundingBox(); const b = geo.boundingBox; O.boxes.push({ minx: x + b.min.x, maxx: x + b.max.x, miny: y + b.min.y, maxy: y + b.max.y, minz: z + b.min.z, maxz: z + b.max.z }); } return o; };
   // THE TERRACE: a solid stone block, a darker coping round its top
   add(new THREE.BoxGeometry(A.W, H, A.D), stone, cx, H / 2, cz, 1);
@@ -21712,13 +21714,14 @@ function shrineBuild() {
   for (const sx of [-1, 1]) add(new THREE.BoxGeometry(hw2 - dW, wh, .25), plaster, cx + sx * (hw2 + dW) / 2, H + wh / 2, hz - hd2, 1);
   add(new THREE.BoxGeometry(dW * 2 + .2, .4, .3), wood, cx, H + wh - .2, hz - hd2, 0);
   for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) add(new THREE.BoxGeometry(.3, wh + .2, .3), wood, cx + sx * hw2, H + (wh + .2) / 2, hz + sz * hd2, 0);
-  bldRoof(g, cx, hz, hw2 + 1.3, hd2 + 1.3, hw2 * .6, H + wh + 2.4, H + wh + .2, .55, wood);
+  bldRoof(g, cx, hz, hw2 + 1.3, hd2 + 1.3, hw2 * .6, H + wh + 2.4, H + wh + .2, .55, wood); { const n = g.children.length; g.children[n - 2].material = tile; g.children[n - 2].userData.mg = g.children[n - 1].userData.mg = 1; }
+  for (const sx of [-1, 1]) add(new THREE.ConeGeometry(.16, .7, 6), K.bronze, cx + sx * hw2 * .6, H + wh + 2.75, hz, 0);     // bronze ridge finials
   const rings = []; for (const [sx, sz] of [[-1, -1], [1, -1]]) rings.push(gringAdd(g, cx + sx * (hw2 + 1.6), H + wh + .1, hz + sz * (hd2 + 1.6)));
   // THE JIN CORE: a stone basin, a great crystal floating over it, three stones orbiting
-  const jz = cz - .5; add(new THREE.CylinderGeometry(1.5, 1.8, .7, 16), stoneD, cx, H + .35, jz, 1); add(new THREE.CylinderGeometry(1.25, 1.25, .05, 16), new THREE.MeshBasicMaterial({ color: 0x2ab8d0, toneMapped: false }), cx, H + .71, jz, 0);
+  const jz = cz - .5; add(new THREE.CylinderGeometry(1.5, 1.8, .7, 16), stoneD, cx, H + .35, jz, 1); add(new THREE.CylinderGeometry(1.25, 1.25, .05, 16), new THREE.MeshBasicMaterial({ color: 0x3fd8b0, toneMapped: false }), cx, H + .71, jz, 0);
   const core = new THREE.Group(); core.position.set(cx, H + 3, jz); g.add(core);
-  const crys = new THREE.Mesh(new THREE.OctahedronGeometry(1, 0), new THREE.MeshBasicMaterial({ color: 0x5ff2ff, toneMapped: false })); crys.scale.set(.75, 1.25, .75); core.add(crys);
-  const shell = new THREE.Mesh(new THREE.OctahedronGeometry(1.35, 0), new THREE.MeshBasicMaterial({ color: 0x9ff8ff, transparent: true, opacity: .18, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })); shell.scale.set(.75, 1.25, .75); core.add(shell);
+  const crys = new THREE.Mesh(new THREE.OctahedronGeometry(1, 0), new THREE.MeshBasicMaterial({ color: 0x7affd8, toneMapped: false })); crys.scale.set(.75, 1.25, .75); core.add(crys);
+  const shell = new THREE.Mesh(new THREE.OctahedronGeometry(1.35, 0), new THREE.MeshBasicMaterial({ color: 0xb8ffea, transparent: true, opacity: .18, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })); shell.scale.set(.75, 1.25, .75); core.add(shell);
   const orb = []; for (let k = 0; k < 3; k++) { const st = new THREE.Mesh(new THREE.DodecahedronGeometry(.28, 0), stoneD); st.castShadow = true; g.add(st); orb.push(st); }
   // ---- PASS 2 (m1141): the koi pond, the stone beam, sake barrels and offering pots to smash, the core HEALS ----
   // THE KOI POND, west of the steps: a stone rim, dark water, koi circling, stepping stones across it
@@ -21735,10 +21738,10 @@ function shrineBuild() {
     bldTris(O, [bx0, H, bz - w, bx1, H, bz - w, bx1, H, bz + w, bx0, H, bz - w, bx1, H, bz + w, bx0, H, bz + w]); }
   // SAKE BARRELS (komodaru, straw-wrapped, a red band) by the honden and OFFERING POTS at the terrace's front corners -- smash them
   const smash = []; { const straw = new THREE.MeshStandardMaterial({ color: 0xd8c896, roughness: .95 }), band = new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .6 }), clay = new THREE.MeshStandardMaterial({ color: 0x5a4a3c, roughness: .7 });
-    for (const [dx, dz] of [[-5, 3.4], [-5.9, 3.4], [-5.45, 4.3], [5, 3.4], [5.9, 3.4], [5.45, 4.3]]) { const x = cx + dx * k, z = cz + dz * k, m = add(new THREE.CylinderGeometry(.42, .42, .9, 12), straw, x, H + .45, z, 0);
+    for (const [dx, dz] of [[-5, 3.4], [-5.9, 3.4], [-5.45, 4.3], [5, 3.4], [5.9, 3.4], [5.45, 4.3]]) { const x = cx + dx * k, z = cz + dz * k, m = add(new THREE.CylinderGeometry(.42, .42, .9, 12), straw, x, H + .45, z, 0); m.userData.mg = 0;
       const bd = new THREE.Mesh(new THREE.CylinderGeometry(.43, .43, .18, 12), band); bd.position.y = .1; m.add(bd);
       smashAdd(smash, m, { minx: x - .42, maxx: x + .42, miny: H, maxy: H + .9, minz: z - .42, maxz: z + .42 }, 2, 15, [.85, .78, .55]); }
-    for (const [dx, dz] of [[-5.8, -4.8], [5.8, -4.8], [-6.2, -3.9], [6.2, -3.9]]) { const x = cx + dx * k, z = cz + dz * k, m = add(new THREE.SphereGeometry(.38, 12, 10), clay, x, H + .36, z, 0); m.scale.y = 1.15;
+    for (const [dx, dz] of [[-5.8, -4.8], [5.8, -4.8], [-6.2, -3.9], [6.2, -3.9]]) { const x = cx + dx * k, z = cz + dz * k, m = add(new THREE.SphereGeometry(.38, 12, 10), clay, x, H + .36, z, 0); m.userData.mg = 0; m.scale.y = 1.15;
       smashAdd(smash, m, { minx: x - .38, maxx: x + .38, miny: H, maxy: H + .8, minz: z - .38, maxz: z + .38 }, 1, 12, [.45, .36, .28]); } }
   // ---- PASS 3 (m1142): the polish -- a shimenawa and a suzu bell on the honden, a glowing alien tree, cables and a drone ----
   { const straw = new THREE.MeshStandardMaterial({ color: 0xc9b07a, roughness: 1 }), paper = new THREE.MeshStandardMaterial({ color: 0xf4f1ea, roughness: .9, side: THREE.DoubleSide });
@@ -21747,22 +21750,29 @@ function shrineBuild() {
     const sg = []; for (let k = 0; k < 4; k++) { const q = new THREE.PlaneGeometry(.2, .24); q.translate(k % 2 ? .05 : -.05, -.12 - k * .23, 0); sg.push(q); } const shide = mergeGeometries(sg);
     for (const u of [.15, .38, .62, .85]) { const p0 = pts[Math.round(u * 16)]; add(shide, paper, p0.x, p0.y - .12, p0.z, 0); }
     // the SUZU: a bronze bell over the door on a red-and-white rope
-    add(new THREE.SphereGeometry(.22, 12, 10), new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .9, roughness: .3 }), cx, H + wh - .75, hz - hd2 - .35, 0);
+    add(new THREE.SphereGeometry(.22, 12, 10), K.bronze, cx, H + wh - .75, hz - hd2 - .35, 0);
     for (let k = 0; k < 6; k++) add(new THREE.CylinderGeometry(.05, .05, .32, 6), k % 2 ? paper : new THREE.MeshStandardMaterial({ color: 0xc8341f }), cx, H + wh - 1.1 - k * .3, hz - hd2 - .35, 0); }
   // THE ALIEN TREE on the terrace's back-left corner: a twisting trunk and a canopy of glowing pods (two merged meshes)
-  { const tx = cx - hw + 1.6, tz = cz + hd - 1.6, tp = []; for (let k = 0; k <= 8; k++) { const u = k / 8; tp.push(new THREE.Vector3(tx + Math.sin(u * 4) * .6 * u, H + u * 5.5, tz + Math.cos(u * 3) * .4 * u)); }
-    add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(tp), 24, .26, 7), new THREE.MeshStandardMaterial({ color: 0x3a2a30, roughness: .9 }), 0, 0, 0, 0);
-    O.boxes.push({ minx: tx - .4, maxx: tx + .4, miny: H, maxy: H + 4, minz: tz - .4, maxz: tz + .4 });
-    const pods = []; let sd = 3; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647; const top = tp[8];
-    for (let k = 0; k < 26; k++) { const a = rnd() * 6.28, r = rnd() * 2.2, q = new THREE.IcosahedronGeometry(.28 + rnd() * .3, 0); q.translate(top.x + Math.cos(a) * r, top.y - .4 + rnd() * 1.4 - r * .3, top.z + Math.sin(a) * r); pods.push(q); }
-    add(mergeGeometries(pods), new THREE.MeshBasicMaterial({ color: 0xff7ad8, toneMapped: false }), 0, 0, 0, 0).castShadow = false; }
+  // m@X4@: the old pink alien tree is now a CHERRY on the terrace's back-left corner, with bamboo behind the honden, moss, ferns and flowers on
+  // the terrace, grass, stones and flowers round its foot and the pond
+  { const tx = cx - hw + 1.6, tz = cz + hd - 1.6; plantPlant(plants, 'cherry', tx, H, tz, 1.7, .4); O.boxes.push({ minx: tx - .4, maxx: tx + .4, miny: H, maxy: H + 4, minz: tz - .4, maxz: tz + .4 });
+    plantPlant(plants, 'cherry', cx + hw + 3.5, 0, cz + hd + 2.5, 1.5, 2); plantPlant(plants, 'pine', cx - hw - 4, 0, cz + hd - 2, 1.4, 1);
+    for (let i = 0; i < 9; i++) plantPlant(plants, 'bamboo', cx - hw2 - 1 + i * (hw2 * 2 + 2) / 8, H, cz + hd - .7, .9 + (i % 3) * .15, i);
+    let sd = 11; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+    for (let i = 0; i < 46; i++) { const side = i % 4, u = rnd() * 2 - 1, d = 1 + rnd() * 3, x = side < 2 ? cx + u * (hw + 2) : cx + (side === 2 ? 1 : -1) * (hw + d), z = side < 2 ? cz + (side ? 1 : -1) * (hd + d) : cz + u * (hd + 1);
+      if (side === 0 && Math.abs(x - cx) < 5 * k / 2 + 1.2) continue; plantPlant(plants, ['grass', 'fern', 'stones', 'flowers', 'tallgrass'][i % 5], x, 0, z, .8 + rnd() * .6, rnd() * 6); }
+    for (let i = 0; i < 12; i++) { const a = i / 12 * 6.28; plantPlant(plants, i % 3 ? 'grass' : 'flowers', pond[0] + Math.cos(a) * (pr + .7), 0, pond[1] + Math.sin(a) * (pr + .7), .8, a); }
+    for (const [dx, dz, kd] of [[-.42, .3, 'fern'], [.42, .3, 'fern'], [-.45, -.35, 'flowers'], [.45, -.35, 'flowers'], [-.2, .42, 'grass'], [.2, .42, 'grass']]) plantPlant(plants, kd, cx + dx * A.W, H, cz + dz * A.D, .9, dx * 9); }
+  // BUNTING: red-and-cream pennants from the honden's front eaves out to the top lanterns, and across the torii's nuki
+  for (const sx of [-1, 1]) korBunting(put, K, [cx + sx * (hw2 + 1.2), H + wh + .1, hz - hd2 - 1.2], [cx + sx * 3.4 * k, H + 2.6, cz - hd + 1], 9, .9);
+  korBunting(put, K, [cx - 2.6 * k, 6.2 * k - 1.3, zFoot - 1.6 * k - .2], [cx + 2.6 * k, 6.2 * k - 1.3, zFoot - 1.6 * k - .2], 8, .5);
   // cables from the honden's back eaves to stakes, and a drone over the terrace
   for (const sx of [-1, 1]) { const E = [cx + sx * (hw2 + 1.2), H + wh + .2, hz + hd2 + 1.2], G = [cx + sx * (hw + 6), .3, cz + hd + 6]; bldCable(g, E, G, 1.4, 4, lamp); add(new THREE.CylinderGeometry(.08, .1, .8, 6), wood, G[0], .4, G[2], 0); }
   const drone = bldDrone(g);
   for (const b of O.boxes) BOXES.push(b); boxGrid();
   // ---- PASS 4 (m1177): two stone KITSUNE (fox guardians) at the head of the steps whose glowing eyes and heads turn to WATCH him; an
   // OFFERING BOX before the honden -- strike it and gold coins burst out with a chime; a board of hanging EMA plaques that swing ----
-  const foxes = []; { const st = new THREE.MeshStandardMaterial({ color: 0xb8b2a8, roughness: .95 }), eyeM = new THREE.MeshBasicMaterial({ color: 0xff8a2a, toneMapped: false }), bib = new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .8 });
+  const foxes = []; { const st = stone, eyeM = new THREE.MeshBasicMaterial({ color: 0x7affd8, toneMapped: false }), bib = new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .8 });
     for (const sx of [-1, 1]) { const fx = new THREE.Group(); fx.position.set(cx + sx * 3.2 * k, H, cz - hd + 2.1); g.add(fx);
       const ped = new THREE.Mesh(new THREE.BoxGeometry(1, .7, 1), stoneD); ped.position.y = .35; fx.add(ped);
       const body = new THREE.Mesh(new THREE.SphereGeometry(.42, 12, 10), st); body.scale.set(.8, 1.1, 1.1); body.position.y = 1.15; fx.add(body);
@@ -21793,7 +21803,9 @@ function shrineBuild() {
     const stand = new THREE.Mesh(new THREE.BoxGeometry(.6, .5, .6), rk); stand.position.set(kuji.x, H + .25, kuji.z); g.add(stand); O.boxes.push({ minx: kuji.x - .3, maxx: kuji.x + .3, miny: H, maxy: H + .5, minz: kuji.z - .3, maxz: kuji.z + .3 }); BOXES.push(O.boxes[O.boxes.length - 1]); boxGrid();
     kuji.rx = kuji.x - 1.2; for (const s2 of [-1, 1]) { const p2 = new THREE.Mesh(new THREE.BoxGeometry(.08, 1.6, .08), rk); p2.position.set(kuji.rx + s2 * .9, H + .8, kuji.z); g.add(p2); }
     for (const y of [1.1, 1.45]) { const c = new THREE.Mesh(new THREE.CylinderGeometry(.015, .015, 1.8, 4).rotateZ(Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xc8341f })); c.position.set(kuji.rx, H + y, kuji.z); g.add(c); } kuji.H = H; }
-  SHRINE.on = { A, g, O, bars: [], rings, core, crys, shell, orb, t: 0, koi, pond, pr, smash, healT: 0, drone, wispT: 0, foxes, obox, ema, obT: 0, fg, veil, warpCd: 0, kuji };
+  for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list.map(q => { const n = q.index ? q.toNonIndexed() : q; for (const a2 of Object.keys(n.attributes)) if (a2 !== 'position' && a2 !== 'normal') n.deleteAttribute(a2); if (!n.attributes.normal) n.computeVertexNormals(); return n; })), m); o.castShadow = o.receiveShadow = true; g.add(o); }
+  bldMergeStatic(g); const plantMs = plantFlush(g, plants);
+  SHRINE.on = { plantMs, A, g, O, bars: [], rings, core, crys, shell, orb, t: 0, koi, pond, pr, smash, healT: 0, drone, wispT: 0, foxes, obox, ema, obT: 0, fg, veil, warpCd: 0, kuji };
   arenaBeam(cx, cz, [.5, .9, 1], 1); snd('clang', { g: .6, r: 1.1 });
 }
 function shrineWarp(S, dt) { const p = player, live = !!STORII.on; S.veil.material.color.setHex(live ? 0x7ff0ff : 0x404850); S.veil.material.opacity = live ? .3 + Math.sin(S.t * 3) * .12 : .12;
@@ -21826,7 +21838,7 @@ function shrineKuji(x, y, z, rad) { const S = SHRINE.on; if (!S || !S.kuji || S.
   const m = new THREE.Mesh(new THREE.PlaneGeometry(.12, .4), new THREE.MeshStandardMaterial({ color: luck === 'bad' ? 0xd8d0f0 : 0xf4f1ea, side: THREE.DoubleSide, emissive: luck === 'great' ? 0x3a2a00 : 0 })); S.g.add(m);
   const n = K.slips.length % 12; K.slips.push({ m, fly: .8, to: [K.rx - .75 + (n % 6) * .3, K.H + (n < 6 ? 1.1 : 1.45) - .2] }); if (K.slips.length > 12) { const o = K.slips.shift(); o.m.removeFromParent(); }
   return 1; }
-function shrineClear() { const S = SHRINE.on; if (!S) return; smashDrop(S.smash); bldClear(S); SHRINE.on = null; }
+function shrineClear() { const S = SHRINE.on; if (!S) return; smashDrop(S.smash); if (S.plantMs) plantDrop(S.plantMs); bldClear(S); SHRINE.on = null; }
 // m1143: THE RAMPART WALL (BUILDINGS.md #7, pass 1) at (0, -24). A 40 m stone wall, 4.2 m high and 3 m thick, its top a walkway behind a row
 // of MERLONS (crenels) on the outer side; a GATEWAY in the middle closed by a breakable timber-and-plaster panel (smash through) under a
 // lintel the walkway runs over; a RAMP up the inner face at each half; and at each end a BASTION 1.5 m higher (steps up from the
