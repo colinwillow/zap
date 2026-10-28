@@ -37,7 +37,7 @@ controls locomotion on the ground and in the air; right stick still controls the
 - In `hop` / `hover` the left pad steers as on the ground, gentler (`airSp` 7); in `fly` it is the wingsuit stick as before.
 - **Getting off** moved to the LEFT pad's double tap (`dragTapL` -> `dragTap`); the left tap no longer beats the wings.
 **Moves:** nothing ticked -- his feel of the new map. Gates: check ok, zone boot ok. Shipped unverified.
-## m15xx -- THE SNOWFIELD: the katana was buried, now it cuts the snow
+## m1628 -- THE SNOWFIELD: the katana was buried, now it cuts the snow
 His (first time in the snowfield: *"might be my favorite thing of all time... expand on that"*): *"the katana -- it's not showing the sword, a weird
 rendering issue."* Measured headless: the hero stands at y 0 and the snow surface is at `SNOWZ.depth` .55 (he WADES; that is the design), and the
 katana's meshes sat at .38-.48 m in his hand at rest -- under the surface. Nothing was mis-rendered; the blade was in the snow.

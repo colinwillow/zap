@@ -10352,7 +10352,7 @@ function snowStep(dt) { const Z = SNOWZ, A = Z.air, p = player; if (!A) return; 
       if (_snF.y < snowAt(_snF.x, _snF.z) * Z.depth + .05) { const before = snowAt(_snF.x, _snF.z); snowStamp(_snF.x, _snF.z, Z.foot, .08); if (before > .4 && sp > .5 && Math.random() < .5) snowPuff(_snF.x, before * Z.depth, _snF.z, 3, 1.6, 1.2); } }
     if (sp > .4 && p.grounded) snowStamp(p.pos.x, p.pos.z, Z.plough * Math.min(1, sp / 4), .3);
     if (p.roll) snowStamp(p.pos.x, p.pos.z, .7, .05);
-    // m15xx (his: *"in the snow sandbox the katana -- it's not showing the sword, a weird rendering issue"*): it was not rendering wrong, it was
+    // m1628 (his: *"in the snow sandbox the katana -- it's not showing the sword, a weird rendering issue"*): it was not rendering wrong, it was
     // BURIED -- he wades with his feet on the ground under .55 m of snow, and a blade held low dips under the surface and vanishes. Now whatever
     // he holds CUTS the snow: the low corners of every weapon mesh in his hand, wherever they go under the surface, carve a groove (and a fast
     // swing throws powder), so the blade always shows and a cut through deep snow leaves its slash.
