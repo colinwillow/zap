@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home pass 26 (Worker B): the RESTORATION, live -- one set of pieces, fallen to restored on a plate
+- His (relayed, and here): *"the opposite of fallen... the same pieces, so we can animate it... pieces moving in and fixing themselves"*, then the correction: *"not every building flies... the ground will be flying"*. Most buildings REVIVE in place, chunks of earth lift, ship-like buildings fly. So the home revives in place.
+- **Chunks by vertex attribute, so the merges stay.** `put` tags every piece with `aChunk` (0 to 9, by where its bounding-box middle lands: `A.chunkOf`) and grows that chunk's bounds. Every home material gets an `onBeforeCompile` (its own kept: triplanar, wind, sway) that moves `transformed` and `objectNormal` by `uCh[aChunk]`. **Still 35 draws.** Chunk 0 (the mound, rocks, plants, paths, pier) never moves.
+- **Main's RESTORE kit drives it.** `ghomeRestoreRig` makes one stand-in `Object3D` per chunk at its bottom-centre pivot (the RESTORED pose) and gives each a FALLEN pose with `restorePiece`:
+  - the crown drops 3.4 m and tilts;
+  - the turret topples 6 m with a 0.4-rad roll;
+  - the stalls cave forward;
+  - the front frame falls flat forward;
+  - the crane falls over;
+  - the hall, tower and store settle and lean.
+  `at` staggers them in order. `ghomeRestoreSync` copies `T(stand-in) R(stand-in) T(-pivot)` into `uCh` every frame (from `ghomeSmoke`, which `homeStep` calls). Every material is `restoreMat`ed with a rust (metal to 0x6e4632, the rest pulled 70% to 0x6a5a4a, x .75). The kit's `R.g` is a scene-less group, so its lift (0) and hover never move him.
+- **The plate**: a mint disc on the front path (local (3.2, 8.4)) is the rig's `R.trig`. Step on it and the show plays (8 s). Step again and he falls. The fires, lanterns and smoke come on only once he is whole (t > .95). The orb and its cable hide while fallen.
+- **Start state** from AGE (`hsF()`: FALLEN unless RESTORED was chosen); `?hs=` for a look. The home is no longer `bldAge`-weathered; the rig owns his colour. Rendered headless at t 0 / .45 / 1: a slumped ruin, pieces in flight, whole.
+- **Not yet**: the colour flood is faint (a tint over still-saturated maps), colliders stay in the RESTORED pose, no Jinra burst or sound in the show beyond the kit's own. Those are pass 27.
 ## The Red Hollows' FALLEN / RESTORED switch, pass 1 (Worker B)
 - His design (KORAJIN.md "THE RESTORATION": the world starts fallen, rusty, a Western frontier over broken samurai ruins, and you restore it), and his answer here: *"everything's gonna be fallen."* So the default is **FALLEN**.
 - **The switch is main's `AGE` (m1501), which landed at the same moment.** My own HSTATE and its TOOLS button were folded into it on the rebase: one state, one switch (**SPAWN > BUILDINGS > STATE**, which now also reloads when he is in the Red Hollows, because these pieces read the state as they build). `?hs=` overrides it for a look. **The default is FALLEN** unless RESTORED was chosen (`mel.age`), which was his answer.
