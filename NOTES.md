@@ -52,6 +52,19 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
+## THE DOJO, PASS 13: THE FLAGSHIP COMES TO THE ALTAR (mXXXX)
+*"Do we have my flying ship in there? It would be cool to see it slowly traversing the islands, and maybe be able to reach it -- and other flying ships of lesser calibre."*
+- **His ship:** its model lives inside `shipBuild`, tangled with the sea, colliders, climbs and spawn, and Worker A is still editing it. Rather than cut into it, I ASKED Worker A for a `shipModel(opts)` returning `{ g, deckY, deck boxes }`, MODULE-SCOPE safe. Until it lands, `mkJunk(3, big)` stands in, with a timber deck plank.
+- **The route (`dojoFlagPath`, a 150 s cycle):**
+  - cruise a loop at r 125 ±18, y 20 ±8 (100 s): clears the halls (min r 107 against their 89) and passes over the pagoda island
+  - sail in to the north (15 s)
+  - park broadside at `dockR` = altar r + 3.4 + the half-beam, deck at the altar's y (25 s): a .5 m hop from the disc
+  - sail out (10 s)
+  - The heading is damped toward the path's motion, broadside while docked. It starts arriving (t 112), so the first thing he sees is the ship pulling in.
+- **Standing on it:** the deck is a TURNED dynamic box (`BDYN`, ADOCK's `{dyn, hx, hz, lz, cs, sn}` form), pushed on the first frame (the TDZ rule). `dojoFlagStep` carries him: his position goes into the deck's old frame and out of the new one, so the turn carries him too, and his heading turns with it.
+- **Escorts:** `mkJunk` is shared. The escorts get a bowsprit, a stern lantern, masthead pennants and a bunting run between the masts. There is a 4th, nearer junk (r 120, y 34).
+- **Not tested here:** standing on the deck as it moves. The carry math is the inverse of the pose (checked by hand), and nothing headless can walk him on it.
+
 ## HIS SECOND PANORAMA IS THE PANO SKY; TOOLS > SKY CYCLES THREE (m1453)
 *"I made this HDR a little more similar to what the game already was -- try this one instead."*
 - **The image:** `textures/sky_sunset_02.webp` (92 KB), lavender sky, peach clouds, a sea of cloud. Sun MEASURED at u .343, v .601, so `uOff` -.081 and `vOff` -.165.

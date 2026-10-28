@@ -10657,7 +10657,7 @@ function dojoBuild(g, W) {
     const spiralTex = (() => { const cv = document.createElement('canvas'); cv.width = cv.height = 256; const c = cv.getContext('2d'); c.fillStyle = '#b3201c'; c.fillRect(0, 0, 256, 256); c.strokeStyle = '#efe2c8'; c.lineWidth = 12; c.beginPath();
       let x = 128, y = 128, L = 14, dir = 0; c.moveTo(x, y); for (let i = 0; i < 10; i++) { x += [1, 0, -1, 0][dir] * L; y += [0, 1, 0, -1][dir] * L; c.lineTo(x, y); dir = (dir + 1) % 4; if (i % 2) L += 26; } c.stroke(); c.lineWidth = 6; c.beginPath(); c.rect(20, 20, 216, 216); c.stroke();
       const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t; })(), sailM = new THREE.MeshStandardMaterial({ map: spiralTex, roughness: .85, side: THREE.DoubleSide });
-    for (const [r, y, w, ph, s] of [[150, 18, .035, 0, 1.4], [210, -6, -.024, 2.2, 1.1], [260, 30, .018, 4.1, 1.8]]) { const J = new THREE.Group(), MG2 = new Map(), p2 = (geo, m) => { if (!MG2.has(m)) MG2.set(m, []); const q = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal' && k !== 'uv') q.deleteAttribute(k); if (!q.attributes.uv) q.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(q.attributes.position.count * 2), 2)); MG2.get(m).push(q); };
+    const mkJunk = (s, big) => { const J = new THREE.Group(), MG2 = new Map(), p2 = (geo, m) => { if (!MG2.has(m)) MG2.set(m, []); const q = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal' && k !== 'uv') q.deleteAttribute(k); if (!q.attributes.uv) q.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(q.attributes.position.count * 2), 2)); MG2.get(m).push(q); };
       const hull = new THREE.BoxGeometry(3.2, 2, 12, 2, 2, 8); const P = hull.attributes.position; for (let i = 0; i < P.count; i++) { const z = P.getZ(i), yv = P.getY(i), t = Math.abs(z) / 6, tap = 1 - Math.pow(t, 3) * .75; P.setX(i, P.getX(i) * tap * (yv < 0 ? .7 : 1)); P.setY(i, yv + Math.pow(t, 2) * 1.2 * (yv > 0 ? 1 : .4)); } hull.computeVertexNormals(); p2(hull, hullM);
       p2(new THREE.BoxGeometry(3.3, .35, 11).translate(0, .55, 0), K.redL); p2(new THREE.BoxGeometry(2, 1.4, 2.6).translate(0, 1.7, -3.6), K.timber); p2(dojoRoof(3, .9, .5, .5).translate(0, 2.4, -3.6), K.timber);
       for (const [mz, mh] of [[1.5, 8], [-1, 6]]) { p2(new THREE.CylinderGeometry(.1, .14, mh, 6).translate(0, 1 + mh / 2, mz), K.timber); p2(new THREE.PlaneGeometry(3.6, mh * .6).translate(0, 1.6 + mh * .55, mz + .2), sailM);
@@ -10665,7 +10665,20 @@ function dojoBuild(g, W) {
       for (const sd of [-1, 1]) { p2(new THREE.CylinderGeometry(.35, .45, 1.6, 10).rotateX(Math.PI / 2).translate(sd * 1.9, -.2, -5), K.bronze); p2(new THREE.CylinderGeometry(.2, .2, .05, 10).rotateX(Math.PI / 2).translate(sd * 1.9, -.2, -5.85), K.lamp); }
       for (const z of [-5, 5]) p2(new THREE.BoxGeometry(.3, .4, .3).translate(0, 1.2, z), K.lamp);
       for (const [m, list] of MG2) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = false; J.add(o); }
-      J.scale.setScalar(s); g.add(J); D.junks.push({ J, r, y, w, a: ph, ph }); } }
+      // m1455: the escorts get a bowsprit, a stern lantern, a pennant at each masthead and a run of bunting between the masts; the FLAGSHIP a timber deck you can stand on
+      p2(new THREE.CylinderGeometry(.05, .09, 4, 6).rotateX(Math.PI / 2 - .35).translate(0, 1.6, 7.2), K.timber); p2(new THREE.BoxGeometry(.3, .4, .3).translate(0, 2.1, -6.3), K.lamp);
+      for (const [mz, mh] of [[1.5, 8], [-1, 6]]) p2(new THREE.PlaneGeometry(1.4, .35).translate(.7, 1 + mh + .1, mz), K.redL);
+      { const a0 = new THREE.Vector3(0, 8.6, 1.5), b0 = new THREE.Vector3(0, 6.6, -1), n = 7; for (let k = 0; k < n; k++) { const t = (k + .5) / n, q = a0.clone().lerp(b0, t); q.y -= Math.sin(t * Math.PI) * .5; p2(new THREE.ConeGeometry(.12, .3, 3).rotateX(Math.PI).translate(q.x, q.y - .15, q.z), k % 2 ? K.redL : K.cream || K.lamp); } }
+      if (big) p2(new THREE.BoxGeometry(3, .1, 5).translate(0, 1.02, .2), triMat('wood_timber', { scale: .9 }));
+      for (const [m, list] of MG2) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = !!big; J.add(o); }
+      J.scale.setScalar(s); g.add(J); return J; };
+    for (const [r, y, w, ph, s] of [[150, 18, .035, 0, 1.4], [210, -6, -.024, 2.2, 1.1], [260, 30, .018, 4.1, 1.8], [120, 34, -.03, 3.3, 1.2]]) D.junks.push({ J: mkJunk(s), r, y, w, a: ph, ph });
+    // m1455: THE FLAGSHIP (his: *"my flying ship -- slowly traversing the islands, and maybe be able to reach it"*). Until `shipModel()` (his Ship,
+    // Worker A) is factored out, a junk at x3 stands in. It CRUISES a wide loop round the islands (`F.T` s), sails in and parks BROADSIDE beside
+    // the north altar with its deck level with the altar's disc (`F.dock` s), then sails off -- jump across from the altar. Its deck is a TURNED
+    // dynamic box (`BDYN`, ADOCK's form) and it CARRIES him (the pose delta, turn included, applied to his feet while he stands on it).
+    { const S2 = 3, J = mkJunk(S2, 1); D.flag = { J, s: S2, deckLocal: 1.07 * S2, T: 150, cruise: 100, inn: 15, dock: 25, R: 125, Y: 20, dockR: D.altarR + 3.4 + 1.6 * S2, dockY: D.altarY - 1.07 * S2, h: Math.PI / 2, t: 112,
+      deckB: { dyn: 1, hx: 1.5 * S2, hz: 2.5 * S2, lz: .2 * S2, y0: 1.07 * S2 - .4, y1: 1.07 * S2, cs: 1, sn: 0, cx: 0, cz: 0, minx: 0, maxx: 0, minz: 0, maxz: 0, miny: 0, maxy: 0 }, last: null }; } }
   { const N = 40, prof = []; for (let i = 0; i <= N; i++) { const u = i / N, rr = Math.sin(Math.pow(u, .8) * Math.PI) * (1 - u * .45) * 3.2 + .05; prof.push(new THREE.Vector2(rr, u * 26 - 13)); }
     const body = new THREE.LatheGeometry(prof, 24).rotateX(Math.PI / 2), BP = body.attributes.position, col = new Float32Array(BP.count * 3), cc = new THREE.Color();
     for (let i = 0; i < BP.count; i++) { const x = BP.getX(i), y = BP.getY(i), z = BP.getZ(i); BP.setY(i, y * .8); const belly = y < -.4 ? 1 : 0, spot = Math.abs(y) < 1.2 && x > 0 && Math.sin(z * 1.1) > .7 ? 1 : 0;
@@ -10782,12 +10795,28 @@ function dojoStep(dt) { const D = DOJO; if (!D.on) return; D.t += dt; D.U.uTime.
   if (D.sunG) D.sunG.m.position.copy(camera.position).addScaledVector(D.sunG.d, 700);
   if (D.manta) { const Mn = D.manta; Mn.a += Mn.w * dt; const rr = Mn.r + Math.sin(Mn.a * 2) * 25; Mn.m.position.set(Math.sin(Mn.a) * rr, Mn.y + Math.sin(D.t * .35) * 5, Math.cos(Mn.a) * rr); Mn.m.rotation.set(Math.cos(D.t * .35) * .1, Mn.a - Math.PI / 2, .35); }
   if (D.whale) { const Wh = D.whale; Wh.a += Wh.w * dt; Wh.m.position.set(Math.sin(Wh.a) * Wh.r, Wh.y + Math.sin(D.t * .25) * 6, Math.cos(Wh.a) * Wh.r); Wh.m.rotation.set(Math.cos(D.t * .25) * .08, Wh.a + Math.PI / 2, 0); }
-  if (!D.dyn) { D.dyn = 1; for (const P of D.plats) BDYN.push(P.box); }
+  if (!D.dyn) { D.dyn = 1; for (const P of D.plats) BDYN.push(P.box); if (D.flag) BDYN.push(D.flag.deckB); }
+  if (D.flag) dojoFlagStep(D.flag, dt);
   for (const P of D.plats) { P.a += P.w * dt; const x = Math.sin(P.a) * P.r, y = P.y + Math.sin(D.t * .6 + P.ph) * .5, z = Math.cos(P.a) * P.r, b = P.box, p = player;
     const on = P.lx !== null && p.grounded && p.pos.x > b.minx - .05 && p.pos.x < b.maxx + .05 && p.pos.z > b.minz - .05 && p.pos.z < b.maxz + .05 && Math.abs(p.pos.y - b.maxy) < .3;
     if (on) { p.pos.x += x - P.lx; p.pos.y += y - P.ly; p.pos.z += z - P.lz; }
     b.minx = x - 1.8; b.maxx = x + 1.8; b.minz = z - 1.8; b.maxz = z + 1.8; b.miny = y - .6; b.maxy = y + .05; P.lx = x; P.ly = y; P.lz = z;
     P.m.position.set(x, y, z); P.m.rotation.y += P.w * dt * 2; } }
+// m1455: the flagship's route (a wide cruise, in to the north altar, a hold, out) and its carry
+function dojoFlagPath(F, t) { const u = ((t % F.T) + F.T) % F.T, sm = v => v * v * (3 - 2 * v); let r, y, a;
+  if (u < F.cruise) { a = u / F.cruise * Math.PI * 2; r = F.R + Math.sin(a * 3) * 18; y = F.Y + Math.sin(a * 2) * 8; }
+  else if (u < F.cruise + F.inn) { const v = sm((u - F.cruise) / F.inn); a = 0; r = F.R + (F.dockR - F.R) * v; y = F.Y + (F.dockY - F.Y) * v; }
+  else if (u < F.cruise + F.inn + F.dock) { a = 0; r = F.dockR; y = F.dockY + Math.sin(t * .6) * .06; }
+  else { const v = sm((u - F.cruise - F.inn - F.dock) / (F.T - F.cruise - F.inn - F.dock)); a = 0; r = F.dockR + (F.R - F.dockR) * v; y = F.dockY + (F.Y - F.dockY) * v; }
+  return [Math.sin(a) * r, y, Math.cos(a) * r, u >= F.cruise + F.inn - 4 && u < F.cruise + F.inn + F.dock]; }
+function dojoFlagStep(F, dt) { F.t += dt; const [x, y, z, docked] = dojoFlagPath(F, F.t), [x2, , z2] = dojoFlagPath(F, F.t + .5);
+  const want = docked ? Math.PI / 2 : Math.atan2(x2 - x, z2 - z); if (Math.hypot(x2 - x, z2 - z) > .01 || docked) F.h += wrapAngle(want - F.h) * (1 - Math.exp(-dt * .9));
+  const J = F.J, p = player, b = F.deckB, c = Math.cos(F.h), s = Math.sin(F.h);
+  if (F.last && p.grounded && Math.abs(p.pos.y - b.maxy) < .35) { const L = F.last, dx = p.pos.x - L.x, dz = p.pos.z - L.z, lc = Math.cos(-L.h), ls = Math.sin(-L.h), lx = dx * lc + dz * ls, lz = -dx * ls + dz * lc;     // in the deck's frame?
+    if (Math.abs(lx) < b.hx + .1 && Math.abs(lz - b.lz) < b.hz + .1) { const nx = x + lx * c + lz * s, nz = z - lx * s + lz * c; p.pos.x = nx; p.pos.z = nz; p.pos.y += y - L.y; p.heading += F.h - L.h; p.faceH = (p.faceH || 0) + F.h - L.h; } }
+  J.position.set(x, y, z); J.rotation.set(Math.sin(F.t * .5) * .02, F.h, Math.sin(F.t * .7) * .03);
+  b.cs = c; b.sn = -s; b.cx = x + b.lz * s; b.cz = z + b.lz * c; const ex = Math.abs(c) * b.hx + Math.abs(s) * b.hz, ez = Math.abs(s) * b.hx + Math.abs(c) * b.hz;
+  b.minx = b.cx - ex; b.maxx = b.cx + ex; b.minz = b.cz - ez; b.maxz = b.cz + ez; b.miny = y + b.y0; b.maxy = y + b.y1; F.last = { x, y, z, h: F.h }; }
 function arenaStage() {
   arenaSky();
   const R = ARENA.r, g = new THREE.Group(), L = ARENA.look; world.add(g);
