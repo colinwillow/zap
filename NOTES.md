@@ -5,6 +5,12 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## FRAME card in the Red Hollows: `TAU is not defined` in `ghomeFish` (Worker B; mine, since home pass 21)
+His phone showed the FRAME card in the Red Hollows (stack ending frameBody -> frame). Reproduced headless with a stepped walk on m1667: the
+leaping fish (`ghomeFish`, pass 21) used `TAU`, which is local to the BUILDERS, not module scope -- and the fish only leaps when its random
+timer comes round (~seconds in), so `check:worlds`' 8 frames never reach it. Every time a fish leapt, the frame threw. Fixed (Math.PI * 2).
+A scan of every top-level function for a `TAU` with no local declaration finds no other. Lesson for the boot gate: a throw behind a timer
+needs frames, not a boot -- the headless walk (scratchpad `hcrash.mjs`, 1500 stepped frames) found it in one run.
 ## m15xx -- THE DRAGON'S CONTROLS, his map (DOCKET 4)
 His: *"when you're riding, the character has the blaster again; use the stick to shoot fireballs the way RollerGirl shoots her blaster in the
 air; the right flick on the ground does melee -- lunges, bites; flicking the left stick left and right does barrel rolls, up and down flips."*
