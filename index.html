@@ -1161,7 +1161,7 @@ const MOVE = {
   // through the roll. Worse, the cancel window was `land * .45`, which is a QUARTER of the clip:
   // one nudge of the stick and you never saw it at all. **A state whose length disagrees with
   // the clip it is playing can only ever cut that clip off.**
-  landSoft: .62,     // landing_soft is 1.083 s -> x1.75, snappy
+  landSoft: .42,     // landing_soft is 1.083 s -> x2.6 (m15xx: his "I don't love it, clip it or speed it up"; was .62)
   landHard: 1.15,    // landing_hard is 1.500 s -> x1.30, so the roll actually reads
   landFree: .70,     // and only past this much of it can the stick run him out of the tail
   // how far he may travel between two collider samples, and the ceiling on how many that buys.
@@ -32220,7 +32220,10 @@ function stepPlayer(dt) {
       if (rig.actions[NINJA.jump]) playOnce(NINJA.jump, clipLen(NINJA.jump) / (2 * NINJA.jumpUp / MOVE.g));     // her jump over the whole airtime (not `flipGo`: a flip owns the body and bleeds the speed)
       snd('swoosh', { r: 1.2, g: .5 });
     }
-    else if ((p.grounded || p.coyote > 0) && !p.land) {
+    else if ((p.grounded || p.coyote > 0) && !p.knock) {     // m15xx (his: "if you've jumped and you just hit the ground you should be able to jump right
+      // back up -- I can't do my second jump until the landing animation has finished"): ON THE GROUND = A JUMP, at once. The landing clip used to
+      // gate it (`!p.land`); now the jump cuts the landing short
+      if (p.land) { p.land = 0; p.landT = 0; p.landHard = 0; }
       p.vel.y = MOVE.jump; p.grounded = false; p.coyote = 0; p.airT = 0; p.jumps = 1;
       // the same swoosh the strikes use, pitched UP and quiet -- a body leaving the ground is
       // a smaller version of the same event, and a second sample for it would be a second
