@@ -132,7 +132,7 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
-## HIS BLUE DRAGON, DRESSED AS OURS: SADDLE, COLLAR, BANDS, CAPE (mXXXX)
+## HIS BLUE DRAGON, DRESSED AS OURS: SADDLE, COLLAR, BANDS, CAPE (m1519)
 *"Embellish him: a collar, a glowing collar, wrist jewellery or armour, definitely a saddle, a cape with a red emblem."*
 - **`dojoDragonDress`:** every piece is a child of one of HIS bones (`Bip001_Spine1` saddle, `Neck1` collar, `L/R_Forearm` and `Calf` bands, `Spine2` cape), so it rides his clips.
 - **`pin` compensates the bone's world scale** (the armature is .01, and the Biped is turned) and solves the piece's turn on the REST pose (`mx.update(0)`), so the piece sits upright in his frame. A piece's own turn composes on top (the bands along the limb, the collar square to the neck from Neck1 to Neck2).
