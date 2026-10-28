@@ -69,6 +69,8 @@ dry windmill, a dull stream, a stunted central tower. The people are ordinary an
    and glow; the boats fly; the central plaza tower SHOOTS UP into the sky.
 
 **THE PROGRESSION (regions):**
+- **The whole-game skeleton (acts, regions, temples, items, collectibles) is proposed in ZELDA_STRUCTURE.md** -- the classic Zeldas picked apart, and a
+  Link's Awakening-scale plan (8 great temples over three acts: the ground, the below, the sky). His to cut.
 - **Region 1, the fallen ground** (the Red Hollows): its levels' Jinra powers YOUR SHIP until it can FLY (the ship's sea-to-air form, built).
 - **Region 2+:** pouring Jinra into a region's heart UNLOCKS A FLOATING SECTION, a whole new world above, and you fly up to explore it. The
   restored sky world (the dojo's islands are its look) is the destination, rebuilt region by region.
