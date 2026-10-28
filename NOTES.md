@@ -5,6 +5,12 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE ZEPPELINS, detail pass 8 (lights and cloth that move)
+- Four red paper CHOCHIN on cords from the roof's corners (warm emissive, iron caps), each a pivot group that sways on its own phase and leans
+  out on the turns (`Z.turnV`, the heading's rate of change, smoothed in `zepPose`).
+- A cream NOREN curtain with three red seams under the bow eave, its vertices rippled every frame like the pennant.
+Render-checked headless (close, from the pier). Shipped unverified.
+
 ## the LADDER REFACTOR, steps 2-4: on from the bottom without a snap, on FROM THE TOP, and off the top over the real climb-over clip (Worker B)
 His words (relayed): "we still need to perfect getting onto the ladder and off at the top". Built on the Ladder Yard (step 1).
 - **ON FROM THE BOTTOM** (`climbGo` -> `p.climbIn`): the latch rule is unchanged (push INTO the rungs from the FRONT, m170/m207/m1316), but he
