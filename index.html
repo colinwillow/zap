@@ -23724,7 +23724,7 @@ function sphangBuild() {
   for (let z = -hd + .6; z <= hd - .5; z += 1.2) for (const sx of [-1, 1]) add(new THREE.SphereGeometry(.06, 6, 4), E.gold, cx + sx * (hw + .01), Hb + fr / 2, cz + z, 0);
   for (const sx of [-1, 1]) add(new THREE.BoxGeometry(t + .04, .08, hd * 2 + .04), E.gold, cx + sx * (hw - t / 2), Hb + .04, cz, 0);
   // m1636 (RE-PASS 2): a JINRA SEAM in a gold frame at the outer foot of each long wall and the back wall -- the keystones (`sphangBreak`)
-  for (const sx of [-1, 1]) { add(new THREE.BoxGeometry(.12, 2.4, .9), E.gold, cx + sx * (hw + .06), 1.5, cz, 0); add(new THREE.BoxGeometry(.1, 2, .5), E.jin, cx + sx * (hw + .12), 1.5, cz, 0); }
+  for (const sx of [-1, 1]) { const z = cz + (sx > 0 ? 4.4 : 0); add(new THREE.BoxGeometry(.12, 2.4, .9), E.gold, cx + sx * (hw + .06), 1.5, z, 0); add(new THREE.BoxGeometry(.1, 2, .5), E.jin, cx + sx * (hw + .12), 1.5, z, 0); }     // m@X4@: the east seam forward of the stair
   add(new THREE.BoxGeometry(.9, 2.4, .12), E.gold, cx, 1.5, cz - hd - .06, 0); add(new THREE.BoxGeometry(.5, 2, .1), E.jin, cx, 1.5, cz - hd - .12, 0);
   // THE GATE: breakable sandstone panels either side (cwallBuild), lacquer jambs, a deep lintel with a gold band and the EMBLEM on the frieze
   const jw = .3, pl = hw - t - dw / 2 - jw;
@@ -23758,6 +23758,13 @@ function sphangBuild() {
   for (const sx of [-1, 1]) for (const z of [-3, 3]) enemyBanner(putM, E, cx + sx * (hw + .03), Hb - .1, cz + z, sx * Math.PI / 2, 1.2, 2.8);
   for (const sx of [-1, 1]) enemyBanner(putM, E, cx + sx * 2.2, Hb - .1, cz - hd - .03, Math.PI, 1.2, 2.8);
   const fires = []; for (const sx of [-1, 1]) { const bz = enemyBrazier(E, 1.2), x = cx + sx * (hw + 1.8), z = cz - hd - 1.8; bz.position.set(x, 0, z); g.add(bz); fires.push([x, bz.userData.top, z, bz.userData.flame]); }
+  // ---- RE-PASS 3 (m@X4@): THE CLIMB -- a sandstone STAIR up the east flank (14 risers of .286, treads .38: under his .357 step), every step
+  // a box from the ground that IS the drawn block; a landing at the eave (4.0 m) beside the roof's edge, a mint lantern on a lacquer post at
+  // its corner; from there the roof is the walk (its tris) up to the gold ridge, where doubloons sit (with the roof: gone when it falls) ----
+  const sx0 = cx + hw + ov + .15, sw = 1.2, nR = 14, rise = eY / nR, tread = .38, lz0 = cz - 3.6, lz1 = cz - 2;
+  add(new THREE.BoxGeometry(sw, eY, lz1 - lz0), stone, sx0 + sw / 2, eY / 2, (lz0 + lz1) / 2, 1); add(new THREE.BoxGeometry(sw + .08, .08, lz1 - lz0 + .08), E.gold, sx0 + sw / 2, eY - .04, (lz0 + lz1) / 2, 0);
+  for (let k = 1; k < nR; k++) { const y = k * rise, z0 = lz1 + (nR - 1 - k) * tread; add(new THREE.BoxGeometry(sw, y, tread), k % 2 ? stone : stoneD, sx0 + sw / 2, y / 2, z0 + tread / 2, 1); }
+  { const px = sx0 + sw - .1, pz = lz0 + .1; add(new THREE.BoxGeometry(.14, 1.6, .14), E.lacquer, px, eY + .8, pz, 1); add(new THREE.BoxGeometry(.34, .44, .34), red, px, eY + 1.82, pz, 0); add(new THREE.BoxGeometry(.42, .06, .42), E.iron, px, eY + 2.07, pz, 0); add(new THREE.ConeGeometry(.1, .3, 4), E.gold, px, eY + 2.25, pz, 0); }
   for (const b of O.boxes) BOXES.push(b); boxGrid();
   // THE SPIDERS
   const sp = []; for (let i = 0; i < A.n; i++) { const S = spiderMake(g); S.a = i / A.n * 6.28; sp.push(S); }
@@ -23793,14 +23800,15 @@ function sphangBuild() {
   const Rr = restoreRig(g, { lift: 0, dur: 2.4, bob: 0 }), pieces = restorePieces(Rr, g, pairs, cls, fall);
   { const skip = new Set([...sp.map(S2 => S2.g), ...pods, ...O.meshes, ...Object.values(pieces)]), wb = new THREE.Box3(), wc = new THREE.Vector3(), ws = new THREE.Vector3();
     for (const o of g.children.slice()) { if (skip.has(o)) continue; wb.setFromObject(o); if (wb.isEmpty()) continue; wb.getCenter(wc); wb.getSize(ws); const key = cls(wc, ws); if (key && pieces[key]) pieces[key].attach(o); } }
+  const coinsU = [coinDrop(g, cx, rY + 1.15, cz - .6), coinDrop(g, cx, rY + 1.15, cz + .6)], coinL = coinDrop(g, sx0 + sw / 2, eY + .9, (lz0 + lz1) / 2);     // m@X4@
   const nm = bldMergeStatic(g), rig = {}, bkey = b2 => b2.cw ? null : cls(new THREE.Vector3((b2.minx + b2.maxx) / 2, (b2.miny + b2.maxy) / 2, (b2.minz + b2.maxz) / 2), new THREE.Vector3(b2.maxx - b2.minx, b2.maxy - b2.miny, b2.maxz - b2.minz));
   const rtris = []; for (let i = 0; i < tris.length; i += 9) rtris.push(tris.slice(i, i + 9));
   for (const key of Object.keys(pieces)) { const Rk = rig[key] = restoreRig(g, { lift: 0, dur: 2.4, bob: 0 }); Rk.pieces = Rr.pieces.filter(P => P.obj === pieces[key]);
-    restoreRide(Rk, { up: { boxes: O.boxes.filter(b2 => bkey(b2) === key), tris: key === 'roof' ? rtris : [], climbs: [], bars: [], rings: [], objs: [], coins: [] } });
+    restoreRide(Rk, { up: { boxes: O.boxes.filter(b2 => bkey(b2) === key), tris: key === 'roof' ? rtris : [], climbs: [], bars: [], rings: [], objs: [], coins: key === 'roof' ? coinsU : [] } });
     Rk.onSet = R2 => restoreRideSet(R2); Rk.goal = 1; restoreSet(Rk, 1); restoreRideSet(Rk, true); }
   RESTORE.list.splice(RESTORE.list.indexOf(Rr), 1);
-  const sup = [{ key: 'wW', x: cx - hw - .1, z: cz, y0: 0, y1: 2.8, r: .9, hp: 6 }, { key: 'wE', x: cx + hw + .1, z: cz, y0: 0, y1: 2.8, r: .9, hp: 6 }, { key: 'back', x: cx, z: cz - hd - .1, y0: 0, y1: 2.8, r: .9, hp: 6 }];
-  SPHANG.on = { g, O, bars: [], sp, door: [cx, cz + hd + 1.5], t: 0, beacon, dish, pods, fires, nm, rig, pieces, sup, fell: {} };
+  const sup = [{ key: 'wW', x: cx - hw - .1, z: cz, y0: 0, y1: 2.8, r: .9, hp: 6 }, { key: 'wE', x: cx + hw + .1, z: cz + 4.4, y0: 0, y1: 2.8, r: .9, hp: 6 }, { key: 'back', x: cx, z: cz - hd - .1, y0: 0, y1: 2.8, r: .9, hp: 6 }];
+  SPHANG.on = { g, O, bars: [], sp, door: [cx, cz + hd + 1.5], t: 0, beacon, dish, pods, fires, nm, rig, pieces, sup, fell: {}, coins: [...coinsU, coinL] };
   arenaBeam(cx, cz, [1, .4, .3], 1); snd('clang', { g: .7, r: .45 });
 }
 function sphangStep(dt) { const H = SPHANG.on; if (!H) return; H.t += dt; const A = SPHANG, [cx, cz] = A.at, Rr = A.loop;
@@ -23865,6 +23873,7 @@ function sphangFell(H, key) { if (H.fell[key] || SPHANG.on !== H || !H.rig[key])
       snd('crack', { g: 1.2, r: .6 }); for (const S of H.sp) if (!S.dead) { S.dead = 1; S.g.visible = false; const P = S.g.position; spkBurst(P.x, P.y, P.z, 20, { col: [1, .55, .15], spread: 6, size: .2, life: .7 }); smokeAt(P.x, P.y, P.z, 1.2, 1.2); } }, 1500); }
   boxGrid(); }
 function sphangClear() { const H = SPHANG.on; if (!H) return; for (const Rk of Object.values(H.rig || {})) { const i = RESTORE.list.indexOf(Rk); if (i >= 0) RESTORE.list.splice(i, 1); if (Rk.ride) { bldTrisDrop(Rk.ride.tb); bldTrisDrop(Rk.ride.tu); } }
+  for (const c of H.coins || []) { const i = COIN.list.indexOf(c); if (i >= 0) COIN.list.splice(i, 1); }
   bldClear(H); SPHANG.on = null; boxGrid(); }
 // m1166: THE SKY BRIDGES (BUILDINGS.md Set 2 #14, pass 1) -- the first set LINKED AT HEIGHT. Each span is built only if both of its ends are
 // standing when you spawn them (spawn the buildings first): a rope bridge from the Watchtower's lookout across over the Hall to the

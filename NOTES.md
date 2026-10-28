@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the SPIDER-BOT HANGAR, pass 3 (THE CLIMB) -- its third pass, DONE
+- How you get UP: a sandstone stair on the east flank, outside the eave (x = hw + .8 + .15), 14 risers of .286 m on .38 treads (under the
+  .357 step), every step a box from the ground that is its drawn block, to a 1.6 m landing at the eave height (4.0) with a gold edge and
+  a mint lantern on a lacquer post (its box the post). The landing stands .15 m off the eave's edge: step across onto the roof, whose
+  walkable tris (m1635) carry you up the curve to the gold ridge.
+- Doubloons: two on the ridge either side of its middle (they ride the `roof` piece: hidden when it falls), one on the landing (stays).
+- The east wall's seam moved to z +4.4: at z 0 it sat behind the stair. The stair is base (it stands as a ruin when the hangar is razed).
+- It stays inside the spiders' 8.4 m loop (the landing's far corner is 7.6 m out).
+Render-checked headless (the stair and landing from the east, the roof walk from above). Next: the Sky Bridges. Shipped unverified.
+
 ## m1636 -- THE RE-PASS: the SPIDER-BOT HANGAR, pass 2 (DESTRUCTIBLE TO THE GROUND)
 - The Rampart's machinery (`restorePieces` into per-piece rigs run BACKWARDS, `restoreRide` parking each piece's boxes, a `sup` list hit
   through `bldHit` -> `sphangBreak`). Pieces: `wW` / `wE` (long walls, frieze, studs, banners, seam), `back`, `roof` (roof, fascia, ridge,
