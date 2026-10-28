@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- THE KILL BLAST, and no wooden box on bodies (his: "the explosion when you killed the samurai -- I want that when you slice through
+## m1695 -- THE KILL BLAST, and no wooden box on bodies (his: "the explosion when you killed the samurai -- I want that when you slice through
 them, a little explosion in the green smoke that billows up"; "the wood box break when an arrow hits me / when you cut through them -- take it
 out; when I'm hit I should make my grunts, I'm one of the alien warriors now")
 - **`killBlast(P, y, k, green)`** (the halving and the Osari's end):

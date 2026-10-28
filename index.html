@@ -12319,7 +12319,7 @@ function arenaBody(d, dt, t) {
 function arenaKO(d) {
   starsStep(d, 0, 0); xrayShow(d, false); if (d.shock) shockStep(d, 0, 0); d.model.position.set(0, 0, 0);     // m903: out cold, not stunned
   d.ko = 1; ARENA.slow = ARENA.slowT; camShake(.35); jinraBody(d, JINRA.burst);     /* m1500 */
-  snd('hit', { g: 1.2, r: .7, x: d.root.position.x, z: d.root.position.z });     // m15xx: a body, not a box
+  snd('hit', { g: 1.2, r: .7, x: d.root.position.x, z: d.root.position.z });     // m1695: a body, not a box
 }
 // after `stepDummies` -- never inside it, because removing a body splices the list it walks
 // m922: A TAIL WITH NO KEYS IS A STICK. Every `c_tail_*` (or `*tail*`) bone: back to its rest each frame, then a swing about
@@ -13739,7 +13739,7 @@ function limbHalve(d, dirH) { const H = halfPrep(d); if (!H.up.length || !H.lo.l
   for (const D of ARENA.debris) { if (D.m === bot) { D.v.multiplyScalar(.18); D.v.y = 1.2; D.w.multiplyScalar(.25); } if (D.m === top) { D.v.x *= 1.5; D.v.z *= 1.5; } }
   const P = d.root.position, cy = P.y + (d.K.h || 1.8) * .55;
   for (let i = 0; i < 3; i++) spkBurst(P.x, cy, P.z, 24, { col: i % 2 ? [1, .8, .35] : [1, 1, .9], spread: 7, size: .2, life: .55 });
-  jinraEmit(P.x, cy, P.z, JINRA.seep * 2); snd('clang', { g: .8, r: .75, x: P.x, z: P.z }); killBlast(P, cy, 1, d.K.osari ? 1 : 0);     // m15xx: the samurai's explosion, in green for the Osari
+  jinraEmit(P.x, cy, P.z, JINRA.seep * 2); snd('clang', { g: .8, r: .75, x: P.x, z: P.z }); killBlast(P, cy, 1, d.K.osari ? 1 : 0);     // m1695: the samurai's explosion, in green for the Osari
   if (d.K.osari) for (let i = 0; i < 70; i++) { const a = Math.random() * 6.283, rr = Math.random() * .35; gfire(P.x + Math.cos(a) * rr, cy + (Math.random() - .5) * .3, P.z + Math.sin(a) * rr, 1 + Math.random() * .5); }
   HALVE.stat.halves++; HORDE.stat.kills++; d.st = 'gone'; d.gone = 1; d.root.visible = false;     /* `gone`: the far-cull (PERF.bodyFar) would show him again before `bodyGone` runs */ const i = HORDE.list.indexOf(d); if (i >= 0) HORDE.list.splice(i, 1); setTimeout(() => bodyGone(d), 0); return true; }
 // a blow that landed on a dismemberable body: cut a limb (true when it did)
@@ -13872,7 +13872,7 @@ function gfireStep(dt) { const G = GFIRE; if (!G.pts || !G.live) return; let any
   const g = G.pts.geometry; for (const n of ['position', 'aCol', 'aSize', 'aA', 'aF', 'aR']) g.attributes[n].needsUpdate = true;
   G.pts.material.uniforms.uPx.value = renderer.domElement.height / (2 * Math.tan(camera.fov * Math.PI / 360)); if (!any) G.live = 0; }
 const OSARI = { fadeT: .7, col: [.12, .85, .32], col2: [.04, .5, .2], fades: [] };
-// m15xx (his: "there used to be this EXPLOSION when you killed the samurai -- that's what I want when you slice through them; a little explosion in
+// m1695 (his: "there used to be this EXPLOSION when you killed the samurai -- that's what I want when you slice through them; a little explosion in
 // the green smoke, and it billows up"): THE KILL BLAST, shared by the halving and the Osari's end. A hot flash of sparks (the samurai's
 // `limbBoom` palette), a ring of green fire thrown out low, a column of green smoke that BILLOWS -- big puffs rising and growing over ~2 s --
 // and the explosion recording (`boom`), a shake and a hit-stop. `k` sizes it.
@@ -13887,7 +13887,7 @@ function osariVanish(d) { const P = d.root.position; HORDE.stat.kills++; bowDrop
   const bones = []; d.model.traverse(o => { if (o.isBone) bones.push(o); }); const bw = new THREE.Vector3();
   for (let i = 0; i < 90; i++) { const b = bones[(Math.random() * bones.length) | 0]; if (b) b.getWorldPosition(bw); else bw.set(P.x, P.y + 1, P.z); gfire(bw.x + (Math.random() - .5) * .2, bw.y, bw.z + (Math.random() - .5) * .2, 1 + Math.random() * .6); }     // m1689: GREEN FIRE off every bone
   for (let i = 0; i < 4; i++) { const a = Math.random() * 6.28, r = Math.random() * .5; smokeAt(P.x + Math.cos(a) * r, P.y + .4 + Math.random() * 1.4, P.z + Math.sin(a) * r, 2.5, 1.2, OSARI.col2, .8); }
-  killBlast(P, P.y + .9, .8, 1); snd('swoosh', { g: .6, r: .55, x: P.x, z: P.z });     // m15xx: an explosion in the green fire
+  killBlast(P, P.y + .9, .8, 1); snd('swoosh', { g: .6, r: .55, x: P.x, z: P.z });     // m1695: an explosion in the green fire
   const mats = []; d.model.traverse(o => { if (o.isMesh && o.material) { o.material = o.material.clone(); o.material.transparent = true; o.material.depthWrite = false; mats.push(o.material); } });
   d.st = 'gone'; d.osariGone = 1; const i = HORDE.list.indexOf(d); if (i >= 0) HORDE.list.splice(i, 1); OSARI.fades.push({ d, mats, t: 0, s0: d.root.scale.x }); }
 function osariStep(dt) { for (let i = OSARI.fades.length - 1; i >= 0; i--) { const F = OSARI.fades[i], u = (F.t += dt) / OSARI.fadeT;
@@ -14038,7 +14038,7 @@ function arrowStep(dt) {
       const h = Math.atan2(A.v.x, A.v.z), hp0 = p.hp;
       playerHurt(ARCH.dmg, h, ARCH.push, 1.5, .25, 0); ARCH.stat.hits++;
       if (p.block) { ARCH.stat.blocked++; spkBurst(P.x, P.y, P.z, 14, { col: [1, .9, .6], spread: 4, size: .12, life: .35 }); snd('clang', { g: .7, r: 1.3, x: P.x, z: P.z }); }
-      else { spkBurst(P.x, P.y, P.z, 10, { col: [1, .3, .25], spread: 3, size: .1, life: .3 }); }     /* m15xx: `playerHurt` voices it (his grunt) */
+      else { spkBurst(P.x, P.y, P.z, 10, { col: [1, .3, .25], spread: 3, size: .1, life: .3 }); }     /* m1695: `playerHurt` voices it (his grunt) */
       A.m.removeFromParent(); ARROWS.splice(i, 1); continue; }
     const gy = groundAt(P.x, P.z, oy, .5);
     const wall = boxRay(ox, oy, oz, P.x, P.y, P.z, _tuR);
@@ -45557,7 +45557,7 @@ function playerHurt0(dmg, dirH, push, up, stun, knock) {
   // a guard sounds like. The red flash goes with the damage rather than with the contact, so a
   // deflect (`cutHard` 0) does not tell him he was hurt when he was not.
   if (dmg > 0) { hurtEl.classList.remove('on'); void hurtEl.offsetWidth; hurtEl.classList.add('on'); }
-  if (!guard) { snd('grunt', { g: .9, r: .92 + Math.random() * .16 }); snd('hit', { g: .55, r: .9 + Math.random() * .2 }); }     // m15xx (his: "the wood box break when an arrow hits me -- I'm one of the alien warriors now, I made grunts"): HIS grunt and a body hit, never the box
+  if (!guard) { snd('grunt', { g: .9, r: .92 + Math.random() * .16 }); snd('hit', { g: .55, r: .9 + Math.random() * .2 }); }     // m1695 (his: "the wood box break when an arrow hits me -- I'm one of the alien warriors now, I made grunts"): HIS grunt and a body hit, never the box
 }
 // **WHERE A BODY CARRIES MOMENTUM, WHATEVER STATE IT IS IN (m37).** This used to live inside
 // the `down` branch, so a knock-down flew and a landed punch did nothing at all -- and adding a
