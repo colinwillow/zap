@@ -136,6 +136,28 @@ wingsuit (borrow from that), shoot the gun while riding, ride him on the ground 
   burning in the braziers they stole). The colour rule holds: their glow is the Jinra's mint because it IS the stolen Jinra. Everything else
   about them is stone, clay, bronze and rust.
 
+
+### THE NAME: KŪKYO, THE HOLLOW (his, Oct 28 2026; PROPOSED, his pick)
+> *"Kūkyo, I think it's how you say empty or hollow in Japanese -- maybe a cool way to refer to our evil empire, that's their name, or a play
+> on that. Then variations: hollow warrior, hollow ninja, hollow giant, hollow spider, hollow monster things."*
+- **The empire:** the **Kūkyo** (空虚, "emptiness, hollowness"): the hollow that drains the Jinra out of the world. This ties to what already
+  exists: "the Osari of the Hollow" (his bowman's name) and "the Hollowed" (the faction list above). One reading: the **Osari** are
+  the constructs, and the **Kūkyo** is the empire they serve.
+- **The units: `Utsuro` (虚ろ, "hollow, vacant -- a body with no soul in it") + what it is.** A suggested set:
+
+| in game | Japanese | meaning |
+|---|---|---|
+| Utsuro Musha | 虚ろ武者 | hollow warrior (the swordsman) |
+| Utsuro Yumitori | 虚ろ弓取 | hollow archer (the bowman) |
+| Utsuro Shinobi | 虚ろ忍 | hollow ninja |
+| Utsurogumo | 虚ろ蜘蛛 | hollow spider (*kumo* becomes *-gumo* in a compound, as in *tsuchigumo*) |
+| Utsuro Kyojin | 虚ろ巨人 | hollow giant (the stone giants, 5-10x his size) |
+| Utsuro Komainu | 虚ろ狛犬 | hollow guardian: the **komainu** is Japan's own lion-dog shrine guardian, the natural name for our sphinx (STATUES.md) |
+| Utsuro Oni | 虚ろ鬼 | hollow ogre / monster |
+
+- **Open (his):** "Kūkyo" for the empire or a play on it, whether "Osari" stays as the people's name, and whether names show in game at
+  all (the SPAWN menu still says OSARI SPIDER / Osari bowmen; nothing has been renamed yet).
+
 ## THE JINRA BEACONS -- a spine for the campaign (his idea, Oct 28 2026; open, "we'll figure it out")
 > *"The evil army has giant torch towers. When you defeat a tower you shoot the Jinra into it, and it lights up green and shoots off -- the levels
 > are arranged around a central place, and you're aligning all the Jinra to the central tower, so it becomes one giant powerful thing that powers
