@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE ZEPPELINS, detail pass 8 (lights and cloth that move)
+## m1596 -- THE ZEPPELINS, detail pass 8 (lights and cloth that move)
 - Four red paper CHOCHIN on cords from the roof's corners (warm emissive, iron caps), each a pivot group that sways on its own phase and leans
   out on the turns (`Z.turnV`, the heading's rate of change, smoothed in `zepPose`).
 - A cream NOREN curtain with three red seams under the bow eave, its vertices rippled every frame like the pennant.
