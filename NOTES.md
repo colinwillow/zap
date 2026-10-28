@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: MARKET STALLS, pass 3 (layers, alive; its third pass, so the loop moves on)
+## m1552 -- THE RE-PASS: MARKET STALLS, pass 3 (layers, alive; its third pass, so the loop moves on)
 **Moves:** its L3, breakable and alive rows.
 - **L3: a FIRE-WATCH LOOKOUT** (hinomi yagura) on the roof's east end, clear of the roof bar and the ring pole: four solid posts, a railed
   platform 3.4 m over the roof (red skirts, timber rails), a tiled 4-sided hip roof with a bronze finial, two small lanterns, and a LADDER
