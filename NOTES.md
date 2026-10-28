@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- THE DRAGON BANKS INTO THE TURN, AND A FIRE TOGGLE WITH A RETICLE (his: "every time you build a vehicle you do the banking wrong
+## m1703 -- THE DRAGON BANKS INTO THE TURN, AND A FIRE TOGGLE WITH A RETICLE (his: "every time you build a vehicle you do the banking wrong
 -- press left and instead of tilting his left arm down to bank that way, his whole body leans to the right as if the momentum throws him";
 "a reticle for fireballs BEHIND the dragon, not on top of him; work it like RollerGirl's -- a button above the right stick toggles the
 fireball; equipped, touching the right stick cocks it, the thumb moves the reticle, release shoots; un-check it to steer / turn the camera")

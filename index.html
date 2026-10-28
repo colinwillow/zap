@@ -11561,7 +11561,7 @@ function dragTapR() { const B = DRAGZ.on && DRAGZ.on.B, D = B && B.drive; if (!D
   if (D.air.mode !== 'fly') { D.air = null; D.flapCool = 0; dragFlap(D); return; }     // up from a jump or a hover: the take-off
   dragFlap(D); }
 function dragHoldR(R, dt) { const B = DRAGZ.on && DRAGZ.on.B, D = B && B.drive, S = stick.R; if (!D) return;
-  if (dragArmed()) { R.rHold = 0; R.rHeld = 0; if (D.air && D.air.mode === 'hover') D.air.hold = false; return; }     // m15xx: armed, the right pad only aims
+  if (dragArmed()) { R.rHold = 0; R.rHeld = 0; if (D.air && D.air.mode === 'hover') D.air.hold = false; return; }     // m1703: armed, the right pad only aims
   const still = S.down && (S.far || 0) < .3; R.rHold = still ? (R.rHold || 0) + dt : 0;
   if (D.air && D.air.mode === 'hover') D.air.hold = !!S.down;
   if (R.rHold > DRAGZ.holdT && !R.rHeld) { R.rHeld = 1; if (!D.air || D.air.mode === 'hop') { D.air = { mode: 'hover', vy: D.air ? D.air.vy : 3, t: 0, hold: 1 }; D.beat = 0; } }
@@ -11586,7 +11586,7 @@ function dragDrive(B, dt) { const Z = DRAGZ, D = B.drive, p = player, sit = p.dr
     else if (F && P.y < F.y) P.y = F.y;
     if (P.y < Z.cloudY + 8) { P.set(Z.at[0], Z.daisY, Z.at[1]); D.air = null; D.v = 0; D.pad = null; tipShow('Into the clouds -- back to the dais.', 3); }
     let tr = 0, tf = 0; if (A.trick) { const T = A.trick; T.t += dt; const u = Math.min(1, T.t / T.T), e = u * u * (3 - 2 * u); if (T.k === 'roll') tr = T.s * e * Math.PI * 2; else tf = T.s * e * Math.PI * 2; if (u >= 1) A.trick = null; }
-    B.root.rotation.order = 'YXZ'; B.root.rotation.set(-(D.air ? A.pitch + tf : 0), h + (B.faceOff || 0), (A.bank - tr) * (D.air ? 1 : 0));     // m15xx: the bank was NEGATED -- left stick rolled his left side UP (a lean out of the turn, "as if the momentum throws him"); now the inside wing goes down
+    B.root.rotation.order = 'YXZ'; B.root.rotation.set(-(D.air ? A.pitch + tf : 0), h + (B.faceOff || 0), (A.bank - tr) * (D.air ? 1 : 0));     // m1703: the bank was NEGATED -- left stick rolled his left side UP (a lean out of the turn, "as if the momentum throws him"); now the inside wing goes down
     D.v = D.air ? A.v : D.v; D.spread = damp(D.spread || 0, 1, Z.spreadHL, dt); }
   else if (D.air) { const A = D.air, s2 = sit ? stickWorld() : { x: 0, z: 0, mag: 0 };     // m1625: the HOP and the HOVER -- steered as on the ground, gently
     if (s2.mag > 0) { const want = Math.atan2(s2.x, s2.z), dh = wrapAngle(want - h); h += clamp(dh, -Z.turn * dt, Z.turn * dt); D.v = damp(D.v, s2.mag * Z.airSp, .5, dt); } else D.v = damp(D.v, 0, .8, dt);
@@ -11726,7 +11726,7 @@ function dragFxStep(dt) { const Z = DRAGZ, O = Z.on;
     if (hitT || (Fl && P.y < Fl.y + f.r * .5) || boxRay(ox, oy, oz, P.x, P.y, P.z, _tuR) || f.life <= 0 || P.y < Z.cloudY) { O.fb.splice(i, 1); dragBoom(f); } }
   for (const t of O.tg) { if (t.dead > 0) { t.dead -= dt; if (t.dead <= 0) t.G.visible = true; continue; }
     for (const b of BOLTS) if (b.t < 50 && Math.hypot(b.pos.x - t.x, b.pos.y - t.y, b.pos.z - t.z) < t.r + (b.size || .4) * .5) { b.t = 1e9; dragTargetHit(t); break; } } }
-// m15xx (his: "we need a reticle when you're shooting fireballs -- BEHIND the dragon, not on top of him. Work it like RollerGirl's: a button
+// m1703 (his: "we need a reticle when you're shooting fireballs -- BEHIND the dragon, not on top of him. Work it like RollerGirl's: a button
 // above the right stick toggles the fireball on and off; equipped, as soon as you touch the right stick it COCKS the fireball, you move the
 // reticle with your thumb, and when you release it shoots; un-check it to just steer or turn the camera normally"). THE FIRE TOGGLE: a FIRE
 // button over the right pad, only in the saddle. ARMED, the right pad is the aimer and nothing else -- no camera drag, no hover hold, no
@@ -66596,7 +66596,7 @@ function frameBody() {
     // position and the speed cap is measured against how far it moved, so solving before the
     // root is written measures last frame's travel -- which at a knock-down's 12 m/s is most
     // of a metre of phantom motion through the limbs on every single frame.
-    if (DRAGZ.ui && !(player.dragon && player.dragon.st === 'sit')) dragAimUi();     // m15xx: the FIRE button goes when he leaves the saddle
+    if (DRAGZ.ui && !(player.dragon && player.dragon.st === 'sit')) dragAimUi();     // m1703: the FIRE button goes when he leaves the saddle
     dragRiderPose();                   // m1619: in the saddle, pitched and banked with his dragon (after every pose that writes the root)
     rig.root.updateMatrixWorld(true); springsStep(dt);     // m1058: hair / cape chains, on the FINAL root (after every pose above)
     dollStep(dt);
