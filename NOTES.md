@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE SHIP: THE SEA STOPS TILING FROM AFAR (m@X4@, WORKER A)
+
+His (screenshot from far out, zoomed): *"you can see the repetition -- is there any way to break that up with a few different sizes of
+noises or variations?"*
+
+Two causes, both in the sea shader. (1) The fine ripple / foam / lace / glitter noise (periods 0.2-3 m) kept drawing at hundreds of
+metres, where it can only ALIAS -- that is the dot grid. (2) The five vertex sines ARE periodic, and their gradient `vG` was the whole
+normal at middle distance -- that is the regular weave. Fixed by: `hf` fades every fine term out over 40-260 m; `vG` gives way (to 30%)
+over 25-220 m; what replaces it is `big`, two noise octaves (22 m and 9 m) on TURNED lattices (`RT`, `RU` -- value noise on an
+axis-aligned lattice shows its grid), strongest far; and a `macro` noise (180 m and 60 m, also turned) scales all of it (`chop`
+.45-1.45) so there are glassy calm stretches beside choppy ones, tints `deep`, and a slow drifting cloud-shadow darkens patches by up
+to 20%. Headless from (-150, 70, -150) toward the island: the grid is gone, the far sea reads as irregular patches. Near the ship it
+looks the same as before. Not signed off.
+
 ## THE SHIP, PASS 11: FOAM, AND THE FIRST BIG SEA CREATURE -- A GIANT ALIEN WHALE (m1409, WORKER A)
 
 His: *"I'm wondering if we can do foam on the water too... spend some time doing passes on developing one big sea creature at a time,
