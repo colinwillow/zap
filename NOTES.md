@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the ROBOT BARRACKS, pass 1 (ENEMY look)
+## m1659 -- THE RE-PASS: the ROBOT BARRACKS, pass 1 (ENEMY look)
 - ENEMY_STYLE's BARRACKS, literally: "a long hall where constructs stand dormant in rows behind black pillars, under a black roof with
   gold trim and lanterns along the eave". The hall's breakable walls are `enemyWallTex` sandstone block; `bldRoof` in black tile under
   a gold ridge with curled finials and gold eave tips; a VERANDA of seven black pillars along the front (.5 m off the wall: at .9 one
