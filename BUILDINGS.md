@@ -164,7 +164,8 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 - [x] **pass 16 (m1465):** the cloud cards no longer read as cotton balls: shaded by HEIGHT IN THE BANK (a flat dark base to lit tops), twice the puffs and smaller, soft overlapping edges
 - [ ] pass 4: life: the clouds moving under you
 - [x] **pass 19 (m1531): THE TRAINING DOJO, part 1.** Two WEAPON RACKS on the dais (E: the SWORD, W: the GUN, a practice staff below): walk up and you take it, the pegs empty; walk back holding it and you put it back. Four STRAW TARGETS rise from bronze hatches: three blows and one sinks in straw, pops back up after 3 s; drop all four together and a gold doubloon rises at the centre; they all SINK while a fight is on
-- [ ] later: shots hit the targets too, a sparring master, the music
+- [x] **pass 20 (m1537):** SHOTS HIT THE TARGETS: a bolt stops in the straw (one blow, knocked the way it flew), a rocket drops one outright (`dojoShot` in `stepBolts`)
+- [ ] later: a sparring master, the music
 
 ## THE ELEMENTS (his, after m1382) -- sandboxes for water, snow and air
 

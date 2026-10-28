@@ -11153,7 +11153,7 @@ function dojoTgtHit(T, y, ux, uz, dmg) { const L = Math.hypot(ux, uz) || 1; ux /
   T.vx += ux * 4.5 * Math.min(2, dmg); T.vz += uz * 4.5 * Math.min(2, dmg); T.cool = DTRAIN.cool; T.hp -= dmg;
   spkBurst(T.x, Math.max(.8, Math.min(1.7, y)), T.z, 14, { col: [.95, .8, .45], spread: 1.6, up: 1.2, size: .1, life: .7 }); snd('thud', { g: .55, r: 1.3, x: T.x, z: T.z });
   if (T.hp <= 0) { T.goal = 0; T.t = 0; spkBurst(T.x, 1.3, T.z, 26, { col: [.95, .8, .45], spread: 2.6, up: 2, size: .13, life: 1 }); snd('crack', { g: .5, x: T.x, z: T.z }); } }
-// m15xx: a SHOT at a target: the bolt's ball against the straw's cylinder (a rocket knocks it straight down); `stepBolts` asks, and the shot stops
+// m1537: a SHOT at a target: the bolt's ball against the straw's cylinder (a rocket knocks it straight down); `stepBolts` asks, and the shot stops
 function dojoShot(b) { const D = DOJO; if (!D.on) return 0; const r = (b.size || .2) * .5, y = b.pos.y;
   for (const T of D.tgts) { if (T.goal < 1 || T.up < .7 || y < .3 || y > 2.15 || Math.hypot(T.x - b.pos.x, T.z - b.pos.z) > .27 + r) continue;
     const v = b.vel || b.v; dojoTgtHit(T, y, v ? v.x : T.x - player.pos.x, v ? v.z : T.z - player.pos.z, b.rocket ? DTRAIN.hp : 1); return 1; }
@@ -18403,7 +18403,7 @@ function stepBolts(dt) {
         if (got && !(WEAP.palThru && got.K.pal)) { dead = true; b.onMan = got; }
         // m350: A FLYING TARGET (an orb): a sphere in `AIRT`, on the ball's own size
         if (!dead) for (const T of AIRT) if (T.on && Math.hypot(b.pos.x - T.x, b.pos.y - T.y, b.pos.z - T.z) < T.r + b.size * .5) { dead = true; T.hit(b); break; }
-        if (!dead && DOJO.tgts && dojoShot(b)) dead = true;     /* m15xx: the dojo's straw targets stop a shot */
+        if (!dead && DOJO.tgts && dojoShot(b)) dead = true;     /* m1537: the dojo's straw targets stop a shot */
       }
       // **AND IT REMEMBERS WHAT STOPPED IT, because `boltHit` runs a frame's worth of code
       // later and by then the only thing left is a position.** The ground is its own case and

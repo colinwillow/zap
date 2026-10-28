@@ -5,6 +5,12 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1537 -- the straw targets stop a shot (dojo pass 20)
+m1531's targets had no box, so a bolt flew through them. `stepBolts` now asks `dojoShot(b)` beside the `AIRT` orbs: the bolt's ball against the straw's
+cylinder (r .27, y .3-2.15, only while the target is up), and the shot dies there. A bolt is one blow, knocked along `b.vel`; a rocket is `DTRAIN.hp`
+(down in one). The blow itself is shared with the swing (`dojoTgtHit`). Measured headless: a shot at a target 3 -> 2, a shot 2 m off misses, a rocket
+sinks one.
+
 ## m1534 -- the Jinra refinery, pass 2: its chunk of mountain lifts live (Worker B, loop tick 3)
 His correction (the buildings do not go up on jets; the ground under them breaks off and floats). The refinery's island is that ground:
 the whole builder is ONE chunk on the shared `rsChunkRig`, and the RESTORE kit's own `lift` carries the group (`R.g = g`, `R.baseY = -L`,
