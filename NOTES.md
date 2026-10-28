@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the FLYING SHIP HOUSE, pass 1 (a HERO flyer: the look; a collider audit)
+## m1599 -- THE RE-PASS: the FLYING SHIP HOUSE, pass 1 (a HERO flyer: the look; a collider audit)
 **Moves:** its pass-1 row.
 - Kit materials: `K.timber`, a warm planks deck, a dark warm planks hull, `K.redL` ribs and pennants, `K.bronze` (the figurehead too, its
   eyes warm amber), warm plain plaster on the deckhouse, `K.lamp`. The three Jin ENGINES and their lift cones are Jinra mint (they were cyan).
