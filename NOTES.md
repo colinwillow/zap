@@ -226,6 +226,21 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
+## THE SHIP, PASS 12f: THE BODY STOPS BEING A TUBE (m@X4@, WORKER A)
+
+His: *"The face is fine. The body just feels very cylindrical and plain. I could see there being more variation."*
+
+- **SILHOUETTE:** `radAt` carries a rhythm of soft swells and pinches (+/-11%, about seven along the body) and a fuller HIP swell at k .5
+  (+12%) on top of the shoulder-to-tail taper.
+- **SADDLES:** darker purple bands across the back in vertex colour (cubed sine along the length, strongest on top, gone by the belly), so
+  the paint has a large-scale pattern over its small mosaic.
+- **FLANK TUFTS:** besides the pectorals, five pairs of silky fin TUFTS at k .2, .36, .52, .68 and .82 (where a Chinese dragon's legs
+  would be), set high on the flank, standing up as vertical sails and fluttering in a wave that runs down the body (`pc.ph`). Each fan
+  carries its own `k` in `W.pecs`.
+- **Measured headless:** the tufts first sat low on the flank and lay FLAT in the body's side plane, so from every camera they were a thin
+  white line or underwater. Raised (+.35 rad up the flank), stood up (rotated 1.15 about their axis) and enlarged (x1.5, spread 2.4),
+  they read as fins on every surfaced arch. 10 more draws. Not signed off.
+
 ## THE SHIP, PASS 12e: THE DRAGON MADE INVITING -- A CHINESE-DRAGON HEAD (m1457, WORKER A)
 
 His: *"I'm not in love... it feels little and sneaky like a snake, kind of sharp. More Chinese dragon, more alien, more big and exaggerated

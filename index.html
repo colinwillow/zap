@@ -25200,7 +25200,8 @@ function shipSerpentMake() { const Z = SHIPZ; if (!Z.seaG) return null; const T 
   const eyeM = new THREE.MeshBasicMaterial({ map: T.eye, toneMapped: false }), mouthM = new THREE.MeshStandardMaterial({ color: 0x8a1c22, roughness: .5 });
   // body skin: static uvs, positions/normals rewritten per frame
   const nv = NL * (NS + 1), P = new Float32Array(nv * 3), N = new Float32Array(nv * 3), Uv = new Float32Array(nv * 2), C = new Float32Array(nv * 3).fill(1), I = [];
-  for (let i = 0; i < NL; i++) for (let j = 0; j <= NS; j++) { const v = i * (NS + 1) + j, sa = Math.sin(j / NS * Math.PI * 2); Uv[v * 2] = i * sp / 3.2; Uv[v * 2 + 1] = .5 + .5 * sa; }
+  for (let i = 0; i < NL; i++) for (let j = 0; j <= NS; j++) { const v = i * (NS + 1) + j, sa = Math.sin(j / NS * Math.PI * 2); Uv[v * 2] = i * sp / 3.2; Uv[v * 2 + 1] = .5 + .5 * sa;
+    const sad = Math.pow(Math.max(0, Math.sin(i * sp * .42)), 3) * Math.max(0, sa + .2) / 1.2; C.set([1 - sad * .42, 1 - sad * .5, 1 - sad * .18], v * 3); }     // m@X4@: darker SADDLES across the back
   for (let i = 0; i < NL - 1; i++) for (let j = 0; j < NS; j++) { const a = i * (NS + 1) + j, b = a + 1, c = a + NS + 1, d = c + 1; I.push(a, c, b, b, c, d); }
   const bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.BufferAttribute(P, 3)); bg.setAttribute('normal', new THREE.BufferAttribute(N, 3)); bg.setAttribute('uv', new THREE.BufferAttribute(Uv, 2)); bg.setAttribute('color', new THREE.BufferAttribute(C, 3)); bg.setIndex(I);
   const body = new THREE.Mesh(bg, skinM); body.frustumCulled = false; body.castShadow = true; root.add(body);
@@ -25247,7 +25248,8 @@ function shipSerpentMake() { const Z = SHIPZ; if (!Z.seaG) return null; const T 
     const tg = new THREE.SphereGeometry(1, 12, 6); tg.scale(.55, .12, 1.4); tg.translate(0, .02, 1.6);
     jaw.add(new THREE.Mesh(mergeGeometries(jt), skinM)); jaw.add(new THREE.Mesh(mergeGeometries(jm), finM)); jaw.add(new THREE.Mesh(tg, mouthM)); }
   hs.add(new THREE.Mesh(mergeGeometries(glows), glowM));
-  const pecs = []; for (const sx of [-1, 1]) { const g = new THREE.Group(); root.add(g); g.matrixAutoUpdate = false; const f = shipFan(3.4, 1.5, 5); f.rotateZ(sx * -.25); const piv = new THREE.Group(); piv.add(new THREE.Mesh(f, finM)); g.add(piv); pecs.push({ g, piv, sx }); }
+  const pecs = []; for (const [k, L] of [[.06, 3.4], [.2, 2.4], [.36, 2.6], [.52, 2.2], [.68, 1.8], [.82, 1.4]]) for (const sx of [-1, 1]) {     // m@X4@: the pectorals and silky TUFTS down the flanks, where a Chinese dragon's legs would be
+    const g = new THREE.Group(); root.add(g); g.matrixAutoUpdate = false; const f = k > .1 ? shipFan(L * 1.5, 2.4, 6) : shipFan(L, 1.5, 5); f.rotateZ(k > .1 ? sx * 1.15 : sx * -.25); const piv = new THREE.Group(); piv.add(new THREE.Mesh(f, finM)); g.add(piv); pecs.push({ g, piv, sx, k, ph: k * 9 }); }
   return { root, body, bg, fins, fgm, head, jaw, pecs, lids, wh, blink: 0, blinkT: 3, NL, NS, sp, ph: Math.random() * 100, dir: Math.random() < .5 ? 1 : -1, prevY: new Float32Array(8), splT: 0, rear: 0, rearT: 0, rearCd: 8,
     _f: [], _u: [], _r: [], _p: [], _b: new THREE.Vector3(), _m: new THREE.Matrix4() }; }
 // the path: tau in seconds of travel; returns the point (local to the sea group) into `o`
@@ -25261,7 +25263,7 @@ function shipSerpentP(W, tau, o) { const v = 6.5, R = 70 + Math.sin(tau * .021) 
 function shipSerpentStep(W, dt, t) { const T = t + W.ph, NL = W.NL, NS = W.NS, dtau = W.sp / 6.5, up = new THREE.Vector3(0, 1, 0), M = W._m, B = W._b, KR = .17;
   const P = W.bg.attributes.position.array, Nn = W.bg.attributes.normal.array, FP = W.fgm.attributes.position.array;
   if (!W._p.length) for (let i = 0; i < NL; i++) { W._p.push(new THREE.Vector3()); W._f.push(new THREE.Vector3()); W._u.push(new THREE.Vector3()); W._r.push(new THREE.Vector3()); }
-  const radAt = k => 1.25 * (k < .22 ? .95 + Math.sin(k / .22 * Math.PI / 2) * .75 : 1.7 * Math.pow(1 - (k - .22) / .78, .85) + .07) * (1 + Math.sin(T * 3 - k * 20) * .02);
+  const radAt = k => (1 + .11 * Math.sin(k * 44) + .12 * Math.exp(-Math.pow((k - .5) / .08, 2))) * 1.25 * (k < .22 ? .95 + Math.sin(k / .22 * Math.PI / 2) * .75 : 1.7 * Math.pow(1 - (k - .22) / .78, .85) + .07) * (1 + Math.sin(T * 3 - k * 20) * .02);
   // the rear schedule: only while the head is near the surface
   shipSerpentP(W, T, B); W.rearCd -= dt;
   if (W.rearT > 0) { W.rearT -= dt; if (W.rearT <= 0) W.rearCd = 14 + Math.random() * 10; }
@@ -25288,9 +25290,8 @@ function shipSerpentStep(W, dt, t) { const T = t + W.ph, NL = W.NL, NS = W.NS, d
   { const p = W._p[0], f0 = W._f[0], f = f0.clone();     // m1457: rearing, it turns its head to look at you (a little down, as if curious)
     if (R > .01) { const pl = W.root.parent.worldToLocal(player.pos.clone()), d = new THREE.Vector3(pl.x - p.x, 0, pl.z - p.z); if (d.lengthSq() > 4) { d.normalize(); d.y = -.2; f.lerp(d.normalize(), R * .8).normalize(); } }
     const r = new THREE.Vector3().crossVectors(up, f).normalize(), u = new THREE.Vector3().crossVectors(f, r); M.makeBasis(r, u, f); M.setPosition(p.x + f0.x * 2.2, p.y + f0.y * 2.2, p.z + f0.z * 2.2); W.head.matrix.copy(M); W.head.matrixWorldNeedsUpdate = true; }
-  { const i = Math.round(NL * .06), p = W._p[i], r = W._r[i], u = W._u[i], f = W._f[i], rad = radAt(i / (NL - 1));
-    for (const pc of W.pecs) { M.makeBasis(r, u, f); M.setPosition(p.x + r.x * pc.sx * rad * .9 - u.x * rad * .3, p.y + r.y * pc.sx * rad * .9 - u.y * rad * .3, p.z + r.z * pc.sx * rad * .9 - u.z * rad * .3); pc.g.matrix.copy(M); pc.g.matrixWorldNeedsUpdate = true;
-      pc.piv.rotation.set(0, pc.sx * (.9 + Math.sin(T * 2.2) * .3), pc.sx * (-.3 + Math.sin(T * 2.2 + .6) * .25)); } }
+  { for (const pc of W.pecs) { const i = Math.round(NL * pc.k), p = W._p[i], r = W._r[i], u = W._u[i], f = W._f[i], rad = radAt(i / (NL - 1)); M.makeBasis(r, u, f); const lift = pc.k > .1 ? .35 : -.3; M.setPosition(p.x + r.x * pc.sx * rad * .9 + u.x * rad * lift, p.y + r.y * pc.sx * rad * .9 + u.y * rad * lift, p.z + r.z * pc.sx * rad * .9 + u.z * rad * lift); pc.g.matrix.copy(M); pc.g.matrixWorldNeedsUpdate = true;
+      if (pc.k > .1) pc.piv.rotation.set(.35, pc.sx * (.55 + Math.sin(T * 2.2 - pc.ph) * .22), Math.sin(T * 2.2 + .6 - pc.ph) * .12 * pc.sx); else pc.piv.rotation.set(0, pc.sx * (.9 + Math.sin(T * 2.2 - pc.ph) * .3), pc.sx * (-.3 + Math.sin(T * 2.2 + .6 - pc.ph) * .25)); } }
   W.splT -= dt; for (let s = 0; s < 8; s++) { const i = Math.floor(s * (NL - 1) / 7), py = W._p[i].y; if (W.prevY[s] && Math.sign(py) !== Math.sign(W.prevY[s]) && W.splT <= 0 && radAt(i / (NL - 1)) > .5) { W.splT = .12; const w = W.root.parent.localToWorld(W._p[i].clone()); spkBurst(w.x, w.y + .3, w.z, 18, { col: [.88, .96, 1], spread: 2.2, up: 2.6, size: .22, life: .8 }); } W.prevY[s] = py || .001; }
   W.jaw.rotation.x = .03 + Math.max(0, Math.sin(T * .5)) * .09 + R * .1;
   W.blinkT -= dt; if (W.blinkT <= 0) { W.blink = .2; W.blinkT = 2.5 + Math.random() * 4; } W.blink -= dt; for (const l of W.lids) l.rotation.x = W.blink > 0 ? 1.3 : .08;
