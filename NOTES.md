@@ -10,6 +10,13 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
+## THE DOJO, PASS 7: THE WEAVE -- A HERITAGE PAGODA, WATERFALLS, A SKY MANTA (mXXXX)
+*"We can still use the more classical Japanese architecture -- weave it together, both can exist."*
+- **The pagoda** is five tiers on the great west island (`SC[0]`): a stone plinth, red storeys that step in, tiled roofs with upturned corners, bronze bells at the eave corners, a ring spire, and four box lanterns. The island's dressing keeps clear of it (`clear: 9`).
+- **`dojoRoof` puts its corners ON THE AXES.** Under an axis-aligned box it reads as a thin, wavy diamond. Turn it `rotateY(PI/4)` under a square box. Bells go at `(w/2 + ov)/sqrt2` per axis.
+- **Waterfalls (`D.falls`):** a stream across each great island's top, then a 70 m ribbon off the rim, aimed toward the dojo. It bows out and widens as it falls, with a flowing-streak shader. One draw each.
+- **`D.manta`:** a diamond lathed from a plane, with a raised back, dark violet, cyan spots, horns and a whip tail. The wings flap in the vertex shader. It banks round a wobbling loop at r 95 ± 25, y 26. One draw.
+
 ## THE DOJO, PASS 6: SKY JUNKS AND THE FIRST SKY WHALE (m1413)
 *"Flying ships... sea creatures... manta rays... whales"* and, mid-pass, *"we can still use the more classical Japanese architecture... both exist"*.
 - `D.junks`: three hero-kit airships on rings r 150/210/260 at different heights and speeds, bobbing. Each is its own group, about 6 draws.

@@ -46,9 +46,10 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - the altars get tent canopies
   - the floor crest is the ship's SQUARE SPIRAL
 - [x] **pass 6 (m1413):** three hero-kit sky junks circling (red-banded hulls, square-spiral sails, bronze thrusters, lanterns) and the first SKY WHALE (lathed, undulating, under the disc). Still open from this line: his ship, the manta, the serpent-dragon, waterfalls
+- [x] **pass 7 (mXXXX):** the weave: a five-tier HERITAGE PAGODA on the great west island (his: classical and the hero kit both exist), WATERFALLS off both great islands, and the second creature, a SKY MANTA that flaps and banks between the islands. Still open: his ship, the serpent-dragon
 - [ ] pass 6b (his, after m1403):
   - the scene: his SHIP in the background, smaller flying ships, AIR CREATURES (one at a time: an alien whale, a manta, a serpent-dragon), and waterfalls off the big islands
-- [ ] pass 7:
+- [ ] pass 8:
   - the gates as ENTRANCES: bosses walk in through a torii (a DOORS entry for the dojo)
   - something AT the altars: take a katana from the rack, a chime, a glint on the blade
   - lit lanterns at dusk
