@@ -22166,10 +22166,12 @@ const ADOCK = { at: [-45, 0], hs: 2.6, H: 20, deck: 5, kite: { sink: 2.2, v: 7 }
 function adockBuild() {
   if (ADOCK.on) return; const A = ADOCK, [cx, cz] = A.at, hs = A.hs, H = A.H, g = new THREE.Group(); scene.add(g);
   const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [];
-  const wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 }), plank = new THREE.MeshStandardMaterial({ color: 0x6e4a2e, roughness: .85 }), stone = new THREE.MeshStandardMaterial({ color: 0x8a8580, roughness: .95 });
-  const plaster = new THREE.MeshStandardMaterial({ color: 0xeae6de, roughness: .9 }), bronze = new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 }), verm = new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .45 });
-  const lamp = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false }), neon = new THREE.MeshBasicMaterial({ color: 0x3fe8ff, toneMapped: false });
-  const add = (geo, m, x, y, z, solid) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; g.add(o);
+  // m@X4@ (the RE-PASS, pass 1): a HERO flyer -- the hero kit in painted maps (timber, warm planks, stone-block footing, the kit bronze and red),
+  // a warm plaster shaft, a cream balloon banded in bronze, bunting off the mast, plants round the foot; statics merge (the ship's into the ship)
+  const K = korMats(), wood = K.timber, plank = triMat('wood_planks', { scale: 2.2, color: 0xc8a68a }), stone = triMat('stone_blocks', { scale: 3, color: 0xe2d8c8 });
+  const plaster = new THREE.MeshStandardMaterial({ color: 0xf3ead8, roughness: .9 }), bronze = K.bronze, verm = K.redL;
+  const lamp = K.lamp, neon = K.bronze, MG = new Map(), put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); }, plants = [];
+  const add = (geo, m, x, y, z, solid) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; g.add(o);
     if (solid) { geo.computeBoundingBox(); const b = geo.boundingBox; O.boxes.push({ minx: x + b.min.x, maxx: x + b.max.x, miny: y + b.min.y, maxy: y + b.max.y, minz: z + b.min.z, maxz: z + b.max.z }); } return o; };
   // the GROUND HALL: breakable walls, a door on the courtyard side (+x) where the lift comes down
   { const t = .35, wall = (x, z, L, yaw) => O.walls.push(cwallBuild(g, T, x, z, L, t, yaw, 3.4, O)), dw = 1.8, sd = (hs * 2 - dw) / 2;
@@ -22197,11 +22199,11 @@ function adockBuild() {
   for (let k = 1; k <= 3; k++) { const z = a0 + k * A.arm / 4; const st = add(new THREE.BoxGeometry(.2, 4, .2), wood, cx, H - 2.3, z - 1.4, 0); st.rotation.x = .6; }     // diagonal struts under it
   // THE AIRSHIP: a gondola deck level with the arm's end (walk on), a cabin, ropes up to the balloon, fins and a propeller
   const ship = new THREE.Group(); ship.position.set(cx, H, a1 + 4.2); g.add(ship);
-  { const sb = (geo, m, x, y, z) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; ship.add(o); return o; };
-    sb(new THREE.BoxGeometry(4, .35, 8.4), plank, 0, -.175, 0); sb(new THREE.BoxGeometry(4.2, .9, 8.6), new THREE.MeshStandardMaterial({ color: 0x5a3a28, roughness: .8 }), 0, -.8, 0);
+  { const sb = (geo, m, x, y, z) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; ship.add(o); return o; };
+    sb(new THREE.BoxGeometry(4, .35, 8.4), plank, 0, -.175, 0); sb(new THREE.BoxGeometry(4.2, .9, 8.6), triMat('wood_planks', { scale: 1.6, color: 0x8a5a44 }), 0, -.8, 0);
     for (const sx of [-1, 1]) sb(new THREE.BoxGeometry(.12, .6, 8.4), wood, sx * 2, .3, 0);
-    sb(new THREE.BoxGeometry(2.6, 2.2, 2.8), plaster, 0, 1.1, 2); sb(new THREE.BoxGeometry(3, .2, 3.2), verm, 0, 2.3, 2); sb(new THREE.BoxGeometry(2.62, .05, .04), neon, 0, 1.5, .58);
-    const hull = sb(new THREE.SphereGeometry(1, 28, 18), new THREE.MeshStandardMaterial({ color: 0xd8d2c4, roughness: .7 }), 0, 8.2, 0); hull.scale.set(4.6, 4, 9.5);
+    sb(new THREE.BoxGeometry(2.6, 2.2, 2.8), plaster, 0, 1.1, 2); sb(new THREE.BoxGeometry(3, .2, 3.2), verm, 0, 2.3, 2); sb(new THREE.BoxGeometry(2.62, .08, .06), neon, 0, 1.5, .58); sb(new THREE.BoxGeometry(2.8, .14, 3), wood, 0, 2.2, 2);
+    const hull = sb(new THREE.SphereGeometry(1, 28, 18), K.cloth, 0, 8.2, 0); hull.scale.set(4.6, 4, 9.5); hull.material = new THREE.MeshStandardMaterial({ color: 0xf0e2c8, roughness: .8 });
     for (const zz of [-5, 0, 5]) sb(new THREE.TorusGeometry(1, .05, 6, 28), bronze, 0, 8.2, zz).scale.set(4.65 * Math.sqrt(1 - (zz / 9.5) ** 2), 4.05 * Math.sqrt(1 - (zz / 9.5) ** 2), 1);
     for (const [fx, fy, rz] of [[0, 3.6, 0], [0, -3.6, 0], [3.4, 0, Math.PI / 2], [-3.4, 0, Math.PI / 2]]) { const f = sb(new THREE.BoxGeometry(.12, 2.6, 3), verm, fx, 8.2 + fy, -8.6); f.rotation.z = rz; }
     for (const [x, z] of [[-1.9, -4], [1.9, -4], [-1.9, 4], [1.9, 4]]) { const r = sb(new THREE.CylinderGeometry(.025, .025, 5.2, 4), wood, x * 1.15, 3, z * 1.1); r.rotation.z = x > 0 ? -.2 : .2; }
@@ -22239,7 +22241,7 @@ function adockBuild() {
   const stur = turretAt(0, 0, 0, Math.PI); { const k = BOXES.indexOf(stur.box); if (k >= 0) BOXES.splice(k, 1); } boxGrid();
   const sock = new THREE.Mesh(new THREE.ConeGeometry(.3, 1.6, 10, 1, true), new THREE.MeshStandardMaterial({ color: 0xff5a1a, roughness: .8, side: THREE.DoubleSide })); sock.position.set(cx - 2, H + 6.2, cz - 2); g.add(sock);
   // ---- PASS 5 (m1220): the KITE RACK on the deck rail (three red tako-kites), and the kite that flies over him (see `adockKite`) ----
-  let kite; { const rk = new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .7, side: THREE.DoubleSide }), mon = new THREE.MeshBasicMaterial({ color: 0x7ff0ff, side: THREE.DoubleSide, toneMapped: false }), bam = new THREE.MeshStandardMaterial({ color: 0x8a6a3a, roughness: .8 });
+  let kite; { const rk = new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .7, side: THREE.DoubleSide }), mon = new THREE.MeshBasicMaterial({ color: 0x7affd8, side: THREE.DoubleSide, toneMapped: false }), bam = new THREE.MeshStandardMaterial({ color: 0x8a6a3a, roughness: .8 });
     const mk = () => { const k = new THREE.Group(), sail = new THREE.Group(); k.add(sail); const sh = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.6), rk); sh.rotation.z = Math.PI / 4; sail.add(sh); const e = new THREE.Mesh(new THREE.CircleGeometry(.35, 16), mon); e.position.z = .01; sail.add(e);
       for (const r of [0, Math.PI / 2]) { const sp = new THREE.Mesh(new THREE.CylinderGeometry(.02, .02, 2.2, 4), bam); sp.rotation.z = r; sail.add(sp); } sail.rotation.x = -.5; return k; };
     for (let k = 0; k < 3; k++) { const r = mk(); r.position.set(cx - A.deck + .3, A.H + 1, cz - 1.5 + k * 1.5); r.rotation.y = Math.PI / 2; r.scale.setScalar(.7); g.add(r); }
@@ -22253,7 +22255,16 @@ function adockBuild() {
     sb(new THREE.SphereGeometry(1, 14, 10), bagM, 0, 3.4, -.2).scale.set(1.1, .9, 2.2); sb(new THREE.BoxGeometry(.6, .5, .05), verm, 1.05, 3.4, -.2);     // a red patch
     sb(new THREE.BoxGeometry(1.7, .06, .06), neon, 0, .28, 1.7); const pr = sb(new THREE.BoxGeometry(.12, 1.1, .05), bronze, 0, .1, -1.95);
     sky = { g: sg, prop: pr, s: 'off', hp: A.sky.hp, T: null, a: 0, x: 0, y: 0, z: 0, h: 0, vy: 0, t: 0, cd: 0, flash: 0 }; }
-  ADOCK.on = { g, O, bars: [], rings, shipRings, drone, dbell, stur, sock, lift, kite, sky, kArm: 0, kOn: 0, lbox, ly: 0, ls: 'bottom', lt: A.lift.wait, ship, t: 0, deckB, cabB, home: [sp.x, sp.y, sp.z], ss: 'docked', st: A.fly.wait, sh: 0 }; shipPose(ADOCK.on, sp.x, sp.y, sp.z, 0);
+  // m@X4@: BUNTING from the mast's head to the deck's four corners, lanterns on the arm's rail posts, PLANTS round the foot (clear of the lift)
+  for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) korBunting(put, K, [cx - 2, H + 5.6, cz - 2], [cx + sx * (D - .2), H + .9, cz + sz * (D - .2)], 9, .5);
+  for (let k = 1; k <= 3; k++) for (const sx of [-1, 1]) korLantern(put, K, cx + sx * aw, H + .85, a0 + k * A.arm / 4, .6);
+  { let sd = 7; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+    for (let i = 0; i < 40; i++) { const an = rnd() * 6.28, rr = hs + 2.5 + rnd() * 6, x = cx + Math.cos(an) * rr, z = cz + Math.sin(an) * rr; if (x > cx + 3 && Math.abs(z - cz) < 3) continue;
+      plantPlant(plants, ['grass', 'fern', 'stones', 'flowers', 'tallgrass', 'boulder'][i % 6], x, 0, z, .8 + rnd() * .6, an); }
+    plantPlant(plants, 'pine', cx - 10, 0, cz - 8, 1.5, 1); plantPlant(plants, 'cherry', cx - 11, 0, cz + 7, 1.4, 2); plantPlant(plants, 'pine', cx + 4, 0, cz - 12, 1.3, 3); }
+  for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list.map(q => { const n = q.index ? q.toNonIndexed() : q; for (const a2 of Object.keys(n.attributes)) if (a2 !== 'position' && a2 !== 'normal') n.deleteAttribute(a2); if (!n.attributes.normal) n.computeVertexNormals(); return n; })), m); o.castShadow = o.receiveShadow = true; g.add(o); }
+  bldMergeStatic(g); bldMergeStatic(ship); const plantMs = plantFlush(g, plants);
+  ADOCK.on = { plantMs, g, O, bars: [], rings, shipRings, drone, dbell, stur, sock, lift, kite, sky, kArm: 0, kOn: 0, lbox, ly: 0, ls: 'bottom', lt: A.lift.wait, ship, t: 0, deckB, cabB, home: [sp.x, sp.y, sp.z], ss: 'docked', st: A.fly.wait, sh: 0 }; shipPose(ADOCK.on, sp.x, sp.y, sp.z, 0);
   arenaBeam(cx, cz, [.6, .8, 1], 1); snd('clang', { g: .7, r: .55 });
 }
 // m1220 (pass 5): THE JIN KITES -- a rack of red tako-kites on the deck's rail. Step off the deck (from up there) and a kite opens over him:
@@ -22329,7 +22340,7 @@ function adockSkyHit(x, y, z, rad) { const D = ADOCK.on, K = D && D.sky; if (!K 
 function shipPose(D, x, y, z, h) { const S = D.ship; S.position.set(x, y, z); S.rotation.y = h; const c = Math.cos(h), s = Math.sin(h);
   for (const b of [D.deckB, D.cabB]) { b.cs = c; b.sn = -s; b.cx = x + b.lz * s; b.cz = z + b.lz * c; const ex = Math.abs(c) * b.hx + Math.abs(s) * b.hz, ez = Math.abs(s) * b.hx + Math.abs(c) * b.hz;
     b.minx = b.cx - ex; b.maxx = b.cx + ex; b.minz = b.cz - ez; b.maxz = b.cz + ez; b.miny = y + b.y0; b.maxy = y + b.y1; } }
-function adockClear() { const D = ADOCK.on; if (!D) return; if (D.kite) D.kite.removeFromParent(); if (D.sky && D.sky.T) turretDrop(D.sky.T); if (D.stur) turretDrop(D.stur); const i = BOXES.indexOf(D.lbox); if (i >= 0) BOXES.splice(i, 1); for (const b of [D.deckB, D.cabB]) { const j = BDYN.indexOf(b); if (j >= 0) BDYN.splice(j, 1); } bldClear(D); ADOCK.on = null; boxGrid(); }
+function adockClear() { const D = ADOCK.on; if (!D) return; if (D.plantMs) plantDrop(D.plantMs); if (D.kite) D.kite.removeFromParent(); if (D.sky && D.sky.T) turretDrop(D.sky.T); if (D.stur) turretDrop(D.stur); const i = BOXES.indexOf(D.lbox); if (i >= 0) BOXES.splice(i, 1); for (const b of [D.deckB, D.cabB]) { const j = BDYN.indexOf(b); if (j >= 0) BDYN.splice(j, 1); } bldClear(D); ADOCK.on = null; boxGrid(); }
 // m1149: THE ZEPPELINS (BUILDINGS.md #9, pass 1). Two zeppelins drift endless loops over the forge, never docking: each a long cigar hull
 // with bronze hoops and fins, a red-lacquered GONDOLA hung under it with a little pagoda roof -- its deck is a turned dynamic box (`BDYN`,
 // m1147's way) that CARRIES whoever lands on it -- and two GRAPPLE RINGS under the gondola that ride along (m1148's way). The first loops

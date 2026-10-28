@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the AIRSHIP DOCK, pass 1 (a HERO flyer: the look)
+**Moves:** its pass-1 row. It is on the HERO list as a FLYER (it may fly; the airship already does).
+- Kit materials: `K.timber`, a warm planks triMat, a `stone_blocks` footing, `K.bronze` (the neon trims too), `K.redL`, `K.lamp`; the 20 m
+  shaft is warm plain plaster.
+- The airship: a cream balloon (its three bronze bands kept), red fins, a dark planks triMat gondola hull, a timber cornice on the cabin; the
+  ship's static meshes merge INTO the ship group (`bldMergeStatic(ship)`), so it still flies as one.
+- The Jin kites' eyes are Jinra mint. Bunting from the mooring mast's head to the deck's four corners; `korLantern`s on the arm's rail;
+  grass, ferns, stones, flowers, tall grass and boulders in a ring round the foot (clear of the lift on +x), two pines and a cherry. `plantDrop` on clear.
+- Untouched: the sky-pirate skiff (an enemy raider), the lift and its rails, the turret, the dispatch bell.
+Render-checked headless (top, foot). 112 meshes. Shipped unverified.
+
 ## m1561 -- THE RE-PASS: the RAMPART WALL, pass 3 (silhouette, L3; its third pass, so the loop moves on)
 **Moves:** detail and verticality. The flat wall got a classical silhouette over its gate.
 - **THE GATE GALLERY** (ENEMY_STYLE's "black gate tower ... a gallery on top"): four solid lacquer posts on the walk over the gateway, gold
