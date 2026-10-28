@@ -45,7 +45,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 | building | p1 | p2 | p3 | his OK |
 |---|---|---|---|---|
 | Dojo Hall |  |  |  |  |
-| Watchtower | m@X4@ hero kit: tent-cone crown, box lanterns, bunting, wheel winch, plants, a low bar; ~180 -> 87 draws |  |  |  |
+| Watchtower | m1487 hero kit: tent-cone crown, box lanterns, bunting, wheel winch, plants, a low bar; ~180 -> 87 draws |  |  |  |
 | Gatehouse |  |  |  |  |
 | Pagoda |  |  |  |  |
 | Great Red Pagoda |  |  |  |  |
