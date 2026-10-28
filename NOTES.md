@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the AIRSHIP DOCK, pass 3 (verticality, L1; its third pass, so the loop moves on)
+**Moves:** verticality (rubric 2: "how do you get UP" had one answer, the lift). Now there is a climb.
+- **THE CLIMB** up the shaft's WEST face (the lift is on the east): ladder 1 from the ground to a railed balcony at 7.6 m, ladder 2 from that
+  to a second balcony at 13.6 m on the other side of the face, and ladder 3 from the upper balcony's outer edge (outside the deck's
+  overhang) to the deck. Ladders are `kitClimbAdd`, each with its exit `mark` on the landing it serves; balconies are solid, with rails, two
+  props each, a `korLantern` and a doubloon. Ladder 3 is an `up` climb (dead while fallen, when there is no deck); 1 and 2 always work.
+- A doubloon on the mast head beside its grapple ring (L3, `up`). Tiled PENT ROOFS (`roof_tiles`) over the ground hall on its two long faces,
+  with timber fascias.
+- `adockClear` removes the climbs and the doubloons.
+Render-checked headless (the west face). Not checked: the climb exits, whether each `mark` lands him cleanly on its balcony.
+Shipped unverified. **The Airship Dock's three passes are done; next in the table: Zeppelins.**
+
 ## m1565 -- THE RE-PASS: the AIRSHIP DOCK, pass 2 (rubric 7: RESTORES IN PLACE)
 **Moves:** its rubric-7 box. For a flyer, what comes back to life is the airship.
 - Base (stays): the ground hall's chunk walls, the shaft and its bands, the lift and its rails. Pieces: `deck` (slab, rails, lanterns, mast and
