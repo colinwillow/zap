@@ -10473,6 +10473,28 @@ function bldJinraMotes(x, z, r, dt) { if (AGE.st === 'fallen' || Math.random() >
 function korTentRuin(T, keep, seed = 3) { let sd = seed; const rnd = () => (sd = sd * 16807 % 2147483647) / 2147483647;
   for (const P of T.panels) { if (rnd() < keep) continue; const pos = P.m.geometry.attributes.position; for (let v = 0; v < P.cnt; v++) pos.setXYZ(P.start + v, T.x, T.y + T.h, T.z); pos.needsUpdate = true; P.dead = 1; } }
 function bldDoorsRuin(doors, which = 0) { const D = doors && doors[which]; if (!D) return; D.dead = 1; D.t2 = -1e9; D.vy = 0; D.vz = 0; D.pv.position.y = -.2; D.pv.rotation.x = 1.45; D.pv.position.z += .9; }
+// m1521: THE ENEMY KIT (ENEMY_STYLE.md, his style sheets): heavy, angular, monumental -- black lacquer, aged GOLD, pale sandstone, terracotta, dark
+// iron, and STOLEN Jinra (mint) as the one glow. Palette A is the working default and lives ONLY in `ENEMY.pal`, so his final pick is one line.
+const ENEMY = { pal: { lacquer: 0x1b1916, gold: 0xc99a3e, stone: 0xcdb48c, terra: 0xb07a52, iron: 0x2a2724, jin: 0x7affd8 }, m: null, emblem: null };
+function enemyEmblemTex() { if (ENEMY.emblem) return ENEMY.emblem; const S = 256, cv = document.createElement('canvas'); cv.width = cv.height = S; const c = cv.getContext('2d'), gold = '#' + ENEMY.pal.gold.toString(16).padStart(6, '0');
+  c.clearRect(0, 0, S, S); c.fillStyle = gold; c.strokeStyle = gold; c.lineJoin = 'miter';
+  c.beginPath(); c.moveTo(128, 8); c.lineTo(160, 96); c.lineTo(128, 248); c.lineTo(96, 96); c.closePath(); c.fill();     // the spear-blade
+  for (const sd of [-1, 1]) { c.beginPath(); c.moveTo(128 + sd * 24, 70); c.lineTo(128 + sd * 104, 24); c.lineTo(128 + sd * 70, 120); c.lineTo(128 + sd * 30, 150); c.closePath(); c.fill(); }     // the swept wing-blades
+  c.globalCompositeOperation = 'destination-out'; c.beginPath(); c.moveTo(128, 82); c.lineTo(146, 112); c.lineTo(128, 142); c.lineTo(110, 112); c.closePath(); c.fill(); c.globalCompositeOperation = 'source-over';     // the hollow heart
+  c.lineWidth = 6; c.beginPath(); c.moveTo(128, 70); c.lineTo(156, 112); c.lineTo(128, 156); c.lineTo(100, 112); c.closePath(); c.stroke();
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return (ENEMY.emblem = t); }
+function enemyMats() { if (ENEMY.m) return ENEMY.m; const P = ENEMY.pal, S = (c, r, x) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: r }, x || {}));
+  const cv = document.createElement('canvas'); cv.width = 128; cv.height = 256; const c = cv.getContext('2d'); c.fillStyle = '#' + P.lacquer.toString(16).padStart(6, '0'); c.fillRect(0, 0, 128, 256);
+  const gh = '#' + P.gold.toString(16).padStart(6, '0'); c.fillStyle = gh; c.fillRect(0, 0, 128, 8); c.fillRect(0, 0, 6, 256); c.fillRect(122, 0, 6, 256); c.drawImage(enemyEmblemTex().image, 24, 40, 80, 80);
+  const bt = new THREE.CanvasTexture(cv); bt.colorSpace = THREE.SRGBColorSpace;
+  return (ENEMY.m = { lacquer: S(P.lacquer, .45, { metalness: .1 }), gold: S(P.gold, .32, { metalness: .85 }), stone: triMat('sandstone', { scale: 3, color: P.stone }), terra: S(P.terra, .8),
+    iron: S(P.iron, .5, { metalness: .6 }), roof: triMat('roof_tiles', { scale: 2.2, color: 0x2a2826, side: THREE.DoubleSide }), jin: new THREE.MeshBasicMaterial({ color: P.jin, toneMapped: false }),
+    glass: S(P.jin, .2, { emissive: P.jin, emissiveIntensity: 1.3, transparent: true, opacity: .85 }), banner: S(0xffffff, .85, { map: bt, side: THREE.DoubleSide }) }); }
+// a tall black banner with the gold emblem, a ragged pointed hem, on a black crossbar with gold finials (yaw `ry`, `w` x `h` m, its top at y)
+function enemyBanner(put, M, x, y, z, ry, w = 1.2, h = 4) { const g = new THREE.PlaneGeometry(w, h, 2, 6), P = g.attributes.position;
+  for (let i = 0; i < P.count; i++) if (P.getY(i) < -h / 2 + .01) P.setY(i, P.getY(i) - (Math.abs(P.getX(i)) < .01 ? h * .12 : 0));     // the pointed hem
+  put(g.rotateY(ry).translate(x, y - h / 2, z), M.banner); put(new THREE.BoxGeometry(w * 1.25, .08, .08).rotateY(ry).translate(x, y + .04, z), M.lacquer);
+  for (const sd of [-1, 1]) put(new THREE.SphereGeometry(.07, 8, 6).translate(x + Math.cos(ry) * sd * w * .66, y + .04, z - Math.sin(ry) * sd * w * .66), M.gold); }
 function korMats() { if (KOR.m) return KOR.m; const S = (c, r, x) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: r }, x || {}));
   return (KOR.m = { cream: triMat('sandstone', { scale: 3.2 }), timber: triMat('wood_timber', { scale: 1.6, color: 0x8a6a52 }), iron: S(0x2a2522, .55, { metalness: .5 }), bronze: triMat('bronze', { scale: 1.2, metal: .75, rough: .35 }),
     red: triMat('red_cloth', { scale: 2.4, side: THREE.DoubleSide }), cloth: S(0xeadcc4, .85, { side: THREE.DoubleSide }), redL: S(0xa8201a, .45), lamp: S(0xffc070, .6, { emissive: 0xff9028, emissiveIntensity: 1.5 }),

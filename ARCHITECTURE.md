@@ -54,6 +54,7 @@ The factions in KORAJIN.md are a natural split. **These are proposals; the taste
 | **The Red Order** (discipline, ritual; Grumbo's origin) | the HERO kit made severe: lacquered black and deep red, symmetry, fewer domes and more terraces, gold trim |
 
 ## ENEMY BUILDINGS: CLASSICAL JAPANESE, EMBELLISHED, IN THE ENEMY'S PALETTE -- AND BREAKABLE (his, Oct 28 2026)
+**THE GUIDE IS `ENEMY_STYLE.md`** (his style sheets, the palette, the emblem, the kit, the five buildings; code `enemyMats()` / `enemyBanner()` / `ENEMY.pal`).
 The forge's ORIGINAL classical Japanese buildings are the enemy's base look (*"probably almost better, we should've just embellished it"*), NOT
 the hero kit. They get an enemy palette (black with a yellow or gold emblem, maybe green: undecided), stolen Jinra burning in their braziers,
 and they are DESTRUCTIBLE. No FALLEN/RESTORED, no floating. Torn down, they make way for our SACRED buildings.
