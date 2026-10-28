@@ -20,5 +20,5 @@
        mark is wanted at all), and the mark must draw BEHIND him (he is drawn over it when it is behind him).
 10. [x] (m1679) **The katana high jump (charge up, then the stick to the bottom):** no ARC preview (a lean back or nothing). The jump itself is one smooth
        parabola (it rises, then moves forward, then swings, then drops), and the strike lands WITH him on the ground, not 3 m up.
-11. [ ] **The dragon's wings are his ARMS (a wyvern):** in his own up-and-flap clip the ARMS beat and the wings follow; ours holds the arms still
+11. [x] (m15xx; dive sweep / bank tuck to redo on the arms) **The dragon's wings are his ARMS (a wyvern):** in his own up-and-flap clip the ARMS beat and the wings follow; ours holds the arms still
        and flaps only the fingers. Drive the arms (from that clip's flap, looped). And in the air his LEGS stand: sweep them back.

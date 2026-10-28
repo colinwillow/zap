@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- THE DRAGON FLAPS WITH HIS ARMS (a wyvern), and his legs sweep back in flight (DOCKET 11)
+His: *"in the sequence where he jumps up and flaps, he relies on his ARMS to flap the wings -- with our edit the arms are stationary, as though
+he's standing, and the wings flap without them. It's basically a wyvern. And in the air his legs look like he's standing rather than back."*
+- **Measured in `attack_air`:** his upper arm is held up ~+70 deg (.33-.73 s), DOWNSTROKES to -50 deg by .85 s, and is back up ~+75 by 1.4 s.
+  One beat = `flapCut` [.70, 1.40].
+- **`wing_flap`:** every bone of both arms and everything hanging off them (the wings) is sampled at 30 fps over that beat, the last
+  `flapBlend` .14 s crossfaded into the first so it LOOPS. It plays whenever he is up (at the flight weight), faster on a tapped beat
+  (`flapRateBeat` 1.7). The body clips (the lightning dragon's) keep the spine, neck and legs. The code fan (`dragWings`) steps aside
+  while it plays.
+- **Legs:** the legs-back fast pose is now .7 of any real flight from the stall up (it waited for 60% of cruise, so a fresh take-off at
+  8 m/s hung his legs).
+- Rendered: four moments of the beat side-on (wings raised, the downstroke); the legs swept back.
+- Lost with the code fan: the dive's sweep and the bank's tuck (to come back as offsets on the arms).
+
 ## m1679 -- THE KATANA'S CHARGE: one mark, drawn behind him; and the HIGH LEAP is one parabola that strikes as he lands (DOCKET 9, 10)
 His: *"the plain square one and the new one on top of it -- I don't like the square; and it's overlaid over the character even though it's
 behind him"*; *"I don't want it to show the arc... he jumps up, then moves forward, then swings down, then comes down -- it should be one
