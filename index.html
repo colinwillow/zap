@@ -13769,6 +13769,49 @@ function osariVanish(d) { const P = d.root.position; HORDE.stat.kills++; bowDrop
 function osariStep(dt) { for (let i = OSARI.fades.length - 1; i >= 0; i--) { const F = OSARI.fades[i], u = (F.t += dt) / OSARI.fadeT;
     for (const m of F.mats) m.opacity = Math.max(0, 1 - u); F.d.root.scale.setScalar(F.s0 * (1 + .25 * Math.min(1, u))); F.d.root.position.y += dt * .6;
     if (u >= 1) { F.d.root.visible = false; OSARI.fades.splice(i, 1); setTimeout(() => bodyGone(F.d), 0); } } }
+// m15xx: THE OSARI SPIDER (his Tripo model; "I'm working on a four-legged spider... we're gonna need to hand-rig the spider"). RIGGED HERE, BY
+// SCRIPT (scratchpad spider/rig.py, Blender): Auto-Rig Pro is a humanoid rig, so the skeleton is placed from MEASURED geometry -- the four feet
+// at the corners (+/-.48, +/-.37 of a 1 m body), each leg rising from the body (+/-.2, +/-.2) to a knee .45 up -- root, body, head, fangs,
+// abdomen and per leg three bones and a tip; weights by distance to each bone segment, the nearest two blended over 3 cm (an armoured
+// spider: its plates move almost rigidly). No clips: it WALKS PROCEDURALLY. Each foot is PLANTED in the world; when its rest spot under
+// the moving body is `stride` away it steps there (and a little ahead), lifted on an arc over `stepT` s -- in DIAGONAL PAIRS (front-left
+// with back-right, then the other two), never both pairs at once. Each leg is solved every frame from rest: two bones onto the ankle
+// (the foot plus the last segment's length straight up), the knee bent up and out, the last segment aimed down at the foot. It walks at
+// you and stops `near` off. SPAWN > OSARI SPIDER. No hits, no death yet: this is the look of the walk.
+const SPIDER = { file: 'models/creatures/osari_spider.glb', w: 2.6, speed: 2.4, turn: 1.8, near: 3.2, stride: .42, stepT: .24, lift: .28, bob: .05, list: [], P: null };
+const _sdA = new THREE.Vector3(), _sdB = new THREE.Vector3();
+async function spiderLoad() { if (SPIDER.P) return SPIDER.P; const g = await loadGLB(SPIDER.file, 'loading the spider'); let w = 1;
+  g.scene.traverse(o => { if (o.isSkinnedMesh) { o.geometry.computeBoundingBox(); const b = o.geometry.boundingBox; w = b.max.x - b.min.x; } });
+  return (SPIDER.P = { proto: g.scene, scale: SPIDER.w / Math.max(.1, w) }); }
+async function spiderAdd() { try { const P = await spiderLoad(), p = player;
+    for (let k = 0; k < 2; k++) { const m = skeletonClone(P.proto); m.scale.setScalar(P.scale); const root = new THREE.Group(); root.add(m);
+      const a = Math.atan2(-p.pos.x, -p.pos.z) + (k ? .6 : -.6), x = p.pos.x + Math.sin(a) * 12, z = p.pos.z + Math.cos(a) * 12; root.position.set(x, groundAt(x, z, p.pos.y + 2, 3), z); root.rotation.y = Math.atan2(p.pos.x - x, p.pos.z - z);
+      m.traverse(o => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; } }); scene.add(root); root.updateMatrixWorld(true);
+      const bn = {}; m.traverse(o => { if (o.isBone) bn[o.name] = o; }); const rest = []; m.traverse(o => { if (o.isBone) rest.push([o, o.quaternion.clone()]); });
+      const legs = []; for (const L of ['FL', 'FR', 'BL', 'BR']) { const b1 = bn['leg_' + L + '_1'], b2 = bn['leg_' + L + '_2'], b3 = bn['leg_' + L + '_3'], tip = bn['leg_' + L + '_tip']; if (!b1 || !b2 || !b3 || !tip) continue;
+        const tw = tip.getWorldPosition(new THREE.Vector3()), restL = root.worldToLocal(tw.clone()), len3 = b3.getWorldPosition(new THREE.Vector3()).distanceTo(tw), out = new THREE.Vector3(L[1] === 'L' ? 1 : -1, 0, 0);
+        legs.push({ L, b1, b2, b3, tip, restL, len3, out, grp: L === 'FL' || L === 'BR' ? 0 : 1, foot: tw.clone(), from: tw.clone(), to: tw.clone(), t: -1 }); }
+      SPIDER.list.push({ root, m, bn, rest, legs, t: Math.random() * 3, y0: root.position.y }); }
+    snd('clang', { g: .5, r: .5 }); } catch (e) { console.error('[melee] spider', e); note('SPIDER FAILED ' + e.message); } }
+function spiderClear() { for (const S of SPIDER.list) S.root.removeFromParent(); SPIDER.list.length = 0; }
+function spiderStep(dt) { const p = player, Z = SPIDER;
+  for (const S of Z.list) { S.t += dt; const R = S.root, dx = p.pos.x - R.position.x, dz = p.pos.z - R.position.z, d = Math.hypot(dx, dz);
+    const want = Math.atan2(dx, dz); R.rotation.y += clamp(wrapAngle(want - R.rotation.y), -Z.turn * dt, Z.turn * dt);
+    const go = d > Z.near ? Z.speed * clamp(1 - Math.abs(wrapAngle(want - R.rotation.y)) / 1.6, .25, 1) : 0, fx = Math.sin(R.rotation.y), fz = Math.cos(R.rotation.y);
+    R.position.x += fx * go * dt; R.position.z += fz * go * dt; const gy = groundAt(R.position.x, R.position.z, R.position.y + 1.5, 1.5);
+    const stepping = S.legs.some(l => l.t >= 0); R.position.y = damp(R.position.y, gy + (stepping ? Z.bob : 0), .08, dt); R.updateMatrixWorld(true);
+    // the feet: a diagonal pair steps when one of them has fallen `stride` behind its rest spot, never while the other pair is in the air
+    const busy = [0, 1].map(g => S.legs.some(l => l.grp === g && l.t >= 0));
+    for (const l of S.legs) { const ideal = R.localToWorld(_sdA.copy(l.restL)); ideal.y = groundAt(ideal.x, ideal.z, ideal.y + 1, 1.5);
+      if (l.t < 0 && !busy[1 - l.grp] && l.foot.distanceTo(ideal) > Z.stride + (go > 0 ? 0 : .08)) { for (const m of S.legs) if (m.grp === l.grp && m.t < 0) { m.t = 0; m.from.copy(m.foot); } busy[l.grp] = true; }
+      if (l.t >= 0) { l.t += dt / Z.stepT; const tgt = R.localToWorld(_sdB.copy(l.restL)).addScaledVector(new THREE.Vector3(fx, 0, fz), go * Z.stepT * .6); tgt.y = groundAt(tgt.x, tgt.z, tgt.y + 1, 1.5);
+        const u = Math.min(1, l.t), e = u * u * (3 - 2 * u); l.foot.lerpVectors(l.from, tgt, e); l.foot.y += Math.sin(u * Math.PI) * Z.lift; if (u >= 1) { l.t = -1; l.foot.copy(tgt); snd('clang', { g: .12, r: 1.6 + Math.random() * .3, x: tgt.x, z: tgt.z }); } } }
+    // the pose: every bone back to rest, the body swayed, then each leg solved onto its foot
+    for (const [b, q] of S.rest) b.quaternion.copy(q);
+    const body = S.bn.body; if (body) body.rotation.z += Math.sin(S.t * 6) * .03 * (go > 0 ? 1 : .3);
+    R.updateMatrixWorld(true);
+    for (const l of S.legs) { const ank = _sdB.copy(l.foot); ank.y += l.len3; const out = l.out.clone().applyQuaternion(R.quaternion);
+      wrLimb(l.b1, l.b2, l.b3, ank, out.multiplyScalar(.6).add(new THREE.Vector3(0, 1, 0)), _sdA.copy(l.foot).sub(ank).normalize()); } } }
 function hordeDie(d) {
   const P = d.root.position; jinraBody(d, Math.round(JINRA.burst * .6));     /* m1500 */
   if (d.K.osari) { osariVanish(d); return; }
@@ -14013,6 +14056,7 @@ function arenaUi() {
       else if (a === 'beam') { ARENA.menu = ''; if (BEAM.list.length) beamClear(); else beamSpawn(); }     // m1037; m1072
       else if (a === 'horde') { hordeAdd(); }     // m1084
       else if (a === 'archers') { archerAdd(); }     // m1103
+      else if (a === 'spider') { ARENA.menu = ''; if (SPIDER.list.length) spiderClear(); else spiderAdd(); }     // m15xx
       else if (a === 'hall') { ARENA.menu = ''; if (HALL.on) hallClear(); else hallBuild(); }     // m1116
       else if (a === 'age') { AGE.st = AGE.st === 'fallen' ? 'restored' : 'fallen'; try { localStorage.setItem('mel.age', AGE.st); } catch (err) {} for (const E of BLDG.list) if (E.on()) { const rg = E.rig && E.rig(); if (rg) restorePlay(rg, AGE.st === 'fallen' ? 0 : 1); else { E.clear(); E.build(); } } if (inHome()) location.reload(); }     // m1501: FALLEN / RESTORED; a restorable building PLAYS it (m1512); the Red Hollows' pieces read it as they build: reload (Worker B)
       else if (a === 'bld') { ARENA.menu = ''; const E = BLDG.list.find(q => q.key === b.dataset.k); if (E) { if (E.on()) E.clear(); else E.build(); } }     // m1117
@@ -14089,7 +14133,7 @@ function arenaUi() {
   if (m === 'bld') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back') + B('age', 'STATE: ' + (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + '<small>tap to switch -- rebuilds what stands</small>', '', AGE.st === 'fallen' ? '' : 'ar-on');
     for (const E of BLDG.list) h += B('bld', E.t + '<small>' + (E.on() ? 'tap to remove' : E.pass >= 3 ? E.sub : 'IN PROGRESS · pass ' + E.pass + ' of 3') + '</small>', E.key, E.on() ? 'ar-on' : '');
     h += '</div>'; }
-  else if (m === 'top') h += '<div class="ar-menu">' + (inForge() ? B('cat', 'BUILDINGS &rsaquo;', 'bld') : '') + B('cat', 'WARBOSS &rsaquo;', 'boss') + B('cat', 'PEOPLE &rsaquo;', 'people') + B('cat', 'BEASTS &rsaquo;', 'beasts') + B('cat', 'RIVALS &rsaquo;', 'rival') + B('turret', 'TURRET<small>' + (TURRET.list.length ? 'tap to remove' : 'sentry gun') + '</small>', '', TURRET.list.length ? 'ar-on' : '') + B('hbar', 'HIGH BAR<small>' + (HBAR.list.length ? 'tap to remove' : 'swing on it') + '</small>', '', HBAR.list.length ? 'ar-on' : '') + B('beam', 'BALANCE BEAM<small>' + (BEAM.list.length ? 'tap to remove' : 'walk it') + '</small>', '', BEAM.list.length ? 'ar-on' : '') + B('wrun', 'WALL RUN<small>' + ((WRUN.boxes || []).length ? 'tap to remove' : 'run along it') + '</small>', '', (WRUN.boxes || []).length ? 'ar-on' : '') + B('course', 'ACROBATICS<small>' + (COURSE.on ? 'tap to remove' : 'the course') + '</small>', '', COURSE.on ? 'ar-on' : '') + B('slice', 'SLICE DUMMY<small>' + (LIMB.stat.cuts ? LIMB.stat.cuts + ' cut, ' + LIMB.stat.booms + ' blown' : 'cut him up') + '</small>') + B('horde', 'HORDE<small>' + (HORDE.busy ? 'loading...' : HORDE.list.length ? HORDE.list.length + ' left, ' + HORDE.stat.kills + ' down -- +' + HORDE.per : '+' + HORDE.per + (HORDE.slice ? ' (slice)' : ' samurai')) + '</small>', '', HORDE.list.length ? 'ar-on' : '') + B('hall', 'HALL<small>' + (HALL.on ? 'tap to remove' : 'the first building') + '</small>', '', HALL.on ? 'ar-on' : '') + B('archers', 'ARCHERS<small>' + (HORDE.busy ? 'loading...' : '+' + ARCH.per + ' red bowmen') + '</small>') + '<button class="ar-off">GRUNTS<small>soon</small></button><button class="ar-off">GREYS<small>soon</small></button></div>';
+  else if (m === 'top') h += '<div class="ar-menu">' + (inForge() ? B('cat', 'BUILDINGS &rsaquo;', 'bld') : '') + B('cat', 'WARBOSS &rsaquo;', 'boss') + B('cat', 'PEOPLE &rsaquo;', 'people') + B('cat', 'BEASTS &rsaquo;', 'beasts') + B('cat', 'RIVALS &rsaquo;', 'rival') + B('turret', 'TURRET<small>' + (TURRET.list.length ? 'tap to remove' : 'sentry gun') + '</small>', '', TURRET.list.length ? 'ar-on' : '') + B('hbar', 'HIGH BAR<small>' + (HBAR.list.length ? 'tap to remove' : 'swing on it') + '</small>', '', HBAR.list.length ? 'ar-on' : '') + B('beam', 'BALANCE BEAM<small>' + (BEAM.list.length ? 'tap to remove' : 'walk it') + '</small>', '', BEAM.list.length ? 'ar-on' : '') + B('wrun', 'WALL RUN<small>' + ((WRUN.boxes || []).length ? 'tap to remove' : 'run along it') + '</small>', '', (WRUN.boxes || []).length ? 'ar-on' : '') + B('course', 'ACROBATICS<small>' + (COURSE.on ? 'tap to remove' : 'the course') + '</small>', '', COURSE.on ? 'ar-on' : '') + B('slice', 'SLICE DUMMY<small>' + (LIMB.stat.cuts ? LIMB.stat.cuts + ' cut, ' + LIMB.stat.booms + ' blown' : 'cut him up') + '</small>') + B('horde', 'HORDE<small>' + (HORDE.busy ? 'loading...' : HORDE.list.length ? HORDE.list.length + ' left, ' + HORDE.stat.kills + ' down -- +' + HORDE.per : '+' + HORDE.per + (HORDE.slice ? ' (slice)' : ' samurai')) + '</small>', '', HORDE.list.length ? 'ar-on' : '') + B('hall', 'HALL<small>' + (HALL.on ? 'tap to remove' : 'the first building') + '</small>', '', HALL.on ? 'ar-on' : '') + B('archers', 'ARCHERS<small>' + (HORDE.busy ? 'loading...' : '+' + ARCH.per + (ARCH.body === 'OSARI_BOW' ? ' Osari bowmen' : ' red bowmen')) + '</small>') + B('spider', 'OSARI SPIDER<small>' + (SPIDER.list.length ? 'tap to remove' : 'the walker') + '</small>', '', SPIDER.list.length ? 'ar-on' : '') + '<button class="ar-off">GRUNTS<small>soon</small></button><button class="ar-off">GREYS<small>soon</small></button></div>';
   else if (m === 'boss' || m === 'people' || m === 'beasts' || m === 'rival') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back');
     for (const k in ARENA.kinds) { const A = ARENA.kinds[k]; if (!!A.creature !== (m === 'beasts')) continue; if (!!A.rival !== (m === 'rival')) continue; if (m !== 'beasts' && !A.both && !!A.civ !== (m === 'people')) continue; h += B('spawn', A.t + (A.sub ? '<small>' + A.sub + '</small>' : ''), k); } h += '</div>'; }
   U.innerHTML = h;
@@ -65033,6 +65077,7 @@ function stepDummies(dt) {
   }
   if (ARROWS.length) arrowStep(dt);
   if (OSARI.fades.length) osariStep(dt);     // m1675
+  if (SPIDER.list.length) spiderStep(dt);     // m15xx
 }
 
 // ============================================================================================

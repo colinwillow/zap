@@ -5,6 +5,25 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- THE OSARI SPIDER: rigged by script, walking procedurally (DOCKET 6)
+His Tripo zip (`models/creatures/osari_spider.zip`). Auto-Rig Pro's rig is humanoid, so the skeleton is placed from MEASURED geometry
+(scratchpad `spider/probe*.py`, `rig.py`):
+- **The mesh:** 14,807 verts, a 1 m body (x +/-.5, y +/-.41, z 0..0.65), the front at -Y (fangs low at y -.4), a tall dome on the back.
+  Four legs, each rising from the body at (+/-.2, +/-.2) to a knee ~.45 up and down to a foot at the corner (+/-.48, +/-.37).
+- **The rig:** root, body, head, fangs, abdomen; per leg (FL, FR, BL, BR) three bones and a `tip`. Weights by distance to each bone segment,
+  the nearest two blended over 3 cm (armoured plates move almost rigidly). Exported, then the 4K texture went to 2048 webp and draco
+  (`models/creatures/osari_spider.glb`, 635 KB).
+- **The walk (`SPIDER`, `spiderStep`):**
+  - no clips; each foot is PLANTED in the world
+  - when a foot's rest spot under the moving body is `stride` away, its DIAGONAL PAIR steps there (a little ahead), lifted on an arc over
+    `stepT` .24 s; the two pairs never step at once, and each foot lands with a light clank
+  - every frame the bones go back to rest; each leg is solved by two-bone IK onto the ankle (the foot + the last segment's length up), the
+    knee bent up and out, the last segment aimed down at the foot
+  - the body sways a little
+- **In the game:** it turns toward you and walks to `near` 3.2 m. SPAWN > OSARI SPIDER puts two in the arena (tap again to remove), 2.6 m wide.
+- Rendered: two walking at him, front and side, legs planted, no tearing seen. Measured: ~2.2 m/s, the pairs alternating (0110 / 1001).
+- **Not built:** hits and death (it is not a body in `DUMMIES` yet), an attack, climbing walls.
+
 ## m1675 -- THE OSARI DIE IN GREEN SMOKE, and their limbs always come off (DOCKET 7, part 1)
 His: *"you'll be able to chop off his limbs, and when you finally kill him he turns into green smoke -- he kind of explodes and evaporates."*
 - `osariVanish` (`OSARI`): a burst of green sparks and green Jinra smoke, a pop. The body swells a touch, rises, and its materials fade to
