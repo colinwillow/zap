@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the GATEHOUSE, pass 2 (DESTRUCTIBLE TO THE GROUND)
+ENEMY RULES: enemy places are for destroying. **Moves:** the Gatehouse's pass-2 row (breakable, alive).
+- The Watchtower's machinery, run backwards, but as FOUR rigs so the pieces fall one at a time: `restorePieces` files every static mesh into
+  `u0` / `u1` (each tower's upper storey), `deck` and `torii`; each key then gets its own `restoreRig` (lift 0) and `restoreRide` (its boxes,
+  the high bar on the deck, the grapple rings on the torii go dead when it falls).
+- **Supports (`G.sup`, `ghouseBreak` via `bldHit`):** the 8 upper corner posts (`postHp` 6 blows) and the 2 torii pillars (8). Cut 3 of a
+  tower's 4 posts and its upper storey tips outward onto the ground; with both towers down the deck crashes into the passage 0.7 s later,
+  killing the ballista for good, knocking the archers off, stopping the oil and dropping the portcullis flat (open passage). Cut either torii
+  pillar and the torii falls flat along the approach. The ground storeys were already chunk walls, so the rest breaks by hand.
+- The ground storeys are sandstone block now (`enemyWallTex`, a canvas texture `cwallBuild` can tile), not the hall's cream.
+- **Order matters:** `bldMergeStatic` runs AFTER the leftovers are sorted into pieces. Run first, it merged both sphinxes and the ramp into one
+  lump whose bounding box got filed under a falling piece, and the sphinxes fell with the towers.
+Render-checked headless: whole, one tower down, all down. Headless frames are slow, so the 1.8 s collapse took ~6 s there.
+**Still open:** no braziers yet; the Sky Bridge beam off the deck is left hanging when the deck falls; the alarm bell stops swinging once
+the deck is down. Shipped unverified.
+
 ## The merchant shop, pass 2 (Worker B): its revival, live, and a zipline down
 - **On the shared chunk rig** (`rsTag` in its `put`; `rsChunkRig` after its merge; `rsChunkSync(GMERCH)` from `homeStep`). Its chunks are by position (`A.chunkOf`: the butte, the ladders and the scaffold, all below the cap, stay put), with the two bone arches and their charms **forced** to their own chunks (`A.forceChunk`, which `rsTag` now honours), because an arch's middle lands among the shop.
 - **FALLEN**: the deck sags .9 and tilts; the ground floor slumps; the upper storey slides 3 m off sideways and rolls; arch A falls over to one side and arch B to the other; the red sail drops 8.6 m and drapes over the shop; the banner pole lies flat; the palm fans droop. **The show** (a mint plate on the deck by the back steps) rebuilds it deck first, arches, then the sail, then the pole. Rendered headless at t 0 / .5 / 1. The merchant is no longer `bldAge`-weathered; the rig owns its colour.
@@ -29,6 +45,7 @@ His (BUILDINGS.md THE DOJO, "later"): *"racks you take weapons from, targets tha
 - **The mill's chunks**: base, tower lower, tower upper, top (gallery and lantern), balcony 1, balcony 2, stair. The island, bridges, turrets and wall stairs stay put. **The wheel and the rotor** spin inside new holder groups (`wheelH`, `rotorH`) that the kit poses, because the kit writes a piece's quaternion and the spin would fight it.
 - **FALLEN**: the base settled; the upper tower snapped, toppling 6 m with a twist; the top crashed 12 m down beside it with its sails (the rotor fell 18 m); the balconies hang; the wheel is tilted and dry; no pour, no chute, no pool, no spray. **RESTORED**: the wheel and the sails start only once it is whole (t > .95), and **the water pours mint**: it runs on Jinra.
 - **The plate** is on the island at the stepping stones. Show: 8 s, from the bottom up. The mill is no longer `bldAge`-weathered; the rig owns its colour. Rendered headless at t 0 / .5 / 1.
+
 ## m1529 -- THE RE-PASS: the GATEHOUSE, pass 1 (an ENEMY gate: the look)
 The Gatehouse is on the ENEMY list, so it gets ENEMY_STYLE.md's "FORTIFIED GATE" and is never restored. **Moves:** its pass-1 row (the look).
 - Palette through `enemyMats()` only: black lacquer timber, upper storeys and torii; `E.iron` for the old black; a dark plank triMat for the
