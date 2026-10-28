@@ -10615,6 +10615,7 @@ function forgePeaks(g) {
 // MASTS (red chevron cloth that waves). On the diagonals, far out on floating rocks, four PAVILIONS with stacked roofs whose eaves turn up at the
 // corners. Small stone platforms drift round. Nothing in the middle (the cover walls are gone here; SPAWN still has everything).
 // `?arena=lab` brings the old stadium back. A boss enters by the BEAM here (the stadium's doors are not built).
+const DTRAIN = { rackR: 16.9, reach: 1.9, tgtR: 10, hp: 3, back: 3.2, cool: .32, k: 60, c: 7 };
 const DOJO = { gap: [0, 1, 23, 24], on: null,     /* m1401: `gap` = rim-wall boxes left out where the altar routes start (index of 48: 0 and 1 by the north altar, 23 and 24 by the south -- its route curves the other way) */
   sun: [-.45, .2, .87], cloudY: -46, altarR: 24, altarY: 7, mastR: 21, mastH: 22, pavR: 74, plat: 7, t: 0 };
 try { DOJO.want = !/[?&]arena=lab\b/.test(location.search); } catch (e) { DOJO.want = true; }
@@ -10869,6 +10870,7 @@ function dojoBuild(g, W) {
       for (let i = 0; i < ring; i++) { const a = i / ring * 6.283 + Rr() * .05, r = I.rimR(a) * (.9 + Rr() * .07); if (r < clr + .4) continue; const x = Math.cos(a) * r, z = Math.sin(a) * r, y = Y + I.topAt(x, z) - .2, q = Rr();
         plantPlant(rec, q < .55 ? 'grass' : q < .7 ? 'tallgrass' : q < .82 ? 'frond' : q < .92 ? 'stones' : 'boulder', X + x, y - (q >= .92 ? .3 : 0), Z + z, q < .82 ? 1.6 + Rr() * .9 : .6 + Rr() * .9, Rr() * 6.28); } }
     D.plantMeshes = plantFlush(g, rec); }
+  dojoTrain(D, g, put, M, W, at);     /* m15xx: the racks and the targets (their static parts go in this merge) */
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o !== null; o.receiveShadow = true; g.add(o); }
   // THE DRIFTING PLATFORMS: small stone discs on rock roots, slowly bobbing and circling outside the rim (decor for now)
   D.plats = [];
@@ -11064,6 +11066,75 @@ function dojoBuild(g, W) {
     D.dragon = { body, mane, H, legs, tuft, N, gap: .17, m4: new THREE.Matrix4(), q: new THREE.Quaternion(), v: new THREE.Vector3(), v2: new THREE.Vector3(), v3: new THREE.Vector3(), up: new THREE.Vector3(0, 1, 0), sc: new THREE.Vector3(), M: new THREE.Matrix4() }; }
   D.on = { g }; }     /* m1429: the entry is his TOOLS > ENTRY again -- DOORS (the default) = through the gates */
 let _dcM = null;
+// m15xx: THE TRAINING DOJO (pass 19, his: *"racks you take weapons from, targets that pop up"*). Two WEAPON RACKS on the dais E and W, against the
+// rail and outside the fighting floor: walk up to one and you take what is on it (the weapon leaves the pegs while you hold it); walk up to it holding
+// that weapon and you put it back (E: the SWORD, W: the GUN -- his kit). Four STRAW TARGETS (makiwara) rise out of bronze hatches in the floor: three blows and one sinks in a puff of
+// straw, then pops back up; drop all four together and a gold doubloon rises at the centre. When a fight is on they all SINK, so the floor is clear.
+function dojoStrawTex() {     // straw: fine vertical stalks in a few golds, a darker stalk here and there, one canvas
+  const cv = document.createElement('canvas'); cv.width = 128; cv.height = 128; const c = cv.getContext('2d'); c.fillStyle = '#c99a4e'; c.fillRect(0, 0, 128, 128);
+  for (let i = 0; i < 260; i++) { const x = Math.random() * 128, w = .6 + Math.random() * 1.6, l = 40 + Math.random() * 90, y = Math.random() * 128, k = Math.random();
+    c.fillStyle = k < .15 ? '#8a6230' : k < .55 ? '#e3bf72' : k < .85 ? '#d4a95a' : '#f2d995'; c.fillRect(x, y, w, l); c.fillRect(x, y - 128, w, l); }
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(3, 1); return t; }
+function dojoTrain(D, g, put, M, W, at) {
+  const K = korMats(), mx = new THREE.Matrix4(), lp = (geo, m) => put(geo.applyMatrix4(mx), m);
+  const steel = new THREE.MeshStandardMaterial({ color: 0xdfe8f2, metalness: .9, roughness: .18, emissive: 0x3a5a7a, emissiveIntensity: .35 }), dark = new THREE.MeshStandardMaterial({ color: 0x241a16, roughness: .7 }),
+    wood = new THREE.MeshStandardMaterial({ color: 0x7a5232, roughness: .75 }), bronze = new THREE.MeshStandardMaterial({ color: 0xc08a3e, metalness: .8, roughness: .35 }),
+    alien = new THREE.MeshStandardMaterial({ color: 0x7c6cb0, metalness: .5, roughness: .4 }), tube = new THREE.MeshStandardMaterial({ color: 0x56625c, metalness: .55, roughness: .45 }),
+    jin = new THREE.MeshBasicMaterial({ color: JINHEX });
+  const box = (w, h, d, x, y, z, m, P) => { const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); b.position.set(x, y, z); P.add(b); return b; };
+  const rod = (r, L, x, y, z, m, P, r2) => { const c = new THREE.Mesh(new THREE.CylinderGeometry(r, r2 || r, L, 10).rotateZ(Math.PI / 2), m); c.position.set(x, y, z); P.add(c); return c; };
+  const SHOW = {     // what sits on the pegs, in the rack's frame (x across, y up, +z toward the floor)
+    katana: P => { box(1.25, .05, .025, .2, 0, 0, steel, P); box(.05, .17, .13, -.45, 0, 0, bronze, P); box(.4, .07, .06, -.68, 0, 0, dark, P); box(.04, .08, .07, -.9, 0, 0, bronze, P); },
+    hammer: P => { rod(.045, 1.4, 0, 0, 0, wood, P); box(.34, .44, .34, .62, 0, 0, dark, P); box(.36, .08, .36, .62, .12, 0, bronze, P); box(.36, .08, .36, .62, -.12, 0, bronze, P); },
+    blaster: P => { box(.72, .22, .16, 0, 0, 0, alien, P); rod(.05, .5, .58, .03, 0, steel, P); box(.1, .26, .1, -.18, -.2, 0, dark, P); box(.2, .05, .17, .1, .12, 0, jin, P); },
+    launcher: P => { rod(.13, 1.2, 0, 0, 0, tube, P); rod(.15, .08, .6, 0, 0, jin, P); rod(.15, .1, -.55, 0, 0, bronze, P); box(.1, .3, .1, -.1, -.24, 0, dark, P); box(.1, .3, .1, .2, -.24, 0, dark, P); } };
+  D.racks = [];
+  for (const [key, a] of [['katana', Math.PI / 2], ['launcher', -Math.PI / 2]]) {     /* his kit is HANDS / SWORD / GUN (KIT3); `SHOW` has the hammer and blaster if they come back */
+    const [x, z] = at(a, DTRAIN.rackR), [sx, sz] = at(a, DTRAIN.rackR - 1.25); mx.makeRotationY(a + Math.PI).setPosition(x, 0, z);
+    lp(new THREE.BoxGeometry(2.5, .26, .8).translate(0, .13, 0), M.stone);
+    for (const s of [-1, 1]) { lp(new THREE.BoxGeometry(.2, 2.5, .2).translate(s * 1.05, 1.5, 0), M.red); lp(new THREE.BoxGeometry(.28, .1, .28).translate(s * 1.05, .31, 0), M.gold); lp(new THREE.BoxGeometry(.3, .14, .32).rotateZ(-s * .35).translate(s * 1.5, 2.86, 0), M.timber); }
+    lp(new THREE.BoxGeometry(2.8, .18, .3).translate(0, 2.78, 0), M.timber); lp(new THREE.BoxGeometry(2.9, .05, .34).translate(0, 2.9, 0), M.gold);
+    lp(new THREE.BoxGeometry(1.9, 1.6, .06).translate(0, 1.6, -.12), M.red); lp(new THREE.BoxGeometry(2, .06, .1).translate(0, 2.43, -.1), M.gold); lp(new THREE.BoxGeometry(2, .06, .1).translate(0, .78, -.1), M.gold);
+    lp(new THREE.BoxGeometry(.34, .34, .04).rotateZ(Math.PI / 4).translate(0, 2.05, -.07), M.gold); lp(new THREE.BoxGeometry(.18, .18, .05).rotateZ(Math.PI / 4).translate(0, 2.05, -.05), M.red);
+    for (const s of [-1, 1]) for (const py of [1.3, .98]) lp(new THREE.CylinderGeometry(.035, .035, .34, 8).rotateX(Math.PI / 2).translate(s * .55, py, .08), M.gold);
+    lp(new THREE.CylinderGeometry(.04, .04, 1.8, 8).rotateZ(Math.PI / 2).translate(0, 1.06, .12), M.timber);     /* the practice staff on the lower pegs (it stays) */
+    korLantern(put, K, ...((u, h) => { const p = new THREE.Vector3(u, h, .25).applyMatrix4(mx); return [p.x, p.y, p.z]; })(0, 3.2), .7);
+    const show = new THREE.Group(); show.matrixAutoUpdate = false; const inner = new THREE.Group(); inner.position.set(0, 1.42, .12); show.add(inner); SHOW[key](inner);
+    show.matrix.copy(mx); show.traverse(o => { if (o.isMesh) o.castShadow = true; }); g.add(show);
+    D.racks.push({ key, x, z, sx, sz, m: show, armed: 1 }); }
+  // the targets: a bronze hatch flush with the floor, a timber post, a straw bundle with three red rope bands
+  const straw = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .95, map: dojoStrawTex() }), rope = new THREE.MeshStandardMaterial({ color: 0xa8201a, roughness: .7 });
+  const bandG = mergeGeometries([.82, 1.25, 1.68].map(y => new THREE.CylinderGeometry(.265, .265, .07, 14).translate(0, y, 0)));
+  D.tgts = []; D.tgtDown = 0;
+  for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2, [x, z] = at(a, DTRAIN.tgtR);
+    put(new THREE.CylinderGeometry(.58, .62, .05, 24).translate(x, .03, z), M.gold); put(new THREE.CylinderGeometry(.44, .44, .055, 24).translate(x, .035, z), M.dark);
+    const T = new THREE.Group(); T.position.set(x, 0, z);
+    T.add(new THREE.Mesh(new THREE.CylinderGeometry(.1, .12, 2, 8).translate(0, 1, 0), wood), new THREE.Mesh(new THREE.CylinderGeometry(.24, .26, 1, 12).translate(0, 1.25, 0), straw), new THREE.Mesh(bandG, rope),
+      new THREE.Mesh(new THREE.CylinderGeometry(.13, .1, .12, 8).translate(0, 2.04, 0), bronze));
+    T.traverse(o => { if (o.isMesh) o.castShadow = true; }); g.add(T);
+    D.tgts.push({ T, x, z, hp: DTRAIN.hp, up: 1, uv: 0, goal: 1, t: 0, tx: 0, tz: 0, vx: 0, vz: 0, cool: 0 }); } }
+function dojoTrainStep(D, dt) { const p = player;
+  for (const Rk of D.racks) { if (Rk.k === undefined) Rk.k = WEAP.slots.findIndex(q => q.key === Rk.key);
+    const has = Rk.k >= 0 && !!(GEAR.mask & (1 << Rk.k)), held = has && p.slot === Rk.k; Rk.m.visible = has && !held;
+    const d = Math.hypot(p.pos.x - Rk.sx, p.pos.z - Rk.sz), on = d < DTRAIN.reach && p.pos.y < 1.2;
+    if (on && Rk.armed && has && !p.swap) { Rk.armed = 0; swapGo(held ? 0 : Rk.k); snd('clang', { g: .4, r: 1.6, x: Rk.x, z: Rk.z }); spkBurst(Rk.x, 1.5, Rk.z, 10, { col: JIN.col, spread: 1.2, size: .14, life: .7 }); }
+    else if (!on && d > DTRAIN.reach + .8) Rk.armed = 1; }
+  const fight = ARENA.live.some(d => !d.ko && d.st !== 'beamOut'); let down = 0;
+  for (const T of D.tgts) { T.cool -= dt;
+    if (fight) { T.goal = 0; T.hp = DTRAIN.hp; T.t = 0; } else if (T.goal === 0) { T.t += dt; if (T.t > DTRAIN.back) { T.goal = 1; T.hp = DTRAIN.hp; snd('swoosh', { g: .35, r: 1.4, x: T.x, z: T.z }); spkBurst(T.x, .2, T.z, 10, { col: [.95, .8, .45], spread: 1, up: 2, size: .1, life: .6 }); } }
+    if (T.goal === 0) down++;
+    T.uv += ((T.goal - T.up) * DTRAIN.k - T.uv * DTRAIN.c) * dt; T.up += T.uv * dt; if (T.up < 0) { T.up = 0; T.uv = 0; }
+    T.vx += (-40 * T.tx - 4 * T.vx) * dt; T.vz += (-40 * T.tz - 4 * T.vz) * dt; T.tx += T.vx * dt; T.tz += T.vz * dt;
+    T.T.visible = T.up > .01; T.T.position.y = -2.15 * (1 - T.up); T.T.rotation.set(T.tz * .5, 0, -T.tx * .5); }
+  if (down === 4 && !D.tgtDown && !fight) { D.tgtDown = 1; if (D.on) coinDrop(D.on.g, 0, 1.2, 0); snd('ready', { g: .6 }); spkBurst(0, 1.2, 0, 24, { col: JIN.col, spread: 2.2, size: .2, life: 1.1 }); }
+  else if (down < 4 && D.tgtDown && D.tgts.every(T => T.goal === 1)) D.tgtDown = 0; }
+function dojoHit(x, y, z, rad) { const D = DOJO; if (!D.on || !D.tgts) return 0; let n = 0;
+  for (const T of D.tgts) { if (T.goal < 1 || T.up < .7 || T.cool > 0 || y < .3 || y > 2.2 || Math.hypot(T.x - x, T.z - z) > .3 + rad) continue;
+    let ux = T.x - player.pos.x, uz = T.z - player.pos.z; const L = Math.hypot(ux, uz) || 1; ux /= L; uz /= L;
+    T.vx += ux * 4.5; T.vz += uz * 4.5; T.cool = DTRAIN.cool; T.hp--; n++;
+    spkBurst(T.x, Math.max(.8, Math.min(1.7, y)), T.z, 14, { col: [.95, .8, .45], spread: 1.6, up: 1.2, size: .1, life: .7 }); snd('thud', { g: .55, r: 1.3, x: T.x, z: T.z });
+    if (T.hp <= 0) { T.goal = 0; T.t = 0; spkBurst(T.x, 1.3, T.z, 26, { col: [.95, .8, .45], spread: 2.6, up: 2, size: .13, life: 1 }); snd('crack', { g: .5, x: T.x, z: T.z }); } }
+  return n; }
 function dojoStep(dt) { const D = DOJO; if (!D.on) return; D.t += dt; D.U.uTime.value = D.t; D.dome.position.copy(camera.position);
   // m1401: OFF THE EDGE. The world has a floor at y 0 everywhere, so past the rim he would stand on the sky. Out there and down at y 0, he has
   // FALLEN: a gust of petals where he went, and he is put back on the floor at his pad, with a beam.
@@ -11081,6 +11152,7 @@ function dojoStep(dt) { const D = DOJO; if (!D.on) return; D.t += dt; D.U.uTime.
     A.vsw += (-9 * A.sw - 1.2 * A.vsw) * dt; A.sw += A.vsw * dt; A.ch.rotation.set(A.sw * .5, 0, Math.sin(D.t * .9 + A.x) * .04 + A.sw * .3);
     A.t += dt; const u = A.t / 1.4; if (u < 1) { A.ring.position.y = A.y + .1 + u * 3.2; A.ring.scale.setScalar(1 + u * .6); A.ring.material.opacity = (1 - u) * .9; } else A.ring.visible = false;
     const v = A.t / .55; if (v < 1) { const uu = -1.3 + 2.6 * v, vv = -.33, yy = A.y + .7 + 2 * .65 + .1; A.gl.position.set(A.x + A.ca * uu + A.sa * vv, yy, A.z - A.sa * uu + A.ca * vv); A.gl.material.opacity = Math.sin(v * Math.PI); A.gl.material.rotation = v * 2; } else A.gl.material.opacity = 0; }
+  if (D.racks) dojoTrainStep(D, dt);
   if (D.birds) dojoBirds(D, D.birds);
   if (D.beasts) { if (!D.beastsGo) { D.beastsGo = 1; for (const B of D.beasts) dojoBeast(D, B); } for (const B of D.beasts) if (B.mx) { B.mx.update(dt); B.t -= dt; if (B.t <= 0) dojoBeastIdle(B); } }
   if (D.dragon) dojoDragon(D, D.dragon);
@@ -41898,7 +41970,7 @@ function strikeSweep(dt, power, live, dmg, body) {
         // -- that is for the SOUND, and a swing through two crates should take out two.
         if (BRK.on && BREAK.length) brkBlast(_sw.x, _sw.y, _sw.z, rad, dmg || FOE.dmg.fist);
         if (PLANT.list.length) plantHit(_sw.x, _sw.y, _sw.z, rad);     /* m1424 */
-        if (inArena()) { vendHit(_sw.x, _sw.y, _sw.z, rad); turretMelee(_sw.x, _sw.y, _sw.z, rad, dmg); if (TURRET.shots.length) turretDeflect(_sw.x, _sw.y, _sw.z, rad); if (ARROWS.length) arrowDeflect(_sw.x, _sw.y, _sw.z, rad); }
+        if (inArena()) { vendHit(_sw.x, _sw.y, _sw.z, rad); if (DOJO.tgts) dojoHit(_sw.x, _sw.y, _sw.z, rad); turretMelee(_sw.x, _sw.y, _sw.z, rad, dmg); if (TURRET.shots.length) turretDeflect(_sw.x, _sw.y, _sw.z, rad); if (ARROWS.length) arrowDeflect(_sw.x, _sw.y, _sw.z, rad); }
         else if (inHome()) bldHit(_sw.x, _sw.y, _sw.z, rad, dmg);     /* m1403: the Red Hollows take blows too (Worker B: his home's door, bells, orb hook into bldHit) */     // m1016: walls are hit by `wallMelee`, once per strike     // m1011: and the turret; m1013: and its shots     // m950
         // AND THE SAME SWING REACHES A WALL CHUNK (m170). A hammer through a brick wall is
         // the whole reason his chunks carry an hp rather than a flag.
@@ -67624,7 +67696,7 @@ async function init() {
 
 // the console handle. Every tuning object is live, so a number can be moved on the phone
 // without a rebuild and without a push.
-window.melee = window.mel = { DOJO, RESTORE, restoreDemoBuild, restoreSet, restorePlay, JINRA, jinraEmit, COIN, coinDrop, GMERCH, GMILL, GPEAK, GJINRA, gjinraBuy, PLANT, plantLibBuild, plantHit, SNOWZ, snowStamp, GHOME, SHIMMY, VAIM, SHIPZ, shipBuild, FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, gaitMeasure, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
+window.melee = window.mel = { DOJO, DTRAIN, dojoHit, RESTORE, restoreDemoBuild, restoreSet, restorePlay, JINRA, jinraEmit, COIN, coinDrop, GMERCH, GMILL, GPEAK, GJINRA, gjinraBuy, PLANT, plantLibBuild, plantHit, SNOWZ, snowStamp, GHOME, SHIMMY, VAIM, SHIPZ, shipBuild, FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, gaitMeasure, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
   // PROGRESS (m276): `mel.SAVE` is the save; the setters write it through; `mel.progReset()` is a new game
   // TALK (m277): `mel.TALK` live; `mel.TALKS` the scripts by kind; `mel.talk` the state
   TALK, TALKS, talk,
