@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- THE CHARGE'S THREE RELEASES BY THE LEFT STICK; and the charge MEETS a locked arrow or rocket in the air (DOCKET 15, 16)
+## m1688 -- THE CHARGE'S THREE RELEASES BY THE LEFT STICK; and the charge MEETS a locked arrow or rocket in the air (DOCKET 15, 16)
 His: *"initiate with pull up on the right stick; if you're holding FORWARD on the left stick when you release, the forward slash charge attack;
 holding DOWN, the leap in the air and slam down; neither, the spin."* And: *"charge, an arrow or rocket shoots at you, the crosshair locks
 on it, release -- he should perfectly meet it where it flies and slash it, which sends it back at the shooter."*

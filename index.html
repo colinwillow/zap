@@ -29645,7 +29645,7 @@ function threatFind(h, cone, maxD, maxT) {
     const sc = d + off * 3; if (sc < bs) { bs = sc; best = T; } }
   return best;
 }
-// m15xx (his: "charge, an arrow or rocket shoots at you, the crosshair locks on it, release -- he should perfectly MEET it where it flies and slash
+// m1688 (his: "charge, an arrow or rocket shoots at you, the crosshair locks on it, release -- he should perfectly MEET it where it flies and slash
 // it, which sends it back at the shooter"). On the release with a projectile locked (`p.chLock`), its path is solved forward (an arrow drops at
 // .55 g, a turret shot flies straight) for the first moment `t` he can reach it -- horizontal speed no more than `INTER.v` -- and he LEAPS on a
 // ballistic arc that arrives at that point (his middle on it) at `t`, the katana's jump attack timed so its strike lands at `t`. While he flies
@@ -29777,11 +29777,11 @@ function chargeRelease() {
   const full = t0 >= MELEE.charge * .5;
   p.charge = 0; p.chargeT = 0;
   if (!full) return;                                   // a short hold is not a swing
-  if (slotNow().blade && p.chLock && threatAlive(p.chLock) && chargeIntercept(p.chLock)) return;     // m15xx: the lock is an ARROW or a ROCKET
+  if (slotNow().blade && p.chLock && threatAlive(p.chLock) && chargeIntercept(p.chLock)) return;     // m1688: the lock is an ARROW or a ROCKET
   // m1065: *"in cover with the katana, I charged and let go and it got stuck in the animation against the wall."* Cover owns the body and returns
   // before the release is ever stepped (m1009's swing bug, the charge's turn). With the blade in HALF cover the release is now the COVER LEAP;
   // with anything else (or full cover) he leaves cover first, so the release runs.
-  // m15xx (his: "if you are holding FORWARD on the left stick when you release, the forward slash; holding DOWN, the leap in the air and slam down;
+  // m1688 (his: "if you are holding FORWARD on the left stick when you release, the forward slash; holding DOWN, the leap in the air and slam down;
   // neither, the spin"): the LEFT stick at the release picks the move. Up the pad = forward, down the pad = the leap (at the right thumb's aimed
   // height if it was aimed, else `CHARGE3.leapK`), anything else = the spin. `CHARGE3.on` 0 is the old reading (right-thumb height, world dot)
   if (!p.wall && slotNow().blade && CHARGE3.on) { const L = stick.L, m = L.down ? Math.hypot(L.x, L.y) : 0, fwd = m > CHARGE3.dead && -L.y > Math.abs(L.x) * .8, back = m > CHARGE3.dead && L.y > Math.abs(L.x) * .8;
