@@ -64592,7 +64592,7 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 // to the shop front and to the round back door. Built in its OWN frame (local +z = the front, toward the river; `at`/`yaw` are HOME.hut's) and
 // merged per material; every collider a local box turned into the world (the yaw is a quarter turn, so a box stays a box); every walkable
 // surface a triangle. `?hut=glb` (or GHOME.on = 0) puts the GLB back, to compare. Pass 1: the massing and the walkable shell, with the inside.
-const GHOME = { on: 1, pass: 24, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
+const GHOME = { on: 1, pass: 25, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   Rtu: 2.5, door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
@@ -64696,7 +64696,7 @@ function ghomeSmoke(dt, t) { const S = GHOME.smoke; if (S && S.tops.length) { fo
     S.pts.geometry.attributes.position.needsUpdate = true; S.pts.material.size = 1.4; }
   for (const [L, k] of GHOME.lights || []) L.intensity = k * (.88 + .08 * Math.sin(t * 9.3 + k) + .04 * Math.sin(t * 23.7)); }
 function ghomeBuild(at, yaw, y0) {
-  const A = GHOME, g = new THREE.Group(); g.position.set(at[0], y0, at[1]); g.rotation.y = yaw; scene.add(g); A.g = g; A.bellPts = []; A.wins = []; A.sw = { z: 0, vz: 0, x: 0, vx: 0, hc: 0 }; A.bellT = 0;
+  const A = GHOME; A.at = at; const g = new THREE.Group(); g.position.set(at[0], y0, at[1]); g.rotation.y = yaw; scene.add(g); A.g = g; A.bellPts = []; A.wins = []; A.sw = { z: 0, vz: 0, x: 0, vx: 0, hc: 0 }; A.bellT = 0;
   const c = Math.round(Math.cos(yaw) * 1e6) / 1e6, s = Math.round(Math.sin(yaw) * 1e6) / 1e6, P = A.P;
   const Wx = (x, z) => at[0] + x * c + z * s, Wz = (x, z) => at[1] - x * s + z * c;
   // ---- the buckets: only position + normal (+ colour on the stone) survive, so every piece merges (mixed attribute sets merge to NULL) ----
@@ -64746,6 +64746,21 @@ function ghomeBuild(at, yaw, y0) {
   let rseed = 1; A.rockC = (x, z, k, rnd) => { const ry = rnd() * 6, main = ghRockGeo(rseed++, k * (1.2 + rnd() * .5), k * (.65 + rnd() * .4), k * (.9 + rnd() * .4)); put(main, rockM, at4(x, -.08 * k, z, ry, (rnd() - .5) * .2, (rnd() - .5) * .2));
     const m = 1 + ((rnd() * 3) | 0); for (let i = 0; i < m; i++) { const a = rnd() * 6, d = k * (.9 + rnd() * .5), kk = k * (.35 + rnd() * .3); put(ghRockGeo(rseed++, kk * (1 + rnd() * .5), kk * (.6 + rnd() * .5), kk), rockM, at4(x + Math.sin(a) * d, -.05 * kk, z + Math.cos(a) * d, rnd() * 6, (rnd() - .5) * .5, (rnd() - .5) * .5)); }
     for (let i = 0; i < 4; i++) { const a = rnd() * 6, d = k * (1.3 + rnd() * .9), kk = .1 + rnd() * .14; put(ghRockGeo(rseed++, kk * 1.3, kk * .7, kk, 1), rockM, at4(x + Math.sin(a) * d, 0, z + Math.cos(a) * d, rnd() * 6)); } };
+  // ---- PASS 25 (his ask: "path textures, trails"): the WORN PATHS -- from the shop steps to the pier and along the strip under the stalls,
+  // round both sides of the mound to the back door, out to the two cave mouths in the canyon walls, and up and down the bank. Each is a
+  // ribbon laid on the ground (`gH`), its own canvas of trodden sand (darker, packed, pebbled, footprints) fading to nothing at its edges:
+  // one draw. Defined up front (`A.paths`) so the rocks, the cacti, the shelves and the plants all keep off them ----
+  {     const bank = (x0, x1, off) => { const pts = []; for (let x = x0; Math.sign(x1 - x0) * (x1 - x) > 0; x += Math.sign(x1 - x0) * 2) { const zw = A.at[1] - x; pts.push([x, hwRc(zw) - A.at[0] - off]); } return pts; };
+    A.paths = [
+      { w: 1.5, pts: [[-12.4, 9.0], [-10.2, 8.5], [-5, 8.25], [0, 8.2], [5, 8.25], [10.2, 8.3], [13.2, 7.6], [16.6, 5.8]] },
+      { w: 1.3, pts: [[0, 7.9], [0, 8.9]] },
+      { w: 1.3, pts: [[16.6, 5.8], [18.6, 2.2], [17.6, -3.2], [13, -7.6], [6.5, -9.6], [1.2, -8.4], [0, -7.2]] },
+      { w: 1.3, pts: [[-12.4, 9.0], [-14.6, 5.2], [-13.6, -1], [-12, -6.6], [-6.5, -9.6], [-1.2, -8.4], [0, -7.2]] },
+      { w: 1.0, pts: [[6.5, -9.6], [12, -12.4], [19, -13.4], [25, -13.2]] },
+      { w: 1.0, pts: [[-6.5, -9.6], [-12, -12.6], [-18, -13.6], [-22, -13.2]] },
+      { w: 1.1, pts: [[-12.4, 9.0], ...bank(-17, -46, 6.6)] }, { w: 1.1, pts: [[16.6, 5.8], ...bank(20, 46, 6.6)] } ].filter(p => p.pts.length > 1);
+    A.pathPts = []; for (const p of A.paths) { const cv = new THREE.CatmullRomCurve3(p.pts.map(([x, z]) => new THREE.Vector3(x, 0, z))), n = Math.max(2, Math.ceil(cv.getLength() / .5)); p.cv = cv; p.n = n; for (let i = 0; i <= n; i++) { const q = cv.getPointAt(i / n); A.pathPts.push([q.x, q.z, p.w / 2]); } }
+    A.onPath = (x, z, r = 0) => A.pathPts.some(([px, pz, hw]) => (px - x) ** 2 + (pz - z) ** 2 < (hw + r) ** 2); }
   // ---- 1. THE MOUND: an oval plinth of stone (its top is the floor of every room), boulders round its foot ----
   { const prof = [[0, P], [.9, P], [.965, P - .1], [.995, P - .35], [1.03, .3], [1.06, -.4]].map(([r, y]) => new THREE.Vector2(r, y));
     put(new THREE.LatheGeometry(prof, 160), stoneM, at4(0, 0, 0, 0, 0, 0, A.rx, 1, A.rz));
@@ -64986,11 +65001,11 @@ function ghomeBuild(at, yaw, y0) {
     const pear = (x, y, z) => { for (let i = 0; i < 5; i++) { const a = rnd() * 6, t = rnd() * .8 - .4; put(new THREE.SphereGeometry(.22, 8, 6), i % 2 ? cact : cactD, at4(x + Math.sin(a) * .2, y + .25 + i * .12, z + Math.cos(a) * .2, a, t, 0, 1, 1.25, .35)); } };
     const agave = (x, y, z, red) => { for (let i = 0; i < 11; i++) { const a = i / 11 * Math.PI * 2 + rnd() * .3, tilt = .5 + rnd() * .5; put(new THREE.ConeGeometry(.07, .65, 4), red && i % 2 ? agR : cactD, _m4.compose(new THREE.Vector3(x + Math.sin(a) * .16, y + .25, z + Math.cos(a) * .16), _q.setFromEuler(_e.set(Math.cos(a) * tilt, 0, -Math.sin(a) * tilt)), _one)); } };
     for (let i = 0; i < 30; i++) { const a = rnd() * Math.PI * 2, rr = 1.12 + rnd() * .28, x = Math.sin(a) * A.rx * rr, z = Math.cos(a) * A.rz * rr;
-      if (z > A.rz * .7 && Math.abs(x) < 2.6) continue; if (x > 9 && z > 3.6 && z < 7.4) continue;     // the steps, the ramp
+      if (z > A.rz * .7 && Math.abs(x) < 2.6) continue; if (x > 9 && z > 3.6 && z < 7.4) continue; if (A.onPath(x, z, .5)) continue;     // the steps, the ramp, the paths
       const k = rnd(); if (k < .3) saguaro(x, z, 1.2 + rnd() * 1.4); else if (k < .6) pear(x, 0, z); else agave(x, 0, z, k > .82); }
     for (const [x, z] of [[-8, 6.6], [-3.6, 6.8], [3.4, 6.9], [8.6, 6.4]]) { pot(x, P, z, .32, .55, 2, clayD); agave(x, P + .5, z, x > 0); }
     for (let i = 0; i < 12; i++) { const a = rnd() * Math.PI * 2, rr = 1.2 + rnd() * .3, x = Math.sin(a) * A.rx * rr, z = Math.cos(a) * A.rz * rr; if (z > A.rz * .7 && Math.abs(x) < 3) continue; if (x > 9 && z > 3.6 && z < 7.4) continue;
-      const k = .6 + rnd() * 1.1; A.rockC(x, z, k, rnd); box(x - k * 1.1, x + k * 1.1, 0, k * .7, z - k * .9, z + k * .9); } }
+      const k = .6 + rnd() * 1.1; if (A.onPath(x, z, k * 1.6)) continue; A.rockC(x, z, k, rnd); box(x - k * 1.1, x + k * 1.1, 0, k * .7, z - k * .9, z + k * .9); } }
   // ---- PASS 7: timber BANDS where each wall meets its dome (iron studs round them), and red TASSELS with brass beads along the front beam ----
   { const brassT = bronzeT; const red = new THREE.MeshStandardMaterial({ color: 0xb02a22, roughness: .8 });
     for (const [x, z, R, y] of [[0, 0, A.R, P + A.Hw], [A.Wc[0], A.Wc[1], A.Rw, P + A.Hwg], [A.T[0], A.T[1], A.Rtu, P + A.Ht], [A.T[0], A.T[1], A.Rt, P + A.Yb - .3]]) {
@@ -65210,10 +65225,10 @@ function ghomeBuild(at, yaw, y0) {
     const reedM = new THREE.MeshStandardMaterial({ color: 0x6f7a3e, roughness: .9 }), brownM = new THREE.MeshStandardMaterial({ color: 0x5a3a22, roughness: .9 }), bulbM = new THREE.MeshStandardMaterial({ color: 0xc8a8ff, emissive: 0x7a52d8, emissiveIntensity: .9, roughness: .5 }), creamM = new THREE.MeshStandardMaterial({ color: 0xf1e6c4, roughness: .8 });
     straw.userData.sway = reedM.userData.sway = 1;     // pass 23: every blade carries its height (set before any is put, or the bucket will not merge)
     const free = (x, z) => { if (Math.abs(x) < 2.8 && z > 5) return false; if (x > 9 && x < 17 && z > 3.6 && z < 7.6) return false; if (z > 3 && z < 8 && Math.abs(x) < 10.2) return false; if (x < -8.4 && x > -11 && z > 8.6 && z < 10.4) return false;
-      const e = (x / A.rx) ** 2 + (z / A.rz) ** 2; return e > 1.15 && gH(x, z) > wY + .25; };
+      const e = (x / A.rx) ** 2 + (z / A.rz) ** 2; return e > 1.15 && gH(x, z) > wY + .25 && !A.onPath(x, z, .25); };
     // the SHELVES: wide, flat, stratified, sunk -- they make ground, not balls
     let sd = 900; const flat = (x, z, r) => { const y = gH(x, z); return [[r, 0], [-r, 0], [0, r], [0, -r]].every(([dx, dz]) => Math.abs(gH(x + dx, z + dz) - y) < .45); };     // a shelf on the wall's slope reads as a slab in the air
-    const shelf = (x, z, w, h, d, ry) => { if (!flat(x, z, Math.max(w, d))) return; const y = gH(x, z); put(ghRockGeo(sd++, w, h, d, 3), A.rockM, at4(x, y - h * .35, z, ry, (rnd() - .5) * .08, (rnd() - .5) * .08)); const c = Math.abs(Math.cos(ry)), s2 = Math.abs(Math.sin(ry)), ex = w * c + d * s2, ez = w * s2 + d * c; box(x - ex * .7, x + ex * .7, y - 1, y + h * .45, z - ez * .7, z + ez * .7); };
+    const shelf = (x, z, w, h, d, ry) => { if (!flat(x, z, Math.max(w, d)) || A.onPath(x, z, Math.max(w, d) * .8)) return; const y = gH(x, z); put(ghRockGeo(sd++, w, h, d, 3), A.rockM, at4(x, y - h * .35, z, ry, (rnd() - .5) * .08, (rnd() - .5) * .08)); const c = Math.abs(Math.cos(ry)), s2 = Math.abs(Math.sin(ry)), ex = w * c + d * s2, ez = w * s2 + d * c; box(x - ex * .7, x + ex * .7, y - 1, y + h * .45, z - ez * .7, z + ez * .7); };
     for (const [x, z, w, h, d, ry] of [[-16, -2, 4.2, 1.1, 2.6, .4], [-14, -9, 5.2, 1.5, 3, -.3], [15, -7, 4.6, 1.2, 2.4, .9], [-21, 5, 3.4, .8, 2.2, 1.3], [6, -11.5, 4.8, 1.0, 2.2, .1], [-6, -12, 3.6, .9, 2, -.6], [21, -1, 3, .7, 1.8, .5]]) if (gH(x, z) > wY + .3 && flat(x, z, Math.max(w, d))) { shelf(x, z, w, h, d, ry); for (let k = 0; k < 2; k++) { const a = rnd() * 6; shelf(x + Math.sin(a) * w * .8, z + Math.cos(a) * d * .8, w * .45, h * .6, d * .5, ry + rnd()); } }
     // the plants
     const bush = (seed, r) => { const gg = new THREE.IcosahedronGeometry(1, 1), q = gg.attributes.position; for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = q.getY(i), z = q.getZ(i), d = .78 + ghNoise3(x * 2.1 + seed, y * 2.1, z * 2.1 - seed) * .5; q.setXYZ(i, x * d * r, Math.max(-.35, y) * d * r * .85, z * d * r); } gg.computeVertexNormals(); return gg; };     // round and lumpy, faceted: a bush, not a pad
@@ -65245,6 +65260,22 @@ function ghomeBuild(at, yaw, y0) {
           const t = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 8, .012, 3).toNonIndexed(); t.deleteAttribute('uv'); tw.push(t); }
         const tm = new THREE.Mesh(mergeGeometries(tw), new THREE.MeshStandardMaterial({ color: 0x9a7a4a, roughness: 1 })); tm.castShadow = true; tm.visible = false; g.add(tm); GHOME.tumble = { m: tm, t: 6, on: 0, gH }; } }
     A.stat.plants = nP; A.stat.reeds = nR; }
+  // pass 25: the paths' ribbons -- their own canvas, laid on the ground a hair above it
+  { const gH = (x, z) => rwHeight(Wx(x, z), Wz(x, z)) - y0, cv = document.createElement('canvas'); cv.width = 128; cv.height = 512; const q = cv.getContext('2d'), R = rwRng(2525);
+    const im = q.createImageData(128, 512); for (let y = 0; y < 512; y++) for (let x = 0; x < 128; x++) { const u = x / 127, e = ghNoise3(y * .045, 3, 1) * .22 + ghNoise3(y * .21, 7, 2) * .08, d = Math.abs(u - .5) * 2, a = Math.max(0, Math.min(1, (1 - d - e * .9) * 2.6)), n = ghNoise3(x * .18, y * .18, 5), k = 4 * (y * 128 + x);
+      im.data[k] = 132 + n * 34; im.data[k + 1] = 88 + n * 26; im.data[k + 2] = 60 + n * 18; im.data[k + 3] = a * (150 + n * 60); }
+    q.putImageData(im, 0, 0); for (let i = 0; i < 160; i++) { const x = 18 + R() * 92, y = R() * 512, r = .8 + R() * 2.2; q.fillStyle = R() < .5 ? 'rgba(90,58,40,.7)' : 'rgba(205,170,130,.7)'; q.beginPath(); q.ellipse(x, y, r, r * .8, R() * 3, 0, 7); q.fill(); }
+    for (let y = 10; y < 512; y += 44) for (const sx of [-1, 1]) { const x = 64 + sx * 14 + (R() - .5) * 8, yy = y + (sx > 0 ? 22 : 0); q.fillStyle = 'rgba(80,50,32,.32)'; q.beginPath(); q.ellipse(x, yy, 5, 9, (R() - .5) * .4, 0, 7); q.fill(); q.beginPath(); q.ellipse(x, yy - 12, 4, 4, 0, 0, 7); q.fill(); }
+    const tex = new THREE.CanvasTexture(cv); tex.wrapT = THREE.RepeatWrapping; tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
+    const pm = new THREE.MeshStandardMaterial({ map: tex, transparent: true, depthWrite: false, roughness: 1, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+    const pos = [], uv = [], idx = []; let base = 0;
+    for (const p of A.paths) { const W = 3, L = p.cv.getLength(); for (let i = 0; i <= p.n; i++) { const t = i / p.n, c = p.cv.getPointAt(t), tg = p.cv.getTangentAt(t), nx = -tg.z, nz = tg.x, hw = p.w / 2 * (1 + .25 * ghNoise3(t * L * .3, 1, 9));
+        for (let j = 0; j <= W; j++) { const s = j / W * 2 - 1, x = c.x + nx * hw * s, z = c.z + nz * hw * s; pos.push(x, gH(x, z) + .07, z); uv.push(j / W, t * L / 3.2); } }
+      for (let i = 0; i < p.n; i++) for (let j = 0; j < W; j++) { const a = base + i * (W + 1) + j, b = a + W + 1; idx.push(a, a + 1, b, a + 1, b + 1, b); } base += (p.n + 1) * (W + 1); }
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); geo.setIndex(idx); geo.computeVertexNormals();
+    const pmesh = new THREE.Mesh(geo, pm); pmesh.receiveShadow = true; pmesh.renderOrder = 1; g.add(pmesh); A.stat.paths = A.paths.length;
+    // small stones kicked to the edges of the paths here and there
+    for (const [px, pz, hw] of A.pathPts) if (R() < .09) { const sd = R() < .5 ? -1 : 1, a = R() * 6, x = px + Math.sin(a) * (hw + .15), z = pz + Math.cos(a) * (hw + .15), s = .07 + R() * .1; put(ghRockGeo(7000 + ((R() * 1e4) | 0), s * 1.4, s * .6, s, 1), A.rockM, at4(x, gH(x, z) + s * .1, z, R() * 6)); } }
   // ---- PASS 12: SMOKE from both stacks -- one point cloud (one draw), each puff rising, drifting downwind and swelling until it is gone;
   // stepped in `ghomeSmoke` ----
   { const N = 40, pos = new Float32Array(N * 3), cv = document.createElement('canvas'); cv.width = cv.height = 64; const q = cv.getContext('2d'), gr = q.createRadialGradient(32, 32, 2, 32, 32, 31);
