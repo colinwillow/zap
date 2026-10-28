@@ -10662,19 +10662,25 @@ function dojoBuild(g, W) {
     const bbd = (list, o) => { const base = new THREE.PlaneGeometry(1, 1), G = new THREE.InstancedBufferGeometry(); G.index = base.index; G.setAttribute('position', base.attributes.position); G.setAttribute('uv', base.attributes.uv);
       const C = new Float32Array(list.length * 4), Sd = new Float32Array(list.length); list.forEach((l, i) => { C.set(l.slice(0, 4), i * 4); Sd[i] = l[4]; });
       G.setAttribute('iC', new THREE.InstancedBufferAttribute(C, 4)); G.setAttribute('iS', new THREE.InstancedBufferAttribute(Sd, 1)); G.instanceCount = list.length;
-      const m = new THREE.ShaderMaterial({ uniforms: { uTime: U.uTime, uSun: U.uSun }, transparent: true, depthWrite: false, fog: false, blending: o.add ? THREE.AdditiveBlending : THREE.NormalBlending,
+      const m = new THREE.ShaderMaterial({ uniforms: Object.assign({ uTime: U.uTime, uSun: U.uSun }, o.uni || {}), transparent: true, depthWrite: false, fog: false, blending: o.add ? THREE.AdditiveBlending : THREE.NormalBlending,
         vertexShader: `attribute vec4 iC; attribute float iS; uniform float uTime; varying vec2 vU; varying float vS; varying vec3 vW; void main() { vU = uv; vS = iS; vec3 c = iC.xyz; ${o.move || ''}
           vW = c; vec4 mv = viewMatrix * vec4(c, 1.0); mv.xy += position.xy * iC.w * vec2(${o.aspect || '1.0'}, 1.0); gl_Position = projectionMatrix * mv; }`,
-        fragmentShader: `uniform float uTime; uniform vec3 uSun; varying vec2 vU; varying float vS; varying vec3 vW; ${NZ} ${o.frag}` });
+        fragmentShader: `uniform float uTime; uniform vec3 uSun; ${o.uniDecl || ''} varying vec2 vU; varying float vS; varying vec3 vW; ${NZ} ${o.frag}` });
       const ms = new THREE.Mesh(G, m); ms.frustumCulled = false; ms.renderOrder = o.order || 0; g.add(ms); return ms; };
     // BIG FLUFFY CLOUDS: cumulus banks -- each a cluster of 9-16 puffs, the big ones at the bottom, smaller piling up, lit warm on top and toward the
     // sun, lavender in the shade; the edge is eaten by noise so every puff is lumpy, never a disc
-    const CL = []; for (let k = 0; k < 16; k++) { const a = k / 16 * 6.283 + rnd() * .3, r = 170 + rnd() * 230, cx = Math.sin(a) * r, cz = Math.cos(a) * r, cy = -34 + rnd() * 40, S = 26 + rnd() * 30, n = 9 + Math.floor(rnd() * 8);
-      for (let i = 0; i < n; i++) { const u = (rnd() - .5) * 2.2, h = Math.pow(rnd(), 1.6); CL.push([cx + u * S * 1.1 + (rnd() - .5) * S * .5, cy + h * S * .9, cz + (rnd() - .5) * S * .9, S * (1.05 - h * .55) * (.7 + rnd() * .5), rnd() * 50]); } }
-    const clM = bbd(CL, { order: -1, frag: `void main() { vec2 q = vU - .5; float d = length(q) * 2.0; float n = fb(vU * 3.2 + vS); float a = smoothstep(1.0, .55, d + (n - .5) * .8);
+    // m1448 (his: *"I like the clouds -- match the colour scheme more, and different Y heights: they all have the same coordinates so they look like a
+    // ring"*): banks at RANDOM bearings, 120-500 m out, in three tiers -- low banks under the islands, mid ones level with them, a few high towers --
+    // each tier its own size; and the colours are uniforms, so the PANO sky gets its own orange-lit, plum-shadowed clouds
+    const CL = []; for (let k = 0; k < 24; k++) { const a = rnd() * 6.283, tier = rnd(), r = 120 + Math.pow(rnd(), .8) * 380, cx = Math.sin(a) * r, cz = Math.cos(a) * r;
+      const cy = tier < .4 ? -40 + rnd() * 18 : tier < .8 ? -18 + rnd() * 30 : 22 + rnd() * 50, S = (tier < .4 ? 34 : tier < .8 ? 24 : 18) + rnd() * 26, n = 7 + Math.floor(rnd() * 10), tall = tier >= .8 ? 1.5 : 1;
+      for (let i = 0; i < n; i++) { const u = (rnd() - .5) * 2.2, h = Math.pow(rnd(), 1.6); CL.push([cx + u * S * 1.1 + (rnd() - .5) * S * .5, cy + h * S * .9 * tall, cz + (rnd() - .5) * S * .9, S * (1.05 - h * .55) * (.7 + rnd() * .5), rnd() * 50]); } }
+    const PANO = D.skyPick === 'PANO', cv3 = (a2) => ({ value: new THREE.Vector3(...a2) });
+    bbd(CL, { order: -1, uni: { uLo: cv3(PANO ? [.36, .17, .3] : [.58, .5, .68]), uHi: cv3(PANO ? [1, .66, .4] : [1, .88, .78]), uRim: cv3(PANO ? [1, .45, .15] : [1, .6, .35]), uFar: cv3(PANO ? [.8, .36, .24] : [.96, .74, .66]) },
+      uniDecl: 'uniform vec3 uLo; uniform vec3 uHi; uniform vec3 uRim; uniform vec3 uFar;', frag: `void main() { vec2 q = vU - .5; float d = length(q) * 2.0; float n = fb(vU * 3.2 + vS); float a = smoothstep(1.0, .55, d + (n - .5) * .8);
       if (a < .01) discard; float lit = clamp(vU.y * .9 + n * .5 - .1, 0.0, 1.0); vec3 V = normalize(vW - cameraPosition); float sf = pow(max(0.0, dot(V, uSun)), 2.0);
-      vec3 c = mix(vec3(.58, .5, .68), vec3(1.0, .88, .78), lit); c += vec3(1.0, .6, .35) * sf * (1.0 - d) * .5; c = mix(c, vec3(.96, .74, .66), smoothstep(250.0, 520.0, length(vW.xz - cameraPosition.xz)) * .6);
-      gl_FragColor = vec4(c, a * .92); }` }); if (D.skyPick === 'PANO') clM.visible = false;     /* m1446: the panorama brings its own clouds */
+      vec3 c = mix(uLo, uHi, lit); c += uRim * sf * (1.0 - d) * .6; c = mix(c, uFar, smoothstep(250.0, 520.0, length(vW.xz - cameraPosition.xz)) * .6);
+      gl_FragColor = vec4(c, a * .92); }` });
     // THE FOG: big soft cards low round the dojo and the islands, broken by drifting noise into wisps and banks (values, not one flat sheet), glowing
     // peach where it faces the sun and lavender away from it; it thins to nothing near the eye so it never sits on the fight
     const FG = []; for (let i = 0; i < 46; i++) { const a = rnd() * 6.283, r = 45 + rnd() * 170; FG.push([Math.sin(a) * r, -14 + rnd() * 20, Math.cos(a) * r, 50 + rnd() * 70, rnd() * 50]); }

@@ -52,6 +52,11 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
+## THE CLOUDS: OFF THE RING, IN TIERS, IN EACH SKY'S COLOURS (mXXXX)
+*"I like the clouds. Make them match the colour scheme a little more, and they need different Y heights: they all have the same coordinates so they look like a ring of clouds."*
+- **Banks:** 24 of them (was 16) at RANDOM bearings (was evenly spaced), 120-500 m out (skewed near), in three tiers. Low (40%) at y -40..-22, just above the painted cloud sea at -46 (lower and they hide under it), big. Mid (40%) at -18..+12. High (20%) at +22..+72, smaller and stacked 1.5x taller.
+- **Colours are uniforms** (`bbd`'s new `uni` / `uniDecl` options): `uLo`/`uHi` (shade and lit), `uRim` (toward the sun), `uFar` (the haze). PAINTED keeps its lavender and cream. PANO gets plum shade, orange-lit tops and a hot rim, and is no longer hidden.
+
 ## THE DOJO CAN TRY A PANORAMA SKY: TOOLS > SKY (m1446)
 *"Curious to try out different HDRIs -- not necessarily in love with this one, I just want to see what it would add."* A taste call, so it is a SWITCH, not a pick.
 - **The image:** his sunset (an LDR equirect PNG, 1774x887) is `textures/sky_sunset_01.webp` (250 KB).
