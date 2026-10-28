@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- THE INTERCEPT STOPS AT THE ARROW; the green smoke in shades (his: "right now you go THROUGH the arrow -- meet it right where it would
+be, slice it, stop in its track"; "tint the green slightly different shades -- depth to the billowing, very subtle")
+- **`chargeIntercept`:** his middle is aimed a blade's REACH (`INTER.reach` .95 m) short of the arrow's point, so the sword meets it there.
+  On the catch he STOPS: his forward speed zeroed, a small lift, then `interHold` .22 s hanging there (the fall slowed, no drift) before he
+  drops.
+- Measured headless: z along the leap .24 -> 3.81 m in even steps, the arrow caught, then z held at 3.81 for the rest (no carry through).
+  The arrow went home and hit the bowman.
+- **`OSARI.shade()`:** each billowing smoke puff takes its own green, between a deeper and a paler one with a little jitter -- subtle, for
+  depth.
+
 ## m1695 -- THE KILL BLAST, and no wooden box on bodies (his: "the explosion when you killed the samurai -- I want that when you slice through
 them, a little explosion in the green smoke that billows up"; "the wood box break when an arrow hits me / when you cut through them -- take it
 out; when I'm hit I should make my grunts, I'm one of the alien warriors now")
