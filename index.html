@@ -65411,7 +65411,7 @@ function ghomeBuild(at, yaw, y0) {
 // painted with the red sun-spiral; a ring gallery and a red-capped LANTERN at the top with a ROTOR of red sails turning round it; timber
 // BALCONIES clinging at two heights under red awnings, an outside stair and ladders between them; ROPE BRIDGES from the lower balcony to
 // both canyon walls, banners hung off them; stepping stones out from the west bank. World axes (no yaw: the tower is round) ----
-const GMILL = { on: 1, pass: 2, z: 62, H: 40, g: null, rotor: null, wheel: null, fall: null, stat: {} };
+const GMILL = { on: 1, pass: 3, z: 62, H: 40, g: null, rotor: null, wheel: null, fall: null, stat: {} };
 function gmillTex(kind) { const cv = document.createElement('canvas'), W = cv.width = 256, Hh = cv.height = 256, q = cv.getContext('2d');
   if (kind === 'sun') { q.clearRect(0, 0, W, Hh); q.strokeStyle = '#c94a2e'; q.fillStyle = '#c94a2e'; q.lineWidth = 16; q.beginPath(); for (let a = 0; a < 12.5; a += .1) { const r = 8 + a * 6.2; q.lineTo(128 + Math.cos(a) * r, 128 + Math.sin(a) * r); } q.stroke();
     for (let k = 0; k < 12; k++) { const a = k / 12 * Math.PI * 2; q.beginPath(); q.moveTo(128 + Math.cos(a - .1) * 92, 128 + Math.sin(a - .1) * 92); q.lineTo(128 + Math.cos(a) * 124, 128 + Math.sin(a) * 124); q.lineTo(128 + Math.cos(a + .1) * 92, 128 + Math.sin(a + .1) * 92); q.fill(); } }
@@ -65511,24 +65511,57 @@ function gmillBuild() {
   // a ladder up the base from the island (the base's roof is the stair's foot)
   ladder(Math.PI / 2, iy, BY + BH + .5, bw + .3, 'gmill_ladder0');
   // ---- THE ROPE BRIDGES from the lower balcony's ends to both canyon walls, sagging, planked, banners hanging off them ----
-  const bridge = (a, sd) => { const ya = Y1, x0 = Math.sin(a) * (Rt(Y1) + 2.4), z0 = Math.cos(a) * (Rt(Y1) + 2.4), X1 = hwWallAt(cz + z0, sd, ya - .2, -1.2) - cx, Z1 = z0, L = Math.abs(X1 - x0), N = Math.max(8, Math.round(L / .6)), sag = L * .05;
-      const P = t => [x0 + (X1 - x0) * t, ya - sag * Math.sin(Math.PI * t), z0]; for (let i = 0; i < N; i++) { const t0 = i / N, t1 = (i + 1) / N, p0 = P(t0), p1 = P(t1), pm = P((t0 + t1) / 2);
+  const bridge = (a, sd) => { const ya = Y1, x0 = Math.sin(a) * (Rt(Y1) + 2.4), z0 = Math.cos(a) * (Rt(Y1) + 2.4), X1 = hwWallAt(cz + z0, sd, ya - .2, -1.2) - cx - sd * 4.6, Z1 = z0, L = Math.abs(X1 - x0), N = Math.max(8, Math.round(L / .6)), sag = L * .05;
+      const P = t => [x0 + (X1 - x0) * t, ya - sag * Math.sin(Math.PI * t), z0]; for (let i = 0; i < N; i++) { const t0 = i / N, t1 = (i + 1) / N, p0 = P(t0), p1 = P(t1), pm = P((t0 + t1) / 2); if (sd > 0 && Math.abs(pm[0] - X1) < 4) continue;
         put(new THREE.BoxGeometry(Math.abs(p1[0] - p0[0]) - .06, .1, 1.8), woodP, at4(pm[0], pm[1] - .05, pm[2])); quad([p0[0], p0[1] + .01, z0 - .9], [p1[0], p1[1] + .01, z0 - .9], [p1[0], p1[1] + .01, z0 + .9], [p0[0], p0[1] + .01, z0 + .9]); box(Math.min(p0[0], p1[0]), Math.max(p0[0], p1[0]), Math.min(p0[1], p1[1]) - .6, Math.max(p0[1], p1[1]), z0 - .9, z0 + .9); }
       for (const zz of [z0 - .95, z0 + .95]) { const cv = new THREE.QuadraticBezierCurve3(new THREE.Vector3(x0, ya + 1.1, zz), new THREE.Vector3((x0 + X1) / 2, ya + 1.1 - sag * 2, zz), new THREE.Vector3(X1, ya + 1.1, zz)); put(new THREE.TubeGeometry(cv, 16, .04, 4), wood);
         for (let i = 0; i <= N; i += 2) { const p = P(i / N); rod([p[0], p[1], zz], [p[0], cv.getPoint(i / N).y, zz], .03, wood); } box(Math.min(x0, X1), Math.max(x0, X1), ya - 3, ya + 1.1, zz - .1, zz + .1, NC); }
       for (let i = 2; i < N - 1; i += 3) { const p = P(i / N); put(new THREE.PlaneGeometry(.7, 1.6, 1, 4), banM, at4(p[0], p[1] - 1, z0 + .97)); }
       vbox(Math.min(X1, X1 + sd * 2.2), Math.max(X1, X1 + sd * 2.2), ya - .3, ya, z0 - 1.4, z0 + 1.4, woodP, 1); quad([X1, ya + .01, z0 - 1.4], [X1 + sd * 2.2, ya + .01, z0 - 1.4], [X1 + sd * 2.2, ya + .01, z0 + 1.4], [X1, ya + .01, z0 + 1.4]);
-      for (const zz of [z0 - 1.2, z0 + 1.2]) vbox(X1 + sd * 1.1 - .12, X1 + sd * 1.1 + .12, ya - 4, ya + 1.4, zz - .12, zz + .12, wood, 0); if (sd < 0) A.landW = [X1, ya, z0]; return L; };
+      for (const zz of [z0 - 1.2, z0 + 1.2]) vbox(X1 + sd * 1.1 - .12, X1 + sd * 1.1 + .12, ya - 4, ya + 1.4, zz - .12, zz + .12, wood, 0); if (sd < 0) A.landW = [X1, ya, z0]; else A.landE = [X1, ya, z0]; return L; };
   A.stat.bridgeW = +bridge(-Math.PI / 2, -1).toFixed(1); A.stat.bridgeE = +bridge(Math.PI / 2, 1).toFixed(1);
   // ---- PASS 2: the WEST STAIR -- one straight timber flight beside the long bridge, from its landing on the wall down toward the river in
   // .3 m risers (the wall falls faster than the stair, so it stands clear of the slope on posts), railed -- so the bank walks to the mill ----
-  { const [X1, ya, z0] = A.landW, zs = z0 + 2.3, tr = .34, w = 1.8; let y = ya, x = X1 + 2.2, n = 0;
-    vbox(X1 - 2.2, X1 + 2.4, ya - .14, ya, z0 + 1.3, zs + w / 2, woodP, 1); quad([X1 - 2.2, ya + .01, z0 + 1.3], [X1 + 2.4, ya + .01, z0 + 1.3], [X1 + 2.4, ya + .01, zs + w / 2], [X1 - 2.2, ya + .01, zs + w / 2]); for (const px of [X1 + .2, X1 + 2.3]) vbox(px - .1, px + .1, gH(px, zs) - .4, ya - .1, zs - .1, zs + .1, wood, 0);
-    while (n < 80) { const xn = x + tr, gy = gH(xn, zs); if (y - .3 <= Math.max(gy, .55) + .05) break; y -= .3; x = xn; n++;
+  // (pass 3: one stair-builder for both walls) -- `e` is the way down the wall, toward the river: +1 off the west wall, -1 off the east
+  const wallStair = (land, e) => { const [X1, ya, z0] = land, zs = z0 + 2.3, tr = .34, w = 1.8; let y = ya, x = X1 + e * 2.2, n = 0; const xa = Math.min(X1 - e * 1.8, X1 + e * 2.4), xb = Math.max(X1 - e * 1.8, X1 + e * 2.4);
+    vbox(xa, xb, ya - .14, ya, z0 + 1.3, zs + w / 2, woodP, 1); quad([xa, ya + .01, z0 + 1.3], [xb, ya + .01, z0 + 1.3], [xb, ya + .01, zs + w / 2], [xa, ya + .01, zs + w / 2]); for (const px of [X1 + e * .4, X1 + e * 2.3]) vbox(px - .1, px + .1, gH(px, zs) - .4, ya - .1, zs - .1, zs + .1, wood, 0);
+    while (n < 80) { const xn = x + e * tr, gy = gH(xn, zs); if (y - .3 <= Math.max(gy, .55) + .05) break; y -= .3; x = xn; n++;
       vbox(x - tr / 2, x + tr / 2, y - .12, y, zs - w / 2, zs + w / 2, woodP, 1); quad([x - tr / 2, y + .01, zs - w / 2], [x + tr / 2, y + .01, zs - w / 2], [x + tr / 2, y + .01, zs + w / 2], [x - tr / 2, y + .01, zs + w / 2]);
-      if (n % 5 === 0) for (const zz of [zs - w / 2 + .1, zs + w / 2 - .1]) { vbox(x - .08, x + .08, gy - .4, y + 1, zz - .08, zz + .08, wood, 0); } }
-    for (const zz of [zs - w / 2 + .05, zs + w / 2 - .05]) { rod([X1 + 2.2, ya + 1, zz], [x, y + 1, zz], .07, wood); box(Math.min(X1, x), Math.max(X1, x), y, ya + 1, zz - .08, zz + .08, NC); }
-    A.stat.stairW = n; A.stat.stairFoot = +y.toFixed(1); }
+      if (n % 5 === 0) for (const zz of [zs - w / 2 + .1, zs + w / 2 - .1]) vbox(x - .08, x + .08, gy - .4, y + 1, zz - .08, zz + .08, wood, 0); }
+    for (const zz of [zs - w / 2 + .05, zs + w / 2 - .05]) { rod([X1 + e * 2.2, ya + 1, zz], [x, y + 1, zz], .07, wood); box(Math.min(X1, x), Math.max(X1, x), y, ya + 1, zz - .08, zz + .08, NC); }
+    return [n, +y.toFixed(1)]; };
+  { const [n, f] = wallStair(A.landW, 1); A.stat.stairW = n; A.stat.stairFoot = f; } { const [n, f] = wallStair(A.landE, -1); A.stat.stairE = n; A.stat.stairFootE = f; }
+  // ---- PASS 3 (his: "anchor those bridges to buildings"): a stone GATE TURRET on each canyon wall where the mill's bridges land -- a round
+  // tower out of the slope, the bridge running in through its doorway onto its floor, battlements and a flag on top, a ladder up its side.
+  // On the EAST one the bridge's last 4 m is a DRAWBRIDGE, raised and lowered by the winch wheel at the turret's door (`gmillHit`) ----
+  const turret = (land, sd) => { const [X1, ya, z0] = land, tx = X1 + sd * 3.2, tz = z0, R = 3.1, th = .6, top = ya + 6.2, door = -sd * Math.PI / 2, dh = 1.15 / R, D = 3;
+      let yb = Infinity; for (let a = 0; a < TAU; a += .4) yb = Math.min(yb, gH(tx + Math.sin(a) * R, tz + Math.cos(a) * R)); yb -= 1;
+      const arc = (a0, a1, y0, y1) => { if (a1 - a0 < .01) return; const seg = Math.max(2, Math.ceil((a1 - a0) / TAU * 32)); put(new THREE.CylinderGeometry(R, R, y1 - y0, seg, 1, true, a0, a1 - a0), stone, at4(tx, (y0 + y1) / 2, tz)); put(new THREE.CylinderGeometry(R - th, R - th, y1 - y0, seg, 1, true, a0, a1 - a0), stone, at4(tx, (y0 + y1) / 2, tz)); };
+      arc(door + dh, door - dh + TAU, yb, top); arc(door - dh, door + dh, yb, ya - .1); arc(door - dh, door + dh, ya + D, top);
+      for (const a of [door - dh, door + dh]) put(new THREE.BoxGeometry(.15, D, th), stone, at4(tx + Math.sin(a) * (R - th / 2), ya + D / 2, tz + Math.cos(a) * (R - th / 2), a));
+      put(new THREE.TorusGeometry(1.15, .16, 6, 12, Math.PI), stone, at4(tx + Math.sin(door) * (R + .05), ya + D, tz + Math.cos(door) * (R + .05), door + Math.PI / 2));
+      const ring = new THREE.RingGeometry(R - th, R + .15, 32); ring.rotateX(-Math.PI / 2); put(ring, stone, at4(tx, top, tz)); for (let k = 0; k < 14; k++) { if (k % 2) continue; const a = k / 14 * TAU; put(new THREE.BoxGeometry(1.1, .9, th), stone, at4(tx + Math.sin(a) * (R - th / 2), top + .45, tz + Math.cos(a) * (R - th / 2), a)); }
+      put(new THREE.CylinderGeometry(R + .25, R + .25, .35, 32, 1, true), stone, at4(tx, top - .2, tz));
+      const fl = new THREE.CircleGeometry(R - th, 24); fl.rotateX(-Math.PI / 2); put(fl, woodP, at4(tx, ya - .02, tz)); box(tx - (R - th) * .75, tx + (R - th) * .75, yb, ya - .02, tz - (R - th) * .75, tz + (R - th) * .75);
+      { const N = 24; for (let i = 0; i < N; i++) { const a0 = i / N * TAU, a1 = (i + 1) / N * TAU, r = R - th; quad([tx, ya, tz], [tx + Math.sin(a0) * r, ya, tz + Math.cos(a0) * r], [tx + Math.sin(a1) * r, ya, tz + Math.cos(a1) * r], [tx, ya, tz]); quad([tx, top + .01, tz], [tx + Math.sin(a0) * r, top + .01, tz + Math.cos(a0) * r], [tx + Math.sin(a1) * r, top + .01, tz + Math.cos(a1) * r], [tx, top + .01, tz]); } }
+      const rf = new THREE.CircleGeometry(R - th + .02, 24); rf.rotateX(-Math.PI / 2); put(rf, woodP, at4(tx, top - .02, tz)); box(tx - (R - th), tx + (R - th), top - .3, top, tz - (R - th), tz + (R - th));
+      for (let k = 0; k < 20; k++) { const a = k / 20 * TAU; if (Math.abs(Math.atan2(Math.sin(a - door), Math.cos(a - door))) < dh + .12) { const lowTop = ya - .1; box(tx + Math.sin(a) * (R - th / 2) - .4, tx + Math.sin(a) * (R - th / 2) + .4, top - 1, top + .9, tz + Math.cos(a) * (R - th / 2) - .4, tz + Math.cos(a) * (R - th / 2) + .4); continue; }
+        const wx = tx + Math.sin(a) * (R - th / 2), wz = tz + Math.cos(a) * (R - th / 2); box(wx - .45, wx + .45, yb, top + .9, wz - .45, wz + .45); }
+      // the flag on its pole, and the ladder up the turret's outside to its roof (beside the stair's head)
+      vbox(tx - .08, tx + .08, top, top + 5, tz - .08, tz + .08, wood, 0); put(new THREE.PlaneGeometry(1.8, 1.2, 4, 2), banM, at4(tx + .95 * -sd, top + 4.3, tz, 0));
+      { const a2 = sd < 0 ? .55 : -.55, lx = tx + Math.sin(a2) * (R + .45), lz = tz + Math.cos(a2) * (R + .45), nx = Math.sin(a2), nz = Math.cos(a2), ux = Math.cos(a2), uz = -Math.sin(a2);
+        for (const o of [-.34, .34]) put(new THREE.BoxGeometry(.09, top - ya + .6, .09), wood, at4(lx + ux * o, (ya + top + .6) / 2, lz + uz * o, a2)); for (let y = ya + .3; y < top + .4; y += .34) put(new THREE.BoxGeometry(.7, .06, .06), wood, at4(lx, y, lz, a2));
+        const hx = .12, hz = .45, ex = Math.abs(nx) * hx + Math.abs(nz) * hz, ez = Math.abs(nz) * hx + Math.abs(nx) * hz, L = kitClimbAdd({ cs: nx, sn: nz, hx, hz, cx: cx + lx, cz: cz + lz, minx: cx + lx - ex, maxx: cx + lx + ex, miny: ya, maxy: top, minz: cz + lz - ez, maxz: cz + lz + ez }, 'gmill_turret', top);
+        L.mark = { x: cx + tx + Math.sin(a2) * (R - th - .6), y: top + .05, z: cz + tz + Math.cos(a2) * (R - th - .6) }; A.climbs.push(L); }
+      return [tx, tz, top]; };
+  A.turrets = [turret(A.landW, -1), turret(A.landE, 1)];
+  // the DRAWBRIDGE: the east bridge's last 4 m, hinged at the turret's door; its own group (it swings); its collider comes and goes
+  { const [X1, ya, z0] = A.landE, Ld = 4, dg = new THREE.Group(); dg.position.set(X1, ya - .02, z0); g.add(dg); const dp = []; for (let i = 0; i < 11; i++) { const b = new THREE.BoxGeometry(Ld / 11 - .04, .16, 2); b.translate(-(i + .5) * Ld / 11, -.08, 0); dp.push(b.toNonIndexed()); }
+    for (const zz of [-1, 1]) { const b = new THREE.BoxGeometry(Ld, .2, .14); b.translate(-Ld / 2, -.1, zz); dp.push(b.toNonIndexed()); } for (const q of dp) q.deleteAttribute('uv'); const dm = new THREE.Mesh(mergeGeometries(dp), wood); dm.castShadow = true; dg.add(dm);
+    const chains = []; for (const zz of [-1, 1]) { const ch = new THREE.Mesh(new THREE.CylinderGeometry(.035, .035, 1, 4), iron); ch.userData.zz = zz; g.add(ch); chains.push(ch); }
+    const dbox = { minx: cx + X1 - Ld, maxx: cx + X1, miny: ya - .6, maxy: ya - .02, minz: cz + z0 - 1, maxz: cz + z0 + 1 }; BOXES.push(dbox);
+    const wx = X1 + .3, wy = ya + 1.6, wz = z0 + 1.6; put(new THREE.TorusGeometry(.6, .07, 6, 18), bronze, at4(wx, wy, wz, Math.PI / 2)); for (let k = 0; k < 6; k++) rod([wx, wy, wz], [wx, wy + Math.sin(k / 6 * TAU) * .8, wz + Math.cos(k / 6 * TAU) * .8], .05, bronze, 1); put(new THREE.CylinderGeometry(.16, .16, .5, 8), iron, at4(wx, wy, wz, 0, 0, Math.PI / 2));
+    A.draw = { g: dg, box: dbox, up: 0, want: 0, L: Ld, winch: [cx + wx, wy, cz + wz], ya, X1, z0, chains }; }
   // ---- PASS 2: DRESSING from the ref -- crates, barrels and sacks on the balconies, lanterns hung on ropes off the gallery, a tall red banner
   // down the upper tower, a coil of rope and a few pots by the base ----
   { const rnd = rwRng(6262), crate = (x, y, z, s, ry) => { put(new THREE.BoxGeometry(s, s, s), wood, at4(x, y + s / 2, z, ry)); for (const f of [.15, .85]) put(new THREE.BoxGeometry(s + .04, .05, s + .04), iron, at4(x, y + s * f, z, ry)); };
@@ -65548,12 +65581,17 @@ function gmillBuild() {
   for (const b of boxes) BOXES.push(b);
   for (let i = 0; i < tris.length; i += 9) { const q = tris.slice(i, i + 9); triAdd(...q); triAdd(q[0], q[1], q[2], q[6], q[7], q[8], q[3], q[4], q[5]); }
   A.stat.draws = draws + 5; A.stat.boxes = boxes.length; A.stat.top = +(T1 + 7.9).toFixed(1);
-  console.log('[melee] water mill (procedural): ' + A.stat.draws + ' draws, ' + boxes.length + ' boxes, top ' + A.stat.top + ' m, bridges ' + A.stat.bridgeW + ' / ' + A.stat.bridgeE + ' m, ' + A.stat.stones + ' stepping stones, west stair ' + A.stat.stairW + ' steps to ' + A.stat.stairFoot);
+  console.log('[melee] water mill (procedural): ' + A.stat.draws + ' draws, ' + boxes.length + ' boxes, top ' + A.stat.top + ' m, bridges ' + A.stat.bridgeW + ' / ' + A.stat.bridgeE + ' m, ' + A.stat.stones + ' stepping stones, west stair ' + A.stat.stairW + ' steps to ' + A.stat.stairFoot + ', east stair ' + A.stat.stairE + ' to ' + A.stat.stairFootE);
 }
 // pass 2: a blow at the waterwheel JAMS it (it shudders to a stop, the water still pouring); another frees it
-function gmillHit(x, y, z, rad) { const A = GMILL; if (!A.hub || !inHome() || A.hc > 0) return 0; const [hx, hy, hz] = A.hub; if (Math.hypot(x - hx, z - hz) > 3.2 + rad || Math.abs(y - hy) > 3 + rad) return 0;
+function gmillHit(x, y, z, rad) { const A = GMILL; if (!A.hub || !inHome() || A.hc > 0) return 0;
+  if (A.draw) { const [wx, wy, wz] = A.draw.winch; if (Math.hypot(x - wx, y - wy, z - wz) < 1.3 + rad) { A.hc = .5; A.draw.want = A.draw.want ? 0 : 1; snd('clang', { g: .9, r: .6, x: wx, z: wz }); spkBurst(x, y, z, 14, { col: [1, .8, .4], spread: 3, size: .1, life: .4 }); camShake(.05); return 1; } }
+  const [hx, hy, hz] = A.hub; if (Math.hypot(x - hx, z - hz) > 3.2 + rad || Math.abs(y - hy) > 3 + rad) return 0;
   A.hc = .4; A.jam = !A.jam; snd('clang', { g: 1, r: A.jam ? .5 : .8, x: hx, z: hz }); spkBurst(x, y, z, 20, { col: [1, .8, .4], spread: 4, size: .12, life: .5 }); camShake(.08); return 1; }
 function gmillStep(dt, t) { const A = GMILL; if (!A.g) return; A.hc = (A.hc || 0) - dt; A.wv = (A.wv == null ? 1.1 : A.wv) + ((A.jam ? 0 : 1.1) - (A.wv == null ? 1.1 : A.wv)) * Math.min(1, dt * (A.jam ? 6 : 1.2)); if (A.wheel) A.wheel.rotation.z -= dt * A.wv;
+  if (A.draw) { const D = A.draw, u0 = D.up; D.up += Math.sign(D.want - D.up) * Math.min(Math.abs(D.want - D.up), dt * .45); D.g.rotation.z = -D.up * 1.35;
+    for (const o of D.chains) { const th = D.up * 1.35, a = new THREE.Vector3(D.X1 - D.L * Math.cos(th), D.ya + D.L * Math.sin(th), D.z0 + o.userData.zz), b = new THREE.Vector3(D.X1 + .2, D.ya + 3.3, D.z0 + o.userData.zz), d = b.clone().sub(a); o.position.copy(a).addScaledVector(d, .5); o.scale.y = d.length(); o.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); }
+    const i = BOXES.indexOf(D.box), down = D.up < .08; if (down && i < 0) { BOXES.push(D.box); boxGrid(); } else if (!down && i >= 0) { BOXES.splice(i, 1); boxGrid(); } if (Math.abs(u0 - D.want) > .001 && Math.abs(D.up - D.want) < .001) snd('thud', { g: .9, r: .6, x: D.winch[0], z: D.winch[2] }); }
   if (A.splash) { A.st = (A.st || 0) - dt; if (A.st <= 0) { A.st = .09; spkBurst(A.splash[0] + (Math.random() - .5) * .8, A.splash[1], A.splash[2] - Math.random() * .5, 3, { col: [.88, .95, 1], spread: 2.4, size: .08, life: .45 }); } } if (A.rotor) A.rotor.rotation.y += dt * .35; if (A.fall) A.fall.map.offset.y = (A.fall.map.offset.y + dt * 1.6) % 1; }
 // THE MERCHANT SHOP (his ref `images/korajin/ref/merchant_shop_1.jpg`, after m1459): high on a sandstone BUTTE that rises out of the canyon's
 // WEST rim upstream of the home, its deck jutting over the drop toward the valley. A two-storey timber-and-stone shop on a plank deck,

@@ -237,7 +237,8 @@ shaft. Placement: the layout test's spot, in the stream 66 m below the home (z 6
     finial, and the ROTOR of six big red sails turning round it; two balconies with red awnings, the outside stair from the base's roof,
     ladders from the island to the roof, between the balconies and up to the gallery; ROPE BRIDGES from the lower balcony to both walls
     (21.9 m west, 11.4 m east) with banners and landings
-  - [x] **pass 2 (next tick):** the WEST STAIR (48 steps of .3 beside the long bridge, from its landing on the wall down to the shore by the stepping stones, railed, on posts) so the bank walks to the mill; strike the WHEEL and it jams to a stop (strike again, it turns); spray where the water lands; crates, barrels and sacks on the balconies, lanterns hung on ropes off the gallery, a tall red banner down the upper tower, a rope coil and red pots by the base
+  - [x] **pass 2 (m1475):** the WEST STAIR (48 steps of .3 beside the long bridge, from its landing on the wall down to the shore by the stepping stones, railed, on posts) so the bank walks to the mill; strike the WHEEL and it jams to a stop (strike again, it turns); spray where the water lands; crates, barrels and sacks on the balconies, lanterns hung on ropes off the gallery, a tall red banner down the upper tower, a rope coil and red pots by the base
+  - [x] **pass 3 (next tick):** BRIDGES ANCHORED TO BUILDINGS (his): a stone GATE TURRET stands out of each canyon wall where the mill's bridges land (doorway the bridge runs into, a floor, battlements, a flag, a ladder up its side to the roof); the EAST bridge's last 4 m is a DRAWBRIDGE, raised and lowered on chains by the winch wheel at the turret's door; the EAST STAIR down to the shore like the west one
 - **DONE WHEN:**
   - [ ] the four views match the ref in silhouette (tower proportions, sails, balconies, base)
   - [ ] the waterwheel and the sails turn, the water reads as water (pour, foam, the pond)
