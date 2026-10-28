@@ -301,7 +301,7 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
-## THE RE-PASS: THE WATCHTOWER, PASS 3 -- THE LAYERS (m@X4@, WORKER A)
+## THE RE-PASS: THE WATCHTOWER, PASS 3 -- THE LAYERS (m1490, WORKER A)
 
 Rubric 3 (L1 / L2 / L3, LEVELDESIGN.md). With this the Watchtower has its three passes; the last box is his OK.
 
