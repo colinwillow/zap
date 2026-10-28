@@ -10723,12 +10723,12 @@ function dojoBuild(g, W) {
   { const NZ = 'float h2(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); } float n2(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(h2(i), h2(i + vec2(1, 0)), f.x), mix(h2(i + vec2(0, 1)), h2(i + vec2(1, 1)), f.x), f.y); } float fb(vec2 p) { float a = .5, s = 0.0; for (int i = 0; i < 5; i++) { s += a * n2(p); p *= 2.07; a *= .5; } return s; }\n';
     const rnd = (() => { let s2 = 9; return () => (s2 = (s2 * 16807) % 2147483647) / 2147483647; })();
     const bbd = (list, o) => { const base = new THREE.PlaneGeometry(1, 1), G = new THREE.InstancedBufferGeometry(); G.index = base.index; G.setAttribute('position', base.attributes.position); G.setAttribute('uv', base.attributes.uv);
-      const C = new Float32Array(list.length * 4), Sd = new Float32Array(list.length); list.forEach((l, i) => { C.set(l.slice(0, 4), i * 4); Sd[i] = l[4]; });
-      G.setAttribute('iC', new THREE.InstancedBufferAttribute(C, 4)); G.setAttribute('iS', new THREE.InstancedBufferAttribute(Sd, 1)); G.instanceCount = list.length;
+      const C = new Float32Array(list.length * 4), Sd = new Float32Array(list.length), aux = list[0].length > 5, Ax = new Float32Array(list.length * 2); list.forEach((l, i) => { C.set(l.slice(0, 4), i * 4); Sd[i] = l[4]; if (aux) Ax.set([l[5], l[6]], i * 2); });
+      G.setAttribute('iC', new THREE.InstancedBufferAttribute(C, 4)); G.setAttribute('iS', new THREE.InstancedBufferAttribute(Sd, 1)); if (aux) G.setAttribute('iA', new THREE.InstancedBufferAttribute(Ax, 2)); G.instanceCount = list.length;     /* m1464: `iA` = per-card aux (the cloud bank's base and height) */
       const m = new THREE.ShaderMaterial({ uniforms: Object.assign({ uTime: U.uTime, uSun: U.uSun }, o.uni || {}), transparent: true, depthWrite: false, fog: false, blending: o.add ? THREE.AdditiveBlending : THREE.NormalBlending,
-        vertexShader: `attribute vec4 iC; attribute float iS; uniform float uTime; varying vec2 vU; varying float vS; varying vec3 vW; void main() { vU = uv; vS = iS; vec3 c = iC.xyz; ${o.move || ''}
+        vertexShader: `attribute vec4 iC; attribute float iS; ${aux ? 'attribute vec2 iA; varying vec2 vA; varying float vWy;' : ''} uniform float uTime; varying vec2 vU; varying float vS; varying vec3 vW; void main() { vU = uv; vS = iS; vec3 c = iC.xyz; ${aux ? 'vA = iA; vWy = c.y + position.y * iC.w;' : ''} ${o.move || ''}
           vW = c; vec4 mv = viewMatrix * vec4(c, 1.0); mv.xy += position.xy * iC.w * vec2(${o.aspect || '1.0'}, 1.0); gl_Position = projectionMatrix * mv; }`,
-        fragmentShader: `uniform float uTime; uniform vec3 uSun; ${o.uniDecl || ''} varying vec2 vU; varying float vS; varying vec3 vW; ${NZ} ${o.frag}` });
+        fragmentShader: `uniform float uTime; uniform vec3 uSun; ${o.uniDecl || ''} ${aux ? 'varying vec2 vA; varying float vWy;' : ''} varying vec2 vU; varying float vS; varying vec3 vW; ${NZ} ${o.frag}` });
       const ms = new THREE.Mesh(G, m); ms.frustumCulled = false; ms.renderOrder = o.order || 0; g.add(ms); return ms; };
     // BIG FLUFFY CLOUDS: cumulus banks -- each a cluster of 9-16 puffs, the big ones at the bottom, smaller piling up, lit warm on top and toward the
     // sun, lavender in the shade; the edge is eaten by noise so every puff is lumpy, never a disc
@@ -10737,13 +10737,14 @@ function dojoBuild(g, W) {
     // each tier its own size; and the colours are uniforms, so the PANO sky gets its own orange-lit, plum-shadowed clouds
     const CL = []; for (let k = 0; k < 24; k++) { const a = rnd() * 6.283, tier = rnd(), r = 120 + Math.pow(rnd(), .8) * 380, cx = Math.sin(a) * r, cz = Math.cos(a) * r;
       const cy = tier < .4 ? -40 + rnd() * 18 : tier < .8 ? -18 + rnd() * 30 : 22 + rnd() * 50, S = (tier < .4 ? 34 : tier < .8 ? 24 : 18) + rnd() * 26, n = 7 + Math.floor(rnd() * 10), tall = tier >= .8 ? 1.5 : 1;
-      for (let i = 0; i < n; i++) { const u = (rnd() - .5) * 2.2, h = Math.pow(rnd(), 1.6); CL.push([cx + u * S * 1.1 + (rnd() - .5) * S * .5, cy + h * S * .9 * tall, cz + (rnd() - .5) * S * .9, S * (1.05 - h * .55) * (.7 + rnd() * .5), rnd() * 50]); } }
+      const bh = S * .9 * tall + S * .5; for (let i = 0; i < n * 2; i++) { const u = (rnd() - .5) * 2.4, w = 1 - Math.abs(u) / 1.3, h = Math.pow(rnd(), 1.4) * Math.max(.15, w), sz = S * (.75 - h * .35) * (.6 + rnd() * .45);     /* m1464: twice the puffs, smaller, piled highest in the middle, the base FLAT */
+        CL.push([cx + u * S * 1.1 + (rnd() - .5) * S * .4, Math.max(cy + sz * .35, cy + h * S * .9 * tall), cz + (rnd() - .5) * S * .9, sz, rnd() * 50, cy, bh]); } }
     const PC = D.pano && D.pano.cloud, cv3 = (a2) => ({ value: new THREE.Vector3(...a2) });
     bbd(CL, { order: -1, uni: { uLo: cv3(PC ? PC.lo : [.58, .5, .68]), uHi: cv3(PC ? PC.hi : [1, .88, .78]), uRim: cv3(PC ? PC.rim : [1, .6, .35]), uFar: cv3(PC ? PC.far : [.96, .74, .66]) },
-      uniDecl: 'uniform vec3 uLo; uniform vec3 uHi; uniform vec3 uRim; uniform vec3 uFar;', frag: `void main() { vec2 q = vU - .5; float d = length(q) * 2.0; float n = fb(vU * 3.2 + vS); float a = smoothstep(1.0, .55, d + (n - .5) * .8);
-      if (a < .01) discard; float lit = clamp(vU.y * .9 + n * .5 - .1, 0.0, 1.0); vec3 V = normalize(vW - cameraPosition); float sf = pow(max(0.0, dot(V, uSun)), 2.0);
+      uniDecl: 'uniform vec3 uLo; uniform vec3 uHi; uniform vec3 uRim; uniform vec3 uFar;', frag: `void main() { vec2 q = vU - .5; float d = length(q) * 2.0; float n = fb(vU * 3.2 + vS); float a = smoothstep(1.0, .2, d + (n - .5) * .9) * smoothstep(-.02, .12, vWy - vA.x);
+      if (a < .01) discard; float lit = clamp((vWy - vA.x) / vA.y * 1.15 + (n - .5) * .35, 0.0, 1.0);     /* m1464: shaded by height in the BANK, not per puff -- one mass, a dark flat base, lit tops */ vec3 V = normalize(vW - cameraPosition); float sf = pow(max(0.0, dot(V, uSun)), 2.0);
       vec3 c = mix(uLo, uHi, lit); c += uRim * sf * (1.0 - d) * .6; c = mix(c, uFar, smoothstep(250.0, 520.0, length(vW.xz - cameraPosition.xz)) * .6);
-      gl_FragColor = vec4(c, a * .92); }` });
+      gl_FragColor = vec4(c, a * .8); }` });
     // THE FOG: big soft cards low round the dojo and the islands, broken by drifting noise into wisps and banks (values, not one flat sheet), glowing
     // peach where it faces the sun and lavender away from it; it thins to nothing near the eye so it never sits on the fight
     const FG = []; for (let i = 0; i < 46; i++) { const a = rnd() * 6.283, r = 45 + rnd() * 170; FG.push([Math.sin(a) * r, -14 + rnd() * 20, Math.cos(a) * r, 50 + rnd() * 70, rnd() * 50]); }

@@ -64,6 +64,12 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
+## THE DOJO, PASS 16: CLOUD BANKS, NOT COTTON BALLS (mXXXX)
+- **Why they read as balls:** every puff shaded ITSELF (lit top, dark bottom, from its own uv) with a firm round edge, so a bank was a pile of separately lit balls.
+- **`bbd` takes per-card aux now:** a 6th and 7th value in the list become `iA`. The vertex passes `vWy` (the fragment's approximate world height; the card is camera-facing and the camera near level).
+- **The cloud shader shades by height in the BANK:** `(vWy - base) / bankH`, plus a little noise. The whole bank goes from a dark, FLAT base (fragments below the base fade out) to lit tops, so it reads as one mass.
+- **The puffs:** twice as many, smaller, piled highest in the middle; a softer edge (`smoothstep(1, .2)`) and .8 alpha so the overlaps melt together.
+
 ## THE DOJO, PASS 15: VERTICALITY AND SPREAD -- HIS STANDING RULE (m1462)
 *"Get away from having everything on the same plane -- it's your natural inclination to put things on the ground plane. The ships are all on the same plane. I really want verticality... I'm going to keep telling you over and over: different planes, different heights, and spread things out. That ship feels awfully close to the main island."*
 - **The rule is in CLAUDE.md** (read every turn) and LEVELDESIGN.md (THE PLANES RULE): every placement gets a height decision; tiers below, level, above and high; spread big things; routes climb.
