@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- THE SWORD TASSEL (his: *"a little rope off the end of the handle with a fluffy ball on it, like Chinese swords"*)
+## m1644 -- THE SWORD TASSEL (his: *"a little rope off the end of the handle with a fluffy ball on it, like Chinese swords"*)
 A red cord off the katana's pommel, a gold bead, and a fluffy red pompom with a ragged fringe. It is a 5-point VERLET chain in world space
 (`tasselStep`, `TASSEL`: seg .038 m, gravity, damping 2.2, 6 constraint passes), anchored to the pommel every frame, so it swings with every
 cut, roll and jump. Three draws. It only hangs on the PLAYER's katana (`WEAP.worn.katana`), not on the rivals' or the dummies'. The pommel's
