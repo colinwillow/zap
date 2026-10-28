@@ -82,7 +82,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - lit lanterns at dusk
 - [x] **pass 12 (m1440):** TRAINING MARKS painted on the floor: stance footprints in a ring, chalk drill rings, dark scuff swirls, four numbered start marks (一 to 四) by the gates
 - [x] **pass 14 (m1460):** BIRDS: a flock of 30 swallows darting between the islands (banking into turns), and a V of 7 red-crowned cranes gliding a slow wide circle
-- [x] **pass 16 (mXXXX):** the cloud cards no longer read as cotton balls: shaded by HEIGHT IN THE BANK (a flat dark base to lit tops), twice the puffs and smaller, soft overlapping edges
+- [x] **pass 16 (m1464):** the cloud cards no longer read as cotton balls: shaded by HEIGHT IN THE BANK (a flat dark base to lit tops), twice the puffs and smaller, soft overlapping edges
 - [ ] pass 4: life: the clouds moving under you
 - [ ] later: the training-dojo function (racks you take weapons from, targets that pop up, a sparring master), the music
 
