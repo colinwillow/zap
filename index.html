@@ -23696,12 +23696,13 @@ function fworkClear() { const W = FWORK.on; if (!W) return; for (const c of W.co
 // a flat walkable crown, warning stripes and red lamps -- and the SPIDER BOTS: three six-legged bronze crawlers (`spiderMake`: a body, a
 // head with a red eye, six two-segment legs walking a procedural tripod gait) that come out of the door and patrol round the bunker.
 // Any hit through `bldHit` damages one; `spHp` hits and it bursts; a new one walks out of the door `spBack` s later.
-const SPHANG = { at: [-48, -36], loop: 6.8, raidR: 40, climbV: 1.6, hw: 4.5, hd: 6, R: 3.6, n: 3, spHp: 3, spBack: 10, spV: 2.4, pounceR: 4.5, leapT: .55, bite: 9, pounceCool: 3.5, on: null };
+const SPHANG = { at: [-48, -36], loop: 8.4, raidR: 40, climbV: 1.6, hw: 4.5, hd: 6, R: 3.6, n: 3, spHp: 3, spBack: 10, spV: 2.4, pounceR: 4.5, leapT: .55, bite: 9, pounceCool: 3.5, on: null };
 function spiderMake(g) {
-  const s = new THREE.Group(); g.add(s); const br = new THREE.MeshStandardMaterial({ color: 0xa8743a, metalness: .8, roughness: .35 }), dk = new THREE.MeshStandardMaterial({ color: 0x2a2c30, metalness: .6, roughness: .5 });
+  const s = new THREE.Group(); g.add(s); const E = enemyMats(), br = E.terra, dk = E.lacquer;     // m@X4@: a terracotta construct, black lacquer, gold, a mint core
   const body = new THREE.Mesh(new THREE.SphereGeometry(.5, 14, 10), br); body.scale.set(1, .55, 1.25); body.castShadow = true; s.add(body);
   const head = new THREE.Mesh(new THREE.SphereGeometry(.26, 12, 8), dk); head.position.set(0, .05, .6); s.add(head);
-  const eye = new THREE.Mesh(new THREE.SphereGeometry(.09, 8, 6), new THREE.MeshBasicMaterial({ color: 0xff2a1a, toneMapped: false })); eye.position.set(0, .1, .82); s.add(eye);
+  const eye = new THREE.Mesh(new THREE.SphereGeometry(.09, 8, 6), E.jin); eye.position.set(0, .1, .82); s.add(eye);
+  const core = new THREE.Mesh(new THREE.SphereGeometry(.16, 10, 6), E.jin); core.scale.set(1, .5, 1.4); core.position.set(0, .26, -.05); s.add(core); const band = new THREE.Mesh(new THREE.TorusGeometry(.5, .03, 5, 18).rotateX(Math.PI / 2), E.gold); band.scale.set(1, 1, 1.25); s.add(band);
   const legs = []; for (let i = 0; i < 6; i++) { const side = i < 3 ? 1 : -1, k = i % 3, hip = new THREE.Group(); hip.position.set(side * .4, 0, .35 - k * .35); hip.rotation.y = side * (Math.PI / 2) + (k - 1) * .5 * side; s.add(hip);
     const up = new THREE.Mesh(new THREE.BoxGeometry(.08, .08, .7), dk); up.position.z = .35; const knee = new THREE.Group(); knee.position.z = .7; const lo = new THREE.Mesh(new THREE.BoxGeometry(.06, .06, .8), br); lo.position.z = .4; knee.add(lo); knee.rotation.x = 1.4;
     const thigh = new THREE.Group(); thigh.rotation.x = -.6; thigh.add(up, knee); hip.add(thigh); legs.push({ thigh, knee, ph: (i + k) % 2 ? 0 : Math.PI }); }
@@ -23709,43 +23710,73 @@ function spiderMake(g) {
 }
 function sphangBuild() {
   if (SPHANG.on) return; const A = SPHANG, [cx, cz] = A.at, hw = A.hw, hd = A.hd, R = A.R, g = new THREE.Group(); scene.add(g);
-  const O = { meshes: [], boxes: [], walls: [] }, T = hallTex();
-  const conc = new THREE.MeshStandardMaterial({ color: 0x8c8e90, roughness: .95 }), concD = new THREE.MeshStandardMaterial({ color: 0x5e6064, roughness: .95 }), red = new THREE.MeshStandardMaterial({ color: 0xff3a2a, emissive: 0xff2a1a, emissiveIntensity: 1.5, toneMapped: false });
-  const add = (geo, m, x, y, z, solid) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; g.add(o);
+  // m@X4@ (the RE-PASS, pass 1): an ENEMY hall (ENEMY_STYLE.md, the classical grammar) where the grey concrete vault was -- a sandstone-block
+  // base whose four walls ARE its colliders (the vault's boxes stood up to .7 m proud of its curve, and the crown box .7 m over it at the
+  // sides), a black lacquer frieze, a curved black-tile hip roof (its walkable surface sampled off the drawn one) under a gold ridge you can
+  // stand on, a gate of lacquer jambs under an emblem lintel, sphinxes facing the approach, braziers and banners, and MINT Jinra where the
+  // red was: the hatching pods, the turning beacon, the spiders' eyes and cores. Statics merged (`bldMergeStatic`)
+  const O = { meshes: [], boxes: [], walls: [] }, T = enemyWallTex(), tris = [], E = enemyMats();
+  const stone = triMat('stone_blocks', { scale: 2.5, color: ENEMY.pal.stone }), stoneD = triMat('stone_blocks', { scale: 2.2, color: 0x9c8a6c }), red = E.glass;
+  const putM = (geo, m) => { const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; g.add(o); return o; };
+  const add = (geo, m, x, y, z, solid, keep) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; if (!keep) o.userData.mg = 1; g.add(o);
     if (solid) { geo.computeBoundingBox(); const b = geo.boundingBox; O.boxes.push({ minx: x + b.min.x, maxx: x + b.max.x, miny: y + b.min.y, maxy: y + b.max.y, minz: z + b.min.z, maxz: z + b.max.z }); } return o; };
-  // THE VAULT: a half-cylinder along z on a low plinth; colliders: the two long sides and the crown (a flat top you can stand on)
-  const v = new THREE.CylinderGeometry(hw, hw, hd * 2, 24, 1, true, -Math.PI / 2, Math.PI); v.rotateX(-Math.PI / 2); add(v, conc, cx, .4, cz, 0).material.side = THREE.DoubleSide;
-  add(new THREE.BoxGeometry(hw * 2 + .8, .4, hd * 2 + .8), concD, cx, .2, cz, 0);
-  for (const sx of [-1, 1]) O.boxes.push({ minx: cx + sx * hw - (sx > 0 ? 1.4 : 0) - (sx < 0 ? .1 : 0), maxx: cx + sx * hw + (sx < 0 ? 1.4 : 0) + (sx > 0 ? .1 : 0), miny: 0, maxy: 2.6, minz: cz - hd, maxz: cz + hd });
-  O.boxes.push({ minx: cx - 2.4, maxx: cx + 2.4, miny: 2.6, maxy: hw + .4, minz: cz - hd, maxz: cz + hd });
-  for (let z = -hd + 1; z <= hd - 1; z += 2.5) add(new THREE.TorusGeometry(hw + .05, .12, 6, 24, Math.PI).rotateY(Math.PI / 2), concD, cx, .4, cz + z, 0).rotation.set(0, Math.PI / 2, 0);
-  // THE ENDS: the back (-z) closed; the front (+z) a hangar door between two breakable panels, a lintel, warning stripes, red lamps
-  const back = new THREE.Mesh(new THREE.CircleGeometry(hw, 24, 0, Math.PI), concD); back.position.set(cx, .4, cz - hd); back.rotation.y = Math.PI; g.add(back);
-  O.boxes.push({ minx: cx - hw, maxx: cx + hw, miny: 0, maxy: hw, minz: cz - hd - .2, maxz: cz - hd + .2 });
-  const dw = 3.2; for (const sx of [-1, 1]) O.walls.push(cwallBuild(g, T, cx + sx * (dw / 2 + (hw - dw / 2) / 2), cz + hd, hw - dw / 2, .4, 0, 3.2, O));
-  add(new THREE.BoxGeometry(hw * 2, hw + .4 - 3.2, .5), concD, cx, (hw + .4 + 3.2) / 2, cz + hd, 1);
-  { const cv = document.createElement('canvas'); cv.width = 64; cv.height = 8; const q = cv.getContext('2d'); for (let i = 0; i < 8; i++) { q.fillStyle = i % 2 ? '#1a1a1a' : '#f2c21a'; q.beginPath(); q.moveTo(i * 8, 8); q.lineTo(i * 8 + 8, 0); q.lineTo(i * 8 + 16, 0); q.lineTo(i * 8 + 8, 8); q.fill(); }
-    const st = new THREE.CanvasTexture(cv); st.colorSpace = THREE.SRGBColorSpace; st.wrapS = THREE.RepeatWrapping; st.repeat.set(3, 1);
-    add(new THREE.PlaneGeometry(dw + .6, .35), new THREE.MeshStandardMaterial({ map: st, roughness: .8 }), cx, 3.35, cz + hd + .27, 0).castShadow = false; }
-  for (const sx of [-1, 1]) add(new THREE.SphereGeometry(.16, 10, 8), red, cx + sx * (dw / 2 + .3), 3.4, cz + hd + .3, 0);
+  const Hb = 3.6, t = .6, fr = .4, ov = .8, eY = Hb + fr, rY = 6.6, dw = 3.2, dh = 3.2, fz = cz + hd;
+  // THE BASE: the two long walls, the back wall, a footing skirt (.3: a step, not a wall), a black frieze with gold studs round the top
+  for (const sx of [-1, 1]) { add(new THREE.BoxGeometry(t, Hb, hd * 2), stone, cx + sx * (hw - t / 2), Hb / 2, cz, 1); add(new THREE.BoxGeometry(.35, .3, hd * 2 + .7), stoneD, cx + sx * (hw + .175), .15, cz, 1); }
+  add(new THREE.BoxGeometry(hw * 2 - t * 2, Hb, t), stone, cx, Hb / 2, cz - hd + t / 2, 1); add(new THREE.BoxGeometry(hw * 2, .3, .35), stoneD, cx, .15, cz - hd - .175, 1);
+  for (const sx of [-1, 1]) add(new THREE.BoxGeometry(t, fr, hd * 2), E.lacquer, cx + sx * (hw - t / 2), Hb + fr / 2, cz, 1);
+  for (const sz of [-1, 1]) add(new THREE.BoxGeometry(hw * 2 - t * 2, fr, t), E.lacquer, cx, Hb + fr / 2, cz + sz * (hd - t / 2), 1);
+  for (let z = -hd + .6; z <= hd - .5; z += 1.2) for (const sx of [-1, 1]) add(new THREE.SphereGeometry(.06, 6, 4), E.gold, cx + sx * (hw + .01), Hb + fr / 2, cz + z, 0);
+  for (const sx of [-1, 1]) add(new THREE.BoxGeometry(t + .04, .08, hd * 2 + .04), E.gold, cx + sx * (hw - t / 2), Hb + .04, cz, 0);
+  // THE GATE: breakable sandstone panels either side (cwallBuild), lacquer jambs, a deep lintel with a gold band and the EMBLEM on the frieze
+  const jw = .3, pl = hw - t - dw / 2 - jw;
+  for (const sx of [-1, 1]) { O.walls.push(cwallBuild(g, T, cx + sx * (dw / 2 + jw + pl / 2), fz - t / 2, pl, t, 0, Hb, O)); add(new THREE.BoxGeometry(jw, dh, t + .1), E.lacquer, cx + sx * (dw / 2 + jw / 2), dh / 2, fz - t / 2, 1);
+    add(new THREE.BoxGeometry(jw + .06, .1, t + .16), E.gold, cx + sx * (dw / 2 + jw / 2), dh - .25, fz - t / 2, 0); add(new THREE.BoxGeometry(jw + .1, .3, t + .2), stoneD, cx + sx * (dw / 2 + jw / 2), .15, fz - t / 2, 0); }
+  add(new THREE.BoxGeometry(dw + jw * 2, Hb - dh, t + .1), E.lacquer, cx, (Hb + dh) / 2, fz - t / 2, 1); add(new THREE.BoxGeometry(dw + jw * 2 + .1, .07, t + .16), E.gold, cx, dh + .04, fz - t / 2, 0);
+  const emb = new THREE.MeshStandardMaterial({ map: enemyEmblemTex(), transparent: true, alphaTest: .4, metalness: .8, roughness: .35, side: THREE.DoubleSide });
+  add(new THREE.PlaneGeometry(.76, .76), emb, cx, (dh + eY) / 2, fz + .07, 0, 1).castShadow = false;
+  add(new THREE.PlaneGeometry(.76, .76).rotateY(Math.PI), emb, cx, Hb + .2, cz - hd - .07, 0, 1).castShadow = false;
+  // mint lanterns hung either side of the gate (iron caps and chains)
+  for (const sx of [-1, 1]) { const x = cx + sx * (dw / 2 + .75), z = fz + .45; add(new THREE.BoxGeometry(.28, .38, .28), red, x, dh + .05, z, 0); add(new THREE.BoxGeometry(.36, .06, .36), E.iron, x, dh + .27, z, 0); add(new THREE.CylinderGeometry(.015, .015, eY - dh - .3, 4), E.iron, x, (eY + dh + .3) / 2, z, 0); }
+  // THE ROOF: `bldRoof`'s curved hip (lifted corners, a lacquer fascia), turned so its ridge runs down the hall's long axis, in black tile;
+  // its walkable surface is the drawn surface sampled every fourth vertex (chord error a few cm), turned the same way
+  bldRoof(g, 0, 0, hd + ov, hw + ov, hd - hw, rY, eY, .5, E.lacquer); { const n = g.children.length, rf = g.children[n - 2], fa = g.children[n - 1]; rf.material = E.roof;
+    for (const o of [rf, fa]) { o.rotation.y = Math.PI / 2; o.position.set(cx, 0, cz); o.userData.mg = 1; }
+    const P = rf.geometry.attributes.position, NX = 49, NZ = 41, at = (i, j) => { const k = j * NX + i; return [cx + P.getZ(k), P.getY(k), cz - P.getX(k)]; };
+    for (let j = 0; j < NZ - 1; j += 4) for (let i = 0; i < NX - 1; i += 4) { const a = at(i, j), b2 = at(Math.min(i + 4, NX - 1), j), c = at(Math.min(i + 4, NX - 1), Math.min(j + 4, NZ - 1)), d = at(i, Math.min(j + 4, NZ - 1)); tris.push(...a, ...b2, ...c, ...a, ...c, ...d); } }
+  // the gold ridge (a walk, its box the drawn cap), curled gold finials at its ends, gold tips on the four eave corners
+  const rz = hd - hw; add(new THREE.BoxGeometry(.34, .26, rz * 2 + .5), E.gold, cx, rY + .13, cz, 1);
+  for (const sz of [-1, 1]) { add(new THREE.ConeGeometry(.16, .9, 6), E.gold, cx, rY + .7, cz + sz * (rz + .1), 0); const c = add(new THREE.TorusGeometry(.2, .06, 6, 10, Math.PI * 1.3), E.gold, cx, rY + .5, cz + sz * (rz + .35), 0); c.rotation.y = Math.PI / 2; }
+  for (const [px, pz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const e = add(new THREE.ConeGeometry(.12, .7, 4), E.gold, cx + px * (hw + ov + .05), eY + .62, cz + pz * (hd + ov + .05), 0); e.rotation.set(pz * .9, 0, -px * .9); }
+  // inside: three lacquer tie beams wall to wall under the frieze (the skeleton), gold-banded, and a king post up from each to the roof
+  for (const z of [-3, 0, 3]) { add(new THREE.BoxGeometry(hw * 2 - t * 2, .26, .26), E.lacquer, cx, Hb - .2, cz + z, 0); add(new THREE.BoxGeometry(.28, .3, .3), E.gold, cx, Hb - .2, cz + z, 0); const top = z ? 5.15 : rY - .15; add(new THREE.BoxGeometry(.16, top - Hb + .2, .16), E.lacquer, cx, (top + Hb - .2) / 2, cz + z, 0); }     // the roof is 5.34 over z = 3 (bldRoof's own curve)
+  // SPHINXES on the approach, facing out (+z); each its plinth, its body and its chest-and-head as boxes off `enemySphinx`'s own sizes
+  for (const sx of [-1, 1]) { const x = cx + sx * 3.4, z = fz + 4; enemySphinx(putM, E, x, z, 0, 1);
+    O.boxes.push({ minx: x - .81, maxx: x + .81, miny: 0, maxy: .72, minz: z - 1.46, maxz: z + 1.46 }, { minx: x - .42, maxx: x + .42, miny: .72, maxy: 1.57, minz: z - 1.25, maxz: z + .95 }, { minx: x - .39, maxx: x + .39, miny: 1.05, maxy: 2.6, minz: z + .22, maxz: z + .9 }); }
+  // NOBORI: a lacquer pole each side of the approach with a black emblem banner, a gold ball on top (its box the pole)
+  for (const sx of [-1, 1]) { const x = cx + sx * (hw + 1.3), z = fz + 1.4; add(new THREE.CylinderGeometry(.07, .08, 5.4, 6), E.lacquer, x, 2.7, z, 0); O.boxes.push({ minx: x - .08, maxx: x + .08, miny: 0, maxy: 5.4, minz: z - .08, maxz: z + .08 });
+    add(new THREE.SphereGeometry(.13, 8, 6), E.gold, x, 5.5, z, 0); enemyBanner(putM, E, x - sx * .62, 5, z, 0, 1, 3.2); }
+  // banners on the long walls and the back, braziers of stolen Jinra at the back corners
+  for (const sx of [-1, 1]) for (const z of [-3, 3]) enemyBanner(putM, E, cx + sx * (hw + .03), Hb - .1, cz + z, sx * Math.PI / 2, 1.2, 2.8);
+  for (const sx of [-1, 1]) enemyBanner(putM, E, cx + sx * 2.2, Hb - .1, cz - hd - .03, Math.PI, 1.2, 2.8);
+  const fires = []; for (const sx of [-1, 1]) { const bz = enemyBrazier(E, 1.2), x = cx + sx * (hw + 1.8), z = cz - hd - 1.8; bz.position.set(x, 0, z); g.add(bz); fires.push([x, bz.userData.top, z, bz.userData.flame]); }
+  bldTris(O, tris);
   for (const b of O.boxes) BOXES.push(b); boxGrid();
   // THE SPIDERS
   const sp = []; for (let i = 0; i < A.n; i++) { const S = spiderMake(g); S.a = i / A.n * 6.28; sp.push(S); }
-  // ---- PASS 3 (m1164): the polish -- a spinning red BEACON and a turning RADAR DISH on the crown, glowing spider PODS inside, an antenna
-  // mast, cables to stakes ----
-  const bronze = new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 });
-  const beacon = new THREE.Group(); beacon.position.set(cx, hw + .45, cz + hd - 1.5); g.add(beacon);
-  { beacon.add(new THREE.Mesh(new THREE.CylinderGeometry(.25, .3, .4, 12), red)); const bg = new THREE.ConeGeometry(1.2, 7, 14, 1, true); bg.translate(0, -3.5, 0); bg.rotateZ(Math.PI / 2);
-    const bm = new THREE.Mesh(bg, new THREE.MeshBasicMaterial({ color: 0xff3a2a, transparent: true, opacity: .1, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, toneMapped: false })); bm.position.y = .1; beacon.add(bm); }
-  const dish = new THREE.Group(); dish.position.set(cx, hw + .4, cz - hd + 2); g.add(dish);
-  { const post = new THREE.Mesh(new THREE.CylinderGeometry(.08, .12, 1.2, 8), concD); post.position.y = .6; dish.add(post);
-    const d = new THREE.Mesh(new THREE.SphereGeometry(1, 18, 8, 0, Math.PI * 2, 0, Math.PI / 3.2), bronze); d.material.side = THREE.DoubleSide; d.position.y = 1.5; d.rotation.x = -Math.PI / 2.3; dish.add(d);
-    const fd = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, .9, 4), concD); fd.position.set(0, 1.55, .35); fd.rotation.x = Math.PI / 2.3; dish.add(fd); }
-  add(new THREE.CylinderGeometry(.05, .07, 4, 6), concD, cx + 1.6, hw + 2.2, cz, 0); add(new THREE.SphereGeometry(.12, 8, 6), red, cx + 1.6, hw + 4.2, cz, 0);
-  const pods = []; { const pm = new THREE.MeshStandardMaterial({ color: 0x3a1a14, emissive: 0xff3a1a, emissiveIntensity: .8, roughness: .4, transparent: true, opacity: .85 });
-    for (const [dx, dz] of [[-1.6, -3.5], [0, -4.2], [1.6, -3.5]]) { const p = add(new THREE.SphereGeometry(.55, 14, 10), pm.clone(), cx + dx, .95, cz + dz, 0); p.scale.y = 1.3; pods.push(p); add(new THREE.CylinderGeometry(.6, .7, .4, 12), concD, cx + dx, .2 + .4, cz + dz, 0); } }
-  for (const sx of [-1, 1]) { const E = [cx + sx * 2, hw + .3, cz + hd - .5], G = [cx + sx * 8, .3, cz + hd + 6]; bldCable(g, E, G, 1, 4, red); add(new THREE.CylinderGeometry(.08, .1, .8, 6), concD, G[0], .4, G[2], 0); }
-  SPHANG.on = { g, O, bars: [], sp, door: [cx, cz + hd + 1.5], t: 0, beacon, dish, pods };
+  // ---- PASS 3 (m1164): the polish -- a spinning BEACON and a turning signal MIRROR on the ridge (m@X4@: mint and gold), glowing spider
+  // PODS inside ----
+  const beacon = new THREE.Group(); beacon.position.set(cx, rY + .26 + .2, cz + rz - .2); g.add(beacon);
+  { beacon.add(new THREE.Mesh(new THREE.CylinderGeometry(.25, .3, .4, 12), red)); const cap = new THREE.Mesh(new THREE.ConeGeometry(.34, .3, 8), E.gold); cap.position.y = .35; beacon.add(cap); const bg = new THREE.ConeGeometry(1.2, 7, 14, 1, true); bg.translate(0, -3.5, 0); bg.rotateZ(Math.PI / 2);
+    const bm = new THREE.Mesh(bg, new THREE.MeshBasicMaterial({ color: ENEMY.pal.jin, transparent: true, opacity: .1, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, toneMapped: false })); bm.position.y = .1; beacon.add(bm); }
+  const dish = new THREE.Group(); dish.position.set(cx, rY + .26, cz - rz + .2); dish.scale.setScalar(.8); g.add(dish);
+  { const post = new THREE.Mesh(new THREE.CylinderGeometry(.08, .12, 1.2, 8), E.iron); post.position.y = .6; dish.add(post);
+    const d = new THREE.Mesh(new THREE.SphereGeometry(1, 18, 8, 0, Math.PI * 2, 0, Math.PI / 3.2), E.gold); d.position.y = 1.5; d.rotation.x = -Math.PI / 2.3; dish.add(d);
+    const fd = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, .9, 4), E.iron); fd.position.set(0, 1.55, .35); fd.rotation.x = Math.PI / 2.3; dish.add(fd); }
+  const pods = []; { const pm = new THREE.MeshStandardMaterial({ color: 0x0e2a24, emissive: ENEMY.pal.jin, emissiveIntensity: .8, roughness: .4, transparent: true, opacity: .85 });
+    for (const [dx, dz] of [[-1.6, -3.5], [0, -4.2], [1.6, -3.5]]) { const p = add(new THREE.SphereGeometry(.55, 14, 10), pm.clone(), cx + dx, .95, cz + dz, 0, 1); p.scale.y = 1.3; pods.push(p); add(new THREE.CylinderGeometry(.6, .7, .4, 12), stoneD, cx + dx, .2 + .4, cz + dz, 0); add(new THREE.TorusGeometry(.62, .04, 6, 16).rotateX(Math.PI / 2), E.gold, cx + dx, .8, cz + dz, 0); } }
+  const nm = bldMergeStatic(g);
+  SPHANG.on = { g, O, bars: [], sp, door: [cx, cz + hd + 1.5], t: 0, beacon, dish, pods, fires, nm };
   arenaBeam(cx, cz, [1, .4, .3], 1); snd('clang', { g: .7, r: .45 });
 }
 function sphangStep(dt) { const H = SPHANG.on; if (!H) return; H.t += dt; const A = SPHANG, [cx, cz] = A.at, Rr = A.loop;
@@ -23754,6 +23785,7 @@ function sphangStep(dt) { const H = SPHANG.on; if (!H) return; H.t += dt; const 
   // the face belly-to-the-wall, crosses the top to the far edge, climbs DOWN the far face head-first, and scuttles home to its loop.
   H.beacon.rotation.y = H.t * 3; H.dish.rotation.y = Math.sin(H.t * .3) * 1.5;
   for (let k = 0; k < H.pods.length; k++) H.pods[k].material.emissiveIntensity = .6 + Math.sin(H.t * 2.2 + k * 1.7) * .4;
+  for (const f of H.fires || []) { f[3].scale.set(1.2 * (.9 + Math.sin(H.t * 7 + f[0]) * .1), 1.2 * (.8 + Math.sin(H.t * 11 + f[2]) * .25), 1.2); if (Math.random() < dt * 3) spk(f[0] + (Math.random() - .5) * .4, f[1] + .3, f[2] + (Math.random() - .5) * .4, 0, 1.5 + Math.random(), 0, .1, .7, [.48, 1, .85]); }     // m@X4@: the braziers burn
   const step = (S, tx, tz, v) => { const P = S.g.position, dx = tx - P.x, dz = tz - P.z, d = Math.hypot(dx, dz), k = Math.min(d, v * dt) / Math.max(d, .01); P.x += dx * k; P.z += dz * k; if (d > .05) S.h = Math.atan2(dx, dz); return d; };
   for (const S of H.sp) { if (S.cool > 0) S.cool -= dt;
     if (S.dead) { S.t -= dt; if (S.t <= 0) { S.dead = 0; S.hp = A.spHp; S.g.visible = true; S.st = 'home'; S.raidT = 4 + Math.random() * 6; const pod = H.pods[H.sp.indexOf(S) % H.pods.length].position; S.g.position.set(pod.x, S.y, pod.z); spkBurst(pod.x, 1, pod.z, 18, { col: [1, .35, .2], spread: 4, size: .14, life: .5 }); smokeAt(pod.x, 1, pod.z, 1, 1, [.6, .3, .25]); snd('swoosh', { g: .5, r: 1.3, x: pod.x, z: pod.z }); /* m1191: it HATCHES from its pod */ } continue; }
@@ -28111,7 +28143,7 @@ const BLDG = { list: [
   { key: 'fship', t: 'Flying Ship House', sub: 'a junk ship on Jin engines: broadside cannons, a bowsprit, a bar, cargo to smash, a sentry gun; take the helm and the broadside fires for you; climb the cargo net and the mast to the crow\'s nest', pass: 6, build: () => fshipBuild(), rig: () => FSHIP.on && FSHIP.on.R, clear: () => fshipClear(), on: () => !!FSHIP.on, step: dt => fshipStep(dt) },
   { key: 'bath', t: 'Bathhouse', sub: 'sliding shoji to tear through, a pool that heals and erupts when you strike the boiler valve, a veranda, a smoking chimney', pass: 4, build: () => bathBuild(), rig: () => BATH.on && BATH.on.R, clear: () => bathClear(), on: () => !!BATH.on, step: dt => bathStep(dt) },
   { key: 'fwork', t: 'Forge-Workshop', sub: 'a furnace that breathes fire when you strike the bellows, a trip-hammer that flattens you, a loft, a crane that swings a bar round', pass: 4, build: () => fworkBuild(), rig: () => FWORK.on && FWORK.on.R, clear: () => fworkClear(), on: () => !!FWORK.on, step: dt => fworkStep(dt) },
-  { key: 'sphang', t: 'Spider-Bot Hangar', sub: 'a vaulted bunker, spider bots that climb every building and pounce on you from walls and roofs, hatching from their pods (smash them)', pass: 4, build: () => sphangBuild(), clear: () => sphangClear(), on: () => !!SPHANG.on, step: dt => sphangStep(dt) },
+  { key: 'sphang', t: 'Spider-Bot Hangar', sub: 'an enemy hall of sandstone and black tile, spider bots that climb every building and pounce on you from walls and roofs, hatching from their pods (smash them)', pass: 4, build: () => sphangBuild(), clear: () => sphangClear(), on: () => !!SPHANG.on, step: dt => sphangStep(dt) },
   { key: 'skyb', t: 'Sky Bridges', sub: 'rope bridges and ziplines linking the buildings up high (they appear as the buildings do); pull back on a zip to brake', pass: 4, build: () => skybBuild(), clear: () => skybClear(), on: () => !!SKYB.on, step: dt => skybStep(dt) },
   { key: 'cliff', t: 'Cliff Lodge', sub: 'a rock crag, a path up it with boulders rolling down (strike the cradle lever to tip one yourself), a lodge, a waterfall, pines', pass: 4, build: () => cliffBuild(), clear: () => cliffClear(), on: () => !!CLIFF.on, step: dt => cliffStep(dt) },
   { key: 'keep', t: 'Moated Keep', sub: 'a keep in a moat with a bronze eel in it, a drawbridge (gong outside, winch inside), archers, a sentry gun', pass: 4, build: () => keepBuild(), clear: () => keepClear(), on: () => !!KEEP.on, step: dt => keepStep(dt) },

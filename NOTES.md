@@ -5,6 +5,24 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the SPIDER-BOT HANGAR, pass 1 (ENEMY look, classical)
+- The grey concrete half-cylinder vault is gone for ENEMY_STYLE's classical grammar on the same footprint: four sandstone-block walls 3.6 m
+  (each wall's box is its mesh), a .3 footing skirt (a step), a black lacquer frieze with gold studs, and `bldRoof`'s curved hip roof in
+  black tile, TURNED so its ridge runs down the long axis. Its walkable surface is the drawn one, sampled every fourth vertex (240 tris).
+  A gold ridge cap (its box the drawn cap) with curled finials; gold eave tips; inside, three tie beams under the frieze with king posts
+  cut to the roof's own height at each (5.34 m over z = +-3, the curve, not the ridge).
+- The gate: breakable sandstone panels (`cwallBuild` on `enemyWallTex`), lacquer jambs and a deep lintel (both solid, both drawn), a gold
+  band, the gold EMBLEM between the lintel and the eave, mint lanterns either side. Two SPHINXES 4 m out on the approach facing it (three
+  boxes each off `enemySphinx`'s own sizes: plinth, body, chest-and-head), two nobori with emblem banners (the pole is its box), emblem
+  banners on the long walls and the back, two flickering mint braziers at the back corners.
+- Mint where the red was: the hatching pods (gold-ringed plinths), the turning beacon (gold-capped), the spiders' eyes and a new back
+  core; the spiders are terracotta and lacquer with a gold band. The signal mirror is gold on iron.
+- COLLIDER AUDIT: the vault's two side boxes ran 2.6 m up a curve that is only 3.9 m out at that height (.7 m of solid air at the top
+  edge), and the crown box sat .7 m over the curve at its sides. Every box now is a drawn wall, beam, cap, plinth or pole.
+- The spiders' patrol loop 6.8 -> 8.4 m: the old loop crossed the building's corners (7.5 m from the centre).
+Merged 137 meshes (38 children). Render-checked headless (outside, from above, at the gate: the first render caught the tie beams and
+the emblem through the roof and frieze, fixed). Next: pass 2 (DESTRUCTIBLE TO THE GROUND). Shipped unverified.
+
 ## m15xx -- THE SNOWFIELD'S MISSING BLADE, the real cause: a pure-mirror material (m1628's "buried" was WRONG)
 His screenshot after m1628: the hilt and guard plain in his hand, held high, the blade gone -- *"it was always missing, it's still missing."* So it
 was never buried. Measured in the page: the blade (`katanaScene`'s `steel`) was `0xd9dee5`, **metalness 1**, roughness .22. A fully metallic
