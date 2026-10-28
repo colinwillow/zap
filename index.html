@@ -20184,6 +20184,16 @@ function bldRoof(g, cx, cz, EX, EZ, RH, ridgeY, eaveY, lift, wood, tint) {
   const fas = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(rim, true), 200, .1, 5, true), wood); fas.position.set(cx, 0, cz); g.add(fas);
   return { geo, tiles };
 }
+// m@X4@ (THE RE-PASS): merge a building's STATIC meshes -- every direct child of `g` flagged `userData.mg` -- into one mesh per material, so a
+// building built one `add` at a time costs a draw per MATERIAL, not per piece. Only opaque materials with no map, or a `triMat` (triplanar, no uvs
+// needed); anything moved, scaled or recoloured later must not be flagged. Returns how many meshes it folded.
+function bldMergeStatic(g) { const by = new Map(), gone = [];
+  for (const o of g.children) { if (!o.isMesh || !o.userData.mg) continue; const m = o.material, tri = m.customProgramCacheKey && String(m.customProgramCacheKey()).startsWith('tri');
+    if (m.transparent || (m.map && !tri)) continue; o.updateMatrix(); const q = (o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()).applyMatrix4(o.matrix);
+    for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal') q.deleteAttribute(k); if (!q.attributes.normal) q.computeVertexNormals();
+    if (!by.has(m)) by.set(m, []); by.get(m).push(q); gone.push(o); }
+  for (const o of gone) o.removeFromParent();
+  for (const [m, list] of by) { const mm = new THREE.Mesh(mergeGeometries(list), m); mm.castShadow = mm.receiveShadow = true; g.add(mm); } return gone.length; }
 function bldClear(R) {
   R.g.removeFromParent(); bldTrisDrop(R.O);
   for (const b of R.O.boxes) { const i = BOXES.indexOf(b); if (i >= 0) BOXES.splice(i, 1); }
@@ -20217,9 +20227,12 @@ function wtowerBuild() {
   // 2 m wide spiral at 5.9 m out, each flight 3 m up over ~9.8 m, about 17 deg); the door 2.4 m; what is his size stays.
   if (WTOWER.on) return; const k0 = WTOWER.scale || 1, A = Object.assign({}, WTOWER, { hs: WTOWER.hs * k0, storey: WTOWER.storey * k0, ro: WTOWER.ro * k0, rw: WTOWER.rw * k0 }), [cx, cz] = A.at, hs = A.hs, S = A.storey, g = new THREE.Group(); scene.add(g);
   const O = { meshes: [], boxes: [], walls: [] }, T = hallTex();
-  const wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 }), plank = new THREE.MeshStandardMaterial({ color: 0x6e4a2e, roughness: .85 }), stone = new THREE.MeshStandardMaterial({ color: 0x8a8580, roughness: .95 });
-  const lamp = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false }), neon = new THREE.MeshBasicMaterial({ color: 0x3fe8ff, toneMapped: false });
-  const add = (geo, m, x, y, z, solid) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; g.add(o);
+  // RE-PASS 1 (m@X4@): the HERO KIT (ARCHITECTURE.md) -- painted timber, planks and sandstone, bronze trim where the cyan neon was, box lanterns,
+  // a red-and-cream TENT CONE crown for the lookout (not a borrowed pagoda cap), bunting down to the stakes, a ship's-wheel winch on the lift,
+  // boulders and plants round the base, and a low BAR at the east foot that flips you up the side. Every static piece is merged per material.
+  const K = korMats(), MG = new Map(), put = (geo, m) => { const q = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal') q.deleteAttribute(k); if (!q.attributes.normal) q.computeVertexNormals(); if (!MG.has(m)) MG.set(m, []); MG.get(m).push(q); };
+  const wood = K.timber, plank = triMat('wood_planks', { scale: 2.2, color: 0xc8a68a }), stone = K.cream, lamp = K.lamp, neon = K.bronze, bronzeM = K.bronze;
+  const add = (geo, m, x, y, z, solid) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; g.add(o);
     if (solid) { geo.computeBoundingBox(); const b = geo.boundingBox; O.boxes.push({ minx: x + b.min.x, maxx: x + b.max.x, miny: y + b.min.y, maxy: y + b.max.y, minz: z + b.min.z, maxz: z + b.max.z }); } return o; };
   // the ground floor: breakable walls, a door in the front (+z)
   const t = .4, wall = (x, z, L, yaw) => O.walls.push(cwallBuild(g, T, x, z, L, t, yaw, S - .2, O));
@@ -20229,15 +20242,15 @@ function wtowerBuild() {
   add(new THREE.BoxGeometry(hs * 2 + 1.4, .18, hs * 2 + 1.4), stone, cx, .09, cz, 0);
   // the decks (solid slabs: stand on them), the corner posts all the way up, lanterns and a neon line on each deck's edge
   for (const y of [S, S * 2, S * 3]) { add(new THREE.BoxGeometry(hs * 2 + .5, .22, hs * 2 + .5), plank, cx, y - .11, cz, 1);
-    for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) add(new THREE.BoxGeometry(.22, .3, .22), lamp, cx + sx * (hs + .05), y + .55, cz + sz * (hs + .05), 0);
+    for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) korLantern(put, K, cx + sx * (hs + .55), y - .75, cz + sz * (hs + .55), 1.1);
     add(new THREE.BoxGeometry(hs * 2 + .55, .04, .04), neon, cx, y - .2, cz + hs + .26, 0); add(new THREE.BoxGeometry(hs * 2 + .55, .04, .04), neon, cx, y - .2, cz - hs - .26, 0); }
   for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) add(new THREE.BoxGeometry(.3, S * 3 + 1.4, .3), wood, cx + sx * hs, (S * 3 + 1.4) / 2, cz + sz * hs, 1);
   // a low rail round the lookout, with a gap where the ramp arrives (the -x,-z corner)
   add(new THREE.BoxGeometry(hs * 2 + .5, .12, .12), wood, cx, S * 3 + .9, cz + hs + .2, 0); add(new THREE.BoxGeometry(.12, .12, hs * 2 + .5), wood, cx + hs + .2, S * 3 + .9, cz, 0);
   // THE PAGODA CAP
-  const R = bldRoof(g, cx, cz, hs + 1.5, hs + 1.5, 0, S * 3 + 4.6, S * 3 + 2.4, .55, wood);
-  add(new THREE.CylinderGeometry(.06, .06, 1.8, 6), new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 }), cx, S * 3 + 5.4, cz, 0);     // the finial
-  for (let k = 0; k < 4; k++) add(new THREE.TorusGeometry(.28 - k * .04, .05, 6, 16).rotateX(Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 }), cx, S * 3 + 4.9 + k * .32, cz, 0);
+  for (const sz of [-1, 1]) { put(new THREE.BoxGeometry(hs * 2 + 1.2, .45, .45).translate(cx, S * 3 + 2.1, cz + sz * hs), wood); put(new THREE.BoxGeometry(.45, .45, hs * 2 + 1.2).translate(cx + sz * hs, S * 3 + 2.1, cz), wood); }
+  for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) put(new THREE.BoxGeometry(.3, 1.1, .3).translate(cx + sx * hs, S * 3 + 1.85, cz + sz * hs), wood);
+  const crownTop = korTent(put, K, cx, S * 3 + 2.35, cz, (hs + 1.6) * 1.18, 7.5, 12);     // the CROWN: his tent cone, red and cream panels, timber ribs, the spoked finial
   // THE RAMP: round the outside, corner to corner, 1.6 m a side
   const ro = A.ro, w = A.rw, C = [[ro, ro], [ro, -ro], [-ro, -ro], [-ro, ro]], tris = [];
   for (let k = 0; k < 6; k++) { const a = C[k % 4], b = C[(k + 1) % 4], ya = k * S / 2, yb = (k + 1) * S / 2;
@@ -20248,13 +20261,13 @@ function wtowerBuild() {
     const lb = [cx + b[0] - w, cx + b[0] + w, cz + b[1] - w, cz + b[1] + w]; tris.push(lb[0], yb, lb[2], lb[1], yb, lb[2], lb[1], yb, lb[3], lb[0], yb, lb[2], lb[1], yb, lb[3], lb[0], yb, lb[3]);     // the landing
     if (k === 0) { const la = [cx + a[0] - w, cx + a[0] + w, cz + a[1] - w, cz + a[1] + w]; tris.push(la[0], .02, la[2], la[1], .02, la[2], la[1], .02, la[3], la[0], .02, la[2], la[1], .02, la[3], la[0], .02, la[3]); }
     const len = Math.hypot(s1 - s0, yb - ya), mid = p((s0 + s1) / 2, 0, (ya + yb) / 2), rp = new THREE.Mesh(new THREE.BoxGeometry(w * 2, .12, len), plank);
-    rp.position.set(mid[0], mid[1] - .06, mid[2]); rp.rotation.y = Math.atan2(ux, uz); rp.rotateX(-Math.atan2(yb - ya, s1 - s0)); rp.castShadow = rp.receiveShadow = true; g.add(rp);
+    rp.position.set(mid[0], mid[1] - .06, mid[2]); rp.rotation.y = Math.atan2(ux, uz); rp.rotateX(-Math.atan2(yb - ya, s1 - s0)); rp.castShadow = rp.receiveShadow = true; rp.userData.mg = 1; g.add(rp);
     add(new THREE.BoxGeometry(w * 2, .12, w * 2), plank, cx + b[0], yb - .06, cz + b[1], 0); add(new THREE.BoxGeometry(.16, yb, .16), wood, cx + b[0] + Math.sign(b[0]) * w * .8, yb / 2, cz + b[1] + Math.sign(b[1]) * w * .8, 0);
     const po = p((s0 + s1) / 2, w * .85, 0); add(new THREE.BoxGeometry(.12, (ya + yb) / 2, .12), wood, po[0], (ya + yb) / 4, po[2], 0); }
   bldTris(O, tris);
   // cables from the cap's eaves down to stakes, lamps on them; the drone orb
-  for (const [sx, sz] of [[1, 1], [-1, 1], [1, -1]]) { const E = [cx + sx * (hs + 1.4), S * 3 + 2.4, cz + sz * (hs + 1.4)], G = [cx + sx * (hs + 9), .3, cz + sz * (hs + 9)];
-    bldCable(g, E, G, 1.4, 4, lamp); add(new THREE.CylinderGeometry(.08, .1, .8, 6), wood, G[0], .4, G[2], 0); }
+  for (const [sx, sz] of [[1, 1], [-1, 1], [1, -1]]) { const rr = (hs + 1.6) * 1.18 * .7, E = [cx + sx * rr, S * 3 + 2.6, cz + sz * rr], G = [cx + sx * (hs + 9), 2.2, cz + sz * (hs + 9)];
+    korBunting(put, K, E, G, 16, 1.6); korPost(put, K, G[0], 0, G[2], 2.4, .14); }
   const drone = bldDrone(g);
   // ---- PASS 2 (m1121): manned, a fire pit, perches, a katana mask ----
   // PERCHES: timber cross-beams jutting out of the second deck and the lookout (walk out on them, 3.5 m over nothing)
@@ -20273,7 +20286,7 @@ function wtowerBuild() {
     bldTris(O, pt); }
   // THE FIRE PIT: a big bronze brazier by the door, coals glowing, flames and smoke (`wtowerStep`)
   const fire = [cx + hs + 2.8, cz + hs + 2.4]; { const bronze = new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 });
-    add(new THREE.CylinderGeometry(1.1, .7, .9, 16, 1, true), bronze, fire[0], 1.15, fire[1], 0).material.side = THREE.DoubleSide;
+    add(new THREE.CylinderGeometry(1.1, .7, .9, 16, 1, true), Object.assign(bronze.clone(), { side: THREE.DoubleSide }), fire[0], 1.15, fire[1], 0);
     for (let k = 0; k < 3; k++) { const a = k / 3 * 6.283, leg = add(new THREE.CylinderGeometry(.08, .08, .9, 6), bronze, fire[0] + Math.cos(a) * .65, .45, fire[1] + Math.sin(a) * .65, 0); leg.rotation.z = Math.cos(a) * .25; leg.rotation.x = -Math.sin(a) * .25; }
     add(new THREE.CylinderGeometry(.95, .95, .12, 16), new THREE.MeshBasicMaterial({ color: 0xff6a1a, toneMapped: false }), fire[0], 1.45, fire[1], 0);
     O.boxes.push({ minx: fire[0] - 1, maxx: fire[0] + 1, miny: 0, maxy: 1.6, minz: fire[1] - 1, maxz: fire[1] + 1 }); }
@@ -20308,7 +20321,7 @@ function wtowerBuild() {
     const bg = new THREE.ConeGeometry(2.6, 20, 20, 1, true); bg.translate(0, -10, 0); bg.rotateX(-Math.PI / 2);
     const beam = new THREE.Mesh(bg, new THREE.MeshBasicMaterial({ color: 0xfff0c0, transparent: true, opacity: .09, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, toneMapped: false })); beam.position.z = .26; sl.add(beam);
     add(new THREE.CylinderGeometry(.06, .08, 1.1, 6), wood, sl.position.x, S * 3 + .55, sl.position.z, 0); }
-  const core = add(new THREE.SphereGeometry(.26, 16, 12), new THREE.MeshBasicMaterial({ color: 0x5ff2ff, toneMapped: false }), cx, S * 3 + 6.5, cz, 0); core.castShadow = false;
+  const core = add(new THREE.SphereGeometry(.26, 16, 12), new THREE.MeshBasicMaterial({ color: 0x5ff2ff, toneMapped: false }), cx, crownTop + .35, cz, 0); core.castShadow = false; core.userData.mg = 0;
   // MANNED: a sentry gun on the second deck, and a red archer posted on the lookout
   const tur = turretAt(cx + hs - .9, S * 2, cz + hs - .9, Math.atan2(ARENA.youAt[0] - cx, ARENA.youAt[1] - cz)); boxGrid();
   const rings = []; for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) rings.push(gringAdd(g, cx + sx * (hs + 1.7), S * 3 + 2.1, cz + sz * (hs + 1.7)));     // m1129: grapple rings
@@ -20318,11 +20331,12 @@ function wtowerBuild() {
     const wick = new THREE.MeshStandardMaterial({ color: 0x9a7a4a, roughness: .95 }); const fl = new THREE.Mesh(new THREE.BoxGeometry(1.3, .08, 1.3), plank); bk.add(fl);
     for (const [sx, sz, wx, wz] of [[0, -.62, 1.3, .06], [0, .62, 1.3, .06], [-.62, 0, .06, 1.3], [.62, 0, .06, 1.3]]) { const sd = new THREE.Mesh(new THREE.BoxGeometry(wx, .7, wz), wick); sd.position.set(sx, .35, sz); bk.add(sd); }
     for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const r = new THREE.Mesh(new THREE.CylinderGeometry(.015, .015, 1.6, 4), wood); r.position.set(sx * .5, 1.3, sz * .5); r.rotation.set(sz * .3, 0, -sx * .3); bk.add(r); }
-    bk.traverse(o => { if (o.isMesh) o.castShadow = true; });
+    bk.traverse(o => { if (o.isMesh) { o.castShadow = true; o.userData.mg = 1; } }); bldMergeStatic(bk);     // m@X4@: the basket in two draws
     add(new THREE.BoxGeometry(hs + 2.8, .3, .3), wood, cx - (hs + 2.8) / 2 + .2, top + 1.7, lz, 0); add(new THREE.BoxGeometry(.25, 1.7, .25), wood, cx - hs + .2, top + .85, lz, 0);
-    const pul = add(new THREE.CylinderGeometry(.25, .25, .12, 14).rotateX(Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 }), lx, top + 1.45, lz, 0);
+    const pul = add(new THREE.CylinderGeometry(.25, .25, .12, 14).rotateX(Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 }), lx, top + 1.45, lz, 0); pul.userData.mg = 0;
+    korWheel(put, K, cx - hs - .25, top + 1.0, lz, Math.PI / 2, .7);     // m@X4@: the winch -- a ship's wheel on the jib post
     const rope = new THREE.Mesh(new THREE.CylinderGeometry(.02, .02, 1, 4), new THREE.MeshStandardMaterial({ color: 0xc9b07a, roughness: 1 })); g.add(rope);
-    const rope2 = rope.clone(); g.add(rope2); const cw = add(new THREE.BoxGeometry(.5, .6, .5), stone, lx - .3, top - 1, lz - .4, 0);
+    const rope2 = rope.clone(); g.add(rope2); const cw = add(new THREE.BoxGeometry(.5, .6, .5), stone, lx - .3, top - 1, lz - .4, 0); cw.userData.mg = 0;
     lift = { bk, rope, rope2, cw, pul, x: lx, z: lz, y: 0, top: top + .1, ride: 0 }; }
   // ---- PASS 6 (m1232): THE SIGNAL BEACON -- an iron brazier on the lookout's corner; strike it and it BLAZES for `beaconT` s (fire and a
   // tall smoke column seen across the forge) and signals the Airship Dock: a docked airship casts off at once. And a ZIPLINE down from the
@@ -20330,7 +20344,17 @@ function wtowerBuild() {
   let beacon; { const bx = cx + hs - .7, bz = cz - hs + .7, iron = new THREE.MeshStandardMaterial({ color: 0x34383e, metalness: .6, roughness: .5, side: THREE.DoubleSide });
     add(new THREE.CylinderGeometry(.08, .1, 1, 6), iron, bx, S * 3 + .5, bz, 0); add(new THREE.CylinderGeometry(.55, .3, .45, 10, 1, true), iron, bx, S * 3 + 1.2, bz, 0);
     const coal = add(new THREE.SphereGeometry(.38, 8, 6), new THREE.MeshBasicMaterial({ color: 0x3a1a10, toneMapped: false }), bx, S * 3 + 1.2, bz, 0); coal.scale.y = .4; coal.castShadow = false; beacon = { coal, x: bx, y: S * 3 + 1.4, z: bz, t: 0 }; }
-  WTOWER.on = { A, rings, g, O, bars: wbars, drone, t: 0, tur, fire, arch: null, sl, core, lift, beacon }; const W = WTOWER.on;
+  // m@X4@: the GROUND -- sandstone boulders, grass, ferns and a pine or two round the plinth (never on the ramp's foot or the door), and a low BAR
+  // at the east foot, square to the wall: swing it and the release flips you up the side
+  const rec = []; { let sd = 7; const rnd = () => (sd = sd * 16807 % 2147483647) / 2147483647;
+    for (let k = 0; k < 26; k++) { const a = rnd() * 6.283, d = hs + 2.2 + rnd() * 5, x = cx + Math.cos(a) * d, z = cz + Math.sin(a) * d;
+      if (z > cz + hs - .5 && Math.abs(x - cx) < 3.5) continue; if (x > cx + hs - 1 && z > cz + hs - 1) continue;     // the door and the ramp's foot
+      const q = rnd(), kd = q < .38 ? 'grass' : q < .6 ? 'fern' : q < .76 ? 'stones' : q < .94 ? 'boulder' : 'pine'; plantPlant(rec, kd, x, 0, z, kd === 'pine' ? .5 : .8 + rnd() * .6, rnd() * 6.283); } }
+  plantFlush(g, rec);
+  { const Bb = hbarMake(cx + hs + 3.2, cz - 1.2, Math.PI / 2, 0); HBAR.list.push(Bb); wbars.push(Bb); }
+  for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
+  const folded = bldMergeStatic(g);
+  WTOWER.on = { A, rings, g, O, bars: wbars, drone, t: 0, tur, fire, arch: null, sl, core, lift, beacon, folded }; const W = WTOWER.on;
   archerPost(cx - hs + 1, S * 3 + .05, cz + hs - 1).then(d => { if (WTOWER.on === W) W.arch = d; else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {});
   // ---- PASS 4 (m1169): a second archer on deck 2, the WAR DRUM (taiko) on deck 1 -- strike it and the alarm goes up: every archer and sentry
   // gun in the forge looses at once -- and two carp KITES flying off the lookout on long lines ----
@@ -20338,7 +20362,7 @@ function wtowerBuild() {
   { const drum = new THREE.Group(); drum.position.set(cx + 1.2, S + 1.05, cz - hs + 1.2); g.add(drum); const body = new THREE.Mesh(new THREE.CylinderGeometry(.75, .75, .9, 18), new THREE.MeshStandardMaterial({ color: 0x8a3a1a, roughness: .5 })); body.rotation.x = Math.PI / 2; drum.add(body);
     for (const sz of [-1, 1]) { const hd = new THREE.Mesh(new THREE.CircleGeometry(.72, 18), new THREE.MeshStandardMaterial({ color: 0xe8dcc0, roughness: .8, side: THREE.DoubleSide })); hd.position.z = sz * .46; drum.add(hd);
       const rim = new THREE.Mesh(new THREE.TorusGeometry(.74, .04, 6, 20), new THREE.MeshStandardMaterial({ color: 0x17130f })); rim.position.z = sz * .44; drum.add(rim); }
-    const stand = new THREE.Mesh(new THREE.BoxGeometry(1.4, .7, .5), wood); stand.position.y = -.75; drum.add(stand); drum.traverse(o => { if (o.isMesh) o.castShadow = true; });
+    const stand = new THREE.Mesh(new THREE.BoxGeometry(1.4, .7, .5), wood); stand.position.y = -.75; drum.add(stand); drum.traverse(o => { if (o.isMesh) { o.castShadow = true; o.userData.mg = 1; } }); bldMergeStatic(drum);
     O.boxes.push({ minx: cx + .4, maxx: cx + 2, miny: S, maxy: S + 1.8, minz: cz - hs + .7, maxz: cz - hs + 1.7 }); BOXES.push(O.boxes[O.boxes.length - 1]); boxGrid(); W.drum = drum; }
   { const kc = [0xc8341f, 0x2a6ac8]; W.kites = []; for (let k = 0; k < 2; k++) { const kt = new THREE.Group(); g.add(kt); const b2 = new THREE.Mesh(new THREE.ConeGeometry(.6, 2.4, 10, 1, true), new THREE.MeshStandardMaterial({ color: kc[k], side: THREE.DoubleSide, roughness: .8 })); b2.rotation.x = -Math.PI / 2; kt.add(b2);
       const ln = new THREE.Line(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3)), new THREE.LineBasicMaterial({ color: 0x2a2622 })); ln.frustumCulled = false; g.add(ln); W.kites.push({ kt, ln, k }); } }

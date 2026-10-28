@@ -301,6 +301,30 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
+## THE RE-PASS: THE WATCHTOWER, PASS 1 -- THE HERO KIT AND THE BUDGET (m@X4@, WORKER A)
+
+His (the re-pass, confirmed in my session: *"Yes"*): every forge building in the new style and rules (BUILDINGS.md "THE RE-PASS"). The
+Watchtower first; it already PLAYED well (six passes: the spiral ramp, perch bars, basket lift, beacon, drum, archers, sentry gun), so this
+pass is its LOOK and its COST, and the rubric's other boxes come in passes 2 and 3.
+
+- **Style (rubric 1):** `korMats()` throughout: painted timber (`K.timber`), painted planks, a sandstone plinth, bronze trim in place of the
+  cyan neon strips, BOX LANTERNS (`korLantern`) hung under every deck corner instead of glowing cubes. The lookout's borrowed pagoda cap
+  (`bldRoof`) is replaced by his TENT CONE (`korTent`, 12 red and cream panels, timber ribs, the spoked finial) on a timber ring beam, with
+  the Jin core riding its finial. The three lamp cables are now red-and-cream BUNTING (`korBunting`) from the crown down to banded posts. The
+  basket lift's winch is a SHIP'S WHEEL (`korWheel`). Round the plinth: boulders, stones, grass, ferns and a small pine (`plantPlant`, kept off
+  the door and the ramp's foot).
+- **Up (rubric 2):** a low high BAR at the east foot, square to the wall (`hbarMake`, in `bars` so it clears with the tower). The ramp, perch
+  bars and lift were already there.
+- **Budget (rubric 6):** a new shared post-pass **`bldMergeStatic(g)`** folds every child flagged `userData.mg` into one mesh per material
+  (opaque, no map or a `triMat`). `add` flags everything it makes; the core, the counterweight and the pulley (moved or scaled later) are
+  unflagged. The basket and the drum are merged inside their own groups. **Measured headless: ~180 draws -> 87** (82 meshes folded).
+  What remains is mostly the ground floor's breakable wall pieces (one mesh each, by design), the moving parts and the plants.
+- **A landmine avoided:** the brazier's bowl used to set `.material.side = DoubleSide` on its material; with the SHARED kit bronze that would
+  have flipped every bronze in the game, so it gets its own clone.
+- **Open:** pass 2, a roof SKELETON (rafters under the tent, so a broken roof reads), doors that open or break, and a cheaper breakable
+  ground floor; pass 3, the L2 lock and the L3 zones written down and tuned (the drum and beacon are the obvious L2 keys; the archers and
+  sentry gun the L3). Then his OK.
+
 ## THE SHIP, PASS 14: THE AIRSHIP FORM -- WINGS (m1479, WORKER A)
 
 His: *"Surprise me... whatever needs the most attention."* The airship form was asked for twice (his first brief: *"I'm going to make it
