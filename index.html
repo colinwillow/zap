@@ -10350,6 +10350,29 @@ function islandDress(put, I, X, Y, Z, o) { o = Object.assign({ cherry: 2, pine: 
 // brass SHIP'S WHEELS; timber POSTS with iron bands; warm BOX LANTERNS; BUNTING of red and cream pennants; red BANNERS on a pole and crossbar.
 // Each takes the caller's `put(geo, mat)` and a material set from `korMats()` (shared, made once).
 const KOR = { m: null };
+// m@X4@: THE RESTORATION'S TWO STATES (KORAJIN.md; his: *"yeah, because it goes along with the storyline"*). Every re-passed building is ONE build
+// with a switch: FALLEN (a Western frontier over samurai ruins -- weathered grey timber, rust for bronze, faded cloth, every lamp and every Jinra
+// glow dead, the crowns half down to their rafters, doors hanging off) or RESTORED (the hero kit, warm lanterns, mint Jinra motes rising from the
+// foundations). SPAWN > BUILDINGS > STATE flips it and rebuilds whatever stands. `bldAge(g)` weathers a group; each building adds its own ruin.
+const AGE = { st: 'restored', cache: new Map() };
+try { AGE.st = localStorage.getItem('mel.age') === 'fallen' ? 'fallen' : 'restored'; } catch (e) {}
+function ageMat(m) { if (AGE.cache.has(m)) return AGE.cache.get(m); let n = m;
+  if (m.isMeshBasicMaterial) { n = m.clone(); n.color.multiplyScalar(.22); if (n.opacity < 1) n.opacity *= .4; }
+  else if (m.isMeshStandardMaterial) { n = m.clone(); const ob = m.onBeforeCompile, ok = m.customProgramCacheKey, metal = m.metalness > .4;
+    // the paint drains: after the map (triplanar or not), the colour is pulled most of the way to its own grey and tinted dust or rust
+    n.onBeforeCompile = (sh, r) => { ob.call(m, sh, r); sh.fragmentShader = sh.fragmentShader.replace('#include <color_fragment>', '#include <color_fragment>\n  { float L = dot(diffuseColor.rgb, vec3(.3, .59, .11)); diffuseColor.rgb = mix(diffuseColor.rgb, vec3(L), ' + (metal ? '.55' : '.72') + ') * ' + (metal ? 'vec3(1.25, .82, .58)' : 'vec3(1.04, .97, .86)') + '; }'); };
+    n.customProgramCacheKey = () => String(ok.call(m)) + (metal ? 'AGEm' : 'AGE');
+    n.color.lerp(metal ? new THREE.Color(.42, .24, .14) : new THREE.Color(.5, .46, .4), metal ? .65 : .3).multiplyScalar(.85);
+    n.roughness = 1; n.metalness = metal ? .25 : m.metalness * .3; if (n.emissive) { n.emissive.setRGB(0, 0, 0); n.emissiveIntensity = 0; } }
+  AGE.cache.set(m, n); return n; }
+function bldAge(g) { if (AGE.st !== 'fallen') return 0; let k = 0; g.traverse(o => { if ((o.isMesh && !o.isInstancedMesh) || o.isLine) { if (Array.isArray(o.material)) o.material = o.material.map(ageMat); else o.material = ageMat(o.material); k++; } if (o.isPoints) o.visible = false; }); return k; }
+// restored: mint motes rise off the foundations, a few a second
+function bldJinraMotes(x, z, r, dt) { if (AGE.st === 'fallen' || Math.random() > dt * 5) return; const a = Math.random() * 6.283, d = r * (.6 + Math.random() * .5);
+  spk(x + Math.cos(a) * d, .3, z + Math.sin(a) * d, (Math.random() - .5) * .2, .8 + Math.random() * .8, (Math.random() - .5) * .2, .09, 2.2, [.45, 1, .75]); }
+// a crown left in ruin: panels collapsed at build, no debris, no sound
+function korTentRuin(T, keep, seed = 3) { let sd = seed; const rnd = () => (sd = sd * 16807 % 2147483647) / 2147483647;
+  for (const P of T.panels) { if (rnd() < keep) continue; const pos = P.m.geometry.attributes.position; for (let v = 0; v < P.cnt; v++) pos.setXYZ(P.start + v, T.x, T.y + T.h, T.z); pos.needsUpdate = true; P.dead = 1; } }
+function bldDoorsRuin(doors, which = 0) { const D = doors && doors[which]; if (!D) return; D.dead = 1; D.t2 = -1e9; D.vy = 0; D.vz = 0; D.pv.position.y = -.2; D.pv.rotation.x = 1.45; D.pv.position.z += .9; }
 function korMats() { if (KOR.m) return KOR.m; const S = (c, r, x) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: r }, x || {}));
   return (KOR.m = { cream: triMat('sandstone', { scale: 3.2 }), timber: triMat('wood_timber', { scale: 1.6, color: 0x8a6a52 }), iron: S(0x2a2522, .55, { metalness: .5 }), bronze: triMat('bronze', { scale: 1.2, metal: .75, rough: .35 }),
     red: triMat('red_cloth', { scale: 2.4, side: THREE.DoubleSide }), cloth: S(0xeadcc4, .85, { side: THREE.DoubleSide }), redL: S(0xa8201a, .45), lamp: S(0xffc070, .6, { emissive: 0xff9028, emissiveIntensity: 1.5 }),
@@ -12980,6 +13003,7 @@ function arenaUi() {
       else if (a === 'horde') { hordeAdd(); }     // m1084
       else if (a === 'archers') { archerAdd(); }     // m1103
       else if (a === 'hall') { ARENA.menu = ''; if (HALL.on) hallClear(); else hallBuild(); }     // m1116
+      else if (a === 'age') { AGE.st = AGE.st === 'fallen' ? 'restored' : 'fallen'; try { localStorage.setItem('mel.age', AGE.st); } catch (err) {} for (const E of BLDG.list) if (E.on()) { E.clear(); E.build(); } }     // m@X4@: FALLEN / RESTORED
       else if (a === 'bld') { ARENA.menu = ''; const E = BLDG.list.find(q => q.key === b.dataset.k); if (E) { if (E.on()) E.clear(); else E.build(); } }     // m1117
       else if (a === 'slice') { ARENA.menu = ''; sliceDummy(); }     // m1090
       else if (a === 'course') { ARENA.menu = ''; if (COURSE.on) courseClear(); else courseBuild('ACRO'); }     // m1078
@@ -13045,7 +13069,7 @@ function arenaUi() {
   const tools = ARENA.tools && !m;     // a menu open folds the tools away: the screen is not tall enough for both
   let h = '<div class="ar-bar">' + B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('vend', 'VEND') + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
     (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('btrail', 'TRAIL ' + (BTRAIL.jin ? 'JIN' : 'BLUE')) + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('sample', 'DNA SAMPLE ' + (SAMPLE.on ? 'ON' : 'OFF')) + B('runslash', 'RUN SLASH ' + (RUNSLASH.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('dsky', 'SKY ' + DOJO.skyPick) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
-  if (m === 'bld') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back');
+  if (m === 'bld') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back') + B('age', 'STATE: ' + (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + '<small>tap to switch -- rebuilds what stands</small>', '', AGE.st === 'fallen' ? '' : 'ar-on');
     for (const E of BLDG.list) h += B('bld', E.t + '<small>' + (E.on() ? 'tap to remove' : E.pass >= 3 ? E.sub : 'IN PROGRESS · pass ' + E.pass + ' of 3') + '</small>', E.key, E.on() ? 'ar-on' : '');
     h += '</div>'; }
   else if (m === 'top') h += '<div class="ar-menu">' + (inForge() ? B('cat', 'BUILDINGS &rsaquo;', 'bld') : '') + B('cat', 'WARBOSS &rsaquo;', 'boss') + B('cat', 'PEOPLE &rsaquo;', 'people') + B('cat', 'BEASTS &rsaquo;', 'beasts') + B('cat', 'RIVALS &rsaquo;', 'rival') + B('turret', 'TURRET<small>' + (TURRET.list.length ? 'tap to remove' : 'sentry gun') + '</small>', '', TURRET.list.length ? 'ar-on' : '') + B('hbar', 'HIGH BAR<small>' + (HBAR.list.length ? 'tap to remove' : 'swing on it') + '</small>', '', HBAR.list.length ? 'ar-on' : '') + B('beam', 'BALANCE BEAM<small>' + (BEAM.list.length ? 'tap to remove' : 'walk it') + '</small>', '', BEAM.list.length ? 'ar-on' : '') + B('wrun', 'WALL RUN<small>' + ((WRUN.boxes || []).length ? 'tap to remove' : 'run along it') + '</small>', '', (WRUN.boxes || []).length ? 'ar-on' : '') + B('course', 'ACROBATICS<small>' + (COURSE.on ? 'tap to remove' : 'the course') + '</small>', '', COURSE.on ? 'ar-on' : '') + B('slice', 'SLICE DUMMY<small>' + (LIMB.stat.cuts ? LIMB.stat.cuts + ' cut, ' + LIMB.stat.booms + ' blown' : 'cut him up') + '</small>') + B('horde', 'HORDE<small>' + (HORDE.busy ? 'loading...' : HORDE.list.length ? HORDE.list.length + ' left, ' + HORDE.stat.kills + ' down -- +' + HORDE.per : '+' + HORDE.per + (HORDE.slice ? ' (slice)' : ' samurai')) + '</small>', '', HORDE.list.length ? 'ar-on' : '') + B('hall', 'HALL<small>' + (HALL.on ? 'tap to remove' : 'the first building') + '</small>', '', HALL.on ? 'ar-on' : '') + B('archers', 'ARCHERS<small>' + (HORDE.busy ? 'loading...' : '+' + ARCH.per + ' red bowmen') + '</small>') + '<button class="ar-off">GRUNTS<small>soon</small></button><button class="ar-off">GREYS<small>soon</small></button></div>';
@@ -20433,6 +20457,8 @@ function wtowerBuild() {
     for (const dy of [.15, 1.15]) { const c = new THREE.Mesh(new THREE.CylinderGeometry(.4, .4, .2, 14), bronzeM); c.position.set(jx, jy + dy, jz); g.add(c); }
     lad.jin = can; }
   WTOWER.on = { A, rings, g, O, bars: wbars, drone, t: 0, tur, fire, arch: null, sl, core, lift, beacon, folded, roof, doors, lad, coins }; const W = WTOWER.on;
+  if (AGE.st === 'fallen') {     // m@X4@: FALLEN -- the crown down to its rafters in places, a door off, the fire cold, no searchlight, no drone, no kites
+    korTentRuin(roof, .45, 5); bldDoorsRuin(doors, 1); W.fire = null; sl.visible = false; drone.visible = false; core.visible = false; W.fallen = 1; }
   archerPost(cx - hs + 1, S * 3 + .05, cz + hs - 1).then(d => { if (WTOWER.on === W) W.arch = d; else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {});
   // ---- PASS 4 (m1169): a second archer on deck 2, the WAR DRUM (taiko) on deck 1 -- strike it and the alarm goes up: every archer and sentry
   // gun in the forge looses at once -- and two carp KITES flying off the lookout on long lines ----
@@ -20444,6 +20470,8 @@ function wtowerBuild() {
     O.boxes.push({ minx: cx + .4, maxx: cx + 2, miny: S, maxy: S + 1.8, minz: cz - hs + .7, maxz: cz - hs + 1.7 }); BOXES.push(O.boxes[O.boxes.length - 1]); boxGrid(); W.drum = drum; }
   { const kc = [0xc8341f, 0x2a6ac8]; W.kites = []; for (let k = 0; k < 2; k++) { const kt = new THREE.Group(); g.add(kt); const b2 = new THREE.Mesh(new THREE.ConeGeometry(.6, 2.4, 10, 1, true), new THREE.MeshStandardMaterial({ color: kc[k], side: THREE.DoubleSide, roughness: .8 })); b2.rotation.x = -Math.PI / 2; kt.add(b2);
       const ln = new THREE.Line(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3)), new THREE.LineBasicMaterial({ color: 0x2a2622 })); ln.frustumCulled = false; g.add(ln); W.kites.push({ kt, ln, k }); } }
+  if (W.fallen) for (const K2 of W.kites || []) { K2.kt.visible = false; K2.ln.visible = false; }
+  bldAge(g);
   arenaBeam(cx, cz, [1, .7, .4], 1); snd('clang', { g: .7, r: .6 });
 }
 function wtowerLift(W, dt) { const L = W.lift, p = player, [cx, cz] = WTOWER.at, d = Math.hypot(p.pos.x - L.x, p.pos.z - L.z);
@@ -20454,7 +20482,7 @@ function wtowerLift(W, dt) { const L = W.lift, p = player, [cx, cz] = WTOWER.at,
   L.bk.position.y = L.y; L.pul.rotation.z = -L.y * 4; const ry = L.top + 1.35, len = Math.max(.1, ry - (L.y + 1.9)); L.rope.scale.y = len; L.rope.position.set(L.x, ry - len / 2, L.z);
   const cy = Math.max(.3, L.top - L.y), len2 = Math.max(.1, ry - (cy + .3)); L.cw.position.y = cy; L.rope2.scale.y = len2; L.rope2.position.set(L.x - .3, ry - len2 / 2, L.z - .4); }
 function wtowerStep(dt) { const W = WTOWER.on; if (!W) return; W.t += dt; const [cx, cz] = WTOWER.at, a = W.t * .35; if (W.lift) wtowerLift(W, dt);
-  if (W.roof) korTentStep(W.roof, dt);
+  if (W.roof) korTentStep(W.roof, dt); bldJinraMotes(cx, cz, W.A.hs + 2, dt);
   if (W.lad) { const L = W.lad, p = player.pos; if (!L.open && Math.hypot(p.x - cx, p.z - (cz - W.A.hs - 1.8)) < 2.2 && Math.abs(p.y - L.top) < 1.2) wtowerLadder(W);
     if (L.open && L.k < 1) { L.k = Math.min(1, L.k + dt * 1.4); L.m.scale.y = Math.max(.02, L.k * L.k); L.roll.position.y = L.top - .1 - L.top * L.k * L.k; L.roll.scale.setScalar(Math.max(.05, 1 - L.k)); }
     if (L.jin) { L.jin.material.emissiveIntensity = 1.3 + Math.sin(W.t * 2.6) * .5; L.jin.rotation.y = W.t * .4; } }
@@ -20469,7 +20497,7 @@ function wtowerStep(dt) { const W = WTOWER.on; if (!W) return; W.t += dt; const 
   if (W.fire) { const [fx, fz] = W.fire; W.fT = (W.fT || 0) - dt; if (W.fT <= 0) { W.fT = .045;     // the fire: flames leaping, sparks, a little smoke
       spk(fx + (Math.random() - .5) * 1.2, 1.55, fz + (Math.random() - .5) * 1.2, (Math.random() - .5) * .6, 2.6 + Math.random() * 2.4, (Math.random() - .5) * .6, .32 + Math.random() * .25, .55, Math.random() < .5 ? [1, .55, .12] : [1, .82, .3]);
       if (Math.random() < .12) smokeAt(fx + (Math.random() - .5) * .6, 2.6, fz + (Math.random() - .5) * .6, 1.2, 1.6, [.3, .28, .26]); } }
-  if (W.sl) { W.sl.rotation.y = Math.PI * .75 + Math.sin(W.t * .32) * 1.1; W.sl.rotation.x = .32 + Math.sin(W.t * .21) * .08; }     // m1123: the searchlight sweeps
+  if (W.sl && !W.fallen) { W.sl.rotation.y = Math.PI * .75 + Math.sin(W.t * .32) * 1.1; W.sl.rotation.x = .32 + Math.sin(W.t * .21) * .08; }     // m1123: the searchlight sweeps
   if (W.core) W.core.scale.setScalar(1 + Math.sin(W.t * 2.4) * .14);
   W.drone.position.set(cx + Math.cos(a) * 6.5 * (WTOWER.scale || 1), W.A.storey * 3 + 3.2 + Math.sin(W.t * 1.3) * .35, cz + Math.sin(a) * 6.5); W.drone.rotation.y = -a; W.drone.children[1].rotation.z = W.t * .6; }
 // m1171: THE GATEHOUSE ALARM -- struck bell (or the Watchtower's drum): the portcullis drops with a crash, archers loose
@@ -20881,9 +20909,11 @@ function pagodaBuild() {
     ch.m = new THREE.Mesh(mergeGeometries(parts), K.bronze); ch.m.position.set(bx, y0, cz); ch.m.scale.y = .01; g.add(ch.m); P0.rain = ch; }
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
   PAGODA.on.folded = bldMergeStatic(g); PAGODA.on.roof = roof; PAGODA.on.doors = doors;
+  if (AGE.st === 'fallen') { korTentRuin(roof, .5, 9); bldDoorsRuin(doors, 0); drone.visible = false; PAGODA.on.fallen = 1; }     // m@X4@: FALLEN
+  bldAge(g);
   arenaBeam(cx, cz, [1, .6, .35], 1); snd('clang', { g: .7, r: .5 });
 }
-function pagodaStep(dt) { const P = PAGODA.on; if (!P) return; P.t += dt; if (P.roof) korTentStep(P.roof, dt); bldDoorsStep(P.doors, dt);
+function pagodaStep(dt) { const P = PAGODA.on; if (!P) return; P.t += dt; if (P.roof) korTentStep(P.roof, dt); bldDoorsStep(P.doors, dt); bldJinraMotes(PAGODA.at[0], PAGODA.at[1], P.A.hs0 + 2, dt);
   if (P.rain && P.rain.open && P.rain.k < 1) { const C = P.rain; C.k = Math.min(1, C.k + dt * .8); C.m.scale.y = Math.max(.01, C.k * C.k); }
   // the bell is a pendulum: a toll kicks it, it swings and settles
   P.bv += (-9 * P.bw - .9 * P.bv) * dt; P.bw += P.bv * dt; P.bell.rotation.z = P.bw + Math.sin(P.t * .8) * .03; P.bell.rotation.x = P.bw * .3;

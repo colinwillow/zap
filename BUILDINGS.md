@@ -41,6 +41,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 4. **Breakable and alive:** doors open or break; roofs have a SKELETON (rafters and beams) so a broken roof reads; something to smash; lanterns, cloth and smoke moving.
 5. **Detail and embellishment:** silhouettes that read from the game camera, plants and rocks round the base, signs of use.
 6. **Budget:** about 40 draws per building (merge per material), no new physics, `npm run check` clean.
+7. **Two states (his, m@X4@: THE RESTORATION):** FALLEN and RESTORED, one build, the SPAWN > BUILDINGS > STATE switch. Fallen = `bldAge(g)` plus the building's own ruin (`korTentRuin`, `bldDoorsRuin`, lamps and machines dead); restored = the hero kit plus `bldJinraMotes`.
 
 **The buildings** (SPAWN > BUILDINGS), at least 3 passes each:
 | building | p1 | p2 | p3 | his OK |

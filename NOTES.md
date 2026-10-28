@@ -321,6 +321,25 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
+## THE RE-PASS: FALLEN / RESTORED -- ONE BUILD, TWO STATES (m@X4@, WORKER A)
+
+His: *"Yeah, because it goes along with the storyline"* (KORAJIN.md, THE RESTORATION: every place starts FALLEN -- a Western frontier over
+samurai ruins -- and is RESTORED with Jinra). So every re-passed building is now one build with a switch.
+
+- **`AGE.st`** ('restored' | 'fallen', kept in `localStorage` `mel.age`). **SPAWN > BUILDINGS > STATE** (the first button under BACK) flips it
+  and rebuilds every building that stands.
+- **`bldAge(g)`** weathers a whole group when fallen, through **`ageMat`** (cached per source material): a standard material's paint DRAINS in
+  the shader after the map (`#include <color_fragment>`: pulled 72% to its own grey and tinted dust, or 55% and tinted rust when it is metal),
+  roughness 1, metal mostly gone, every emissive dead; a basic (glow) material drops to 22%; Points hide. The wrapper calls the source's own
+  `onBeforeCompile` first, so `triMat`'s triplanar survives, and takes its own program key (`...AGE` / `...AGEm`). Instanced plants are left alone.
+  A tint alone was measured first and barely read on the painted maps: multiplying a colour cannot desaturate a texture.
+- **Shared ruin helpers:** `korTentRuin(T, keep, seed)` leaves a crown down to its rafters (panels collapsed at build, no debris);
+  `bldDoorsRuin(doors, i)` lays a leaf flat by its doorway (never hidden).
+- **Restored:** `bldJinraMotes(x, z, r, dt)` sends a few mint motes a second up off the foundations.
+- **The Watchtower fallen:** ~half the crown gone, one door down, the fire pit cold, no searchlight, drone, kites or core. **The Pagoda fallen:**
+  half the belfry cap gone, a door down, no drone. Both weathered by `bldAge`. Every later re-pass adds its own ruin to this.
+- **Measured headless** with both standing fallen: dusty grey tiles, dry stone, rusted bronze, faded bunting, the tower's crown a skeleton. Not signed off.
+
 ## THE RE-PASS: THE PAGODA, PASS 3 -- THE LAYERS (m1500, WORKER A)
 
 Rubric 3. With this the Pagoda has its three passes; the last box is his OK.
