@@ -24,6 +24,27 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
+## THE SHIP, PASS 12: THE SERPENT FISH (m@X4@, WORKER A)
+
+His: *"long, elongated serpent fish"* (one big sea creature per pass; the whale was pass 11).
+
+- `shipSerpentMake` / `shipSerpentP` / `shipSerpentStep`, `SHIPZ.on.serpent`, in `Z.seaG` (rocks with the sea). About 46 m: 44 body
+  segments in ONE `InstancedMesh` (banded teal back, scaled flank stripes, a pale belly in vertex colour), a continuous dorsal SAIL (one
+  translucent fin per segment, heights varied), a glowing lateral line (instanced), and a head that is its own group: a long skull and
+  snout, a JAW that opens and shuts with teeth, glowing eyes, two fanned FRILLS, swept-back horns, and two long trailing WHISKERS. 3 draws
+  for the body, plus the head.
+- **THE BODY FOLLOWS ONE PATH.** Segment i sits at `P(T - i * sp / v)`, where the head was a moment ago, so the arches stand still in the
+  sea and the body slides THROUGH them (that is what reads as a sea serpent rather than a wobbling tube), and a dive starts at the head and
+  runs down the body. `P` loops the ship at 55-85 m (radius breathes) with a 2.6 m weave, 6.5 m/s; arches every 16 m of path at +/-3 m;
+  a slow envelope (period ~140 s) brings it up for roughly half the time and takes it down to -10 m. A splash where a segment breaks the
+  surface (throttled to one every 0.12 s). Hidden when every segment is deeper than 2.5 m.
+- **Measured headless, not guessed:** the first cut had the segments at 0.78 x their spacing and read as a string of BEADS with separate
+  triangle fins; at 1.45 x they overlap into one body, and per-segment fins join into a sail. The arches went 2.2 -> 3.0 m so they stand
+  clear of the waves.
+- `mel.SHIPZ.on.serpent`: `ph` (phase: `W.ph = 37 - mel.SHIPZ.U.uTime.value` brings it up now), `dir` (+1/-1, which way round it loops).
+- **Moves:** THE SHIP pass 12. **Open:** the mantas that swim AND fly (pass 13), other ships / a harbour / air creatures. Nothing reacts to
+  the serpent and it never comes at the ship. Not signed off.
+
 ## THE SHIP: THE SEA STOPS TILING FROM AFAR (m1411, WORKER A)
 
 His (screenshot from far out, zoomed): *"you can see the repetition -- is there any way to break that up with a few different sizes of

@@ -24670,7 +24670,7 @@ function shipBuild() {
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
   { const o = new THREE.Mesh(mergeGeometries(sails.map(q => q.index ? q.toNonIndexed() : q)), sailM); o.castShadow = o.receiveShadow = true; g.add(o); }
   bldTris(O, tris); for (const b of O.boxes) BOXES.push(b); boxGrid();
-  Z.on = { g, O, climbs, rings, gulls, sprayT: 0, bowH: 0, coreM, flags, sparkAt, fish: shipFishMake(g), chimney, whale: shipWhaleMake() }; bldXrayTag(g); shipHome(); }
+  Z.on = { g, O, climbs, rings, gulls, sprayT: 0, bowH: 0, coreM, flags, sparkAt, fish: shipFishMake(g), chimney, whale: shipWhaleMake(), serpent: shipSerpentMake() }; bldXrayTag(g); shipHome(); }
 // m1375 (pass 3): the gulls -- wheel round the masts (circles of their own, a glide in every few seconds); the percher bursts off the yard when he is near and comes back
 const _shgM = new THREE.Matrix4(), _shgQ = new THREE.Quaternion(), _shgE = new THREE.Euler(), _shgV = new THREE.Vector3(), _shgU = new THREE.Vector3(1, 1, 1);
 function shipGulls(S, dt) { const G = S.gulls, p = player, t = SHIPZ.U ? SHIPZ.U.uTime.value : 0; if (!G || !G.im) return;
@@ -24707,6 +24707,48 @@ function shipWhaleMake() { const Z = SHIPZ; if (!Z.seaG) return null; const L = 
   const spots = []; for (let k = 0; k < 18; k++) { const u = .25 + k * .04, x = (u - .5) * L; for (const sz of [-1, 1]) for (const yy of [.15, -.25]) { const r = rad(u), m = new THREE.Mesh(new THREE.SphereGeometry(.22, 6, 4), glowM); m.position.set(x, r * yy * .8, sz * r * Math.cos(Math.asin(yy)) * 1.01); (u >= .36 ? front : hind).add(m); if (u < .36) m.position.x -= jA; spots.push(m); } }
   for (const sz of [-1, 1]) { const e = new THREE.Mesh(new THREE.SphereGeometry(.42, 10, 8), glowM); e.position.set(L * .38, .5, sz * rad(.88) * .93); front.add(e); }
   root.visible = false; return { root, hind, fl, glowM, st: 'under', t: 0, x: 120, z: 60, h: 0, tx: 0, tz: 0, blows: 0, blowT: 0 }; }
+// m@X4@ (pass 12): THE SERPENT FISH (his: *"long, elongated serpent fish"*). 44 segments of one INSTANCED body (one draw), a dorsal sail and a
+// lateral line of glow spots instanced the same way, and a frilled, whiskered head. The body does not bend in place: every segment sits on ONE
+// analytic path `P(tau)` at the time the head was there, so the arches stand still in the sea and the body slides THROUGH them -- the way a sea
+// serpent's humps read -- and a dive starts at the head and runs down the body. The path loops the ship at 55-85 m with a lateral weave, and a
+// slow envelope `E` brings it up into three or four arches and takes it back down. Splashes where a segment breaks the surface.
+function shipSerpentMake() { const Z = SHIPZ; if (!Z.seaG) return null; const N = 44, sp = 1.05, root = new THREE.Group(); Z.seaG.add(root);
+  const bodyM = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .4, metalness: .25 }), finM = new THREE.MeshStandardMaterial({ color: 0x3fb8a8, emissive: 0x0c5a5a, roughness: .5, transparent: true, opacity: .82, side: THREE.DoubleSide }),
+    glowM = new THREE.MeshBasicMaterial({ color: 0x7affd8, toneMapped: false });
+  const seg = new THREE.SphereGeometry(1, 14, 10); seg.scale(1, .9, sp * 1.45); { const p = seg.attributes.position, C = new Float32Array(p.count * 3);     // banded back, pale belly
+    for (let i = 0; i < p.count; i++) { const y = p.getY(i), x = p.getX(i), sc = Math.sin(Math.atan2(x, y) * 7) > .6; const c = y < -.25 ? [.78, .74, .58] : y > .55 ? [.08, .2, .26] : sc ? [.14, .4, .42] : [.1, .3, .34]; C.set(c, i * 3); } seg.setAttribute('color', new THREE.BufferAttribute(C, 3)); }
+  const body = new THREE.InstancedMesh(seg, bodyM, N); body.castShadow = true; body.frustumCulled = false; root.add(body);
+  const fg = new THREE.BufferGeometry(); fg.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, .75, 0, 0, -.75, 0, 1.25, -.55, 0, 0, .75, 0, 1.25, -.55, 0, 1.15, .65], 3)); fg.computeVertexNormals();
+  const fins = new THREE.InstancedMesh(fg, finM, N); fins.frustumCulled = false; root.add(fins);
+  const glow = new THREE.InstancedMesh(new THREE.SphereGeometry(.16, 6, 4), glowM, N * 2); glow.frustumCulled = false; root.add(glow);
+  const head = new THREE.Group(); root.add(head); const hm = (g, m, c) => { const o = new THREE.Mesh(g, m); if (c) colorize(o.geometry, c); head.add(o); return o; };
+  const skull = hm(new THREE.SphereGeometry(1, 16, 12), bodyM, [.1, .3, .34]); skull.scale.set(1.25, 1.05, 2.1); skull.position.z = .6;
+  const snout = hm(new THREE.ConeGeometry(.95, 2.6, 12).rotateX(Math.PI / 2), bodyM, [.12, .34, .36]); snout.position.set(0, .15, 3.4); snout.scale.y = .7;
+  const jaw = new THREE.Group(); jaw.position.set(0, -.35, 1.6); head.add(jaw); { const j = new THREE.Mesh(new THREE.ConeGeometry(.75, 3.0, 10).rotateX(Math.PI / 2), bodyM); colorize(j.geometry, [.74, .68, .52]); j.scale.y = .5; j.position.set(0, -.15, 1.4); jaw.add(j);
+    for (let k = 0; k < 7; k++) for (const sx of [-1, 1]) { const tth = new THREE.Mesh(new THREE.ConeGeometry(.07, .35, 4), bodyM); colorize(tth.geometry, [.95, .93, .85]); tth.position.set(sx * (.5 - k * .055), .12, .3 + k * .32); jaw.add(tth); } }
+  for (const sx of [-1, 1]) { const e = hm(new THREE.SphereGeometry(.24, 10, 8), glowM); e.position.set(sx * .95, .5, 1.7);
+    const fr = new THREE.Mesh(new THREE.CircleGeometry(1.7, 9, 0, Math.PI), finM); fr.position.set(sx * 1.05, .3, -.2); fr.rotation.set(0, sx * 1.25, sx * -.35); head.add(fr);     // the frill fans
+    const hn = hm(new THREE.ConeGeometry(.22, 2.4, 6), bodyM, [.62, .6, .5]); hn.position.set(sx * .55, 1.4, -.5); hn.rotation.set(-1.0, 0, sx * -.3);
+    const wh = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(0, 0, 0), new THREE.Vector3(sx * .7, -.4, -.8), new THREE.Vector3(sx * 1.2, -1.1, -2.0), new THREE.Vector3(sx * 1.1, -1.9, -3.4)]), 12, .06, 5), finM);
+    wh.position.set(sx * .55, -.1, 3.6); head.add(wh); }
+  return { root, body, fins, glow, head, jaw, N, sp, ph: Math.random() * 100, dir: Math.random() < .5 ? 1 : -1, prevY: new Float32Array(N), splT: 0, _m: new THREE.Matrix4(), _f: new THREE.Vector3(), _u: new THREE.Vector3(), _r: new THREE.Vector3(), _p: new THREE.Vector3(), _q: new THREE.Vector3() }; }
+// the path: tau in seconds of travel; returns the point (local to the sea group) into `o`
+function shipSerpentP(W, tau, o) { const v = 6.5, R = 70 + Math.sin(tau * .021) * 15, a = W.dir * tau * v / 70, wv = Math.sin(tau * .9) * 2.6;
+  const E = Math.min(1, Math.max(0, Math.sin(tau * .045) * 1.8 + .25)), arch = Math.sin(tau * v * 6.2832 / 16) * 3.0 - 1.0;
+  o.set(Math.cos(a) * (R + wv), -10 + (10 + arch) * E * E * (3 - 2 * E), Math.sin(a) * (R + wv)); return o; }
+function shipSerpentStep(W, dt, t) { const T = t + W.ph, M = W._m, f = W._f, u = W._u, r = W._r, p = W._p, q = W._q, up = new THREE.Vector3(0, 1, 0), dtau = W.sp / 6.5;
+  W.splT -= dt; let any = 0;
+  for (let i = 0; i < W.N; i++) { const tau = T - i * dtau, k = i / (W.N - 1), rad = 1.25 * (k < .18 ? .8 + k * 1.1 : Math.pow(1 - (k - .18) / .82, .8) * 1.0 + .12) * (1 + Math.sin(T * 4 - i * .5) * .03);
+    shipSerpentP(W, tau, p); shipSerpentP(W, tau + .06, q); f.subVectors(q, p).normalize(); r.crossVectors(up, f).normalize(); u.crossVectors(f, r);
+    if (p.y > -2.5) any = 1;
+    M.makeBasis(r.clone().multiplyScalar(rad), u.clone().multiplyScalar(rad), f.clone().multiplyScalar(rad)); M.setPosition(p); W.body.setMatrixAt(i, M);
+    const fs = k < .06 ? 0 : rad * (.65 + .35 * Math.sin(i * 1.3) * Math.sin(i * .37)) * (k < .85 ? 1 : .6); M.makeBasis(r.clone().multiplyScalar(fs), u.clone().multiplyScalar(fs), f.clone().multiplyScalar(fs ? W.sp / rad * 1.1 : 0)); M.setPosition(p.x + u.x * rad * .8, p.y + u.y * rad * .8, p.z + u.z * rad * .8); W.fins.setMatrixAt(i, M);
+    for (const s of [0, 1]) { const g = (i % 2 && k > .05 && k < .9) ? 1 : 0, sx = s ? 1 : -1; M.makeScale(g, g, g); M.setPosition(p.x + r.x * sx * rad * .93 + u.x * rad * .15, p.y + r.y * sx * rad * .93 + u.y * rad * .15, p.z + r.z * sx * rad * .93 + u.z * rad * .15); W.glow.setMatrixAt(i * 2 + s, M); }
+    if (W.prevY[i] && Math.sign(p.y) !== Math.sign(W.prevY[i]) && W.splT <= 0 && rad > .5) { W.splT = .12; const w = W.root.parent.localToWorld(p.clone()); spkBurst(w.x, w.y + .3, w.z, 18, { col: [.88, .96, 1], spread: rad * 1.6, up: 2.6, size: .2, life: .8 }); }
+    W.prevY[i] = p.y || .001;
+    if (i === 0) { M.makeBasis(r, u, f); M.setPosition(p); W.head.matrixAutoUpdate = false; W.head.matrix.copy(M); W.head.matrixWorldNeedsUpdate = true; } }
+  W.body.instanceMatrix.needsUpdate = W.fins.instanceMatrix.needsUpdate = W.glow.instanceMatrix.needsUpdate = true; W.root.visible = any;
+  W.jaw.rotation.x = Math.max(0, Math.sin(T * .7)) * .45; }
 function colorize(geo, c) { const n = geo.attributes.position.count, C = new Float32Array(n * 3); for (let i = 0; i < n; i++) { C[i * 3] = c[0]; C[i * 3 + 1] = c[1]; C[i * 3 + 2] = c[2]; } geo.setAttribute('color', new THREE.BufferAttribute(C, 3)); }
 function shipWhaleStep(W, dt, t) { W.t += dt; const R = W.root, spd = { under: 9, rise: 5, cruise: 4.5, dive: 4 }[W.st] || 5, hx = Math.cos(W.h), hz = -Math.sin(W.h);
   const pickSpot = () => { const a = Math.random() * 6.28, d = 70 + Math.random() * 80; W.tx = Math.cos(a) * d; W.tz = Math.sin(a) * d; };
@@ -24767,7 +24809,7 @@ function shipStep(dt) { const Z = SHIPZ; if (Z.U) Z.U.uTime.value += dt; const p
     const S = Z.on; if (S) { const bh = hB - M.h, vb = (bh - S.bowH) / Math.max(dt, 1e-3); S.bowH = bh; S.sprayT -= dt;
       if (vb < -.18 && S.sprayT <= 0) { S.sprayT = 1.6 + Math.random(); const bz = Z.L / 2 * .97; spkBurst(0, .6, bz + 1, 34, { col: [.9, .97, 1], spread: 4.5, up: 3.2, size: .2, life: 1 }); for (const sx of [-1, 1]) spkBurst(sx * 2.4, .4, bz - 3, 16, { col: [.85, .95, 1], spread: 3, up: 2.2, size: .16, life: .8 });
         if (Math.hypot(p.pos.x, p.pos.z - bz) < 16) snd('swoosh', { g: .35, r: .5 + Math.random() * .2, x: 0, z: bz }); } shipGulls(S, dt);
-      shipLife(S, dt, t); if (S.whale) shipWhaleStep(S.whale, dt, t);
+      shipLife(S, dt, t); if (S.whale) shipWhaleStep(S.whale, dt, t); if (S.serpent) shipSerpentStep(S.serpent, dt, t);
       if (S.coreM) { const k = 2.2 + Math.sin(t * 2.3) * .5 + Math.sin(t * 7.1) * .15; S.coreM.emissiveIntensity = k; if (Z.engHalo) Z.engHalo.material.size = 4.2 * (.85 + .15 * Math.sin(t * 2.3)); }     // m1378: the cores breathe
       for (const F of S.flags || []) shipCloth(F, t); } }
   if (p.pos.y < Z.sea - 2.5) { spkBurst(p.pos.x, Z.sea + .2, p.pos.z, 30, { col: [.8, .95, 1], spread: 5, up: 1.5, size: .16, life: .7 }); snd('thud', { g: .6, r: .6 }); shipHome(); }     /* in the sea: back aboard (no swimming here yet) */
