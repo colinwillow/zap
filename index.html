@@ -22687,7 +22687,7 @@ function fshipBuild() {
     const o = new THREE.Mesh(new THREE.SphereGeometry(.55, 14, 10), glow); e.add(o); const r = new THREE.Mesh(new THREE.TorusGeometry(.8, .1, 8, 24), bronze); r.rotation.x = Math.PI / 2; e.add(r);
     const cg = new THREE.ConeGeometry(1.4, 2.8, 16, 1, true); cg.translate(0, -1.4, 0); const c = new THREE.Mesh(cg, new THREE.MeshBasicMaterial({ color: 0x7affd8, transparent: true, opacity: .12, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, toneMapped: false })); e.add(c); engines.push(e); }
   // THE RIG: two masts, junk sails (cream panels between dark battens), a red pennant at each masthead; grapple rings at the mastheads
-  const rings = []; { const sail = new THREE.MeshStandardMaterial({ color: 0xe8dcc0, roughness: .9, side: THREE.DoubleSide });
+  const rings = []; { const sail = FSHIP.sailM = new THREE.MeshStandardMaterial({ color: 0xe8dcc0, roughness: .9, side: THREE.DoubleSide });
     for (const [mx, mh] of [[-5.2, 11], [1, 13]]) { add(new THREE.CylinderGeometry(.16, .22, mh, 10), wood, cx + mx, Y + mh / 2, cz, 1);
       const sw = mh * .55, shh = mh * .62; add(new THREE.PlaneGeometry(sw, shh), sail, cx + mx + sw / 2 - .4, Y + mh - shh / 2 - .6, cz + .25, 0);
       for (let k = 0; k <= 5; k++) add(new THREE.BoxGeometry(sw + .3, .08, .08), wood, cx + mx + sw / 2 - .4, Y + mh - .6 - k * shh / 5, cz + .3, 0);
@@ -22769,20 +22769,37 @@ function fshipBuild() {
   for (const b of O.boxes) if (!BOXES.includes(b)) BOXES.push(b); boxGrid();
   // m1599: lanterns on posts at the gangplank's foot, bunting from the masts' heads down the stays, plants on the ground under her
   const MG = new Map(), put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); }, plants = [];
-  { const xa = gx1 - Y / .3, z1 = cz + W + .35 + 1.5; for (const zz of [cz + W + .2, z1 + .15]) { korPost(put, K, xa - .4, 0, zz, 2.2, .1); korLantern(put, K, xa - .4, 2.45, zz, .7); } }
+  const fsFoot = [], putF = (geo, m) => { const o = new THREE.Mesh(geo, m); o.castShadow = true; g.add(o); fsFoot.push(o); };     // the gangplank's foot stands on the ground, not on the ship
+  { const xa = gx1 - Y / .3, z1 = cz + W + .35 + 1.5; for (const zz of [cz + W + .2, z1 + .15]) { korPost(putF, K, xa - .4, 0, zz, 2.2, .1); korLantern(putF, K, xa - .4, 2.45, zz, .7); } }
   for (const [mx, mh] of [[-5.2, 11], [1, 13]]) for (const sz of [-1, 1]) korBunting(put, K, [cx + mx, Y + mh - 1.2, cz], [cx + mx + (mx < 0 ? -2.5 : 2.5), Y + .8, cz + sz * (W + .1)], 8, .4);
   { let sd = 13; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647; for (let i = 0; i < 36; i++) { const x = cx + (rnd() - .5) * (L * 2 + 8), z = cz + (rnd() - .5) * (W * 2 + 9); if (z > cz + W && z < cz + W + 2.5 && x > gx1 - Y / .3 - 1 && x < gx1 + 1) continue; plantPlant(plants, ['grass', 'fern', 'stones', 'flowers', 'tallgrass'][i % 5], x, 0, z, .8 + rnd() * .5, rnd() * 6); } }
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list.map(q => { const n = q.index ? q.toNonIndexed() : q; for (const a2 of Object.keys(n.attributes)) if (a2 !== 'position' && a2 !== 'normal') n.deleteAttribute(a2); if (!n.attributes.normal) n.computeVertexNormals(); return n; })), m); o.castShadow = o.receiveShadow = true; g.add(o); }
   bldMergeStatic(vis); bldMergeStatic(g); const plantMs = plantFlush(g, plants);
-  FSHIP.on = { plantMs, g, O, bars: [bar], rings, vis, engines, t: 0, smash, helm, tur, drone, moteT: 0, cans, climbs };
+  // ---- RE-PASS 2 (m@X4@): RESTORABLE (rubric 7; a FLYER, so restored means AFLOAT). FALLEN: she rests on her keel in the grass (the whole
+  // group `drop` m lower), engines dead and dark, sails gone, cannons and the bow gun silent, the climbs dead, the colour drained. RESTORE (the
+  // mint plate by the gangplank, or SPAWN > BUILDINGS > STATE): she rises `drop` m onto her engines and comes alive. Every collider rides:
+  // the collider data is shifted down by `drop` and `restoreRide` lifts it back with her ----
+  plantMs.forEach(m => scene.attach(m)); for (const o of fsFoot) scene.attach(o); const drop = Y - 2.8, Rr = restoreRig(g, { lift: drop, dur: 9, bob: 0 }); Rr.baseY = -drop; g.position.y = -drop;
+  const sails = vis.children.filter(o => o.material === FSHIP.sailM); restoreSkin(Rr);     // (found before the skin clones the materials)
+  const dn = b2 => { b2.miny -= drop; b2.maxy -= drop; }; O.boxes.forEach(dn); smash.forEach(S2 => dn(S2.b));
+  const tb = []; for (const q of O.tri || []) { const t3 = q.split(',').map(Number); t3[1] -= drop; t3[4] -= drop; t3[7] -= drop; tb.push(t3); } bldTrisDrop(O);
+  for (const L of climbs) { L.miny -= drop; L.maxy -= drop; L.top -= drop; if (L.mark) L.mark.y -= drop; }
+  bar.y -= drop; bar.top -= drop; bar.g.position.y -= drop; bar.boxes.forEach(dn); for (const G2 of rings) G2.y -= drop;
+  restoreRide(Rr, { base: { boxes: [...O.boxes, ...smash.map(S2 => S2.b)], tris: tb }, up: { boxes: [], tris: [], climbs, bars: [bar], rings, coins: [], objs: [drone, ...sails] } });
+  Rr.onSet = R2 => restoreRideSet(R2);
+  const ground = []; { const px = gx1 - Y / .3 - 3.5, pz = cz + W + 4.5, plate = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, .12, 24), new THREE.MeshStandardMaterial({ color: 0x3a4a46, emissive: 0x7affd8, emissiveIntensity: .7 })); plate.position.set(px, .06, pz); scene.add(plate); ground.push(plate); Rr.trig = { x: px, y: 0, z: pz, armed: 1 }; }
+  { const t0 = AGE.st === 'fallen' ? 0 : 1; Rr.goal = t0; restoreSet(Rr, t0); restoreRideSet(Rr, true); }
+  ground.push(...fsFoot); FSHIP.on = { R: Rr, drop, ground, plantMs, g, O, bars: [bar], rings, vis, engines, t: 0, smash, helm, tur, drone, moteT: 0, cans, climbs };
   arenaBeam(cx, cz, [.5, .9, 1], 1); snd('swoosh', { g: .7, r: .4 });
 }
-function fshipStep(dt) { const F = FSHIP.on; if (!F) return; F.t += dt;
+function fshipStep(dt) { const F = FSHIP.on; if (!F) return; F.t += dt; const whole = !F.R || F.R.t >= 1, lf = F.R ? F.g.position.y - F.R.baseY : F.drop || 0;
+  if (F.tur && !F.tur.dead) { const T = F.tur; T.y = whole ? FSHIP.deck : -600; T.g.position.y = T.y; T.box.miny = T.y; T.box.maxy = T.y + TURRET.h; }     // RE-PASS 2: the bow gun only on a ship afloat
+  for (const e of F.engines) e.children[2].visible = whole;
   // m1224 (pass 5): TAKE THE HELM -- stand at the wheel on the deck and the broadside is YOURS: each cannon turns on the nearest body on its
   // side instead of you (its balls are yours: they strike bodies), and fires a beat faster; the wheel spins with you on it
   { const pl = player, [hx, hz] = FSHIP.at; F.manned = Math.hypot(pl.pos.x - (hx + 2.5), pl.pos.z - hz) < 1.4 && Math.abs(pl.pos.y - FSHIP.deck) < 1.3;
     if (F.manned !== F.wasManned) { F.wasManned = F.manned; if (F.manned) { snd('clang', { g: .6, r: 1.2, x: hx, z: hz }); arenaBeam(hx + 2.5, hz, [1, .8, .35], .4); } } }
-  if (F.cans) for (const C of F.cans) { if (C.hc > 0) C.hc -= dt; const W = new THREE.Vector3(); C.g.getWorldPosition(W);
+  if (F.cans && whole) for (const C of F.cans) { if (C.hc > 0) C.hc -= dt; const W = new THREE.Vector3(); C.g.getWorldPosition(W);
     if (C.dead) { C.t -= dt; if (Math.random() < dt * 3) smokeAt(W.x, W.y + .5, W.z, .8, 1.2, [.3, .29, .28]); if (C.t <= 0) { C.dead = 0; C.hp = FSHIP.canHp; C.bar.rotation.x = 0; } continue; }
     let p = player; if (F.manned) { let best = FSHIP.canR, tg = null; for (const b of DUMMIES) { if (b.st === 'gone' || b.st === 'down' || !b.root.visible) continue; const R = b.root.position; if (Math.sign(R.z - W.z) !== C.sz) continue; const q = Math.hypot(R.x - W.x, R.z - W.z); if (q > 3 && q < best) { best = q; tg = b; } } p = tg ? { pos: tg.root.position } : { pos: new THREE.Vector3(W.x, -99, W.z + C.sz * 999) }; }
     const dx = p.pos.x - W.x, dz = p.pos.z - W.z, d = Math.hypot(dx, dz), side = Math.sign(dz) === C.sz;
@@ -22793,12 +22810,12 @@ function fshipStep(dt) { const F = FSHIP.on; if (!F) return; F.t += dt;
         ARROWS.push({ m, v: new THREE.Vector3((p.pos.x - o.x) / T, (ty - o.y) / T + .5 * gr * T, (p.pos.z - o.z) / T), t: 0, stuck: 0, from: null, mine: F.manned ? 1 : 0 });
         snd('boom', { g: .9, r: .7, x: o.x, z: o.z }); for (let k = 0; k < 4; k++) smokeAt(o.x, o.y, o.z, 1, 1, [.55, .53, .5]); spkBurst(o.x, o.y, o.z, 14, { col: [1, .7, .3], spread: 3, size: .14, life: .3 }); camShake(.08); } }
     else { C.bar.rotation.y *= Math.exp(-2 * dt); C.cool = Math.max(C.cool, .8); } }
-  F.vis.position.y = Math.sin(F.t * .8) * .1; F.vis.rotation.x = Math.sin(F.t * .55) * .012;     // the bob is the picture's alone
+  F.vis.position.y = whole ? Math.sin(F.t * .8) * .1 : 0; F.vis.rotation.x = whole ? Math.sin(F.t * .55) * .012 : .035;     // the bob is the picture's alone; aground, she lists
   for (let i = 0; i < F.engines.length; i++) F.engines[i].children[1].rotation.z = F.t * (1.2 + i * .3);
   F.helm.rotation.z = F.manned ? F.helm.rotation.z + dt * 2.5 : Math.sin(F.t * .3) * 1.2;
-  { const [cx, cz] = FSHIP.at; if ((F.moteT -= dt) <= 0) { F.moteT = .08; const e = F.engines[(Math.random() * 3) | 0].position; spk(e.x + (Math.random() - .5) * .8, e.y + F.vis.position.y - .4, e.z + (Math.random() - .5) * .8, (Math.random() - .5) * .3, -1.2 - Math.random(), (Math.random() - .5) * .3, .08, 1.2, [.4, .95, 1]); }
+  { const [cx, cz] = FSHIP.at; if (whole && (F.moteT -= dt) <= 0) { F.moteT = .08; const e = F.engines[(Math.random() * 3) | 0].position; spk(e.x + (Math.random() - .5) * .8, e.y + F.vis.position.y - .4, e.z + (Math.random() - .5) * .8, (Math.random() - .5) * .3, -1.2 - Math.random(), (Math.random() - .5) * .3, .08, 1.2, [.4, .95, 1]); }
     const a = F.t * .32; F.drone.position.set(cx + Math.cos(a) * 13, FSHIP.deck + 6 + Math.sin(F.t * 1.3) * .4, cz + Math.sin(a) * 8); F.drone.rotation.y = -a; F.drone.children[1].rotation.z = F.t * .6; } }
-function fshipClear() { const F = FSHIP.on; if (!F) return; if (F.plantMs) plantDrop(F.plantMs); for (const L of F.climbs || []) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && (F.climbs || []).includes(player.climb.L || player.climb)) climbOff(); smashDrop(F.smash); turretDrop(F.tur); bldClear(F); FSHIP.on = null; }
+function fshipClear() { const F = FSHIP.on; if (!F) return; if (F.R) { const i = RESTORE.list.indexOf(F.R); if (i >= 0) RESTORE.list.splice(i, 1); if (F.R.ride) { bldTrisDrop(F.R.ride.tb); bldTrisDrop(F.R.ride.tu); } } for (const o of F.ground || []) o.removeFromParent(); if (F.plantMs) plantDrop(F.plantMs); for (const L of F.climbs || []) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && (F.climbs || []).includes(player.climb.L || player.climb)) climbOff(); smashDrop(F.smash); turretDrop(F.tur); bldClear(F); FSHIP.on = null; }
 // m1155: THE BATHHOUSE (BUILDINGS.md #11, pass 1) at (-30, 24). A low timber-and-plaster bathhouse, 12 x 10 m: breakable walls on three
 // sides (cwallBuild), the courtyard side (+x) open between posts onto a raised ENGAWA (veranda), a curved roof, and inside a big steaming
 // POOL in a low stone rim (step over it, wade in), a cold plunge tub, benches; a tall stone CHIMNEY smoking at the back corner.
@@ -27415,7 +27432,7 @@ const BLDG = { list: [
   { key: 'rampart', t: 'Rampart Wall', sub: 'a 40 m wall, a gateway to smash, archers, sentry guns, bars on top, rocks dropped on you, robot sentries on the walk, a war horn that summons a raid', pass: 6, build: () => rampBuild(), clear: () => rampClear(), on: () => !!RAMP.on, step: dt => rampStep(dt) },
   { key: 'adock', t: 'Airship Dock', sub: 'a 20 m tower, a lift, an airship that flies you round (ring the bell to cast off; grapple it); kites to glide off the deck; sky pirates raid the flight', pass: 6, build: () => adockBuild(), rig: () => ADOCK.on && ADOCK.on.R, clear: () => adockClear(), on: () => !!ADOCK.on, step: dt => adockStep(dt) },
   { key: 'zep', t: 'Zeppelins', sub: 'two zeppelins: land on a gondola, swing from its trapeze, grapple it, kill its gun, supply drops; hole the envelope and it sinks low; strike the bow lever to bomb the forge below', pass: 6, build: () => zepBuild(), rig: () => ZEP.on && ZEP.on.R, clear: () => zepClear(), on: () => !!ZEP.on, step: dt => zepStep(dt) },
-  { key: 'fship', t: 'Flying Ship House', sub: 'a junk ship on Jin engines: broadside cannons, a bowsprit, a bar, cargo to smash, a sentry gun; take the helm and the broadside fires for you; climb the cargo net and the mast to the crow\'s nest', pass: 6, build: () => fshipBuild(), clear: () => fshipClear(), on: () => !!FSHIP.on, step: dt => fshipStep(dt) },
+  { key: 'fship', t: 'Flying Ship House', sub: 'a junk ship on Jin engines: broadside cannons, a bowsprit, a bar, cargo to smash, a sentry gun; take the helm and the broadside fires for you; climb the cargo net and the mast to the crow\'s nest', pass: 6, build: () => fshipBuild(), rig: () => FSHIP.on && FSHIP.on.R, clear: () => fshipClear(), on: () => !!FSHIP.on, step: dt => fshipStep(dt) },
   { key: 'bath', t: 'Bathhouse', sub: 'sliding shoji to tear through, a pool that heals and erupts when you strike the boiler valve, a veranda, a smoking chimney', pass: 4, build: () => bathBuild(), clear: () => bathClear(), on: () => !!BATH.on, step: dt => bathStep(dt) },
   { key: 'fwork', t: 'Forge-Workshop', sub: 'a furnace that breathes fire when you strike the bellows, a trip-hammer that flattens you, a loft, a crane that swings a bar round', pass: 4, build: () => fworkBuild(), clear: () => fworkClear(), on: () => !!FWORK.on, step: dt => fworkStep(dt) },
   { key: 'sphang', t: 'Spider-Bot Hangar', sub: 'a vaulted bunker, spider bots that climb every building and pounce on you from walls and roofs, hatching from their pods (smash them)', pass: 4, build: () => sphangBuild(), clear: () => sphangClear(), on: () => !!SPHANG.on, step: dt => sphangStep(dt) },

@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the FLYING SHIP HOUSE, pass 2 (rubric 7 for a flyer: AGROUND / AFLOAT)
+**Moves:** its rubric-7 box. A flyer, so restored is afloat. This is the one place a building rises (`lift`), and it is a ship.
+- One rig over the whole group, `lift` = `drop` = 3.2 m (deck height minus keel depth): FALLEN, the group sits `drop` lower, so the keel
+  rests on the grass. `restoreSkin` drains it; the vis group lists (`rotation.x` .035) instead of bobbing; the engines' lift cones are off,
+  no motes; the SAILS are gone (found before the skin cloned their material, and an `up.obj`); the broadside cannons do not fire and the
+  bow gun is parked; the high bar, the grapple rings, the cargo net and the crow's-nest ladder are `up`.
+- **EVERY COLLIDER RIDES:** the hull, bulwark, deckhouse, mast, cannon and crow's-nest boxes, the smash props' boxes and the gangplank and
+  bowsprit triangles are all shifted down by `drop`, then `restoreRide` carries them up with her as `base` (measured: the hull box spans
+  0-2.8 m aground and 3.2-6 afloat; the mast 2.8-15.8 and 6-19). The bar, rings and climbs are shifted the same way and are `up`.
+- The plants and the gangplank's foot lanterns are moved to the scene first, so they stay on the ground.
+- Plate by the gangplank's foot; `rig` hook; `fshipClear` drops the rig, the plate and the foot lanterns.
+Render-checked headless: aground (sails gone, drained) and afloat. Shipped unverified.
+
 ## the LADDER REFACTOR, step 5: the hands meet the rungs (Worker B)
 He said go on the clip pass. `npm run clips models/characters/zap_02.glb`: `climbing_Ladder` 0.792 s, 20 keys, 38 bones. Then MEASURED on the
 shipped hero in the sim (the clip sampled like `mantleCurve`, and the hands' world heights read off the drawn pose while climbing):
