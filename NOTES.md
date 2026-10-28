@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- THE INTERCEPT STOPS AT THE ARROW; the green smoke in shades (his: "right now you go THROUGH the arrow -- meet it right where it would
+## m1697 -- THE INTERCEPT STOPS AT THE ARROW; the green smoke in shades (his: "right now you go THROUGH the arrow -- meet it right where it would
 be, slice it, stop in its track"; "tint the green slightly different shades -- depth to the billowing, very subtle")
 - **`chargeIntercept`:** his middle is aimed a blade's REACH (`INTER.reach` .95 m) short of the arrow's point, so the sword meets it there.
   On the catch he STOPS: his forward speed zeroed, a small lift, then `interHold` .22 s hanging there (the fall slowed, no drift) before he
