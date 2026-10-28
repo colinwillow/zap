@@ -64042,7 +64042,7 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 // to the shop front and to the round back door. Built in its OWN frame (local +z = the front, toward the river; `at`/`yaw` are HOME.hut's) and
 // merged per material; every collider a local box turned into the world (the yaw is a quarter turn, so a box stays a box); every walkable
 // surface a triangle. `?hut=glb` (or GHOME.on = 0) puts the GLB back, to compare. Pass 1: the massing and the walkable shell, with the inside.
-const GHOME = { on: 1, pass: 16, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
+const GHOME = { on: 1, pass: 17, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   Rtu: 2.5, door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
@@ -64085,14 +64085,19 @@ function ghClothTex(kind) { const C = GHOME.tex || (GHOME.tex = {}); if (C[kind]
   const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return (C[kind] = t); }
 // pass 12: the stacks' smoke and the fires' flicker, each frame
 // pass 14: the ORB is a pendulum -- the wind sways it, a blow knocks it (2.25 m of chain: omega^2 = g / L), and it settles back into the wind
-function ghomeOrb(dt, t) { const o = GHOME.orb, w = GHOME.sw; if (!o || !w) return; const k = 4.4, wz = Math.sin(t * .95) * .13, wx = Math.sin(t * .71 + 1.3) * .07, d = Math.exp(-.7 * dt);
+function ghomeOrb(dt, t) { const o = GHOME.orb, w = GHOME.sw; if (!o || !w) return;
+  if (GHOME.hang) { const d0 = GHOME.drop, dT = GHOME.dropT; GHOME.drop += Math.sign(dT - d0) * Math.min(Math.abs(dT - d0), 1.7 * dt); GHOME.hang.position.y = -GHOME.drop;     // pass 17: the winch, 1.7 m/s
+    GHOME.cable.visible = GHOME.drop > .02; GHOME.cable.scale.y = Math.max(.001, GHOME.drop); if (Math.abs(dT - d0) > .01 && Math.abs(dT - GHOME.drop) < .01) { const P = o.localToWorld(new THREE.Vector3(0, -2.25 - GHOME.drop, 0)); snd('thud', { g: .6, r: .6, x: P.x, z: P.z }); w.vz += .25; } }
+  const k = 9.8 / (2.25 + (GHOME.drop || 0)), wz = Math.sin(t * .95) * .13, wx = Math.sin(t * .71 + 1.3) * .07, d = Math.exp(-.7 * dt);
   w.vz = (w.vz - k * (w.z - wz) * dt) * d; w.vx = (w.vx - k * (w.x - wx) * dt) * d; w.z += w.vz * dt; w.x += w.vx * dt;
   w.z = Math.max(-1.1, Math.min(1.1, w.z)); w.x = Math.max(-1.1, Math.min(1.1, w.x)); o.rotation.z = w.z; o.rotation.x = w.x; }
 // pass 14: a blow at the home (`bldHit`, m1403): the back door takes it and breaks, the orb is knocked swinging, a bell rings
-function ghomeHit(x, y, z, rad) { if (!GHOME.g || !inHome()) return 0;
+function ghomeHit(x, y, z, rad) { if (!GHOME.g || !inHome()) return 0; const w0hc = () => !GHOME.sw || GHOME.sw.hc <= 0;
   for (const G of GHOME.gates || []) if (bgateHit(G, x, y, z, rad)) return 1;
-  const o = GHOME.orb, w = GHOME.sw; if (o && w && w.hc <= 0) { const P = o.localToWorld(new THREE.Vector3(0, -2.25, 0));
-    if (Math.hypot(x - P.x, y - P.y, z - P.z) < .85 + rad) { const yaw = GHOME.g.rotation.y, c = Math.cos(yaw), s = Math.sin(yaw), dx = P.x - player.pos.x, dz = P.z - player.pos.z, n = Math.hypot(dx, dz) || 1;
+  const Wn = GHOME.winch; if (Wn && w0hc() && Math.hypot(x - Wn[0], y - Wn[1], z - Wn[2]) < .8 + rad) { GHOME.sw.hc = .5; GHOME.dropT = GHOME.dropT > 0 ? 0 : GHOME.dropMax;     // pass 17: strike the winch -- the orb comes down, strike it again and it winds up
+    snd('clang', { g: .9, r: .55, x: Wn[0], z: Wn[2] }); spkBurst(x, y, z, 14, { col: [1, .75, .3], spread: 3, size: .1, life: .4 }); camShake(.05); return 1; }
+  const o = GHOME.orb, w = GHOME.sw; if (o && w && w.hc <= 0) { const P = o.localToWorld(new THREE.Vector3(0, -2.25 - (GHOME.drop || 0), 0));
+    if (Math.hypot(x - P.x, y - P.y, z - P.z) < 1.0 + rad) { const yaw = GHOME.g.rotation.y, c = Math.cos(yaw), s = Math.sin(yaw), dx = P.x - player.pos.x, dz = P.z - player.pos.z, n = Math.hypot(dx, dz) || 1;
       const lx = (dx * c - dz * s) / n, lz = (dx * s + dz * c) / n; w.vz += lx * 1.9; w.vx -= lz * 1.9; w.hc = .25;
       snd('clang', { g: 1, r: .7, x: P.x, z: P.z }); spkBurst(x, y, z, 18, { col: [1, .8, .35], spread: 4, size: .12, life: .5 }); camShake(.06); return 1; } }
   if (GHOME.bellT <= 0) for (const B of GHOME.bellPts || []) if (Math.hypot(x - B[0], y - B[1], z - B[2]) < .4 + rad) { GHOME.bellT = .15; snd('clang', { g: .55, r: 2.1 + Math.random() * .4, x: B[0], z: B[2] }); spkBurst(B[0], B[1], B[2], 8, { col: [1, .85, .4], spread: 2, size: .07, life: .35 }); return 1; }
@@ -64332,9 +64337,12 @@ function ghomeBuild(at, yaw, y0) {
         for (let y = -.05; y > -1.5; y -= .22) { const q = new THREE.TorusGeometry(.09, .025, 4, 8).toNonIndexed(); q.applyMatrix4(new THREE.Matrix4().compose(new THREE.Vector3(0, y, 0), new THREE.Quaternion().setFromEuler(new THREE.Euler(0, (y * 7) % 3, 0)), _one)); ch.push(q); }
         for (const a of [0, Math.PI / 2]) { const q = new THREE.TorusGeometry(.76, .05, 5, 24).toNonIndexed(); q.applyMatrix4(new THREE.Matrix4().compose(new THREE.Vector3(0, -2.25, 0), new THREE.Quaternion().setFromEuler(new THREE.Euler(0, a, 0)), _one)); ch.push(q); }
         for (const q of ch) { q.deleteAttribute('uv'); }
-        const mk = (geo, m) => { const o = new THREE.Mesh(geo, m); o.castShadow = true; pend.add(o); return o; };
+        const hang = new THREE.Group(); pend.add(hang); GHOME.hang = hang; const mk = (geo, m) => { const o = new THREE.Mesh(geo, m); o.castShadow = true; hang.add(o); return o; };     // pass 17: all of it on `hang`, which the winch lowers
         mk(mergeGeometries(ch), iron); mk(new THREE.SphereGeometry(.75, 18, 12), bronze).position.y = -2.25;
-        const tg = new THREE.PlaneGeometry(.7, 1.9, 2, 6); tg.translate(0, -2.25 - .7 - .95, 0); const tm = mk(tg, banM); tm.material = banM; }
+        const tg = new THREE.PlaneGeometry(.7, 1.9, 2, 6); tg.translate(0, -2.25 - .7 - .95, 0); const tm = mk(tg, banM); tm.material = banM;
+        // pass 17: the CABLE paid out between the boom's tip and the chain (a unit cylinder, scaled to the drop), and where the winch is
+        const cg = new THREE.CylinderGeometry(.035, .035, 1, 5); cg.translate(0, -.5, 0); const cab = new THREE.Mesh(cg, iron); cab.scale.y = .001; cab.visible = false; pend.add(cab); GHOME.cable = cab;
+        GHOME.winch = [Wx(mx, mz), y0 + my1 + .15, Wz(mx, mz)]; GHOME.drop = 0; GHOME.dropT = 0; GHOME.dropMax = tip[1] - 2.25 - 3.0; }
       for (const dx of [-.16, .16]) { const wx = tip[0] + 1.6 + dx; rodW([tip[0] + 1.6, tip[1] - .3, tip[2]], [wx, tip[1] - 1.5, tip[2]], .03, iron, 1); cyl(wx, tip[1] - 2.3, tip[2], .13, .13, .8, bronze, 10); } }
     // the BALCONY CANOPY: four posts at the rail, a red roof on them sloping from the tower wall
     { const [Tx, Tz] = A.T, Yb = P + A.Yb, ro = A.Rt + 2.25, angs = [-.4, .55, 1.5, 2.45];

@@ -116,7 +116,8 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - [x] **pass 13 (m1405):** one shared bronze / glow / red across the passes (33 -> 26 draws); the iron GEARBOX under the big wheel with a brass cog above it; the low SIGNBOARD on two posts at the front-left (ref 1)
   - [x] **pass 14 (m1406):** blows reach the home (main's m1403 hook): the back door breaks and mends, the orb is knocked swinging (a real pendulum now -- its sway had been inside a comment since pass 9), each stall bell rings
   - [x] **pass 15 (m1408):** THE BACK (ref 2): an iron-studded timber belt round the hall's back half with two brass wheels and two plaques on it, the big chevron banner and a narrow one, red tassels, the back door framed in timber under a round arch
-  - [x] **pass 16 (next tick):** BREAK UP THE STONE (his note on the back view): a torn red hood and a timber sill on every round window, a timber cage of ribs on the tower's drum, the turret and the store, studded timber straps over all three domes, plank eaves where the hall and the store meet their domes
+  - [x] **pass 16 (m1412):** BREAK UP THE STONE (his note on the back view): a torn red hood and a timber sill on every round window, a timber cage of ribs on the tower's drum, the turret and the store, studded timber straps over all three domes, plank eaves where the hall and the store meet their domes
+  - [x] **pass 17 (next tick):** RAISE / LOWER: strike the crane's winch and the orb is paid out on a cable down to head height (1.7 m/s, a thud as it arrives, the pendulum lengthens with it); strike it again and it winds back up
   - [ ] then more passes, each one closer to the four views
 
 ## THE SHIP (his, after m1372) -- its own track, alongside the blueprint work
