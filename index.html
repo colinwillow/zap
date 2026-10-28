@@ -26262,6 +26262,75 @@ function chunkBuild() { if (CHUNK.on) return; const g = new THREE.Group(); scene
   for (const b of O.boxes) BOXES.push(b); boxGrid(); CHUNK.on = { g, O, bars, climbs, zips, rings: [] }; bldXrayTag(g); }
 function chunkClear() { const C = CHUNK.on; if (!C) return; for (const Zp of C.zips) { const i = ZIPS.indexOf(Zp); if (i >= 0) ZIPS.splice(i, 1); if (player.zip && player.zip.Z === Zp) player.zip = null; }
   for (const L of C.climbs) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && C.climbs.includes(player.climb)) climbOff(); if (player.bar && C.bars.includes(player.bar.B)) player.bar = null; bldClear(C); CHUNK.on = null; }
+// m1547: LEVEL 1 v2 -- THE FIRST BEACON (his, Oct 28 2026: *"design the foundational whatever you gotta do... we'll work down this one for a while"*).
+// The blueprint is `BEACON.plan` (LEVELDESIGN.md "THE BLUEPRINT"; his ChatGPT sheets `images/korajin/ref/beacon_sheet.jpg` / `beacon_plan.jpg` for
+// the layout): STATIONS (mesas, solid to the canyon floor, a ladder up every one) and RUNS between them, each a list of the chunk library's pieces
+// (`CHUNKS`, sized from the measured move table) plus three of its own (`BCH`: a small `hop`, a `walk`, a `chim`ney of any height). The builder
+// CHAINS them: every piece starts at the last one's out port, heading along the axis that points best at the run's `aim`, a corner pad where it
+// turns. So the route is makeable by construction, and a station sits wherever its run arrives. KORAJIN > Level 1 v2 (`?w=forge&lvl=beacon`).
+const BEACON = { at: [-70, -40], want: 0, on: null,
+  plan: [
+    { st: 'S', name: 'START YARD', R: 12 },
+    { aim: [25, 14], c: ['hop', 'walk:4', 'hop', 'up_jump', 'up_jump', 'gap_dbl', 'up_dbl'] },     // teach: jump, ledge, double
+    { st: 'A', name: 'LANTERN RUIN', R: 10 },
+    { aim: [60, -4], c: ['walk:4', 'drop', 'walk:10'] },     // the ride down (one way: A is only reached from S, until its bridge)
+    { st: 'B', name: 'SUNKEN COURT', R: 16 },
+    { aim: [64, 44], c: ['chim:4', 'walk:3', 'chimney', 'hop', 'chim:6'] },     // THE BIG CLIMB: the wall jump, taught -> developed -> twisted -> concluded
+    { st: 'C', name: 'CLIFF SHRINE', R: 10 },
+    { aim: [120, 58], c: ['gap_dbl', 'walk:6', 'gap_dbl', 'chim:4', 'walk:4'] },     // the rooftops
+    { st: 'D', name: 'THE RIM', R: 10 },
+    { aim: [150, 6], c: ['zip', 'zip'] },     // the long ride to the tower
+    { st: 'T', name: 'TOWER TERRACE', R: 14, tower: 1 },
+    { aim: [260, -30], c: ['chim:12', 'up_jump', 'up_jump', 'up_dbl'] },     // the finale climb (the guardian's sweeps are layer 5)
+    { st: 'X', name: 'THE BRAZIER', R: 9, brazier: 1 } ] };
+try { if (/[?&]lvl=beacon\b/.test(location.search)) BEACON.want = 1; } catch (e) {}
+const BCH = {
+  hop:  (P, K) => { const g = 3.5; K.slab(g, g + 4, P.y); return { out: K.out(g + 4, P.y), ask: `hop ${g} m: a run jump, safe (comfy ${MOVEC.jump_run})` }; },
+  walk: (P, K, n) => { const L = +n || 6; K.slab(0, L, P.y); return { out: K.out(L, P.y), ask: `walk ${L} m` }; },
+  chim: (P, K, n) => { const H = +n || 8, kicks = Math.ceil(H / MOVEC.wall_chain); for (const s of [-1, 1]) K.B(1, 6, s * 2.3, s * 2.3 + s * .5, P.y - .5, P.y + H + .4, K.M.wall, 1); K.slab(6, 11, P.y + H, P.y);
+    return { out: K.out(11, P.y + H), ask: `chimney +${H} m: WALL JUMP, ~${kicks} kicks` }; } };
+function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, MG = new Map(), bars = [], climbs = [], zips = [];
+  const put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); const q = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal') q.deleteAttribute(k); MG.get(m).push(q); };
+  const EM = enemyMats(), M = { slab: triMat('stone_blocks', { scale: 3, color: 0xa9a49c }), land: triMat('stone_blocks', { scale: 2.4, color: 0xc9c4ba }), wall: triMat('sandstone', { scale: 5, color: 0xd88a58 }),
+    step: triMat('wood_timber', { scale: 2 }), mesa: triMat('sandstone', { scale: 7, color: 0xc4764a }), lac: EM.lacquer, gold: EM.gold };
+  const [ox, oz] = BEACON.at, L = { g, O, bars, climbs, zips, rings: [], st: {}, log: [] };
+  // the canyon floor: sand under the whole level, a little past it
+  put(new THREE.BoxGeometry(360, .1, 200).translate(ox + 120, .02, oz + 20), triMat('sandstone', { scale: 9, color: 0xe0b48a }));
+  const sign = (txt, sub, x, y, z, s = 1) => { const cv = document.createElement('canvas'); cv.width = 512; cv.height = 150; const c = cv.getContext('2d'); c.fillStyle = 'rgba(10,12,18,.85)'; c.fillRect(0, 0, 512, 150);
+    c.fillStyle = '#7affd8'; c.font = 'bold 50px sans-serif'; c.fillText(txt, 18, 60); c.fillStyle = '#fff'; c.font = '28px sans-serif'; c.fillText(sub, 18, 116);
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(cv), depthWrite: false })); sp.scale.set(5 * s, 1.46 * s, 1); sp.position.set(x, y, z); g.add(sp); };
+  const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]], aimDir = (P, ax, az, cur) => { const dx = ax - P.x, dz = az - P.z; let best = null, bv = -1e9;
+    for (const d of DIRS) { if (cur && d[0] === -cur[0] && d[1] === -cur[1]) continue; const v = d[0] * dx + d[1] * dz; if (v > bv) { bv = v; best = d; } } return best; };
+  const kit = (P) => { const F = chunkFrame(P, put, O); return { ...F, M, O, slab: (u0, u1, y, from) => { if (from !== undefined) { F.B(u0, u1, -2.5, 2.5, 0, y, M.wall, 1); F.B(u0, u1, -2.5, 2.5, y - .3, y + .02, M.land, 0); return; }
+      F.B(u0, u1, -2.5, 2.5, y - .5, y, M.land, 1); const t = Math.max(0, y - .5); if (t > .1) F.B((u0 + u1) / 2 - .5, (u0 + u1) / 2 + .5, -.5, .5, 0, t, M.slab, 1); },
+    bar: (u, y) => { const w = F.W(u, 0), B2 = hbarMake(w[0], w[1], 0, y - .3, 1); HBAR.list.push(B2); bars.push(B2); },
+    ladder: (u, y, R) => { const w = F.W(u, 0), Lc = kitClimbAdd({ minx: w[0] - .4, maxx: w[0] + .4, miny: y, maxy: y + R, minz: w[1] - .15, maxz: w[1] + .15 }, 'beacon_ladder', y + R); const t = F.W(u + 2.5, 0); Lc.mark = { x: t[0], y: y + R, z: t[1] }; climbs.push(Lc); put(new THREE.BoxGeometry(.8, R, .12).translate(w[0], y + R / 2, w[1]), M.step); },
+    zip: (u, y, Ln, D) => { const a = F.W(u, 0), b = F.W(u + Ln - 1, 0), Zp = { A: [a[0], y + 4.5, a[1]], B: [b[0], y - D + 2, b[1]] }; ZIPS.push(Zp); zips.push(Zp); put(new THREE.BoxGeometry(.3, 4.5, .3).translate(a[0] + .4, y + 2.25, a[1]), M.step);
+      g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.LineCurve3(new THREE.Vector3(...Zp.A), new THREE.Vector3(...Zp.B)), 8, .04, 5), M.gold)); } }; };
+  // a STATION: a sandstone mesa to the floor (its top the rest), a ladder up the side away from both runs, a sign
+  const ladderUp = (x, z, y, side) => { if (y < 1) return; const [sx, sz] = side, b = sx ? { minx: x - .15, maxx: x + .15, miny: 0, maxy: y, minz: z - .4, maxz: z + .4 } : { minx: x - .4, maxx: x + .4, miny: 0, maxy: y, minz: z - .15, maxz: z + .15 };
+    const Lc = kitClimbAdd(b, 'beacon_ladder', y); Lc.mark = { x: x - sx * 1.6, y, z: z - sz * 1.6 }; climbs.push(Lc); put(new THREE.BoxGeometry(sx ? .12 : .8, y, sx ? .8 : .12).translate(x + sx * .1, y / 2, z + sz * .1), M.step); };
+  const station = (S, P, inDir) => { const R = S.R, h = R / 2, cx = P.x + (inDir ? inDir[0] * h : 0), cz = P.z + (inDir ? inDir[1] * h : 0), y = P.y;
+    const mm = S.brazier ? M.lac : M.mesa; if (y > .3) { put(new THREE.BoxGeometry(R, y, R).translate(cx, y / 2, cz), mm); O.boxes.push({ minx: cx - h, maxx: cx + h, miny: 0, maxy: y, minz: cz - h, maxz: cz + h }); }
+    put(new THREE.BoxGeometry(R + .2, .3, R + .2).translate(cx, y + .01 - .15 + .02, cz), S.brazier ? M.gold : M.land);
+    if (S.brazier) { for (let k = 1; k * 6 < y; k++) put(new THREE.BoxGeometry(R + .3, .35, R + .3).translate(cx, k * 6, cz), M.gold);     // the tower's gold bands
+      put(new THREE.CylinderGeometry(1.6, 1.1, 1.2, 10).translate(cx, y + .6, cz), EM.iron); const fl = new THREE.Mesh(new THREE.ConeGeometry(1.2, 3.2, 10).translate(0, 1.6, 0), new THREE.MeshBasicMaterial({ color: 0xff8a3a }));
+      fl.position.set(cx, y + 1.2, cz); g.add(fl); L.flame = fl; L.brazier = { x: cx, y, z: cz }; O.boxes.push({ minx: cx - 1.6, maxx: cx + 1.6, miny: y, maxy: y + 1.2, minz: cz - 1.6, maxz: cz + 1.6 }); }
+    const side = inDir ? [-inDir[1], inDir[0]] : [1, 0]; ladderUp(cx + side[0] * (h + .15), cz + side[1] * (h + .15), y, side);
+    sign(S.st + '  ' + S.name, (y < .1 ? 0 : y).toFixed(1) + ' m', cx, y + 3.4, cz, 1.1); L.st[S.st] = { x: cx, y, z: cz, R }; L.log.push(S.st + ' ' + y.toFixed(1)); return { x: cx, y, z: cz, h }; };
+  let P = { x: ox, y: 0, z: oz, dir: [1, 0] }, cur = null, nChunks = 0;
+  for (let i = 0; i < BEACON.plan.length; i++) { const E = BEACON.plan[i];
+    if (E.st) { const C = station(E, P, cur); const nx = BEACON.plan[i + 1]; if (!nx) break; const d = aimDir(C, ox + nx.aim[0], oz + nx.aim[1], null); P = { x: C.x + d[0] * C.h, y: C.y, z: C.z + d[1] * C.h, dir: d }; cur = d; continue; }
+    const ax = ox + E.aim[0], az = oz + E.aim[1];
+    for (const spec of E.c) { const [nm, arg] = spec.split(':'), d = aimDir(P, ax, az, cur);
+      if (d[0] !== cur[0] || d[1] !== cur[1]) { const K0 = kit(P); K0.slab(0, 5, P.y); const c = K0.W(2.5, 0); P = { x: c[0] + d[0] * 2.5, y: P.y, z: c[1] + d[1] * 2.5, dir: d }; cur = d; }     // the corner pad
+      const K = kit({ ...P, dir: cur }), fn = BCH[nm] || CHUNKS[nm]; if (!fn) { note('BEACON: no chunk ' + nm); continue; } const r = fn({ ...P, dir: cur }, K, arg); nChunks++;
+      sign(nm.toUpperCase(), r.ask.length > 34 ? r.ask.slice(0, 33) + '…' : r.ask, P.x, P.y + 2.4, P.z, .55); P = { x: r.out.x, y: r.out.y, z: r.out.z, dir: cur }; } }
+  for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
+  for (const b of O.boxes) BOXES.push(b); boxGrid(); BEACON.on = L; bldXrayTag(g);
+  { const S = L.st.S, p = player; p.pos.set(S.x, .05, S.z); p.vel.set(0, 0, 0); const n = L.st.A || S; p.faceH = p.heading = Math.atan2(n.x - S.x, n.z - S.z); arenaBeam(S.x, S.z, [.48, 1, .85], 1); }
+  console.log('[melee] the first beacon: ' + nChunks + ' chunks, stations ' + L.log.join(' | ') + ', ' + O.boxes.length + ' boxes, ' + climbs.length + ' ladders, ' + zips.length + ' zips'); }
+function beaconStep(dt) { const L = BEACON.on; if (!L || !L.flame) return; const t = performance.now() * .001; L.flame.scale.set(1 + Math.sin(t * 9) * .08, 1 + Math.sin(t * 7.3) * .14, 1 + Math.cos(t * 8.1) * .08); }
 const COURT = { scale: 1.5, at: [0, 150], hw: 28, hd: 32, wallH: 4, walk: 2.6, gate: 6, on: null };
 function courtBuild() {
   // STEER S2 (his, after walking X4: *"increase the scale... 1.5... we need room to play"*): the court is DESIGNED in the old numbers and BUILT
@@ -30197,7 +30266,7 @@ function boardPose(dt) {
 }
 
 function stepPlayer(dt) {
-  if (inArena()) { deflStep(dt); hallStep(dt); if (SKIN.list.length) skinStep(dt); if (PIECE.list.length) pieceStep(dt); if (SMASH.list.length) smashStep(dt); for (const E of BLDG.list) if (E.step && E.on()) E.step(dt); if (LVL.want && inForge()) lvlStart(); if (LVG.on) lvgStep(dt); if (SHIPZ.want === 1 && inForge()) shipBuild(); if (SHIPZ.on) shipStep(dt); if (SNOWZ.on) snowStep(dt); }
+  if (inArena()) { deflStep(dt); hallStep(dt); if (SKIN.list.length) skinStep(dt); if (PIECE.list.length) pieceStep(dt); if (SMASH.list.length) smashStep(dt); for (const E of BLDG.list) if (E.step && E.on()) E.step(dt); if (LVL.want && inForge()) lvlStart(); if (BEACON.want && inForge()) beaconBuild(); if (BEACON.on) beaconStep(dt); if (LVG.on) lvgStep(dt); if (SHIPZ.want === 1 && inForge()) shipBuild(); if (SHIPZ.on) shipStep(dt); if (SNOWZ.on) snowStep(dt); }
   if (PLANT.list.length) plantStep(dt);     // m1424
   if (RESTORE.list.length) restoreStep(dt);     // m1505     // m1105; m1119; m1120: each building's own life
   const p = player;
@@ -67997,7 +68066,7 @@ async function init() {
 
 // the console handle. Every tuning object is live, so a number can be moved on the phone
 // without a rebuild and without a push.
-window.melee = window.mel = { DOJO, DTRAIN, dojoHit, dojoShot, RESTORE, restoreDemoBuild, restoreSet, restorePlay, JINRA, jinraEmit, COIN, coinDrop, GMERCH, GMILL, GPEAK, GJINRA, gjinraBuy, PLANT, plantLibBuild, plantHit, SNOWZ, snowStamp, GHOME, SHIMMY, VAIM, SHIPZ, shipBuild, FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, gaitMeasure, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
+window.melee = window.mel = { BEACON, beaconBuild, DOJO, DTRAIN, dojoHit, dojoShot, RESTORE, restoreDemoBuild, restoreSet, restorePlay, JINRA, jinraEmit, COIN, coinDrop, GMERCH, GMILL, GPEAK, GJINRA, gjinraBuy, PLANT, plantLibBuild, plantHit, SNOWZ, snowStamp, GHOME, SHIMMY, VAIM, SHIPZ, shipBuild, FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, gaitMeasure, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
   // PROGRESS (m276): `mel.SAVE` is the save; the setters write it through; `mel.progReset()` is a new game
   // TALK (m277): `mel.TALK` live; `mel.TALKS` the scripts by kind; `mel.talk` the state
   TALK, TALKS, talk,
@@ -68443,6 +68512,7 @@ function startGate() {
       add('h4', '', 'KORAJIN GRUMBO');
       btn(el, 'The Arena', 'The katana, the horde, the archers, the rival. Where the fighting is built.', () => go('arena'), 'main');
       btn(el, 'Level 1 -- The Grid', 'The first level, built in layers: the run first, then the puzzle, the enemies, the theme, the boss. Toggle each layer at the top.', () => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter('forge', '?w=forge&lvl=1'); });
+      btn(el, 'Level 1 v2 -- The First Beacon', 'The blueprint level: the canyon to the enemy torch tower, generated from the measured moves. The run only (layer 1), a greybox.', () => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter('forge', '?w=forge&lvl=beacon'); });
       btn(el, 'The Snowfield', 'Deep snow under a falling sky: trudge, leave tracks, plough, dive -- the snow bounces off you. (An element sandbox.)', () => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter('forge', '?w=forge&zone=snow'); });
       btn(el, 'The Ship', 'A samurai pirate ship on a sunrise sea: climb the rigging, the sails, the castle, the cabin. (Being built.)', () => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter('forge', '?w=forge&zone=ship'); });
       btn(el, 'Building Forge', 'An empty white floor: spawn the buildings, run on them, swing on them, blow them up.', () => go('forge'));

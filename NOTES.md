@@ -28,6 +28,16 @@ His queue item. First placement (r = Rt + 1.15) rose INTO the balcony's mushroom
 Rides at 1.8 m/s after .6 s standing at an end; calls itself to the end he stands near (within 2.6 m, his height within 1.5 m of that
 end). FALLEN (RT < .99): parked at the foot, tilted, ropes hidden. +2 draws (cage, ropes) beside the merged 36.
 Box moved: the home's "still open" list (rope lift). Next: breakable pots.
+## m1547 -- LEVEL 1 v2, THE FIRST BEACON: the blueprint, generated (BEACON.md)
+His: *"design the foundational whatever you gotta do from here on out... put the loop on it"*, with two ChatGPT sheets made from the blueprint
+brief (`images/korajin/ref/beacon_sheet.jpg`, `beacon_plan.jpg`). The sheets are a picture, not a measurement (STEER 000: never transcribe an
+image), so the level is a BLUEPRINT that the builder turns into geometry from the measured moves:
+- `BEACON.plan`: 7 stations and 6 runs. `beaconBuild` chains `CHUNKS` + `BCH` (hop, walk, chim:H) along axis headings toward each run's aim, corner
+  pads at turns; stations are sandstone mesas solid to the floor with a ladder on the side. Generated: **26 chunks, S 0 | A 10.9 | B 4.9 |
+  C 22.9 | D 26.9 | T 10.9 | X 33.8, 66 boxes, 6 ladders, 2 zips** (logged `[melee] the first beacon` on build; headless renders checked).
+- **A station lands where its run arrives, not where the aim says** (the chunk lengths are measured, not stretched). First render: the tower
+  climb aimed back at a point behind the terrace and stood the tower between D and T; the aim now carries on past it.
+- KORAJIN > Level 1 v2 opens it; `mel.BEACON` / `mel.beaconBuild` are live. Layer 1 only. BEACON.md has the DONE WHEN list.
 
 ## m1545 -- the clouds move under you (dojo pass 21, the old "pass 4: life" line)
 - **Wisps:** a third `bbd` layer, 46 single puffs at y -8 to -34, out to 110 m. The `move` hook blows them along +x at 2.4 m/s and wraps them in a
