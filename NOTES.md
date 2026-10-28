@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- NEON GREEN SMOKE (his: "the green smoke has gone kind of dark... I want it glowing, neon, fluorescent. Instead of shades, HUES --
+## m1702 -- NEON GREEN SMOKE (his: "the green smoke has gone kind of dark... I want it glowing, neon, fluorescent. Instead of shades, HUES --
 a little more turquoise, a little more slime green-yellow")
 - **Why it was dark:** the smoke pool's shader outputs premultiplied colour, and its NormalBlending multiplies by alpha a SECOND time. Every
   puff's colour lands at roughly colour x alpha squared over the background, which greys a coloured puff to murk on white snow. Grey smoke
