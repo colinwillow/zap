@@ -39,6 +39,14 @@ an attack."* A new sandbox with its own DONE WHEN (`DRAGON.md`); KORAJIN > The D
 **Moves:** DRAGON.md box 1 (his look still open). **Still open:** boxes 2-6 and his sign-off; no fly clip in his file (asked for).
 Gates: `npm run check` ok, and a boot of `MEL_WORLD='forge&zone=dragon'` ok (the dragon itself loads after boot, so a throw in the
 dressing is only visible on the phone, as the chip line above). Shipped unverified.
+## m15xx -- THE BEACON'S FLOOR IS DISPLACED GEOMETRY (his: "how do displacement maps work in three.js -- geometric or pixel? make this ground not flat")
+The answer, for the record: three's `displacementMap` is GEOMETRIC (it moves vertices in the vertex shader, so it needs a dense mesh, and it never
+touches collision); `bumpMap` / `normalMap` are PER-PIXEL (lighting only, the silhouette stays flat); parallax mapping is a per-pixel fake depth.
+- **Geometric:** the canyon floor (was one .1 m box) is a 2.5 m grid lifted on the CPU into dunes and mounds (`isl3Fbm` + a smaller noise, 0 to ~2.5 m,
+  never below the world's floor at 0). It stays FLAT within 3-8 m of the route's LOW pieces (tops under 3.2 m -- a dune cannot reach the rest), so
+  no dune fills a gap or buries a slab. **Its triangles are walkable** (`bldTris`, 21,630 of them), so he runs over the bumps, not through them.
+- **Per-pixel:** the sandstone's relief (m1600's triplanar bump) carries the cracks the vertices are too far apart for.
+- First try flattened within 4-10 m of EVERY route piece: in a narrow canyon that was nearly all of it (no visible dunes). Route check still 63 ok.
 
 ## m1607 -- THE RE-PASS: the FLYING SHIP HOUSE, pass 3 (alive, L3; its third pass, so the loop moves on)
 - THE SAILS BILLOW: each junk sail is an 8 x 6 grid now, merged; every vertex carries its (u, v) inside its own sail (from `FSHIP.sailR`)

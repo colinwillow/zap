@@ -26950,7 +26950,17 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
       if (mv) tally[mv] = (tally[mv] || 0) + 1; else fail.push(((a.minx + a.maxx) / 2).toFixed(0) + ',' + ((a.minz + a.maxz) / 2).toFixed(0) + ' d' + d.toFixed(1) + ' r' + r.toFixed(1)); }
     L.walk = { pairs: T.length - 1, tally, fail }; if (fail.length) note('BEACON: route check ' + fail.length + ' BAD: ' + fail.slice(0, 5).join(' | ')); }
   { const xs = Object.values(L.st).map(q => q.x), zs = Object.values(L.st).map(q => q.z), x0 = Math.min(...xs) - 75, x1 = Math.max(...xs) + 75, z0 = Math.min(...zs) - 75, z1 = Math.max(...zs) + 75;     // the canyon floor, under it all
-    put(new THREE.BoxGeometry(x1 - x0, .1, z1 - z0).translate((x0 + x1) / 2, .02, (z0 + z1) / 2), triMat('sandstone', { scale: 9, color: 0xe0b48a })); L.bounds = [x0 + 25, x1 - 25, z0 + 25, z1 - 25]; }
+    // m15xx (his: *"make this ground not flat -- displaced by the texture, or even just a noise displacement"*): the floor is GEOMETRY now, a 2.5 m
+    // grid lifted into low dunes and mounds (fbm, 0-~2.5 m, never below 0, the world's own floor), FLAT within 4-10 m of every route piece so no
+    // dune fills a gap or buries a slab; its triangles are walkable (`bldTris`), so he runs over the bumps. The per-pixel relief on the sandstone map
+    // (m1600) does the cracks the vertices are too far apart to carry.
+    const RT = O.boxes.filter(b => b.top && b.maxy < 3.2), st = 2.5, nx = Math.ceil((x1 - x0) / st), nz = Math.ceil((z1 - z0) / st), hAt = (x, z) => { let d = 1e9; for (const b of RT) { const dx = Math.max(b.minx - x, 0, x - b.maxx), dz = Math.max(b.minz - z, 0, z - b.maxz); d = Math.min(d, Math.hypot(dx, dz)); }
+      const f = Math.max(0, isl3Fbm(x * .024, 3.1, z * .024, 3) + .18) * 2.6 + Math.max(0, isl3Noise(x * .13, 7.7, z * .13)) * .45; return f * Math.min(1, Math.max(0, (d - 3) / 5)); };     /* flat only near the route's LOW pieces (< 3.2 m up): a dune cannot reach the rest */
+    const gg = new THREE.PlaneGeometry(nx * st, nz * st, nx, nz).rotateX(-Math.PI / 2).translate(x0 + nx * st / 2, 0, z0 + nz * st / 2), GP = gg.attributes.position;
+    for (let i = 0; i < GP.count; i++) GP.setY(i, hAt(GP.getX(i), GP.getZ(i)) + .02); gg.computeVertexNormals();
+    { const tris = [], ix = gg.index.array; for (let t = 0; t < ix.length; t += 3) { const a = ix[t], b = ix[t + 1], c = ix[t + 2]; if (GP.getY(a) + GP.getY(b) + GP.getY(c) < .1) continue;
+        tris.push(GP.getX(a), GP.getY(a), GP.getZ(a), GP.getX(b), GP.getY(b), GP.getZ(b), GP.getX(c), GP.getY(c), GP.getZ(c)); } L.dune = tris.length / 9; if (tris.length) bldTris(O, tris); }
+    put(gg, triMat('sandstone', { scale: 9, color: 0xe0b48a })); L.bounds = [x0 + 25, x1 - 25, z0 + 25, z1 - 25]; }
   // m1555: THE CANYON (pass 2). Sandstone mesas on an 8 m lattice round the route, never within `clear` of it (plan distance to every route box and
   // zip line), stepped in two or three tiers; near the route they stand a few metres over the route's own height (walls to run between), further
   // out they are the canyon's walls (22-52 m). Low along the sight line from the start to the brazier, so the tower is seen from S.
@@ -26993,7 +27003,7 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
   for (const b of O.boxes) BOXES.push(b); boxGrid(); BEACON.on = L; bldXrayTag(g);
   { const S = L.st.S, p = player; p.pos.set(S.x, .05, S.z); p.vel.set(0, 0, 0); const n = L.st.A || S; p.faceH = p.heading = Math.atan2(n.x - S.x, n.z - S.z); arenaBeam(S.x, S.z, [.48, 1, .85], 1); }
-  console.log('[melee] the first beacon: ' + nChunks + ' chunks, stations ' + L.log.join(' | ') + ', runs ' + (L.fit || []).join(', ') + ', ' + (L.mesas || 0) + ' mesas, ' + O.boxes.length + ' boxes, ' + climbs.length + ' ladders (' + (L.audit ? L.audit.laddersAdded : 0) + ' for falls), headroom ' + (L.audit && L.audit.headroom.length ? L.audit.headroom.length + ' BAD' : 'ok') + ', route check ' + (L.walk ? L.walk.pairs + ' pairs ' + (L.walk.fail.length ? L.walk.fail.length + ' BAD' : 'ok') + ' ' + JSON.stringify(L.walk.tally) : '?') + ', sees the tower: ' + (L.audit ? L.audit.sees.join(' ') : '?') + ', sees the next: ' + (L.audit ? L.audit.next.join(' ') : '?') + ', ' + zips.length + ' zips'); }
+  console.log('[melee] the first beacon: ' + nChunks + ' chunks, stations ' + L.log.join(' | ') + ', runs ' + (L.fit || []).join(', ') + ', ' + (L.mesas || 0) + ' mesas, ' + (L.dune || 0) + ' dune tris, ' + O.boxes.length + ' boxes, ' + climbs.length + ' ladders (' + (L.audit ? L.audit.laddersAdded : 0) + ' for falls), headroom ' + (L.audit && L.audit.headroom.length ? L.audit.headroom.length + ' BAD' : 'ok') + ', route check ' + (L.walk ? L.walk.pairs + ' pairs ' + (L.walk.fail.length ? L.walk.fail.length + ' BAD' : 'ok') + ' ' + JSON.stringify(L.walk.tally) : '?') + ', sees the tower: ' + (L.audit ? L.audit.sees.join(' ') : '?') + ', sees the next: ' + (L.audit ? L.audit.next.join(' ') : '?') + ', ' + zips.length + ' zips'); }
 // m1569: CHECKPOINTS. Standing on a station lights its lantern mint (a chime, a burst) and makes it the checkpoint; leaving the canyon (out past its
 // walls, or below the floor) puts him back on the last one lit. The start is lit from the first frame.
 function beaconStep(dt) { const L = BEACON.on; if (!L) return; const t = performance.now() * .001, p = player;
