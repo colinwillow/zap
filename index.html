@@ -64303,7 +64303,7 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 // to the shop front and to the round back door. Built in its OWN frame (local +z = the front, toward the river; `at`/`yaw` are HOME.hut's) and
 // merged per material; every collider a local box turned into the world (the yaw is a quarter turn, so a box stays a box); every walkable
 // surface a triangle. `?hut=glb` (or GHOME.on = 0) puts the GLB back, to compare. Pass 1: the massing and the walkable shell, with the inside.
-const GHOME = { on: 1, pass: 19, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
+const GHOME = { on: 1, pass: 20, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   Rtu: 2.5, door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
@@ -64842,6 +64842,36 @@ function ghomeBuild(at, yaw, y0) {
       // the mooring line, bow to the T-head's corner post (in the canoe's own frame)
       { const a = new THREE.Vector3(0, .8, L + .05), b = new THREE.Vector3(-(tz1 - .05 - cz), dY - wY - .05, tx - .15 - cx), c = a.clone().lerp(b, .5); c.y -= .45; cadd(new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(a, c, b), 12, .018, 4), innerM); }
       for (const [m, list] of CB) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = true; cg.add(o); } GHOME.canoe = { g: cg, x: Wx(cx, cz), z: Wz(cx, cz), y: wY, ry: Math.PI / 2 }; } }
+  // ---- PASS 20 (his ask: "shrubs, plants and land masses, breaking up the circular spherical rocks"): low SANDSTONE SHELVES half-buried
+  // round the home (wide flat strata, `ghRockGeo` stretched), and a planting that thins out from the mound: SAGEBRUSH (lumpy low clumps, two
+  // greens), golden GRASS tufts, YUCCAS (a rosette of blades and a cream flower spike), the valley's own ALIEN BULBS (lavender, faintly lit,
+  // on curling stalks), and REEDS and cattails where the bank meets the water. All merged: one draw per look ----
+  { const gH = (x, z) => rwHeight(Wx(x, z), Wz(x, z)) - y0, wY = -y0, rnd = rwRng(2020), NC = { noCam: 1 };
+    const sage = new THREE.MeshStandardMaterial({ color: 0x7f8c5c, roughness: .95 }), olive = new THREE.MeshStandardMaterial({ color: 0x55633a, roughness: .95 }), straw = new THREE.MeshStandardMaterial({ color: 0xc2a55e, roughness: .95 });
+    const reedM = new THREE.MeshStandardMaterial({ color: 0x6f7a3e, roughness: .9 }), brownM = new THREE.MeshStandardMaterial({ color: 0x5a3a22, roughness: .9 }), bulbM = new THREE.MeshStandardMaterial({ color: 0xc8a8ff, emissive: 0x7a52d8, emissiveIntensity: .9, roughness: .5 }), creamM = new THREE.MeshStandardMaterial({ color: 0xf1e6c4, roughness: .8 });
+    const free = (x, z) => { if (Math.abs(x) < 2.8 && z > 5) return false; if (x > 9 && x < 17 && z > 3.6 && z < 7.6) return false; if (z > 3 && z < 8 && Math.abs(x) < 10.2) return false; if (x < -8.4 && x > -11 && z > 8.6 && z < 10.4) return false;
+      const e = (x / A.rx) ** 2 + (z / A.rz) ** 2; return e > 1.15 && gH(x, z) > wY + .25; };
+    // the SHELVES: wide, flat, stratified, sunk -- they make ground, not balls
+    let sd = 900; const flat = (x, z, r) => { const y = gH(x, z); return [[r, 0], [-r, 0], [0, r], [0, -r]].every(([dx, dz]) => Math.abs(gH(x + dx, z + dz) - y) < .45); };     // a shelf on the wall's slope reads as a slab in the air
+    const shelf = (x, z, w, h, d, ry) => { if (!flat(x, z, Math.max(w, d))) return; const y = gH(x, z); put(ghRockGeo(sd++, w, h, d, 3), stoneM, at4(x, y - h * .35, z, ry, (rnd() - .5) * .08, (rnd() - .5) * .08)); const c = Math.abs(Math.cos(ry)), s2 = Math.abs(Math.sin(ry)), ex = w * c + d * s2, ez = w * s2 + d * c; box(x - ex * .7, x + ex * .7, y - 1, y + h * .45, z - ez * .7, z + ez * .7); };
+    for (const [x, z, w, h, d, ry] of [[-16, -2, 4.2, 1.1, 2.6, .4], [-14, -9, 5.2, 1.5, 3, -.3], [15, -7, 4.6, 1.2, 2.4, .9], [-21, 5, 3.4, .8, 2.2, 1.3], [6, -11.5, 4.8, 1.0, 2.2, .1], [-6, -12, 3.6, .9, 2, -.6], [21, -1, 3, .7, 1.8, .5]]) if (gH(x, z) > wY + .3 && flat(x, z, Math.max(w, d))) { shelf(x, z, w, h, d, ry); for (let k = 0; k < 2; k++) { const a = rnd() * 6; shelf(x + Math.sin(a) * w * .8, z + Math.cos(a) * d * .8, w * .45, h * .6, d * .5, ry + rnd()); } }
+    // the plants
+    const bush = (seed, r) => { const gg = new THREE.IcosahedronGeometry(1, 1), q = gg.attributes.position; for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = q.getY(i), z = q.getZ(i), d = .78 + ghNoise3(x * 2.1 + seed, y * 2.1, z * 2.1 - seed) * .5; q.setXYZ(i, x * d * r, Math.max(-.35, y) * d * r * .85, z * d * r); } gg.computeVertexNormals(); return gg; };     // round and lumpy, faceted: a bush, not a pad
+    const sagebrush = (x, y, z, k) => { const n = 4 + ((rnd() * 4) | 0); for (let i = 0; i < n; i++) { const a = rnd() * 6, r = rnd() * .35 * k, s = (.2 + rnd() * .2) * k; put(bush(sd++ * 1.7, s), rnd() < .5 ? sage : olive, at4(x + Math.sin(a) * r, y + s * .55 + rnd() * s * .4, z + Math.cos(a) * r, rnd() * 6)); }
+      for (let i = 0; i < 5; i++) { const a = rnd() * 6; put(new THREE.CylinderGeometry(.008, .015, .3 * k, 3), brownM, at4(x + Math.sin(a) * .15 * k, y + .1, z + Math.cos(a) * .15 * k, 0, Math.cos(a) * .5, Math.sin(a) * .5)); } };
+    const grass = (x, y, z, k) => { for (let i = 0; i < 9; i++) { const a = rnd() * 6, t = .25 + rnd() * .45, h = (.35 + rnd() * .35) * k; put(new THREE.ConeGeometry(.025 * k, h, 3), straw, _m4.compose(new THREE.Vector3(x + Math.sin(a) * .06, y + h * .45, z + Math.cos(a) * .06), _q.setFromEuler(_e.set(Math.cos(a) * t, 0, -Math.sin(a) * t)), _one)); } };
+    const yucca = (x, y, z) => { for (let i = 0; i < 16; i++) { const a = i / 16 * TAU + rnd() * .3, t = .35 + rnd() * .7, h = .7 + rnd() * .3; put(new THREE.ConeGeometry(.045, h, 3), i % 3 ? sage : olive, _m4.compose(new THREE.Vector3(x + Math.sin(a) * .12, y + .3, z + Math.cos(a) * .12), _q.setFromEuler(_e.set(Math.cos(a) * t, 0, -Math.sin(a) * t)), _one)); }
+      if (rnd() < .6) { put(new THREE.CylinderGeometry(.02, .03, 1.3, 4), brownM, at4(x, y + .95, z)); for (let k = 0; k < 7; k++) put(new THREE.SphereGeometry(.07, 6, 4), creamM, at4(x + (rnd() - .5) * .14, y + 1.25 + k * .1, z + (rnd() - .5) * .14, 0, 0, 0, 1, 1.4, 1)); } };
+    const bulbs = (x, y, z) => { const n = 2 + ((rnd() * 3) | 0); for (let i = 0; i < n; i++) { const a = rnd() * 6, h = .4 + rnd() * .6, tx2 = x + Math.sin(a) * .25, tz2 = z + Math.cos(a) * .25, c = new THREE.QuadraticBezierCurve3(new THREE.Vector3(x, y, z), new THREE.Vector3(tx2, y + h * .5, tz2), new THREE.Vector3(tx2 + Math.sin(a) * .15, y + h, tz2 + Math.cos(a) * .15));
+        put(new THREE.TubeGeometry(c, 5, .018, 3), reedM); const tp = c.getPoint(1); put(new THREE.SphereGeometry(.09 + rnd() * .05, 8, 6), bulbM, at4(tp.x, tp.y, tp.z, 0, 0, 0, 1, 1.3, 1)); }
+      for (let i = 0; i < 4; i++) { const a = rnd() * 6; put(new THREE.ConeGeometry(.05, .3, 3), olive, at4(x + Math.sin(a) * .1, y + .1, z + Math.cos(a) * .1, 0, Math.cos(a) * .9, -Math.sin(a) * .9)); } };
+    const reeds = (x, y, z) => { const n = 6 + ((rnd() * 6) | 0); for (let i = 0; i < n; i++) { const a = rnd() * 6, r = rnd() * .5, h = 1.0 + rnd() * .9, lx = x + Math.sin(a) * r, lz = z + Math.cos(a) * r, t = (rnd() - .5) * .25;
+        put(new THREE.CylinderGeometry(.012, .02, h, 3), reedM, at4(lx, y + h / 2 - .1, lz, 0, t, t * .5)); if (rnd() < .4) put(new THREE.CylinderGeometry(.04, .04, .22, 6), brownM, at4(lx + Math.sin(t) * h * .45, y + h * .85, lz, 0, t, t * .5)); } };
+    // scatter: dense near the mound, thinning outward; reeds along the waterline; seen plants avoid the paths, the ramp and the water
+    let nP = 0; for (let i = 0; i < 520; i++) { const a = rnd() * TAU, rr = 1.15 + Math.pow(rnd(), 1.6) * 2.4, x = Math.sin(a) * A.rx * rr, z = Math.cos(a) * A.rz * rr; if (!free(x, z)) continue; const y = gH(x, z), k = rnd();
+      if (k < .32) grass(x, y, z, .8 + rnd() * .6); else if (k < .58) sagebrush(x, y, z, .8 + rnd() * .9); else if (k < .7) yucca(x, y, z); else if (k < .8) bulbs(x, y, z); else if (k < .9) grass(x, y, z, .6); nP++; }
+    let nR = 0; for (let x = -26; x < 26; x += .9) for (let z = 6; z < 20; z += .7) { if (Math.abs(x) < 4 && z < 17) continue; const y = gH(x + (rnd() - .5) * .5, z); if (y < wY + .32 && y > wY - .35 && rnd() < .3) { reeds(x, Math.max(y, wY - .2), z); nR++; } }
+    A.stat.plants = nP; A.stat.reeds = nR; }
   // ---- PASS 12: SMOKE from both stacks -- one point cloud (one draw), each puff rising, drifting downwind and swelling until it is gone;
   // stepped in `ghomeSmoke` ----
   { const N = 40, pos = new Float32Array(N * 3), cv = document.createElement('canvas'); cv.width = cv.height = 64; const q = cv.getContext('2d'), gr = q.createRadialGradient(32, 32, 2, 32, 32, 31);
