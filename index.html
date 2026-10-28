@@ -10436,7 +10436,7 @@ function isl4Mat() { if (ISLE3.mat4) return ISLE3.mat4; const m = new THREE.Mesh
         c *= .78 + .38 * blade; float slope = 1.0 - clamp(vGn.y, 0.0, 1.0); float d = smoothstep(.64, .72, gfb(p * .1 + 9.0)) * .8 + smoothstep(.22, .55, slope);
         c = mix(c, vec3(.4, .27, .16) * (.75 + .45 * fine), clamp(d, 0.0, 1.0) * .9); float fl = step(.988, gn(p * 6.0 + 11.0)) * (1.0 - d);
         c = mix(c, mix(vec3(1.0, .92, .96), vec3(1.0, .85, .3), step(.5, gh(floor(p * 6.0)))), fl * .8); diffuseColor.rgb = c; }
-      else { vec3 p = vGw; float w = gfb(p.xz * .05) * 6.0 + gn(p.xz * .3) * .6, band = fract(p.y * .32 + w * .25);     /* m15xx: THE ROCK -- strata, seams, streaks, cracks, a lavender underside, and relief */
+      else { vec3 p = vGw; float w = gfb(p.xz * .05) * 6.0 + gn(p.xz * .3) * .6, band = fract(p.y * .32 + w * .25);     /* m1612: THE ROCK -- strata, seams, streaks, cracks, a lavender underside, and relief */
         vec3 c = mix(vec3(.42, .21, .11), vec3(.62, .4, .23), smoothstep(.18, .6, band)); c = mix(c, vec3(.3, .13, .08), smoothstep(.8, .95, band) * .85);
         float st = gn(vec2(p.x * 1.3 + p.z * .9, p.y * .07)), cr = smoothstep(.035, .0, abs(gn(vec2(p.x * .6 + p.z * .45, p.y * .6)) - .5));
         c *= (.84 + .3 * st) * (1.0 - cr * .45); c = mix(c, vec3(.3, .22, .28), smoothstep(.15, -.65, vGn.y) * .6); c *= .82 + .3 * dot(vColor.rgb, vec3(.33));
@@ -26950,7 +26950,7 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
       if (mv) tally[mv] = (tally[mv] || 0) + 1; else fail.push(((a.minx + a.maxx) / 2).toFixed(0) + ',' + ((a.minz + a.maxz) / 2).toFixed(0) + ' d' + d.toFixed(1) + ' r' + r.toFixed(1)); }
     L.walk = { pairs: T.length - 1, tally, fail }; if (fail.length) note('BEACON: route check ' + fail.length + ' BAD: ' + fail.slice(0, 5).join(' | ')); }
   { const xs = Object.values(L.st).map(q => q.x), zs = Object.values(L.st).map(q => q.z), x0 = Math.min(...xs) - 75, x1 = Math.max(...xs) + 75, z0 = Math.min(...zs) - 75, z1 = Math.max(...zs) + 75;     // the canyon floor, under it all
-    // m15xx (his: *"make this ground not flat -- displaced by the texture, or even just a noise displacement"*): the floor is GEOMETRY now, a 2.5 m
+    // m1612 (his: *"make this ground not flat -- displaced by the texture, or even just a noise displacement"*): the floor is GEOMETRY now, a 2.5 m
     // grid lifted into low dunes and mounds (fbm, 0-~2.5 m, never below 0, the world's own floor), FLAT within 4-10 m of every route piece so no
     // dune fills a gap or buries a slab; its triangles are walkable (`bldTris`), so he runs over the bumps. The per-pixel relief on the sandstone map
     // (m1600) does the cracks the vertices are too far apart to carry.

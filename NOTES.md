@@ -39,7 +39,7 @@ an attack."* A new sandbox with its own DONE WHEN (`DRAGON.md`); KORAJIN > The D
 **Moves:** DRAGON.md box 1 (his look still open). **Still open:** boxes 2-6 and his sign-off; no fly clip in his file (asked for).
 Gates: `npm run check` ok, and a boot of `MEL_WORLD='forge&zone=dragon'` ok (the dragon itself loads after boot, so a throw in the
 dressing is only visible on the phone, as the chip line above). Shipped unverified.
-## m15xx -- THE BEACON'S FLOOR IS DISPLACED GEOMETRY (his: "how do displacement maps work in three.js -- geometric or pixel? make this ground not flat")
+## m1612 -- THE BEACON'S FLOOR IS DISPLACED GEOMETRY (his: "how do displacement maps work in three.js -- geometric or pixel? make this ground not flat")
 The answer, for the record: three's `displacementMap` is GEOMETRIC (it moves vertices in the vertex shader, so it needs a dense mesh, and it never
 touches collision); `bumpMap` / `normalMap` are PER-PIXEL (lighting only, the silhouette stays flat); parallax mapping is a per-pixel fake depth.
 - **Geometric:** the canyon floor (was one .1 m box) is a 2.5 m grid lifted on the CPU into dunes and mounds (`isl3Fbm` + a smaller noise, 0 to ~2.5 m,
