@@ -22,6 +22,22 @@ shipped hero in the sim (the clip sampled like `mantleCurve`, and the hands' wor
 - **AND THE SPEED IS NOW THE ANIMATION'S SPEED**: 2.3 m/s would cycle the hands ~6x. TOOLS > CLIMB cycles .9 / 1.4 / 2.3 m/s (`mel.climbspd`),
   **1.4 by default** -- his pick. Ladder 3 (7 m): bottom to standing on top 5.6 s; top back down 5 s.
 The feet are not locked (they follow the same phase; not measured against the rungs).
+## m15xx -- WALL RUNS START FROM A SWIPE; the run-up's legs out to the wall
+His (playing Level 1 v2): *"we need a way to initiate the wall runs so he doesn't just automatically wall run. If you're touching a wall and you swipe
+the right stick directionally, he'll run that direction -- hit the wall at an angle and swipe for a horizontal run; straight on, swipe up, he runs up
+the wall. If you don't swipe he does the thing where he's perched on the wall, can jump off or slide down -- it gets confused which one you're
+trying to do."* And: *"the vertical wall run: his feet more forward, out in front, as if his hips are at 90 degrees, the torso straight up and down,
+feet parallel to the wall."*
+- **`WRUN.swipe` (1; 0 = the old tap / auto, the A/B):** `wrunTap` no longer starts a run (a tap by a wall is the jump; a tap ON a wall is still the
+  wall jump); `wrunAuto` starts NO run by itself, and ANY touch of a tall face in the air is the perch-and-slide (m1372), stick or no stick.
+  **`wrunSwipe`**, first in the right pad's flick chain after the board: a tall face within `swipeReach` .7 (or the one he is perched on): flick UP
+  = the RUN UP (`upV`, or faster if he hit it fast), LEFT / RIGHT = a SIDE RUN along the face that way (the flick's world heading, `flickH`, onto
+  the wall's tangent), DOWN = let go of the perch. No wall in reach: the flick is the strike, unchanged.
+- **The run-up pose (`wrunPose`, kind `up`):** both `UpLeg` bones swung `upLeg` 1.35 rad forward about his own right axis (world space, on top of
+  the run clip, so the legs keep stepping), and the drawn body held hipY x .82 off the face so the soles land on it; ramps in over .12 s. **The
+  first sign was backwards** (headless render: legs swung out BEHIND him, away from the wall); flipped, the render shows the legs level into the
+  wall and the torso upright.
+
 ## m1599 -- THE RE-PASS: the FLYING SHIP HOUSE, pass 1 (a HERO flyer: the look; a collider audit)
 **Moves:** its pass-1 row.
 - Kit materials: `K.timber`, a warm planks deck, a dark warm planks hull, `K.redL` ribs and pennants, `K.bronze` (the figurehead too, its
