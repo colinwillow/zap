@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE ZEPPELINS, detail pass 4 (his report: an invisible collider, no way up, "I don't really like the way that looks")
+## m1586 -- THE ZEPPELINS, detail pass 4 (his report: an invisible collider, no way up, "I don't really like the way that looks")
 His words: *"There was an invisible collider on there ... Need a better way to get up to it cause I wasn't able to ... it needs a bunch of
 detail passes."* The re-pass loop stays on the zeppelins for more detail passes before moving on.
 - **THE INVISIBLE COLLIDER, measured:** the gondola's `deckB` was a 0.3 m slab at deck height (y0 -.3) while the red hull hung 1.3 m below it,
