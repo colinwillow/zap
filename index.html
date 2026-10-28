@@ -23268,6 +23268,20 @@ function bathBuild() {
     for (let i = 0; i < 24; i++) { const a = rnd() * 6.28, rr = Math.max(hw, hd) + 2 + rnd() * 3, x = cx + Math.cos(a) * rr * 1.1, z = cz + Math.sin(a) * rr; if (x > cx + hw && Math.abs(z - cz) < hd + 1) continue; plantPlant(plants, ['grass', 'tallgrass', 'stones', 'flowers'][i % 4], x, 0, z, .8 + rnd() * .5, a); } }
   for (const sz of [-1, 1]) { korPost(put, K, cx + hw + 1.9, 0, cz + sz * (hd + .4), 2.2, .1); korLantern(put, K, cx + hw + 1.9, 2.45, cz + sz * (hd + .4), .75); }
   korBunting(put, K, [cx + hw + 1.5, H + .15, cz - hd - .6], [cx + hw + 1.5, H + .15, cz + hd + .6], 14, .35);
+  // ---- RE-PASS 3 (m@X4@): UP -- a MONOHOSHI (the rooftop drying deck) perched over the -z eave at 6.3 m, on four posts, railed, with
+  // laundry poles and towels flapping; a LADDER up to it from the yard; doubloons on it, and one hung high over the pool that only the GEYSER
+  // can reach. All of it rides the roof piece (gone while fallen) ----
+  const my = H + 2.9, mz0 = cz - hd - 2, mz1 = cz - hd + .9, mx0 = cx + .6, mx1 = cx + 3.4, nb0 = O.boxes.length, towels = [], coinsU = [];
+  add(new THREE.BoxGeometry(mx1 - mx0, .14, mz1 - mz0), plank, (mx0 + mx1) / 2, my - .07, (mz0 + mz1) / 2, 1);
+  for (const [x, z] of [[mx0, mz0], [mx1, mz0], [mx0, mz1], [mx1, mz1]]) add(new THREE.BoxGeometry(.14, z < cz - hd - 1 ? my : 2.2, .14), wood, x, z < cz - hd - 1 ? my / 2 : my - 1.1, z, 0);
+  for (const [w, d, x, z] of [[mx1 - mx0, .06, (mx0 + mx1) / 2, mz1], [.06, mz1 - mz0, mx0, (mz0 + mz1) / 2], [.06, mz1 - mz0, mx1, (mz0 + mz1) / 2]]) { add(new THREE.BoxGeometry(w, .06, d), wood, x, my + .85, z, 0); add(new THREE.BoxGeometry(w || .06, .7, d || .06).scale(1, 1, 1), wood, x, my + .45, z, 0).scale.set(w > 1 ? 1 : 1, 1, 1); }
+  O.boxes.push({ minx: mx0, maxx: mx1, miny: my, maxy: my + .9, minz: mz1 - .05, maxz: mz1 + .05 }, { minx: mx0 - .05, maxx: mx0 + .05, miny: my, maxy: my + .9, minz: mz0, maxz: mz1 }, { minx: mx1 - .05, maxx: mx1 + .05, miny: my, maxy: my + .9, minz: mz0, maxz: mz1 });
+  for (const x of [mx0 + .2, mx1 - .2]) add(new THREE.BoxGeometry(.08, 1.9, .08), wood, x, my + .95, (mz0 + mz1) / 2, 0); add(new THREE.CylinderGeometry(.03, .03, mx1 - mx0, 6).rotateZ(Math.PI / 2), wood, (mx0 + mx1) / 2, my + 1.85, (mz0 + mz1) / 2, 0);
+  { const cols = [0xf2ece0, 0x24506e, 0xd8302a, 0xf2ece0]; for (let k = 0; k < 4; k++) { const t2 = new THREE.Mesh(new THREE.PlaneGeometry(.55, .8, 1, 4).translate(0, -.4, 0), new THREE.MeshStandardMaterial({ color: cols[k], roughness: .9, side: THREE.DoubleSide })); t2.position.set(mx0 + .55 + k * .55, my + 1.83, (mz0 + mz1) / 2); g.add(t2); towels.push(t2); } }
+  { const lx = mx0 + 1.4, lz = mz0 - .1; for (const e of [-.3, .3]) add(new THREE.BoxGeometry(.07, my, .07), wood, lx + e, my / 2, lz, 0); for (let y = .3; y < my; y += .32) add(new THREE.BoxGeometry(.66, .05, .06), wood, lx, y, lz, 0);
+    var mLad = kitClimbAdd({ minx: lx - .45, maxx: lx + .45, miny: 0, maxy: my, minz: lz - .12, maxz: lz + .12 }, 'bath_monohoshi', my); mLad.mark = { x: lx, y: my, z: lz + 1 }; }
+  for (const dx of [.8, 2]) coinsU.push(coinDrop(g, mx0 + dx, my + .9, (mz0 + mz1) / 2 + .5)); coinsU.push(coinDrop(g, cx - .8, 6.6, cz));
+  for (const b2 of O.boxes.slice(nb0)) BOXES.push(b2); boxGrid();
   // ---- RE-PASS 2 (m1617): RESTORABLE IN PLACE (rubric 7). The floor, the breakable walls, the pool, the benches, the tub, the boiler and the
   // engawa stay. The ROOF (with the bunting under its eave), the FRONT posts and beam, the CHIMNEY, the bamboo FENCE and the garden's stone
   // LANTERN are pieces. FALLEN: the roof has sagged into the hall, the chimney lies in the yard, the front posts are down, the fence flat; the
@@ -23284,18 +23298,19 @@ function bathBuild() {
   const fall = (key, c, sz) => key === 'roof' ? { p: [c.x - .5, c.y - 2.4, c.z + .3], r: [.12, .05, -.18], hop: .6, at: .55 } : key === 'chim' ? { p: [c.x - 3.6, .6, c.z + .6], r: [0, .3, Math.PI / 2 * .95], hop: 1, at: .1 }
     : key === 'front' ? { p: [c.x + H / 2, .3, c.z], r: [0, 0, -Math.PI / 2 * .93], hop: .8, at: .3 } : key === 'fence' ? { p: [c.x, .2, c.z + .9], r: [Math.PI / 2 * .92, 0, 0], hop: .5, at: .2 } : { p: [c.x + .6, .35, c.z], r: [Math.PI / 2 * .85, .6, 0], hop: .6, at: .05 };
   const pieces = restorePieces(Rr, g, pairs, cls, fall); bldMergeStatic(g); const plantMs = plantFlush(g, plants);
-  { const skip = new Set([drone, valve, ...cables, ...plantMs, ...shoji.map(S2 => S2.p), ...smash.map(S2 => S2.m), ...Object.values(pieces)]), wb = new THREE.Box3(), wc = new THREE.Vector3(), ws = new THREE.Vector3();
+  { const skip = new Set([drone, valve, ...coinsU.map(c2 => c2.m), ...cables, ...plantMs, ...shoji.map(S2 => S2.p), ...smash.map(S2 => S2.m), ...Object.values(pieces)]), wb = new THREE.Box3(), wc = new THREE.Vector3(), ws = new THREE.Vector3();
     for (const o of g.children.slice()) { if (skip.has(o) || O.meshes.includes(o)) continue; wb.setFromObject(o); if (wb.isEmpty()) continue; wb.getCenter(wc); wb.getSize(ws); const key = cls(wc, ws); if (key && pieces[key]) pieces[key].attach(o); } }
   restoreSkin(Rr);
   const bk = b2 => b2.cw ? null : cls(new THREE.Vector3((b2.minx + b2.maxx) / 2, (b2.miny + b2.maxy) / 2, (b2.minz + b2.maxz) / 2), new THREE.Vector3(b2.maxx - b2.minx, b2.maxy - b2.miny, b2.maxz - b2.minz));
-  restoreRide(Rr, { base: { boxes: [], tris: [] }, up: { boxes: O.boxes.filter(b2 => bk(b2)), tris: [], climbs: [], bars: [], rings: [], coins: [], objs: [drone, ...cables] } });
+  restoreRide(Rr, { base: { boxes: [], tris: [] }, up: { boxes: O.boxes.filter(b2 => bk(b2)), tris: [], climbs: [mLad], bars: [], rings: [], coins: coinsU, objs: [drone, ...cables] } });
   Rr.onSet = R2 => restoreRideSet(R2);
   const ground = []; { const px2 = cx + hw + 4.5, pz2 = cz - hd - 1, plate = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, .12, 24), new THREE.MeshStandardMaterial({ color: 0x3a4a46, emissive: 0x7affd8, emissiveIntensity: .7 })); plate.position.set(px2, .06, pz2); scene.add(plate); ground.push(plate); Rr.trig = { x: px2, y: 0, z: pz2, armed: 1 }; }
   { const t0 = AGE.st === 'fallen' ? 0 : 1; Rr.goal = t0; restoreSet(Rr, t0); restoreRideSet(Rr, true); }
-  BATH.on = { R: Rr, pieces, ground, plantMs, g, O, bars: [], pool: [px, pz, pw, pd], ch, t: 0, shoji, smash, drone, valve, gey: 0, vT: 0 };
+  BATH.on = { towels, lad: mLad, coins: coinsU, R: Rr, pieces, ground, plantMs, g, O, bars: [], pool: [px, pz, pw, pd], ch, t: 0, shoji, smash, drone, valve, gey: 0, vT: 0 };
   arenaBeam(cx, cz, [.6, .85, 1], 1); snd('clang', { g: .6, r: .8 });
 }
-function bathStep(dt) { const B = BATH.on; if (!B) return; B.t += dt; const whole = !B.R || B.R.t >= 1; if (whole) bldJinraMotes(BATH.at[0], BATH.at[1], BATH.hw + 1, dt);
+function bathStep(dt) { const B = BATH.on; if (!B) return; B.t += dt; if (B.towels) for (let k = 0; k < B.towels.length; k++) B.towels[k].rotation.x = Math.sin(B.t * 2.4 + k * 1.3) * .22 + .1;     // RE-PASS 3: the laundry flaps
+  const whole = !B.R || B.R.t >= 1; if (whole) bldJinraMotes(BATH.at[0], BATH.at[1], BATH.hw + 1, dt);
   const p = player, A = BATH;
   for (const S of B.shoji) { if (S.torn) { S.t -= dt; if (S.t <= 0 && Math.hypot(p.pos.x - S.p.position.x, p.pos.z - S.zc) > 1.5) { S.torn = 0; S.paper.visible = true; } }
     const near = Math.hypot(p.pos.x - S.p.position.x, p.pos.z - S.zc) < A.shojiR, want = near ? 1 : 0;
@@ -23316,7 +23331,7 @@ function bathStep(dt) { const B = BATH.on; if (!B) return; B.t += dt; const whol
   { const [px, pz, pw, pd] = B.pool; if (whole && Math.abs(p.pos.x - px) < pw - .2 && Math.abs(p.pos.z - pz) < pd - .2 && p.pos.y < .6 && p.hp < HEALTH.max) p.hp = Math.min(HEALTH.max, p.hp + A.heal * dt); }
   if (whole && (B.sT = (B.sT || 0) - dt) <= 0) { B.sT = .12; const [px, pz, pw, pd] = B.pool; smokeAt(px + (Math.random() - .5) * pw * 1.8, .4, pz + (Math.random() - .5) * pd * 1.8, .9, 1.6, [.95, .95, .95]);
     if (Math.random() < .35) smokeAt(B.ch[0] + (Math.random() - .5) * .4, 8.4, B.ch[1] + (Math.random() - .5) * .4, 1.3, 2, [.4, .38, .36]); } }
-function bathClear() { const B = BATH.on; if (!B) return; if (B.R) { const i = RESTORE.list.indexOf(B.R); if (i >= 0) RESTORE.list.splice(i, 1); if (B.R.ride) { bldTrisDrop(B.R.ride.tb); bldTrisDrop(B.R.ride.tu); } } for (const o of B.ground || []) o.removeFromParent(); if (B.plantMs) plantDrop(B.plantMs); for (const S of B.shoji) { const i = BDYN.indexOf(S.box); if (i >= 0) BDYN.splice(i, 1); } smashDrop(B.smash); bldClear(B); BATH.on = null; }
+function bathClear() { const B = BATH.on; if (!B) return; for (const c of B.coins || []) { const i = COIN.list.indexOf(c); if (i >= 0) COIN.list.splice(i, 1); } if (B.lad) { const i = KCLIMB.indexOf(B.lad); if (i >= 0) KCLIMB.splice(i, 1); if (player.climb === B.lad) climbOff(); } if (B.R) { const i = RESTORE.list.indexOf(B.R); if (i >= 0) RESTORE.list.splice(i, 1); if (B.R.ride) { bldTrisDrop(B.R.ride.tb); bldTrisDrop(B.R.ride.tu); } } for (const o of B.ground || []) o.removeFromParent(); if (B.plantMs) plantDrop(B.plantMs); for (const S of B.shoji) { const i = BDYN.indexOf(S.box); if (i >= 0) BDYN.splice(i, 1); } smashDrop(B.smash); bldClear(B); BATH.on = null; }
 // m1158: THE FORGE-WORKSHOP (BUILDINGS.md #12, pass 1) at (31, 25). A tall open-fronted smithy shed facing the courtyard (-x): breakable back
 // and side walls (cwallBuild), a high curved roof; inside a great bronze FURNACE with a glowing mouth, its flue up through the roof (sparks
 // and smoke), an anvil and a quench trough, two GEARS turning on the back wall; and outside a slewing JIB CRANE whose hook carries a HIGH
