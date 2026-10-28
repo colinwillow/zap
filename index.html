@@ -67818,7 +67818,9 @@ function ghPathMat() { if (ghPathMat.m) return ghPathMat.m; const cv = document.
 // geometry has no UVs) and MULTIPLIES the existing colour by map / its own linear mean -- so the palette, the strata bands, the moss and the
 // FALLEN drain all stay what they were and the paint is the detail. 'land': sand on the flats, cliff on the steeps (by slope); 'rock': the rock
 // map. It goes in BEFORE `color_fragment`, so a drain spliced after it still has the last word. `HWPAINT.k` is the strength (0 = off)
-const HWPAINT = { k: .85, sand: { n: 'hollows_sand', s: 7, mean: [.8579, .2564, .0882] }, rock: { n: 'hollows_rock', s: 3.2, mean: [.485, .1559, .0497] }, cliff: { n: 'hollows_cliff', s: 12, mean: [.4453, .0731, .0466] }, pebble: { n: 'hollows_pebble', s: 3, mean: [.2112, .1599, .0906] } };
+const HWPAINT = { k: .85, sand: { n: 'hollows_sand', s: 7, mean: [.8579, .2564, .0882] }, rock: { n: 'hollows_rock', s: 3.2, mean: [.485, .1559, .0497] }, cliff: { n: 'hollows_cliff', s: 12, mean: [.4453, .0731, .0466] }, pebble: { n: 'hollows_pebble', s: 3, mean: [.2112, .1599, .0906] },
+  planks: { n: 'wood_planks', s: 2.2, mean: [.0648, .022, .016] }, timber: { n: 'wood_timber', s: 1.6, mean: [.1474, .0826, .0409] }, stone: { n: 'stone_blocks', s: 2.4, mean: [.1351, .1359, .1267] } };
+// pass 3: the texture library's planks / timber / stone by the same rule (the bridges, poles, the stone lanterns), and the caves and sky islands
 // pass 2: kinds 'cliff' (triplanar cliff: the ledge paths' retaining faces), 'sand' (the walkways), and on 'land' the PEBBLE bed below the waterline
 function hwPaint(mat, kind) { if (!HWPAINT.k) return mat; const P = HWPAINT, ob = mat.onBeforeCompile, ok = mat.customProgramCacheKey, land = kind === 'land', A1 = land ? P.cliff : P[kind] || P.rock;
   mat.onBeforeCompile = function (sh, r) { if (ob) ob.call(this, sh, r);
@@ -68939,7 +68941,7 @@ function gmillBuild() {
   const quad = (a, b, d, e) => { for (const q of [a, b, d, a, d, e]) tris.push(cx + q[0], q[1], cz + q[2]); };
   const rod = (a, b, r, m, round) => { const d = new THREE.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]), L = d.length(); put(round ? new THREE.CylinderGeometry(r, r, L, 6) : new THREE.BoxGeometry(r, L, r), m, _m4.compose(new THREE.Vector3((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2), _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()), _one)); };
   const NC = { noCam: 1 }, gH = (x, z) => rwHeight(cx + x, cz + z);
-  const wood = triMat('wood_timber', { scale: 1.6, rough: .85 }), woodP = triMat('wood_planks', { scale: 2.2, rough: .85 }), stone = triMat('stone_blocks', { scale: 2.4, rough: .9 }), plaster = triMat('sandstone', { scale: 4.5, rough: .92 }), bronze = triMat('bronze', { scale: 1.2, metal: .75, rough: .35 });
+  const wood = triMat('wood_timber', { scale: 1.6, rough: .85 }), woodP = triMat('wood_planks', { scale: 2.2, rough: .85 }), stone = triMat('stone_blocks', { scale: 2.4, rough: .9, color: 0xe6aa84 }), plaster = triMat('sandstone', { scale: 4.5, rough: .92 }), bronze = triMat('bronze', { scale: 1.2, metal: .75, rough: .35 });
   for (const m of [wood, woodP, stone, plaster, bronze]) m.userData.tri = 1;
   const iron = new THREE.MeshStandardMaterial({ color: 0x2c2724, metalness: .6, roughness: .5 }), red = new THREE.MeshStandardMaterial({ color: 0xb8402c, roughness: .7 }), sand = new THREE.MeshStandardMaterial({ color: 0xe2b98a, roughness: 1 });
   const rockM = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .93 }); rockM.userData.strata = 1; hwPaint(rockM, 'rock');
@@ -69369,7 +69371,7 @@ function hollowDress() {
   { const dark = [], rim = []; for (const [z, side] of [[-30, -1], [18, -1], [-55, 1], [40, 1], [95, -1]]) { const x = wallX(z, side, 1.5), y = rwHeight(x, z) - .3, ry = side < 0 ? Math.PI / 2 : -Math.PI / 2;     // m1114: the cave at 70 moved to 95, out of the west path's foot
       const a = new THREE.CircleGeometry(3, 18, 0, Math.PI); a.scale(1, 1.3, 1); a.rotateY(ry); a.translate(x - side * .3, y, z); dark.push(a);
       const t = new THREE.TorusGeometry(3.1, .5, 6, 16, Math.PI); t.scale(1, 1.3, 1); t.rotateY(ry); t.translate(x - side * .2, y, z); rim.push(t); }
-    rwMesh(dark, new THREE.MeshBasicMaterial({ color: 0x120806, side: THREE.DoubleSide }), false); rwMesh(rim, hwPaint(rwMat(0x9a4e34), 'rock')); }
+    rwMesh(dark, hwPaint(rwMat(0x2a120a, { side: THREE.DoubleSide, roughness: 1 }), 'rock'), false); rwMesh(rim, hwPaint(rwMat(0x9a4e34), 'rock')); }
   // ROPE BRIDGES across the canyon, high up, sagging; banners hang from them
   const ban = [], banM = new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 });
   { const plank = [], rope = []; for (const [z, y0] of [[-24, 15], [32, 21]]) { const xa = hwWallAt(z, -1, y0 + .3, -1.2), xb = hwWallAt(z, 1, y0 + .3, -1.2), N = Math.max(12, Math.round(Math.abs(xb - xa) / .62)), sag = Math.abs(xb - xa) * .07;     // anchored IN the wall at its height
@@ -69381,13 +69383,13 @@ function hollowDress() {
       for (const side of [-1, 1]) hwPath(side, z, y0, z < 0 ? -1 : 1);     // m1114: a ledge path up the wall to each end
       for (const off of [-1.05, 1.05]) for (const dy of [.1, 1.1]) for (let i = 0; i < N; i++) { const [x0, ya] = at(i / N), [x1, yb] = at((i + 1) / N); rope.push(x0, ya + dy, z + off, x1, yb + dy, z + off); }
       for (const u of [.3, .5, .7]) { const [x, y] = at(u); const bg = new THREE.PlaneGeometry(1.4, 2.8); bg.translate(0, -1.4, 0); const bm = new THREE.Mesh(bg, banM); bm.position.set(x, y, z + 1.1); scene.add(bm); ban.push({ m: bm, ph: r() * 6 }); } }
-    rwMesh(plank, rwMat(0x6e4a2e)); const rg = new THREE.BufferGeometry(); rg.setAttribute('position', new THREE.Float32BufferAttribute(rope, 3));
+    rwMesh(plank, hwPaint(rwMat(0x6e4a2e), 'planks')); const rg = new THREE.BufferGeometry(); rg.setAttribute('position', new THREE.Float32BufferAttribute(rope, 3));
     const rl = new THREE.LineSegments(rg, new THREE.LineBasicMaterial({ color: 0x3a2a1c })); rl.frustumCulled = false; scene.add(rl); }
   // BANNER POLES by the hut and along the west floor
   { const pole = []; for (const [x, z] of [[H.hut.at[0] - 6 * (H.hutS || 1), H.hut.at[1] + 5 * (H.hutS || 1)], [H.hut.at[0] + 6 * (H.hutS || 1), H.hut.at[1] + 5 * (H.hutS || 1)], [-4, 22], [-12, -26]]) { const y = rwHeight(x, z);
       pole.push(Cy(.1, .12, 6, x, y + 3, z, 6), B(1.8, .12, .12, x, y + 5.8, z)); const bg = new THREE.PlaneGeometry(1.5, 3.2); bg.translate(0, -1.6, 0); const bm = new THREE.Mesh(bg, banM); bm.position.set(x, y + 5.7, z + .08); scene.add(bm); ban.push({ m: bm, ph: r() * 6 });
       BOXES.push({ minx: x - .25, maxx: x + .25, miny: -2, maxy: y + 6, minz: z - .25, maxz: z + .25 }); }
-    rwMesh(pole, rwMat(0x4a3424)); }
+    rwMesh(pole, hwPaint(rwMat(0x4a3424), 'timber')); }
   H.banners = ban;
   // BRONZE GEARS set in the walls, turning
   { const gm = rwMat(0xb07a3a, { metalness: .75, roughness: .38 }), gears = [];
@@ -69404,12 +69406,12 @@ function hollowDress() {
       if (r() < .7) { const f = new THREE.PlaneGeometry(s * .25, y * 1.1); f.translate(x + s * .7, y - y * .55, z); f.rotateY(0); fall.push(f); } }
     // his (after m1704): fallen and restored read as a HYBRID -- these sky islands floated over a fallen valley. KORAJIN: the floating world is
     // what RESTORATION raises, so FALLEN has none
-    const sky = AGE.st !== 'fallen'; rwMesh(isl, rwMat(0xb7744e, { flatShading: true })).visible = sky; rwMesh(top, rwMat(0x5f8a45)).visible = sky; if (fall.length) { const fm = rwMesh(fall, new THREE.MeshBasicMaterial({ color: 0xeaf6ff, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false }), false); fm.renderOrder = 3; fm.visible = sky; } }
+    const sky = AGE.st !== 'fallen'; rwMesh(isl, hwPaint(rwMat(0xb7744e, { flatShading: true }), 'cliff')).visible = sky; rwMesh(top, hwPaint(rwMat(0x5f8a45), 'sand')).visible = sky; if (fall.length) { const fm = rwMesh(fall, new THREE.MeshBasicMaterial({ color: 0xeaf6ff, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false }), false); fm.renderOrder = 3; fm.visible = sky; } }
   // HIS STONE LANTERNS on the approach
   { const st = [], lit = []; for (const [dx, dz] of [[9, -3.2], [9, 3.2], [6.2, -3.2], [6.2, 3.2]]) { const x = H.hut.at[0] + dx + (H.hutS ? 0 : 0), z = H.hut.at[1] + dz * (H.hutS || 1), y = rwHeight(x, z);     // in front of the door (the hut faces the river, +x)
       st.push(B(.9, .3, .9, x, y + .15, z), Cy(.16, .2, 1.1, x, y + .85, z, 6), B(.7, .18, .7, x, y + 1.45, z), B(1.05, .2, 1.05, x, y + 2.2, z), Cy(.0, .62, .45, x, y + 2.5, z, 4));
       lit.push(B(.5, .5, .5, x, y + 1.8, z)); BOXES.push({ minx: x - .45, maxx: x + .45, miny: -2, maxy: y + 2.6, minz: z - .45, maxz: z + .45 }); }
-    rwMesh(st, rwMat(0x9b8b78, { roughness: .95 })); rwMesh(lit, new THREE.MeshStandardMaterial({ color: 0xffd8a0, emissive: 0xffa040, emissiveIntensity: 2.2 }), false); }
+    rwMesh(st, hwPaint(rwMat(0x9b8b78, { roughness: .95 }), 'stone')); rwMesh(lit, new THREE.MeshStandardMaterial({ color: 0xffd8a0, emissive: 0xffa040, emissiveIntensity: 2.2 }), false); }
 }
 function homeDress() {
   const H = HOME, at = (x, z) => [x, rwHeight(x, z), z], B = (w, h, d, x, y, z, ry = 0, rx = 0) => { const g = new THREE.BoxGeometry(w, h, d); if (rx) g.rotateX(rx); g.rotateY(ry); g.translate(x, y, z); return g; };
