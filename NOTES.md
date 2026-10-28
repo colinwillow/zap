@@ -14,6 +14,14 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - **Sentries:** a robot sentry standing on a fallen segment (`R.cls(P.x)`) drops into its `fall` state and does not climb back while its
   post segment is down. The old fall drifted it 2 m/s in -z for the whole 20 s respawn (40 m); it only drifts while airborne now.
 Render-checked headless (outer face, walk). Shipped unverified. **The Rampart's three passes are done; next in the table: Airship Dock (a flyer).**
+## m15xx -- The First Beacon pass 4: the AUDIT (headroom, pillars, fall-forward ladders)
+`beaconBuild` now checks its own output after the canyon is placed (`L.audit`, and the build line says `headroom ok`):
+- **HEADROOM:** nothing may sit in the 2.2 m over any walking surface (every slab top, raised landing and station is tagged `top`). First run found
+  9 BAD, all over B: the A -> B leg came south down x 67.5 into the court's north side, which is exactly the line the wall-jump climb B -> C leaves
+  on, so the climb's chimney walls stood on the walkway in. A -> B now goes south first and comes in from the EAST. Then 1 BAD: Z -> T forced x-first
+  for a 7.5 m leg, so the corner pad sat against Z and the chimney's wall clipped Z's edge; it goes north first now. 0 BAD.
+- **PILLARS stand ON a lower walkway, never through it:** a slab's pillar starts at the top of any walkway already under it (the crossing over A).
+- **FAIL FORWARD:** every walkway over 2 m gets a ladder from the canyon floor within `BEACON.ladderR` (16 m) of it, on its long side; 12 added, 18 in all.
 
 ## m1558 -- THE RE-PASS: the RAMPART WALL, pass 2 (DESTRUCTIBLE TO THE GROUND)
 **Moves:** its breakable row (ENEMY RULES: for destroying). The Gatehouse's machinery: one rig per piece, run backwards.
