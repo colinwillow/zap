@@ -29,7 +29,7 @@ dragon into a level (the WHOLE-PIECE RULE).
       drops); run off any edge and he glides; he lands on whatever is under him (meadow, dais, crag, the six islands) and rides on from there.
       Get off only on the meadow. **No fly clip in his file**: `attack_air` is his base pose aloft and his wing fingers are fanned and beaten in
       code (TOOLS > DRAGON WINGS: CODE / CLIP). *Open: his feel of it, and his fly cycle.*
-- [ ] **5. Attacks** (mDRG): the RIGHT FLICK breathes a fireball (the m1096 look) from his head along his forward (`attack_ground` on the ground,
+- [ ] **5. Attacks** (m1621): the RIGHT FLICK breathes a fireball (the m1096 look) from his head along his forward (`attack_ground` on the ground,
       the ball leaving partway in; aloft at once); the RIGHT PAD HELD UP fires Grumbo's blaster from the saddle toward the middle of the
       screen; 12 archery butts on posts and ropes over the meadow, the crag, four islands and by the hoops burst when hit and come back.
       *Open: his feel of it.*

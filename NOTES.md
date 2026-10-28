@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## mDRG -- THE DRAGON RIDE, build 5: ATTACKS (DRAGON.md box 5)
+## m1621 -- THE DRAGON RIDE, build 5: ATTACKS (DRAGON.md box 5)
 - **His breath** (`dragBreath` on the right flick in the saddle; `fbCool` .6 s): on the ground `attack_ground` plays once (weighted in over
   idle / run, `wA`, still summing to 1) and the ball leaves `breathAt` .38 into it; aloft (`attack_air` already playing) it leaves at once.
   `dragFire`: from `Bip001_Head` + .14 H along his forward (his pitch aloft, -.12 rad on the ground), `fbV` 34 m/s + his own speed, falling at
