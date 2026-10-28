@@ -26,6 +26,58 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 - [ ] serpent-dragon (not built)
 
 
+## THE RE-PASS: EVERY FORGE BUILDING IN THE NEW STYLE AND THE NEW RULES (his, Oct 28 2026 -- Worker A)
+> *"Redesign the buildings we already made -- embellish them, a detail pass to make them read in game with our new style, and follow the game rules
+> of layer one, layer two, layer three. Towers: how do you get up? Is there a fun dynamic to each? Breakable buildings, or roofs with a skeleton
+> that break. Can you hang on the rims? Bars at the bottom of some places where you can flip up to the second deck. Do the ladders make sense?
+> Do the doors break or open?"*
+
+**The rubric, every building, every pass** (tick in its row with the build number; Colin signs the last box on his phone):
+1. **Style:** ARCHITECTURE.md (the hero kit for his places; classical for heritage; the enemy grammar for enemy places) and the shared kits: `triMat`, `kor*`, the plant library, coins, the Jin glow (mint ONLY for Jin).
+2. **Verticality (CLAUDE.md, the planes rule):** tiers, not a single ground plane. Every building answers **"how do you get UP"**, and the answer is fun: bars to flip to the next deck, rims and ledges to hang on, wall runs, ladders that sit where a person would use them, ramps or stairs at his step (.32 m risers or less).
+3. **Layers (LEVELDESIGN.md):** L1 the run (the parkour line through it, timed to the move table), L2 a puzzle or key (a lock, a lever, a door), L3 enemies with zones (who stands where, what they guard).
+4. **Breakable and alive:** doors open or break; roofs have a SKELETON (rafters and beams) so a broken roof reads; something to smash; lanterns, cloth and smoke moving.
+5. **Detail and embellishment:** silhouettes that read from the game camera, plants and rocks round the base, signs of use.
+6. **Budget:** about 40 draws per building (merge per material), no new physics, `npm run check` clean.
+
+**The buildings** (SPAWN > BUILDINGS), at least 3 passes each:
+| building | p1 | p2 | p3 | his OK |
+|---|---|---|---|---|
+| Dojo Hall |  |  |  |  |
+| Watchtower |  |  |  |  |
+| Gatehouse |  |  |  |  |
+| Pagoda |  |  |  |  |
+| Great Red Pagoda |  |  |  |  |
+| Shrine |  |  |  |  |
+| Market Stalls |  |  |  |  |
+| Rampart Wall |  |  |  |  |
+| Airship Dock |  |  |  |  |
+| Zeppelins |  |  |  |  |
+| Flying Ship House |  |  |  |  |
+| Bathhouse |  |  |  |  |
+| Forge-Workshop |  |  |  |  |
+| Spider-Bot Hangar |  |  |  |  |
+| Sky Bridges |  |  |  |  |
+| Cliff Lodge |  |  |  |  |
+| Moated Keep |  |  |  |  |
+| Robot Barracks |  |  |  |  |
+| Jin Lighthouse |  |  |  |  |
+| Floating Islands |  |  |  |  |
+| Ninja Pillars |  |  |  |  |
+| Senbon Torii |  |  |  |  |
+| Siege Yard |  |  |  |  |
+| Teahouse Garden |  |  |  |  |
+| Kneeling Colossus |  |  |  |  |
+| Oni Gate |  |  |  |  |
+| Jin Observatory |  |  |  |  |
+| Lantern Festival Street |  |  |  |  |
+| White Heron Castle |  |  |  |  |
+| The Courtyard |  |  |  |  |
+| Mega Wall |  |  |  |  |
+| Sky Wreck |  |  |  |  |
+| Octagonal Block Pagoda |  |  |  |  |
+| Timber Siege Fort |  |  |  |  |
+
 ## THE DOJO (his, after m1390) -- the arena becomes the floating samurai dojo; many passes
 
 > *"Start making the arena the dojo, more in line with the game aesthetic: our texture maps, our architecture -- take reference from his home and the
