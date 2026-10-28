@@ -26106,8 +26106,10 @@ function gpagBuild(opt) {     // m1307: `opt.at` / `opt.court` -- the courtyard 
   // furniture, the ladders' rungs. The pavilion and the fence move OUT with it but keep their own size. Inside the courtyard it stays x1
   // until the court itself is rescaled (it would hit the court walls).
   opt = opt || {}; if (GPAG.on) return; const S = opt.court ? (opt.scale || 1) : GPAG.scale, A = S === 1 ? GPAG : Object.assign({}, GPAG, { hb0: GPAG.hb0 * S, shrink: GPAG.shrink * S, sh: 5.7, balc: GPAG.balc * S, eave: GPAG.eave * S, door: 2.4, doorH: 3.4, lift: GPAG.lift * S }), [cx, cz] = opt.at || A.at, g = new THREE.Group(); scene.add(g); const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [];
-  const lac = new THREE.MeshStandardMaterial({ color: 0xb3261c, roughness: .42 }), lacD = new THREE.MeshStandardMaterial({ color: 0x7e1913, roughness: .5 }), floorM = new THREE.MeshStandardMaterial({ color: 0x4a3324, roughness: .8 });
-  const gold = new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .85, roughness: .3 }), stone = new THREE.MeshStandardMaterial({ color: 0x9a948c, roughness: .95 }), plaster = new THREE.MeshStandardMaterial({ color: 0xece4d4, roughness: .9 });
+  // RE-PASS 1 (m@X4@): CLASSICAL HERITAGE in our painted maps -- the lacquer kept bright, painted timber floors, painted roof tiles, a
+  // sandstone plinth and plaster; the altar core in JINRA mint; plants round the fence; FALLEN / RESTORED (`bldAge`, the motes)
+  const K = korMats(), lac = new THREE.MeshStandardMaterial({ color: 0xb3261c, roughness: .42 }), lacD = new THREE.MeshStandardMaterial({ color: 0x7e1913, roughness: .5 }),     /* the lacquer stays bright: a red tint over the plank map read maroon */ floorM = triMat('wood_timber', { scale: 2, color: 0xb08a70 });
+  const gold = new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .85, roughness: .3 }), stone = K.cream, plaster = triMat('sandstone', { scale: 3, color: 0xfaf2e6 });
   const lamp = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false });
   const paperLit = new THREE.MeshStandardMaterial({ color: 0xf4e6c8, emissive: 0xffa050, emissiveIntensity: .55, roughness: .9 });     // m1272: the windows glow from inside
   let flushed = 0;     // pass 10: every plain box goes into the per-material buckets too -- the whole tower is a handful of draws
@@ -26122,7 +26124,7 @@ function gpagBuild(opt) {     // m1307: `opt.at` / `opt.court` -- the courtyard 
   const mbox = (x0, x1, y0, y1, z0, z1, m) => mg(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), m, _m4.makeTranslation((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2));
   const mrod = (A0, B0, r, m) => { const a = new THREE.Vector3(...A0), b = new THREE.Vector3(...B0), d = b.clone().sub(a), L = d.length(); _q.setFromUnitVectors(_up, d.normalize());
     mg(new THREE.CylinderGeometry(r, r, L, 6), m, _m4.compose(a.add(b).multiplyScalar(.5), _q, new THREE.Vector3(1, 1, 1))); };
-  const tileD = new THREE.MeshStandardMaterial({ color: 0x46524e, roughness: .6, metalness: .2 });
+  const tileD = triMat('roof_tiles', { scale: 1.6, rough: .55, color: 0xa8b4b0 });
   const sides = [opt.door || '-x', '+x', '-z', '+z', '+x'];     // the door of each storey (ground: toward the forge's middle)
   const corners = [[1, 1], [-1, 1], [-1, -1], [1, -1], [1, 1]];     // each storey's ladder corner (turning as it climbs)
   // the stone plinth and two steps
@@ -26262,7 +26264,7 @@ function gpagBuild(opt) {     // m1307: `opt.at` / `opt.court` -- the courtyard 
   const zip = { A: [cx - .6, sy + .2, cz], B: opt.zipTo || [cx - 12.5 * S + 1, 2, cz + 3.4] }; ZIPS.push(zip);
   { const c = new THREE.Mesh(new THREE.TubeGeometry(new THREE.LineCurve3(new THREE.Vector3(...zip.A), new THREE.Vector3(...zip.B)), 10, .04, 5), gold); g.add(c); }
   // the GROUND SHRINE inside: an altar with a glowing Jin core
-  box(cx + 1.6, cx + 3, 0, .9, cz - 1, cz + 1, lacD, 1); const core = new THREE.Mesh(new THREE.SphereGeometry(.3, 14, 10), new THREE.MeshBasicMaterial({ color: 0x5ff2ff, toneMapped: false })); core.position.set(cx + 2.3, 1.3, cz); g.add(core);
+  box(cx + 1.6, cx + 3, 0, .9, cz - 1, cz + 1, lacD, 1); const core = new THREE.Mesh(new THREE.SphereGeometry(.3, 14, 10), new THREE.MeshBasicMaterial({ color: 0x6dffc0, toneMapped: false })); core.position.set(cx + 2.3, 1.3, cz); g.add(core);
   bldTris(O, tris);
   for (const b of O.boxes) if (!BOXES.includes(b)) BOXES.push(b); boxGrid();
   // ---- PASS 7 (m1272): THE LIGHT -- the paper windows glow warm from inside (`paperLit`), every eave lantern gets a soft HALO (one
@@ -26306,9 +26308,14 @@ function gpagBuild(opt) {     // m1307: `opt.at` / `opt.court` -- the courtyard 
       for (const sz of [-1, 1]) { if (GPAG.on !== G0 || opt.court) return; const x = cx - 12.5 * S + 1.9, z = cz + sz * 2.6, d = bodySpawn(K.P, K, x, z, 0); arenaKatana(d, AK); d.horde = 1; d.aggro = 0; d.hp = d.hpMax = 40; d.gap = 1; d.h = -Math.PI / 2;
         HORDE.list.push(d); G0.guards.push(d); } } catch (e) { console.error('[melee] pagoda guards', e); } })(); }
   for (const [m, list] of MG) { const geo = mergeGeometries(list); const o = new THREE.Mesh(geo, m); o.castShadow = true; o.receiveShadow = true; g.add(o); } flushed = 1;     // the buckets, one draw each (pass 10: at the very end, every box in them)
+  if (!opt.court) { const rec = []; let sd = 17; const rnd = () => (sd = sd * 16807 % 2147483647) / 2147483647, R0 = A.hb0 + 9;
+    for (let k = 0; k < 40; k++) { const a2 = rnd() * 6.283, d = R0 + rnd() * 9, x = cx + Math.cos(a2) * d, z = cz + Math.sin(a2) * d;
+      const q = rnd(), kd = q < .3 ? 'grass' : q < .46 ? 'fern' : q < .6 ? 'stones' : q < .74 ? 'boulder' : q < .88 ? 'flowers' : q < .95 ? 'cherry' : 'pine'; plantPlant(rec, kd, x, 0, z, kd === 'cherry' || kd === 'pine' ? .6 : .8 + rnd() * .6, rnd() * 6.283); }
+    plantFlush(g, rec); }
+  if (AGE.st === 'fallen') { core.visible = false; GPAG.on.fallen = 1; } bldAge(g);
   arenaBeam(cx, cz, [1, .45, .3], 1); snd('clang', { g: .7, r: .6 });
 }
-function gpagStep(dt) { const G = GPAG.on; if (!G) return; G.t += dt; G.core.position.y = 1.3 + Math.sin(G.t * 1.7) * .08;
+function gpagStep(dt) { const G = GPAG.on; if (!G) return; G.t += dt; bldJinraMotes(G.at[0], G.at[1], G.A.hb0 + 2, dt); G.core.position.y = 1.3 + Math.sin(G.t * 1.7) * .08;
   // m1297: *"There are doors I can't break down or go through -- the guys are behind them and can't get out. They should open, or at least break
   // down."* The gate doors now OPEN for anyone who comes near them (him from either side, or a guard on his way out -- `GPAG.gateR`), as
   // well as for the gong; and they BREAK (`gpagGateHit`: `gateHp` blows from a blade, a rocket, the whirlwind) -- splinters and smoke, the

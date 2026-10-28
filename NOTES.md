@@ -352,6 +352,19 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
+## THE RE-PASS: THE GREAT RED PAGODA, PASS 1 -- PAINTED MAPS AND BOTH STATES (m@X4@, WORKER A)
+
+Classical heritage like the Pagoda; it was already batched (its pass 10 put every plain box in per-material buckets), so this pass is materials,
+ground and the two states.
+
+- **Style:** painted timber floors (`triMat('wood_timber')`), painted ROOF TILES on every eave (`tileD`), a sandstone plinth (`K.cream`) and
+  sandstone plaster. The altar core is JINRA mint. **The lacquer stays the plain bright red:** a red tint over the plank map was tried and read
+  MAROON (the plank map is brown), which kills the "Great Red".
+- **Ground:** 40 plants outside the fence (grass, ferns, stones, boulders, flowers, a few cherries and pines); none inside the courtyard version.
+- **Fallen / restored:** `bldAge` when fallen (the red fades to a dusty rose, the tiles go grey, the core is hidden); mint motes off the plinth
+  when restored. Its own ruin (the roofs and gate) is pass 2.
+- **Measured headless:** 138 draws (131 before; the plants add 7). Not signed off.
+
 ## THE RE-PASS: FALLEN / RESTORED -- ONE BUILD, TWO STATES (m1501, WORKER A)
 
 His: *"Yeah, because it goes along with the storyline"* (KORAJIN.md, THE RESTORATION: every place starts FALLEN -- a Western frontier over
