@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the ROBOT BARRACKS, pass 3 (THE YAGURA) -- its third pass, DONE
+## m1664 -- THE RE-PASS: the ROBOT BARRACKS, pass 3 (THE YAGURA) -- its third pass, DONE
 - How you get UP (and L3): a black YAGURA (watch tower) 11.5 m west of the hall's centre off the yard's north-west corner, clear of the
   dummies, the cables and the braziers. Four lacquer legs with gold bands and two tiers of cross ties, a 2.9 m plank deck at 5 m, rails on
   three sides (the yard side open for the ladder), corner posts up to a black-tile hip roof with a gold finial, a mint lantern hung under
