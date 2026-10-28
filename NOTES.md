@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the GATEHOUSE, pass 1 (an ENEMY gate: the look)
+## m1529 -- THE RE-PASS: the GATEHOUSE, pass 1 (an ENEMY gate: the look)
 The Gatehouse is on the ENEMY list, so it gets ENEMY_STYLE.md's "FORTIFIED GATE" and is never restored. **Moves:** its pass-1 row (the look).
 - Palette through `enemyMats()` only: black lacquer timber, upper storeys and torii; `E.iron` for the old black; a dark plank triMat for the
   deck and ramps; gold where the cyan neon was (trim on the timber bands, studs on the front corner posts, the kasagi edge); mint `E.glass`
