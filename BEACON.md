@@ -21,8 +21,8 @@ then the level is GENERATED from `BEACON.plan` in index.html.
 - [ ] verticality and spread checked from a wide render (no one plane)
 - [~] a canyon to stand in (m1555, part 1): 222 stepped sandstone mesas on an 8 m lattice, never within 8 m of the route or under a zip; near ones are shoulders below the route's height, the outer ring (wider than the lattice) closes into canyon WALLS 26-50 m. Open: a canyon material (the sandstone reads spongy up close), carved shapes rather than boxes
 - [ ] the four beats of the wall jump feel right (taught safe, developed, twisted, concluded)
-- [x] fail forward (m15xx): every walkway over 2 m has a ladder from the floor within 16 m (`ladderR`); 12 added by the audit, 18 in all
-- [x] headroom (m15xx): the audit checks the 2.2 m over every walking surface -- found the drop into the court and the wall-jump climb sharing one line north of B, and the finale chimney's wall on the zip landing's edge; both re-routed, now 0
+- [x] fail forward (m1562): every walkway over 2 m has a ladder from the floor within 16 m (`ladderR`); 12 added by the audit, 18 in all
+- [x] headroom (m1562): the audit checks the 2.2 m over every walking surface -- found the drop into the court and the wall-jump climb sharing one line north of B, and the finale chimney's wall on the zip landing's edge; both re-routed, now 0
 - [ ] rests and checkpoints at the stations
 - [ ] **his sign-off on his phone**
 

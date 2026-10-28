@@ -26388,7 +26388,7 @@ BEACON.sheet = { k: 1.5, st: [     // `k`: the sheet's metres are ~2/3 of what t
     { id: 'T', name: 'THE BRAZIER', g: [97, 22], R: 10, want: 40, brazier: 1 } ],
   runs: [
     { c: ['hop', 'ledge:3.3', 'ledge:3.3', 'gap_dbl', 'ledge:2.4'], first: 'z' },     // S->A teach: hop, jump-and-catch, the double; +9
-    { c: ['drop:5'], first: 'z' },     // A->B the drop into the court (one way); south first, in from the EAST, so it never shares the climb's line north of B (m15xx audit)
+    { c: ['drop:5'], first: 'z' },     // A->B the drop into the court (one way); south first, in from the EAST, so it never shares the climb's line north of B (m1562 audit)
     { c: ['chim:4', 'chimney', 'hop', 'chim:8'] },     // B->C THE BIG CLIMB: the wall jump in four beats, +20
     { c: ['gap_dbl', 'ledge:4'], first: 'x' },     // C->D the rooftops, +4
     { c: ['zip', 'drop:6'], first: 'z' },     // D->Z zip line 1 down the canyon to the east (28 -> 14)
@@ -26417,7 +26417,7 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
     for (const d of DIRS) { if (cur && d[0] === -cur[0] && d[1] === -cur[1]) continue; const v = d[0] * dx + d[1] * dz; if (v > bv) { bv = v; best = d; } } return best; };
   const kit = (P) => { const F = chunkFrame(P, put, O); return { ...F, M, O, slab: (u0, u1, y, from) => { if (from !== undefined) { F.B(u0, u1, -2.5, 2.5, 0, y, M.wall, 1); O.boxes[O.boxes.length - 1].top = 1; F.B(u0, u1, -2.5, 2.5, y - .3, y + .02, M.land, 0); return; }
       F.B(u0, u1, -2.5, 2.5, y - .5, y, M.land, 1); O.boxes[O.boxes.length - 1].top = 1; const t = Math.max(0, y - .5);
-      if (t > .1) { const a = F.W((u0 + u1) / 2, 0); let y0 = 0; for (const b of O.boxes) if (b.top && b.maxy < t - .1 && a[0] > b.minx - .5 && a[0] < b.maxx + .5 && a[1] > b.minz - .5 && a[1] < b.maxz + .5) y0 = Math.max(y0, b.maxy);     /* m15xx: a pillar over a lower walkway STANDS on it, never through it */
+      if (t > .1) { const a = F.W((u0 + u1) / 2, 0); let y0 = 0; for (const b of O.boxes) if (b.top && b.maxy < t - .1 && a[0] > b.minx - .5 && a[0] < b.maxx + .5 && a[1] > b.minz - .5 && a[1] < b.maxz + .5) y0 = Math.max(y0, b.maxy);     /* m1562: a pillar over a lower walkway STANDS on it, never through it */
         F.B((u0 + u1) / 2 - .5, (u0 + u1) / 2 + .5, -.5, .5, y0, t, M.slab, 1); O.boxes[O.boxes.length - 1].pil = 1; } },
     bar: (u, y) => { const w = F.W(u, 0), B2 = hbarMake(w[0], w[1], 0, y - .3, 1); HBAR.list.push(B2); bars.push(B2); },
     ladder: (u, y, R) => { const w = F.W(u, 0), Lc = kitClimbAdd({ minx: w[0] - .4, maxx: w[0] + .4, miny: y, maxy: y + R, minz: w[1] - .15, maxz: w[1] + .15 }, 'beacon_ladder', y + R); const t = F.W(u + 2.5, 0); Lc.mark = { x: t[0], y: y + R, z: t[1] }; climbs.push(Lc); put(new THREE.BoxGeometry(.8, R, .12).translate(w[0], y + R / 2, w[1]), M.step); },
@@ -26476,7 +26476,7 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
       for (let k = 0; k < tiers; k++) { const th = k === tiers - 1 ? h - y : h * (k ? .3 : .5) * (.8 + R() * .3); put(new THREE.BoxGeometry(ww, th, wd).translate(jx, y + th / 2, jz), (k + n) % 2 ? M2 : M.mesa);
         O.boxes.push({ minx: jx - ww / 2, maxx: jx + ww / 2, miny: y, maxy: y + th, minz: jz - wd / 2, maxz: jz + wd / 2 }); y += th; ww *= .72 + R() * .12; wd *= .72 + R() * .12; } n++; }
     L.mesas = n; }
-  // m15xx: THE AUDIT (pass 4). HEADROOM: nothing may sit in the 2.2 m over any walking surface (a crossing's pillar, a mesa). FAIL FORWARD: every
+  // m1562: THE AUDIT (pass 4). HEADROOM: nothing may sit in the 2.2 m over any walking surface (a crossing's pillar, a mesa). FAIL FORWARD: every
   // walkway over 2 m up gets a ladder from the floor within `ladderR` of it, so a fall costs a climb, never the run. Both logged; `mel.BEACON.on.audit`.
   { const tops = O.boxes.filter(b => b.top), bad = []; for (const t of tops) { const y0 = t.maxy + .05, y1 = t.maxy + 2.2;
       for (const b of O.boxes) { if (b === t || b.maxy <= y0 || b.miny >= y1) continue; const ux = Math.min(t.maxx, b.maxx) - Math.max(t.minx, b.minx), uz = Math.min(t.maxz, b.maxz) - Math.max(t.minz, b.minz);
