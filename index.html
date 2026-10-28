@@ -22623,16 +22623,20 @@ const FSHIP = { at: [0, -60], canR: 28, canEvery: 4.5, canHp: 4, canFix: 20, dec
 function fshipBuild() {
   if (FSHIP.on) return; const A = FSHIP, [cx, cz] = A.at, Y = A.deck, L = A.len, W = A.hw, g = new THREE.Group(), vis = new THREE.Group(); scene.add(g); g.add(vis);
   const O = { meshes: [], boxes: [], walls: [] }, tris = [];
-  const wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 }), hullM = new THREE.MeshStandardMaterial({ color: 0x4a3222, roughness: .75 }), plank = new THREE.MeshStandardMaterial({ color: 0x6e4a2e, roughness: .85 });
-  const verm = new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .45 }), plaster = new THREE.MeshStandardMaterial({ color: 0xeae6de, roughness: .9 }), bronze = new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 });
-  const lamp = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false }), glow = new THREE.MeshBasicMaterial({ color: 0x5ff2ff, toneMapped: false });
-  const add = (geo, m, x, y, z, solid, par) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; (par || vis).add(o);
+  // m@X4@ (the RE-PASS, pass 1): a HERO flyer -- the hero kit in painted maps (timber, warm planks, a dark planked hull, the kit red and bronze),
+  // warm plaster, and its engines burn JINRA mint (they are Jin engines); statics merge (`mg`, the hull's picture bobs as one)
+  const K = korMats(), wood = K.timber, hullM = triMat('wood_planks', { scale: 1.8, color: 0x8a5a44 }), plank = triMat('wood_planks', { scale: 2.2, color: 0xc8a68a });
+  const verm = K.redL, plaster = new THREE.MeshStandardMaterial({ color: 0xf3ead8, roughness: .9 }), bronze = K.bronze;
+  const lamp = K.lamp, glow = new THREE.MeshBasicMaterial({ color: 0x7affd8, toneMapped: false });
+  const add = (geo, m, x, y, z, solid, par) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; (par || vis).add(o);
     if (solid) { geo.computeBoundingBox(); const b = geo.boundingBox; O.boxes.push({ minx: x + b.min.x, maxx: x + b.max.x, miny: y + b.min.y, maxy: y + b.max.y, minz: z + b.min.z, maxz: z + b.max.z }); } return o; };
   // THE HULL: a side profile (flat deck line, upswept bow and a taller stern), extruded across the beam
   { const sh = new THREE.Shape(); const P = [[-L, Y], [L, Y], [L + 1.7, Y + 2.4], [L + .4, Y - 1.8], [6, Y - 2.8], [-6, Y - 2.8], [-L - .3, Y - 1.6], [-L - 1.5, Y + 1.7]];
     sh.moveTo(P[0][0], P[0][1]); for (let i = 1; i < P.length; i++) sh.lineTo(P[i][0], P[i][1]); sh.closePath();
     const hg = new THREE.ExtrudeGeometry(sh, { depth: W * 2 + .6, bevelEnabled: false }); hg.translate(0, 0, -W - .3); add(hg, hullM, cx, 0, cz, 0);
-    O.boxes.push({ minx: cx - L - .3, maxx: cx + L + .4, miny: Y - 2.8, maxy: Y, minz: cz - W - .3, maxz: cz + W + .3 });
+    // m@X4@ (collider audit): the hull was ONE box, full depth (Y - 2.8) bow to stern, but the drawn keel sweeps up at both ends -- up to 1.2 m of
+    // invisible hull under the bow and stern. Three boxes now: the flat keel, and the shallower ends
+    O.boxes.push({ minx: cx - 6, maxx: cx + 6, miny: Y - 2.8, maxy: Y, minz: cz - W - .3, maxz: cz + W + .3 }, { minx: cx - L - .3, maxx: cx - 6, miny: Y - 1.7, maxy: Y, minz: cz - W - .3, maxz: cz + W + .3 }, { minx: cx + 6, maxx: cx + L + .4, miny: Y - 1.9, maxy: Y, minz: cz - W - .3, maxz: cz + W + .3 });
     add(new THREE.BoxGeometry(L * 2 + .1, .08, W * 2 + .4), plank, cx, Y + .04, cz, 0);
     for (let k = -3; k <= 3; k++) add(new THREE.BoxGeometry(.12, 2.6, W * 2 + .62), verm, cx + k * 2.6, Y - 1.4, cz, 0); }
   // the BULWARKS (a gap on the starboard side where the gangplank comes aboard)
@@ -22642,7 +22646,7 @@ function fshipBuild() {
   // THE ENGINES under the hull: three glowing Jin orbs in bronze rings, a faint cone of lift under each
   const engines = []; for (const ex of [-5, 0, 5]) { const e = new THREE.Group(); e.position.set(cx + ex, Y - 3.1, cz); vis.add(e);
     const o = new THREE.Mesh(new THREE.SphereGeometry(.55, 14, 10), glow); e.add(o); const r = new THREE.Mesh(new THREE.TorusGeometry(.8, .1, 8, 24), bronze); r.rotation.x = Math.PI / 2; e.add(r);
-    const cg = new THREE.ConeGeometry(1.4, 2.8, 16, 1, true); cg.translate(0, -1.4, 0); const c = new THREE.Mesh(cg, new THREE.MeshBasicMaterial({ color: 0x5ff2ff, transparent: true, opacity: .12, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, toneMapped: false })); e.add(c); engines.push(e); }
+    const cg = new THREE.ConeGeometry(1.4, 2.8, 16, 1, true); cg.translate(0, -1.4, 0); const c = new THREE.Mesh(cg, new THREE.MeshBasicMaterial({ color: 0x7affd8, transparent: true, opacity: .12, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, toneMapped: false })); e.add(c); engines.push(e); }
   // THE RIG: two masts, junk sails (cream panels between dark battens), a red pennant at each masthead; grapple rings at the mastheads
   const rings = []; { const sail = new THREE.MeshStandardMaterial({ color: 0xe8dcc0, roughness: .9, side: THREE.DoubleSide });
     for (const [mx, mh] of [[-5.2, 11], [1, 13]]) { add(new THREE.CylinderGeometry(.16, .22, mh, 10), wood, cx + mx, Y + mh / 2, cz, 1);
@@ -22675,7 +22679,7 @@ function fshipBuild() {
   // CARGO amidships to smash: crates and barrels
   const smash = []; { const cm = new THREE.MeshStandardMaterial({ color: 0xa0784a, roughness: .85 }), bm = new THREE.MeshStandardMaterial({ color: 0x5a4030, roughness: .8 });
     for (const [dx, dz, k] of [[-2.8, -2.2, 0], [-2, -2.3, 1], [-2.4, 2.2, 0], [2.2, -2.3, 1], [2.9, -2.2, 0]]) { const X = cx + dx, Z = cz + dz;
-      const m = k ? add(new THREE.CylinderGeometry(.38, .38, .85, 10), bm, X, Y + .42, Z, 0, g) : add(new THREE.BoxGeometry(.85, .85, .85), cm, X, Y + .42, Z, 0, g);
+      const m = k ? add(new THREE.CylinderGeometry(.38, .38, .85, 10), bm, X, Y + .42, Z, 0, g) : add(new THREE.BoxGeometry(.85, .85, .85), cm, X, Y + .42, Z, 0, g); m.userData.mg = 0;
       smashAdd(smash, m, { minx: X - .42, maxx: X + .42, miny: Y, maxy: Y + .85, minz: Z - .42, maxz: Z + .42 }, 2, 15, k ? [.45, .32, .22] : [.7, .5, .3]); } }
   // THE HELM: a spoked wheel on a post before the deckhouse door, turning slowly
   const helm = new THREE.Group(); helm.position.set(cx + 2.8, Y + 1.3, cz); vis.add(helm);
@@ -22687,12 +22691,12 @@ function fshipBuild() {
   const tur = turretAt(cx - L + 1.2, Y, cz, -Math.PI / 2); boxGrid();
   // ---- PASS 3 (m1154): the polish -- painted OCULI on the bow, a dragon-head figurehead, lantern lines masthead to bow and stern, a stern
   // banner, a drone; and the engines shed glowing motes ----
-  { const white = new THREE.MeshBasicMaterial({ color: 0xf4f1ea }), black = new THREE.MeshBasicMaterial({ color: 0x17130f }), gold = new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .9, roughness: .3 });
+  { const white = new THREE.MeshBasicMaterial({ color: 0xf4f1ea }), black = new THREE.MeshBasicMaterial({ color: 0x17130f }), gold = K.bronze;
     for (const sz of [-1, 1]) { const ex = cx - L + .3, ez = cz + sz * (W + .31), ey = Y - .9; const e1 = add(new THREE.CircleGeometry(.55, 20), white, ex, ey, ez, 0); e1.rotation.y = sz > 0 ? 0 : Math.PI; e1.castShadow = false;
       const e2 = add(new THREE.CircleGeometry(.28, 16), black, ex + .08, ey, ez + sz * .01, 0); e2.rotation.y = e1.rotation.y; e2.castShadow = false; }
     const hd = new THREE.Group(); hd.position.set(cx - L - 1.4, Y + 1.9, cz); vis.add(hd);
     const sk = new THREE.Mesh(new THREE.ConeGeometry(.45, 1.4, 6), gold); sk.rotation.z = Math.PI / 2; hd.add(sk);
-    for (const sz of [-1, 1]) { const h = new THREE.Mesh(new THREE.ConeGeometry(.08, .7, 5), gold); h.position.set(.3, .4, sz * .2); h.rotation.z = -.6; hd.add(h); const ey = new THREE.Mesh(new THREE.SphereGeometry(.07, 8, 6), new THREE.MeshBasicMaterial({ color: 0xff3a2a, toneMapped: false })); ey.position.set(-.1, .15, sz * .22); hd.add(ey); } }
+    for (const sz of [-1, 1]) { const h = new THREE.Mesh(new THREE.ConeGeometry(.08, .7, 5), gold); h.position.set(.3, .4, sz * .2); h.rotation.z = -.6; hd.add(h); const ey = new THREE.Mesh(new THREE.SphereGeometry(.07, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffb04a, toneMapped: false })); ey.position.set(-.1, .15, sz * .22); hd.add(ey); } }
   for (const [mx, mh] of [[-5.2, 11], [1, 13]]) { bldCable(vis, [cx + mx, Y + mh - .5, cz], [cx - L - 1, Y + 1.8, cz], 1, 5, lamp); bldCable(vis, [cx + mx, Y + mh - .5, cz], [cx + L + 1.4, Y + 2.3, cz], 1, 5, lamp); }
   { const ban = new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 }); const bm = add(new THREE.PlaneGeometry(1.4, 3), ban, cx + L + 1.2, Y + .6, cz, 0); bm.rotation.y = Math.PI / 2; bm.castShadow = false; }
   const drone = bldDrone(g);
@@ -22724,7 +22728,14 @@ function fshipBuild() {
     add(new THREE.BoxGeometry(.24, .3, .24), lamp, mx + 1.05, ny + .85, cz - 1.05, 0, g);
     rings.push(gringAdd(g, mx + .9, ny + 3.6, cz)); }
   for (const b of O.boxes) if (!BOXES.includes(b)) BOXES.push(b); boxGrid();
-  FSHIP.on = { g, O, bars: [bar], rings, vis, engines, t: 0, smash, helm, tur, drone, moteT: 0, cans, climbs };
+  // m@X4@: lanterns on posts at the gangplank's foot, bunting from the masts' heads down the stays, plants on the ground under her
+  const MG = new Map(), put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); }, plants = [];
+  { const xa = gx1 - Y / .3, z1 = cz + W + .35 + 1.5; for (const zz of [cz + W + .2, z1 + .15]) { korPost(put, K, xa - .4, 0, zz, 2.2, .1); korLantern(put, K, xa - .4, 2.45, zz, .7); } }
+  for (const [mx, mh] of [[-5.2, 11], [1, 13]]) for (const sz of [-1, 1]) korBunting(put, K, [cx + mx, Y + mh - 1.2, cz], [cx + mx + (mx < 0 ? -2.5 : 2.5), Y + .8, cz + sz * (W + .1)], 8, .4);
+  { let sd = 13; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647; for (let i = 0; i < 36; i++) { const x = cx + (rnd() - .5) * (L * 2 + 8), z = cz + (rnd() - .5) * (W * 2 + 9); if (z > cz + W && z < cz + W + 2.5 && x > gx1 - Y / .3 - 1 && x < gx1 + 1) continue; plantPlant(plants, ['grass', 'fern', 'stones', 'flowers', 'tallgrass'][i % 5], x, 0, z, .8 + rnd() * .5, rnd() * 6); } }
+  for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list.map(q => { const n = q.index ? q.toNonIndexed() : q; for (const a2 of Object.keys(n.attributes)) if (a2 !== 'position' && a2 !== 'normal') n.deleteAttribute(a2); if (!n.attributes.normal) n.computeVertexNormals(); return n; })), m); o.castShadow = o.receiveShadow = true; g.add(o); }
+  bldMergeStatic(vis); bldMergeStatic(g); const plantMs = plantFlush(g, plants);
+  FSHIP.on = { plantMs, g, O, bars: [bar], rings, vis, engines, t: 0, smash, helm, tur, drone, moteT: 0, cans, climbs };
   arenaBeam(cx, cz, [.5, .9, 1], 1); snd('swoosh', { g: .7, r: .4 });
 }
 function fshipStep(dt) { const F = FSHIP.on; if (!F) return; F.t += dt;
@@ -22748,7 +22759,7 @@ function fshipStep(dt) { const F = FSHIP.on; if (!F) return; F.t += dt;
   F.helm.rotation.z = F.manned ? F.helm.rotation.z + dt * 2.5 : Math.sin(F.t * .3) * 1.2;
   { const [cx, cz] = FSHIP.at; if ((F.moteT -= dt) <= 0) { F.moteT = .08; const e = F.engines[(Math.random() * 3) | 0].position; spk(e.x + (Math.random() - .5) * .8, e.y + F.vis.position.y - .4, e.z + (Math.random() - .5) * .8, (Math.random() - .5) * .3, -1.2 - Math.random(), (Math.random() - .5) * .3, .08, 1.2, [.4, .95, 1]); }
     const a = F.t * .32; F.drone.position.set(cx + Math.cos(a) * 13, FSHIP.deck + 6 + Math.sin(F.t * 1.3) * .4, cz + Math.sin(a) * 8); F.drone.rotation.y = -a; F.drone.children[1].rotation.z = F.t * .6; } }
-function fshipClear() { const F = FSHIP.on; if (!F) return; for (const L of F.climbs || []) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && (F.climbs || []).includes(player.climb.L || player.climb)) climbOff(); smashDrop(F.smash); turretDrop(F.tur); bldClear(F); FSHIP.on = null; }
+function fshipClear() { const F = FSHIP.on; if (!F) return; if (F.plantMs) plantDrop(F.plantMs); for (const L of F.climbs || []) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && (F.climbs || []).includes(player.climb.L || player.climb)) climbOff(); smashDrop(F.smash); turretDrop(F.tur); bldClear(F); FSHIP.on = null; }
 // m1155: THE BATHHOUSE (BUILDINGS.md #11, pass 1) at (-30, 24). A low timber-and-plaster bathhouse, 12 x 10 m: breakable walls on three
 // sides (cwallBuild), the courtyard side (+x) open between posts onto a raised ENGAWA (veranda), a curved roof, and inside a big steaming
 // POOL in a low stone rim (step over it, wade in), a cold plunge tub, benches; a tall stone CHIMNEY smoking at the back corner.

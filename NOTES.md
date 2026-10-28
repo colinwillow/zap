@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the FLYING SHIP HOUSE, pass 1 (a HERO flyer: the look; a collider audit)
+**Moves:** its pass-1 row.
+- Kit materials: `K.timber`, a warm planks deck, a dark warm planks hull, `K.redL` ribs and pennants, `K.bronze` (the figurehead too, its
+  eyes warm amber), warm plain plaster on the deckhouse, `K.lamp`. The three Jin ENGINES and their lift cones are Jinra mint (they were cyan).
+- Lanterns on posts at the gangplank's foot, `korBunting` from both mastheads down to the bulwarks, grass, ferns, stones, flowers and tall
+  grass on the ground under her (the gangplank's run kept clear). `plantDrop` on clear. Statics merged in both the bobbing picture (`vis`)
+  and the still group.
+- **COLLIDER AUDIT (the standing rule since the zeppelin):** the hull was one box, full depth (`Y - 2.8`) bow to stern, but the drawn keel
+  sweeps up at both ends to `Y - 1.6` (bow) and `Y - 1.8` (stern), so up to 1.2 m of invisible hull hung under them. It is three boxes now:
+  the flat keel (x +/-6) and the shallower bow and stern. The bulwarks, deckhouse walls, masts, helm post, cannons and crow's nest boxes all
+  sit on drawn geometry.
+Render-checked headless (three-quarter, gangplank). Shipped unverified.
+
 ## m1598 -- THE ZEPPELINS, detail pass 10 (a COLLIDER AUDIT; the last of the zeppelin passes)
 His first complaint was an invisible collider, so the last pass measures every zeppelin collider against what is drawn:
 - **The deck**, against the hull's own half-width `zw(z)`: the single 1.7 x 3.4 m box overhung the bow and stern corners by **0.26 m** (an
