@@ -16446,7 +16446,7 @@ scene.add(markRing);
 // him, behind anyone (Grumbo) nearer the camera
 const _lpV = new THREE.Vector3();
 function lockPull(o, k) { _lpV.copy(camera.position).sub(o.position); const L = _lpV.length(); if (L <= k + .3) return;
-  // m15xx (his screenshot: still over him): never pulled PAST him -- standing close to his target, the pull carried the mark in front of Grumbo. It
+  // m1686 (his screenshot: still over him): never pulled PAST him -- standing close to his target, the pull carried the mark in front of Grumbo. It
   // stops `lockGap` m behind him (measured along the lens line); right up against the target it barely moves, and the target's body may hide part of it
   const pd = player.pos.distanceTo(camera.position), lim = Math.max(0, L - pd - LOCKGAP); o.position.addScaledVector(_lpV, Math.min(k, lim) / L); }
 const LOCKGAP = .7;

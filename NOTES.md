@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- THE SUN-WHEEL BEHIND HIM, even up close (his m1679 screenshot: "way better -- but still on top of my player")
+## m1686 -- THE SUN-WHEEL BEHIND HIM, even up close (his m1679 screenshot: "way better -- but still on top of my player")
 m1679 depth-tested the mark and pulled it toward the lens by the target's radius + .35 (~.85 m), so the target's own body would not hide
 it. His screenshot: Grumbo standing right in front of an Osari bowman, closer than that, so the pull carried the mark IN FRONT of Grumbo.
 `lockPull` now never pulls past him: it stops `LOCKGAP` .7 m behind him along the lens line.
