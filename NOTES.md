@@ -5,6 +5,12 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home pass 21 (Worker B): the pier and the canoe, second pass
+- **His rule:** *"we'll do a few passes on everything we do. Minimum 3 passes, max a million."* It is written at the top of the BUILDINGS section with a tally of which elements are at which pass.
+- **Pier.** Planks are now individually placed boxes: about one in four is darker timber, each has a little offset, twist and sag, and one is missing. The walkable quad is unchanged. X-braces between each post pair where the deck clears the bed by .35 m, plus diagonals under the T-head's sides. Four iron bollards. A ladder from the T-head's end down into the water. A drying rack (two A-frames and a pole) with a catch hung by the tails, and a crate of fish (one collider). A **bell** on a post at the pier's foot, added to `A.bellPts`, so it rings like the stall bells.
+- **The jumping fish** (`GHOME.fish`, `ghomeFish`): one hidden mesh. Every 4-11 s it leaps a 0.6-1.2 m arc, 1.3 m across, off the T-head's water side, pitched along its path, with a splash of `spkBurst` at both ends.
+- **Canoe.** A brass engine pod at the stern on two struts, with a nose cone and a glowing exhaust ring and face. A prow lantern. A short mast with its wing-sail furled along a boom and tied in three places. A basket and a rolled rug in the well. The runes breathe (`emissiveIntensity` 1.2-2.0). **A blow within 2.6 m rocks it** (`C.kv`, a damped spring on the roll), with a thud and spray.
+- One new material (`fishM`) and the fish mesh: **34 draws** for the home, plus the canoe's 5 and the fish.
 ## Grumbo's home pass 20 (Worker B): plants and ground
 - His ask: *"shrubs, plants and land masses, breaking up the circular spherical rocks."*
 - **Shelves.** Wide, flat, stratified `ghRockGeo` slabs sunk into the sand, each with two smaller ones beside it, plus a collider box. **A shelf on the canyon wall's slope read as a slab floating in the air** on the first render. `flat(x, z, r)` now requires the ground to vary less than .45 m across the shelf's span.
