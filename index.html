@@ -14367,7 +14367,7 @@ function arenaClear() {
 }
 // THE MENU: SPAWN opens it, WARBOSS opens the bosses, a boss beams down. CLEAR sweeps the floor.
 function arenaUi() {
-  if (!inArena()) return;
+  if (!inArena() && !inHome()) return;
   let U = ARENA.ui;
   if (!U) {
     U = ARENA.ui = document.createElement('div'); U.id = 'arenaUi'; document.body.appendChild(U);
@@ -14387,7 +14387,7 @@ function arenaUi() {
       else if (a === 'statue') { ARENA.menu = ''; if (STATUE.g) statueClear(); else statueAdd(); }     // m1705
       else if (a === 'spider') { ARENA.menu = ''; if (SPIDER.list.length) spiderClear(); else spiderAdd(); }     // m1677
       else if (a === 'hall') { ARENA.menu = ''; if (HALL.on) hallClear(); else hallBuild(); }     // m1116
-      else if (a === 'age') { AGE.st = AGE.st === 'fallen' ? 'restored' : 'fallen'; try { localStorage.setItem('mel.age', AGE.st); } catch (err) {} for (const E of BLDG.list) if (E.on()) { const rg = E.rig && E.rig(); if (rg) restorePlay(rg, AGE.st === 'fallen' ? 0 : 1); else { E.clear(); E.build(); } } if (inHome()) location.reload(); }     // m1501: FALLEN / RESTORED; a restorable building PLAYS it (m1512); the Red Hollows' pieces read it as they build: reload (Worker B)
+      else if (a === 'age') { AGE.st = AGE.st === 'fallen' ? 'restored' : 'fallen'; try { localStorage.setItem('mel.age', AGE.st); } catch (err) {} for (const E of BLDG.list) if (E.on()) { const rg = E.rig && E.rig(); if (rg) restorePlay(rg, AGE.st === 'fallen' ? 0 : 1); else { E.clear(); E.build(); } } if (inHome()) { const u = new URL(location.href); u.searchParams.delete('hs'); location.replace(u.toString()); } }     // m1501: FALLEN / RESTORED; a restorable building PLAYS it (m1512); the Red Hollows' pieces read it as they build: reload (Worker B)
       else if (a === 'bld') { ARENA.menu = ''; const E = BLDG.list.find(q => q.key === b.dataset.k); if (E) { if (E.on()) E.clear(); else E.build(); } }     // m1117
       else if (a === 'slice') { ARENA.menu = ''; sliceDummy(); }     // m1090
       else if (a === 'course') { ARENA.menu = ''; if (COURSE.on) courseClear(); else courseBuild('ACRO'); }     // m1078
@@ -14457,7 +14457,9 @@ function arenaUi() {
   const m = ARENA.menu, B = (a, txt, k, cls) => '<button data-a="' + a + '"' + (k ? ' data-k="' + k + '"' : '') + (cls ? ' class="' + cls + '"' : '') + '>' + txt + '</button>';
   if (ARENA.tools === undefined) { try { ARENA.tools = +localStorage.getItem('mel.arena.tools') || 0; } catch (err) { ARENA.tools = 0; } }
   const tools = ARENA.tools && !m;     // a menu open folds the tools away: the screen is not tall enough for both
-  let h = '<div class="ar-bar">' + B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('vend', 'VEND') + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
+  // in the RED HOLLOWS (his: "I need the debug menu in there so I can transform it between the two states") the bar is the STATE switch + TOOLS
+  let h = '<div class="ar-bar">' + (inHome() ? B('age', (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + '<small>tap: ' + (AGE.st === 'fallen' ? 'restore it all' : 'make it fall') + '</small>', '', 'ar-main' + (AGE.st === 'fallen' ? '' : ' on'))
+    : B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('vend', 'VEND')) + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
     (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('climbspd', 'CLIMB ' + CLIMB.speed.toFixed(1) + ' m/s') + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('btrail', 'TRAIL ' + (BTRAIL.jin ? 'JIN' : 'BLUE')) + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('sample', 'DNA SAMPLE ' + (SAMPLE.on ? 'ON' : 'OFF')) + B('runslash', 'RUN SLASH ' + (RUNSLASH.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('dsky', 'SKY ' + DOJO.skyPick) + B('dfx', 'DOJO FX ' + (DOJO.fx || 'FULL')) + B('rwsky', 'HOLLOWS SKY ' + RW.skyPick) + B('dragon', 'DRAGON ' + (DRAGZ.on ? DRAGZ.look : DOJO.dragonPick)) + B('dwing', 'DRAGON WINGS ' + DRAGZ.wingPick) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
   if (m === 'bld') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back') + B('age', 'STATE: ' + (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + '<small>tap to switch -- rebuilds what stands</small>', '', AGE.st === 'fallen' ? '' : 'ar-on');
     for (const E of BLDG.list) h += B('bld', E.t + '<small>' + (E.on() ? 'tap to remove' : E.pass >= 3 ? E.sub : 'IN PROGRESS · pass ' + E.pass + ' of 3') + '</small>', E.key, E.on() ? 'ar-on' : '');
@@ -68563,7 +68565,7 @@ function ghomeBuild(at, yaw, y0) {
     // FLOWERS (cream and orange heads on thin stalks) through the grass round the mound. Same buckets as the rest of the planting ----
     { const R4 = rwRng(3232), L = (wx, wz) => { const dx = wx - at[0], dz = wz - at[1]; return [dx * c - dz * s, dx * s + dz * c]; }, orange = new THREE.MeshStandardMaterial({ color: 0xe8843a, roughness: .8 }); let nC = 0, nV = 0;
       for (let zw = at[1] - 46; zw < at[1] + 46; zw += 2.6) for (const side of [-1, 1]) { const fl = hwHeight(hwRc(zw), zw);
-        for (let t = 0; t < 3; t++) { if (R4() < .35) continue; const yw = fl + 3 + Math.pow(R4(), 1.3) * 31, z2 = zw + (R4() - .5) * 2, xw = hwWallAt(z2, side, yw, .25);
+        for (let t = 0; t < 3; t++) { if (R4() < .35) continue; const yw = fl + 3 + Math.pow(R4(), 1.3) * 31, z2 = zw + (R4() - .5) * 2, xw = hwWallAt(z2, side, yw, -.1);
           if (Math.abs(xw - hwRc(z2)) > 39) continue; const [lx, lz] = L(xw, z2), ly = yw - y0, k = 1.2 + R4() * 1.4; sagebrush(lx, ly - .2, lz, k); nC++;
           if (R4() < .45) { const pts = []; let n = 3 + ((R4() * 5) | 0); for (let j = 0; j <= n; j++) { const yy = yw - j * .55, xx = hwWallAt(z2 + Math.sin(j * 1.3) * .2, side, yy, .12), [qx, qz] = L(xx, z2 + Math.sin(j * 1.3) * .2); pts.push(new THREE.Vector3(qx, yy - y0, qz)); }
             const cv = new THREE.CatmullRomCurve3(pts); put(new THREE.TubeGeometry(cv, n * 3, .035, 3), olive); for (let j = 1; j < n * 2; j++) { const q = cv.getPoint(j / (n * 2)); put(new THREE.ConeGeometry(.09, .28, 3), R4() < .5 ? sage : olive, at4(q.x, q.y, q.z, R4() * 6, (R4() - .5) * 2.4, (R4() - .5) * 2.4)); } nV++; }
@@ -69243,7 +69245,7 @@ async function buildHome() {
   // m1112: HIS OWN BODY through the lake's patch too (chained onto whatever his materials already do), so wading his legs read wet
   if (rig.model) { let n = 0; rig.model.traverse(o => { if (o.isMesh) for (const m of [].concat(o.material)) if (m && m.isMeshStandardMaterial && !m.userData.rw) { m.userData.rw = 1; rwPatch(m, true); m.needsUpdate = true; n++; } }); H.stat.bodyMats = n; }
   player.pos.x = H.spawn[0]; player.pos.z = H.spawn[1]; cam.az = player.faceH = player.heading = Math.PI;
-  H.live = 1; console.log('[melee] refuge: hut x' + H.stat.hutK + ', ' + RW.stat.walkTris + ' walkable tris, the lake water on');
+  H.live = 1; try { arenaUi(); } catch (e) { console.warn('[melee] hollows bar', e); } console.log('[melee] refuge: hut x' + H.stat.hutK + ', ' + RW.stat.walkTris + ' walkable tris, the lake water on');
 }
 // m1115: THE HUT IS ENTERABLE. *"Make the hut enterable."* His collider is only a skirt, so the walls are built here in the hut's OWN
 // units (the GLB's, before scale and turn): a grid of `cell` solid cells over the plan (radius `r`), except the INTERIOR (the measured bounds
@@ -69320,11 +69322,14 @@ function hollowDress() {
     for (let i = 0; i < 34; i++) { const z = -110 + r() * 220, side = r() < .55 ? -1 : 1, s = hwRc(z) + side * (8 + r() * ((side < 0 ? HOLLOW.floorW : HOLLOW.floorE) - 9));
       if (Math.hypot(s - H.hut.at[0], z - H.hut.at[1]) < 9 * (H.hutS || 1) || Math.hypot(s - H.spawn[0], z - H.spawn[1]) < 5) continue;
       const y = rwHeight(s, z), n = r() < .35 ? 3 : 1;
-      for (let k = 0; k < n; k++) { const R = (n > 1 ? 1.6 - k * .35 : 1.2 + r() * 2.2); const g = ghRockGeo(i * 5 + k + 300, R * (1.1 + r() * .4), R * (n > 1 ? .75 : .6 + r() * .35), R * (.85 + r() * .3), 2); g.rotateY(r() * 6);     /* pass 18 (Worker B): rocks, not eggs */
-        g.translate(s + (r() - .5) * .4, y + (n > 1 ? R * .7 + k * R * 1.15 : R * .3), z); rk.push(ghStrataCol(g)); }
-      BOXES.push({ minx: s - 1.3, maxx: s + 1.3, miny: -2, maxy: y + (n > 1 ? 5 : 1.2), minz: z - 1.3, maxz: z + 1.3 }); }
+      // his report (after m1704): "these rocks are kind of floating". The stack was placed by a SPHERE's numbers and pass 18 flattened the rocks
+      // (`ghRockGeo` clips its top and bottom), so each piece hung ~a metre over the one under it. Now every piece sits on the measured top of
+      // the one below (sunk a little into it), the first sunk into the ground by a sixth of its height; the collider is the stack's real top
+      let yc = y; for (let k = 0; k < n; k++) { const R = (n > 1 ? 1.6 - k * .35 : 1.2 + r() * 2.2); const g = ghRockGeo(i * 5 + k + 300, R * (1.1 + r() * .4), R * (n > 1 ? .75 : .6 + r() * .35), R * (.85 + r() * .3), 2); g.rotateY(r() * 6);     /* pass 18 (Worker B): rocks, not eggs */
+        g.computeBoundingBox(); const bb = g.boundingBox, hh = bb.max.y - bb.min.y, sink = k ? hh * .12 : hh * .18; g.translate(s + (r() - .5) * .4, yc - sink - bb.min.y, z); yc = yc - sink + hh; rk.push(ghStrataCol(g)); }
+      BOXES.push({ minx: s - 1.3, maxx: s + 1.3, miny: -2, maxy: yc - .1, minz: z - 1.3, maxz: z + 1.3 }); }
     for (let i = 0; i < 40; i++) { const z = -150 + r() * 300, side = r() < .5 ? -1 : 1, s = hwRc(z) + side * ((side < 0 ? HOLLOW.floorW : HOLLOW.floorE) + HOLLOW.wall + 6 + r() * 20), y = rwHeight(s, z), R = 3 + r() * 5;
-      const g = ghRockGeo(i + 500, R * (1.1 + r() * .4), R * (.5 + r() * .25), R * (.85 + r() * .3), 2); g.rotateY(r() * 6); g.translate(s, y + R * .1, z); rk.push(ghStrataCol(g)); }
+      const g = ghRockGeo(i + 500, R * (1.1 + r() * .4), R * (.5 + r() * .25), R * (.85 + r() * .3), 2); g.rotateY(r() * 6); g.computeBoundingBox(); g.translate(s, y - g.boundingBox.min.y - (g.boundingBox.max.y - g.boundingBox.min.y) * .2, z); rk.push(ghStrataCol(g)); }
     const m = rwMesh(rk, rwMat(0xffffff, { vertexColors: true, roughness: .95 })); m.geometry.computeVertexNormals(); }
   // CAVE MOUTHS in the walls at the floor: a dark arch with a rim of darker stone
   { const dark = [], rim = []; for (const [z, side] of [[-30, -1], [18, -1], [-55, 1], [40, 1], [95, -1]]) { const x = wallX(z, side, 1.5), y = rwHeight(x, z) - .3, ry = side < 0 ? Math.PI / 2 : -Math.PI / 2;     // m1114: the cave at 70 moved to 95, out of the west path's foot
@@ -69363,7 +69368,9 @@ function hollowDress() {
   { const isl = [], top = [], fall = []; for (let i = 0; i < 9; i++) { const a = r() * 6.2832, R = 120 + r() * 160, x = Math.cos(a) * R * .7, z = Math.sin(a) * R, y = 60 + r() * 70, s = 10 + r() * 16;
       const c = new THREE.ConeGeometry(s, s * 2.2, 7, 2); c.rotateX(Math.PI); c.translate(x, y - s * 1.1, z); isl.push(c); const t = new THREE.CylinderGeometry(s, s * .96, 2, 7); t.translate(x, y + .9, z); top.push(t);
       if (r() < .7) { const f = new THREE.PlaneGeometry(s * .25, y * 1.1); f.translate(x + s * .7, y - y * .55, z); f.rotateY(0); fall.push(f); } }
-    rwMesh(isl, rwMat(0xb7744e, { flatShading: true })); rwMesh(top, rwMat(0x5f8a45)); if (fall.length) { const fm = rwMesh(fall, new THREE.MeshBasicMaterial({ color: 0xeaf6ff, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false }), false); fm.renderOrder = 3; } }
+    // his (after m1704): fallen and restored read as a HYBRID -- these sky islands floated over a fallen valley. KORAJIN: the floating world is
+    // what RESTORATION raises, so FALLEN has none
+    const sky = AGE.st !== 'fallen'; rwMesh(isl, rwMat(0xb7744e, { flatShading: true })).visible = sky; rwMesh(top, rwMat(0x5f8a45)).visible = sky; if (fall.length) { const fm = rwMesh(fall, new THREE.MeshBasicMaterial({ color: 0xeaf6ff, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false }), false); fm.renderOrder = 3; fm.visible = sky; } }
   // HIS STONE LANTERNS on the approach
   { const st = [], lit = []; for (const [dx, dz] of [[9, -3.2], [9, 3.2], [6.2, -3.2], [6.2, 3.2]]) { const x = H.hut.at[0] + dx + (H.hutS ? 0 : 0), z = H.hut.at[1] + dz * (H.hutS || 1), y = rwHeight(x, z);     // in front of the door (the hut faces the river, +x)
       st.push(B(.9, .3, .9, x, y + .15, z), Cy(.16, .2, 1.1, x, y + .85, z, 6), B(.7, .18, .7, x, y + 1.45, z), B(1.05, .2, 1.05, x, y + 2.2, z), Cy(.0, .62, .45, x, y + 2.5, z, 4));
