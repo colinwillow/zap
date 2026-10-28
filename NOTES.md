@@ -52,7 +52,7 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
-## HIS SECOND PANORAMA IS THE PANO SKY; TOOLS > SKY CYCLES THREE (mXXXX)
+## HIS SECOND PANORAMA IS THE PANO SKY; TOOLS > SKY CYCLES THREE (m1453)
 *"I made this HDR a little more similar to what the game already was -- try this one instead."*
 - **The image:** `textures/sky_sunset_02.webp` (92 KB), lavender sky, peach clouds, a sea of cloud. Sun MEASURED at u .343, v .601, so `uOff` -.081 and `vOff` -.165.
 - **`PANOS` is keyed by pick:** `PANO` (this one) and `FIRE` (the first). Each row carries its own cloud colours (`cloud.lo/hi/rim/far`) for the cumulus cards.
