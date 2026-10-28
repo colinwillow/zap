@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: MARKET STALLS, pass 1 (a HERO / TOWN place: the look)
+**Moves:** its pass-1 row (the look). Restoring in place is pass 2.
+- Kit materials: `K.timber`, a warm `wood_planks` triMat, a `stone_blocks` paving, `K.redL`, `K.lamp`; the rooftop cushions are `K.red`.
+- The four NEON signs are TIMBER SIGNBOARDS (kanban): a framed plank board with rails, a bronze cap, and red brush glyphs in three shapes
+  (three strokes, a box over a bar, a tree), with a `korLantern` each side. The first try (a bar and a cross per glyph) read as grave crosses.
+- The 20 goods boxes had a new material each; they share five now, so the merge makes 5 draws for them, not 20.
+- Bunting along the roof's front rail, and from the two ring poles down to the outer nobori. Plants: bamboo clumps at both ends, a cherry and
+  a pine behind, iron pots of ferns and flowers at each front post, grass, stones and tall grass along the paving's edges. `plantDrop` on clear.
+- Everything static is `mg` and merged, except the fruit crates and the firework tubes (they hide or move). 147 meshes in the group.
+- **The robot merchant is untouched**: Worker B owns the merchant.
+Render-checked headless (front, roof, signs). Shipped unverified.
+
 ## Grumbo's home, pass 28: the stall shutters roll up and down (Worker B, loop tick 5)
 His queue item (agreed after m1459). One roll-up tin curtain per stall front (local x 2.45..9.75 each side, z 7.68, deck to P+2.55), a drum
 under the outer beam and iron guides at the ends (both in the merged buckets). The slats of BOTH are one mesh, `ghomeShutFill` lays them from
