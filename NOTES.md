@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the SPIDER-BOT HANGAR, pass 1 (ENEMY look, classical)
+## m1635 -- THE RE-PASS: the SPIDER-BOT HANGAR, pass 1 (ENEMY look, classical)
 - The grey concrete half-cylinder vault is gone for ENEMY_STYLE's classical grammar on the same footprint: four sandstone-block walls 3.6 m
   (each wall's box is its mesh), a .3 footing skirt (a step), a black lacquer frieze with gold studs, and `bldRoof`'s curved hip roof in
   black tile, TURNED so its ridge runs down the long axis. Its walkable surface is the drawn one, sampled every fourth vertex (240 tris).
