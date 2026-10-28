@@ -243,10 +243,18 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - [x] **pass 29 (m1547):** the ROPE LIFT (his queue): a railed plank cage on two ropes from a timber gantry out of the turret with a brass pulley, outside the balcony's east edge (a gap in its rail); stand on it and it rides to the other end, walk up to it at either end and it comes to you; it carries him. FALLEN it lies tilted at the foot, ropes gone
   - [x] **pass 30 (m1550):** BREAKABLE POTS (his queue): all 145 pots (the stall shelves, the decks, the shop's shelves and counter, the planters) break at a blow -- a clay burst and a crack, the big ones lose their collider -- and are back 25 s later unless he stands on the spot. No new draws: each pot is a vertex range of its merged bucket
   - [x] **pass 31 (m1553):** THE ROCKS, third pass: some big stones are SPLIT (two halves leaning apart along a crack), some carry a flat CAP slab, the big ones are finer, and every cluster sits in a soft DRIFT of blown sand (the paths' look, one draw)
-  - [x] **pass 32 (next build):** THE PLANTS, third pass: 134 SHRUBS CLINGING TO THE CANYON WALLS from 3 to 34 m over the floor, 57 of them trailing leafy VINES down the rock, the odd lavender bulb hanging off a ledge; and 50 clumps of DESERT FLOWERS (cream and orange) through the grass round the mound
+  - [x] **pass 32 (m1557):** THE PLANTS, third pass: 134 SHRUBS CLINGING TO THE CANYON WALLS from 3 to 34 m over the floor, 57 of them trailing leafy VINES down the rock, the odd lavender bulb hanging off a ledge; and 50 clumps of DESERT FLOWERS (cream and orange) through the grass round the mound
   - [ ] then more passes, each one closer to the four views
   - **Still open on the home** (agreed after m1459): ~~the shop SHUTTERS~~ (pass 28), ~~the rope LIFT~~ (pass 29), ~~BREAKABLE pots~~ (pass 30), ~~the rocks' 3rd pass~~ (pass 31), ~~the plants' 3rd pass with
     cliff shrubs~~ (pass 32), the rope LIFT to the balcony, BREAKABLE pots, the back ladder and stall rack (ref 2) -- then his sign-off.
+
+## THE RED HOLLOWS' SKY AND WATER (his, after m1557: "work on the water shader, and apply the HDR from the other window")
+The "HDR" is the dojo's PANO (`textures/sky_sunset_02.webp`, 8-bit, 1774 x 887 -- no .hdr/.exr is in the repo; a real one would give the IBL a sun).
+- [x] **pass 1 (next build):** the PANO is the valley's sky dome, the water's reflection (soft), the fog's horizon, the image light and the lights' tint; turned so its sun sits on the valley's sun; TOOLS > HOLLOWS SKY cycles PANO / FIRE / PAINTED. The stream FLOWS (its ripples drift downstream, +z) with foam streaks along the flow in the shallows
+- **DONE WHEN:**
+  - [ ] the water reads as a river from the home, the pier and the mill (flow, depth colour, foam at rocks, the pier's legs, the mill's pour)
+  - [ ] the sky is his pick on the phone (PANO / FIRE / PAINTED), and a real .hdr if he wants the sun in the bounce light
+  - [ ] his sign-off on the phone
 
 ## FALLEN / RESTORED (his, after m1495; KORAJIN.md "THE RESTORATION") -- every Red Hollows piece has two states, default FALLEN
 *"Everything's gonna be fallen."* One build, one switch, and it is **main's `AGE` (m1501)**: **SPAWN > BUILDINGS > STATE** (in the Red Hollows it reloads), saved as `mel.age`, **FALLEN unless RESTORED was chosen**; `?hs=restored|fallen` for a look.
