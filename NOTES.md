@@ -40,6 +40,15 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
+## THE DOJO, PASS 12: TRAINING MARKS ON THE FLOOR, AND SMOOTH KNOLLS (mXXXX)
+- **Training marks:** one 1024 canvas on a circle just over the boards (transparent, no depth write, polygon offset), so they never obstruct anything.
+  - 46 dark scuff arcs (where feet turn)
+  - a ring of paired stance FOOTPRINTS at 9.2 m (some missing, worn to different alphas)
+  - two dashed chalk drill rings (7.2 and 11.6 m)
+  - the numerals 一 二 三 四 at 13.2 m, facing each gate
+  - The first version drew real-size feet (.13 m) and could not be read from the game's camera; they are drawn about 2.3x now.
+- **Smooth knolls:** `floatIsland({ smoothTop })` averages the normals of shared positions on TOP vertices only (keyed at 2 cm), so the knolls shade round while the underside rock keeps its facets. The dojo's dressed islands set it.
+
 ## THE GROUND, PASS 1: KNOLLS, PAINTED GRASS, AND THE PLANT LIBRARY ON EVERY ISLAND (m1437)
 *"The grass is just very low quality... where it should be flat it should be flat, but grassy knolls should have variation. Paint the grass textures, add little alien plants, rocks, dirt... it's very flat green."*
 - **`floatIsland({ knoll, flatR })`:** rounded hills (fbm, capped 3.5 m) rise outside `flatR` and fade toward the rim. Both default to 0, so the forge, the home and the Ship are untouched. The dojo's `isl()` sets `knoll` .07 (.04 under R 8) and `flatR` = the dress `clear`, so courtyards, halls and the pagoda plinth stay level.
