@@ -24028,7 +24028,9 @@ function cliffBuild() {
     for (let k = 0; k < P.count; k++) { const x = P.getX(k), y = P.getY(k), z = P.getZ(k), key = x.toFixed(2) + ',' + y.toFixed(2) + ',' + z.toFixed(2);
       if (!jit.has(key)) jit.set(key, y > H / 2 - .01 ? [0, 0, 0] : [(rnd() - .5) * .3, (rnd() - .5) * .8, (rnd() - .5) * .3]); const j = jit.get(key); P.setXYZ(k, x + j[0], y + j[1] * (y < -H / 2 + .01 ? 0 : 1), z + j[2]); }     // m1648 (collider audit): the jitter was INWARD-only to .45 m, so the box stood up to .45 proud of the drawn rock; now +-.15 about the face
     geo.computeVertexNormals(); add(geo, rock, cx, H / 2, cz, 0); O.boxes.push({ minx: cx - hx, maxx: cx + hx, miny: 0, maxy: H, minz: cz - hz, maxz: cz + hz }); }
-  for (let k = 0; k < 9; k++) { const a = rnd() * 6.28, r = 1 + rnd() * 1.6, b = add(new THREE.DodecahedronGeometry(r, 0), rockD, cx + Math.sin(a) * (hx + 3.6 + rnd() * 2), r * .5, cz + Math.cos(a) * (hz + 3.6 + rnd() * 2), 0); b.rotation.set(rnd() * 3, rnd() * 3, 0); }
+  for (let k = 0; k < 9; k++) { const a = rnd() * 6.28, r = 1 + rnd() * 1.6, bx = cx + Math.sin(a) * (hx + 3.6 + rnd() * 2), bz = cz + Math.cos(a) * (hz + 3.6 + rnd() * 2), rx = rnd() * 3, ry = rnd() * 3;
+    if (Math.hypot(bx - cx + 3.6, bz - cz + hz + 4.3) < r + 1.2) continue;     // m@X4@: clear of the rope ladder's foot (the same rnd draws, so the rest stay put)
+    add(new THREE.DodecahedronGeometry(r, 0), rockD, bx, r * .5, bz, 0).rotation.set(rx, ry, 0); }
   // THE PATH: round the four faces, 3 m a face, corner landings; flat stone slabs
   const w = A.lane / 2, ax = hx + w, az = hz + w, C = [[-ax, -az], [ax, -az], [ax, az], [-ax, az]], rise = H / 4;
   for (let k = 0; k < 4; k++) { const a = C[k], b = C[(k + 1) % 4], ya = k * rise, yb = (k + 1) * rise, dx = b[0] - a[0], dz = b[1] - a[1], L = Math.hypot(dx, dz), ux = dx / L, uz = dz / L, nx = -uz, nz = ux;
@@ -24120,11 +24122,21 @@ function cliffBuild() {
     for (const o of g.children.slice()) { if (skip.has(o) || o.userData.keep) continue; wb.setFromObject(o); if (wb.isEmpty()) continue; wb.getCenter(wc); wb.getSize(ws); const key = cls(wc, ws); if (key && pieces[key]) pieces[key].attach(o); } }
   restoreSkin(R); const nm = bldMergeStatic(g), plantMs = plantFlush(g, plants) || [];
   const bkey = b2 => cls(new THREE.Vector3((b2.minx + b2.maxx) / 2, (b2.miny + b2.maxy) / 2, (b2.minz + b2.maxz) / 2)), ptris = []; for (let i = nP; i < tris.length; i += 9) ptris.push(tris.slice(i, i + 9));
-  restoreRide(R, { up: { boxes: O.boxes.filter(b2 => bkey(b2)), tris: ptris, climbs: [], bars: [], rings, objs: [drone, fall0, pool, ...cables], coins: [] } }); R.onSet = R2 => restoreRideSet(R2);
+  // ---- RE-PASS 3 (m@X4@): THE SHORTCUT -- a ROPE LADDER from the ground straight up to the perch's tip (12 m, outside the path's lane), the
+  // fast way to the summit for whoever skips the lap: climb it, walk the beam in. It rides the perch (gone while fallen). Doubloons on the
+  // three landings (they stay) and one on the perch tip under the ring (it rides the perch) ----
+  const ladO = [], coins = [], coinsU = []; { const x = cx - 3.6, z = cz - hz - 4.5 + .2, rope = new THREE.MeshStandardMaterial({ color: 0xc9b07a, roughness: 1 }), parts = [], rp = [];
+    for (const e of [-.28, .28]) rp.push(new THREE.CylinderGeometry(.025, .025, H, 5).translate(x + e, H / 2, z));
+    for (let y = .32; y < H - .1; y += .32) parts.push(new THREE.BoxGeometry(.6, .05, .08).translate(x, y, z));
+    const rr = new THREE.Mesh(mergeGeometries(rp), rope), rg = new THREE.Mesh(mergeGeometries(parts), wood); rr.castShadow = rg.castShadow = true; g.add(rr, rg); ladO.push(rr, rg);
+    var cLad = kitClimbAdd({ minx: x - .3, maxx: x + .3, miny: 0, maxy: H, minz: z - .1, maxz: z + .1 }, 'cliff_perch', H); cLad.mark = { x, y: H, z: z + .7 };
+    coinsU.push(coinDrop(g, x, H + .9, z + .5)); }
+  for (let k = 1; k <= 3; k++) { const c = C[k]; coins.push(coinDrop(g, cx + c[0], k * rise + .9, cz + c[1])); }
+  restoreRide(R, { up: { boxes: O.boxes.filter(b2 => bkey(b2)), tris: ptris, climbs: [cLad], bars: [], rings, objs: [drone, fall0, pool, ...cables, ...ladO], coins: coinsU } }); R.onSet = R2 => restoreRideSet(R2);
   const ground = []; { const px = cx + k0[0] - 3.4, pz = cz + k0[1] - 1.5, plate = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, .12, 24), new THREE.MeshStandardMaterial({ color: 0x3a4a46, emissive: 0x7affd8, emissiveIntensity: .7 }));
     plate.position.set(px, .06, pz); scene.add(plate); ground.push(plate); R.trig = { x: px, y: 0, z: pz, armed: 1 }; }
   { const t0 = AGE.st === 'fallen' ? 0 : 1; R.goal = t0; restoreSet(R, t0); restoreRideSet(R, true); }
-  CLIFF.on = { g, O, bars: [], rings, wt, fallAt: [cx + hx + .6, cz + 1.2], t: 0, path, rocks: [], rockT: 4, drone, lever, lvT: 0, cradleRock, nm, plantMs, R, ground, pieces };
+  CLIFF.on = { g, O, bars: [], rings, wt, fallAt: [cx + hx + .6, cz + 1.2], t: 0, path, rocks: [], rockT: 4, drone, lever, lvT: 0, cradleRock, nm, plantMs, R, ground, pieces, lad: cLad, coins: [...coins, ...coinsU] };
   arenaBeam(cx, cz, [.7, .9, 1], 1); snd('clang', { g: .6, r: .7 });
 }
 function cliffStep(dt) { const C = CLIFF.on; if (!C) return; C.t += dt; C.wt.offset.y -= dt * 1.4;
@@ -24144,6 +24156,7 @@ function cliffStep(dt) { const C = CLIFF.on; if (!C) return; C.t += dt; C.wt.off
   if (whole && (C.mT = (C.mT || 0) - dt) <= 0) { C.mT = .1; const [x, z] = C.fallAt; smokeAt(x + 2.8 + (Math.random() - .5) * 2, .3, z + (Math.random() - .5) * 2, .8, 1.2, [.92, .95, 1]); } }
 function cliffClear() { const C = CLIFF.on; if (!C) return; for (const R of C.rocks) R.m.removeFromParent(); if (C.plantMs) plantDrop(C.plantMs);
   if (C.R) { const i = RESTORE.list.indexOf(C.R); if (i >= 0) RESTORE.list.splice(i, 1); if (C.R.ride) { bldTrisDrop(C.R.ride.tb); bldTrisDrop(C.R.ride.tu); } } for (const o of C.ground || []) o.removeFromParent();     // m1649
+  for (const c of C.coins || []) { const i = COIN.list.indexOf(c); if (i >= 0) COIN.list.splice(i, 1); } if (C.lad) { const i = KCLIMB.indexOf(C.lad); if (i >= 0) KCLIMB.splice(i, 1); if (player.climb === C.lad) climbOff(); }     // m@X4@
   bldClear(C); CLIFF.on = null; }
 // m1178: THE MOATED KEEP (Set 2 #16, pass 1) at (46, 0). A stone KEEP on a 3 m ISLAND in a MOAT, ringed by a 2.8 m CURB wall you climb by
 // a flight of steps on the courtyard side. A DRAWBRIDGE spans the moat from the curb to the island: it starts RAISED -- strike the GONG

@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the CLIFF LODGE, pass 3 (L1: THE SHORTCUT) -- its third pass, DONE
+- The path is a full lap of the crag (four faces, 12 m). The shortcut: a ROPE LADDER (two ropes, 37 timber rungs, merged: 2 meshes) from
+  the ground straight up to the perch's tip at 12 m, hanging .2 m in from the tip and 4.3 m off the north face (clear of the path's 1.6 m
+  lane). `kitClimbAdd` `cliff_perch`, top 12, its mark on the beam; climb it, walk the beam in. It rides the perch (`up.climbs`,
+  `up.objs`): gone while fallen (measured parked at -600).
+- Doubloons: one on the perch tip under the ring (rides the perch), one on each of the three path landings (they stay).
+- A foot boulder sat on the ladder's foot; boulders within reach of it are skipped, drawing the same `rnd` values so the rest stay put.
+- `cliffClear` drops the coins and the climb.
+Render-checked headless (the ladder up the north face to the perch; fallen: ladder gone, perch hanging). Next: the Moated Keep (ENEMY).
+Shipped unverified.
+
 ## m1649 -- THE RE-PASS: the CLIFF LODGE, pass 2 (rubric 7: RESTORES IN PLACE)
 - Base (stays): the crag, the path slabs and lips, its stone lanterns, the foot boulders, the pines, the pool's stone rim. Pieces:
   `walls` (the lodge's frame, plaster, irori, bonsai; its wall boxes ride it), `roof` (roof, fascia, bunting, eave lamps), `perch` (the beam
