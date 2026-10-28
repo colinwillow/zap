@@ -53,6 +53,15 @@ messages land between them. Design context is `GAME_DESIGN.md`. If an item is to
 split it in `ROADMAP.md` and ship the first half. Never ship a blank page; NOTES.md entry per build
 as usual.
 
+## VERTICALITY AND SPREAD -- HIS STANDING RULE (Oct 28 2026, "I'm going to keep telling you over and over")
+
+*"Get away from having everything on the same plane -- it's your natural inclination to put things on the ground plane. The ships are all on the
+same plane. I really want verticality: different planes, different heights -- and spreading things out; that ship feels awfully close."*
+- **Every placement gets a HEIGHT decision, not y = 0 by default.** Islands, buildings, ships, creatures, routes, enemies, pickups: spread them over
+  several tiers (below, level, above, high above) and check a wide render for "is everything on one plane?" before shipping.
+- **Spread them out.** Give big things room; a hero object should not crowd the play space. Distance is part of the composition.
+- **Routes climb.** Reaching something should usually go UP or DOWN, not just across.
+
 ## Verification budget
 
 **HE TESTS THE GAME. YOU DO NOT.** He asks for a change, you make it, you `npm run bump`, you

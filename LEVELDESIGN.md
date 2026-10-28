@@ -4,6 +4,11 @@ His method (after m1369) is the spine. The research did not replace it: every se
 first, then the gating, then the enemies placed around the gates, then a theme, then a boss that tests what the level taught.** What
 the research adds is **a layer zero (the numbers), a shape inside each layer, and a few things it is easy to forget.**
 
+## THE PLANES RULE (his, standing: *"different planes, different heights, and spreading things out"*)
+Every level is built in TIERS, never on one ground plane: a low tier (pits, sunken courts, the underside), the main tier, raised tiers (roofs,
+ledges, platforms), and a high tier (spires, airships, the boss's perch). Routes move BETWEEN tiers. Key things are spread out with room
+round them. A blueprint that puts everything at one y is wrong before it is built.
+
 ## Layer 0: THE NUMBERS (before any geometry)
 - **Fix the character's metrics first:**
   - jump height and distance

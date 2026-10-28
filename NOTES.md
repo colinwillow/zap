@@ -64,6 +64,17 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
+## THE DOJO, PASS 15: VERTICALITY AND SPREAD -- HIS STANDING RULE (mXXXX)
+*"Get away from having everything on the same plane -- it's your natural inclination to put things on the ground plane. The ships are all on the same plane. I really want verticality... I'm going to keep telling you over and over: different planes, different heights, and spread things out. That ship feels awfully close to the main island."*
+- **The rule is in CLAUDE.md** (read every turn) and LEVELDESIGN.md (THE PLANES RULE): every placement gets a height decision; tiers below, level, above and high; spread big things; routes climb.
+- **Applied here:**
+  - **Halls:** y0 [-12, 9, -3, 17] (were -4 / +2).
+  - **Escorts:** five junks at bases -35..+85 m and radii 140-330, each on a `vy` climb-and-dive with a matching pitch.
+  - **Flagship:** cruises r 210 ±40, y 42 ±26, and no longer parks at the dojo. It docks at `D.pier` (r 62, y 26).
+  - **The SKY STAIR:** ten floating stones from the north altar's far side to the pier, +1.9 m and ~3.4 m on each (his comfy jump is 2.2 up and 5.95 across), curving 7 m sideways as it climbs. A lantern on every third stone.
+  - **The pier:** a stone disc R 5 on its own island with posts, lanterns and a banner.
+  - **Drifting platforms:** lowered to y 1.5-5.5 so they never cross the stair.
+
 ## THE DOJO, PASS 14: SWALLOWS AND CRANES (m1460)
 - **One InstancedMesh per flock.** Each bird is a few triangles (body, two wings, and for the cranes a neck, a red crown and trailing legs) with `aW` (0 at the body, ±1 at the wingtips). The flap is in the vertex shader: per-instance `iF` = phase and rate, and the span narrows a touch on the downstroke.
 - **Swallows (30):** follow a leader on a looping path (r ~70, y 9-27), each on its own offset that drifts, banking with the turn (`dojoBirds`).

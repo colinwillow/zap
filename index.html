@@ -10510,6 +10510,18 @@ function dojoBuild(g, W) {
       put(new THREE.CylinderGeometry(1.35, 1.1, .5, 14).translate(sx, sy - .25, sz), M.stone); isl({ R: 1.7, depth: 3.2, seed: 21 + k + a, detail: 3, flat: .05, lobes: 1 }, sx, sy - .5, sz); put(new THREE.CylinderGeometry(1.38, 1.38, .1, 14, 1, true).translate(sx, sy - .05, sz), M.gold);
       D.boxes.push({ minx: sx - .95, maxx: sx + .95, miny: sy - .5, maxy: sy, minz: sz - .95, maxz: sz + .95 }); });
     D.boxes.push({ minx: x - 2.3, maxx: x + 2.3, miny: y - 1.2, maxy: y, minz: z - 2.3, maxz: z + 2.3 }); }
+  // m1462: THE SKY STAIR AND THE PIER (his: verticality, and *"that ship feels awfully close"*). The flagship no longer parks at the dojo: it
+  // docks at a stone PIER on its own island, 60 m out to the north and 19 m UP, and a stair of floating stones climbs to it from the north
+  // altar's far side -- +1.9 m and ~3.8 m on per stone (his jump: 2.2 up comfy, 5.95 across), curving as it rises
+  { D.pier = { r: 62, y: 26, R: 5 }; const N = 10, a0 = 0, y0s = D.altarY, r0 = D.altarR + 2.4, pr = D.pier.r - D.pier.R - 1.2;
+    for (let i = 1; i <= N; i++) { const t = i / (N + 1), r2 = r0 + (pr - r0) * t, sy = y0s + (D.pier.y - y0s) * t, side = Math.sin(t * Math.PI * 1.5) * 7, sx = side, sz = r2;
+      put(new THREE.CylinderGeometry(1.35, 1.1, .5, 14).translate(sx, sy - .25, sz), M.stone); isl({ R: 1.8, depth: 3 + (i % 3), seed: 140 + i, detail: 3, flat: .05, lobes: 1 }, sx, sy - .5, sz); put(new THREE.CylinderGeometry(1.38, 1.38, .1, 14, 1, true).translate(sx, sy - .05, sz), M.gold);
+      if (i % 3 === 0) korLantern(put, korMats(), sx + .9, sy, sz, .9);
+      D.boxes.push({ minx: sx - .95, maxx: sx + .95, miny: sy - .5, maxy: sy, minz: sz - .95, maxz: sz + .95 }); }
+    const px = 0, pz = D.pier.r, py = D.pier.y; put(new THREE.CylinderGeometry(D.pier.R, D.pier.R - .3, .7, 28).translate(px, py - .35, pz), M.stone); put(new THREE.CylinderGeometry(D.pier.R + .05, D.pier.R + .05, .14, 28, 1, true).translate(px, py - .07, pz), M.gold);
+    isl({ R: D.pier.R + 1.6, depth: 16, seed: 160, detail: 4, flat: .1, lobes: 3 }, px, py - .7, pz, { cherry: 1, pine: 0, rocks: 2, shrubs: 0, roots: 14, seed: 160, clear: D.pier.R + .2 });
+    { const KP = korMats(); for (const sd of [-1, 1]) { korPost(put, KP, px + sd * 3.4, py, pz + 3.6, 3.2, .18); korLantern(put, KP, px + sd * 3.4, py + 2.2, pz + 3.6, 1); } korBanner(put, KP, px - 3.8, py, pz - 1, Math.PI, 1.2, 4); }
+    D.boxes.push({ minx: px - D.pier.R + .4, maxx: px + D.pier.R - .4, miny: py - .7, maxy: py, minz: pz - D.pier.R + .4, maxz: pz + D.pier.R - .4 }); }
   // THE BANNER MASTS (E and W): a tall timber mast on a stone foot at the rim, a crossbar, and a long red chevron banner that WAVES
   D.flags = []; const fm = new THREE.MeshStandardMaterial({ map: texGet('red_cloth'), side: THREE.DoubleSide, roughness: .85 }); fm.map = fm.map.clone(); fm.map.repeat.set(1, 3.5); fm.map.needsUpdate = true;
   fm.onBeforeCompile = sh => { sh.uniforms.uTime = U.uTime; sh.vertexShader = 'uniform float uTime;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n float fk = (1.0 - uv.y); transformed.z += sin(uTime * 2.4 + uv.y * 5.0 + position.x * .6) * .45 * fk + sin(uTime * 4.1 + uv.y * 9.0) * .12 * fk;'); };
@@ -10520,7 +10532,7 @@ function dojoBuild(g, W) {
   // m1408: THE HERO HALLS (the diagonals), on their islands, in HIS vocabulary (ARCHITECTURE.md), not a borrowed pagoda: a cluster of sandstone
   // domes banded in timber, the red-and-cream TENT CONE on the big one, bronze STACKS either side, a brass WHEEL on the face toward the dojo, a
   // timber scaffold front with a red AWNING and box LANTERNS, BUNTING off the cone, portholes with lavender rims, and a CRANE with a brass orb
-  { const K = korMats(); for (let k = 0; k < 4; k++) { const a = Math.PI / 4 + k * Math.PI / 2, [x, z] = at(a, D.pavR), y0 = -4 + (k % 2) * 6, face = a + Math.PI, c = Math.cos(face), sn = Math.sin(face);
+  { const K = korMats(); for (let k = 0; k < 4; k++) { const a = Math.PI / 4 + k * Math.PI / 2, [x, z] = at(a, D.pavR), y0 = [-12, 9, -3, 17][k], face = a + Math.PI, c = Math.cos(face), sn = Math.sin(face);
     const W2 = (u, v) => [x + c * u + sn * v, z - sn * u + c * v];     // u across, v toward the dojo
     isl({ R: 19 + (k % 2) * 4, depth: 30 + k * 4, seed: 40 + k, detail: 5, flat: .25, lobes: 3 }, x, y0, z, { cherry: 3, pine: 2, rocks: 6, shrubs: 10, roots: 22, seed: 40 + k, clear: 13 });
     const top = korDome(put, K, x, y0, z, 9, 1.15); const [bx, bz] = W2(-8, -2.5), [sx2, sz2] = W2(7.6, -4); korDome(put, K, bx, y0, bz, 5.6, 1.2); korDome(put, K, sx2, y0, sz2, 3.6, 1.25);
@@ -10639,7 +10651,7 @@ function dojoBuild(g, W) {
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o !== null; o.receiveShadow = true; g.add(o); }
   // THE DRIFTING PLATFORMS: small stone discs on rock roots, slowly bobbing and circling outside the rim (decor for now)
   D.plats = [];
-  for (let i = 0; i < D.plat; i++) { const m = new THREE.Mesh(floatIsland({ R: 2.6, depth: 4.5 + (i % 3), seed: 60 + i, detail: 3, flat: .04, lobes: 1 + (i % 2) }).geo, isl3Mat()); m.castShadow = true; g.add(m); const box = { minx: 0, maxx: 0, miny: 0, maxy: 0, minz: 0, maxz: 0 }; D.plats.push({ m, box, r: W + 9 + (i % 3) * 7, a: i / D.plat * Math.PI * 2 + .3, y: 3 + (i * 37 % 9), w: (i % 2 ? 1 : -1) * (.03 + i * .004), ph: i * 1.3, lx: null }); }     /* m1401: standable -- a BDYN box that carries him (pushed on the first dojo FRAME: this builder runs at module scope, above BDYN's declaration -- the TDZ landmine) */
+  for (let i = 0; i < D.plat; i++) { const m = new THREE.Mesh(floatIsland({ R: 2.6, depth: 4.5 + (i % 3), seed: 60 + i, detail: 3, flat: .04, lobes: 1 + (i % 2) }).geo, isl3Mat()); m.castShadow = true; g.add(m); const box = { minx: 0, maxx: 0, miny: 0, maxy: 0, minz: 0, maxz: 0 }; D.plats.push({ m, box, r: W + 9 + (i % 3) * 7, a: i / D.plat * Math.PI * 2 + .3, y: 1.5 + (i * 37 % 5), w: (i % 2 ? 1 : -1) * (.03 + i * .004), ph: i * 1.3, lx: null }); }     /* m1401: standable -- a BDYN box that carries him (pushed on the first dojo FRAME: this builder runs at module scope, above BDYN's declaration -- the TDZ landmine) */
   // m1399: PETALS -- pink cherry petals drifting across the dojo on the wind, tumbling (their size flickers as they turn)
   { const N = 700, P = new Float32Array(N * 3), S = new Float32Array(N), Ph = new Float32Array(N); for (let i = 0; i < N; i++) { P[i * 3] = (Math.random() - .5) * 60; P[i * 3 + 1] = Math.random() * 16; P[i * 3 + 2] = (Math.random() - .5) * 60; S[i] = .09 + Math.random() * .08; Ph[i] = Math.random() * 100; }
     const pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(P, 3)); pg.setAttribute('aSize', new THREE.BufferAttribute(S, 1)); pg.setAttribute('aPh', new THREE.BufferAttribute(Ph, 1));
@@ -10672,12 +10684,12 @@ function dojoBuild(g, W) {
       if (big) p2(new THREE.BoxGeometry(3, .1, 5).translate(0, 1.02, .2), triMat('wood_timber', { scale: .9 }));
       for (const [m, list] of MG2) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = !!big; J.add(o); }
       J.scale.setScalar(s); g.add(J); return J; };
-    for (const [r, y, w, ph, s] of [[150, 18, .035, 0, 1.4], [210, -6, -.024, 2.2, 1.1], [260, 30, .018, 4.1, 1.8], [120, 34, -.03, 3.3, 1.2]]) D.junks.push({ J: mkJunk(s), r, y, w, a: ph, ph });
+    for (const [r, y, w, ph, s, vy] of [[170, 55, .03, 0, 1.4, 14], [240, -35, -.02, 2.2, 1.1, 10], [330, 85, .014, 4.1, 1.8, 20], [140, 10, -.026, 3.3, 1.2, 18], [290, 20, .017, 5.2, 1.5, 25]]) D.junks.push({ J: mkJunk(s), r, y, w, a: ph, ph, vy });     /* m1462: TIERS -- from 35 below the dojo to 85 above, each climbing and diving (`vy`) on its own loop */
     // m1455: THE FLAGSHIP (his: *"my flying ship -- slowly traversing the islands, and maybe be able to reach it"*). Until `shipModel()` (his Ship,
     // Worker A) is factored out, a junk at x3 stands in. It CRUISES a wide loop round the islands (`F.T` s), sails in and parks BROADSIDE beside
     // the north altar with its deck level with the altar's disc (`F.dock` s), then sails off -- jump across from the altar. Its deck is a TURNED
     // dynamic box (`BDYN`, ADOCK's form) and it CARRIES him (the pose delta, turn included, applied to his feet while he stands on it).
-    { const S2 = 3, J = mkJunk(S2, 1); D.flag = { J, s: S2, deckLocal: 1.07 * S2, T: 150, cruise: 100, inn: 15, dock: 25, R: 125, Y: 20, dockR: D.altarR + 3.4 + 1.6 * S2, dockY: D.altarY - 1.07 * S2, h: Math.PI / 2, t: 112,
+    { const S2 = 3, J = mkJunk(S2, 1); D.flag = { J, s: S2, deckLocal: 1.07 * S2, T: 170, cruise: 120, inn: 15, dock: 25, R: 210, Y: 42, dockR: D.pier.r + D.pier.R + 1.6 * S2 + .4, dockY: D.pier.y - 1.07 * S2, h: Math.PI / 2, t: 112,
       deckB: { dyn: 1, hx: 1.5 * S2, hz: 2.5 * S2, lz: .2 * S2, y0: 1.07 * S2 - .4, y1: 1.07 * S2, cs: 1, sn: 0, cx: 0, cz: 0, minx: 0, maxx: 0, minz: 0, maxz: 0, miny: 0, maxy: 0 }, last: null }; } }
   { const N = 40, prof = []; for (let i = 0; i <= N; i++) { const u = i / N, rr = Math.sin(Math.pow(u, .8) * Math.PI) * (1 - u * .45) * 3.2 + .05; prof.push(new THREE.Vector2(rr, u * 26 - 13)); }
     const body = new THREE.LatheGeometry(prof, 24).rotateX(Math.PI / 2), BP = body.attributes.position, col = new Float32Array(BP.count * 3), cc = new THREE.Color();
@@ -10800,7 +10812,7 @@ function dojoStep(dt) { const D = DOJO; if (!D.on) return; D.t += dt; D.U.uTime.
     for (let i = 0; i < Q.N; i++) { const o = i * 3, ph = Q.Ph[i]; let x = P2[o] + (wx + Math.sin(t * 1.1 + ph) * .7) * dt, y = P2[o + 1] + (-.55 + Math.sin(t * 1.7 + ph) * .35) * dt, z = P2[o + 2] + (wz + Math.cos(t * .9 + ph * 1.3) * .7) * dt;
       if (x - cx > 30) x -= 60; else if (x - cx < -30) x += 60; if (z - cz > 30) z -= 60; else if (z - cz < -30) z += 60; if (y < -1) y = 14 + Math.random() * 4; P2[o] = x; P2[o + 1] = y; P2[o + 2] = z; }
     Q.pg.attributes.position.needsUpdate = true; Q.pm.uniforms.uPx.value = renderer.domElement.height / (2 * Math.tan(camera.fov * Math.PI / 360)); }
-  for (const Jk of D.junks || []) { Jk.a += Jk.w * dt; const x = Math.sin(Jk.a) * Jk.r, z = Math.cos(Jk.a) * Jk.r; Jk.J.position.set(x, Jk.y + Math.sin(D.t * .4 + Jk.ph) * 1.5, z); Jk.J.rotation.set(Math.sin(D.t * .5 + Jk.ph) * .04, Jk.a + (Jk.w > 0 ? Math.PI / 2 : -Math.PI / 2), Math.sin(D.t * .7 + Jk.ph) * .05); }
+  for (const Jk of D.junks || []) { Jk.a += Jk.w * dt; const x = Math.sin(Jk.a) * Jk.r, z = Math.cos(Jk.a) * Jk.r, cl = Math.cos(Jk.a * 2 + Jk.ph); Jk.J.position.set(x, Jk.y + Math.sin(Jk.a * 2 + Jk.ph) * (Jk.vy || 0) + Math.sin(D.t * .4 + Jk.ph) * 1.5, z); Jk.J.rotation.set(Math.sin(D.t * .5 + Jk.ph) * .04 - cl * Math.sign(Jk.w) * (Jk.vy || 0) * .006, Jk.a + (Jk.w > 0 ? Math.PI / 2 : -Math.PI / 2), Math.sin(D.t * .7 + Jk.ph) * .05); }
   if (D.candles) { const C2 = D.candles, mx = _dcM || (_dcM = new THREE.Matrix4()); C2.list.forEach((c, i) => { mx.makeScale(1, c.h, 1).setPosition(c.x, c.y + Math.sin(D.t * .8 + c.s) * .25, c.z); C2.m.setMatrixAt(i, mx); }); C2.m.instanceMatrix.needsUpdate = true; }
   if (JIN.bless > 0) JIN.bless -= dt;
   for (const A of D.altars || []) { if (!A.ch) continue; const p = player.pos, d = Math.hypot(p.x - A.x, p.z - A.z), on = d < 2.4 && Math.abs(p.y - A.y) < .7;
@@ -10833,7 +10845,7 @@ function dojoBirds(D, B) { const t = D.t, lead = tt => [Math.sin(tt * .11) * 70 
   B.cr.instanceMatrix.needsUpdate = true; }
 // m1455: the flagship's route (a wide cruise, in to the north altar, a hold, out) and its carry
 function dojoFlagPath(F, t) { const u = ((t % F.T) + F.T) % F.T, sm = v => v * v * (3 - 2 * v); let r, y, a;
-  if (u < F.cruise) { a = u / F.cruise * Math.PI * 2; r = F.R + Math.sin(a * 3) * 18; y = F.Y + Math.sin(a * 2) * 8; }
+  if (u < F.cruise) { a = u / F.cruise * Math.PI * 2; r = F.R + Math.sin(a * 3) * 40; y = F.Y + Math.sin(a * 2) * 26; }     /* m1462: far out, climbing and diving */
   else if (u < F.cruise + F.inn) { const v = sm((u - F.cruise) / F.inn); a = 0; r = F.R + (F.dockR - F.R) * v; y = F.Y + (F.dockY - F.Y) * v; }
   else if (u < F.cruise + F.inn + F.dock) { a = 0; r = F.dockR; y = F.dockY + Math.sin(t * .6) * .06; }
   else { const v = sm((u - F.cruise - F.inn - F.dock) / (F.T - F.cruise - F.inn - F.dock)); a = 0; r = F.dockR + (F.R - F.dockR) * v; y = F.dockY + (F.Y - F.dockY) * v; }
