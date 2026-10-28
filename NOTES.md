@@ -30,6 +30,22 @@ Shipped unverified.
 - `barrClear` drops the rigs. HEADLESS NOTE (again): the rigs step slowly headless; the roof's fall shows at 30 s.
 Render-checked headless: four pillars cut -> pillars down in the yard, the roof down over the bunks, the walls and posts gone.
 Shipped unverified.
+## m15xx -- WALL RUNNING: THE RUN-UP AND THE PERCH ARE SOLVED ON THE WALL (his: "legs bent the wrong way -- Superman flying at the wall")
+His: *"when he runs up the wall his legs are 180 degrees the wrong direction, he looks like Superman flying at the wall... jump against the wall
+and he needs to PERCH like a gargoyle, ready to jump off, and slide down; flick up or to the side and he runs up it or along it."*
+- **Measured first, headless** (scratchpad `wallcheck.mjs`: Grumbo, a wall whose face is at z = 10; jump at it -> perch; perched + swipe up
+  -> the run-up; a jump along it + swipe side -> the side run; every phase rendered side-on, and distances off the face printed for the
+  hips, head, knee, both feet and a hand).
+  - m1604's run-up turned the thighs a fixed `upLeg` on top of the run clip, so where the feet went was the clip's swing plus that angle.
+  - Grumbo: feet **.54-.95 m off the face** with the hips at .5. The legs trailed AWAY from the wall -- exactly his Superman.
+  - (m1604's render had looked right on one frame of one hero; that is not a check.)
+- **Now (`wrunSolve`, `wrLimb`):** each leg is a two-bone IK onto a point ON the face, the knee bent toward a pole (up and out), and the foot
+  turned so its toes point up the wall. The hips are held `upD` x hipY off the face.
+  - The run-up steps: the two feet alternate up and down the face (`upAmp`, `upRate`); the swinging foot lifts off it (`upLift`).
+  - The spine is turned back `upTorso` .32 rad so the torso stands upright (the run clip leaned him into the wall).
+  - The PERCH (the slide): both feet planted on the face below the hips (`perchFoot`), knees bent, both hands on the face above his head.
+- **After:** run-up feet .01-.16 m off the face, knees .2, hips .5, head .4; perch feet .02, hands .03, hips .32. Rendered every phase.
+- The side run is unchanged (feet .14-.32 off the face, hips .52).
 
 ## m1659 -- THE RE-PASS: the ROBOT BARRACKS, pass 1 (ENEMY look)
 - ENEMY_STYLE's BARRACKS, literally: "a long hall where constructs stand dormant in rows behind black pillars, under a black roof with
