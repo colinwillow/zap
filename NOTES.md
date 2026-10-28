@@ -20,6 +20,16 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
   splinters, dust, a crack, "Target! n / 12 down"); back after `tgBack` 10 s.
 **Moves:** DRAGON.md box 5 (his feel open). **Still open:** 6 (taming) and his sign-off. Gates: check ok, zone boot ok. Shipped unverified.
 
+## m1620 -- THE RE-PASS: the BATHHOUSE, pass 3 (verticality, L3; its third pass, so the loop moves on)
+- **A MONOHOSHI**, the traditional rooftop drying deck: a plank deck at 6.3 m perched over the -z eave on four posts (the outer pair to the
+  ground, the inner pair down to the roof), solid railings on three sides, two laundry poles with four towels that flap (`bathStep`).
+  A LADDER up to it from the yard (`kitClimbAdd`, its exit mark on the deck). Two doubloons on the deck.
+- **A doubloon hung 6.6 m over the pool**: only the GEYSER (strike the valve, stand in the water) throws you high enough. It is L3, using
+  the building's own trick.
+- All of it sorts into the `roof` piece (the deck and railing boxes are `up`, the ladder an `up` climb, the doubloons `up` coins), so it
+  is gone while fallen and comes back with the roof. `bathClear` removes the coins and the climb.
+Render-checked headless (the deck from the side). Shipped unverified. **Its three passes are done; next in the table after the Bathhouse.**
+
 ## m1619 -- THE DRAGON RIDE, build 4: FLYING (DRAGON.md box 4)
 - **The model is `wingFly`'s** (RollerGirl's wingsuit) on the beast, in `dragDrive`'s air branch (`B.drive.air = { v, pitch, bank }`): stick X
   turns (`fturn`, negated -- heading grows toward his LEFT) and banks him (`bank`); stick UP climbs, DOWN dives (her game's way round), centred
