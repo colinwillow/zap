@@ -22059,6 +22059,22 @@ function rampBuild() {
   // m1554: two SPHINX guardians flank the gate on the OUTER face (the approach), facing out
   { const putG = (geo, m) => putM(geo, m); for (const sx of [-1, 1]) { const x = cx + sx * (g2 + 2.6), z = cz - ht - 4.2; enemySphinx(putG, E, x, z, Math.PI, 1.25 * k);
       const bb = { minx: x - 1.1 * k, maxx: x + 1.1 * k, miny: 0, maxy: 2.6 * k, minz: z - 2 * k, maxz: z + 2 * k }; O.boxes.push(bb); BOXES.push(bb); } boxGrid(); }
+  // ---- RE-PASS 3 (m@X4@): THE GATE GALLERY (ENEMY_STYLE "a black gate tower ... a gallery on top"): a roofed gallery on the walk over the
+  // gateway -- four lacquer posts, gold beam bands, a two-tier black-tile hip roof with a gold finial, the gold emblem on plaques front and
+  // back, two mint lanterns hung inside, and grapple rings under its outer eaves (L3). It is part of the `gate` piece and falls with it ----
+  { const ax = g2 + 1.6, az = ht + 1.2, y0 = H, R2 = Math.SQRT2, emb = new THREE.MeshStandardMaterial({ map: enemyEmblemTex(), transparent: true, alphaTest: .4, metalness: .8, roughness: .35, side: THREE.DoubleSide });
+    for (const [px, pz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) add(new THREE.BoxGeometry(.3, 3, .3), wood, cx + px * (g2 - .3), y0 + 1.5, cz + pz * (ht - .35), 1);
+    for (const pz of [-1, 1]) add(new THREE.BoxGeometry((g2 - .3) * 2 + .3, .26, .24), E.gold, cx, y0 + 2.85, cz + pz * (ht - .35), 0);
+    for (const px of [-1, 1]) add(new THREE.BoxGeometry(.24, .26, (ht - .35) * 2 + .3), E.gold, cx + px * (g2 - .3), y0 + 2.85, cz, 0);
+    add(new THREE.BoxGeometry(ax * 2 - .4, .18, az * 2 - .4), wood, cx, y0 + 3.05, cz, 0);
+    add(new THREE.CylinderGeometry(.55 * R2, R2, .95, 4, 1, true).rotateY(Math.PI / 4).scale(ax, 1, az), E.roof, cx, y0 + 3.55, cz, 0);
+    add(new THREE.ConeGeometry(.55 * R2, 1.4, 4).rotateY(Math.PI / 4).scale(ax, 1, az), E.roof, cx, y0 + 4.72, cz, 0);
+    add(new THREE.ConeGeometry(.14, .9, 6), E.gold, cx, y0 + 5.8, cz, 0); add(new THREE.SphereGeometry(.2, 10, 8), E.gold, cx, y0 + 5.38, cz, 0);
+    for (const [px, pz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const e = add(new THREE.ConeGeometry(.12, .7, 4), E.gold, cx + px * (ax + .1), y0 + 3.15, cz + pz * (az + .1), 0); e.rotation.set(pz * .9, 0, -px * .9); }
+    for (const pz of [-1, 1]) { putM(new THREE.PlaneGeometry(1.6, 1.6).translate(cx, y0 + 2.05, cz + pz * (ht - .3)), emb); add(new THREE.BoxGeometry(1.9, 1.9, .08), E.lacquer, cx, y0 + 2.05, cz + pz * (ht - .22), 0); }
+    for (const px of [-1, 1]) { putM(new THREE.BoxGeometry(.34, .5, .34).translate(cx + px * 2.2, y0 + 2.2, cz), lamp); add(new THREE.BoxGeometry(.42, .08, .42), E.gold, cx + px * 2.2, y0 + 2.49, cz, 0); add(new THREE.BoxGeometry(.03, .5, .03), E.iron, cx + px * 2.2, y0 + 2.75, cz, 0); }
+    for (const px of [-1, 1]) rings.push(gringAdd(g, cx + px * (g2 - .4), y0 + 3.2, cz - az - .2));
+    const nb = O.boxes.length - 4; for (const b2 of O.boxes.slice(nb)) BOXES.push(b2); boxGrid(); }
   // ---- RE-PASS 2 (m1558): DESTRUCTIBLE TO THE GROUND (ENEMY RULES; the Gatehouse's machinery). Pieces: `wL0..3` / `wR0..3` (the segments,
   // 0 at the gate, each with its merlons, coping, banners and lanterns), `bL` / `bR` (the bastions with their steps, merlons, emblems, brazier,
   // pole and ring) and `gate` (the lintel, the jambs, the oni masks, the horn). Smash a segment's seam (6 blows) and it SLUMPS into rubble,
@@ -22090,7 +22106,8 @@ function rampBuild() {
 }
 function rampSentries(R, dt) { const A = RAMP, [cx, cz] = A.at, p = player, top = A.H + .15, lim = A.L / 2 - A.bast - .8;
   for (const S of R.sen) { const P = S.g.position; S.t += dt; if (S.hc > 0) S.hc -= dt;
-    if (S.st === 'fall') { S.vy -= MOVE.g * dt; P.y += S.vy * dt; P.z -= 2 * dt; S.g.rotation.x -= dt * 3; if (P.y < .2) { P.y = .2; } if (S.t > A.senBack) { S.st = 'walk'; S.t = 0; S.hp = A.senHp; P.set(S.x0, top, cz + .3); S.g.rotation.set(0, 0, 0); arenaBeam(P.x, P.z, [.6, .9, 1], .4); } continue; }
+    if (S.st !== 'fall' && R.fell && R.fell[R.cls(P.x, cz)]) { S.st = 'fall'; S.t = 0; S.vy = 0; }     // m@X4@: the walk fell out from under it
+    if (S.st === 'fall') { S.vy -= MOVE.g * dt; P.y += S.vy * dt; if (P.y > .2) P.z -= 2 * dt; S.g.rotation.x = Math.max(-1.5, S.g.rotation.x - dt * 3); if (P.y < .2) { P.y = .2; S.vy = 0; } if (S.t > A.senBack && !(R.fell && R.fell[R.cls(S.x0, cz)])) { S.st = 'walk'; S.t = 0; S.hp = A.senHp; P.set(S.x0, top, cz + .3); S.g.rotation.set(0, 0, 0); arenaBeam(P.x, P.z, [.6, .9, 1], .4); } continue; }
     const onWall = Math.abs(p.pos.y - top) < 1.3 && Math.abs(p.pos.z - cz) < A.T / 2 + .5, dx = p.pos.x - P.x, d = Math.abs(dx);
     if (S.st === 'walk') { P.x += S.dir * A.senV * dt; if (P.x > cx + lim) S.dir = -1; if (P.x < cx - lim) S.dir = 1; S.g.rotation.y = S.dir * Math.PI / 2; S.arm.rotation.x = 0; S.eye.color.setRGB(.37, .95, 1);
       if (onWall && d < 7) { S.st = 'close'; S.t = 0; } }

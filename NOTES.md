@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the RAMPART WALL, pass 3 (silhouette, L3; its third pass, so the loop moves on)
+**Moves:** detail and verticality. The flat wall got a classical silhouette over its gate.
+- **THE GATE GALLERY** (ENEMY_STYLE's "black gate tower ... a gallery on top"): four solid lacquer posts on the walk over the gateway, gold
+  beam bands, a timber ceiling, a two-tier black-tile hip roof (an open 4-sided skirt and a cap, scaled to the gate's rectangle), a gold
+  finial and up-turned gold corner tips, the gold emblem on lacquer plaques front and back, two mint lanterns. Two grapple rings under its
+  outer eaves (L3). Every piece of it sorts into `gate`, so it comes down with the gate.
+- **Sentries:** a robot sentry standing on a fallen segment (`R.cls(P.x)`) drops into its `fall` state and does not climb back while its
+  post segment is down. The old fall drifted it 2 m/s in -z for the whole 20 s respawn (40 m); it only drifts while airborne now.
+Render-checked headless (outer face, walk). Shipped unverified. **The Rampart's three passes are done; next in the table: Airship Dock (a flyer).**
+
 ## m1558 -- THE RE-PASS: the RAMPART WALL, pass 2 (DESTRUCTIBLE TO THE GROUND)
 **Moves:** its breakable row (ENEMY RULES: for destroying). The Gatehouse's machinery: one rig per piece, run backwards.
 - Each wall run is FOUR SEGMENTS now (a box, a footing and a coping each, 6.4 m), not one 25 m box, so each can fall alone. Pieces: `wL0..3`,
