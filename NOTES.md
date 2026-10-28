@@ -10,6 +10,16 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
+## THE DOJO, PASS 8: THE ATMOSPHERE -- CLOUDS, GOD RAYS, SKY LANTERNS, FAIRY FLECKS, SUN, BROKEN FOG (mXXXX)
+*"Big fluffy clouds, god rays, those floating lanterns, little fairy glowing flecks, a nice sun, a subtle glowing fog... moody, a sunset vibe... with an opacity texture so it's broken up, not 100% one linear section of fog; it has values to it."*
+- **`bbd(list, {frag, move, aspect, add, order})`** inside dojoBuild: ONE instanced camera-facing card per layer (`iC` = centre + size, `iS` = seed). The look is in the fragment shader and the drift is in `move` (vertex). Five layers, five draws.
+- **Clouds:** 16 cumulus banks at r 170-400, 9-16 puffs each, big at the base and piling up. The edges are eaten by fbm, warm on top and toward the sun, lavender in the shade, fading to the horizon colour.
+- **Fog:** 46 wide cards low round the dojo and islands. The alpha is the product of two fbm octaves drifting in time, so the fog breaks into wisps and banks with VALUES. It glows peach toward the sun and lavender away, and fades out within 14-40 m of the eye so it never sits on the fight.
+- **Sky lanterns:** 70 at r 34-154, rising (wrapping at 70 m) and drifting, a flickering flame at the base and a halo. They fade within 6-18 m of the camera, because a lantern rising past the lens is a big flat yellow block.
+- **Fairy flecks:** 260 additive motes over the floor (r < 40, y .4-9.4), gold and some cyan, twinkling.
+- **God rays:** 7 open cones along the sun vector, merged and additive. A view-facing edge falloff, faded at both ends, slow streaks. The first try at .16 was invisible; it is .3 now.
+- **Sun:** an additive radial-gradient sprite (320 m) kept on the sun line, 700 m from the camera (`D.sunG`).
+
 ## THE DOJO, PASS 7: THE WEAVE -- A HERITAGE PAGODA, WATERFALLS, A SKY MANTA (m1417)
 *"We can still use the more classical Japanese architecture -- weave it together, both can exist."*
 - **The pagoda** is five tiers on the great west island (`SC[0]`): a stone plinth, red storeys that step in, tiled roofs with upturned corners, bronze bells at the eave corners, a ring spire, and four box lanterns. The island's dressing keeps clear of it (`clear: 9`).

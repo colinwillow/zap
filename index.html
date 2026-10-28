@@ -10445,6 +10445,60 @@ function dojoBuild(g, W) {
     const mm = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .6, side: THREE.DoubleSide, emissive: 0x110a22, emissiveIntensity: .2 });
     mm.onBeforeCompile = sh => { sh.uniforms.uTime = U.uTime; sh.vertexShader = 'uniform float uTime;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n float ax = abs(transformed.x) / 7.0; transformed.y += sin(uTime * 1.3 - ax * 1.6) * ax * ax * 3.2; float tz = max(0.0, -transformed.z - 3.0); transformed.x += sin(uTime * 2.0 - tz * .5) * tz * .12;'); };
     const mt = new THREE.Mesh(mg, mm); mt.scale.setScalar(2.2); g.add(mt); D.manta = { m: mt, r: 95, y: 26, w: -.05, a: 2.6 }; }
+  // m1419: THE ATMOSPHERE (his: *"big fluffy clouds, god rays, those floating lanterns, little fairy glowing flecks, a nice sun, a subtle glowing fog --
+  // moody, a sunset vibe -- with an opacity texture so it's broken up, not 100% one linear section of fog; it has values to it"*). Every layer is ONE
+  // draw: an instanced camera-facing card (`bbd`) whose look lives in its fragment shader. Nothing here stands on the fighting floor.
+  { const NZ = 'float h2(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); } float n2(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(h2(i), h2(i + vec2(1, 0)), f.x), mix(h2(i + vec2(0, 1)), h2(i + vec2(1, 1)), f.x), f.y); } float fb(vec2 p) { float a = .5, s = 0.0; for (int i = 0; i < 5; i++) { s += a * n2(p); p *= 2.07; a *= .5; } return s; }\n';
+    const rnd = (() => { let s2 = 9; return () => (s2 = (s2 * 16807) % 2147483647) / 2147483647; })();
+    const bbd = (list, o) => { const base = new THREE.PlaneGeometry(1, 1), G = new THREE.InstancedBufferGeometry(); G.index = base.index; G.setAttribute('position', base.attributes.position); G.setAttribute('uv', base.attributes.uv);
+      const C = new Float32Array(list.length * 4), Sd = new Float32Array(list.length); list.forEach((l, i) => { C.set(l.slice(0, 4), i * 4); Sd[i] = l[4]; });
+      G.setAttribute('iC', new THREE.InstancedBufferAttribute(C, 4)); G.setAttribute('iS', new THREE.InstancedBufferAttribute(Sd, 1)); G.instanceCount = list.length;
+      const m = new THREE.ShaderMaterial({ uniforms: { uTime: U.uTime, uSun: U.uSun }, transparent: true, depthWrite: false, fog: false, blending: o.add ? THREE.AdditiveBlending : THREE.NormalBlending,
+        vertexShader: `attribute vec4 iC; attribute float iS; uniform float uTime; varying vec2 vU; varying float vS; varying vec3 vW; void main() { vU = uv; vS = iS; vec3 c = iC.xyz; ${o.move || ''}
+          vW = c; vec4 mv = viewMatrix * vec4(c, 1.0); mv.xy += position.xy * iC.w * vec2(${o.aspect || '1.0'}, 1.0); gl_Position = projectionMatrix * mv; }`,
+        fragmentShader: `uniform float uTime; uniform vec3 uSun; varying vec2 vU; varying float vS; varying vec3 vW; ${NZ} ${o.frag}` });
+      const ms = new THREE.Mesh(G, m); ms.frustumCulled = false; ms.renderOrder = o.order || 0; g.add(ms); return ms; };
+    // BIG FLUFFY CLOUDS: cumulus banks -- each a cluster of 9-16 puffs, the big ones at the bottom, smaller piling up, lit warm on top and toward the
+    // sun, lavender in the shade; the edge is eaten by noise so every puff is lumpy, never a disc
+    const CL = []; for (let k = 0; k < 16; k++) { const a = k / 16 * 6.283 + rnd() * .3, r = 170 + rnd() * 230, cx = Math.sin(a) * r, cz = Math.cos(a) * r, cy = -34 + rnd() * 40, S = 26 + rnd() * 30, n = 9 + Math.floor(rnd() * 8);
+      for (let i = 0; i < n; i++) { const u = (rnd() - .5) * 2.2, h = Math.pow(rnd(), 1.6); CL.push([cx + u * S * 1.1 + (rnd() - .5) * S * .5, cy + h * S * .9, cz + (rnd() - .5) * S * .9, S * (1.05 - h * .55) * (.7 + rnd() * .5), rnd() * 50]); } }
+    bbd(CL, { order: -1, frag: `void main() { vec2 q = vU - .5; float d = length(q) * 2.0; float n = fb(vU * 3.2 + vS); float a = smoothstep(1.0, .55, d + (n - .5) * .8);
+      if (a < .01) discard; float lit = clamp(vU.y * .9 + n * .5 - .1, 0.0, 1.0); vec3 V = normalize(vW - cameraPosition); float sf = pow(max(0.0, dot(V, uSun)), 2.0);
+      vec3 c = mix(vec3(.58, .5, .68), vec3(1.0, .88, .78), lit); c += vec3(1.0, .6, .35) * sf * (1.0 - d) * .5; c = mix(c, vec3(.96, .74, .66), smoothstep(250.0, 520.0, length(vW.xz - cameraPosition.xz)) * .6);
+      gl_FragColor = vec4(c, a * .92); }` });
+    // THE FOG: big soft cards low round the dojo and the islands, broken by drifting noise into wisps and banks (values, not one flat sheet), glowing
+    // peach where it faces the sun and lavender away from it; it thins to nothing near the eye so it never sits on the fight
+    const FG = []; for (let i = 0; i < 46; i++) { const a = rnd() * 6.283, r = 45 + rnd() * 170; FG.push([Math.sin(a) * r, -14 + rnd() * 20, Math.cos(a) * r, 50 + rnd() * 70, rnd() * 50]); }
+    bbd(FG, { aspect: '1.8', order: -1, frag: `void main() { vec2 q = vU - .5; float e = smoothstep(.5, .1, abs(q.x)) * smoothstep(.5, .15, abs(q.y)); vec2 p = vU * vec2(2.4, 1.3) + vec2(uTime * .012 + vS, uTime * .004);
+      float n = fb(p) * fb(p * 1.7 + 3.1); float a = smoothstep(.1, .45, n) * e; vec3 V = normalize(vW - cameraPosition); float sf = pow(max(0.0, dot(V, uSun)), 3.0);
+      float near = smoothstep(14.0, 40.0, length(vW - cameraPosition)); vec3 c = mix(vec3(.66, .58, .78), vec3(1.0, .76, .56), .35 + sf * .65);
+      gl_FragColor = vec4(c, a * .42 * near); }` });
+    // FLOATING LANTERNS: paper sky-lanterns rising slowly round the dojo and drifting on the wind, a warm body with a brighter flame at the base, a halo
+    const LN = []; for (let i = 0; i < 70; i++) { const a = rnd() * 6.283, r = 34 + rnd() * 120; LN.push([Math.sin(a) * r, rnd() * 70, Math.cos(a) * r, 1.3 + rnd() * 1.1, rnd() * 100]); }
+    bbd(LN, { aspect: '.8', order: 2, move: 'c.y = mod(c.y + uTime * (.5 + fract(iS * .37) * .5), 70.0) - 25.0; c.x += sin(uTime * .21 + iS) * 2.5 + uTime * .25; c.z += cos(uTime * .17 + iS * 1.7) * 2.5;', frag: `void main() { vec2 q = (vU - .5) * 2.0;
+      float body = step(abs(q.x), .38 - q.y * .08) * step(abs(q.y), .55); float fl = .75 + .25 * sin(uTime * 9.0 + vS * 7.0); float halo = exp(-dot(q, q) * 2.2) * .55 * fl;
+      vec3 c = mix(vec3(1.0, .42, .14), vec3(1.0, .86, .5), clamp(.5 - q.y * .7, 0.0, 1.0) * fl); float a = max(body * .95, halo) * smoothstep(6.0, 18.0, length(vW - cameraPosition)); if (a < .01) discard;
+      gl_FragColor = vec4(mix(vec3(1.0, .6, .3), c, body) * (1.0 + body * .4), a); }` });
+    // FAIRY FLECKS: tiny gold and cyan motes drifting and twinkling over and round the floor (additive: they only ever add light)
+    const FL = []; for (let i = 0; i < 260; i++) { const a = rnd() * 6.283, r = Math.sqrt(rnd()) * 40; FL.push([Math.sin(a) * r, .4 + rnd() * 9, Math.cos(a) * r, .1 + rnd() * .12, rnd() * 100]); }
+    bbd(FL, { add: true, order: 3, move: 'c.x += sin(uTime * .3 + iS) * 2.0 + sin(uTime * 1.3 + iS * 3.0) * .3; c.y += sin(uTime * .5 + iS * 1.7) * 1.2; c.z += cos(uTime * .27 + iS * 2.3) * 2.0;', frag: `void main() { vec2 q = (vU - .5) * 2.0;
+      float tw = pow(.5 + .5 * sin(uTime * (1.5 + fract(vS) * 3.0) + vS * 9.0), 3.0); float g2 = exp(-dot(q, q) * 6.0) + exp(-dot(q, q) * 40.0);
+      vec3 c = mix(vec3(1.0, .82, .4), vec3(.5, .95, 1.0), step(.7, fract(vS * .31))); gl_FragColor = vec4(c * g2 * (.25 + tw), 1.0); }` });
+    // GOD RAYS: long soft shafts down the sun's own line, falling through the gaps in the clouds onto the islands and the dojo's rim; additive, faded
+    // at both ends and toward their edges (a view-facing falloff on an open cone), slow streaks moving down them
+    const RG = []; const sv = sd.clone(), up = new THREE.Vector3(0, 1, 0), qq = new THREE.Quaternion().setFromUnitVectors(up, sv);
+    for (const [tx, ty, tz, r0, L] of [[-30, 0, -10, 5, 260], [20, -4, 30, 3.5, 240], [-110, -10, 40, 9, 300], [90, -20, -100, 10, 300], [40, 10, -40, 4, 220], [-60, 6, 70, 6, 260], [60, -10, 60, 7, 280]]) {
+      const cg = new THREE.CylinderGeometry(r0 * .45, r0, L, 18, 1, true).translate(0, L / 2, 0).applyQuaternion(qq).translate(tx, ty, tz); RG.push(cg); }
+    const rm = new THREE.ShaderMaterial({ uniforms: { uTime: U.uTime }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false,
+      vertexShader: 'varying vec3 vN; varying vec3 vV; varying vec2 vU; void main() { vU = uv; vec4 mv = modelViewMatrix * vec4(position, 1.0); vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }',
+      fragmentShader: 'uniform float uTime; varying vec3 vN; varying vec3 vV; varying vec2 vU; void main() { float e = pow(abs(dot(vN, vV)), 2.5); float along = smoothstep(0.0, .25, vU.y) * smoothstep(1.0, .55, vU.y);' +
+        ' float st = .6 + .4 * sin(vU.x * 40.0 + vU.y * 6.0 - uTime * .4) * sin(vU.x * 17.0 + uTime * .2); gl_FragColor = vec4(vec3(1.0, .78, .5) * e * along * st * .3, 1.0); }' });
+    const rays = new THREE.Mesh(mergeGeometries(RG), rm); rays.frustumCulled = false; rays.renderOrder = 4; g.add(rays);
+    // THE SUN: a big warm glow round the sky's sun disc, kept on the sun's line from wherever the camera is
+    const gc = document.createElement('canvas'); gc.width = gc.height = 256; const gx = gc.getContext('2d'), gr = gx.createRadialGradient(128, 128, 0, 128, 128, 128);
+    gr.addColorStop(0, 'rgba(255,240,215,1)'); gr.addColorStop(.12, 'rgba(255,214,160,.85)'); gr.addColorStop(.35, 'rgba(255,160,110,.28)'); gr.addColorStop(1, 'rgba(255,140,120,0)'); gx.fillStyle = gr; gx.fillRect(0, 0, 256, 256);
+    const gt = new THREE.CanvasTexture(gc); gt.colorSpace = THREE.SRGBColorSpace; const sg = new THREE.Sprite(new THREE.SpriteMaterial({ map: gt, blending: THREE.AdditiveBlending, depthWrite: false, fog: false, transparent: true }));
+    sg.scale.setScalar(320); sg.renderOrder = -1; sg.frustumCulled = false; g.add(sg); D.sunG = { m: sg, d: sd.clone() }; }
   D.on = { g }; ARENA.door.entry = 'BEAM'; }
 function dojoStep(dt) { const D = DOJO; if (!D.on) return; D.t += dt; D.U.uTime.value = D.t; D.dome.position.copy(camera.position);
   // m1401: OFF THE EDGE. The world has a floor at y 0 everywhere, so past the rim he would stand on the sky. Out there and down at y 0, he has
@@ -10456,6 +10510,7 @@ function dojoStep(dt) { const D = DOJO; if (!D.on) return; D.t += dt; D.U.uTime.
       if (x - cx > 30) x -= 60; else if (x - cx < -30) x += 60; if (z - cz > 30) z -= 60; else if (z - cz < -30) z += 60; if (y < -1) y = 14 + Math.random() * 4; P2[o] = x; P2[o + 1] = y; P2[o + 2] = z; }
     Q.pg.attributes.position.needsUpdate = true; Q.pm.uniforms.uPx.value = renderer.domElement.height / (2 * Math.tan(camera.fov * Math.PI / 360)); }
   for (const Jk of D.junks || []) { Jk.a += Jk.w * dt; const x = Math.sin(Jk.a) * Jk.r, z = Math.cos(Jk.a) * Jk.r; Jk.J.position.set(x, Jk.y + Math.sin(D.t * .4 + Jk.ph) * 1.5, z); Jk.J.rotation.set(Math.sin(D.t * .5 + Jk.ph) * .04, Jk.a + (Jk.w > 0 ? Math.PI / 2 : -Math.PI / 2), Math.sin(D.t * .7 + Jk.ph) * .05); }
+  if (D.sunG) D.sunG.m.position.copy(camera.position).addScaledVector(D.sunG.d, 700);
   if (D.manta) { const Mn = D.manta; Mn.a += Mn.w * dt; const rr = Mn.r + Math.sin(Mn.a * 2) * 25; Mn.m.position.set(Math.sin(Mn.a) * rr, Mn.y + Math.sin(D.t * .35) * 5, Math.cos(Mn.a) * rr); Mn.m.rotation.set(Math.cos(D.t * .35) * .1, Mn.a - Math.PI / 2, .35); }
   if (D.whale) { const Wh = D.whale; Wh.a += Wh.w * dt; Wh.m.position.set(Math.sin(Wh.a) * Wh.r, Wh.y + Math.sin(D.t * .25) * 6, Math.cos(Wh.a) * Wh.r); Wh.m.rotation.set(Math.cos(D.t * .25) * .08, Wh.a + Math.PI / 2, 0); }
   if (!D.dyn) { D.dyn = 1; for (const P of D.plats) BDYN.push(P.box); }
