@@ -102,6 +102,20 @@ stun, instant riposte). Next, in order:
 6. **Smears (later)**: the blade-arc ribbon held 2-3 frames; then the lag-transform vertex stretch on blade and arm during the active
    frames only; optionally the mixer stepped at 12 fps during attacks ("on twos"), smears held at most 2 frames.
 
+## HIS NOTES, Oct 28 2026 (playing the dojo) -- the open gesture slots and the reticle
+> *"If you press and hold up on the right stick and then move it down to the bottom before releasing, he does the up-air attack where he goes up
+> in the air. I don't like the reticle, how it shows the arc -- maybe he just bends his body like he's about to launch upward. In the reverse:
+> press DOWN on the right stick and he goes into parry -- maybe you move it up and let go and he does a special move. The charge (hold up on the
+> right): holding UP on the left and releasing does the launch-forward down slice; releasing at neutral does the spin; there's an opportunity to
+> hold DOWN on the left while you charge and do a whole different attack."*
+- [ ] **The up-air launcher's tell is his BODY, not a reticle arc:** a crouch-coil anticipation (knees bent, blade drawn low behind) while held
+  up-then-down; drop the arc reticle (keep it on a TOOLS switch for comparison).
+- [ ] **PARRY -> UP + release = a SPECIAL** (open: his pick). Proposals: a RISING COUNTER (the parry's stored force thrown back as an upward cut
+  that launches the attacker); a RIPOSTE DASH (a lunge through the attacker, behind him); a GUARD BREAK (the hilt into his guard, it shatters
+  shields -- ties to the boss armour below).
+- [ ] **CHARGE + LEFT-STICK DOWN = a third release** (open: his pick). Proposals: a GROUND SLAM / shockwave (the blade driven into the floor, a
+  ring that knocks everyone down); a BACKSTEP IAI (a retreating quick-draw that cuts the space he just left); a SWEEP (a low spinning cut that trips).
+
 ## DONE WHEN (the whole-piece gate -- every box needs evidence in the NOTES entry that ticks it)
 
 - [ ] Four directional attacks that look and feel different (slash L, slash R, chop, thrust), and the slash chains a 3-hit combo.

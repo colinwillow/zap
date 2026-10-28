@@ -19,6 +19,17 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The rider's `p.speed` is .3 x his, so the lens pulls out a little with pace (`CAM.distV`).
 **Moves:** DRAGON.md box 3 (his feel open). **Still open:** 4-6 and his sign-off. Gates: check ok, zone boot ok. Shipped unverified.
 
+## m1617 -- THE RE-PASS: the BATHHOUSE, pass 2 (rubric 7: RESTORES IN PLACE)
+- Base (stays): the floor, the breakable walls, the pool and its rim, the benches, the tub, the boiler and its valve, the engawa, the
+  shoji (their own dynamic boxes), the engawa lanterns. Pieces (`cls`): `roof` (with the bunting under its eave), `front` (posts, beam,
+  eave lanterns), `chim` (the chimney and its cap), `fence` (the bamboo fence) and `toro` (the garden's stone lantern).
+- FALLEN: the roof sags 2.4 m into the hall, the chimney lies in the yard, the front posts lie across the engawa, the fence lies flat, the
+  lantern is tipped. The pool is COLD: no steam, no healing, and the valve will not set off the geyser. Drained; the drone and the
+  cables are gone. RESTORE: the lantern rights itself, the fence and posts stand, the chimney rises, the roof settles back on last; the
+  pool steams again; Jinra motes.
+- Plate before the engawa's corner; `rig` hook; `bathClear` drops the rig and the plate.
+Render-checked headless: fallen and restored. Shipped unverified.
+
 ## m1614 -- THE DRAGON RIDE, build 2: MOUNT / DISMOUNT (DRAGON.md box 2)
 - **The mount spot** (`dragSeat`): a mint ring at his LEFT flank, stepped out along his side until it is clear of his body box (+1.1 m),
   level with the dais. It pulses, brightens when you stand on it, and a tip says what to do (or, not CAPTURED, that he will not be ridden).
@@ -34,6 +45,16 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - **The lens** (`stepCam`, the one writer of `cam.az`): comes round behind his heading after `camIdle` .8 s of no drag, pulled back `camPull`
   6 m and lifted `camLift` .4 m.
 **Moves:** DRAGON.md box 2 (his look open). **Still open:** 3-6 and his sign-off. Gates: check ok, zone boot ok. Shipped unverified.
+
+## m1615 -- the dojo stops beaming him home off the gates; TOOLS > DOJO FX to find the 20 fps
+- **"When I try to go anywhere other than the main dojo it spawns me back in the middle":** the four gate LANDINGS and their BRIDGES were drawn at
+  floor height with NO collider -- he stood on the world's invisible floor at y 0, which is exactly what the off-the-edge rule (m1401: past the
+  rim, at y < .35 -> beam home) exists to catch. They are real ground now (`safe` boxes), and the rule fires only when nothing real is under his feet.
+- **20 fps:** the chip reads ~50 ms a frame with the CPU at ~14 ms, so the GPU is the wait (fill: a dozen transparent card layers over the sky,
+  and the shadow pass). Not guessed at: **TOOLS > DOJO FX** steps the suspects off cumulatively -- FULL / NO SKY FX (every `bbd` card layer, the
+  sun glow, the candles) / NO PLANTS / NO SHADOWS -- live, no reload; the FPS on the chip at each step names the cost. Then the fix is aimed.
+- His notes for the sword's open gesture slots and the reticle went into SWORD.md; the war bosses (shields that don't block, an armour key)
+  and the spider bots into HORDE.md.
 
 ## m1611 -- THE RE-PASS: the BATHHOUSE, pass 1 (a HERO / TOWN place: the look; a collider audit)
 - Kit materials: `K.timber`, a warm planks triMat, a `stone_blocks` triMat in two tones, `K.lamp`, `K.bronze` (chimney cap, boiler, pipe).
