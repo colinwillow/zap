@@ -23,7 +23,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 - [ ] sky whale (dojo, pass 1 at m1413): pass 2 -- a real silhouette (a heavier head, a jaw line, barnacle and Jin markings, a slower roll)
 - [ ] sky manta (dojo, pass 1 at m1417): pass 2 -- a thicker body, a curled cephalic fin, a proper underside, wings that ripple, not fold
 - [ ] serpent fish (the Ship, Worker A): its own passes in the Ship's list
-- [x] **sky dragon pass 1 (mXXXX):** a 64-segment red-and-gold Jin serpent-dragon with a mint mane, gold horns and whiskers, weaving between the islands through the tiers (-30 to +60 m)
+- [x] **sky dragon pass 1 (m1481):** a 64-segment red-and-gold Jin serpent-dragon with a mint mane, gold horns and whiskers, weaving between the islands through the tiers (-30 to +60 m)
 - [ ] sky dragon pass 2: a real head (a snout, an open jaw, a brow, a beard), little clawed legs, a tail tuft, a body that rolls as it turns
 
 
