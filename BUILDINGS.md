@@ -171,9 +171,26 @@ stairs cut in rock, ladders, rope bridges, floating platforms, lifts, flying shi
 spires, bridges strung high across the gap).
 
 ## THE WATER-MILL TOWER (his, after m1459) -- the spire in the stream
-The layout test put a 55 m sandstone spire in the stream 66 m below the home. *"That to me looks like an opportunity for a water... tower,
-a windmill powered through the stream. You can leave that there."* The spot is held for it. **His image is to come; nothing is built
-until it does.**
+Ref: `images/korajin/ref/water_mill_1.jpg` (his, after m1468: front / back / left / right / waterwheel / interior / top platform / signage).
+What it is: on a sandy island in the stream, a square cream BASE with an arched opening and a WATERWHEEL in it, water pouring over the
+wheel from a chute; a tall tapering cream TOWER painted with the red sun-spiral; a ring GALLERY and a red-capped timber LANTERN at the top
+with big red SAILS on spars round it; timber BALCONIES clinging at two heights under red awnings, crates and lanterns on them; outside
+STAIRS; ROPE BRIDGES with red banners from the tower to both canyon walls; lanterns hanging off it; an interior round room with a central
+shaft. Placement: the layout test's spot, in the stream 66 m below the home (z 62), in a POND carved round it.
+- **Passes:**
+  - [x] **pass 1 (next tick):** the pond, the island and three stepping stones from the west bank; the cream base (stone quoins) with
+    the race through it and the WATERWHEEL facing out of its front arch, turning, water pouring over it from a timber chute into a pool;
+    the tapering tower (40 m to the gallery) with two painted sun-spirals and small windows; the gallery, the lantern with its red cap and
+    finial, and the ROTOR of six big red sails turning round it; two balconies with red awnings, the outside stair from the base's roof,
+    ladders from the island to the roof, between the balconies and up to the gallery; ROPE BRIDGES from the lower balcony to both walls
+    (21.9 m west, 11.4 m east) with banners and landings
+- **DONE WHEN:**
+  - [ ] the four views match the ref in silhouette (tower proportions, sails, balconies, base)
+  - [ ] the waterwheel and the sails turn, the water reads as water (pour, foam, the pond)
+  - [ ] the interior: the round room and its central shaft, reached from the base
+  - [ ] the route is fun: the bridges connect to the canyon's own routes (and the old first-pass bridges are redone)
+  - [ ] machines you work (stop the wheel, turn the sails, a lift up the tower) and things that break (the DOORS / CHAOS rule)
+  - [ ] his sign-off on the phone
 
 ## THE MERCHANT SHOP (his, after m1459) -- high on a cliff, hard to reach, many passes (minimum 3 for every element)
 Ref: `images/korajin/ref/merchant_shop_1.jpg` (front / back / left / right / entry / interior / second floor / sign / prop sheet). What

@@ -64523,6 +64523,7 @@ function hwHeight(x, z) {
   const wk = smooth(fw - 1, fw + H.wall, d + lump * .35);                          // the wall: rounded, lumpy, by the noise
   h += (H.rim + lump * .6) * wk * wk * (3 - 2 * wk) * .9 + (H.rim * .1) * smooth(fw + H.wall, fw + H.wall + 30, d);
   const hd = Math.hypot(x - HOME.hut.at[0], z - HOME.hut.at[1]); h = h + (HOME.padY - h) * (1 - smooth(HOME.hut.w * .6, HOME.hut.w * .95, hd)) * (d < fw - 2 ? 1 : 0);
+  { const mz = 62, md = Math.hypot(x - hwRc(mz), z - mz); if (md < 17) h = Math.min(h, h + (H.bed - h) * (1 - smooth(11, 16.5, md))); }     // the water mill's POND (BUILDINGS.md: THE WATER-MILL TOWER): the stream opens out round its island
   return h;
 }
 function rwHeight(x, z) { return HOME.style === 'lake' ? rwLakeH(x, z) : hwHeight(x, z); }
@@ -65369,6 +65370,128 @@ function ghomeBuild(at, yaw, y0) {
   A.stat.draws = draws; A.stat.boxes = boxes.length; A.stat.tris = tris.length / 9;
   console.log('[melee] grumbo home (procedural): ' + draws + ' draws, ' + boxes.length + ' boxes, ' + tris.length / 9 + ' walkable tris, stair ' + A.stat.stair);
 }
+// THE WATER-MILL TOWER (his ref `images/korajin/ref/water_mill_1.jpg`, after m1468): on a sandy ISLAND in the stream below the home, a
+// square stone BASE with an arched race through it and a WATERWHEEL turning in it, water pouring over it; a tall tapering cream TOWER
+// painted with the red sun-spiral; a ring gallery and a red-capped LANTERN at the top with a ROTOR of red sails turning round it; timber
+// BALCONIES clinging at two heights under red awnings, an outside stair and ladders between them; ROPE BRIDGES from the lower balcony to
+// both canyon walls, banners hung off them; stepping stones out from the west bank. World axes (no yaw: the tower is round) ----
+const GMILL = { on: 1, pass: 1, z: 62, H: 40, g: null, rotor: null, wheel: null, fall: null, stat: {} };
+function gmillTex(kind) { const cv = document.createElement('canvas'), W = cv.width = 256, Hh = cv.height = 256, q = cv.getContext('2d');
+  if (kind === 'sun') { q.clearRect(0, 0, W, Hh); q.strokeStyle = '#c94a2e'; q.fillStyle = '#c94a2e'; q.lineWidth = 16; q.beginPath(); for (let a = 0; a < 12.5; a += .1) { const r = 8 + a * 6.2; q.lineTo(128 + Math.cos(a) * r, 128 + Math.sin(a) * r); } q.stroke();
+    for (let k = 0; k < 12; k++) { const a = k / 12 * Math.PI * 2; q.beginPath(); q.moveTo(128 + Math.cos(a - .1) * 92, 128 + Math.sin(a - .1) * 92); q.lineTo(128 + Math.cos(a) * 124, 128 + Math.sin(a) * 124); q.lineTo(128 + Math.cos(a + .1) * 92, 128 + Math.sin(a + .1) * 92); q.fill(); } }
+  else if (kind === 'sail') { q.fillStyle = '#d0533a'; q.fillRect(0, 0, W, Hh); q.strokeStyle = '#f1dcc0'; q.lineWidth = 7; q.beginPath(); q.arc(128, 128, 60, 0, 7); q.stroke(); q.beginPath(); q.arc(128, 128, 30, 0, 7); q.stroke(); q.fillStyle = '#f1dcc0'; q.beginPath(); q.arc(128, 128, 10, 0, 7); q.fill();
+    for (let k = 0; k < 8; k++) { const a = k / 8 * Math.PI * 2; q.fillRect(128 + Math.cos(a) * 78 - 5, 128 + Math.sin(a) * 78 - 5, 10, 10); } q.fillStyle = 'rgba(90,20,10,.35)'; for (const [x, y, w, h] of [[6, 6, W - 12, 3], [6, Hh - 9, W - 12, 3], [6, 6, 3, Hh - 12], [W - 9, 6, 3, Hh - 12]]) q.fillRect(x, y, w, h);
+    q.globalCompositeOperation = 'destination-out'; for (let x = 0; x < W; x += 22) { q.beginPath(); q.moveTo(x, Hh); q.lineTo(x + 11, Hh - 16 - (x % 3) * 4); q.lineTo(x + 22, Hh); q.fill(); } q.globalCompositeOperation = 'source-over'; }
+  else if (kind === 'water') { const g = q.createLinearGradient(0, 0, W, 0); g.addColorStop(0, 'rgba(200,235,255,0)'); g.addColorStop(.2, 'rgba(210,240,255,.8)'); g.addColorStop(.8, 'rgba(210,240,255,.8)'); g.addColorStop(1, 'rgba(200,235,255,0)'); q.fillStyle = g; q.fillRect(0, 0, W, Hh);
+    for (let i = 0; i < 70; i++) { q.fillStyle = 'rgba(255,255,255,' + (.3 + Math.random() * .5) + ')'; q.fillRect(20 + Math.random() * 216, Math.random() * Hh, 2 + Math.random() * 5, 20 + Math.random() * 60); } }
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; return t; }
+function gmillBuild() {
+  const TAU = Math.PI * 2, A = GMILL, cz = A.z, cx = hwRc(cz), g = new THREE.Group(); g.position.set(cx, 0, cz); scene.add(g); A.g = g; A.x = cx;
+  const MG = new Map(), _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _v = new THREE.Vector3(), _one = new THREE.Vector3(1, 1, 1), boxes = [], tris = [];
+  const put = (geo, m, mat4) => { geo = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(geo.attributes)) if (k !== 'position' && k !== 'normal' && !(k === 'uv' && m.map && !m.userData.tri)) geo.deleteAttribute(k);
+    if (mat4) geo.applyMatrix4(mat4); if (!geo.attributes.normal) geo.computeVertexNormals(); if (m.userData.strata) { const gg = geo.clone(); gg.translate(cx, 0, cz); ghStrataCol(gg); geo.setAttribute('color', gg.attributes.color); }
+    if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); };
+  const at4 = (x, y, z, ry = 0, rx = 0, rz = 0, sx = 1, sy = 1, sz = 1) => _m4.compose(_v.set(x, y, z), _q.setFromEuler(_e.set(rx, ry, rz)), new THREE.Vector3(sx, sy, sz));
+  const box = (x0, x1, y0, y1, z0, z1, ex) => boxes.push(Object.assign({ minx: cx + x0, maxx: cx + x1, miny: y0, maxy: y1, minz: cz + z0, maxz: cz + z1 }, ex || {}));
+  const vbox = (x0, x1, ya, yb, z0, z1, m, solid, ex) => { put(new THREE.BoxGeometry(x1 - x0, yb - ya, z1 - z0), m, at4((x0 + x1) / 2, (ya + yb) / 2, (z0 + z1) / 2)); if (solid) box(x0, x1, ya, yb, z0, z1, ex); };
+  const quad = (a, b, d, e) => { for (const q of [a, b, d, a, d, e]) tris.push(cx + q[0], q[1], cz + q[2]); };
+  const rod = (a, b, r, m, round) => { const d = new THREE.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]), L = d.length(); put(round ? new THREE.CylinderGeometry(r, r, L, 6) : new THREE.BoxGeometry(r, L, r), m, _m4.compose(new THREE.Vector3((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2), _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()), _one)); };
+  const NC = { noCam: 1 }, gH = (x, z) => rwHeight(cx + x, cz + z);
+  const wood = triMat('wood_timber', { scale: 1.6, rough: .85 }), woodP = triMat('wood_planks', { scale: 2.2, rough: .85 }), stone = triMat('stone_blocks', { scale: 2.4, rough: .9 }), plaster = triMat('sandstone', { scale: 4.5, rough: .92 }), bronze = triMat('bronze', { scale: 1.2, metal: .75, rough: .35 });
+  for (const m of [wood, woodP, stone, plaster, bronze]) m.userData.tri = 1;
+  const iron = new THREE.MeshStandardMaterial({ color: 0x2c2724, metalness: .6, roughness: .5 }), red = new THREE.MeshStandardMaterial({ color: 0xb8402c, roughness: .7 }), sand = new THREE.MeshStandardMaterial({ color: 0xe2b98a, roughness: 1 });
+  const rockM = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .93 }); rockM.userData.strata = 1;
+  const glow = new THREE.MeshStandardMaterial({ color: 0xffd9a0, emissive: 0xffa040, emissiveIntensity: 2.2, toneMapped: false });
+  const sunM = new THREE.MeshStandardMaterial({ map: gmillTex('sun'), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, roughness: .9 }), sailM = new THREE.MeshStandardMaterial({ map: gmillTex('sail'), alphaTest: .5, side: THREE.DoubleSide, roughness: .9 });
+  const awnM = new THREE.MeshStandardMaterial({ map: ghClothTex('awning'), alphaTest: .5, side: THREE.DoubleSide, roughness: .9 }), banM = new THREE.MeshStandardMaterial({ map: ghClothTex('banner'), alphaTest: .5, side: THREE.DoubleSide, roughness: .9 });
+  // ---- THE ISLAND: a low sandy mound in the stream on a skirt of rock, walkable on top; STEPPING STONES out to the west bank ----
+  const iy = .7, IR = 8.5; put(ghRockGeo(3001, IR * 1.1, 1.6, IR, 3), rockM, at4(0, -.6, 0)); put(new THREE.CylinderGeometry(IR * .86, IR * .98, .5, 32), sand, at4(0, iy - .25, 0));
+  { const N = 32; for (let i = 0; i < N; i++) { const a0 = i / N * TAU, a1 = (i + 1) / N * TAU, r = IR * .86; quad([0, iy + .01, 0], [Math.sin(a0) * r, iy + .01, Math.cos(a0) * r], [Math.sin(a1) * r, iy + .01, Math.cos(a1) * r], [0, iy + .01, 0]); } }
+  for (let gz = -IR; gz < IR; gz += 1.5) { const hw = Math.sqrt(Math.max(0, (IR * .86) ** 2 - (gz + .75) ** 2)); if (hw > .5) box(-hw, hw, -3, iy, gz, gz + 1.5); }
+  { let x = -IR - 1.4; const stones = []; while (x > -40) { const gy = gH(x, 0); if (gy > iy + .2) break; stones.push(x); x -= 1.9 + (stones.length % 2) * .5; }
+    for (const [i, sx] of stones.entries()) { const sz = (i % 2 ? .5 : -.5), r = .75 + (i % 3) * .12; put(ghRockGeo(3100 + i, r * 1.2, .8, r, 2), rockM, at4(sx, -.35, sz, i)); put(new THREE.CylinderGeometry(r * .85, r * .95, .2, 10), rockM, at4(sx, .45, sz)); box(sx - r * .8, sx + r * .8, -2, .55, sz - r * .8, sz + r * .8);
+      const N = 10; for (let k = 0; k < N; k++) { const a0 = k / N * TAU, a1 = (k + 1) / N * TAU, rr = r * .8; quad([sx, .56, sz], [sx + Math.sin(a0) * rr, .56, sz + Math.cos(a0) * rr], [sx + Math.sin(a1) * rr, .56, sz + Math.cos(a1) * rr], [sx, .56, sz]); } }
+    A.stat.stones = stones.length; }
+  // ---- THE BASE: a square stone block with a batter, the arched RACE through it along the stream (z), the wheel in it ----
+  const BY = iy, BH = 8, bw = 5.2, aw = 2.4, ah = 5.6;
+  for (const sd of [-1, 1]) vbox(sd < 0 ? -bw : aw, sd < 0 ? -aw : bw, BY, BY + BH, -bw, bw, plaster, 1);
+  vbox(-aw, aw, BY + ah, BY + BH, -bw, bw, plaster, 1); for (const [qx, qz] of [[-bw, -bw], [bw, -bw], [-bw, bw], [bw, bw]]) for (let y = BY; y < BY + BH; y += 1.1) vbox(qx - .35, qx + .35, y, y + .9, qz - .35, qz + .35, stone, 0); put(new THREE.CylinderGeometry(aw, aw, bw * 2, 18, 1, true, Math.PI / 2, Math.PI), stone, at4(0, BY + ah - aw * .0, 0, 0, Math.PI / 2, 0));
+  for (const sz of [-1, 1]) { put(new THREE.TorusGeometry(aw + .2, .28, 6, 18, Math.PI), stone, at4(0, BY + ah - .1, sz * (bw + .02))); }
+  vbox(-bw - .3, bw + .3, BY + BH, BY + BH + .5, -bw - .3, bw + .3, stone, 1); quad([-bw - .3, BY + BH + .51, -bw - .3], [bw + .3, BY + BH + .51, -bw - .3], [bw + .3, BY + BH + .51, bw + .3], [-bw - .3, BY + BH + .51, bw + .3]);
+  // the WATERWHEEL in the race (its own group: it turns), and the water pouring over it
+  { const wg = new THREE.Group(); wg.position.set(0, BY + 2.5, -bw + 1.1); g.add(wg); A.wheel = wg; const R = 2.4, parts = [], add = (geo, m) => parts.push([geo, m]);
+    for (const sx of [-.75, .75]) { const t = new THREE.TorusGeometry(R, .12, 6, 32); t.translate(0, 0, sx); add(t, wood); const t2 = new THREE.TorusGeometry(R * .55, .08, 5, 24); t2.translate(0, 0, sx); add(t2, wood); }
+    for (let k = 0; k < 14; k++) { const a = k / 14 * TAU, p = new THREE.BoxGeometry(.8, .1, 1.7); p.translate(0, R - .25, 0); p.rotateZ(a); add(p, woodP); const s2 = new THREE.BoxGeometry(.12, R, .1); s2.translate(0, R / 2, -.75); s2.rotateZ(a); add(s2, wood); const s3 = new THREE.BoxGeometry(.12, R, .1); s3.translate(0, R / 2, .75); s3.rotateZ(a); add(s3, wood); }
+    const hub = new THREE.CylinderGeometry(.35, .35, 2.4, 12); hub.rotateX(Math.PI / 2); add(hub, iron);
+    const byM = new Map(); for (const [geo, m] of parts) { const q = geo.index ? geo.toNonIndexed() : geo; q.deleteAttribute('uv'); if (!byM.has(m)) byM.set(m, []); byM.get(m).push(q); } for (const [m, list] of byM) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = true; wg.add(o); }
+    const fm = new THREE.MeshBasicMaterial({ map: gmillTex('water'), transparent: true, depthWrite: false, side: THREE.DoubleSide }), fall = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 5.2), fm); fall.position.set(1.2, BY + 3.2, -bw - .05); fall.rotation.x = .08; g.add(fall);
+    const chute = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 2.2), fm); chute.position.set(1.2, BY + 6.05, -bw - 1); chute.rotation.x = -Math.PI / 2 + .25; g.add(chute); A.fall = fm;
+    vbox(.45, 1.95, BY + 5.75, BY + 5.95, -bw - 2.2, -bw, wood, 0); for (const sx of [.45, 1.95]) vbox(sx - .06, sx + .06, BY + 5.75, BY + 6.3, -bw - 2.2, -bw, wood, 0); vbox(1.1, 1.3, BY + 3.8, BY + 5.75, -bw - 2.1, -bw - 1.9, wood, 0);
+    const pool = new THREE.Mesh(new THREE.CircleGeometry(3.4, 24), new THREE.MeshStandardMaterial({ color: 0x6fc2d8, roughness: .15, metalness: .1, transparent: true, opacity: .85 })); pool.rotation.x = -Math.PI / 2; pool.position.set(0, iy + .03, -bw + 1.1); g.add(pool); }
+  // ---- THE TOWER: a tapering cream lathe from the base's top to the gallery, the red sun-spiral painted on it, small windows ----
+  const T0 = BY + BH + .5, T1 = T0 + A.H - 10, r0 = 4.4, r1 = 2.8, Rt = y => r0 + (r1 - r0) * Math.pow((y - T0) / (T1 - T0), .9) + .25 * Math.sin(Math.PI * (y - T0) / (T1 - T0));
+  { const pts = []; for (let i = 0; i <= 24; i++) { const y = T0 + (T1 - T0) * i / 24; pts.push(new THREE.Vector2(Rt(y), y)); } put(new THREE.LatheGeometry(pts, 40), plaster);
+    for (let y = T0; y < T1; y += 1.5) { const r = Rt(y + .75) - .3; box(-r * .72, r * .72, T0 - 1, y + 1.5, -r * .72, r * .72); }
+    for (const [a, y, s] of [[0, T0 + 7, 4.4], [Math.PI, T0 + 15, 3.2]]) { const r = Rt(y) + .03; put(new THREE.CylinderGeometry(r, r, s, 24, 1, true, a - s / r / 2, s / r), sunM, at4(0, y, 0)); }
+    for (const [a, y] of [[.7, T0 + 4], [-1.2, T0 + 11], [2.4, T0 + 19], [-2.6, T0 + 8], [1.6, T0 + 24]]) { const r = Rt(y) + .02; put(new THREE.BoxGeometry(.5, .8, .1), iron, at4(Math.sin(a) * r, y, Math.cos(a) * r, a)); put(new THREE.BoxGeometry(.7, .1, .25), wood, at4(Math.sin(a) * (r + .05), y - .45, Math.cos(a) * (r + .05), a)); } }
+  // ---- THE TOP: a ring GALLERY, a timber LANTERN with a red cap, and the ROTOR of six red sails turning round it ----
+  { const GY = T1; for (let k = 0; k < 24; k++) { const a = k / 24 * TAU; rod([Math.sin(a) * (r1 - .1), GY - .1, Math.cos(a) * (r1 - .1)], [Math.sin(a) * 4.6, GY - .1, Math.cos(a) * 4.6], .16, wood); }
+    put(new THREE.CylinderGeometry(4.7, 4.7, .22, 32), woodP, at4(0, GY, 0)); { const N = 32; for (let i = 0; i < N; i++) { const a0 = i / N * TAU, a1 = (i + 1) / N * TAU; quad([0, GY + .12, 0], [Math.sin(a0) * 4.6, GY + .12, Math.cos(a0) * 4.6], [Math.sin(a1) * 4.6, GY + .12, Math.cos(a1) * 4.6], [0, GY + .12, 0]); } }
+    for (let k = 0; k < 20; k++) { const a = k / 20 * TAU; if (Math.abs(Math.atan2(Math.sin(a - 3), Math.cos(a - 3))) < .3) continue; vbox(Math.sin(a) * 4.5 - .05, Math.sin(a) * 4.5 + .05, GY, GY + 1.1, Math.cos(a) * 4.5 - .05, Math.cos(a) * 4.5 + .05, wood, 0); } put(new THREE.TorusGeometry(4.5, .06, 4, 40), wood, at4(0, GY + 1.1, 0, 0, Math.PI / 2));
+    for (let gz = -4.6; gz < 4.6; gz += 1.15) { const hw = Math.sqrt(Math.max(0, 4.6 ** 2 - (gz + .57) ** 2)); if (hw > .3) box(-hw, hw, GY - .2, GY + .12, gz, gz + 1.15); }
+    for (let k = 0; k < 12; k++) { const a = k / 12 * TAU; if (Math.abs(Math.atan2(Math.sin(a - 3), Math.cos(a - 3))) < .4) continue; box(Math.sin(a) * 4.5 - .4, Math.sin(a) * 4.5 + .4, GY, GY + 1.1, Math.cos(a) * 4.5 - .4, Math.cos(a) * 4.5 + .4, NC); }
+    put(new THREE.CylinderGeometry(2.3, 2.5, 3.2, 12), wood, at4(0, GY + 1.6, 0)); for (const yy of [GY + .3, GY + 2.9]) put(new THREE.CylinderGeometry(2.6, 2.6, .25, 12), red, at4(0, yy, 0));
+    for (let k = 0; k < 6; k++) { const a = k / 6 * TAU + .3; put(new THREE.BoxGeometry(.7, 1, .1), glow, at4(Math.sin(a) * 2.42, GY + 1.6, Math.cos(a) * 2.42, a)); }
+    box(-2, 2, GY, GY + 3.2, -2, 2); put(new THREE.ConeGeometry(3.4, 2.6, 12), red, at4(0, GY + 4.5, 0)); put(new THREE.CylinderGeometry(.12, .2, 2.4, 6), bronze, at4(0, GY + 6.7, 0)); put(new THREE.SphereGeometry(.3, 8, 6), bronze, at4(0, GY + 7.9, 0));
+    // the rotor: its own group (it turns), six spars and six curved red sails
+    const rg = new THREE.Group(); rg.position.set(0, GY + 2.4, 0); g.add(rg); A.rotor = rg; const parts = [];
+    for (let k = 0; k < 6; k++) { const a = k / 6 * TAU; const sp = new THREE.CylinderGeometry(.14, .2, 17, 6); sp.rotateZ(Math.PI / 2 - .16); sp.translate(8.6, 1.3, 0); sp.rotateY(a); parts.push([sp, wood]);
+      const NU = 6, NV = 6, pos = [], uv = [], at = (u, v) => { const x = 3.2 + u * 12.5, y = 1.4 + u * 1.4 - v * 9 * (1 - .3 * u), z = 1.8 * Math.sin(Math.PI * v) * (1 - .3 * u) + .4 * u; const c = Math.cos(a), s = Math.sin(a); return [x * c + z * s, y + .55, -x * s + z * c]; };
+      for (let i = 0; i < NU; i++) for (let j = 0; j < NV; j++) { const u0 = i / NU, u1 = (i + 1) / NU, v0 = j / NV, v1 = (j + 1) / NV; for (const [u, v] of [[u0, v0], [u1, v0], [u1, v1], [u0, v0], [u1, v1], [u0, v1]]) { pos.push(...at(u, v)); uv.push(u, 1 - v); } }
+      const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); sg.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); sg.computeVertexNormals(); parts.push([sg, sailM]); }
+    const ring = new THREE.TorusGeometry(2.8, .14, 6, 24); ring.rotateX(Math.PI / 2); parts.push([ring, iron]);
+    const byM = new Map(); for (const [geo, m] of parts) { const q = geo.index ? geo.toNonIndexed() : geo; if (!m.map) q.deleteAttribute('uv'); if (!byM.has(m)) byM.set(m, []); byM.get(m).push(q); } for (const [m, list] of byM) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = true; rg.add(o); } }
+  // ---- THE BALCONIES: two timber platforms clinging to the tower (2.4 m deep), railed, a red awning over each; the outside STAIR from the
+  // base's roof up to the lower one, a LADDER from it to the upper, another to the gallery ----
+  A.climbs = []; const near = (q, list) => list.some(k => Math.abs(Math.atan2(Math.sin(q - k), Math.cos(q - k))) < .28), balc = (y, a0, a1, skip) => { const ri = Rt(y) - .1, ro = ri + 2.6, N = Math.ceil((a1 - a0) / .12);
+      for (let i = 0; i < N; i++) { const q0 = a0 + (a1 - a0) * i / N, q1 = a0 + (a1 - a0) * (i + 1) / N, P = (q, r) => [Math.sin(q) * r, y, Math.cos(q) * r]; const g2 = new THREE.BufferGeometry(), c = [P(q0, ri), P(q1, ri), P(q1, ro), P(q0, ri), P(q1, ro), P(q0, ro)];
+        g2.setAttribute('position', new THREE.Float32BufferAttribute(c.flat(), 3)); put(new THREE.BoxGeometry(.32, .14, 2.6), woodP, at4(Math.sin((q0 + q1) / 2) * (ri + 1.3), y - .07, Math.cos((q0 + q1) / 2) * (ri + 1.3), (q0 + q1) / 2)); quad(P(q0, ri), P(q0, ro), P(q1, ro), P(q1, ri));
+        const mx = Math.sin((q0 + q1) / 2) * (ri + 1.3), mz = Math.cos((q0 + q1) / 2) * (ri + 1.3); box(mx - .9, mx + .9, y - .8, y, mz - .9, mz + .9); if (i % 3 === 0 && !near(q0, skip)) { const px = Math.sin(q0) * (ro - .1), pz = Math.cos(q0) * (ro - .1); vbox(px - .07, px + .07, y, y + 1.1, pz - .07, pz + .07, wood, 0); rod([px, y - .1, pz], [Math.sin(q0) * (ri + .2), y - 2.2, Math.cos(q0) * (ri + .2)], .14, wood); } }
+      const ra = new THREE.TorusGeometry(ri + 2.5, .05, 4, Math.ceil(N / 2), a1 - a0); ra.rotateX(Math.PI / 2); ra.rotateY(-Math.PI / 2 + a0); put(ra, wood, at4(0, y + 1.1, 0));
+      for (let q = a0; q < a1; q += .3) { if (near(q, skip)) continue; const px = Math.sin(q) * (ro - .1), pz = Math.cos(q) * (ro - .1); box(px - .35, px + .35, y, y + 1.1, pz - .35, pz + .35, NC); }
+      const awg = new THREE.BufferGeometry(), pos = [], uv = [], NU = Math.max(4, Math.ceil((a1 - a0) / .2)); for (let i = 0; i < NU; i++) { const q0 = a0 + (a1 - a0) * i / NU, q1 = a0 + (a1 - a0) * (i + 1) / NU, T = (q, r, h) => [Math.sin(q) * r, h, Math.cos(q) * r];
+        for (const p of [T(q0, ri + .1, y + 3.4), T(q1, ri + .1, y + 3.4), T(q1, ro + .3, y + 2.6), T(q0, ri + .1, y + 3.4), T(q1, ro + .3, y + 2.6), T(q0, ro + .3, y + 2.6)]) pos.push(...p); for (const [u, v] of [[i, 0], [i + 1, 0], [i + 1, 1], [i, 0], [i + 1, 1], [i, 1]]) uv.push(u * .25, 1 - v); }
+      awg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); awg.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); awg.computeVertexNormals(); put(awg, awnM);
+      for (const q of [a0 + .15, a1 - .15]) { const px = Math.sin(q) * (ro + .2), pz = Math.cos(q) * (ro + .2); vbox(px - .08, px + .08, y, y + 2.7, pz - .08, pz + .08, wood, 1, NC); } };
+  const Y1 = T0 + 6, Y2 = T0 + 17; balc(Y1, -1.9, 1.9, [-Math.PI / 2, Math.PI / 2, 1.75, -.95]); balc(Y2, 1.2, 4.2, [1.75, 3.0]);
+  const ladder = (a, ya, yb, r, name) => { const x = Math.sin(a) * r, z = Math.cos(a) * r, nx = Math.sin(a), nz = Math.cos(a), tx = Math.cos(a), tz = -Math.sin(a);
+      for (const o of [-.34, .34]) put(new THREE.BoxGeometry(.09, yb - ya + .6, .09), wood, at4(x + tx * o, (ya + yb + .6) / 2, z + tz * o, a)); for (let y = ya + .3; y < yb + .4; y += .34) put(new THREE.BoxGeometry(.7, .06, .06), wood, at4(x, y, z, a));
+      const hx = .12, hz = .45, ex = Math.abs(nx) * hx + Math.abs(nz) * hz, ez = Math.abs(nz) * hx + Math.abs(nx) * hz, L = kitClimbAdd({ cs: nx, sn: nz, hx, hz, cx: cx + x, cz: cz + z, minx: cx + x - ex, maxx: cx + x + ex, miny: ya, maxy: yb, minz: cz + z - ez, maxz: cz + z + ez }, name, yb);
+      L.mark = { x: cx + Math.sin(a) * (r - .9), y: yb + .05, z: cz + Math.cos(a) * (r - .9) }; A.climbs.push(L); };
+  // the stair: round the base's roof edge, then up the tower's side to the lower balcony, in risers of .3
+  { const y0 = BY + BH + .5, n = Math.ceil((Y1 - y0) / .3), a0 = -2.6; for (let i = 0; i < n; i++) { const a = a0 + i * .085, r = Rt(y0 + i * .3) + .9, y = y0 + (i + 1) * (Y1 - y0) / n, x = Math.sin(a) * r, z = Math.cos(a) * r; vbox(x - .8, x + .8, y - .2, y, z - .8, z + .8, woodP, 1); quad([x - .8, y + .01, z - .8], [x + .8, y + .01, z - .8], [x + .8, y + .01, z + .8], [x - .8, y + .01, z + .8]); if (i % 4 === 0) rod([x, y - .2, z], [Math.sin(a) * (r - .9), y - 2, Math.cos(a) * (r - .9)], .12, wood); }
+    A.stat.stair = n; }
+  ladder(1.75, Y1, Y2, Rt(Y1) + 2.3, 'gmill_ladder1'); ladder(3.0, Y2, T1, 4.95, 'gmill_ladder2');
+  // a ladder up the base from the island (the base's roof is the stair's foot)
+  ladder(Math.PI / 2, iy, BY + BH + .5, bw + .3, 'gmill_ladder0');
+  // ---- THE ROPE BRIDGES from the lower balcony's ends to both canyon walls, sagging, planked, banners hanging off them ----
+  const bridge = (a, sd) => { const ya = Y1, x0 = Math.sin(a) * (Rt(Y1) + 2.4), z0 = Math.cos(a) * (Rt(Y1) + 2.4), X1 = hwWallAt(cz + z0, sd, ya - .2, -1.2) - cx, Z1 = z0, L = Math.abs(X1 - x0), N = Math.max(8, Math.round(L / .6)), sag = L * .05;
+      const P = t => [x0 + (X1 - x0) * t, ya - sag * Math.sin(Math.PI * t), z0]; for (let i = 0; i < N; i++) { const t0 = i / N, t1 = (i + 1) / N, p0 = P(t0), p1 = P(t1), pm = P((t0 + t1) / 2);
+        put(new THREE.BoxGeometry(Math.abs(p1[0] - p0[0]) - .06, .1, 1.8), woodP, at4(pm[0], pm[1] - .05, pm[2])); quad([p0[0], p0[1] + .01, z0 - .9], [p1[0], p1[1] + .01, z0 - .9], [p1[0], p1[1] + .01, z0 + .9], [p0[0], p0[1] + .01, z0 + .9]); box(Math.min(p0[0], p1[0]), Math.max(p0[0], p1[0]), Math.min(p0[1], p1[1]) - .6, Math.max(p0[1], p1[1]), z0 - .9, z0 + .9); }
+      for (const zz of [z0 - .95, z0 + .95]) { const cv = new THREE.QuadraticBezierCurve3(new THREE.Vector3(x0, ya + 1.1, zz), new THREE.Vector3((x0 + X1) / 2, ya + 1.1 - sag * 2, zz), new THREE.Vector3(X1, ya + 1.1, zz)); put(new THREE.TubeGeometry(cv, 16, .04, 4), wood);
+        for (let i = 0; i <= N; i += 2) { const p = P(i / N); rod([p[0], p[1], zz], [p[0], cv.getPoint(i / N).y, zz], .03, wood); } box(Math.min(x0, X1), Math.max(x0, X1), ya - 3, ya + 1.1, zz - .1, zz + .1, NC); }
+      for (let i = 2; i < N - 1; i += 3) { const p = P(i / N); put(new THREE.PlaneGeometry(.7, 1.6, 1, 4), banM, at4(p[0], p[1] - 1, z0 + .97)); }
+      vbox(Math.min(X1, X1 + sd * 2.2), Math.max(X1, X1 + sd * 2.2), ya - .3, ya, z0 - 1.4, z0 + 1.4, woodP, 1); quad([X1, ya + .01, z0 - 1.4], [X1 + sd * 2.2, ya + .01, z0 - 1.4], [X1 + sd * 2.2, ya + .01, z0 + 1.4], [X1, ya + .01, z0 + 1.4]);
+      for (const zz of [z0 - 1.2, z0 + 1.2]) vbox(X1 + sd * 1.1 - .12, X1 + sd * 1.1 + .12, ya - 4, ya + 1.4, zz - .12, zz + .12, wood, 0); return L; };
+  A.stat.bridgeW = +bridge(-Math.PI / 2, -1).toFixed(1); A.stat.bridgeE = +bridge(Math.PI / 2, 1).toFixed(1);
+  // ---- merge; the world gets the boxes and the floors ----
+  let draws = 0; for (const [m, list] of MG) { if (m.map && !m.userData.tri) m.map.wrapS = m.map.wrapT = THREE.RepeatWrapping; const geo = mergeGeometries(list); if (!geo) { console.warn('[melee] gmill: a bucket would not merge', m.color); continue; } const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; g.add(o); draws++; }
+  for (const b of boxes) BOXES.push(b);
+  for (let i = 0; i < tris.length; i += 9) { const q = tris.slice(i, i + 9); triAdd(...q); triAdd(q[0], q[1], q[2], q[6], q[7], q[8], q[3], q[4], q[5]); }
+  A.stat.draws = draws + 5; A.stat.boxes = boxes.length; A.stat.top = +(T1 + 7.9).toFixed(1);
+  console.log('[melee] water mill (procedural): ' + A.stat.draws + ' draws, ' + boxes.length + ' boxes, top ' + A.stat.top + ' m, bridges ' + A.stat.bridgeW + ' / ' + A.stat.bridgeE + ' m, ' + A.stat.stones + ' stepping stones');
+}
+function gmillStep(dt, t) { const A = GMILL; if (!A.g) return; if (A.wheel) A.wheel.rotation.z -= dt * 1.1; if (A.rotor) A.rotor.rotation.y += dt * .35; if (A.fall) A.fall.map.offset.y = (A.fall.map.offset.y + dt * 1.6) % 1; }
 // THE MERCHANT SHOP (his ref `images/korajin/ref/merchant_shop_1.jpg`, after m1459): high on a sandstone BUTTE that rises out of the canyon's
 // WEST rim upstream of the home, its deck jutting over the drop toward the valley. A two-storey timber-and-stone shop on a plank deck,
 // under two huge curved BONE ARCHES holding a red SAIL canopy; teal and pink awnings; the round target SIGN in a wheel; the tall target
@@ -65509,6 +65632,7 @@ async function buildHome() {
   // the hut, on its levelled pad -- built in code (GHOME), or his Tripo GLB to compare (`?hut=glb`)
   if (GHOME.on) { try { ghomeBuild(H.hut.at, H.hut.yaw, H.padY); H.stat.hutK = 'proc'; } catch (e) { console.error('[melee] grumbo home', e); note('HOME BUILD THREW'); } }
   if (GMERCH.on && H.style !== 'lake') try { gmerchBuild(); } catch (e) { console.error('[melee] merchant shop', e); note('MERCHANT BUILD THREW'); }
+  if (GMILL.on && H.style !== 'lake') try { gmillBuild(); } catch (e) { console.error('[melee] water mill', e); note('MILL BUILD THREW'); }
   else try { const g = await loadGLB(H.hut.file, 'loading the refuge');
     const m = g.scene, drop = []; m.traverse(o => { if (o.isLight) drop.push(o); }); for (const o of drop) o.removeFromParent();
     m.updateMatrixWorld(true); const bb = new THREE.Box3(); m.traverse(o => { if (o.isMesh && o.name !== 'collider' && o.geometry) { o.geometry.computeBoundingBox(); bb.union(o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld)); } });
@@ -65732,6 +65856,7 @@ function homeLanterns() {
 }
 function homeStep(dt) {
   const H = HOME; H.t += dt; if (RW.U) RW.U.uTime.value = H.t;
+  gmillStep(dt, H.t);
   if (GHOME.U) GHOME.U.uWind.value = H.t; ghomeSmoke(dt, H.t); for (const G of GHOME.gates || []) bgateStep(G, dt);     // pass 9: his back door
   if (GHOME.canoe) { const C = GHOME.canoe, t = H.t; C.g.position.y = C.y + rwWaveAt(C.x, C.z, t) * .8 * (1 - Math.min(1, (C.lift || 0) * 2)) + .02 + (C.lift || 0); C.ht = (C.ht == null ? 12 : C.ht) - dt; if (C.ht <= 0 && !C.hu) { C.hu = 1e-3; } if (C.hu) { C.hu += dt; if (C.hu > 6) { C.hu = 0; C.ht = 18 + Math.random() * 20; const P = C.g.getWorldPosition(new THREE.Vector3()); spkBurst(P.x, GHOME.g.position.y + C.y + .05, P.z, 30, { col: [.85, .93, 1], spread: 4, size: .09, life: .6 }); snd('thud', { g: .5, r: .7, x: P.x, z: P.z }); } }     // pass 24: now and then it LIFTS on its discs, hangs dripping, and settles
   const lift = C.hu ? .5 * Math.min(1, C.hu / 1.4) * Math.min(1, Math.max(0, (6 - C.hu) / 1.2)) : 0; if (lift > .05 && Math.random() < dt * 14) { const P = C.g.localToWorld(new THREE.Vector3((Math.random() - .5) * .8, -.4, (Math.random() - .5) * 4)); spkBurst(P.x, P.y, P.z, 2, { col: [.8, .9, 1], spread: .4, size: .05, life: .5 }); }
@@ -66597,7 +66722,7 @@ async function init() {
 
 // the console handle. Every tuning object is live, so a number can be moved on the phone
 // without a rebuild and without a push.
-window.melee = window.mel = { GMERCH, PLANT, plantLibBuild, plantHit, SNOWZ, snowStamp, GHOME, SHIMMY, VAIM, SHIPZ, shipBuild, FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, gaitMeasure, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
+window.melee = window.mel = { GMERCH, GMILL, PLANT, plantLibBuild, plantHit, SNOWZ, snowStamp, GHOME, SHIMMY, VAIM, SHIPZ, shipBuild, FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, gaitMeasure, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
   // PROGRESS (m276): `mel.SAVE` is the save; the setters write it through; `mel.progReset()` is a new game
   // TALK (m277): `mel.TALK` live; `mel.TALKS` the scripts by kind; `mel.talk` the state
   TALK, TALKS, talk,
