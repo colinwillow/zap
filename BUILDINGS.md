@@ -159,6 +159,41 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - [x] **pass 24 (m1443):** THE PIER AND CANOE, third pass: the hung catch slimmed into fish (tails, eyes), a red cloth canopy over the T-head's shore half, a fishing net draped over the rail with floats; every 18-38 s the CANOE LIFTS half a metre on its discs, hangs dripping with its runes blazing, and settles with a splash. **Also fixes m1442, which threw on every frame in the home** (see NOTES)
   - [x] **pass 25 (next tick):** PATHS AND TRAILS (his ask): worn tracks of trodden sand with footprints and pebbled edges -- shop steps to the pier and along the strip under the stalls, round both sides of the mound to the back door, out to the two cave mouths, and up and down the bank; every rock, cactus, shelf and plant keeps off them
   - [ ] then more passes, each one closer to the four views
+  - **Still open on the home** (agreed after m1459): the shop SHUTTERS (roll up / down), the rocks' 3rd pass, the plants' 3rd pass with
+    cliff shrubs, the rope LIFT to the balcony, BREAKABLE pots, the back ladder and stall rack (ref 2) -- then his sign-off.
+
+## VERTICALITY (his rule, after m1459) -- for every building and level from here
+*"I'm constantly fighting with you about verticality... you build everything on the same plane, and when I ask for something up in the
+air it's 10 or 20 feet up when I'm talking 50 or 100."* So: **heights are tens of metres** (a lookout, a shop on a cliff: 40-100 m),
+places are **framed together in one wide-lens shot** for the cinematic view, and they are **HARD TO GET TO** -- the route is the game:
+stairs cut in rock, ladders, rope bridges, floating platforms, lifts, flying ships. Measure every gap against his numbers (jump apex
+2.81 m, a double jump, step .357 m) rather than eyeballing it. His layout ref: the canyon city image he sent after m1459 (cliff shops,
+spires, bridges strung high across the gap).
+
+## THE WATER-MILL TOWER (his, after m1459) -- the spire in the stream
+The layout test put a 55 m sandstone spire in the stream 66 m below the home. *"That to me looks like an opportunity for a water... tower,
+a windmill powered through the stream. You can leave that there."* The spot is held for it. **His image is to come; nothing is built
+until it does.**
+
+## THE MERCHANT SHOP (his, after m1459) -- high on a cliff, hard to reach, many passes (minimum 3 for every element)
+Ref: `images/korajin/ref/merchant_shop_1.jpg` (front / back / left / right / entry / interior / second floor / sign / prop sheet). What
+it is: a two-storey timber-and-stone shop on a wide plank DECK on stilts, under two huge curved BONE ARCHES that hold up a sail-like red
+CANOPY roof; teal and pink awnings over a shopfront crammed with potions, pots and glowing purple CRYSTALS; a round TARGET SIGN in a
+wheel frame; a tall pole with the red target BANNER; rope rails on posts with lanterns; steps up to the deck; a second-floor balcony;
+teal palm-fan leaves; charms and lanterns hanging everywhere. **Placement:** NOT in the stream (that is the mill's). On a BUTTE that
+rises out of the canyon's east rim upstream of the home, its deck jutting over the drop toward the home -- about 50 m up, framed with
+the home in a wide shot from the valley floor.
+- **Passes:**
+  - [x] **pass 1 (next tick):** the BUTTE (a stratified sandstone lathe on the west rim, 29 m, its cap at 51.7) with the shop on top: the plank deck run out past the lip on struts, rope rails, lantern posts; the stone ground floor (open front, counter, shelves of pots and crystals), the timber upper storey and its balcony; the two BONE ARCHES and the red SAIL; the target SIGN in its wheel, teal and pink awnings, the BANNER pole, two palm fans, charms. **The way up (first cut):** a scaffold of four ~6 m ladders and landings up the canyon's west wall, then a 19 m ladder up the butte's back. Framed with the home from across the stream.
+- **DONE WHEN:**
+  - [ ] the butte stands on the rim, the shop on top reads as ref 1 from the valley floor and from the deck (massing, arches, canopy)
+  - [ ] the four views match ref 1 (front, back, left, right) in silhouette and dressing
+  - [ ] the ground floor is a shop you walk into (counter, shelves of potions, crystals, the interior detail view)
+  - [ ] the second floor and balcony are up and walkable (2.2 m clear)
+  - [ ] the route up is HARD and fun: measured gaps, at least four different moves (stair, ladder, bridge, floating platform / lift)
+  - [ ] it is SHOPPABLE (something to buy) -- with main, who owns the economy
+  - [ ] its doors open and break; its props smash (the DOORS / CHAOS rule)
+  - [ ] his sign-off on the phone
 
 ## THE SHIP (his, after m1372) -- its own track, alongside the blueprint work
 

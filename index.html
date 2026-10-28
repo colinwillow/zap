@@ -65335,6 +65335,137 @@ function ghomeBuild(at, yaw, y0) {
   A.stat.draws = draws; A.stat.boxes = boxes.length; A.stat.tris = tris.length / 9;
   console.log('[melee] grumbo home (procedural): ' + draws + ' draws, ' + boxes.length + ' boxes, ' + tris.length / 9 + ' walkable tris, stair ' + A.stat.stair);
 }
+// THE MERCHANT SHOP (his ref `images/korajin/ref/merchant_shop_1.jpg`, after m1459): high on a sandstone BUTTE that rises out of the canyon's
+// WEST rim upstream of the home, its deck jutting over the drop toward the valley. A two-storey timber-and-stone shop on a plank deck,
+// under two huge curved BONE ARCHES holding a red SAIL canopy; teal and pink awnings; the round target SIGN in a wheel; the tall target
+// BANNER; rope rails and lanterns. Reached (pass 1) by a scaffold of ladders and landings up the canyon wall, then a ladder up the butte's
+// face. Built in its own frame (local +z = the deck's front, toward the canyon); one draw per look. `GMERCH` holds the numbers ----
+const GMERCH = { on: 1, pass: 1, z: -60, back: 48, R: 13, H: 20, yaw: .93, g: null, stat: {} };
+function gmTex(kind) { const cv = document.createElement('canvas'), W = cv.width = 256, Hh = cv.height = kind === 'banner' ? 512 : 256, q = cv.getContext('2d'), r = rwRng(kind.length * 31);
+  if (kind === 'sail') { q.fillStyle = '#c4492c'; q.fillRect(0, 0, W, Hh); for (let i = 0; i < 40; i++) { q.fillStyle = 'rgba(120,30,20,' + (.08 + r() * .12) + ')'; q.beginPath(); q.ellipse(r() * W, r() * Hh, 10 + r() * 40, 6 + r() * 20, r() * 3, 0, 7); q.fill(); }
+    q.strokeStyle = 'rgba(240,200,150,.35)'; q.lineWidth = 3; for (let y = 30; y < Hh; y += 60) { q.beginPath(); for (let x = 0; x <= W; x += 16) q.lineTo(x, y + Math.sin(x * .05) * 6); q.stroke(); } }
+  else if (kind === 'teal' || kind === 'pink') { q.fillStyle = kind === 'teal' ? '#3f9a94' : '#d9708a'; q.fillRect(0, 0, W, Hh); q.fillStyle = kind === 'teal' ? '#e8d8b0' : '#f4dcc0'; for (let x = 0; x < W; x += 32) q.fillRect(x, 0, 14, Hh * .85);
+    q.globalCompositeOperation = 'destination-out'; for (let x = 0; x < W; x += 32) { q.beginPath(); q.arc(x + 16, Hh, 16, 0, 7); q.fill(); } q.globalCompositeOperation = 'source-over'; }
+  else if (kind === 'banner' || kind === 'sign') { const cx = W / 2, cy = kind === 'banner' ? 150 : Hh / 2; q.fillStyle = kind === 'banner' ? '#b8402c' : '#efe2c4'; q.fillRect(0, 0, W, Hh);
+    for (const [rr, c] of [[90, '#efe2c4'], [70, '#b8402c'], [48, '#efe2c4'], [26, '#b8402c']]) { q.fillStyle = c; q.beginPath(); q.arc(cx, cy, rr * (kind === 'banner' ? .95 : 1.2), 0, 7); q.fill(); }
+    if (kind === 'banner') { q.fillStyle = '#efe2c4'; for (const [x, y, w, h] of [[70, 290, 20, 70], [118, 300, 20, 20], [166, 290, 20, 70], [60, 400, 136, 18], [96, 430, 20, 50], [140, 430, 20, 50]]) q.fillRect(x, y, w, h); q.fillRect(108, 20, 40, 14); q.globalCompositeOperation = 'destination-out'; for (let x = 0; x < W; x += 28) { q.beginPath(); q.moveTo(x, Hh); q.lineTo(x + 14, Hh - 22); q.lineTo(x + 28, Hh); q.fill(); } q.globalCompositeOperation = 'source-over'; } }
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t; }
+function gmerchBuild() {
+  const TAU = Math.PI * 2;
+  const A = GMERCH, zc = A.z, cxW = hwRc(zc) - A.back, czW = zc, c = Math.cos(A.yaw), s = Math.sin(A.yaw);
+  const Wx = (x, z) => cxW + x * c + z * s, Wz = (x, z) => czW - x * s + z * c;
+  let base = Infinity; for (let a = 0; a < TAU; a += .5) base = Math.min(base, rwHeight(cxW + Math.sin(a) * A.R * 1.2, czW + Math.cos(a) * A.R * 1.2)); base -= 6;
+  const top = rwHeight(cxW, czW) + A.H; A.top = top;
+  const g = new THREE.Group(); g.position.set(cxW, 0, czW); g.rotation.y = A.yaw; scene.add(g); A.g = g;
+  const MG = new Map(), _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _v = new THREE.Vector3(), _one = new THREE.Vector3(1, 1, 1), boxes = [], tris = [];
+  const put = (geo, m, mat4) => { geo = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(geo.attributes)) if (k !== 'position' && k !== 'normal' && !(k === 'uv' && m.map && !m.userData.tri)) geo.deleteAttribute(k);
+    if (mat4) geo.applyMatrix4(mat4); if (!geo.attributes.normal) geo.computeVertexNormals(); if (m.userData.strata) { const gg = geo.clone(); gg.rotateY(A.yaw); gg.translate(cxW, 0, czW); ghStrataCol(gg); geo.setAttribute('color', gg.attributes.color); }
+    if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); };
+  const at4 = (x, y, z, ry = 0, rx = 0, rz = 0, sx = 1, sy = 1, sz = 1) => _m4.compose(_v.set(x, y, z), _q.setFromEuler(_e.set(rx, ry, rz)), new THREE.Vector3(sx, sy, sz));
+  const box = (x0, x1, y0b, y1, z0, z1, ex) => { const xs = [Wx(x0, z0), Wx(x1, z0), Wx(x0, z1), Wx(x1, z1)], zs = [Wz(x0, z0), Wz(x1, z0), Wz(x0, z1), Wz(x1, z1)]; boxes.push(Object.assign({ minx: Math.min(...xs), maxx: Math.max(...xs), miny: y0b, maxy: y1, minz: Math.min(...zs), maxz: Math.max(...zs) }, ex || {})); };
+  const vbox = (x0, x1, ya, yb, z0, z1, m, solid, ex) => { put(new THREE.BoxGeometry(x1 - x0, yb - ya, z1 - z0), m, at4((x0 + x1) / 2, (ya + yb) / 2, (z0 + z1) / 2)); if (solid) box(x0, x1, ya, yb, z0, z1, ex); };
+  const tri = (a, b, d) => { for (const q of [a, b, d]) tris.push(Wx(q[0], q[2]), q[1], Wz(q[0], q[2])); };
+  const quad = (a, b, d, e) => { tri(a, b, d); tri(a, d, e); };
+  const rod = (a, b, r, m, round) => { const d = new THREE.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]), L = d.length(); put(round ? new THREE.CylinderGeometry(r, r, L, 8) : new THREE.BoxGeometry(r, L, r), m, _m4.compose(new THREE.Vector3((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2), _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()), _one)); };
+  const NC = { noCam: 1 };
+  const wood = triMat('wood_timber', { scale: 1.6, rough: .85 }), woodP = triMat('wood_planks', { scale: 2.2, rough: .85 }), stone = triMat('sandstone', { scale: 3.2, rough: .92 }), bronze = triMat('bronze', { scale: 1.2, metal: .75, rough: .35 });
+  for (const m of [wood, woodP, stone, bronze]) m.userData.tri = 1;
+  const iron = new THREE.MeshStandardMaterial({ color: 0x2c2724, metalness: .6, roughness: .5 }), bone = new THREE.MeshStandardMaterial({ color: 0xe9dcc0, roughness: .6 }), boneD = new THREE.MeshStandardMaterial({ color: 0xc9b894, roughness: .7 });
+  const rockM = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .93 }); rockM.userData.strata = 1;
+  const glow = new THREE.MeshStandardMaterial({ color: 0xffd9a0, emissive: 0xffa040, emissiveIntensity: 2.2, toneMapped: false }), crystal = new THREE.MeshStandardMaterial({ color: 0xc9a0ff, emissive: 0x9a50ff, emissiveIntensity: 1.4, roughness: .3, toneMapped: false });
+  const leaf = new THREE.MeshStandardMaterial({ color: 0x3f9a8c, roughness: .8, side: THREE.DoubleSide });
+  const cloth = k => new THREE.MeshStandardMaterial({ map: gmTex(k), alphaTest: .5, side: THREE.DoubleSide, roughness: .9 }), sailM = cloth('sail'), tealM = cloth('teal'), pinkM = cloth('pink'), banM = cloth('banner'), signM = new THREE.MeshStandardMaterial({ map: gmTex('sign'), roughness: .8 });
+  // ---- THE BUTTE: a noisy lathe of stratified sandstone from below the rim up to `top`, ledged every few metres, a flat cap you can stand on ----
+  const Rof = (th, y) => { const f = (y - base) / (top - base), r0 = A.R * (1.28 - .28 * f) + (f > .96 ? .5 : 0); const n = ghNoise3(Math.cos(th) * 2.2 + 5, y * .18, Math.sin(th) * 2.2) - .5, ledge = .45 * Math.floor(((y - base) / 3.1) % 2); return r0 * (1 + n * .16) + ledge; };
+  { const NS = 48, NY = Math.ceil((top - base) / 1.2), pos = [];
+    const P = (i, j) => { const th = i / NS * TAU, y = base + (top - base) * j / NY, r = Rof(th, y); return [Math.sin(th) * r, y, Math.cos(th) * r]; };
+    for (let j = 0; j < NY; j++) for (let i = 0; i < NS; i++) { const a = P(i, j), b = P(i + 1, j), d = P(i + 1, j + 1), e = P(i, j + 1); pos.push(...a, ...d, ...b, ...a, ...e, ...d); }
+    const cap = []; for (let i = 0; i < NS; i++) { const a = P(i, NY), b = P(i + 1, NY); cap.push(0, top, 0, ...a, ...b); quad([0, top, 0], [a[0], top, a[2]], [b[0], top, b[2]], [0, top, 0]); }
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.computeVertexNormals(); put(geo, rockM);
+    const cg = new THREE.BufferGeometry(); cg.setAttribute('position', new THREE.Float32BufferAttribute(cap, 3)); cg.computeVertexNormals(); put(cg, rockM);
+    // the collider: cells inside the cap's radius are solid to the top; the skirt outside steps down with the profile
+    const cell = 1.5, Rm = A.R * 1.28 * 1.1; for (let gz = -Rm; gz < Rm; gz += cell) { let run = null; const flush = () => { if (run) box(run.x0, run.x1, base, run.h, gz, gz + cell); run = null; };
+      for (let gx = -Rm; gx < Rm; gx += cell) { const x = gx + cell / 2, z = gz + cell / 2, r = Math.hypot(x, z), th = Math.atan2(x, z); let h = null;
+        if (r < Rof(th, top) - .4) h = top; else { for (let y = top; y > base; y -= 1.2) if (r < Rof(th, y) - .4) { h = Math.round(y * 2) / 2; break; } }
+        if (h == null) { flush(); continue; } if (run && run.h === h) run.x1 = gx + cell; else { flush(); run = { x0: gx, x1: gx + cell, h }; } } flush(); } }
+  // ---- THE DECK: a plank floor over the cap, its front run out past the lip on struts into the face; rope rails, lantern posts ----
+  const Y = top + .8, dx0 = -10, dx1 = 10, dz0 = -6, dz1 = 15; A.deckY = Y;
+  for (let z = dz0; z < dz1 - .01; z += .34) vbox(dx0, dx1, Y - .12, Y, z + .015, z + .325, woodP, 0); box(dx0, dx1, top - 1, Y, dz0, dz1); quad([dx0, Y + .01, dz0], [dx1, Y + .01, dz0], [dx1, Y + .01, dz1], [dx0, Y + .01, dz1]);
+  for (const x of [dx0, dx1]) vbox(x - .12, x + .12, Y - .45, Y - .1, dz0, dz1, wood, 0); for (const z of [dz0, dz1]) vbox(dx0, dx1, Y - .45, Y - .1, z - .12, z + .12, wood, 0);
+  for (let x = dx0 + 1; x < dx1; x += 3) for (const z of [dz1 - .3, 9]) { const rr = Math.hypot(x, z); if (rr < A.R - 1 && z < 12) continue; rod([x, Y - .4, z], [x * .8, top - 7, Math.min(z, A.R * .7) - 1], .3, wood); }
+  const posts = []; for (let x = dx0 + .2; x <= dx1; x += 2.5) posts.push([x, dz1 - .2]); for (let z = dz1 - 2.7; z > dz0; z -= 2.6) { posts.push([dx0 + .2, z]); posts.push([dx1 - .2, z]); }
+  for (const [x, z] of posts) { if (Math.abs(x) < 1.6 && z > dz1 - 1) continue; vbox(x - .14, x + .14, Y, Y + 1.3, z - .14, z + .14, wood, 1, NC); put(new THREE.SphereGeometry(.17, 8, 6), wood, at4(x, Y + 1.38, z)); }
+  { const rope = (a, b) => { const P0 = new THREE.Vector3(...a), P1 = new THREE.Vector3(...b), m = P0.clone().lerp(P1, .5); m.y -= .3; const t = new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(P0, m, P1), 8, .04, 4); put(t, boneD); };
+    const front = posts.filter(p => p[1] > dz1 - 1).sort((a, b) => a[0] - b[0]); for (let i = 0; i < front.length - 1; i++) rope([front[i][0], Y + 1.15, front[i][1]], [front[i + 1][0], Y + 1.15, front[i + 1][1]]);
+    for (const sx of [dx0 + .2, dx1 - .2]) { const side = posts.filter(p => Math.abs(p[0] - sx) < .01).sort((a, b) => a[1] - b[1]); for (let i = 0; i < side.length - 1; i++) rope([sx, Y + 1.15, side[i][1]], [sx, Y + 1.15, side[i + 1][1]]); }
+    for (const sx of [-1, 1]) box(sx > 0 ? dx1 - .4 : dx0, sx > 0 ? dx1 : dx0 + .4, Y, Y + 1.2, dz0, dz1, NC); box(dx0, dx1, Y, Y + 1.2, dz1 - .4, dz1, NC); }
+  const lamp = (x, y, z) => { vbox(x - .1, x + .1, y, y + 2.4, z - .1, z + .1, wood, 1, NC); vbox(x - .08, x + .6, y + 2.3, y + 2.4, z - .06, z + .06, wood, 0); put(new THREE.ConeGeometry(.2, .16, 6), bronze, at4(x + .5, y + 2.05, z)); put(new THREE.CylinderGeometry(.14, .14, .34, 6), glow, at4(x + .5, y + 1.8, z)); put(new THREE.CylinderGeometry(.16, .12, .05, 6), bronze, at4(x + .5, y + 1.6, z)); };
+  for (const [x, z] of [[dx0 + .4, dz1 - .4], [dx1 - .9, dz1 - .4], [dx0 + .4, 4], [dx1 - .9, 4]]) lamp(x, Y, z);
+  // ---- THE SHOP: a stone ground floor (a counter across its open front), a timber second floor on it, a balcony round that ----
+  const sx0 = -5.5, sx1 = 5.5, sz0 = -2, sz1 = 7, H1 = 4.2, H2 = 3.2, t = .4, Y2 = Y + H1;
+  vbox(sx0, sx1, Y, Y + H1, sz0, sz0 + t, stone, 1); for (const x of [sx0, sx1 - t]) vbox(x, x + t, Y, Y + H1, sz0, sz1, stone, 1);
+  for (const [a, b] of [[sx0, -3.4], [3.4, sx1]]) vbox(a, b, Y, Y + H1, sz1 - t, sz1, stone, 1); vbox(-3.4, 3.4, Y + 3.3, Y + H1, sz1 - t, sz1, stone, 0);
+  vbox(-3.2, 3.2, Y, Y + 1.05, sz1 - 1.5, sz1 - .9, wood, 1); vbox(-3.3, 3.3, Y + 1.05, Y + 1.15, sz1 - 1.6, sz1 - .8, woodP, 0); box(-1.1, 1.1, Y, Y + 1.15, sz1 - 1.6, sz1 - .8, { noCam: 1 });
+  for (let x = sx0 + .3; x < sx1 - .2; x += 1.1) vbox(x - .12, x + .12, Y, Y + H1, sz1 + .02, sz1 + .2, wood, 0); vbox(sx0 - .1, sx1 + .1, Y + H1 - .3, Y + H1, sz1, sz1 + .3, wood, 0);
+  for (const hh of [1, 1.9, 2.8]) vbox(sx0 + t, sx1 - t, Y + hh - .06, Y + hh, sz0 + t, sz0 + t + .5, woodP, 0);
+  // the floor of the upper storey (walkable) and the balcony beyond it; the upper walls; its roof
+  const bx0 = sx0 - 1.4, bx1 = sx1 + 1.4, bz0 = sz0 - .4, bz1 = sz1 + 2.4; for (let z = bz0; z < bz1 - .01; z += .34) vbox(bx0, bx1, Y2 - .15, Y2, z + .015, z + .325, woodP, 0); box(bx0, bx1, Y2 - .2, Y2, bz0, bz1); quad([bx0, Y2 + .01, bz0], [bx1, Y2 + .01, bz0], [bx1, Y2 + .01, bz1], [bx0, Y2 + .01, bz1]);
+  for (const [x, z] of [[bx0 + .15, bz1 - .15], [bx1 - .15, bz1 - .15]]) vbox(x - .15, x + .15, Y, Y2, z - .15, z + .15, wood, 1, NC);
+  const ux0 = -3.6, ux1 = 3.6, uz0 = -1.4, uz1 = 4.6; vbox(ux0, ux1, Y2, Y2 + H2, uz0, uz0 + .3, wood, 1); for (const x of [ux0, ux1 - .3]) vbox(x, x + .3, Y2, Y2 + H2, uz0, uz1, wood, 1);
+  for (const [a, b] of [[ux0, -1], [1, ux1]]) vbox(a, b, Y2, Y2 + H2, uz1 - .3, uz1, wood, 1); vbox(-1, 1, Y2 + 2.5, Y2 + H2, uz1 - .3, uz1, wood, 0);
+  vbox(ux0 - .5, ux1 + .5, Y2 + H2, Y2 + H2 + .25, uz0 - .5, uz1 + .5, woodP, 1); quad([ux0 - .5, Y2 + H2 + .26, uz0 - .5], [ux1 + .5, Y2 + H2 + .26, uz0 - .5], [ux1 + .5, Y2 + H2 + .26, uz1 + .5], [ux0 - .5, Y2 + H2 + .26, uz1 + .5]);
+  for (let x = bx0 + .3; x <= bx1 - .3; x += 1.2) vbox(x - .06, x + .06, Y2, Y2 + 1.1, bz1 - .2, bz1 - .08, wood, 0); vbox(bx0, bx1, Y2 + 1.05, Y2 + 1.15, bz1 - .22, bz1 - .06, wood, 0); box(bx0, bx1, Y2, Y2 + 1.1, bz1 - .3, bz1, NC);
+  for (const x of [bx0, bx1]) { for (let z = bz0 + .3; z < bz1; z += 1.2) vbox(x - .06, x + .06, Y2, Y2 + 1.1, z - .06, z + .06, wood, 0); vbox(x - .08, x + .08, Y2 + 1.05, Y2 + 1.15, bz0, bz1, wood, 0); box(x - .15, x + .15, Y2, Y2 + 1.1, bz0, bz1, NC); }
+  // the TARGET SIGN in its wheel over the shopfront; awnings, teal and pink; the CRYSTALS and pots on the counter
+  { const sy = Y + 3.75, sz = sz1 + .42; put(new THREE.CircleGeometry(.85, 28), signM, at4(0, sy, sz)); put(new THREE.TorusGeometry(.95, .09, 6, 28), bronze, at4(0, sy, sz + .02)); for (let k = 0; k < 8; k++) rod([0, sy, sz + .04], [Math.cos(k / 8 * TAU) * 1.25, sy + Math.sin(k / 8 * TAU) * 1.25, sz + .04], .07, bronze, 1); }
+  const awn = (x0, x1, m) => { const NU = 10, NV = 4, pos = [], uv = [], L = x1 - x0, at = (u, v) => [x0 + L * u, Y + 3.2 - v * .9 - .15 * Math.sin(Math.PI * u) * v, sz1 + .3 + v * 1.8]; for (let i = 0; i < NU; i++) for (let j = 0; j < NV; j++) { const u0 = i / NU, u1 = (i + 1) / NU, v0 = j / NV, v1 = (j + 1) / NV; for (const [u, v] of [[u0, v0], [u1, v0], [u1, v1], [u0, v0], [u1, v1], [u0, v1]]) { pos.push(...at(u, v)); uv.push(u * L / 3, 1 - v); } }
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); geo.computeVertexNormals(); put(geo, m); };
+  awn(-5.6, -.6, tealM); awn(.6, 5.6, pinkM);
+  { const rnd = rwRng(5150); for (let x = -3; x < 3.1; x += .45) { const k = rnd(); if (k < .3) { for (let i = 0; i < 3; i++) put(new THREE.OctahedronGeometry(.12 + rnd() * .1, 0), crystal, at4(x + (rnd() - .5) * .2, Y + 1.25 + rnd() * .1, sz1 - 1.2, rnd(), 0, (rnd() - .5) * .5, .6, 1.6, .6)); } else put(new THREE.LatheGeometry([[0, 0], [.12, .02], [.16, .12], [.08, .26], [.09, .32]].map(([a, b]) => new THREE.Vector2(a, b)), 10), k < .6 ? bronze : glow, at4(x, Y + 1.15, sz1 - 1.2)); }
+    for (const hh of [1, 1.9, 2.8]) for (let x = sx0 + .7; x < sx1 - .6; x += .5) put(rnd() < .3 ? new THREE.OctahedronGeometry(.13, 0) : new THREE.CylinderGeometry(.09, .12, .28, 8), rnd() < .3 ? crystal : bronze, at4(x, Y + hh + .15, sz0 + t + .25)); }
+  // ---- THE BONE ARCHES: two great curved tusks springing from the deck, crossing over the shop; the red SAIL canopy stretched on them ----
+  const arch = (a, m, b) => { const cv = new THREE.QuadraticBezierCurve3(new THREE.Vector3(...a), new THREE.Vector3(...m), new THREE.Vector3(...b)); const tg = new THREE.TubeGeometry(cv, 28, .55, 10); const q = tg.attributes.position;
+      put(tg, bone); for (let k = 1; k < 7; k++) { const p = cv.getPoint(k / 7), d = cv.getTangent(k / 7); put(new THREE.TorusGeometry(.6, .1, 6, 14), boneD, _m4.compose(p, _q.setFromUnitVectors(new THREE.Vector3(0, 0, 1), d), _one)); }
+      for (const P0 of [a, b]) { put(new THREE.CylinderGeometry(.9, 1.2, .6, 10), boneD, at4(P0[0], Y + .3, P0[2])); box(P0[0] - .8, P0[0] + .8, Y, Y + 3, P0[2] - .8, P0[2] + .8, NC); } return cv; };
+  const A1 = arch([-8.2, Y, 11.5], [-2, Y + 22, 4], [5.5, Y, -4.5]), A2 = arch([8.4, Y, 10], [1.5, Y + 20, 3], [-6.5, Y, -4.8]);
+  { const NU = 16, NV = 10, pos = [], uv = [], yS = Y + 9.6, at = (u, v) => { const x = -9.5 + 19 * u, z = -5 + 16.5 * v; return [x, yS + 1.7 * Math.sin(Math.PI * v) - 1.3 * (v * v) + .9 * Math.sin(Math.PI * u) - .8 * Math.abs(u - .5) * v, z]; };
+    for (let i = 0; i < NU; i++) for (let j = 0; j < NV; j++) { const u0 = i / NU, u1 = (i + 1) / NU, v0 = j / NV, v1 = (j + 1) / NV; for (const [u, v] of [[u0, v0], [u1, v0], [u1, v1], [u0, v0], [u1, v1], [u0, v1]]) { pos.push(...at(u, v)); uv.push(u * 3, v * 3); } }
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); geo.computeVertexNormals(); put(geo, sailM); }
+  // ---- THE BANNER POLE (the red target banner) at the deck's front-right; two teal PALM FANS; charms hung from the arches ----
+  { const px = 8.6, pz = 13.6, ph = 15; vbox(px - .2, px + .2, Y, Y + ph, pz - .2, pz + .2, wood, 1, NC); for (let y = Y + 2; y < Y + ph; y += 3) vbox(px - .26, px + .26, y - .08, y + .08, pz - .26, pz + .26, iron, 0); vbox(px - 2.2, px + .3, Y + ph - .6, Y + ph - .35, pz - .12, pz + .12, wood, 0);
+    put(new THREE.PlaneGeometry(2, 4.4, 2, 8), banM, at4(px - 1.15, Y + ph - 2.85, pz + .05)); }
+  for (const [fx, fz, ry] of [[-8.5, -3.5, -.6], [8.2, -3, .7]]) { put(new THREE.CylinderGeometry(.14, .2, 6.5, 6), wood, at4(fx, Y + 3.25, fz)); for (let k = 0; k < 7; k++) { const a = -1.2 + k * .4, sh = new THREE.Shape(); sh.moveTo(0, 0); sh.quadraticCurveTo(.9, 1.8, 0, 4.2); sh.quadraticCurveTo(-.9, 1.8, 0, 0);
+      const lg = new THREE.ShapeGeometry(sh, 6); lg.rotateX(-.9); lg.rotateZ(a); lg.rotateY(ry); lg.translate(fx, Y + 6.3, fz); put(lg, leaf); } }
+  { const rnd = rwRng(4141); for (const cv of [A1, A2]) for (let k = 2; k < 9; k++) { const p = cv.getPoint(k / 10); if (p.y < Y + 4) continue; const L = .8 + rnd() * 1.4; put(new THREE.CylinderGeometry(.01, .01, L, 3), boneD, at4(p.x, p.y - L / 2 - .5, p.z)); put(rnd() < .5 ? new THREE.OctahedronGeometry(.15, 0) : new THREE.SphereGeometry(.1, 6, 4), rnd() < .5 ? crystal : bronze, at4(p.x, p.y - L - .55, p.z)); } }
+  // ---- THE WAY UP (pass 1): a ladder up the butte's face from the rim, its mark on the deck; the rest of the route is the next passes ----
+  A.climbs = []; const ladder = (lx, lz, ya, yb, ry, markL) => { const nx = Math.sin(ry), nz = Math.cos(ry), tx = Math.cos(ry), tz = -Math.sin(ry);
+      for (const o of [-.34, .34]) put(new THREE.BoxGeometry(.09, yb - ya + .6, .09), wood, at4(lx + tx * o, (ya + yb + .6) / 2, lz + tz * o, ry)); for (let y = ya + .3; y < yb + .4; y += .34) put(new THREE.BoxGeometry(.7, .06, .06), wood, at4(lx, y, lz, ry));
+      const cw = Wx(lx, lz), czz = Wz(lx, lz), wnx = nx * c + nz * s, wnz = -nx * s + nz * c, hx = .12, hz = .45, ex = Math.abs(wnx) * hx + Math.abs(wnz) * hz, ez = Math.abs(wnz) * hx + Math.abs(wnx) * hz;
+      const L = kitClimbAdd({ cs: wnx, sn: wnz, hx, hz, cx: cw, cz: czz, minx: cw - ex, maxx: cw + ex, miny: ya, maxy: yb, minz: czz - ez, maxz: czz + ez }, 'gmerch_ladder', yb); L.mark = { x: Wx(markL[0], markL[1]), y: markL[2], z: Wz(markL[0], markL[1]) }; A.climbs.push(L); };
+  { const th = Math.PI, ry = th; let rmax = 0; for (let y = base; y < top; y += .6) rmax = Math.max(rmax, Rof(th, y)); const r = rmax + .35, lx = Math.sin(th) * r, lz = Math.cos(th) * r, ya = rwHeight(Wx(lx, lz), Wz(lx, lz)) + .1;
+    ladder(lx, lz, ya, top + .3, ry, [Math.sin(th) * (A.R - 2), Math.cos(th) * (A.R - 2), top + .1]); A.stat.ladder = +(top - ya).toFixed(1); }
+  // two steps from the cap up onto the deck's back edge, where the butte's ladder comes over
+  for (let k = 0; k < 2; k++) vbox(-1.6, 1.6, top, top + .4 * (k + 1), dz0 - .9 + k * .45, dz0 - .45 + k * .45, wood, 1);
+  // THE SCAFFOLD up the canyon's west wall (pass 1 of the route): ladders of about 6 m, each topping out on a plank landing that runs back to
+  // where the slope reaches it, the next ladder standing there. World-built (the group's inverse brings each piece into its frame)
+  { g.updateMatrixWorld(true); const inv = new THREE.Matrix4().copy(g.matrixWorld).invert(), zw = czW + 9, wput = (geo, m, x, y, z) => { geo.applyMatrix4(_m4.makeTranslation(x, y, z)); geo.applyMatrix4(inv); put(geo, m); };
+    let y = 1.4, n = 0; const ladW = [];
+    while (n < 8) { const X0 = hwWallAt(zw, -1, y, -.5); if (Math.abs(X0 - hwRc(zw)) > 39) break; const yt = y + 6, X1 = hwWallAt(zw, -1, yt, .2); if (Math.abs(X1 - hwRc(zw)) > 39) break;
+      for (const o of [-.34, .34]) wput(new THREE.BoxGeometry(.09, 6.6, .09), wood, X0, y + 3.3, zw + o); for (let yy = y + .3; yy < yt + .4; yy += .34) wput(new THREE.BoxGeometry(.06, .06, .7), wood, X0, yy, zw);
+      const hx = .12, hz = .45, L = kitClimbAdd({ cs: 1, sn: 0, hx, hz, cx: X0, cz: zw, minx: X0 - hx, maxx: X0 + hx, miny: y, maxy: yt, minz: zw - hz, maxz: zw + hz }, 'gmerch_wall', yt); L.mark = { x: X0 - .7, y: yt + .1, z: zw }; A.climbs.push(L);
+      const xa = Math.min(X0, X1) - .3, xb = Math.max(X0, X1) + .3; wput(new THREE.BoxGeometry(xb - xa, .14, 2.2), woodP, (xa + xb) / 2, yt - .07, zw); BOXES.push({ minx: xa, maxx: xb, miny: yt - 1, maxy: yt, minz: zw - 1.1, maxz: zw + 1.1 });
+      for (const q of [[xa, yt + .01, zw - 1.1, xb, yt + .01, zw - 1.1, xb, yt + .01, zw + 1.1], [xa, yt + .01, zw - 1.1, xb, yt + .01, zw + 1.1, xa, yt + .01, zw + 1.1]]) tris.push(...q);
+      for (const zz of [zw - 1.05, zw + 1.05]) { wput(new THREE.BoxGeometry(.1, 1.1, .1), wood, xa + .1, yt + .55, zz); wput(new THREE.BoxGeometry(xb - xa, .07, .07), wood, (xa + xb) / 2, yt + 1.05, zz); }
+      wput(new THREE.BoxGeometry(.16, yt - y + 1, .16), wood, xb - .1, (y + yt) / 2 - .5, zw - 1); wput(new THREE.BoxGeometry(.16, yt - y + 1, .16), wood, xb - .1, (y + yt) / 2 - .5, zw + 1);
+      ladW.push(+(X0).toFixed(1)); y = yt; n++; }
+    A.stat.scaffold = n; A.stat.wallTop = +y.toFixed(1); }
+  // ---- merge; the world gets the boxes and the floors ----
+  let draws = 0; for (const [m, list] of MG) { if (m.map && !m.userData.tri) m.map.wrapS = m.map.wrapT = THREE.RepeatWrapping; const geo = mergeGeometries(list); if (!geo) { console.warn('[melee] gmerch: a bucket would not merge', m.color); continue; } const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; g.add(o); draws++; }
+  for (const b of boxes) BOXES.push(b);
+  for (let i = 0; i < tris.length; i += 9) { const q = tris.slice(i, i + 9); triAdd(...q); triAdd(q[0], q[1], q[2], q[6], q[7], q[8], q[3], q[4], q[5]); }
+  A.stat.draws = draws; A.stat.boxes = boxes.length; A.stat.top = +top.toFixed(1); A.stat.deckY = +Y.toFixed(1);
+  console.log('[melee] merchant shop (procedural): ' + draws + ' draws, ' + boxes.length + ' boxes, deck at y ' + Y.toFixed(1) + ', butte ' + (top - base).toFixed(0) + ' m, ladder ' + A.stat.ladder + ' m');
+}
 async function buildHome() {
   const H = HOME; try { const q = new URLSearchParams(location.search).get('style'); if (q === 'lake' || q === 'hollows') H.style = q; } catch (e) {}
   if (H.style !== 'lake') { H.padY = 1.3; H.hut.at = [hwRc(-4) - 14, -4]; H.hut.yaw = Math.PI / 2; H.spawn = [hwRc(10) - 7, 10]; RW.time = { el: 18, az: 200, sun: [1, .8, .58], zen: [.28, .46, .78], hor: [1, .86, .7] }; }
@@ -65343,6 +65474,7 @@ async function buildHome() {
   rwBuild();
   // the hut, on its levelled pad -- built in code (GHOME), or his Tripo GLB to compare (`?hut=glb`)
   if (GHOME.on) { try { ghomeBuild(H.hut.at, H.hut.yaw, H.padY); H.stat.hutK = 'proc'; } catch (e) { console.error('[melee] grumbo home', e); note('HOME BUILD THREW'); } }
+  if (GMERCH.on && H.style !== 'lake') try { gmerchBuild(); } catch (e) { console.error('[melee] merchant shop', e); note('MERCHANT BUILD THREW'); }
   else try { const g = await loadGLB(H.hut.file, 'loading the refuge');
     const m = g.scene, drop = []; m.traverse(o => { if (o.isLight) drop.push(o); }); for (const o of drop) o.removeFromParent();
     m.updateMatrixWorld(true); const bb = new THREE.Box3(); m.traverse(o => { if (o.isMesh && o.name !== 'collider' && o.geometry) { o.geometry.computeBoundingBox(); bb.union(o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld)); } });
@@ -66431,7 +66563,7 @@ async function init() {
 
 // the console handle. Every tuning object is live, so a number can be moved on the phone
 // without a rebuild and without a push.
-window.melee = window.mel = { PLANT, plantLibBuild, plantHit, SNOWZ, snowStamp, GHOME, SHIMMY, VAIM, SHIPZ, shipBuild, FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, gaitMeasure, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
+window.melee = window.mel = { GMERCH, PLANT, plantLibBuild, plantHit, SNOWZ, snowStamp, GHOME, SHIMMY, VAIM, SHIPZ, shipBuild, FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, gaitMeasure, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
   // PROGRESS (m276): `mel.SAVE` is the save; the setters write it through; `mel.progReset()` is a new game
   // TALK (m277): `mel.TALK` live; `mel.TALKS` the scripts by kind; `mel.talk` the state
   TALK, TALKS, talk,
