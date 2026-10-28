@@ -18,7 +18,7 @@ texture.
 
 | family | items | sandbox | status |
 |---|---|---|---|
-| **PLANTS** | cherry, pine, saguaro, agave, bamboo, fern, Jin bulb, grass. Next: ivy (climbing walls), maple, bonsai, moss, reeds, lilies, alien bulbs and fronds, flowers, hanging vines, potted plants | Plant Library | pass 1 (m1424) |
+| **PLANTS** | cherry, pine, saguaro, agave, bamboo, fern, Jin bulb, grass. Next: ivy (climbing walls), maple, bonsai, moss, reeds, lilies, alien bulbs and fronds, flowers, hanging vines, potted plants | Plant Library | pass 1 (m1425) |
 | **ROCKS** | boulders in the sandstone of the Red Hollows, river stones, stepping stones, scree, standing stones, moss-capped rocks | -- | |
 | **WATER** | fountains, basins, spouts (bamboo shishi-odoshi), ponds with lilies, streams, small falls; JIN springs (KORAJIN.md) | -- | |
 | **COURTYARD** | stone lanterns, benches, tables, gravel beds, paths, planters, gates, wells | -- | |
@@ -35,7 +35,7 @@ texture.
 
 ## Pass plan for the plants (one pass = one build)
 
-1. ~~eight types, the wind, the hit springs, the sandbox~~ (m1424)
+1. ~~eight types, the wind, the hit springs, the sandbox~~ (m1425)
 2. shapes: real silhouettes per type (the cherry's canopy in clouds of blossom, not blobs; the pine's layered skirts; agave leaves with a spine)
 3. ivy: a climbing kit that grows over a box or a wall face
 4. variety: a seed per instance changes colour, lean and proportions, so no two match

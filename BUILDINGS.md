@@ -7,7 +7,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 
 ## THE PROP LIBRARY (his, Oct 28 2026; PROPS.md)
 *"Plants, pots and pans, tables, benches... rocks, water features, fountains, fences, ladders -- detailed passes on all of those tertiary items."* About ten passes each; each family gets a sandbox.
-- [x] **plants pass 1 (mXXXX):** SPAWN > BUILDINGS > Plant Library: cherry, pine, saguaro, agave, bamboo, fern, Jin bulb, grass. Wind sway; a katana, a bolt or walking through bends them and they spring back
+- [x] **plants pass 1 (m1425):** SPAWN > BUILDINGS > Plant Library: cherry, pine, saguaro, agave, bamboo, fern, Jin bulb, grass. Wind sway; a katana, a bolt or walking through bends them and they spring back
 - [ ] plants pass 2: real silhouettes per type (PROPS.md has the ten-pass plan)
 - [ ] rocks, water, courtyard, fences and blocks, household, climbing: each its own sandbox, pass 1 each
 

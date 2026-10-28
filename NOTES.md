@@ -23,7 +23,7 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
-## THE PLANT LIBRARY, PASS 1: A SHARED KIT THAT SWAYS AND TAKES A HIT (mXXXX)
+## THE PLANT LIBRARY, PASS 1: A SHARED KIT THAT SWAYS AND TAKES A HIT (m1425)
 *"Plants of various sizes and styles that are dynamic, move, flow in the wind, but you can also kinda hit them."* PROPS.md is the program (families, sandboxes, ten passes each).
 - **`PLANTK`:** eight types, each with `make()` returning parts built by `plantPart(geo, col, sw, fl, gl)`. `col` can be a hex, an [r,g,b] array or fn(x,y,z). The array case was missed at first and the Jin bulb drew BLACK.
 - **One InstancedMesh per kind** on the one `plantMat()`. Wind: an offset in WORLD space mapped into instance-local space with `transpose(mat3(instanceMatrix)) / scale^2`, so a turned plant still leans downwind.
