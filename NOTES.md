@@ -112,7 +112,7 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
-## THE DOJO, PASS 18: JINRA SEEPS FROM WHAT YOU BREAK (mXXXX)
+## THE DOJO, PASS 18: JINRA SEEPS FROM WHAT YOU BREAK (m1502)
 *"Every time you destroy one, a little of the green stuff leaves them -- it seeps out and rises into the air, or you collect it."* (KORAJIN.md, THE ENEMY.)
 - **`JINRA`:** a count `n` saved in `mel.jinra`, plus a pool of up to 260 wisps drawn as ONE additive Points draw with a soft mint sprite.
 - **`jinraEmit(x, y, z, k)` throws k wisps out and up.** Each RISES for `rise` .9 s (damped, drifting), then HOMES to his chest (accelerating to `home` 9 m/s) and is collected within .5 m, with a soft `ready` chime (throttled).
