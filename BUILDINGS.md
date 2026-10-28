@@ -39,7 +39,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - a cliff band, then lobed undersides cracked and banded in strata, with moss at the rim
   - dressed with cherry and pine trees, boulders, shrubs and hanging roots
   - the platform's own island, the altars', the stepping stones', the pagodas' and the drifting platforms', plus twelve art-directed scenery masses (two great ones, a chain of medium, small rocks)
-- [x] **pass 5 (m1408): HIS VOCABULARY, not borrowed Japanese** (ARCHITECTURE.md):
+- [x] **pass 5 (m1410): HIS VOCABULARY, not borrowed Japanese** (ARCHITECTURE.md):
   - the pagodas become HERO HALLS: sandstone domes, the red-and-cream tent cone, bronze stacks, a brass wheel, a scaffold front with an awning and box lanterns, bunting, a banner, portholes, the crane and orb
   - the torii become timber-and-iron GATES with wheels, banners and lanterns
   - the paper-lantern strings become BUNTING

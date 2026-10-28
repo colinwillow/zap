@@ -535,7 +535,7 @@ SHIPPED UNVERIFIED. The queue's passes 2 and 3 are done. Next is his call: more 
 
 SHIPPED UNVERIFIED. Next: pass 3, foam and wake, bow spray, the sun on the water, gulls, an island.
 
-## THE DOJO IN HIS VOCABULARY: THE HERO KIT (m1408), AND ARCHITECTURE.md
+## THE DOJO IN HIS VOCABULARY: THE HERO KIT (m1410), AND ARCHITECTURE.md
 
 His (with four screenshots of Worker B's home and Worker A's ship): *"It seems like you're using the architecture of other games rather than the architecture of these images. We have an architecture of our own now... all the buildings we've made get a new set of passes in this style. Enemy bases probably shouldn't be in this style -- this is the hero's, my dojo, my home; the enemy would have different architecture and colours, a similar general style."*
 
