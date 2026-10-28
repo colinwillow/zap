@@ -35,12 +35,12 @@ Render-checked headless: intact, then all three seams cut (walls slumped, roof d
 Merged 137 meshes (38 children). Render-checked headless (outside, from above, at the gate: the first render caught the tie beams and
 the emblem through the roof and frieze, fixed). Next: pass 2 (DESTRUCTIBLE TO THE GROUND). Shipped unverified.
 
-## m15xx -- THE SNOWFIELD'S MISSING BLADE, the real cause: a pure-mirror material (m1628's "buried" was WRONG)
+## m1637 -- THE SNOWFIELD'S MISSING BLADE, the real cause: a pure-mirror material (m1628's "buried" was WRONG)
 His screenshot after m1628: the hilt and guard plain in his hand, held high, the blade gone -- *"it was always missing, it's still missing."* So it
 was never buried. Measured in the page: the blade (`katanaScene`'s `steel`) was `0xd9dee5`, **metalness 1**, roughness .22. A fully metallic
 surface has NO diffuse colour of its own -- it is only its reflection -- so on the snowfield, under a white sky with a white environment, the
 blade rendered white on white and vanished; in the dojo it reflects the sunset and reads. m1634 tried `0x8e99a7`, metalness .72 -- a render
-still lost it, so the blade was forced to flat RED in the page: it drew, full length, in his hand. So it is purely shading. m15xx: gunmetal
+still lost it, so the blade was forced to flat RED in the page: it drew, full length, in his hand. So it is purely shading. m1637: gunmetal
 `0x55606c`, metalness .5, roughness .32, `envMapIntensity` .45 -- dark enough to read against white snow. **m1628's snow-cutting by the held
 weapon is REMOVED**: its diagnosis was wrong, and stamping a rim every frame piled the snow into tall spikes beside him.
 **Lesson: when the hilt shows and the blade does not, look at the blade's MATERIAL before its position.**
