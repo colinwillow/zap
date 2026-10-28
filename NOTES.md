@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home, pass 28: the stall shutters roll up and down (Worker B, loop tick 5)
+His queue item (agreed after m1459). One roll-up tin curtain per stall front (local x 2.45..9.75 each side, z 7.68, deck to P+2.55), a drum
+under the outer beam and iron guides at the ends (both in the merged buckets). The slats of BOTH are one mesh, `ghomeShutFill` lays them from
+the curtain's bottom edge up to the drum (a slat past the drum folds into it), rewritten only while one moves. It carries `aChunk` (the
+stall's) and uses a material in MG, so the restoration rig patches it and it falls with its stall. `ghomeShut` (homeStep): rolls at .55/s up,
+.8/s down, thud at the end; the collider (`box()` built then popped, so it is ours to add) is in BOXES only while it is mostly down and
+the home is restored. Strike (ghomeHit, local frame like the orb): toggles; FALLEN it only rattles. RT reaching 1 with goal 1 rolls them up.
+36 draws. Render: restored, left shutter down, right half way. Box moved: the home's "still open" list (shutters). Next: rope lift, pots.
 ## m1542 -- THE RE-PASS: the SHRINE, pass 3 (layers, breakables, alive; its third pass, so the loop moves on)
 **Moves:** the Shrine's L1/L2/L3 and breakable rows.
 - L1, the courtyard: a LAUNCH BAR (`hbarMake`, yaw pi/2 so the swing carries toward the wall) 3 m off the terrace's west wall; three straw
