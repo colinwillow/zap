@@ -95,7 +95,8 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 ## THE DRAGON RIDE (his, Oct 28 2026; KORAJIN.md THE BLUE DRAGON) -- a test zone, then the dojo
 - [ ] a sandbox: the blue dragon, tame (a Jinra offering), mount, ride on the ground, take off, fly (RollerGirl's wingsuit model), land
 - [ ] fireballs from the saddle; Grumbo's gun while riding
-- [ ] dressing: saddle, glowing Jinra collar, wrist and ankle armour, tail ornaments, our red cape and emblem when captured; EVIL vs CAPTURED textures
+- [x] **dressing pass 1 (mXXXX):** on HIS bones, measured by raycasts on his skinned mesh: a saddle (seat, pommel, cantle, red blanket with a gold edge, stirrups), a gold collar with a glowing Jinra ring and tag, gold bands on the forearms and calves, our red cape with the nested-diamond crest. TOOLS > DRAGON: CAPTURED / WILD
+- [ ] dressing pass 2: tail ornaments, a bridle and reins, a richer saddle (to fit Grumbo), EVIL vs CAPTURED textures
 - [ ] needs from him: a fly cycle (and any riding clips)
 
 ## THE DOJO (his, after m1390) -- the arena becomes the floating samurai dojo; many passes

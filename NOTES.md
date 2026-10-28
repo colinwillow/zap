@@ -132,6 +132,13 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
+## HIS BLUE DRAGON, DRESSED AS OURS: SADDLE, COLLAR, BANDS, CAPE (mXXXX)
+*"Embellish him: a collar, a glowing collar, wrist jewellery or armour, definitely a saddle, a cape with a red emblem."*
+- **`dojoDragonDress`:** every piece is a child of one of HIS bones (`Bip001_Spine1` saddle, `Neck1` collar, `L/R_Forearm` and `Calf` bands, `Spine2` cape), so it rides his clips.
+- **`pin` compensates the bone's world scale** (the armature is .01, and the Biped is turned) and solves the piece's turn on the REST pose (`mx.update(0)`), so the piece sits upright in his frame. A piece's own turn composes on top (the bands along the limb, the collar square to the neck from Neck1 to Neck2).
+- **Where the skin is comes from RAYCASTS on the posed skinned mesh:** down onto the back for the saddle and cape, sideways for the neck girth. The first try took the FIRST hit, which was a back spike for the saddle (it floated) and a wing for the collar (a giant ring round his head). It takes the hit NEAREST the bone now, and the collar is clamped to .075-.11 of his height.
+- **TOOLS > DRAGON: CAPTURED / WILD** (`mel.dragon`; it reloads). CAPTURED is the default in the dojo for now.
+
 ## HIS BLUE DRAGON AND HIS THREE-HEADED DOG IN THE DOJO (m1515)
 *"I don't think you understood what I meant by dragon -- I have models. The blue dragon GLB and the three-headed dog... unlock animals along the way."* His `models/creatures/blue_dragon.glb` and `3_headed_dog.glb` (already arena beasts: DRAGON / DOG).
 - **`dojoBeast(D, B)`** goes through `arenaLoad(key)`, so the padding is trimmed (`beastPrep`), the scale and facing are measured, and `skeletonClone(P.proto)` is scaled `mul` and faced at the dojo. Its own mixer cross-fades the idles in turn (`dojoBeastIdle`). Called on the FIRST dojo frame, because `arenaLoad` must not run at module scope.
