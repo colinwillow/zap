@@ -11561,6 +11561,7 @@ function dragTapR() { const B = DRAGZ.on && DRAGZ.on.B, D = B && B.drive; if (!D
   if (D.air.mode !== 'fly') { D.air = null; D.flapCool = 0; dragFlap(D); return; }     // up from a jump or a hover: the take-off
   dragFlap(D); }
 function dragHoldR(R, dt) { const B = DRAGZ.on && DRAGZ.on.B, D = B && B.drive, S = stick.R; if (!D) return;
+  if (dragArmed()) { R.rHold = 0; R.rHeld = 0; if (D.air && D.air.mode === 'hover') D.air.hold = false; return; }     // m15xx: armed, the right pad only aims
   const still = S.down && (S.far || 0) < .3; R.rHold = still ? (R.rHold || 0) + dt : 0;
   if (D.air && D.air.mode === 'hover') D.air.hold = !!S.down;
   if (R.rHold > DRAGZ.holdT && !R.rHeld) { R.rHeld = 1; if (!D.air || D.air.mode === 'hop') { D.air = { mode: 'hover', vy: D.air ? D.air.vy : 3, t: 0, hold: 1 }; D.beat = 0; } }
@@ -11585,7 +11586,7 @@ function dragDrive(B, dt) { const Z = DRAGZ, D = B.drive, p = player, sit = p.dr
     else if (F && P.y < F.y) P.y = F.y;
     if (P.y < Z.cloudY + 8) { P.set(Z.at[0], Z.daisY, Z.at[1]); D.air = null; D.v = 0; D.pad = null; tipShow('Into the clouds -- back to the dais.', 3); }
     let tr = 0, tf = 0; if (A.trick) { const T = A.trick; T.t += dt; const u = Math.min(1, T.t / T.T), e = u * u * (3 - 2 * u); if (T.k === 'roll') tr = T.s * e * Math.PI * 2; else tf = T.s * e * Math.PI * 2; if (u >= 1) A.trick = null; }
-    B.root.rotation.order = 'YXZ'; B.root.rotation.set(-(D.air ? A.pitch + tf : 0), h + (B.faceOff || 0), -(A.bank + tr) * (D.air ? 1 : 0));
+    B.root.rotation.order = 'YXZ'; B.root.rotation.set(-(D.air ? A.pitch + tf : 0), h + (B.faceOff || 0), (A.bank - tr) * (D.air ? 1 : 0));     // m15xx: the bank was NEGATED -- left stick rolled his left side UP (a lean out of the turn, "as if the momentum throws him"); now the inside wing goes down
     D.v = D.air ? A.v : D.v; D.spread = damp(D.spread || 0, 1, Z.spreadHL, dt); }
   else if (D.air) { const A = D.air, s2 = sit ? stickWorld() : { x: 0, z: 0, mag: 0 };     // m1625: the HOP and the HOVER -- steered as on the ground, gently
     if (s2.mag > 0) { const want = Math.atan2(s2.x, s2.z), dh = wrapAngle(want - h); h += clamp(dh, -Z.turn * dt, Z.turn * dt); D.v = damp(D.v, s2.mag * Z.airSp, .5, dt); } else D.v = damp(D.v, 0, .8, dt);
@@ -11704,14 +11705,14 @@ function dragBite(B) { const Z = DRAGZ, hd = B.m.getObjectByName('Bip001_Head');
 function dragTrick(dx, dy) { const B = DRAGZ.on && DRAGZ.on.B, D = B && B.drive, A = D && D.air; if (!A || A.mode !== 'fly' || A.trick) return;
   if (Math.abs(dx) > Math.abs(dy)) A.trick = { k: 'roll', s: dx > 0 ? 1 : -1, t: 0, T: DRAGZ.rollT }; else A.trick = { k: 'flip', s: dy < 0 ? 1 : -1, t: 0, T: DRAGZ.flipT };
   snd('swoosh', { g: .6, r: .7 }); }
-function dragFire(B, aim) { const Z = DRAGZ, D = B.drive, hd = B.m.getObjectByName('Bip001_Head'); if (!hd) return;
+function dragFire(B, aim, k = 1) { const Z = DRAGZ, D = B.drive, hd = B.m.getObjectByName('Bip001_Head'); if (!hd) return;
   const h = dragH(B), pt = D.air ? D.air.pitch : -.12, f = aim ? aim.clone() : new THREE.Vector3(Math.sin(h) * Math.cos(pt), Math.sin(pt), Math.cos(h) * Math.cos(pt)), o = hd.getWorldPosition(new THREE.Vector3()).addScaledVector(f, B.hd * .14);
   const m = new THREE.Group(), FB = FIREBALL;
   const core = new THREE.Mesh(FB.geo || (FB.geo = new THREE.IcosahedronGeometry(1, 2)), new THREE.MeshBasicMaterial({ color: 0xfff1b8, toneMapped: false }));
   const shell = new THREE.Mesh(FB.geo, new THREE.MeshBasicMaterial({ color: 0xff6a12, toneMapped: false, transparent: true, opacity: .72, depthWrite: false }));
   const shell2 = new THREE.Mesh(FB.geo, new THREE.MeshBasicMaterial({ color: 0xc8260a, toneMapped: false, transparent: true, opacity: .35, depthWrite: false }));
-  core.scale.setScalar(.55); shell2.scale.setScalar(1.3); m.add(core, shell, shell2); m.userData.fb = { core, shell, shell2 }; m.scale.setScalar(Z.fbR); m.position.copy(o); scene.add(m);
-  Z.on.fb.push({ m, v: f.multiplyScalar(Z.fbV + (D.v || 0)), life: 3.5, tr: 0, r: Z.fbR }); snd('plasma', { g: .9, r: .55, x: o.x, z: o.z }); camShake(.08); }
+  core.scale.setScalar(.55); shell2.scale.setScalar(1.3); m.add(core, shell, shell2); m.userData.fb = { core, shell, shell2 }; m.scale.setScalar(Z.fbR * k); m.position.copy(o); scene.add(m);
+  Z.on.fb.push({ m, v: f.multiplyScalar(Z.fbV + (D.v || 0)), life: 3.5, tr: 0, r: Z.fbR * k }); snd('plasma', { g: .9, r: .55, x: o.x, z: o.z }); camShake(.08); }
 function dragBoom(f) { const P = f.m.position, Z = DRAGZ; snd('boom', { g: .8, r: .9, x: P.x, z: P.z }); camShake(.15);
   for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2, r = .3 + Math.random() * .6; smokeAt(P.x + Math.sin(a) * r, P.y + .1 + Math.random() * .5, P.z + Math.cos(a) * r, 5 + Math.random() * 3, .14, i % 3 ? ROCKTRAIL.org : ROCKTRAIL.yel, 1.3); }
   for (let i = 0; i < 5; i++) smokeAt(P.x + (Math.random() - .5), P.y + .4 + Math.random(), P.z + (Math.random() - .5), 4, 1.5, [.3, .28, .26]);
@@ -11725,14 +11726,37 @@ function dragFxStep(dt) { const Z = DRAGZ, O = Z.on;
     if (hitT || (Fl && P.y < Fl.y + f.r * .5) || boxRay(ox, oy, oz, P.x, P.y, P.z, _tuR) || f.life <= 0 || P.y < Z.cloudY) { O.fb.splice(i, 1); dragBoom(f); } }
   for (const t of O.tg) { if (t.dead > 0) { t.dead -= dt; if (t.dead <= 0) t.G.visible = true; continue; }
     for (const b of BOLTS) if (b.t < 50 && Math.hypot(b.pos.x - t.x, b.pos.y - t.y, b.pos.z - t.z) < t.r + (b.size || .4) * .5) { b.t = 1e9; dragTargetHit(t); break; } } }
-// the gun from the saddle: the right pad held UP (the trigger's own arc), a bolt every `gunT`
+// m15xx (his: "we need a reticle when you're shooting fireballs -- BEHIND the dragon, not on top of him. Work it like RollerGirl's: a button
+// above the right stick toggles the fireball on and off; equipped, as soon as you touch the right stick it COCKS the fireball, you move the
+// reticle with your thumb, and when you release it shoots; un-check it to just steer or turn the camera normally"). THE FIRE TOGGLE: a FIRE
+// button over the right pad, only in the saddle. ARMED, the right pad is the aimer and nothing else -- no camera drag, no hover hold, no
+// flap tap, no breath flick: the reticle rests at `aimHome` (screen fractions: up in the sky AHEAD of him, clear of his body), the thumb
+// carries it up to `aimX`/`aimY` of the screen off that, and the release lobs a fireball down the camera ray through it (`aimFar` m out).
+// Held longer it grows (`fbChargeT` s to `1 + fbChargeK`). Unarmed, the right pad is the camera and the flap again, and nothing shoots.
+Object.assign(DRAGZ, { fbArm: 0, aimHome: [.5, .3], aimX: .4, aimY: .3, aimFar: 90, fbChargeT: .8, fbChargeK: .7 });
+function dragArmed() { const R = player.dragon; return !!(DRAGZ.fbArm && R && R.st === 'sit'); }
+function dragAimUi() { const Z = DRAGZ, R = player.dragon, sit = !!(R && R.st === 'sit');
+  if (!Z.ui) { const b = document.createElement('div'); b.id = 'dragFireBtn'; b.innerHTML = '<span>&#x1F525;</span><b>FIRE</b>';
+    b.style.cssText = 'position:fixed;z-index:30;width:62px;height:62px;margin:-31px 0 0 -31px;border-radius:50%;display:none;flex-direction:column;align-items:center;justify-content:center;font:800 11px system-ui;color:#fff;background:rgba(20,22,30,.55);border:3px solid rgba(255,255,255,.55);touch-action:none;user-select:none;-webkit-user-select:none';
+    const tog = e => { e.preventDefault(); e.stopPropagation(); Z.fbArm = Z.fbArm ? 0 : 1; snd('clang', { g: .35, r: Z.fbArm ? 1.6 : 1.1 }); }; b.addEventListener('pointerdown', tog); b.addEventListener('touchstart', e => { e.stopPropagation(); }, { passive: true });
+    const r = document.createElement('div'); r.id = 'dragReticle'; r.innerHTML = '<i></i>';
+    r.style.cssText = 'position:fixed;z-index:12;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:3px solid #ffb347;box-shadow:0 0 10px #ff7a1a;display:none;pointer-events:none';
+    r.firstChild.style.cssText = 'position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:#fff1b8;box-shadow:0 0 8px #ff7a1a';
+    document.body.appendChild(b); document.body.appendChild(r); Z.ui = { b, r }; }
+  const U = Z.ui; U.b.style.display = sit ? 'flex' : 'none'; U.r.style.display = sit && Z.fbArm ? 'block' : 'none'; if (!sit) return;
+  const pr = padR.getBoundingClientRect(), ok = pr.width > 0 && pr.top > 0; U.b.style.left = (ok ? pr.left + pr.width / 2 : innerWidth - 92) + 'px'; U.b.style.top = (ok ? pr.top - 46 : innerHeight - 250) + 'px';
+  U.b.style.background = Z.fbArm ? 'rgba(255,110,20,.85)' : 'rgba(20,22,30,.55)'; U.b.style.borderColor = Z.fbArm ? '#fff1b8' : 'rgba(255,255,255,.55)';
+  if (Z.fbArm) { U.r.style.left = R.ax + 'px'; U.r.style.top = R.ay + 'px'; const c = R.fbCock ? 1 + Math.min(1, (R.fbHold || 0) / Z.fbChargeT) * Z.fbChargeK : 1; U.r.firstChild.style.transform = 'scale(' + (R.fbCock ? c * 1.6 : .6) + ')'; U.r.style.opacity = R.fbCock ? 1 : .55; } }
 function dragGun(dt) { const Z = DRAGZ, R = player.dragon, S = stick.R; R.gunT = Math.max(0, (R.gunT || 0) - dt);
-  const up = S.down && -S.y > Z.gunUp && Math.abs(Math.atan2(S.x, -S.y)) < Z.gunArc; R.trig = up ? (R.trig || 0) + dt : 0;
-  if (R.trig < .1 || R.gunT > 0) return; R.gunT = Z.holdFbT;
-  // m1671 (his: "use the stick to shoot FIREBALLS the same way RollerGirl shoots her blaster in the air"): held UP, HIS fire, at the middle of
-  // the screen (where the camera looks, 90 m out), every `holdFbT` s -- no gun in Grumbo's hands
-  const B = DRAGZ.on && DRAGZ.on.B, hd = B && B.m.getObjectByName('Bip001_Head'); if (!hd) return; const o = hd.getWorldPosition(new THREE.Vector3());
-  const d = camera.getWorldDirection(new THREE.Vector3()), tgt = camera.position.clone().addScaledVector(d, 90); dragFire(B, tgt.sub(o).normalize()); }
+  const W = innerWidth, H = innerHeight, tx = W * Z.aimHome[0] + (S.down ? clamp(S.x, -1, 1) * W * Z.aimX : 0), ty = H * Z.aimHome[1] + (S.down ? clamp(S.y, -1, 1) * H * Z.aimY : 0);
+  R.ax = R.ax == null ? tx : damp(R.ax, tx, .035, dt); R.ay = R.ay == null ? ty : damp(R.ay, ty, .035, dt);
+  if (!dragArmed()) { R.fbCock = 0; R.fbHold = 0; dragAimUi(); return; }
+  if (S.down) { R.fbHold = (R.fbHold || 0) + dt; if (!R.fbCock) { R.fbCock = 1; snd('swoosh', { g: .35, r: 1.4 }); } }
+  else if (R.fbCock) { R.fbCock = 0; const k = 1 + Math.min(1, (R.fbHold || 0) / Z.fbChargeT) * Z.fbChargeK; R.fbHold = 0;
+    const B = DRAGZ.on && DRAGZ.on.B, hd = B && B.m.getObjectByName('Bip001_Head'); if (hd) { const o = hd.getWorldPosition(new THREE.Vector3()), cr = renderer.domElement.getBoundingClientRect();
+      const ray = new THREE.Vector3(((R.ax - cr.left) / cr.width) * 2 - 1, -((R.ay - cr.top) / cr.height) * 2 + 1, .5).unproject(camera).sub(camera.position).normalize();
+      const tgt = camera.position.clone().addScaledVector(ray, Z.aimFar); dragFire(B, tgt.sub(o).normalize(), k); R.gunT = Z.holdFbT; } }
+  dragAimUi(); }
 // m1622: TAMING (DRAGON.md box 6; KORAJIN.md: "you fight the dragon, tame it by giving it good Jinra"). WILD is the EVIL look: he will not be
 // ridden, he turns to watch you, growls, and SHOVES you off if you crowd him (`wildR`). On the meadow by the spawn is a JINRA SPRING (a stone
 // basin with a mint orb floating over it): walk into it and Grumbo carries the orb in his right hand. Take it to the dragon and tap the right
@@ -30350,9 +30374,9 @@ PADS.L = bindStick(padL, stick.L,
 PADS.R = bindStick(padR, stick.R,
   // tap: jump -- and as her, a quick SECOND tap opens / folds the wings (m266)
   // ...unless someone in reach has something to say: then it is TALK (m277), and the left tap still jumps
-  () => { if (aim3Now()) return; /* m1345: 3D AIM owns the whole right pad -- a tap is not a jump */ if (talkTap()) return; if (player.dragon) { if (player.dragon.st === 'sit') dragTapR(); return; } if (dragTap()) return; /* m1614 */ if (pickTap()) return; if (portalTap()) return; if (wingTapR()) return; if (hurdleTap()) return; if (mantleTap()) return; if (wrunTap()) return; player.jump = 1; },     // m1064: a tall face beside / ahead -> wall run     // m1063: pushing into a half block -> hurdle it     // m1039: a ledge in reach -> climb it
+  () => { if (aim3Now()) return; /* m1345: 3D AIM owns the whole right pad -- a tap is not a jump */ if (talkTap()) return; if (player.dragon) { if (player.dragon.st === 'sit' && !dragArmed()) dragTapR(); return; } if (dragTap()) return; /* m1614 */ if (pickTap()) return; if (portalTap()) return; if (wingTapR()) return; if (hurdleTap()) return; if (mantleTap()) return; if (wrunTap()) return; player.jump = 1; },     // m1064: a tall face beside / ahead -> wall run     // m1063: pushing into a half block -> hurdle it     // m1039: a ledge in reach -> climb it
   // flick: a SLAM if he is in the air and it went down, otherwise a strike in that direction
-  (dx, dy) => { if (player.dragon) { dragBreath(); return; } /* m1621: his fireball */ if (player.wing || aim3Now()) return; /* m1282: in 3D AIM a fast drag moves the cursor, it never swings */ if (tossQuick(dx, dy)) return; if (boardFlick(dx, dy, 0)) return; if (zipKick(dx, dy)) return; if (wrunSwipe(dx, dy)) return; if (runSwipe(dx, dy)) return; if (!slamGo(dx, dy)) { KATANA.dir = katanaDir(dx, dy); meleeGo(KATANA.dir === 'down' ? player.faceH : flickH(dx, dy)); } },     // m1054: DOWN is not a direction -- the strike goes where he faces (a slot kept for a grab / throw / special)     // m1014: the right pad is MELEE, by direction (m1012's down-slide is off it)
+  (dx, dy) => { if (player.dragon) { if (!dragArmed()) dragBreath(); return; } /* m1621: his fireball */ if (player.wing || aim3Now()) return; /* m1282: in 3D AIM a fast drag moves the cursor, it never swings */ if (tossQuick(dx, dy)) return; if (boardFlick(dx, dy, 0)) return; if (zipKick(dx, dy)) return; if (wrunSwipe(dx, dy)) return; if (runSwipe(dx, dy)) return; if (!slamGo(dx, dy)) { KATANA.dir = katanaDir(dx, dy); meleeGo(KATANA.dir === 'down' ? player.faceH : flickH(dx, dy)); } },     // m1054: DOWN is not a direction -- the strike goes where he faces (a slot kept for a grab / throw / special)     // m1014: the right pad is MELEE, by direction (m1012's down-slide is off it)
   null,
   // THE RELEASE IS THE SHOT, so this must NOT clear `p.aim` -- `stepKit` sees the pad is no
   // longer held and fires on that edge. Clearing it here would eat every shot in the game.
@@ -65544,7 +65568,7 @@ function stepCam(dt) {
   // m1030: *"when you pull down on the right stick into guard you can turn him by nudging left or right -- I want it inverted."* In the guard
   // the nudge turns the other way (`CAM.guardInv`, 1 = inverted); the ordinary drag is untouched.
   const gInv = p.block && CAM.guardInv ? -1 : 1;
-  if (ax > dz && !p.speedSk && !flyAim) { cam.az -= gInv * Math.sign(rx) * ((ax - dz) / (1 - dz)) * CAM.yawRate * dt; p.camWant = null; cam.idle = 0; }
+  if (ax > dz && !p.speedSk && !flyAim && !(stick.R.down && dragArmed())) { cam.az -= gInv * Math.sign(rx) * ((ax - dz) / (1 - dz)) * CAM.yawRate * dt; p.camWant = null; cam.idle = 0; }
   else cam.idle += dt;
   // **AND THE MOUSE IS THE SAME WRITER, NOT A SECOND ONE (m79).** It is spent HERE rather than
   // in the listener for exactly the reason the line above it exists: `cam.az` has one writer and
@@ -66572,6 +66596,7 @@ function frameBody() {
     // position and the speed cap is measured against how far it moved, so solving before the
     // root is written measures last frame's travel -- which at a knock-down's 12 m/s is most
     // of a metre of phantom motion through the limbs on every single frame.
+    if (DRAGZ.ui && !(player.dragon && player.dragon.st === 'sit')) dragAimUi();     // m15xx: the FIRE button goes when he leaves the saddle
     dragRiderPose();                   // m1619: in the saddle, pitched and banked with his dragon (after every pose that writes the root)
     rig.root.updateMatrixWorld(true); springsStep(dt);     // m1058: hair / cape chains, on the FINAL root (after every pose above)
     dollStep(dt);

@@ -5,6 +5,27 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- THE DRAGON BANKS INTO THE TURN, AND A FIRE TOGGLE WITH A RETICLE (his: "every time you build a vehicle you do the banking wrong
+-- press left and instead of tilting his left arm down to bank that way, his whole body leans to the right as if the momentum throws him";
+"a reticle for fireballs BEHIND the dragon, not on top of him; work it like RollerGirl's -- a button above the right stick toggles the
+fireball; equipped, touching the right stick cocks it, the thumb moves the reticle, release shoots; un-check it to steer / turn the camera")
+- **The bank:** `B.root.rotation.z` was `-(bank)`. Left stick gives a negative `bank`, so the roll came out positive and raised his LEFT
+  (+X) side: a lean OUT of the turn. It is `+bank` now. **Measured** in the flying dragon zone: the root's up vector tilts toward the side
+  he is turning to, by .59 (left) and .58 (right). Before, it tilted away. The barrel roll's sign is kept as it was.
+  **THE RULE FOR EVERY VEHICLE:** the roll comes from the TURN, and the inside side goes DOWN. Check it as a dot product (up . turn side
+  > 0), never by reasoning.
+- **FIRE:** a round button over the right pad, only in the saddle (`dragAimUi`, `DRAGZ.fbArm`). Armed, the right pad is ONLY the aimer:
+  - no camera drag, no hover hold, no flap tap, no breath flick
+  - the reticle rests at `aimHome` (.5, .3 of the screen: sky ahead of him, clear of his body)
+  - the thumb carries it up to `aimX`/`aimY` of the screen
+  - the release fires down the camera ray through it, at a point `aimFar` 90 m out
+  - held for `fbChargeT` .8 s, the ball grows to 1.7x
+  Unarmed: camera and flap as before. The old hold-up gun at the screen centre is GONE (that was the reticle on top of him).
+- **Measured:** armed + thumb up-right for 40 frames: cocked, the reticle at (672, 65), release: one ball, r 1.27 (charged), flying
+  (.20, -.08, -.98) against his heading (0, -1).
+- **Not built:** the rocket launcher from the saddle (his "he'd have to hang below or climb to one side" -- an animation question first).
+  **Not checked:** on his phone (the button over a floating pad especially).
+
 ## m1702 -- NEON GREEN SMOKE (his: "the green smoke has gone kind of dark... I want it glowing, neon, fluorescent. Instead of shades, HUES --
 a little more turquoise, a little more slime green-yellow")
 - **Why it was dark:** the smoke pool's shader outputs premultiplied colour, and its NormalBlending multiplies by alpha a SECOND time. Every
