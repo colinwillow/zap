@@ -42,7 +42,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 4. **Breakable and alive:** doors open or break; roofs have a SKELETON (rafters and beams) so a broken roof reads; something to smash; lanterns, cloth and smoke moving.
 5. **Detail and embellishment:** silhouettes that read from the game camera, plants and rocks round the base, signs of use.
 6. **Budget:** about 40 draws per building (merge per material), no new physics, `npm run check` clean.
-7. **Two states, ONE set of pieces -- for HERO / TOWN buildings only (his, m@X4@):** FALLEN = pieces collapsed, slid, tipped, rust-grey; RESTORED = the pieces fly home and the colour, lamps and Jinra come back IN PLACE. Buildings do NOT fly on their own: a town's GROUND breaks off and rises as a whole (a later town-scale system; the Watchtower test rides its own chunk of earth to show it); only ships fly. ENEMY buildings are not restored. Kit: `restorePieces` / `restoreSkin` / `restoreRide` (the Watchtower is the reference).
+7. **Two states, ONE set of pieces -- for HERO / TOWN buildings only (his, m1513):** FALLEN = pieces collapsed, slid, tipped, rust-grey; RESTORED = the pieces fly home and the colour, lamps and Jinra come back IN PLACE. Buildings do NOT fly on their own: a town's GROUND breaks off and rises as a whole (a later town-scale system; the Watchtower test rides its own chunk of earth to show it); only ships fly. ENEMY buildings are not restored. Kit: `restorePieces` / `restoreSkin` / `restoreRide` (the Watchtower is the reference).
 
 **The buildings** (SPAWN > BUILDINGS), at least 3 passes each:
 | building | p1 | p2 | p3 | his OK |
