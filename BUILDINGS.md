@@ -181,7 +181,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - [x] **pass 12 (m1416):** a long serpent-fish that arcs up and down through the swell
   - [x] **pass 12b (m1433):** the serpent REBUILT -- one continuous scaled skin, a membrane fin with spines and a tail fan, flapping pectorals, a lofted head (brow, hinged jaw, teeth, sunken eyes, frills, horns, whiskers)
   - [x] **pass 12c (m1439):** the serpent in PAINTED textures -- skin (spine scutes, iridescent scales, belly plates), glowing lateral line, spined fin membrane, slit-pupil eye
-  - [x] **pass 12d (m@X4@):** the SEA DRAGON from his reference sheet -- textures generated from the sheet (mosaic scales, cream belly, torn red-orange fins, gold eye), a horned fanged head with a red mouth, and the REAR: the neck rises straight out of the sea, head level on top
+  - [x] **pass 12d (m1448):** the SEA DRAGON from his reference sheet -- textures generated from the sheet (mosaic scales, cream belly, torn red-orange fins, gold eye), a horned fanged head with a red mouth, and the REAR: the neck rises straight out of the sea, head level on top
   - [ ] pass 13: manta rays that swim AND fly (for the airship sky too)
   - [ ] later: other ships about (junks under sail), a bigger land harbour; air creatures for the airship (his: flying fish, serpent-dragons, pterodactyls)
   - [ ] later: swimming here; the AIRSHIP transform (his)

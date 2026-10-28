@@ -158,7 +158,7 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
-## THE SHIP, PASS 12d: THE SEA DRAGON, FROM HIS REFERENCE SHEET (m@X4@, WORKER A)
+## THE SHIP, PASS 12d: THE SEA DRAGON, FROM HIS REFERENCE SHEET (m1448, WORKER A)
 
 His (a concept sheet: a horned sea dragon, mosaic scales, cream belly, torn red-orange fins, rearing out of the sea): *"you could use
 this to create the sea dragon monster thing."* The serpent becomes that dragon:
