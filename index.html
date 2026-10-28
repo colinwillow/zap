@@ -67805,16 +67805,17 @@ function ghPathMat() { if (ghPathMat.m) return ghPathMat.m; const cv = document.
 // geometry has no UVs) and MULTIPLIES the existing colour by map / its own linear mean -- so the palette, the strata bands, the moss and the
 // FALLEN drain all stay what they were and the paint is the detail. 'land': sand on the flats, cliff on the steeps (by slope); 'rock': the rock
 // map. It goes in BEFORE `color_fragment`, so a drain spliced after it still has the last word. `HWPAINT.k` is the strength (0 = off)
-const HWPAINT = { k: .85, sand: { n: 'hollows_sand', s: 7, mean: [.8579, .2564, .0882] }, rock: { n: 'hollows_rock', s: 3.2, mean: [.485, .1559, .0497] }, cliff: { n: 'hollows_cliff', s: 12, mean: [.4453, .0731, .0466] } };
-function hwPaint(mat, kind) { if (!HWPAINT.k) return mat; const P = HWPAINT, ob = mat.onBeforeCompile, ok = mat.customProgramCacheKey, land = kind === 'land', A1 = land ? P.cliff : P.rock;
+const HWPAINT = { k: .85, sand: { n: 'hollows_sand', s: 7, mean: [.8579, .2564, .0882] }, rock: { n: 'hollows_rock', s: 3.2, mean: [.485, .1559, .0497] }, cliff: { n: 'hollows_cliff', s: 12, mean: [.4453, .0731, .0466] }, pebble: { n: 'hollows_pebble', s: 3, mean: [.2112, .1599, .0906] } };
+// pass 2: kinds 'cliff' (triplanar cliff: the ledge paths' retaining faces), 'sand' (the walkways), and on 'land' the PEBBLE bed below the waterline
+function hwPaint(mat, kind) { if (!HWPAINT.k) return mat; const P = HWPAINT, ob = mat.onBeforeCompile, ok = mat.customProgramCacheKey, land = kind === 'land', A1 = land ? P.cliff : P[kind] || P.rock;
   mat.onBeforeCompile = function (sh, r) { if (ob) ob.call(this, sh, r);
     Object.assign(sh.uniforms, { uHwA: { value: texGet(A1.n) }, uHwAs: { value: 1 / A1.s }, uHwAm: { value: new THREE.Vector3(...A1.mean) }, uHwK: { value: P.k } });
-    if (land) Object.assign(sh.uniforms, { uHwB: { value: texGet(P.sand.n) }, uHwBs: { value: 1 / P.sand.s }, uHwBm: { value: new THREE.Vector3(...P.sand.mean) } });
+    if (land) Object.assign(sh.uniforms, { uHwB: { value: texGet(P.sand.n) }, uHwBs: { value: 1 / P.sand.s }, uHwBm: { value: new THREE.Vector3(...P.sand.mean) }, uHwC: { value: texGet(P.pebble.n) }, uHwCs: { value: 1 / P.pebble.s }, uHwCm: { value: new THREE.Vector3(...P.pebble.mean) } });
     sh.vertexShader = 'varying vec3 vHwP; varying vec3 vHwN;\n' + sh.vertexShader.replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\n  vHwP = (modelMatrix * vec4(transformed, 1.0)).xyz; vHwN = normalize(mat3(modelMatrix) * objectNormal);');
-    sh.fragmentShader = 'varying vec3 vHwP; varying vec3 vHwN; uniform sampler2D uHwA; uniform float uHwAs; uniform vec3 uHwAm; uniform float uHwK;' + (land ? ' uniform sampler2D uHwB; uniform float uHwBs; uniform vec3 uHwBm;' : '') + '\n' +
+    sh.fragmentShader = 'varying vec3 vHwP; varying vec3 vHwN; uniform sampler2D uHwA; uniform float uHwAs; uniform vec3 uHwAm; uniform float uHwK;' + (land ? ' uniform sampler2D uHwB; uniform float uHwBs; uniform vec3 uHwBm; uniform sampler2D uHwC; uniform float uHwCs; uniform vec3 uHwCm;' : '') + '\n' +
       sh.fragmentShader.replace('#include <color_fragment>', `{ vec3 hn = normalize(vHwN), bw = pow(abs(hn), vec3(4.0)); bw /= (bw.x + bw.y + bw.z);
         vec3 ta = (texture2D(uHwA, vHwP.zy * uHwAs).rgb * bw.x + texture2D(uHwA, vHwP.xz * uHwAs).rgb * bw.y + texture2D(uHwA, vHwP.xy * uHwAs).rgb * bw.z) / uHwAm;` +
-        (land ? ` vec3 tb = texture2D(uHwB, vHwP.xz * uHwBs).rgb / uHwBm; tb = mix(vec3(1.0), tb, 1.6); ta = mix(ta, tb, smoothstep(0.62, 0.82, hn.y));` : '') + `
+        (land ? ` vec3 tb = texture2D(uHwB, vHwP.xz * uHwBs).rgb / uHwBm; tb = mix(vec3(1.0), tb, 1.6); vec3 tc = texture2D(uHwC, vHwP.xz * uHwCs).rgb / uHwCm; tb = mix(tb, tc, smoothstep(0.4, 0.0, vHwP.y)); ta = mix(ta, tb, smoothstep(0.62, 0.82, hn.y));` : '') + `
         diffuseColor.rgb *= mix(vec3(1.0), clamp(ta, 0.0, 2.2), uHwK); }
       #include <color_fragment>`); };
   mat.customProgramCacheKey = () => String(ok ? ok.call(mat) : '') + 'hwp' + kind; mat.needsUpdate = true; return mat; }
@@ -69326,8 +69327,8 @@ function hwPath(side, zb, y0, dir) {
     if (!lastPost || Math.abs(a.z - lastPost.z) >= 2) { const px = oa + side * .15; const g = new THREE.CylinderGeometry(.06, .07, 1.2, 5); g.translate(px, a.y + .6, a.z); posts.push(g);
       if (lastPost) rope.push(lastPost.x, lastPost.y + 1.05, lastPost.z, px, a.y + 1.05, a.z); lastPost = { x: px, y: a.y, z: a.z }; } }
   const mk = (arr, mat) => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(arr, 3)); g.computeVertexNormals(); const m = new THREE.Mesh(g, mat); m.receiveShadow = true; m.castShadow = true; scene.add(m); return m; };
-  mk(top, rwMat(0xb3765a, { side: THREE.DoubleSide, roughness: .95 })); mk(skirt, rwMat(0x8f4f36, { side: THREE.DoubleSide, roughness: .95 }));
-  if (treads.length) rwMesh(treads, rwMat(0xc48a68, { roughness: .9 })); if (posts.length) rwMesh(posts, rwMat(0x4a3424), false);
+  mk(top, hwPaint(rwMat(0xb3765a, { side: THREE.DoubleSide, roughness: .95 }), 'sand')); mk(skirt, hwPaint(rwMat(0x8f4f36, { side: THREE.DoubleSide, roughness: .95 }), 'cliff'));
+  if (treads.length) rwMesh(treads, hwPaint(rwMat(0xc48a68, { roughness: .9 }), 'rock')); if (posts.length) rwMesh(posts, rwMat(0x4a3424), false);
   const rg = new THREE.BufferGeometry(); rg.setAttribute('position', new THREE.Float32BufferAttribute(rope, 3)); const rl = new THREE.LineSegments(rg, new THREE.LineBasicMaterial({ color: 0x3a2a1c })); rl.frustumCulled = false; scene.add(rl);
   H.n++; H.len.push({ side, zb, y0, from: pts[pts.length - 1].z, steps: treads.length, bottomY: +pts[pts.length - 1].y.toFixed(2), top: [sm[0] - side * H.w / 2, y0, zb] });
 }
@@ -69355,7 +69356,7 @@ function hollowDress() {
   { const dark = [], rim = []; for (const [z, side] of [[-30, -1], [18, -1], [-55, 1], [40, 1], [95, -1]]) { const x = wallX(z, side, 1.5), y = rwHeight(x, z) - .3, ry = side < 0 ? Math.PI / 2 : -Math.PI / 2;     // m1114: the cave at 70 moved to 95, out of the west path's foot
       const a = new THREE.CircleGeometry(3, 18, 0, Math.PI); a.scale(1, 1.3, 1); a.rotateY(ry); a.translate(x - side * .3, y, z); dark.push(a);
       const t = new THREE.TorusGeometry(3.1, .5, 6, 16, Math.PI); t.scale(1, 1.3, 1); t.rotateY(ry); t.translate(x - side * .2, y, z); rim.push(t); }
-    rwMesh(dark, new THREE.MeshBasicMaterial({ color: 0x120806, side: THREE.DoubleSide }), false); rwMesh(rim, rwMat(0x9a4e34)); }
+    rwMesh(dark, new THREE.MeshBasicMaterial({ color: 0x120806, side: THREE.DoubleSide }), false); rwMesh(rim, hwPaint(rwMat(0x9a4e34), 'rock')); }
   // ROPE BRIDGES across the canyon, high up, sagging; banners hang from them
   const ban = [], banM = new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 });
   { const plank = [], rope = []; for (const [z, y0] of [[-24, 15], [32, 21]]) { const xa = hwWallAt(z, -1, y0 + .3, -1.2), xb = hwWallAt(z, 1, y0 + .3, -1.2), N = Math.max(12, Math.round(Math.abs(xb - xa) / .62)), sag = Math.abs(xb - xa) * .07;     // anchored IN the wall at its height
