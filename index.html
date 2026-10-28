@@ -64516,6 +64516,8 @@ function godMenuOpen(on) {
   });
   sec('SWITCHES');
   btn('FLY ' + (GOD.fly ? 'ON' : 'OFF'), () => { godFly(!GOD.fly); godMenuOpen(1); });
+  // the Red Hollows' state on the phone (his ask: "how can I see it in all its glory"): main's AGE, saved; reloads (a `?hs=` would win, so it goes)
+  if (inHome()) btn('RED HOLLOWS: ' + (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + ' (tap for ' + (AGE.st === 'fallen' ? 'RESTORED, all of it built' : 'FALLEN') + ', reloads)', () => { try { localStorage.setItem('mel.age', AGE.st === 'fallen' ? 'restored' : 'fallen'); } catch (e) {} const u = new URL(location.href); u.searchParams.delete('hs'); location.replace(u.toString()); });
   if (inAW()) btn('ALIEN BUILDINGS ' + (AW.bldOn ? 'ON' : 'OFF') + ' (reloads; ' + AW.bld + ' placed, ' + AW.missing.length + ' missing)', () => { try { localStorage.setItem('mel.awbld', AW.bldOn ? '0' : '1'); } catch (e) {} location.replace(location.pathname); });   // m434
   { const al = /alien_pano/.test(SKY.img); btn('SKY: ' + (al ? 'THE ALIEN PANO' : 'THE GAME HDRI') + ' (tap for ' + (al ? 'the game HDRI' : 'the alien pano') + ', reloads)', () => { try { localStorage.setItem('mel.skypick', al ? 'game' : 'alien'); } catch (e) {} location.replace(location.pathname); }); }   // m435
   btn('ALL KIT ' + (GEAR.all ? 'ON' : 'OFF') + ' (campaign: everything, not just what he has found)', () => { GEAR.all = GEAR.all ? 0 : 1; try { localStorage.setItem('mel.allkit', GEAR.all ? '1' : '0'); } catch (e) {} GEAR.pack = gearHas('pack'); gearSync(1); godMenuOpen(1); });   // m465
