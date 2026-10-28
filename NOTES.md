@@ -39,7 +39,7 @@ cylinder (r .27, y .3-2.15, only while the target is up), and the shot dies ther
 (down in one). The blow itself is shared with the swing (`dojoTgtHit`). Measured headless: a shot at a target 3 -> 2, a shot 2 m off misses, a rocket
 sinks one.
 
-## m1534 -- the Jinra refinery, pass 2: its chunk of mountain lifts live (Worker B, loop tick 3)
+## m1536 -- the Jinra refinery, pass 2: its chunk of mountain lifts live (Worker B, loop tick 3)
 His correction (the buildings do not go up on jets; the ground under them breaks off and floats). The refinery's island is that ground:
 the whole builder is ONE chunk on the shared `rsChunkRig`, and the RESTORE kit's own `lift` carries the group (`R.g = g`, `R.baseY = -L`,
 `R.lift = L`, L = island y minus the flank height + 1, ~83 m). FALLEN: grounded on the flank, drained and rusted; the mint plate at its door
