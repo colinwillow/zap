@@ -243,6 +243,26 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
+## THE SHIP AS A MODEL: `shipModel()` FOR THE DOJO (m@X4@, WORKER A)
+
+His (relayed by the dojo session, then confirmed here: *"Yes"*): the ship flying slowly round the dojo islands in the arena, close enough to
+jump aboard. The dojo session owns the placing, the flight and the moving deck; this build only makes the ship reusable.
+
+- `shipBuild` is split. **`shipMake(vis)`** is the whole build into a Group at the origin facing +Z and returns `{ g, O, tris, climbs, rings,
+  gulls, coreM, flags, sparkAt, chimney }`; `shipBuild` calls `shipMake(0)` and does what it always did (scene, `bldTris`, BOXES, `boxGrid`,
+  `SHIPZ.on`, the fish/whale/serpent, `bldXrayTag`, spawn). **`shipModel(opts)`** calls `shipMake(1)`, which registers NOTHING: no
+  `kitClimbAdd` (ladder, hatch, the three sails), no `gringAdd`, no `smashAdd` (the barrels are still drawn), no gulls, no `SHIPZ.engHalo`.
+  It returns `{ g, deckY, deck: every solid box in the group's LOCAL frame (165), tris: the ramps' walkable triangles, local (54 floats),
+  flags, coreM, step(dt, t) }`. `step` runs the cloth and the core's pulse.
+- **`triMat` GAINED A `local` OPTION** (object-space triplanar, its own program key `tri<scale>L`). World-space triplanar on a MOVING model makes
+  the wood grain crawl across it. Inside `shipMake`, `triMat` is a local wrapper that adds `local` only when `vis` is set, and `triMatG` is the
+  real one. The sea ship is unchanged (its ship-local and world frames coincide anyway).
+- **`hwBanner` caches on itself, not on `HOLLOW`.** Measured: calling `shipModel()` at module scope right after `arenaStage()` threw
+  `Cannot access 'HOLLOW' before initialization` (a blank page), because `HOLLOW` is declared ~40,000 lines below. With the cache moved, a
+  temporary module-scope call in `?w=arena` boots clean, and the ship renders over the islands textured (165 deck boxes, 54 tri floats, 72
+  children). The sea ship still boots onto its deck with its 7 climbs.
+- **Open (the dojo's side):** placing it, flying it, the deck as moving boxes. No airship form exists yet (no wings or sails out). Not signed off.
+
 ## THE SHIP, PASS 12f: THE BODY STOPS BEING A TUBE (m1464, WORKER A)
 
 His: *"The face is fine. The body just feels very cylindrical and plain. I could see there being more variation."*
