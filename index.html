@@ -65353,6 +65353,30 @@ function ghomeRestoreSync() { const A = GHOME; if (!A.chU || !A.stand) return; c
   if (R && A.g) { for (let i = 0; i < R.pieces.length; i++) { const P = R.pieces[i], u = Math.min(1, Math.max(0, (t - P.at * .55) / .45)); if (!P.landed && u > .985 && R.goal === 1) { P.landed = 1; const w = A.g.localToWorld(P.obj.userData.piv.clone()); spkBurst(w.x, w.y + .5, w.z, 26, { col: [.5, 1, .78], spread: 5, size: .16, life: .8 }); snd('thud', { g: .7, r: 1.2 + Math.random() * .3, x: w.x, z: w.z }); camShake(.08); } if (u < .5) P.landed = 0; }
     if (t > .02 && t < .999 && R.goal === 1 && Math.random() < .5) { const a = Math.random() * 6.283, r = 6 + Math.random() * 6, w = A.g.localToWorld(new THREE.Vector3(Math.sin(a) * r, A.P + Math.random() * 3, Math.cos(a) * r)); spkBurst(w.x, w.y, w.z, 2, { col: [.55, 1, .8], spread: 1.5, size: .12, life: 1.4 }); }
     if (A.plate) A.plate.material.emissiveIntensity = R.trig && R.trig.armed ? .9 + .6 * Math.sin(performance.now() * .004) : .3; } }
+// THE CHUNKED RESTORATION, shared by the Red Hollows' places (the home's pass-26 method made general): a builder tags each piece with a chunk
+// (`rsTag(A, geo)` inside its `put`, using `A.chunkOf` and `A.chNames`), merges per material as always, then `rsChunkRig(A, MG, fallen, plate,
+// extra)` -- each material learns `aChunk` (moved by `A.chU`) and `uDrain`; a stand-in per chunk is a RESTORE piece with its FALLEN pose; the
+// plate is the trigger; `extra` are real Object3Ds (a wheel's holder) posed by the kit directly. `rsChunkSync(A)` every frame ----
+function rsTag(A, geo) { geo.computeBoundingBox(); const bb = geo.boundingBox, k = A.chunkOf((bb.min.x + bb.max.x) / 2, (bb.min.y + bb.max.y) / 2, (bb.min.z + bb.max.z) / 2); geo.setAttribute('aChunk', new THREE.BufferAttribute(new Float32Array(geo.attributes.position.count).fill(k), 1)); if (k) A.chBox[k].union(bb); }
+function rsChunkRig(A, MG, fallen, plate, extra) { const N = A.chNames.length, U = A.chU = { value: [] }, DR = A.drain = { value: 0 }; for (let k = 0; k < N; k++) U.value.push(new THREE.Matrix4());
+  for (const m of MG.keys()) { const ob = m.onBeforeCompile, ok = m.customProgramCacheKey, key = A.rsKey || 'rsch';
+    m.onBeforeCompile = (sh, r) => { if (ob) ob.call(m, sh, r); sh.uniforms.uCh = U; sh.uniforms.uDrain = DR; sh.vertexShader = 'attribute float aChunk;\nuniform mat4 uCh[' + N + '];\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n  transformed = (uCh[int(aChunk + .5)] * vec4(transformed, 1.)).xyz;');
+      if (sh.vertexShader.includes('#include <beginnormal_vertex>')) sh.vertexShader = sh.vertexShader.replace('#include <beginnormal_vertex>', '#include <beginnormal_vertex>\n  objectNormal = mat3(uCh[int(aChunk + .5)]) * objectNormal;');
+      sh.fragmentShader = 'uniform float uDrain;\n' + sh.fragmentShader.replace('#include <color_fragment>', '#include <color_fragment>\n  { float L = dot(diffuseColor.rgb, vec3(.3, .59, .11)); diffuseColor.rgb = mix(diffuseColor.rgb, vec3(L) * vec3(1.06, .94, .8), uDrain * .78) * (1. - uDrain * .2); }'); };
+    m.customProgramCacheKey = () => String(ok ? ok.call(m) : '') + key; m.needsUpdate = true; }
+  const R = A.R_ = restoreRig(new THREE.Group(), { lift: 0, dur: A.rsDur || 8 }); A.stand = [];
+  for (let k = 1; k < N; k++) { const b = A.chBox[k], d = new THREE.Object3D(); if (b.isEmpty() || !fallen[k]) { A.stand.push(null); continue; } const piv = new THREE.Vector3((b.min.x + b.max.x) / 2, b.min.y, (b.min.z + b.max.z) / 2); d.position.copy(piv); d.userData.piv = piv; A.stand.push(d);
+    const F = fallen[k]; restorePiece(R, d, { p: [piv.x + F.p[0], piv.y + F.p[1], piv.z + F.p[2]], r: F.r, hop: F.hop }, F.at != null ? F.at : (k - 1) / (N - 1)); }
+  for (const [obj, F] of extra || []) restorePiece(R, obj, { p: [obj.position.x + F.p[0], obj.position.y + F.p[1], obj.position.z + F.p[2]], r: F.r, hop: F.hop }, F.at);
+  for (const m of MG.keys()) { if (!m.color || m.userData.rest) continue; m.userData.rest = 1; const c = m.color.clone(), rust = (m.metalness || 0) > .5 ? new THREE.Color(0x6e4632) : c.clone().lerp(new THREE.Color(0x8a7a6a), .35).multiplyScalar(.85); restoreMat(R, m, rust); }
+  if (plate) { const pl = new THREE.Mesh(new THREE.CylinderGeometry(.9, .95, .12, 24), new THREE.MeshStandardMaterial({ color: 0x9afce0, emissive: 0x30d0a0, emissiveIntensity: 1.2, roughness: .4 })); pl.position.set(...plate); scene.add(pl); A.plate = pl; R.trig = { x: plate[0], y: plate[1], z: plate[2], armed: 1 }; }
+  const t0 = hsF() ? 0 : 1; R.goal = t0; restoreSet(R, t0); for (const P of R.pieces) P.landed = t0; rsChunkSync(A); return R; }
+function rsChunkSync(A) { if (!A.chU || !A.stand) return; const M = new THREE.Matrix4(), T = new THREE.Matrix4(), one = new THREE.Vector3(1, 1, 1);
+  for (let k = 1; k < A.chNames.length; k++) { const d = A.stand[k - 1]; if (!d) continue; M.compose(d.position, d.quaternion, one); T.makeTranslation(-d.userData.piv.x, -d.userData.piv.y, -d.userData.piv.z); A.chU.value[k].multiplyMatrices(M, T); }
+  const R = A.R_, t = R ? R.t : 1; if (A.drain) A.drain.value = 1 - rsEase((t - .15) / .6);
+  if (R && A.g) { for (const P of R.pieces) { const u = Math.min(1, Math.max(0, (t - P.at * .55) / .45)); if (!P.landed && u > .985 && R.goal === 1) { P.landed = 1; const w = P.obj.userData.piv ? A.g.localToWorld(P.obj.userData.piv.clone()) : P.obj.getWorldPosition(new THREE.Vector3()); spkBurst(w.x, w.y + .5, w.z, 26, { col: [.5, 1, .78], spread: 5, size: .16, life: .8 }); snd('thud', { g: .7, r: 1.2 + Math.random() * .3, x: w.x, z: w.z }); camShake(.06); } if (u < .5) P.landed = 0; }
+    if (A.plate) A.plate.material.emissiveIntensity = R.trig && R.trig.armed ? .9 + .6 * Math.sin(performance.now() * .004) : .3; }
+  return t; }
 // pass 21: a fish leaps off the T-head now and then -- a short arc out of the water and back, a splash at both ends
 // pass 23: the tumbleweed -- every 8-20 s it comes in from upwind (local +x), rolls and hops across the floor in front of the home, and goes
 // (the beach between the shop and the water; it hops over the pier's foot)
@@ -66174,7 +66198,7 @@ function gpeakStep(dt) { const A = GPEAK; if (!A.g) return; if (hsF()) A.fireAt 
 // painted with the red sun-spiral; a ring gallery and a red-capped LANTERN at the top with a ROTOR of red sails turning round it; timber
 // BALCONIES clinging at two heights under red awnings, an outside stair and ladders between them; ROPE BRIDGES from the lower balcony to
 // both canyon walls, banners hung off them; stepping stones out from the west bank. World axes (no yaw: the tower is round) ----
-const GMILL = { on: 1, pass: 3, z: 62, H: 40, g: null, rotor: null, wheel: null, fall: null, stat: {} };
+const GMILL = { on: 1, pass: 4, z: 62, H: 40, g: null, rotor: null, wheel: null, fall: null, stat: {} };
 function gmillTex(kind) { const cv = document.createElement('canvas'), W = cv.width = 256, Hh = cv.height = 256, q = cv.getContext('2d');
   if (kind === 'sun') { q.clearRect(0, 0, W, Hh); q.strokeStyle = '#c94a2e'; q.fillStyle = '#c94a2e'; q.lineWidth = 16; q.beginPath(); for (let a = 0; a < 12.5; a += .1) { const r = 8 + a * 6.2; q.lineTo(128 + Math.cos(a) * r, 128 + Math.sin(a) * r); } q.stroke();
     for (let k = 0; k < 12; k++) { const a = k / 12 * Math.PI * 2; q.beginPath(); q.moveTo(128 + Math.cos(a - .1) * 92, 128 + Math.sin(a - .1) * 92); q.lineTo(128 + Math.cos(a) * 124, 128 + Math.sin(a) * 124); q.lineTo(128 + Math.cos(a + .1) * 92, 128 + Math.sin(a + .1) * 92); q.fill(); } }
@@ -66189,7 +66213,12 @@ function gmillBuild() {
   const MG = new Map(), _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _v = new THREE.Vector3(), _one = new THREE.Vector3(1, 1, 1), boxes = [], tris = [];
   const put = (geo, m, mat4) => { geo = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(geo.attributes)) if (k !== 'position' && k !== 'normal' && !(k === 'uv' && m.map && !m.userData.tri)) geo.deleteAttribute(k);
     if (mat4) geo.applyMatrix4(mat4); if (!geo.attributes.normal) geo.computeVertexNormals(); if (m.userData.strata) { const gg = geo.clone(); gg.translate(cx, 0, cz); ghStrataCol(gg); geo.setAttribute('color', gg.attributes.color); }
+    rsTag(A, geo);
     if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); };
+  // the RESTORATION's chunks (the island, the bridges, the turrets and the stairs stay put: 0)
+  A.chNames = ['ground', 'base', 'towerLo', 'towerHi', 'top', 'balc1', 'balc2', 'stair']; A.chBox = A.chNames.map(() => new THREE.Box3()); A.rsKey = 'rsmill';
+  A.chunkOf = (x, y, z) => { const r = Math.hypot(x, z), T0 = .7 + 8.5; if (Math.abs(x) > 8 || Math.abs(z) > 8) return 0; if (y < .9) return 0; if (y < T0 && Math.abs(x) < 5.7 && Math.abs(z) < 5.7) return 1;
+    if (y > T0 + 29.6) return 4; if (r > 3.4 && Math.abs(y - (T0 + 6)) < 3.6) return 5; if (r > 3.2 && Math.abs(y - (T0 + 17)) < 3.6) return 6; if (r > 4 && y < T0 + 6) return 7; return y < T0 + 13 ? 2 : 3; };
   const at4 = (x, y, z, ry = 0, rx = 0, rz = 0, sx = 1, sy = 1, sz = 1) => _m4.compose(_v.set(x, y, z), _q.setFromEuler(_e.set(rx, ry, rz)), new THREE.Vector3(sx, sy, sz));
   const box = (x0, x1, y0, y1, z0, z1, ex) => boxes.push(Object.assign({ minx: cx + x0, maxx: cx + x1, miny: y0, maxy: y1, minz: cz + z0, maxz: cz + z1 }, ex || {}));
   const vbox = (x0, x1, ya, yb, z0, z1, m, solid, ex) => { put(new THREE.BoxGeometry(x1 - x0, yb - ya, z1 - z0), m, at4((x0 + x1) / 2, (ya + yb) / 2, (z0 + z1) / 2)); if (solid) box(x0, x1, ya, yb, z0, z1, ex); };
@@ -66218,7 +66247,7 @@ function gmillBuild() {
   for (const sz of [-1, 1]) { put(new THREE.TorusGeometry(aw + .2, .28, 6, 18, Math.PI), stone, at4(0, BY + ah - .1, sz * (bw + .02))); }
   vbox(-bw - .3, bw + .3, BY + BH, BY + BH + .5, -bw - .3, bw + .3, stone, 1); quad([-bw - .3, BY + BH + .51, -bw - .3], [bw + .3, BY + BH + .51, -bw - .3], [bw + .3, BY + BH + .51, bw + .3], [-bw - .3, BY + BH + .51, bw + .3]);
   // the WATERWHEEL in the race (its own group: it turns), and the water pouring over it
-  { const wg = new THREE.Group(); wg.position.set(0, BY + 2.5, -bw + 1.1); g.add(wg); A.wheel = wg; const R = 2.4, parts = [], add = (geo, m) => parts.push([geo, m]);
+  { const wh = new THREE.Group(); wh.position.set(0, BY + 2.5, -bw + 1.1); g.add(wh); A.wheelH = wh; const wg = new THREE.Group(); wh.add(wg); A.wheel = wg; const R = 2.4, parts = [], add = (geo, m) => parts.push([geo, m]);
     for (const sx of [-.75, .75]) { const t = new THREE.TorusGeometry(R, .12, 6, 32); t.translate(0, 0, sx); add(t, wood); const t2 = new THREE.TorusGeometry(R * .55, .08, 5, 24); t2.translate(0, 0, sx); add(t2, wood); }
     for (let k = 0; k < 14; k++) { const a = k / 14 * TAU, p = new THREE.BoxGeometry(.8, .1, 1.7); p.translate(0, R - .25, 0); p.rotateZ(a); add(p, woodP); const s2 = new THREE.BoxGeometry(.12, R, .1); s2.translate(0, R / 2, -.75); s2.rotateZ(a); add(s2, wood); const s3 = new THREE.BoxGeometry(.12, R, .1); s3.translate(0, R / 2, .75); s3.rotateZ(a); add(s3, wood); }
     const hub = new THREE.CylinderGeometry(.35, .35, 2.4, 12); hub.rotateX(Math.PI / 2); add(hub, iron);
@@ -66226,7 +66255,7 @@ function gmillBuild() {
     const fm = new THREE.MeshBasicMaterial({ map: gmillTex('water'), transparent: true, depthWrite: false, side: THREE.DoubleSide }), fall = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 5.2), fm); fall.position.set(1.2, BY + 3.2, -bw - .05); fall.rotation.x = .08; g.add(fall);
     const chute = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 2.2), fm); chute.position.set(1.2, BY + 6.05, -bw - 1); chute.rotation.x = -Math.PI / 2 + .25; g.add(chute); A.fall = fm;
     vbox(.45, 1.95, BY + 5.75, BY + 5.95, -bw - 2.2, -bw, wood, 0); for (const sx of [.45, 1.95]) vbox(sx - .06, sx + .06, BY + 5.75, BY + 6.3, -bw - 2.2, -bw, wood, 0); vbox(1.1, 1.3, BY + 3.8, BY + 5.75, -bw - 2.1, -bw - 1.9, wood, 0);
-    const pool = new THREE.Mesh(new THREE.CircleGeometry(3.4, 24), new THREE.MeshStandardMaterial({ color: 0x6fc2d8, roughness: .15, metalness: .1, transparent: true, opacity: .85 })); pool.rotation.x = -Math.PI / 2; pool.position.set(0, iy + .03, -bw + 1.1); g.add(pool); A.splash = [cx + 1.2, iy + .25, cz - bw - .05]; A.hub = [cx, BY + 2.5, cz - bw + 1.1]; }
+    const pool = new THREE.Mesh(new THREE.CircleGeometry(3.4, 24), new THREE.MeshStandardMaterial({ color: 0x6fc2d8, roughness: .15, metalness: .1, transparent: true, opacity: .85 })); pool.rotation.x = -Math.PI / 2; pool.position.set(0, iy + .03, -bw + 1.1); g.add(pool); A.pool = pool; A.splash = [cx + 1.2, iy + .25, cz - bw - .05]; A.hub = [cx, BY + 2.5, cz - bw + 1.1]; }
   // ---- THE TOWER: a tapering cream lathe from the base's top to the gallery, the red sun-spiral painted on it, small windows ----
   const T0 = BY + BH + .5, T1 = T0 + A.H - 10, r0 = 4.4, r1 = 2.8, Rt = y => r0 + (r1 - r0) * Math.pow((y - T0) / (T1 - T0), .9) + .25 * Math.sin(Math.PI * (y - T0) / (T1 - T0));
   { const pts = []; for (let i = 0; i <= 24; i++) { const y = T0 + (T1 - T0) * i / 24; pts.push(new THREE.Vector2(Rt(y), y)); } put(new THREE.LatheGeometry(pts, 40), plaster);
@@ -66243,7 +66272,7 @@ function gmillBuild() {
     for (let k = 0; k < 6; k++) { const a = k / 6 * TAU + .3; put(new THREE.BoxGeometry(.7, 1, .1), glow, at4(Math.sin(a) * 2.42, GY + 1.6, Math.cos(a) * 2.42, a)); }
     box(-2, 2, GY, GY + 3.2, -2, 2); put(new THREE.ConeGeometry(3.4, 2.6, 12), red, at4(0, GY + 4.5, 0)); put(new THREE.CylinderGeometry(.12, .2, 2.4, 6), bronze, at4(0, GY + 6.7, 0)); put(new THREE.SphereGeometry(.3, 8, 6), bronze, at4(0, GY + 7.9, 0));
     // the rotor: its own group (it turns), six spars and six curved red sails
-    const rg = new THREE.Group(); rg.position.set(0, GY + 2.4, 0); g.add(rg); A.rotor = rg; const parts = [];
+    const rh = new THREE.Group(); rh.position.set(0, GY + 2.4, 0); g.add(rh); A.rotorH = rh; const rg = new THREE.Group(); rh.add(rg); A.rotor = rg; const parts = [];
     for (let k = 0; k < 6; k++) { const a = k / 6 * TAU; const sp = new THREE.CylinderGeometry(.14, .2, 17, 6); sp.rotateZ(Math.PI / 2 - .16); sp.translate(8.6, 1.3, 0); sp.rotateY(a); parts.push([sp, wood]);
       const NU = 6, NV = 6, pos = [], uv = [], at = (u, v) => { const x = 3.2 + u * 12.5, y = 1.4 + u * 1.4 - v * 9 * (1 - .3 * u), z = 1.8 * Math.sin(Math.PI * v) * (1 - .3 * u) + .4 * u; const c = Math.cos(a), s = Math.sin(a); return [x * c + z * s, y + .55, -x * s + z * c]; };
       for (let i = 0; i < NU; i++) for (let j = 0; j < NV; j++) { const u0 = i / NU, u1 = (i + 1) / NU, v0 = j / NV, v1 = (j + 1) / NV; for (const [u, v] of [[u0, v0], [u1, v0], [u1, v1], [u0, v0], [u1, v1], [u0, v1]]) { pos.push(...at(u, v)); uv.push(u, 1 - v); } }
@@ -66343,6 +66372,10 @@ function gmillBuild() {
   let draws = 0; for (const [m, list] of MG) { if (m.map && !m.userData.tri) m.map.wrapS = m.map.wrapT = THREE.RepeatWrapping; const geo = mergeGeometries(list); if (!geo) { console.warn('[melee] gmill: a bucket would not merge', m.color); continue; } const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; g.add(o); draws++; }
   for (const b of boxes) BOXES.push(b);
   for (let i = 0; i < tris.length; i += 9) { const q = tris.slice(i, i + 9); triAdd(...q); triAdd(q[0], q[1], q[2], q[6], q[7], q[8], q[3], q[4], q[5]); }
+  { const IR = 8.5, pw = [cx - IR - 2.2 + 1.1, .58, cz + .1];
+    rsChunkRig(A, MG, { 1: { p: [0, -.5, 0], r: [.03, 0, -.04], hop: 1, at: 0 }, 2: { p: [.4, -1.2, .3], r: [-.06, 0, .08], hop: 1.5, at: .15 }, 3: { p: [2.4, -6, 1.2], r: [-.18, .4, .28], hop: 6, at: .35 }, 4: { p: [4.5, -12, 2.5], r: [-.5, .8, .7], hop: 9, at: .6 },
+      5: { p: [.5, -2.6, .5], r: [.3, 0, -.2], hop: 3, at: .45 }, 6: { p: [-1.2, -4, .8], r: [-.35, .2, .25], hop: 4, at: .7 }, 7: { p: [.3, -1.6, .2], r: [.2, 0, .15], hop: 2, at: .3 } }, null,
+      [[A.wheelH, { p: [.8, -1.4, -.6], r: [.12, .5, .9], hop: 2, at: .25 }], [A.rotorH, { p: [5, -18, 3], r: [-.9, .5, .4], hop: 10, at: .8 }]]); }
   A.stat.draws = draws + 5; A.stat.boxes = boxes.length; A.stat.top = +(T1 + 7.9).toFixed(1);
   console.log('[melee] water mill (procedural): ' + A.stat.draws + ' draws, ' + boxes.length + ' boxes, top ' + A.stat.top + ' m, bridges ' + A.stat.bridgeW + ' / ' + A.stat.bridgeE + ' m, ' + A.stat.stones + ' stepping stones, west stair ' + A.stat.stairW + ' steps to ' + A.stat.stairFoot + ', east stair ' + A.stat.stairE + ' to ' + A.stat.stairFootE);
 }
@@ -66351,11 +66384,13 @@ function gmillHit(x, y, z, rad) { const A = GMILL; if (!A.hub || !inHome() || A.
   if (A.draw) { const [wx, wy, wz] = A.draw.winch; if (Math.hypot(x - wx, y - wy, z - wz) < 1.3 + rad) { A.hc = .5; A.draw.want = A.draw.want ? 0 : 1; snd('clang', { g: .9, r: .6, x: wx, z: wz }); spkBurst(x, y, z, 14, { col: [1, .8, .4], spread: 3, size: .1, life: .4 }); camShake(.05); return 1; } }
   const [hx, hy, hz] = A.hub; if (Math.hypot(x - hx, z - hz) > 3.2 + rad || Math.abs(y - hy) > 3 + rad) return 0;
   A.hc = .4; A.jam = !A.jam; snd('clang', { g: 1, r: A.jam ? .5 : .8, x: hx, z: hz }); spkBurst(x, y, z, 20, { col: [1, .8, .4], spread: 4, size: .12, life: .5 }); camShake(.08); return 1; }
-function gmillStep(dt, t) { const A = GMILL; if (!A.g) return; if (hsF()) { if (A.fall && A.fall.visible) { A.fall.visible = false; A.g.traverse(o => { if (o.isMesh && o.material && o.material.map && o.material.transparent && o.material.depthWrite === false && o.material.isMeshBasicMaterial) o.visible = false; }); } A.splash = null; A.jam = true; } A.hc = (A.hc || 0) - dt; A.wv = (A.wv == null ? 1.1 : A.wv) + ((A.jam ? 0 : 1.1) - (A.wv == null ? 1.1 : A.wv)) * Math.min(1, dt * (A.jam ? 6 : 1.2)); if (A.wheel) A.wheel.rotation.z -= dt * A.wv;
+function gmillStep(dt, t) { const A = GMILL; if (!A.g) return; const RT = rsChunkSync(A), alive = RT == null || RT > .95;
+  if (A.waterOn !== alive) { A.waterOn = alive; A.g.traverse(o => { if (o.isMesh && o.material && o.material.isMeshBasicMaterial && o.material.transparent) o.visible = alive; }); if (A.pool) A.pool.visible = alive; if (A.fall) A.fall.color.setHex(alive ? 0xb8ffe4 : 0xffffff); }
+  if (!alive && A.splash) { A.splashS = A.splash; A.splash = null; } else if (alive && !A.splash && A.splashS) A.splash = A.splashS; A.dead = !alive; A.hc = (A.hc || 0) - dt; A.wv = (A.wv == null ? 1.1 : A.wv) + ((A.jam || A.dead ? 0 : 1.1) - (A.wv == null ? 1.1 : A.wv)) * Math.min(1, dt * (A.jam ? 6 : 1.2)); if (A.wheel) A.wheel.rotation.z -= dt * A.wv;
   if (A.draw) { const D = A.draw, u0 = D.up; D.up += Math.sign(D.want - D.up) * Math.min(Math.abs(D.want - D.up), dt * .45); D.g.rotation.z = -D.up * 1.35;
     for (const o of D.chains) { const th = D.up * 1.35, a = new THREE.Vector3(D.X1 - D.L * Math.cos(th), D.ya + D.L * Math.sin(th), D.z0 + o.userData.zz), b = new THREE.Vector3(D.X1 + .2, D.ya + 3.3, D.z0 + o.userData.zz), d = b.clone().sub(a); o.position.copy(a).addScaledVector(d, .5); o.scale.y = d.length(); o.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); }
     const i = BOXES.indexOf(D.box), down = D.up < .08; if (down && i < 0) { BOXES.push(D.box); boxGrid(); } else if (!down && i >= 0) { BOXES.splice(i, 1); boxGrid(); } if (Math.abs(u0 - D.want) > .001 && Math.abs(D.up - D.want) < .001) snd('thud', { g: .9, r: .6, x: D.winch[0], z: D.winch[2] }); }
-  if (A.splash) { A.st = (A.st || 0) - dt; if (A.st <= 0) { A.st = .09; spkBurst(A.splash[0] + (Math.random() - .5) * .8, A.splash[1], A.splash[2] - Math.random() * .5, 3, { col: [.88, .95, 1], spread: 2.4, size: .08, life: .45 }); } } if (A.rotor && !hsF()) A.rotor.rotation.y += dt * .35; if (A.fall) A.fall.map.offset.y = (A.fall.map.offset.y + dt * 1.6) % 1; }
+  if (A.splash) { A.st = (A.st || 0) - dt; if (A.st <= 0) { A.st = .09; spkBurst(A.splash[0] + (Math.random() - .5) * .8, A.splash[1], A.splash[2] - Math.random() * .5, 3, { col: [.88, .95, 1], spread: 2.4, size: .08, life: .45 }); } } if (A.rotor && !A.dead) A.rotor.rotation.y += dt * .35; if (A.fall) A.fall.map.offset.y = (A.fall.map.offset.y + dt * 1.6) % 1; }
 // THE MERCHANT SHOP (his ref `images/korajin/ref/merchant_shop_1.jpg`, after m1459): high on a sandstone BUTTE that rises out of the canyon's
 // WEST rim upstream of the home, its deck jutting over the drop toward the valley. A two-storey timber-and-stone shop on a plank deck,
 // under two huge curved BONE ARCHES holding a red SAIL canopy; teal and pink awnings; the round target SIGN in a wheel; the tall target
@@ -66499,7 +66534,7 @@ async function buildHome() {
   if (GMILL.on && H.style !== 'lake') try { gmillBuild(); } catch (e) { console.error('[melee] water mill', e); note('MILL BUILD THREW'); }
   if (GPEAK.on && H.style !== 'lake') try { gpeakBuild(); } catch (e) { console.error('[melee] the peak', e); note('PEAK BUILD THREW'); }
   if (GJINRA.on && GPEAK.on && H.style !== 'lake') try { gjinraBuild(); } catch (e) { console.error('[melee] jinra refinery', e); note('JINRA BUILD THREW'); }
-  if (H.style !== 'lake') { for (const P of [GMERCH, GMILL, GPEAK, GJINRA]) hsFallen(P.g); }     // FALLEN: weathered, unlit
+  if (H.style !== 'lake') { for (const P of [GMERCH, GPEAK, GJINRA]) hsFallen(P.g); }     // FALLEN: weathered, unlit
   else try { const g = await loadGLB(H.hut.file, 'loading the refuge');
     const m = g.scene, drop = []; m.traverse(o => { if (o.isLight) drop.push(o); }); for (const o of drop) o.removeFromParent();
     m.updateMatrixWorld(true); const bb = new THREE.Box3(); m.traverse(o => { if (o.isMesh && o.name !== 'collider' && o.geometry) { o.geometry.computeBoundingBox(); bb.union(o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld)); } });
