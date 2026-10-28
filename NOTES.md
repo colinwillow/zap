@@ -12,6 +12,7 @@ timer comes round (~seconds in), so `check:worlds`' 8 frames never reach it. Eve
 A scan of every top-level function for a `TAU` with no local declaration finds no other. Lesson for the boot gate: a throw behind a timer
 needs frames, not a boot -- the headless walk (scratchpad `hcrash.mjs`, 1500 stepped frames) found it in one run.
 ## m15xx -- THE DRAGON'S CONTROLS, his map (DOCKET 4)
+## m1671 -- THE DRAGON'S CONTROLS, his map (DOCKET 4)
 His: *"when you're riding, the character has the blaster again; use the stick to shoot fireballs the way RollerGirl shoots her blaster in the
 air; the right flick on the ground does melee -- lunges, bites; flicking the left stick left and right does barrel rolls, up and down flips."*
 - **Right pad held UP:** HIS fireballs, every `holdFbT` .38 s, from his head at the middle of the screen (the camera's line, 90 m out). The

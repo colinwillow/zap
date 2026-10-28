@@ -11567,7 +11567,7 @@ function dragDrive(B, dt) { const Z = DRAGZ, D = B.drive, p = player, sit = p.dr
     if (s2.mag > 0) { const want = Math.atan2(s2.x, s2.z), dh = wrapAngle(want - h), mx = (D.v > 2 ? Z.turn : Z.turnStill) * dt; h += clamp(dh, -mx, mx);
       D.v = damp(D.v, s2.mag * Z.runSp * clamp(1 - Math.abs(dh) / 2.4, .2, 1), Z.accHL, dt); }
     else D.v = damp(D.v, 0, Z.brakeHL, dt);
-    if (D.bite > 0) { D.bite -= dt; D.v = Math.max(D.v, Z.biteV * (D.bite / Z.biteT)); }     // m15xx: the lunge
+    if (D.bite > 0) { D.bite -= dt; D.v = Math.max(D.v, Z.biteV * (D.bite / Z.biteT)); }     // m1671: the lunge
     if (D.v < .02) D.v = 0;
     let nx = P.x + Math.sin(h) * D.v * dt, nz = P.z + Math.cos(h) * D.v * dt;
     if (!D.pad) for (const [ox, oz, orr] of Z.obst) { const dx = nx - ox, dz = nz - oz, d = Math.hypot(dx, dz), m = orr + Z.bodyR; if (d < m && d > 1e-4) { nx = ox + dx / d * m; nz = oz + dz / d * m; } }
@@ -11600,7 +11600,7 @@ function dragWings(B) { const D = B.drive, S = D ? D.spread || 0 : 0; if (S < .0
     const want = cur.clone().lerp(fan, S).normalize(); _dwQ.setFromUnitVectors(cur, want);
     const pq = b.parent.getWorldQuaternion(_dwQ2), wq = b.getWorldQuaternion(new THREE.Quaternion()); b.quaternion.copy(pq.invert().multiply(_dwQ.multiply(wq))); b.updateMatrixWorld(true); } }
 function dragRiderPose() { const R = player.dragon, B = DRAGZ.on && DRAGZ.on.B; if (!R || R.st !== 'sit' || !B || !B.seat) return;
-  for (const k in WEAP.worn) { const w = WEAP.worn[k]; if (w && w.group) w.group.visible = false; }     // m15xx (his: "for some reason the character has the blaster again"): nothing in his hands in the saddle
+  for (const k in WEAP.worn) { const w = WEAP.worn[k]; if (w && w.group) w.group.visible = false; }     // m1671 (his: "for some reason the character has the blaster again"): nothing in his hands in the saddle
   const bq = B.root.getWorldQuaternion(_dwQ3); rig.root.quaternion.copy(bq).multiply(_dwQ2.setFromAxisAngle(_wkY, (rig.faceOff || 0) - (B.faceOff || 0)));
   const seat = B.seat.getWorldPosition(_drV), up = _dwA.set(0, 1, 0).applyQuaternion(bq); rig.root.position.copy(seat).addScaledVector(up, -R.hip);
   // m1627 (his: "he was sitting inside the dragon"): the HIPS BONE put exactly on the seat (plus `seatUp`), measured on this frame's final pose --
@@ -11649,14 +11649,14 @@ function dragTargetHit(t) { if (t.dead > 0) return; t.dead = DRAGZ.tgBack; t.G.v
   const O = DRAGZ.on; O.hits = (O.hits || 0) + 1; const up = O.tg.filter(x => x.dead <= 0).length; tipShow('Target! ' + (O.tg.length - up) + ' / ' + O.tg.length + ' down', 1.6); }
 function dragBreath() { const R = player.dragon, B = DRAGZ.on && DRAGZ.on.B, D = B && B.drive; if (!R || R.st !== 'sit' || !D || (D.fbCool || 0) > 0) return; D.fbCool = DRAGZ.fbCool;
   if (D.air || !D.aAtk) { dragFire(B); return; }
-  // m15xx (his: "on the ground the flick does melee -- lunges or bites"): his `attack_ground` with a LUNGE forward (`biteV` for `biteT` s), and the
+  // m1671 (his: "on the ground the flick does melee -- lunges or bites"): his `attack_ground` with a LUNGE forward (`biteV` for `biteT` s), and the
   // bite lands `breathAt` into it on anything within `biteR` of his jaws (the archery butts now; bodies when the zone has them)
   D.bite = DRAGZ.biteT; D.atkMelee = 1;
   D.aAtk.reset().setLoop(THREE.LoopOnce, 1).play(); D.aAtk.clampWhenFinished = true; D.atkT = D.aAtk.getClip().duration; D.atkFire = D.atkT * (1 - DRAGZ.breathAt); snd('creature', { g: .7, r: .8 }); }
 function dragBite(B) { const Z = DRAGZ, hd = B.m.getObjectByName('Bip001_Head'); if (!hd) return; const P = hd.getWorldPosition(new THREE.Vector3());
   snd('thud', { g: .9, r: .5, x: P.x, z: P.z }); camShake(.12); spkBurst(P.x, P.y, P.z, 10, { col: [1, .9, .7], spread: 3, size: .15, life: .3 });
   for (const t of Z.on.tg) if (t.dead <= 0 && Math.hypot(t.x - P.x, t.y - P.y, t.z - P.z) < Z.biteR) dragTargetHit(t); }
-// m15xx (his: "flicking the LEFT stick left and right does BARREL ROLLS, up and down FLIPS, like RollerGirl"): in flight, a left-pad flick turns
+// m1671 (his: "flicking the LEFT stick left and right does BARREL ROLLS, up and down FLIPS, like RollerGirl"): in flight, a left-pad flick turns
 // him once round his own forward axis (a roll, `rollT` s, the flick's side) or once round his wings' axis (a loop: UP the screen = over the top,
 // DOWN = under), drawn on his root on top of the bank and pitch (`A.trick`); his flight path is not changed, so a trick costs no height
 function dragTrick(dx, dy) { const B = DRAGZ.on && DRAGZ.on.B, D = B && B.drive, A = D && D.air; if (!A || A.mode !== 'fly' || A.trick) return;
@@ -11687,7 +11687,7 @@ function dragFxStep(dt) { const Z = DRAGZ, O = Z.on;
 function dragGun(dt) { const Z = DRAGZ, R = player.dragon, S = stick.R; R.gunT = Math.max(0, (R.gunT || 0) - dt);
   const up = S.down && -S.y > Z.gunUp && Math.abs(Math.atan2(S.x, -S.y)) < Z.gunArc; R.trig = up ? (R.trig || 0) + dt : 0;
   if (R.trig < .1 || R.gunT > 0) return; R.gunT = Z.holdFbT;
-  // m15xx (his: "use the stick to shoot FIREBALLS the same way RollerGirl shoots her blaster in the air"): held UP, HIS fire, at the middle of
+  // m1671 (his: "use the stick to shoot FIREBALLS the same way RollerGirl shoots her blaster in the air"): held UP, HIS fire, at the middle of
   // the screen (where the camera looks, 90 m out), every `holdFbT` s -- no gun in Grumbo's hands
   const B = DRAGZ.on && DRAGZ.on.B, hd = B && B.m.getObjectByName('Bip001_Head'); if (!hd) return; const o = hd.getWorldPosition(new THREE.Vector3());
   const d = camera.getWorldDirection(new THREE.Vector3()), tgt = camera.position.clone().addScaledVector(d, 90); dragFire(B, tgt.sub(o).normalize()); }
@@ -11759,7 +11759,7 @@ function dragAnim(dt, t) { const R = player.dragon;
   let nm;
   if (R.st === 'on') nm = dragHas('ride_on') && R.t > .05 ? 'ride_on' : dragHas('in_air') ? 'in_air' : CLIPS.idle;
   else if (R.st === 'off') nm = dragHas('ride_off') ? 'ride_off' : R.t < (R.T || DRAGZ.offT) * .8 && dragHas('in_air') ? 'in_air' : CLIPS.idle;
-  else nm = dragHas('ride_seat') ? 'ride_seat' : dragHas('driving') ? 'driving' : CLIPS.idle;     /* m15xx: the fire is HIS now; Grumbo holds the reins */
+  else nm = dragHas('ride_seat') ? 'ride_seat' : dragHas('driving') ? 'driving' : CLIPS.idle;     /* m1671: the fire is HIS now; Grumbo holds the reins */
   t[nm] = 1; setWeights(t, dt); }
 // the measuring kit both dressing passes use: his bones by name, raycasts on his posed skinned mesh, and `pin` (an object built in WORLD metres,
 // upright to him, centred at `at`, parented to a bone with the bone's world scale and turn undone). `bag` collects every pinned piece.

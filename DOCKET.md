@@ -6,7 +6,7 @@
        together it is hard to hop between them.
 3. [x] (m1670) **The rocket launcher's jump-throw** (his: *"Wanted"* -- bend the bullet): hold UP on the right pad to ready the shot, jump, release in the
        air -> the rocket leaves with some of his upward velocity, so it climbs at a slight angle. Not exact; you can "throw" rockets up.
-4. [x] (m15xx) **Dragon riding controls, rebuilt:** no blaster in the saddle (he carries the ROCKET LAUNCHER at the start); RIGHT HOLD = fireballs,
+4. [x] (m1671) **Dragon riding controls, rebuilt:** no blaster in the saddle (he carries the ROCKET LAUNCHER at the start); RIGHT HOLD = fireballs,
        aimed like RollerGirl's blaster in the air; RIGHT FLICK on the ground = melee (lunge / bite / claw, from his clips); LEFT FLICK in the air
        = barrel rolls (sideways) and flips (up / down), like RollerGirl. (His speed / climb mapping to be settled -- ask.)
 5. [ ] **Dragon fly animations:** an AIR IDLE (legs tucked, not standing) with a LOOPING wing flap; a DIVE (wings swept back); BANKS (one wing
