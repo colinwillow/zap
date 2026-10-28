@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: MARKET STALLS, pass 1 (a HERO / TOWN place: the look)
+## m1544 -- THE RE-PASS: MARKET STALLS, pass 1 (a HERO / TOWN place: the look)
 **Moves:** its pass-1 row (the look). Restoring in place is pass 2.
 - Kit materials: `K.timber`, a warm `wood_planks` triMat, a `stone_blocks` paving, `K.redL`, `K.lamp`; the rooftop cushions are `K.red`.
 - The four NEON signs are TIMBER SIGNBOARDS (kanban): a framed plank board with rails, a bronze cap, and red brush glyphs in three shapes
