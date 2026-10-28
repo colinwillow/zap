@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- The First Beacon pass 8: the route checked off the built boxes
+- **`L.walk`:** every walking surface (`top`) in build order -- which is route order -- paired with the next, the gap between their EDGES and the rise,
+  each matched to a move from `MOVEC`: walk (step .38, gap .3), run jump (5.95), double (9.98), ledge caught (3.58 / 4.69 up, gap 2.5), drop, chimney
+  (its landing tagged `wj` with the chimney's height), zip (its landing tagged `zip`). 63 pairs: walk 36, run jump 10, double 2, ledge 4, ledge
+  (double) 2, drop 2, chimney 6, zip 1. **0 BAD.** The build line says `route check 63 pairs ok {...}`; a BAD lists where.
+- **It can fail:** with the hop's gap set to 11 m (headless, reverted) it reports `9 BAD: 105,-0 d11.0 r0.0 | ...`.
+- **What it is not:** a WALK. It reads geometry, not the physics; the scripted-input walk through the shipped frame stays open in BEACON.md.
+- A wide render from outside shows only canyon walls and the beacon: the walls bury the route, as a canyon should.
+
 ## m1575 -- THE RE-PASS: the ZEPPELINS, pass 3 (L3, alive) -- AND DOUBLOONS NOW WORK OUTSIDE THE DOJO
 **Moves:** the Zeppelins' L3 and alive rows; its third pass, so the loop moves on.
 - **THE BUG (worth more than the pass): `coinStep` was only ever called from `dojoStep`.** Outside the dojo world, every doubloon sat still

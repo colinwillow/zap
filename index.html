@@ -26536,7 +26536,7 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
   let nChunks = 0; const SH = BEACON.sheet, SC = SH.st.map(s => ({ ...s, x: ox - s.g[0] * SH.k, z: oz - s.g[1] * SH.k })), dry = (nm, arg) => { const P0 = { x: 0, y: 0, z: 0, dir: [1, 0] }, O0 = { boxes: [] }, F = chunkFrame(P0, () => {}, O0), fn = BCH[nm] || CHUNKS[nm];
     if (!fn) return null; const r = fn(P0, { ...F, M, O: O0, slab() {}, bar() {}, ladder() {}, zip() {} }, arg); return { L: r.out.x, dy: r.out.y }; };
   const lay = (P, list) => { for (const spec0 of list) { const [spec, beat] = spec0.split('|'), [nm, arg] = spec.split(':'), K = kit(P), fn = BCH[nm] || CHUNKS[nm]; if (!fn) { note('BEACON: no chunk ' + nm); continue; }
-      const r = fn(P, K, arg); nChunks++; if (nm !== 'walk') sign(beat ? beat : nm.toUpperCase(), r.ask.length > 34 ? r.ask.slice(0, 33) + '…' : r.ask, P.x, P.y + 2.4, P.z, beat ? .75 : .55); P = { x: r.out.x, y: r.out.y, z: r.out.z, dir: P.dir }; } return P; };
+      const nb = O.boxes.length, r = fn(P, K, arg); nChunks++; { const nt = O.boxes.slice(nb).filter(b => b.top); if (nt.length) { if (nm === 'zip') nt.forEach(b => b.zip = 1); if (/^chim/.test(nm)) nt[nt.length - 1].wj = +arg || 8; } } if (nm !== 'walk') sign(beat ? beat : nm.toUpperCase(), r.ask.length > 34 ? r.ask.slice(0, 33) + '…' : r.ask, P.x, P.y + 2.4, P.z, beat ? .75 : .55); P = { x: r.out.x, y: r.out.y, z: r.out.z, dir: P.dir }; } return P; };
   let y = 0, inDir = null; const fit = [];
   for (let i = 0; i < SC.length; i++) { const S = SC[i]; station(S, { x: S.x, y, z: S.z }, null); if (i === SC.length - 1) break;
     const T = SC[i + 1], run = SH.runs[i], dx = T.x - S.x, dz = T.z - S.z, xFirst = run.first ? run.first === 'x' : Math.abs(dx) >= Math.abs(dz);
@@ -26551,6 +26551,16 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
     y = P.y; inDir = one ? d1 : d2; if (short < -.05) { note('BEACON: run ' + S.id + '->' + T.id + ' SHORT by ' + (-short).toFixed(1) + ' m'); T.x = P.x + inDir[0] * T.R / 2; T.z = P.z + inDir[1] * T.R / 2; }
     fit.push(S.id + T.id + ' ' + (L1 + L2).toFixed(0) + 'm/' + (s1 + s2).toFixed(0) + (short < -.05 ? ' SHORT' : '')); }
   L.fit = fit;
+  // m15xx: THE ROUTE CHECK. Every pair of walking surfaces in the order the route builds them (stations, chunk tops, corner pads), measured off the
+  // BOXES -- the gap between their edges and the rise -- against the move table's comfy values: a step, a run jump (5.95), a double (9.98), a ledge
+  // caught (jump 3.58 / double 4.69 up), a drop, a chimney (its landing's own height), a zip. What the builder made, not what each piece meant to.
+  { const T = O.boxes.filter(b => b.top && !b.prop), tally = {}, fail = [], C = MOVEC;
+    for (let i = 0; i + 1 < T.length; i++) { const a = T[i], b = T[i + 1], d = Math.hypot(Math.max(0, b.minx - a.maxx, a.minx - b.maxx), Math.max(0, b.minz - a.maxz, a.minz - b.maxz)), r = b.maxy - a.maxy;
+      let mv = null; if (b.zip) mv = 'zip'; else if (b.wj) mv = r <= b.wj + .01 ? 'chimney' : null; else if (Math.abs(r) <= C.step + .08 && d <= .3) mv = 'walk';
+      else if (r < 0) mv = -r <= 24 && d <= C.dbl_run ? 'drop' : null; else if (r <= C.step + .08) mv = d <= C.jump_run ? 'run jump' : d <= C.dbl_run ? 'double' : null;
+      else mv = r <= C.ledge_jump && d <= 2.5 ? 'ledge' : r <= C.ledge_dbl && d <= 2.5 ? 'ledge (double)' : null;
+      if (mv) tally[mv] = (tally[mv] || 0) + 1; else fail.push(((a.minx + a.maxx) / 2).toFixed(0) + ',' + ((a.minz + a.maxz) / 2).toFixed(0) + ' d' + d.toFixed(1) + ' r' + r.toFixed(1)); }
+    L.walk = { pairs: T.length - 1, tally, fail }; if (fail.length) note('BEACON: route check ' + fail.length + ' BAD: ' + fail.slice(0, 5).join(' | ')); }
   { const xs = Object.values(L.st).map(q => q.x), zs = Object.values(L.st).map(q => q.z), x0 = Math.min(...xs) - 75, x1 = Math.max(...xs) + 75, z0 = Math.min(...zs) - 75, z1 = Math.max(...zs) + 75;     // the canyon floor, under it all
     put(new THREE.BoxGeometry(x1 - x0, .1, z1 - z0).translate((x0 + x1) / 2, .02, (z0 + z1) / 2), triMat('sandstone', { scale: 9, color: 0xe0b48a })); L.bounds = [x0 + 25, x1 - 25, z0 + 25, z1 - 25]; }
   // m1555: THE CANYON (pass 2). Sandstone mesas on an 8 m lattice round the route, never within `clear` of it (plan distance to every route box and
@@ -26590,7 +26600,7 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
   for (const b of O.boxes) BOXES.push(b); boxGrid(); BEACON.on = L; bldXrayTag(g);
   { const S = L.st.S, p = player; p.pos.set(S.x, .05, S.z); p.vel.set(0, 0, 0); const n = L.st.A || S; p.faceH = p.heading = Math.atan2(n.x - S.x, n.z - S.z); arenaBeam(S.x, S.z, [.48, 1, .85], 1); }
-  console.log('[melee] the first beacon: ' + nChunks + ' chunks, stations ' + L.log.join(' | ') + ', runs ' + (L.fit || []).join(', ') + ', ' + (L.mesas || 0) + ' mesas, ' + O.boxes.length + ' boxes, ' + climbs.length + ' ladders (' + (L.audit ? L.audit.laddersAdded : 0) + ' for falls), headroom ' + (L.audit && L.audit.headroom.length ? L.audit.headroom.length + ' BAD' : 'ok') + ', sees the tower: ' + (L.audit ? L.audit.sees.join(' ') : '?') + ', ' + zips.length + ' zips'); }
+  console.log('[melee] the first beacon: ' + nChunks + ' chunks, stations ' + L.log.join(' | ') + ', runs ' + (L.fit || []).join(', ') + ', ' + (L.mesas || 0) + ' mesas, ' + O.boxes.length + ' boxes, ' + climbs.length + ' ladders (' + (L.audit ? L.audit.laddersAdded : 0) + ' for falls), headroom ' + (L.audit && L.audit.headroom.length ? L.audit.headroom.length + ' BAD' : 'ok') + ', route check ' + (L.walk ? L.walk.pairs + ' pairs ' + (L.walk.fail.length ? L.walk.fail.length + ' BAD' : 'ok') + ' ' + JSON.stringify(L.walk.tally) : '?') + ', sees the tower: ' + (L.audit ? L.audit.sees.join(' ') : '?') + ', ' + zips.length + ' zips'); }
 // m1569: CHECKPOINTS. Standing on a station lights its lantern mint (a chime, a burst) and makes it the checkpoint; leaving the canyon (out past its
 // walls, or below the floor) puts him back on the last one lit. The start is lit from the first frame.
 function beaconStep(dt) { const L = BEACON.on; if (!L) return; const t = performance.now() * .001, p = player;
