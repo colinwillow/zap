@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the BATHHOUSE, pass 2 (rubric 7: RESTORES IN PLACE)
+## m1617 -- THE RE-PASS: the BATHHOUSE, pass 2 (rubric 7: RESTORES IN PLACE)
 - Base (stays): the floor, the breakable walls, the pool and its rim, the benches, the tub, the boiler and its valve, the engawa, the
   shoji (their own dynamic boxes), the engawa lanterns. Pieces (`cls`): `roof` (with the bunting under its eave), `front` (posts, beam,
   eave lanterns), `chim` (the chimney and its cap), `fence` (the bamboo fence) and `toro` (the garden's stone lantern).
