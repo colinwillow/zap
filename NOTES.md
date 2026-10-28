@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- STATUES: THE ENEMY'S STONE TWIN AND THE CHALICE (his: "every time we make a new enemy we should first make the statue version --
+## m1705 -- STATUES: THE ENEMY'S STONE TWIN AND THE CHALICE (his: "every time we make a new enemy we should first make the statue version --
 pose the rigged model, texture it with no green glowing parts, then the one that does; they guard the lairs; at the end you take a chalice
 and a cut scene shows them all coming to life")
 - **STATUES.md** is the rule and the checklist; CLAUDE.md carries one line.

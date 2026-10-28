@@ -13921,7 +13921,7 @@ function osariStep(dt) { for (let i = OSARI.fades.length - 1; i >= 0; i--) { con
 // with back-right, then the other two), never both pairs at once. Each leg is solved every frame from rest: two bones onto the ankle
 // (the foot plus the last segment's length straight up), the knee bent up and out, the last segment aimed down at the foot. It walks at
 // you and stops `near` off. SPAWN > OSARI SPIDER. (m1701: it fights now -- below.)
-// m15xx (his: "every time we make a new enemy -- humanoid, a spider, a big sphinx-like dog or cat -- we should first make the STATUE version: the
+// m1705 (his: "every time we make a new enemy -- humanoid, a spider, a big sphinx-like dog or cat -- we should first make the STATUE version: the
 // rigged model posed, textured so it has NO green glowing parts, and the live one that does. In the level they stand guarding the evil
 // lairs; you do the acrobatic part first, at the end you take a CHALICE, and a cut scene shows them all coming to life"). STATUES.md is the
 // rule. This is the first one, the spider: the SAME rig, posed (rearing guard or crouched) and frozen, in STONE -- every material swapped for
@@ -14030,7 +14030,7 @@ function spiderDie(S, dirH) { if (S.dead) return; S.dead = 1; spiderTris(S.mesh)
   S.root.removeFromParent(); SPIDER.list.splice(SPIDER.list.indexOf(S), 1); SPIDER.stat.kills++; HORDE.stat.kills++; }
 // ONE BLOW on a spider: `dirH` the way it travels, `hx/hz` where it landed (nearest leg comes off). Returns 'block', 1 (landed) or 0.
 function spiderBlow(S, dirH, power, dmg, hx, hz) { if (S.dead || S.hitCd > 0) return 0; S.hitCd = .2; const R = S.root, Z = SPIDER, p = player;
-  if (S.statue) { const M = spiderMid(S, _sdC); spkBurst(M.x, M.y, M.z, 16, { col: [.8, .74, .64], spread: 4, size: .1, life: .4 }); smokeAt(M.x, M.y, M.z, 1.5, .8, [.82, .76, .66]); snd('clang', { g: .6, r: .6, x: M.x, z: M.z }); return 'block'; }     // m15xx: stone chips
+  if (S.statue) { const M = spiderMid(S, _sdC); spkBurst(M.x, M.y, M.z, 16, { col: [.8, .74, .64], spread: 4, size: .1, life: .4 }); smokeAt(M.x, M.y, M.z, 1.5, .8, [.82, .76, .66]); snd('clang', { g: .6, r: .6, x: M.x, z: M.z }); return 'block'; }     // m1705: stone chips
   const full = p.chargeGo && slotNow().blade && (p.chargeGoK || 0) >= HALVE.full, front = Math.abs(wrapAngle(dirH + Math.PI - R.rotation.y)) < 1.1, M = spiderMid(S, _sdC);
   if (S.st === 'guard' && front && !full) { SPIDER.stat.blocks++; S.stT = 0; S.recoil = .5; spkBurst(M.x + Math.sin(R.rotation.y) * 1, M.y + .3, M.z + Math.cos(R.rotation.y) * 1, 20, { col: [1, .9, .6], spread: 5, size: .13, life: .35 });
     snd('clang', { g: 1, r: 1.1 + Math.random() * .2, x: M.x, z: M.z }); camShake(.08); return 'block'; }
@@ -14384,7 +14384,7 @@ function arenaUi() {
       else if (a === 'beam') { ARENA.menu = ''; if (BEAM.list.length) beamClear(); else beamSpawn(); }     // m1037; m1072
       else if (a === 'horde') { hordeAdd(); }     // m1084
       else if (a === 'archers') { archerAdd(); }     // m1103
-      else if (a === 'statue') { ARENA.menu = ''; if (STATUE.g) statueClear(); else statueAdd(); }     // m15xx
+      else if (a === 'statue') { ARENA.menu = ''; if (STATUE.g) statueClear(); else statueAdd(); }     // m1705
       else if (a === 'spider') { ARENA.menu = ''; if (SPIDER.list.length) spiderClear(); else spiderAdd(); }     // m1677
       else if (a === 'hall') { ARENA.menu = ''; if (HALL.on) hallClear(); else hallBuild(); }     // m1116
       else if (a === 'age') { AGE.st = AGE.st === 'fallen' ? 'restored' : 'fallen'; try { localStorage.setItem('mel.age', AGE.st); } catch (err) {} for (const E of BLDG.list) if (E.on()) { const rg = E.rig && E.rig(); if (rg) restorePlay(rg, AGE.st === 'fallen' ? 0 : 1); else { E.clear(); E.build(); } } if (inHome()) location.reload(); }     // m1501: FALLEN / RESTORED; a restorable building PLAYS it (m1512); the Red Hollows' pieces read it as they build: reload (Worker B)
@@ -65728,7 +65728,7 @@ function stepCam(dt) {
     camera.position.z += -bx * Math.sin(w * .77 + 1.9) * cam.shakeA * S.side;
   } else cam.shakeA = 0;
   camera.lookAt(cam.tgt);
-  if (STATUE.cine) statueCam();     // m15xx: the wake's cut-away
+  if (STATUE.cine) statueCam();     // m1705: the wake's cut-away
   // the lens widens with speed -- the cheapest speed cue there is, and it costs nothing
   const rush = smooth(CAM.rush0, CAM.rush0 + CAM.rushSpan, p.speed);
   // m1035: *"horizontal it's very widescreen and far away -- change the FOV so the character is more or less the same distance and size, with
