@@ -65481,7 +65481,7 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 try { const q = new URLSearchParams(location.search).get('hs'); if (q === 'restored' || q === 'fallen') AGE.st = q; } catch (e) {}     // the state is main's AGE (m1501); `?hs=` overrides for a look
 const hsF = () => AGE.st === 'fallen';
 function hsFallen(g) { if (!g || !hsF()) return; bldAge(g); }     // main's weathering (`bldAge`, m1501): the paint drained in the shader, metal to rust, glows out
-const GHOME = { on: 1, pass: 28, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
+const GHOME = { on: 1, pass: 29, liftA: 1.4, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   Rtu: 2.5, door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
@@ -65585,6 +65585,17 @@ function ghomeShutFill() { const A = GHOME, pa = A.shutMesh.geometry.attributes.
       for (let v = 0; v < nv; v++) { const q = base + v * 3; if (gone) { pa.array[q] = cx + T[v * 3] * w; pa.array[q + 1] = S.yt; pa.array[q + 2] = S.z; continue; }
         pa.array[q] = cx + T[v * 3] * w; pa.array[q + 1] = yb + (T[v * 3 + 1] + .5) * hh; pa.array[q + 2] = S.z + dz + T[v * 3 + 2] * th; } } }
   pa.needsUpdate = true; }
+// pass 29: the rope lift -- ride it, or call it to the end you stand at; it carries him (moves him by its own dy while he stands on it)
+function ghomeLift(dt) { const A = GHOME, L = A.lift; if (!L) return; const RT = A.R_ ? A.R_.t : 1, p = player, y0 = A.g.position.y, b = L.box, h = .6;
+  const on = p.grounded && Math.abs(p.pos.x - L.wx) < h + .1 && Math.abs(p.pos.z - L.wz) < h + .1 && L.ly !== null && Math.abs(p.pos.y - (y0 + L.ly)) < .35;
+  if (RT < .99) { L.want = L.y = L.yb; L.wait = 0; }
+  else { const atB = Math.abs(L.y - L.yb) < .01, atT = Math.abs(L.y - L.yt) < .01, d = Math.hypot(p.pos.x - L.wx, p.pos.z - L.wz);
+    if (on && (atB || atT)) { L.wait += dt; if (L.wait > .6) { L.want = atB ? L.yt : L.yb; L.wait = 0; snd('clang', { g: .45, r: .5, x: L.wx, z: L.wz }); } } else L.wait = 0;
+    if (!on && d < 2.6 && (atB || atT) && L.want === L.y) { const py = p.pos.y - y0; if (atT && Math.abs(py - L.yb) < 1.5) L.want = L.yb; if (atB && Math.abs(py - L.yt) < 1.5) L.want = L.yt; }
+    if (L.y !== L.want) { const v = 1.8 * dt; L.y = L.want > L.y ? Math.min(L.want, L.y + v) : Math.max(L.want, L.y - v); if (L.y === L.want) snd('thud', { g: .5, r: .9, x: L.wx, z: L.wz }); } }
+  if (on && L.ly !== null) p.pos.y += L.y - L.ly; L.ly = L.y;
+  b.minx = L.wx - h; b.maxx = L.wx + h; b.minz = L.wz - h; b.maxz = L.wz + h; b.miny = y0 + L.y - .3; b.maxy = y0 + L.y;
+  L.g.position.y = L.y; L.g.rotation.z = RT < .99 ? .12 : 0; L.rg.visible = RT > .99; for (const m of L.ropes) m.scale.y = Math.max(.1, L.yg - .25 - L.y - 1); }
 function ghomeShut(dt) { const A = GHOME; if (!A.shut) return; const RT = A.R_ ? A.R_.t : 1; let grid = 0;
   for (const S of A.shut) { if (RT > .99 && !S.woke) { S.woke = 1; if (A.R_.goal === 1 && S.u < .5) S.want = 1; } if (RT < .01) { S.woke = 0; S.want = S.u = 0; S.dirty = 1; }
     if (S.u !== S.want) { const was = S.u; S.u = S.want > S.u ? Math.min(S.want, S.u + dt * .55) : Math.max(S.want, S.u - dt * .8); S.dirty = 1; if (S.u === S.want && was !== S.u) snd('thud', { g: .5, r: .8, x: S.box.minx, z: S.box.minz }); }
@@ -65826,8 +65837,8 @@ function ghomeBuild(at, yaw, y0) {
     const prof = [[ri, Y - 1.9], [ri + 1.2, Y - 1.1], [ro - .2, Y - .45], [ro, Y - .2], [ro, Y], [ri, Y]].map(([r, y]) => new THREE.Vector2(r, y));
     put(new THREE.LatheGeometry(prof, 40, b0, b1 - b0), stoneM, at4(Tx, 0, Tz));
     const N = 24, V = (a, rr) => [Tx + Math.sin(a) * rr, Y + .04, Tz + Math.cos(a) * rr]; for (let i = 0; i < N; i++) { const a = b0 + (b1 - b0) * i / N, e = b0 + (b1 - b0) * (i + 1) / N; quad(V(a, ri), V(a, ro), V(e, ro), V(e, ri)); }
-    for (let i = 0; i <= 18; i++) { const a = b0 + (b1 - b0) * i / 18, x = Tx + Math.sin(a) * (ro - .1), z = Tz + Math.cos(a) * (ro - .1); vbox(x - .06, x + .06, Y, Y + 1, z - .06, z + .06, wood, 1, { noCam: 1 });
-      if (i < 18) { const e = b0 + (b1 - b0) * (i + 1) / 18, x2 = Tx + Math.sin(e) * (ro - .1), z2 = Tz + Math.cos(e) * (ro - .1), L = Math.hypot(x2 - x, z2 - z);
+    for (let i = 0; i <= 18; i++) { const a = b0 + (b1 - b0) * i / 18, x = Tx + Math.sin(a) * (ro - .1), z = Tz + Math.cos(a) * (ro - .1); if (Math.abs(a - A.liftA) < .15) continue; vbox(x - .06, x + .06, Y, Y + 1, z - .06, z + .06, wood, 1, { noCam: 1 });
+      if (i < 18 && Math.abs(a + (b1 - b0) / 36 - A.liftA) > .25) { const e = b0 + (b1 - b0) * (i + 1) / 18, x2 = Tx + Math.sin(e) * (ro - .1), z2 = Tz + Math.cos(e) * (ro - .1), L = Math.hypot(x2 - x, z2 - z);
         put(new THREE.BoxGeometry(L, .08, .08), wood, at4((x + x2) / 2, Y + .95, (z + z2) / 2, Math.atan2(x2 - x, z2 - z) + Math.PI / 2)); box(Math.min(x, x2) - .05, Math.max(x, x2) + .05, Y + .5, Y + 1, Math.min(z, z2) - .05, Math.max(z, z2) + .05, { noCam: 1 }); } } }
   // ---- ROUND WINDOWS (dark glass in a timber ring) and the round BACK DOOR's arch ----
   { const win = (cx, cz, R, a, y, r) => { const x = cx + Math.sin(a) * (R + .02), z = cz + Math.cos(a) * (R + .02);
@@ -66252,6 +66263,23 @@ function ghomeBuild(at, yaw, y0) {
     const puffs = []; for (let i = 0; i < N; i++) puffs.push({ s: i % 2, age: (i / N) * 4.5, life: 4.5, x: 0, y: 0, z: 0, vx: 0, vz: 0 });
     GHOME.smoke = { pts, pos, puffs, tops: A.tops || [] }; }
   // ---- merge, and the world gets the boxes and the floors ----
+  // ---- PASS 29 (his queue): the ROPE LIFT up the tower's east side to the balcony (a gap in its rail, `liftA`) -- a timber gantry out of the turret with a brass
+  // pulley, two ropes, a railed plank cage. Stand on it and it rides to the other end; at either end, walk up to it and it comes to you.
+  // FALLEN it lies at the foot, ropes gone (the gantry falls with the turret). Stepped by `ghomeLift`; its floor is a moving box (`BDYN`) ----
+  { const a = A.liftA, r = A.Rt + 2.4 + .75, lx = A.T[0] + Math.sin(a) * r, lz = A.T[1] + Math.cos(a) * r, yt = P + A.Yb + .02, ybt = rwHeight(Wx(lx, lz), Wz(lx, lz)) - y0 + .05, yg = yt + 3.9, ux = Math.cos(a), uz = -Math.sin(a), ry = a;
+    const g0 = [A.T[0] + Math.sin(a) * (A.Rtu - .2), A.T[1] + Math.cos(a) * (A.Rtu - .2)];
+    for (const o of [-.45, .45]) { const p0 = [g0[0] + ux * o, yg, g0[1] + uz * o], p1 = [lx + ux * o, yg, lz + uz * o], d = new THREE.Vector3(p1[0] - p0[0], 0, p1[2] - p0[2]), L = d.length();
+      put(new THREE.BoxGeometry(.2, .22, L + .3), wood, at4((p0[0] + p1[0]) / 2, yg, (p0[2] + p1[2]) / 2, ry)); put(new THREE.BoxGeometry(.12, 1.6, .12), wood, at4(g0[0] + ux * o + Math.sin(a) * .5, yg - .8, g0[1] + uz * o + Math.cos(a) * .5, ry, -.6)); }
+    put(new THREE.BoxGeometry(1.1, .14, .3), wood, at4(lx, yg + .15, lz, ry)); put(new THREE.TorusGeometry(.26, .06, 6, 14), bronzeT, at4(lx, yg - .25, lz, ry + Math.PI / 2)); put(new THREE.CylinderGeometry(.06, .06, 1.05, 6), iron, at4(lx, yg - .25, lz, ry, 0, Math.PI / 2));
+    const cg = []; { const w = 1.3; for (let k = 0; k < 5; k++) { const b = new THREE.BoxGeometry(w, .08, w / 5 - .03); b.translate(0, -.04, -w / 2 + (k + .5) * w / 5); cg.push(b.toNonIndexed()); }
+      for (const [x, z] of [[-.62, -.62], [.62, -.62], [-.62, .62], [.62, .62]]) { const b = new THREE.BoxGeometry(.08, 1.05, .08); b.translate(x, .5, z); cg.push(b.toNonIndexed()); }
+      for (const [x, z, sx, sz] of [[0, -.62, 1.3, .06], [0, .62, 1.3, .06], [-.62, 0, .06, 1.3]]) for (const yy of [.5, 1]) { const b = new THREE.BoxGeometry(sx, .06, sz); b.translate(x, yy, z); cg.push(b.toNonIndexed()); }
+      for (const q of cg) q.deleteAttribute('uv'); }
+    const lg = new THREE.Group(); lg.position.set(lx, hsF() ? ybt : ybt, lz); lg.rotation.y = ry; g.add(lg); const cage = new THREE.Mesh(mergeGeometries(cg), new THREE.MeshStandardMaterial({ color: 0x8a6440, roughness: .85 })); cage.castShadow = cage.receiveShadow = true; lg.add(cage);
+    const rg = new THREE.Group(); g.add(rg); const ropeM = new THREE.MeshStandardMaterial({ color: 0xc9b07a, roughness: 1 }), rgeo = new THREE.CylinderGeometry(.025, .025, 1, 4); rgeo.translate(0, -.5, 0); const ropes = [];
+    for (const o of [-.55, .55]) { const m = new THREE.Mesh(rgeo, ropeM); m.position.set(lx + ux * o, yg - .25, lz + uz * o); rg.add(m); ropes.push(m); }
+    const b = { minx: 0, maxx: 0, miny: 0, maxy: 0, minz: 0, maxz: 0, noCam: 1 }; BDYN.push(b);
+    A.lift = { g: lg, ropes, rg, box: b, yb: ybt, yt, yg, y: ybt, want: ybt, wx: Wx(lx, lz), wz: Wz(lx, lz), wait: 0, ly: null }; A.stat.lift = +(yt - ybt).toFixed(1); }
   // ---- PASS 28 (his queue): the stall SHUTTERS -- a roll-up tin curtain on each stall's front, from a drum under the outer beam down to the
   // deck. Strike one and it rolls up (or down); FALLEN they are down and stuck, RESTORED up, and the show rolls them up at its end. The slats
   // are ONE mesh (both shutters) rewritten only while one moves (`ghomeShut`); it is chunked like the rest, so it falls with its stall ----
@@ -67073,7 +67101,7 @@ function homeLanterns() {
 function homeStep(dt) {
   const H = HOME; H.t += dt; if (RW.U) RW.U.uTime.value = H.t;
   gmillStep(dt, H.t); gpeakStep(dt); gjinraStep(dt, H.t); if (GMERCH.g) rsChunkSync(GMERCH);
-  if (GHOME.U) GHOME.U.uWind.value = H.t; ghomeSmoke(dt, H.t); ghomeShut(dt); for (const G of GHOME.gates || []) bgateStep(G, dt);     // pass 9: his back door
+  if (GHOME.U) GHOME.U.uWind.value = H.t; ghomeSmoke(dt, H.t); ghomeShut(dt); ghomeLift(dt); for (const G of GHOME.gates || []) bgateStep(G, dt);     // pass 9: his back door
   if (GHOME.canoe) { const C = GHOME.canoe, t = H.t; C.g.position.y = C.y + rwWaveAt(C.x, C.z, t) * .8 * (1 - Math.min(1, (C.lift || 0) * 2)) + .02 + (C.lift || 0); C.ht = (C.ht == null ? 12 : C.ht) - dt; if (C.ht <= 0 && !C.hu) { C.hu = 1e-3; } if (C.hu) { C.hu += dt; if (C.hu > 6) { C.hu = 0; C.ht = 18 + Math.random() * 20; const P = C.g.getWorldPosition(new THREE.Vector3()); spkBurst(P.x, GHOME.g.position.y + C.y + .05, P.z, 30, { col: [.85, .93, 1], spread: 4, size: .09, life: .6 }); snd('thud', { g: .5, r: .7, x: P.x, z: P.z }); } }     // pass 24: now and then it LIFTS on its discs, hangs dripping, and settles
   const lift = C.hu ? .5 * Math.min(1, C.hu / 1.4) * Math.min(1, Math.max(0, (6 - C.hu) / 1.2)) : 0; if (lift > .05 && Math.random() < dt * 14) { const P = C.g.localToWorld(new THREE.Vector3((Math.random() - .5) * .8, -.4, (Math.random() - .5) * 4)); spkBurst(P.x, P.y, P.z, 2, { col: [.8, .9, 1], spread: .4, size: .05, life: .5 }); }
   C.kv = (C.kv - 9 * C.roll * dt) * Math.exp(-1.2 * dt); C.roll += C.kv * dt; C.g.rotation.set(Math.sin(t * .9) * .03, C.ry + Math.sin(t * .23) * .04, Math.sin(t * 1.1 + 1) * .05 + C.roll); C.rune.emissiveIntensity = 1.2 + .8 * Math.sin(t * 2.2) ** 2 + lift * 5; C.lift = lift; }     // pass 21: struck, it rocks; the runes breathe
