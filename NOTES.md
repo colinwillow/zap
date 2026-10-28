@@ -35,6 +35,17 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
+## THE DOJO, PASS 11: THE ALTARS ANSWER (mXXXX)
+- **Each altar has a chime, a ring and a glint.** The chime is a bronze wind-chime under the canopy (5 tubes, a striker, a mint tassel) on a spring (`A.sw`). The Jin ring is an additive mint torus that rises 3.2 m and fades over 1.4 s. The glint is a star sprite (`dojoGlintTex`) that runs the top katana in .55 s.
+- **The trigger:** `dojoStep` checks him on the disc (within 2.4 m, |dy| < .7) and calls `dojoBlessing(A)` once. It re-arms past 3.5 m.
+- **`dojoBlessing` does five things:**
+  - a high clang (r 2.3) plus `ready`
+  - three mint bursts
+  - `swapGo` to the katana if it is in his kit (GEAR.mask) and not already out
+  - `JIN.bless = 20` s, which makes `bladeTrail` shed `JIN.blessX` (4x) motes
+- **`JINHEX` is declared above `dojoBuild`.** JIN itself is declared 8,000 lines below and the dojo builds at MODULE SCOPE, so reading `JIN.hex` there would be a blank page (the landmine). `JIN.col` is only read at runtime, in the blessing.
+- **Not seen running:** the ring, the glint and the swing need him to climb up. Static renders show the chime under the canopy.
+
 ## THE DOJO, PASS 10: THE GATES ARE ENTRANCES (m1430)
 - **The lab's DOORS entry, turned to the dojo's gates.** `ARENA.door.aOff` (PI/4 in the dojo, 0 in the lab) is added everywhere a door angle was `k * PI/2`: `arenaSpawn` x2, `arenaEnter`, `arenaDoorPick`. In the dojo, `r0` is W+8.6 (the landing), `rTaunt` W-.8 (just inside the gate) and `rLand` 7. `yAt` is 0 in the dojo, which has one floor height.
 - **dojoBuild no longer forces BEAM.** TOOLS > ENTRY is his again, and DOORS is the default.

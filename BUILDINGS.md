@@ -67,7 +67,8 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 - [x] **pass 10 (m1430):** the gates are ENTRANCES. A floating stone landing outside each gate, a timber bridge, and the rail open there. A boss arrives on a landing in a burst of Jin, crosses, walks in through the gate, taunts and leaps in (TOOLS > ENTRY: DOORS; BEAM is the old drop-in)
 - [ ] pass 8 (rest):
   - ~~the gates as ENTRANCES~~: bosses walk in through a torii (a DOORS entry for the dojo)
-  - something AT the altars: take a katana from the rack, a chime, a glint on the blade
+  - ~~something AT the altars~~ -> **pass 11 (mXXXX):** step onto an altar and it ANSWERS: the bronze wind-chime swings and rings, a Jin ring rises off the disc, a glint runs the top blade, the katana comes out, and the blade is Jin-blessed for 20 s (4x the motes). It re-arms when you step off
+  - (was) something AT the altars: take a katana from the rack, a chime, a glint on the blade
   - lit lanterns at dusk
 - [ ] pass 4: life: birds, light shafts, the clouds moving under you, training marks on the floor
 - [ ] later: the training-dojo function (racks you take weapons from, targets that pop up, a sparring master), the music

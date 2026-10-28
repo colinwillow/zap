@@ -10350,6 +10350,15 @@ function dojoRoof(w, h, lift, overhang) { const seg = 32, geo = new THREE.ConeGe
     const k = (1 - (y + .5)), R = r * sq * (w / 2 + overhang) * Math.SQRT1_2, curve = Math.pow(k, 3) * lift * (.35 + .65 * Math.pow(c, 3)), sag = Math.sin(k * Math.PI) * h * .12;
     P.setXYZ(i, Math.cos(th + Math.PI / 4) * R, y * h + h / 2 - sag + curve, Math.sin(th + Math.PI / 4) * R); }
   geo.computeVertexNormals(); return geo; }
+const JINHEX = 0x7affd8;     // m1432: the Jin's colour for code above JIN's own declaration (the dojo builds at module scope)
+function dojoGlintTex() { const cv = document.createElement('canvas'); cv.width = cv.height = 64; const c = cv.getContext('2d'), gr = c.createRadialGradient(32, 32, 0, 32, 32, 32);
+  gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.25, 'rgba(200,255,240,.6)'); gr.addColorStop(1, 'rgba(120,255,220,0)'); c.fillStyle = gr; c.fillRect(0, 0, 64, 64);
+  c.fillStyle = 'rgba(255,255,255,.9)'; c.fillRect(30, 2, 4, 60); c.fillRect(2, 30, 60, 4); const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t; }
+function dojoBlessing(A) {     // m1432: he stepped onto an altar: the chime rings, the Jin ring rises, the glint runs the blade, the katana comes out, Jin-blessed
+  A.armed = 0; A.t = 0; A.vsw += 2.6; A.ring.visible = true; snd('clang', { g: .55, r: 2.3, x: A.x, z: A.z }); snd('ready', { g: .7, x: A.x, z: A.z });
+  for (let i = 0; i < 3; i++) spkBurst(A.x, A.y + .3 + i * .6, A.z, 16, { col: JIN.col, spread: 2.4, size: .22, life: 1.2 });
+  const k = WEAP.slots.findIndex(q => q.melee === 'katana'); if (k >= 0 && player.slot !== k && (GEAR.mask & (1 << k)) && !player.swap) swapGo(k);
+  JIN.bless = JIN.blessT; }
 function dojoBuild(g, W) {
   const D = DOJO, R = ARENA.r, MG = new Map(), put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); const q = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal') q.deleteAttribute(k); MG.get(m).push(q); };
   const M = { plank: triMat('wood_planks', { scale: 2.4 }), floor: triMat('wood_timber', { scale: 3.2, color: 0xf2dcc0, rough: .6 }), stone: triMat('stone_blocks', { scale: 3 }), rock: triMat('sandstone', { scale: 6, color: 0xb8a48c }), timber: triMat('wood_timber', { scale: 2 }),
@@ -10402,7 +10411,13 @@ function dojoBuild(g, W) {
     for (const s of [-1, 1]) { const p = L(s * 2.6, 1.6, y + 1.4); put(new THREE.BoxGeometry(.2, 2.8, .2).translate(...p), M.timber); }
     { const KK = korMats(); for (const s2 of [-1, 1]) { const p = L(s2 * 2.6, -1.4, y); korPost(put, KK, p[0], y, p[2], 2.8); } korTent(put, KK, x, y + 2.8, z, 3.6, 3.2, 8); korWheel(put, KK, ...L(0, -2.2, y + 2.5), face, .55); }     /* m1408: the hero kit's tent canopy, not a pagoda roof */
     for (const s of [-1, 1]) { const p = L(s * 2.3, -1.9, y + .5); put(new THREE.BoxGeometry(.5, .7, .5).translate(...p), M.lamp); }
-    D.altars.push({ x, y, z });
+    // m1432: THE ALTAR ANSWERS. A bronze wind-chime hangs under the canopy, a Jin ring waits in the disc, and a glint rides the top blade
+    const ch = new THREE.Group(), KC = korMats(); { const [hx, , hz] = L(1.9, -2.6, 0); ch.position.set(hx, y + 3.05, hz);
+      ch.add(new THREE.Mesh(new THREE.CylinderGeometry(.5, .5, .06, 14), KC.timber)); for (let j = 0; j < 5; j++) { const aa = j / 5 * 6.283, tl = .9 + (j % 3) * .25, tb = new THREE.Mesh(new THREE.CylinderGeometry(.045, .045, tl, 8), KC.bronze); tb.position.set(Math.sin(aa) * .36, -.1 - tl / 2, Math.cos(aa) * .36); ch.add(tb); }
+      const st = new THREE.Mesh(new THREE.CylinderGeometry(.16, .16, .05, 12), KC.bronze); st.position.y = -1.0; ch.add(st); const ts = new THREE.Mesh(new THREE.BoxGeometry(.12, .5, .02), new THREE.MeshBasicMaterial({ color: JINHEX })); ts.position.y = -1.35; ch.add(ts); g.add(ch); }
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(2.6, .07, 8, 48).rotateX(Math.PI / 2), new THREE.MeshBasicMaterial({ color: JINHEX, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })); ring.position.set(x, y + .1, z); ring.visible = false; g.add(ring);
+    const gl = new THREE.Sprite(new THREE.SpriteMaterial({ map: D.glintT || (D.glintT = dojoGlintTex()), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0 })); gl.scale.setScalar(.9); g.add(gl);
+    D.altars.push({ x, y, z, ca, sa, ch, ring, gl, armed: 1, sw: 0, vsw: 0, t: 9 });
     // m1401: THE ROUTE UP: three floating stepping stones from the rim (where the rim wall is left open) up to the altar, each +2 m (his jump is
     // 2.7, comfy 2.2) and ~3 m apart (a run jump is 5.95 comfy), the last a 1 m hop onto the altar's disc -- which is now a floor (a box)
     const sg = a === 0 ? 1 : -1; [[20.6, .06, 1.9], [22.4, .2, 3.9], [22.6, .36, 5.9]].forEach(([r2, da, sy], k) => { const [sx, sz] = at(a + sg * da, r2);
@@ -10637,6 +10652,12 @@ function dojoStep(dt) { const D = DOJO; if (!D.on) return; D.t += dt; D.U.uTime.
     Q.pg.attributes.position.needsUpdate = true; Q.pm.uniforms.uPx.value = renderer.domElement.height / (2 * Math.tan(camera.fov * Math.PI / 360)); }
   for (const Jk of D.junks || []) { Jk.a += Jk.w * dt; const x = Math.sin(Jk.a) * Jk.r, z = Math.cos(Jk.a) * Jk.r; Jk.J.position.set(x, Jk.y + Math.sin(D.t * .4 + Jk.ph) * 1.5, z); Jk.J.rotation.set(Math.sin(D.t * .5 + Jk.ph) * .04, Jk.a + (Jk.w > 0 ? Math.PI / 2 : -Math.PI / 2), Math.sin(D.t * .7 + Jk.ph) * .05); }
   if (D.candles) { const C2 = D.candles, mx = _dcM || (_dcM = new THREE.Matrix4()); C2.list.forEach((c, i) => { mx.makeScale(1, c.h, 1).setPosition(c.x, c.y + Math.sin(D.t * .8 + c.s) * .25, c.z); C2.m.setMatrixAt(i, mx); }); C2.m.instanceMatrix.needsUpdate = true; }
+  if (JIN.bless > 0) JIN.bless -= dt;
+  for (const A of D.altars || []) { if (!A.ch) continue; const p = player.pos, d = Math.hypot(p.x - A.x, p.z - A.z), on = d < 2.4 && Math.abs(p.y - A.y) < .7;
+    if (on && A.armed) dojoBlessing(A); else if (!on && d > 3.5) A.armed = 1;
+    A.vsw += (-9 * A.sw - 1.2 * A.vsw) * dt; A.sw += A.vsw * dt; A.ch.rotation.set(A.sw * .5, 0, Math.sin(D.t * .9 + A.x) * .04 + A.sw * .3);
+    A.t += dt; const u = A.t / 1.4; if (u < 1) { A.ring.position.y = A.y + .1 + u * 3.2; A.ring.scale.setScalar(1 + u * .6); A.ring.material.opacity = (1 - u) * .9; } else A.ring.visible = false;
+    const v = A.t / .55; if (v < 1) { const uu = -1.3 + 2.6 * v, vv = -.33, yy = A.y + .7 + 2 * .65 + .1; A.gl.position.set(A.x + A.ca * uu + A.sa * vv, yy, A.z - A.sa * uu + A.ca * vv); A.gl.material.opacity = Math.sin(v * Math.PI); A.gl.material.rotation = v * 2; } else A.gl.material.opacity = 0; }
   if (D.sunG) D.sunG.m.position.copy(camera.position).addScaledVector(D.sunG.d, 700);
   if (D.manta) { const Mn = D.manta; Mn.a += Mn.w * dt; const rr = Mn.r + Math.sin(Mn.a * 2) * 25; Mn.m.position.set(Math.sin(Mn.a) * rr, Mn.y + Math.sin(D.t * .35) * 5, Math.cos(Mn.a) * rr); Mn.m.rotation.set(Math.cos(D.t * .35) * .1, Mn.a - Math.PI / 2, .35); }
   if (D.whale) { const Wh = D.whale; Wh.a += Wh.w * dt; Wh.m.position.set(Math.sin(Wh.a) * Wh.r, Wh.y + Math.sin(D.t * .25) * 6, Math.cos(Wh.a) * Wh.r); Wh.m.rotation.set(Math.cos(D.t * .25) * .08, Wh.a + Math.PI / 2, 0); }
@@ -18727,7 +18748,7 @@ const KATANA = { dmgK: 1.6,
 const BTRAIL = { n: 18, base: 14, tip: 70, col: [.25, .72, 1], k: .7 };     // a cool blue, NORMAL blending: additive white vanished on the white arena
 // m1421: JIN ESSENCE (his, KORAJIN.md "THE JIN GLOW"): the mint glow first seen on the serpent fish's spots is the visible Jin. One colour, used
 // everywhere the Jin shows: the blade trail and the motes it sheds, the dojo's floating candles, a Jin spring. TOOLS > TRAIL: JIN / BLUE
-const JIN = { hex: 0x7affd8, col: [.48, 1, .85], shed: 26 };
+const JIN = { hex: 0x7affd8, col: [.48, 1, .85], shed: 26, bless: 0, blessT: 20, blessX: 4 };     // m1432: `bless` s left of an altar's blessing: the blade sheds `blessX` x
 try { BTRAIL.jin = localStorage.getItem('mel.btrail') === 'blue' ? 0 : 1; } catch (e) { BTRAIL.jin = 1; }
 function bladeTrail(dt) {
   const T = BTRAIL;
@@ -18743,7 +18764,7 @@ function bladeTrail(dt) {
   const HS = heroSword();
   if (on) { w.group.updateWorldMatrix(true, false); T.hist.unshift([w.group.localToWorld(new THREE.Vector3(0, HS ? HS.base : T.base, 0)), w.group.localToWorld(new THREE.Vector3(0, HS ? HS.tip : T.tip, 0))]); if (T.hist.length > T.n) T.hist.length = T.n; }
   else if (T.hist.length) T.hist.pop();
-  if (on && T.jin && T.hist.length > 1 && SPK.on) { const [b0, t0] = T.hist[0], t1 = T.hist[1][1]; for (let n = JIN.shed * dt; n > 0; n--) { if (n < 1 && Math.random() > n) break;     /* m1421: Jin motes shed along the edge */
+  if (on && T.jin && T.hist.length > 1 && SPK.on) { const [b0, t0] = T.hist[0], t1 = T.hist[1][1]; for (let n = JIN.shed * (JIN.bless > 0 ? JIN.blessX : 1) * dt; n > 0; n--) { if (n < 1 && Math.random() > n) break;     /* m1421: Jin motes shed along the edge */
     const f = .35 + Math.random() * .65, x = b0.x + (t0.x - b0.x) * f, y = b0.y + (t0.y - b0.y) * f, z = b0.z + (t0.z - b0.z) * f, k = f / Math.max(dt, 1e-3) * .12;
     spk(x, y, z, (t0.x - t1.x) * k + (Math.random() - .5) * .4, (t0.y - t1.y) * k - .3 + Math.random() * .3, (t0.z - t1.z) * k + (Math.random() - .5) * .4, .05 + Math.random() * .05, .45 + Math.random() * .4, JIN.col); } }
   const P = T.mesh.geometry.attributes.position, A = T.mesh.geometry.attributes.a, H = T.hist;
