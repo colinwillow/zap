@@ -132,6 +132,16 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
+## HIS BLUE DRAGON AND HIS THREE-HEADED DOG IN THE DOJO (mXXXX)
+*"I don't think you understood what I meant by dragon -- I have models. The blue dragon GLB and the three-headed dog... unlock animals along the way."* His `models/creatures/blue_dragon.glb` and `3_headed_dog.glb` (already arena beasts: DRAGON / DOG).
+- **`dojoBeast(D, B)`** goes through `arenaLoad(key)`, so the padding is trimmed (`beastPrep`), the scale and facing are measured, and `skeletonClone(P.proto)` is scaled `mul` and faced at the dojo. Its own mixer cross-fades the idles in turn (`dojoBeastIdle`). Called on the FIRST dojo frame, because `arenaLoad` must not run at module scope.
+- **The dragon (x2.2)** is on a new high CRAG (R 8, deep, y 40) at (-66, 34), cycling idle / casual / wake_up.
+- **The dog (x1.6)** is on its own LEDGE at (86, 4, -14) east of the dojo, cycling idle_1-3. The first spot was inside a hero hall's island: the halls sit on the diagonals at r 74.
+- **The clips (read from the files):**
+  - dragon: attack_air, attack_ground, casual, death, dizzy, entrance, hit, idle, run, wake_up. NO fly loop.
+  - dog: attack_1-2, death, dizzy, entrance, hit, idle_1-3, run.
+- **The procedural dragon's head is back to pass 1** (*"I kinda liked the old one"*). Pass 2's head, legs and tuft are in git at m1510.
+
 ## THE SKY DRAGON, PASS 2: A HEAD, LEGS AND A TAIL (m1510)
 - **The head** is one merged vertex-coloured mesh (red, gold, bone, pink, dark): a skull, a long snout and a fat nose with nostrils, gold brow ridges, fangs, a gold upper lip, an OPEN lower jaw with a tongue, a gold beard of cones, branching gold antlers swept back, and the long whiskers. A second, glowing mesh holds a frill of 12 Jinra flame cones round the back of the skull and the mint irises. x1.9.
 - **Legs:** four (segments 10 and 30, both sides), thigh plus shin plus three bone claws. Placed each frame from that segment's own transform and paddling in alternation (`dojoDragon`).

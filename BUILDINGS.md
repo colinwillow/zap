@@ -26,6 +26,8 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 - [ ] serpent fish (the Ship, Worker A): its own passes in the Ship's list
 - [x] **sky dragon pass 1 (m1481):** a 64-segment red-and-gold Jin serpent-dragon with a mint mane, gold horns and whiskers, weaving between the islands through the tiers (-30 to +60 m)
 - [x] **sky dragon pass 2 (m1510):** a real eastern head (long snout, fat nose, an OPEN jaw with fangs and tongue, gold lips, brow ridges, mint eyes, branching antlers, a gold beard, whiskers, a frill of Jinra flames), four clawed legs that paddle, a Jinra tail tuft
+- [x] **(mXXXX, his: *"I meant my blue dragon GLB and the three-headed dog"*)** HIS BLUE DRAGON rests on its own high crag off the dojo (the one you will tame it on); HIS THREE-HEADED DOG stands on its own ledge to the east; both his models and clips, cycling their idles. The procedural dragon's head went back to pass 1 (he liked it more)
+- [ ] his beasts next: the dragon takes off and flies (it has no fly loop -- `attack_air` is the nearest; ask him for a fly cycle), the dog prowls its ledge; then TAMING (give it good Jinra) and RIDING
 - [ ] sky dragon pass 3: the body rolls into its turns; scales (a texture or bands of plates); the jaw opens and closes; a roar; then the TAMING and RIDING (KORAJIN.md: the first mount)
 
 
