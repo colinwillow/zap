@@ -92,6 +92,12 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 | Octagonal Block Pagoda |  |  |  |  |
 | Timber Siege Fort |  |  |  |  |
 
+## THE DRAGON RIDE (his, Oct 28 2026; KORAJIN.md THE BLUE DRAGON) -- a test zone, then the dojo
+- [ ] a sandbox: the blue dragon, tame (a Jinra offering), mount, ride on the ground, take off, fly (RollerGirl's wingsuit model), land
+- [ ] fireballs from the saddle; Grumbo's gun while riding
+- [ ] dressing: saddle, glowing Jinra collar, wrist and ankle armour, tail ornaments, our red cape and emblem when captured; EVIL vs CAPTURED textures
+- [ ] needs from him: a fly cycle (and any riding clips)
+
 ## THE DOJO (his, after m1390) -- the arena becomes the floating samurai dojo; many passes
 
 > *"Start making the arena the dojo, more in line with the game aesthetic: our texture maps, our architecture -- take reference from his home and the

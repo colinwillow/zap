@@ -102,6 +102,23 @@ illuminating, pieces moving in and fixing themselves -- very cinematic. The tran
 - **The thread:** an uncle's stories you don't believe, then the shopkeeper who tells you more, then quests from the townspeople, then the
   slow realisation of who you are (the Korajin's question: born one, or made one?).
 
+## OURS vs THEIRS: WHAT IS RESTORED AND WHAT IS TORN DOWN (his, Oct 28 2026)
+- **OUR places** (the Korajin's towns, his home) start FALLEN and are RESTORED: rebuilt and lifted into the sky on Jinra jets (RESTORE kit).
+- **ENEMY places are for DESTROYING.** They never float. You tear them down (fully destructible), and in their place you raise SACRED
+  buildings: Jinra power plants, shrines, which feed the restoration. *"Why would we put the enemy buildings up into the sky? That's the opposite."*
+- **The enemy has its OWN LOOK, our opposite:** classical Japanese (the forge's original style, embellished) in an ENEMY palette. He leans
+  black with a yellow or gold emblem, maybe green; NOT decided. Concept images come next, from `ENEMY_BRIEF.md`.
+
+## THE BLUE DRAGON, THE FIRST MOUNT (his, Oct 28 2026)
+*"Embellish the blue dragon GLB. When he becomes yours I want to control him, really fun: shoot fireballs, the same feel as RollerGirl with her
+wingsuit (borrow from that), shoot the gun while riding, ride him on the ground too."*
+- **Riding:** on the ground (the run clip) and in the air (a flight model borrowed from RollerGirl's wingsuit). Fireballs (he already has
+  `attack_air`) and Grumbo's own gun while riding.
+- **Dressing:** a SADDLE; a glowing Jinra COLLAR; wrist and ankle jewellery or armour; tail ornaments; once captured, a red CAPE or banner
+  with OUR emblem. Two texture looks: EVIL (wild, the enemy's) and CAPTURED (ours).
+- **A test zone of its own** for riding and its animations (BUILDINGS.md, THE DRAGON RIDE).
+- **Needs from him:** a FLY cycle (the GLB has none; `attack_air` is the nearest), and any riding clips for Grumbo.
+
 ## THE ENEMY: ANCIENT CONSTRUCTS FEEDING ON STOLEN JINRA (his, Oct 28 2026; open)
 > *"The enemy feeds off the power -- an ancient robotic thing. Stone, almost Egyptian, like the Sphinx made of rock, or the buried Chinese
 > terracotta army -- so when you break them they're robotic, held together by this magical power. They've been feeding off the ancient Jinra. The

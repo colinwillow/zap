@@ -53,6 +53,11 @@ The factions in KORAJIN.md are a natural split. **These are proposals; the taste
 | **The Dustwalkers** (scavengers, traders) | patched, mismatched: sun-bleached canvas, rust, salvaged ship parts bolted on; ochre and olive |
 | **The Red Order** (discipline, ritual; Grumbo's origin) | the HERO kit made severe: lacquered black and deep red, symmetry, fewer domes and more terraces, gold trim |
 
+## ENEMY BUILDINGS: CLASSICAL JAPANESE, EMBELLISHED, IN THE ENEMY'S PALETTE -- AND BREAKABLE (his, Oct 28 2026)
+The forge's ORIGINAL classical Japanese buildings are the enemy's base look (*"probably almost better, we should've just embellished it"*), NOT
+the hero kit. They get an enemy palette (black with a yellow or gold emblem, maybe green: undecided), stolen Jinra burning in their braziers,
+and they are DESTRUCTIBLE. No FALLEN/RESTORED, no floating. Torn down, they make way for our SACRED buildings.
+
 ## THE ENEMY IS STONE AND CLAY (his, Oct 28 2026; KORAJIN.md, THE ENEMY)
 Their places are carved STONE and fired TERRACOTTA, Sphinx-like and buried-army-like, with stolen Jinra burning mint in their braziers, core
 chambers and torch towers. That is a strong candidate for the enemy grammar above (closest to "The Hollowed": ancient machinery), and still his to settle.
