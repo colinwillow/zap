@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the MOATED KEEP, pass 2 (DESTRUCTIBLE TO THE GROUND)
+## m1654 -- THE RE-PASS: the MOATED KEEP, pass 2 (DESTRUCTIBLE TO THE GROUND)
 - The Hangar's machinery (per-piece rigs run backwards, `restoreRide` parking each piece's boxes, a `sup` list hit through `bldHit` ->
   `keepBreak`). Pieces: `wN` / `wS` / `wE` / `wW` (a wall with its skirt, gold band, banner, seam and the corner posts on its side; the
   door wall carries the oni mask and the lamps) and `roof` (slab, merlons, the turret-house and its roof, the poles and banners).
