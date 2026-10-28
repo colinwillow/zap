@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the AIRSHIP DOCK, pass 2 (rubric 7: RESTORES IN PLACE)
+## m1565 -- THE RE-PASS: the AIRSHIP DOCK, pass 2 (rubric 7: RESTORES IN PLACE)
 **Moves:** its rubric-7 box. For a flyer, what comes back to life is the airship.
 - Base (stays): the ground hall's chunk walls, the shaft and its bands, the lift and its rails. Pieces: `deck` (slab, rails, lanterns, mast and
   its ring, the dispatch bell, the wind sock, the kite rack, the bunting) and `arm` (the landing arm, its rails, lanterns, struts and gangway).
