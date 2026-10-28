@@ -10423,9 +10423,15 @@ function dojoBlessing(A) {     // m1432: he stepped onto an altar: the chime rin
 // m1446: TRY A PANORAMA SKY (his: *"curious to try out different HDRIs -- not necessarily in love with this one, I just want to see what it adds"*).
 // TOOLS > SKY: PAINTED (the shader sunrise) / PANO (an equirect image on the dome, ALSO the scene's image light, the lights retinted to it).
 // `PANOS` is the list to try; `uOff` turns the image so its sun sits on the dojo's sun line (measured: this one's sun at u .310, v .638 from the top).
-const PANOS = [{ file: 'textures/sky_sunset_01.webp', uOff: -.114, vOff: -.202, env: .5, sun: 0xffa060, hemi: 0xffb890, ground: 0x4a2630, fog: 0xc86a4a }];
-try { DOJO.skyPick = localStorage.getItem('mel.dojo.sky') === 'PANO' ? 'PANO' : 'PAINTED'; } catch (e) { DOJO.skyPick = 'PAINTED'; }
-function dojoPano(dome) { const Pn = PANOS[0];
+// m1453: his SECOND panorama, painted closer to the game's own sky (lavender, peach, a sea of cloud) -- it is `PANO` now; the fiery first is `FIRE`
+const PANOS = { PANO: { file: 'textures/sky_sunset_02.webp', uOff: -.081, vOff: -.165, env: .5, sun: 0xffc890, hemi: 0xffd6c8, ground: 0x5a4a6e, fog: 0xd8a0a0,
+    cloud: { lo: [.52, .44, .66], hi: [1, .82, .66], rim: [1, .62, .32], far: [.92, .66, .62] } },
+  FIRE: { file: 'textures/sky_sunset_01.webp', uOff: -.114, vOff: -.202, env: .5, sun: 0xffa060, hemi: 0xffb890, ground: 0x4a2630, fog: 0xc86a4a,
+    cloud: { lo: [.36, .17, .3], hi: [1, .66, .4], rim: [1, .45, .15], far: [.8, .36, .24] } } };
+const SKYPICKS = ['PAINTED', 'PANO', 'FIRE'];
+try { const v = localStorage.getItem('mel.dojo.sky'); DOJO.skyPick = SKYPICKS.includes(v) ? v : 'PAINTED'; } catch (e) { DOJO.skyPick = 'PAINTED'; }
+DOJO.pano = PANOS[DOJO.skyPick] || null;
+function dojoPano(dome) { const Pn = DOJO.pano;
   new THREE.TextureLoader().load(A(Pn.file), t => { t.colorSpace = THREE.SRGBColorSpace; t.minFilter = THREE.LinearFilter; t.generateMipmaps = false; t.wrapS = THREE.RepeatWrapping;
     dome.material = new THREE.ShaderMaterial({ uniforms: { uT: { value: t }, uOff: { value: new THREE.Vector2(Pn.uOff, Pn.vOff) } }, side: THREE.BackSide, depthWrite: false, fog: false,
       vertexShader: 'varying vec3 vD; void main() { vD = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
@@ -10453,7 +10459,7 @@ function dojoBuild(g, W) {
       #include <tonemapping_fragment>
       #include <colorspace_fragment>
     }` })); dome.renderOrder = -2; dome.frustumCulled = false; g.add(dome); D.dome = dome;
-  if (D.skyPick === 'PANO') dojoPano(dome);
+  if (D.pano) dojoPano(dome);
   const cloud = new THREE.Mesh(new THREE.PlaneGeometry(2400, 2400, 1, 1).rotateX(-Math.PI / 2), new THREE.ShaderMaterial({ uniforms: U, transparent: true, depthWrite: false, fog: false,
     vertexShader: 'varying vec3 vW; void main() { vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
     fragmentShader: SKYGLSL + `uniform float uTime; uniform vec3 uSun; varying vec3 vW;
@@ -10464,7 +10470,7 @@ function dojoBuild(g, W) {
         vec3 col = mix(lit, hz, smoothstep(250.0, 1100.0, d)); gl_FragColor = vec4(col, mix(.55 + c * .45, 1.0, smoothstep(250.0, 900.0, d)));
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
-      }` })); cloud.position.y = D.cloudY; cloud.renderOrder = -1; cloud.frustumCulled = false; g.add(cloud); if (D.skyPick === 'PANO') cloud.visible = false;
+      }` })); cloud.position.y = D.cloudY; cloud.renderOrder = -1; cloud.frustumCulled = false; g.add(cloud); if (D.pano) cloud.visible = false;
   scene.background = new THREE.Color(0xf0b089); if (scene.fog) { scene.fog.color.setHex(0xe8b49a); scene.fog.near = 120; scene.fog.far = 700; }
   { const L0 = Math.hypot(_sunOff.x, _sunOff.y, _sunOff.z) || 20; _sunOff.copy(sd).multiplyScalar(L0); sun.position.copy(_sunOff); sun.color.setHex(0xffd2a6); hemi.color.setHex(0xffe0c8); hemi.groundColor.setHex(0x5a4a5a); }
   camera.far = Math.max(camera.far, 1000); camera.updateProjectionMatrix();
@@ -10707,8 +10713,8 @@ function dojoBuild(g, W) {
     const CL = []; for (let k = 0; k < 24; k++) { const a = rnd() * 6.283, tier = rnd(), r = 120 + Math.pow(rnd(), .8) * 380, cx = Math.sin(a) * r, cz = Math.cos(a) * r;
       const cy = tier < .4 ? -40 + rnd() * 18 : tier < .8 ? -18 + rnd() * 30 : 22 + rnd() * 50, S = (tier < .4 ? 34 : tier < .8 ? 24 : 18) + rnd() * 26, n = 7 + Math.floor(rnd() * 10), tall = tier >= .8 ? 1.5 : 1;
       for (let i = 0; i < n; i++) { const u = (rnd() - .5) * 2.2, h = Math.pow(rnd(), 1.6); CL.push([cx + u * S * 1.1 + (rnd() - .5) * S * .5, cy + h * S * .9 * tall, cz + (rnd() - .5) * S * .9, S * (1.05 - h * .55) * (.7 + rnd() * .5), rnd() * 50]); } }
-    const PANO = D.skyPick === 'PANO', cv3 = (a2) => ({ value: new THREE.Vector3(...a2) });
-    bbd(CL, { order: -1, uni: { uLo: cv3(PANO ? [.36, .17, .3] : [.58, .5, .68]), uHi: cv3(PANO ? [1, .66, .4] : [1, .88, .78]), uRim: cv3(PANO ? [1, .45, .15] : [1, .6, .35]), uFar: cv3(PANO ? [.8, .36, .24] : [.96, .74, .66]) },
+    const PC = D.pano && D.pano.cloud, cv3 = (a2) => ({ value: new THREE.Vector3(...a2) });
+    bbd(CL, { order: -1, uni: { uLo: cv3(PC ? PC.lo : [.58, .5, .68]), uHi: cv3(PC ? PC.hi : [1, .88, .78]), uRim: cv3(PC ? PC.rim : [1, .6, .35]), uFar: cv3(PC ? PC.far : [.96, .74, .66]) },
       uniDecl: 'uniform vec3 uLo; uniform vec3 uHi; uniform vec3 uRim; uniform vec3 uFar;', frag: `void main() { vec2 q = vU - .5; float d = length(q) * 2.0; float n = fb(vU * 3.2 + vS); float a = smoothstep(1.0, .55, d + (n - .5) * .8);
       if (a < .01) discard; float lit = clamp(vU.y * .9 + n * .5 - .1, 0.0, 1.0); vec3 V = normalize(vW - cameraPosition); float sf = pow(max(0.0, dot(V, uSun)), 2.0);
       vec3 c = mix(uLo, uHi, lit); c += uRim * sf * (1.0 - d) * .6; c = mix(c, uFar, smoothstep(250.0, 520.0, length(vW.xz - cameraPosition.xz)) * .6);
@@ -12850,7 +12856,7 @@ function arenaUi() {
       else if (a === 'grip') { gripSet({ HIGH: 'MID', MID: 'OFF', OFF: 'HIGH' }[MOVE.gripPick]); try { localStorage.setItem('mel.grip', MOVE.gripPick); } catch (err) {} }
       else if (a === 'rhue') { const k = Object.keys(RIVAL.hues), n = k[(k.indexOf(RIVAL.pick) + 1) % k.length]; RIVAL.pick = n; RIVAL.u.value = RIVAL.hues[n] * Math.PI / 180; try { localStorage.setItem('mel.rival.hue', n); } catch (err) {} }
       else if (a === 'tlie') { TAIL.lie = { FLAT: 'BELLY', BELLY: 'OFF', OFF: 'FLAT' }[TAIL.lie]; try { localStorage.setItem('mel.tail.lie', TAIL.lie); } catch (err) {} }
-      else if (a === 'dsky') { try { localStorage.setItem('mel.dojo.sky', DOJO.skyPick === 'PANO' ? 'PAINTED' : 'PANO'); } catch (err) {} location.reload(); }     // m1446
+      else if (a === 'dsky') { try { localStorage.setItem('mel.dojo.sky', SKYPICKS[(SKYPICKS.indexOf(DOJO.skyPick) + 1) % SKYPICKS.length]); } catch (err) {} location.reload(); }     // m1446
       else if (a === 'entry') { ARENA.door.entry = ARENA.door.entry === 'DOORS' ? 'BEAM' : 'DOORS'; try { localStorage.setItem('mel.arena.entry', ARENA.door.entry); } catch (err) {} }
       else if (a === 'glow') { arenaGlowSet(ARENA.look.glow === 'WHITE' ? 'CYAN' : 'WHITE'); }
       else if (a === 'notice') { DRINK.notice = DRINK.notice === 'notice' ? 'notice_look' : 'notice'; }
