@@ -11555,7 +11555,12 @@ function dragWings(B) { const D = B.drive, S = D ? D.spread || 0 : 0; if (S < .0
     const pq = b.parent.getWorldQuaternion(_dwQ2), wq = b.getWorldQuaternion(new THREE.Quaternion()); b.quaternion.copy(pq.invert().multiply(_dwQ.multiply(wq))); b.updateMatrixWorld(true); } }
 function dragRiderPose() { const R = player.dragon, B = DRAGZ.on && DRAGZ.on.B; if (!R || R.st !== 'sit' || !B || !B.seat) return;
   const bq = B.root.getWorldQuaternion(_dwQ3); rig.root.quaternion.copy(bq).multiply(_dwQ2.setFromAxisAngle(_wkY, (rig.faceOff || 0) - (B.faceOff || 0)));
-  const seat = B.seat.getWorldPosition(_drV), up = _dwA.set(0, 1, 0).applyQuaternion(bq); rig.root.position.copy(seat).addScaledVector(up, -R.hip); }
+  const seat = B.seat.getWorldPosition(_drV), up = _dwA.set(0, 1, 0).applyQuaternion(bq); rig.root.position.copy(seat).addScaledVector(up, -R.hip);
+  // mDRG (his: "he was sitting inside the dragon"): the HIPS BONE put exactly on the seat (plus `seatUp`), measured on this frame's final pose --
+  // not the root less an estimated hip height, which leaves him wherever the clip's hips happen to be
+  const hb = rig.bones.mixamorig_Hips; if (hb) { rig.root.updateMatrixWorld(true); const hw = hb.getWorldPosition(_drV2), tx = seat.x + up.x * DRAGZ.seatUp, ty = seat.y + up.y * DRAGZ.seatUp, tz = seat.z + up.z * DRAGZ.seatUp;
+    rig.root.position.x += tx - hw.x; rig.root.position.y += ty - hw.y; rig.root.position.z += tz - hw.z; } }
+Object.assign(DRAGZ, { seatUp: .14 });
 // m1621: ATTACKS (DRAGON.md box 5). In the saddle the RIGHT FLICK is his BREATH: a fireball out of his head along his own forward (his pitch in
 // the air, a little down on the ground) at `fbV` plus his own speed, the m1096 look (the white core, the flickering shells, the rocket's fire
 // trail). On the ground he plays `attack_ground` and the ball leaves `breathAt` into it; aloft he is already in `attack_air`, so it leaves at
