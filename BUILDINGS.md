@@ -219,6 +219,16 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - **Still open on the home** (agreed after m1459): the shop SHUTTERS (roll up / down), the rocks' 3rd pass, the plants' 3rd pass with
     cliff shrubs, the rope LIFT to the balcony, BREAKABLE pots, the back ladder and stall rack (ref 2) -- then his sign-off.
 
+## FALLEN / RESTORED (his, after m1495; KORAJIN.md "THE RESTORATION") -- every Red Hollows piece has two states, default FALLEN
+*"Everything's gonna be fallen."* One build, one switch: **TOOLS > HOLLOWS > STATE** (reloads), `?hs=restored|fallen`, saved as `mel.hstate`.
+- [x] **pass 1 (next tick):** the switch (`HSTATE`, `hsF()`), and `hsFallen(g)` weathering every material of the home, the merchant, the mill,
+  the peak and the refinery (desaturated to dust, metal to rust, every glow out, glass emptied); FALLEN: the home's fires and lights out and
+  no smoke, the mill's wheel and sails still, no water poured; the lookout's brazier cold; the Jinra refinery NOT afloat: sunk on the
+  mountain's flank (40 m), no Jinra fall, no motes, no floating stones. RESTORED is everything as built.
+- [ ] pass 2: real ruin in FALLEN (broken and missing boards, torn cloth, rust streaks, collapsed bits, dust) and the RESTORED extras
+  (the stream glowing mint, the mill turning on Jinra, the floating pieces bobbing, warm lanterns)
+- [ ] pass 3: the TURN between them as a moment (the restoration happening, not a reload), when he says how it is earned
+
 ## VERTICALITY (his rule, after m1459) -- for every building and level from here
 *"I'm constantly fighting with you about verticality... you build everything on the same plane, and when I ask for something up in the
 air it's 10 or 20 feet up when I'm talking 50 or 100."* So: **heights are tens of metres** (a lookout, a shop on a cliff: 40-100 m),
@@ -273,7 +283,7 @@ mountain."* What it does: *"you can buy Jinra, also refined Jinra, powers; it gi
 fully fleshed out."* So **`GJINRA.goods` (name, vessel kind, price: null) and `gjinraBuy(item)` are the hook** and take nothing yet.
 Mint is ONLY Jinra. The bottles, canisters, globe and crystals are the shared **JINRA VESSELS** kit (`jvesMats` / `jvesPut`, PROPS.md).
 - **Passes:**
-  - [x] **pass 1 (next tick):** the FLOATING ISLAND (stratified inverted rock, a grass cap, hanging crags, a falling sheet of Jinra off
+  - [x] **pass 1 (m1495):** the FLOATING ISLAND (stratified inverted rock, a grass cap, hanging crags, a falling sheet of Jinra off
     one edge with motes) at 124 m, east of and above the lookout; the deck on stilts with front steps and a rail; the sandstone DOME
     with a mint-lit doorway and a counter of vessels; the GLASS GLOBE of glowing Jinra on its crown in a copper cage, copper PIPES, a
     stack on top and a CHIMNEY breathing mint; teal Jinra AWNINGS and the BANNER; mint lanterns; the vessels along the front; and the

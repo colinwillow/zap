@@ -10412,7 +10412,7 @@ const KOR = { m: null };
 // glow dead, the crowns half down to their rafters, doors hanging off) or RESTORED (the hero kit, warm lanterns, mint Jinra motes rising from the
 // foundations). SPAWN > BUILDINGS > STATE flips it and rebuilds whatever stands. `bldAge(g)` weathers a group; each building adds its own ruin.
 const AGE = { st: 'restored', cache: new Map() };
-try { AGE.st = localStorage.getItem('mel.age') === 'fallen' ? 'fallen' : 'restored'; } catch (e) {}
+AGE.st = 'fallen'; try { AGE.st = localStorage.getItem('mel.age') === 'restored' ? 'restored' : 'fallen'; } catch (e) {}     // his (to Worker B, after m1495): "everything's gonna be fallen" -- FALLEN unless RESTORED was chosen
 function ageMat(m) { if (AGE.cache.has(m)) return AGE.cache.get(m); let n = m;
   if (m.isMeshBasicMaterial) { n = m.clone(); n.color.multiplyScalar(.22); if (n.opacity < 1) n.opacity *= .4; }
   else if (m.isMeshStandardMaterial) { n = m.clone(); const ob = m.onBeforeCompile, ok = m.customProgramCacheKey, metal = m.metalness > .4;
@@ -13061,7 +13061,7 @@ function arenaUi() {
       else if (a === 'horde') { hordeAdd(); }     // m1084
       else if (a === 'archers') { archerAdd(); }     // m1103
       else if (a === 'hall') { ARENA.menu = ''; if (HALL.on) hallClear(); else hallBuild(); }     // m1116
-      else if (a === 'age') { AGE.st = AGE.st === 'fallen' ? 'restored' : 'fallen'; try { localStorage.setItem('mel.age', AGE.st); } catch (err) {} for (const E of BLDG.list) if (E.on()) { E.clear(); E.build(); } }     // m1501: FALLEN / RESTORED
+      else if (a === 'age') { AGE.st = AGE.st === 'fallen' ? 'restored' : 'fallen'; try { localStorage.setItem('mel.age', AGE.st); } catch (err) {} for (const E of BLDG.list) if (E.on()) { E.clear(); E.build(); } if (inHome()) location.reload(); }     // m1501: FALLEN / RESTORED (the Red Hollows' pieces read it as they build: reload, Worker B)
       else if (a === 'bld') { ARENA.menu = ''; const E = BLDG.list.find(q => q.key === b.dataset.k); if (E) { if (E.on()) E.clear(); else E.build(); } }     // m1117
       else if (a === 'slice') { ARENA.menu = ''; sliceDummy(); }     // m1090
       else if (a === 'course') { ARENA.menu = ''; if (COURSE.on) courseClear(); else courseBuild('ACRO'); }     // m1078
@@ -65001,6 +65001,12 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 // to the shop front and to the round back door. Built in its OWN frame (local +z = the front, toward the river; `at`/`yaw` are HOME.hut's) and
 // merged per material; every collider a local box turned into the world (the yaw is a quarter turn, so a box stays a box); every walkable
 // surface a triangle. `?hut=glb` (or GHOME.on = 0) puts the GLB back, to compare. Pass 1: the massing and the walkable shell, with the inside.
+// THE TWO STATES of the Red Hollows (KORAJIN.md "THE RESTORATION", his): FALLEN (the default: rust, dust, dead wood, nothing glows, nothing
+// floats, the mill stands still) and RESTORED (Jinra glow, the mill turning, the refinery afloat). One build, one switch: TOOLS > HOLLOWS
+// STATE -- now main's `AGE` (m1501): SPAWN > BUILDINGS > STATE, which reloads in the Red Hollows; `?hs=` for a look. `hsFallen(g)` is main's `bldAge` ----
+try { const q = new URLSearchParams(location.search).get('hs'); if (q === 'restored' || q === 'fallen') AGE.st = q; } catch (e) {}     // the state is main's AGE (m1501); `?hs=` overrides for a look
+const hsF = () => AGE.st === 'fallen';
+function hsFallen(g) { if (!g || !hsF()) return; bldAge(g); }     // main's weathering (`bldAge`, m1501): the paint drained in the shader, metal to rust, glows out
 const GHOME = { on: 1, pass: 25, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   Rtu: 2.5, door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
@@ -65099,7 +65105,7 @@ function ghomeFish(dt) { const F = GHOME.fish; if (!F || !GHOME.g) return; F.t -
   if (!F.on && F.t <= 0) { F.on = 1; F.u = 0; F.x = -5 + Math.random() * 10; F.z = F.zr[0] + Math.random() * (F.zr[1] - F.zr[0]); F.a = Math.random() * TAU; F.h = .6 + Math.random() * .6; m.visible = true; splash(F.x, F.z); }
   if (F.on) { F.u += dt / F.d; const u = Math.min(1, F.u), dx = Math.sin(F.a) * 1.3, dz = Math.cos(F.a) * 1.3; m.position.set(F.x + dx * u, F.wY + 4 * F.h * u * (1 - u), F.z + dz * u); m.rotation.set(-(1 - 2 * u) * 1.1, F.a, 0, 'YXZ');
     if (u >= 1) { F.on = 0; m.visible = false; splash(F.x + dx, F.z + dz); F.t = 4 + Math.random() * 7; } } }
-function ghomeSmoke(dt, t) { const S = GHOME.smoke; if (S && S.tops.length) { for (let i = 0; i < S.puffs.length; i++) { const p = S.puffs[i]; p.age += dt;
+function ghomeSmoke(dt, t) { if (hsF()) return; const S = GHOME.smoke; if (S && S.tops.length) { for (let i = 0; i < S.puffs.length; i++) { const p = S.puffs[i]; p.age += dt;
       if (p.age >= p.life) { const T = S.tops[p.s % S.tops.length]; p.age = 0; p.x = T[0] + (Math.random() - .5) * .3; p.y = T[1] + .2; p.z = T[2] + (Math.random() - .5) * .3; p.vx = .35 + Math.random() * .25; p.vz = (Math.random() - .5) * .25; }
       p.x += p.vx * dt; p.z += p.vz * dt; p.y += (1.1 - p.age * .12) * dt; S.pos[i * 3] = p.x; S.pos[i * 3 + 1] = p.y; S.pos[i * 3 + 2] = p.z; }
     S.pts.geometry.attributes.position.needsUpdate = true; S.pts.material.size = 1.4; }
@@ -65733,7 +65739,7 @@ function gjinraTex(kind) { const cv = document.createElement('canvas'), W = cv.w
   q.globalCompositeOperation = 'destination-out'; for (let x = 0; x < W; x += 26) { q.beginPath(); q.moveTo(x, Hh); q.lineTo(x + 13, Hh - 18); q.lineTo(x + 26, Hh); q.fill(); } q.globalCompositeOperation = 'source-over';
   const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t; }
 function gjinraBuild() {
-  const TAU = Math.PI * 2, A = GJINRA, px = gpeakX(), pz = GPEAK.z, cxW = px + A.dx, czW = pz + A.dz, c = Math.cos(A.yaw), s = Math.sin(A.yaw), Y0 = A.y;
+  const TAU = Math.PI * 2, A = GJINRA, px = gpeakX(), pz = GPEAK.z, cxW = px + A.dx, czW = pz + A.dz, c = Math.cos(A.yaw), s = Math.sin(A.yaw), Y0 = hsF() ? Math.round(rwHeight(px + A.dx, pz + A.dz)) + 1 : A.y;     /* FALLEN: it sits on the mountain's flank, its island sunk in the slope */
   const Wx = (x, z) => cxW + x * c + z * s, Wz = (x, z) => czW - x * s + z * c;
   const g = new THREE.Group(); g.position.set(cxW, 0, czW); g.rotation.y = A.yaw; scene.add(g); A.g = g;
   const MG = new Map(), _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _v = new THREE.Vector3(), _one = new THREE.Vector3(1, 1, 1), boxes = [], tris = [];
@@ -65786,7 +65792,7 @@ function gjinraBuild() {
     for (let x = -3; x <= 3; x += .55) jvesPut(put, M, ['round', 'gourd', 'tall', 'spiral', 'crystal'][Math.round((x + 3) / .55) % 5], x, Y + 1.15, DR - .35, .8, x);
     A.goods = [{ name: 'a flask of Jinra', kind: 'round', price: null }, { name: 'refined Jinra', kind: 'spiral', price: null }, { name: 'a Jinra crystal', kind: 'crystal', price: null }]; }
   // ---- THE FLOATING STONES: from the lookout's deck up to the island's edge, a spiral of flat-topped rocks, each a jump up ----
-  { const L0 = [px + 4.2, GPEAK.top + 8, pz + 4.2], E = [Wx(0, dz1 + 3.5), Y0, Wz(0, dz1 + 3.5)], n = Math.ceil((E[1] - L0[1]) / 2.1), stones = [];
+  if (!hsF()) { const L0 = [px + 4.2, GPEAK.top + 8, pz + 4.2], E = [Wx(0, dz1 + 3.5), Y0, Wz(0, dz1 + 3.5)], n = Math.ceil((E[1] - L0[1]) / 2.1), stones = [];
     for (let i = 1; i <= n; i++) { const t = i / (n + 1), sw = Math.sin(t * Math.PI) * 9, dxx = E[0] - L0[0], dzz = E[2] - L0[2], dl = Math.hypot(dxx, dzz), nx = -dzz / dl, nz = dxx / dl, x = L0[0] + dxx * t + nx * sw, z = L0[2] + dzz * t + nz * sw, y = L0[1] + (E[1] - L0[1]) * i / (n + .4), r = 1.25;
       stones.push([x, y, z]); const gs = ghRockGeo(7200 + i, r * 1.2, 1.6, r, 2); gs.rotateX(Math.PI); gs.translate(x - cxW, y - .5, z - czW); gs.rotateY(-A.yaw); put(gs, rockM); const tg = new THREE.CylinderGeometry(r * .95, r, .3, 12); tg.translate(x - cxW, y - .15, z - czW); tg.rotateY(-A.yaw); put(tg, grass);
       boxes.push({ minx: x - r * .8, maxx: x + r * .8, miny: y - 1.4, maxy: y, minz: z - r * .8, maxz: z + r * .8 }); const N = 10; for (let k = 0; k < N; k++) { const a0 = k / N * TAU, a1 = (k + 1) / N * TAU; tris.push(x, y + .01, z, x + Math.sin(a0) * r * .85, y + .01, z + Math.cos(a0) * r * .85, x + Math.sin(a1) * r * .85, y + .01, z + Math.cos(a1) * r * .85); } }
@@ -65796,11 +65802,11 @@ function gjinraBuild() {
   for (const b of boxes) BOXES.push(b);
   for (let i = 0; i < tris.length; i += 9) { const q = tris.slice(i, i + 9); triAdd(...q); triAdd(q[0], q[1], q[2], q[6], q[7], q[8], q[3], q[4], q[5]); }
   A.stat.draws = draws + 1;
-  console.log('[melee] the Jinra refinery (procedural): ' + A.stat.draws + ' draws, island top ' + Y0 + ' m, globe at ' + GY.toFixed(0) + ' m, ' + A.stat.stones + ' floating stones from the lookout');
+  console.log('[melee] the Jinra refinery (procedural): ' + A.stat.draws + ' draws, island top ' + Y0 + ' m, globe at ' + GY.toFixed(0) + ' m, ' + A.stat.stones + ' floating stones from the lookout (' + AGE.st + ')');
 }
 // the hook for what it sells (his to flesh out): a chime and a log, nothing taken yet
 function gjinraBuy(item) { snd('clang', { g: .6, r: 2.2 }); console.log('[melee] jinra shop: asked for ' + (item && item.name)); return 0; }
-function gjinraStep(dt, t) { const A = GJINRA; if (!A.g) return; if (A.fall) A.fall.material.opacity = .45 + .12 * Math.sin(t * 3.1); A.st = (A.st || 0) - dt;
+function gjinraStep(dt, t) { const A = GJINRA; if (!A.g) return; if (hsF()) { if (A.fall) A.fall.visible = false; return; } if (A.fall) A.fall.material.opacity = .45 + .12 * Math.sin(t * 3.1); A.st = (A.st || 0) - dt;
   if (A.st <= 0) { A.st = .14; if (A.fallTop) spkBurst(A.fallTop[0], A.fallTop[1] - Math.random() * 30, A.fallTop[2], 2, { col: [.55, 1, .8], spread: 1.2, size: .1, life: .7 }); if (A.smokeAt) spkBurst(A.smokeAt[0], A.smokeAt[1], A.smokeAt[2], 1, { col: [.7, 1, .85], spread: .6, size: .16, life: 1.2 }); }
   if (A.stones && A.g) { } }
 // THE PEAK (his, after m1475: "another element of height... a hill, a mountain on the top up there... a lookout tower at the very top"): a
@@ -65889,7 +65895,7 @@ function gpeakBuild() {
 }
 // the bell rings, the brazier smokes
 function gpeakHit(x, y, z, rad) { const A = GPEAK; if (!A.bell || !inHome() || A.hc > 0) return 0; const [bx, by, bz] = A.bell; if (Math.hypot(x - bx, y - by, z - bz) > .9 + rad) return 0; A.hc = .25; snd('clang', { g: 1, r: .45, x: bx, z: bz }); spkBurst(bx, by, bz, 16, { col: [1, .85, .4], spread: 3, size: .1, life: .5 }); return 1; }
-function gpeakStep(dt) { const A = GPEAK; if (!A.g) return; A.hc = (A.hc || 0) - dt; if (A.fireAt) { A.ft = (A.ft || 0) - dt; if (A.ft <= 0) { A.ft = .12; spkBurst(A.fireAt[0], A.fireAt[1], A.fireAt[2], 2, { col: [1, .6, .2], spread: .8, size: .12, life: .6 }); } } }
+function gpeakStep(dt) { const A = GPEAK; if (!A.g) return; if (hsF()) A.fireAt = null; A.hc = (A.hc || 0) - dt; if (A.fireAt) { A.ft = (A.ft || 0) - dt; if (A.ft <= 0) { A.ft = .12; spkBurst(A.fireAt[0], A.fireAt[1], A.fireAt[2], 2, { col: [1, .6, .2], spread: .8, size: .12, life: .6 }); } } }
 // THE WATER-MILL TOWER (his ref `images/korajin/ref/water_mill_1.jpg`, after m1468): on a sandy ISLAND in the stream below the home, a
 // square stone BASE with an arched race through it and a WATERWHEEL turning in it, water pouring over it; a tall tapering cream TOWER
 // painted with the red sun-spiral; a ring gallery and a red-capped LANTERN at the top with a ROTOR of red sails turning round it; timber
@@ -66072,11 +66078,11 @@ function gmillHit(x, y, z, rad) { const A = GMILL; if (!A.hub || !inHome() || A.
   if (A.draw) { const [wx, wy, wz] = A.draw.winch; if (Math.hypot(x - wx, y - wy, z - wz) < 1.3 + rad) { A.hc = .5; A.draw.want = A.draw.want ? 0 : 1; snd('clang', { g: .9, r: .6, x: wx, z: wz }); spkBurst(x, y, z, 14, { col: [1, .8, .4], spread: 3, size: .1, life: .4 }); camShake(.05); return 1; } }
   const [hx, hy, hz] = A.hub; if (Math.hypot(x - hx, z - hz) > 3.2 + rad || Math.abs(y - hy) > 3 + rad) return 0;
   A.hc = .4; A.jam = !A.jam; snd('clang', { g: 1, r: A.jam ? .5 : .8, x: hx, z: hz }); spkBurst(x, y, z, 20, { col: [1, .8, .4], spread: 4, size: .12, life: .5 }); camShake(.08); return 1; }
-function gmillStep(dt, t) { const A = GMILL; if (!A.g) return; A.hc = (A.hc || 0) - dt; A.wv = (A.wv == null ? 1.1 : A.wv) + ((A.jam ? 0 : 1.1) - (A.wv == null ? 1.1 : A.wv)) * Math.min(1, dt * (A.jam ? 6 : 1.2)); if (A.wheel) A.wheel.rotation.z -= dt * A.wv;
+function gmillStep(dt, t) { const A = GMILL; if (!A.g) return; if (hsF()) { if (A.fall && A.fall.visible) { A.fall.visible = false; A.g.traverse(o => { if (o.isMesh && o.material && o.material.map && o.material.transparent && o.material.depthWrite === false && o.material.isMeshBasicMaterial) o.visible = false; }); } A.splash = null; A.jam = true; } A.hc = (A.hc || 0) - dt; A.wv = (A.wv == null ? 1.1 : A.wv) + ((A.jam ? 0 : 1.1) - (A.wv == null ? 1.1 : A.wv)) * Math.min(1, dt * (A.jam ? 6 : 1.2)); if (A.wheel) A.wheel.rotation.z -= dt * A.wv;
   if (A.draw) { const D = A.draw, u0 = D.up; D.up += Math.sign(D.want - D.up) * Math.min(Math.abs(D.want - D.up), dt * .45); D.g.rotation.z = -D.up * 1.35;
     for (const o of D.chains) { const th = D.up * 1.35, a = new THREE.Vector3(D.X1 - D.L * Math.cos(th), D.ya + D.L * Math.sin(th), D.z0 + o.userData.zz), b = new THREE.Vector3(D.X1 + .2, D.ya + 3.3, D.z0 + o.userData.zz), d = b.clone().sub(a); o.position.copy(a).addScaledVector(d, .5); o.scale.y = d.length(); o.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); }
     const i = BOXES.indexOf(D.box), down = D.up < .08; if (down && i < 0) { BOXES.push(D.box); boxGrid(); } else if (!down && i >= 0) { BOXES.splice(i, 1); boxGrid(); } if (Math.abs(u0 - D.want) > .001 && Math.abs(D.up - D.want) < .001) snd('thud', { g: .9, r: .6, x: D.winch[0], z: D.winch[2] }); }
-  if (A.splash) { A.st = (A.st || 0) - dt; if (A.st <= 0) { A.st = .09; spkBurst(A.splash[0] + (Math.random() - .5) * .8, A.splash[1], A.splash[2] - Math.random() * .5, 3, { col: [.88, .95, 1], spread: 2.4, size: .08, life: .45 }); } } if (A.rotor) A.rotor.rotation.y += dt * .35; if (A.fall) A.fall.map.offset.y = (A.fall.map.offset.y + dt * 1.6) % 1; }
+  if (A.splash) { A.st = (A.st || 0) - dt; if (A.st <= 0) { A.st = .09; spkBurst(A.splash[0] + (Math.random() - .5) * .8, A.splash[1], A.splash[2] - Math.random() * .5, 3, { col: [.88, .95, 1], spread: 2.4, size: .08, life: .45 }); } } if (A.rotor && !hsF()) A.rotor.rotation.y += dt * .35; if (A.fall) A.fall.map.offset.y = (A.fall.map.offset.y + dt * 1.6) % 1; }
 // THE MERCHANT SHOP (his ref `images/korajin/ref/merchant_shop_1.jpg`, after m1459): high on a sandstone BUTTE that rises out of the canyon's
 // WEST rim upstream of the home, its deck jutting over the drop toward the valley. A two-storey timber-and-stone shop on a plank deck,
 // under two huge curved BONE ARCHES holding a red SAIL canopy; teal and pink awnings; the round target SIGN in a wheel; the tall target
@@ -66220,6 +66226,7 @@ async function buildHome() {
   if (GMILL.on && H.style !== 'lake') try { gmillBuild(); } catch (e) { console.error('[melee] water mill', e); note('MILL BUILD THREW'); }
   if (GPEAK.on && H.style !== 'lake') try { gpeakBuild(); } catch (e) { console.error('[melee] the peak', e); note('PEAK BUILD THREW'); }
   if (GJINRA.on && GPEAK.on && H.style !== 'lake') try { gjinraBuild(); } catch (e) { console.error('[melee] jinra refinery', e); note('JINRA BUILD THREW'); }
+  if (H.style !== 'lake') { for (const P of [GHOME, GMERCH, GMILL, GPEAK, GJINRA]) hsFallen(P.g); if (hsF()) { for (const [L] of GHOME.lights || []) L.intensity = 0; GHOME.lights = []; if (GHOME.smoke) GHOME.smoke.pts.visible = false; } }     // FALLEN: weathered, unlit
   else try { const g = await loadGLB(H.hut.file, 'loading the refuge');
     const m = g.scene, drop = []; m.traverse(o => { if (o.isLight) drop.push(o); }); for (const o of drop) o.removeFromParent();
     m.updateMatrixWorld(true); const bb = new THREE.Box3(); m.traverse(o => { if (o.isMesh && o.name !== 'collider' && o.geometry) { o.geometry.computeBoundingBox(); bb.union(o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld)); } });
