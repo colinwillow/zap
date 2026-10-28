@@ -29,7 +29,7 @@ His first complaint was an invisible collider, so the last pass measures every z
   of the props only the lower crate and the barrel are solid. **Nothing else on the ship is solid**: the posts, rails, roof, cargo and helm
   are walk-through, and no box exists where nothing is drawn.
 The zeppelin detail passes end here (4-10); the loop resumes the table at the Flying Ship House. Shipped unverified.
-## m15xx -- THE DOJO at 20 FPS: 1.62M triangles were grass; the invisible rim; wood and stone stop shining
+## m1600 -- THE DOJO at 20 FPS: 1.62M triangles were grass; the invisible rim; wood and stone stop shining
 His: *"20 frames per second... look at the draw calls and the triangles... a roughness map or displacement on the wood and stone, it looks shiny...
 an invisible collider, I can't go anywhere, running into and hanging on an invisible thing, maybe left over from the original dojo."*
 (His chip: 82 DC, 1,585k tris.)

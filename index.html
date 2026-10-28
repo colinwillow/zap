@@ -10025,12 +10025,12 @@ function texGet(name) { const C = TEXLIB.cache; if (C[name]) return C[name];
   const t = new THREE.TextureLoader().load(A('textures/' + name + '.webp')); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = TEXLIB.aniso; return (C[name] = t); }
 function triMatG(name, o) { return triMat(name, o); }
 function triMat(name, o) { o = o || {}; const m = new THREE.MeshStandardMaterial({ color: o.color != null ? o.color : 0xffffff, roughness: o.rough != null ? o.rough : .8, metalness: o.metal || 0, map: texGet(name), side: o.side || THREE.FrontSide });
-  const ts = 1 / (o.scale || 2), bump = o.bump != null ? o.bump : /wood|stone|sandstone|roof|marble/.test(name) ? 1.4 : 0;     /* m15xx: relief on by default for the wood and stone maps */
+  const ts = 1 / (o.scale || 2), bump = o.bump != null ? o.bump : /wood|stone|sandstone|roof|marble/.test(name) ? 1.4 : 0;     /* m1600: relief on by default for the wood and stone maps */
   m.onBeforeCompile = sh => { sh.uniforms.uTS = { value: ts };     /* m1469: `local` maps in OBJECT space, for a model that moves (world-space triplanar crawls across it) */
     sh.vertexShader = 'varying vec3 vTriW; varying vec3 vTriN;\n' + sh.vertexShader.replace('#include <worldpos_vertex>', o.local ? '#include <worldpos_vertex>\n  vTriW = transformed; vTriN = normalize(objectNormal);' : '#include <worldpos_vertex>\n  vTriW = (modelMatrix * vec4(transformed, 1.0)).xyz; vTriN = normalize(mat3(modelMatrix) * objectNormal);');
     sh.fragmentShader = 'uniform float uTS; varying vec3 vTriW; varying vec3 vTriN;\n' + sh.fragmentShader.replace('#include <map_fragment>',
       'vec3 tbw = pow(abs(normalize(vTriN)), vec3(4.0)); tbw /= (tbw.x + tbw.y + tbw.z); vec4 sampledDiffuseColor = texture2D(map, vTriW.zy * uTS) * tbw.x + texture2D(map, vTriW.xz * uTS) * tbw.y + texture2D(map, vTriW.xy * uTS) * tbw.z; diffuseColor *= sampledDiffuseColor; float triH = dot(sampledDiffuseColor.rgb, vec3(.299, .587, .114));');
-    // m15xx (his: *"put a roughness map or a displacement map on the wood texture and the stone -- it looks shiny"*): the merged meshes carry no UVs, so a
+    // m1600 (his: *"put a roughness map or a displacement map on the wood texture and the stone -- it looks shiny"*): the merged meshes carry no UVs, so a
     // stock bumpMap cannot work; the RELIEF comes from the triplanar sample itself -- its brightness is the height, the screen derivatives of it tilt
     // the normal (three's perturbNormalArb), so the grain, the grout and the knots catch the light; and the dark cracks are ROUGHER than the faces
     if (bump > 0) { sh.uniforms.uTB = { value: bump };
@@ -10066,12 +10066,12 @@ function plantPart(geo, col, sw, fl, gl) { const q = geo.index ? geo.toNonIndexe
 function plantRnd(s) { return () => (s = (s * 16807) % 2147483647) / 2147483647; }
 function plantBlob(r, seed, d = 1) { const g = new THREE.IcosahedronGeometry(r, d), P = g.attributes.position, R = plantRnd(seed), seen = new Map();     // a lumpy blob (shared verts move together)
   for (let i = 0; i < P.count; i++) { const k = P.getX(i).toFixed(3) + P.getY(i).toFixed(3) + P.getZ(i).toFixed(3); if (!seen.has(k)) seen.set(k, .82 + R() * .3); const f = seen.get(k); P.setXYZ(i, P.getX(i) * f, P.getY(i) * f * .85, P.getZ(i) * f); } g.computeVertexNormals(); return g; }
-function plantTube(pts, r0, r1, seg = 8, len = 12) { const c = new THREE.CatmullRomCurve3(pts.map(p => new THREE.Vector3(...p))), g = new THREE.TubeGeometry(c, len, 1, seg, false), P = g.attributes.position;     /* m15xx: `len` = segments along it (12 was the only choice; a 3-point blade needs 4) */
+function plantTube(pts, r0, r1, seg = 8, len = 12) { const c = new THREE.CatmullRomCurve3(pts.map(p => new THREE.Vector3(...p))), g = new THREE.TubeGeometry(c, len, 1, seg, false), P = g.attributes.position;     /* m1600: `len` = segments along it (12 was the only choice; a 3-point blade needs 4) */
   const ring = seg + 1; for (let i = 0; i < P.count; i++) { const t = Math.floor(i / ring) / len, p = c.getPointAt(Math.min(1, t)), r = r0 + (r1 - r0) * t; P.setXYZ(i, p.x + (P.getX(i) - p.x) * r, p.y + (P.getY(i) - p.y) * r, p.z + (P.getZ(i) - p.z) * r); }
   g.computeVertexNormals(); return g; }
 function plantMix(c1, c2, R) { const a = new THREE.Color(c1), b = new THREE.Color(c2); return () => { const t = R(); return [a.r + (b.r - a.r) * t, a.g + (b.g - a.g) * t, a.b + (b.b - a.b) * t]; }; }
 // THE TYPES. h = height (m, at scale 1), r = how near counts as touching it, stiff = how far the wind moves its tips, bend = how far a blow does
-PLANT.noShadow = ['tallgrass', 'grass', 'carpet', 'flowers', 'frond', 'stones', 'sticks', 'fern', 'jinbulb'];     // m15xx
+PLANT.noShadow = ['tallgrass', 'grass', 'carpet', 'flowers', 'frond', 'stones', 'sticks', 'fern', 'jinbulb'];     // m1600
 const PLANTK = {
   cherry: { h: 6.5, r: 1.4, stiff: .55, bend: .9, make() { const R = plantRnd(11), H = 6.5, sw = (x, y) => Math.pow(Math.max(0, y / H), 1.6), parts = [];
     parts.push(plantPart(plantTube([[0, 0, 0], [.2, 1.4, .1], [-.1, 2.6, .2], [.3, 3.6, 0]], .36, .16), 0x5a3a2c, sw));
@@ -10153,7 +10153,7 @@ function plantFlush(g, rec) { const by = {}; for (const r of rec) (by[r.kind] = 
     const m = new THREE.InstancedMesh(geo, plantMat(), rs.length), mx = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(); m.name = "plant:" + kind;
     rs.forEach((r, i) => { mx.compose(new THREE.Vector3(r.x, r.y, r.z), q.setFromEuler(e.set(0, r.yaw, 0)), new THREE.Vector3(r.s, r.s, r.s)); m.setMatrixAt(i, mx);
       if (!Kd.K.nohit) PLANT.list.push({ at, i, x: r.x, y: r.y, z: r.z, h: Kd.K.h * r.s, r: Kd.K.r * r.s, bend: Kd.K.bend, bx: 0, bz: 0, vx: 0, vz: 0, m }); });
-    m.castShadow = !PLANT.noShadow.includes(kind); m.receiveShadow = true; m.frustumCulled = false; g.add(m); meshes.push(m); } return meshes; }     /* m15xx: ground cover casts NO shadow (the shadow pass drew every blade a second time) */
+    m.castShadow = !PLANT.noShadow.includes(kind); m.receiveShadow = true; m.frustumCulled = false; g.add(m); meshes.push(m); } return meshes; }     /* m1600: ground cover casts NO shadow (the shadow pass drew every blade a second time) */
 function plantDrop(meshes) { PLANT.list = PLANT.list.filter(P => !meshes.includes(P.m)); }
 function plantPush(P, dx, dz, imp) { const L = Math.hypot(dx, dz) || 1; P.vx += dx / L * imp * P.bend; P.vz += dz / L * imp * P.bend; }
 function plantHit(x, y, z, rad) { if (!PLANT.list.length) return 0; let n = 0; const p = player.pos;
@@ -11310,7 +11310,7 @@ function arenaStage() {
     camera.far = Math.max(camera.far, 900); camera.updateProjectionMatrix();     // m1366: the peaks moved out to 380-470 m
     CWALL.g = g; COVER.meshes = []; COVER.boxes = []; ARENA.r = 60; return; }
   if (DOJO.want) { const W = R + 2.2;
-    // m15xx (his: *"an imaginary invisible collider -- I can't go anywhere, running into and hanging on an invisible thing; maybe left over from the
+    // m1600 (his: *"an imaginary invisible collider -- I can't go anywhere, running into and hanging on an invisible thing; maybe left over from the
     // original dojo"*): the rim was 48 INVISIBLE 2.8 m boxes 6 m tall at W+.2, their inner face ~2.4 m INSIDE the visible rail, across the gates
     // too -- a strip of stone you could see and not reach, gates you could not walk out of, and 6 m tops to hang on. Now the guard IS the rail:
     // 96 thin boxes at the rail's radius, the rail's height, open where the rail is open (the four gates) and where the altar routes leave.
@@ -11318,7 +11318,7 @@ function arenaStage() {
       if ((deg > 356 || deg < 12) || (deg > 168 && deg < 184)) continue; const x = Math.sin(a) * (W + 1.15), z = Math.cos(a) * (W + 1.15), s = .62;
       BOXES.push({ minx: x - s, maxx: x + s, miny: 0, maxy: 1.15, minz: z - s, maxz: z + s, noCam: 1 }); }
     dojoBuild(g, W); COVER.blocks = []; coverBlocks(g);
-    for (const Rk of DOJO.racks || []) BOXES.push({ minx: Rk.x - .45, maxx: Rk.x + .45, miny: 0, maxy: 3, minz: Rk.z - 1.3, maxz: Rk.z + 1.3 });     /* m15xx: the racks are solid (the dais is walkable to the rail now) */
+    for (const Rk of DOJO.racks || []) BOXES.push({ minx: Rk.x - .45, maxx: Rk.x + .45, miny: 0, maxy: 3, minz: Rk.z - 1.3, maxz: Rk.z + 1.3 });     /* m1600: the racks are solid (the dais is walkable to the rail now) */
     const pad = (x, z, r, hex) => { const m = new THREE.Mesh(new THREE.RingGeometry(r * .78, r, 48), new THREE.MeshBasicMaterial({ color: hex, transparent: true, opacity: .7, toneMapped: false })); m.rotation.x = -Math.PI / 2; m.position.set(x, .03, z); g.add(m); return m; };
     ARENA.pad = pad(ARENA.spawnAt[0], ARENA.spawnAt[1], 2.2, 0xff4d6d); return; }     // m1394: THE DOJO instead of the stadium
   // m971: the room's floor, a ring from the dais step outward, polished tiles, a little translucent over the mirrored room
