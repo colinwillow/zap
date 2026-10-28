@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the SPIDER-BOT HANGAR, pass 2 (DESTRUCTIBLE TO THE GROUND)
+- The Rampart's machinery (`restorePieces` into per-piece rigs run BACKWARDS, `restoreRide` parking each piece's boxes, a `sup` list hit
+  through `bldHit` -> `sphangBreak`). Pieces: `wW` / `wE` (long walls, frieze, studs, banners, seam), `back`, `roof` (roof, fascia, ridge,
+  finials, tie beams and king posts, the beacon and the mirror; the roof's walkable tris ride it) and `gate` (jambs, lintel, front frieze,
+  emblem, lanterns). The footing skirt, the pods, the sphinxes, the nobori and the braziers stay.
+- Keystones: a mint Jinra SEAM in a gold frame at the outer foot of each long wall and the back wall, 6 blows each. Either long wall down
+  drops the roof into the hall (.6 s), the gate follows (.7 s). All three walls down and it is RAZED: the pods crack and spill Jinra, the
+  live spiders burst, and `sphangStep` skips the hatch for good. A spider climbing a wall that falls drops off it.
+- The front panels are still `cwallBuild` and stay standing until shot; `sphangClear` drops the rigs and their ride tris.
+- HEADLESS NOTE: the rigs step slowly in the headless page (t was .5 after 4.5 s); a 16 s wait shows the whole collapse.
+Render-checked headless: intact, then all three seams cut (walls slumped, roof down on them, gate down, pods gone). Shipped unverified.
+
 ## m1635 -- THE RE-PASS: the SPIDER-BOT HANGAR, pass 1 (ENEMY look, classical)
 - The grey concrete half-cylinder vault is gone for ENEMY_STYLE's classical grammar on the same footprint: four sandstone-block walls 3.6 m
   (each wall's box is its mesh), a .3 footing skirt (a step), a black lacquer frieze with gold studs, and `bldRoof`'s curved hip roof in

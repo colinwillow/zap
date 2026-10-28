@@ -21790,6 +21790,7 @@ function bldHit(x, y, z, rad, dmg) {
   if (lvgHit(x, y, z, rad)) return 1;     // m1356: the grid level's button and candle
   if (pieceHit(x, y, z, rad, dmg)) return 1;     // m1354: rails, balusters (S3b)
   if (sphangHit(x, y, z, rad, dmg)) return 1;     // m1161: the spider bots
+  if (sphangBreak(x, y, z, rad)) return 1;     // RE-PASS 2 (m@X4@): the hangar's wall seams
   if (barrHit(x, y, z, rad, dmg)) return 1;     // m1184: the drilling robot samurai
   if (FSHIP.on && FSHIP.on.cans) for (const C of FSHIP.on.cans) { if (C.dead || C.hc > 0) continue; const W = new THREE.Vector3(); C.g.getWorldPosition(W); if (Math.hypot(x - W.x, y - W.y, z - W.z) > 1.1 + rad) continue;
     C.hc = .25; C.hp -= Math.max(.5, dmg || 1); spkBurst(W.x, W.y + .4, W.z, 12, { col: [1, .8, .4], spread: 3, size: .1, life: .35 }); snd('clang', { g: .8, r: .8, x: W.x, z: W.z });
@@ -23728,6 +23729,9 @@ function sphangBuild() {
   for (const sz of [-1, 1]) add(new THREE.BoxGeometry(hw * 2 - t * 2, fr, t), E.lacquer, cx, Hb + fr / 2, cz + sz * (hd - t / 2), 1);
   for (let z = -hd + .6; z <= hd - .5; z += 1.2) for (const sx of [-1, 1]) add(new THREE.SphereGeometry(.06, 6, 4), E.gold, cx + sx * (hw + .01), Hb + fr / 2, cz + z, 0);
   for (const sx of [-1, 1]) add(new THREE.BoxGeometry(t + .04, .08, hd * 2 + .04), E.gold, cx + sx * (hw - t / 2), Hb + .04, cz, 0);
+  // m@X4@ (RE-PASS 2): a JINRA SEAM in a gold frame at the outer foot of each long wall and the back wall -- the keystones (`sphangBreak`)
+  for (const sx of [-1, 1]) { add(new THREE.BoxGeometry(.12, 2.4, .9), E.gold, cx + sx * (hw + .06), 1.5, cz, 0); add(new THREE.BoxGeometry(.1, 2, .5), E.jin, cx + sx * (hw + .12), 1.5, cz, 0); }
+  add(new THREE.BoxGeometry(.9, 2.4, .12), E.gold, cx, 1.5, cz - hd - .06, 0); add(new THREE.BoxGeometry(.5, 2, .1), E.jin, cx, 1.5, cz - hd - .12, 0);
   // THE GATE: breakable sandstone panels either side (cwallBuild), lacquer jambs, a deep lintel with a gold band and the EMBLEM on the frieze
   const jw = .3, pl = hw - t - dw / 2 - jw;
   for (const sx of [-1, 1]) { O.walls.push(cwallBuild(g, T, cx + sx * (dw / 2 + jw + pl / 2), fz - t / 2, pl, t, 0, Hb, O)); add(new THREE.BoxGeometry(jw, dh, t + .1), E.lacquer, cx + sx * (dw / 2 + jw / 2), dh / 2, fz - t / 2, 1);
@@ -23760,7 +23764,6 @@ function sphangBuild() {
   for (const sx of [-1, 1]) for (const z of [-3, 3]) enemyBanner(putM, E, cx + sx * (hw + .03), Hb - .1, cz + z, sx * Math.PI / 2, 1.2, 2.8);
   for (const sx of [-1, 1]) enemyBanner(putM, E, cx + sx * 2.2, Hb - .1, cz - hd - .03, Math.PI, 1.2, 2.8);
   const fires = []; for (const sx of [-1, 1]) { const bz = enemyBrazier(E, 1.2), x = cx + sx * (hw + 1.8), z = cz - hd - 1.8; bz.position.set(x, 0, z); g.add(bz); fires.push([x, bz.userData.top, z, bz.userData.flame]); }
-  bldTris(O, tris);
   for (const b of O.boxes) BOXES.push(b); boxGrid();
   // THE SPIDERS
   const sp = []; for (let i = 0; i < A.n; i++) { const S = spiderMake(g); S.a = i / A.n * 6.28; sp.push(S); }
@@ -23775,8 +23778,35 @@ function sphangBuild() {
     const fd = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, .9, 4), E.iron); fd.position.set(0, 1.55, .35); fd.rotation.x = Math.PI / 2.3; dish.add(fd); }
   const pods = []; { const pm = new THREE.MeshStandardMaterial({ color: 0x0e2a24, emissive: ENEMY.pal.jin, emissiveIntensity: .8, roughness: .4, transparent: true, opacity: .85 });
     for (const [dx, dz] of [[-1.6, -3.5], [0, -4.2], [1.6, -3.5]]) { const p = add(new THREE.SphereGeometry(.55, 14, 10), pm.clone(), cx + dx, .95, cz + dz, 0, 1); p.scale.y = 1.3; pods.push(p); add(new THREE.CylinderGeometry(.6, .7, .4, 12), stoneD, cx + dx, .2 + .4, cz + dz, 0); add(new THREE.TorusGeometry(.62, .04, 6, 16).rotateX(Math.PI / 2), E.gold, cx + dx, .8, cz + dz, 0); } }
-  const nm = bldMergeStatic(g);
-  SPHANG.on = { g, O, bars: [], sp, door: [cx, cz + hd + 1.5], t: 0, beacon, dish, pods, fires, nm };
+  // ---- RE-PASS 2 (m@X4@): DESTRUCTIBLE TO THE GROUND (ENEMY RULES; the Rampart's machinery). Pieces: `wW` / `wE` (the long walls with
+  // their frieze, studs, banners and seam), `back` (the back wall, its emblem, banners and seam), `roof` (the roof, fascia, ridge, finials,
+  // the tie beams and king posts, the beacon and the mirror) and `gate` (the jambs, the lintel, the front frieze, the emblem, the lanterns).
+  // Six blows on a wall's seam and it SLUMPS outward into rubble; either long wall down drops the roof into the hall, and the gate after it;
+  // all three walls down and the hangar is RAZED -- the pods crack and no spider hatches again. The front panels stay breakable (cwall) ----
+  const pairs = []; for (const o of g.children.slice()) if (o.isMesh && o.userData.mg) { const m = o.material, tri = m.customProgramCacheKey && String(m.customProgramCacheKey()).startsWith('tri'); if (m.transparent || (m.map && !tri)) continue;
+    o.updateMatrix(); pairs.push([(o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()).applyMatrix4(o.matrix), m]); o.removeFromParent(); }
+  const cls = (c, sz) => { const dx = Math.abs(c.x - cx), dz = c.z - cz;
+    if (c.y > eY - .05 || (dx < hw - t - .01 && Math.abs(dz) < hd - t && c.y > 3)) return 'roof';
+    if (dz > hd - t - .05 && dz < hd + 1.2 && dx < 2.5 && c.y > .35) return 'gate';
+    if (c.y > .35 && dx > hw - t - .05 && dx < hw + .25 && Math.abs(dz) < hd + .1) return c.x < cx ? 'wW' : 'wE';
+    if (c.y > .35 && dz < -hd + t + .05 && dz > -hd - .25 && dx < hw) return 'back';
+    return null; };
+  const fall = (key, c, sz) => { const rn = ((Math.sin(c.x * 12.9898 + c.z) * 43758.5453) % 1 + 1) % 1 - .5;
+    if (key === 'roof') return { p: [c.x + rn * .4, c.y - (eY - .9), c.z], r: [rn * .16, 0, .14], hop: .2, at: .15 };
+    if (key === 'gate') return { p: [c.x, c.y - dh * .8, c.z + 1], r: [.5, 0, rn * .3], hop: .3, at: 0 };
+    if (key === 'back') return { p: [c.x, c.y - Hb * .72, c.z - 1.2], r: [-.45, 0, rn * .2], hop: .4, at: 0 };
+    const sx = key === 'wW' ? -1 : 1; return { p: [c.x + sx * 1.2, c.y - Hb * .72, c.z], r: [rn * .15, 0, -sx * .45], hop: .4, at: 0 }; };
+  const Rr = restoreRig(g, { lift: 0, dur: 2.4, bob: 0 }), pieces = restorePieces(Rr, g, pairs, cls, fall);
+  { const skip = new Set([...sp.map(S2 => S2.g), ...pods, ...O.meshes, ...Object.values(pieces)]), wb = new THREE.Box3(), wc = new THREE.Vector3(), ws = new THREE.Vector3();
+    for (const o of g.children.slice()) { if (skip.has(o)) continue; wb.setFromObject(o); if (wb.isEmpty()) continue; wb.getCenter(wc); wb.getSize(ws); const key = cls(wc, ws); if (key && pieces[key]) pieces[key].attach(o); } }
+  const nm = bldMergeStatic(g), rig = {}, bkey = b2 => b2.cw ? null : cls(new THREE.Vector3((b2.minx + b2.maxx) / 2, (b2.miny + b2.maxy) / 2, (b2.minz + b2.maxz) / 2), new THREE.Vector3(b2.maxx - b2.minx, b2.maxy - b2.miny, b2.maxz - b2.minz));
+  const rtris = []; for (let i = 0; i < tris.length; i += 9) rtris.push(tris.slice(i, i + 9));
+  for (const key of Object.keys(pieces)) { const Rk = rig[key] = restoreRig(g, { lift: 0, dur: 2.4, bob: 0 }); Rk.pieces = Rr.pieces.filter(P => P.obj === pieces[key]);
+    restoreRide(Rk, { up: { boxes: O.boxes.filter(b2 => bkey(b2) === key), tris: key === 'roof' ? rtris : [], climbs: [], bars: [], rings: [], objs: [], coins: [] } });
+    Rk.onSet = R2 => restoreRideSet(R2); Rk.goal = 1; restoreSet(Rk, 1); restoreRideSet(Rk, true); }
+  RESTORE.list.splice(RESTORE.list.indexOf(Rr), 1);
+  const sup = [{ key: 'wW', x: cx - hw - .1, z: cz, y0: 0, y1: 2.8, r: .9, hp: 6 }, { key: 'wE', x: cx + hw + .1, z: cz, y0: 0, y1: 2.8, r: .9, hp: 6 }, { key: 'back', x: cx, z: cz - hd - .1, y0: 0, y1: 2.8, r: .9, hp: 6 }];
+  SPHANG.on = { g, O, bars: [], sp, door: [cx, cz + hd + 1.5], t: 0, beacon, dish, pods, fires, nm, rig, pieces, sup, fell: {} };
   arenaBeam(cx, cz, [1, .4, .3], 1); snd('clang', { g: .7, r: .45 });
 }
 function sphangStep(dt) { const H = SPHANG.on; if (!H) return; H.t += dt; const A = SPHANG, [cx, cz] = A.at, Rr = A.loop;
@@ -23788,6 +23818,7 @@ function sphangStep(dt) { const H = SPHANG.on; if (!H) return; H.t += dt; const 
   for (const f of H.fires || []) { f[3].scale.set(1.2 * (.9 + Math.sin(H.t * 7 + f[0]) * .1), 1.2 * (.8 + Math.sin(H.t * 11 + f[2]) * .25), 1.2); if (Math.random() < dt * 3) spk(f[0] + (Math.random() - .5) * .4, f[1] + .3, f[2] + (Math.random() - .5) * .4, 0, 1.5 + Math.random(), 0, .1, .7, [.48, 1, .85]); }     // m1635: the braziers burn
   const step = (S, tx, tz, v) => { const P = S.g.position, dx = tx - P.x, dz = tz - P.z, d = Math.hypot(dx, dz), k = Math.min(d, v * dt) / Math.max(d, .01); P.x += dx * k; P.z += dz * k; if (d > .05) S.h = Math.atan2(dx, dz); return d; };
   for (const S of H.sp) { if (S.cool > 0) S.cool -= dt;
+    if (S.dead && H.razed) continue;     // m@X4@: razed, nothing hatches
     if (S.dead) { S.t -= dt; if (S.t <= 0) { S.dead = 0; S.hp = A.spHp; S.g.visible = true; S.st = 'home'; S.raidT = 4 + Math.random() * 6; const pod = H.pods[H.sp.indexOf(S) % H.pods.length].position; S.g.position.set(pod.x, S.y, pod.z); spkBurst(pod.x, 1, pod.z, 18, { col: [1, .35, .2], spread: 4, size: .14, life: .5 }); smokeAt(pod.x, 1, pod.z, 1, 1, [.6, .3, .25]); snd('swoosh', { g: .5, r: 1.3, x: pod.x, z: pod.z }); /* m1191: it HATCHES from its pod */ } continue; }
     S.t += dt; S.g.rotation.order = 'YXZ'; const P = S.g.position; let pitch = 0, lift = Math.abs(Math.sin(S.t * 9)) * .05;
     if (!S.st) { S.st = 'loop'; S.raidT = 3 + Math.random() * 8; }
@@ -23823,7 +23854,24 @@ function sphangHit(x, y, z, rad, dmg) { const H = SPHANG.on; if (!H) return 0;
     S.cool = .25; S.hp -= Math.max(.5, dmg || 1); spkBurst(P.x, P.y, P.z, 10, { col: [1, .8, .4], spread: 3, size: .1, life: .35 }); snd('clang', { g: .7, r: 1.4 + Math.random() * .2, x: P.x, z: P.z });
     if (S.hp <= 0) { S.dead = 1; S.t = SPHANG.spBack; S.g.visible = false; for (let k = 0; k < 3; k++) spkBurst(P.x, P.y, P.z, 20, { col: k ? [1, .55, .15] : [.9, .9, .85], spread: 6, size: .2, life: .7 }); smokeAt(P.x, P.y, P.z, 1.2, 1.2); snd('boom', { g: .7, r: 1.2, x: P.x, z: P.z }); camShake(.15); }
     return 1; } return 0; }
-function sphangClear() { const H = SPHANG.on; if (!H) return; bldClear(H); SPHANG.on = null; }
+// RE-PASS 2 (m@X4@): THE HANGAR COMES DOWN -- a blow on a wall's Jinra seam chips it; cut through, the wall slumps (`sphangFell`)
+function sphangBreak(x, y, z, rad) { const H = SPHANG.on; if (!H || !H.sup) return 0;
+  for (const P of H.sup) { if (P.cut || H.fell[P.key] || Math.hypot(x - P.x, z - P.z) > P.r + rad || y < P.y0 - .3 || y > P.y1 + .3) continue;
+    P.hp--; snd('thud', { g: .9, r: .8, x, z }); spkBurst(x, y, z, 12, { col: [.48, 1, .85], spread: 2, size: .12, life: .5 }); camShake(.06);
+    if (P.hp <= 0) { P.cut = 1; snd('crack', { g: 1.2, r: .45, x, z }); sphangFell(H, P.key); } return 1; }
+  return 0; }
+function sphangFell(H, key) { if (H.fell[key] || SPHANG.on !== H || !H.rig[key]) return; H.fell[key] = 1; restorePlay(H.rig[key], 0); camShake(.6); const pc = H.pieces[key].position;
+  snd('boom', { g: 1.3, r: .4, x: pc.x, z: pc.z }); jinraEmit(pc.x, 2, pc.z, 30);
+  setTimeout(() => { if (SPHANG.on !== H) return; snd('thud', { g: 1.4, r: .35, x: pc.x, z: pc.z }); camShake(.4); for (let i = 0; i < 5; i++) spkBurst(pc.x + (Math.random() - .5) * 5, .5, pc.z + (Math.random() - .5) * 5, 16, { col: [.8, .72, .55], spread: 6, size: .5, life: 1.4 }); }, 900);
+  for (const S of H.sp) if (!S.dead && (S.st === 'up' || S.st === 'top' || S.st === 'down') && S.T && S.T.maxy < -100) { S.st = 'drop'; S.vy = 0; }     // its wall fell out from under it
+  if ((key === 'wW' || key === 'wE') && !H.fell.roof) setTimeout(() => sphangFell(H, 'roof'), 600);
+  if (key === 'roof' && !H.fell.gate) setTimeout(() => sphangFell(H, 'gate'), 700);
+  if (H.fell.wW && H.fell.wE && H.fell.back && !H.razed) { H.razed = 1;     // RAZED: the pods crack, the stolen Jinra spills out
+    setTimeout(() => { if (SPHANG.on !== H) return; for (const p of H.pods) { p.visible = false; jinraEmit(p.position.x, 1, p.position.z, 20); spkBurst(p.position.x, 1, p.position.z, 24, { col: [.48, 1, .85], spread: 5, size: .2, life: .8 }); }
+      snd('crack', { g: 1.2, r: .6 }); for (const S of H.sp) if (!S.dead) { S.dead = 1; S.g.visible = false; const P = S.g.position; spkBurst(P.x, P.y, P.z, 20, { col: [1, .55, .15], spread: 6, size: .2, life: .7 }); smokeAt(P.x, P.y, P.z, 1.2, 1.2); } }, 1500); }
+  boxGrid(); }
+function sphangClear() { const H = SPHANG.on; if (!H) return; for (const Rk of Object.values(H.rig || {})) { const i = RESTORE.list.indexOf(Rk); if (i >= 0) RESTORE.list.splice(i, 1); if (Rk.ride) { bldTrisDrop(Rk.ride.tb); bldTrisDrop(Rk.ride.tu); } }
+  bldClear(H); SPHANG.on = null; boxGrid(); }
 // m1166: THE SKY BRIDGES (BUILDINGS.md Set 2 #14, pass 1) -- the first set LINKED AT HEIGHT. Each span is built only if both of its ends are
 // standing when you spawn them (spawn the buildings first): a rope bridge from the Watchtower's lookout across over the Hall to the
 // Gatehouse deck; a plank bridge from the Gatehouse deck down between the torii's pillars to the Market roof; a short bridge from the
