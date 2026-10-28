@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the JIN LIGHTHOUSE, pass 1 (HERO look)
+## m1666 -- THE RE-PASS: the JIN LIGHTHOUSE, pass 1 (HERO look)
 - The hero kit (`korMats`): timber for the stair, ramp, desk, rail posts; warm `stone_blocks` for the shaft and roof slab; kit bronze for
   the bands, lantern posts, cap and crank; the kit red cloth (`K.red`) on the four nobori; the kit lamp. The JIN was cyan (0x7ff0ff)
   everywhere -- the crystal, the beam, the rune bands, the mon, and five `setHex` calls in `lhouseStep` -- now the true Jin mint
