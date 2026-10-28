@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- GREEN FIRE: smaller, shorter, and every tongue turned (his: "a little tall, no rotation -- random rotation, smaller")
+## m1691 -- GREEN FIRE: smaller, shorter, and every tongue turned (his: "a little tall, no rotation -- random rotation, smaller")
 - `aR`: each particle carries its own angle, turned in the fragment shader (the corners outside the turned sprite discarded). It starts
   within +/-.7 rad and spins at up to +/-2.5 rad/s as it rises.
 - Size .42-.82 m -> .24-.5 m. The painted tongues are shorter (.86 -> .62 of the cell), their licks and core to match.
