@@ -21162,6 +21162,7 @@ function bldHit(x, y, z, rad, dmg) {
   if (ghouseBell(x, y, z, rad)) return 1;     // m1171: the Gatehouse alarm bell
   if (ghouseBreak(x, y, z, rad)) return 1;     // RE-PASS 2: its posts and torii pillars
   if (mktBell(x, y, z, rad)) return 1;     // RE-PASS 3: the market lookout's alarm bell
+  if (rampBreak(x, y, z, rad)) return 1;     // RE-PASS 2: the rampart's seams and bastion braziers
   if (ADOCK.on && ADOCK.on.dbell && !(ADOCK.on.dbT > .4)) { const D = ADOCK.on, B = D.dbell.position; if (Math.hypot(x - B.x, y - B.y, z - B.z) < .8 + rad) { D.dbT = 1; snd('clang', { g: 1, r: 1.3, x: B.x, z: B.z }); if (D.ss === 'docked') D.st = Math.min(D.st, .6); return 1; } }     // m1181: the dispatch bell
   if (siegeHit(x, y, z, rad, dmg)) return 1;     // m1213: the trebuchet
   if (rampHorn(x, y, z, rad)) return 1;     // m1242: the war horn
@@ -21981,8 +21982,12 @@ function rampBuild() {
   const add = (geo, m, x, y, z, solid) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; g.add(o);
     if (solid) { geo.computeBoundingBox(); const b = geo.boundingBox; O.boxes.push({ minx: x + b.min.x, maxx: x + b.max.x, miny: y + b.min.y, maxy: y + b.max.y, minz: z + b.min.z, maxz: z + b.max.z }); } return o; };
   // the two wall runs either side of the gateway, a coping on top, a footing course
-  for (const sx of [-1, 1]) { const L = hl - g2, x = cx + sx * (g2 + L / 2);
-    add(new THREE.BoxGeometry(L, H, A.T), stone, x, H / 2, cz, 1); add(new THREE.BoxGeometry(L, .5, A.T + .4), stoneD, x, .25, cz, 0); add(new THREE.BoxGeometry(L, .15, A.T + .2), stoneD, x, H + .075 - .15, cz, 0); }
+  // m@X4@ (RE-PASS 2): each run is FOUR SEGMENTS (a box each), so each can come down on its own; a glowing JINRA SEAM in a gold frame at the
+  // outer foot of each one is its keystone (`rampBreak`)
+  const nS = 4, sl = (hl - g2) / nS;
+  for (const sx of [-1, 1]) for (let j = 0; j < nS; j++) { const x = cx + sx * (g2 + sl * (j + .5));
+    add(new THREE.BoxGeometry(sl, H, A.T), stone, x, H / 2, cz, 1); add(new THREE.BoxGeometry(sl, .5, A.T + .4), stoneD, x, .25, cz, 0); add(new THREE.BoxGeometry(sl, .15, A.T + .2), stoneD, x, H + .075 - .15, cz, 0);
+    add(new THREE.BoxGeometry(.9, 2.4, .12), E.gold, x, 1.7, cz - ht - .06, 0); add(new THREE.BoxGeometry(.5, 2, .1), E.jin, x, 1.7, cz - ht - .12, 0); }
   // THE GATEWAY: a lintel the walkway runs over, a breakable panel filling the passage (smash it through), vermilion jambs
   const gH = 3.4 * k; add(new THREE.BoxGeometry(A.gate + .2, H - gH, A.T), stoneD, cx, (H + gH) / 2, cz, 1);
   O.walls.push(cwallBuild(g, T, cx, cz, A.gate, .6, 0, gH, O));
@@ -21994,6 +21999,7 @@ function rampBuild() {
   const bx = hl + A.bast / 2, bh = A.bH;
   for (const sx of [-1, 1]) { const x = cx + sx * bx; add(new THREE.BoxGeometry(A.bast, bh, A.bast), stone, x, bh / 2, cz, 1); add(new THREE.BoxGeometry(A.bast + .4, .5, A.bast + .4), stoneD, x, .25, cz, 0);
     for (const [px, pz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) add(new THREE.BoxGeometry(.7, .9, .7), stone, x + px * (A.bast / 2 - .35), bh + .45, cz + pz * (A.bast / 2 - .35), 1);
+    add(new THREE.BoxGeometry(1.1, 2.8, .12), E.gold, x, 1.9, cz - A.bast / 2 - .06, 0); add(new THREE.BoxGeometry(.6, 2.4, .1), E.jin, x, 1.9, cz - A.bast / 2 - .12, 0);     // the bastion's seam
     const n = Math.ceil((bh - H) / .3), r = (bh - H) / n; for (let k = 0; k < n; k++) { const top = H + (k + 1) * r, ex = cx + sx * (hl - (n - k) * .5); add(new THREE.BoxGeometry(.5, top - H + .02, A.T - .6), stoneD, ex + sx * .25, H + (top - H) / 2, cz + .3, 1); } }
   // THE RAMPS up the inner face (+z): one each half, from beside the gateway out toward the bastion, slope .3, posts under them
   { const w = 1.5 * k, z0 = cz + ht, z1 = z0 + w, run = H / A.slope;
@@ -22053,8 +22059,32 @@ function rampBuild() {
   // m1554: two SPHINX guardians flank the gate on the OUTER face (the approach), facing out
   { const putG = (geo, m) => putM(geo, m); for (const sx of [-1, 1]) { const x = cx + sx * (g2 + 2.6), z = cz - ht - 4.2; enemySphinx(putG, E, x, z, Math.PI, 1.25 * k);
       const bb = { minx: x - 1.1 * k, maxx: x + 1.1 * k, miny: 0, maxy: 2.6 * k, minz: z - 2 * k, maxz: z + 2 * k }; O.boxes.push(bb); BOXES.push(bb); } boxGrid(); }
-  bldMergeStatic(g);
-  RAMP.on = { g, O, bars: wbars, turs, t: 0, fires, rings, smash, arch: [], drone, drops: [], dropT: 0, sen, horn, raid: [], raidCd: 0 }; const R0 = RAMP.on;
+  // ---- RE-PASS 2 (m@X4@): DESTRUCTIBLE TO THE GROUND (ENEMY RULES; the Gatehouse's machinery). Pieces: `wL0..3` / `wR0..3` (the segments,
+  // 0 at the gate, each with its merlons, coping, banners and lanterns), `bL` / `bR` (the bastions with their steps, merlons, emblems, brazier,
+  // pole and ring) and `gate` (the lintel, the jambs, the oni masks, the horn). Smash a segment's seam (6 blows) and it SLUMPS into rubble,
+  // falling outward; a bastion falls to its seam OR its brazier (and takes its turret); both segments beside the gate down drops the gate ----
+  const pairs = []; for (const o of g.children.slice()) if (o.isMesh && o.userData.mg) { const m = o.material, tri = m.customProgramCacheKey && String(m.customProgramCacheKey()).startsWith('tri'); if (m.transparent || (m.map && !tri)) continue;
+    o.updateMatrix(); pairs.push([(o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()).applyMatrix4(o.matrix), m]); o.removeFromParent(); }
+  const nStep = Math.ceil((bh - H) / .3);
+  const cls = (c, sz) => { if (c.z < cz - A.bast / 2 - 1 || c.z > cz + ht + .4) return null; const d = Math.abs(c.x - cx), sd = c.x < cx ? 'L' : 'R';
+    if (d < g2 + .05) return 'gate'; if (d > hl - .05 || (c.y > H && sz.x < .6 && d > hl - nStep * .5 - .3)) return 'b' + sd;
+    return 'w' + sd + Math.max(0, Math.min(nS - 1, Math.floor((d - g2) / sl))); };
+  const fall = (key, c, sz) => { const rn = ((Math.sin(c.x * 12.9898) * 43758.5453) % 1 + 1) % 1 - .5;
+    if (key === 'gate') return { p: [c.x, c.y - H * .78, c.z - .6], r: [-.4, 0, .12], hop: .3, at: 0 };
+    if (key[0] === 'b') return { p: [c.x, c.y - bh * .66, c.z - 1.2], r: [-.32, rn * .4, (key === 'bL' ? -1 : 1) * .25], hop: .4, at: 0 };
+    return { p: [c.x + rn * .6, c.y - H * .7, c.z - 1.4], r: [-.38, rn * .2, rn * .25], hop: .4, at: 0 }; };
+  const Rr = restoreRig(g, { lift: 0, dur: 2.4, bob: 0 }), pieces = restorePieces(Rr, g, pairs, cls, fall); bldMergeStatic(g);
+  { const skip = new Set([drone, ...sen.map(S2 => S2.g), ...smash.map(S2 => S2.m), ...Object.values(pieces)]), wb = new THREE.Box3(), wc = new THREE.Vector3(), ws = new THREE.Vector3();
+    for (const o of g.children.slice()) { if (skip.has(o)) continue; wb.setFromObject(o); if (wb.isEmpty()) continue; wb.getCenter(wc); wb.getSize(ws); const key = cls(wc, ws); if (key && pieces[key]) pieces[key].attach(o); } }
+  const rig = {}, bkey = b2 => b2.cw ? null : cls(new THREE.Vector3((b2.minx + b2.maxx) / 2, (b2.miny + b2.maxy) / 2, (b2.minz + b2.maxz) / 2), new THREE.Vector3(b2.maxx - b2.minx, b2.maxy - b2.miny, b2.maxz - b2.minz));
+  const at = (x, z) => cls(new THREE.Vector3(x, H + .5, z), new THREE.Vector3(1, 1, 1));
+  for (const key of Object.keys(pieces)) { const Rk = rig[key] = restoreRig(g, { lift: 0, dur: 2.4, bob: 0 }); Rk.pieces = Rr.pieces.filter(P => P.obj === pieces[key]);
+    restoreRide(Rk, { up: { boxes: O.boxes.filter(b2 => bkey(b2) === key), tris: [], climbs: [], bars: wbars.filter(B => at(B.x !== undefined ? B.x : B.g.position.x, cz) === key), rings: rings.filter(G => at(G.x, G.z) === key), objs: [], coins: [] } });
+    Rk.onSet = R2 => restoreRideSet(R2); Rk.goal = 1; restoreSet(Rk, 1); restoreRideSet(Rk, true); }
+  RESTORE.list.splice(RESTORE.list.indexOf(Rr), 1);
+  const sup = []; for (const sd of ['L', 'R']) { const sx = sd === 'L' ? -1 : 1; for (let j = 0; j < nS; j++) sup.push({ key: 'w' + sd + j, x: cx + sx * (g2 + sl * (j + .5)), z: cz - ht - .1, y0: 0, y1: 3, r: .8, hp: 6 });
+    sup.push({ key: 'b' + sd, x: cx + sx * bx, z: cz - A.bast / 2 - .1, y0: 0, y1: 3.2, r: .9, hp: 6 }); const F = fires[sx < 0 ? 0 : 1]; sup.push({ key: 'b' + sd, x: F[0], z: F[2], y0: bh, y1: bh + 2.6, r: .9, hp: 4 }); }
+  RAMP.on = { rig, pieces, sup, fell: {}, cls: at, g, O, bars: wbars, turs, t: 0, fires, rings, smash, arch: [], drone, drops: [], dropT: 0, sen, horn, raid: [], raidCd: 0 }; const R0 = RAMP.on;
   for (const x of [-9, 9]) archerPost(cx + x * k, H + .05, cz - .4).then(d => { if (RAMP.on === R0) R0.arch.push(d); else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {});
   arenaBeam(cx, cz, [1, .6, .35], 1); snd('clang', { g: .7, r: .5 });
 }
@@ -22095,7 +22125,20 @@ function rampStep(dt) { const R = RAMP.on; if (!R) return; R.t += dt; if (R.sen)
   { const [cx, cz] = RAMP.at, u = Math.sin(R.t * .18); R.drone.position.set(cx + u * (RAMP.L / 2 - 2), RAMP.H + 4 + Math.sin(R.t * 1.4) * .3, cz + 3.5); R.drone.rotation.y = Math.cos(R.t * .18) > 0 ? Math.PI / 2 : -Math.PI / 2; R.drone.children[1].rotation.z = R.t * .6; }
   if ((R.fT = (R.fT || 0) - dt) <= 0) { R.fT = .06; for (const [fx, fy, fz] of R.fires) { spk(fx + (Math.random() - .5) * .9, fy, fz + (Math.random() - .5) * .9, (Math.random() - .5) * .5, 2.4 + Math.random() * 2, (Math.random() - .5) * .5, .3 + Math.random() * .2, .5, Math.random() < .5 ? [.45, 1, .82] : [.75, 1, .92]);
       if (Math.random() < .1) smokeAt(fx, fy + 1.2, fz, 1.1, 1.6, [.3, .28, .26]); } } }
-function rampClear() { const R = RAMP.on; if (!R) return; for (const T of R.turs) turretDrop(T); smashDrop(R.smash);
+// RE-PASS 2 (m@X4@): THE RAMPART COMES DOWN -- a blow on a seam (or a bastion's brazier) chips it; cut through, that piece slumps (`rampFell`)
+function rampBreak(x, y, z, rad) { const R = RAMP.on; if (!R || !R.sup) return 0;
+  for (const P of R.sup) { if (P.cut || R.fell[P.key] || Math.hypot(x - P.x, z - P.z) > P.r + rad || y < P.y0 - .3 || y > P.y1 + .3) continue;
+    P.hp--; snd('thud', { g: .9, r: .8, x, z }); spkBurst(x, y, z, 12, { col: [.48, 1, .85], spread: 2, size: .12, life: .5 }); camShake(.06);
+    if (P.hp <= 0) { P.cut = 1; snd('crack', { g: 1.2, r: .45, x, z }); rampFell(R, P.key); } return 1; }
+  return 0; }
+function rampFell(R, key) { if (R.fell[key] || RAMP.on !== R || !R.rig[key]) return; R.fell[key] = 1; restorePlay(R.rig[key], 0); camShake(.6); const pc = R.pieces[key].position;
+  snd('boom', { g: 1.3, r: .4, x: pc.x, z: pc.z }); jinraEmit(pc.x, 2, pc.z - RAMP.T / 2, 30);
+  setTimeout(() => { if (RAMP.on !== R) return; snd('thud', { g: 1.4, r: .35, x: pc.x, z: pc.z }); camShake(.4); for (let i = 0; i < 5; i++) spkBurst(pc.x + (Math.random() - .5) * 6, .5, pc.z - 2 + (Math.random() - .5) * 3, 16, { col: [.8, .72, .55], spread: 6, size: .5, life: 1.4 }); }, 900);
+  for (const S of R.smash) if (!S.dead && R.cls(S.m.position.x, S.m.position.z) === key) { S.dead = 1; S.t = 1e9; S.m.visible = false; const i = BOXES.indexOf(S.b); if (i >= 0) BOXES.splice(i, 1); }
+  for (const d of R.arch) if (d && d.st !== 'gone' && R.cls(d.root.position.x, d.root.position.z) === key) dummyBlow(d, Math.PI, 1.4, 99);
+  if (key[0] === 'b') for (const T of R.turs.slice()) if (R.cls(T.x, T.z) === key) { turretDrop(T); R.turs.splice(R.turs.indexOf(T), 1); }
+  if (R.fell.wL0 && R.fell.wR0 && !R.fell.gate) setTimeout(() => rampFell(R, 'gate'), 700); boxGrid(); }
+function rampClear() { const R = RAMP.on; if (!R) return; for (const Rk of Object.values(R.rig || {})) { const i = RESTORE.list.indexOf(Rk); if (i >= 0) RESTORE.list.splice(i, 1); if (Rk.ride) { bldTrisDrop(Rk.ride.tb); bldTrisDrop(Rk.ride.tu); } } for (const T of R.turs) turretDrop(T); smashDrop(R.smash);
   for (const d of R.arch || []) if (d && HORDE.list.includes(d)) { bowDrop(d); bodyGone(d); HORDE.list.splice(HORDE.list.indexOf(d), 1); }
   bldClear(R); RAMP.on = null; boxGrid(); }
 // m1146: THE AIRSHIP DOCK TOWER (BUILDINGS.md #8, pass 1) at (-30, 0). A 20 m tower: a breakable ground hall (cwallBuild), a solid white

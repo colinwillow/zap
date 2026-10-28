@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the RAMPART WALL, pass 2 (DESTRUCTIBLE TO THE GROUND)
+**Moves:** its breakable row (ENEMY RULES: for destroying). The Gatehouse's machinery: one rig per piece, run backwards.
+- Each wall run is FOUR SEGMENTS now (a box, a footing and a coping each, 6.4 m), not one 25 m box, so each can fall alone. Pieces: `wL0..3`,
+  `wR0..3` (0 at the gate), `bL`/`bR` (the bastions, with their steps, merlons, emblems, brazier, pole and ring) and `gate` (the lintel,
+  jambs, both oni masks and the horn). The sphinxes, the ramps and the gate's chunk panel stay.
+- **Keystones (`RAMP.on.sup`, `rampBreak` via `bldHit`):** a glowing mint JINRA SEAM in a gold frame at the outer foot of every segment and
+  bastion (6 blows), plus each bastion's brazier (4). Cut one and its piece SLUMPS into rubble, sinking and toppling outward (`rampFell`):
+  stolen Jinra spills out (`jinraEmit`), dust follows. A segment takes its walkway supplies (smash props) and knocks off any archer on it; a
+  bastion takes its turret (`turretDrop`); with both gate-side segments down the gate follows 0.7 s later. Its boxes, bars and rings go dead.
+- Known gap: the two robot-samurai sentries keep patrolling the walk's line even over a fallen segment (their own state machine).
+Render-checked headless: four pieces cut plus the gate following, from both faces. Shipped unverified.
+
 ## Grumbo's home, pass 32: the plants' third pass -- cliff shrubs (Worker B, loop tick 9; the queue's last item)
 Every 2.6 m of canyon over 92 m round the home, each wall, up to three tries: a height 3-34 m over that floor (skewed low), the wall point
 from `hwWallAt` .25 m out, turned into the home's local frame (inverse of Wx/Wz) and fed to the existing `sagebrush` (k 1.2-2.6 -- the
@@ -13,6 +25,7 @@ re-found on the wall .55 m lower) as a tube with leaf cones; 12% hang a bulb. De
 heads where `free()` allows. Same buckets (one new: orange) -> 37 draws. 134 shrubs, 57 vines. Own rng (3232), nothing else moves.
 The loop's queue (mill, merchant, refinery, peak, home's list) is done; the home's still-open list is down to the back ladder and stall
 rack (ref 2) and his sign-off.
+
 ## m1554 -- THE RE-PASS: the RAMPART WALL, pass 1 (an ENEMY wall: the look)
 **Moves:** its pass-1 row (the look). Destructible to the ground is pass 2.
 - Masonry is a `stone_blocks` triMat tinted `ENEMY.pal.stone` (and a darker tone for footings, coping and steps), not `E.stone`'s sandstone
