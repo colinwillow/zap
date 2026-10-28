@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the SKY BRIDGES, pass 3 (L1/L3: THE RUN ACROSS) -- its third pass, DONE
+## m1647 -- THE RE-PASS: the SKY BRIDGES, pass 3 (L1/L3: THE RUN ACROSS) -- its third pass, DONE
 - Three doubloons down each deck at a quarter, the middle and three quarters, set on the deck's own sag (the same curve `bridgeSpan`
   lays the planks on) .9 m up.
 - A bronze GRAPPLE RING (`gringAdd`) on a rope 1.4 m under each span's middle: the way across from BELOW (swing from one building toward
