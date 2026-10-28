@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the AIRSHIP DOCK, pass 1 (a HERO flyer: the look)
+## m1564 -- THE RE-PASS: the AIRSHIP DOCK, pass 1 (a HERO flyer: the look)
 **Moves:** its pass-1 row. It is on the HERO list as a FLYER (it may fly; the airship already does).
 - Kit materials: `K.timber`, a warm planks triMat, a `stone_blocks` footing, `K.bronze` (the neon trims too), `K.redL`, `K.lamp`; the 20 m
   shaft is warm plain plaster.
