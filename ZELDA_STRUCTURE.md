@@ -125,6 +125,8 @@ special). That is the Link's Awakening count. Each act ends on a world-changing 
 | **mounts / vehicles** | 3 | the ship (act I), the dragon (act II), the board |
 | **money** | doubloons | wallets as side-quest rewards |
 
+**The gear ladders and what blocks what (shields vs lasers, arrows to rockets, outfits, the dragon) are in ARSENAL.md.**
+
 ### Collectibles and side content (the completionist layer)
 
 - **One big set:** say **100 Jinra wisps** (OoT's 100 Gold Skulltulas) traded at a shrine at 10 / 20 / 30 / 50 / 100 for upgrades.
