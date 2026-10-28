@@ -27,3 +27,8 @@
        only on the way DOWN (a jump beside a wall is not cut short); the camera helps.
 13. [x] (m1684) **The zip line:** you can drop off mid-line; slow; the hands are off the line; the sword is not out; no sparks. Wanted: speed, a swing
        (rotational, with velocity), maybe loops; keep the engage / disengage.
+14. [ ] **The Osari's death is FIRE:** the green smoke must read as bright particle FIRE (green), not mods/smoke -- generated sprites.
+15. [ ] **The charge's three releases (left stick at the release):** FORWARD = the forward slash (the launch); DOWN = the leap in the air and the
+       slam down; NEITHER = the spin.
+16. [ ] **The charge locks onto an incoming ARROW or ROCKET:** release and he meets it in the air where it flies and slashes it -- back at
+       the shooter.
