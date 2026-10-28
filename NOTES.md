@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE ZEPPELINS, detail pass 9 (the Jinra core; the piers grounded)
+- THE JINRA LIFT-CORE: a mint crystal turning and breathing in a bronze cage on a post under the roof, shedding mint motes while it flies.
+  Jinra is the one mint thing, and this is what holds the ship up. Fallen, it shrinks to a dim ember (`restoreSkin` drains it too).
+- THE PIERS GROUNDED: grass, ferns, flowers, stones and tall grass round each pier's base (clear of the stair run and the ship side), a
+  plank waiting bench, a stack of crates and a barrel by the stairs (the lower crate and the barrel solid). `plantDrop` on clear.
+Render-checked headless (pier and deck). Shipped unverified.
+
 ## m1596 -- THE ZEPPELINS, detail pass 8 (lights and cloth that move)
 - Four red paper CHOCHIN on cords from the roof's corners (warm emissive, iron caps), each a pivot group that sways on its own phase and leans
   out on the turns (`Z.turnV`, the heading's rate of change, smoothed in `zepPose`).
