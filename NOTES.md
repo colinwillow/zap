@@ -29,6 +29,23 @@ His first complaint was an invisible collider, so the last pass measures every z
   of the props only the lower crate and the barrel are solid. **Nothing else on the ship is solid**: the posts, rails, roof, cargo and helm
   are walk-through, and no box exists where nothing is drawn.
 The zeppelin detail passes end here (4-10); the loop resumes the table at the Flying Ship House. Shipped unverified.
+## m15xx -- THE DOJO at 20 FPS: 1.62M triangles were grass; the invisible rim; wood and stone stop shining
+His: *"20 frames per second... look at the draw calls and the triangles... a roughness map or displacement on the wood and stone, it looks shiny...
+an invisible collider, I can't go anywhere, running into and hanging on an invisible thing, maybe left over from the original dojo."*
+(His chip: 82 DC, 1,585k tris.)
+- **Measured per mesh** (headless, scratchpad `dojoperf.js`; plant meshes are named `plant:<kind>` now): tallgrass 446 x 1,242 tris = **554k**, frond
+  265 x 1,092 = 289k, grass 101k, shrub 98k, carpet 90k... = 1.62M, and EVERY plant cast a shadow, so the shadow pass drew all of it again.
+  - `plantTube` takes `len` (segments ALONG it; it was always 12): tallgrass blades 4 along x 3 round, lighter seed heads; frond 6 x 4, lighter Jin tips.
+    tallgrass 554k -> 214k, frond 289k -> 119k. **Total 1.62M -> 1.11M.**
+  - `PLANT.noShadow`: tallgrass, grass, carpet, flowers, frond, stones, sticks, fern, jinbulb cast no shadow (~830k triangles out of the shadow pass).
+- **The invisible rim:** 48 boxes 2.8 m wide and **6 m tall**, invisible, at W+.2, their inner face ~2.4 m INSIDE the visible rail, and across the
+  four GATES (only the altar gaps were open). So a strip of stone he could see and not reach, gates he could not walk out of onto their bridges
+  (m1430 opened the rail there, never the boxes), and 6 m tops to hang from. Now the guard IS the rail: 96 boxes 1.24 m at the rail's radius and
+  height (1.15), open at the gates and the altar routes. The weapon racks got their own colliders (the dais is walkable to the rail now).
+- **The shine (`triMat` relief):** the merged meshes have no UVs, so a stock bumpMap is impossible. The triplanar sample's brightness is the height;
+  its screen derivatives tilt the normal (three's perturbNormalArb, `triBump`), and dark cracks are rougher than faces. ON BY DEFAULT for every
+  wood / stone / sandstone / roof / marble map (`o.bump`, 1.4; 0 turns it off) -- so the ship, the home and the beacon get it too. The dojo floor's
+  roughness .6 -> .86.
 
 ## m1597 -- THE ZEPPELINS, detail pass 9 (the Jinra core; the piers grounded)
 - THE JINRA LIFT-CORE: a mint crystal turning and breathing in a bronze cage on a post under the roof, shedding mint motes while it flies.
