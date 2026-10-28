@@ -13805,7 +13805,7 @@ try { if (localStorage.getItem('mel.hslice') === '0') HORDE.slice = 0; } catch (
 // m1675: THE OSARI OF THE HOLLOW DO NOT FALL (his: "when you finally kill him he turns into GREEN SMOKE -- he kind of explodes and evaporates").
 // An Osari's death is a burst of green Jinra smoke and sparks; the body swells a touch, its materials fade to nothing over `fadeT`, and he is
 // gone. His limbs still come off before that (an Osari always has `limbs`).
-// m15xx (his: "the green smoke needs to feel MUCH more like bright particle FIRE -- generate some sprites"): GREEN FIRE. Its own additive pool
+// m1689 (his: "the green smoke needs to feel MUCH more like bright particle FIRE -- generate some sprites"): GREEN FIRE. Its own additive pool
 // (`GFIRE`, one draw): four FLAME sprites painted once to a 2x2 canvas atlas (a ragged teardrop of flame with a hot core and licks off its
 // edge, each different), every particle a frame of it, rising, flickering, swelling and spinning a touch, its colour run white-hot -> bright
 // Jinra green -> dark teal over its life, sized in metres at any lens. The Osari burst it from every bone of the body and keep burning off it
@@ -13851,7 +13851,7 @@ const OSARI = { fadeT: .7, col: [.12, .85, .32], col2: [.04, .5, .2], fades: [] 
 function osariVanish(d) { const P = d.root.position; HORDE.stat.kills++; bowDrop(d);
   for (let i = 0; i < 3; i++) spkBurst(P.x, P.y + .9, P.z, 22, { col: i % 2 ? OSARI.col : [.85, 1, .9], spread: 6, size: .24, life: .7 });
   const bones = []; d.model.traverse(o => { if (o.isBone) bones.push(o); }); const bw = new THREE.Vector3();
-  for (let i = 0; i < 90; i++) { const b = bones[(Math.random() * bones.length) | 0]; if (b) b.getWorldPosition(bw); else bw.set(P.x, P.y + 1, P.z); gfire(bw.x + (Math.random() - .5) * .2, bw.y, bw.z + (Math.random() - .5) * .2, 1 + Math.random() * .6); }     // m15xx: GREEN FIRE off every bone
+  for (let i = 0; i < 90; i++) { const b = bones[(Math.random() * bones.length) | 0]; if (b) b.getWorldPosition(bw); else bw.set(P.x, P.y + 1, P.z); gfire(bw.x + (Math.random() - .5) * .2, bw.y, bw.z + (Math.random() - .5) * .2, 1 + Math.random() * .6); }     // m1689: GREEN FIRE off every bone
   for (let i = 0; i < 4; i++) { const a = Math.random() * 6.28, r = Math.random() * .5; smokeAt(P.x + Math.cos(a) * r, P.y + .4 + Math.random() * 1.4, P.z + Math.sin(a) * r, 2.5, 1.2, OSARI.col2, .8); }
   snd('boom', { g: .55, r: 1.4, x: P.x, z: P.z }); snd('swoosh', { g: .6, r: .55, x: P.x, z: P.z }); camShake(.2);
   const mats = []; d.model.traverse(o => { if (o.isMesh && o.material) { o.material = o.material.clone(); o.material.transparent = true; o.material.depthWrite = false; mats.push(o.material); } });

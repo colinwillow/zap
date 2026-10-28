@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- THE OSARI BURN IN GREEN FIRE (DOCKET 14; his: "the green smoke needs to feel MUCH more like bright particle fire -- generate some sprites")
+## m1689 -- THE OSARI BURN IN GREEN FIRE (DOCKET 14; his: "the green smoke needs to feel MUCH more like bright particle fire -- generate some sprites")
 - **`GFIRE`:** its own particle pool (one draw), its sprites PAINTED at load into a 2x2 atlas: four tall, blurred flame tongues (a body and
   two or three licks off it). The atlas's red is the flame's mask, its green the HOT CORE, which the shader runs to yellow-green.
 - **Each particle:** rises fast (2.6-5 m/s, buoyant, wind-jittered), shrinks as it burns out, flickers (a new flame shape now and then),
