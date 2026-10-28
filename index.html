@@ -12777,15 +12777,15 @@ function wrunSwipe(dx, dy) { const p = player; if (!WRUN.on || !WRUN.swipe || p.
   if (p.wrun && p.wrun.kind !== 'slide') return 0;
   const W = p.wrun ? { b: p.wrun.b, nx: p.wrun.nx, nz: p.wrun.nz, d: p.r + WRUN.gap } : wrunFind(p.pos.x, p.pos.y, p.pos.z, p.r + WRUN.swipeReach, null); if (!W) return 0;
   if (dy > Math.abs(dx) * 1.2) { if (p.wrun) { wrunEnd(1.2); return 1; } return 0; }     // DOWN: drop off the perch (on the ground it is still the strike)
-  if (-dy >= Math.abs(dx) * WRUN.upCone) { const into = Math.max(0, -(p.vel.x * W.nx + p.vel.z * W.nz)); return wrunGo(W, 'up',     /* m15xx (his: "the horizontal wall run seems gone, it kept engaging only the vertical"): a thumb flicks sideways AND up; UP must be clearly up (`upCone`), anything else is the side run */ 0, 0, Math.min(WRUN.upMax, Math.max(WRUN.upV, into * WRUN.upK))); }
+  if (-dy >= Math.abs(dx) * WRUN.upCone) { const into = Math.max(0, -(p.vel.x * W.nx + p.vel.z * W.nz)); return wrunGo(W, 'up',     /* m1683 (his: "the horizontal wall run seems gone, it kept engaging only the vertical"): a thumb flicks sideways AND up; UP must be clearly up (`upCone`), anything else is the side run */ 0, 0, Math.min(WRUN.upMax, Math.max(WRUN.upV, into * WRUN.upK))); }
   const h = flickH(dx, dy), mx = Math.sin(h), mz = Math.cos(h); return wrunGo(W, 'side', mx, mz); }
 function wrunGo(W, kind, mx, mz, upV) {
   const p = player, tx = -W.nz, tz = W.nx, s = kind === 'side' ? (mx * tx + mz * tz >= 0 ? 1 : -1) : 0;
   p.melee = 0; p.roll = 0; p.land = 0; p.slide = null; p.aflip = null; p.cart = null; p.hook = null; p.rope = null; p.zip = null; p.flip = ''; p.slam = 0; p.jump = 0; swapStop(); triggerStop();
   p.wrun = { kind, b: W.b, nx: W.nx, nz: W.nz, dx: tx * s, dz: tz * s, t: 0, v: Math.max(WRUN.v, Math.hypot(p.vel.x, p.vel.z)) };
   { const k = p.r + WRUN.gap - W.d; p.pos.x += W.nx * k; p.pos.z += W.nz * k; }     // onto the face: a tap is taken from up to `reach` off it
-  p.vel.y = kind === 'side' ? WRUN.up : kind === 'slide' ? p.vel.y : Math.max(WRUN.upV, upV || 0);     /* m15xx: the perch keeps his climb (it cut it to .4) */ p.grounded = false; p.wrun.vy0 = p.vel.y;
-  p.faceH = p.heading = kind === 'side' ? Math.atan2(tx * s, tz * s) : kind === 'slide' ? Math.atan2(W.nx, W.nz) : Math.atan2(-W.nx, -W.nz); if (kind !== 'slide') p.camWant = p.faceH;     /* m15xx: the PERCH faces AWAY from the wall, ready to spring off (his) */
+  p.vel.y = kind === 'side' ? WRUN.up : kind === 'slide' ? p.vel.y : Math.max(WRUN.upV, upV || 0);     /* m1683: the perch keeps his climb (it cut it to .4) */ p.grounded = false; p.wrun.vy0 = p.vel.y;
+  p.faceH = p.heading = kind === 'side' ? Math.atan2(tx * s, tz * s) : kind === 'slide' ? Math.atan2(W.nx, W.nz) : Math.atan2(-W.nx, -W.nz); if (kind !== 'slide') p.camWant = p.faceH;     /* m1683: the PERCH faces AWAY from the wall, ready to spring off (his) */
   snd('swoosh', { r: .9, g: .5 }); return 1;
 }
 function wrunEnd(push) {
@@ -12805,7 +12805,7 @@ function stepWrun(dt) {
   if (R.kind === 'slide' && p.jump && R.t > .05) { p.jump = 0; wrunJump(); return; }     // m1372: either pad's tap kicks off the slide
   if (R.kind === 'side') { p.vel.x = R.dx * R.v; p.vel.z = R.dz * R.v; p.vel.y += (MOVE.g - WRUN.g) * dt; }     // `integrate` takes MOVE.g; he feels only WRUN.g
   else if (R.kind === 'slide') { p.vel.x = -R.nx * .5; p.vel.z = -R.nz * .5;
-    // m15xx (his: "a friction stops his upward momentum -- standing at the base of the wall and jumping, his height is hindered; only on the way
+    // m1683 (his: "a friction stops his upward momentum -- standing at the base of the wall and jumping, his height is hindered; only on the way
     // DOWN should the friction hold him"): RISING he flies on under gravity alone; from the top of it, a moment's hold (`hold`), then the skim
     // down at up to `slideV`
     if (p.vel.y > 0) R.top = R.t; else { const since = R.t - (R.top || 0), vy = since < WRUN.hold ? damp(p.vel.y, 0, .06, dt) : Math.max(p.vel.y - WRUN.slideG * dt, -WRUN.slideV); p.vel.y = vy + MOVE.g * dt; } }
@@ -12849,7 +12849,7 @@ function wrunPose() {
     sp.parent.getWorldQuaternion(_wrQ3).invert(); sp.quaternion.copy(_wrQ3.multiply(_wrQ)); sp.updateMatrixWorld(true); }
 }
 const _wrQ2 = new THREE.Quaternion(), _wrQ3 = new THREE.Quaternion();
-Object.assign(WRUN, { upD: .8, upFoot: -.12, upAmp: .34, upLift: .26, upRate: 2.4, upW: .14, upTorso: .32, perchD: .42, perchFoot: -.18, perchKnee: -.55, perchFwd: .12, perchDrop: .22, perchLean: .45, perchW: .2, perchHand: .05, perchHandW: .55, ik: 1 });     /* m15xx: the perch faces away -- back to the wall, a foot planted on it behind, hands back on it at the hips */
+Object.assign(WRUN, { upD: .8, upFoot: -.12, upAmp: .34, upLift: .26, upRate: 2.4, upW: .14, upTorso: .32, perchD: .42, perchFoot: -.18, perchKnee: -.55, perchFwd: .12, perchDrop: .22, perchLean: .45, perchW: .2, perchHand: .05, perchHandW: .55, ik: 1 });     /* m1683: the perch faces away -- back to the wall, a foot planted on it behind, hands back on it at the hips */
 const _wsA = new THREE.Vector3(), _wsB = new THREE.Vector3(), _wsC = new THREE.Vector3(), _wsT = new THREE.Vector3(), _wsK = new THREE.Vector3(), _wsQ = new THREE.Quaternion(), _wsQ2 = new THREE.Quaternion();
 // two bones onto `T`, the middle joint bent toward `pole` (a world direction); `end` turned so its child points along `aim` (optional)
 function wrLimb(up, mid, end, T, pole, aim) { if (!up || !mid || !end) return;

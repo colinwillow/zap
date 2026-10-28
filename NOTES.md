@@ -9,7 +9,7 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 His ask: "how can I see the Red Hollows in all its glory (built) on a phone?" The state switch lived only in SPAWN > BUILDINGS, which is the
 arena/forge UI and never shows in the Red Hollows. Now a GOD menu switch in the hollows flips main's `AGE` (`mel.age`, saved) and reloads,
 dropping any `?hs=` (which would win). The mint plates still play each piece's restoration live.
-## m15xx -- WALL RUN, sound: the side run starts, the perch catches at once FACING AWAY, and the wall only brakes the way DOWN (DOCKET 12)
+## m1683 -- WALL RUN, sound: the side run starts, the perch catches at once FACING AWAY, and the wall only brakes the way DOWN (DOCKET 12)
 His: *"the horizontal wall run seems gone -- it kept engaging only the vertical; when the character touches a wall in the air he needs to go
 straight into skimming down it, ready to jump off FACING AWAY (Prince of Persia) -- he flails for a second first and his momentum starts
 going down; a friction stops his upward momentum: standing at the base and jumping, his height is hindered; only on the way down should
