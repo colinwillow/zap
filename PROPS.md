@@ -19,7 +19,7 @@ texture.
 | family | items | sandbox | status |
 |---|---|---|---|
 | **PLANTS** | cherry, pine, saguaro, agave, bamboo, fern, Jin bulb, grass. Next: ivy (climbing walls), maple, bonsai, moss, reeds, lilies, alien bulbs and fronds, flowers, hanging vines, potted plants | Plant Library | pass 1 (m1425) |
-| **JINRA VESSELS** (his sheet: `images/korajin/ref/jinra_sheet.jpg`) | glowing bottles and flasks (corked, spiral-bellied, gourd), canisters (iron-banded barrels with glass windows, globe tanks on legs, tube columns), crystals and crystal clusters, a dripping basin, a Jinra lantern, an amulet, the teal Jinra banner; the liquid is translucent mint with motes | Jinra Vessels | -- |
+| **JINRA VESSELS** (his sheet: `images/korajin/ref/jinra_sheet.jpg`) | glowing bottles and flasks (corked, spiral-bellied, gourd), canisters (iron-banded barrels with glass windows, globe tanks on legs, tube columns), crystals and crystal clusters, a dripping basin, a Jinra lantern, an amulet, the teal Jinra banner; the liquid is translucent mint with motes | Jinra Refinery (Red Hollows, Worker B) | pass 1 (m1494-ish, Worker B): `jvesMats()` / `jvesPut(put, M, kind, x, y, z, s, ry)` -- kinds round, gourd, tall, spiral, canister, globe, crystal; drops into any builder's own `put`, merging per material |
 | **ROCKS** | boulders in the sandstone of the Red Hollows, river stones, stepping stones, scree, standing stones, moss-capped rocks | -- | |
 | **WATER** | fountains, basins, spouts (bamboo shishi-odoshi), ponds with lilies, streams, small falls; JIN springs (KORAJIN.md) | -- | |
 | **COURTYARD** | stone lanterns, benches, tables, gravel beds, paths, planters, gates, wells | -- | |
