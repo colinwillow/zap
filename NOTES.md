@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE ZEPPELINS, detail pass 5 (the envelope)
+- GORE SEAMS: four meridian rings (a torus turned into the yz-plane, scaled to the envelope and turned about z), so eight tan seams run
+  nose to tail.
+- The two straight red flank stripes (18 m boxes) poked out where the envelope curves in. They are one red EQUATOR band now, a constant
+  .16 m tube along the envelope's own ellipse. A scaled torus was tried first: its TUBE scales with it and speared 2.4 m past the nose.
+- A bronze NOSE CAP (a flattened hemisphere) with a mooring ring, and a bronze TAIL CONE behind the propeller.
+- A red PENNANT on the stern staff, its vertices rippled every frame (`zepStep`).
+Render-checked headless (three-quarter, side). Shipped unverified.
+
 ## the Red Hollows' sky and water, pass 1: his panorama over the valley, and a stream that flows (Worker B)
 His ask: "work on the water shader, and apply the HDR from the other window". Only three 8-bit panoramas are in the repo (no .hdr/.exr);
 he picked the dojo's PANO (`textures/sky_sunset_02.webp`) and the stream. `RW_GLSL` gains `uPano/uPanoOn/uPanoOff` and `panoAt(d, lod)`
