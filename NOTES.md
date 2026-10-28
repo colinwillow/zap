@@ -35,7 +35,7 @@ zeroes him and `stepClimb` sets x/z the same frame), and the top-out is a .32 s 
 - A bronze NOSE CAP (a flattened hemisphere) with a mooring ring, and a bronze TAIL CONE behind the propeller.
 - A red PENNANT on the stern staff, its vertices rippled every frame (`zepStep`).
 Render-checked headless (three-quarter, side). Shipped unverified.
-## m15xx -- THE SHIP, COLLIDERS part 1 (main session; Worker A is on the buildings): the hidden lip in the pagoda's eave
+## m1592 -- THE SHIP, COLLIDERS part 1 (main session; Worker A is on the buildings): the hidden lip in the pagoda's eave
 His: *"weird collider all over it. I try to climb it, I get stuck in this pose... stuck to walls."* (screenshot: hanging mid-wall under the tiled
 roof tiers on the quarterdeck)
 - **Measured, not eyeballed:** an audit in the headless page (scratchpad `shipaudit.js`): for every face of every ship box, 9 samples, a ray from .6 m
