@@ -20564,7 +20564,7 @@ function ghouseStep(dt) { const G = GHOUSE.on; if (!G) return; G.t += dt; if (G.
 // his shots (`turretBlast`) and its own bolt PARRIED back (`arrowStep`): `balHp` hits and it smashes (sparks, smoke, the stock slumps),
 // stops shooting, and is REPAIRED after `balFix` s.
 function bldHit(x, y, z, rad, dmg) {
-  if (gmillHit(x, y, z, rad)) return 1;     // the water mill's wheel jams and frees (Worker B)
+  if (gmillHit(x, y, z, rad) || gpeakHit(x, y, z, rad)) return 1;     // the water mill's wheel jams and frees (Worker B)
   if (PLANT.list.length) plantHit(x, y, z, rad);     // m1424: plants bend and keep going (they never stop the shot)
   if (ghomeHit(x, y, z, rad)) return 1;     // pass 14 (Worker B): Grumbo's home -- its back door, the orb, the bells
   if (pagodaChain(x, y, z, rad)) return 1;     // m1236: the altar core calls the spire's chain lightning
@@ -64584,6 +64584,7 @@ function hwHeight(x, z) {
   const wk = smooth(fw - 1, fw + H.wall, d + lump * .35);                          // the wall: rounded, lumpy, by the noise
   h += (H.rim + lump * .6) * wk * wk * (3 - 2 * wk) * .9 + (H.rim * .1) * smooth(fw + H.wall, fw + H.wall + 30, d);
   const hd = Math.hypot(x - HOME.hut.at[0], z - HOME.hut.at[1]); h = h + (HOME.padY - h) * (1 - smooth(HOME.hut.w * .6, HOME.hut.w * .95, hd)) * (d < fw - 2 ? 1 : 0);
+  h += gpeakLift(x, z);     // THE PEAK's mountain (BUILDINGS.md: THE PEAK)
   { const mz = 62, md = Math.hypot(x - hwRc(mz), z - mz); if (md < 17) h = Math.min(h, h + (H.bed - h) * (1 - smooth(11, 16.5, md))); }     // the water mill's POND (BUILDINGS.md: THE WATER-MILL TOWER): the stream opens out round its island
   return h;
 }
@@ -65431,6 +65432,93 @@ function ghomeBuild(at, yaw, y0) {
   A.stat.draws = draws; A.stat.boxes = boxes.length; A.stat.tris = tris.length / 9;
   console.log('[melee] grumbo home (procedural): ' + draws + ' draws, ' + boxes.length + ' boxes, ' + tris.length / 9 + ' walkable tris, stair ' + A.stat.stair);
 }
+// THE PEAK (his, after m1475: "another element of height... a hill, a mountain on the top up there... a lookout tower at the very top"): a
+// MOUNTAIN rising out of the east plateau (in `hwHeight`, so its slopes are the ground: a hike), a sheer stratified PINNACLE on its top (a
+// climb: two ladders and a ledge), and on the pinnacle's pad a timber LOOKOUT TOWER with a signal bell and a brazier -- and a ZIPLINE from
+// it all the way down to the home. A marked TRAIL (cairns, rope posts) climbs from the rim above the mill's east turret, and a SCAFFOLD of
+// ladders runs from that turret's roof up the wall to the rim. World axes ----
+const GPEAK = { on: 1, pass: 1, z: 20, out: 78, H: 38, R: 58, pin: 24, g: null, stat: {} };
+function gpeakX() { return hwRc(GPEAK.z) + GPEAK.out; }
+function gpeakLift(x, z) { if (!GPEAK.on) return 0; const m = Math.hypot(x - gpeakX(), z - GPEAK.z); if (m >= GPEAK.R) return 0; return GPEAK.H * Math.pow(1 - smooth(5, GPEAK.R, m), 1.25) * (.86 + .28 * rwFbm(x * .045 + 3, z * .045)); }
+function gpeakBuild() {
+  const TAU = Math.PI * 2, A = GPEAK, px = gpeakX(), pz = A.z, g = new THREE.Group(); scene.add(g); A.g = g;
+  const MG = new Map(), _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _v = new THREE.Vector3(), _one = new THREE.Vector3(1, 1, 1), boxes = [], tris = [];
+  const put = (geo, m, mat4) => { geo = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(geo.attributes)) if (k !== 'position' && k !== 'normal' && !(k === 'uv' && m.map && !m.userData.tri)) geo.deleteAttribute(k);
+    if (mat4) geo.applyMatrix4(mat4); if (!geo.attributes.normal) geo.computeVertexNormals(); if (m.userData.strata) ghStrataCol(geo); if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); };
+  const at4 = (x, y, z, ry = 0, rx = 0, rz = 0, sx = 1, sy = 1, sz = 1) => _m4.compose(_v.set(x, y, z), _q.setFromEuler(_e.set(rx, ry, rz)), new THREE.Vector3(sx, sy, sz));
+  const box = (x0, x1, y0, y1, z0, z1, ex) => boxes.push(Object.assign({ minx: x0, maxx: x1, miny: y0, maxy: y1, minz: z0, maxz: z1 }, ex || {}));
+  const vbox = (x0, x1, ya, yb, z0, z1, m, solid, ex) => { put(new THREE.BoxGeometry(x1 - x0, yb - ya, z1 - z0), m, at4((x0 + x1) / 2, (ya + yb) / 2, (z0 + z1) / 2)); if (solid) box(x0, x1, ya, yb, z0, z1, ex); };
+  const quad = (a, b, d, e) => { for (const q of [a, b, d, a, d, e]) tris.push(...q); };
+  const rod = (a, b, r, m, round) => { const d = new THREE.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]), L = d.length(); put(round ? new THREE.CylinderGeometry(r, r, L, 6) : new THREE.BoxGeometry(r, L, r), m, _m4.compose(new THREE.Vector3((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2), _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()), _one)); };
+  const NC = { noCam: 1 }, gH = (x, z) => rwHeight(x, z);
+  const wood = triMat('wood_timber', { scale: 1.6, rough: .85 }), woodP = triMat('wood_planks', { scale: 2.2, rough: .85 }), bronze = triMat('bronze', { scale: 1.2, metal: .75, rough: .35 }); for (const m of [wood, woodP, bronze]) m.userData.tri = 1;
+  const iron = new THREE.MeshStandardMaterial({ color: 0x2c2724, metalness: .6, roughness: .5 }), red = new THREE.MeshStandardMaterial({ color: 0xb8402c, roughness: .7 }), rope = new THREE.MeshStandardMaterial({ color: 0xc9b07a, roughness: 1 });
+  const rockM = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .93 }); rockM.userData.strata = 1;
+  const glow = new THREE.MeshStandardMaterial({ color: 0xffd9a0, emissive: 0xffa040, emissiveIntensity: 2.2, toneMapped: false }), fire = new THREE.MeshStandardMaterial({ color: 0xffb040, emissive: 0xff6010, emissiveIntensity: 3, toneMapped: false });
+  A.climbs = [];
+  const ladder = (x, z, ya, yb, nx, nz, mark, name) => { const ux = nz, uz = -nx, ry = Math.atan2(nx, nz);
+      for (const o of [-.34, .34]) put(new THREE.BoxGeometry(.09, yb - ya + .6, .09), wood, at4(x + ux * o, (ya + yb + .6) / 2, z + uz * o, ry)); for (let y = ya + .3; y < yb + .4; y += .34) put(new THREE.BoxGeometry(.7, .06, .06), wood, at4(x, y, z, ry));
+      const hx = .12, hz = .45, ex = Math.abs(nx) * hx + Math.abs(nz) * hz, ez = Math.abs(nz) * hx + Math.abs(nx) * hz, L = kitClimbAdd({ cs: nx, sn: nz, hx, hz, cx: x, cz: z, minx: x - ex, maxx: x + ex, miny: ya, maxy: yb, minz: z - ez, maxz: z + ez }, name, yb);
+      L.mark = { x: mark[0], y: mark[1], z: mark[2] }; A.climbs.push(L); };
+  // ---- THE PINNACLE: a stratified noisy lathe out of the mountain's top, ledged, its flat cap the lookout's PAD ----
+  const mt = gH(px, pz), base = mt - 8, top = mt + A.pin, Rp = 8.5; A.top = top;
+  const Rof = (th, y) => { const f = (y - base) / (top - base), r0 = Rp * (1.25 - .3 * f) + (f > .95 ? .4 : 0), n = ghNoise3(Math.cos(th) * 2.2 + 9, y * .2, Math.sin(th) * 2.2) - .5; return r0 * (1 + n * .2) + .5 * Math.floor(((y - base) / 2.8) % 2); };
+  { const NS = 40, NY = Math.ceil((top - base) / 1.2), pos = [], P = (i, j) => { const th = i / NS * TAU, y = base + (top - base) * j / NY, r = Rof(th, y); return [px + Math.sin(th) * r, y, pz + Math.cos(th) * r]; };
+    for (let j = 0; j < NY; j++) for (let i = 0; i < NS; i++) { const a = P(i, j), b = P(i + 1, j), d = P(i + 1, j + 1), e = P(i, j + 1); pos.push(...a, ...d, ...b, ...a, ...e, ...d); }
+    const cap = []; for (let i = 0; i < NS; i++) { const a = P(i, NY), b = P(i + 1, NY); cap.push(px, top, pz, ...a, ...b); quad([px, top, pz], [a[0], top, a[2]], [b[0], top, b[2]], [px, top, pz]); }
+    for (const arr of [pos, cap]) { const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(arr, 3)); geo.computeVertexNormals(); put(geo, rockM); }
+    const cell = 1.5, Rm = Rp * 1.3; for (let gz = -Rm; gz < Rm; gz += cell) { let run = null; const flush = () => { if (run) box(px + run.x0, px + run.x1, base, run.h, pz + gz, pz + gz + cell); run = null; };
+      for (let gx = -Rm; gx < Rm; gx += cell) { const x = gx + cell / 2, z = gz + cell / 2, r = Math.hypot(x, z), th = Math.atan2(x, z); let h = null;
+        if (r < Rof(th, top) - .4) h = top; else for (let y = top; y > base; y -= 1.2) if (r < Rof(th, y) - .4) { h = Math.round(y * 2) / 2; break; }
+        if (h == null) { flush(); continue; } if (run && run.h === h) run.x1 = gx + cell; else { flush(); run = { x0: gx, x1: gx + cell, h }; } } flush(); } }
+  // the climb: a ladder to a ledge half way up the pinnacle's west face (toward the canyon), another from it to the pad
+  { const th = -Math.PI / 2, nx = Math.sin(th), nz = Math.cos(th); let rmax = 0; for (let y = base; y < top; y += .6) rmax = Math.max(rmax, Rof(th, y)); const r = rmax + .4, lx = px + nx * r, lz = pz + nz * r, ya = gH(lx, lz) + .05, ym = (ya + top) / 2;
+    vbox(lx - 1.4, lx + nx * -1.6 + .2, ym - .25, ym, lz - 1.6, lz + 1.6, woodP, 1); quad([lx - 1.4, ym + .01, lz - 1.6], [lx + 1.4, ym + .01, lz - 1.6], [lx + 1.4, ym + .01, lz + 1.6], [lx - 1.4, ym + .01, lz + 1.6]);
+    for (const zz of [lz - 1.5, lz + 1.5]) rod([lx - 1.3, ym - .2, zz], [px + nx * (Rp * .7), ym - 3, zz], .14, wood);
+    ladder(lx - 1.0, lz - .8, ya, ym, nx, nz, [lx, ym + .05, lz - .8], 'gpeak_pin1'); ladder(lx, lz + .8, ym, top + .2, nx, nz, [px + nx * (Rp - 2), top + .05, pz + nz * (Rp - 2) + .8], 'gpeak_pin2'); A.stat.pin = +(top - ya).toFixed(1); }
+  // ---- THE LOOKOUT: four timber legs, a deck at +8 (railed, 2.2 m clear round a hatch), a pointed red roof, the signal BELL, a BRAZIER ----
+  { const lh = 8, s = 2.6, Y = top + lh; for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { rod([px + sx * (s + .6), top, pz + sz * (s + .6)], [px + sx * s, Y + 3.2, pz + sz * s], .28, wood); box(px + sx * (s + .3) - .25, px + sx * (s + .3) + .25, top, Y, pz + sz * (s + .3) - .25, pz + sz * (s + .3) + .25, NC); }
+    for (const yy of [top + 2.7, top + 5.4]) for (const [a, b] of [[[-1, -1], [1, -1]], [[1, -1], [1, 1]], [[1, 1], [-1, 1]], [[-1, 1], [-1, -1]]]) rod([px + a[0] * (s + .4), yy, pz + a[1] * (s + .4)], [px + b[0] * (s + .4), yy, pz + b[1] * (s + .4)], .14, wood);
+    const dS = s + 1.6; for (let z = -dS; z < dS - .01; z += .34) { if (Math.abs(z + .17) < .6) { vbox(px - dS, px - .8, Y - .14, Y, pz + z + .015, pz + z + .325, woodP, 0); vbox(px + .8, px + dS, Y - .14, Y, pz + z + .015, pz + z + .325, woodP, 0); continue; } vbox(px - dS, px + dS, Y - .14, Y, pz + z + .015, pz + z + .325, woodP, 0); }
+    for (const [x0, x1, z0, z1] of [[-dS, dS, -dS, -.6], [-dS, dS, .6, dS], [-dS, -.8, -.6, .6], [.8, dS, -.6, .6]]) { box(px + x0, px + x1, Y - .3, Y, pz + z0, pz + z1); quad([px + x0, Y + .01, pz + z0], [px + x1, Y + .01, pz + z0], [px + x1, Y + .01, pz + z1], [px + x0, Y + .01, pz + z1]); }
+    for (let k = -dS; k <= dS; k += 1.1) for (const [x, z] of [[k, -dS], [k, dS], [-dS, k], [dS, k]]) vbox(px + x - .05, px + x + .05, Y, Y + 1.1, pz + z - .05, pz + z + .05, wood, 0);
+    for (const [x0, x1, z0, z1] of [[-dS, dS, -dS, -dS], [-dS, dS, dS, dS], [-dS, -dS, -dS, dS], [dS, dS, -dS, dS]]) { vbox(px + Math.min(x0, x1) - .06, px + Math.max(x0, x1) + .06, Y + 1.05, Y + 1.15, pz + Math.min(z0, z1) - .06, pz + Math.max(z0, z1) + .06, wood, 0); box(px + Math.min(x0, x1) - .15, px + Math.max(x0, x1) + .15, Y, Y + 1.1, pz + Math.min(z0, z1) - .15, pz + Math.max(z0, z1) + .15, NC); }
+    ladder(px, pz - .1, top, Y, 0, -1, [px, Y + .05, pz - 1.6], 'gpeak_lookout');
+    put(new THREE.ConeGeometry(s + 2.4, 3.4, 4), red, at4(px, Y + 4.9, pz, Math.PI / 4)); put(new THREE.CylinderGeometry(.1, .1, 2.4, 6), bronze, at4(px, Y + 7.5, pz)); put(new THREE.PlaneGeometry(1.6, 1, 2, 2), red, at4(px + .85, Y + 8.1, pz));
+    const bx = px + 1.6, bz = pz + 1.6, by = Y + 3; put(new THREE.CylinderGeometry(.012, .012, .25, 4), iron, at4(bx, by + .1, bz)); put(new THREE.CylinderGeometry(.18, .5, .7, 14, 1, true), bronze, at4(bx, by - .35, bz)); put(new THREE.SphereGeometry(.08, 6, 4), iron, at4(bx, by - .7, bz));
+    A.bell = [bx, by - .35, bz]; vbox(px - 2.8, px - 1.8, Y, Y + .8, pz + 1.4, pz + 2.4, iron, 1, NC); put(new THREE.ConeGeometry(.45, .9, 7), fire, at4(px - 2.3, Y + 1.15, pz + 1.9)); A.fireAt = [px - 2.3, Y + 1.6, pz + 1.9];
+    // the ZIPLINE: from the lookout's deck edge out over the canyon, down to a post beside the home
+    const HA = HOME.hut.at, zA = [px - dS + .2, Y + 2.2, pz - dS + .6], zB = [HA[0] - 2, rwHeight(HA[0] - 2, HA[1] + 14) + 1.9, HA[1] + 14];
+    { const c = new THREE.Mesh(new THREE.TubeGeometry(new THREE.LineCurve3(new THREE.Vector3(...zA), new THREE.Vector3(...zB)), 16, .045, 5), bronze); c.castShadow = true; g.add(c); }
+    vbox(zA[0] - .12, zA[0] + .12, Y, zA[1] + .5, zA[2] - .12, zA[2] + .12, wood, 0); vbox(zB[0] + .2, zB[0] + .5, zB[1] - 1.9 - .3, zB[1] + .6, zB[2] - .15, zB[2] + .15, wood, 1, NC);
+    for (const E of [zA, zB]) put(new THREE.SphereGeometry(.16, 8, 6), glow, at4(...E)); A.zip = { A: zA, B: zB }; ZIPS.push(A.zip); A.stat.zip = +Math.hypot(zA[0] - zB[0], zA[1] - zB[1], zA[2] - zB[2]).toFixed(0); }
+  // ---- THE TRAIL: from the rim above the mill's east turret, switchbacking up the mountain to the pinnacle's foot -- cairns, rope posts ----
+  { const tw = GMILL.turrets && GMILL.turrets[1], sx = tw ? GMILL.x + tw[0] : hwRc(62) + 20, sz = tw ? GMILL.z + tw[1] : 62, rim = [hwWallAt(sz, 1, 30, -4), sz];
+    const pts = [rim, [rim[0] + 10, sz - 8], [px - 30, pz + 22], [px - 14, pz + 26], [px - 24, pz + 10], [px - 12, pz + 4], [px - Rp - 1.4, pz]].map(([x, z]) => new THREE.Vector3(x, 0, z));
+    const cv = new THREE.CatmullRomCurve3(pts), L = cv.getLength(), rnd = rwRng(9191); let k = 0;
+    for (let d = 0; d < L; d += 7) { const p = cv.getPointAt(d / L), tg = cv.getTangentAt(d / L), side = (k++ % 2) ? 1 : -1, x = p.x - tg.z * 1.4 * side, z = p.z + tg.x * 1.4 * side, y = gH(x, z);
+      if (k % 3 === 0) { let yy = y; for (let i = 0; i < 4; i++) { const s = .45 - i * .08; put(ghRockGeo(9000 + k * 7 + i, s * 1.3, s * .6, s, 1), rockM, at4(x + (rnd() - .5) * .1, yy + s * .25, z + (rnd() - .5) * .1, rnd() * 6)); yy += s * .55; } }
+      else { vbox(x - .08, x + .08, y - .2, y + 1.1, z - .08, z + .08, wood, 0); put(new THREE.SphereGeometry(.1, 6, 4), red, at4(x, y + 1.15, z)); } }
+    A.stat.trail = +L.toFixed(0); }
+  // ---- THE SCAFFOLD from the east turret's roof up the wall to the rim: a plank out to the slope, then ladders and landings ----
+  if (GMILL.turrets && GMILL.turrets[1]) { const [tx0, tz0, troof] = GMILL.turrets[1], tx = GMILL.x + tx0, tzw = GMILL.z + tz0, zw = tzw; let y = troof, n = 0;
+    { const X0 = hwWallAt(zw, 1, y + .2, -.3); vbox(tx + 2.2, X0 + .3, y - .14, y, zw - .7, zw + 2.1, woodP, 1); quad([tx + 2.2, y + .01, zw - .7], [X0 + .3, y + .01, zw - .7], [X0 + .3, y + .01, zw + 2.1], [tx + 2.2, y + .01, zw + 2.1]); }
+    while (n < 6) { const X0 = hwWallAt(zw, 1, y, -.3); if (Math.abs(X0 - hwRc(zw)) > 39) break; const yt = y + 6, X1 = hwWallAt(zw, 1, yt, -.2); if (Math.abs(X1 - hwRc(zw)) > 39) break;
+      ladder(X0 - .2, zw + 1.2, y, yt, -1, 0, [X0 - .9, yt + .1, zw + 1.2], 'gpeak_wall');
+      const xa = Math.min(X0, X1) - 1.2, xb = Math.max(X0, X1) + .3; vbox(xa, xb, yt - .14, yt, zw + .3, zw + 2.1, woodP, 1); quad([xa, yt + .01, zw + .3], [xb, yt + .01, zw + .3], [xb, yt + .01, zw + 2.1], [xa, yt + .01, zw + 2.1]);
+      for (const zz of [zw + .35, zw + 2.05]) vbox(xa - .08, xa + .08, gH(xa, zz) - .3, yt, zz - .08, zz + .08, wood, 0);
+      y = yt; n++; if (gH(X1 + 2, zw) - yt < 2) break; }
+    A.stat.scaffold = n; A.stat.scaffTop = +y.toFixed(1); }
+  // ---- merge ----
+  let draws = 0; for (const [m, list] of MG) { const geo = mergeGeometries(list); if (!geo) { console.warn('[melee] gpeak: a bucket would not merge', m.color); continue; } const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; g.add(o); draws++; }
+  for (const b of boxes) BOXES.push(b);
+  for (let i = 0; i < tris.length; i += 9) { const q = tris.slice(i, i + 9); triAdd(...q); triAdd(q[0], q[1], q[2], q[6], q[7], q[8], q[3], q[4], q[5]); }
+  A.stat.draws = draws + 1; A.stat.mount = +mt.toFixed(1); A.stat.top = +top.toFixed(1);
+  console.log('[melee] the peak (procedural): ' + A.stat.draws + ' draws, mountain ' + A.stat.mount + ' m, pinnacle pad ' + A.stat.top + ' m, lookout deck ' + (top + 8).toFixed(1) + ' m, zipline ' + A.stat.zip + ' m, trail ' + A.stat.trail + ' m, scaffold ' + A.stat.scaffold + ' ladders to ' + A.stat.scaffTop);
+}
+// the bell rings, the brazier smokes
+function gpeakHit(x, y, z, rad) { const A = GPEAK; if (!A.bell || !inHome() || A.hc > 0) return 0; const [bx, by, bz] = A.bell; if (Math.hypot(x - bx, y - by, z - bz) > .9 + rad) return 0; A.hc = .25; snd('clang', { g: 1, r: .45, x: bx, z: bz }); spkBurst(bx, by, bz, 16, { col: [1, .85, .4], spread: 3, size: .1, life: .5 }); return 1; }
+function gpeakStep(dt) { const A = GPEAK; if (!A.g) return; A.hc = (A.hc || 0) - dt; if (A.fireAt) { A.ft = (A.ft || 0) - dt; if (A.ft <= 0) { A.ft = .12; spkBurst(A.fireAt[0], A.fireAt[1], A.fireAt[2], 2, { col: [1, .6, .2], spread: .8, size: .12, life: .6 }); } } }
 // THE WATER-MILL TOWER (his ref `images/korajin/ref/water_mill_1.jpg`, after m1468): on a sandy ISLAND in the stream below the home, a
 // square stone BASE with an arched race through it and a WATERWHEEL turning in it, water pouring over it; a tall tapering cream TOWER
 // painted with the red sun-spiral; a ring gallery and a red-capped LANTERN at the top with a ROTOR of red sails turning round it; timber
@@ -65565,13 +65653,13 @@ function gmillBuild() {
       arc(door + dh, door - dh + TAU, yb, top); arc(door - dh, door + dh, yb, ya - .1); arc(door - dh, door + dh, ya + D, top);
       for (const a of [door - dh, door + dh]) put(new THREE.BoxGeometry(.15, D, th), stone, at4(tx + Math.sin(a) * (R - th / 2), ya + D / 2, tz + Math.cos(a) * (R - th / 2), a));
       put(new THREE.TorusGeometry(1.15, .16, 6, 12, Math.PI), stone, at4(tx + Math.sin(door) * (R + .05), ya + D, tz + Math.cos(door) * (R + .05), door + Math.PI / 2));
-      const ring = new THREE.RingGeometry(R - th, R + .15, 32); ring.rotateX(-Math.PI / 2); put(ring, stone, at4(tx, top, tz)); for (let k = 0; k < 14; k++) { if (k % 2) continue; const a = k / 14 * TAU; put(new THREE.BoxGeometry(1.1, .9, th), stone, at4(tx + Math.sin(a) * (R - th / 2), top + .45, tz + Math.cos(a) * (R - th / 2), a)); }
+      const ring = new THREE.RingGeometry(R - th, R + .15, 32); ring.rotateX(-Math.PI / 2); put(ring, stone, at4(tx, top, tz)); for (let k = 0; k < 14; k++) { if (k % 2) continue; const a = k / 14 * TAU; if (sd > 0 && Math.abs(Math.atan2(Math.sin(a - Math.PI / 2), Math.cos(a - Math.PI / 2))) < .5) continue; put(new THREE.BoxGeometry(1.1, .9, th), stone, at4(tx + Math.sin(a) * (R - th / 2), top + .45, tz + Math.cos(a) * (R - th / 2), a)); }
       put(new THREE.CylinderGeometry(R + .25, R + .25, .35, 32, 1, true), stone, at4(tx, top - .2, tz));
       const fl = new THREE.CircleGeometry(R - th, 24); fl.rotateX(-Math.PI / 2); put(fl, woodP, at4(tx, ya - .02, tz)); box(tx - (R - th) * .75, tx + (R - th) * .75, yb, ya - .02, tz - (R - th) * .75, tz + (R - th) * .75);
       { const N = 24; for (let i = 0; i < N; i++) { const a0 = i / N * TAU, a1 = (i + 1) / N * TAU, r = R - th; quad([tx, ya, tz], [tx + Math.sin(a0) * r, ya, tz + Math.cos(a0) * r], [tx + Math.sin(a1) * r, ya, tz + Math.cos(a1) * r], [tx, ya, tz]); quad([tx, top + .01, tz], [tx + Math.sin(a0) * r, top + .01, tz + Math.cos(a0) * r], [tx + Math.sin(a1) * r, top + .01, tz + Math.cos(a1) * r], [tx, top + .01, tz]); } }
       const rf = new THREE.CircleGeometry(R - th + .02, 24); rf.rotateX(-Math.PI / 2); put(rf, woodP, at4(tx, top - .02, tz)); box(tx - (R - th), tx + (R - th), top - .3, top, tz - (R - th), tz + (R - th));
       for (let k = 0; k < 20; k++) { const a = k / 20 * TAU; if (Math.abs(Math.atan2(Math.sin(a - door), Math.cos(a - door))) < dh + .12) { const lowTop = ya - .1; box(tx + Math.sin(a) * (R - th / 2) - .4, tx + Math.sin(a) * (R - th / 2) + .4, top - 1, top + .9, tz + Math.cos(a) * (R - th / 2) - .4, tz + Math.cos(a) * (R - th / 2) + .4); continue; }
-        const wx = tx + Math.sin(a) * (R - th / 2), wz = tz + Math.cos(a) * (R - th / 2); box(wx - .45, wx + .45, yb, top + .9, wz - .45, wz + .45); }
+        const wx = tx + Math.sin(a) * (R - th / 2), wz = tz + Math.cos(a) * (R - th / 2), out = sd > 0 && Math.abs(Math.atan2(Math.sin(a - Math.PI / 2), Math.cos(a - Math.PI / 2))) < .5; box(wx - .45, wx + .45, yb, out ? top : top + .9, wz - .45, wz + .45); }
       // the flag on its pole, and the ladder up the turret's outside to its roof (beside the stair's head)
       vbox(tx - .08, tx + .08, top, top + 5, tz - .08, tz + .08, wood, 0); put(new THREE.PlaneGeometry(1.8, 1.2, 4, 2), banM, at4(tx + .95 * -sd, top + 4.3, tz, 0));
       { const a2 = sd < 0 ? .55 : -.55, lx = tx + Math.sin(a2) * (R + .45), lz = tz + Math.cos(a2) * (R + .45), nx = Math.sin(a2), nz = Math.cos(a2), ux = Math.cos(a2), uz = -Math.sin(a2);
@@ -65759,6 +65847,7 @@ async function buildHome() {
   if (GHOME.on) { try { ghomeBuild(H.hut.at, H.hut.yaw, H.padY); H.stat.hutK = 'proc'; } catch (e) { console.error('[melee] grumbo home', e); note('HOME BUILD THREW'); } }
   if (GMERCH.on && H.style !== 'lake') try { gmerchBuild(); } catch (e) { console.error('[melee] merchant shop', e); note('MERCHANT BUILD THREW'); }
   if (GMILL.on && H.style !== 'lake') try { gmillBuild(); } catch (e) { console.error('[melee] water mill', e); note('MILL BUILD THREW'); }
+  if (GPEAK.on && H.style !== 'lake') try { gpeakBuild(); } catch (e) { console.error('[melee] the peak', e); note('PEAK BUILD THREW'); }
   else try { const g = await loadGLB(H.hut.file, 'loading the refuge');
     const m = g.scene, drop = []; m.traverse(o => { if (o.isLight) drop.push(o); }); for (const o of drop) o.removeFromParent();
     m.updateMatrixWorld(true); const bb = new THREE.Box3(); m.traverse(o => { if (o.isMesh && o.name !== 'collider' && o.geometry) { o.geometry.computeBoundingBox(); bb.union(o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld)); } });
@@ -65982,7 +66071,7 @@ function homeLanterns() {
 }
 function homeStep(dt) {
   const H = HOME; H.t += dt; if (RW.U) RW.U.uTime.value = H.t;
-  gmillStep(dt, H.t);
+  gmillStep(dt, H.t); gpeakStep(dt);
   if (GHOME.U) GHOME.U.uWind.value = H.t; ghomeSmoke(dt, H.t); for (const G of GHOME.gates || []) bgateStep(G, dt);     // pass 9: his back door
   if (GHOME.canoe) { const C = GHOME.canoe, t = H.t; C.g.position.y = C.y + rwWaveAt(C.x, C.z, t) * .8 * (1 - Math.min(1, (C.lift || 0) * 2)) + .02 + (C.lift || 0); C.ht = (C.ht == null ? 12 : C.ht) - dt; if (C.ht <= 0 && !C.hu) { C.hu = 1e-3; } if (C.hu) { C.hu += dt; if (C.hu > 6) { C.hu = 0; C.ht = 18 + Math.random() * 20; const P = C.g.getWorldPosition(new THREE.Vector3()); spkBurst(P.x, GHOME.g.position.y + C.y + .05, P.z, 30, { col: [.85, .93, 1], spread: 4, size: .09, life: .6 }); snd('thud', { g: .5, r: .7, x: P.x, z: P.z }); } }     // pass 24: now and then it LIFTS on its discs, hangs dripping, and settles
   const lift = C.hu ? .5 * Math.min(1, C.hu / 1.4) * Math.min(1, Math.max(0, (6 - C.hu) / 1.2)) : 0; if (lift > .05 && Math.random() < dt * 14) { const P = C.g.localToWorld(new THREE.Vector3((Math.random() - .5) * .8, -.4, (Math.random() - .5) * 4)); spkBurst(P.x, P.y, P.z, 2, { col: [.8, .9, 1], spread: .4, size: .05, life: .5 }); }
@@ -66848,7 +66937,7 @@ async function init() {
 
 // the console handle. Every tuning object is live, so a number can be moved on the phone
 // without a rebuild and without a push.
-window.melee = window.mel = { GMERCH, GMILL, PLANT, plantLibBuild, plantHit, SNOWZ, snowStamp, GHOME, SHIMMY, VAIM, SHIPZ, shipBuild, FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, gaitMeasure, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
+window.melee = window.mel = { GMERCH, GMILL, GPEAK, PLANT, plantLibBuild, plantHit, SNOWZ, snowStamp, GHOME, SHIMMY, VAIM, SHIPZ, shipBuild, FORGED, forgedLoad, mphSkin, DRINK, drinkPlace, VEND, vendHit, vendPlace, PICK, pickTap, TOSS, tossQuick, gaitMeasure, TXD, txDress, txGo: f => { const B = turfAt(player.pos.x, player.pos.z); if (B && B.area) { progFlag('tx:' + B.id, f); txDress(B, f); return B.name; } return 'not in the Pearl or the Waterfront'; }, MTIME, OTIC, OTRI, ORELAY, OPOLT, OPROJ, MCORE, EMTELL, HUM, HOTH, GFLUME, UNDER, HOVER, AIR, PL, AW, awSpot, awOpen, awPlaces, GLBNOIMG, LOD, perfMem, mem: () => { const m = perfMem(8); return m.tex + ' textures ' + m.texMB.toFixed(1) + ' MB (' + m.top.join(', ') + ') | ' + m.geo + ' geometries ' + m.geoMB.toFixed(1) + ' MB (' + m.topG.join(', ') + ') | gl ' + m.glTex + ' tex ' + m.glGeo + ' geo ' + m.programs + ' programs'; }, RADIO, radioSay, radioNext, E115, e115Done, TFLASH, flashStart, flashEnd, TPUSH, turfMove, KSWAP, kswapGod, kswapSettle, KGEN, KGSTYLE, KPIECE, kgenMake, kgenDrop, kgenGod, TDRESS, TURF, turfPush, turfAt, ISUIT, shipEnd, ISGAUNT, ISFOLK, ISDECK, ISHIP, IKEEP, ITHERM, IXING, IWIND, windGust, IJUMP, IKITE, IBASE, ISKATE, HCRACE, RBIKE, raceStep, BIKE, PBIKE, bikeOn, HCRALLY, rallyStart, rallyBrawl, HCTRAIN, HCROAD, OPLAZA, plazaStart, pearlCrowd, OPEARL, OGOOD, UPGRADES, goodGift, upApply, OLOOK, UPLIFT, cyborgRevert, SMART, ROSTER, rosterSpawn, rosterApply, OAMP, OWATCH, OORB, AIRT, orbRelease, OINCUR, incurStart, protestCrowd, OPROTEST, protestStart, protestBrawl, OSTRIKE, strike: strikeSet, ODECAY, decayApply, DHEALTH, dhPush, dhGet, FOOT, footFix, fireSheet, BURN, burnStart, OTLIFE, OTSITE, OTCARTS, HATS, OTCAMP, MAPREG, tipShow, GATES, SOCIAL, socialMe, talkTap, mapOpen, RUMOURS, rumourHear, tasksOpen, questTrack, cowSpook, cowFright, FTERR, SKYLINE, buildSkyline,
   // PROGRESS (m276): `mel.SAVE` is the save; the setters write it through; `mel.progReset()` is a new game
   // TALK (m277): `mel.TALK` live; `mel.TALKS` the scripts by kind; `mel.talk` the state
   TALK, TALKS, talk,

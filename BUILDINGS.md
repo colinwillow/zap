@@ -239,13 +239,29 @@ shaft. Placement: the layout test's spot, in the stream 66 m below the home (z 6
     ladders from the island to the roof, between the balconies and up to the gallery; ROPE BRIDGES from the lower balcony to both walls
     (21.9 m west, 11.4 m east) with banners and landings
   - [x] **pass 2 (m1475):** the WEST STAIR (48 steps of .3 beside the long bridge, from its landing on the wall down to the shore by the stepping stones, railed, on posts) so the bank walks to the mill; strike the WHEEL and it jams to a stop (strike again, it turns); spray where the water lands; crates, barrels and sacks on the balconies, lanterns hung on ropes off the gallery, a tall red banner down the upper tower, a rope coil and red pots by the base
-  - [x] **pass 3 (next tick):** BRIDGES ANCHORED TO BUILDINGS (his): a stone GATE TURRET stands out of each canyon wall where the mill's bridges land (doorway the bridge runs into, a floor, battlements, a flag, a ladder up its side to the roof); the EAST bridge's last 4 m is a DRAWBRIDGE, raised and lowered on chains by the winch wheel at the turret's door; the EAST STAIR down to the shore like the west one
+  - [x] **pass 3 (m1480):** BRIDGES ANCHORED TO BUILDINGS (his): a stone GATE TURRET stands out of each canyon wall where the mill's bridges land (doorway the bridge runs into, a floor, battlements, a flag, a ladder up its side to the roof); the EAST bridge's last 4 m is a DRAWBRIDGE, raised and lowered on chains by the winch wheel at the turret's door; the EAST STAIR down to the shore like the west one
 - **DONE WHEN:**
   - [ ] the four views match the ref in silhouette (tower proportions, sails, balconies, base)
   - [ ] the waterwheel and the sails turn, the water reads as water (pour, foam, the pond)
   - [ ] the interior: the round room and its central shaft, reached from the base
   - [ ] the route is fun: the bridges connect to the canyon's own routes (and the old first-pass bridges are redone)
   - [ ] machines you work (stop the wheel, turn the sails, a lift up the tower) and things that break (the DOORS / CHAOS rule)
+  - [ ] his sign-off on the phone
+
+## THE PEAK (his, after m1475) -- another element of height: a mountain on the east plateau, a lookout at the very top
+*"We're gonna wanna get another element of height, so maybe put a hill, a mountain, on the top up there... a plateau or an actual
+mountain. Maybe there's a lookout tower at the very top... anchoring those drawbridges to buildings, building dedicated pads, paths."*
+- **Passes:**
+  - [x] **pass 1 (next tick):** the MOUNTAIN raised out of the east plateau (`gpeakLift` in `hwHeight`: 38 m over the plateau, top at
+    64 m, radius 58, so its slopes are ground and a hike); a stratified PINNACLE on its top (24 m, sheer, cell-box collider) climbed by
+    two ladders and a ledge to its PAD at 88 m; the timber LOOKOUT on the pad (deck at 96 m, railed, a hatch and a ladder, a red roof,
+    a flag), its signal BELL (rings when struck) and a BRAZIER (sparks); a 134 m ZIPLINE from the lookout down to a post beside the
+    home; a marked TRAIL (cairns and red-capped posts) from the rim above the mill's east turret up to the pinnacle's foot; a plank and
+    a ladder from the east turret's roof up to where the wall eases off to the rim
+- **DONE WHEN:**
+  - [ ] the mountain reads as a mountain (ridges, outcrops, scree, not a smooth bump) from the home and the mill
+  - [ ] the trail is a real path (the worn ribbon, switchbacks, steps where it is steep) and the climb is fun
+  - [ ] the lookout is dressed (telescope, flags, a roof you can see from far) and the zipline ride lands well at the home
   - [ ] his sign-off on the phone
 
 ## THE MERCHANT SHOP (his, after m1459) -- high on a cliff, hard to reach, many passes (minimum 3 for every element)
