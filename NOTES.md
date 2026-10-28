@@ -95,7 +95,7 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
-## HIS SHIP FLIES WITH WINGS NOW, AND DOCKS BOW-FIRST (mXXXX)
+## HIS SHIP FLIES WITH WINGS NOW, AND DOCKS BOW-FIRST (m1483)
 - **Worker A's `shipModel()` has the airship form by default since m1479:** two battened junk-sail wings, 57 m tip to tip along local X, tail fins, the canvas rippling in `step`, and 167 boxes (the two new ones are walkable wing spars). The dojo picked it up with no change.
 - **But docked broadside, the wing pointed AT the pier,** and since the dock distance was taken from the boxes' union (wings included), the hull sat ~20 m off. It now docks BOW-FIRST (`F.dockH` = PI). `dockR` = pier edge + `bowZ` (the furthest forward point of the deck-height boxes, ignoring thin spars) + .5, so the bow deck stops a hop from the pier and the wings stand clear either side.
 
