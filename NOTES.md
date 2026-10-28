@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the SHRINE, pass 3 (layers, breakables, alive; its third pass, so the loop moves on)
+**Moves:** the Shrine's L1/L2/L3 and breakable rows.
+- L1, the courtyard: a LAUNCH BAR (`hbarMake`, yaw pi/2 so the swing carries toward the wall) 3 m off the terrace's west wall; three straw
+  barrels and three clay pots at the foot of the steps (`smashAdd`, they break and come back), clear of the torii, the lanterns and the pond.
+- L2, the terrace: four doubloons along the 9 m stone beam, always there (the beam is base). A fifth sits on the beam lantern's cap.
+- L3, the honden RIDGE: a narrow solid ridge box (`up`, part of the honden piece) reached off the eave grapple rings, with three doubloons along
+  it. The ridge, its doubloons and the lantern-cap doubloon are `up` coins, so they exist only when restored.
+- Alive: cherry petals drift off both cherries (`spk`, pink, slow, sideways).
+- `shrineClear` removes the doubloons from `COIN.list`; the bar goes through `S.bars`.
+Render-checked headless (west, east). Not checked: whether the launch bar's swing actually clears the 4.8 m terrace edge. It is the Pagoda's
+pattern, but that terrace is lower. Shipped unverified. **The Shrine's three passes are done; next in the table: Market Stalls.**
+
 ## the peak, pass 2: ridges, outcrops, scree, a worn trail (Worker B, loop tick 4)
 DONE WHEN box "the mountain reads as a mountain" moved (not ticked: his phone). `gpeakLift` multiplies the old bump by
 `1 + GPEAK.ridge * smooth(6, 20, m) * (gpeakRidge^2 - .4)`, gpeakRidge = 1 - |sin(3θ + noise)|: six warped spurs, gullies between, faded

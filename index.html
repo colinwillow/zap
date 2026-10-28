@@ -21812,7 +21812,23 @@ function shrineBuild() {
   // lies wrecked off the back of the terrace, the torii on its side by the steps, the lanterns toppled; the colour is drained, the bunting, the
   // cables and the drone are gone, and the core lies dark in its basin (it does not heal). RESTORE (the mint plate by the terrace's east wall, or
   // SPAWN > BUILDINGS > STATE): the lanterns right themselves, the torii stands, the honden flies home last and the Jinra comes back ----
-  const S0 = SHRINE.on, R = restoreRig(g, { lift: 0, dur: 8, bob: 0 }); S0.R = R; S0.ground = [];
+  // ---- RE-PASS 3 (m@X4@): THE LAYERS -- L1 the courtyard (a LAUNCH BAR by the west wall swings him up onto the terrace; barrels and pots to
+  // smash by the foot), L2 the terrace and the stone beam (doubloons along it, one on its lantern's cap), L3 the honden RIDGE: a narrow
+  // walkable ridge reached off the eave grapple rings, three doubloons along it. The ridge and the high doubloons exist only when restored ----
+  const S0 = SHRINE.on, coinsB = [], coinsU = [];
+  { const Bb = hbarMake(cx - hw - 3, cz - 1.5, Math.PI / 2, 0); HBAR.list.push(Bb); S0.bars.push(Bb); }
+  const ridgeY = H + wh + 2.4; add(new THREE.BoxGeometry(hw2 * 1.2 + .4, .2, .5), wood, cx, ridgeY + .02, hz, 1); BOXES.push(O.boxes[O.boxes.length - 1]); boxGrid();
+  for (let i = 1; i <= 4; i++) coinsB.push(coinDrop(g, cx + hw + i * 1.8, H + .9, cz));
+  coinsU.push(coinDrop(g, cx + hw + 9.7, H + 3.5, cz)); for (const dx of [-1.6, 0, 1.6]) coinsU.push(coinDrop(g, cx + dx, ridgeY + .95, hz));
+  S0.coins = [...coinsB, ...coinsU];
+  { const straw = new THREE.MeshStandardMaterial({ color: 0xd8c896, roughness: .95 }), band = K.redL, clay = new THREE.MeshStandardMaterial({ color: 0x8a5a3c, roughness: .7 });
+    for (const [x, z] of [[cx + 8.5, zFoot + 4.5], [cx + 9.4, zFoot + 4.5], [cx + 8.95, zFoot + 5.3]]) { const m = new THREE.Mesh(new THREE.CylinderGeometry(.42, .42, .9, 12), straw); m.position.set(x, .45, z); m.castShadow = true; g.add(m);
+      const bd = new THREE.Mesh(new THREE.CylinderGeometry(.43, .43, .18, 12), band); bd.position.y = .1; m.add(bd); smashAdd(smash, m, { minx: x - .42, maxx: x + .42, miny: 0, maxy: .9, minz: z - .42, maxz: z + .42 }, 2, 15, [.85, .78, .55]); }
+    for (const [x, z] of [[cx - 5.6, zFoot + 6.6], [cx - 5.0, zFoot + 5.8], [cx - 6.1, zFoot + 5.6]]) { const m = new THREE.Mesh(new THREE.SphereGeometry(.38, 12, 10), clay); m.scale.y = 1.15; m.position.set(x, .36, z); m.castShadow = true; g.add(m);
+      smashAdd(smash, m, { minx: x - .38, maxx: x + .38, miny: 0, maxy: .8, minz: z - .38, maxz: z + .38 }, 1, 12, [.55, .38, .28]); } }
+  boxGrid();
+  S0.petal = [[cx - hw + 1.6, H + 5.5, cz + hd - 1.6], [cx + hw + 3.5, 5, cz + hd + 2.5]];
+  const R = restoreRig(g, { lift: 0, dur: 8, bob: 0 }); S0.R = R; S0.ground = [];
   const bx1 = cx + hw + 9, toroAt = [[cx - 4.2 * k, 0, zFoot + .6], [cx + 4.2 * k, 0, zFoot + .6], [cx - 3.4 * k, H, cz - hd + 1], [cx + 3.4 * k, H, cz - hd + 1], [bx1 + .7, H, cz]], tzT = zFoot - 1.6 * k;
   const pairs = []; for (const o of g.children.slice()) if (o.isMesh && o.userData.mg) { const m = o.material, tri = m.customProgramCacheKey && String(m.customProgramCacheKey()).startsWith('tri'); if (m.transparent || (m.map && !tri)) continue;
     o.updateMatrix(); pairs.push([(o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()).applyMatrix4(o.matrix), m]); o.removeFromParent(); }
@@ -21823,11 +21839,11 @@ function shrineBuild() {
     if (key === 'torii') return { p: [c.x + 1.5, .45, c.z - 1.6], r: [0, .3, Math.PI / 2 * .96], hop: 2, at: .3 };
     const i = +key.slice(1), T = toroAt[i]; return { p: [c.x + (i % 2 ? .8 : -.8), T[1] + .35, c.z + .5], r: [Math.PI / 2 * .9, i * 1.3, .2], hop: 1.2, at: .04 + i * .05 }; };
   const pieces = S0.pieces = restorePieces(R, g, pairs, cls, fall); bldMergeStatic(g);
-  { const skip = new Set([drone, core, ...orb, ...koi, ...cables, ...bunt, ...plantMs, ...Object.values(pieces)]), wb = new THREE.Box3(), wc = new THREE.Vector3(), ws = new THREE.Vector3();
+  { const skip = new Set([drone, core, ...orb, ...koi, ...cables, ...bunt, ...plantMs, ...S0.coins.map(c2 => c2.m), ...Object.values(pieces)]), wb = new THREE.Box3(), wc = new THREE.Vector3(), ws = new THREE.Vector3();
     for (const o of g.children.slice()) { if (skip.has(o) || o.isInstancedMesh) continue; wb.setFromObject(o); if (wb.isEmpty()) continue; wb.getCenter(wc); wb.getSize(ws); const key = cls(wc, ws); if (key && pieces[key]) pieces[key].attach(o); } }
   restoreSkin(R);
   const bk = b2 => cls(new THREE.Vector3((b2.minx + b2.maxx) / 2, (b2.miny + b2.maxy) / 2, (b2.minz + b2.maxz) / 2), new THREE.Vector3(b2.maxx - b2.minx, b2.maxy - b2.miny, b2.maxz - b2.minz));
-  restoreRide(R, { base: { boxes: [], tris: [] }, up: { boxes: O.boxes.filter(b2 => bk(b2)), tris: [], climbs: [], bars: [], rings, coins: [], objs: [drone, ...cables, ...bunt] } });
+  restoreRide(R, { base: { boxes: [], tris: [] }, up: { boxes: O.boxes.filter(b2 => bk(b2)), tris: [], climbs: [], bars: [], rings, coins: coinsU, objs: [drone, ...cables, ...bunt] } });
   R.onSet = R2 => restoreRideSet(R2);
   { const px = cx + hw + 2, pz = cz - hd + 1.5, plate = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, .12, 24), new THREE.MeshStandardMaterial({ color: 0x3a4a46, emissive: 0x7affd8, emissiveIntensity: .7 })); plate.position.set(px, .06, pz); scene.add(plate); S0.ground.push(plate); R.trig = { x: px, y: 0, z: pz, armed: 1 }; }
   { const t0 = AGE.st === 'fallen' ? 0 : 1; R.goal = t0; restoreSet(R, t0); restoreRideSet(R, true); }
@@ -21839,7 +21855,8 @@ function shrineWarp(S, dt) { const p = player, live = !!STORII.on; S.veil.materi
     arenaBeam(x, z, [.55, .9, 1], .6); spkBurst(x, y + 1, z, 24, { col: [.55, .9, 1], spread: 4, size: .14, life: .6 }); snd('swoosh', { g: .8, r: 1.6, x, z }); };
   if (Math.abs(p.pos.x - S.fg[0]) < .7 && Math.abs(p.pos.z - S.fg[1]) < .3 && p.pos.y < 1.5) { const T = STORII; go(T.x1 - 1.5, T.top + .05, T.z, -Math.PI / 2); return; }
   { const T = STORII, dx = T.x1 - 8.5 + 3 + 1.55; if (Math.abs(p.pos.x - dx) < .5 && Math.abs(p.pos.z - T.z) < .7 && p.pos.y > T.top - .5) go(S.fg[0], 0, S.fg[1] - 1.4, Math.PI); } }
-function shrineStep(dt) { const S = SHRINE.on; if (!S) return; S.t += dt; const C = S.core, t = S.t, whole = !S.R || S.R.t >= 1; if (whole) bldJinraMotes(SHRINE.at[0], SHRINE.at[1], S.A.W / 2, dt); if (S.veil) shrineWarp(S, dt);
+function shrineStep(dt) { const S = SHRINE.on; if (!S) return; S.t += dt; const C = S.core, t = S.t, whole = !S.R || S.R.t >= 1; if (whole) bldJinraMotes(SHRINE.at[0], SHRINE.at[1], S.A.W / 2, dt);
+  if (S.petal && SPK.on && Math.random() < dt * 5) { const P = S.petal[Math.random() < .5 ? 0 : 1]; spk(P[0] + (Math.random() - .5) * 4, P[1] + Math.random(), P[2] + (Math.random() - .5) * 4, .4 + Math.random() * .5, -.5, (Math.random() - .5) * .4, .09, 2.6, Math.random() < .6 ? [1, .72, .82] : [1, .88, .92]); }     // RE-PASS 3: cherry petals drift if (S.veil) shrineWarp(S, dt);
   if (S.kuji) { const K = S.kuji; if (K.cd > 0) { K.cd -= dt; K.box.rotation.z = K.cd > SHRINE.kujiCd - .6 ? Math.sin(S.t * 40) * .25 : 0; }
     for (const P of K.slips) if (P.fly > 0) { P.fly -= dt; const u = 1 - P.fly / .8; P.m.position.set(K.x + (P.to[0] - K.x) * u, K.H + 1.2 + Math.sin(u * Math.PI) * 1.4 + (P.to[1] - K.H - 1.2) * u, K.z); P.m.rotation.y += dt * 9; } }
   if (S.foxes) { const p = player; for (const F of S.foxes) { const P = F.fx.position, want = Math.atan2(p.pos.x - P.x, p.pos.z - P.z) + Math.PI; F.hdg.rotation.y += clamp(wrapAngle(want - F.hdg.rotation.y), -2 * dt, 2 * dt); }
@@ -21865,7 +21882,7 @@ function shrineKuji(x, y, z, rad) { const S = SHRINE.on; if (!S || !S.kuji || S.
   const m = new THREE.Mesh(new THREE.PlaneGeometry(.12, .4), new THREE.MeshStandardMaterial({ color: luck === 'bad' ? 0xd8d0f0 : 0xf4f1ea, side: THREE.DoubleSide, emissive: luck === 'great' ? 0x3a2a00 : 0 })); S.g.add(m);
   const n = K.slips.length % 12; K.slips.push({ m, fly: .8, to: [K.rx - .75 + (n % 6) * .3, K.H + (n < 6 ? 1.1 : 1.45) - .2] }); if (K.slips.length > 12) { const o = K.slips.shift(); o.m.removeFromParent(); }
   return 1; }
-function shrineClear() { const S = SHRINE.on; if (!S) return; if (S.R) { const i = RESTORE.list.indexOf(S.R); if (i >= 0) RESTORE.list.splice(i, 1); if (S.R.ride) { bldTrisDrop(S.R.ride.tb); bldTrisDrop(S.R.ride.tu); } } for (const o of S.ground || []) o.removeFromParent(); smashDrop(S.smash); if (S.plantMs) plantDrop(S.plantMs); bldClear(S); SHRINE.on = null; }
+function shrineClear() { const S = SHRINE.on; if (!S) return; for (const c of S.coins || []) { const i = COIN.list.indexOf(c); if (i >= 0) COIN.list.splice(i, 1); } if (S.R) { const i = RESTORE.list.indexOf(S.R); if (i >= 0) RESTORE.list.splice(i, 1); if (S.R.ride) { bldTrisDrop(S.R.ride.tb); bldTrisDrop(S.R.ride.tu); } } for (const o of S.ground || []) o.removeFromParent(); smashDrop(S.smash); if (S.plantMs) plantDrop(S.plantMs); bldClear(S); SHRINE.on = null; }
 // m1143: THE RAMPART WALL (BUILDINGS.md #7, pass 1) at (0, -24). A 40 m stone wall, 4.2 m high and 3 m thick, its top a walkway behind a row
 // of MERLONS (crenels) on the outer side; a GATEWAY in the middle closed by a breakable timber-and-plaster panel (smash through) under a
 // lintel the walkway runs over; a RAMP up the inner face at each half; and at each end a BASTION 1.5 m higher (steps up from the
