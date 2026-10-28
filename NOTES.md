@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- THE ZIP LINE, rebuilt: fast, on the katana with sparks, hands on the cable, a swing you can loop (DOCKET 13)
+His: *"you can disengage without reaching the ends; it doesn't go very fast; the hand placement is off; the sword isn't out and there's no
+sparks. There should be some rotational swing and velocity -- maybe loops for fun. The engage / disengage is good."*
+- **Off only by a tap or at an end:** the hard-down stick for .45 s dropped him -- the same gesture as the brake, pushed further. Gone.
+- **Faster:** caught at `v0` 9 m/s (was 3), a constant `pull` of 5 m/s/s downhill, drag .25 -> .1, top speed 17 -> 28.
+- **The katana comes out on the catch** (if he has it) and the previous weapon goes back on the way off. He rides on the blade over the
+  cable.
+- **Sparks:** a stream at the contact point that grows with speed (1 + v x .25 a frame), thrown back along the line, plus a hiss above 6 m/s.
+- **The hands:** both IK'd onto the cable -- the left .16 m ahead, the right just under it on the grip -- elbows out (`zipPose`).
+- **The SWING:** he hangs from his hands on a pendulum (`sw`, + = feet forward). Speeding up leaves his body behind, braking throws it
+  forward. **A right-pad flick UP kicks it round** (`zipKick`, `kick` 9 rad/s: about one loop over the cable), DOWN the other way. The
+  drawn body is turned to hang along the swing.
+- **Measured headless** (a 9 m -> 2.5 m line, 54 m): 15.2 m/s after a second, the swing lagging -.41 rad, the left hand .13 m from the
+  cable. Two kicks: 10.9 rad of swing (more than a full loop), still on the line at 19.9 m/s. Rendered riding, mid-loop.
+
 ## GOD > SWITCHES > RED HOLLOWS: FALLEN / RESTORED (Worker B)
 His ask: "how can I see the Red Hollows in all its glory (built) on a phone?" The state switch lived only in SPAWN > BUILDINGS, which is the
 arena/forge UI and never shows in the Red Hollows. Now a GOD menu switch in the hollows flips main's `AGE` (`mel.age`, saved) and reloads,

@@ -13138,16 +13138,29 @@ function stepRope(dt) {
 // m1168: ZIPLINES (Sky Bridges pass 2). A cable from a high point to a low one (`ZIPS`: {A, B}). In the air, his hands within `grab` m of
 // the cable (and inside its length) CATCH it: he hangs and slides down it, gravity along the slope against a little drag, up to `max`
 // m/s, and drops off at the bottom end with the speed he has. TAP to let go anywhere on the way.
-const ZIP = { brake: 14, grab: .7, max: 17, drag: .25, v0: 3, up: 2.6, dropT: .45 }, ZIPS = [];
+const ZIP = { brake: 14, grab: .7, max: 28, drag: .1, v0: 9, up: 2.6, dropT: .45, pull: 5, swDamp: .6, kick: 9, sparkK: .25, katana: 1 }, ZIPS = [];     /* m15xx: faster (max 17 -> 28, drag .25 -> .1, a constant `pull`, caught at `v0` 9), the swing, the katana */
 function zipCatch() {
   const p = player, H = hbarH(), hx = p.pos.x, hy = p.pos.y + H * 1.15, hz = p.pos.z;
   for (const Z of ZIPS) { const A = Z.A, B = Z.B, dx = B[0] - A[0], dy = B[1] - A[1], dz = B[2] - A[2], L2 = dx * dx + dy * dy + dz * dz, u = ((hx - A[0]) * dx + (hy - A[1]) * dy + (hz - A[2]) * dz) / L2;
     if (u < .02 || u > .95) continue; const qx = A[0] + dx * u - hx, qy = A[1] + dy * u - hy, qz = A[2] + dz * u - hz;
     if (Math.hypot(qx, qy, qz) > ZIP.grab) continue;
     p.zip = { Z, u, v: Math.max(ZIP.v0, (p.vel.x * dx + p.vel.y * dy + p.vel.z * dz) / Math.sqrt(L2)), L: Math.sqrt(L2) }; p.melee = 0; p.flip = ''; p.aflip = null; p.barFly = null;
-    p.faceH = p.heading = Math.atan2(dx, dz); snd('clang', { g: .4, r: 1.8, x: hx, z: hz }); return 1; }
+    p.faceH = p.heading = Math.atan2(dx, dz); snd('clang', { g: .4, r: 1.8, x: hx, z: hz });
+    // m15xx (his: "the sword isn't out and there's no sparks"): he rides the line on his KATANA, hooked over the cable -- it comes out on the catch and
+    // goes back on the way off
+    if (ZIP.katana) { const k = WEAP.slots.findIndex(q => q.melee === 'katana'); if (k >= 0 && player.slot !== k && (GEAR.mask & (1 << k))) { p.zip.prev = player.slot; applySlot(k); } }
+    p.zip.sw = 0; p.zip.sww = 0; return 1; }
   return 0;
 }
+function zipKick(dx, dy) { const K = player.zip; if (!K) return 0; K.sww += (dy < 0 ? 1 : -1) * ZIP.kick; snd('swoosh', { g: .5, r: .8 }); return 1; }     // m15xx: up = feet forward and over
+// m15xx: the drawn body on the line -- turned so it hangs from the hands along `K.down`, both hands IK'd onto the cable (the right one on the
+// katana's grip just under it), elbows out
+const _zpU = new THREE.Vector3(0, 1, 0), _zpQ = new THREE.Quaternion(), _zpT = new THREE.Vector3();
+function zipPose() { const p = player, K = p.zip; if (!K || !K.down || !rig.bones) return; const A = K.Z.A, B = K.Z.B, L = K.L, u = Math.min(1, K.u), dx = (B[0] - A[0]) / L, dy = (B[1] - A[1]) / L, dz = (B[2] - A[2]) / L;
+  _zpQ.setFromUnitVectors(_zpU, _zpT.copy(K.down).negate()); rig.root.quaternion.premultiply(_zpQ); rig.root.updateMatrixWorld(true);
+  const rx = dz, rz = -dx, rl = Math.hypot(rx, rz) || 1;     // his right, across the line
+  for (const [S, sd, ahead] of [['Left', -1, .16], ['Right', 1, -.02]]) { const cx = A[0] + (B[0] - A[0]) * u + dx * ahead, cy = A[1] + (B[1] - A[1]) * u + dy * ahead - (sd > 0 ? .1 : .03), cz = A[2] + (B[2] - A[2]) * u + dz * ahead;
+    wrLimb(rig.bones['mixamorig_' + S + 'Arm'], rig.bones['mixamorig_' + S + 'ForeArm'], rig.bones['mixamorig_' + S + 'Hand'], new THREE.Vector3(cx, cy, cz), new THREE.Vector3(rx / rl * sd, -.4, rz / rl * sd)); } }
 function stepZip(dt) {
   const p = player, K = p.zip, A = K.Z.A, B = K.Z.B, H = hbarH(), sn = (A[1] - B[1]) / K.L;
   K.v = Math.min(ZIP.max, K.v + (MOVE.g * sn - ZIP.drag * K.v) * dt);
@@ -13156,13 +13169,25 @@ function stepZip(dt) {
   if (stick.L.down && stick.L.y < -.35) K.v = sn > 0 ? -ZIP.up : ZIP.up;
   // m1352: *"I got onto a zipline by accident and couldn't get off, he was moving really slow."* A tap (either pad) still lets go; now so does the
   // left stick held hard DOWN for `dropT` s (the obvious "get me off this" gesture), and the shimmy is quicker (`up` 1.6 -> 2.6)
-  K.dn = stick.L.down && stick.L.y > .85 ? (K.dn || 0) + dt : 0; if (K.dn > ZIP.dropT) p.jump = 1;
+  // m15xx (his: "you can disengage from it without reaching the ends"): the hard-down stick no longer drops him (it is the BRAKE's own gesture,
+  // pushed further); a TAP lets go, nothing else
+  const v0 = K.v; K.v = Math.min(ZIP.max, K.v + (sn > 0 ? ZIP.pull : 0) * dt);
   K.u += K.v / K.L * dt; p.grounded = false;     // m1293: THIS LINE WAS INSIDE THE COMMENT ABOVE SINCE m1193 -- every zipline froze where you caught it
   if (K.u < 0) K.u = 0;
   const u = Math.min(1, K.u), dx = (B[0] - A[0]) / K.L, dy = (B[1] - A[1]) / K.L, dz = (B[2] - A[2]) / K.L;
   p.pos.set(A[0] + (B[0] - A[0]) * u, A[1] + (B[1] - A[1]) * u - H * 1.15, A[2] + (B[2] - A[2]) * u); p.vel.set(dx * K.v, dy * K.v, dz * K.v);
-  if (Math.random() < .5) spk(p.pos.x, p.pos.y + H * 1.15, p.pos.z, (Math.random() - .5), .5, (Math.random() - .5), .05, .25, [1, .8, .4]);
-  if (K.u >= 1 || (K.u <= 0 && K.v < 0) || p.jump) { const tap = p.jump; p.zip = null; p.jump = 0; p.airT = 0; p.jumps = 1; if (tap) p.vel.y += 4; snd('swoosh', { g: .5, r: .9 }); }
+  // m15xx: THE SWING. He hangs from his hands on a pendulum (`sw`, + = feet forward along the line): speeding up leaves his body BEHIND, braking
+  // throws it forward, and a right-pad flick UP kicks it round (`zipKick`) -- hard enough and he goes right over the cable, LOOPS
+  { const Lp = H * 1.15, acc = (K.v - v0) / Math.max(1e-4, dt); K.sww += (-(MOVE.g / Lp) * Math.sin(K.sw) - ZIP.swDamp * K.sww - (acc / Lp) * Math.cos(K.sw)) * dt; K.sw += K.sww * dt;
+    const hx = A[0] + (B[0] - A[0]) * u, hy = A[1] + (B[1] - A[1]) * u, hz = A[2] + (B[2] - A[2]) * u, dh = Math.hypot(dx, dz) || 1;
+    K.down = K.down || new THREE.Vector3(); K.down.set(dx / dh * Math.sin(K.sw), -Math.cos(K.sw), dz / dh * Math.sin(K.sw));
+    p.pos.set(hx + K.down.x * Lp, hy + K.down.y * Lp, hz + K.down.z * Lp); }
+  // the SPARKS: the blade on the cable, a stream that grows with his speed
+  { const n = Math.floor(1 + K.v * ZIP.sparkK + Math.random()); const cx = A[0] + (B[0] - A[0]) * u, cy = A[1] + (B[1] - A[1]) * u, cz = A[2] + (B[2] - A[2]) * u;
+    for (let i = 0; i < n; i++) spk(cx, cy, cz, -dx * K.v * .3 + (Math.random() - .5) * 2, .6 + Math.random() * 1.5, -dz * K.v * .3 + (Math.random() - .5) * 2, .04 + Math.random() * .04, .25 + Math.random() * .2, Math.random() < .5 ? [1, .85, .45] : [1, 1, .85]);
+    K.hiss = (K.hiss || 0) - dt; if (K.hiss <= 0 && K.v > 6) { K.hiss = .14; snd('swoosh', { g: .08 + Math.min(.15, K.v * .006), r: 2.2 + Math.random() * .3, x: cx, z: cz }); } }
+  if (K.u >= 1 || (K.u <= 0 && K.v < 0) || p.jump) { const tap = p.jump; p.zip = null; p.jump = 0; p.airT = 0; p.jumps = 1; if (tap) p.vel.y += 4; snd('swoosh', { g: .5, r: .9 });
+    if (K.prev !== undefined && K.prev !== player.slot) applySlot(K.prev); }
 }
 function stepBar(dt) {
   const p = player, S = p.bar, B = S.B, R = Math.max(.5, S.R); S.t += dt;
@@ -30072,7 +30097,7 @@ PADS.R = bindStick(padR, stick.R,
   // ...unless someone in reach has something to say: then it is TALK (m277), and the left tap still jumps
   () => { if (aim3Now()) return; /* m1345: 3D AIM owns the whole right pad -- a tap is not a jump */ if (talkTap()) return; if (player.dragon) { if (player.dragon.st === 'sit') dragTapR(); return; } if (dragTap()) return; /* m1614 */ if (pickTap()) return; if (portalTap()) return; if (wingTapR()) return; if (hurdleTap()) return; if (mantleTap()) return; if (wrunTap()) return; player.jump = 1; },     // m1064: a tall face beside / ahead -> wall run     // m1063: pushing into a half block -> hurdle it     // m1039: a ledge in reach -> climb it
   // flick: a SLAM if he is in the air and it went down, otherwise a strike in that direction
-  (dx, dy) => { if (player.dragon) { dragBreath(); return; } /* m1621: his fireball */ if (player.wing || aim3Now()) return; /* m1282: in 3D AIM a fast drag moves the cursor, it never swings */ if (tossQuick(dx, dy)) return; if (boardFlick(dx, dy, 0)) return; if (wrunSwipe(dx, dy)) return; if (runSwipe(dx, dy)) return; if (!slamGo(dx, dy)) { KATANA.dir = katanaDir(dx, dy); meleeGo(KATANA.dir === 'down' ? player.faceH : flickH(dx, dy)); } },     // m1054: DOWN is not a direction -- the strike goes where he faces (a slot kept for a grab / throw / special)     // m1014: the right pad is MELEE, by direction (m1012's down-slide is off it)
+  (dx, dy) => { if (player.dragon) { dragBreath(); return; } /* m1621: his fireball */ if (player.wing || aim3Now()) return; /* m1282: in 3D AIM a fast drag moves the cursor, it never swings */ if (tossQuick(dx, dy)) return; if (boardFlick(dx, dy, 0)) return; if (zipKick(dx, dy)) return; if (wrunSwipe(dx, dy)) return; if (runSwipe(dx, dy)) return; if (!slamGo(dx, dy)) { KATANA.dir = katanaDir(dx, dy); meleeGo(KATANA.dir === 'down' ? player.faceH : flickH(dx, dy)); } },     // m1054: DOWN is not a direction -- the strike goes where he faces (a slot kept for a grab / throw / special)     // m1014: the right pad is MELEE, by direction (m1012's down-slide is off it)
   null,
   // THE RELEASE IS THE SHOT, so this must NOT clear `p.aim` -- `stepKit` sees the pad is no
   // longer held and fires on that edge. Clearing it here would eat every shot in the game.
@@ -66281,6 +66306,7 @@ function frameBody() {
     else if (player.vaultRes) { const R = player.vaultRes; R.t += dt; const k = 1 - smooth(0, VAULT.resT, R.t); rig.root.position.x -= R.ox * k; rig.root.position.z -= R.oz * k; if (k <= 0) player.vaultRes = null; }     // and eased out as the clip fades
     airFlipPose();                     // m1050: the left stick's air flips, turned about his middle
     wrunPose();                        // m1064: rolled off the wall on a side run
+    zipPose();                         // m15xx: hanging from the zip line, swung, hands on the cable
     duckPose(dt);                      // m1070: the cover duck (right pad down in half cover)
     gsidePose();                       // m1073: the mirrored guard's blade, laid along the reflection of his own
     beamPose();                        // m1037: on the beam, tilted with the balance, arms out
