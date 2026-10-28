@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## the LADDER REFACTOR, step 1: the LADDER YARD in the forge (Worker B)
+His ask (relayed, then confirmed to me): "the ladder needs a refactor -- we still need to perfect getting onto the ladder and off at the top";
+build a test ground first. History read before touching anything: m170 (latch by pushing in, no button), m180 (turned volumes, the foot
+stepped onto), m189 (`climbing_Ladder`, measured .73 m/s), m195/m207/m208 (which side is the front: the probe, the axis swap), m1316
+(`ladderFront` by the exit mark; the step-over arc `climbOver`; speed 3.4 -> 2.3), m1352 (the step-over only `overD` .9 m in).
+SPAWN > BUILDINGS > LADDER YARD (`ladyBuild`, at (165, -80), spawns him at its gate facing it): 13 NUMBERED ladders, each a yellow ladder on
+a wall (or slab) with its exit mark on the top and a sign (number + what it is):
+  1-5   wall ladders 2 / 4 / 7 / 12 / 20 m          6-9  4 m walls turned 45 / 90 / 135 / 180 deg (oriented boxes, `cs`/`sn`)
+  10    a free-standing deck on four posts (5 m)    11   up through a roof HATCH (7 m slab, 1.2 m hole)
+  12    the foot on a .6 m STEP (5 m)               13   the top onto a NARROW .7 m ledge (6 m)
+The chip carries `LAD<OFF|MOUNT|CLIMB|OVER>#<n>` while the yard stands. Nothing about the climb itself changed in this build: it is the
+baseline to feel. Known from reading the code: mounting FROM THE TOP is not possible at all (`climbFind` latches only from the FRONT side and
+only by pushing INTO the rungs; standing on the top he is on the mark's side), the bottom mount is an instant snap to the rungs (`climbGo`
+zeroes him and `stepClimb` sets x/z the same frame), and the top-out is a .32 s scripted arc onto a point .9 m in. Steps 2-4 next.
 ## m1589 -- THE ZEPPELINS, detail pass 5 (the envelope)
 - GORE SEAMS: four meridian rings (a torus turned into the yz-plane, scaled to the envelope and turned about z), so eight tan seams run
   nose to tail.
