@@ -75,6 +75,13 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
+## THE GOLD DOUBLOON, AND A COIN UP EVERY STAIR STONE (mXXXX)
+*"Coins -- gold doubloons, a cool looking gold coin. The Jin, the green glowing stuff, is for my powers. I don't really know yet."* Recorded as his LEAN in KORAJIN.md (MONEY).
+- **`coinGeo()`:** an extruded 14-sided, slightly wobbly disc with a square hole, bevelled; a rim torus and the SQUARE SPIRAL (boxes along the path, starting outside the hole) and four studs on each face. TWO TONES by vertex colour (an antique face, bright raised work). One-tone gold hid the spiral head-on.
+- **`coinDrop(g, x, y, z)` and `coinStep`:** spin, bob, and collect within .9 m: a leap up, a high clang, a gold sparkle. `COIN.n` is saved to `mel.coins`.
+- **In the dojo:** a doubloon floats over each of the ten sky-stair stones, so the climb pays. `mel.COIN` and `mel.coinDrop` are live.
+- **Worker B's merchant** is told: gold for buying, the Jin for powers. A price list and the buy hook are theirs; no on-screen counter yet (his call).
+
 ## THE DOJO, PASS 16: CLOUD BANKS, NOT COTTON BALLS (m1465)
 - **Why they read as balls:** every puff shaded ITSELF (lit top, dark bottom, from its own uv) with a firm round edge, so a bank was a pile of separately lit balls.
 - **`bbd` takes per-card aux now:** a 6th and 7th value in the list become `iA`. The vertex passes `vWy` (the fragment's approximate world height; the card is camera-facing and the camera near level).

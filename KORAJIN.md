@@ -38,6 +38,12 @@ out of weirdport. Do it when Korajin stops needing Zap's code, or the day he ask
   to the Jin, and Grumbo can wake them. Was the Korajin made to guard them, are they descended from their builders, or did the
   structures make the Korajin? Don't answer it early.
 
+## MONEY: GOLD DOUBLOONS -- and the Jin is for POWERS (his lean, Oct 28 2026; "I don't really know yet")
+> *"Coins, just like gold doubloons -- a cool looking gold coin. We'll have the Jin, the green glowing stuff, for my powers."*
+- **Two currencies that never look alike:** GOLD (doubloons) buys things (the merchant, gear). MINT Jin powers Grumbo (and the ship's flight).
+- **The doubloon (`COIN`, `coinGeo`, m1469):** hand-struck gold with a square hole (old eastern coinage), the ship's square spiral embossed round it, a rim and four studs, in two tones. A pickup spins and bobs; walking through it collects it (a leap, a ring, a sparkle), and `COIN.n` counts (saved).
+- **Not decided:** where coins come from beyond pickups (enemies? chests? the merchant buying from you?), prices, and a counter on screen.
+
 ## THE JIN GLOW -- the essence you can SEE (his, Oct 28 2026, off the serpent fish's spots)
 
 > *"I really like this green glowing stuff... floating candles with this green glowing fire-liquid, things that should be spewing water but it's

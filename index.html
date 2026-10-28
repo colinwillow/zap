@@ -10371,6 +10371,29 @@ function korStack(put, K, x, y, z, h, r = .45) { let yy = y; for (const [f, k] o
 function korWheel(put, K, x, y, z, yaw, r) { put(new THREE.TorusGeometry(r, r * .08, 6, 24).rotateY(yaw).translate(x, y, z), K.bronze); put(new THREE.CylinderGeometry(r * .18, r * .18, r * .25, 10).rotateX(Math.PI / 2).rotateY(yaw).translate(x, y, z), K.bronze);
   for (let i = 0; i < 8; i++) { const g = new THREE.BoxGeometry(r * 2.3, r * .07, r * .07); g.rotateZ(i * Math.PI / 8); g.rotateY(yaw); put(g.translate(x, y, z), K.bronze); } }
 function korPost(put, K, x, y, z, h, r = .16) { put(new THREE.CylinderGeometry(r, r * 1.1, h, 8).translate(x, y + h / 2, z), K.timber); for (const k of [.12, .5, .88]) put(new THREE.CylinderGeometry(r * 1.3, r * 1.3, .12, 8).translate(x, y + h * k, z), K.iron); }
+// m1469: THE GOLD DOUBLOON (his: *"coins -- gold doubloons, a cool looking gold coin; the Jin, the green glowing stuff, is for my powers"*). The
+// money of the world, never green. A hand-struck coin: a slightly wobbly 14-sided edge, a raised rim, a SQUARE HOLE (old eastern coinage) with
+// the ship's SQUARE SPIRAL embossed round it and four studs. `coinGeo()` / `coinMat()` are shared; `coinDrop(g, x, y, z)` puts a pickup down
+// (spinning, bobbing, a glint), `coinStep` collects it when he passes through: it leaps up, rings, and `COIN.n` counts (kept in `mel.coins`).
+const COIN = { n: 0, list: [], r: .9, s: .55 };
+try { COIN.n = +localStorage.getItem('mel.coins') || 0; } catch (e) {}
+function coinGeo() { if (COIN.geo) return COIN.geo; const sh = new THREE.Shape(), N = 14, R = .5;
+  for (let i = 0; i <= N; i++) { const a = i / N * 6.2832, r = R * (1 + .025 * Math.sin(i * 5.3)); i ? sh.lineTo(Math.cos(a) * r, Math.sin(a) * r) : sh.moveTo(Math.cos(a) * r, Math.sin(a) * r); }
+  const h = .075, hole = new THREE.Path(); hole.moveTo(-h, -h); hole.lineTo(-h, h); hole.lineTo(h, h); hole.lineTo(h, -h); hole.lineTo(-h, -h); sh.holes.push(hole);
+  const parts = [new THREE.ExtrudeGeometry(sh, { depth: .06, bevelEnabled: true, bevelThickness: .02, bevelSize: .02, bevelSegments: 2, curveSegments: 1 }).translate(0, 0, -.03)];
+  for (const z of [.052, -.052]) { parts.push(new THREE.TorusGeometry(.44, .028, 6, 28).translate(0, 0, z));
+    const pts = [[-.12, -.12]]; let x = -.12, y = -.12, L = .24, d = 0; for (let i = 0; i < 6; i++) { x += [1, 0, -1, 0][d] * L; y += [0, 1, 0, -1][d] * L; pts.push([x, y]); d = (d + 1) % 4; if (i % 2) L += .1; }     /* the square spiral wrapping the hole */
+    for (let i = 1; i < pts.length; i++) { const [x0, y0] = pts[i - 1], [x1, y1] = pts[i];
+      parts.push(new THREE.BoxGeometry(Math.abs(x1 - x0) + .04, Math.abs(y1 - y0) + .04, .03).translate((x0 + x1) / 2, (y0 + y1) / 2, z)); }
+    for (const [sx, sy] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) parts.push(new THREE.SphereGeometry(.03, 6, 4).translate(sx * .33, sy * .33, z)); }
+  for (const q of parts) { if (q.index) continue; } COIN.geo = mergeGeometries(parts.map((q, j) => { const n = q.index ? q.toNonIndexed() : q; for (const k of Object.keys(n.attributes)) if (k !== 'position' && k !== 'normal') n.deleteAttribute(k); const c = j ? [1, .9, .55] : [.62, .4, .1]; n.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(n.attributes.position.count * 3).map((_, i) => c[i % 3]), 3)); return n; }));     /* two tones: an antique face, the raised work bright */ COIN.geo.computeVertexNormals(); return COIN.geo; }
+function coinMat() { return COIN.mat || (COIN.mat = new THREE.MeshStandardMaterial({ color: 0xffd060, vertexColors: true, metalness: 1, roughness: .3, emissive: 0x2a1800, emissiveIntensity: .5 })); }
+function coinDrop(g, x, y, z) { const m = new THREE.Mesh(coinGeo(), coinMat()); m.scale.setScalar(COIN.s); m.position.set(x, y, z); m.castShadow = true; g.add(m); const c = { m, x, y, z, ph: Math.random() * 6.28, t: -1 }; COIN.list.push(c); return c; }
+function coinStep(dt) { const p = player.pos;
+  for (let i = COIN.list.length - 1; i >= 0; i--) { const c = COIN.list[i]; c.ph += dt;
+    if (c.t < 0) { c.m.rotation.y = c.ph * 2.2; c.m.position.y = c.y + Math.sin(c.ph * 2) * .12;
+      if (Math.hypot(p.x - c.x, p.z - c.z) < COIN.r && p.y > c.y - 1.6 && p.y < c.y + .8) { c.t = 0; COIN.n++; try { localStorage.setItem('mel.coins', COIN.n); } catch (e) {} snd('clang', { g: .5, r: 2.6, x: c.x, z: c.z }); spkBurst(c.x, c.y, c.z, 10, { col: [1, .8, .25], spread: 1.4, size: .14, life: .6 }); } }
+    else { c.t += dt; c.m.rotation.y += dt * 18; c.m.position.y = c.y + c.t * 4 - c.t * c.t * 3; c.m.scale.setScalar(COIN.s * Math.max(0, 1 - c.t * 1.6)); if (c.t > .62) { c.m.removeFromParent(); COIN.list.splice(i, 1); } } } }
 function korLantern(put, K, x, y, z, s = 1) { put(new THREE.BoxGeometry(.42 * s, .55 * s, .42 * s).translate(x, y, z), K.lamp); for (const d of [-1, 1]) put(new THREE.BoxGeometry(.52 * s, .07 * s, .52 * s).translate(x, y + d * .3 * s, z), K.iron);
   put(new THREE.BoxGeometry(.04, .35 * s, .04).translate(x, y + .48 * s, z), K.iron); }
 function korBunting(put, K, a, b, n = 10, sag = 1.2) { let prev = null; for (let i = 0; i <= n; i++) { const u = i / n, p = [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u - Math.sin(u * Math.PI) * sag, a[2] + (b[2] - a[2]) * u];
@@ -10518,7 +10541,7 @@ function dojoBuild(g, W) {
     for (let i = 1; i <= N; i++) { const t = i / (N + 1), r2 = r0 + (pr - r0) * t, sy = y0s + (D.pier.y - y0s) * t, side = Math.sin(t * Math.PI * 1.5) * 7, sx = side, sz = r2;
       put(new THREE.CylinderGeometry(1.35, 1.1, .5, 14).translate(sx, sy - .25, sz), M.stone); isl({ R: 1.8, depth: 3 + (i % 3), seed: 140 + i, detail: 3, flat: .05, lobes: 1 }, sx, sy - .5, sz); put(new THREE.CylinderGeometry(1.38, 1.38, .1, 14, 1, true).translate(sx, sy - .05, sz), M.gold);
       if (i % 3 === 0) korLantern(put, korMats(), sx + .9, sy, sz, .9);
-      D.boxes.push({ minx: sx - .95, maxx: sx + .95, miny: sy - .5, maxy: sy, minz: sz - .95, maxz: sz + .95 }); }
+      D.boxes.push({ minx: sx - .95, maxx: sx + .95, miny: sy - .5, maxy: sy, minz: sz - .95, maxz: sz + .95 }); coinDrop(g, sx, sy + 1.1, sz); }     /* m1469: a doubloon over every stone -- the climb pays */
     const px = 0, pz = D.pier.r, py = D.pier.y; put(new THREE.CylinderGeometry(D.pier.R, D.pier.R - .3, .7, 28).translate(px, py - .35, pz), M.stone); put(new THREE.CylinderGeometry(D.pier.R + .05, D.pier.R + .05, .14, 28, 1, true).translate(px, py - .07, pz), M.gold);
     isl({ R: D.pier.R + 1.6, depth: 16, seed: 160, detail: 4, flat: .1, lobes: 3 }, px, py - .7, pz, { cherry: 1, pine: 0, rocks: 2, shrubs: 0, roots: 14, seed: 160, clear: D.pier.R + .2 });
     { const KP = korMats(); for (const sd of [-1, 1]) { korPost(put, KP, px + sd * 3.4, py, pz + 3.6, 3.2, .18); korLantern(put, KP, px + sd * 3.4, py + 2.2, pz + 3.6, 1); } korBanner(put, KP, px - 3.8, py, pz - 1, Math.PI, 1.2, 4); }
@@ -10823,6 +10846,7 @@ function dojoStep(dt) { const D = DOJO; if (!D.on) return; D.t += dt; D.U.uTime.
     A.t += dt; const u = A.t / 1.4; if (u < 1) { A.ring.position.y = A.y + .1 + u * 3.2; A.ring.scale.setScalar(1 + u * .6); A.ring.material.opacity = (1 - u) * .9; } else A.ring.visible = false;
     const v = A.t / .55; if (v < 1) { const uu = -1.3 + 2.6 * v, vv = -.33, yy = A.y + .7 + 2 * .65 + .1; A.gl.position.set(A.x + A.ca * uu + A.sa * vv, yy, A.z - A.sa * uu + A.ca * vv); A.gl.material.opacity = Math.sin(v * Math.PI); A.gl.material.rotation = v * 2; } else A.gl.material.opacity = 0; }
   if (D.birds) dojoBirds(D, D.birds);
+  if (COIN.list.length) coinStep(dt);
   if (D.sunG) D.sunG.m.position.copy(camera.position).addScaledVector(D.sunG.d, 700);
   if (D.manta) { const Mn = D.manta; Mn.a += Mn.w * dt; const rr = Mn.r + Math.sin(Mn.a * 2) * 25; Mn.m.position.set(Math.sin(Mn.a) * rr, Mn.y + Math.sin(D.t * .35) * 5, Math.cos(Mn.a) * rr); Mn.m.rotation.set(Math.cos(D.t * .35) * .1, Mn.a - Math.PI / 2, .35); }
   if (D.whale) { const Wh = D.whale; Wh.a += Wh.w * dt; Wh.m.position.set(Math.sin(Wh.a) * Wh.r, Wh.y + Math.sin(D.t * .25) * 6, Math.cos(Wh.a) * Wh.r); Wh.m.rotation.set(Math.cos(D.t * .25) * .08, Wh.a + Math.PI / 2, 0); }
