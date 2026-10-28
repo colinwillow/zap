@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE ZEPPELINS, detail pass 5 (the envelope)
+## m1589 -- THE ZEPPELINS, detail pass 5 (the envelope)
 - GORE SEAMS: four meridian rings (a torus turned into the yz-plane, scaled to the envelope and turned about z), so eight tan seams run
   nose to tail.
 - The two straight red flank stripes (18 m boxes) poked out where the envelope curves in. They are one red EQUATOR band now, a constant
