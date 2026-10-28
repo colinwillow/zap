@@ -44,7 +44,14 @@ out of weirdport. Do it when Korajin stops needing Zap's code, or the day he ask
 - **The doubloon (`COIN`, `coinGeo`, m1470):** hand-struck gold with a DIAMOND hole and the banners' nested crosshair diamond round it (his, m1475), a rim, in two tones. A pickup spins and bobs; walking through it collects it (a leap, a ring, a sparkle), and `COIN.n` counts (saved).
 - **Not decided:** where coins come from beyond pickups (enemies? chests? the merchant buying from you?), prices, and a counter on screen.
 
-## THE JIN GLOW -- the essence you can SEE (his, Oct 28 2026, off the serpent fish's spots)
+## JINRA (ジンラ) -- the name of the green (his pick, Oct 28 2026)
+> *"I like Jinra."* (From the suggestions: Jinra, Jinki, Jinmori, Kōra, Numa.)
+- **The Jin is the force; JINRA is its visible substance:** the luminous, semi-living essence that flows through everything (biology, machinery, weapons, spirituality, and the ship's flight). It is an invented word.
+- **How it looks:** translucent, slightly viscous MINT with suspended luminous motes. Sometimes liquid, sometimes vapour, sometimes CRYSTAL. It can be harvested, bottled, refined, corrupted, and used to power ancient machines.
+- **Visual reference:** `images/korajin/ref/jinra_sheet.jpg`. A Jinra refinery-shop (a sandstone dome with a giant glass globe tank, copper pipes, teal banners, a timber deck), bottles and containers, canisters and storage, esoteric items (crystals, a gyroscope orb, a dripping basin, amulets), environment props, an interior shop, a processing station and large storage.
+- **In code:** the colour token is `JIN` / `JINHEX` (mint), and the rule stands: mint is the Jinra's alone. Gold doubloons are money (MONEY, above).
+
+## THE JIN GLOW -- the essence you can SEE (now named JINRA, above) (his, Oct 28 2026, off the serpent fish's spots)
 
 > *"I really like this green glowing stuff... floating candles with this green glowing fire-liquid, things that should be spewing water but it's
 > this green, weapons that shoot it, his katana makes it as it cuts the air. Maybe this is the stuff he collects -- the ship is in the water and you
