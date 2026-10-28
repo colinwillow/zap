@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home, pass 32: the plants' third pass -- cliff shrubs (Worker B, loop tick 9; the queue's last item)
+Every 2.6 m of canyon over 92 m round the home, each wall, up to three tries: a height 3-34 m over that floor (skewed low), the wall point
+from `hwWallAt` .25 m out, turned into the home's local frame (inverse of Wx/Wz) and fed to the existing `sagebrush` (k 1.2-2.6 -- the
+first try at .6-1.4 read as specks from the home, the render showed it). 45% trail a vine: a Catmull-Rom down the face (each knot
+re-found on the wall .55 m lower) as a tube with leaf cones; 12% hang a bulb. Desert flowers: 50 clumps of stalks with cream/orange
+heads where `free()` allows. Same buckets (one new: orange) -> 37 draws. 134 shrubs, 57 vines. Own rng (3232), nothing else moves.
+The loop's queue (mill, merchant, refinery, peak, home's list) is done; the home's still-open list is down to the back ladder and stall
+rack (ref 2) and his sign-off.
 ## m1554 -- THE RE-PASS: the RAMPART WALL, pass 1 (an ENEMY wall: the look)
 **Moves:** its pass-1 row (the look). Destructible to the ground is pass 2.
 - Masonry is a `stone_blocks` triMat tinted `ENEMY.pal.stone` (and a darker tone for footings, coping and steps), not `E.stone`'s sandstone
