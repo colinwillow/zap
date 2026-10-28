@@ -10379,13 +10379,14 @@ const COIN = { n: 0, list: [], r: .9, s: .55 };
 try { COIN.n = +localStorage.getItem('mel.coins') || 0; } catch (e) {}
 function coinGeo() { if (COIN.geo) return COIN.geo; const sh = new THREE.Shape(), N = 14, R = .5;
   for (let i = 0; i <= N; i++) { const a = i / N * 6.2832, r = R * (1 + .025 * Math.sin(i * 5.3)); i ? sh.lineTo(Math.cos(a) * r, Math.sin(a) * r) : sh.moveTo(Math.cos(a) * r, Math.sin(a) * r); }
-  const h = .075, hole = new THREE.Path(); hole.moveTo(-h, -h); hole.lineTo(-h, h); hole.lineTo(h, h); hole.lineTo(h, -h); hole.lineTo(-h, -h); sh.holes.push(hole);
+  const h = .075, hd = .1, hole = new THREE.Path(); hole.moveTo(0, -hd); hole.lineTo(-hd, 0); hole.lineTo(0, hd); hole.lineTo(hd, 0); hole.lineTo(0, -hd); sh.holes.push(hole);     /* m1475: a DIAMOND hole, the heart of his banner's crosshair diamond */
   const parts = [new THREE.ExtrudeGeometry(sh, { depth: .06, bevelEnabled: true, bevelThickness: .02, bevelSize: .02, bevelSegments: 2, curveSegments: 1 }).translate(0, 0, -.03)];
   for (const z of [.052, -.052]) { parts.push(new THREE.TorusGeometry(.44, .028, 6, 28).translate(0, 0, z));
-    const pts = [[-.12, -.12]]; let x = -.12, y = -.12, L = .24, d = 0; for (let i = 0; i < 6; i++) { x += [1, 0, -1, 0][d] * L; y += [0, 1, 0, -1][d] * L; pts.push([x, y]); d = (d + 1) % 4; if (i % 2) L += .1; }     /* the square spiral wrapping the hole */
-    for (let i = 1; i < pts.length; i++) { const [x0, y0] = pts[i - 1], [x1, y1] = pts[i];
-      parts.push(new THREE.BoxGeometry(Math.abs(x1 - x0) + .04, Math.abs(y1 - y0) + .04, .03).translate((x0 + x1) / 2, (y0 + y1) / 2, z)); }
-    for (const [sx, sy] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) parts.push(new THREE.SphereGeometry(.03, 6, 4).translate(sx * .33, sy * .33, z)); }
+    // m1475 (his: *"put the design from our crosshair banner on the doubloon"*): the banners' NESTED DIAMOND -- two diamond rings round the diamond
+    // hole, and the crosshair: four chevron points out to the rim on the axes
+    const bar = (x0, y0, x1, y1, w) => { const L = Math.hypot(x1 - x0, y1 - y0); parts.push(new THREE.BoxGeometry(L + w, w, .03).rotateZ(Math.atan2(y1 - y0, x1 - x0)).translate((x0 + x1) / 2, (y0 + y1) / 2, z)); };
+    for (const r of [.17, .27]) for (let k = 0; k < 4; k++) { const a0 = k * Math.PI / 2, a1 = a0 + Math.PI / 2; bar(Math.cos(a0) * r, Math.sin(a0) * r, Math.cos(a1) * r, Math.sin(a1) * r, r > .2 ? .045 : .035); }
+    for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2, ca = Math.cos(a), sa = Math.sin(a), tip = [ca * .41, sa * .41]; for (const sd of [-1, 1]) bar(ca * .32 - sa * sd * .06, sa * .32 + ca * sd * .06, tip[0], tip[1], .035); } }
   for (const q of parts) { if (q.index) continue; } COIN.geo = mergeGeometries(parts.map((q, j) => { const n = q.index ? q.toNonIndexed() : q; for (const k of Object.keys(n.attributes)) if (k !== 'position' && k !== 'normal') n.deleteAttribute(k); const c = j ? [1, .9, .55] : [.62, .4, .1]; n.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(n.attributes.position.count * 3).map((_, i) => c[i % 3]), 3)); return n; }));     /* two tones: an antique face, the raised work bright */ COIN.geo.computeVertexNormals(); return COIN.geo; }
 function coinMat() { return COIN.mat || (COIN.mat = new THREE.MeshStandardMaterial({ color: 0xffd060, vertexColors: true, metalness: 1, roughness: .3, emissive: 0x2a1800, emissiveIntensity: .5 })); }
 function coinDrop(g, x, y, z) { const m = new THREE.Mesh(coinGeo(), coinMat()); m.scale.setScalar(COIN.s); m.position.set(x, y, z); m.castShadow = true; g.add(m); const c = { m, x, y, z, ph: Math.random() * 6.28, t: -1 }; COIN.list.push(c); return c; }

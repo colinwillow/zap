@@ -89,6 +89,11 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
+## THE DOUBLOON WEARS THE BANNER'S CROSSHAIR DIAMOND (mXXXX)
+*"Put the design from our crosshair banner thing on the doubloon."* (The banners' nested red-and-cream diamond: it reads as a target, a crosshair.)
+- **The hole is a DIAMOND now,** the centre of the motif. Two embossed diamond rings round it (.17 and .27), and four chevron points out toward the rim on the axes: the crosshair. These replace the square spiral. Still two-tone, with the raised work bright.
+- **A landmine paid here:** replacing the spiral's block also cut the `for (const z ...)` loop's closing brace (the studs' line ended with it), and `check:syntax` caught it as "Unexpected end of input". When replacing a span that ends a loop, re-check the braces.
+
 ## THE DOJO, PASS 17: HIS SHIP FLIES THE ROUTE (m1473)
 - **Worker A's `shipModel()` (m1469):** `{ g, deckY, deck: 165 boxes, tris, step }`, module-scope safe. The dojo builds it in place of the junk stand-in, which stays only as the fallback (`NO SHIPMODEL` in the chip if it throws).
 - **Every one of its 165 solid boxes is a TURNED dynamic box** in `BDYN`, so its decks, bulwarks, castles, yards and cargo are solid and walkable as it flies and turns. The local offsets are now (`lx`, `lz`): cx = x + lx*cos h + lz*sin h, cz = z - lx*sin h + lz*cos h.
