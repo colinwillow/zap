@@ -11420,7 +11420,7 @@ function dragNear() { const B = DRAGZ.on && DRAGZ.on.B, p = player; if (!B || !B
   return Math.hypot(p.pos.x - B.mountAt.x, p.pos.z - B.mountAt.z) < DRAGZ.reach && Math.abs(p.pos.y - B.mountAt.y) < 1.5; }
 function dragTap() { if (!DRAGZ.on) return false; const p = player, R = p.dragon; if (!R && dragGive()) return true;
   if (R) { if (R.st === 'sit') { const B = DRAGZ.on.B; if (B.drive && (B.drive.air || B.drive.pad)) { tipShow(B.drive.air ? 'Land first.' : 'Land on the meadow to get off.', 2.5); return true; }
-      const now = performance.now() / 1000; if (!(now - (R.tap1 || -9) < DRAGZ.offTap)) { R.tap1 = now; tipShow('Tap the right pad again to get off.', 1.4); return true; } R.tap1 = -9;     /* m1624: a DOUBLE tap (his: a push of the right stick threw him off) */ dragDriveEnd(B); R.st = 'off'; R.t = 0; R.from = p.pos.clone(); snd('swoosh', { g: .4, r: 1.1 }); } return true; }
+      const now = performance.now() / 1000; if (!(now - (R.tap1 || -9) < DRAGZ.offTap)) { R.tap1 = now; tipShow('Tap the left pad again to get off.', 1.4); return true; } R.tap1 = -9;     /* m1624: a DOUBLE tap (his: a push of the right stick threw him off) */ dragDriveEnd(B); R.st = 'off'; R.t = 0; R.from = p.pos.clone(); snd('swoosh', { g: .4, r: 1.1 }); } return true; }
   if (!dragNear() || !p.grounded) return false;
   if (DRAGZ.look !== 'CAPTURED' || DRAGZ.on.B.tame) { tipShow(DRAGZ.look === 'EVIL' ? 'He is wild. Bring him good Jinra -- the spring by the start.' : 'He will not be ridden like that. (TOOLS > DRAGON)', 4); return true; }
   const B = DRAGZ.on.B; if (!B.seat) return false;
@@ -11432,8 +11432,8 @@ function dragRide(dt) { const p = player, R = p.dragon, B = DRAGZ.on && DRAGZ.on
   const seat = B.seat.getWorldPosition(_drV), sx = seat.x, sy = seat.y - R.hip, sz = seat.z, h = dragH(B);
   if (R.st === 'on') { const u = Math.min(1, R.t / DRAGZ.mountT), k = smooth(0, 1, u);
     p.pos.set(R.from.x + (sx - R.from.x) * k, R.from.y + (sy - R.from.y) * k + Math.sin(u * Math.PI) * DRAGZ.arc, R.from.z + (sz - R.from.z) * k);
-    p.faceH = p.heading = R.h0 + wrapAngle(h - R.h0) * k; if (u >= 1) { R.st = 'sit'; R.t = 0; dragDriveStart(B); tipShow('In the saddle. Left pad: ride. Left tap: take off, then beat the wings. Double-tap the right pad (on the meadow): get off.', 5); } }
-  else if (R.st === 'sit') { p.pos.set(sx, sy, sz); p.faceH = p.heading = h; p.speed = B.drive ? B.drive.v * .3 : 0; dragGun(dt); }
+    p.faceH = p.heading = R.h0 + wrapAngle(h - R.h0) * k; if (u >= 1) { R.st = 'sit'; R.t = 0; dragDriveStart(B); tipShow('In the saddle. Left pad: ride. Right tap: jump. Right double tap: fly. Right hold: hover. Double-tap the left pad (on the meadow): get off.', 5); } }
+  else if (R.st === 'sit') { p.pos.set(sx, sy, sz); p.faceH = p.heading = h; p.speed = B.drive ? B.drive.v * .3 : 0; dragGun(dt); dragHoldR(R, dt); }
   else { const u = Math.min(1, R.t / DRAGZ.offT), k = smooth(0, 1, u), to = B.mountAt;
     p.pos.set(R.from.x + (to.x - R.from.x) * k, R.from.y + (to.y - R.from.y) * k + Math.sin(u * Math.PI) * DRAGZ.arc * .6, R.from.z + (to.z - R.from.z) * k);
     if (u >= 1) { p.pos.y = to.y + .05; p.dragon = null; p.grounded = false; } } }
@@ -11469,14 +11469,30 @@ function dragFloor(x, z, y) { const Z = DRAGZ; let best = null;
   for (const P of Z.pads) if (Math.hypot(x - P.x, z - P.z) < P.r && P.y <= y + .8 && (!best || P.y > best.y)) best = { y: P.y, pad: P };
   return best; }
 function dragFlap(D) { if (D.flapCool > 0) return; D.flapCool = DRAGZ.flapCool; D.beat = 0; snd('swoosh', { g: .7, r: .55 });
-  if (!D.air) { D.air = { v: Math.max(D.v, DRAGZ.takeV), pitch: DRAGZ.takePitch, bank: 0 }; return; }
+  if (!D.air || D.air.mode !== 'fly') { D.air = { mode: 'fly', v: Math.max(D.v, DRAGZ.takeV), pitch: DRAGZ.takePitch, bank: 0 }; return; }
   D.air.v = Math.min(DRAGZ.vmax, D.air.v + DRAGZ.flapV); D.air.pitch = Math.min(DRAGZ.climb, D.air.pitch + DRAGZ.flapLift); }
 // the left tap in the saddle
-function dragTapL() { const R = player.dragon, B = DRAGZ.on && DRAGZ.on.B; if (!R || R.st !== 'sit' || !B || !B.drive) return; dragFlap(B.drive); }
+// mDRG (his: "tapping the right stick should have the dragon jump, double tapping has him take flight; tap and hold, he kind of jump-flies up
+// into the air and slowly comes back down; double tap, he takes off and is actually flying like RollerGirl; left stick is locomotion on the
+// ground and in the air, right stick still controls the camera"). The RIGHT PAD in the saddle: a TAP is a JUMP (`hopV`); a tap while he is
+// already up from a jump or a hover (so a DOUBLE TAP) TAKES OFF into the wingsuit flight; a tap in flight is a wing beat; HOLDING it in place
+// (`holdT`, the thumb barely moving) is the HOVER: he beats up at `riseV` for as long as it is held (to `hoverMax` s), then sinks at `sinkV`
+// back down. A drag is still the camera; a flick the fireball; held UP the gun. Getting off moved to a DOUBLE TAP of the LEFT pad.
+Object.assign(DRAGZ, { hopV: 10, hopG: 22, airSp: 7, riseV: 6, sinkV: 2.2, hoverMax: 3, holdT: .25 });
+function dragTapR() { const B = DRAGZ.on && DRAGZ.on.B, D = B && B.drive; if (!D) return; snd('swoosh', { g: .5, r: .7 });
+  if (!D.air) { D.air = { mode: 'hop', vy: DRAGZ.hopV }; D.beat = 0; return; }
+  if (D.air.mode !== 'fly') { D.air = null; D.flapCool = 0; dragFlap(D); return; }     // up from a jump or a hover: the take-off
+  dragFlap(D); }
+function dragHoldR(R, dt) { const B = DRAGZ.on && DRAGZ.on.B, D = B && B.drive, S = stick.R; if (!D) return;
+  const still = S.down && (S.far || 0) < .3; R.rHold = still ? (R.rHold || 0) + dt : 0;
+  if (D.air && D.air.mode === 'hover') D.air.hold = !!S.down;
+  if (R.rHold > DRAGZ.holdT && !R.rHeld) { R.rHeld = 1; if (!D.air || D.air.mode === 'hop') { D.air = { mode: 'hover', vy: D.air ? D.air.vy : 3, t: 0, hold: 1 }; D.beat = 0; } }
+  if (!S.down) R.rHeld = 0; }
+function dragTapL() { const R = player.dragon; if (R && R.st === 'sit') dragTap(); }
 function dragDrive(B, dt) { const Z = DRAGZ, D = B.drive, p = player, sit = p.dragon && p.dragon.st === 'sit', P = B.root.position;
   D.flapCool = Math.max(0, (D.flapCool || 0) - dt); if (D.beat !== undefined && D.beat !== null) { D.beat += dt / Z.flapT; if (D.beat >= 1) D.beat = null; }
   let h = dragH(B); const h0 = h;
-  if (D.air) { const A = D.air; let sx = sit ? stick.L.x : 0, sy = sit ? stick.L.y : 0;
+  if (D.air && D.air.mode === 'fly') { const A = D.air; let sx = sit ? stick.L.x : 0, sy = sit ? stick.L.y : 0;
     if (sit) { if (keys.a || keys.arrowleft) sx -= 1; if (keys.d || keys.arrowright) sx += 1; if (keys.w || keys.arrowup) sy -= 1; if (keys.s || keys.arrowdown) sy += 1; }
     sx = clamp(sx, -1, 1); sy = clamp(sy, -1, 1);
     const tx = Math.abs(sx) > .08 ? Math.sign(sx) * clamp((Math.abs(sx) - .08) / .62, 0, 1) : 0, ty = Math.abs(sy) > .12 ? Math.sign(sy) * clamp((Math.abs(sy) - .12) / .58, 0, 1) : 0;
@@ -11493,6 +11509,15 @@ function dragDrive(B, dt) { const Z = DRAGZ, D = B.drive, p = player, sit = p.dr
     if (P.y < Z.cloudY + 8) { P.set(Z.at[0], Z.daisY, Z.at[1]); D.air = null; D.v = 0; D.pad = null; tipShow('Into the clouds -- back to the dais.', 3); }
     B.root.rotation.order = 'YXZ'; B.root.rotation.set(-(D.air ? A.pitch : 0), h + (B.faceOff || 0), -A.bank * (D.air ? 1 : 0));
     D.v = D.air ? A.v : D.v; D.spread = damp(D.spread || 0, 1, Z.spreadHL, dt); }
+  else if (D.air) { const A = D.air, s2 = sit ? stickWorld() : { x: 0, z: 0, mag: 0 };     // mDRG: the HOP and the HOVER -- steered as on the ground, gently
+    if (s2.mag > 0) { const want = Math.atan2(s2.x, s2.z), dh = wrapAngle(want - h); h += clamp(dh, -Z.turn * dt, Z.turn * dt); D.v = damp(D.v, s2.mag * Z.airSp, .5, dt); } else D.v = damp(D.v, 0, .8, dt);
+    if (A.mode === 'hover') { A.t += dt; const rising = A.hold && A.t < Z.hoverMax; A.vy = damp(A.vy, rising ? Z.riseV : -Z.sinkV, .25, dt); if (rising && (D.beat === null || D.beat === undefined)) { D.beat = 0; snd('swoosh', { g: .45, r: .6 }); } }
+    else A.vy -= Z.hopG * dt;
+    P.x += Math.sin(h) * D.v * dt; P.z += Math.cos(h) * D.v * dt; P.y += A.vy * dt;
+    const F = dragFloor(P.x, P.z, P.y + 1);
+    if (F && P.y <= F.y && A.vy <= 0) { P.y = F.y; D.air = null; D.pad = F.pad; snd('thud', { g: .7, r: .6 }); camShake(.1); }
+    else if (P.y < Z.cloudY + 8) { P.set(Z.at[0], Z.daisY, Z.at[1]); D.air = null; D.v = 0; D.pad = null; }
+    B.root.rotation.order = 'YXZ'; B.root.rotation.set(-clamp(A.vy * .03, -.25, .25), h + (B.faceOff || 0), 0); D.spread = damp(D.spread || 0, 1, Z.spreadHL, dt); }
   else { const s2 = sit ? stickWorld() : { x: 0, z: 0, mag: 0 };
     if (s2.mag > 0) { const want = Math.atan2(s2.x, s2.z), dh = wrapAngle(want - h), mx = (D.v > 2 ? Z.turn : Z.turnStill) * dt; h += clamp(dh, -mx, mx);
       D.v = damp(D.v, s2.mag * Z.runSp * clamp(1 - Math.abs(dh) / 2.4, .2, 1), Z.accHL, dt); }
@@ -11501,7 +11526,7 @@ function dragDrive(B, dt) { const Z = DRAGZ, D = B.drive, p = player, sit = p.dr
     let nx = P.x + Math.sin(h) * D.v * dt, nz = P.z + Math.cos(h) * D.v * dt;
     if (!D.pad) for (const [ox, oz, orr] of Z.obst) { const dx = nx - ox, dz = nz - oz, d = Math.hypot(dx, dz), m = orr + Z.bodyR; if (d < m && d > 1e-4) { nx = ox + dx / d * m; nz = oz + dz / d * m; } }
     const F = dragFloor(nx, nz, P.y + .5);
-    if (!F || F.y < P.y - 1.2) { P.x = nx; P.z = nz; D.air = { v: Math.max(D.v, Z.stall), pitch: -.1, bank: 0 }; }     // off the edge: he spreads his wings
+    if (!F || F.y < P.y - 1.2) { P.x = nx; P.z = nz; D.air = { mode: 'fly', v: Math.max(D.v, Z.stall), pitch: -.1, bank: 0 }; }     // off the edge: he spreads his wings
     else { P.x = nx; P.z = nz; P.y = damp(P.y, F.y, .08, dt); D.pad = F.pad; }
     const yawRate = wrapAngle(h - h0) / Math.max(dt, 1e-4); D.lean = damp(D.lean, clamp(-yawRate * D.v * Z.lean, -.35, .35), .15, dt);
     B.root.rotation.order = 'YXZ'; B.root.rotation.set(0, h + (B.faceOff || 0), D.lean); D.spread = damp(D.spread || 0, 0, Z.spreadHL, dt); }
@@ -29395,7 +29420,7 @@ PADS.L = bindStick(padL, stick.L,
 PADS.R = bindStick(padR, stick.R,
   // tap: jump -- and as her, a quick SECOND tap opens / folds the wings (m266)
   // ...unless someone in reach has something to say: then it is TALK (m277), and the left tap still jumps
-  () => { if (aim3Now()) return; /* m1345: 3D AIM owns the whole right pad -- a tap is not a jump */ if (talkTap()) return; if (dragTap()) return; /* m1614 */ if (pickTap()) return; if (portalTap()) return; if (wingTapR()) return; if (hurdleTap()) return; if (mantleTap()) return; if (wrunTap()) return; player.jump = 1; },     // m1064: a tall face beside / ahead -> wall run     // m1063: pushing into a half block -> hurdle it     // m1039: a ledge in reach -> climb it
+  () => { if (aim3Now()) return; /* m1345: 3D AIM owns the whole right pad -- a tap is not a jump */ if (talkTap()) return; if (player.dragon) { if (player.dragon.st === 'sit') dragTapR(); return; } if (dragTap()) return; /* m1614 */ if (pickTap()) return; if (portalTap()) return; if (wingTapR()) return; if (hurdleTap()) return; if (mantleTap()) return; if (wrunTap()) return; player.jump = 1; },     // m1064: a tall face beside / ahead -> wall run     // m1063: pushing into a half block -> hurdle it     // m1039: a ledge in reach -> climb it
   // flick: a SLAM if he is in the air and it went down, otherwise a strike in that direction
   (dx, dy) => { if (player.dragon) { dragBreath(); return; } /* m1621: his fireball */ if (player.wing || aim3Now()) return; /* m1282: in 3D AIM a fast drag moves the cursor, it never swings */ if (tossQuick(dx, dy)) return; if (boardFlick(dx, dy, 0)) return; if (wrunSwipe(dx, dy)) return; if (runSwipe(dx, dy)) return; if (!slamGo(dx, dy)) { KATANA.dir = katanaDir(dx, dy); meleeGo(KATANA.dir === 'down' ? player.faceH : flickH(dx, dy)); } },     // m1054: DOWN is not a direction -- the strike goes where he faces (a slot kept for a grab / throw / special)     // m1014: the right pad is MELEE, by direction (m1012's down-slide is off it)
   null,

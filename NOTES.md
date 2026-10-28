@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## mDRG -- THE DRAGON RIDE: HIS CONTROL MAP (the right pad jumps and flies, the left pad moves, the camera stays on the right drag)
+His: *"Tapping the right stick should have the dragon jump; double tapping has him take flight. If you tap and hold, he kind of jump-flies up
+into the air and then slowly comes back down to the ground; double tap, he takes off and is actually flying like RollerGirl. Left stick
+controls locomotion on the ground and in the air; right stick still controls the camera."*
+- `D.air.mode` is `hop` | `hover` | `fly`. **Right tap** (`dragTapR`, routed from the right pad's tap whenever `p.dragon`): on the ground a
+  HOP (`hopV` 10 up, `hopG` 22); off the ground from a hop or a hover it is the TAKE-OFF into the wingsuit flight (`dragFlap` -> `fly`) -- which
+  is what makes a double tap "take flight" with no wait on the first tap; in `fly` a beat.
+- **Right hold in place** (`dragHoldR`: down and `far` < .3 for `holdT` .25 s -- so neither a drag nor the gun's push UP): the HOVER, rising at
+  `riseV` 6 with the wings beating while held (to `hoverMax` 3 s), then sinking at `sinkV` 2.2 back to whatever is under him.
+- In `hop` / `hover` the left pad steers as on the ground, gentler (`airSp` 7); in `fly` it is the wingsuit stick as before.
+- **Getting off** moved to the LEFT pad's double tap (`dragTapL` -> `dragTap`); the left tap no longer beats the wings.
+**Moves:** nothing ticked -- his feel of the new map. Gates: check ok, zone boot ok. Shipped unverified.
+
 ## m1624 -- THE DRAGON RIDE: his first look (m1614 on the phone) -- the saddle, the plates, the lens, the dismount
 His (screenshot at M1614 +3, i.e. three builds behind -- the riding, flying and fire are m1618-m1622 and had not reached him): *"When I got on
 I'm pretty much in the dragon, can't even see me. The saddle is crooked. The armour kind of cuts into his body (I'll probably model that on

@@ -39,6 +39,12 @@ dragon into a level (the WHOLE-PIECE RULE).
       EVIL makes him wild again to replay it. (No kneel clip.) *Open: his look at it.*
 - [ ] **He played it on his phone and signed it off.**
 
+## THE CONTROLS IN THE SADDLE (his, after m1624)
+
+LEFT PAD: walk / run on the ground; in flight the wingsuit stick (sideways banks and turns, up climbs, down dives). LEFT DOUBLE TAP (on the
+meadow): get off. RIGHT TAP: jump. RIGHT DOUBLE TAP (a tap while up from a jump or a hover): take off and fly; in flight a tap is a wing beat.
+RIGHT HOLD (in place): hover up while held, then sink slowly back down. RIGHT DRAG: the camera. RIGHT FLICK: fireball. RIGHT HELD UP: the gun.
+
 ## Needs from him
 
 - A **fly cycle** for the dragon (a flap and a glide) -- the GLB has `attack_air, attack_ground, casual, death, dizzy, entrance, hit, idle,
