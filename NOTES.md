@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## the peak, pass 2: ridges, outcrops, scree, a worn trail (Worker B, loop tick 4)
+DONE WHEN box "the mountain reads as a mountain" moved (not ticked: his phone). `gpeakLift` multiplies the old bump by
+`1 + GPEAK.ridge * smooth(6, 20, m) * (gpeakRidge^2 - .4)`, gpeakRidge = 1 - |sin(3θ + noise)|: six warped spurs, gullies between, faded
+out near the top (θ is undefined at m = 0) and zero at the rim like before. Outcrops are sampled only where the ridge value > .55, kept 4.5 m
+off the trail and 19 m off the refinery's fallen spot; each is 2-3 stacked flattened slabs (the first try, one rock each, read as grey eggs
+again -- his old complaint). Scree: small rocks fanned radially downhill. The trail now has the home's worn-path ribbon (the canvas moved
+into `ghPathMat()`, shared, one material) and a log step wherever the ground rises .32 m in a metre. Draws 8 -> 10 (the ribbon, +1 bucket).
+Still open: the trail box (switchbacks are there, fun is his call), the lookout dressing box. Also fixed the refinery entry's build number (m1536).
 ## m1540 -- THE RE-PASS: the SHRINE, pass 2 (rubric 7: RESTORES IN PLACE)
 **Moves:** the Shrine's rubric-7 box (two states, restored in place, no lift). The Pagoda's m1518 is the pattern.
 - Base (survived, stays): the terrace, steps, cheek walls, coping, the stone beam and its pillar, the basin, the foxes, the omikuji, the ema board.
