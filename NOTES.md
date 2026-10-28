@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## the Red Hollows' sky and water, pass 1: his panorama over the valley, and a stream that flows (Worker B)
+His ask: "work on the water shader, and apply the HDR from the other window". Only three 8-bit panoramas are in the repo (no .hdr/.exr);
+he picked the dojo's PANO (`textures/sky_sunset_02.webp`) and the stream. `RW_GLSL` gains `uPano/uPanoOn/uPanoOff` and `panoAt(d, lod)`
+(the dojo's equirect mapping, `textureLod` on a mipmapped sRGB texture): `skyFull` = the pano (the dome; below the horizon its cloud
+sea, no painted sun disc), `skyCol` = the pano at mip 5 in a band just above the horizon (fog and every `rwPatch` material's fogTo),
+new `skyRefl` = mip 3 for the water (mip 1.5 read as oil -- the render showed it). `rwPano` (from `rwBuild`, not in the lake style):
+the offsets are COMPUTED so the pano's measured sun (u .310, v .638 from the top, the dojo's measurement) lands on the valley sun
+(`RW.time.az`, elevation `RW.panoEl` 9 deg -- lower than the painted 18, it is a sunset), uSunCol / sun / hemi tints and the
+environment intensity are the dojo's per-pano numbers, IBL by PMREM. TOOLS > HOLLOWS SKY cycles PANO / FIRE / PAINTED (`mel.rwsky`,
+`?rwsky=`), PANO the default. Water: `uFlow` (0, .55) m/s in the hollows: the two finer normal layers drift downstream (+z, 1x and
+1.6x) and a streak noise stretched along the flow adds foam in the shallows (dep < 1.5). Still a still picture here: whether it reads
+as moving water is a phone question. Next on the water: foam rings at the rocks and the pier legs, the mill's pour, depth colour.
 ## m1586 -- THE ZEPPELINS, detail pass 4 (his report: an invisible collider, no way up, "I don't really like the way that looks")
 His words: *"There was an invisible collider on there ... Need a better way to get up to it cause I wasn't able to ... it needs a bunch of
 detail passes."* The re-pass loop stays on the zeppelins for more detail passes before moving on.
