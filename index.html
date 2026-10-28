@@ -24936,48 +24936,118 @@ function shipWhaleMake() { const Z = SHIPZ; if (!Z.seaG) return null; const L = 
   const spots = []; for (let k = 0; k < 18; k++) { const u = .25 + k * .04, x = (u - .5) * L; for (const sz of [-1, 1]) for (const yy of [.15, -.25]) { const r = rad(u), m = new THREE.Mesh(new THREE.SphereGeometry(.22, 6, 4), glowM); m.position.set(x, r * yy * .8, sz * r * Math.cos(Math.asin(yy)) * 1.01); (u >= .36 ? front : hind).add(m); if (u < .36) m.position.x -= jA; spots.push(m); } }
   for (const sz of [-1, 1]) { const e = new THREE.Mesh(new THREE.SphereGeometry(.42, 10, 8), glowM); e.position.set(L * .38, .5, sz * rad(.88) * .93); front.add(e); }
   root.visible = false; return { root, hind, fl, glowM, st: 'under', t: 0, x: 120, z: 60, h: 0, tx: 0, tz: 0, blows: 0, blowT: 0 }; }
-// m1416 (pass 12): THE SERPENT FISH (his: *"long, elongated serpent fish"*). 44 segments of one INSTANCED body (one draw), a dorsal sail and a
-// lateral line of glow spots instanced the same way, and a frilled, whiskered head. The body does not bend in place: every segment sits on ONE
-// analytic path `P(tau)` at the time the head was there, so the arches stand still in the sea and the body slides THROUGH them -- the way a sea
-// serpent's humps read -- and a dive starts at the head and runs down the body. The path loops the ship at 55-85 m with a lateral weave, and a
-// slow envelope `E` brings it up into three or four arches and takes it back down. Splashes where a segment breaks the surface.
-function shipSerpentMake() { const Z = SHIPZ; if (!Z.seaG) return null; const N = 44, sp = 1.05, root = new THREE.Group(); Z.seaG.add(root);
-  const bodyM = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .4, metalness: .25 }), finM = new THREE.MeshStandardMaterial({ color: 0x3fb8a8, emissive: 0x0c5a5a, roughness: .5, transparent: true, opacity: .82, side: THREE.DoubleSide }),
-    glowM = new THREE.MeshBasicMaterial({ color: 0x7affd8, toneMapped: false });
-  const seg = new THREE.SphereGeometry(1, 14, 10); seg.scale(1, .9, sp * 1.45); { const p = seg.attributes.position, C = new Float32Array(p.count * 3);     // banded back, pale belly
-    for (let i = 0; i < p.count; i++) { const y = p.getY(i), x = p.getX(i), sc = Math.sin(Math.atan2(x, y) * 7) > .6; const c = y < -.25 ? [.78, .74, .58] : y > .55 ? [.08, .2, .26] : sc ? [.14, .4, .42] : [.1, .3, .34]; C.set(c, i * 3); } seg.setAttribute('color', new THREE.BufferAttribute(C, 3)); }
-  const body = new THREE.InstancedMesh(seg, bodyM, N); body.castShadow = true; body.frustumCulled = false; root.add(body);
-  const fg = new THREE.BufferGeometry(); fg.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, .75, 0, 0, -.75, 0, 1.25, -.55, 0, 0, .75, 0, 1.25, -.55, 0, 1.15, .65], 3)); fg.computeVertexNormals();
-  const fins = new THREE.InstancedMesh(fg, finM, N); fins.frustumCulled = false; root.add(fins);
-  const glow = new THREE.InstancedMesh(new THREE.SphereGeometry(.16, 6, 4), glowM, N * 2); glow.frustumCulled = false; root.add(glow);
-  const head = new THREE.Group(); root.add(head); const hm = (g, m, c) => { const o = new THREE.Mesh(g, m); if (c) colorize(o.geometry, c); head.add(o); return o; };
-  const skull = hm(new THREE.SphereGeometry(1, 16, 12), bodyM, [.1, .3, .34]); skull.scale.set(1.25, 1.05, 2.1); skull.position.z = .6;
-  const snout = hm(new THREE.ConeGeometry(.95, 2.6, 12).rotateX(Math.PI / 2), bodyM, [.12, .34, .36]); snout.position.set(0, .15, 3.4); snout.scale.y = .7;
-  const jaw = new THREE.Group(); jaw.position.set(0, -.35, 1.6); head.add(jaw); { const j = new THREE.Mesh(new THREE.ConeGeometry(.75, 3.0, 10).rotateX(Math.PI / 2), bodyM); colorize(j.geometry, [.74, .68, .52]); j.scale.y = .5; j.position.set(0, -.15, 1.4); jaw.add(j);
-    for (let k = 0; k < 7; k++) for (const sx of [-1, 1]) { const tth = new THREE.Mesh(new THREE.ConeGeometry(.07, .35, 4), bodyM); colorize(tth.geometry, [.95, .93, .85]); tth.position.set(sx * (.5 - k * .055), .12, .3 + k * .32); jaw.add(tth); } }
-  for (const sx of [-1, 1]) { const e = hm(new THREE.SphereGeometry(.24, 10, 8), glowM); e.position.set(sx * .95, .5, 1.7);
-    const fr = new THREE.Mesh(new THREE.CircleGeometry(1.7, 9, 0, Math.PI), finM); fr.position.set(sx * 1.05, .3, -.2); fr.rotation.set(0, sx * 1.25, sx * -.35); head.add(fr);     // the frill fans
-    const hn = hm(new THREE.ConeGeometry(.22, 2.4, 6), bodyM, [.62, .6, .5]); hn.position.set(sx * .55, 1.4, -.5); hn.rotation.set(-1.0, 0, sx * -.3);
-    const wh = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(0, 0, 0), new THREE.Vector3(sx * .7, -.4, -.8), new THREE.Vector3(sx * 1.2, -1.1, -2.0), new THREE.Vector3(sx * 1.1, -1.9, -3.4)]), 12, .06, 5), finM);
-    wh.position.set(sx * .55, -.1, 3.6); head.add(wh); }
-  return { root, body, fins, glow, head, jaw, N, sp, ph: Math.random() * 100, dir: Math.random() < .5 ? 1 : -1, prevY: new Float32Array(N), splT: 0, _m: new THREE.Matrix4(), _f: new THREE.Vector3(), _u: new THREE.Vector3(), _r: new THREE.Vector3(), _p: new THREE.Vector3(), _q: new THREE.Vector3() }; }
+// m@X4@ (pass 12, m1416) THE SERPENT FISH, REBUILT (m@X4@; his: *"pretty ugly, low quality"*). One CONTINUOUS skin, not beads: a tube of
+// `NL` rings x `NS` sides rewritten each frame along the path, its cross-section a keeled back over a flattened belly, under a painted SCALE
+// map and a glowing lateral line in the emissive map (no extra meshes for the spots). A real MEMBRANE fin -- one ribbon down the back with
+// spines and a scalloped edge, a ventral one at the tail, the two meeting in a tail fan -- and pectoral fans that flap. The head is LOFTED
+// (skull, brow ridges, a tapering snout) with a hinged lofted jaw, rows of teeth, sunken glowing eyes, spined frills, swept horns and whiskers,
+// all merged into two draws (skin, membrane) plus the jaw. The body still sits on ONE path (`shipSerpentP`), so the arches stand still in the sea.
+function shipSerpentTex() { const S = 256, cv = document.createElement('canvas'); cv.width = cv.height = S; const c = cv.getContext('2d'); c.fillStyle = '#d8d8d8'; c.fillRect(0, 0, S, S);
+  for (let row = -1; row < 9; row++) for (let col = -1; col < 9; col++) { const x = col * 32 + (row % 2 ? 16 : 0), y = row * 30; const g = c.createRadialGradient(x, y + 6, 2, x, y + 4, 22);
+    g.addColorStop(0, '#ffffff'); g.addColorStop(.7, '#c4c4c4'); g.addColorStop(1, '#6a6a6a'); c.fillStyle = g; c.beginPath(); c.arc(x, y, 19, 0, Math.PI); c.fill(); }
+  const map = new THREE.CanvasTexture(cv); map.wrapS = map.wrapT = THREE.RepeatWrapping; map.colorSpace = THREE.SRGBColorSpace;
+  const ev = document.createElement('canvas'); ev.width = ev.height = S; const e = ev.getContext('2d'); e.fillStyle = '#000'; e.fillRect(0, 0, S, S);
+  for (const vy of [.045, .455]) for (const ux of [.15, .65]) { const g = e.createRadialGradient(ux * S, vy * S, 0, ux * S, vy * S, 9); g.addColorStop(0, '#9fffe8'); g.addColorStop(.5, '#2fd8c0'); g.addColorStop(1, 'rgba(0,0,0,0)'); e.fillStyle = g; e.fillRect(ux * S - 10, vy * S - 10, 20, 20); }
+  const emi = new THREE.CanvasTexture(ev); emi.wrapS = emi.wrapT = THREE.RepeatWrapping; emi.colorSpace = THREE.SRGBColorSpace;
+  const fv = document.createElement('canvas'); fv.width = 128; fv.height = 128; const f = fv.getContext('2d'); const fg = f.createLinearGradient(0, 128, 0, 0);
+  fg.addColorStop(0, 'rgba(40,150,150,.95)'); fg.addColorStop(.7, 'rgba(70,210,200,.6)'); fg.addColorStop(.93, 'rgba(150,255,235,.85)'); fg.addColorStop(1, 'rgba(190,255,245,.95)'); f.fillStyle = fg; f.fillRect(0, 0, 128, 128);
+  f.strokeStyle = 'rgba(14,50,58,.9)'; f.lineWidth = 7; f.beginPath(); f.moveTo(4, 128); f.lineTo(6, 0); f.stroke(); f.lineWidth = 2; f.strokeStyle = 'rgba(20,70,80,.45)'; for (const x of [40, 72, 100]) { f.beginPath(); f.moveTo(x, 128); f.lineTo(x - 6, 0); f.stroke(); }
+  const fin = new THREE.CanvasTexture(fv); fin.wrapS = THREE.RepeatWrapping; fin.colorSpace = THREE.SRGBColorSpace; return { map, emi, fin }; }
+// a geometry from arrays (position, uv, colour) with indices; normals computed
+function shipGeo(P, U, C, I) { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(U, 2));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(C, 3)); g.setIndex(I); g.computeVertexNormals(); return g.toNonIndexed(); }
+// a loft along +Z: rings at z[i] with half-width w(z), half-height h(z) above (hb below); `col(y01, z)` gives the colour; `top` keeps only angles in [a0, a1]
+function shipLoft(zs, w, h, hb, col, a0 = 0, a1 = Math.PI * 2, NS = 18, bump) { const P = [], U = [], C = [], I = [];
+  zs.forEach((z, i) => { for (let j = 0; j <= NS; j++) { const a = a0 + (a1 - a0) * j / NS, ca = Math.cos(a), sa = Math.sin(a); let x = ca * w(z), y = sa * (sa > 0 ? h(z) : hb(z)); if (bump) y += bump(x, z, sa);
+      P.push(x, y, z); U.push(z * .5, j / NS); C.push(...col(sa, z)); } });
+  for (let i = 0; i < zs.length - 1; i++) for (let j = 0; j < NS; j++) { const a = i * (NS + 1) + j, b = a + 1, c = a + NS + 1, d = c + 1; I.push(a, b, c, b, d, c); }
+  return shipGeo(P, U, C, I); }
+// a tapered tube along a curve (horns, whiskers)
+function shipTaper(pts, n, r0, r1, col, NS = 6) { const cu = new THREE.CatmullRomCurve3(pts), P = [], U = [], C = [], I = [], fr = cu.computeFrenetFrames(n, false);
+  for (let i = 0; i <= n; i++) { const p = cu.getPointAt(i / n), r = r0 + (r1 - r0) * i / n; for (let j = 0; j <= NS; j++) { const a = j / NS * Math.PI * 2; const v = fr.normals[i].clone().multiplyScalar(Math.cos(a) * r).addScaledVector(fr.binormals[i], Math.sin(a) * r);
+      P.push(p.x + v.x, p.y + v.y, p.z + v.z); U.push(i / n, j / NS); C.push(...col); } }
+  for (let i = 0; i < n; i++) for (let j = 0; j < NS; j++) { const a = i * (NS + 1) + j, b = a + 1, c = a + NS + 1, d = c + 1; I.push(a, b, c, b, d, c); } return shipGeo(P, U, C, I); }
+// a spined fan (frills, pectorals): rays from a root, the edge scalloped between them; u runs ray to ray so the fin map's spine lands on each
+function shipFan(len, spread, rays, col = [1, 1, 1]) { const P = [0, 0, 0], U = [.5, 0], C = [...col], I = [], M = rays * 4;
+  for (let k = 0; k <= M; k++) { const a = -spread / 2 + spread * k / M, sc = .78 + .22 * Math.pow(Math.abs(Math.cos(k / 4 * Math.PI)), 3), L = len * sc * (1 - .25 * Math.abs(k / M - .5) * 2);
+    P.push(Math.sin(a) * L, 0, -Math.cos(a) * L); U.push(k / 4, 1); C.push(...col); if (k) I.push(0, k, k + 1); }
+  return shipGeo(P, U, C, I); }
+function shipSerpentMake() { const Z = SHIPZ; if (!Z.seaG) return null; const T = shipSerpentTex(), NL = 110, NS = 20, sp = .44, root = new THREE.Group(); Z.seaG.add(root);
+  const skinM = new THREE.MeshStandardMaterial({ vertexColors: true, map: T.map, emissiveMap: T.emi, emissive: 0xffffff, emissiveIntensity: 1.4, roughness: .32, metalness: .18 });
+  T.map.repeat.set(1, 3); T.emi.repeat.set(1, 1);
+  const finM = new THREE.MeshStandardMaterial({ map: T.fin, transparent: true, side: THREE.DoubleSide, depthWrite: false, roughness: .45, emissive: 0x0a4a48, vertexColors: true });
+  const eyeM = new THREE.MeshBasicMaterial({ color: 0xa8fff0, toneMapped: false });
+  // body skin: static colours and uvs, positions rewritten per frame
+  const nv = NL * (NS + 1), P = new Float32Array(nv * 3), N = new Float32Array(nv * 3), Uv = new Float32Array(nv * 2), C = new Float32Array(nv * 3), I = [];
+  for (let i = 0; i < NL; i++) for (let j = 0; j <= NS; j++) { const v = i * (NS + 1) + j, a = j / NS * Math.PI * 2, sa = Math.sin(a), s = i * sp, band = Math.sin(s * .55) > .35;
+    Uv[v * 2] = s / 2.2; Uv[v * 2 + 1] = j / NS;
+    const c = sa < -.35 ? [.86, .8, .62] : sa < -.05 ? [.5, .62, .55] : sa > .7 ? (band ? [.04, .1, .14] : [.07, .2, .25]) : band ? [.08, .26, .3] : [.12, .4, .42]; C.set(c, v * 3); }
+  for (let i = 0; i < NL - 1; i++) for (let j = 0; j < NS; j++) { const a = i * (NS + 1) + j, b = a + 1, c = a + NS + 1, d = c + 1; I.push(a, c, b, b, c, d); }
+  const bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.BufferAttribute(P, 3)); bg.setAttribute('normal', new THREE.BufferAttribute(N, 3)); bg.setAttribute('uv', new THREE.BufferAttribute(Uv, 2)); bg.setAttribute('color', new THREE.BufferAttribute(C, 3)); bg.setIndex(I);
+  const body = new THREE.Mesh(bg, skinM); body.frustumCulled = false; body.castShadow = true; root.add(body);
+  // membrane: dorsal ribbon (all rings) + ventral ribbon (the tail third); 2 vertices per ring each
+  const fP = new Float32Array(NL * 2 * 2 * 3), fU = new Float32Array(NL * 2 * 2 * 2), fC = new Float32Array(NL * 2 * 2 * 3).fill(1), fI = [];
+  for (let r = 0; r < 2; r++) for (let i = 0; i < NL; i++) { const v = (r * NL + i) * 2; fU.set([i / 6, 0, i / 6, 1], v * 2); if (i < NL - 1) { const a = v, b = v + 1, c = v + 2, d = v + 3; fI.push(a, c, b, b, c, d); } }
+  const fgm = new THREE.BufferGeometry(); fgm.setAttribute('position', new THREE.BufferAttribute(fP, 3)); fgm.setAttribute('uv', new THREE.BufferAttribute(fU, 2)); fgm.setAttribute('color', new THREE.BufferAttribute(fC, 3)); fgm.setIndex(fI);
+  const fins = new THREE.Mesh(fgm, finM); fins.frustumCulled = false; root.add(fins);
+  // the head, lofted along +Z (its back ring at z -1.1 meets the neck)
+  const hcol = (sa, z) => sa < -.3 ? [.86, .8, .62] : sa > .55 ? [.06, .17, .22] : [.12, .38, .4];
+  const lerpT = (pts) => z => { for (let k = 1; k < pts.length; k++) if (z <= pts[k][0]) { const [z0, a] = pts[k - 1], [z1, b] = pts[k], u = (z - z0) / (z1 - z0), s = u * u * (3 - 2 * u); return a + (b - a) * s; } return pts[pts.length - 1][1]; };
+  const zs = []; for (let k = 0; k <= 22; k++) zs.push(-1.1 + 5.0 * k / 22);
+  const brow = (x, z, sa) => sa > .2 ? Math.exp(-Math.pow((Math.abs(x) - .62) / .2, 2)) * Math.exp(-Math.pow((z - .9) / .5, 2)) * .32 : 0;
+  const skullG = shipLoft(zs, lerpT([[-1.1, .82], [.4, 1.08], [1.5, .82], [2.9, .4], [3.9, .1]]), lerpT([[-1.1, .78], [.6, .92], [1.6, .6], [3.0, .32], [3.9, .08]]), lerpT([[-1.1, .55], [1.0, .32], [3.9, .05]]), hcol, 0, Math.PI * 2, 20, brow);
+  const parts = [skullG], mem = [];
+  for (const sx of [-1, 1]) {
+    parts.push(shipTaper([new THREE.Vector3(sx * .5, .85, .2), new THREE.Vector3(sx * .8, 1.5, -.9), new THREE.Vector3(sx * 1.0, 1.75, -2.2), new THREE.Vector3(sx * .9, 1.6, -3.3)], 10, .26, .02, [.7, .66, .52]));     // horns
+    parts.push(shipTaper([new THREE.Vector3(sx * .3, -.05, 3.4), new THREE.Vector3(sx * .9, -.35, 2.9), new THREE.Vector3(sx * 1.5, -.9, 1.8), new THREE.Vector3(sx * 1.6, -1.8, .4), new THREE.Vector3(sx * 1.3, -2.6, -.8)], 16, .07, .015, [.25, .7, .66]));     // whiskers
+    const fr = shipFan(2.4, 2.0, 5); fr.rotateX(Math.PI / 2 - .35); fr.rotateY(sx * 1.2); fr.translate(sx * .8, .25, -.6); mem.push(fr);     // frills
+    const ridge = shipFan(.9, 1.0, 3); ridge.rotateZ(sx * .5); ridge.rotateX(-.2); ridge.translate(sx * .25, .95, -.2); mem.push(ridge); }
+  { const tg = []; for (let k = 0; k < 9; k++) for (const sx of [-1, 1]) { const z = 2.9 - k * .32, t = new THREE.ConeGeometry(.06, .34 - k * .015, 4); t.rotateX(Math.PI); t.translate(sx * (lerpT([[-1.1, .82], [.4, 1.08], [1.5, .82], [2.9, .4], [3.9, .1]])(z) * .82), -.3, z); tg.push(t); }
+    for (const t of tg) { t.deleteAttribute('normal'); const n = t.attributes.position.count; t.setAttribute('color', new THREE.Float32BufferAttribute(new Array(n * 3).fill(.95), 3)); t.computeVertexNormals(); parts.push(t.index ? t.toNonIndexed() : t); } }
+  const head = new THREE.Group(); root.add(head); head.matrixAutoUpdate = false;
+  head.add(new THREE.Mesh(mergeGeometries(parts), skinM)); head.add(new THREE.Mesh(mergeGeometries(mem), finM));
+  for (const sx of [-1, 1]) { const so = new THREE.Mesh(new THREE.TorusGeometry(.27, .07, 6, 14), new THREE.MeshStandardMaterial({ color: 0x0a1418, roughness: .6 })); so.position.set(sx * .9, .52, 1.15); so.rotation.y = sx * 1.25; head.add(so);
+    const e = new THREE.Mesh(new THREE.SphereGeometry(.24, 12, 8), eyeM); e.position.set(sx * .88, .52, 1.15); head.add(e);
+    const pu = new THREE.Mesh(new THREE.SphereGeometry(.1, 8, 6), new THREE.MeshBasicMaterial({ color: 0x041010 })); pu.scale.set(.4, 1, .4); pu.position.set(sx * 1.08, .52, 1.18); head.add(pu); }
+  const jaw = new THREE.Group(); jaw.position.set(0, -.28, -.5); head.add(jaw);
+  { const jz = []; for (let k = 0; k <= 14; k++) jz.push(3.6 * k / 14); const jw = lerpT([[0, .74], [1.4, .62], [3.0, .26], [3.6, .08]]);
+    const jg = shipLoft(jz, jw, z => .06, lerpT([[0, .5], [2.0, .3], [3.6, .06]]), (sa) => sa > 0 ? [.55, .25, .28] : [.84, .78, .6], Math.PI, Math.PI * 2, 14);
+    const jt = [jg]; for (let k = 0; k < 8; k++) for (const sx of [-1, 1]) { const z = 3.1 - k * .34, t = new THREE.ConeGeometry(.055, .3, 4); t.translate(sx * jw(z) * .85, .14, z); t.deleteAttribute('normal'); const n = t.attributes.position.count; t.setAttribute('color', new THREE.Float32BufferAttribute(new Array(n * 3).fill(.95), 3)); t.computeVertexNormals(); jt.push(t.toNonIndexed()); }
+    jaw.add(new THREE.Mesh(mergeGeometries(jt), skinM)); }
+  const pecs = []; for (const sx of [-1, 1]) { const g = new THREE.Group(); root.add(g); g.matrixAutoUpdate = false; const f = shipFan(2.6, 1.3, 4); f.rotateZ(sx * -.25); const m = new THREE.Mesh(f, finM); const piv = new THREE.Group(); piv.add(m); g.add(piv); pecs.push({ g, piv, sx }); }
+  return { root, body, bg, fins, fgm, head, jaw, pecs, NL, NS, sp, ph: Math.random() * 100, dir: Math.random() < .5 ? 1 : -1, prevY: new Float32Array(8), splT: 0,
+    _f: [], _u: [], _r: [], _p: [], _q: new THREE.Vector3(), _m: new THREE.Matrix4() }; }
 // the path: tau in seconds of travel; returns the point (local to the sea group) into `o`
 function shipSerpentP(W, tau, o) { const v = 6.5, R = 70 + Math.sin(tau * .021) * 15, a = W.dir * tau * v / 70, wv = Math.sin(tau * .9) * 2.6;
   const E = Math.min(1, Math.max(0, Math.sin(tau * .045) * 1.8 + .25)), arch = Math.sin(tau * v * 6.2832 / 16) * 3.0 - 1.0;
   o.set(Math.cos(a) * (R + wv), -10 + (10 + arch) * E * E * (3 - 2 * E), Math.sin(a) * (R + wv)); return o; }
-function shipSerpentStep(W, dt, t) { const T = t + W.ph, M = W._m, f = W._f, u = W._u, r = W._r, p = W._p, q = W._q, up = new THREE.Vector3(0, 1, 0), dtau = W.sp / 6.5;
-  W.splT -= dt; let any = 0;
-  for (let i = 0; i < W.N; i++) { const tau = T - i * dtau, k = i / (W.N - 1), rad = 1.25 * (k < .18 ? .8 + k * 1.1 : Math.pow(1 - (k - .18) / .82, .8) * 1.0 + .12) * (1 + Math.sin(T * 4 - i * .5) * .03);
-    shipSerpentP(W, tau, p); shipSerpentP(W, tau + .06, q); f.subVectors(q, p).normalize(); r.crossVectors(up, f).normalize(); u.crossVectors(f, r);
-    if (p.y > -2.5) any = 1;
-    M.makeBasis(r.clone().multiplyScalar(rad), u.clone().multiplyScalar(rad), f.clone().multiplyScalar(rad)); M.setPosition(p); W.body.setMatrixAt(i, M);
-    const fs = k < .06 ? 0 : rad * (.65 + .35 * Math.sin(i * 1.3) * Math.sin(i * .37)) * (k < .85 ? 1 : .6); M.makeBasis(r.clone().multiplyScalar(fs), u.clone().multiplyScalar(fs), f.clone().multiplyScalar(fs ? W.sp / rad * 1.1 : 0)); M.setPosition(p.x + u.x * rad * .8, p.y + u.y * rad * .8, p.z + u.z * rad * .8); W.fins.setMatrixAt(i, M);
-    for (const s of [0, 1]) { const g = (i % 2 && k > .05 && k < .9) ? 1 : 0, sx = s ? 1 : -1; M.makeScale(g, g, g); M.setPosition(p.x + r.x * sx * rad * .93 + u.x * rad * .15, p.y + r.y * sx * rad * .93 + u.y * rad * .15, p.z + r.z * sx * rad * .93 + u.z * rad * .15); W.glow.setMatrixAt(i * 2 + s, M); }
-    if (W.prevY[i] && Math.sign(p.y) !== Math.sign(W.prevY[i]) && W.splT <= 0 && rad > .5) { W.splT = .12; const w = W.root.parent.localToWorld(p.clone()); spkBurst(w.x, w.y + .3, w.z, 18, { col: [.88, .96, 1], spread: rad * 1.6, up: 2.6, size: .2, life: .8 }); }
-    W.prevY[i] = p.y || .001;
-    if (i === 0) { M.makeBasis(r, u, f); M.setPosition(p); W.head.matrixAutoUpdate = false; W.head.matrix.copy(M); W.head.matrixWorldNeedsUpdate = true; } }
-  W.body.instanceMatrix.needsUpdate = W.fins.instanceMatrix.needsUpdate = W.glow.instanceMatrix.needsUpdate = true; W.root.visible = any;
-  W.jaw.rotation.x = Math.max(0, Math.sin(T * .7)) * .45; }
+function shipSerpentStep(W, dt, t) { const T = t + W.ph, NL = W.NL, NS = W.NS, dtau = W.sp / 6.5, up = new THREE.Vector3(0, 1, 0), q = W._q, M = W._m;
+  const P = W.bg.attributes.position.array, Nn = W.bg.attributes.normal.array, FP = W.fgm.attributes.position.array;
+  if (!W._p.length) for (let i = 0; i < NL; i++) { W._p.push(new THREE.Vector3()); W._f.push(new THREE.Vector3()); W._u.push(new THREE.Vector3()); W._r.push(new THREE.Vector3()); }
+  const radAt = k => (k < .2 ? .82 + Math.sin(k / .2 * Math.PI / 2) * .5 : 1.32 * Math.pow(1 - (k - .2) / .8, .9) + .06) * (1 + Math.sin(T * 3 - k * 20) * .025);
+  let any = 0;
+  for (let i = 0; i < NL; i++) { const p = W._p[i], f = W._f[i], u = W._u[i], r = W._r[i], tau = T - i * dtau; shipSerpentP(W, tau, p); shipSerpentP(W, tau + .05, q); f.subVectors(q, p).normalize();
+    r.crossVectors(up, f).normalize(); u.crossVectors(f, r); if (p.y > -2.5) any = 1;
+    const k = i / (NL - 1), rad = radAt(k), roll = Math.sin(tau * .9 + .8) * .18;     // a slight roll into the weave
+    const cr = Math.cos(roll), sr = Math.sin(roll), rx = r.x * cr + u.x * sr, ry = r.y * cr + u.y * sr, rz = r.z * cr + u.z * sr, ux = u.x * cr - r.x * sr, uy = u.y * cr - r.y * sr, uz = u.z * cr - r.z * sr;
+    for (let j = 0; j <= NS; j++) { const a = j / NS * Math.PI * 2, ca = Math.cos(a), sa = Math.sin(a), keel = sa > 0 ? Math.pow(sa, 10) * .22 : 0, ly = sa * (sa > 0 ? .92 : .7) + keel, lx = ca;
+      const v = (i * (NS + 1) + j) * 3; P[v] = p.x + (rx * lx + ux * ly) * rad; P[v + 1] = p.y + (ry * lx + uy * ly) * rad; P[v + 2] = p.z + (rz * lx + uz * ly) * rad;
+      const nx = ca / 1, ny = sa / (sa > 0 ? .92 : .7), nl = Math.hypot(nx, ny); Nn[v] = (rx * nx + ux * ny) / nl; Nn[v + 1] = (ry * nx + uy * ny) / nl; Nn[v + 2] = (rz * nx + uz * ny) / nl; }
+    // dorsal fin: base on the keel, tip up and swept back; scalloped every 6 rings; a tail fan where k > .9
+    const spine = .74 + .26 * Math.pow(Math.abs(Math.cos(i / 6 * Math.PI)), 4), tail = k > .88 ? (k - .88) / .12 : 0;
+    const dh = (k < .04 ? 0 : k < .1 ? (k - .04) / .06 : 1) * (1.05 * (1 - k * .55) + tail * 2.2) * spine * (1 + Math.sin(T * 5 - i * .3) * .05);
+    const bY = 1.12 * rad, b = i * 6; FP[b] = p.x + ux * bY; FP[b + 1] = p.y + uy * bY; FP[b + 2] = p.z + uz * bY;
+    FP[b + 3] = FP[b] + ux * dh - f.x * dh * .35; FP[b + 4] = FP[b + 1] + uy * dh - f.y * dh * .35; FP[b + 5] = FP[b + 2] + uz * dh - f.z * dh * .35;
+    const vh = k < .62 ? 0 : Math.min(1, (k - .62) / .1) * (.6 + tail * 2.0) * spine, vb = (NL + i) * 6, bV = -.7 * rad;
+    FP[vb] = p.x + ux * bV; FP[vb + 1] = p.y + uy * bV; FP[vb + 2] = p.z + uz * bV; FP[vb + 3] = FP[vb] - ux * vh - f.x * vh * .35; FP[vb + 4] = FP[vb + 1] - uy * vh - f.y * vh * .35; FP[vb + 5] = FP[vb + 2] - uz * vh - f.z * vh * .35; }
+  W.bg.attributes.position.needsUpdate = W.bg.attributes.normal.needsUpdate = W.fgm.attributes.position.needsUpdate = true; W.fgm.computeVertexNormals();
+  W.bg.computeBoundingSphere(); W.root.visible = any;
+  { const p = W._p[0], f = W._f[0]; M.makeBasis(W._r[0], W._u[0], f); M.setPosition(p.x + f.x * 1.05, p.y + f.y * 1.05, p.z + f.z * 1.05); W.head.matrix.copy(M); W.head.matrixWorldNeedsUpdate = true; }
+  { const i = Math.round(W.NL * .07), p = W._p[i], r = W._r[i], u = W._u[i], f = W._f[i], rad = radAt(i / (W.NL - 1));
+    for (const pc of W.pecs) { M.makeBasis(r, u, f); M.setPosition(p.x + r.x * pc.sx * rad * .9 - u.x * rad * .3, p.y + r.y * pc.sx * rad * .9 - u.y * rad * .3, p.z + r.z * pc.sx * rad * .9 - u.z * rad * .3); pc.g.matrix.copy(M); pc.g.matrixWorldNeedsUpdate = true;
+      pc.piv.rotation.set(0, pc.sx * (.9 + Math.sin(T * 2.2) * .3), pc.sx * (-.3 + Math.sin(T * 2.2 + .6) * .25)); } }
+  W.splT -= dt; for (let s = 0; s < 8; s++) { const i = Math.floor(s * (NL - 1) / 7), p = W._p[i], py = p.y; if (W.prevY[s] && Math.sign(py) !== Math.sign(W.prevY[s]) && W.splT <= 0 && radAt(i / (NL - 1)) > .5) { W.splT = .12; const w = W.root.parent.localToWorld(p.clone()); spkBurst(w.x, w.y + .3, w.z, 18, { col: [.88, .96, 1], spread: 1.8, up: 2.6, size: .2, life: .8 }); } W.prevY[s] = py || .001; }
+  W.jaw.rotation.x = Math.max(0, Math.sin(T * .7)) * .42; }
 function colorize(geo, c) { const n = geo.attributes.position.count, C = new Float32Array(n * 3); for (let i = 0; i < n; i++) { C[i * 3] = c[0]; C[i * 3 + 1] = c[1]; C[i * 3 + 2] = c[2]; } geo.setAttribute('color', new THREE.BufferAttribute(C, 3)); }
 function shipWhaleStep(W, dt, t) { W.t += dt; const R = W.root, spd = { under: 9, rise: 5, cruise: 4.5, dive: 4 }[W.st] || 5, hx = Math.cos(W.h), hz = -Math.sin(W.h);
   const pickSpot = () => { const a = Math.random() * 6.28, d = 70 + Math.random() * 80; W.tx = Math.cos(a) * d; W.tz = Math.sin(a) * d; };

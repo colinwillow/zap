@@ -99,6 +99,28 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
+## THE SHIP, PASS 12b: THE SERPENT REBUILT -- ONE SKIN, A REAL HEAD (m@X4@, WORKER A)
+
+His: *"Do a pass on the monster, it's pretty ugly, low quality lol -- we need like 600,000 passes."* m1416's serpent was 44 instanced
+ellipsoids, triangle fins and a head of stacked primitives. All replaced (the path `shipSerpentP` is kept, so it still loops the ship and
+the arches still stand still in the sea):
+
+- **ONE CONTINUOUS SKIN:** a 110-ring x 20-side tube rewritten every frame along the path (positions AND analytic normals, no
+  `computeVertexNormals` on the body), its cross-section a keeled back over a flattened belly, rolling slightly into its weave, with a
+  breathing pulse. Static vertex colours (dark back with bands, teal flanks, cream belly) under a painted SCALE map (canvas, overlapping
+  shaded scales) and a glowing lateral line drawn in the EMISSIVE map, so the photophores cost no meshes at all.
+- **A REAL MEMBRANE:** one ribbon down the back (a spine every 6 rings, scalloped edge, swept back, rippling), a ventral ribbon on the
+  last third, and both grow into a TAIL FAN at the end. Its texture is a gradient membrane with a dark spine and fainter rays.
+  Pectoral FANS behind the head flap.
+- **A LOFTED HEAD** (`shipLoft`): a skull that widens at the cheeks into a tapering snout, BROW RIDGES pushed out over the eyes, a hinged
+  lofted JAW with a red mouth and its own row of teeth, upper teeth along the skull's edge, sunken eyes (a dark socket ring, a glowing eye,
+  a slit pupil), spined FRILLS, curved tapering HORNS and long tapering WHISKERS (`shipTaper`). Merged into one skin draw plus one
+  membrane draw (plus the jaw and eyes). Helpers: `shipSerpentTex`, `shipGeo`, `shipLoft`, `shipTaper`, `shipFan`.
+- **Measured headless:** the first render had the body and then the head INSIDE OUT (you saw the inside of the tube from above). The body's
+  rings run counter-clockwise about forward and advance BACKWARD; the head loft and the tapers advance FORWARD, so they need the opposite
+  winding. Both are now right: the skin is solid from above, the side and below.
+- **Moves:** the serpent. **Open:** the eyes are cartoonish, and nothing reacts to it. Not signed off.
+
 ## THE SHIP, PASS 12: THE SERPENT FISH (m1416, WORKER A)
 
 His: *"long, elongated serpent fish"* (one big sea creature per pass; the whale was pass 11).
