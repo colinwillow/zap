@@ -11278,7 +11278,7 @@ function dojoDragon(D, R) { const t = D.t + 40, v = R.v, v2 = R.v2, M = R.m4, q 
 async function dojoBeast(D, B) { try { const K = await arenaLoad(B.key), P = K.P, m = skeletonClone(P.proto); m.scale.setScalar(P.scale * B.mul);
     const root = new THREE.Group(); root.add(m); root.position.set(B.x, B.y, B.z); root.rotation.y = Math.atan2(-B.x, -B.z) + (P.faceOff || 0); m.traverse(o => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; } });
     D.on.g.add(root); B.root = root; B.mx = new THREE.AnimationMixer(m); B.clips = {}; for (const c of P.clips) B.clips[c.name] = c; B.i = 0; B.t = 0; B.cur = null; dojoBeastIdle(B);
-    if (B.key === 'DRAGON' && DOJO.dragonPick === 'CAPTURED') { B.mx.update(0); root.updateMatrixWorld(true); dojoDragonDress(B, m, root, P); }
+    if (B.key === 'DRAGON' && DOJO.dragonPick === 'CAPTURED' && SADDLE.dress) { B.mx.update(0); root.updateMatrixWorld(true); dojoDragonDress(B, m, root, P); }
   } catch (e) { console.warn('[melee] dojo beast ' + B.key, e); note('NO BEAST ' + B.key); } }
 function dojoBeastIdle(B) { const n = B.idles[B.i++ % B.idles.length], c = B.clips[n] || B.clips[B.idles[0]]; if (!c) { B.t = 99; return; }
   const a = B.mx.clipAction(c); a.reset().setLoop(THREE.LoopRepeat).play(); if (B.cur && B.cur !== a) B.cur.crossFadeTo(a, .6, false); B.cur = a; B.t = Math.max(4, c.duration * (2 + Math.floor(Math.random() * 2))); }
@@ -11289,7 +11289,7 @@ function dojoBeastIdle(B) { const n = B.idles[B.i++ % B.idles.length], c = B.cli
 try { const v = localStorage.getItem('mel.dragon'); DOJO.dragonPick = v && v !== 'CAPTURED' ? 'WILD' : 'CAPTURED'; } catch (e) { DOJO.dragonPick = 'CAPTURED'; }     // m1610: the zone's EVIL / BARE read as WILD here
 // m1655: THE SADDLE AT THE RIDER'S SIZE (his: "he needs to be sitting on a saddle on top of the very wide dragon's body"). Built off the
 // dragon's height it was ~2 m wide with a pommel taller than Grumbo, and hid him; `k` scales the saddle (both passes), its rein rings and the seat.
-const SADDLE = { k: .4 };
+const SADDLE = { k: .4, dress: 0 };     // m15xx (his: "remove the armour and the saddle -- I'll make a much better saddle myself out of pieces of the mesh"): `dress` 0 builds NONE of it (both passes, the reins); 1 is the A/B
 function dojoDragonDress(B, m, root, P) { const H = (B.hd = (P.h || 3.2) * B.mul), K1 = dragKit(m, root, H, B.bag), { bone, wq, up, side, fwd, hitAlong, pin, bw } = K1;     // m1610: the kit is shared with pass 2 (and `bag` collects the pieces for the zone's look switch)
   const mat = { leather: new THREE.MeshStandardMaterial({ color: 0x5a3220, roughness: .7 }), red: new THREE.MeshStandardMaterial({ color: 0xb3261c, roughness: .6, side: THREE.DoubleSide }), gold: new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .85, roughness: .3 }),
     jin: new THREE.MeshBasicMaterial({ color: JINHEX, toneMapped: false }), iron: new THREE.MeshStandardMaterial({ color: 0x2a2624, metalness: .6, roughness: .5 }) };
@@ -11417,7 +11417,7 @@ async function dragBeast() { const Z = DRAGZ, O = Z.on; try { const K = await ar
     O.g.add(root); const B = { root, m, mul: Z.mul, mats, idles: Z.idles, clips: {}, i: 0, t: 0, cur: null, bag: [] }; B.mx = new THREE.AnimationMixer(m); for (const c of P.clips) B.clips[c.name] = c; dojoBeastIdle(B);
     B.mx.update(0); root.updateMatrixWorld(true);
     O.B = B; B.sets = { CAPTURED: B.bag, EVIL: [] };     // stood and breathing first: a dressing that throws leaves him bare, not frozen
-    try { dojoDragonDress(B, m, root, P); dragDress2(B, m, root, P); } catch (e) { console.warn('[melee] dragon dress', e); note('DRAGON DRESS ' + e.message); }
+    B.hd = (P.h || 3.2) * B.mul; try { if (SADDLE.dress) { dojoDragonDress(B, m, root, P); dragDress2(B, m, root, P); } } catch (e) { console.warn('[melee] dragon dress', e); note('DRAGON DRESS ' + e.message); }
     dragBox(B);
     dragSeat(B, m, root, P);
     dragLook();
@@ -11445,7 +11445,7 @@ const _drV = new THREE.Vector3(), _drV2 = new THREE.Vector3();
 const dragH = B => B.root.rotation.y - (B.faceOff || 0);
 function dragSeat(B, m, root, P) { const K = dragKit(m, root, B.hd), sp = K.bw('Bip001_Spine1'); B.faceOff = P.faceOff || 0; if (!sp) return;
   const top = K.backTop(sp) || K.hitAlong(sp, K.up.clone().negate(), B.hd * 1.2, sp) || sp.clone().addScaledVector(K.up, B.hd * .15);
-  B.seat = new THREE.Group(); K.pin('Bip001_Spine1', B.seat, top.clone().addScaledVector(K.up, B.hd * .055 * SADDLE.k));
+  B.seat = new THREE.Group(); K.pin('Bip001_Spine1', B.seat, top.clone().addScaledVector(K.up, SADDLE.dress ? B.hd * .055 * SADDLE.k : .04));     /* bare: on his back itself */
   const g = top.clone(); g.y = DRAGZ.daisY; let d = 0; const inBox = v => v.x > B.box.minx && v.x < B.box.maxx && v.z > B.box.minz && v.z < B.box.maxz;
   while (d < 20 && inBox(_drV.copy(g).addScaledVector(K.side, d))) d += .25; B.mountAt = g.addScaledVector(K.side, d + 1.1); B.mountL = root.worldToLocal(B.mountAt.clone());
   const ring = new THREE.Mesh(new THREE.TorusGeometry(.9, .06, 6, 32).rotateX(Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0x7affd8, toneMapped: false, transparent: true }));

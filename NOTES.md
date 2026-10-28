@@ -22,6 +22,10 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
   (m1635's 240 were through `bldTris`). It now tries the second winding when the first is rejected. After both: 240 / 258 / 268.
 Render-checked headless (the belt from the south-west: the runs, the door gap, the corner doubloons, the rings). Next: the Robot
 Barracks (ENEMY). Shipped unverified.
+## m15xx -- THE DRAGON RIDE: THE ARMOUR AND THE SADDLE ARE GONE (his: "I'll make a much better saddle myself out of pieces of the mesh")
+`SADDLE.dress` 0: neither dressing pass is built (CAPTURED, EVIL, the reins), in the zone or the dojo. The seat is his back itself (`backTop`
++ .04 m; the hips `seatUp` .14 over it). Rendered mounted: Grumbo sits on the bare back, visible. The hide still darkens when wild (EVIL),
+since that is not armour. `SADDLE.dress = 1` is the A/B (a reload).
 
 ## m1654 -- THE RE-PASS: the MOATED KEEP, pass 2 (DESTRUCTIBLE TO THE GROUND)
 - The Hangar's machinery (per-piece rigs run backwards, `restoreRide` parking each piece's boxes, a `sup` list hit through `bldHit` ->
