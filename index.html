@@ -67709,7 +67709,7 @@ function rwBuild() {
     else { c.copy(bed).lerp(deep, smooth(-1.5, -10, h)); c.lerp(weed, smooth(.05, .16, rwFbm(x * .8 + 13, z * .8 - 7)) * smooth(-1.2, -3, h) * .85); }
     col.set([c.r, c.g, c.b], i * 3); }
   g.setAttribute('color', new THREE.BufferAttribute(col, 3)); g.computeVertexNormals();
-  const land = new THREE.Mesh(g, rwPatch(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .95 }))); land.receiveShadow = true; land.frustumCulled = false; scene.add(land);
+  const land = new THREE.Mesh(g, (m => hw ? hwPaint(m, 'land') : m)(rwPatch(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .95 })))); land.receiveShadow = true; land.frustumCulled = false; scene.add(land);
   const idx = g.index.array; let nW = 0; const up0 = TRI.up; if (hw) TRI.up = .02;     // m1114: the canyon's steep faces are in the store too -- a wall is then a riser too tall to step, not a hole to fall through
   for (let i = 0; i < idx.length; i += 3) { const a = idx[i], b = idx[i + 1], d = idx[i + 2]; if (Math.hypot(P.getX(a), P.getZ(a)) > (hw ? 150 : RW.R * 2.4)) continue;
     nW += triAdd(P.getX(a), P.getY(a), P.getZ(a), P.getX(b), P.getY(b), P.getZ(b), P.getX(d), P.getY(d), P.getZ(d)); surfAdd(P.getX(a), P.getY(a), P.getZ(a), P.getX(b), P.getY(b), P.getZ(b), P.getX(d), P.getY(d), P.getZ(d)); }
@@ -67798,6 +67798,26 @@ function ghPathMat() { if (ghPathMat.m) return ghPathMat.m; const cv = document.
     for (let y = 10; y < 512; y += 44) for (const sx of [-1, 1]) { const x = 64 + sx * 14 + (R() - .5) * 8, yy = y + (sx > 0 ? 22 : 0); q.fillStyle = 'rgba(80,50,32,.32)'; q.beginPath(); q.ellipse(x, yy, 5, 9, (R() - .5) * .4, 0, 7); q.fill(); q.beginPath(); q.ellipse(x, yy - 12, 4, 4, 0, 0, 7); q.fill(); }
     const tex = new THREE.CanvasTexture(cv); tex.wrapT = THREE.RepeatWrapping; tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
     return ghPathMat.m = new THREE.MeshStandardMaterial({ map: tex, transparent: true, depthWrite: false, roughness: 1, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }); }
+// THE RED HOLLOWS' PAINTED MAPS (his, after m1704: "we need some nice painted texture maps -- look how much of this is just plain orange; we need
+// to really develop these textures on this level"). Three tileable 1024 maps generated with his OpenAI key (gpt-image-2, streamed), made seamless
+// offline (the half-rolled copy takes the borders): `hollows_sand` (ripples, grit, pebbles), `hollows_rock` (strata, cracks, pits) and
+// `hollows_cliff` (fluted red walls, varnish streaks). `hwPaint(mat, kind)` lays them on by world-space TRIPLANAR projection (the merged
+// geometry has no UVs) and MULTIPLIES the existing colour by map / its own linear mean -- so the palette, the strata bands, the moss and the
+// FALLEN drain all stay what they were and the paint is the detail. 'land': sand on the flats, cliff on the steeps (by slope); 'rock': the rock
+// map. It goes in BEFORE `color_fragment`, so a drain spliced after it still has the last word. `HWPAINT.k` is the strength (0 = off)
+const HWPAINT = { k: .85, sand: { n: 'hollows_sand', s: 7, mean: [.8579, .2564, .0882] }, rock: { n: 'hollows_rock', s: 3.2, mean: [.485, .1559, .0497] }, cliff: { n: 'hollows_cliff', s: 12, mean: [.4453, .0731, .0466] } };
+function hwPaint(mat, kind) { if (!HWPAINT.k) return mat; const P = HWPAINT, ob = mat.onBeforeCompile, ok = mat.customProgramCacheKey, land = kind === 'land', A1 = land ? P.cliff : P.rock;
+  mat.onBeforeCompile = function (sh, r) { if (ob) ob.call(this, sh, r);
+    Object.assign(sh.uniforms, { uHwA: { value: texGet(A1.n) }, uHwAs: { value: 1 / A1.s }, uHwAm: { value: new THREE.Vector3(...A1.mean) }, uHwK: { value: P.k } });
+    if (land) Object.assign(sh.uniforms, { uHwB: { value: texGet(P.sand.n) }, uHwBs: { value: 1 / P.sand.s }, uHwBm: { value: new THREE.Vector3(...P.sand.mean) } });
+    sh.vertexShader = 'varying vec3 vHwP; varying vec3 vHwN;\n' + sh.vertexShader.replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\n  vHwP = (modelMatrix * vec4(transformed, 1.0)).xyz; vHwN = normalize(mat3(modelMatrix) * objectNormal);');
+    sh.fragmentShader = 'varying vec3 vHwP; varying vec3 vHwN; uniform sampler2D uHwA; uniform float uHwAs; uniform vec3 uHwAm; uniform float uHwK;' + (land ? ' uniform sampler2D uHwB; uniform float uHwBs; uniform vec3 uHwBm;' : '') + '\n' +
+      sh.fragmentShader.replace('#include <color_fragment>', `{ vec3 hn = normalize(vHwN), bw = pow(abs(hn), vec3(4.0)); bw /= (bw.x + bw.y + bw.z);
+        vec3 ta = (texture2D(uHwA, vHwP.zy * uHwAs).rgb * bw.x + texture2D(uHwA, vHwP.xz * uHwAs).rgb * bw.y + texture2D(uHwA, vHwP.xy * uHwAs).rgb * bw.z) / uHwAm;` +
+        (land ? ` vec3 tb = texture2D(uHwB, vHwP.xz * uHwBs).rgb / uHwBm; tb = mix(vec3(1.0), tb, 1.6); ta = mix(ta, tb, smoothstep(0.62, 0.82, hn.y));` : '') + `
+        diffuseColor.rgb *= mix(vec3(1.0), clamp(ta, 0.0, 2.2), uHwK); }
+      #include <color_fragment>`); };
+  mat.customProgramCacheKey = () => String(ok ? ok.call(mat) : '') + 'hwp' + kind; mat.needsUpdate = true; return mat; }
 function ghRockGeo(seed, sx, sy, sz, det = 3) { const g = new THREE.IcosahedronGeometry(1, det), p = g.attributes.position, o = seed * 7.31;
   for (let i = 0; i < p.count; i++) { let x = p.getX(i), y = p.getY(i), z = p.getZ(i);
     const n1 = ghNoise3(x * 1.3 + o, y * 1.3 + o * .7, z * 1.3 - o), n2 = ghNoise3(x * 3.2 - o, y * 3.2 + o, z * 3.2 + o * .3), d = 1 + (n1 - .5) * .62 + (n2 - .5) * .22;
@@ -68046,7 +68066,7 @@ function ghomeBuild(at, yaw, y0) {
     for (let i = 0; i < p.count; i++) { const u = p.getX(i) / w + .5, v = p.getY(i) / h + .5; p.setZ(i, .07 * Math.sin(Math.PI * u) + .04 * Math.sin(v * 9 + u * 3)); }
     geo.computeVertexNormals(); put(geo, m, at4(x, ytop - h / 2, z)); };
   // pass 18: a ROCK CLUSTER -- one big stone, one to three smaller ones leaning into it, a scatter of pebbles; all sunk into the ground
-  const rockM = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .93 }); rockM.userData.strata = 1; A.rockM = rockM;     // pass 22: the rocks are desert sandstone, not the house's stone
+  const rockM = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .93 }); rockM.userData.strata = 1; hwPaint(rockM, 'rock'); A.rockM = rockM;     // pass 22: the rocks are desert sandstone, not the house's stone
   // pass 31 (the rocks' 3rd): a big stone is sometimes SPLIT (two halves leaning apart along a crack), sometimes carries a flat CAP slab, the
   // big ones are finer, and every cluster sits in a soft DRIFT of sand blown against it (`A.drift`, one bucket). Its own rng (`R3`), so the
   // rest of the valley's placements do not move
@@ -68698,7 +68718,7 @@ function gjinraBuild() {
   const rod = (a, b, r, m, round) => { const d = new THREE.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]), L = d.length(); put(round ? new THREE.CylinderGeometry(r, r, L, 8) : new THREE.BoxGeometry(r, L, r), m, _m4.compose(new THREE.Vector3((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2), _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()), _one)); };
   const NC = { noCam: 1 }, M = jvesMats();
   const wood = triMat('wood_timber', { scale: 1.6, rough: .85 }), woodP = triMat('wood_planks', { scale: 2.2, rough: .85 }), stone = triMat('sandstone', { scale: 3.2, rough: .92 }); for (const m of [wood, woodP, stone]) m.userData.tri = 1;
-  const rockM = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .93 }); rockM.userData.strata = 1; const grass = new THREE.MeshStandardMaterial({ color: 0x8a9a52, roughness: 1 });
+  const rockM = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .93 }); rockM.userData.strata = 1; hwPaint(rockM, 'rock'); const grass = new THREE.MeshStandardMaterial({ color: 0x8a9a52, roughness: 1 });
   const teal = new THREE.MeshStandardMaterial({ map: gjinraTex('awning'), alphaTest: .5, side: THREE.DoubleSide, roughness: .9 }), banM = new THREE.MeshStandardMaterial({ map: gjinraTex('banner'), alphaTest: .5, side: THREE.DoubleSide, roughness: .9 });
   const lampM = new THREE.MeshStandardMaterial({ color: 0xbfffe4, emissive: 0x40f0b0, emissiveIntensity: 2, toneMapped: false });
   // ---- THE ISLAND: an inverted stratified cone of rock, its top a flat cap of grass and sand; Jinra spilling off one edge ----
@@ -68785,7 +68805,7 @@ function gpeakBuild() {
   const NC = { noCam: 1 }, gH = (x, z) => rwHeight(x, z);
   const wood = triMat('wood_timber', { scale: 1.6, rough: .85 }), woodP = triMat('wood_planks', { scale: 2.2, rough: .85 }), bronze = triMat('bronze', { scale: 1.2, metal: .75, rough: .35 }); for (const m of [wood, woodP, bronze]) m.userData.tri = 1;
   const iron = new THREE.MeshStandardMaterial({ color: 0x2c2724, metalness: .6, roughness: .5 }), red = new THREE.MeshStandardMaterial({ color: 0xb8402c, roughness: .7 }), rope = new THREE.MeshStandardMaterial({ color: 0xc9b07a, roughness: 1 });
-  const rockM = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .93 }); rockM.userData.strata = 1;
+  const rockM = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .93 }); rockM.userData.strata = 1; hwPaint(rockM, 'rock');
   const glow = new THREE.MeshStandardMaterial({ color: 0xffd9a0, emissive: 0xffa040, emissiveIntensity: 2.2, toneMapped: false }), fire = new THREE.MeshStandardMaterial({ color: 0xffb040, emissive: 0xff6010, emissiveIntensity: 3, toneMapped: false });
   A.climbs = [];
   const ladder = (x, z, ya, yb, nx, nz, mark, name) => { const ux = nz, uz = -nx, ry = Math.atan2(nx, nz);
@@ -68908,7 +68928,7 @@ function gmillBuild() {
   const wood = triMat('wood_timber', { scale: 1.6, rough: .85 }), woodP = triMat('wood_planks', { scale: 2.2, rough: .85 }), stone = triMat('stone_blocks', { scale: 2.4, rough: .9 }), plaster = triMat('sandstone', { scale: 4.5, rough: .92 }), bronze = triMat('bronze', { scale: 1.2, metal: .75, rough: .35 });
   for (const m of [wood, woodP, stone, plaster, bronze]) m.userData.tri = 1;
   const iron = new THREE.MeshStandardMaterial({ color: 0x2c2724, metalness: .6, roughness: .5 }), red = new THREE.MeshStandardMaterial({ color: 0xb8402c, roughness: .7 }), sand = new THREE.MeshStandardMaterial({ color: 0xe2b98a, roughness: 1 });
-  const rockM = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .93 }); rockM.userData.strata = 1;
+  const rockM = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .93 }); rockM.userData.strata = 1; hwPaint(rockM, 'rock');
   const glow = new THREE.MeshStandardMaterial({ color: 0xffd9a0, emissive: 0xffa040, emissiveIntensity: 2.2, toneMapped: false });
   const sunM = new THREE.MeshStandardMaterial({ map: gmillTex('sun'), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, roughness: .9 }), sailM = new THREE.MeshStandardMaterial({ map: gmillTex('sail'), alphaTest: .5, side: THREE.DoubleSide, roughness: .9 });
   const awnM = new THREE.MeshStandardMaterial({ map: ghClothTex('awning'), alphaTest: .5, side: THREE.DoubleSide, roughness: .9 }), banM = new THREE.MeshStandardMaterial({ map: ghClothTex('banner'), alphaTest: .5, side: THREE.DoubleSide, roughness: .9 });
@@ -69108,7 +69128,7 @@ function gmerchBuild() {
   const wood = triMat('wood_timber', { scale: 1.6, rough: .85 }), woodP = triMat('wood_planks', { scale: 2.2, rough: .85 }), stone = triMat('sandstone', { scale: 3.2, rough: .92 }), bronze = triMat('bronze', { scale: 1.2, metal: .75, rough: .35 });
   for (const m of [wood, woodP, stone, bronze]) m.userData.tri = 1;
   const iron = new THREE.MeshStandardMaterial({ color: 0x2c2724, metalness: .6, roughness: .5 }), bone = new THREE.MeshStandardMaterial({ color: 0xe9dcc0, roughness: .6 }), boneD = new THREE.MeshStandardMaterial({ color: 0xc9b894, roughness: .7 });
-  const rockM = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .93 }); rockM.userData.strata = 1;
+  const rockM = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .93 }); rockM.userData.strata = 1; hwPaint(rockM, 'rock');
   const glow = new THREE.MeshStandardMaterial({ color: 0xffd9a0, emissive: 0xffa040, emissiveIntensity: 2.2, toneMapped: false }), crystal = new THREE.MeshStandardMaterial({ color: 0xc9a0ff, emissive: 0x9a50ff, emissiveIntensity: 1.4, roughness: .3, toneMapped: false });
   const leaf = new THREE.MeshStandardMaterial({ color: 0x3f9a8c, roughness: .8, side: THREE.DoubleSide });
   const cloth = k => new THREE.MeshStandardMaterial({ map: gmTex(k), alphaTest: .5, side: THREE.DoubleSide, roughness: .9 }), sailM = cloth('sail'), tealM = cloth('teal'), pinkM = cloth('pink'), banM = cloth('banner'), signM = new THREE.MeshStandardMaterial({ map: gmTex('sign'), roughness: .8 });
@@ -69330,7 +69350,7 @@ function hollowDress() {
       BOXES.push({ minx: s - 1.3, maxx: s + 1.3, miny: -2, maxy: yc - .1, minz: z - 1.3, maxz: z + 1.3 }); }
     for (let i = 0; i < 40; i++) { const z = -150 + r() * 300, side = r() < .5 ? -1 : 1, s = hwRc(z) + side * ((side < 0 ? HOLLOW.floorW : HOLLOW.floorE) + HOLLOW.wall + 6 + r() * 20), y = rwHeight(s, z), R = 3 + r() * 5;
       const g = ghRockGeo(i + 500, R * (1.1 + r() * .4), R * (.5 + r() * .25), R * (.85 + r() * .3), 2); g.rotateY(r() * 6); g.computeBoundingBox(); g.translate(s, y - g.boundingBox.min.y - (g.boundingBox.max.y - g.boundingBox.min.y) * .2, z); rk.push(ghStrataCol(g)); }
-    const m = rwMesh(rk, rwMat(0xffffff, { vertexColors: true, roughness: .95 })); m.geometry.computeVertexNormals(); }
+    const m = rwMesh(rk, hwPaint(rwMat(0xffffff, { vertexColors: true, roughness: .95 }), 'rock')); m.geometry.computeVertexNormals(); }
   // CAVE MOUTHS in the walls at the floor: a dark arch with a rim of darker stone
   { const dark = [], rim = []; for (const [z, side] of [[-30, -1], [18, -1], [-55, 1], [40, 1], [95, -1]]) { const x = wallX(z, side, 1.5), y = rwHeight(x, z) - .3, ry = side < 0 ? Math.PI / 2 : -Math.PI / 2;     // m1114: the cave at 70 moved to 95, out of the west path's foot
       const a = new THREE.CircleGeometry(3, 18, 0, Math.PI); a.scale(1, 1.3, 1); a.rotateY(ry); a.translate(x - side * .3, y, z); dark.push(a);
