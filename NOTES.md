@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the ROBOT BARRACKS, pass 2 (DESTRUCTIBLE TO THE GROUND)
+- Keystones: the veranda's six black PILLARS (m1659), each its own piece, 3 blows (`barrBreak`, after `barrHit` so a robot in front of
+  one takes the blow first). A cut pillar topples OUT into the yard (1.5 rad about x, its centre swung down to the ground). Four cut and
+  the ROOF piece drops into the hall front-first (roof, fascia, ridge and finials, the eave lanterns, the head beam, the interior lamp,
+  the door lintel and its box); the pillars still standing topple after it, and the hall's breakable walls go WITH it: every live chunk
+  through `wallBreak` (staggered 25 ms, one in three throwing pieces), and the stone end posts (`cwallBuild`'s frame meshes, which are not
+  chunks and stood up through the fallen roof in the first render) are hidden with their boxes. Razed to the bunks.
+- Stay: the yard, kerb, dais and taiko, the dummies and butt, the weapon rack, the nobori, the braziers, the robots and the bar.
+- `barrClear` drops the rigs. HEADLESS NOTE (again): the rigs step slowly headless; the roof's fall shows at 30 s.
+Render-checked headless: four pillars cut -> pillars down in the yard, the roof down over the bunks, the walls and posts gone.
+Shipped unverified.
+
 ## m1659 -- THE RE-PASS: the ROBOT BARRACKS, pass 1 (ENEMY look)
 - ENEMY_STYLE's BARRACKS, literally: "a long hall where constructs stand dormant in rows behind black pillars, under a black roof with
   gold trim and lanterns along the eave". The hall's breakable walls are `enemyWallTex` sandstone block; `bldRoof` in black tile under
