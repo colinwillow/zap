@@ -26359,7 +26359,7 @@ const BEACON = { at: [150, 110], want: 0, on: null, canyon: { cell: 8, clear: 8,
     { c: ['go:E', 'chim:12', 'up_jump', 'up_jump', 'up_dbl'] },     // the finale climb (the guardian's sweeps are layer 5)
     { st: 'X', name: 'THE BRAZIER', R: 9, brazier: 1 } ] };
 try { if (/[?&]lvl=beacon\b/.test(location.search)) BEACON.want = 1; } catch (e) {}
-// m15xx: his third sheet's stations (x, z off its top-down grid, x MIRRORED into the world because +X is his left: facing north, the sheet's east is
+// m1559: his third sheet's stations (x, z off its top-down grid, x MIRRORED into the world because +X is his left: facing north, the sheet's east is
 // on his right; `want` = its height) and the runs between them, in order
 BEACON.sheet = { k: 1.5, st: [     // `k`: the sheet's metres are ~2/3 of what the measured moves need (at 1.0, S->A, B->C, C->D came up 16, 6, 11 m SHORT)
     { id: 'S', name: 'START YARD', g: [10, 92], R: 12, want: 0 },
@@ -26415,7 +26415,7 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
       fl.position.set(cx, y + 1.2, cz); g.add(fl); L.flame = fl; L.brazier = { x: cx, y, z: cz }; O.boxes.push({ minx: cx - 1.6, maxx: cx + 1.6, miny: y, maxy: y + 1.2, minz: cz - 1.6, maxz: cz + 1.6 }); }
     const side = inDir ? [-inDir[1], inDir[0]] : [1, 0]; ladderUp(cx + side[0] * (h + .15), cz + side[1] * (h + .15), y, side);
     const id = S.id || S.st; sign(id + '  ' + S.name, (y < .1 ? 0 : y).toFixed(1) + ' m' + (S.want !== undefined ? '  (sheet ' + S.want + ')' : ''), cx, y + 3.4, cz, 1.1); L.st[id] = { x: cx, y, z: cz, R }; L.log.push(id + ' ' + y.toFixed(1)); if (S.brazier) L.st.X = L.st[id]; return { x: cx, y, z: cz, h }; };
-  // m15xx: THE SHEET'S LAYOUT (his third sheet, `beacon_grid.jpg`, the first with a metre grid). Stations sit at the sheet's (x, z) -- `g`, read
+  // m1559: THE SHEET'S LAYOUT (his third sheet, `beacon_grid.jpg`, the first with a metre grid). Stations sit at the sheet's (x, z) -- `g`, read
   // off its top-down plan, north up, z counted DOWN the page -- and each run is FITTED between two of them: an L (the longer axis first, unless
   // `first`), a corner pad at the bend, its pieces laid in order with each leg's slack taken up by a walkway at the leg's end. The pieces' sizes
   // are the measured ones, so a run that cannot fit is reported (`SHORT`) and the station moves to where it arrives, never stretched.

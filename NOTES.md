@@ -25,7 +25,7 @@ re-found on the wall .55 m lower) as a tube with leaf cones; 12% hang a bulb. De
 heads where `free()` allows. Same buckets (one new: orange) -> 37 draws. 134 shrubs, 57 vines. Own rng (3232), nothing else moves.
 The loop's queue (mill, merchant, refinery, peak, home's list) is done; the home's still-open list is down to the back ladder and stall
 rack (ref 2) and his sign-off.
-## m15xx -- The First Beacon on HIS SHEET's layout (his third sheet, `beacon_grid.jpg`)
+## m1559 -- The First Beacon on HIS SHEET's layout (his third sheet, `beacon_grid.jpg`)
 His: *"these don't really look the same -- is it hard for you to draw in reference from this photo?"*, then a sheet with a metre grid. The first two
 sheets had no scale, so pass 1 took only the blueprint's heights and let each station land wherever its run arrived. This one has a grid, so:
 - **`BEACON.sheet`:** the stations at the sheet's (x, z) and its heights; `beaconBuild` FITS each run between two of them: an L (the longer axis

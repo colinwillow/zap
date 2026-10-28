@@ -14,7 +14,7 @@ then the level is GENERATED from `BEACON.plan` in index.html.
 
 ## DONE WHEN (layer 1, THE RUN) -- each ticked with evidence in a NOTES entry; the last box is his sign-off on the phone
 - [x] the route exists end to end from the blueprint (m1549)
-- [x] **on his sheet's layout and heights (m15xx):** stations at the grid sheet's (x, z) x1.5 (its metres are ~2/3 of what the moves need), runs FITTED between them, heights exactly the sheet's: S 0 | A 9 | B 4 | C 24 | D 28 | Z 14 | brazier 39.6. No run SHORT
+- [x] **on his sheet's layout and heights (m1559):** stations at the grid sheet's (x, z) x1.5 (its metres are ~2/3 of what the moves need), runs FITTED between them, heights exactly the sheet's: S 0 | A 9 | B 4 | C 24 | D 28 | Z 14 | brazier 39.6. No run SHORT
 - [ ] every piece WALKED by the route checker (scripted inputs, the shipped frame), not just sized
 - [x] the spine crosses itself (m1555): the rooftops run C -> D back WEST over the lantern ruin A (23-27 m over its 10.9 top), and the zips pass the sunken court B (`go:E/W/N/S` steering in the plan). Still open: stations seeing each other, checked from each one
 - [ ] the tower seen from S (the canyon is kept to 6 m along the S -> brazier line; not yet checked from S in a render)
