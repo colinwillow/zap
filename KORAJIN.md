@@ -73,11 +73,34 @@ dry windmill, a dull stream, a stunted central tower. The people are ordinary an
 - **Region 2+:** pouring Jinra into a region's heart UNLOCKS A FLOATING SECTION, a whole new world above, and you fly up to explore it. The
   restored sky world (the dojo's islands are its look) is the destination, rebuilt region by region.
 
+**THE TRANSFORMATION IS THE SHOW (his, emphatic):** *"Fallen is not just decrepit -- the opposite of fallen is literally lifted into the air,
+floating on jets. It can't be one or the other: it has to be made of the SAME PIECES so we can animate it going up into the air, lighting,
+illuminating, pieces moving in and fixing themselves -- very cinematic. The transformation is going to be huge."*
+- **One set of pieces, two poses per piece.** FALLEN: on the ground, collapsed, tilted, slid off, cracked, rust-dull. RESTORED: assembled,
+  glowing, the whole thing LIFTED and hovering on Jinra jets.
+- **The transition is choreographed:** the base heaves free; the jets ignite; pieces fly back into place one by one (staggered, with arcs
+  and a snap); the colours flood from rust to life; the glow comes on; it rises; the dust and Jinra pour off it.
+- **The shared kit is `RESTORE`** (`restoreRig` / `restorePiece` / `restoreSet` / `restorePlay`). The reference is SPAWN > BUILDINGS >
+  Restoration Demo. Every restorable place is built through it.
+
 **What it means for building now:**
 - Every place should be designed with TWO STATES, FALLEN and RESTORED, as one build with a switch: the same layout, rust versus Jinra glow,
   grounded versus floating.
 - **The look of the fallen world:** a Western frontier over ancient samurai ruins. Weathered timber, rusted iron, dry stone, dull colour.
   **The look of the restored world:** the hero kit, floating islands, mint Jinra, warm lanterns (the dojo).
+
+## THE STORY'S FIRST THREAD: THE UNCLE, THE DRAGON, THE ONE FLOATING BUILDING (his, Oct 28 2026; a sketch)
+> *"The three-headed dog and the dragon were going to be enemies, but maybe they're animals you unlock. You fight the dragon, tame it by giving it
+> the good Jinra, and then you can ride it and control it -- one of the ways you fly up. There's only ONE floating place in the sky: the refinery,
+> run by a crazy old man. You can't get up there, it's too high, so you find the dragon, give it the Jinra, and fly it up. He's your long-lost
+> uncle... Or in the beginning your crazy uncle tells you about these things and you don't believe him, then the man at the shop tells you more and
+> you start to believe it's true. People send you off on quests and you slowly realise who you are and where you came from."*
+- **Beasts are MOUNTS, not just enemies:** the sky dragon (built, flying the dojo) and the three-headed dog. You fight one, TAME it with
+  refined, "good" Jinra, then RIDE and steer it. The dragon is a way UP.
+- **The one floating building at the start is the JINRA REFINERY** (Worker B's, over the peak in the Red Hollows), run by a CRAZY OLD MAN,
+  maybe your long-lost UNCLE. It is unreachable until you have the dragon.
+- **The thread:** an uncle's stories you don't believe, then the shopkeeper who tells you more, then quests from the townspeople, then the
+  slow realisation of who you are (the Korajin's question: born one, or made one?).
 
 ## THE ENEMY: ANCIENT CONSTRUCTS FEEDING ON STOLEN JINRA (his, Oct 28 2026; open)
 > *"The enemy feeds off the power -- an ancient robotic thing. Stone, almost Egyptian, like the Sphinx made of rock, or the buried Chinese
