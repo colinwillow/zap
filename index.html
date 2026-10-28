@@ -21087,13 +21087,34 @@ function pagodaBuild() {
     put(new THREE.BoxGeometry(bx - (cx + hT) + .4, .3, .3).translate((bx + cx + hT) / 2, y0 + .2, cz), wood); put(new THREE.CylinderGeometry(.12, .12, .5, 8).rotateX(Math.PI / 2).translate(bx, y0, cz), K.iron);
     const parts = []; for (let y = 0; y < y0; y += .5) { const cup = new THREE.CylinderGeometry(.16, .1, .26, 7, 1, true).translate(0, -y - .2, 0).toNonIndexed(); cup.deleteAttribute('uv'); parts.push(cup); const lk = new THREE.TorusGeometry(.07, .025, 4, 8).translate(0, -y - .42, 0).toNonIndexed(); lk.deleteAttribute('uv'); parts.push(lk); }
     ch.m = new THREE.Mesh(mergeGeometries(parts), K.bronze); ch.m.position.set(bx, y0, cz); ch.m.scale.y = .01; g.add(ch.m); P0.rain = ch; }
-  for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
-  PAGODA.on.folded = bldMergeStatic(g); PAGODA.on.roof = roof; PAGODA.on.doors = doors;
-  if (AGE.st === 'fallen') { korTentRuin(roof, .5, 9); bldDoorsRuin(doors, 0); drone.visible = false; PAGODA.on.fallen = 1; }     // m1501: FALLEN
-  bldAge(g);
+  // RE-PASS 4 (m@X4@): RESTORABLE IN PLACE (a HERO building: rubric 7 -- no lift, the town's ground will do the rising). The GROUND STOREY and its
+  // roof survived and stay; storeys 2-5 (each with its skirt, gutter ledge and inner flights), the SHINBASHIRA and the BELFRY are the pieces.
+  // FALLEN: they lie round the base in a spiral of wreckage, the pillar flat in the dirt, the belfry beyond it, every colour drained. RESTORE (the
+  // mint plate by the west corner, or SPAWN > BUILDINGS > STATE): the pillar rises first, the storeys fly home one by one up the tower, the
+  // belfry last, and the colour and the Jinra come back. Storeys 2 and up are solid only once it is whole.
+  const P0b = PAGODA.on, R = restoreRig(g, { lift: 0, dur: 9, bob: 0 }); P0b.R = R; P0b.ground = []; P0b.roof = roof; P0b.doors = doors;
+  const pairs = []; for (const [m, list] of MG) for (const q of list) pairs.push([q, m]);
+  for (const o of g.children.slice()) if (o.isMesh && o.userData.mg) { const m = o.material, tri = m.customProgramCacheKey && String(m.customProgramCacheKey()).startsWith('tri'); if (m.transparent || (m.map && !tri)) continue;
+    o.updateMatrix(); pairs.push([(o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()).applyMatrix4(o.matrix), m]); o.removeFromParent(); }
+  const cls = (c, sz) => { if (sz.y > top * .6) return 'pillar'; if (c.y >= top - .3) return 'belfry'; const k = Math.floor(c.y / Hh); return k <= 0 ? null : 's' + Math.min(S - 1, k); };
+  const fall = (k, c, sz) => { let h = 11; for (const ch of k) h = h * 31 + ch.charCodeAt(0); const r = i => ((Math.sin(h * 12.9898 + i * 78.233) * 43758.5453) % 1 + 1) % 1;
+    if (k === 'pillar') return { p: [c.x + 7, .5, c.z - 3], r: [Math.PI / 2, .4, 0], hop: 4, at: .06 };
+    if (k === 'belfry') return { p: [c.x - 9, 2.2, c.z + 8], r: [.9, .5, .3], hop: 7, at: .82 };
+    const n = +k.slice(1), a = n * 1.9 + .6, d = 8 + n * 2.6; return { p: [c.x + Math.cos(a) * d, .8 + n * .35, c.z + Math.sin(a) * d], r: [(r(1) - .5) * .8, (r(2) - .5) * 1.6, (r(3) - .5) * .7], hop: 3 + n, at: .1 + n * .14 }; };
+  const pieces = P0b.pieces = restorePieces(R, g, pairs, cls, fall); P0b.folded = pairs.length;
+  { const skip = new Set([drone, ...Object.values(pieces), ...P0b.coins.map(c2 => c2.m)]), wb = new THREE.Box3(), wc = new THREE.Vector3(), ws = new THREE.Vector3();
+    for (const o of g.children.slice()) { if (skip.has(o) || o.isInstancedMesh) continue; wb.setFromObject(o); if (wb.isEmpty()) continue; wb.getCenter(wc); wb.getSize(ws); const k = cls(wc, ws); if (k && pieces[k]) pieces[k].attach(o); } }
+  restoreSkin(R);
+  const tb = [], tu = []; for (const k of O.tri || []) { const t = k.split(',').map(Number); (Math.max(t[1], t[4], t[7]) <= Hh + .02 ? tb : tu).push(t); } bldTrisDrop(O);
+  restoreRide(R, { base: { boxes: [], tris: tb }, up: { boxes: O.boxes.filter(b2 => !(b2.maxy <= Hh + .6 && b2.maxy - b2.miny < top * .6)), tris: tu, climbs: [], bars: [], rings, coins: P0b.coins, objs: [drone] } });
+  R.onSet = R2 => restoreRideSet(R2);
+  { const px = cx - A.hs0 - 6, pz = cz + A.hs0 + 5, plate = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, .12, 24), new THREE.MeshStandardMaterial({ color: 0x3a4a46, emissive: 0x7affd8, emissiveIntensity: .7 })); plate.position.set(px, .06, pz); scene.add(plate); P0b.ground.push(plate); R.trig = { x: px, y: 0, z: pz, armed: 1 }; }
+  { const t0 = AGE.st === 'fallen' ? 0 : 1; R.goal = t0; restoreSet(R, t0); restoreRideSet(R, true); }
   arenaBeam(cx, cz, [1, .6, .35], 1); snd('clang', { g: .7, r: .5 });
 }
-function pagodaStep(dt) { const P = PAGODA.on; if (!P) return; P.t += dt; if (P.roof) korTentStep(P.roof, dt); bldDoorsStep(P.doors, dt); bldJinraMotes(PAGODA.at[0], PAGODA.at[1], P.A.hs0 + 2, dt);
+function pagodaStep(dt) { const P = PAGODA.on; if (!P) return; P.t += dt; if (P.roof) korTentStep(P.roof, dt); bldDoorsStep(P.doors, dt); const whole = !P.R || P.R.t >= 1; if (whole) bldJinraMotes(PAGODA.at[0], PAGODA.at[1], P.A.hs0 + 2, dt);
+  if (P.R && P.roof) { if (P.roof.y0 === undefined) P.roof.y0 = P.roof.y; P.roof.y = whole ? P.roof.y0 : -600; }
+  if (P.rain && P.rain.L) { const C = P.rain, L = C.L; if (whole) { L.miny = 0; L.maxy = L.top = C.top; L.mark.y = C.top; } else L.miny = L.maxy = L.top = -600; }
   if (P.rain && P.rain.open && P.rain.k < 1) { const C = P.rain; C.k = Math.min(1, C.k + dt * .8); C.m.scale.y = Math.max(.01, C.k * C.k); }
   // the bell is a pendulum: a toll kicks it, it swings and settles
   P.bv += (-9 * P.bw - .9 * P.bv) * dt; P.bw += P.bv * dt; P.bell.rotation.z = P.bw + Math.sin(P.t * .8) * .03; P.bell.rotation.x = P.bw * .3;
@@ -21112,7 +21133,7 @@ function pagodaBreak(x, y, z, rad) { const P = PAGODA.on; if (!P) return 0;
   if (P.roof) { const i = korTentAt(P.roof, x, y, z, rad); if (i >= 0 && !P.roof.panels[i].dead) { const Q = P.roof.panels[i]; if (--Q.hp <= 0) korTentBreak(P.roof, i, P.g); else { snd('thud', { g: .6, r: 1.2, x, z }); spkBurst(x, y, z, 6, { col: [.4, .45, .55], spread: 1, size: .1, life: .4 }); } return 1; } }
   return bldDoorsHit(P.doors, x, y, z, rad); }
 function pagodaBell(x, y, z, rad) {
-  const P = PAGODA.on; if (!P || P.tollC > 0) return 0; const B = P.bell.position;
+  const P = PAGODA.on; if (!P || P.tollC > 0 || (P.R && P.R.t < 1)) return 0; const B = P.bell.getWorldPosition(new THREE.Vector3());     // m@X4@: it rides the belfry piece
   if (Math.hypot(x - B.x, y - (B.y - .75), z - B.z) > 1.3 + rad) return 0;
   P.tollC = .6; P.bv += 2.2 * (Math.random() < .5 ? -1 : 1);
   if (P.rain && !P.rain.open) { const C = P.rain; C.open = 1; snd('swoosh', { g: .9, r: .5, x: C.x, z: C.z }); setTimeout(() => snd('clang', { g: .6, r: 1.6, x: C.x, z: C.z }), 900);     // RE-PASS 3: the rain chain unfurls -- a climb from now on
@@ -21135,7 +21156,7 @@ function pagodaChain(x, y, z, rad) { const P = PAGODA.on; if (!P || !P.chain || 
   P.chain.geometry.setDrawRange(0, n); PA.needsUpdate = true; P.chain.visible = true; P.chainT = .3;
   for (const d of hit) { const Q = d.root.position; dummyBlow(d, Math.atan2(Q.x - sx, Q.z - sz), 1.6, A.chainDmg); spkBurst(Q.x, Q.y + 1, Q.z, 18, { col: [.7, .95, 1], spread: 4, size: .14, life: .5 }); }
   return 1; }
-function pagodaClear() { const P = PAGODA.on; if (!P) return; if (P.rain && P.rain.L) { const i = KCLIMB.indexOf(P.rain.L); if (i >= 0) KCLIMB.splice(i, 1); if (player.climb === P.rain.L) climbOff(); }
+function pagodaClear() { const P = PAGODA.on; if (!P) return; if (P.R) { const i = RESTORE.list.indexOf(P.R); if (i >= 0) RESTORE.list.splice(i, 1); if (P.R.ride) { bldTrisDrop(P.R.ride.tb); bldTrisDrop(P.R.ride.tu); } } for (const o of P.ground || []) o.removeFromParent(); if (P.rain && P.rain.L) { const i = KCLIMB.indexOf(P.rain.L); if (i >= 0) KCLIMB.splice(i, 1); if (player.climb === P.rain.L) climbOff(); }
   for (const c of P.coins || []) { const i = COIN.list.indexOf(c); if (i >= 0) COIN.list.splice(i, 1); } for (const d of P.arch || []) if (d && HORDE.list.includes(d)) { bowDrop(d); bodyGone(d); HORDE.list.splice(HORDE.list.indexOf(d), 1); } bldClear(P); PAGODA.on = null; }
 // m1136: THE MARKET STALL ROW (BUILDINGS.md #5, pass 1) at (16, 12). Four open-front stalls in a row (4.5 m each, 18 m in all) facing the
 // courtyard (-z): a breakable back wall and partitions (cwallBuild), counters with goods, striped AWNINGS on two stalls and a HIGH BAR hung in
@@ -26468,7 +26489,7 @@ const BLDG = { list: [
   { key: 'hall', t: 'Dojo Hall', sub: 'breakable walls, a roof to run on, bars, a gong that calls a sparring robot out of the Jin panel (beat it to rank it up: five belts, then a trophy)', pass: 6, build: () => hallBuild(), clear: () => hallClear(), on: () => !!HALL.on },
   { key: 'wtower', t: 'Watchtower', sub: 'three big storeys, a ramp round, perches with bars, a sentry gun, two archers, a war drum, a searchlight, a pulley basket up to the lookout, a signal beacon that calls the airship, a zip to the hall roof', pass: 6, build: () => wtowerBuild(), clear: () => wtowerClear(), on: () => !!WTOWER.on, rig: () => WTOWER.on && WTOWER.on.R, step: dt => wtowerStep(dt) },
   { key: 'gate', t: 'Gatehouse', sub: 'a torii, a ballista you can man (stand at its breech), a drawbridge, archers, an alarm bell that drops the portcullis, a murder-hole cauldron', pass: 6, build: () => ghouseBuild(), clear: () => ghouseClear(), on: () => !!GHOUSE.on, step: dt => ghouseStep(dt) },
-  { key: 'pagoda', t: 'Pagoda', sub: 'five storeys, a spiral ramp, gutters to climb the outside, a bell that knocks everyone down, shinobi archers on the roofs, an altar core that calls chain lightning off the spire', pass: 6, build: () => pagodaBuild(), clear: () => pagodaClear(), on: () => !!PAGODA.on, step: dt => pagodaStep(dt) },
+  { key: 'pagoda', t: 'Pagoda', sub: 'five storeys, a spiral ramp, gutters to climb the outside, a bell that knocks everyone down, shinobi archers on the roofs, an altar core that calls chain lightning off the spire', pass: 6, build: () => pagodaBuild(), clear: () => pagodaClear(), rig: () => PAGODA.on && PAGODA.on.R, on: () => !!PAGODA.on, step: dt => pagodaStep(dt) },
   { key: 'market', t: 'Market Stalls', sub: 'four stalls, a noodle bar, a rooftop teahouse, a robot merchant, bars, crates and fruit to smash, a pickpocket to catch, a fireworks stall that launches at enemies', pass: 6, build: () => mktBuild(), clear: () => mktClear(), on: () => !!MKT.on, step: dt => mktStep(dt) },
   { key: 'shrine', t: 'Shrine', sub: 'a terrace, a koi pond, fox guardians that watch you, an offering box, a Jin core that heals, a fox gate to the Senbon Torii, an omikuji fortune box', pass: 6, build: () => shrineBuild(), clear: () => shrineClear(), on: () => !!SHRINE.on, step: dt => shrineStep(dt) },
   { key: 'rampart', t: 'Rampart Wall', sub: 'a 40 m wall, a gateway to smash, archers, sentry guns, bars on top, rocks dropped on you, robot sentries on the walk, a war horn that summons a raid', pass: 6, build: () => rampBuild(), clear: () => rampClear(), on: () => !!RAMP.on, step: dt => rampStep(dt) },

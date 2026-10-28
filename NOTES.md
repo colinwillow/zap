@@ -388,6 +388,22 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
+## THE RE-PASS: THE PAGODA RESTORES IN PLACE (m@X4@, WORKER A)
+
+Rubric 7 for a HERO building (his split, m1514): restored IN PLACE, no lift, no jets (the town's ground will do the rising).
+
+- **Pieces** (`restorePieces`, the Watchtower's machinery with `lift` 0): the GROUND STOREY and its roof survived and are the base; storeys 2-5
+  (each with its skirt, gutter ledge and inner flights), the SHINBASHIRA (anything taller than 60% of the tower) and the BELFRY (cap, spire,
+  bell, chimes, rain chain) are pieces. FALLEN: the storeys lie round the base in a spiral of wreckage (further out the higher they stood), the
+  pillar flat, the belfry beyond; the colour drained (`restoreSkin`). RESTORE (the mint plate west of the door, or SPAWN > BUILDINGS > STATE,
+  which now plays it -- `rig` in its BLDG entry): the pillar first, the storeys home one by one up the tower, the belfry last.
+- **Colliders:** storeys 2 and up (their walls, gutters, the pillar, the belfry floor, 36 boxes) and the upper inner flights' tris exist only
+  when whole (`restoreRide` up set); the first storey's flights stay. The bell tolls only when whole and takes its position from the belfry
+  piece (`getWorldPosition`); the cap's panels break only when whole; the rain chain's climb is parked until then.
+- m1501's static fallen (`korTentRuin` / `bldAge` on rebuild) is gone from the Pagoda.
+- **Measured headless:** pieces belfry, s1-s4, pillar; fallen, the up boxes read -594 (parked) with 0 up-tris and 18 base tris; renders of
+  fallen wreckage, storeys flying home mid-show, and the whole pagoda. 140 draws. Not signed off.
+
 ## THE RE-PASS: THE GROUND RISES, NOT THE BUILDING -- NO JETS (m1513, WORKER A)
 
 His correction: *"they're not gonna go up onto jets -- the ground under them breaks off, a chunk of earth breaks out of the ground and they
