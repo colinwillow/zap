@@ -25155,7 +25155,7 @@ function shipFan(len, spread, rays, col = [1, 1, 1]) { const P = [], U = [], C =
 function shipSerpentMake() { const Z = SHIPZ; if (!Z.seaG) return null; const T = shipSerpentTex(), NL = 120, NS = 20, sp = .45, root = new THREE.Group(); Z.seaG.add(root);
   // m1448: THE SEA DRAGON (his reference sheet): mosaic scales over a cream ribbed belly, torn red-orange fins, a horned dragon head
   const skinM = new THREE.MeshStandardMaterial({ vertexColors: true, map: T.map, roughness: .5, metalness: .08 });
-  const finM = new THREE.MeshStandardMaterial({ map: T.fin, alphaTest: .4, side: THREE.DoubleSide, roughness: .55, emissive: 0x3a0e04, vertexColors: true });
+  const finM = new THREE.MeshStandardMaterial({ map: T.fin, alphaTest: .4, side: THREE.DoubleSide, roughness: .55, emissive: 0x2a1a14, vertexColors: true });
   const eyeM = new THREE.MeshBasicMaterial({ map: T.eye, toneMapped: false }), mouthM = new THREE.MeshStandardMaterial({ color: 0x8a1c22, roughness: .5 });
   // body skin: static uvs, positions/normals rewritten per frame
   const nv = NL * (NS + 1), P = new Float32Array(nv * 3), N = new Float32Array(nv * 3), Uv = new Float32Array(nv * 2), C = new Float32Array(nv * 3).fill(1), I = [];
@@ -25168,41 +25168,46 @@ function shipSerpentMake() { const Z = SHIPZ; if (!Z.seaG) return null; const T 
   for (let r = 0; r < 2; r++) for (let i = 0; i < NL; i++) { const v = (r * NL + i) * 2; fU.set([i / 30, 0, i / 30, 1], v * 2); if (i < NL - 1) { const a = v, b = v + 1, c = v + 2, d = v + 3; fI.push(a, c, b, b, c, d); } }
   const fgm = new THREE.BufferGeometry(); fgm.setAttribute('position', new THREE.BufferAttribute(fP, 3)); fgm.setAttribute('uv', new THREE.BufferAttribute(fU, 2)); fgm.setAttribute('color', new THREE.BufferAttribute(fC, 3)); fgm.setIndex(fI);
   const fins = new THREE.Mesh(fgm, finM); fins.frustumCulled = false; root.add(fins);
-  // THE HEAD, lofted along +Z (its back ring at z -1.2 meets the neck); scaled up as a whole
-  const white = () => [1, 1, 1];
+  // THE HEAD (m@X4@; his: *"more Chinese dragon, more alien, big exaggerated features... inviting, not scary, but not cartoony"*): a big round
+  // skull over a short broad snout with a bulbous nose, big forward eyes under relaxed lids that blink, deer ANTLERS with glowing tips, long
+  // flowing WHISKERS that sway, bushy brows, a MANE and a BEARD of silky fins, the mouth closed in a soft line with two small blunt fangs
+  const white = () => [1, 1, 1], glowM = new THREE.MeshBasicMaterial({ color: 0xa8fff0, toneMapped: false });
   const lerpT = (pts) => z => { for (let k = 1; k < pts.length; k++) if (z <= pts[k][0]) { const [z0, a] = pts[k - 1], [z1, b] = pts[k], u = (z - z0) / (z1 - z0), s = u * u * (3 - 2 * u); return a + (b - a) * s; } return pts[pts.length - 1][1]; };
-  const zs = []; for (let k = 0; k <= 26; k++) zs.push(-1.2 + 5.4 * k / 26);
-  const sw = lerpT([[-1.2, .9], [0, 1.15], [1.0, 1.02], [2.4, .74], [3.6, .64], [4.2, .34]]);
-  const bump = (x, z, sa) => sa > .15 ? Math.exp(-Math.pow((Math.abs(x) - .62) / .22, 2)) * Math.exp(-Math.pow((z - .7) / .45, 2)) * .45     // the heavy brow over each eye
-    + Math.exp(-Math.pow((Math.abs(x) - .3) / .14, 2)) * Math.exp(-Math.pow((z - 3.75) / .25, 2)) * .2 : 0;                                  // the nostrils
-  const parts = [shipLoft(zs, sw, lerpT([[-1.2, .86], [.3, 1.0], [1.4, .72], [2.6, .56], [3.6, .58], [4.2, .3]]), lerpT([[-1.2, .62], [1.0, .3], [4.2, .16]]), white, 0, Math.PI * 2, 22, bump)], mem = [], mouth = [];
-  const tooth = (x, y, z, r, L, down, out) => { const t = new THREE.ConeGeometry(r, L, 5); if (down) t.rotateX(Math.PI); t.translate(x, y + (down ? -L / 2 : L / 2), z); t.deleteAttribute('normal'); const n = t.attributes.position.count;
+  const zs = []; for (let k = 0; k <= 30; k++) zs.push(-1.2 + 5.1 * k / 30);
+  const sw = lerpT([[-1.2, .95], [-.3, 1.5], [.6, 1.68], [1.5, 1.38], [2.4, 1.16], [3.1, 1.14], [3.5, .86], [3.75, .4], [3.9, .03]]);
+  const bump = (x, z, sa) => sa > .1 ? Math.exp(-Math.pow((Math.abs(x) - .95) / .35, 2)) * Math.exp(-Math.pow((z - .75) / .45, 2)) * .22     // soft brows
+    + Math.exp(-Math.pow((Math.abs(x) - .48) / .24, 2)) * Math.exp(-Math.pow((z - 3.05) / .35, 2)) * .32 : 0;                                  // the round nose
+  const parts = [shipLoft(zs, sw, lerpT([[-1.2, .9], [-.2, 1.45], [.5, 1.6], [1.3, 1.22], [2.2, .88], [3.0, .92], [3.5, .68], [3.75, .32], [3.9, .03]]), lerpT([[-1.2, .72], [.5, .78], [2.2, .48], [3.6, .36], [3.75, .18], [3.9, .02]]), white, 0, Math.PI * 2, 26, bump)];
+  const mem = [], mouth = [], glows = [];
+  const tooth = (x, y, z, r, L, down, out) => { const t = new THREE.ConeGeometry(r, L, 6); if (down) t.rotateX(Math.PI); t.translate(x, y + (down ? -L / 2 : L / 2), z); t.deleteAttribute('normal'); const n = t.attributes.position.count;
     t.setAttribute('color', new THREE.Float32BufferAttribute(new Array(n * 3).fill(1), 3)); t.setAttribute('uv', new THREE.Float32BufferAttribute(new Array(n * 2).fill(.04), 2)); t.computeVertexNormals(); out.push(t.toNonIndexed()); };
-  for (let k = 0; k < 10; k++) for (const sx of [-1, 1]) { const z = 3.0 - k * .3; tooth(sx * sw(z) * .84, -.2, z, .065, .3, 1, parts); }
-  for (const sx of [-1, 1]) { tooth(sx * .5, -.15, 3.55, .12, .8, 1, parts);     // the upper FANGS
-    parts.push(shipTaper([new THREE.Vector3(sx * .55, .9, .3), new THREE.Vector3(sx * .8, 1.35, -.9), new THREE.Vector3(sx * 1.0, 1.6, -2.4), new THREE.Vector3(sx * .95, 1.95, -3.6), new THREE.Vector3(sx * .8, 2.5, -4.3)], 16, .24, .015, [.86, .78, .66], 8, .12));     // main horns
-    parts.push(shipTaper([new THREE.Vector3(sx * .95, .35, -.5), new THREE.Vector3(sx * 1.5, .45, -1.7), new THREE.Vector3(sx * 1.8, .7, -2.7)], 10, .14, .015, [.86, .78, .66], 6, .12));     // cheek horns
-    parts.push(shipTaper([new THREE.Vector3(sx * .55, .02, 3.95), new THREE.Vector3(sx * 1.2, -.2, 3.6), new THREE.Vector3(sx * 2.0, -.9, 2.6), new THREE.Vector3(sx * 2.4, -2.0, 1.2), new THREE.Vector3(sx * 2.1, -3.0, -.3), new THREE.Vector3(sx * 1.6, -3.6, -1.6)], 20, .09, .015, [1, 1, 1], 6, .55));     // whiskers
-    const fr = shipFan(3.2, 2.3, 6); fr.rotateX(Math.PI / 2 - .25); fr.rotateY(sx * 1.15); fr.translate(sx * 1.05, .3, -.8); mem.push(fr);     // cheek fins
-    const cr = shipFan(2.4, 1.4, 4); cr.rotateX(.25); cr.rotateZ(sx * .45); cr.translate(sx * .35, 1.0, -.9); mem.push(cr); }     // crest fins
-  for (let k = 0; k < 4; k++) { const t = new THREE.ConeGeometry(.12 - k * .015, .45 - k * .06, 5); t.rotateX(-.5); t.translate(0, .62 + (k ? 0 : .02), 3.2 - k * .55); t.deleteAttribute('normal'); const n = t.attributes.position.count;
-    t.setAttribute('color', new THREE.Float32BufferAttribute(new Array(n * 3).fill(1), 3)); t.setAttribute('uv', new THREE.Float32BufferAttribute(new Array(n * 2).fill(.1), 2)); t.computeVertexNormals(); parts.push(t.toNonIndexed()); }     // the nose ridge
-  { const pz = []; for (let k = 0; k <= 10; k++) pz.push(.2 + 3.6 * k / 10); mouth.push(shipLoft(pz, z => sw(z) * .8, z => .02, z => .06, white, Math.PI, Math.PI * 2, 10)); }     // the palate
-  const head = new THREE.Group(); root.add(head); head.matrixAutoUpdate = false; const hs = new THREE.Group(); hs.scale.setScalar(1.3); head.add(hs);
+  const glow = (v, r) => { const s = new THREE.SphereGeometry(r, 10, 6); s.translate(v.x, v.y, v.z); glows.push(s); };
+  const V = (x, y, z) => new THREE.Vector3(x, y, z), horn = [.95, .88, .72];
+  for (const sx of [-1, 1]) { tooth(sx * .62, -.3, 3.0, .11, .34, 1, parts);     // two small blunt fangs
+    const A = [V(sx * .75, 1.35, .1), V(sx * 1.1, 2.1, -.5), V(sx * 1.35, 2.9, -1.3), V(sx * 1.3, 3.6, -2.3)], t1 = [V(sx * 1.15, 2.2, -.6), V(sx * 1.7, 2.7, -.25), V(sx * 2.0, 3.2, -.1)], t2 = [V(sx * 1.33, 2.95, -1.4), V(sx * 1.8, 3.4, -1.5), V(sx * 2.05, 3.9, -1.9)];
+    parts.push(shipTaper(A, 14, .22, .05, horn, 8, .12), shipTaper(t1, 8, .11, .03, horn, 6, .12), shipTaper(t2, 8, .1, .03, horn, 6, .12));     // the ANTLERS
+    glow(A[3], .14); glow(t1[2], .1); glow(t2[2], .1);
+    const br = shipFan(1.6, 1.1, 3); br.rotateX(.55); br.rotateZ(sx * -.35); br.translate(sx * 1.0, 1.4, .75); mem.push(br);     // bushy brows
+    const ck = shipFan(3.0, 2.0, 5); ck.rotateZ(sx * 1.25); ck.rotateY(sx * .45); ck.translate(sx * 1.4, .2, -.5); mem.push(ck); }     // big cheek frills
+  for (const a of [-1.35, -.8, -.27, .27, .8, 1.35]) { const m = shipFan(3.6 - Math.abs(a) * .7, 1.05, 3); m.rotateX(.3); m.rotateZ(a); m.translate(Math.sin(-a) * .9, Math.cos(a) * .9 + .2, -1.0); mem.push(m); }     // the MANE
+  { const pz = []; for (let k = 0; k <= 10; k++) pz.push(.2 + 3.3 * k / 10); mouth.push(shipLoft(pz, z => sw(z) * .78, z => .02, z => .06, white, Math.PI, Math.PI * 2, 10)); }     // the palate
+  const head = new THREE.Group(); root.add(head); head.matrixAutoUpdate = false; const hs = new THREE.Group(); hs.scale.setScalar(1.7); head.add(hs);
   hs.add(new THREE.Mesh(mergeGeometries(parts), skinM)); hs.add(new THREE.Mesh(mergeGeometries(mem), finM)); hs.add(new THREE.Mesh(mergeGeometries(mouth), mouthM));
-  for (const sx of [-1, 1]) { const so = new THREE.Mesh(new THREE.TorusGeometry(.3, .08, 6, 16), new THREE.MeshStandardMaterial({ color: 0x1a0c10, roughness: .6 })); so.position.set(sx * .92, .55, 1.2); so.rotation.y = sx * 1.25; hs.add(so);
-    const e = new THREE.Mesh(new THREE.CircleGeometry(.31, 24), eyeM); e.rotation.y = sx * 1.25; e.position.set(sx * .99, .55, 1.22); hs.add(e); }
-  const jaw = new THREE.Group(); jaw.position.set(0, -.3, -.6); hs.add(jaw);
-  { const jz = []; for (let k = 0; k <= 16; k++) jz.push(4.0 * k / 16); const jw = lerpT([[0, .86], [2.0, .72], [3.6, .52], [4.0, .3]]);
-    const jt = [shipLoft(jz, jw, z => .06, lerpT([[0, .62], [2.0, .42], [4.0, .26]]), white, Math.PI, Math.PI * 2, 14)], jm = [];
-    for (let k = 0; k < 9; k++) for (const sx of [-1, 1]) { const z = 3.4 - k * .32; tooth(sx * jw(z) * .82, .02, z, .06, .28, 0, jt); }
-    for (const sx of [-1, 1]) { tooth(sx * .38, .02, 3.75, .11, .65, 0, jt);     // the lower fangs
-      const jf = shipFan(1.8, 1.2, 3); jf.rotateX(-Math.PI / 2 - .6); jf.rotateY(sx * .9); jf.translate(sx * .8, -.4, .9); jm.push(jf); }     // jaw fins
-    for (const dx of [-.35, 0, .35]) jt.push(shipTaper([new THREE.Vector3(dx, -.5, 3.2), new THREE.Vector3(dx * 1.3, -1.2, 2.9), new THREE.Vector3(dx * 1.1, -1.9, 2.5)], 8, .07, .015, [1, 1, 1], 5, .55));     // chin tendrils
-    const tg = new THREE.SphereGeometry(1, 12, 6); tg.scale(.45, .12, 1.5); tg.translate(0, .02, 1.7);
+  const lids = []; for (const sx of [-1, 1]) { const eg = new THREE.Group(); eg.position.set(sx * 1.3, .8, 1.05); eg.rotation.y = sx * .85; hs.add(eg);
+    eg.add(new THREE.Mesh(new THREE.CircleGeometry(.5, 28), eyeM)); const so = new THREE.Mesh(new THREE.TorusGeometry(.52, .07, 6, 20), new THREE.MeshStandardMaterial({ color: 0x24141a, roughness: .6 })); eg.add(so);
+    const lid = new THREE.Mesh(new THREE.SphereGeometry(.58, 20, 8, 0, Math.PI * 2, 0, 1.2), skinM); lid.scale.z = .6; eg.add(lid); lids.push(lid); }
+  const wh = []; for (const sx of [-1, 1]) { const g = new THREE.Group(); g.position.set(sx * .9, .45, 3.15); hs.add(g);
+    const pts = [V(0, 0, 0), V(sx * .6, -.25, .25), V(sx * 1.3, -.9, 0), V(sx * 1.9, -1.9, -1.0), V(sx * 2.2, -2.9, -2.4), V(sx * 2.1, -3.7, -4.0)];
+    g.add(new THREE.Mesh(shipTaper(pts, 24, .14, .025, [1, .9, .78], 6, .3), skinM)); const tip = new THREE.Mesh(new THREE.SphereGeometry(.1, 8, 6), glowM); tip.position.copy(pts[5]); g.add(tip); wh.push({ g, sx }); }     // flowing WHISKERS
+  const jaw = new THREE.Group(); jaw.position.set(0, -.42, -.5); hs.add(jaw);
+  { const jz = []; for (let k = 0; k <= 16; k++) jz.push(3.65 * k / 16); const jw = lerpT([[0, 1.3], [1.5, 1.15], [2.8, 1.0], [3.4, .62], [3.65, .2]]);
+    const jt = [shipLoft(jz, jw, z => .06, lerpT([[0, .82], [2.0, .62], [3.65, .3]]), white, Math.PI, Math.PI * 2, 16)], jm = [];
+    for (const dx of [-.5, 0, .5]) { const b = shipFan(2.0 - Math.abs(dx) * .6, .9, 3); b.rotateX(-1.0); b.translate(dx, -.6, 2.3 - Math.abs(dx)); jm.push(b); }     // the BEARD
+    const tg = new THREE.SphereGeometry(1, 12, 6); tg.scale(.55, .12, 1.4); tg.translate(0, .02, 1.6);
     jaw.add(new THREE.Mesh(mergeGeometries(jt), skinM)); jaw.add(new THREE.Mesh(mergeGeometries(jm), finM)); jaw.add(new THREE.Mesh(tg, mouthM)); }
+  hs.add(new THREE.Mesh(mergeGeometries(glows), glowM));
   const pecs = []; for (const sx of [-1, 1]) { const g = new THREE.Group(); root.add(g); g.matrixAutoUpdate = false; const f = shipFan(3.4, 1.5, 5); f.rotateZ(sx * -.25); const piv = new THREE.Group(); piv.add(new THREE.Mesh(f, finM)); g.add(piv); pecs.push({ g, piv, sx }); }
-  return { root, body, bg, fins, fgm, head, jaw, pecs, NL, NS, sp, ph: Math.random() * 100, dir: Math.random() < .5 ? 1 : -1, prevY: new Float32Array(8), splT: 0, rear: 0, rearT: 0, rearCd: 8,
+  return { root, body, bg, fins, fgm, head, jaw, pecs, lids, wh, blink: 0, blinkT: 3, NL, NS, sp, ph: Math.random() * 100, dir: Math.random() < .5 ? 1 : -1, prevY: new Float32Array(8), splT: 0, rear: 0, rearT: 0, rearCd: 8,
     _f: [], _u: [], _r: [], _p: [], _b: new THREE.Vector3(), _m: new THREE.Matrix4() }; }
 // the path: tau in seconds of travel; returns the point (local to the sea group) into `o`
 function shipSerpentP(W, tau, o) { const v = 6.5, R = 70 + Math.sin(tau * .021) * 15, a = W.dir * tau * v / 70, wv = Math.sin(tau * .9) * 2.6;
@@ -25215,7 +25220,7 @@ function shipSerpentP(W, tau, o) { const v = 6.5, R = 70 + Math.sin(tau * .021) 
 function shipSerpentStep(W, dt, t) { const T = t + W.ph, NL = W.NL, NS = W.NS, dtau = W.sp / 6.5, up = new THREE.Vector3(0, 1, 0), M = W._m, B = W._b, KR = .17;
   const P = W.bg.attributes.position.array, Nn = W.bg.attributes.normal.array, FP = W.fgm.attributes.position.array;
   if (!W._p.length) for (let i = 0; i < NL; i++) { W._p.push(new THREE.Vector3()); W._f.push(new THREE.Vector3()); W._u.push(new THREE.Vector3()); W._r.push(new THREE.Vector3()); }
-  const radAt = k => (k < .22 ? .95 + Math.sin(k / .22 * Math.PI / 2) * .75 : 1.7 * Math.pow(1 - (k - .22) / .78, .85) + .07) * (1 + Math.sin(T * 3 - k * 20) * .02);
+  const radAt = k => 1.25 * (k < .22 ? .95 + Math.sin(k / .22 * Math.PI / 2) * .75 : 1.7 * Math.pow(1 - (k - .22) / .78, .85) + .07) * (1 + Math.sin(T * 3 - k * 20) * .02);
   // the rear schedule: only while the head is near the surface
   shipSerpentP(W, T, B); W.rearCd -= dt;
   if (W.rearT > 0) { W.rearT -= dt; if (W.rearT <= 0) W.rearCd = 14 + Math.random() * 10; }
@@ -25224,7 +25229,7 @@ function shipSerpentStep(W, dt, t) { const T = t + W.ph, NL = W.NL, NS = W.NS, d
   const iB = Math.round(KR * (NL - 1)); shipSerpentP(W, T - iB * dtau, B);
   let any = 0;
   for (let i = 0; i < NL; i++) { const p = W._p[i]; shipSerpentP(W, T - i * dtau, p); const k = i / (NL - 1);
-    if (R > .001 && k < KR) { const w = 1 - k / KR; p.x = B.x + (p.x - B.x) * (1 - R * .78); p.z = B.z + (p.z - B.z) * (1 - R * .78); p.y = p.y * (1 - R) + (Math.max(B.y, -.5) + 9.2 * Math.sin(w * Math.PI / 2)) * R; }
+    if (R > .001 && k < KR) { const w = 1 - k / KR; p.x = B.x + (p.x - B.x) * (1 - R * .78); p.z = B.z + (p.z - B.z) * (1 - R * .78); p.y = p.y * (1 - R) + (Math.max(B.y, -.5) + 11.5 * Math.sin(w * Math.PI / 2)) * R; }
     if (p.y > -2.5) any = 1; }
   for (let i = 0; i < NL; i++) { const p = W._p[i], f = W._f[i], u = W._u[i], r = W._r[i]; f.subVectors(W._p[Math.max(0, i - 1)], W._p[Math.min(NL - 1, i + 1)]).normalize();
     const ref = i ? W._u[i - 1] : up; r.crossVectors(ref, f).normalize(); u.crossVectors(f, r);
@@ -25233,18 +25238,22 @@ function shipSerpentStep(W, dt, t) { const T = t + W.ph, NL = W.NL, NS = W.NS, d
     for (let j = 0; j <= NS; j++) { const a = j / NS * Math.PI * 2, ca = Math.cos(a), sa = Math.sin(a), keel = sa > 0 ? Math.pow(sa, 10) * .2 : 0, ly = sa * (sa > 0 ? .92 : .76) + keel, lx = ca;
       const v = (i * (NS + 1) + j) * 3; P[v] = p.x + (rx * lx + ux * ly) * rad; P[v + 1] = p.y + (ry * lx + uy * ly) * rad; P[v + 2] = p.z + (rz * lx + uz * ly) * rad;
       const ny = sa / (sa > 0 ? .92 : .76), nl = Math.hypot(ca, ny); Nn[v] = (rx * ca + ux * ny) / nl; Nn[v + 1] = (ry * ca + uy * ny) / nl; Nn[v + 2] = (rz * ca + uz * ny) / nl; }
-    const tail = k > .86 ? (k - .86) / .14 : 0, dh = (k < .03 ? 0 : k < .08 ? (k - .03) / .05 : 1) * (2.1 * (1 - k * .5) + tail * 2.6) * (1 + Math.sin(T * 4 - i * .25) * .06);
+    const tail = k > .86 ? (k - .86) / .14 : 0, dh = (k < .03 ? 0 : k < .08 ? (k - .03) / .05 : 1) * (2.5 * (1 - k * .5) + tail * 3.1) * (1 + Math.sin(T * 4 - i * .25) * .06);
     const bY = 1.08 * rad, b = i * 6; FP[b] = p.x + ux * bY; FP[b + 1] = p.y + uy * bY; FP[b + 2] = p.z + uz * bY;
     FP[b + 3] = FP[b] + ux * dh - f.x * dh * .45; FP[b + 4] = FP[b + 1] + uy * dh - f.y * dh * .45; FP[b + 5] = FP[b + 2] + uz * dh - f.z * dh * .45;
     const vh = k < .6 ? 0 : Math.min(1, (k - .6) / .1) * (.9 + tail * 2.4), vb = (NL + i) * 6, bV = -.72 * rad;
     FP[vb] = p.x + ux * bV; FP[vb + 1] = p.y + uy * bV; FP[vb + 2] = p.z + uz * bV; FP[vb + 3] = FP[vb] - ux * vh - f.x * vh * .45; FP[vb + 4] = FP[vb + 1] - uy * vh - f.y * vh * .45; FP[vb + 5] = FP[vb + 2] - uz * vh - f.z * vh * .45; }
   W.bg.attributes.position.needsUpdate = W.bg.attributes.normal.needsUpdate = W.fgm.attributes.position.needsUpdate = true; W.fgm.computeVertexNormals(); W.root.visible = any;
-  { const p = W._p[0], f = W._f[0]; M.makeBasis(W._r[0], W._u[0], f); M.setPosition(p.x + f.x * 1.4, p.y + f.y * 1.4, p.z + f.z * 1.4); W.head.matrix.copy(M); W.head.matrixWorldNeedsUpdate = true; }
+  { const p = W._p[0], f0 = W._f[0], f = f0.clone();     // m@X4@: rearing, it turns its head to look at you (a little down, as if curious)
+    if (R > .01) { const pl = W.root.parent.worldToLocal(player.pos.clone()), d = new THREE.Vector3(pl.x - p.x, 0, pl.z - p.z); if (d.lengthSq() > 4) { d.normalize(); d.y = -.2; f.lerp(d.normalize(), R * .8).normalize(); } }
+    const r = new THREE.Vector3().crossVectors(up, f).normalize(), u = new THREE.Vector3().crossVectors(f, r); M.makeBasis(r, u, f); M.setPosition(p.x + f0.x * 2.2, p.y + f0.y * 2.2, p.z + f0.z * 2.2); W.head.matrix.copy(M); W.head.matrixWorldNeedsUpdate = true; }
   { const i = Math.round(NL * .06), p = W._p[i], r = W._r[i], u = W._u[i], f = W._f[i], rad = radAt(i / (NL - 1));
     for (const pc of W.pecs) { M.makeBasis(r, u, f); M.setPosition(p.x + r.x * pc.sx * rad * .9 - u.x * rad * .3, p.y + r.y * pc.sx * rad * .9 - u.y * rad * .3, p.z + r.z * pc.sx * rad * .9 - u.z * rad * .3); pc.g.matrix.copy(M); pc.g.matrixWorldNeedsUpdate = true;
       pc.piv.rotation.set(0, pc.sx * (.9 + Math.sin(T * 2.2) * .3), pc.sx * (-.3 + Math.sin(T * 2.2 + .6) * .25)); } }
   W.splT -= dt; for (let s = 0; s < 8; s++) { const i = Math.floor(s * (NL - 1) / 7), py = W._p[i].y; if (W.prevY[s] && Math.sign(py) !== Math.sign(W.prevY[s]) && W.splT <= 0 && radAt(i / (NL - 1)) > .5) { W.splT = .12; const w = W.root.parent.localToWorld(W._p[i].clone()); spkBurst(w.x, w.y + .3, w.z, 18, { col: [.88, .96, 1], spread: 2.2, up: 2.6, size: .22, life: .8 }); } W.prevY[s] = py || .001; }
-  W.jaw.rotation.x = Math.max(.08, Math.sin(T * .7)) * (.32 + R * .25); }
+  W.jaw.rotation.x = .03 + Math.max(0, Math.sin(T * .5)) * .09 + R * .1;
+  W.blinkT -= dt; if (W.blinkT <= 0) { W.blink = .2; W.blinkT = 2.5 + Math.random() * 4; } W.blink -= dt; for (const l of W.lids) l.rotation.x = W.blink > 0 ? 1.3 : .08;
+  for (const w of W.wh) w.g.rotation.set(Math.sin(T * 1.1 + w.sx) * .12, Math.sin(T * .8) * .14 * w.sx, Math.sin(T * 1.3 + w.sx * 2) * .1); }
 function colorize(geo, c) { const n = geo.attributes.position.count, C = new Float32Array(n * 3); for (let i = 0; i < n; i++) { C[i * 3] = c[0]; C[i * 3 + 1] = c[1]; C[i * 3 + 2] = c[2]; } geo.setAttribute('color', new THREE.BufferAttribute(C, 3)); }
 function shipWhaleStep(W, dt, t) { W.t += dt; const R = W.root, spd = { under: 9, rise: 5, cruise: 4.5, dive: 4 }[W.st] || 5, hx = Math.cos(W.h), hz = -Math.sin(W.h);
   const pickSpot = () => { const a = Math.random() * 6.28, d = 70 + Math.random() * 80; W.tx = Math.cos(a) * d; W.tz = Math.sin(a) * d; };

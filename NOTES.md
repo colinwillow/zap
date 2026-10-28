@@ -196,6 +196,25 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
+## THE SHIP, PASS 12e: THE DRAGON MADE INVITING -- A CHINESE-DRAGON HEAD (m@X4@, WORKER A)
+
+His: *"I'm not in love... it feels little and sneaky like a snake, kind of sharp. More Chinese dragon, more alien, more big and exaggerated
+features. I don't want it to feel scary at all -- inviting, but not cartoony."*
+
+- **THE HEAD, REDONE** (scaled x1.7, so it is now well wider than the neck): a big ROUND skull (1.68 half-width at the cheeks) over a short
+  BROAD snout with a bulbous NOSE (two round nostril lobes), the snout tip now closed (the old loft ended in an open ring that read as a white
+  disc). The mouth sits closed in a soft line, opening only a little as it breathes, with TWO small blunt fangs (no rows of teeth). BIG
+  forward-set EYES (0.5 discs turned .85 rad forward) with a new painted eye (a large ROUND pupil, amber-to-turquoise iris, two highlights;
+  the slit pupil read as sneaky) under relaxed LIDS (a squashed skin cap) that BLINK every 2.5-6.5 s. Deer ANTLERS (a beam and two tines a
+  side) with GLOWING tips, which are the alien touch, and glowing tips on the WHISKERS too. Long drooping whiskers that SWAY, bushy fin BROWS,
+  big cheek frills, a six-lock MANE round the back of the head and a three-lock BEARD under the jaw.
+- **SILKY FINS:** `serpent_fin.webp` regenerated as a soft scalloped koi-like membrane, coral at the root to peach-gold and pale turquoise at
+  the tips (transparent, cropped to a solid root). The torn red one read as aggressive.
+- **BIGGER:** the body radius is x1.25, the dorsal fin taller, and the rear lifts the head to 11.5 m.
+- **IT LOOKS AT YOU:** while rearing, the head turns toward the player (80% at full rear) and tips slightly down, as if curious.
+- Measured headless: in the first cut the head read SMALL beside the neck at x1.0, so it is x1.7; the whiskers stuck straight out like cat
+  whiskers, so they droop now. Not signed off.
+
 ## THE SHIP, PASS 12d: THE SEA DRAGON, FROM HIS REFERENCE SHEET (m1448, WORKER A)
 
 His (a concept sheet: a horned sea dragon, mosaic scales, cream belly, torn red-orange fins, rearing out of the sea): *"you could use
