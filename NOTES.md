@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home, pass 30: breakable pots (Worker B, loop tick 7)
+His queue item. Main's `smashAdd` is one Mesh per prop and is stepped only `inArena()`, so the home does its own, with no new draws: `pot()`
+remembers its material and its index in that material's MG list; `ghomePotsDone` (after the merge) turns that into a vertex range of the
+merged mesh (non-indexed, merged in order, so i0 = the counts before it) and keeps a copy of its positions. `ghomePotHit` (first thing
+after the bells in `ghomeHit`, local frame like the orb) folds the range to the pot's middle, bursts clay in its own colour, thuds and
+cracks, and pulls its box (only pots r > .32 have one). `ghomePots` puts it back after `GHOME.potFix` 25 s unless he is on the spot. The
+ranges sit in the chunked buckets, so a pot on a fallen stall breaks where the stall is drawn (it carries its chunk attribute).
+145 pots. Render: restored, right stall's shelf pots every other one smashed. Next: the rocks' 3rd pass.
 ## m1548 -- THE RE-PASS: MARKET STALLS, pass 2 (rubric 7: RESTORES IN PLACE)
 **Moves:** its rubric-7 box. The Pagoda's and the Shrine's pattern.
 - Base (stays): the paving, the chunk walls (breakable as before), the back ramp, the fireworks booth, the crates and fruit crates, the potted plants.
