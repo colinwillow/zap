@@ -132,6 +132,12 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
+## THE SKY DRAGON, PASS 2: A HEAD, LEGS AND A TAIL (mXXXX)
+- **The head** is one merged vertex-coloured mesh (red, gold, bone, pink, dark): a skull, a long snout and a fat nose with nostrils, gold brow ridges, fangs, a gold upper lip, an OPEN lower jaw with a tongue, a gold beard of cones, branching gold antlers swept back, and the long whiskers. A second, glowing mesh holds a frill of 12 Jinra flame cones round the back of the skull and the mint irises. x1.9.
+- **Legs:** four (segments 10 and 30, both sides), thigh plus shin plus three bone claws. Placed each frame from that segment's own transform and paddling in alternation (`dojoDragon`).
+- **Tail:** a tuft of 7 Jinra flames on the last segment.
+- **`mel.DOJO` is on the debug handle now** (the shots aim at `DOJO.dragon.H`).
+
 ## THE RESTORATION KIT AND ITS DEMO -- ONE SET OF PIECES, A CINEMATIC LIFT (m1505)
 *"When we say fallen... the opposite of fallen is literally lifted into the air, floating on jets. It can't be one or the other -- it has to be made of essentially the same pieces so we can animate it going up into the air, lighting, illuminating, moving in and fixing itself. Very cinematic. The transformation is going to be huge."*
 - **`RESTORE`, the shared kit (KORAJIN.md THE TRANSFORMATION):**
