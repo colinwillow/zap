@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m1545 -- the clouds move under you (dojo pass 21, the old "pass 4: life" line)
+- **Wisps:** a third `bbd` layer, 46 single puffs at y -8 to -34, out to 110 m. The `move` hook blows them along +x at 2.4 m/s and wraps them in a
+  220 m box (`mod`), and the frag fades them by 70-110 m on both axes, so a wrap happens where nothing is drawn. **Every card also fades to zero at
+  its own quad's edge** (`smoothstep(.5, .3, abs(q))`): the first version's ellipse still had alpha at the card's side, and from below they read as
+  RECTANGLES (seen in the headless render, fixed before push).
+- **Banks:** the cumulus cards turn round the dojo's axis in the vertex shader, the speed picked by the BANK's base height (`iA.x`, shared by every
+  puff in a bank, so a bank never tears): .0055 rad/s low, .003 mid, .0014 high. A rotation, so nothing ever wraps.
+- **The cloud sea's noise drifts ~1 m/s** (`uTime * .011`).
+
 ## m1544 -- THE RE-PASS: MARKET STALLS, pass 1 (a HERO / TOWN place: the look)
 **Moves:** its pass-1 row (the look). Restoring in place is pass 2.
 - Kit materials: `K.timber`, a warm `wood_planks` triMat, a `stone_blocks` paving, `K.redL`, `K.lamp`; the rooftop cushions are `K.red`.

@@ -162,7 +162,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 - [x] **pass 12 (m1440):** TRAINING MARKS painted on the floor: stance footprints in a ring, chalk drill rings, dark scuff swirls, four numbered start marks (一 to 四) by the gates
 - [x] **pass 14 (m1460):** BIRDS: a flock of 30 swallows darting between the islands (banking into turns), and a V of 7 red-crowned cranes gliding a slow wide circle
 - [x] **pass 16 (m1465):** the cloud cards no longer read as cotton balls: shaded by HEIGHT IN THE BANK (a flat dark base to lit tops), twice the puffs and smaller, soft overlapping edges
-- [ ] pass 4: life: the clouds moving under you
+- [x] **pass 21 (m1545): THE CLOUDS MOVE UNDER YOU.** 46 loose wisps 8-34 m under the floor blown along the wind (+x, 2.4 m/s) and wrapped where they have faded, so the dojo's rock root cuts through moving mist; the cumulus banks turn slowly round the dojo (low ones fastest); the cloud sea drifts ~1 m/s (was .33)
 - [x] **pass 19 (m1531): THE TRAINING DOJO, part 1.** Two WEAPON RACKS on the dais (E: the SWORD, W: the GUN, a practice staff below): walk up and you take it, the pegs empty; walk back holding it and you put it back. Four STRAW TARGETS rise from bronze hatches: three blows and one sinks in straw, pops back up after 3 s; drop all four together and a gold doubloon rises at the centre; they all SINK while a fight is on
 - [x] **pass 20 (m1537):** SHOTS HIT THE TARGETS: a bolt stops in the straw (one blow, knocked the way it flew), a rocket drops one outright (`dojoShot` in `stepBolts`)
 - [ ] later: a sparring master, the music
