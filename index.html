@@ -13363,6 +13363,7 @@ function arenaUi() {
       else if (a === 'swseg') { SWSEG.on = SWSEG.on ? 0 : 1; try { localStorage.setItem('mel.swseg', SWSEG.on ? '1' : '0'); } catch (err) {} }     // m1101
       else if (a === 'airlegs') { AIRLEGS.on = AIRLEGS.on ? 0 : 1; try { localStorage.setItem('mel.airlegs', AIRLEGS.on ? '1' : '0'); } catch (err) {} }     // m1098
       else if (a === 'jfloat') { JUGGLE.float = JUGGLE.float ? 0 : 1; try { localStorage.setItem('mel.jfloat', JUGGLE.float ? '1' : '0'); } catch (err) {} }     // m1098
+      else if (a === 'climbspd') { const L = CLIMB.speeds, i = L.indexOf(CLIMB.speed); CLIMB.speed = L[(i + 1) % L.length]; try { localStorage.setItem('mel.climbspd', String(CLIMB.speed)); } catch (err) {} }     // the ladder refactor: his pick
       else if (a === 'runland') { RUNLAND.mode = RUNLAND.mode === 'DIP' ? 'STOP' : 'DIP'; try { localStorage.setItem('mel.runland', RUNLAND.mode); } catch (err) {} }     // m1097
       else if (a === 'btrail') { BTRAIL.jin = BTRAIL.jin ? 0 : 1; try { localStorage.setItem('mel.btrail', BTRAIL.jin ? 'jin' : 'blue'); } catch (err) {} if (BTRAIL.mat) BTRAIL.mat.uniforms.uC.value.setRGB(...(BTRAIL.jin ? JIN.col : BTRAIL.col)); }     // m1421
       else if (a === 'toprun') { GAIT.topRun = GAIT.topRun ? 0 : 1; try { localStorage.setItem('mel.toprun', GAIT.topRun ? '1' : '0'); } catch (err) {} runSetUse(GAIT.runSet, 0); }     // m1092
@@ -13393,7 +13394,7 @@ function arenaUi() {
   if (ARENA.tools === undefined) { try { ARENA.tools = +localStorage.getItem('mel.arena.tools') || 0; } catch (err) { ARENA.tools = 0; } }
   const tools = ARENA.tools && !m;     // a menu open folds the tools away: the screen is not tall enough for both
   let h = '<div class="ar-bar">' + B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('vend', 'VEND') + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
-    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('btrail', 'TRAIL ' + (BTRAIL.jin ? 'JIN' : 'BLUE')) + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('sample', 'DNA SAMPLE ' + (SAMPLE.on ? 'ON' : 'OFF')) + B('runslash', 'RUN SLASH ' + (RUNSLASH.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('dsky', 'SKY ' + DOJO.skyPick) + B('rwsky', 'HOLLOWS SKY ' + RW.skyPick) + B('dragon', 'DRAGON ' + DOJO.dragonPick) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
+    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('climbspd', 'CLIMB ' + CLIMB.speed.toFixed(1) + ' m/s') + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('btrail', 'TRAIL ' + (BTRAIL.jin ? 'JIN' : 'BLUE')) + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('sample', 'DNA SAMPLE ' + (SAMPLE.on ? 'ON' : 'OFF')) + B('runslash', 'RUN SLASH ' + (RUNSLASH.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('dsky', 'SKY ' + DOJO.skyPick) + B('rwsky', 'HOLLOWS SKY ' + RW.skyPick) + B('dragon', 'DRAGON ' + DOJO.dragonPick) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
   if (m === 'bld') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back') + B('age', 'STATE: ' + (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + '<small>tap to switch -- rebuilds what stands</small>', '', AGE.st === 'fallen' ? '' : 'ar-on');
     for (const E of BLDG.list) h += B('bld', E.t + '<small>' + (E.on() ? 'tap to remove' : E.pass >= 3 ? E.sub : 'IN PROGRESS · pass ' + E.pass + ' of 3') + '</small>', E.key, E.on() ? 'ar-on' : '');
     h += '</div>'; }
@@ -27370,7 +27371,7 @@ function ladyBuild() {
     for (const lx of [-.36, .36]) obox(lx - .04, lx + .04, y0, h + .9, -.04, .04, railM, 0); for (let y = y0 + .3; y < h + .05; y += .3) obox(-.36, .36, y - .025, y + .025, -.03, .03, railM, 0);
     const [lx, lz] = W(0, 0), ex = Math.abs(c) * .45 + Math.abs(sn) * .12, ez = Math.abs(sn) * .45 + Math.abs(c) * .12, vb = { minx: lx - ex, maxx: lx + ex, miny: y0, maxy: h, minz: lz - ez, maxz: lz + ez };
     if (Math.abs(sn) > 1e-3 && Math.abs(c) > 1e-3) Object.assign(vb, { cx: lx, cz: lz, hx: .45, hz: .12, cs: c, sn: -sn });
-    const L = kitClimbAdd(vb, 'lady_' + n, h); L.mark = { x: mark[0], y: h, z: mark[1] }; L.lady = n; climbs.push(L);
+    const L = kitClimbAdd(vb, 'lady_' + n, h); L.mark = { x: mark[0], y: h, z: mark[1] }; L.lady = n; L.rung = { y0: y0 + .3, s: .3 }; climbs.push(L);
     // the NUMBER, on a post in front and to the left, facing the way he comes
     { const cv = document.createElement('canvas'); cv.width = 256; cv.height = 160; const q = cv.getContext('2d'); q.fillStyle = '#1b2430'; q.fillRect(0, 0, 256, 160); q.fillStyle = '#ffd040'; q.font = 'bold 96px sans-serif'; q.textAlign = 'center'; q.fillText(String(n), 128, 92); q.fillStyle = '#e8eef4'; q.font = 'bold 26px sans-serif'; q.fillText(label, 128, 140);
       const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; const pl = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1), new THREE.MeshBasicMaterial({ map: t, toneMapped: false })); const [sx, sz] = W(-1.6, 2.6); pl.position.set(sx, 1.9, sz); pl.rotation.y = yaw; g.add(pl); obox(-1.64, -1.56, 0, 1.4, 2.56, 2.64, railM, 0); } };
@@ -32228,7 +32229,25 @@ function rigAnim(dt) {
     const nm = real ? CLIMB.clip : CLIPS.walk;
     t[nm] = 1;
     // the real clip on its own measured rate (m189); the walk stand-in as it always was
-    if (real) setScale(nm, clamp(p.speed / (CLIMB.ref * (rig.scale || GAIT.refScale) / GAIT.refScale * (rig.gaitK || 1)), 0, CLIMB.hi));
+    // THE HANDS ON THE RUNGS (the ladder refactor, step 5): the clip's time is a function of his HEIGHT, so every grip lands on a rung --
+    // `climbCurve` measured how far one cycle pulls him (zap_02: ~.36 m -- one .30 rung, each hand regripping a rung up) and where in the
+    // cycle each hand takes hold; the cycle's rise is rounded to whole rungs of this ladder (`L.rung`, else `CLIMB.rungS`) and phased so the
+    // left hand starts near one (each hand is then trimmed onto its rung below). No height change, no hand motion: hanging still is a still pose, and the speed never outruns the hands
+    const C = real && CLIMB.lock && climbCurve(), Lc = p.climb;
+    if (C && !p.climbOver) { const sp = Lc.rung ? Lc.rung.s : CLIMB.rungS, y1 = Lc.rung ? Lc.rung.y0 : Lc.miny + sp, Rc = Math.max(1, Math.round(C.R / sp)) * sp, a = rig.actions[nm];
+      const ph0 = y1 - C.hg - C.tg * Rc;
+      // AND IT CALIBRATES ITSELF ON THE REAL POSE: where each hand actually stops in the world (its rise turning to a fall) is measured against
+      // the nearest rung, and the phase (`rig.climbFix`, metres) is nudged until the two sit evenly either side of their rungs. MEASURED in the
+      // sim: the offline sample of the clip read the hands ~.25 m off the drawn pose, and on the drawn pose the two hands take hold ~.17 m apart
+      // -- a .30 ladder cannot carry both (a per-hand warp needed the clip to run backwards), so each settles ~8 cm off its rung, evenly. Kept
+      // per hero, so the next ladder starts calibrated. A clip whose hands grip a whole rung apart would land both
+      const G = rig.climbG || (rig.climbG = { eL: null, eR: null }), v = _clV;
+      for (const [k, b] of [['L', rig.bones.mixamorig_LeftHand], ['R', rig.bones.mixamorig_RightHand]]) { if (!b) continue; const y = b.getWorldPosition(v).y, q = G[k];
+        if (q && q.up > 0 && y < q.y - 1e-4 && y > Lc.miny + .4 && y < Lc.top - .2) { let e = ((y - y1) % sp + sp) % sp; if (e > sp / 2) e -= sp; G['e' + k] = e;
+          if (G.eL !== null && G.eR !== null) rig.climbFix = (rig.climbFix || 0) - clamp((G.eL + G.eR) / 4, -.03, .03); }
+        G[k] = { y, up: y > (q ? q.y : y) + 1e-4 ? 1 : y < (q ? q.y : y) - 1e-4 ? -1 : (q ? q.up : 0) }; }
+      let u = ((p.pos.y - ph0 - (rig.climbFix || 0)) / Rc) % 1; if (u < 0) u += 1; setScale(nm, 0); a.time = u * C.dur; }
+    else if (real) setScale(nm, clamp(p.speed / (CLIMB.ref * (rig.scale || GAIT.refScale) / GAIT.refScale * (rig.gaitK || 1)), 0, CLIMB.hi));
     else setScale(nm, Math.max(0, p.speed / Math.max(.3, GAIT.walkRef)) * CLIMB.rate);
     setWeights(t, dt); return;
   }
@@ -35455,7 +35474,7 @@ function buildKit(g) {
 // backwards on one ladder and right on the other, and no extra field is asked of his export.
 const CLIMB = {
   on: 1,
-  speed: 2.3,       // m/s at a full thumb (m1316: 3.4 drove the hands at 3.2x -- *"the animation is kind of ridiculous"*)
+  speed: (() => { let v = 1.4; try { const k = parseFloat(localStorage.getItem('mel.climbspd')); if ([.9, 1.4, 2.3].includes(k)) v = k; } catch (e) {} return v; })(), speeds: [.9, 1.4, 2.3],       // m/s at a full thumb (m1316: 3.4 drove the hands at 3.2x -- *"the animation is kind of ridiculous"*)
   grab: .30,        // how much thumb INTO the ladder latches one
   off: .55,         // and how far the thumb has to be pulled away to let go
   out: .30,         // how far off the rungs his root hangs
@@ -35468,6 +35487,11 @@ const CLIMB = {
   // the ledge CLIMB-OVER clip with his hands pinned to the lip (`stepMantle`), 0 = m1316's scripted arc; `topIn` how far in on the top it
   // sets him down; `topR` how far back from the edge a push toward it still mounts from the top
   inT: .22, downT: .8, mantle: 1, topIn: .65, topR: 1.3,
+  // step 5: `lock` 1 = the clip's time follows his height so the hands meet the rungs (`climbCurve`); `rungS` the spacing a ladder without its
+  // own `rung` is assumed to have (the forge's and the kit's are .30)
+  lock: 1, rungS: .3,
+  // and with the hands locked to the rungs the SPEED is the animation's speed too: the clip pulls ~.35 m a cycle at 1x (.44 m/s), so 2.3 m/s
+  // would cycle the hands ~6x. TOOLS > CLIMB cycles `speeds`; 1.4 (~3.7x) is the default until he picks
   rate: 1.9,        // the walk clip, quickened -- there is no climb clip in this export and a
                     // walk cycle facing a wall IS legs on rungs and arms reaching (the grind's
                     // and the hang's own stand-in rule)
@@ -35570,6 +35594,26 @@ function climbGo(L, into) {
 }
 // ONTO A LADDER FROM ITS TOP (the refactor; there was no way at all): standing on the top behind its rungs (within `topR` of the edge, his feet
 // at the top) and walking toward the edge it hangs from -> he turns round and lowers himself onto it (`climbDown` in `stepClimb`)
+// the climb clip MEASURED on this hero (`mantleCurve`'s pattern): both hands' height over his root through one cycle; `R` = the rise one cycle
+// pulls (the gripping hand's speed down past him x the cycle), `tg` / `hg` = the cycle fraction and hand height where the LEFT hand takes hold
+const _clV = new THREE.Vector3();
+function climbCurve() {
+  if (rig.climbC !== undefined) return rig.climbC;
+  const nm = CLIMB.clip, a = rig.actions[nm], c = rig.clips[nm], bn = rig.bones, LH = bn.mixamorig_LeftHand, RH = bn.mixamorig_RightHand;
+  if (!a || !c || !LH || !RH) return (rig.climbC = null);
+  const N = 40, HL = [], HR = [], o = new THREE.Vector3(), v = new THREE.Vector3(), qi = new THREE.Quaternion();
+  const was = []; for (const k in rig.actions) { const x = rig.actions[k]; was.push([x, x.getEffectiveWeight(), x.time, x.enabled, x.paused]); x.setEffectiveWeight(0); }
+  a.enabled = true; a.paused = false; if (!a.isRunning()) a.play(); a.setEffectiveWeight(1);
+  for (let i = 0; i <= N; i++) { a.time = c.duration * i / N; rig.mixer.update(0); rig.root.updateMatrixWorld(true); rig.root.getWorldPosition(o); rig.root.getWorldQuaternion(qi).invert();
+    const dy = o.y - player.pos.y; HL.push(LH.getWorldPosition(v).sub(o).applyQuaternion(qi).y + dy); HR.push(RH.getWorldPosition(v).sub(o).applyQuaternion(qi).y + dy); }     // over his FEET (`p.pos`), not the model's root: in the climb they sit ~.3 m apart
+  for (const [x, wt, t, en, pz] of was) { x.setEffectiveWeight(wt); x.time = t; x.enabled = en; x.paused = pz; } rig.mixer.update(0);
+  // the stance: from each hand's highest frame forward (wrapping) to its lowest; its slope is how fast the body rises at 1x
+  const stance = H => { let hi = 0, lo = 0; for (let i = 0; i < N; i++) { if (H[i] > H[hi]) hi = i; if (H[i] < H[lo]) lo = i; } const fr = ((lo - hi + N) % N) || N; return { hi, d: H[hi] - H[lo], T: fr / N * c.duration }; };
+  const A = stance(HL), B = stance(HR), vel = (A.d + B.d) / (A.T + B.T), R = vel * c.duration;
+  // the GRIP is where the hand stops in the WORLD, not where it tops out against him: the first frame after its top whose fall past him matches
+  // his rise (R / N a frame) -- measured in the sim, the top-of-clip moment put the left hand 15 cm off its rung
+  const grip = (H, hi) => { for (let k = 0; k < N; k++) { const i = (hi + k) % N, j = (i + 1) % N; if (H[j] - H[i] <= -R / N) return i; } return hi; }, gL = grip(HL, A.hi), gR = grip(HR, B.hi);
+  return (rig.climbC = { R, tg: gL / N, hg: HL[gL], tgR: gR / N, hgR: HR[gR], dur: c.duration, vel }); }
 function climbTopTry(s) {
   const p = player; if (!(s.mag > .45)) return 0;
   for (const L of KCLIMB) { if (Math.abs(p.pos.y - L.top) > .45) continue; const dx = p.pos.x - L.cx, dz = p.pos.z - L.cz; if (Math.abs(dx) > 4 || Math.abs(dz) > 4) continue;
@@ -66513,7 +66557,7 @@ function ghomeBuild(at, yaw, y0) {
       for (let y = ya + .3; y < yb + .3; y += .34) vbox(lx - .32, lx + .32, y - .03, y + .03, lz - .03, lz + .03, wood, 0);
       const nx = s, nz = c, cxw = Wx(lx, lz), czw = Wz(lx, lz), hx = .12, hz = .45;     // the local +z normal in the world
       const ex = Math.abs(nx) * hx + Math.abs(nz) * hz, ez = Math.abs(nz) * hx + Math.abs(nx) * hz;
-      const Lb = kitClimbAdd({ cs: nx, sn: nz, hx, hz, cx: cxw, cz: czw, minx: cxw - ex, maxx: cxw + ex, miny: y0 + ya, maxy: y0 + yb, minz: czw - ez, maxz: czw + ez }, 'ghome_ladder', y0 + P + A.Hwg);
+      const Lb = kitClimbAdd({ cs: nx, sn: nz, hx, hz, cx: cxw, cz: czw, minx: cxw - ex, maxx: cxw + ex, miny: y0 + ya, maxy: y0 + yb, minz: czw - ez, maxz: czw + ez }, 'ghome_ladder', y0 + P + A.Hwg); Lb.rung = { y0: y0 + ya + .3, s: .34 };
       const mr = A.Rw - 1, my = P + A.Hwg + 2.2 * Math.cos(Math.asin(mr / A.Rw)); Lb.mark = { x: Wx(A.Wc[0], A.Wc[1] + mr), y: y0 + my, z: Wz(A.Wc[0], A.Wc[1] + mr) }; A.climbs = [Lb]; }
     // the long RAMP off the right deck down to the ground, railed (noCam)
     { const x0 = 9.8, x1 = 16.2, z0 = 4.5, z1 = 6.6, n = Math.ceil((x1 - x0) / .34);
@@ -67095,7 +67139,7 @@ function gpeakBuild() {
   A.climbs = [];
   const ladder = (x, z, ya, yb, nx, nz, mark, name) => { const ux = nz, uz = -nx, ry = Math.atan2(nx, nz);
       for (const o of [-.34, .34]) put(new THREE.BoxGeometry(.09, yb - ya + .6, .09), wood, at4(x + ux * o, (ya + yb + .6) / 2, z + uz * o, ry)); for (let y = ya + .3; y < yb + .4; y += .34) put(new THREE.BoxGeometry(.7, .06, .06), wood, at4(x, y, z, ry));
-      const hx = .12, hz = .45, ex = Math.abs(nx) * hx + Math.abs(nz) * hz, ez = Math.abs(nz) * hx + Math.abs(nx) * hz, L = kitClimbAdd({ cs: nx, sn: nz, hx, hz, cx: x, cz: z, minx: x - ex, maxx: x + ex, miny: ya, maxy: yb, minz: z - ez, maxz: z + ez }, name, yb);
+      const hx = .12, hz = .45, ex = Math.abs(nx) * hx + Math.abs(nz) * hz, ez = Math.abs(nz) * hx + Math.abs(nx) * hz, L = kitClimbAdd({ cs: nx, sn: nz, hx, hz, cx: x, cz: z, minx: x - ex, maxx: x + ex, miny: ya, maxy: yb, minz: z - ez, maxz: z + ez }, name, yb); L.rung = { y0: ya + .3, s: .34 };
       L.mark = { x: mark[0], y: mark[1], z: mark[2] }; A.climbs.push(L); };
   // ---- THE PINNACLE: a stratified noisy lathe out of the mountain's top, ledged, its flat cap the lookout's PAD ----
   const mt = gH(px, pz), base = mt - 8, top = mt + A.pin, Rp = 8.5; A.top = top;
@@ -67328,7 +67372,7 @@ function gmillBuild() {
       vbox(tx - .08, tx + .08, top, top + 5, tz - .08, tz + .08, wood, 0); put(new THREE.PlaneGeometry(1.8, 1.2, 4, 2), banM, at4(tx + .95 * -sd, top + 4.3, tz, 0));
       { const a2 = sd < 0 ? .55 : -.55, lx = tx + Math.sin(a2) * (R + .45), lz = tz + Math.cos(a2) * (R + .45), nx = Math.sin(a2), nz = Math.cos(a2), ux = Math.cos(a2), uz = -Math.sin(a2);
         for (const o of [-.34, .34]) put(new THREE.BoxGeometry(.09, top - ya + .6, .09), wood, at4(lx + ux * o, (ya + top + .6) / 2, lz + uz * o, a2)); for (let y = ya + .3; y < top + .4; y += .34) put(new THREE.BoxGeometry(.7, .06, .06), wood, at4(lx, y, lz, a2));
-        const hx = .12, hz = .45, ex = Math.abs(nx) * hx + Math.abs(nz) * hz, ez = Math.abs(nz) * hx + Math.abs(nx) * hz, L = kitClimbAdd({ cs: nx, sn: nz, hx, hz, cx: cx + lx, cz: cz + lz, minx: cx + lx - ex, maxx: cx + lx + ex, miny: ya, maxy: top, minz: cz + lz - ez, maxz: cz + lz + ez }, 'gmill_turret', top);
+        const hx = .12, hz = .45, ex = Math.abs(nx) * hx + Math.abs(nz) * hz, ez = Math.abs(nz) * hx + Math.abs(nx) * hz, L = kitClimbAdd({ cs: nx, sn: nz, hx, hz, cx: cx + lx, cz: cz + lz, minx: cx + lx - ex, maxx: cx + lx + ex, miny: ya, maxy: top, minz: cz + lz - ez, maxz: cz + lz + ez }, 'gmill_turret', top); L.rung = { y0: ya + .3, s: .34 };
         L.mark = { x: cx + tx + Math.sin(a2) * (R - th - .6), y: top + .05, z: cz + tz + Math.cos(a2) * (R - th - .6) }; A.climbs.push(L); }
       return [tx, tz, top]; };
   A.turrets = [turret(A.landW, -1), turret(A.landE, 1)];
