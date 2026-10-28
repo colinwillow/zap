@@ -22385,8 +22385,8 @@ function adockClear() { const D = ADOCK.on; if (!D) return; for (const c of D.co
 // round the Pagoda and passes 3-4 m off the Watchtower's lookout a metre below it (a running jump across); the second loops the east side
 // over the Gatehouse and the Market.
 const ZEP = { trap: 4.2, dropEvery: 22, hp: 10, downT: 30, bomb: { cd: 4, r: 4.5, dmg: 6, g: 14 }, list: [
-  { c: [-24, 22.5], rx: 39, rz: 21, y: 16.5, T: 140, ph: 0 },     /* m1341: the forge's layout spread x1.5 (STEER S2) -- the circuits with it */
-  { c: [36, -6], rx: 15, rz: 27, y: 21, T: 115, ph: .5 } ], on: null };
+  { c: [-24, 22.5], rx: 39, rz: 21, y: 16.5, T: 140, ph: 0, rest: [-24, 1.5] },     /* m@X4@: `rest` = where it lies when FALLEN */     /* m1341: the forge's layout spread x1.5 (STEER S2) -- the circuits with it */
+  { c: [36, -6], rx: 15, rz: 27, y: 21, T: 115, ph: .5, rest: [52, -6] } ], on: null };
 function zepMake(g) {
   const ship = new THREE.Group(); g.add(ship);
   // m1571 (the RE-PASS, pass 1): HERO flyers -- the hero kit (warm planks, timber, the kit red and bronze), a cream envelope with red lacquer
@@ -22453,11 +22453,18 @@ function zepBuild() {
       Z.lever = lv; Z.larm = arm; Z.racks = [];
       for (const lz of [-1.2, 0, 1.2]) { const b = new THREE.Mesh(new THREE.SphereGeometry(.32, 12, 8), bm); b.position.set(0, -1.6, lz); b.scale.y = 1.25; Z.ship.add(b); const r = new THREE.Mesh(new THREE.TorusGeometry(.33, .03, 4, 14), gl); r.rotation.x = Math.PI / 2; b.add(r); Z.racks.push(b); }
       const tr = new THREE.Mesh(new THREE.RingGeometry(ZEP.bomb.r - .25, ZEP.bomb.r, 40).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xff3a2a, transparent: true, opacity: .5, depthWrite: false, toneMapped: false })); tr.visible = false; g.add(tr); Z.tring = tr; Z.bcd = 0; } }
-  for (const Z of zs) bldMergeStatic(Z.ship);     // m1571
-  ZEP.on = { g, O, bars, rings: zs.flatMap(Z => Z.rings), zs, t: 0, drops: [], landed: [], dropT: 8, bombs: [] };
+  for (const Z of zs) { const env = new THREE.Group(); Z.ship.add(env); for (const o2 of Z.ship.children.slice()) if (o2 !== env && o2.position.y > 3.6) env.attach(o2);     // m@X4@: the ENVELOPE assembly (hull, hoops, bands, fins, rigging, prop, banners, keel lamps) -- it deflates as one
+    bldMergeStatic(Z.ship); bldMergeStatic(env); Z.hull = env; Z.clock = 0; }     // m1571
+  // ---- RE-PASS 2 (m@X4@): RESTORABLE (rubric 7, flyers): FALLEN, each lies grounded at its `rest` spot, its envelope slumped over the gondola,
+  // drained; it does not fly, its trapeze, rings and gun are dead, no drops, no bombs. RESTORE (the mint plate by the first wreck, or
+  // SPAWN > BUILDINGS > STATE): the envelope fills, the ship rises to cruise and glides back onto its loop (`zepStep`) ----
+  const R = restoreRig(g, { lift: 0, dur: 10, bob: 0 }); restoreSkin(R); const ground = [];
+  { const [px, pz] = [ZEP.list[0].rest[0] + 6, ZEP.list[0].rest[1] + 5], plate = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, .12, 24), new THREE.MeshStandardMaterial({ color: 0x3a4a46, emissive: 0x7affd8, emissiveIntensity: .7 })); plate.position.set(px, .06, pz); scene.add(plate); ground.push(plate); R.trig = { x: px, y: 0, z: pz, armed: 1 }; }
+  { const t0 = AGE.st === 'fallen' ? 0 : 1; R.goal = t0; restoreSet(R, t0); }
+  ZEP.on = { R, ground, g, O, bars, rings: zs.flatMap(Z => Z.rings), zs, t: 0, drops: [], landed: [], dropT: 8, bombs: [] };
   zepStep(0); snd('swoosh', { g: .6, r: .4 });
 }
-function zepStep(dt) { const Q = ZEP.on; if (!Q) return; Q.t += dt;
+function zepStep(dt) { const Q = ZEP.on; if (!Q) return; Q.t += dt; const k = Q.R ? Q.R.t : 1, whole = k >= 1; if (!whole) Q.dropT = Math.max(Q.dropT, 3);
   // m1183: SUPPLY DROPS -- every `dropEvery` s the first zeppelin lets a crate go on a red-and-white parachute; it drifts down and lands, and
   // then it is a crate like any other (smash it). Up to three lie about at once (the oldest goes). It lands wherever it falls -- a roof, a deck, the ground.
   if ((Q.dropT -= dt) <= 0) { Q.dropT = ZEP.dropEvery; const Z = Q.zs[0], P = Z.ship.position, m = new THREE.Mesh(new THREE.BoxGeometry(.9, .9, .9), new THREE.MeshStandardMaterial({ color: 0xa0784a, roughness: .85 }));
@@ -22468,14 +22475,19 @@ function zepStep(dt) { const Q = ZEP.on; if (!Q) return; Q.t += dt;
     const gy = groundAt(P.x, P.z, P.y, 1); if (P.y - .45 <= gy) { P.y = gy + .45; D.m.remove(D.ch); Q.drops.splice(i, 1); snd('thud', { g: .6, r: 1, x: P.x, z: P.z });
       const S = smashAdd(Q.landed, D.m, { minx: P.x - .45, maxx: P.x + .45, miny: gy, maxy: gy + .9, minz: P.z - .45, maxz: P.z + .45 }, 2, 1e9, [.7, .5, .3]); boxGrid();
       while (Q.landed.length > 3) { const old = Q.landed.shift(); smashDrop([old]); old.m.removeFromParent(); boxGrid(); } } }
-  for (const Z of Q.zs) { const P = Z.P, th = (Q.t / P.T + P.ph) * Math.PI * 2;
+  for (const Z of Q.zs) { const P = Z.P; if (whole) Z.clock = (Z.clock || 0) + dt; const th = ((Z.clock || 0) / P.T + P.ph) * Math.PI * 2;
     // round the loop: position on the ellipse, the nose along the tangent, a slow rise and fall
     // m1222 (pass 5): A ZEPPELIN CAN BE BROUGHT DOWN -- `hp` hits on its envelope (blade from the deck, arrows, parried shots) and it is
     // HOLED: it sinks, listing and trailing smoke, down to a few metres off the ground and limps round its loop low for `downT` s, then
     // patches itself and climbs back to cruise
     if (Z.downT > 0) { Z.downT -= dt; Z.sink = Math.min(P.y - 3.5, (Z.sink || 0) + 1.6 * dt); } else if (Z.sink > 0) Z.sink = Math.max(0, Z.sink - 1.1 * dt);
-    const x = P.c[0] + P.rx * Math.sin(th), z = P.c[1] - P.rz * Math.cos(th), y = P.y + Math.sin(th * 2) * .6 - (Z.sink || 0);
-    zepPose(Z, x, y, z, Math.atan2(P.rx * Math.cos(th), P.rz * Math.sin(th))); Z.prop.rotation.z += dt * (Z.downT > 0 ? 2 : 6); Z.ship.rotation.z = (Z.sink || 0) * .035;
+    let x = P.c[0] + P.rx * Math.sin(th), z = P.c[1] - P.rz * Math.cos(th), y = P.y + Math.sin(th * 2) * .6 - (Z.sink || 0), h = Math.atan2(P.rx * Math.cos(th), P.rz * Math.sin(th));
+    if (!whole && P.rest) { const [rx, rz] = P.rest, gy = Z.gy !== undefined ? Z.gy : (Z.gy = groundAt(rx, rz, 60, 1) || 0), e = u => u * u * (3 - 2 * u), hr = .4;     // RE-PASS 2: lying, rising, gliding home
+      if (k < .5) { x = rx; z = rz; h = hr; y = gy + 1.1 + (P.y - gy - 1.1) * e(Math.max(0, k - .2) / .3); }
+      else { const u = e((k - .5) * 2); x = rx + (x - rx) * u; z = rz + (z - rz) * u; y = P.y + (y - P.y) * u; h = hr + wrapAngle(h - hr) * u; } }
+    if (Z.hull) { const sI = .25 + .75 * Math.min(1, k / .3), ctr = 2.6 + 4.9 * Math.min(1, k / .3); Z.hull.scale.y = sI; Z.hull.position.y = ctr - 7.5 * sI; }     // the envelope fills
+    zepPose(Z, x, y, z, h);
+    if (!whole) { for (const R2 of Z.rings) R2.y = -600; if (Z.bar) { Z.bar.y = -600; Z.bar.top = -600; Z.bar.g.visible = false; } if (Z.tur && !Z.tur.dead) { Z.tur.y = -600; Z.tur.g.position.y = -600; } } else if (Z.bar) Z.bar.g.visible = true; Z.prop.rotation.z += dt * (Z.downT > 0 ? 2 : 6); Z.ship.rotation.z = (Z.sink || 0) * .035;
     if (Z.downT > 0 && Math.random() < dt * 8) { const v = new THREE.Vector3((Math.random() - .5) * 4, 7.5 + Math.random() * 2, (Math.random() - .5) * 14); Z.ship.localToWorld(v); smokeAt(v.x, v.y, v.z, 1.6, 1.8, [.3, .28, .27]); }
     if (Z.sl) { Z.sl.rotation.x = .35 + Math.sin(Q.t * .5 + P.ph * 9) * .3; Z.sl.rotation.z = Math.sin(Q.t * .37 + P.ph * 5) * .5; }     // the searchlight sweeps below
     if (Z.drone) { const a = Q.t * 1.1 + P.ph * 6; Z.drone.position.set(x + Math.cos(a) * 7, y + 3 + Math.sin(Q.t * 1.5) * .5, z + Math.sin(a) * 7); Z.drone.rotation.y = -a; Z.drone.children[1].rotation.z = Q.t * .6; } } zepBombs(Q, dt); }
@@ -22493,7 +22505,7 @@ function zepBombs(Q, dt) { const B = ZEP.bomb, p = player;
     snd('boom', { g: 1.2, r: .55, x: M.x, z: M.z }); camShake(Math.hypot(p.pos.x - M.x, p.pos.z - M.z) < 14 ? .4 : .15);
     for (const d of DUMMIES) { if (d.st === 'gone' || d.st === 'down' || !d.root.visible) continue; const P2 = d.root.position; if (Math.hypot(P2.x - M.x, P2.z - M.z) < B.r && Math.abs(P2.y - gy) < 2.5) dummyBlow(d, Math.atan2(P2.x - M.x, P2.z - M.z), 2.2, B.dmg); }
     turretBlast(M.x, gy + .6, M.z, B.r * .6, 4); } }
-function zepLever(x, y, z, rad) { const Q = ZEP.on; if (!Q) return 0;
+function zepLever(x, y, z, rad) { const Q = ZEP.on; if (!Q || (Q.R && Q.R.t < 1)) return 0;
   for (const Z of Q.zs) { if (!Z.lever) continue; const L = Z.lever.getWorldPosition(new THREE.Vector3()); if (Math.hypot(x - L.x, y - L.y - .7, z - L.z) > .7 + rad) continue;
     if (Z.bcd > 0) return 1; Z.bcd = ZEP.bomb.cd; snd('clang', { g: .8, r: 1.2, x: L.x, z: L.z });
     const S = Z.ship.position, m = Z.racks[1].clone(); m.position.set(S.x, S.y - 1.6, S.z); Q.g.add(m); Q.bombs.push({ m, vy: 0 }); snd('swoosh', { g: .6, r: .5, x: S.x, z: S.z }); return 1; } return 0; }
@@ -22502,7 +22514,7 @@ function zepHit(x, y, z, rad, dmg) { const Q = ZEP.on; if (!Q) return 0;
     Z.hc = Q.t + .25; Z.hp = (Z.hp == null ? ZEP.hp : Z.hp) - Math.max(.5, dmg || 1); spkBurst(x, y, z, 12, { col: [1, .8, .4], spread: 3, size: .1, life: .35 }); snd('thud', { g: .7, r: .7, x, z });
     if (Z.hp <= 0) { Z.hp = ZEP.hp; Z.downT = ZEP.downT; for (let k = 0; k < 4; k++) spkBurst(x, y, z, 24, { col: k % 2 ? [1, .55, .15] : [.9, .9, .85], spread: 7, size: .22, life: .8 }); snd('boom', { g: 1, r: .6, x, z }); camShake(.3); }
     return 1; } return 0; }
-function zepClear() { const Q = ZEP.on; if (!Q) return; smashDrop(Q.landed); for (const Z of Q.zs) { const j = BDYN.indexOf(Z.deckB); if (j >= 0) BDYN.splice(j, 1); if (Z.tur) turretDrop(Z.tur); if (player.bar && player.bar.B === Z.bar) player.bar = null; } if (player.rope && Q.rings.includes(player.rope.R)) player.rope = null; bldClear(Q); ZEP.on = null; }
+function zepClear() { const Q = ZEP.on; if (!Q) return; if (Q.R) { const i = RESTORE.list.indexOf(Q.R); if (i >= 0) RESTORE.list.splice(i, 1); } for (const o of Q.ground || []) o.removeFromParent(); smashDrop(Q.landed); for (const Z of Q.zs) { const j = BDYN.indexOf(Z.deckB); if (j >= 0) BDYN.splice(j, 1); if (Z.tur) turretDrop(Z.tur); if (player.bar && player.bar.B === Z.bar) player.bar = null; } if (player.rope && Q.rings.includes(player.rope.R)) player.rope = null; bldClear(Q); ZEP.on = null; }
 // m1152: THE FLYING SHIP HOUSE (BUILDINGS.md #10, pass 1) at (0, -40), floating. A junk-ship hull 21 m long hanging 3 m off the ground on three
 // glowing Jin engines, its deck at 6 m, a two-masted junk rig with battened sails, a DECKHOUSE at the stern (a door on its bow side, a curved
 // roof), and a long GANGPLANK up the starboard side from the ground. The hull bobs gently (picture only; the deck you stand on holds still).
@@ -27188,7 +27200,7 @@ const BLDG = { list: [
   { key: 'shrine', t: 'Shrine', sub: 'a terrace, a koi pond, fox guardians that watch you, an offering box, a Jin core that heals, a fox gate to the Senbon Torii, an omikuji fortune box', pass: 6, build: () => shrineBuild(), clear: () => shrineClear(), rig: () => SHRINE.on && SHRINE.on.R, on: () => !!SHRINE.on, step: dt => shrineStep(dt) },
   { key: 'rampart', t: 'Rampart Wall', sub: 'a 40 m wall, a gateway to smash, archers, sentry guns, bars on top, rocks dropped on you, robot sentries on the walk, a war horn that summons a raid', pass: 6, build: () => rampBuild(), clear: () => rampClear(), on: () => !!RAMP.on, step: dt => rampStep(dt) },
   { key: 'adock', t: 'Airship Dock', sub: 'a 20 m tower, a lift, an airship that flies you round (ring the bell to cast off; grapple it); kites to glide off the deck; sky pirates raid the flight', pass: 6, build: () => adockBuild(), rig: () => ADOCK.on && ADOCK.on.R, clear: () => adockClear(), on: () => !!ADOCK.on, step: dt => adockStep(dt) },
-  { key: 'zep', t: 'Zeppelins', sub: 'two zeppelins: land on a gondola, swing from its trapeze, grapple it, kill its gun, supply drops; hole the envelope and it sinks low; strike the bow lever to bomb the forge below', pass: 6, build: () => zepBuild(), clear: () => zepClear(), on: () => !!ZEP.on, step: dt => zepStep(dt) },
+  { key: 'zep', t: 'Zeppelins', sub: 'two zeppelins: land on a gondola, swing from its trapeze, grapple it, kill its gun, supply drops; hole the envelope and it sinks low; strike the bow lever to bomb the forge below', pass: 6, build: () => zepBuild(), rig: () => ZEP.on && ZEP.on.R, clear: () => zepClear(), on: () => !!ZEP.on, step: dt => zepStep(dt) },
   { key: 'fship', t: 'Flying Ship House', sub: 'a junk ship on Jin engines: broadside cannons, a bowsprit, a bar, cargo to smash, a sentry gun; take the helm and the broadside fires for you; climb the cargo net and the mast to the crow\'s nest', pass: 6, build: () => fshipBuild(), clear: () => fshipClear(), on: () => !!FSHIP.on, step: dt => fshipStep(dt) },
   { key: 'bath', t: 'Bathhouse', sub: 'sliding shoji to tear through, a pool that heals and erupts when you strike the boiler valve, a veranda, a smoking chimney', pass: 4, build: () => bathBuild(), clear: () => bathClear(), on: () => !!BATH.on, step: dt => bathStep(dt) },
   { key: 'fwork', t: 'Forge-Workshop', sub: 'a furnace that breathes fire when you strike the bellows, a trip-hammer that flattens you, a loft, a crane that swings a bar round', pass: 4, build: () => fworkBuild(), clear: () => fworkClear(), on: () => !!FWORK.on, step: dt => fworkStep(dt) },

@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the ZEPPELINS, pass 2 (rubric 7 for flyers: FALLEN / RESTORED)
+**Moves:** its rubric-7 box. A flyer has no ground storey to stand on, so here FALLEN means grounded and RESTORED means flying.
+- One rig over the group (`restoreRig` + `restoreSkin`, so the colour drains). Everything above the gondola (hull, hoops, flank bands, fins,
+  rigging, prop, banners, keel lamps) is gathered into one ENVELOPE group per ship (`Z.hull`, everything with local y > 3.6), so it deflates
+  as one. The first try squashed only the hull mesh and left its hoops, fins and banners up at cruise size.
+- FALLEN: each ship sits at its `ZEP.list[].rest` spot (the first between the Watchtower and the Pagoda, the second east of its loop, off the
+  Market's roof), gondola on the ground, envelope squashed (y x .25) and slumped over it. Its loop clock is frozen; its rings, trapeze, stern
+  gun, supply drops and bomb lever are dead.
+- RESTORING (`zepStep`, from `R.t`): the envelope fills over the first 30%, the ship rises to cruise between 20% and 50%, then glides from
+  its rest point onto its loop pose and the clock runs again.
+- Plate beside the first wreck; `rig` hook; `zepClear` drops the rig and the plate.
+Render-checked headless: fallen (grounded, deflated) and restored (flying). A first restored shot rendered the planks black: that is
+the headless same-tick shader compile, and it renders correctly after a wait. Shipped unverified.
+
 ## m1571 -- THE RE-PASS: the ZEPPELINS, pass 1 (HERO flyers: the look)
 **Moves:** its pass-1 row.
 - `zepMake`: shared kit materials (cached on `ZEP` so the two ships share them): a warm planks triMat deck, `K.timber`, `K.redL` gondola and
