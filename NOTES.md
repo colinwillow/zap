@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## mDRG -- THE DRAGON RIDE: THE RIDER SAT INSIDE THE DRAGON
+## m1627 -- THE DRAGON RIDE: THE RIDER SAT INSIDE THE DRAGON
 His: *"he was sitting inside the dragon -- that's why"* (he could not see himself). The rider's root went at the seat less a HIP HEIGHT that was
 an estimate (.6 x `rig.hipY`) corrected by a lagged measurement that only ran inside a sane range -- so wherever the `driving` clip actually put
 his hips, nothing checked it. `dragRiderPose` (last before the springs) now poses him, MEASURES his `mixamorig_Hips` on that same final frame,
