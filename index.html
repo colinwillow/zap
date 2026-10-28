@@ -10067,7 +10067,7 @@ const PLANTK = {
   cherry: { h: 6.5, r: 1.4, stiff: .55, bend: .9, make() { const R = plantRnd(11), H = 6.5, sw = (x, y) => Math.pow(Math.max(0, y / H), 1.6), parts = [];
     parts.push(plantPart(plantTube([[0, 0, 0], [.2, 1.4, .1], [-.1, 2.6, .2], [.3, 3.6, 0]], .36, .16), 0x5a3a2c, sw));
     for (const [a, l] of [[0, 1.9], [2.2, 1.7], [4.1, 2]]) parts.push(plantPart(plantTube([[.3, 3.4, 0], [.3 + Math.cos(a) * l * .5, 4.1, Math.sin(a) * l * .5], [.3 + Math.cos(a) * l, 4.5, Math.sin(a) * l]], .13, .05, 6), 0x5a3a2c, sw));
-    const pink = plantMix(0xe58aa8, 0xffc8da, R); for (let i = 0; i < 9; i++) { const a = R() * 6.28, d = R() * 1.6, y = 4.3 + R() * 1.6; parts.push(plantPart(plantBlob(.9 + R() * .6, 20 + i).translate(.3 + Math.cos(a) * d, y, Math.sin(a) * d), (x, y2) => { const c = pink(); return y2 < 4.4 ? c.map(v => v * .82) : c; }, sw, 1)); }
+    const pink = plantMix(0xe58aa8, 0xffc8da, R); for (let i = 0; i < 18; i++) { const a = R() * 6.28, d = .4 + R() * 2, y = 4.1 + R() * 1.9; parts.push(plantPart(plantBlob(.5 + R() * .45, 20 + i).translate(.3 + Math.cos(a) * d, y, Math.sin(a) * d), (x, y2) => { const c = pink(); return y2 < 4.4 ? c.map(v => v * .82) : c; }, sw, 1)); }
     return parts; } },
   pine: { h: 7, r: 1.2, stiff: .35, bend: .6, make() { const H = 7, sw = (x, y) => Math.pow(Math.max(0, y / H), 1.8), parts = [plantPart(plantTube([[0, 0, 0], [0, 3, 0], [.1, 6.8, 0]], .3, .08), 0x4a3226, sw)], R = plantRnd(7), gr = plantMix(0x1f5a3c, 0x2f7a4a, R);
     for (let k = 0; k < 5; k++) { const c = new THREE.ConeGeometry(2.4 - k * .4, 2.2, 9, 2).translate(0, 2.2 + k * 1.05, 0), P = c.attributes.position; for (let i = 0; i < P.count; i++) if (P.getY(i) < 1.6 + k * 1.05) { const f = .85 + R() * .3; P.setX(i, P.getX(i) * f); P.setZ(i, P.getZ(i) * f); }
@@ -10109,6 +10109,28 @@ const PLANTK = {
     for (let i = 0; i < 7; i++) { const a = i / 7 * 6.28 + R() * .4, L = .6 + R() * .4, pts = []; for (let k = 0; k <= 6; k++) { const t = k / 6, r = t * L * .8, y = Math.sin(t * 2.4) * L * .9; const cu = t > .7 ? (t - .7) * 3 : 0; pts.push([Math.cos(a) * (r - cu * .15), y - cu * .2, Math.sin(a) * (r - cu * .15)]); }
       p.push(plantPart(plantTube(pts, .045, .018, 5), (x, y) => [.32 + y * .2, .16 + y * .1, .42 + y * .25], (x, y, z) => Math.min(1, Math.hypot(x, z) / .7), .3));
       const e = pts[6]; p.push(plantPart(new THREE.SphereGeometry(.045, 6, 4).translate(...e), [.48, 1, .85], Math.min(1, Math.hypot(e[0], e[2]) / .7), 0, 1)); } return p; } },
+  // m1451 (his: *"break the landmasses up... a few passes on the grass, the trees, the shrubs, the dirt -- sticks, rocks, plants, different grass"*)
+  carpet: { h: .4, r: .5, stiff: 1.3, bend: 1, nohit: 1, make() { const R = plantRnd(41), P = [], C = [], N = [];     // a dense patch of single-triangle blades: hides the painted ground up close
+    for (let i = 0; i < 24; i++) { const a = R() * 6.28, d = Math.sqrt(R()) * .55, h = .14 + R() * .3, x = Math.cos(a) * d, z = Math.sin(a) * d, w = .03 + R() * .025, ta = R() * 6.28, lx = Math.cos(ta) * h * .3, lz = Math.sin(ta) * h * .3, sx = -Math.sin(ta) * w, sz = Math.cos(ta) * w;
+      P.push(x - sx, 0, z - sz, x + sx, 0, z + sz, x + lx, h, z + lz); const t = .7 + R() * .5, y2 = R() < .15 ? .1 : 0; C.push(.07 * t, .18 * t, .05 * t, .07 * t, .18 * t, .05 * t, (.36 + y2) * t, (.55 + y2 * .5) * t, .16 * t); for (let k = 0; k < 3; k++) N.push(lx, 1, lz); }
+    const b = new THREE.BufferGeometry(); b.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); b.setAttribute('normal', new THREE.Float32BufferAttribute(N, 3)); const q = plantPart(b, 0, (x, y) => y / .45, .2); q.setAttribute('color', new THREE.Float32BufferAttribute(C, 3)); return [q]; } },
+  tallgrass: { h: 1.2, r: .5, stiff: 1.4, bend: 1.2, make() { const R = plantRnd(43), p = [];
+    for (let i = 0; i < 11; i++) { const a = R() * 6.28, d = R() * .25, h = .7 + R() * .6, x = Math.cos(a) * d, z = Math.sin(a) * d, ta = R() * 6.28, lean = .15 + R() * .25, lx = Math.cos(ta), lz = Math.sin(ta);
+      const pts = [[x, 0, z], [x + lx * lean * .3, h * .5, z + lz * lean * .3], [x + lx * lean, h, z + lz * lean]]; p.push(plantPart(plantTube(pts, .018, .006, 3), (X, y) => { const t = y / 1.3; return [.24 + t * .4, .36 + t * .3, .1 + t * .08]; }, (X, y) => y / 1.3));
+      if (R() < .6) p.push(plantPart(new THREE.CapsuleGeometry(.03, .16, 2, 5).translate(...pts[2]), [.75, .62, .32], h / 1.3)); } return p; } },
+  shrub: { h: 1.2, r: 1, stiff: .35, bend: .7, make() { const R = plantRnd(47), p = [], gr = plantMix(0x2a5a22, 0x5a8a34, R), cent = [];
+    for (let k = 0; k < 3; k++) { const c = [(R() - .5) * .8, .45 + R() * .35, (R() - .5) * .8]; cent.push(c); p.push(plantPart(plantBlob(.32 + R() * .15, 50 + k).translate(...c), [.12, .24, .08], c[1] / 1.2)); }
+    const bloom = R() < .4, bc = R() < .5 ? [1, .55, .75] : [.75, .6, 1];
+    for (let i = 0; i < 70; i++) { const c = cent[i % 3], u = new THREE.Vector3(R() - .5, R() - .3, R() - .5).normalize().multiplyScalar(.3 + R() * .3), x = c[0] + u.x, y = c[1] + u.y, z = c[2] + u.z, lf = new THREE.PlaneGeometry(.2, .12);
+      lf.rotateY(R() * 6.28).rotateX((R() - .5) * 1.2).translate(x, y, z); const col = gr(); p.push(plantPart(lf, col.map(v => v * (.8 + y * .3)), y / 1.2, 1)); }
+    if (bloom) for (let i = 0; i < 14; i++) { const c = cent[i % 3], u = new THREE.Vector3(R() - .5, R() * .5 + .1, R() - .5).normalize().multiplyScalar(.5), b2 = new THREE.IcosahedronGeometry(.05, 0).translate(c[0] + u.x, c[1] + u.y, c[2] + u.z); p.push(plantPart(b2, bc, (c[1] + u.y) / 1.2)); }
+    return p; } },
+  boulder: { h: 1.4, r: 1.2, stiff: 0, bend: 0, make() { const b = plantBlob(1, 61, 2); b.scale(1.2, .75, 1); const P = b.attributes.position; let lo = 9, hi = -9; for (let i = 0; i < P.count; i++) { lo = Math.min(lo, P.getY(i)); hi = Math.max(hi, P.getY(i)); }
+    return [plantPart(b, (x, y, z) => { const t = (y - lo) / (hi - lo), n = Math.sin(x * 7 + z * 5) * .04; return t > .72 + n ? [.24, .38, .14] : [.42 + t * .12 + n, .38 + t * .1 + n, .34 + t * .08]; }, 0)]; } },
+  sticks: { h: .2, r: .6, stiff: 0, bend: 0, make() { const R = plantRnd(67), p = [];
+    for (let i = 0; i < 3; i++) { const a = R() * 6.28, L = .5 + R() * .7, x = (R() - .5) * .5, z = (R() - .5) * .5, dx = Math.cos(a) * L / 2, dz = Math.sin(a) * L / 2;
+      p.push(plantPart(plantTube([[x - dx, .03, z - dz], [x + dz * .15, .06, z - dx * .15], [x + dx, .03, z + dz]], .03, .018, 4), [.32, .22, .14], 0)); } return p; } },
+  mound: { h: .6, r: 1.4, stiff: 0, bend: 0, make() { const b = plantBlob(1, 71, 2); b.scale(1.5, .45, 1.2); return [plantPart(b, (x, y) => [.13 + y * .25, .26 + y * .3, .07 + y * .1], 0)]; } },
   stones: { h: .5, r: .6, stiff: 0, bend: 0, make() { const R = plantRnd(31), p = [];
     for (let i = 0; i < 3; i++) { const s = .18 + R() * .3, b = plantBlob(s, 40 + i, 1); b.scale(1, .6, 1).translate((R() - .5) * .7, s * .25, (R() - .5) * .7); const t = .85 + R() * .3; p.push(plantPart(b, (x, y) => [(.5 + y * .2) * t, (.44 + y * .2) * t, (.4 + y * .15) * t], 0)); }
     return p; } },
@@ -10121,7 +10143,7 @@ function plantFlush(g, rec) { const by = {}; for (const r of rec) (by[r.kind] = 
     rs.forEach((r, i) => iB.set([0, 0, (r.x * 1.7 + r.z * 2.3) % 6.28, Kd.K.stiff], i * 4)); const at = new THREE.InstancedBufferAttribute(iB, 4); geo.setAttribute('iB', at);
     const m = new THREE.InstancedMesh(geo, plantMat(), rs.length), mx = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler();
     rs.forEach((r, i) => { mx.compose(new THREE.Vector3(r.x, r.y, r.z), q.setFromEuler(e.set(0, r.yaw, 0)), new THREE.Vector3(r.s, r.s, r.s)); m.setMatrixAt(i, mx);
-      PLANT.list.push({ at, i, x: r.x, y: r.y, z: r.z, h: Kd.K.h * r.s, r: Kd.K.r * r.s, bend: Kd.K.bend, bx: 0, bz: 0, vx: 0, vz: 0, m }); });
+      if (!Kd.K.nohit) PLANT.list.push({ at, i, x: r.x, y: r.y, z: r.z, h: Kd.K.h * r.s, r: Kd.K.r * r.s, bend: Kd.K.bend, bx: 0, bz: 0, vx: 0, vz: 0, m }); });
     m.castShadow = true; m.receiveShadow = true; m.frustumCulled = false; g.add(m); meshes.push(m); } return meshes; }
 function plantDrop(meshes) { PLANT.list = PLANT.list.filter(P => !meshes.includes(P.m)); }
 function plantPush(P, dx, dz, imp) { const L = Math.hypot(dx, dz) || 1; P.vx += dx / L * imp * P.bend; P.vz += dz / L * imp * P.bend; }
@@ -10422,7 +10444,7 @@ function dojoBuild(g, W) {
     blade: new THREE.MeshStandardMaterial({ color: 0xdfe8f2, metalness: .9, roughness: .15, emissive: 0x3a5a7a, emissiveIntensity: .4 }), lamp: new THREE.MeshStandardMaterial({ color: 0xffb46a, emissive: 0xff8a2a, emissiveIntensity: 1.4 }), dark: new THREE.MeshStandardMaterial({ color: 0x1c1614, roughness: .6 }) };
   const at = (a, r) => [Math.sin(a) * r, Math.cos(a) * r];
   const ISL = [], SCAT = [], isl = (o, x, y, z, dress) => { if (dress) { o.smoothTop = 1; if (o.knoll === undefined) o.knoll = o.R > 8 ? .07 : .04; if (o.flatR === undefined) o.flatR = dress.clear || 0; }     /* m1436: knolls where nothing is built */
-    const I = floatIsland(o); ISL.push(I.geo.translate(x, y, z)); if (dress) { islandDress(put, I, x, y, z, dress); SCAT.push([I, x, y, z, dress.clear || 0, dress.seed || 1]); } return I; };     /* m1404: islands, not cones */
+    const I = floatIsland(o); ISL.push(I.geo.translate(x, y, z)); if (dress) { islandDress(put, I, x, y, z, Object.assign({}, dress, { cherry: 0, pine: 0, shrubs: 0 })); SCAT.push([I, x, y, z, dress.clear || 0, dress.seed || 1, dress]); } return I; };     /* m1451: trees and shrubs come from the plant library now */     /* m1404: islands, not cones */
   // SKY and CLOUDS: the sunrise dome, and a sea of cloud far below (soft noise, fading to the horizon)
   const sd = new THREE.Vector3(...D.sun).normalize(), U = { uTime: { value: 0 }, uSun: { value: sd } }; D.U = U;
   const dome = new THREE.Mesh(new THREE.SphereGeometry(880, 48, 24), new THREE.ShaderMaterial({ uniforms: U, side: THREE.BackSide, depthWrite: false, fog: false,
@@ -10564,7 +10586,7 @@ function dojoBuild(g, W) {
   const SC = []; for (const [x, y, z, R2, dp, sdd, dress] of [[-120, -18, 40, 26, 44, 71, { cherry: 5, pine: 7, rocks: 8, shrubs: 18, roots: 30 }], [95, -26, -110, 30, 50, 72, { cherry: 3, pine: 9, rocks: 9, shrubs: 20, roots: 34 }],
       [-52, 14, -60, 8, 14, 73, { cherry: 2, pine: 1, rocks: 2, shrubs: 6, roots: 10 }], [58, 22, 34, 6, 10, 74, { cherry: 1, pine: 2, rocks: 2, shrubs: 4, roots: 8 }], [-35, -12, 95, 11, 18, 75, { cherry: 3, pine: 2, rocks: 3, shrubs: 8, roots: 14 }],
       [130, 6, 60, 14, 22, 76, { cherry: 2, pine: 5, rocks: 4, shrubs: 10, roots: 16 }], [142, 9, 48, 9, 16, 77, { cherry: 2, pine: 1, rocks: 2, shrubs: 6, roots: 8 }], [-90, 30, -20, 4, 7, 78, { cherry: 1, pine: 0, rocks: 1, shrubs: 2, roots: 5 }],
-      [20, -38, -60, 5, 9, 79, null], [-15, 38, 70, 3, 5, 80, null], [75, -8, 85, 4, 6, 81, null], [-70, 2, 120, 7, 11, 82, { cherry: 0, pine: 3, rocks: 1, shrubs: 3, roots: 6 }]])
+      [20, -38, -60, 5, 9, 79, { cherry: 0, pine: 0, rocks: 1, shrubs: 0, roots: 4 }], [-15, 38, 70, 3, 5, 80, { cherry: 0, pine: 0, rocks: 1, shrubs: 0, roots: 4 }], [75, -8, 85, 4, 6, 81, { cherry: 0, pine: 0, rocks: 1, shrubs: 0, roots: 4 }], [-70, 2, 120, 7, 11, 82, { cherry: 0, pine: 3, rocks: 1, shrubs: 3, roots: 6 }]])
     SC.push([isl({ R: R2, depth: dp, seed: sdd, detail: R2 > 12 ? 5 : 4, flat: .6, lobes: R2 > 10 ? 3 : 2 }, x, y, z, dress && Object.assign({ seed: sdd, clear: sdd === 71 ? 9 : 0 }, dress)), x, y, z]);
   // m1415: THE HERITAGE PAGODA (his, after m1410: *"we can still use the more classical Japanese architecture -- weave it together, both can exist"*).
   // One five-tier pagoda on the great west island, the older shared culture beside Grumbo's domes: a stone plinth, red-lacquered storeys that step in,
@@ -10594,9 +10616,19 @@ function dojoBuild(g, W) {
   { const o = new THREE.Mesh(mergeGeometries(ISL), isl4Mat()); o.castShadow = o.receiveShadow = true; g.add(o); }
   // m1436: THE GROUND DRESSING -- the plant library's grass, flowers, alien fronds, Jin bulbs and stones scattered over every dressed island
   // (denser on the near ones; the painted ground carries the far ones), kept off what is built (`clear`). One draw per kind for the lot.
-  { const rec = []; for (const [I, X, Y, Z, clr, sdd] of SCAT) { const Rr = plantRnd(sdd * 977 + 3), far = Math.hypot(X, Z) > 110, n = Math.min(far ? 90 : 380, Math.round(I.R * I.R * (far ? .15 : .85)));
-      const drop = (kind, k, s0, s1) => { for (let i = 0; i < k; i++) { for (let t = 0; t < 6; t++) { const a = Rr() * 6.283, r = Math.sqrt(Rr()) * I.rimR(a) * .86; if (r < clr + .4) continue; const x = Math.cos(a) * r, z = Math.sin(a) * r; plantPlant(rec, kind, X + x, Y + I.topAt(x, z) - .03, Z + z, s0 + Rr() * (s1 - s0), Rr() * 6.28); break; } } };
-      drop('grass', n, 1.2, 2.1); drop('flowers', Math.round(n / 9), .8, 1.3); drop('frond', Math.round(n / 16), .7, 1.3); drop('stones', Math.round(n / 14), .7, 1.8); if (!far) drop('jinbulb', Math.round(n / 60), .5, .8); }
+  // m1451: and a SECOND pass on it -- a dense blade CARPET (hides the paint up close), tall seed grass, leafy SHRUBS, mossy BOULDERS, fallen
+  // STICKS and grassy MOUNDS; the trees are the library's swaying cherry and pine; and a FRINGE round every rim (grass, fronds, tall grass,
+  // rocks sunk into the lip) so the island's outline is broken, not a clean polygon edge.
+  { const rec = []; for (const [I, X, Y, Z, clr, sdd, dr] of SCAT) { const Rr = plantRnd(sdd * 977 + 3), far = Math.hypot(X, Z) > 110, A2 = I.R * I.R;
+      const drop = (kind, k, s0, s1, sink = .03) => { for (let i = 0; i < k; i++) { for (let t = 0; t < 6; t++) { const a = Rr() * 6.283, r = Math.sqrt(Rr()) * I.rimR(a) * .86; if (r < clr + .4) continue; const x = Math.cos(a) * r, z = Math.sin(a) * r; plantPlant(rec, kind, X + x, Y + I.topAt(x, z) - sink, Z + z, s0 + Rr() * (s1 - s0), Rr() * 6.28); break; } } };
+      const nc = Math.round(Math.min(far ? 120 : 700, A2 * (far ? .25 : 1.9)));
+      drop('carpet', nc, 1, 1.8); drop('grass', Math.round(nc / (far ? 6 : 3)), 1.2, 2.1); drop('tallgrass', Math.round(nc / 14), .8, 1.3); drop('flowers', Math.round(nc / 16), .8, 1.3);
+      drop('shrub', Math.round(A2 * .035), .7, 1.5, .1); drop('boulder', Math.round(A2 * .01), .5, 1.6, .35); drop('mound', Math.round(A2 * .012), .7, 1.6, .18); drop('sticks', Math.round(A2 * .02), .8, 1.4, 0);
+      drop('frond', Math.round(nc / 30), .7, 1.3); drop('stones', Math.round(nc / 25), .7, 1.8); if (!far) drop('jinbulb', Math.round(nc / 120), .5, .8);
+      drop('cherry', dr.cherry || 0, .65, .95, .1); drop('pine', dr.pine || 0, .6, 1, .1);
+      const ring = Math.min(far ? 60 : 150, Math.round(I.R * 6.283 / (far ? 2.2 : 1.1)));     // the rim fringe
+      for (let i = 0; i < ring; i++) { const a = i / ring * 6.283 + Rr() * .05, r = I.rimR(a) * (.9 + Rr() * .07); if (r < clr + .4) continue; const x = Math.cos(a) * r, z = Math.sin(a) * r, y = Y + I.topAt(x, z) - .2, q = Rr();
+        plantPlant(rec, q < .55 ? 'grass' : q < .7 ? 'tallgrass' : q < .82 ? 'frond' : q < .92 ? 'stones' : 'boulder', X + x, y - (q >= .92 ? .3 : 0), Z + z, q < .82 ? 1.6 + Rr() * .9 : .6 + Rr() * .9, Rr() * 6.28); } }
     D.plantMeshes = plantFlush(g, rec); }
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o !== null; o.receiveShadow = true; g.add(o); }
   // THE DRIFTING PLATFORMS: small stone discs on rock roots, slowly bobbing and circling outside the rim (decor for now)

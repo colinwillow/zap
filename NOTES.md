@@ -52,6 +52,20 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
+## THE GROUND, PASS 3: BREAK THE LANDMASSES UP (mXXXX)
+*"The grass very obviously looks like a texture... break the landmasses up a little better... the grass, the trees, the shrubs, the dirt -- sticks, rocks, plants, different grass."*
+- **New plant kinds:**
+  - `carpet`: 24 single-triangle blades (72 verts), up to 700 a near island. It hides the paint up close. `nohit`, so it skips the springs and the per-frame brush loop.
+  - `tallgrass`: seed heads.
+  - `shrub`: 3 dark cores and 70 leaf cards, 40% in bloom.
+  - `boulder`: moss on the top 28%, sunk .35.
+  - `sticks`
+  - `mound`: grassy hummocks, half sunk.
+  - The cherry canopy is 18 smaller clusters (was 9 big blobs).
+- **The rim fringe:** every 1.1 m round each dressed island (2.2 m far): grass, tall grass, fronds, stones and sunk boulders, at .9-.97 of the rim. The island's outline is broken instead of a clean polygon.
+- **Trees and shrubs come from the library:** the dojo's `isl()` zeroes islandDress's cherry, pine and shrub blobs and plants the library's swaying ones at the same counts. The three bare islands got a dress.
+- **COST, watch on the phone:** the headless render of the wide shot went from ~50 to ~78 s. The near carpet cap (700) and `far` (110 m) are the dials if it drags.
+
 ## THE CLOUDS: OFF THE RING, IN TIERS, IN EACH SKY'S COLOURS (m1449)
 *"I like the clouds. Make them match the colour scheme a little more, and they need different Y heights: they all have the same coordinates so they look like a ring of clouds."*
 - **Banks:** 24 of them (was 16) at RANDOM bearings (was evenly spaced), 120-500 m out (skewed near), in three tiers. Low (40%) at y -40..-22, just above the painted cloud sea at -46 (lower and they hide under it), big. Mid (40%) at -18..+12. High (20%) at +22..+72, smaller and stacked 1.5x taller.
