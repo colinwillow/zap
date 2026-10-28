@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## mDRG -- THE DRAGON RIDE, build 3: GROUND RIDING (DRAGON.md box 3)
+- **`dragDrive`** (from `dragStep` while `B.drive`): the left pad's world direction (`stickWorld`, so camera-relative like walking) is where he
+  goes. He turns toward it at `turn` 2.0 rad/s (`turnStill` 3.2 under 2 m/s, so he can turn on the spot) and runs to `runSp` 11 m/s x the
+  push, held to 20-100 % while the turn is still wide (a beast does not gallop sideways); let go and he pulls up (`brakeHL` .3).
+- **His clips**: on mounting the idle cycle stops (`stopAllAction`, then `idle` and `run` both PLAYED with weights summing to 1 -- never a
+  zero total, which is the T-pose); the run's weight and rate are his speed over `runRef` 7 (a dial -- his run was trimmed by `beastPrep`
+  but never measured for a foot speed). He leans `lean` x yaw rate x speed into a turn (root roll, so the rider leans too).
+- **The ground**: `dragGround` -- 0 on the meadow, .3 / .6 on the dais' steps, eased. He keeps inside 85 % of `rimR` and pushes out of the
+  lantern posts and the stepping stones under 5 m (`obst`, circles + `bodyR` 2.2). Trees are walk-through (as on foot).
+- **His body box** is PARKED while he is ridden (`dragBox(B, 1)`) and rebuilt from his bones where he stops; the mount spot is remembered in
+  his own frame (`mountL`) so the ring and the hop-off go where he went (clamped inside the rim).
+- The rider's `p.speed` is .3 x his, so the lens pulls out a little with pace (`CAM.distV`).
+**Moves:** DRAGON.md box 3 (his feel open). **Still open:** 4-6 and his sign-off. Gates: check ok, zone boot ok. Shipped unverified.
+
 ## m1614 -- THE DRAGON RIDE, build 2: MOUNT / DISMOUNT (DRAGON.md box 2)
 - **The mount spot** (`dragSeat`): a mint ring at his LEFT flank, stepped out along his side until it is clear of his body box (+1.1 m),
   level with the dais. It pulses, brightens when you stand on it, and a tip says what to do (or, not CAPTURED, that he will not be ridden).

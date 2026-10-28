@@ -11329,7 +11329,7 @@ function dragStage(g) { const Z = DRAGZ, sd = new THREE.Vector3(...Z.sun).normal
   { const L0 = Math.hypot(_sunOff.x, _sunOff.y, _sunOff.z) || 20; _sunOff.copy(sd).multiplyScalar(L0); sun.position.copy(_sunOff); sun.color.setHex(0xffd2a6); hemi.color.setHex(0xffe0c8); hemi.groundColor.setHex(0x5a4a5a); }
   camera.far = Math.max(camera.far, 1000); camera.updateProjectionMatrix();
   const MG = new Map(), put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); const q = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal') q.deleteAttribute(k); MG.get(m).push(q); };
-  const M = isl3M(), ISL = [], box = (x, z, hx, hz, y0, y1) => BOXES.push({ minx: x - hx, maxx: x + hx, miny: y0, maxy: y1, minz: z - hz, maxz: z + hz });
+  Z.obst = []; const M = isl3M(), ISL = [], box = (x, z, hx, hz, y0, y1) => BOXES.push({ minx: x - hx, maxx: x + hx, miny: y0, maxy: y1, minz: z - hz, maxz: z + hz });
   // THE MEADOW: one big flat-topped island, the floor at y = 0, trees and rocks kept off the middle
   const I = floatIsland({ R: Z.R, depth: 38, seed: 211, detail: 14, flat: 0, lobes: 4 }); I.geo.translate(0, .02, 0); ISL.push(I.geo); Z.I = I;
   islandDress(put, I, 0, 0, 0, { cherry: 5, pine: 6, rocks: 7, shrubs: 12, roots: 26, seed: 211, clear: 24 });
@@ -11340,9 +11340,9 @@ function dragStage(g) { const Z = DRAGZ, sd = new THREE.Vector3(...Z.sun).normal
   { const [x, z] = Z.at; put(new THREE.CylinderGeometry(9, 9.4, .3, 40).translate(x, .15, z), M.stone); put(new THREE.CylinderGeometry(7.2, 7.4, .3, 40).translate(x, .45, z), M.stone);
     box(x, z, 6.4, 6.4, 0, .3); box(x, z, 5, 5, 0, .6); Z.daisY = .6;
     const gold = new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .85, roughness: .3 }); put(new THREE.TorusGeometry(7.3, .07, 6, 64).rotateX(Math.PI / 2).translate(x, .61, z), gold);
-    for (const sd2 of [-1, 1]) { const px = x + sd2 * 10.5, pz = z - 4; put(new THREE.CylinderGeometry(.22, .28, 4.2, 8).translate(px, 2.1, pz), M.trunk); put(new THREE.BoxGeometry(.9, .9, .9).translate(px, 4.5, pz), gold); box(px, pz, .3, .3, 0, 4.2); } }
+    for (const sd2 of [-1, 1]) { const px = x + sd2 * 10.5, pz = z - 4; put(new THREE.CylinderGeometry(.22, .28, 4.2, 8).translate(px, 2.1, pz), M.trunk); put(new THREE.BoxGeometry(.9, .9, .9).translate(px, 4.5, pz), gold); box(px, pz, .3, .3, 0, 4.2); Z.obst.push([px, pz, .4]); } }
   // THE CLIMB: stepping stones rising round the side to a high crag (the take-off perch for the flying, later)
-  const step = (x, y, z, R2, seed) => { const S = floatIsland({ R: R2, depth: 2.5 + R2, seed, detail: 3, flat: .03, lobes: 1 }); ISL.push(S.geo.translate(x, y, z)); box(x, z, R2 * .7, R2 * .7, y - .6, y + .02); };
+  const step = (x, y, z, R2, seed) => { const S = floatIsland({ R: R2, depth: 2.5 + R2, seed, detail: 3, flat: .03, lobes: 1 }); ISL.push(S.geo.translate(x, y, z)); box(x, z, R2 * .7, R2 * .7, y - .6, y + .02); if (y < 5) Z.obst.push([x, z, R2]); };
   for (let i = 0; i < 9; i++) { const a = .7 + i * .13, r = 28; step(Math.sin(a) * r, 1 + i, Math.cos(a) * r, 1.5, 300 + i); }
   { const a = 1.98, r = 31, x = Math.sin(a) * r, z = Math.cos(a) * r, C = floatIsland({ R: 7, depth: 22, seed: 331, detail: 5, flat: .02, lobes: 2 }); ISL.push(C.geo.translate(x, 10, z)); box(x, z, 4.8, 4.8, 9.2, 10.02);
     islandDress(put, C, x, 10, z, { cherry: 1, pine: 1, rocks: 2, shrubs: 2, roots: 10, seed: 331, clear: 4 }); Z.perch = [x, 10, z]; }
@@ -11358,7 +11358,8 @@ function dragStage(g) { const Z = DRAGZ, sd = new THREE.Vector3(...Z.sun).normal
 function dragHome() { const p = player, Z = DRAGZ; p.pos.set(Z.spawn[0], .05, Z.spawn[1]); p.vel.set(0, 0, 0); p.faceH = p.heading = 0; p.grounded = false; }
 function dragStep(dt) { const Z = DRAGZ, O = Z.on; O.t += dt; Z.U.uTime.value = O.t;
   if (!O.go) { O.go = 1; dragHome(); dragBeast(); }
-  const B = O.B; if (B && B.mx) { B.mx.update(dt); B.t -= dt; if (B.t <= 0) dojoBeastIdle(B); if (B.reins && B.reins.m.visible) dragReins(B.reins); }
+  const B = O.B; if (B && B.mx) { if (B.drive) dragDrive(B, dt); else { B.t -= dt; if (B.t <= 0) dojoBeastIdle(B); } B.mx.update(dt); if (B.reins && B.reins.m.visible) dragReins(B.reins);
+    if (B.ring && !B.drive && B.mountL) { B.root.updateMatrixWorld(true); B.mountAt.copy(B.mountL); B.root.localToWorld(B.mountAt); B.mountAt.y = dragGround(B.mountAt.x, B.mountAt.z); B.ring.position.copy(B.mountAt).y += .03; } }
   for (const h of O.hoops) h.m.rotation.y += h.w * dt;
   if (B && B.ring) { const near = dragNear(); B.ring.visible = !player.dragon && Z.look === 'CAPTURED'; B.ring.material.opacity = near ? 1 : .45 + .3 * Math.sin(O.t * 3); B.ring.scale.setScalar(near ? 1.15 : 1);
     if (near && !Z.tipped) { Z.tipped = 1; tipShow(Z.look === 'CAPTURED' ? 'Tap the right pad to climb on.' : 'He is wild -- he will not be ridden. (TOOLS > DRAGON)', 4); } else if (!near) Z.tipped = 0; }
@@ -11372,11 +11373,17 @@ async function dragBeast() { const Z = DRAGZ, O = Z.on; try { const K = await ar
     B.mx.update(0); root.updateMatrixWorld(true);
     O.B = B; B.sets = { CAPTURED: B.bag, EVIL: [] };     // stood and breathing first: a dressing that throws leaves him bare, not frozen
     try { dojoDragonDress(B, m, root, P); dragDress2(B, m, root, P); } catch (e) { console.warn('[melee] dragon dress', e); note('DRAGON DRESS ' + e.message); }
-    { const bb = new THREE.Box3(); for (const n of ['Bip001_Pelvis', 'Bip001_Spine2', 'Bip001_Neck', 'Bip001_L_UpperArm', 'Bip001_R_UpperArm', 'Bip001_L_Thigh', 'Bip001_R_Thigh']) { const b = m.getObjectByName(n); if (b) bb.expandByPoint(b.getWorldPosition(new THREE.Vector3())); }
-      const pd = B.hd * .1; B.box = { minx: bb.min.x - pd, maxx: bb.max.x + pd, miny: 0, maxy: bb.max.y, minz: bb.min.z - pd, maxz: bb.max.z + pd, noCam: 1 }; BOXES.push(B.box); boxGrid(); }
+    dragBox(B);
     dragSeat(B, m, root, P);
     dragLook();
   } catch (e) { console.warn('[melee] dragon zone', e); note('NO DRAGON ' + e.message); } }
+// his body box: an AABB of his trunk bones, padded; parked far away while he is ridden (the rider is not colliding, and a box that does not
+// turn with him would be wrong the moment he turned), rebuilt where he stands when he is not
+function dragBox(B, park) { if (!B.box) { B.box = { minx: 0, maxx: 0, miny: 0, maxy: 0, minz: 0, maxz: 0, noCam: 1 }; BOXES.push(B.box); }
+  if (park) Object.assign(B.box, { minx: 9e4, maxx: 9e4 + 1, minz: 9e4, maxz: 9e4 + 1 });
+  else { const bb = new THREE.Box3(); B.root.updateMatrixWorld(true); for (const n of ['Bip001_Pelvis', 'Bip001_Spine2', 'Bip001_Neck', 'Bip001_L_UpperArm', 'Bip001_R_UpperArm', 'Bip001_L_Thigh', 'Bip001_R_Thigh']) { const b = B.m.getObjectByName(n); if (b) bb.expandByPoint(b.getWorldPosition(new THREE.Vector3())); }
+    const pd = B.hd * .1; Object.assign(B.box, { minx: bb.min.x - pd, maxx: bb.max.x + pd, miny: 0, maxy: bb.max.y, minz: bb.min.z - pd, maxz: bb.max.z + pd }); }
+  boxGrid(); }
 function dragLook() { const B = DRAGZ.on && DRAGZ.on.B; if (!B) return; const L = DRAGZ.look;
   for (const k in B.sets) for (const o of B.sets[k]) o.visible = k === L;
   if (B.reins) B.reins.m.visible = L === 'CAPTURED';
@@ -11395,13 +11402,13 @@ function dragSeat(B, m, root, P) { const K = dragKit(m, root, B.hd), sp = K.bw('
   const top = K.hitAlong(sp, K.up.clone().negate(), B.hd * 1.2, sp) || sp.clone().addScaledVector(K.up, B.hd * .15);
   B.seat = new THREE.Group(); K.pin('Bip001_Spine1', B.seat, top.clone().addScaledVector(K.up, B.hd * .055));
   const g = top.clone(); g.y = DRAGZ.daisY; let d = 0; const inBox = v => v.x > B.box.minx && v.x < B.box.maxx && v.z > B.box.minz && v.z < B.box.maxz;
-  while (d < 20 && inBox(_drV.copy(g).addScaledVector(K.side, d))) d += .25; B.mountAt = g.addScaledVector(K.side, d + 1.1);
+  while (d < 20 && inBox(_drV.copy(g).addScaledVector(K.side, d))) d += .25; B.mountAt = g.addScaledVector(K.side, d + 1.1); B.mountL = root.worldToLocal(B.mountAt.clone());
   const ring = new THREE.Mesh(new THREE.TorusGeometry(.9, .06, 6, 32).rotateX(Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0x7affd8, toneMapped: false, transparent: true }));
   ring.position.copy(B.mountAt).y += .03; DRAGZ.on.g.add(ring); B.ring = ring; }
 function dragNear() { const B = DRAGZ.on && DRAGZ.on.B, p = player; if (!B || !B.mountAt || p.dragon) return 0;
   return Math.hypot(p.pos.x - B.mountAt.x, p.pos.z - B.mountAt.z) < DRAGZ.reach && Math.abs(p.pos.y - B.mountAt.y) < 1.5; }
 function dragTap() { if (!DRAGZ.on) return false; const p = player, R = p.dragon;
-  if (R) { if (R.st === 'sit') { R.st = 'off'; R.t = 0; R.from = p.pos.clone(); snd('swoosh', { g: .4, r: 1.1 }); } return true; }
+  if (R) { if (R.st === 'sit') { const B = DRAGZ.on.B; dragDriveEnd(B); R.st = 'off'; R.t = 0; R.from = p.pos.clone(); snd('swoosh', { g: .4, r: 1.1 }); } return true; }
   if (!dragNear() || !p.grounded) return false;
   if (DRAGZ.look !== 'CAPTURED') { tipShow('He will not be ridden -- not yet. (TOOLS > DRAGON: CAPTURED. The taming comes later.)', 4); return true; }
   const B = DRAGZ.on.B; if (!B.seat) return false;
@@ -11413,11 +11420,37 @@ function dragRide(dt) { const p = player, R = p.dragon, B = DRAGZ.on && DRAGZ.on
   const seat = B.seat.getWorldPosition(_drV), sx = seat.x, sy = seat.y - R.hip, sz = seat.z, h = dragH(B);
   if (R.st === 'on') { const u = Math.min(1, R.t / DRAGZ.mountT), k = smooth(0, 1, u);
     p.pos.set(R.from.x + (sx - R.from.x) * k, R.from.y + (sy - R.from.y) * k + Math.sin(u * Math.PI) * DRAGZ.arc, R.from.z + (sz - R.from.z) * k);
-    p.faceH = p.heading = R.h0 + wrapAngle(h - R.h0) * k; if (u >= 1) { R.st = 'sit'; R.t = 0; tipShow('In the saddle. Tap the right pad to get off.', 4); } }
-  else if (R.st === 'sit') { p.pos.set(sx, sy, sz); p.faceH = p.heading = h; }
+    p.faceH = p.heading = R.h0 + wrapAngle(h - R.h0) * k; if (u >= 1) { R.st = 'sit'; R.t = 0; dragDriveStart(B); tipShow('In the saddle. Left pad: ride. Tap the right pad to get off.', 4); } }
+  else if (R.st === 'sit') { p.pos.set(sx, sy, sz); p.faceH = p.heading = h; p.speed = B.drive ? B.drive.v * .3 : 0; }
   else { const u = Math.min(1, R.t / DRAGZ.offT), k = smooth(0, 1, u), to = B.mountAt;
     p.pos.set(R.from.x + (to.x - R.from.x) * k, R.from.y + (to.y - R.from.y) * k + Math.sin(u * Math.PI) * DRAGZ.arc * .6, R.from.z + (to.z - R.from.z) * k);
     if (u >= 1) { p.pos.y = to.y + .05; p.dragon = null; p.grounded = false; } } }
+// mDRG: GROUND RIDING (DRAGON.md box 3). The LEFT PAD is his body now: push where you want him to go (camera-relative, like walking) and
+// he TURNS toward it at `turn` rad/s (faster at a standstill, so he can turn on the spot) and runs up to `runSp` x how hard you push, slower
+// while the turn is still wide; let go and he pulls up (`brakeHL`). His own clips carry it: `idle` and `run` held together, the run's weight
+// and rate from his speed against `runRef` (a dial: his run is not measured yet), so a slow push is a trot and a full one a gallop; he leans
+// into a turn by `lean`. The ground under him is the meadow (y 0) and the dais' two steps; he keeps inside the rim and walks round the
+// lantern posts and the low stepping stones (circles, `obst`). His body box is parked while he is ridden and rebuilt where he stops.
+Object.assign(DRAGZ, { runSp: 11, runRef: 7, turn: 2.0, turnStill: 3.2, accHL: .45, brakeHL: .3, lean: .05, bodyR: 2.2 });
+function dragGround(x, z) { const [ax, az] = DRAGZ.at, d = Math.hypot(x - ax, z - az); return d < 7.2 ? DRAGZ.daisY : d < 9.4 ? .3 : 0; }
+function dragDriveStart(B) { B.mx.stopAllAction(); const D = B.drive = { v: 0, lean: 0, aIdle: B.mx.clipAction(B.clips.idle), aRun: B.clips.run ? B.mx.clipAction(B.clips.run) : null };
+  D.aIdle.reset().setLoop(THREE.LoopRepeat).setEffectiveWeight(1).play(); if (D.aRun) D.aRun.reset().setLoop(THREE.LoopRepeat).setEffectiveWeight(0).play(); B.cur = D.aIdle; dragBox(B, 1); }
+function dragDriveEnd(B) { const D = B.drive; if (!D) return; if (D.aRun) D.aRun.stop(); D.aIdle.setEffectiveWeight(1).setEffectiveTimeScale(1); B.cur = D.aIdle; B.t = 3; B.drive = null; B.root.rotation.z = 0;
+  B.root.updateMatrixWorld(true); dragBox(B); B.mountAt.copy(B.mountL); B.root.localToWorld(B.mountAt);
+  const r = Math.hypot(B.mountAt.x, B.mountAt.z), lim = DRAGZ.I.rimR(Math.atan2(B.mountAt.z, B.mountAt.x)) * .9; if (r > lim) { B.mountAt.x *= lim / r; B.mountAt.z *= lim / r; } B.mountAt.y = dragGround(B.mountAt.x, B.mountAt.z); }
+function dragDrive(B, dt) { const Z = DRAGZ, D = B.drive, p = player, s = p.dragon && p.dragon.st === 'sit' ? stickWorld() : { x: 0, z: 0, mag: 0 };
+  let h = dragH(B); const h0 = h;
+  if (s.mag > 0) { const want = Math.atan2(s.x, s.z), dh = wrapAngle(want - h), mx = (D.v > 2 ? Z.turn : Z.turnStill) * dt; h += clamp(dh, -mx, mx);
+    D.v = damp(D.v, s.mag * Z.runSp * clamp(1 - Math.abs(dh) / 2.4, .2, 1), Z.accHL, dt); }
+  else D.v = damp(D.v, 0, Z.brakeHL, dt);
+  if (D.v < .02) D.v = 0;
+  const P = B.root.position; let nx = P.x + Math.sin(h) * D.v * dt, nz = P.z + Math.cos(h) * D.v * dt;
+  for (const [ox, oz, orr] of Z.obst) { const dx = nx - ox, dz = nz - oz, d = Math.hypot(dx, dz), m = orr + Z.bodyR; if (d < m && d > 1e-4) { nx = ox + dx / d * m; nz = oz + dz / d * m; } }
+  const r = Math.hypot(nx, nz), lim = Z.I.rimR(Math.atan2(nz, nx)) * .85; if (r > lim) { nx *= lim / r; nz *= lim / r; D.v *= Math.exp(-5 * dt); }
+  P.x = nx; P.z = nz; P.y = damp(P.y, dragGround(nx, nz), .08, dt);
+  const yawRate = wrapAngle(h - h0) / Math.max(dt, 1e-4); D.lean = damp(D.lean, clamp(-yawRate * D.v * Z.lean, -.35, .35), .15, dt);
+  B.root.rotation.y = h + (B.faceOff || 0); B.root.rotation.z = D.lean;
+  if (D.aRun) { const k = clamp(D.v / Z.runRef, 0, 1); D.aRun.setEffectiveWeight(k); D.aIdle.setEffectiveWeight(1 - k); D.aRun.setEffectiveTimeScale(clamp(D.v / Z.runRef, .7, 1.6)); } }
 // his clips while mounted: in the air on the way up and down, `driving` in the saddle
 function dragAnim(dt, t) { const R = player.dragon, has = n => !!(n && rig.actions[n]);
   const air = R.st === 'on' ? true : R.st === 'off' && R.t < DRAGZ.offT * .8;

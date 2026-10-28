@@ -21,7 +21,9 @@ dragon into a level (the WHOLE-PIECE RULE).
 - [ ] **2. Mount / dismount** (m1614): a mint ring at his left flank; stand on it and tap the right pad: an arc up into the saddle
       (`in_air`), Grumbo seated in his `driving` clip (no riding clip in his file), the seat pinned to the dragon's Spine1; tap again to hop
       off onto the ring. CAPTURED only. The lens follows behind and pulls back. *Open: his look at it.*
-- [ ] **3. Ground riding**: the left pad steers him (his `run` / `idle` clips by speed), the camera behind and above, sized to him.
+- [ ] **3. Ground riding** (mDRG): the left pad steers him camera-relative (turns at `turn`, on the spot when still), `idle` + `run` blended
+      and sped by his speed (`runRef` 7 is a dial: his run is not measured), leans into turns, keeps in the rim, walks round the posts and low
+      stones; the lens behind and above. *Open: his feel of it (speed, turn, the run's rate).*
 - [ ] **4. Flying**: take off (from the ground or off the perch), glide and flap with RollerGirl's wingsuit feel (`WING`: lift from speed,
       bank to turn, dive for speed), land. **There is no fly clip in his file**: the wings are posed in code on their bones until he
       makes one.
