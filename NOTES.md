@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the FLYING SHIP HOUSE, pass 3 (alive, L3; its third pass, so the loop moves on)
+## m1607 -- THE RE-PASS: the FLYING SHIP HOUSE, pass 3 (alive, L3; its third pass, so the loop moves on)
 - THE SAILS BILLOW: each junk sail is an 8 x 6 grid now, merged; every vertex carries its (u, v) inside its own sail (from `FSHIP.sailR`)
   and is pushed forward by sin(pi u) sin(pi v), a belly that breathes. Afloat only. A deeper belly lifted the sail off its battens.
 - A bronze GALLEY CHIMNEY on the deckhouse roof, smoking while she is afloat.
