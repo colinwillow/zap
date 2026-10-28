@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the ZEPPELINS, pass 2 (rubric 7 for flyers: FALLEN / RESTORED)
+## m1572 -- THE RE-PASS: the ZEPPELINS, pass 2 (rubric 7 for flyers: FALLEN / RESTORED)
 **Moves:** its rubric-7 box. A flyer has no ground storey to stand on, so here FALLEN means grounded and RESTORED means flying.
 - One rig over the group (`restoreRig` + `restoreSkin`, so the colour drains). Everything above the gondola (hull, hoops, flank bands, fins,
   rigging, prop, banners, keel lamps) is gathered into one ENVELOPE group per ship (`Z.hull`, everything with local y > 3.6), so it deflates
