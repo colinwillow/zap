@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the ZEPPELINS, pass 3 (L3, alive) -- AND DOUBLOONS NOW WORK OUTSIDE THE DOJO
+**Moves:** the Zeppelins' L3 and alive rows; its third pass, so the loop moves on.
+- **THE BUG (worth more than the pass): `coinStep` was only ever called from `dojoStep`.** Outside the dojo world, every doubloon sat still
+  where `coinDrop` put it and COULD NOT BE PICKED UP: every forge doubloon from the RE-PASS (Pagoda, Great Red Pagoda, Watchtower, Shrine,
+  Market, Airship Dock) and from earlier builds. The main step now calls it when the dojo is not on (`else if (COIN.list.length)`), and the
+  dojo keeps its own call, untouched. Found because a doubloon that has to MOVE stayed at -600.
+- Doubloons that ride: three per ship, in the group but posed every frame from a ship-local point (`c.lp`, `localToWorld`): two beside the
+  grapple rings under the gondola and one below the trapeze bar, so they are had on the swing. Hidden and parked while fallen.
+- Alive: a bronze exhaust stack on each gondola's stern puffing grey smoke while flying; three red-and-cream tail streamers off the lower
+  fin, waving (they live in the envelope group, so they deflate with it).
+Render-checked headless (the doubloons under the gondola and the trapeze). Shipped unverified.
+**The Zeppelins' three passes are done; next in the table: Flying Ship House.**
+
 ## m1572 -- THE RE-PASS: the ZEPPELINS, pass 2 (rubric 7 for flyers: FALLEN / RESTORED)
 **Moves:** its rubric-7 box. A flyer has no ground storey to stand on, so here FALLEN means grounded and RESTORED means flying.
 - One rig over the group (`restoreRig` + `restoreSkin`, so the colour drains). Everything above the gondola (hull, hoops, flank bands, fins,

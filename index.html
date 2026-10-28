@@ -11749,7 +11749,7 @@ function arenaStep(dt) {
   hintStep(dt);
   tmStep(dt);
   if (JINRA.w.length || JINRA.pts) jinraStep(dt);     /* m1500 */
-  vendStep(dt); pickStep(dt); arenaLabStep(dt); if (DOJO.on) dojoStep(dt); beastFxStep(dt); bladeTrail(dt);
+  vendStep(dt); pickStep(dt); arenaLabStep(dt); if (DOJO.on) dojoStep(dt); else if (COIN.list.length) coinStep(dt);     /* m@X4@: doubloons everywhere, not only in the dojo (dojoStep steps them there) */ beastFxStep(dt); bladeTrail(dt);
   if (DRINK.cans.length) drinkScan();
   if (player.toss || DRINK.flying.length) drinkThrowStep(dt);
   ARENA.hold = Math.max(0, (ARENA.hold || 0) - dt);     // `mel.ARENA.hold = 5`: pretend you are aiming for 5 s (testing)
@@ -22453,6 +22453,12 @@ function zepBuild() {
       Z.lever = lv; Z.larm = arm; Z.racks = [];
       for (const lz of [-1.2, 0, 1.2]) { const b = new THREE.Mesh(new THREE.SphereGeometry(.32, 12, 8), bm); b.position.set(0, -1.6, lz); b.scale.y = 1.25; Z.ship.add(b); const r = new THREE.Mesh(new THREE.TorusGeometry(.33, .03, 4, 14), gl); r.rotation.x = Math.PI / 2; b.add(r); Z.racks.push(b); }
       const tr = new THREE.Mesh(new THREE.RingGeometry(ZEP.bomb.r - .25, ZEP.bomb.r, 40).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xff3a2a, transparent: true, opacity: .5, depthWrite: false, toneMapped: false })); tr.visible = false; g.add(tr); Z.tring = tr; Z.bcd = 0; } }
+  // ---- RE-PASS 3 (m@X4@): L3 and ALIVE -- DOUBLOONS that ride under each gondola, beside its grapple rings and below its trapeze (only to be
+  // had on the swing); a bronze EXHAUST STACK on the gondola's stern that puffs smoke; three red-and-cream TAIL STREAMERS off the fins ----
+  { const K = korMats(), clothM = [K.redL, new THREE.MeshStandardMaterial({ color: 0xf2ece0, roughness: .9, side: THREE.DoubleSide })];
+    for (const Z of zs) { Z.coins = [[0, -2.7, -1.3], [0, -2.7, 1.3], [0, -ZEP.trap - .9, 0]].map(lp => { const c = coinDrop(g, 0, -600, 0); c.lp = new THREE.Vector3(...lp); return c; });
+      const st = new THREE.Mesh(new THREE.CylinderGeometry(.16, .2, 1.4, 10), K.bronze); st.position.set(.9, .7, -3.3); st.castShadow = true; st.userData.mg = 1; Z.ship.add(st); Z.stack = new THREE.Vector3(.9, 1.6, -3.3);
+      Z.tails = []; for (let k = 0; k < 3; k++) { const t = new THREE.Mesh(new THREE.PlaneGeometry(.28, 3.2, 1, 6).translate(0, -1.6, 0), clothM[k % 2]); t.position.set((k - 1) * .6, 7.5 - 2.6, -11.6); Z.ship.add(t); Z.tails.push(t); } } }
   for (const Z of zs) { const env = new THREE.Group(); Z.ship.add(env); for (const o2 of Z.ship.children.slice()) if (o2 !== env && o2.position.y > 3.6) env.attach(o2);     // m1572: the ENVELOPE assembly (hull, hoops, bands, fins, rigging, prop, banners, keel lamps) -- it deflates as one
     bldMergeStatic(Z.ship); bldMergeStatic(env); Z.hull = env; Z.clock = 0; }     // m1571
   // ---- RE-PASS 2 (m1572): RESTORABLE (rubric 7, flyers): FALLEN, each lies grounded at its `rest` spot, its envelope slumped over the gondola,
@@ -22487,6 +22493,9 @@ function zepStep(dt) { const Q = ZEP.on; if (!Q) return; Q.t += dt; const k = Q.
       else { const u = e((k - .5) * 2); x = rx + (x - rx) * u; z = rz + (z - rz) * u; y = P.y + (y - P.y) * u; h = hr + wrapAngle(h - hr) * u; } }
     if (Z.hull) { const sI = .25 + .75 * Math.min(1, k / .3), ctr = 2.6 + 4.9 * Math.min(1, k / .3); Z.hull.scale.y = sI; Z.hull.position.y = ctr - 7.5 * sI; }     // the envelope fills
     zepPose(Z, x, y, z, h);
+    for (const c of Z.coins || []) { if (c.t >= 0) continue; if (!whole) { c.y = -600; c.m.visible = false; continue; } const v = c.lp.clone(); Z.ship.localToWorld(v); c.x = v.x; c.y = v.y; c.z = v.z; c.m.position.set(v.x, v.y + Math.sin((c.ph || 0) * 2) * .12, v.z); c.m.visible = true; }
+    if (Z.tails) for (let k = 0; k < Z.tails.length; k++) Z.tails[k].rotation.x = .25 + Math.sin(Q.t * 3 + k * 1.3) * .25;     // RE-PASS 3: the streamers wave
+    if (whole && Z.stack && SPK.on && (Z.smT = (Z.smT || 0) - dt) <= 0) { Z.smT = .45; const v = Z.stack.clone(); Z.ship.localToWorld(v); smokeAt(v.x, v.y, v.z, .5, .8, [.62, .6, .58]); }
     if (!whole) { for (const R2 of Z.rings) R2.y = -600; if (Z.bar) { Z.bar.y = -600; Z.bar.top = -600; Z.bar.g.visible = false; } if (Z.tur && !Z.tur.dead) { Z.tur.y = -600; Z.tur.g.position.y = -600; } } else if (Z.bar) Z.bar.g.visible = true; Z.prop.rotation.z += dt * (Z.downT > 0 ? 2 : 6); Z.ship.rotation.z = (Z.sink || 0) * .035;
     if (Z.downT > 0 && Math.random() < dt * 8) { const v = new THREE.Vector3((Math.random() - .5) * 4, 7.5 + Math.random() * 2, (Math.random() - .5) * 14); Z.ship.localToWorld(v); smokeAt(v.x, v.y, v.z, 1.6, 1.8, [.3, .28, .27]); }
     if (Z.sl) { Z.sl.rotation.x = .35 + Math.sin(Q.t * .5 + P.ph * 9) * .3; Z.sl.rotation.z = Math.sin(Q.t * .37 + P.ph * 5) * .5; }     // the searchlight sweeps below
@@ -22514,7 +22523,7 @@ function zepHit(x, y, z, rad, dmg) { const Q = ZEP.on; if (!Q) return 0;
     Z.hc = Q.t + .25; Z.hp = (Z.hp == null ? ZEP.hp : Z.hp) - Math.max(.5, dmg || 1); spkBurst(x, y, z, 12, { col: [1, .8, .4], spread: 3, size: .1, life: .35 }); snd('thud', { g: .7, r: .7, x, z });
     if (Z.hp <= 0) { Z.hp = ZEP.hp; Z.downT = ZEP.downT; for (let k = 0; k < 4; k++) spkBurst(x, y, z, 24, { col: k % 2 ? [1, .55, .15] : [.9, .9, .85], spread: 7, size: .22, life: .8 }); snd('boom', { g: 1, r: .6, x, z }); camShake(.3); }
     return 1; } return 0; }
-function zepClear() { const Q = ZEP.on; if (!Q) return; if (Q.R) { const i = RESTORE.list.indexOf(Q.R); if (i >= 0) RESTORE.list.splice(i, 1); } for (const o of Q.ground || []) o.removeFromParent(); smashDrop(Q.landed); for (const Z of Q.zs) { const j = BDYN.indexOf(Z.deckB); if (j >= 0) BDYN.splice(j, 1); if (Z.tur) turretDrop(Z.tur); if (player.bar && player.bar.B === Z.bar) player.bar = null; } if (player.rope && Q.rings.includes(player.rope.R)) player.rope = null; bldClear(Q); ZEP.on = null; }
+function zepClear() { const Q = ZEP.on; if (!Q) return; for (const Z of Q.zs) for (const c of Z.coins || []) { const i = COIN.list.indexOf(c); if (i >= 0) COIN.list.splice(i, 1); } if (Q.R) { const i = RESTORE.list.indexOf(Q.R); if (i >= 0) RESTORE.list.splice(i, 1); } for (const o of Q.ground || []) o.removeFromParent(); smashDrop(Q.landed); for (const Z of Q.zs) { const j = BDYN.indexOf(Z.deckB); if (j >= 0) BDYN.splice(j, 1); if (Z.tur) turretDrop(Z.tur); if (player.bar && player.bar.B === Z.bar) player.bar = null; } if (player.rope && Q.rings.includes(player.rope.R)) player.rope = null; bldClear(Q); ZEP.on = null; }
 // m1152: THE FLYING SHIP HOUSE (BUILDINGS.md #10, pass 1) at (0, -40), floating. A junk-ship hull 21 m long hanging 3 m off the ground on three
 // glowing Jin engines, its deck at 6 m, a two-masted junk rig with battened sails, a DECKHOUSE at the stern (a door on its bow side, a curved
 // roof), and a long GANGPLANK up the starboard side from the ground. The hull bobs gently (picture only; the deck you stand on holds still).
