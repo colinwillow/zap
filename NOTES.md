@@ -395,6 +395,25 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
+## THE RE-PASS: THE WATCHTOWER IS AN ENEMY TOWER -- CLASSICAL AGAIN, AND IT COMES DOWN (m@X4@, WORKER A)
+
+His steer (relayed, then confirmed here): enemy buildings are FOR DESTROYING -- never fallen/restored, never floating; they keep their CLASSICAL
+Japanese base, embellished, not the hero kit; each is DESTRUCTIBLE TO THE GROUND (a sacred building raised in its place is a later system); the
+enemy PALETTE waits for his concept images. He picked "back to classical, destructible" for the Watchtower and "destructibility now, palette
+later" for the other enemy buildings.
+
+- **Back out the hero kit:** the tent cone is a four-panel TILED pagoda cap again (`korTentB` squared, still breakable to its rafters, corners
+  kicked up); box lanterns are red PAPER lanterns; the bunting is lamp CABLES (`bldCable`) to plain posts; the ship's-wheel winch a plain timber
+  drum. The painted timber, planks and sandstone stay until the palette.
+- **Back out the restoration:** no plate, no earth chunk, no crater; `lift` 0; it no longer answers SPAWN > BUILDINGS > STATE (no `rig` hook).
+- **DESTRUCTIBLE:** the restoration's pieces are used the other way. The tower stands whole (t = 1); each of the four corner POSTS takes
+  `WTOWER.postHp` (6) blows in `wtowerBreak` (a thud and splinters each, a lean and a crack when it is cut through); cut THREE and it COLLAPSES
+  (`restorePlay(R, 0)`, ~2.2 s): the decks, posts and cap come down round the ground floor in their fallen poses, the colour drains to rubble,
+  and everything up there stops being solid (the ride's up set parks). The ground floor stays, still breakable chunk by chunk. That is the L2
+  for an enemy tower: cut the legs.
+- **Measured headless:** 18 blows on three posts cut them, the goal went to 0, the deck colliders parked (-594); side renders of the standing
+  tower, mid-collapse, and the ground floor standing in its wreckage. Not signed off.
+
 ## THE RE-PASS: THE PAGODA RESTORES IN PLACE (m1518, WORKER A)
 
 Rubric 7 for a HERO building (his split, m1514): restored IN PLACE, no lift, no jets (the town's ground will do the rising).
