@@ -405,6 +405,16 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
+## THE RE-PASS: THE GREAT RED PAGODA, PASS 3 -- FEWER PIECES, A BALCONY REWARD (m@X4@, WORKER A)
+
+- **Pieces paired:** storeys 2-3 fly home together (`lo`, at .12) and 4-5 (`hi`, at .45), the spire last; measured 169 -> 158 draws (the four
+  new coins add 4). The rest is the many small attached parts (lanterns, the bell, streamers, halos) and the breakable ground floor, so ~40 is
+  out of reach for a building this size without merging those moving parts; noted, not forced.
+- **L1:** a DOUBLOON on every upper balcony (4, in the ride's up set: there only when it is whole; cleared from `COIN.list` with it). Its L1-L3
+  were already full from its first ten passes (ladders up through the hatches, eave-to-eave climbing, the guardians and archers, the armoury,
+  the gate and the gong).
+- With this it has its three re-pass passes; the last box is his OK. Not signed off.
+
 ## THE RE-PASS: THE GREAT RED PAGODA, PASS 2 -- RESTORES IN PLACE (m1524, WORKER A)
 
 A HERO building (his split), so rubric 7 the Pagoda's way: no lift, one set of pieces.
