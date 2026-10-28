@@ -26467,7 +26467,7 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
   const put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); const q = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(q.attributes)) if (k !== 'position' && k !== 'normal') q.deleteAttribute(k); MG.get(m).push(q); };
   const EM = enemyMats(), M = { slab: triMat('stone_blocks', { scale: 3, color: 0xa9a49c }), land: triMat('stone_blocks', { scale: 2.4, color: 0xc9c4ba }), wall: beaconRock(0xe8c49a, 0xc79a70, 0xf3dcbc),
     step: triMat('wood_timber', { scale: 2 }), mesa: beaconRock(0xc8744a, 0x94452c, 0xe0a070), lac: EM.lacquer, gold: EM.gold };
-  const [ox, oz] = BEACON.at, L = { g, O, bars, climbs, zips, rings: [], st: {}, log: [] };
+  const [ox, oz] = BEACON.at, L = { g, O, bars, climbs, zips, rings: [], st: {}, log: [], cps: [], cp: null };
   const sign = (txt, sub, x, y, z, s = 1) => { const cv = document.createElement('canvas'); cv.width = 512; cv.height = 150; const c = cv.getContext('2d'); c.fillStyle = 'rgba(10,12,18,.85)'; c.fillRect(0, 0, 512, 150);
     c.fillStyle = '#7affd8'; c.font = 'bold 50px sans-serif'; c.fillText(txt, 18, 60); c.fillStyle = '#fff'; c.font = '28px sans-serif'; c.fillText(sub, 18, 116);
     const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(cv), depthWrite: false })); sp.scale.set(5 * s, 1.46 * s, 1); sp.position.set(x, y, z); g.add(sp); };
@@ -26493,6 +26493,11 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
         const bm = new THREE.Mesh(new THREE.CylinderGeometry(.5, 1.1, 16, 12, 1, true).translate(0, 8, 0), new THREE.MeshBasicMaterial({ color: 0x7affd8, transparent: true, opacity: .35, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); bm.position.set(cx, y + 2, cz); g.add(bm); }     /* a 16 m column of light off the fire: seen over the shrine's climb from S and A */
       fl.position.set(cx, y + 1.2, cz); g.add(fl); L.flame = fl; L.brazier = { x: cx, y, z: cz }; O.boxes.push({ minx: cx - 1.6, maxx: cx + 1.6, miny: y, maxy: y + 1.2, minz: cz - 1.6, maxz: cz + 1.6, prop: 1 }); }
     const side = inDir ? [-inDir[1], inDir[0]] : [1, 0]; ladderUp(cx + side[0] * (h + .15), cz + side[1] * (h + .15), y, side);
+    if (!S.brazier) { const px = cx + side[0] * (h - 1.1) + side[1] * (h - 1.1), pz = cz + side[1] * (h - 1.1) - side[0] * (h - 1.1);     /* m15xx: the REST -- a stone bench and a checkpoint lantern on a post */
+      put(new THREE.BoxGeometry(.3, 1.6, .3).translate(px, y + .8, pz), M.step); put(new THREE.BoxGeometry(.7, .12, .7).translate(px, y + 1.66, pz), M.slab);
+      const bx = cx + side[0] * (h - 1.1), bz = cz + side[1] * (h - 1.1); put(new THREE.BoxGeometry(side[0] ? .6 : 2, .45, side[0] ? 2 : .6).translate(bx, y + .22, bz), M.slab);
+      const lm = new THREE.Mesh(new THREE.SphereGeometry(.3, 12, 8), new THREE.MeshStandardMaterial({ color: 0x55605c, roughness: .4, emissive: 0x000000 })); lm.position.set(px, y + 2.02, pz); g.add(lm);
+      L.cps.push({ id: S.id || S.st, x: cx, y, z: cz, h, lm, lit: 0 }); }
     const id = S.id || S.st; sign(id + '  ' + S.name, (y < .1 ? 0 : y).toFixed(1) + ' m' + (S.want !== undefined ? '  (sheet ' + S.want + ')' : ''), cx, y + 3.4, cz, 1.1); L.st[id] = { x: cx, y, z: cz, R }; L.log.push(id + ' ' + y.toFixed(1)); if (S.brazier) L.st.X = L.st[id]; return { x: cx, y, z: cz, h }; };
   // m1559: THE SHEET'S LAYOUT (his third sheet, `beacon_grid.jpg`, the first with a metre grid). Stations sit at the sheet's (x, z) -- `g`, read
   // off its top-down plan, north up, z counted DOWN the page -- and each run is FITTED between two of them: an L (the longer axis first, unless
@@ -26518,7 +26523,7 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
     fit.push(S.id + T.id + ' ' + (L1 + L2).toFixed(0) + 'm/' + (s1 + s2).toFixed(0) + (short < -.05 ? ' SHORT' : '')); }
   L.fit = fit;
   { const xs = Object.values(L.st).map(q => q.x), zs = Object.values(L.st).map(q => q.z), x0 = Math.min(...xs) - 75, x1 = Math.max(...xs) + 75, z0 = Math.min(...zs) - 75, z1 = Math.max(...zs) + 75;     // the canyon floor, under it all
-    put(new THREE.BoxGeometry(x1 - x0, .1, z1 - z0).translate((x0 + x1) / 2, .02, (z0 + z1) / 2), triMat('sandstone', { scale: 9, color: 0xe0b48a })); }
+    put(new THREE.BoxGeometry(x1 - x0, .1, z1 - z0).translate((x0 + x1) / 2, .02, (z0 + z1) / 2), triMat('sandstone', { scale: 9, color: 0xe0b48a })); L.bounds = [x0 + 25, x1 - 25, z0 + 25, z1 - 25]; }
   // m1555: THE CANYON (pass 2). Sandstone mesas on an 8 m lattice round the route, never within `clear` of it (plan distance to every route box and
   // zip line), stepped in two or three tiers; near the route they stand a few metres over the route's own height (walls to run between), further
   // out they are the canyon's walls (22-52 m). Low along the sight line from the start to the brazier, so the tower is seen from S.
@@ -26557,7 +26562,15 @@ function beaconBuild() { BEACON.want = 0; if (BEACON.on) return; const g = new T
   for (const b of O.boxes) BOXES.push(b); boxGrid(); BEACON.on = L; bldXrayTag(g);
   { const S = L.st.S, p = player; p.pos.set(S.x, .05, S.z); p.vel.set(0, 0, 0); const n = L.st.A || S; p.faceH = p.heading = Math.atan2(n.x - S.x, n.z - S.z); arenaBeam(S.x, S.z, [.48, 1, .85], 1); }
   console.log('[melee] the first beacon: ' + nChunks + ' chunks, stations ' + L.log.join(' | ') + ', runs ' + (L.fit || []).join(', ') + ', ' + (L.mesas || 0) + ' mesas, ' + O.boxes.length + ' boxes, ' + climbs.length + ' ladders (' + (L.audit ? L.audit.laddersAdded : 0) + ' for falls), headroom ' + (L.audit && L.audit.headroom.length ? L.audit.headroom.length + ' BAD' : 'ok') + ', sees the tower: ' + (L.audit ? L.audit.sees.join(' ') : '?') + ', ' + zips.length + ' zips'); }
-function beaconStep(dt) { const L = BEACON.on; if (!L || !L.flame) return; const t = performance.now() * .001; L.flame.scale.set(1 + Math.sin(t * 9) * .08, 1 + Math.sin(t * 7.3) * .14, 1 + Math.cos(t * 8.1) * .08); }
+// m15xx: CHECKPOINTS. Standing on a station lights its lantern mint (a chime, a burst) and makes it the checkpoint; leaving the canyon (out past its
+// walls, or below the floor) puts him back on the last one lit. The start is lit from the first frame.
+function beaconStep(dt) { const L = BEACON.on; if (!L) return; const t = performance.now() * .001, p = player;
+  if (L.flame) L.flame.scale.set(1 + Math.sin(t * 9) * .08, 1 + Math.sin(t * 7.3) * .14, 1 + Math.cos(t * 8.1) * .08);
+  for (const C of L.cps) { if (C.lit) { C.lm.material.emissiveIntensity = 1.6 + Math.sin(t * 3 + C.x) * .4; continue; }
+    if (Math.abs(p.pos.x - C.x) < C.h && Math.abs(p.pos.z - C.z) < C.h && Math.abs(p.pos.y - C.y) < .8) { C.lit = 1; L.cp = C; C.lm.material.color.setHex(0x7affd8); C.lm.material.emissive.setHex(0x7affd8);
+      if (t > (L.t0 || 0) + .5) { spkBurst(C.lm.position.x, C.lm.position.y, C.lm.position.z, 18, { col: [.48, 1, .85], spread: 2, size: .16, life: .9 }); snd('ready', { g: .5 }); } } }
+  if (!L.t0) L.t0 = t;
+  const B = L.bounds; if (L.cp && B && (p.pos.x < B[0] || p.pos.x > B[1] || p.pos.z < B[2] || p.pos.z > B[3] || p.pos.y < -8)) { const C = L.cp; p.pos.set(C.x, C.y + .05, C.z); p.vel.set(0, 0, 0); arenaBeam(C.x, C.z, [.48, 1, .85], 1); } }
 const COURT = { scale: 1.5, at: [0, 150], hw: 28, hd: 32, wallH: 4, walk: 2.6, gate: 6, on: null };
 function courtBuild() {
   // STEER S2 (his, after walking X4: *"increase the scale... 1.5... we need room to play"*): the court is DESIGNED in the old numbers and BUILT

@@ -23,7 +23,7 @@ then the level is GENERATED from `BEACON.plan` in index.html.
 - [ ] the four beats of the wall jump feel right (taught safe, developed, twisted, concluded)
 - [x] fail forward (m1562): every walkway over 2 m has a ladder from the floor within 16 m (`ladderR`); 12 added by the audit, 18 in all
 - [x] headroom (m1562): the audit checks the 2.2 m over every walking surface -- found the drop into the court and the wall-jump climb sharing one line north of B, and the finale chimney's wall on the zip landing's edge; both re-routed, now 0
-- [ ] rests and checkpoints at the stations
+- [x] rests and checkpoints (m15xx): every station but the brazier has a stone bench and a lantern on a post; standing on it lights the lantern mint (chime, burst) and makes it the checkpoint; leaving the canyon (past its walls, or under the floor) returns him to the last one lit. Measured headless: S lit at spawn, the rest unlit, cp = S. Not yet exercised by walking out
 - [ ] **his sign-off on his phone**
 
 ## Layers 2-5 (not before layer 1 is signed)
