@@ -11,8 +11,8 @@ leaping fish (`ghomeFish`, pass 21) used `TAU`, which is local to the BUILDERS, 
 timer comes round (~seconds in), so `check:worlds`' 8 frames never reach it. Every time a fish leapt, the frame threw. Fixed (Math.PI * 2).
 A scan of every top-level function for a `TAU` with no local declaration finds no other. Lesson for the boot gate: a throw behind a timer
 needs frames, not a boot -- the headless walk (scratchpad `hcrash.mjs`, 1500 stepped frames) found it in one run.
-## m15xx -- THE DRAGON'S CONTROLS, his map (DOCKET 4)
-## m15xx -- THE DRAGON FLIES: the lightning dragon's flight on his body, his wings flapping in code (DOCKET 5)
+## m1673 -- THE DRAGON'S CONTROLS, his map (DOCKET 4)
+## m1673 -- THE DRAGON FLIES: the lightning dragon's flight on his body, his wings flapping in code (DOCKET 5)
 His: *"the fly sequence is not working -- it's him on flat ground going up and coming back down, clipped; it's not a loop, he doesn't even look
 like he's in the air. Steal from the lightning dragon or hand-animate: an air idle with the legs not on the ground, a looping wing flap; a dive,
 wings back; banks, one wing tucked; dynamic tail and wings."*
