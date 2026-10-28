@@ -9517,7 +9517,7 @@ function arenaDoorGlowMat() {     // the back of the tunnel: red light rising fr
 }
 function arenaDoorPick() {     // the free portal nearest where the camera is looking
   const Z = ARENA.door, v = camera.getWorldDirection(new THREE.Vector3()), c = Math.atan2(v.x, v.z); let best = -1, bd = 9;
-  for (let k = 0; k < 4; k++) { if (Z.busy[k]) continue; const dd = Math.abs(wrapAngle(k * Math.PI / 2 - c)); if (dd < bd) { bd = dd; best = k; } }
+  for (let k = 0; k < 4; k++) { if (Z.busy[k]) continue; const dd = Math.abs(wrapAngle(k * Math.PI / 2 + (Z.aOff || 0) - c)); if (dd < bd) { bd = dd; best = k; } }
   return best;
 }
 // its speed: the clips are authored in place (no root motion to read), so it is the PLANTED FOOT's speed, `gaitMeasure`'s method
@@ -9547,8 +9547,8 @@ function arenaStomp(d, clip, k) {     // two footfalls a cycle: a thud, dust, a 
 }
 function arenaLeapClip(d) { const K = d.K; return d.actions.enter_leap ? 'enter_leap' : K.leap && d.actions[K.leap.clip] ? K.leap.clip : ''; }
 function arenaEnter(d, dt, t) {
-  const Z = ARENA.door, K = d.K, L = d.root, a = d.door * Math.PI / 2, sx = Math.sin(a), sz = Math.cos(a), FY = ARENA.lab.floorY, W = ARENA.r + 2.2;
-  const r = Math.hypot(L.position.x, L.position.z), yAt = r => r > 33.8 ? 0 : r > W + 1.4 ? FY : r > W ? -.15 : 0;
+  const Z = ARENA.door, K = d.K, L = d.root, a = d.door * Math.PI / 2 + (Z.aOff || 0), sx = Math.sin(a), sz = Math.cos(a), FY = ARENA.lab.floorY, W = ARENA.r + 2.2;
+  const r = Math.hypot(L.position.x, L.position.z), yAt = r => DOJO.on ? 0 : r > 33.8 ? 0 : r > W + 1.4 ? FY : r > W ? -.15 : 0;
   d.h = a + Math.PI; if (d.bar) d.bar.g.visible = false;
   if (d.st === 'doorWait') { t[K.clips.idle] = 1; L.position.y = 0; if (d.t > Z.openT * .75) { d.st = 'doorWalk'; d.t = 0; } return true; }
   if (d.st === 'doorWalk') {
@@ -10387,8 +10387,8 @@ function dojoBuild(g, W) {
   // THE ROOT: the platform's underside, a rough rock cone down into the air, with a few rocks hanging off it
   isl({ R: W + 3.2, depth: 30, seed: 3, detail: 5, flat: .12, lobes: 4 }, 0, -.75, 0, { cherry: 0, pine: 0, rocks: 5, shrubs: 14, roots: 26, seed: 3, clear: W + 1.8 });     /* the platform's own island: grass and shrubs round the dais, roots off its rim */
   // THE RAIL: red lacquer posts round the rim, a timber top rail (the invisible wall is still what holds him)
-  for (let i = 0; i < 48; i++) { const a = i / 48 * Math.PI * 2, [x, z] = at(a, W + 1.15); put(new THREE.BoxGeometry(.22, 1.1, .22).translate(x, .55, z), M.red); if (i % 6 === 0) put(new THREE.BoxGeometry(.32, .14, .32).translate(x, 1.17, z), M.gold); }
-  { const rg = new THREE.TorusGeometry(W + 1.15, .08, 6, 128).rotateX(Math.PI / 2).translate(0, 1.08, 0); put(rg, M.timber); }
+  const gG = .17; for (let i = 0; i < 48; i++) { const a = i / 48 * Math.PI * 2, [x, z] = at(a, W + 1.15); { const u = a - Math.PI / 4; if (Math.abs(u - Math.round(u / (Math.PI / 2)) * Math.PI / 2) < gG + .02) continue; } put(new THREE.BoxGeometry(.22, 1.1, .22).translate(x, .55, z), M.red); if (i % 6 === 0) put(new THREE.BoxGeometry(.32, .14, .32).translate(x, 1.17, z), M.gold); }
+  for (let m = 0; m < 4; m++) { const rg = new THREE.TorusGeometry(W + 1.15, .08, 6, 32, Math.PI / 2 - 2 * gG).rotateZ(Math.PI / 4 + gG + m * Math.PI / 2).rotateX(Math.PI / 2).translate(0, 1.08, 0); put(rg, M.timber); }     /* m1429: open at the gates */
   // THE SWORD ALTARS (N and S), hovering high over the rim: a stone disc, a red rack with three katanas, a two-tier roof, lanterns
   D.altars = []; D.boxes = []; D.W = W;
   for (const a of [0, Math.PI]) { const [x, z] = at(a, D.altarR), y = D.altarY, face = a + Math.PI;
@@ -10450,6 +10450,19 @@ function dojoBuild(g, W) {
     D.torii.push([cx, H + .6, cz]); }
   for (const a of [Math.PI / 2, -Math.PI / 2]) { const [mx, mz] = at(a, D.mastR), top = [mx, D.mastH - 1.2, mz];
     for (const T of D.torii) { const d = Math.hypot(T[0] - mx, T[2] - mz); if (d > 22) continue; korBunting(put, K, top, T, 16, 2.2); } } }
+  // m1429: THE GATES ARE ENTRANCES. Outside each gate a floating stone LANDING on its own island, joined to the rim by a timber BRIDGE
+  // (iron-banded, rope rails); the rail is open there. A boss now arrives ON a landing in a burst of Jin, crosses the bridge, walks in
+  // through the gate, taunts just inside it and leaps into the ring -- the lab's DOORS entry turned to the dojo's diagonals (`ARENA.door.aOff`).
+  { const K = korMats(); Object.assign(ARENA.door, { aOff: Math.PI / 4, r0: W + 8.6, rTaunt: W - .8, rLand: 7 });
+    for (let k = 0; k < 4; k++) { const a = Math.PI / 4 + k * Math.PI / 2, [lx, lz] = at(a, W + 8.6), ya = a;
+      put(new THREE.CylinderGeometry(4.2, 3.9, .6, 28).translate(lx, -.3, lz), M.stone); put(new THREE.CylinderGeometry(4.25, 4.25, .12, 28, 1, true).translate(lx, -.06, lz), M.gold);
+      isl({ R: 5.2, depth: 9 + k, seed: 90 + k, detail: 4, flat: .1, lobes: 2 }, lx, -.65, lz, { cherry: 0, pine: 0, rocks: 2, shrubs: 6, roots: 10, seed: 90 + k, clear: 4.4 });
+      for (const sd of [-1, 1]) { const lat = sd * 3.2, [px, pz] = [lx + Math.cos(a) * lat * -1, lz + Math.sin(a) * lat]; korLantern(put, K, px, 0, pz, 1); }
+      const r0 = W + 1.3, r1 = W + 4.6, [bx, bz] = at(a, (r0 + r1) / 2), Lb = r1 - r0;
+      put(new THREE.BoxGeometry(3.4, .22, Lb).rotateY(ya).translate(bx, -.11, bz), M.plank);
+      for (let j = 0; j < 4; j++) { const [jx, jz] = at(a, r0 + .4 + j * (Lb - .8) / 3); put(new THREE.BoxGeometry(3.6, .1, .18).rotateY(ya).translate(jx, .02, jz), K.iron); }
+      for (const sd of [-1, 1]) { const ox = Math.cos(a) * 1.7 * sd, oz = -Math.sin(a) * 1.7 * sd, [p0x, p0z] = at(a, r0), [p1x, p1z] = at(a, r1);
+        korPost(put, K, p1x + ox, 0, p1z + oz, 1.3, .12); korRod(put, K.timber, [p0x + ox, 1, p0z + oz], [p1x + ox, 1.1, p1z + oz], .05); } } }
   D.lamps = [];
   // m1408: the floor's CREST is HIS emblem now -- the ship's square spiral, cream on red, in a gold ring (not a borrowed mitsudomoe)
   { const cv = document.createElement('canvas'); cv.width = cv.height = 512; const c = cv.getContext('2d'), C = 256; c.clearRect(0, 0, 512, 512);
@@ -10611,7 +10624,7 @@ function dojoBuild(g, W) {
     gr.addColorStop(0, 'rgba(255,240,215,1)'); gr.addColorStop(.12, 'rgba(255,214,160,.85)'); gr.addColorStop(.35, 'rgba(255,160,110,.28)'); gr.addColorStop(1, 'rgba(255,140,120,0)'); gx.fillStyle = gr; gx.fillRect(0, 0, 256, 256);
     const gt = new THREE.CanvasTexture(gc); gt.colorSpace = THREE.SRGBColorSpace; const sg = new THREE.Sprite(new THREE.SpriteMaterial({ map: gt, blending: THREE.AdditiveBlending, depthWrite: false, fog: false, transparent: true }));
     sg.scale.setScalar(320); sg.renderOrder = -1; sg.frustumCulled = false; g.add(sg); D.sunG = { m: sg, d: sd.clone() }; }
-  D.on = { g }; ARENA.door.entry = 'BEAM'; }
+  D.on = { g }; }     /* m1429: the entry is his TOOLS > ENTRY again -- DOORS (the default) = through the gates */
 let _dcM = null;
 function dojoStep(dt) { const D = DOJO; if (!D.on) return; D.t += dt; D.U.uTime.value = D.t; D.dome.position.copy(camera.position);
   // m1401: OFF THE EDGE. The world has a floor at y 0 everywhere, so past the rim he would stand on the sky. Out there and down at y 0, he has
@@ -10950,7 +10963,7 @@ async function arenaSpawn(key) {
   try {
     const K = await arenaLoad(key);
     const door = ARENA.door.entry === 'DOORS' && !A.civ ? arenaDoorPick() : -1;
-    let [x, z] = ARENA.spawnAt; if (door >= 0) { const a = door * Math.PI / 2; x = Math.sin(a) * ARENA.door.r0; z = Math.cos(a) * ARENA.door.r0; }
+    let [x, z] = ARENA.spawnAt; if (door >= 0) { const a = door * Math.PI / 2 + (ARENA.door.aOff || 0); x = Math.sin(a) * ARENA.door.r0; z = Math.cos(a) * ARENA.door.r0; }
     if (door < 0) arenaBeam(x, z, A.beam, 1);
     const d = bodySpawn(K.P, K, x, z, 0);
     arenaArm(d); arenaArmour(d);
@@ -10959,7 +10972,7 @@ async function arenaSpawn(key) {
     d.arena = 1; d.st = 'beamIn'; d.t = 0; d.aggro = 1; arenaJit(d);
     d.h = Math.atan2(player.pos.x - x, player.pos.z - z);
     d.root.visible = false;
-    if (door >= 0) { d.entering = 1; d.door = door; d.st = 'doorWait'; d.h = door * Math.PI / 2 + Math.PI; d.root.visible = true; d.root.position.y = 0; ARENA.door.want[door] = 1; ARENA.door.busy[door] = 1; }
+    if (door >= 0) { d.entering = 1; d.door = door; d.st = 'doorWait'; d.h = door * Math.PI / 2 + (ARENA.door.aOff || 0) + Math.PI; if (DOJO.on) for (let i = 0; i < 3; i++) spkBurst(x, 1 + i * .8, z, 22, { col: JIN.col, spread: 3, size: .3, life: 1.3 }); d.root.visible = true; d.root.position.y = 0; ARENA.door.want[door] = 1; ARENA.door.busy[door] = 1; }
     actionCam(door >= 0 ? { obj: d.root, y: K.h * .6, until: () => !d.entering, after: 1 } : { obj: d.root, y: K.h * .6, dur: ARENA.beamT + 1.4 });     // m1083
     ARENA.live.push(d);
   } catch (e) { console.error('[melee] arena spawn', e); note('ARENA ' + key + ' FAILED'); }

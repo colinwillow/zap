@@ -64,8 +64,9 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 - [x] **pass 9 (m1422, his: THE JIN GLOW):** the mint Jin essence (KORAJIN.md): 30 floating JIN CANDLES round the rim, the pagoda island's spring pours Jin, and the katana's trail is Jin and sheds motes (TOOLS > TRAIL)
 - [ ] pass 6b (his, after m1403):
   - the scene: his SHIP in the background, smaller flying ships, AIR CREATURES (one at a time: an alien whale, a manta, a serpent-dragon), and waterfalls off the big islands
-- [ ] pass 8:
-  - the gates as ENTRANCES: bosses walk in through a torii (a DOORS entry for the dojo)
+- [x] **pass 10 (mXXXX):** the gates are ENTRANCES. A floating stone landing outside each gate, a timber bridge, and the rail open there. A boss arrives on a landing in a burst of Jin, crosses, walks in through the gate, taunts and leaps in (TOOLS > ENTRY: DOORS; BEAM is the old drop-in)
+- [ ] pass 8 (rest):
+  - ~~the gates as ENTRANCES~~: bosses walk in through a torii (a DOORS entry for the dojo)
   - something AT the altars: take a katana from the rack, a chime, a glint on the blade
   - lit lanterns at dusk
 - [ ] pass 4: life: birds, light shafts, the clouds moving under you, training marks on the floor

@@ -29,6 +29,14 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - The orb's chain, bands, orb and tassel moved from `pend` into a child group `GHOME.hang`. The winch pays it out: `hang.position.y = -drop`, with `drop` eased toward `dropT` at 1.7 m/s. A cable (a unit iron cylinder, scaled to `drop`) fills the gap between the boom's tip and the chain. That is one more mesh, outside the merged buckets.
 - A blow within .8 + rad of the winch drum (`GHOME.winch`, world) flips `dropT` between 0 and `dropMax` (the tip's height minus the chain minus 3 m, so the orb comes down to about 3 m and is in reach of a jump-slash). Clang and sparks on the strike, a thud and a small nudge when it arrives.
 - The pendulum's spring is now g / (2.25 + drop), so a lowered orb swings slower and wider, the way a longer pendulum does. The orb's hit sphere follows the drop (and is 1.0 + rad now).
+## THE DOJO, PASS 10: THE GATES ARE ENTRANCES (mXXXX)
+- **The lab's DOORS entry, turned to the dojo's gates.** `ARENA.door.aOff` (PI/4 in the dojo, 0 in the lab) is added everywhere a door angle was `k * PI/2`: `arenaSpawn` x2, `arenaEnter`, `arenaDoorPick`. In the dojo, `r0` is W+8.6 (the landing), `rTaunt` W-.8 (just inside the gate) and `rLand` 7. `yAt` is 0 in the dojo, which has one floor height.
+- **dojoBuild no longer forces BEAM.** TOOLS > ENTRY is his again, and DOORS is the default.
+- **The landings:** a stone disc on its own island at W+8.6 with a bronze band and two box lanterns, joined to the rim by a 3.3 m iron-banded plank bridge with rope rails on posts. The rail posts skip within .19 rad of a gate, and the timber rail is four `TorusGeometry` arcs instead of one ring.
+- **The rim's invisible wall is unchanged,** so HE cannot walk out onto a landing. They are the bosses' way in.
+- **The arrival:** three stacked mint `spkBurst`s at the landing (Jin, KORAJIN.md). The walk, taunt and leap are the lab's own states.
+- **Not seen yet:** an actual boss walking it. Spawn one from the arena's menu with ENTRY on DOORS.
+
 ## THE BOOT GATE NEVER BUILT A WORLD PAST `init()`'s AWAITS -- NOW IT BUILDS THE HOME (m1427)
 Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while ghomeBuild was throwing."* There were two holes, and the second was bigger:
 - **The throw is caught.** `buildHome` logs `HOME BUILD THREW` and carries on. Now every logged line containing THREW fails the gate.
