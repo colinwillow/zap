@@ -20447,7 +20447,7 @@ function bldDrone(g) {
 // lifted). A plank RAMP wraps the OUTSIDE, one side at a time, 1.6 m up each side, a landing at each corner: two sides to the first deck,
 // four to the second, six to the lookout (walkable surfaces, `bldTris`). A drone orb circles the cap; cables run from the eaves down to
 // stakes in the ground, lamps hung on them; lanterns at the deck corners.
-const WTOWER = { at: [-24, -12], scale: 1.5, hs: 3, storey: 4, ro: 3.95, rw: .65, beaconT: 40, lift: 4.5, on: null };     // m1512: `lift` m it floats when restored     // m1121: bigger (his: *"large scale, everything is big"*)
+const WTOWER = { at: [-24, -12], scale: 1.5, hs: 3, storey: 4, ro: 3.95, rw: .65, beaconT: 40, lift: 8, on: null };     // m1512: `lift` m it floats when restored     // m1121: bigger (his: *"large scale, everything is big"*)
 function wtowerBuild() {
   // STEER S2 (x1.5, m1342): the plan, the storeys, the ramp's ring and width scale (hs 4.5, storeys 6 m -- the lookout at 18 -- the ramp a
   // 2 m wide spiral at 5.9 m out, each flight 3 m up over ~9.8 m, about 17 deg); the door 2.4 m; what is his size stays.
@@ -20638,17 +20638,19 @@ function wtowerBuild() {
   const skip = new Set([drone, ...Object.values(pieces), ...(W.kites || []).flatMap(K2 => [K2.kt, K2.ln]), ...coins.map(c2 => c2.m), lad.m, lad.roll]), wb = new THREE.Box3(), wc = new THREE.Vector3(), ws = new THREE.Vector3();
   for (const o of g.children.slice()) { if (skip.has(o)) continue; wb.setFromObject(o); if (wb.isEmpty()) continue; wb.getCenter(wc); wb.getSize(ws); const k = cls(wc, ws); if (k && pieces[k]) pieces[k].attach(o); }
   if (pieces.d2) { pieces.d2.attach(lad.m); pieces.d2.attach(lad.roll); }
-  // the JETS: four bronze pods under the plinth, a mint flame each
-  { const pod = new THREE.MeshStandardMaterial({ color: 0xc8963c, metalness: .8, roughness: .35, emissive: 0x3aa088, emissiveIntensity: .9 }), glowM = new THREE.MeshBasicMaterial({ color: 0x7affd8, toneMapped: false, transparent: true, opacity: .9, blending: THREE.AdditiveBlending, depthWrite: false });
-    for (const [sx, sz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) { const pd = new THREE.Mesh(new THREE.CylinderGeometry(.7, .95, 1.3, 14), pod); pd.position.set(cx + sx * (hs - .6), -.55, cz + sz * (hs - .6)); g.add(pd);
-      const f = new THREE.Mesh(new THREE.ConeGeometry(.6, 3.2, 12, 1, true).rotateX(Math.PI).translate(0, -2.8, 0), glowM); f.position.set(cx + sx * (hs - .6), 0, cz + sz * (hs - .6)); g.add(f); R.jets.push(f); } }
+  // m@X4@ (his correction: *"they're not gonna go up onto jets -- the ground under them breaks off, a chunk of earth breaks out of the ground and
+  // they float... the ground will be flying"*): the EARTH UNDER IT is what rises -- a chunk of ground (`floatIsland`: grass top, banded rock
+  // under it) sits just below the surface when fallen, and when restored it tears out of the dirt carrying the tower, leaving a CRATER
+  { const I = floatIsland({ R: hs + 1.4, depth: 7.5, seed: 21, detail: 4, flat: .7, lobes: 3 }), chunk = new THREE.Mesh(I.geo, isl3Mat()); chunk.position.set(cx, -.06, cz); chunk.castShadow = chunk.receiveShadow = true; g.add(chunk); W.chunk = chunk;
+    const crater = new THREE.Mesh(new THREE.CircleGeometry(hs + 2.2, 28).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x3a2c22, roughness: 1 })); crater.position.set(cx, .03, cz); scene.add(crater); W.ground.push(crater); W.crater = crater;
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(hs + 2.3, .35, 6, 28).rotateX(Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x6a5240, roughness: 1, flatShading: true })); rim.scale.y = .5; rim.position.set(cx, .05, cz); scene.add(rim); W.ground.push(rim); W.craterRim = rim; }
   restoreSkin(R);
   // the colliders that ride
   const tb = [], tu = []; for (const k of O.tri || []) { const t = k.split(',').map(Number); (Math.max(t[1], t[4], t[7]) <= S + .02 ? tb : tu).push(t); } bldTrisDrop(O);
   const onGround = b2 => Math.hypot((b2.minx + b2.maxx) / 2 - cx, (b2.minz + b2.maxz) / 2 - cz) > hs + 1.6 && b2.maxy < 2.6, isBase = b2 => b2.maxy <= S - .15 && b2.maxy - b2.miny < S * 2;
   restoreRide(R, { base: { boxes: O.boxes.filter(b2 => isBase(b2) && !onGround(b2)), tris: tb },
     up: { boxes: O.boxes.filter(b2 => !isBase(b2) && !onGround(b2)), tris: tu, climbs: [], bars: wbars.slice(0, 3), rings, coins, objs: [drone, sl, core, ...(W.kites || []).flatMap(K2 => [K2.kt, K2.ln])] } });
-  R.onSet = R2 => restoreRideSet(R2);
+  R.onSet = R2 => { restoreRideSet(R2); const torn = R2.t > .45; W.crater.visible = W.craterRim.visible = torn; };     // the crater shows once the ground has torn out
   // the PLATE that starts it, on the ground by the west corner
   { const plate = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, .12, 24), new THREE.MeshStandardMaterial({ color: 0x3a4a46, emissive: 0x7affd8, emissiveIntensity: .7 })); plate.position.set(cx - hs - 6, .06, cz + hs + 4); scene.add(plate); W.ground.push(plate);
     R.trig = { x: cx - hs - 6, y: 0, z: cz + hs + 4, armed: 1 }; }

@@ -378,6 +378,21 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
+## THE RE-PASS: THE GROUND RISES, NOT THE BUILDING -- NO JETS (m@X4@, WORKER A)
+
+His correction: *"they're not gonna go up onto jets -- the ground under them breaks off, a chunk of earth breaks out of the ground and they
+float... some buildings will fly that are set up like ships, but whole swaths of earth will float up into the sky, and the buildings on them
+won't have to fly. It's not like every building flies... a giant town goes up into the sky, breaks off the Earth, and the town goes from
+decrepit to alive."* And: the Watchtower is an ENEMY tower, so it will not be restored in the game; finish it as a test.
+
+- **The Watchtower test:** the four jet pods are gone. A chunk of EARTH (`floatIsland`, grass top, banded rock under it, R = hs + 1.4, 7.5 m
+  deep) sits just under the surface when fallen, and on restore it tears out of the dirt carrying the tower up 8 m (`WTOWER.lift`), leaving a
+  dark CRATER with a raised rim on the ground (shown once t > .45). The pieces still fly home and the colour still floods; only the lift is
+  different. Headless renders: the tower riding the chunk over its crater, and mid-show the chunk just breaking out.
+- **What it means for the re-pass (rubric 7 rewritten):** ships fly; places do not. A town's ground rises as a whole (a later, town-scale
+  system), and a building on it restores IN PLACE -- pieces back, colour back, lamps and Jinra on -- with no lift of its own. Enemy buildings
+  (the enemy grammar, ARCHITECTURE.md) are not restored at all. Which forge buildings are hero/town and which are enemy is his call.
+
 ## THE RE-PASS: THE WATCHTOWER IS RESTORABLE -- ONE SET OF PIECES, ANIMATED, AND IT FLOATS (m1512, WORKER A)
 
 His (relayed, then confirmed here): FALLEN versus RESTORED is PHYSICAL -- *"the opposite of fallen is literally lifted into the air, floating on
