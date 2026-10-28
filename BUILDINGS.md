@@ -221,10 +221,16 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
 
 ## FALLEN / RESTORED (his, after m1495; KORAJIN.md "THE RESTORATION") -- every Red Hollows piece has two states, default FALLEN
 *"Everything's gonna be fallen."* One build, one switch, and it is **main's `AGE` (m1501)**: **SPAWN > BUILDINGS > STATE** (in the Red Hollows it reloads), saved as `mel.age`, **FALLEN unless RESTORED was chosen**; `?hs=restored|fallen` for a look.
-- [x] **pass 1 (next tick):** the state (`hsF()` reads `AGE.st`), and `hsFallen(g)` (main's `bldAge`) weathering every material of the home, the merchant, the mill,
+- [x] **pass 1 (m1508):** the state (`hsF()` reads `AGE.st`), and `hsFallen(g)` (main's `bldAge`) weathering every material of the home, the merchant, the mill,
   the peak and the refinery (desaturated to dust, metal to rust, every glow out, glass emptied); FALLEN: the home's fires and lights out and
   no smoke, the mill's wheel and sails still, no water poured; the lookout's brazier cold; the Jinra refinery NOT afloat: sunk on the
   mountain's flank (40 m), no Jinra fall, no motes, no floating stones. RESTORED is everything as built.
+- **His clarification (after m1508):** restoration is NOT every building flying. Most REVIVE in place (pieces fly back, colour floods back,
+  glow and machines come on); whole CHUNKS OF EARTH break off and float with what stands on them; ship-like buildings fly. So: the home, the
+  mill and the merchant revive; the Jinra refinery's piece of mountain is the earth chunk that lifts.
+- [x] **the home, live (next tick):** ONE set of pieces, animated by main's RESTORE kit -- nine chunks (hall, crown, tower, turret, store,
+  both stalls, the front frame, the crane) slumped, tilted and toppled when FALLEN; step on the MINT PLATE by the steps and they fly home
+  one after another, the colour comes back, the lanterns light and the smoke starts (step again: it falls). Still one draw per look.
 - [ ] pass 2: real ruin in FALLEN (broken and missing boards, torn cloth, rust streaks, collapsed bits, dust) and the RESTORED extras
   (the stream glowing mint, the mill turning on Jinra, the floating pieces bobbing, warm lanterns)
 - [ ] pass 3: the TURN between them as a moment (the restoration happening, not a reload), when he says how it is earned

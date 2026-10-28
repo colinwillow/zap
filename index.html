@@ -65007,7 +65007,7 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 try { const q = new URLSearchParams(location.search).get('hs'); if (q === 'restored' || q === 'fallen') AGE.st = q; } catch (e) {}     // the state is main's AGE (m1501); `?hs=` overrides for a look
 const hsF = () => AGE.st === 'fallen';
 function hsFallen(g) { if (!g || !hsF()) return; bldAge(g); }     // main's weathering (`bldAge`, m1501): the paint drained in the shader, metal to rust, glows out
-const GHOME = { on: 1, pass: 25, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
+const GHOME = { on: 1, pass: 26, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   Rtu: 2.5, door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
@@ -65092,6 +65092,25 @@ function ghomeHit(x, y, z, rad) { if (!GHOME.g || !inHome()) return 0; const w0h
   { const C = GHOME.canoe; if (C && GHOME.sw && GHOME.sw.hc <= 0 && Math.hypot(x - C.x, z - C.z) < 2.6 + rad && y < GHOME.g.position.y + C.y + 2) { C.kv += (Math.random() < .5 ? -1 : 1) * 1.1; GHOME.sw.hc = .3; snd('thud', { g: .7, r: 1.1, x: C.x, z: C.z }); spkBurst(x, y, z, 10, { col: [.85, .93, 1], spread: 3, size: .08, life: .4 }); return 1; } }     // pass 21: a blow rocks the canoe
   if (GHOME.bellT <= 0) for (const B of GHOME.bellPts || []) if (Math.hypot(x - B[0], y - B[1], z - B[2]) < .4 + rad) { GHOME.bellT = .15; snd('clang', { g: .55, r: 2.1 + Math.random() * .4, x: B[0], z: B[2] }); spkBurst(B[0], B[1], B[2], 8, { col: [1, .85, .4], spread: 2, size: .07, life: .35 }); return 1; }
   return 0; }
+// THE RESTORATION's rig for him: a stand-in Object3D per chunk (the RESTORE kit poses those), copied every frame into `chU` as
+// T(stand-in) R(stand-in) T(-pivot); every material learns `aChunk` (its own onBeforeCompile kept); colour floods from rust; the plate by the steps
+function ghomeRestoreRig(MG) { const A = GHOME, N = A.chNames.length, U = A.chU = { value: [] }; for (let k = 0; k < N; k++) U.value.push(new THREE.Matrix4());
+  for (const m of MG.keys()) { const ob = m.onBeforeCompile, ok = m.customProgramCacheKey;
+    m.onBeforeCompile = (sh, r) => { if (ob) ob.call(m, sh, r); sh.uniforms.uCh = U; sh.vertexShader = 'attribute float aChunk;\nuniform mat4 uCh[' + N + '];\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n  transformed = (uCh[int(aChunk + .5)] * vec4(transformed, 1.)).xyz;');
+      if (sh.vertexShader.includes('#include <beginnormal_vertex>')) sh.vertexShader = sh.vertexShader.replace('#include <beginnormal_vertex>', '#include <beginnormal_vertex>\n  objectNormal = mat3(uCh[int(aChunk + .5)]) * objectNormal;'); };
+    m.customProgramCacheKey = () => String(ok ? ok.call(m) : '') + 'ghch'; m.needsUpdate = true; }
+  const R = A.R_ = restoreRig(new THREE.Group(), { lift: 0, dur: 8 }); A.stand = [];
+  const fallen = { 1: { p: [0, -.6, 0], r: [.05, 0, -.04], hop: 1 }, 2: { p: [1.4, -3.4, -.8], r: [.22, .3, -.3], hop: 5 }, 3: { p: [0, -.8, 0], r: [-.08, 0, .1], hop: 1.5 }, 4: { p: [1.6, -2.6, -.6], r: [-.3, .5, .42], hop: 6 },
+    5: { p: [.4, -1.1, .3], r: [.1, -.2, .14], hop: 1.5 }, 6: { p: [-.8, -1.3, .9], r: [.42, .1, -.2], hop: 2.5 }, 7: { p: [.8, -1.4, .9], r: [.38, -.15, .24], hop: 2.5 }, 8: { p: [0, -3.4, 2.6], r: [1.15, 0, .08], hop: 3 }, 9: { p: [-2.5, -6, 1.5], r: [0, .3, 1.05], hop: 7 } };
+  for (let k = 1; k < N; k++) { const b = A.chBox[k], d = new THREE.Object3D(); if (b.isEmpty()) { A.stand.push(null); continue; } const piv = new THREE.Vector3((b.min.x + b.max.x) / 2, b.min.y, (b.min.z + b.max.z) / 2); d.position.copy(piv); d.userData.piv = piv; A.stand.push(d);
+    const F = fallen[k]; restorePiece(R, d, { p: [piv.x + F.p[0], piv.y + F.p[1], piv.z + F.p[2]], r: F.r, hop: F.hop }, (k - 1) / (N - 1)); }
+  for (const m of MG.keys()) { if (!m.color || m.userData.rest) continue; m.userData.rest = 1; const c = m.color.clone(), rust = (m.metalness || 0) > .5 ? new THREE.Color(0x6e4632) : c.clone().lerp(new THREE.Color(0x6a5a4a), .7).multiplyScalar(.75); restoreMat(R, m, rust); }
+  { const pz = 8.4, px = 3.2, wx = A.at[0] + px * Math.cos(A.yaw) + pz * Math.sin(A.yaw), wz = A.at[1] - px * Math.sin(A.yaw) + pz * Math.cos(A.yaw), wy = rwHeight(wx, wz) + .06;
+    const pl = new THREE.Mesh(new THREE.CylinderGeometry(.9, .95, .12, 24), new THREE.MeshStandardMaterial({ color: 0x9afce0, emissive: 0x30d0a0, emissiveIntensity: 1.2, roughness: .4 })); pl.position.set(wx, wy, wz); scene.add(pl); A.plate = pl; R.trig = { x: wx, y: wy, z: wz, armed: 1 }; }
+  const t0 = hsF() ? 0 : 1; R.goal = t0; restoreSet(R, t0); ghomeRestoreSync(); }
+function ghomeRestoreSync() { const A = GHOME; if (!A.chU || !A.stand) return; const M = new THREE.Matrix4(), T = new THREE.Matrix4();
+  for (let k = 1; k < A.chNames.length; k++) { const d = A.stand[k - 1]; if (!d) continue; M.compose(d.position, d.quaternion, new THREE.Vector3(1, 1, 1)); T.makeTranslation(-d.userData.piv.x, -d.userData.piv.y, -d.userData.piv.z); A.chU.value[k].multiplyMatrices(M, T); }
+  const t = A.R_ ? A.R_.t : 1; if (A.orb) A.orb.visible = t > .9; if (A.cable) A.cable.visible = t > .9 && (A.drop || 0) > .02; }
 // pass 21: a fish leaps off the T-head now and then -- a short arc out of the water and back, a splash at both ends
 // pass 23: the tumbleweed -- every 8-20 s it comes in from upwind (local +x), rolls and hops across the floor in front of the home, and goes
 // (the beach between the shop and the water; it hops over the pier's foot)
@@ -65105,7 +65124,7 @@ function ghomeFish(dt) { const F = GHOME.fish; if (!F || !GHOME.g) return; F.t -
   if (!F.on && F.t <= 0) { F.on = 1; F.u = 0; F.x = -5 + Math.random() * 10; F.z = F.zr[0] + Math.random() * (F.zr[1] - F.zr[0]); F.a = Math.random() * TAU; F.h = .6 + Math.random() * .6; m.visible = true; splash(F.x, F.z); }
   if (F.on) { F.u += dt / F.d; const u = Math.min(1, F.u), dx = Math.sin(F.a) * 1.3, dz = Math.cos(F.a) * 1.3; m.position.set(F.x + dx * u, F.wY + 4 * F.h * u * (1 - u), F.z + dz * u); m.rotation.set(-(1 - 2 * u) * 1.1, F.a, 0, 'YXZ');
     if (u >= 1) { F.on = 0; m.visible = false; splash(F.x + dx, F.z + dz); F.t = 4 + Math.random() * 7; } } }
-function ghomeSmoke(dt, t) { if (hsF()) return; const S = GHOME.smoke; if (S && S.tops.length) { for (let i = 0; i < S.puffs.length; i++) { const p = S.puffs[i]; p.age += dt;
+function ghomeSmoke(dt, t) { ghomeRestoreSync(); const RT = GHOME.R_ ? GHOME.R_.t : 1; if (GHOME.smoke) GHOME.smoke.pts.visible = RT > .95; if (RT < .95) { for (const [L] of GHOME.lights || []) L.intensity = 0; return; } const S = GHOME.smoke; if (S && S.tops.length) { for (let i = 0; i < S.puffs.length; i++) { const p = S.puffs[i]; p.age += dt;
       if (p.age >= p.life) { const T = S.tops[p.s % S.tops.length]; p.age = 0; p.x = T[0] + (Math.random() - .5) * .3; p.y = T[1] + .2; p.z = T[2] + (Math.random() - .5) * .3; p.vx = .35 + Math.random() * .25; p.vz = (Math.random() - .5) * .25; }
       p.x += p.vx * dt; p.z += p.vz * dt; p.y += (1.1 - p.age * .12) * dt; S.pos[i * 3] = p.x; S.pos[i * 3 + 1] = p.y; S.pos[i * 3 + 2] = p.z; }
     S.pts.geometry.attributes.position.needsUpdate = true; S.pts.material.size = 1.4; }
@@ -65120,7 +65139,18 @@ function ghomeBuild(at, yaw, y0) {
     if (mat4) geo.applyMatrix4(mat4); if (!geo.attributes.normal) geo.computeVertexNormals();
     if (m.userData.sway) { const q = geo.attributes.position; let lo = Infinity; for (let i = 0; i < q.count; i++) lo = Math.min(lo, q.getY(i)); const a = new Float32Array(q.count); for (let i = 0; i < q.count; i++) a[i] = q.getY(i) - lo; geo.setAttribute('sway', new THREE.BufferAttribute(a, 1)); }     // pass 23: height above the blade's own foot
     if (m.userData.strata) ghStrataCol(geo); else if (m.vertexColors) { const p = geo.attributes.position, a = new Float32Array(p.count * 3); for (let i = 0; i < p.count; i++) { ghStone(p.getX(i), p.getY(i), p.getZ(i), col); a[i * 3] = col[0]; a[i * 3 + 1] = col[1]; a[i * 3 + 2] = col[2]; } geo.setAttribute('color', new THREE.BufferAttribute(a, 3)); }
+    { geo.computeBoundingBox(); const bb = geo.boundingBox, mx = (bb.min.x + bb.max.x) / 2, my = (bb.min.y + bb.max.y) / 2, mz = (bb.min.z + bb.max.z) / 2, k = A.chunkOf(mx, my, mz), ch = new Float32Array(geo.attributes.position.count).fill(k);
+      geo.setAttribute('aChunk', new THREE.BufferAttribute(ch, 1)); if (k) A.chBox[k].union(bb); }     // the RESTORATION: which piece of him this is (0 stays put)
     if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); };
+  // THE RESTORATION (his, KORAJIN.md THE TRANSFORMATION): he is ONE set of pieces with two poses. Every vertex carries the CHUNK it belongs to
+  // (`aChunk`); the shader moves each chunk by its own matrix (`GHOME.chU`), which the shared RESTORE kit animates through a stand-in per chunk
+  // (`ghomeRestore`). So the merges stay one draw per look, and FALLEN is the same geometry slumped, tilted and toppled ----
+  A.chNames = ['ground', 'hall', 'crown', 'tower', 'turret', 'store', 'stallL', 'stallR', 'frame', 'crane']; A.chBox = A.chNames.map(() => new THREE.Box3());
+  A.chunkOf = (x, y, z) => { const dT = Math.hypot(x - A.T[0], z - A.T[1]), dW = Math.hypot(x - A.Wc[0], z - A.Wc[1]), r = Math.hypot(x, z), top = P + A.Hw;
+    if (x < A.Wc[0] - 1.5 && y > P + A.Hwg + 1) return 9; if (dW < A.Rw + 1.2 && x < -3.4) return 5;
+    if (dT < A.Rt + 3.2) return y < P + A.Yb + .4 ? 3 : 4;
+    if (z > 3.2 && z < 8.6 && y > P - .5) { if (y > P + 3.9 && Math.abs(x) < 6.8 && z < 6) return 8; return x < 0 ? 6 : 7; }
+    if (r < A.R + 1.5 && y >= top - .3) return 2; if (r < A.R + 1.5 && y > P - .2) return 1; return 0; };
   const at4 = (x, y, z, ry = 0, rx = 0, rz = 0, sx = 1, sy = 1, sz = 1) => _m4.compose(_v.set(x, y, z), _q.setFromEuler(_e.set(rx, ry, rz)), new THREE.Vector3(sx, sy, sz));
   // pass 5: THE LOOK -- main's tileable maps, TRIPLANAR (`triMat`: no uv, so every merged piece takes them): his sandstone (cream, pores,
   // lavender spots) on every shell and boulder, timber on the frame, planks on the decks, steps and floors
@@ -65702,6 +65732,7 @@ function ghomeBuild(at, yaw, y0) {
     GHOME.smoke = { pts, pos, puffs, tops: A.tops || [] }; }
   // ---- merge, and the world gets the boxes and the floors ----
   let draws = 0; for (const [m, list] of MG) { if (m.map && !m.userData.tri) m.map.wrapS = THREE.RepeatWrapping; const geo = mergeGeometries(list); if (!geo) { console.warn('[melee] ghome: a bucket would not merge', m.name || m.color); continue; } const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; g.add(o); draws++; }
+  ghomeRestoreRig(MG);
   for (const b of boxes) BOXES.push(b);
   for (let i = 0; i < tris.length; i += 9) { const q = tris.slice(i, i + 9); triAdd(...q); triAdd(q[0], q[1], q[2], q[6], q[7], q[8], q[3], q[4], q[5]); }
   A.stat.draws = draws; A.stat.boxes = boxes.length; A.stat.tris = tris.length / 9;
@@ -66226,7 +66257,7 @@ async function buildHome() {
   if (GMILL.on && H.style !== 'lake') try { gmillBuild(); } catch (e) { console.error('[melee] water mill', e); note('MILL BUILD THREW'); }
   if (GPEAK.on && H.style !== 'lake') try { gpeakBuild(); } catch (e) { console.error('[melee] the peak', e); note('PEAK BUILD THREW'); }
   if (GJINRA.on && GPEAK.on && H.style !== 'lake') try { gjinraBuild(); } catch (e) { console.error('[melee] jinra refinery', e); note('JINRA BUILD THREW'); }
-  if (H.style !== 'lake') { for (const P of [GHOME, GMERCH, GMILL, GPEAK, GJINRA]) hsFallen(P.g); if (hsF()) { for (const [L] of GHOME.lights || []) L.intensity = 0; GHOME.lights = []; if (GHOME.smoke) GHOME.smoke.pts.visible = false; } }     // FALLEN: weathered, unlit
+  if (H.style !== 'lake') { for (const P of [GMERCH, GMILL, GPEAK, GJINRA]) hsFallen(P.g); }     // FALLEN: weathered, unlit
   else try { const g = await loadGLB(H.hut.file, 'loading the refuge');
     const m = g.scene, drop = []; m.traverse(o => { if (o.isLight) drop.push(o); }); for (const o of drop) o.removeFromParent();
     m.updateMatrixWorld(true); const bb = new THREE.Box3(); m.traverse(o => { if (o.isMesh && o.name !== 'collider' && o.geometry) { o.geometry.computeBoundingBox(); bb.union(o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld)); } });
