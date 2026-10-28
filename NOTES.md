@@ -5,7 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- A JUMP ON THE GROUND IS A JUMP: the landing no longer blocks it (DOCKET 1)
+## m15xx -- THE DRAGON ZONE'S CLIMB, SIZED FROM HIS JUMP (DOCKET 2)
+His: *"floating little islands you jump from one to the next -- they didn't take into account how far and high he jumps; they're so close together
+it's hard."* Before: nine stones (R 1.5, collider half 1.05) 3.6 m apart centre to centre, so 1.5 m edge to edge, each 1 m up. Every one of
+Grumbo's jumps (`tools/moves.json`: run jump comfortably 5.95 m, walk jump 3.88 m) overshoots that.
+Now SIX stones of R 2.2, 4.1 m edge to edge and 1.4 m up each (jump comfy height 2.18), then the crag 4.1 m on and 1.6 m up, all on the same arc.
+A walk jump or a run jump makes each gap with room either side. Rendered: a stepped route with real gaps.
+
+## m1668 -- A JUMP ON THE GROUND IS A JUMP: the landing no longer blocks it (DOCKET 1)
 His: *"if you've jumped and you just hit the ground you should be able to jump right back up in the air -- I can't do my second jump until the
 landing animation has finished... and the landing animation itself, clip it or speed it up."* The ground jump was gated `!p.land`, so for the
 whole landing clip (soft .62 s, hard 1.15 s) a tap did nothing. Now any ground jump (not while knocked down) cuts the landing short and goes:

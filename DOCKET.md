@@ -1,8 +1,8 @@
 # THE DOCKET (his, Oct 28 2026 night -- worked through overnight, one build each, ticked with the build number)
 
-1. [x] (m15xx) **The landing never blocks a jump.** On the ground = you can jump, at once, even mid-landing clip (his: "if you've jumped and you just hit
+1. [x] (m1668) **The landing never blocks a jump.** On the ground = you can jump, at once, even mid-landing clip (his: "if you've jumped and you just hit
        the ground you should be able to jump right back up"). And the landing clip itself clipped / sped up (he doesn't love it).
-2. [ ] **The Dragon zone's floating islands spaced for HIS jump** (LEVELDESIGN rules: jump apex, sprint gap, double jump) -- they are so close
+2. [x] (m15xx) **The Dragon zone's floating islands spaced for HIS jump** (LEVELDESIGN rules: jump apex, sprint gap, double jump) -- they are so close
        together it is hard to hop between them.
 3. [ ] **The rocket launcher's jump-throw** (his: *"Wanted"* -- bend the bullet): hold UP on the right pad to ready the shot, jump, release in the
        air -> the rocket leaves with some of his upward velocity, so it climbs at a slight angle. Not exact; you can "throw" rockets up.

@@ -1161,7 +1161,7 @@ const MOVE = {
   // through the roll. Worse, the cancel window was `land * .45`, which is a QUARTER of the clip:
   // one nudge of the stick and you never saw it at all. **A state whose length disagrees with
   // the clip it is playing can only ever cut that clip off.**
-  landSoft: .42,     // landing_soft is 1.083 s -> x2.6 (m15xx: his "I don't love it, clip it or speed it up"; was .62)
+  landSoft: .42,     // landing_soft is 1.083 s -> x2.6 (m1668: his "I don't love it, clip it or speed it up"; was .62)
   landHard: 1.15,    // landing_hard is 1.500 s -> x1.30, so the roll actually reads
   landFree: .70,     // and only past this much of it can the stick run him out of the tail
   // how far he may travel between two collider samples, and the ceiling on how many that buys.
@@ -11393,8 +11393,11 @@ function dragStage(g) { const Z = DRAGZ, sd = new THREE.Vector3(...Z.sun).normal
     for (const sd2 of [-1, 1]) { const px = x + sd2 * 10.5, pz = z - 4; put(new THREE.CylinderGeometry(.22, .28, 4.2, 8).translate(px, 2.1, pz), M.trunk); put(new THREE.BoxGeometry(.9, .9, .9).translate(px, 4.5, pz), gold); box(px, pz, .3, .3, 0, 4.2); Z.obst.push([px, pz, .4]); } }
   // THE CLIMB: stepping stones rising round the side to a high crag (the take-off perch for the flying, later)
   const step = (x, y, z, R2, seed) => { const S = floatIsland({ R: R2, depth: 2.5 + R2, seed, detail: 3, flat: .03, lobes: 1 }); ISL.push(S.geo.translate(x, y, z)); box(x, z, R2 * .7, R2 * .7, y - .6, y + .02); if (y < 5) Z.obst.push([x, z, R2]); };
-  for (let i = 0; i < 9; i++) { const a = .7 + i * .13, r = 28; step(Math.sin(a) * r, 1 + i, Math.cos(a) * r, 1.5, 300 + i); }
-  { const a = 1.98, r = 31, x = Math.sin(a) * r, z = Math.cos(a) * r, C = floatIsland({ R: 7, depth: 22, seed: 331, detail: 5, flat: .02, lobes: 2 }); ISL.push(C.geo.translate(x, 10, z)); box(x, z, 4.8, 4.8, 9.2, 10.02);
+  // m15xx (his: "they totally didn't take into account how far and high he jumps -- they're so close together it's hard to jump from one to the next"):
+  // sized from the MOVE TABLE (tools/moves.json, Grumbo): nine 1.5 m stones 3.6 m apart left 1.5 m edge to edge, under any run jump (comfy
+  // 5.95 m), so he overshot. Now SIX bigger stones (R 2.2), 4.1 m edge to edge, each 1.4 m up (comfy jump height 2.18), and the crag 4.1 m on, 1.6 up
+  for (let i = 0; i < 6; i++) { const a = .5 + i * (7.2 / 28), r = 28; step(Math.sin(a) * r, 1.4 * (i + 1), Math.cos(a) * r, 2.2, 300 + i); }
+  { const a = 2.11, r = 32, x = Math.sin(a) * r, z = Math.cos(a) * r, C = floatIsland({ R: 7, depth: 22, seed: 331, detail: 5, flat: .02, lobes: 2 }); ISL.push(C.geo.translate(x, 10, z)); box(x, z, 4.8, 4.8, 9.2, 10.02);
     islandDress(put, C, x, 10, z, { cherry: 1, pine: 1, rocks: 2, shrubs: 2, roots: 10, seed: 331, clear: 4 }); Z.perch = [x, 10, z]; Z.pads.push({ x, z, r: 5.2, y: 10.02, I: C }); }
   // THE TIERS: islands spread out below, level, above and high above (scenery now; places to fly to later)
   for (const [x, y, z, R2, sdI] of [[-84, 24, 52, 13, 401], [78, 38, -74, 10, 402], [-52, 60, -104, 15, 403], [112, 14, 38, 8, 404], [24, -24, 98, 11, 405], [-118, -10, -30, 12, 406]]) {
@@ -32220,7 +32223,7 @@ function stepPlayer(dt) {
       if (rig.actions[NINJA.jump]) playOnce(NINJA.jump, clipLen(NINJA.jump) / (2 * NINJA.jumpUp / MOVE.g));     // her jump over the whole airtime (not `flipGo`: a flip owns the body and bleeds the speed)
       snd('swoosh', { r: 1.2, g: .5 });
     }
-    else if ((p.grounded || p.coyote > 0) && !p.knock) {     // m15xx (his: "if you've jumped and you just hit the ground you should be able to jump right
+    else if ((p.grounded || p.coyote > 0) && !p.knock) {     // m1668 (his: "if you've jumped and you just hit the ground you should be able to jump right
       // back up -- I can't do my second jump until the landing animation has finished"): ON THE GROUND = A JUMP, at once. The landing clip used to
       // gate it (`!p.land`); now the jump cuts the landing short
       if (p.land) { p.land = 0; p.landT = 0; p.landHard = 0; }
