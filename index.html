@@ -64471,7 +64471,7 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 // to the shop front and to the round back door. Built in its OWN frame (local +z = the front, toward the river; `at`/`yaw` are HOME.hut's) and
 // merged per material; every collider a local box turned into the world (the yaw is a quarter turn, so a box stays a box); every walkable
 // surface a triangle. `?hut=glb` (or GHOME.on = 0) puts the GLB back, to compare. Pass 1: the massing and the walkable shell, with the inside.
-const GHOME = { on: 1, pass: 22, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
+const GHOME = { on: 1, pass: 23, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   Rtu: 2.5, door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
@@ -64557,6 +64557,12 @@ function ghomeHit(x, y, z, rad) { if (!GHOME.g || !inHome()) return 0; const w0h
   if (GHOME.bellT <= 0) for (const B of GHOME.bellPts || []) if (Math.hypot(x - B[0], y - B[1], z - B[2]) < .4 + rad) { GHOME.bellT = .15; snd('clang', { g: .55, r: 2.1 + Math.random() * .4, x: B[0], z: B[2] }); spkBurst(B[0], B[1], B[2], 8, { col: [1, .85, .4], spread: 2, size: .07, life: .35 }); return 1; }
   return 0; }
 // pass 21: a fish leaps off the T-head now and then -- a short arc out of the water and back, a splash at both ends
+// pass 23: the tumbleweed -- every 8-20 s it comes in from upwind (local +x), rolls and hops across the floor in front of the home, and goes
+function ghomeTumble(dt) {     // the beach between the shop and the water; it hops over the pier's foot const T = GHOME.tumble; if (!T) return; const m = T.m; T.t -= dt;
+  if (!T.on && T.t <= 0) { T.on = 1; T.x = 34; T.z = 9.8 + Math.random() * .8; T.v = 2.6 + Math.random() * 1.6; T.hop = 0; T.vy = 0; T.y = 0; m.visible = true; }
+  if (T.on) { T.x -= T.v * dt; T.z += Math.sin(T.x * .3) * dt * .25; T.vy -= 9.8 * dt; T.y += T.vy * dt; if (T.y <= 0) { T.y = 0; T.vy = Math.abs(T.x) < 3.2 ? 4.2 : Math.random() < .5 ? 1.2 + Math.random() * 1.8 : 0; }
+    let gy; try { gy = T.gH(T.x, T.z); } catch (e) { gy = 0; } m.position.set(T.x, gy + .45 + T.y, T.z); m.rotation.z += T.v * dt / .45; m.rotation.x += dt * .4;
+    if (T.x < -34) { T.on = 0; m.visible = false; T.t = 8 + Math.random() * 12; } } }
 function ghomeFish(dt) { const F = GHOME.fish; if (!F || !GHOME.g) return; F.t -= dt; const m = F.m;
   const splash = (x, z) => { const P = GHOME.g.localToWorld(new THREE.Vector3(x, F.wY + .05, z)); spkBurst(P.x, P.y, P.z, 12, { col: [.85, .93, 1], spread: 2.2, size: .07, life: .45 }); };
   if (!F.on && F.t <= 0) { F.on = 1; F.u = 0; F.x = -5 + Math.random() * 10; F.z = F.zr[0] + Math.random() * (F.zr[1] - F.zr[0]); F.a = Math.random() * TAU; F.h = .6 + Math.random() * .6; m.visible = true; splash(F.x, F.z); }
@@ -64575,6 +64581,7 @@ function ghomeBuild(at, yaw, y0) {
   const MG = new Map(), _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _v = new THREE.Vector3(), _one = new THREE.Vector3(1, 1, 1), col = [0, 0, 0];
   const put = (geo, m, mat4) => { geo = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(geo.attributes)) if (k !== 'position' && k !== 'normal' && !(k === 'uv' && m.map && !m.userData.tri)) geo.deleteAttribute(k);
     if (mat4) geo.applyMatrix4(mat4); if (!geo.attributes.normal) geo.computeVertexNormals();
+    if (m.userData.sway) { const q = geo.attributes.position; let lo = Infinity; for (let i = 0; i < q.count; i++) lo = Math.min(lo, q.getY(i)); const a = new Float32Array(q.count); for (let i = 0; i < q.count; i++) a[i] = q.getY(i) - lo; geo.setAttribute('sway', new THREE.BufferAttribute(a, 1)); }     // pass 23: height above the blade's own foot
     if (m.userData.strata) ghStrataCol(geo); else if (m.vertexColors) { const p = geo.attributes.position, a = new Float32Array(p.count * 3); for (let i = 0; i < p.count; i++) { ghStone(p.getX(i), p.getY(i), p.getZ(i), col); a[i * 3] = col[0]; a[i * 3 + 1] = col[1]; a[i * 3 + 2] = col[2]; } geo.setAttribute('color', new THREE.BufferAttribute(a, 3)); }
     if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); };
   const at4 = (x, y, z, ry = 0, rx = 0, rz = 0, sx = 1, sy = 1, sz = 1) => _m4.compose(_v.set(x, y, z), _q.setFromEuler(_e.set(rx, ry, rz)), new THREE.Vector3(sx, sy, sz));
@@ -65069,6 +65076,7 @@ function ghomeBuild(at, yaw, y0) {
   { const gH = (x, z) => rwHeight(Wx(x, z), Wz(x, z)) - y0, wY = -y0, rnd = rwRng(2020), NC = { noCam: 1 };
     const sage = new THREE.MeshStandardMaterial({ color: 0x7f8c5c, roughness: .95 }), olive = new THREE.MeshStandardMaterial({ color: 0x55633a, roughness: .95 }), straw = new THREE.MeshStandardMaterial({ color: 0xc2a55e, roughness: .95 });
     const reedM = new THREE.MeshStandardMaterial({ color: 0x6f7a3e, roughness: .9 }), brownM = new THREE.MeshStandardMaterial({ color: 0x5a3a22, roughness: .9 }), bulbM = new THREE.MeshStandardMaterial({ color: 0xc8a8ff, emissive: 0x7a52d8, emissiveIntensity: .9, roughness: .5 }), creamM = new THREE.MeshStandardMaterial({ color: 0xf1e6c4, roughness: .8 });
+    straw.userData.sway = reedM.userData.sway = 1;     // pass 23: every blade carries its height (set before any is put, or the bucket will not merge)
     const free = (x, z) => { if (Math.abs(x) < 2.8 && z > 5) return false; if (x > 9 && x < 17 && z > 3.6 && z < 7.6) return false; if (z > 3 && z < 8 && Math.abs(x) < 10.2) return false; if (x < -8.4 && x > -11 && z > 8.6 && z < 10.4) return false;
       const e = (x / A.rx) ** 2 + (z / A.rz) ** 2; return e > 1.15 && gH(x, z) > wY + .25; };
     // the SHELVES: wide, flat, stratified, sunk -- they make ground, not balls
@@ -65091,6 +65099,19 @@ function ghomeBuild(at, yaw, y0) {
     let nP = 0; for (let i = 0; i < 520; i++) { const a = rnd() * TAU, rr = 1.15 + Math.pow(rnd(), 1.6) * 2.4, x = Math.sin(a) * A.rx * rr, z = Math.cos(a) * A.rz * rr; if (!free(x, z)) continue; const y = gH(x, z), k = rnd();
       if (k < .32) grass(x, y, z, .8 + rnd() * .6); else if (k < .58) sagebrush(x, y, z, .8 + rnd() * .9); else if (k < .7) yucca(x, y, z); else if (k < .8) bulbs(x, y, z); else if (k < .9) grass(x, y, z, .6); nP++; }
     let nR = 0; for (let x = -26; x < 26; x += .9) for (let z = 6; z < 20; z += .7) { if (Math.abs(x) < 4 && z < 17) continue; const y = gH(x + (rnd() - .5) * .5, z); if (y < wY + .32 && y > wY - .35 && rnd() < .3) { reeds(x, Math.max(y, wY - .2), z); nR++; } }
+    // ---- PASS 23 (the plants' second pass): the grass and the reeds SWAY (a per-vertex height above each blade's own foot, `sway`, drives
+    // the wind in the vertex shader); fuller golden GRASS drifts; GRAVEL patches of sandstone chips; and a TUMBLEWEED that rolls down the
+    // floor on the wind now and then (`GHOME.tumble`) ----
+    { const windy = (m, amp) => { m.userData.sway = 1; m.onBeforeCompile = sh => { sh.uniforms.uWind = U.uWind; sh.vertexShader = 'uniform float uWind;\nattribute float sway;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n  float sw = pow(sway, 1.5) * ' + amp.toFixed(3) + ';\n  transformed.x += sw * (sin(uWind * 1.9 + position.x * .7 + position.z * .4) + .6 * sin(uWind * 3.7 + position.z * 1.3));\n  transformed.z += sw * .6 * sin(uWind * 2.3 + position.x * .5 - position.z * .8);'); }; m.customProgramCacheKey = () => 'ghsway' + amp; };
+      windy(straw, .09); windy(reedM, .06);
+      for (let i = 0; i < 70; i++) { const a = rnd() * TAU, rr = 1.2 + Math.pow(rnd(), 1.2) * 2.2, x = Math.sin(a) * A.rx * rr, z = Math.cos(a) * A.rz * rr; if (!free(x, z)) continue; const y = gH(x, z);
+        for (let k = 0; k < 4 + ((rnd() * 5) | 0); k++) { const b = rnd() * TAU, r = rnd() * .9; if (free(x + Math.sin(b) * r, z + Math.cos(b) * r)) grass(x + Math.sin(b) * r, gH(x + Math.sin(b) * r, z + Math.cos(b) * r), z + Math.cos(b) * r, 1 + rnd() * .7); } }
+      for (let i = 0; i < 26; i++) { const a = rnd() * TAU, rr = 1.15 + rnd() * 1.8, x = Math.sin(a) * A.rx * rr, z = Math.cos(a) * A.rz * rr; if (!free(x, z)) continue;
+        for (let k = 0; k < 14; k++) { const b = rnd() * TAU, r = Math.sqrt(rnd()) * 1.1, px = x + Math.sin(b) * r, pz = z + Math.cos(b) * r, s = .05 + rnd() * .09; put(ghRockGeo(sd++, s * 1.4, s * .6, s, 1), A.rockM, at4(px, gH(px, pz) + s * .15, pz, rnd() * 6)); } }
+      // the TUMBLEWEED: a tangle of dry twigs on a ball; it rolls along local -x (down the floor with the wind), hopping, and comes again
+      { const tw = []; for (let k = 0; k < 26; k++) { const pts = []; let v = new THREE.Vector3().randomDirection().multiplyScalar(.45); for (let j = 0; j < 5; j++) { pts.push(v.clone()); v = v.clone().add(new THREE.Vector3().randomDirection().multiplyScalar(.3)).setLength(.32 + Math.random() * .2); }
+          const t = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 8, .012, 3).toNonIndexed(); t.deleteAttribute('uv'); tw.push(t); }
+        const tm = new THREE.Mesh(mergeGeometries(tw), new THREE.MeshStandardMaterial({ color: 0x9a7a4a, roughness: 1 })); tm.castShadow = true; tm.visible = false; g.add(tm); GHOME.tumble = { m: tm, t: 6, on: 0, gH }; } }
     A.stat.plants = nP; A.stat.reeds = nR; }
   // ---- PASS 12: SMOKE from both stacks -- one point cloud (one draw), each puff rising, drifting downwind and swelling until it is gone;
   // stepped in `ghomeSmoke` ----
@@ -65341,7 +65362,7 @@ function homeStep(dt) {
   const H = HOME; H.t += dt; if (RW.U) RW.U.uTime.value = H.t;
   if (GHOME.U) GHOME.U.uWind.value = H.t; ghomeSmoke(dt, H.t); for (const G of GHOME.gates || []) bgateStep(G, dt);     // pass 9: his back door
   if (GHOME.canoe) { const C = GHOME.canoe, t = H.t; C.g.position.y = C.y + rwWaveAt(C.x, C.z, t) * .8 + .02; C.kv = (C.kv - 9 * C.roll * dt) * Math.exp(-1.2 * dt); C.roll += C.kv * dt; C.g.rotation.set(Math.sin(t * .9) * .03, C.ry + Math.sin(t * .23) * .04, Math.sin(t * 1.1 + 1) * .05 + C.roll); C.rune.emissiveIntensity = 1.2 + .8 * Math.sin(t * 2.2) ** 2; }     // pass 21: struck, it rocks; the runes breathe
-  ghomeFish(dt);     // pass 19: the canoe rides the waves
+  ghomeFish(dt); ghomeTumble(dt);     // pass 19: the canoe rides the waves
   if (GHOME.sw) GHOME.sw.hc -= dt; GHOME.bellT -= dt; ghomeOrb(dt, H.t);     // pass 6 / pass 14: the orb swings (that line had been inside the comment above since pass 9)
   // the boat rides the waves
   if (H.boat) { const B = H.boat, t = H.t, hh = rwWaveAt(B.x, B.z, t); B.o.position.y = hh * .8 - .05; B.o.rotation.set(Math.sin(t * .9) * .03, B.ry, Math.sin(t * 1.1 + 1) * .04); }
