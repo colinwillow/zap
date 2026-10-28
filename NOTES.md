@@ -196,7 +196,7 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
-## THE SHIP, PASS 12e: THE DRAGON MADE INVITING -- A CHINESE-DRAGON HEAD (m@X4@, WORKER A)
+## THE SHIP, PASS 12e: THE DRAGON MADE INVITING -- A CHINESE-DRAGON HEAD (m1457, WORKER A)
 
 His: *"I'm not in love... it feels little and sneaky like a snake, kind of sharp. More Chinese dragon, more alien, more big and exaggerated
 features. I don't want it to feel scary at all -- inviting, but not cartoony."*
