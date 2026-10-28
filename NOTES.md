@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m@X4@ -- THE RE-PASS: the CLIFF LODGE, pass 2 (rubric 7: RESTORES IN PLACE)
+## m1649 -- THE RE-PASS: the CLIFF LODGE, pass 2 (rubric 7: RESTORES IN PLACE)
 - Base (stays): the crag, the path slabs and lips, its stone lanterns, the foot boulders, the pines, the pool's stone rim. Pieces:
   `walls` (the lodge's frame, plaster, irori, bonsai; its wall boxes ride it), `roof` (roof, fascia, bunting, eave lamps), `perch` (the beam
   and ring post; its walk tris ride it, and the ring is `up`), `cradle` (cradle and the lever's post) and `lamps` (the foot lanterns).
