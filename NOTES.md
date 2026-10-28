@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the RAMPART WALL, pass 1 (an ENEMY wall: the look)
+**Moves:** its pass-1 row (the look). Destructible to the ground is pass 2.
+- Masonry is a `stone_blocks` triMat tinted `ENEMY.pal.stone` (and a darker tone for footings, coping and steps), not `E.stone`'s sandstone
+  map, which reads as sponge over a 60 m wall. Timber, jambs and the grapple poles are `E.lacquer`; gold bands on the jambs and the
+  bastions; the two coping neon strips are gold; the lanterns are `E.glass`; the gate panel's chunk wall uses `enemyWallTex`.
+- `enemyBanner`s replace the `hwBanner`s on BOTH faces. The gold emblem sits on each bastion's two long faces.
+- The signal fires are `enemyBrazier`s, and `rampStep`'s flame sparks are mint now.
+- The two oni masks over the gateway are lacquer, iron and gold with mint eyes; the war horn is gold.
+- Two SPHINXES flank the gate on the OUTER face, facing the approach (solid).
+- **`enemyMats().statue`** (new): a smooth pale stone for carved statues. `enemySphinx` uses it, so the Gatehouse's sphinxes stop looking
+  like sponge too.
+- Every static `add` and the ramp boards are merged; the supply barrels and crates are left out (they smash and come back). 139 meshes.
+- A jamb's gold band first went in outside its `for` without braces and threw `sx is not defined`, but only when the wall was BUILT, so
+  `npm run check` passed it. The headless render caught it. **A builder that is not at module scope is invisible to `check:boot`.**
+Render-checked headless (outer face, inner face, sphinx). Untouched: the robot samurai sentries and the turrets (shared systems).
+Shipped unverified.
+
 ## Grumbo's home, pass 31: the rocks' third pass (Worker B, loop tick 8)
 `A.rockC` keeps every rnd() call it made (so nothing else in the valley moves) and takes its new decisions from its own `R3 = rwRng(7300 +
 seed * 13)`: k > 1.05 and 40% -> the main stone is two halves (x .55 each) set apart along its own axis by a .06-.16 m crack and tilted
@@ -13,6 +30,7 @@ discs (3 rings x 18), radial uv so `ghPathMat`'s soft edge is the rim, on a clon
 patch off the peak's trail, which shares the original). First winding was downward; flipped before shipping. +1 draw (the drifts mesh).
 Correction to pass 30's entry: a pot on a FALLEN stall is hit-tested where it stands RESTORED, not where its chunk is drawn.
 Next: the plants' 3rd pass with cliff shrubs.
+
 ## m1552 -- THE RE-PASS: MARKET STALLS, pass 3 (layers, alive; its third pass, so the loop moves on)
 **Moves:** its L3, breakable and alive rows.
 - **L3: a FIRE-WATCH LOOKOUT** (hinomi yagura) on the roof's east end, clear of the roof bar and the ring pole: four solid posts, a railed

@@ -10496,7 +10496,7 @@ function enemyMats() { if (ENEMY.m) return ENEMY.m; const P = ENEMY.pal, S = (c,
   const gh = '#' + P.gold.toString(16).padStart(6, '0'); c.fillStyle = gh; c.fillRect(0, 0, 128, 8); c.fillRect(0, 0, 6, 256); c.fillRect(122, 0, 6, 256); c.drawImage(enemyEmblemTex().image, 24, 40, 80, 80);
   const bt = new THREE.CanvasTexture(cv); bt.colorSpace = THREE.SRGBColorSpace;
   return (ENEMY.m = { lacquer: S(P.lacquer, .45, { metalness: .1 }), gold: S(P.gold, .32, { metalness: .85 }), stone: triMat('sandstone', { scale: 3, color: P.stone }), terra: S(P.terra, .8),
-    iron: S(P.iron, .5, { metalness: .6 }), roof: triMat('roof_tiles', { scale: 2.2, color: 0x2a2826, side: THREE.DoubleSide }), jin: new THREE.MeshBasicMaterial({ color: P.jin, toneMapped: false }),
+    iron: S(P.iron, .5, { metalness: .6 }), statue: S(P.stone, .78),     /* m@X4@: smooth carved stone for statues; the sandstone map reads as sponge up close */ roof: triMat('roof_tiles', { scale: 2.2, color: 0x2a2826, side: THREE.DoubleSide }), jin: new THREE.MeshBasicMaterial({ color: P.jin, toneMapped: false }),
     glass: S(P.jin, .2, { emissive: P.jin, emissiveIntensity: 1.3, transparent: true, opacity: .85 }), banner: S(0xffffff, .85, { map: bt, side: THREE.DoubleSide }) }); }
 // a tall black banner with the gold emblem, a ragged pointed hem, on a black crossbar with gold finials (yaw `ry`, `w` x `h` m, its top at y)
 function enemyBanner(put, M, x, y, z, ry, w = 1.2, h = 4) { const g = new THREE.PlaneGeometry(w, h, 2, 6), P = g.attributes.position;
@@ -10506,25 +10506,25 @@ function enemyBanner(put, M, x, y, z, ry, w = 1.2, h = 4) { const g = new THREE.
 // m1529: a SPHINX guardian (ENEMY_STYLE.md "STATUES"): a lion body couchant on a battered sandstone plinth, a black-and-gold nemes headdress,
 // a gold mask with mint eyes; it faces local +z (yaw `ry`), `s` its scale (about 2.2 m tall at 1). Static: every piece through `put`
 function enemySphinx(put, M, x, z, ry = 0, s = 1) { const q = (geo, m, px, py, pz, rx = 0) => put(geo.rotateX(rx).translate(px, py, pz).scale(s, s, s).rotateY(ry).translate(x, 0, z), m);
-  q(new THREE.CylinderGeometry(.95, 1.15, .7, 4, 1).rotateY(Math.PI / 4).scale(1, 1, 1.8), M.stone, 0, .35, 0);     // the battered plinth
+  q(new THREE.CylinderGeometry(.95, 1.15, .7, 4, 1).rotateY(Math.PI / 4).scale(1, 1, 1.8), M.statue, 0, .35, 0);     // the battered plinth
   q(new THREE.BoxGeometry(1.46, .07, 2.66), M.gold, 0, .72, 0);
-  q(new THREE.CapsuleGeometry(.42, 1, 4, 10), M.stone, 0, 1.15, -.15, Math.PI / 2);     // the couchant body
-  q(new THREE.SphereGeometry(.5, 12, 8).scale(1, .8, 1.1), M.stone, 0, 1.05, -.75);     // the haunches
-  for (const sd of [-1, 1]) { q(new THREE.BoxGeometry(.26, .2, .9), M.stone, sd * .3, .85, .75); q(new THREE.BoxGeometry(.3, .12, .3), M.stone, sd * .3, .8, 1.15); }     // the forepaws
-  q(new THREE.BoxGeometry(.78, 1, .55), M.stone, 0, 1.55, .5);     // the raised chest
-  q(new THREE.BoxGeometry(.52, .58, .5), M.stone, 0, 2.2, .62);     // the head
+  q(new THREE.CapsuleGeometry(.42, 1, 4, 10), M.statue, 0, 1.15, -.15, Math.PI / 2);     // the couchant body
+  q(new THREE.SphereGeometry(.5, 12, 8).scale(1, .8, 1.1), M.statue, 0, 1.05, -.75);     // the haunches
+  for (const sd of [-1, 1]) { q(new THREE.BoxGeometry(.26, .2, .9), M.statue, sd * .3, .85, .75); q(new THREE.BoxGeometry(.3, .12, .3), M.statue, sd * .3, .8, 1.15); }     // the forepaws
+  q(new THREE.BoxGeometry(.78, 1, .55), M.statue, 0, 1.55, .5);     // the raised chest
+  q(new THREE.BoxGeometry(.52, .58, .5), M.statue, 0, 2.2, .62);     // the head
   q(new THREE.CylinderGeometry(.34, .5, .62, 4, 1).rotateY(Math.PI / 4).scale(1, 1, .7), M.lacquer, 0, 2.3, .5);     // the nemes
   for (const sd of [-1, 1]) q(new THREE.BoxGeometry(.16, .7, .2), M.lacquer, sd * .3, 1.85, .72);     // its lappets
   for (const y of [2.12, 2.32, 2.52]) q(new THREE.BoxGeometry(.72, .04, .5), M.gold, 0, y, .5);     // gold stripes
   q(new THREE.BoxGeometry(.44, .48, .06), M.gold, 0, 2.17, .89);     // the mask
   for (const sd of [-1, 1]) q(new THREE.BoxGeometry(.11, .04, .03), M.jin, sd * .11, 2.25, .93);
   q(new THREE.ConeGeometry(.07, .3, 4), M.gold, 0, 2.73, .62);     // the crest
-  q(new THREE.ConeGeometry(.1, .7, 6), M.stone, 0, 1.05, -1.3, -1.2); }     // the tail
+  q(new THREE.ConeGeometry(.1, .7, 6), M.statue, 0, 1.05, -1.3, -1.2); }     // the tail
 // m1535: a standing BRAZIER (ENEMY_STYLE.md): a sandstone foot, an iron stem and bowl, a gold rim, mint Jinra coals and a flickering flame.
 // A Group (it can be tipped over); `userData.top` is the coals' height, `userData.flame` the flame mesh
 function enemyBrazier(M, s = 1) { const g = new THREE.Group(), q = (geo, m, y) => { const o = new THREE.Mesh(geo, m); o.position.y = y * s; o.scale.setScalar(s); o.castShadow = true; g.add(o); return o; };
   ENEMY.flame = ENEMY.flame || new THREE.MeshBasicMaterial({ color: ENEMY.pal.jin, transparent: true, opacity: .6, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
-  q(new THREE.CylinderGeometry(.3, .42, .22, 6), M.stone, .11); q(new THREE.CylinderGeometry(.07, .09, 1.25, 6), M.iron, .85);
+  q(new THREE.CylinderGeometry(.3, .42, .22, 6), M.statue, .11); q(new THREE.CylinderGeometry(.07, .09, 1.25, 6), M.iron, .85);
   for (let i = 0; i < 3; i++) { const o = q(new THREE.BoxGeometry(.05, .5, .05), M.iron, 1.35); o.position.x = Math.cos(i * 2.09) * .22 * s; o.position.z = Math.sin(i * 2.09) * .22 * s; o.rotation.set(Math.sin(i * 2.09) * .5, 0, -Math.cos(i * 2.09) * .5); }
   q(new THREE.CylinderGeometry(.5, .26, .42, 8), M.iron, 1.66); q(new THREE.TorusGeometry(.5, .045, 6, 16).rotateX(Math.PI / 2), M.gold, 1.87);
   q(new THREE.CylinderGeometry(.45, .45, .05, 8), M.jin, 1.86); const flame = q(new THREE.ConeGeometry(.32, 1, 8).translate(0, .5, 0), ENEMY.flame, 1.86); flame.castShadow = false;
@@ -21972,10 +21972,13 @@ function shrineClear() { const S = SHRINE.on; if (!S) return; for (const c of S.
 const RAMP = { scale: 1.5, raidN: 3, raidCd: 40, at: [0, -36], L: 60, H: 6.3, T: 4.5, gate: 9, bast: 7.5, bH: 8.55, slope: .32, senHp: 3, senV: 1.3, senWind: .6, senDmg: 9, senBack: 20, on: null };     // H 4.2: the ramp (slope .32) must land before the bastion steps
 function rampBuild() {
   if (RAMP.on) return; const A = RAMP, k = A.scale || 1, [cx, cz] = A.at, H = A.H, hl = A.L / 2, ht = A.T / 2, g2 = A.gate / 2, g = new THREE.Group(); scene.add(g);
-  const O = { meshes: [], boxes: [], walls: [] }, T = hallTex(), tris = [];
-  const stone = new THREE.MeshStandardMaterial({ color: 0x9a948c, roughness: .95 }), stoneD = new THREE.MeshStandardMaterial({ color: 0x77726b, roughness: .95 }), wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 });
-  const plank = new THREE.MeshStandardMaterial({ color: 0x6e4a2e, roughness: .85 }), lamp = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false }), neon = new THREE.MeshBasicMaterial({ color: 0x3fe8ff, toneMapped: false });
-  const add = (geo, m, x, y, z, solid) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; g.add(o);
+  const O = { meshes: [], boxes: [], walls: [] }, T = enemyWallTex(), tris = [];
+  // m@X4@ (the RE-PASS, pass 1): an ENEMY wall (ENEMY_STYLE.md) -- pale sandstone block masonry (block, not the sandstone map: that reads as
+  // sponge over 60 m), black lacquer timber, gold where the neon was, mint Jinra in the lanterns and the signal fires, black emblem banners
+  const E = enemyMats(), stone = triMat('stone_blocks', { scale: 3, color: ENEMY.pal.stone }), stoneD = triMat('stone_blocks', { scale: 2.5, color: 0x9c8a6c }), wood = E.lacquer;
+  const plank = triMat('wood_planks', { scale: 2.2, color: 0x5a4c40 }), lamp = E.glass, neon = E.gold;
+  const putM = (geo, m) => { const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; g.add(o); return o; };
+  const add = (geo, m, x, y, z, solid) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; g.add(o);
     if (solid) { geo.computeBoundingBox(); const b = geo.boundingBox; O.boxes.push({ minx: x + b.min.x, maxx: x + b.max.x, miny: y + b.min.y, maxy: y + b.max.y, minz: z + b.min.z, maxz: z + b.max.z }); } return o; };
   // the two wall runs either side of the gateway, a coping on top, a footing course
   for (const sx of [-1, 1]) { const L = hl - g2, x = cx + sx * (g2 + L / 2);
@@ -21983,7 +21986,7 @@ function rampBuild() {
   // THE GATEWAY: a lintel the walkway runs over, a breakable panel filling the passage (smash it through), vermilion jambs
   const gH = 3.4 * k; add(new THREE.BoxGeometry(A.gate + .2, H - gH, A.T), stoneD, cx, (H + gH) / 2, cz, 1);
   O.walls.push(cwallBuild(g, T, cx, cz, A.gate, .6, 0, gH, O));
-  for (const sx of [-1, 1]) add(new THREE.BoxGeometry(.4, gH, A.T + .1), new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .45 }), cx + sx * (g2 - .2), gH / 2, cz, 0);
+  for (const sx of [-1, 1]) { add(new THREE.BoxGeometry(.4, gH, A.T + .1), E.lacquer, cx + sx * (g2 - .2), gH / 2, cz, 0); add(new THREE.BoxGeometry(.5, .12, A.T + .2), E.gold, cx + sx * (g2 - .2), gH - .1, cz, 0); }
   add(new THREE.BoxGeometry(A.gate - 1, .06, .04), neon, cx, gH + .4, cz + ht + .03, 0);
   // MERLONS on the outer side (-z): .9 tall, .8 wide, every 1.6 m, solid
   for (let x = -hl + .8; x <= hl - .8; x += 1.6) add(new THREE.BoxGeometry(.8, .9, .5), stone, cx + x, H + .45, cz - ht + .25, 1);
@@ -21996,7 +21999,7 @@ function rampBuild() {
   { const w = 1.5 * k, z0 = cz + ht, z1 = z0 + w, run = H / A.slope;
     for (const sx of [-1, 1]) { const xa = cx + sx * (g2 + .3), xb = xa + sx * run;
       tris.push(xa, 0, z0, xb, H, z0, xb, H, z1, xa, 0, z0, xb, H, z1, xa, 0, z1);
-      const L = Math.hypot(run, H), m = new THREE.Mesh(new THREE.BoxGeometry(L, .16, w), plank); m.position.set((xa + xb) / 2, H / 2 - .08, (z0 + z1) / 2); m.rotation.z = Math.atan2(H, xb - xa); m.castShadow = m.receiveShadow = true; g.add(m);
+      const L = Math.hypot(run, H), m = new THREE.Mesh(new THREE.BoxGeometry(L, .16, w), plank); m.position.set((xa + xb) / 2, H / 2 - .08, (z0 + z1) / 2); m.rotation.z = Math.atan2(H, xb - xa); m.castShadow = m.receiveShadow = true; m.userData.mg = 1; g.add(m);
       tris.push(xb, H, z0 - .05, xb + sx * 1.5, H, z0 - .05, xb + sx * 1.5, H, z1, xb, H, z0 - .05, xb + sx * 1.5, H, z1, xb, H, z1); add(new THREE.BoxGeometry(1.5, .16, w), plank, xb + sx * .75, H - .08, (z0 + z1) / 2, 0);
       for (let k = 1; k <= 5; k++) { const x = lerp(xa, xb, k / 5), y = H * k / 5; add(new THREE.BoxGeometry(.16, y, .16), wood, x, y / 2, z1 - .1, 0); } }
     // the walkway on top is the boxes' tops; the ramp's landing joins it (the wall's inner edge)
@@ -22009,45 +22012,48 @@ function rampBuild() {
   for (let x = -hl + 4; x <= hl - 4; x += 8) add(new THREE.BoxGeometry(.26, .32, .26), lamp, cx + x, H + .2, cz + ht - .2, 0);
   // ---- PASS 2 (m1144): manned, banners, signal fires, grapple poles, supplies to smash ----
   // BANNERS down the inner face, between the ramps' feet and the bastions
-  { const ban = new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 });
-    for (const x0 of [-15, -9, 9, 15]) { const x = x0 * k; const bm = add(new THREE.PlaneGeometry(1.4, 3.2), ban, cx + x, H - 1.9, cz + ht + .04, 0); bm.castShadow = false; add(new THREE.BoxGeometry(1.7, .1, .1), wood, cx + x, H - .25, cz + ht + .08, 0); } }
+  for (const x0 of [-15, -9, 9, 15]) enemyBanner(putM, E, cx + x0 * k, H - .2, cz + ht + .1, 0, 1.5, 3.6);     // m@X4@: black emblem banners
+  // m@X4@: the gold EMBLEM on each bastion's two long faces, and a gold band round each bastion's top
+  { const emb = new THREE.MeshStandardMaterial({ map: enemyEmblemTex(), transparent: true, alphaTest: .4, metalness: .8, roughness: .35, side: THREE.DoubleSide });
+    for (const sx of [-1, 1]) { const x = cx + sx * bx; for (const fz of [-1, 1]) putM(new THREE.PlaneGeometry(3.2, 3.2).translate(x, bh * .55, cz + fz * (A.bast / 2 + .03)), emb); add(new THREE.BoxGeometry(A.bast + .1, .2, A.bast + .1), E.gold, x, bh - .3, cz, 0); } }
   // SIGNAL FIRES: a bronze brazier on each bastion's back corner (flames in `rampStep`)
-  const fires = []; { const bronze = new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 });
-    for (const sx of [-1, 1]) { const fx = cx + sx * (bx + 1.4), fz = cz + 1.4; add(new THREE.CylinderGeometry(.7, .45, .6, 14, 1, true), bronze, fx, bh + .7, fz, 0).material.side = THREE.DoubleSide;
-      add(new THREE.CylinderGeometry(.1, .14, .5, 8), bronze, fx, bh + .25, fz, 0); add(new THREE.CylinderGeometry(.6, .6, .08, 14), new THREE.MeshBasicMaterial({ color: 0xff6a1a, toneMapped: false }), fx, bh + .9, fz, 0); fires.push([fx, bh + 1, fz]); } }
+  const fires = []; for (const sx of [-1, 1]) { const fx = cx + sx * (bx + 1.4), fz = cz + 1.4, bz = enemyBrazier(E, 1.4); bz.position.set(fx, bh, fz); g.add(bz); fires.push([fx, bh + bz.userData.top, fz]); }     // m@X4@: iron braziers of stolen Jinra
   // GRAPPLE POLES: a tall vermilion pole on each bastion's outer corner, a ring on top
-  const rings = []; for (const sx of [-1, 1]) { const px = cx + sx * (bx + 1.8), pz = cz - 1.8; add(new THREE.CylinderGeometry(.09, .12, 4.5, 8), new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .45 }), px, bh + 2.25, pz, 0); rings.push(gringAdd(g, px, bh + 4.1, pz + .3)); }
+  const rings = []; for (const sx of [-1, 1]) { const px = cx + sx * (bx + 1.8), pz = cz - 1.8; add(new THREE.CylinderGeometry(.09, .12, 4.5, 8), E.lacquer, px, bh + 2.25, pz, 0); rings.push(gringAdd(g, px, bh + 4.1, pz + .3)); }
   // SUPPLIES on the walkway to smash: arrow barrels and crates
   const smash = []; { const cm = new THREE.MeshStandardMaterial({ color: 0xa0784a, roughness: .85 }), bm = new THREE.MeshStandardMaterial({ color: 0x5a4030, roughness: .8 });
     for (const [x, kind] of [[-12.5, 0], [-11.7, 1], [-5, 0], [6, 1], [11.5, 0], [12.3, 0]]) { const X = cx + x * k, Z = cz + .5;
-      const m = kind ? add(new THREE.CylinderGeometry(.35, .35, .8, 10), bm, X, H + .4, Z, 0) : add(new THREE.BoxGeometry(.8, .8, .8), cm, X, H + .4, Z, 0);
+      const m = kind ? add(new THREE.CylinderGeometry(.35, .35, .8, 10), bm, X, H + .4, Z, 0) : add(new THREE.BoxGeometry(.8, .8, .8), cm, X, H + .4, Z, 0); m.userData.mg = 0;
       if (kind) for (let k = 0; k < 5; k++) { const ar = new THREE.Mesh(new THREE.CylinderGeometry(.012, .012, .6, 4), wood); ar.position.set((k - 2) * .1, .65, (k % 2) * .1 - .05); m.add(ar); }
       smashAdd(smash, m, { minx: X - .4, maxx: X + .4, miny: H, maxy: H + .8, minz: Z - .4, maxz: Z + .4 }, 2, 15, kind ? [.45, .32, .22] : [.7, .5, .3]); } }
   // ---- PASS 3 (m1145): the polish -- a great oni mask over the gateway, crossed katanas, neon on the coping, a patrolling drone ----
-  { const lq = new THREE.MeshStandardMaterial({ color: 0xa8231e, roughness: .4, metalness: .1 }), blk = new THREE.MeshStandardMaterial({ color: 0x14100e, roughness: .5 }), steel = new THREE.MeshStandardMaterial({ color: 0xd4dae0, metalness: .9, roughness: .2 });
-    const gold = new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .9, roughness: .3 }), glow = new THREE.MeshBasicMaterial({ color: 0xffb03a, toneMapped: false });
+  { const lq = E.lacquer, blk = E.iron, steel = new THREE.MeshStandardMaterial({ color: 0xd4dae0, metalness: .9, roughness: .2 });
+    const gold = E.gold, glow = E.jin;
     for (const fz of [1, -1]) { const mz = cz + fz * (ht + .25), my = H - .4, rot = fz > 0 ? 0 : Math.PI, o = new THREE.Group(); o.position.set(cx, my, mz); o.rotation.y = rot; g.add(o);
       const m = (geo, mat, x, y, z) => { const q = new THREE.Mesh(geo, mat); q.position.set(x, y, z); q.castShadow = true; o.add(q); return q; };
       for (const sg of [-1, 1]) { const k = m(new THREE.BoxGeometry(.11, 4.4, .05), steel, 0, 0, -.15); k.rotation.z = sg * .75; const h = m(new THREE.BoxGeometry(.15, 1.1, .1), blk, Math.sin(sg * .75) * -2.4, -Math.cos(sg * .75) * 2.4, -.15); h.rotation.z = sg * .75; }
       const face = m(new THREE.SphereGeometry(1.05, 18, 12, 0, Math.PI * 2, 0, Math.PI / 2), lq, 0, 0, 0); face.rotation.x = Math.PI / 2; face.scale.set(1, .55, 1.15);
       for (const sg of [-1, 1]) { const br = m(new THREE.BoxGeometry(.75, .12, .15), blk, sg * .4, .38, .5); br.rotation.z = -sg * .35; m(new THREE.BoxGeometry(.32, .07, .06), glow, sg * .37, .17, .55);
         const mu = m(new THREE.BoxGeometry(.6, .1, .12), blk, sg * .32, -.34, .52); mu.rotation.z = sg * .45; const hn = m(new THREE.ConeGeometry(.15, 1.1, 6), gold, sg * .85, .9, .1); hn.rotation.z = -sg * .5; }
-      for (let k = -2; k <= 2; k++) m(new THREE.ConeGeometry(.06, .2, 4), new THREE.MeshStandardMaterial({ color: 0xf2efe6 }), k * .17, -.55, .55).rotation.x = Math.PI; } }
-  { const neon2 = new THREE.MeshBasicMaterial({ color: 0xff3a5c, toneMapped: false }); for (const sx of [-1, 1]) { const L = hl - g2 - 1; add(new THREE.BoxGeometry(L, .05, .05), neon2, cx + sx * (g2 + .5 + L / 2), H - .35, cz + ht + .03, 0); add(new THREE.BoxGeometry(L, .05, .05), neon2, cx + sx * (g2 + .5 + L / 2), H - .35, cz - ht - .03, 0); } }
+      for (let k = -2; k <= 2; k++) m(new THREE.ConeGeometry(.06, .2, 4), gold, k * .17, -.55, .55).rotation.x = Math.PI; } }
+  { const neon2 = E.gold; for (const sx of [-1, 1]) { const L = hl - g2 - 1; add(new THREE.BoxGeometry(L, .05, .05), neon2, cx + sx * (g2 + .5 + L / 2), H - .35, cz + ht + .03, 0); add(new THREE.BoxGeometry(L, .05, .05), neon2, cx + sx * (g2 + .5 + L / 2), H - .35, cz - ht - .03, 0); } }
   const drone = bldDrone(g);
   // ---- PASS 4 (m1179): HIGH BARS on the walkway (three, over the wall), the clan banners down the OUTER face too, and the DEFENDERS' ROCKS:
   // walk along the outer foot of the wall and stones are tipped off the walkway onto you (a shadow, then the stone) ----
   const wbars = []; for (const x of [-15.5, 0, 15.5]) { const B = hbarMake(cx + x * k, cz + .3, 0, H); HBAR.list.push(B); wbars.push(B); }
-  { const ban = new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 });
-    for (const x of [-15, -9, 9, 15]) { const bm = add(new THREE.PlaneGeometry(1.4, 3.2), ban, cx + x * k, H - 1.9, cz - ht - .04, 0); bm.castShadow = false; bm.rotation.y = Math.PI; } }
+  for (const x of [-15, -9, 9, 15]) enemyBanner(putM, E, cx + x * k, H - .2, cz - ht - .1, Math.PI, 1.5, 3.6);
   // ---- PASS 5 (m1218): WALL SENTRIES -- two robot samurai patrol the wall walk; when he is up on the walk near one it turns, closes and
   // CUTS (`senWind` s wind-up, red eye); three hits throw it off the wall, and it climbs back `senBack` s later ----
   const sen = []; for (const sx of [-1, 1]) { const R = robotSam(g); R.g.scale.setScalar(1.05); R.x0 = cx + sx * 3; R.dir = sx; R.st = 'walk'; R.t = 0; R.hp = A.senHp; R.g.position.set(R.x0, H + .15, cz + .3); sen.push(R); }
   // ---- PASS 6 (m1242): THE WAR HORN -- a great bronze horn on a stand on the wall walk; blow it (strike it) and a RAIDING PARTY of
   // `raidN` samurai comes for the wall from outside (they spawn beyond the merlons and charge); one raid at a time, `raidCd` s apart ----
   const horn = new THREE.Group(); horn.position.set(cx + 2.4, H + .15, cz + .5); g.add(horn);
-  { const br = new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 }); const st = new THREE.Mesh(new THREE.BoxGeometry(.2, 1, .2), wood); st.position.y = .5; horn.add(st);
+  { const br = new THREE.MeshStandardMaterial({ color: ENEMY.pal.gold, metalness: .85, roughness: .32 }); const st = new THREE.Mesh(new THREE.BoxGeometry(.2, 1, .2), wood); st.position.y = .5; horn.add(st);
     const pts = []; for (let k = 0; k <= 10; k++) { const u = k / 10; pts.push(new THREE.Vector2(.06 + Math.pow(u, 2.4) * .45, u * 1.6)); } const hm = new THREE.Mesh(new THREE.LatheGeometry(pts, 16), br); hm.material.side = THREE.DoubleSide; hm.rotation.z = -Math.PI / 2 - .3; hm.position.set(-.3, 1.15, 0); hm.castShadow = true; horn.add(hm); }
+  // m@X4@: two SPHINX guardians flank the gate on the OUTER face (the approach), facing out
+  { const putG = (geo, m) => putM(geo, m); for (const sx of [-1, 1]) { const x = cx + sx * (g2 + 2.6), z = cz - ht - 4.2; enemySphinx(putG, E, x, z, Math.PI, 1.25 * k);
+      const bb = { minx: x - 1.1 * k, maxx: x + 1.1 * k, miny: 0, maxy: 2.6 * k, minz: z - 2 * k, maxz: z + 2 * k }; O.boxes.push(bb); BOXES.push(bb); } boxGrid(); }
+  bldMergeStatic(g);
   RAMP.on = { g, O, bars: wbars, turs, t: 0, fires, rings, smash, arch: [], drone, drops: [], dropT: 0, sen, horn, raid: [], raidCd: 0 }; const R0 = RAMP.on;
   for (const x of [-9, 9]) archerPost(cx + x * k, H + .05, cz - .4).then(d => { if (RAMP.on === R0) R0.arch.push(d); else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {});
   arenaBeam(cx, cz, [1, .6, .35], 1); snd('clang', { g: .7, r: .5 });
@@ -22087,7 +22093,7 @@ function rampStep(dt) { const R = RAMP.on; if (!R) return; R.t += dt; if (R.sen)
           if (Math.hypot(p.pos.x - D.x, p.pos.z - D.z) < .9 && p.pos.y < 1.6) { camShake(.25); playerHurt(14, Math.atan2(p.pos.x - D.x, p.pos.z - D.z), 4, 1.5, .25, 0); }
           D.m.removeFromParent(); D.sh.removeFromParent(); R.drops.splice(i, 1); } } } }
   { const [cx, cz] = RAMP.at, u = Math.sin(R.t * .18); R.drone.position.set(cx + u * (RAMP.L / 2 - 2), RAMP.H + 4 + Math.sin(R.t * 1.4) * .3, cz + 3.5); R.drone.rotation.y = Math.cos(R.t * .18) > 0 ? Math.PI / 2 : -Math.PI / 2; R.drone.children[1].rotation.z = R.t * .6; }
-  if ((R.fT = (R.fT || 0) - dt) <= 0) { R.fT = .06; for (const [fx, fy, fz] of R.fires) { spk(fx + (Math.random() - .5) * .9, fy, fz + (Math.random() - .5) * .9, (Math.random() - .5) * .5, 2.4 + Math.random() * 2, (Math.random() - .5) * .5, .3 + Math.random() * .2, .5, Math.random() < .5 ? [1, .55, .12] : [1, .82, .3]);
+  if ((R.fT = (R.fT || 0) - dt) <= 0) { R.fT = .06; for (const [fx, fy, fz] of R.fires) { spk(fx + (Math.random() - .5) * .9, fy, fz + (Math.random() - .5) * .9, (Math.random() - .5) * .5, 2.4 + Math.random() * 2, (Math.random() - .5) * .5, .3 + Math.random() * .2, .5, Math.random() < .5 ? [.45, 1, .82] : [.75, 1, .92]);
       if (Math.random() < .1) smokeAt(fx, fy + 1.2, fz, 1.1, 1.6, [.3, .28, .26]); } } }
 function rampClear() { const R = RAMP.on; if (!R) return; for (const T of R.turs) turretDrop(T); smashDrop(R.smash);
   for (const d of R.arch || []) if (d && HORDE.list.includes(d)) { bowDrop(d); bodyGone(d); HORDE.list.splice(HORDE.list.indexOf(d), 1); }
