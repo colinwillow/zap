@@ -66178,7 +66178,7 @@ function jvesPut(put, M, kind, x, y, z, s = 1, ry = 0) { const m4 = (dx, dy, dz,
 // deck on stilts, a sandstone DOME, the giant GLASS GLOBE of Jinra on top in its copper cage, copper PIPES and a CHIMNEY, teal Jinra AWNINGS
 // and the BANNER, mint lanterns, vessels along the front. Reached from the lookout by a spiral of FLOATING STONES. What it sells (Jinra,
 // refined Jinra, powers, special weapons) is his to flesh out: `GJINRA.goods` and `gjinraBuy` are the hook ----
-const GJINRA = { on: 1, pass: 1, dx: 30, dz: 26, y: 124, R: 14, yaw: -1.95, g: null, stat: {}, goods: [] };
+const GJINRA = { on: 1, pass: 2, dx: 30, dz: 26, y: 124, R: 14, yaw: -1.95, g: null, stat: {}, goods: [] };
 function gjinraTex(kind) { const cv = document.createElement('canvas'), W = cv.width = 256, Hh = cv.height = kind === 'banner' ? 512 : 256, q = cv.getContext('2d');
   q.fillStyle = '#2f7d78'; q.fillRect(0, 0, W, Hh); q.fillStyle = '#e8dcc0'; const cx = W / 2, cy = kind === 'banner' ? 180 : Hh / 2, s = kind === 'banner' ? 1 : .7;
   q.beginPath(); q.moveTo(cx, cy - 90 * s); q.lineTo(cx + 70 * s, cy); q.lineTo(cx, cy + 90 * s); q.lineTo(cx - 70 * s, cy); q.closePath(); q.fill(); q.fillStyle = '#2f7d78'; q.beginPath(); q.moveTo(cx, cy - 66 * s); q.lineTo(cx + 50 * s, cy); q.lineTo(cx, cy + 66 * s); q.lineTo(cx - 50 * s, cy); q.closePath(); q.fill();
@@ -66187,13 +66187,14 @@ function gjinraTex(kind) { const cv = document.createElement('canvas'), W = cv.w
   q.globalCompositeOperation = 'destination-out'; for (let x = 0; x < W; x += 26) { q.beginPath(); q.moveTo(x, Hh); q.lineTo(x + 13, Hh - 18); q.lineTo(x + 26, Hh); q.fill(); } q.globalCompositeOperation = 'source-over';
   const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t; }
 function gjinraBuild() {
-  const TAU = Math.PI * 2, A = GJINRA, px = gpeakX(), pz = GPEAK.z, cxW = px + A.dx, czW = pz + A.dz, c = Math.cos(A.yaw), s = Math.sin(A.yaw), Y0 = hsF() ? Math.round(rwHeight(px + A.dx, pz + A.dz)) + 1 : A.y;     /* FALLEN: it sits on the mountain's flank, its island sunk in the slope */
+  const TAU = Math.PI * 2, A = GJINRA, px = gpeakX(), pz = GPEAK.z, cxW = px + A.dx, czW = pz + A.dz, c = Math.cos(A.yaw), s = Math.sin(A.yaw), Y0 = A.y, gF = Math.round(rwHeight(px + A.dx, pz + A.dz)) + 1;     /* built in the sky; FALLEN the kit holds it down on the mountain's flank (gF), sunk in the slope */
   const Wx = (x, z) => cxW + x * c + z * s, Wz = (x, z) => czW - x * s + z * c;
   const g = new THREE.Group(); g.position.set(cxW, 0, czW); g.rotation.y = A.yaw; scene.add(g); A.g = g;
   const MG = new Map(), _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _v = new THREE.Vector3(), _one = new THREE.Vector3(1, 1, 1), boxes = [], tris = [];
   const put = (geo, m, mat4) => { geo = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(geo.attributes)) if (k !== 'position' && k !== 'normal' && !(k === 'uv' && m.map && !m.userData.tri)) geo.deleteAttribute(k);
     if (mat4) geo.applyMatrix4(mat4); if (!geo.attributes.normal) geo.computeVertexNormals(); if (m.userData.strata) { const gg = geo.clone(); gg.rotateY(A.yaw); gg.translate(cxW, 0, czW); ghStrataCol(gg); geo.setAttribute('color', gg.attributes.color); }
-    if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); };
+    rsTag(A, geo); const B = A._mg || MG; if (!B.has(m)) B.set(m, []); B.get(m).push(geo); };
+  A.chNames = ['ground']; A.chBox = [new THREE.Box3()]; A.chunkOf = () => 0; A.rsKey = 'rsjin'; const MGs = new Map();     // one chunk: the whole island rises (the kit's lift)
   const at4 = (x, y, z, ry = 0, rx = 0, rz = 0, sx = 1, sy = 1, sz = 1) => _m4.compose(_v.set(x, y, z), _q.setFromEuler(_e.set(rx, ry, rz)), new THREE.Vector3(sx, sy, sz));
   const box = (x0, x1, y0b, y1, z0, z1, ex) => { const xs = [Wx(x0, z0), Wx(x1, z0), Wx(x0, z1), Wx(x1, z1)], zs = [Wz(x0, z0), Wz(x1, z0), Wz(x0, z1), Wz(x1, z1)]; boxes.push(Object.assign({ minx: Math.min(...xs), maxx: Math.max(...xs), miny: y0b, maxy: y1, minz: Math.min(...zs), maxz: Math.max(...zs) }, ex || {})); };
   const vbox = (x0, x1, ya, yb, z0, z1, m, solid, ex) => { put(new THREE.BoxGeometry(x1 - x0, yb - ya, z1 - z0), m, at4((x0 + x1) / 2, (ya + yb) / 2, (z0 + z1) / 2)); if (solid) box(x0, x1, ya, yb, z0, z1, ex); };
@@ -66240,21 +66241,27 @@ function gjinraBuild() {
     for (let x = -3; x <= 3; x += .55) jvesPut(put, M, ['round', 'gourd', 'tall', 'spiral', 'crystal'][Math.round((x + 3) / .55) % 5], x, Y + 1.15, DR - .35, .8, x);
     A.goods = [{ name: 'a flask of Jinra', kind: 'round', price: null }, { name: 'refined Jinra', kind: 'spiral', price: null }, { name: 'a Jinra crystal', kind: 'crystal', price: null }]; }
   // ---- THE FLOATING STONES: from the lookout's deck up to the island's edge, a spiral of flat-topped rocks, each a jump up ----
-  if (!hsF()) { const L0 = [px + 4.2, GPEAK.top + 8, pz + 4.2], E = [Wx(0, dz1 + 3.5), Y0, Wz(0, dz1 + 3.5)], n = Math.ceil((E[1] - L0[1]) / 2.1), stones = [];
+  const nMain = boxes.length; A._mg = MGs; { const L0 = [px + 4.2, GPEAK.top + 8, pz + 4.2], E = [Wx(0, dz1 + 3.5), Y0, Wz(0, dz1 + 3.5)], n = Math.ceil((E[1] - L0[1]) / 2.1), stones = [];
     for (let i = 1; i <= n; i++) { const t = i / (n + 1), sw = Math.sin(t * Math.PI) * 9, dxx = E[0] - L0[0], dzz = E[2] - L0[2], dl = Math.hypot(dxx, dzz), nx = -dzz / dl, nz = dxx / dl, x = L0[0] + dxx * t + nx * sw, z = L0[2] + dzz * t + nz * sw, y = L0[1] + (E[1] - L0[1]) * i / (n + .4), r = 1.25;
       stones.push([x, y, z]); const gs = ghRockGeo(7200 + i, r * 1.2, 1.6, r, 2); gs.rotateX(Math.PI); gs.translate(x - cxW, y - .5, z - czW); gs.rotateY(-A.yaw); put(gs, rockM); const tg = new THREE.CylinderGeometry(r * .95, r, .3, 12); tg.translate(x - cxW, y - .15, z - czW); tg.rotateY(-A.yaw); put(tg, grass);
-      boxes.push({ minx: x - r * .8, maxx: x + r * .8, miny: y - 1.4, maxy: y, minz: z - r * .8, maxz: z + r * .8 }); const N = 10; for (let k = 0; k < N; k++) { const a0 = k / N * TAU, a1 = (k + 1) / N * TAU; tris.push(x, y + .01, z, x + Math.sin(a0) * r * .85, y + .01, z + Math.cos(a0) * r * .85, x + Math.sin(a1) * r * .85, y + .01, z + Math.cos(a1) * r * .85); } }
-    A.stones = stones; A.stat.stones = n; }
+      boxes.push({ minx: x - r * .8, maxx: x + r * .8, miny: y - 1.4, maxy: y, minz: z - r * .8, maxz: z + r * .8 }); }
+    A.stones = stones; A.stat.stones = n; } A._mg = null;
   // ---- merge ----
   let draws = 0; for (const [m, list] of MG) { if (m.map && !m.userData.tri) m.map.wrapS = m.map.wrapT = THREE.RepeatWrapping; const geo = mergeGeometries(list); if (!geo) { console.warn('[melee] gjinra: a bucket would not merge', m.color); continue; } const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; if (m.transparent) o.renderOrder = 3; g.add(o); draws++; }
-  for (const b of boxes) BOXES.push(b);
-  for (let i = 0; i < tris.length; i += 9) { const q = tris.slice(i, i + 9); triAdd(...q); triAdd(q[0], q[1], q[2], q[6], q[7], q[8], q[3], q[4], q[5]); }
+  // the floating stones: their own group, fixed in the sky (they do not rise with the island); shown once it is afloat
+  { const sg = new THREE.Group(); sg.position.copy(g.position); sg.rotation.y = A.yaw; scene.add(sg); A.sg = sg; for (const [m, list] of MGs) { const geo = mergeGeometries(list); if (!geo) continue; const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; sg.add(o); draws++; } }
+  // THE LIFT (his: a chunk of earth breaks off and floats): one rig, the whole island its piece; FALLEN it is held 83 m down on the mountain
+  { const L = Y0 - gF, pl = [Wx(0, 14.8), rwHeight(Wx(0, 14.8), Wz(0, 14.8)) + .06, Wz(0, 14.8)]; const R = rsChunkRig(A, MG, {}, pl, []); R.g = g; R.lift = L; R.baseY = -L; R.dur = 10; restoreSet(R, R.goal); A.lift = L;
+    A.bR = boxes.slice(0, nMain); A.bS = boxes.slice(nMain); A.bF = A.bR.map(b => Object.assign({}, b, { miny: b.miny - L, maxy: b.maxy - L })); A.bOn = null; gjinraBoxes(R.goal ? 'R' : 'F'); }
   A.stat.draws = draws + 1;
   console.log('[melee] the Jinra refinery (procedural): ' + A.stat.draws + ' draws, island top ' + Y0 + ' m, globe at ' + GY.toFixed(0) + ' m, ' + A.stat.stones + ' floating stones from the lookout (' + AGE.st + ')');
 }
 // the hook for what it sells (his to flesh out): a chime and a log, nothing taken yet
 function gjinraBuy(item) { snd('clang', { g: .6, r: 2.2 }); console.log('[melee] jinra shop: asked for ' + (item && item.name)); return 0; }
-function gjinraStep(dt, t) { const A = GJINRA; if (!A.g) return; if (hsF()) { if (A.fall) A.fall.visible = false; return; } if (A.fall) A.fall.material.opacity = .45 + .12 * Math.sin(t * 3.1); A.st = (A.st || 0) - dt;
+// the refinery's colliders: the island's set where it stands (F on the mountain, R in the sky, plus the floating stones), none while it flies
+function gjinraBoxes(k) { const A = GJINRA; if (A.bOn === k) return; for (const set of [A.bR, A.bF, A.bS]) for (const b of set || []) { const i = BOXES.indexOf(b); if (i >= 0) BOXES.splice(i, 1); }
+  if (k === 'R') for (const b of A.bR.concat(A.bS)) BOXES.push(b); else if (k === 'F') for (const b of A.bF) BOXES.push(b); A.bOn = k; if (typeof boxGrid === 'function' && A.built) boxGrid(); }
+function gjinraStep(dt, t) { const A = GJINRA; if (!A.g) return; A.built = 1; const RT = rsChunkSync(A); gjinraBoxes(RT >= .999 ? 'R' : RT <= .001 ? 'F' : 'none'); if (A.sg) A.sg.visible = RT > .99; if (A.fall) A.fall.visible = RT > .95; if (RT < .95) return; if (A.fall) A.fall.material.opacity = .45 + .12 * Math.sin(t * 3.1); A.st = (A.st || 0) - dt;
   if (A.st <= 0) { A.st = .14; if (A.fallTop) spkBurst(A.fallTop[0], A.fallTop[1] - Math.random() * 30, A.fallTop[2], 2, { col: [.55, 1, .8], spread: 1.2, size: .1, life: .7 }); if (A.smokeAt) spkBurst(A.smokeAt[0], A.smokeAt[1], A.smokeAt[2], 1, { col: [.7, 1, .85], spread: .6, size: .16, life: 1.2 }); }
   if (A.stones && A.g) { } }
 // THE PEAK (his, after m1475: "another element of height... a hill, a mountain on the top up there... a lookout tower at the very top"): a
@@ -66699,7 +66706,7 @@ async function buildHome() {
   if (GMILL.on && H.style !== 'lake') try { gmillBuild(); } catch (e) { console.error('[melee] water mill', e); note('MILL BUILD THREW'); }
   if (GPEAK.on && H.style !== 'lake') try { gpeakBuild(); } catch (e) { console.error('[melee] the peak', e); note('PEAK BUILD THREW'); }
   if (GJINRA.on && GPEAK.on && H.style !== 'lake') try { gjinraBuild(); } catch (e) { console.error('[melee] jinra refinery', e); note('JINRA BUILD THREW'); }
-  if (H.style !== 'lake') { for (const P of [GPEAK, GJINRA]) hsFallen(P.g); }     // FALLEN: weathered, unlit
+  if (H.style !== 'lake') { for (const P of [GPEAK]) hsFallen(P.g); }     // FALLEN: weathered, unlit
   else try { const g = await loadGLB(H.hut.file, 'loading the refuge');
     const m = g.scene, drop = []; m.traverse(o => { if (o.isLight) drop.push(o); }); for (const o of drop) o.removeFromParent();
     m.updateMatrixWorld(true); const bb = new THREE.Box3(); m.traverse(o => { if (o.isMesh && o.name !== 'collider' && o.geometry) { o.geometry.computeBoundingBox(); bb.union(o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld)); } });
