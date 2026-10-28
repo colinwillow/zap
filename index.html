@@ -21431,7 +21431,7 @@ function mktBuild() {
   // m1544 (the RE-PASS, pass 1): a HERO / TOWN place -- the hero kit in painted maps (timber, warm planks, stone-block paving, the kit red),
   // timber signboards instead of the neon, bunting, plants; every static piece merges (`mg`)
   const K = korMats(), wood = K.timber, plank = triMat('wood_planks', { scale: 2.2, color: 0xc8a68a }), stone = triMat('stone_blocks', { scale: 3, color: 0xe2d8c8 });
-  const verm = K.redL, lamp = K.lamp, MG = new Map(), put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); }, plants = [];
+  const verm = K.redL, lamp = K.lamp, cables = [], cab = (...q) => { const n0 = g.children.length; bldCable(g, ...q); cables.push(...g.children.slice(n0)); }, MG = new Map(), put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); }, plants = [];
   const add = (geo, m, x, y, z, solid) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; g.add(o);
     if (solid) { geo.computeBoundingBox(); const b = geo.boundingBox; O.boxes.push({ minx: x + b.min.x, maxx: x + b.max.x, miny: y + b.min.y, maxy: y + b.max.y, minz: z + b.min.z, maxz: z + b.max.z }); } return o; };
   const flat = (xa, xb, za, zc, y) => tris.push(xa, y, za, xb, y, za, xb, y, zc, xa, y, za, xb, y, zc, xa, y, zc);
@@ -21496,7 +21496,7 @@ function mktBuild() {
       else { st(.06, .56, 0, 0); st(.38, .06, 0, .1); st(.06, .3, -.09, -.1, -.7); st(.06, .3, .09, -.1, .7); } }
     for (const e of [-1, 1]) korLantern(put, K, sx + e * 1.45, RT + .95, zf - .3, .7); }
   // a string of lanterns along the front, and a red CHOCHIN at each partition post
-  bldCable(g, [x0, H - .2, zf - .3], [x0 + W, H - .2, zf - .3], .45, 9, lamp);
+  cab([x0, H - .2, zf - .3], [x0 + W, H - .2, zf - .3], .45, 9, lamp);
   const chochin = [], cp = new THREE.MeshStandardMaterial({ color: 0xd8302a, emissive: 0xff5a2a, emissiveIntensity: .9, roughness: .8 });
   for (let i = 0; i <= A.n; i++) { const c = new THREE.Group(); c.position.set(x0 + i * A.w, H - .5, zf - .35); g.add(c); const l = new THREE.Mesh(new THREE.SphereGeometry(.26, 12, 10), cp); l.scale.y = 1.3; l.position.y = -.35; c.add(l); chochin.push(c); }
   // ---- PASS 3 (m1138): the polish -- nobori flags, a robot merchant, tall poles with grapple rings, cables and a drone ----
@@ -21517,7 +21517,7 @@ function mktBuild() {
   // TALL POLES at the roof's two ends with GRAPPLE RINGS at their tops (swing off the market roof)
   const rings = []; for (const ex of [x0 - .1, x0 + W + .1]) { add(new THREE.CylinderGeometry(.09, .12, 5, 8), verm, ex, RT + 2.5, zb, 0); rings.push(gringAdd(g, ex, RT + 4.6, zb - .3)); }
   // cables from the poles to stakes behind, lamps on them; a drone
-  for (const ex of [x0 - .1, x0 + W + .1]) { const G2 = [ex, .3, zb + 5.5]; bldCable(g, [ex, RT + 4.9, zb], G2, 1.2, 4, lamp); add(new THREE.CylinderGeometry(.08, .1, .8, 6), wood, G2[0], .4, G2[2], 0); }     // m1139: stakes straight back (sideways they ran into the Shrine)
+  for (const ex of [x0 - .1, x0 + W + .1]) { const G2 = [ex, .3, zb + 5.5]; cab([ex, RT + 4.9, zb], G2, 1.2, 4, lamp); add(new THREE.CylinderGeometry(.08, .1, .8, 6), wood, G2[0], .4, G2[2], 0); }     // m1139: stakes straight back (sideways they ran into the Shrine)
   const drone = bldDrone(g);
   // ---- PASS 4 (m1175): a ROOFTOP TEAHOUSE and a FRUIT STAND -- low tables and cushions on the roof under a red parasol, a LAUNDRY LINE
   // strung pole to pole with washing flapping, three crates of bright FRUIT by the noodle bar that burst in their own colours ----
@@ -21525,7 +21525,7 @@ function mktBuild() {
       add(new THREE.BoxGeometry(1.1, .35, .8), wood, X, RTp + .18, Z, 1); for (const sx of [-1, 1]) add(new THREE.BoxGeometry(.5, .12, .5), K.red, X + sx * .85, RTp + .06, Z, 0); }
     const pz = cz + 1.6 * k; add(new THREE.CylinderGeometry(.05, .05, 2.6, 6), wood, cx - 2.3 * k, RTp + 1.3, pz, 1); const par = add(new THREE.ConeGeometry(1.8, .7, 16, 1, true), new THREE.MeshStandardMaterial({ color: 0xc8341f, roughness: .8, side: THREE.DoubleSide }), cx - 2.3 * k, RTp + 2.6, pz, 0); par.castShadow = true;
     const lp = []; for (let k = 0; k <= 20; k++) { const u = k / 20; lp.push(new THREE.Vector3(x0 - .1 + (W + .2) * u, RT + 4.2 - Math.sin(u * Math.PI) * 1.2, zb)); }
-    g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(lp), 40, .015, 3), wood));
+    var lline = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(lp), 40, .015, 3), wood); g.add(lline);
     const cc = [0xf2ece0, 0x2a6ac8, 0xc8341f, 0xe8c23a, 0x3aa84a]; var wash = []; for (let k = 1; k < 20; k += 2) { const q = lp[k], w = new THREE.Mesh(new THREE.PlaneGeometry(.6 + (k % 3) * .2, .7 + (k % 2) * .3), new THREE.MeshStandardMaterial({ color: cc[k % 5], roughness: .9, side: THREE.DoubleSide })); w.position.set(q.x, q.y - .45, q.z); g.add(w); wash.push(w); } }
   var fruitS = []; { const fc = [[0xff7a1a, [1, .5, .1]], [0xd8302a, [.9, .2, .15]], [0x8ad040, [.5, .85, .25]]];
     for (let k = 0; k < 3; k++) { const X = x0 + 2.5 * A.w - 1.6 + k * .9, Z = zf - 1.15, cr = add(new THREE.BoxGeometry(.8, .45, .6), wood, X, .23, Z, 0); cr.userData.mg = 0;
@@ -21546,9 +21546,40 @@ function mktBuild() {
   plantPlant(plants, 'cherry', cx - 4 * k, 0, zb + 4.5, 1.4, 1); plantPlant(plants, 'pine', cx + 7 * k, 0, zb + 5, 1.2, 2);
   for (let i = 0; i <= A.n; i++) { const px = x0 + i * A.w + (i === A.n ? -.55 : .55); put(new THREE.CylinderGeometry(.28, .22, .4, 10).translate(px, .2, zf - .45), K.iron); plantPlant(plants, i % 2 ? 'flowers' : 'fern', px, .4, zf - .45, .7, i); }
   for (let i = 0; i < 18; i++) { const u = i / 17, e = i % 2 ? zf - .9 - (i % 3) * .4 : zb + .9 + (i % 3) * .3; plantPlant(plants, ['grass', 'stones', 'tallgrass'][i % 3], x0 - 1 + (W + 2) * u, 0, e, .8, i); }
-  for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list.map(q => { const n = q.index ? q.toNonIndexed() : q; for (const a2 of Object.keys(n.attributes)) if (a2 !== 'position' && a2 !== 'normal') n.deleteAttribute(a2); if (!n.attributes.normal) n.computeVertexNormals(); return n; })), m); o.castShadow = o.receiveShadow = true; g.add(o); }
-  bldMergeStatic(g); const plantMs = plantFlush(g, plants);
-  MKT.on = { plantMs, A, g, O, bars, crates, t: 0, pot, chochin, robot, rings, drone, wash, fruitS, thief: null, thT: 8, lane: [x0 - 4, x0 + W + 4, zf - 1.6], pouch: null, fw };
+  // ---- RE-PASS 2 (m@X4@): RESTORABLE IN PLACE (rubric 7, a HERO place: no lift). The paving, the chunk walls, the ramp and the fireworks booth
+  // stay. The ROOF (slab, rail, signboards, teahouse, parasol), the FRONT POSTS and beam, each STALL (counter, goods, shelf, awning, noren,
+  // stools), the two RING POLES and the NOBORI are pieces. Fallen: the roof has come down across the stalls, the posts and poles lie in the
+  // street, the counters are tipped over, the colour is drained; the lantern strings, the laundry, the bars and the drone are gone, and the
+  // roof is not walkable. RESTORE (the mint plate off the west end, or SPAWN > BUILDINGS > STATE): the stalls right themselves, the posts and
+  // poles stand, the roof settles back on last ----
+  const R = restoreRig(g, { lift: 0, dur: 8, bob: 0 });
+  const pairs = []; for (const [m, list] of MG) for (const q of list) pairs.push([q, m]);
+  for (const o of g.children.slice()) if (o.isMesh && o.userData.mg) { const m = o.material, tri = m.customProgramCacheKey && String(m.customProgramCacheKey()).startsWith('tri'); if (m.transparent || (m.map && !tri)) continue;
+    o.updateMatrix(); pairs.push([(o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()).applyMatrix4(o.matrix), m]); o.removeFromParent(); }
+  const inX = x => x > x0 - 1 && x < x0 + W + 1;
+  const cls = (c, sz) => { if (!inX(c.x) && c.z > zf - 1) return null;
+    if (sz.y > 3 && c.y > H) return c.x < cx ? 'pole0' : 'pole1';
+    if (c.z < zf - 1.6 && (c.y > 2.5 || sz.y > 2)) return 'nob';
+    if (c.z > zb + .3 || c.z < zf - 1.6) return null;
+    if (c.y > H - .5) return 'roof';
+    if (sz.y > H * .8 && Math.abs(c.z - zf) < .4) return 'posts';
+    if (c.y < H - .2 && inX(c.x) && c.z < zb - .1) return 's' + Math.max(0, Math.min(A.n - 1, Math.floor((c.x - x0) / A.w))); return null; };
+  const fall = (key, c, sz) => { if (key === 'roof') return { p: [c.x + .5, 1.7, c.z + .4], r: [.2, .03, .07], hop: .6, at: .55 };
+    if (key === 'posts') return { p: [c.x + .4, .3, c.z - 2.2], r: [Math.PI / 2 * .95, .06, 0], hop: 1, at: .3 };
+    if (key === 'nob') return { p: [c.x + .6, .2, c.z - .4], r: [Math.PI / 2 * .95, .2, 0], hop: 1, at: .2 };
+    if (key[0] === 'p') { const e = key === 'pole1' ? 1 : -1; return { p: [c.x + e * 3.5, .3, c.z + .5], r: [0, .2, -e * Math.PI / 2 * .96], hop: 1.5, at: .4 }; }
+    const i = +key.slice(1); return { p: [c.x + (i % 2 ? .5 : -.5), .6, c.z - 1], r: [(i % 2 ? .6 : -.5), i * .4, (i % 2 ? -.3 : .3)], hop: 1, at: .06 + i * .05 }; };
+  const pieces = restorePieces(R, g, pairs, cls, fall); bldMergeStatic(g); const plantMs = plantFlush(g, plants);
+  { const skip = new Set([drone, robot, lline, ...wash, ...cables, ...plantMs, ...crates.map(C => C.m), ...fruitS.map(F => F.m), ...fw.tubes, ...Object.values(pieces)]), wb = new THREE.Box3(), wc = new THREE.Vector3(), ws = new THREE.Vector3();
+    for (const o of g.children.slice()) { if (skip.has(o) || o.isInstancedMesh) continue; wb.setFromObject(o); if (wb.isEmpty()) continue; wb.getCenter(wc); wb.getSize(ws); const key = cls(wc, ws); if (key && pieces[key]) pieces[key].attach(o); } }
+  scene.attach(robot); restoreSkin(R); g.attach(robot);     // the merchant is Worker B's: its materials are left alone
+  const bk = b2 => b2.cw ? null : cls(new THREE.Vector3((b2.minx + b2.maxx) / 2, (b2.miny + b2.maxy) / 2, (b2.minz + b2.maxz) / 2), new THREE.Vector3(b2.maxx - b2.minx, b2.maxy - b2.miny, b2.maxz - b2.minz));
+  const tb = [], tu = []; for (const q of O.tri || []) { const t3 = q.split(',').map(Number); (Math.min(t3[1], t3[4], t3[7]) > RT - .05 && Math.max(t3[2], t3[5], t3[8]) <= zb + .45 ? tu : tb).push(t3); } bldTrisDrop(O);
+  restoreRide(R, { base: { boxes: [], tris: tb }, up: { boxes: O.boxes.filter(b2 => bk(b2)), tris: tu, climbs: [], bars, rings, coins: [], objs: [drone, lline, ...wash, ...cables] } });
+  R.onSet = R2 => restoreRideSet(R2);
+  const ground = []; { const px = x0 - 4, pz = zf - 5, plate = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, .12, 24), new THREE.MeshStandardMaterial({ color: 0x3a4a46, emissive: 0x7affd8, emissiveIntensity: .7 })); plate.position.set(px, .06, pz); scene.add(plate); ground.push(plate); R.trig = { x: px, y: 0, z: pz, armed: 1 }; }
+  { const t0 = AGE.st === 'fallen' ? 0 : 1; R.goal = t0; restoreSet(R, t0); restoreRideSet(R, true); }
+  MKT.on = { R, pieces, ground, plantMs, A, g, O, bars, crates, t: 0, pot, chochin, robot, rings, drone, wash, fruitS, thief: null, thT: 8, lane: [x0 - 4, x0 + W + 4, zf - 1.6], pouch: null, fw };
   arenaBeam(cx, cz, [1, .7, .4], 1); snd('clang', { g: .7, r: .7 });
 }
 function mktHit(x, y, z, rad, dmg) {
@@ -21593,7 +21624,7 @@ function mktFireHit(x, y, z, rad) { const M = MKT.on; if (!M || !M.fw || M.fw.cd
   for (let k = 0; k < 8; k++) { const m = new THREE.Mesh(new THREE.ConeGeometry(.08, .35, 6), new THREE.MeshBasicMaterial({ color: 0xffd080, toneMapped: false })); m.position.set(F.x - .5 + (k % 4) * .33, 1.5, F.z - .4 + Math.floor(k / 4) * .6); M.g.add(m);
     const a = Math.random() * 6.28; F.rk.push({ m, t: -k * .12, vx: Math.sin(a) * 1.5, vz: Math.cos(a) * 1.5, tg: near.length ? near[k % near.length] : null, sky: [F.x + (Math.random() - .5) * 20, 14 + Math.random() * 6, F.z + (Math.random() - .5) * 20], col: cols[k % 4] }); }
   snd('swoosh', { g: .9, r: 1.5, x: F.x, z: F.z }); return 1; }
-function mktStep(dt) { const M = MKT.on; if (!M) return; M.t += dt; mktThief(M, dt); if (M.fw) mktFireworks(M, dt);
+function mktStep(dt) { const M = MKT.on; if (!M) return; M.t += dt; if (!M.R || M.R.t >= 1) bldJinraMotes(MKT.at[0], MKT.at[1], M.A.n * M.A.w / 2, dt); mktThief(M, dt); if (M.fw) mktFireworks(M, dt);
   for (const C of M.crates) { if (C.cool > 0) C.cool -= dt; if (!C.dead) continue; C.t -= dt;
     if (C.t <= 0) { const P = C.m.position, p = player; if (Math.hypot(p.pos.x - P.x, p.pos.z - P.z) < 1.2) { C.t = 1; continue; }
       const y = C.below && C.below.dead ? 0 : C.y0; P.y = y + .45; C.b.miny = y; C.b.maxy = y + .9; C.fall = null;
@@ -21609,7 +21640,7 @@ function mktStep(dt) { const M = MKT.on; if (!M) return; M.t += dt; mktThief(M, 
   if (M.robot) { const R = M.robot, p = player, P = R.position; R.position.y = Math.sin(M.t * 2.2) * .04;     // the merchant bobs and watches him
     R.userData.head.rotation.y = clamp(wrapAngle(Math.atan2(p.pos.x - P.x, p.pos.z - P.z) - Math.PI), -1.2, 1.2); }
   if (M.drone) { const [cx, cz] = MKT.at, a = M.t * .3; M.drone.position.set(cx + Math.cos(a) * 12, M.A.H + 7 + Math.sin(M.t * 1.3) * .4, cz + Math.sin(a) * 5); M.drone.rotation.y = -a; M.drone.children[1].rotation.z = M.t * .6; } }
-function mktClear() { const M = MKT.on; if (!M) return; smashDrop(M.fruitS); if (M.plantMs) plantDrop(M.plantMs); for (const C of M.crates) { const i = BOXES.indexOf(C.b); if (i >= 0) BOXES.splice(i, 1); } bldClear(M); MKT.on = null; }
+function mktClear() { const M = MKT.on; if (!M) return; if (M.R) { const i = RESTORE.list.indexOf(M.R); if (i >= 0) RESTORE.list.splice(i, 1); if (M.R.ride) { bldTrisDrop(M.R.ride.tb); bldTrisDrop(M.R.ride.tu); } } for (const o of M.ground || []) o.removeFromParent(); smashDrop(M.fruitS); if (M.plantMs) plantDrop(M.plantMs); for (const C of M.crates) { const i = BOXES.indexOf(C.b); if (i >= 0) BOXES.splice(i, 1); } bldClear(M); MKT.on = null; }
 // m1141: SMASHABLES -- any building's breakable props (pots, barrels, offering boxes). `smashAdd(list, mesh, box, hp, fix, col)`: the mesh is
 // already in the building's group, its box goes into BOXES; any hit through `bldHit` chips it, at 0 it bursts (chips in `col`, a puff), the
 // box goes, and it is back `fix` s later (not while he stands on it). `smashDrop(list)` on clear. Stepped once a frame from the arena step.
@@ -26841,7 +26872,7 @@ const BLDG = { list: [
   { key: 'wtower', t: 'Watchtower', sub: 'three big storeys, a ramp round, perches with bars, a sentry gun, two archers, a war drum, a searchlight, a pulley basket up to the lookout, a signal beacon that calls the airship, a zip to the hall roof', pass: 6, build: () => wtowerBuild(), clear: () => wtowerClear(), on: () => !!WTOWER.on, step: dt => wtowerStep(dt) },
   { key: 'gate', t: 'Gatehouse', sub: 'a torii, a ballista you can man (stand at its breech), a drawbridge, archers, an alarm bell that drops the portcullis, a murder-hole cauldron', pass: 6, build: () => ghouseBuild(), clear: () => ghouseClear(), on: () => !!GHOUSE.on, step: dt => ghouseStep(dt) },
   { key: 'pagoda', t: 'Pagoda', sub: 'five storeys, a spiral ramp, gutters to climb the outside, a bell that knocks everyone down, shinobi archers on the roofs, an altar core that calls chain lightning off the spire', pass: 6, build: () => pagodaBuild(), clear: () => pagodaClear(), rig: () => PAGODA.on && PAGODA.on.R, on: () => !!PAGODA.on, step: dt => pagodaStep(dt) },
-  { key: 'market', t: 'Market Stalls', sub: 'four stalls, a noodle bar, a rooftop teahouse, a robot merchant, bars, crates and fruit to smash, a pickpocket to catch, a fireworks stall that launches at enemies', pass: 6, build: () => mktBuild(), clear: () => mktClear(), on: () => !!MKT.on, step: dt => mktStep(dt) },
+  { key: 'market', t: 'Market Stalls', sub: 'four stalls, a noodle bar, a rooftop teahouse, a robot merchant, bars, crates and fruit to smash, a pickpocket to catch, a fireworks stall that launches at enemies', pass: 6, build: () => mktBuild(), rig: () => MKT.on && MKT.on.R, clear: () => mktClear(), on: () => !!MKT.on, step: dt => mktStep(dt) },
   { key: 'shrine', t: 'Shrine', sub: 'a terrace, a koi pond, fox guardians that watch you, an offering box, a Jin core that heals, a fox gate to the Senbon Torii, an omikuji fortune box', pass: 6, build: () => shrineBuild(), clear: () => shrineClear(), rig: () => SHRINE.on && SHRINE.on.R, on: () => !!SHRINE.on, step: dt => shrineStep(dt) },
   { key: 'rampart', t: 'Rampart Wall', sub: 'a 40 m wall, a gateway to smash, archers, sentry guns, bars on top, rocks dropped on you, robot sentries on the walk, a war horn that summons a raid', pass: 6, build: () => rampBuild(), clear: () => rampClear(), on: () => !!RAMP.on, step: dt => rampStep(dt) },
   { key: 'adock', t: 'Airship Dock', sub: 'a 20 m tower, a lift, an airship that flies you round (ring the bell to cast off; grapple it); kites to glide off the deck; sky pirates raid the flight', pass: 6, build: () => adockBuild(), clear: () => adockClear(), on: () => !!ADOCK.on, step: dt => adockStep(dt) },
