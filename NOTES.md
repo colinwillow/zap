@@ -35,7 +35,7 @@ in there so I can transform it between the two states"; "these rocks are kind of
 - **THE HYBRID:** the sky islands over the rim (m1113) showed in FALLEN. KORAJIN: the floating world is what restoration raises -> hidden
   while fallen. (The refinery already sits on the flank when fallen.)
 Next: the painted textures (rock, sand, cliff), his ask in the same message.
-## m15xx -- ARENA SPEED, THE INTERCEPT YOU EARNED, SWINGS THAT LAND, THE CHARGE SWAP (his arena report, 20 fps)
+## m1711 -- ARENA SPEED, THE INTERCEPT YOU EARNED, SWINGS THAT LAND, THE CHARGE SWAP (his arena report, 20 fps)
 - **20 fps / chugging -- MEASURED (`?w=arena`, the game camera):** 1,033k triangles rendered and 104 calls.
   - ~900k of the triangles were the PLANTS: one InstancedMesh per kind over the whole world with `frustumCulled = false`, so every blade
     behind the lens and 80 m off was drawn every frame. Tallgrass 214k, frond 119k, grass 101k, shrub 98k, carpet 90k.

@@ -10160,7 +10160,7 @@ const PLANTK = {
 function plantKind(name) { if (PLANT.kinds[name]) return PLANT.kinds[name]; const K = PLANTK[name], geo = mergeGeometries(K.make()); PLANT.kinds[name] = { K, geo, n: 0, list: [] }; return PLANT.kinds[name]; }
 // put the instanced meshes down for every kind used under `g` (call once after all plantPlant calls for that group)
 function plantPlant(rec, kind, x, y, z, s, yaw) { rec.push({ kind, x, y, z, s, yaw }); }
-// m15xx (his: "the arena still needs a lot of optimization -- 20 fps, laggy, chugs"): MEASURED, the arena drew 1,033k triangles a frame and
+// m1711 (his: "the arena still needs a lot of optimization -- 20 fps, laggy, chugs"): MEASURED, the arena drew 1,033k triangles a frame and
 // ~900k of them were these plants -- one InstancedMesh per kind over the WHOLE world, `frustumCulled` off, so every blade behind the lens
 // and 80 m away was drawn every frame. Now each kind is cut into `cell` m squares, each its own mesh with a real bounding sphere (the
 // lens culls it), and the small ground cover goes past `far[kind]` m from the lens (`plantCull`). `mel.PLANT.cell = 0` is the old way.
@@ -14056,7 +14056,7 @@ function spiderArea(x, y, z, r, power, dmg) { let n = 0; for (const S of SPIDER.
     if (q < r + SPIDER.w * .4 && Math.abs(R.y - y) < 2.5 && spiderBlow(S, q > 1e-3 ? Math.atan2(dx, dz) : player.faceH, power, dmg, x, z)) n++; } return n; }
 // a limb or a blade sweeping from `a` to `b` (the strike's own sweep)
 function spiderSweep(a, b, rad, power, dmg, dirH) { let n = 0; for (const S of SPIDER.list.slice()) { const R = S.root.position;
-    if (!segBody(a, b, R.x, R.z, SPIDER.w * SPIDER.hitR + rad, R.y + S.lift + SPIDER.P.h, rad, R.y)) continue;     // m15xx: to the LEG span (.48 of its width), not the body's .38 -- a cut that met a leg missed, and at 20 fps every one did
+    if (!segBody(a, b, R.x, R.z, SPIDER.w * SPIDER.hitR + rad, R.y + S.lift + SPIDER.P.h, rad, R.y)) continue;     // m1711: to the LEG span (.48 of its width), not the body's .38 -- a cut that met a leg missed, and at 20 fps every one did
     const r = spiderBlow(S, dirH, power, dmg, _hitP.x, _hitP.z); if (r) { n++; if (r === 1) meleeHit(null, _hitP.x, _hitP.y, _hitP.z, .55 + Math.min(1, power) * .75); } } return n; }
 // a bolt in flight: true when a spider stopped it
 function spiderShot(b) { for (const S of SPIDER.list) { const M = spiderMid(S, _sdC); if (Math.hypot(b.pos.x - M.x, (b.pos.y - M.y) * 1.4, b.pos.z - M.z) > SPIDER.w * .42 + b.size * .5) continue;
@@ -14097,7 +14097,7 @@ function spiderThink(S, d, dt) { const Z = SPIDER, R = S.root, p = player, roll 
     case 'air': break;     // stepped in spiderStep (ballistic)
     case 'swind': if (S.stT > Z.spit.wind) { spiderGlob(S); S.st = 'srec'; S.stT = 0; } break;
     case 'srec': if (S.stT > .35) { S.st = 'walk'; S.cool = roll(Z.spit.cool); } break;
-    case 'stag': if (S.stT > .45) { const g = (S.hitRun || 0) >= Z.guardEvery || Math.random() < Z.guardP; S.st = g ? 'guard' : 'walk'; if (g) S.hitRun = 0; S.stT = 0; S.cool = Math.max(S.cool, .5); } break;     // m15xx: the guard was 30% after EVERY stagger for 1.1 s -- swipe after swipe clanged off it. Now a rarer, shorter guard, or after `guardEvery` hits in a row
+    case 'stag': if (S.stT > .45) { const g = (S.hitRun || 0) >= Z.guardEvery || Math.random() < Z.guardP; S.st = g ? 'guard' : 'walk'; if (g) S.hitRun = 0; S.stT = 0; S.cool = Math.max(S.cool, .5); } break;     // m1711: the guard was 30% after EVERY stagger for 1.1 s -- swipe after swipe clanged off it. Now a rarer, shorter guard, or after `guardEvery` hits in a row
     case 'guard': if (S.stT > Z.guardT) { S.st = 'walk'; S.stT = 0; } break; } }
 function spiderStep(dt) { const p = player, Z = SPIDER; if (Z.globs.length) spiderGlobStep(dt);
   for (const S of Z.list.slice()) { S.t += dt; S.hitCd -= dt; const R = S.root, dx = p.pos.x - R.position.x, dz = p.pos.z - R.position.z, d = Math.hypot(dx, dz);
@@ -14246,7 +14246,7 @@ function arrowStep(dt) {
       if (!hit && bldHit(P.x, P.y, P.z, .3, 3)) { A.m.removeFromParent(); ARROWS.splice(i, 1); continue; }     // m1128: a bolt sent home smashes the ballista
       if (hit) { dummyBlow(hit, Math.atan2(A.v.x, A.v.z), 1, 6); spkBurst(P.x, P.y, P.z, 14, { col: [.6, .85, 1], spread: 4, size: .12, life: .35 }); snd('hit', { g: 1, r: 1, x: P.x, z: P.z }); ARCH.stat.back = (ARCH.stat.back || 0) + 1;
         A.m.removeFromParent(); ARROWS.splice(i, 1); continue; } }
-    else if ((p.inter || p.interHold > 0 || (p.chargeGo && p.chLock)) && Math.abs(qy) < H * .8 && Math.hypot(qx, qz) < 1.1) {     // m15xx (his: "I'd release at the right time and as I flew through the air the arrows would still hit me"): in the intercept every arrow that reaches him is CUT and sent back -- at 20 fps an arrow covers 1.3 m a frame and could pass `deflStep`'s point test between frames
+    else if ((p.inter || p.interHold > 0 || (p.chargeGo && p.chLock)) && Math.abs(qy) < H * .8 && Math.hypot(qx, qz) < 1.1) {     // m1711 (his: "I'd release at the right time and as I flew through the air the arrows would still hit me"): in the intercept every arrow that reaches him is CUT and sent back -- at 20 fps an arrow covers 1.3 m a frame and could pass `deflStep`'s point test between frames
       const inter = p.inter; deflectThreat({ A, p: P }, 1); DEFL.stat.lockHits++; p.defl = null; p.chLock = null; p.inter = null; if (inter) { p.vel.x = 0; p.vel.z = 0; p.vel.y = Math.max(0, p.vel.y) * .2 + 1.5; p.interHold = INTER.hold; } continue; }
     else if (arrowBlock(A, cx, cy, cz)) continue;     // m1106: the blade turned it
     else if (Math.abs(qy) < H * .55 && Math.hypot(qx, qz) < .45) {
@@ -20910,7 +20910,7 @@ function mechTargets(dyMax, wide) { const out = [], p = player, DY = dyMax || ME
   if (SIEGE.on) { const S = SIEGE.on; for (const L of S.bals) if (!(L.dead > 0)) put(L, L.x, 0, L.z, .9); if (!(S.dead > 0)) put(S, S.tp[0], 0, S.tp[1], 1.7); }
   if (FSHIP.on && FSHIP.on.cans) for (const C of FSHIP.on.cans) if (!C.dead) { const W = C.g.getWorldPosition(new THREE.Vector3()); put(C, W.x, W.y - .55, W.z, .6); }
   if (RAMP.on && RAMP.on.sen) for (const S of RAMP.on.sen) if (S.st !== 'fall') { const P = S.g.position; put(S, P.x, P.y, P.z, .5); }
-  for (const S of SPIDER.list) if (!S.dead && !S.statue) { const P = S.root.position; put(S, P.x, P.y, P.z, SPIDER.w * .38); }     // m15xx: the spiders -- a swipe tracks and lunges to them like any man
+  for (const S of SPIDER.list) if (!S.dead && !S.statue) { const P = S.root.position; put(S, P.x, P.y, P.z, SPIDER.w * .38); }     // m1711: the spiders -- a swipe tracks and lunges to them like any man
   // m1260: *"if I'm trying to hit this box and I'm clearly targeted on it, it should lock, and when I let go he should launch and hit it --
   // not launch through it. Whatever he's indicating: a turret, a human, a box, a wall."* For the CHARGE (`wide`): every standing smashable
   // (crates, pots, barrels, supply drops) at its middle, and every breakable wall at the point of it nearest him (its standoff its half depth)
@@ -30047,7 +30047,7 @@ function coverLeap() {
 // above `top` (pushed up, as it charged) 0 = the flat launch forward as before; down to `bot` 1 = the highest leap. Over `min` the release is
 // `aimLeap`: straight up to `h0`..`h1` m and the katana's air slam (`slamGo`), its horizontal solved from the slam's clock to land where the
 // flat launch would have (the man in reach, or the hold's distance). An arc of dots shows the leap before he goes (`KAIM.line`).
-const CHARGE3 = { on: 1, dead: .3, leapK: .75, swap: 1 };     // m15xx `swap` (his: "I keep trying to do the lunge and it does the spiral"): 1 = NEUTRAL lunges forward, FORWARD spins; 0 = the m1688 way round
+const CHARGE3 = { on: 1, dead: .3, leapK: .75, swap: 1 };     // m1711 `swap` (his: "I keep trying to do the lunge and it does the spiral"): 1 = NEUTRAL lunges forward, FORWARD spins; 0 = the m1688 way round
 const KAIM = { top: .35, bot: -.8, min: .12, h0: 1.4, h1: 5.2, line: null, n: 28, dots: 0 };
 function kaimHold() {
   const p = player, R = stick.R; return slotNow().blade && R.down && p.chargeT >= MELEE.charge * .5 && !p.chargeGo && !p.knock && p.grounded;
