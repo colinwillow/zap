@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- THE KILL BLAST, and no wooden box on bodies (his: "the explosion when you killed the samurai -- I want that when you slice through
+them, a little explosion in the green smoke that billows up"; "the wood box break when an arrow hits me / when you cut through them -- take it
+out; when I'm hit I should make my grunts, I'm one of the alien warriors now")
+- **`killBlast(P, y, k, green)`** (the halving and the Osari's end):
+  - a hot flash of sparks (the samurai's `limbBoom` palette, the third burst green)
+  - a ring of green fire thrown out low (`gfire`)
+  - a column of big green smoke puffs that rise and grow over ~2 s
+  - the explosion recording (`boom` = `explosion_small.mp3`), a shake, a hit-stop
+  - Rendered: the cut, the fire ring, the smoke billowing up while the top half flies.
+- **Sounds:** `thud` IS `box_break_01.mp3`, and it stays on wood (props, buildings, bamboo, an arrow sticking in the ground). Off bodies:
+  - the player hurt (`playerHurt0`) -> HIS GRUNT (`grunt`, the seven `alien_orc_grunt` files) and a body `hit`
+  - an arrow on him -> the same (it went through `playerHurt` AND a second `thud`)
+  - an arrow sent home onto an enemy, the arena KO, the shield bash, the dragon's bite -> `hit`
+
 ## m1693 -- A FULL KATANA CHARGE CUTS THEM IN HALF (his: "it should just slice through -- small and medium guys cut in half; anything less shouldn't")
 - **`HALVE`:** a blow from a FULL charge (`chargeGoK` 1) with the katana on a horde body that is not heavy (`TIER` brute is the heavy class;
   peons, warriors and the Osari are small / medium) is `limbHalve`, an instant kill. A partial charge, a plain swing or a brute: as before.
