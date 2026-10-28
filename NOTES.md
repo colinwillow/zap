@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- The First Beacon: layer 1 handed to him (the Beacon loop stopped)
+Every box of BEACON.md's layer 1 that this side can tick is ticked (passes m1549-m1580): the route on his sheet's layout and exact heights, the
+spine crossing itself, a carved strata canyon, the wall jump in four beats, rests and checkpoints, fail-forward ladders, headroom, the route checked
+pair by pair against the move table (63 ok, proven to fail), the beacon seen from every station and each station seeing the next. **The scripted
+walk is PARKED:** a pad-driving bot through chimneys, ledges and zips is a big fragile rig, and the verification budget is his phone. The loop
+stopped so the level holds still while he walks it; his notes decide the next pass (or layer 2).
+
 ## m1580 -- The First Beacon pass 10: each station sees the next (local landmarks)
 - **Banners:** every station but the brazier gets a hero-kit banner pole (`korBanner`, 10.6 m, the red diamond cloth) on the corner FURTHEST from the
   next station, so the next run never stands between them. The beacon is the GLOBAL landmark (seen from every station, m1566); the banners are the
