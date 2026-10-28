@@ -134,7 +134,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - [x] **pass 8 (m1393, WORKER A):** his reference's SKY -- floating islands with pagodas and waterfalls, a ringed planet, drifting clouds; a smoking galley chimney
   - [x] **pass 9 (m1399, WORKER A):** flags that FLOW -- every banner and pennant is cloth (a travelling wave from the hoist, a shared gust); real pennants on masthead staffs with swallow-tails
   - [x] **pass 10 (m1404, WORKER A):** the SCENERY REBUILT (his: *"a cone flipped upside down... so goddamn geometric... the island is just a circle"*) -- `shipIsle`: eroded outlines with coves, painted ground, strata undersides that drip into lobes, floating chunks, vines, mixed trees with cherry blossom; the sea island with a mountain, beaches, surf on its real coast, sea stacks, and a HARBOUR (pier, houses, torii); eight floating islands; the haze pushed out
-  - [x] **pass 11 (m@X4@):** more FOAM on the sea (whitecaps, streaks) and the first BIG SEA CREATURE: a giant alien whale that surfaces, blows and dives (his: *"one big sea creature at a time"*)
+  - [x] **pass 11 (m1409):** more FOAM on the sea (whitecaps, streaks) and the first BIG SEA CREATURE: a giant alien whale that surfaces, blows and dives (his: *"one big sea creature at a time"*)
   - [ ] pass 12: a long serpent-fish that arcs up and down through the swell
   - [ ] pass 13: manta rays that swim AND fly (for the airship sky too)
   - [ ] later: other ships about (junks under sail), a bigger land harbour; air creatures for the airship (his: flying fish, serpent-dragons, pterodactyls)

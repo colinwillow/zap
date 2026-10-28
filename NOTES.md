@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## THE SHIP, PASS 11: FOAM, AND THE FIRST BIG SEA CREATURE -- A GIANT ALIEN WHALE (m@X4@, WORKER A)
+## THE SHIP, PASS 11: FOAM, AND THE FIRST BIG SEA CREATURE -- A GIANT ALIEN WHALE (m1409, WORKER A)
 
 His: *"I'm wondering if we can do foam on the water too... spend some time doing passes on developing one big sea creature at a time,
 like giant alien whales."*
