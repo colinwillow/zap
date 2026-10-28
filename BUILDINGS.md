@@ -220,8 +220,8 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
     cliff shrubs, the rope LIFT to the balcony, BREAKABLE pots, the back ladder and stall rack (ref 2) -- then his sign-off.
 
 ## FALLEN / RESTORED (his, after m1495; KORAJIN.md "THE RESTORATION") -- every Red Hollows piece has two states, default FALLEN
-*"Everything's gonna be fallen."* One build, one switch: **TOOLS > HOLLOWS > STATE** (reloads), `?hs=restored|fallen`, saved as `mel.hstate`.
-- [x] **pass 1 (next tick):** the switch (`HSTATE`, `hsF()`), and `hsFallen(g)` weathering every material of the home, the merchant, the mill,
+*"Everything's gonna be fallen."* One build, one switch, and it is **main's `AGE` (m1501)**: **SPAWN > BUILDINGS > STATE** (in the Red Hollows it reloads), saved as `mel.age`, **FALLEN unless RESTORED was chosen**; `?hs=restored|fallen` for a look.
+- [x] **pass 1 (next tick):** the state (`hsF()` reads `AGE.st`), and `hsFallen(g)` (main's `bldAge`) weathering every material of the home, the merchant, the mill,
   the peak and the refinery (desaturated to dust, metal to rust, every glow out, glass emptied); FALLEN: the home's fires and lights out and
   no smoke, the mill's wheel and sails still, no water poured; the lookout's brazier cold; the Jinra refinery NOT afloat: sunk on the
   mountain's flank (40 m), no Jinra fall, no motes, no floating stones. RESTORED is everything as built.
