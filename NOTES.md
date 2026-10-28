@@ -301,6 +301,24 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
+## THE RE-PASS: THE WATCHTOWER, PASS 3 -- THE LAYERS (m@X4@, WORKER A)
+
+Rubric 3 (L1 / L2 / L3, LEVELDESIGN.md). With this the Watchtower has its three passes; the last box is his OK.
+
+- **L1, the run:** the critical path is the spiral ramp (rest landings at every corner); the risky line is the perch BARS on decks 2 and 3,
+  and now each perch tip carries a DOUBLOON (`coinDrop`, removed from `COIN.list` on clear) as the optional reward. The east-foot bar (p1)
+  is the shortcut up the side.
+- **L2, the key:** a SHORTCUT, the Dark Souls loop back. A rope ladder sits ROLLED on the north perch of deck 2 (`W.lad`). Reach the perch's
+  root (within 2.2 m, at deck height), or strike the roll, and `wtowerLadder` unrolls it to the ground (the rungs grow down, the roll drops
+  and shrinks) and registers it as a climb (`kitClimbAdd`, its face to the +x side, its mark on the perch). From then on the second deck is a
+  ladder away. The keys already there stay: the war DRUM (alarm) and the BEACON (casts the airship off).
+- **L3, the guard:** the prize is a JINRA canister on the lookout (mint glass in bronze caps, pulsing and turning; the only mint on the
+  tower), with the lookout archer, the deck-2 archer and the sentry gun round it. The ramp's spiral exposes him to all three on the climb, and the
+  bar line and the shortcut are the ways to cut that exposure. No new leash code: zones stay as the archers' and the turret's own.
+- **Measured headless:** a strike on the roll opened it, the climb registered, three coins down, 98 draws. Not signed off.
+- **Open (for his look):** the draw count is still ~98 against the ~40 aim. Most of it is the breakable ground-floor wall pieces, the moving
+  parts and the plants; batching `cwallBuild` is a shared change for a later pass across every building that uses it.
+
 ## THE RE-PASS: THE WATCHTOWER, PASS 2 -- THE CROWN BREAKS, THE DOORS OPEN (m1489, WORKER A)
 
 Rubric 4 (breakable and alive). Started from his: *"start the loop as well, a few passes on each, then move on to the next."*

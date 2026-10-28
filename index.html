@@ -20393,7 +20393,21 @@ function wtowerBuild() {
   { const Bb = hbarMake(cx + hs + 3.2, cz - 1.2, Math.PI / 2, 0); HBAR.list.push(Bb); wbars.push(Bb); }
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
   const folded = bldMergeStatic(g);
-  WTOWER.on = { A, rings, g, O, bars: wbars, drone, t: 0, tur, fire, arch: null, sl, core, lift, beacon, folded, roof, doors }; const W = WTOWER.on;
+  // RE-PASS 3 (m@X4@): THE LAYERS. L2 -- a SHORTCUT: a rope ladder rolled up on the north perch of the second deck; reach the perch (or strike
+  // the roll) and it drops to the ground and is climbable from then on, so the next climb skips the ramp (a loop back). L1 -- DOUBLOONS out on
+  // the perch tips beyond the bars, the reward for the risky line. L3 -- the PRIZE on the lookout: a JINRA canister (mint, the only mint here),
+  // guarded by the lookout archer, the deck-2 archer and the sentry gun, with the beacon beside it.
+  const lad = { lx: cx + .62, lz: cz - hs - 2.6, top: S * 2, open: 0, k: 0, L: null }; { const parts = [], H = lad.top;
+    for (const sz of [-.42, .42]) parts.push(new THREE.CylinderGeometry(.04, .04, H, 5).translate(0, -H / 2, sz));
+    for (let y = .35; y < H; y += .36) parts.push(new THREE.CylinderGeometry(.035, .035, .84, 5).rotateX(Math.PI / 2).translate(0, -y, 0));
+    lad.m = new THREE.Mesh(mergeGeometries(parts.map(q => { const n = q.toNonIndexed(); n.deleteAttribute('uv'); return n; })), wood); lad.m.position.set(lad.lx, H, lad.lz); lad.m.scale.y = .02; lad.m.castShadow = true; g.add(lad.m);
+    lad.roll = new THREE.Mesh(new THREE.CylinderGeometry(.22, .22, .95, 10).rotateX(Math.PI / 2), wood); lad.roll.position.set(lad.lx, H - .1, lad.lz); g.add(lad.roll); }
+  const coins = []; for (const [y, sx, sz] of [[S * 2, 1, 0], [S * 3, -1, 0], [S * 2, 0, -1]]) coins.push(coinDrop(g, cx + sx * (hs + 3.6), y + 1.4, cz + sz * (hs + 3.6)));
+  { const jm = new THREE.MeshStandardMaterial({ color: 0x6dffc0, emissive: 0x2aff9a, emissiveIntensity: 1.6, transparent: true, opacity: .85, toneMapped: false }), jx = cx - .6, jz = cz - .6, jy = S * 3;
+    const can = new THREE.Mesh(new THREE.CylinderGeometry(.32, .32, .9, 14), jm); can.position.set(jx, jy + .65, jz); g.add(can);
+    for (const dy of [.15, 1.15]) { const c = new THREE.Mesh(new THREE.CylinderGeometry(.4, .4, .2, 14), bronzeM); c.position.set(jx, jy + dy, jz); g.add(c); }
+    lad.jin = can; }
+  WTOWER.on = { A, rings, g, O, bars: wbars, drone, t: 0, tur, fire, arch: null, sl, core, lift, beacon, folded, roof, doors, lad, coins }; const W = WTOWER.on;
   archerPost(cx - hs + 1, S * 3 + .05, cz + hs - 1).then(d => { if (WTOWER.on === W) W.arch = d; else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {});
   // ---- PASS 4 (m1169): a second archer on deck 2, the WAR DRUM (taiko) on deck 1 -- strike it and the alarm goes up: every archer and sentry
   // gun in the forge looses at once -- and two carp KITES flying off the lookout on long lines ----
@@ -20416,6 +20430,9 @@ function wtowerLift(W, dt) { const L = W.lift, p = player, [cx, cz] = WTOWER.at,
   const cy = Math.max(.3, L.top - L.y), len2 = Math.max(.1, ry - (cy + .3)); L.cw.position.y = cy; L.rope2.scale.y = len2; L.rope2.position.set(L.x - .3, ry - len2 / 2, L.z - .4); }
 function wtowerStep(dt) { const W = WTOWER.on; if (!W) return; W.t += dt; const [cx, cz] = WTOWER.at, a = W.t * .35; if (W.lift) wtowerLift(W, dt);
   if (W.roof) korTentStep(W.roof, dt);
+  if (W.lad) { const L = W.lad, p = player.pos; if (!L.open && Math.hypot(p.x - cx, p.z - (cz - W.A.hs - 1.8)) < 2.2 && Math.abs(p.y - L.top) < 1.2) wtowerLadder(W);
+    if (L.open && L.k < 1) { L.k = Math.min(1, L.k + dt * 1.4); L.m.scale.y = Math.max(.02, L.k * L.k); L.roll.position.y = L.top - .1 - L.top * L.k * L.k; L.roll.scale.setScalar(Math.max(.05, 1 - L.k)); }
+    if (L.jin) { L.jin.material.emissiveIntensity = 1.3 + Math.sin(W.t * 2.6) * .5; L.jin.rotation.y = W.t * .4; } }
   for (const D of W.doors || []) { if (D.dead) { D.t2 = (D.t2 || 0) + dt; D.vy -= 14 * dt; D.pv.position.y = Math.max(-.2, D.pv.position.y + D.vy * dt); D.pv.position.z += D.vz * dt; D.pv.rotation.x = Math.min(1.5, D.pv.rotation.x + dt * 2.5); if (D.t2 > 5) D.pv.visible = false; continue; }
     const p = player.pos, near = Math.hypot(p.x - cx, p.z - (cz + W.A.hs)) < 3.6 && p.y < 3; D.a += ((near ? 1.75 : 0) - D.a) * Math.min(1, dt * 4); D.pv.rotation.y = -D.sd * D.a; }     // both leaves swing IN (-z)
   if (W.beacon) { const B = W.beacon; if (B.t > 0) { B.t -= dt; B.coal.material.color.setRGB(1, .45 + Math.random() * .15, .1);
@@ -20441,8 +20458,12 @@ function wtowerBeacon(x, y, z, rad) { const W = WTOWER.on; if (!W || !W.beacon |
   B.t = WTOWER.beaconT; snd('boom', { g: .7, r: .9, x: B.x, z: B.z }); snd('swoosh', { g: .8, r: .6, x: B.x, z: B.z }); spkBurst(B.x, B.y, B.z, 26, { col: [1, .6, .2], spread: 5, size: .16, life: .7 });
   if (ADOCK.on && ADOCK.on.ss === 'docked') { ADOCK.on.st = Math.min(ADOCK.on.st, .6); ADOCK.on.dbT = 1; }     // the signal: the airship casts off
   return 1; }
+// RE-PASS 3 (m@X4@): the shortcut drops -- the ladder unrolls to the ground and becomes a climb (from its east face) up to the perch
+function wtowerLadder(W) { const L = W.lad; if (L.open) return; L.open = 1; snd('swoosh', { g: .8, r: .7, x: L.lx, z: L.lz }); snd('thud', { g: .6, r: .6, x: L.lx, z: L.lz });
+  L.L = kitClimbAdd({ minx: L.lx - .12, maxx: L.lx + .12, miny: 0, maxy: L.top, minz: L.lz - .45, maxz: L.lz + .45 }, 'wtower_ladder', L.top); L.L.mark = { x: WTOWER.at[0], y: L.top, z: L.lz + .6 }; }
 // RE-PASS 2 (m1489): a blow on the crown takes a panel (two hits), on a door a leaf
 function wtowerBreak(x, y, z, rad) { const W = WTOWER.on; if (!W) return 0;
+  if (W.lad && !W.lad.open && Math.hypot(x - W.lad.lx, y - W.lad.top, z - W.lad.lz) < .9 + rad) { wtowerLadder(W); return 1; }
   if (W.roof) { const i = korTentAt(W.roof, x, y, z, rad); if (i >= 0 && !W.roof.panels[i].dead) { const P = W.roof.panels[i]; if (--P.hp <= 0) korTentBreak(W.roof, i, W.g); else { snd('thud', { g: .6, r: 1.2, x, z }); spkBurst(x, y, z, 6, { col: [.8, .4, .3], spread: 1, size: .1, life: .4 }); } return 1; } }
   for (const D of W.doors || []) { if (D.dead) continue; const hx = D.pv.position.x, hz = D.pv.position.z, mx = hx - D.sd * Math.cos(D.pv.rotation.y) * D.lw / 2, mz = hz + D.sd * Math.sin(D.pv.rotation.y) * D.lw / 2;
     if (Math.hypot(x - mx, z - mz) < D.lw * .6 + rad && y < D.dh + rad) { D.dead = 1; D.vy = 2; D.vz = .8; snd('crack', { g: 1, r: .7, x, z }); snd('thud', { g: .8, r: .5, x, z }); spkBurst(mx, 1.5, mz, 18, { col: [.5, .35, .2], spread: 2, size: .14, life: .7 }); return 1; } }
@@ -20453,6 +20474,8 @@ function wtowerDrum(x, y, z, rad) { const W = WTOWER.on; if (!W || !W.drum || W.
   for (const d of HORDE.list) if (d.archer && d.st !== 'gone') d.arCool = 0; for (const T of TURRET.list) if (!T.dead) { T.cool = 0; T.see = 1; }
   ghouseAlarm(); return 1; }
 function wtowerClear() { const W = WTOWER.on; if (!W) return; bldClear(W); turretDrop(W.tur);
+  if (W.lad && W.lad.L) { const i = KCLIMB.indexOf(W.lad.L); if (i >= 0) KCLIMB.splice(i, 1); if (player.climb === W.lad.L) climbOff(); }
+  for (const c of W.coins || []) { const i = COIN.list.indexOf(c); if (i >= 0) COIN.list.splice(i, 1); }
   if (W.arch2 && HORDE.list.includes(W.arch2)) { bowDrop(W.arch2); bodyGone(W.arch2); HORDE.list.splice(HORDE.list.indexOf(W.arch2), 1); }
   if (W.arch && HORDE.list.includes(W.arch)) { bowDrop(W.arch); bodyGone(W.arch); HORDE.list.splice(HORDE.list.indexOf(W.arch), 1); } WTOWER.on = null; boxGrid(); }
 // m1126: THE GATEHOUSE (BUILDINGS.md #3, pass 1). Two gate towers either side of a 5 m passage, their ground storeys breakable
