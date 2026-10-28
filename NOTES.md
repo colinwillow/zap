@@ -6,7 +6,7 @@ report, and read the entry before touching that system. New notes go at the TOP 
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
 <<<<<<< HEAD
-## mDRG -- THE DRAGON RIDE, build 2: MOUNT / DISMOUNT (DRAGON.md box 2)
+## m1614 -- THE DRAGON RIDE, build 2: MOUNT / DISMOUNT (DRAGON.md box 2)
 - **The mount spot** (`dragSeat`): a mint ring at his LEFT flank, stepped out along his side until it is clear of his body box (+1.1 m),
   level with the dais. It pulses, brightens when you stand on it, and a tip says what to do (or, not CAPTURED, that he will not be ridden).
 - **`p.dragon`** is the state, `{ st: on | sit | off }`. `dragTap` (the right pad's tap, after TALK; `e` on a keyboard) climbs on or off.

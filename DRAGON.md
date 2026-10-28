@@ -18,7 +18,7 @@ dragon into a level (the WHOLE-PIECE RULE).
       (red lacquer and gold: head plate, bridle, live reins, cantle and saddle lames, pauldrons, a chest plate with our crest, neck and
       tail plates, tail rings and a crescent blade) and EVIL (blackened iron: mask with horns, spiked plates, spiked collar and chain,
       shackles, stolen red Jinra, his hide darkened). TOOLS > DRAGON switches CAPTURED / EVIL / BARE live. *Open: his look at it.*
-- [ ] **2. Mount / dismount** (mDRG): a mint ring at his left flank; stand on it and tap the right pad: an arc up into the saddle
+- [ ] **2. Mount / dismount** (m1614): a mint ring at his left flank; stand on it and tap the right pad: an arc up into the saddle
       (`in_air`), Grumbo seated in his `driving` clip (no riding clip in his file), the seat pinned to the dragon's Spine1; tap again to hop
       off onto the ring. CAPTURED only. The lens follows behind and pulls back. *Open: his look at it.*
 - [ ] **3. Ground riding**: the left pad steers him (his `run` / `idle` clips by speed), the camera behind and above, sized to him.
