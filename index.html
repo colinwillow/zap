@@ -64407,7 +64407,7 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 // to the shop front and to the round back door. Built in its OWN frame (local +z = the front, toward the river; `at`/`yaw` are HOME.hut's) and
 // merged per material; every collider a local box turned into the world (the yaw is a quarter turn, so a box stays a box); every walkable
 // surface a triangle. `?hut=glb` (or GHOME.on = 0) puts the GLB back, to compare. Pass 1: the massing and the walkable shell, with the inside.
-const GHOME = { on: 1, pass: 21, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
+const GHOME = { on: 1, pass: 22, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   Rtu: 2.5, door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
@@ -64427,6 +64427,18 @@ function ghNoise3(x, y, z) { const h = (i, j, k) => { let n = (i * 374761393 + j
   const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z), fx = x - xi, fy = y - yi, fz = z - zi, s = t => t * t * (3 - 2 * t), u = s(fx), v = s(fy), w = s(fz);
   const L = (a, b, t) => a + (b - a) * t;
   return L(L(L(h(xi, yi, zi), h(xi + 1, yi, zi), u), L(h(xi, yi + 1, zi), h(xi + 1, yi + 1, zi), u), v), L(L(h(xi, yi, zi + 1), h(xi + 1, yi, zi + 1), u), L(h(xi, yi + 1, zi + 1), h(xi + 1, yi + 1, zi + 1), u), v), w); }
+// pass 22: DESERT SANDSTONE, coloured per vertex (LINEAR): strata bands by height, warped by noise so they wander but stay level across
+// neighbouring rocks; dark VARNISH streaks running down the steep faces; tops bleached by the sun; a fine speckle
+function ghStrata(x, y, z, nx, ny, nz, out) { const C = [[.62, .36, .16], [.48, .17, .05], [.7, .4, .22], [.28, .07, .03], [.55, .26, .1], [.66, .44, .26]];
+  const w = ghNoise3(x * .25 + 4, y * .25, z * .25 - 2), t = y * 4.2 + w * 2.2 + ghNoise3(x * 1.3, y * 6, z * 1.3) * .35, i = Math.floor(t), f = t - i, k = f < .8 ? 0 : (f - .8) / .2, a = C[((i % 6) + 6) % 6], b = C[(((i + 1) % 6) + 6) % 6];
+  for (let j = 0; j < 3; j++) out[j] = a[j] + (b[j] - a[j]) * k;
+  const g = .9 + .2 * ghNoise3(x * .8 + 9, y * .8, z * .8); out[0] *= g; out[1] *= g; out[2] *= g;
+  if (ny < .5) { const st = ghNoise3(x * 3.1 + 1, y * .35, z * 3.1 - 5); if (st > .45) { const q = Math.min(1, (st - .45) * 4) * Math.min(1, (.5 - ny) * 2.5) * .85; out[0] += (.1 - out[0]) * q; out[1] += (.05 - out[1]) * q; out[2] += (.035 - out[2]) * q; } }
+  if (ny > .8) { const q = (ny - .8) * 1.2; out[0] += (.72 - out[0]) * q; out[1] += (.48 - out[1]) * q; out[2] += (.28 - out[2]) * q; }
+  if (ghNoise3(x * 5.3, y * 5.3, z * 5.3) > .8) { out[0] *= .7; out[1] *= .66; out[2] *= .64; }
+  return out; }
+function ghStrataCol(geo) { const p = geo.attributes.position, n = geo.attributes.normal, a = new Float32Array(p.count * 3), c = [0, 0, 0];
+  for (let i = 0; i < p.count; i++) { ghStrata(p.getX(i), p.getY(i), p.getZ(i), n.getX(i), n.getY(i), n.getZ(i), c); a[i * 3] = c[0]; a[i * 3 + 1] = c[1]; a[i * 3 + 2] = c[2]; } geo.setAttribute('color', new THREE.BufferAttribute(a, 3)); return geo; }
 function ghStone(x, y, z, out) {     // LINEAR colour (vertex colours are not sRGB-decoded): cream sRGB ~(.9,.79,.6), purple ~(.56,.42,.68), speckle dark brown
   const big = ghNoise3(x * .55 + 3, y * .55, z * .55 - 7), spot = ghNoise3(x * .9 + 11, y * .9, z * .9 + 5), fine = ghNoise3(x * 2.4, y * 2.4, z * 2.4), g = .86 + .18 * big;
   out[0] = .78 * g; out[1] = .58 * g; out[2] = .33 * g;
@@ -64499,7 +64511,7 @@ function ghomeBuild(at, yaw, y0) {
   const MG = new Map(), _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _v = new THREE.Vector3(), _one = new THREE.Vector3(1, 1, 1), col = [0, 0, 0];
   const put = (geo, m, mat4) => { geo = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(geo.attributes)) if (k !== 'position' && k !== 'normal' && !(k === 'uv' && m.map && !m.userData.tri)) geo.deleteAttribute(k);
     if (mat4) geo.applyMatrix4(mat4); if (!geo.attributes.normal) geo.computeVertexNormals();
-    if (m.vertexColors) { const p = geo.attributes.position, a = new Float32Array(p.count * 3); for (let i = 0; i < p.count; i++) { ghStone(p.getX(i), p.getY(i), p.getZ(i), col); a[i * 3] = col[0]; a[i * 3 + 1] = col[1]; a[i * 3 + 2] = col[2]; } geo.setAttribute('color', new THREE.BufferAttribute(a, 3)); }
+    if (m.userData.strata) ghStrataCol(geo); else if (m.vertexColors) { const p = geo.attributes.position, a = new Float32Array(p.count * 3); for (let i = 0; i < p.count; i++) { ghStone(p.getX(i), p.getY(i), p.getZ(i), col); a[i * 3] = col[0]; a[i * 3 + 1] = col[1]; a[i * 3 + 2] = col[2]; } geo.setAttribute('color', new THREE.BufferAttribute(a, 3)); }
     if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); };
   const at4 = (x, y, z, ry = 0, rx = 0, rz = 0, sx = 1, sy = 1, sz = 1) => _m4.compose(_v.set(x, y, z), _q.setFromEuler(_e.set(rx, ry, rz)), new THREE.Vector3(sx, sy, sz));
   // pass 5: THE LOOK -- main's tileable maps, TRIPLANAR (`triMat`: no uv, so every merged piece takes them): his sandstone (cream, pores,
@@ -64537,9 +64549,10 @@ function ghomeBuild(at, yaw, y0) {
     for (let i = 0; i < p.count; i++) { const u = p.getX(i) / w + .5, v = p.getY(i) / h + .5; p.setZ(i, .07 * Math.sin(Math.PI * u) + .04 * Math.sin(v * 9 + u * 3)); }
     geo.computeVertexNormals(); put(geo, m, at4(x, ytop - h / 2, z)); };
   // pass 18: a ROCK CLUSTER -- one big stone, one to three smaller ones leaning into it, a scatter of pebbles; all sunk into the ground
-  let rseed = 1; A.rockC = (x, z, k, rnd) => { const ry = rnd() * 6, main = ghRockGeo(rseed++, k * (1.2 + rnd() * .5), k * (.65 + rnd() * .4), k * (.9 + rnd() * .4)); put(main, stoneM, at4(x, -.08 * k, z, ry, (rnd() - .5) * .2, (rnd() - .5) * .2));
-    const m = 1 + ((rnd() * 3) | 0); for (let i = 0; i < m; i++) { const a = rnd() * 6, d = k * (.9 + rnd() * .5), kk = k * (.35 + rnd() * .3); put(ghRockGeo(rseed++, kk * (1 + rnd() * .5), kk * (.6 + rnd() * .5), kk), stoneM, at4(x + Math.sin(a) * d, -.05 * kk, z + Math.cos(a) * d, rnd() * 6, (rnd() - .5) * .5, (rnd() - .5) * .5)); }
-    for (let i = 0; i < 4; i++) { const a = rnd() * 6, d = k * (1.3 + rnd() * .9), kk = .1 + rnd() * .14; put(ghRockGeo(rseed++, kk * 1.3, kk * .7, kk, 1), stoneM, at4(x + Math.sin(a) * d, 0, z + Math.cos(a) * d, rnd() * 6)); } };
+  const rockM = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .93 }); rockM.userData.strata = 1; A.rockM = rockM;     // pass 22: the rocks are desert sandstone, not the house's stone
+  let rseed = 1; A.rockC = (x, z, k, rnd) => { const ry = rnd() * 6, main = ghRockGeo(rseed++, k * (1.2 + rnd() * .5), k * (.65 + rnd() * .4), k * (.9 + rnd() * .4)); put(main, rockM, at4(x, -.08 * k, z, ry, (rnd() - .5) * .2, (rnd() - .5) * .2));
+    const m = 1 + ((rnd() * 3) | 0); for (let i = 0; i < m; i++) { const a = rnd() * 6, d = k * (.9 + rnd() * .5), kk = k * (.35 + rnd() * .3); put(ghRockGeo(rseed++, kk * (1 + rnd() * .5), kk * (.6 + rnd() * .5), kk), rockM, at4(x + Math.sin(a) * d, -.05 * kk, z + Math.cos(a) * d, rnd() * 6, (rnd() - .5) * .5, (rnd() - .5) * .5)); }
+    for (let i = 0; i < 4; i++) { const a = rnd() * 6, d = k * (1.3 + rnd() * .9), kk = .1 + rnd() * .14; put(ghRockGeo(rseed++, kk * 1.3, kk * .7, kk, 1), rockM, at4(x + Math.sin(a) * d, 0, z + Math.cos(a) * d, rnd() * 6)); } };
   // ---- 1. THE MOUND: an oval plinth of stone (its top is the floor of every room), boulders round its foot ----
   { const prof = [[0, P], [.9, P], [.965, P - .1], [.995, P - .35], [1.03, .3], [1.06, -.4]].map(([r, y]) => new THREE.Vector2(r, y));
     put(new THREE.LatheGeometry(prof, 160), stoneM, at4(0, 0, 0, 0, 0, 0, A.rx, 1, A.rz));
@@ -64996,7 +65009,7 @@ function ghomeBuild(at, yaw, y0) {
       const e = (x / A.rx) ** 2 + (z / A.rz) ** 2; return e > 1.15 && gH(x, z) > wY + .25; };
     // the SHELVES: wide, flat, stratified, sunk -- they make ground, not balls
     let sd = 900; const flat = (x, z, r) => { const y = gH(x, z); return [[r, 0], [-r, 0], [0, r], [0, -r]].every(([dx, dz]) => Math.abs(gH(x + dx, z + dz) - y) < .45); };     // a shelf on the wall's slope reads as a slab in the air
-    const shelf = (x, z, w, h, d, ry) => { if (!flat(x, z, Math.max(w, d))) return; const y = gH(x, z); put(ghRockGeo(sd++, w, h, d, 3), stoneM, at4(x, y - h * .35, z, ry, (rnd() - .5) * .08, (rnd() - .5) * .08)); const c = Math.abs(Math.cos(ry)), s2 = Math.abs(Math.sin(ry)), ex = w * c + d * s2, ez = w * s2 + d * c; box(x - ex * .7, x + ex * .7, y - 1, y + h * .45, z - ez * .7, z + ez * .7); };
+    const shelf = (x, z, w, h, d, ry) => { if (!flat(x, z, Math.max(w, d))) return; const y = gH(x, z); put(ghRockGeo(sd++, w, h, d, 3), A.rockM, at4(x, y - h * .35, z, ry, (rnd() - .5) * .08, (rnd() - .5) * .08)); const c = Math.abs(Math.cos(ry)), s2 = Math.abs(Math.sin(ry)), ex = w * c + d * s2, ez = w * s2 + d * c; box(x - ex * .7, x + ex * .7, y - 1, y + h * .45, z - ez * .7, z + ez * .7); };
     for (const [x, z, w, h, d, ry] of [[-16, -2, 4.2, 1.1, 2.6, .4], [-14, -9, 5.2, 1.5, 3, -.3], [15, -7, 4.6, 1.2, 2.4, .9], [-21, 5, 3.4, .8, 2.2, 1.3], [6, -11.5, 4.8, 1.0, 2.2, .1], [-6, -12, 3.6, .9, 2, -.6], [21, -1, 3, .7, 1.8, .5]]) if (gH(x, z) > wY + .3 && flat(x, z, Math.max(w, d))) { shelf(x, z, w, h, d, ry); for (let k = 0; k < 2; k++) { const a = rnd() * 6; shelf(x + Math.sin(a) * w * .8, z + Math.cos(a) * d * .8, w * .45, h * .6, d * .5, ry + rnd()); } }
     // the plants
     const bush = (seed, r) => { const gg = new THREE.IcosahedronGeometry(1, 1), q = gg.attributes.position; for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = q.getY(i), z = q.getZ(i), d = .78 + ghNoise3(x * 2.1 + seed, y * 2.1, z * 2.1 - seed) * .5; q.setXYZ(i, x * d * r, Math.max(-.35, y) * d * r * .85, z * d * r); } gg.computeVertexNormals(); return gg; };     // round and lumpy, faceted: a bush, not a pad
@@ -65133,10 +65146,10 @@ function hollowDress() {
       if (Math.hypot(s - H.hut.at[0], z - H.hut.at[1]) < 9 * (H.hutS || 1) || Math.hypot(s - H.spawn[0], z - H.spawn[1]) < 5) continue;
       const y = rwHeight(s, z), n = r() < .35 ? 3 : 1;
       for (let k = 0; k < n; k++) { const R = (n > 1 ? 1.6 - k * .35 : 1.2 + r() * 2.2); const g = ghRockGeo(i * 5 + k + 300, R * (1.1 + r() * .4), R * (n > 1 ? .75 : .6 + r() * .35), R * (.85 + r() * .3), 2); g.rotateY(r() * 6);     /* pass 18 (Worker B): rocks, not eggs */
-        g.translate(s + (r() - .5) * .4, y + (n > 1 ? R * .7 + k * R * 1.15 : R * .3), z); rk.push(sCol(g, [0xd09066, 0xc06a45, 0xe0b08a][(i + k) % 3])); }
+        g.translate(s + (r() - .5) * .4, y + (n > 1 ? R * .7 + k * R * 1.15 : R * .3), z); rk.push(ghStrataCol(g)); }
       BOXES.push({ minx: s - 1.3, maxx: s + 1.3, miny: -2, maxy: y + (n > 1 ? 5 : 1.2), minz: z - 1.3, maxz: z + 1.3 }); }
     for (let i = 0; i < 40; i++) { const z = -150 + r() * 300, side = r() < .5 ? -1 : 1, s = hwRc(z) + side * ((side < 0 ? HOLLOW.floorW : HOLLOW.floorE) + HOLLOW.wall + 6 + r() * 20), y = rwHeight(s, z), R = 3 + r() * 5;
-      const g = ghRockGeo(i + 500, R * (1.1 + r() * .4), R * (.5 + r() * .25), R * (.85 + r() * .3), 2); g.rotateY(r() * 6); g.translate(s, y + R * .1, z); rk.push(sCol(g, [0xc87a52, 0xe0b08a, 0xb5603e][i % 3])); }
+      const g = ghRockGeo(i + 500, R * (1.1 + r() * .4), R * (.5 + r() * .25), R * (.85 + r() * .3), 2); g.rotateY(r() * 6); g.translate(s, y + R * .1, z); rk.push(ghStrataCol(g)); }
     const m = rwMesh(rk, rwMat(0xffffff, { vertexColors: true, roughness: .95 })); m.geometry.computeVertexNormals(); }
   // CAVE MOUTHS in the walls at the floor: a dark arch with a rim of darker stone
   { const dark = [], rim = []; for (const [z, side] of [[-30, -1], [18, -1], [-55, 1], [40, 1], [95, -1]]) { const x = wallX(z, side, 1.5), y = rwHeight(x, z) - .3, ry = side < 0 ? Math.PI / 2 : -Math.PI / 2;     // m1114: the cave at 70 moved to 95, out of the west path's foot
