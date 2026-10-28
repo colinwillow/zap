@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- A HIT BREAKS THE CHARGE; THE DRAGON SHOOTS LIKE A FIGHTER PLANE
+## m1704 -- A HIT BREAKS THE CHARGE; THE DRAGON SHOOTS LIKE A FIGHTER PLANE
 **The charge (his: "when I'm charging up on the right stick and the enemy attacks, it auto-lets-go and I auto attack them -- that's too
 easy, you'd charge over and over and never get hurt. If you don't release in time it should just f--- you up. The counter is the parry"):**
 - **The cause:** the charge's hold branch needs `!p.knock`, grounded and so on. A blow that stuns or shoves broke those conditions, and the

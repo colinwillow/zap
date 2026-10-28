@@ -11725,7 +11725,7 @@ function dragFxStep(dt) { const Z = DRAGZ, O = Z.on;
     if (hitT || (Fl && P.y < Fl.y + f.r * .5) || boxRay(ox, oy, oz, P.x, P.y, P.z, _tuR) || f.life <= 0 || P.y < Z.cloudY) { O.fb.splice(i, 1); dragBoom(f); } }
   for (const t of O.tg) { if (t.dead > 0) { t.dead -= dt; if (t.dead <= 0) t.G.visible = true; continue; }
     for (const b of BOLTS) if (b.t < 50 && Math.hypot(b.pos.x - t.x, b.pos.y - t.y, b.pos.z - t.z) < t.r + (b.size || .4) * .5) { b.t = 1e9; dragTargetHit(t); break; } } }
-// m15xx (his: "the same as the normal shot: press UP on the right stick to start the shot, let go and it shoots -- and you AIM WITH THE LEFT
+// m1704 (his: "the same as the normal shot: press UP on the right stick to start the shot, let go and it shoots -- and you AIM WITH THE LEFT
 // STICK: the aimer is just in front of the dragon, so you shoot like a FIGHTER PLANE"). m1703's FIRE toggle and thumb-dragged reticle are gone.
 // The right pad pushed UP (the trigger's own arc: `gunUp`, `gunArc`) for `armT` COCKS a fireball; letting it fall back or lifting the thumb
 // LOOSES it straight down his line of flight (heading and pitch, `dragFire`'s own default), grown by how long it was held (`fbChargeT` s to
@@ -45634,7 +45634,7 @@ function playerHurt0(dmg, dirH, push, up, stun, knock) {
   else if (guard) { dmg *= BLOCK.cut; push *= BLOCK.push; stun *= BLOCK.stun; up = 0; }
   if (guard) { blockFx(dirH, parry); p.parryT = parry ? BLOCK.show : 0; }
   if (parry && slotNow().blade) katanaParry(dirH);     // m979: a parry with the katana staggers him
-  // m15xx (his: "when I'm charging up on the right stick and the enemy attacks, it auto-lets-go -- I auto attack them. That's too easy, you'd
+  // m1704 (his: "when I'm charging up on the right stick and the enemy attacks, it auto-lets-go -- I auto attack them. That's too easy, you'd
   // charge over and over and never get hurt. If you don't release in time it should just f--- you up"): a blow that LANDS breaks the charge.
   // The stun / knock stopped the charge's hold branch, and the frame after fell through to `chargeRelease` -- a free counter on every hit.
   // Now the charge is thrown away (no swing) with a fizzle; a fresh one starts from nothing if the thumb is still up. The counter is the PARRY.
