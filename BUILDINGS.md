@@ -185,8 +185,8 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - **HIS (Oct 28 2026, first time in it): *"that might be my favorite thing of all time. I love the snow. Expand on that, expand on that, expand on
     that -- maybe that's where you find the dragon. A snow dragon."*** It is a REGION now, not a test patch: the passes below, then a snow world
     with height (VERTICALITY: ice shelves, a frozen waterfall, a cliff cave) where the SNOW DRAGON's lair is.
-  - [x] **the katana vanished (fixed m1640; m1628 'buried' and m1634/m1637 'mirror' were WRONG):** its faces shaded as back faces under the
-    physical BRDF (Basic/Lambert/DoubleSide copies drew, a FrontSide Standard one did not) -> DoubleSide steel. m1628's weapon snow-cutting removed (spikes).
+  - [x] **the katana vanished (really fixed m15xx):** a shader PROGRAM-CACHE collision -- the snow ground's displacing shader, unkeyed,
+    was handed to the blade and grip and squashed them into the snow (m1628/m1634/m1640's guesses superseded). Weapon snow-cutting removed.
   - [x] **pass 2a (m1632):** WIND-SHAPED DRIFTS and banks (the pack's resting depth is a field stretched along the wind, up to ~1 m; the refill
     returns to it; deeper drags harder), SNOWY PINES in seven stands (46, 3 draws) that DROP their snow when struck or slammed into (powder, a thud;
     the caps grow back over half a minute), and his BREATH fogging every ~1.6 s (quicker as he runs)

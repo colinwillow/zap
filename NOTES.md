@@ -47,6 +47,21 @@ reading the code has not found it, and a headless render of the zone (the preins
 Gates: check ok, zone boot ok. Shipped unverified.
 
 ## m15xx -- THE SWORD TASSEL (his: *"a little rope off the end of the handle with a fluffy ball on it, like Chinese swords"*)
+## m15xx -- THE KATANA IN THE SNOW, ACTUALLY FIXED: a shader PROGRAM-CACHE COLLISION (every earlier diagnosis superseded)
+His report after m1641: *"the sword blade is there but now the hilt is gone."* Isolated in the page with five boxes in the snowfield, each a
+different material: Physical, Lambert, Phong and DoubleSide Standard all drew right, but the plain FrontSide **MeshStandard box came out
+TALL and in the wrong place.** The cause: `MeshStandardMaterial.prototype.customProgramCacheKey` returns `'paint:1'` for every Standard
+material, and the snow ground's material set its own `onBeforeCompile` (it displaces y from the depth map) WITHOUT its own key. So three
+handed the snow's program to every plain Standard material with the same parameters, and the katana's blade and grip had their vertices
+pushed to snow height. m1628's "buried", m1634's "mirror" and m1640's DoubleSide all only changed which program got picked; none of them
+was the cause.
+- Fix: the snow ground gets key `'snowpack'`. The same unkeyed hook was on five more materials, and each now has its own key: the dojo
+  banners, the sky whale, the sky manta, the court tufts and the island land. The steel is back to m1634's grey (`0x8e99a7`, metalness
+  .72), FrontSide.
+- Rendered: the red box is square and in place, and the whole sword reads in his hand -- blade, guard, gold collar, dark grip, pommel, tassel.
+- **Rule (a comment by `paintPatch` now says it): an instance `onBeforeCompile` on a Standard material MUST set an instance
+  `customProgramCacheKey`.**
+- The tassel's pompom is up to .038 m.
 
 ## m1644 -- THE SWORD TASSEL (his: *"a little rope off the end of the handle with a fluffy ball on it, like Chinese swords"*)
 A red cord off the katana's pommel, a gold bead, and a fluffy red pompom with a ragged fringe. It is a 5-point VERLET chain in world space
