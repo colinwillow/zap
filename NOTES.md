@@ -5,6 +5,24 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## the LADDER REFACTOR, steps 2-4: on from the bottom without a snap, on FROM THE TOP, and off the top over the real climb-over clip (Worker B)
+His words (relayed): "we still need to perfect getting onto the ladder and off at the top". Built on the Ladder Yard (step 1).
+- **ON FROM THE BOTTOM** (`climbGo` -> `p.climbIn`): the latch rule is unchanged (push INTO the rungs from the FRONT, m170/m207/m1316), but he
+  no longer snaps onto the rungs: x/z ease from where he stood over `CLIMB.inT` .22 s while the climb starts.
+- **ON FROM THE TOP** (new: `climbTopTry`; there was no way at all -- `climbFind` only latches from the front, and on the top he is on the
+  mark's side): standing on the top within `CLIMB.topR` 1.3 m behind the rungs, feet at the top, walking toward the edge (stick . front > .6)
+  -> `p.climbDown` over `downT` .8 s: he walks to the edge turning round to face the ladder (0-.4), then lowers and swings in onto the
+  rungs with a small outward bulge (.4-1), hands near the lip. `p.climbTop`: that same push AWAY from the wall now means DOWN (it used to
+  mean "let go") until his thumb comes back to neutral.
+- **OFF AT THE TOP** (`CLIMB.mantle` 1): when his hands reach the lip (root = top - the clip's first hand height, `mantleCurve().H[0]`) and
+  he is still pushing up, the climb HANDS OVER to the ledge climb-up -- `stepMantle` with his hands pinned to the lip edge (m1043/m1051's
+  `ledge_hang_to_get_up_over_ledge`, its own 1.05 s pull) -- and he comes up over the top onto his feet `topIn` .65 m in (or at his exit
+  mark if that is nearer: the narrow ledge). Not pushing: he hangs at the top. `CLIMB.mantle = 0` is m1316's scripted arc (the A/B).
+Sim (headless, the shipped `frameBody`, the stick driven): ladder 3 (7 m) bottom -> MOUNT at .4 s -> CLIMB -> OVER at y 5.8 -> standing on
+the top .79 m in at 4.0 s; from its top -> TOPIN .8 s -> CLIMB down to the foot; ladders 1 (2 m: the pull from the floor), 6 (turned 45),
+11 (the hatch) and 13 (the narrow ledge, now landing on its mark) all go bottom -> over the top. Chip: LAD<OFF|MOUNT|CLIMB|TOPIN|OVER>#n.
+Still open (step 5): the hands and feet against the rungs at the climb speed (`npm run clips` is ask-first), and how each of these LOOKS --
+his phone.
 ## m1594 -- THE ZEPPELINS, detail pass 7 (the envelope walk: a moving climb)
 - A rope LADDER from the gondola deck (aft of the chart table) up through a hatch in the roof, and a railed plank CATWALK, 12 m along the
   envelope's spine at local y 11.15, on struts where the spine curves away, with a lantern at each end and three doubloons along it.
