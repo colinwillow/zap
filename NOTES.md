@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- A FULL KATANA CHARGE CUTS THEM IN HALF (his: "it should just slice through -- small and medium guys cut in half; anything less shouldn't")
+- **`HALVE`:** a blow from a FULL charge (`chargeGoK` 1) with the katana on a horde body that is not heavy (`TIER` brute is the heavy class;
+  peons, warriors and the Osari are small / medium) is `limbHalve`, an instant kill. A partial charge, a plain swing or a brute: as before.
+- **The split:** per kind, once (`halfPrep`), every triangle of his skin goes to the UPPER half (dominated by a bone under `Spine1`: chest,
+  arms, head) or the LOWER, by two of its three vertices. Both are lifted out as real pieces (`limbBake` now takes a triangle list): the top
+  flies on along the cut, spinning; the legs slump where he stood.
+- **The hit:** sparks and Jinra along the cut, a heavy ring and a boom, a hit-stop. The Osari burst into green fire at the cut.
+- The body is marked `gone` at once (the far-cull, `PERF.bodyFar`, re-showed it until `bodyGone` ran -- caught in the render).
+- Checked headless: a full charge on an Osari bowman -> halved (`gone`, the top thrown, the legs left standing and slumping); a .6 charge on
+  another -> knocked down, whole.
+
 ## m1691 -- GREEN FIRE: smaller, shorter, and every tongue turned (his: "a little tall, no rotation -- random rotation, smaller")
 - `aR`: each particle carries its own angle, turned in the fragment shader (the corners outside the turned sprite discarded). It starts
   within +/-.7 rad and spins at up to +/-2.5 rad/s as it rises.
