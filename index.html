@@ -13805,15 +13805,60 @@ try { if (localStorage.getItem('mel.hslice') === '0') HORDE.slice = 0; } catch (
 // m1675: THE OSARI OF THE HOLLOW DO NOT FALL (his: "when you finally kill him he turns into GREEN SMOKE -- he kind of explodes and evaporates").
 // An Osari's death is a burst of green Jinra smoke and sparks; the body swells a touch, its materials fade to nothing over `fadeT`, and he is
 // gone. His limbs still come off before that (an Osari always has `limbs`).
+// m15xx (his: "the green smoke needs to feel MUCH more like bright particle FIRE -- generate some sprites"): GREEN FIRE. Its own additive pool
+// (`GFIRE`, one draw): four FLAME sprites painted once to a 2x2 canvas atlas (a ragged teardrop of flame with a hot core and licks off its
+// edge, each different), every particle a frame of it, rising, flickering, swelling and spinning a touch, its colour run white-hot -> bright
+// Jinra green -> dark teal over its life, sized in metres at any lens. The Osari burst it from every bone of the body and keep burning off it
+// while they fade.
+const GFIRE = { n: 900, i: 0, pts: null };
+function gfireTex() { const cv = document.createElement('canvas'), S = 128; cv.width = cv.height = S * 2; const q = cv.getContext('2d'); let sd = 11; const r = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+  // soft painted flames, TALL and narrow: a tongue body and two or three licks off it, blurred (a flame has no hard edge). RED = the flame's mask,
+  // GREEN = its HOT CORE (a smaller tongue inside), which the shader runs to white-yellow -- the thing that makes it read as fire, not smoke
+  q.fillStyle = '#000'; q.fillRect(0, 0, S * 2, S * 2); q.globalCompositeOperation = 'lighter';
+  const tear = (x, y, w, h, al, col) => { const g = q.createRadialGradient(x, y - h * .32, 1, x, y - h * .38, h * .78); g.addColorStop(0, `rgba(${col},${al})`); g.addColorStop(.6, `rgba(${col},${al * .75})`); g.addColorStop(1, `rgba(${col},0)`);
+    q.fillStyle = g; q.beginPath(); q.moveTo(x, y - h); q.bezierCurveTo(x + w * .3, y - h * .6, x + w, y - h * .18, x, y); q.bezierCurveTo(x - w, y - h * .18, x - w * .3, y - h * .6, x, y - h); q.fill(); };
+  for (let f = 0; f < 4; f++) { const ox = (f % 2) * S, oy = (f >> 1) * S, cx = ox + S / 2, base = oy + S * .92;
+    q.save(); q.beginPath(); q.rect(ox, oy, S, S); q.clip(); q.filter = 'blur(' + (3 + f) + 'px)';
+    const lean = (r() - .5) * S * .12;
+    tear(cx, base, S * .36, S * .86, 1, '255,0,0');
+    const n = 2 + (f % 2); for (let k = 0; k < n; k++) tear(cx + lean + (r() - .5) * S * .28, base - S * (.2 + r() * .2), S * (.12 + r() * .06), S * (.42 + r() * .3), .9, '255,0,0');
+    tear(cx, base - S * .04, S * .14, S * .42, .9, '0,255,0');     // the hot core
+    q.restore(); }
+  const t = new THREE.CanvasTexture(cv); return t; }
+function gfireInit() { const N = GFIRE.n, g = new THREE.BufferGeometry(), P = new Float32Array(N * 3).fill(-999), C = new Float32Array(N * 3), S = new Float32Array(N), A = new Float32Array(N), Fr = new Float32Array(N);
+  g.setAttribute('position', new THREE.BufferAttribute(P, 3)); g.setAttribute('aCol', new THREE.BufferAttribute(C, 3)); g.setAttribute('aSize', new THREE.BufferAttribute(S, 1)); g.setAttribute('aA', new THREE.BufferAttribute(A, 1)); g.setAttribute('aF', new THREE.BufferAttribute(Fr, 1));
+  const m = new THREE.ShaderMaterial({ uniforms: { uT: { value: gfireTex() }, uPx: { value: 600 } }, transparent: true, depthWrite: false, blending: THREE.NormalBlending,     /* not additive: on his white snow additive fire is WHITE (rendered) -- saturated green over alpha reads on any ground */
+    vertexShader: 'attribute vec3 aCol; attribute float aSize, aA, aF; uniform float uPx; varying vec3 vC; varying float vA, vF; void main() { vec4 mv = modelViewMatrix * vec4(position, 1.0); gl_PointSize = aSize * uPx / max(.1, -mv.z); vC = aCol; vA = aA; vF = aF; gl_Position = projectionMatrix * mv; }',
+    fragmentShader: 'uniform sampler2D uT; varying vec3 vC; varying float vA, vF; void main() { vec2 uv = vec2(gl_PointCoord.x, 1.0 - gl_PointCoord.y) * .5 + vec2(mod(vF, 2.0), floor(vF / 2.0)) * .5; vec4 tx = texture2D(uT, uv); float a = tx.r * vA; if (a < .01) discard; gl_FragColor = vec4(mix(vC, vec3(.8, 1.0, .35), tx.g * .55), min(1.0, a * 1.3)); }' });
+  const pts = new THREE.Points(g, m); pts.frustumCulled = false; pts.renderOrder = 50; scene.add(pts);     /* after the fading (transparent) body it burns off, or he paints over his own fire */
+  GFIRE.pts = pts; GFIRE.P = P; GFIRE.C = C; GFIRE.S = S; GFIRE.A = A; GFIRE.F = Fr; GFIRE.v = new Float32Array(N * 3); GFIRE.life = new Float32Array(N); GFIRE.L0 = new Float32Array(N); GFIRE.s0 = new Float32Array(N); GFIRE.live = 0; }
+function gfire(x, y, z, k = 1) { if (!GFIRE.pts) gfireInit(); const G = GFIRE, i = G.i = (G.i + 1) % G.n;
+  G.P[i * 3] = x; G.P[i * 3 + 1] = y; G.P[i * 3 + 2] = z; G.v[i * 3] = (Math.random() - .5) * 1.6 * k; G.v[i * 3 + 1] = (2.6 + Math.random() * 2.4) * k; G.v[i * 3 + 2] = (Math.random() - .5) * 1.6 * k;
+  G.L0[i] = G.life[i] = .32 + Math.random() * .42; G.s0[i] = (.42 + Math.random() * .4) * k; G.F[i] = Math.floor(Math.random() * 4); G.live = 1; }
+function gfireStep(dt) { const G = GFIRE; if (!G.pts || !G.live) return; let any = 0, t = performance.now() / 1000;
+  for (let i = 0; i < G.n; i++) { if (G.life[i] <= 0) continue; any = 1; G.life[i] -= dt; const u = 1 - Math.max(0, G.life[i]) / G.L0[i], o = i * 3;
+    G.v[o + 1] += 2.5 * dt; G.v[o] += Math.sin(t * 9 + i) * 3 * dt; G.v[o + 2] += Math.cos(t * 8 + i * 1.7) * 3 * dt;
+    G.P[o] += G.v[o] * dt; G.P[o + 1] += G.v[o + 1] * dt; G.P[o + 2] += G.v[o + 2] * dt;
+    G.S[i] = G.s0[i] * (1.1 - u * .5) * (.9 + .2 * Math.sin(t * 30 + i));     // a tongue SHRINKS as it rises and burns out
+    G.A[i] = G.life[i] <= 0 ? 0 : Math.min(1, u * 8) * Math.pow(1 - u, .7) * .85 * (.8 + .2 * Math.sin(t * 25 + i * 3));
+    if (Math.random() < .08) G.F[i] = Math.floor(Math.random() * 4);     // the flicker: a new flame shape now and then
+    const c0 = u < .25 ? [.55, 1, .3] : u < .55 ? [.15, .95, .25] : [.05, .75, .25], c1 = u < .25 ? [.15, .95, .25] : u < .55 ? [.05, .75, .25] : [.03, .55, .2],     /* bright to the end: it FADES, it does not soot */ w = u < .25 ? u / .25 : u < .55 ? (u - .25) / .3 : (u - .55) / .45;
+    G.C[o] = c0[0] + (c1[0] - c0[0]) * w; G.C[o + 1] = c0[1] + (c1[1] - c0[1]) * w; G.C[o + 2] = c0[2] + (c1[2] - c0[2]) * w;
+    if (G.life[i] <= 0) { G.P[o + 1] = -999; G.A[i] = 0; } }
+  const g = G.pts.geometry; for (const n of ['position', 'aCol', 'aSize', 'aA', 'aF']) g.attributes[n].needsUpdate = true;
+  G.pts.material.uniforms.uPx.value = renderer.domElement.height / (2 * Math.tan(camera.fov * Math.PI / 360)); if (!any) G.live = 0; }
 const OSARI = { fadeT: .7, col: [.12, .85, .32], col2: [.04, .5, .2], fades: [] };
 function osariVanish(d) { const P = d.root.position; HORDE.stat.kills++; bowDrop(d);
   for (let i = 0; i < 3; i++) spkBurst(P.x, P.y + .9, P.z, 22, { col: i % 2 ? OSARI.col : [.85, 1, .9], spread: 6, size: .24, life: .7 });
-  for (let i = 0; i < 14; i++) { const a = Math.random() * 6.28, r = Math.random() * .7; smokeAt(P.x + Math.cos(a) * r, P.y + .2 + Math.random() * 1.6, P.z + Math.sin(a) * r, 3 + Math.random() * 2, 1.4 + Math.random(), i % 3 ? OSARI.col : OSARI.col2, 1.2); }
+  const bones = []; d.model.traverse(o => { if (o.isBone) bones.push(o); }); const bw = new THREE.Vector3();
+  for (let i = 0; i < 90; i++) { const b = bones[(Math.random() * bones.length) | 0]; if (b) b.getWorldPosition(bw); else bw.set(P.x, P.y + 1, P.z); gfire(bw.x + (Math.random() - .5) * .2, bw.y, bw.z + (Math.random() - .5) * .2, 1 + Math.random() * .6); }     // m15xx: GREEN FIRE off every bone
+  for (let i = 0; i < 4; i++) { const a = Math.random() * 6.28, r = Math.random() * .5; smokeAt(P.x + Math.cos(a) * r, P.y + .4 + Math.random() * 1.4, P.z + Math.sin(a) * r, 2.5, 1.2, OSARI.col2, .8); }
   snd('boom', { g: .55, r: 1.4, x: P.x, z: P.z }); snd('swoosh', { g: .6, r: .55, x: P.x, z: P.z }); camShake(.2);
   const mats = []; d.model.traverse(o => { if (o.isMesh && o.material) { o.material = o.material.clone(); o.material.transparent = true; o.material.depthWrite = false; mats.push(o.material); } });
   d.st = 'gone'; d.osariGone = 1; const i = HORDE.list.indexOf(d); if (i >= 0) HORDE.list.splice(i, 1); OSARI.fades.push({ d, mats, t: 0, s0: d.root.scale.x }); }
 function osariStep(dt) { for (let i = OSARI.fades.length - 1; i >= 0; i--) { const F = OSARI.fades[i], u = (F.t += dt) / OSARI.fadeT;
     for (const m of F.mats) m.opacity = Math.max(0, 1 - u); F.d.root.scale.setScalar(F.s0 * (1 + .25 * Math.min(1, u))); F.d.root.position.y += dt * .6;
+    if (!F.bones) { F.bones = []; F.d.model.traverse(o => { if (o.isBone) F.bones.push(o); }); } const bw = _sdA; for (let k = 0; k < 3; k++) { const b = F.bones[(Math.random() * F.bones.length) | 0]; if (b) { b.getWorldPosition(bw); gfire(bw.x, bw.y, bw.z, .7 + (1 - u) * .4); } }     // he BURNS off as he goes
     if (u >= 1) { F.d.root.visible = false; OSARI.fades.splice(i, 1); setTimeout(() => bodyGone(F.d), 0); } } }
 // m1677: THE OSARI SPIDER (his Tripo model; "I'm working on a four-legged spider... we're gonna need to hand-rig the spider"). RIGGED HERE, BY
 // SCRIPT (scratchpad spider/rig.py, Blender): Auto-Rig Pro is a humanoid rig, so the skeleton is placed from MEASURED geometry -- the four feet
@@ -65163,7 +65208,8 @@ function stepDummies(dt) {
     if (d.archer) { d.model.updateMatrixWorld(true); archerBow(d); }     // m1103: after the pose
   }
   if (ARROWS.length) arrowStep(dt);
-  if (OSARI.fades.length) osariStep(dt);     // m1675
+  if (OSARI.fades.length) osariStep(dt);
+  gfireStep(dt);     // m1675
   if (SPIDER.list.length) spiderStep(dt);     // m1677
 }
 

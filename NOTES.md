@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- THE OSARI BURN IN GREEN FIRE (DOCKET 14; his: "the green smoke needs to feel MUCH more like bright particle fire -- generate some sprites")
+- **`GFIRE`:** its own particle pool (one draw), its sprites PAINTED at load into a 2x2 atlas: four tall, blurred flame tongues (a body and
+  two or three licks off it). The atlas's red is the flame's mask, its green the HOT CORE, which the shader runs to yellow-green.
+- **Each particle:** rises fast (2.6-5 m/s, buoyant, wind-jittered), shrinks as it burns out, flickers (a new flame shape now and then),
+  its colour run bright yellow-green -> Jinra green -> deep green over .3-.75 s.
+- **On an Osari's death:** 90 tongues off random bones of his whole body, then three a frame off him while he fades (`osariStep`).
+- **Three things the renders caught on the way:**
+  - ADDITIVE fire is WHITE on his snow, so it is alpha-blended in saturated green.
+  - It must draw AFTER the fading body (`renderOrder` 50), or he paints over his own fire.
+  - A comment had swallowed the alpha line (every particle at alpha 0) -- found by reading the pool's live values.
+- Rendered: the burst engulfing two bowmen, the tongues streaming up off them, the fade.
+
 ## m1688 -- THE CHARGE'S THREE RELEASES BY THE LEFT STICK; and the charge MEETS a locked arrow or rocket in the air (DOCKET 15, 16)
 His: *"initiate with pull up on the right stick; if you're holding FORWARD on the left stick when you release, the forward slash charge attack;
 holding DOWN, the leap in the air and slam down; neither, the spin."* And: *"charge, an arrow or rocket shoots at you, the crosshair locks
