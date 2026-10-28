@@ -53,6 +53,10 @@ The factions in KORAJIN.md are a natural split. **These are proposals; the taste
 | **The Dustwalkers** (scavengers, traders) | patched, mismatched: sun-bleached canvas, rust, salvaged ship parts bolted on; ochre and olive |
 | **The Red Order** (discipline, ritual; Grumbo's origin) | the HERO kit made severe: lacquered black and deep red, symmetry, fewer domes and more terraces, gold trim |
 
+## THE ENEMY IS STONE AND CLAY (his, Oct 28 2026; KORAJIN.md, THE ENEMY)
+Their places are carved STONE and fired TERRACOTTA, Sphinx-like and buried-army-like, with stolen Jinra burning mint in their braziers, core
+chambers and torch towers. That is a strong candidate for the enemy grammar above (closest to "The Hollowed": ancient machinery), and still his to settle.
+
 ## Classical Japanese stays in the world (his, after m1410)
 
 > *"I think we can still use the more classical Japanese architecture -- we just have to weave it together; they can both exist. Or maybe make the enemy

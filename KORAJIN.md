@@ -79,6 +79,23 @@ dry windmill, a dull stream, a stunted central tower. The people are ordinary an
 - **The look of the fallen world:** a Western frontier over ancient samurai ruins. Weathered timber, rusted iron, dry stone, dull colour.
   **The look of the restored world:** the hero kit, floating islands, mint Jinra, warm lanterns (the dojo).
 
+## THE ENEMY: ANCIENT CONSTRUCTS FEEDING ON STOLEN JINRA (his, Oct 28 2026; open)
+> *"The enemy feeds off the power -- an ancient robotic thing. Stone, almost Egyptian, like the Sphinx made of rock, or the buried Chinese
+> terracotta army -- so when you break them they're robotic, held together by this magical power. They've been feeding off the ancient Jinra. The
+> master might be a giant thing, a living race or a mechanical presence. Every time you destroy one, a little of the green stuff leaves them.
+> Their chests or heads glow with it, and when you kill one or break pieces off, the green seeps out and rises into the air, or you collect it."*
+- **The look:** carved STONE and fired TERRACOTTA soldiers (the Sphinx, the buried army), weathered, cracked and chipped, jointed like machines.
+  They are not alive; the stolen Jinra holds them together.
+- **The tell:** the Jinra glows mint INSIDE them, through the cracks: a core in the chest, eyes, seams at the joints. The brighter the glow,
+  the stronger the construct.
+- **Breaking them:** knock off a piece (they already DISMEMBER, as the robot samurai does) and Jinra SEEPS from the break. Destroy one and its core
+  releases a burst that RISES as wisps, which you collect. So fighting is GATHERING; it feeds the restoration (THE RESTORATION) and the
+  beacons (THE JINRA BEACONS).
+- **The master:** open. A colossal construct (a kneeling colossus already stands in the forge), or a living power behind them. His call.
+- **Ties to:** the enemy torch towers are THEIR architecture (ARCHITECTURE.md's enemy grammar: carved stone, terracotta, bronze, with Jinra
+  burning in the braziers they stole). The colour rule holds: their glow is the Jinra's mint because it IS the stolen Jinra. Everything else
+  about them is stone, clay, bronze and rust.
+
 ## THE JINRA BEACONS -- a spine for the campaign (his idea, Oct 28 2026; open, "we'll figure it out")
 > *"The evil army has giant torch towers. When you defeat a tower you shoot the Jinra into it, and it lights up green and shoots off -- the levels
 > are arranged around a central place, and you're aligning all the Jinra to the central tower, so it becomes one giant powerful thing that powers
