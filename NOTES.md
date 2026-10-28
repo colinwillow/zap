@@ -28,6 +28,14 @@ an attack."* A new sandbox with its own DONE WHEN (`DRAGON.md`); KORAJIN > The D
 **Moves:** DRAGON.md box 1 (his look still open). **Still open:** boxes 2-6 and his sign-off; no fly clip in his file (asked for).
 Gates: `npm run check` ok, and a boot of `MEL_WORLD='forge&zone=dragon'` ok (the dragon itself loads after boot, so a throw in the
 dressing is only visible on the phone, as the chip line above). Shipped unverified.
+## m1607 -- THE RE-PASS: the FLYING SHIP HOUSE, pass 3 (alive, L3; its third pass, so the loop moves on)
+- THE SAILS BILLOW: each junk sail is an 8 x 6 grid now, merged; every vertex carries its (u, v) inside its own sail (from `FSHIP.sailR`)
+  and is pushed forward by sin(pi u) sin(pi v), a belly that breathes. Afloat only. A deeper belly lifted the sail off its battens.
+- A bronze GALLEY CHIMNEY on the deckhouse roof, smoking while she is afloat.
+- DOUBLOONS where the climbs go: the bowsprit's tip, the crow's nest, the deckhouse ridge, beside the high bar. They are `up` coins shifted
+  by `drop` like every other collider, so they ride her and show only afloat; `fshipClear` removes them.
+Render-checked headless (afloat, three-quarter). Shipped unverified. **Its three passes are done; next in the table: the Bathhouse.**
+
 ## m1606 -- THE RE-PASS: the FLYING SHIP HOUSE, pass 2 (rubric 7 for a flyer: AGROUND / AFLOAT)
 **Moves:** its rubric-7 box. A flyer, so restored is afloat. This is the one place a building rises (`lift`), and it is a ship.
 - One rig over the whole group, `lift` = `drop` = 3.2 m (deck height minus keel depth): FALLEN, the group sits `drop` lower, so the keel
