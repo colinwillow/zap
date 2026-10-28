@@ -11296,7 +11296,7 @@ function dojoBeastIdle(B) { const n = B.idles[B.i++ % B.idles.length], c = B.cli
 try { const v = localStorage.getItem('mel.dragon'); DOJO.dragonPick = v && v !== 'CAPTURED' ? 'WILD' : 'CAPTURED'; } catch (e) { DOJO.dragonPick = 'CAPTURED'; }     // m1610: the zone's EVIL / BARE read as WILD here
 // m1655: THE SADDLE AT THE RIDER'S SIZE (his: "he needs to be sitting on a saddle on top of the very wide dragon's body"). Built off the
 // dragon's height it was ~2 m wide with a pommel taller than Grumbo, and hid him; `k` scales the saddle (both passes), its rein rings and the seat.
-const SADDLE = { k: .4, dress: 0 };     // m15xx (his: "remove the armour and the saddle -- I'll make a much better saddle myself out of pieces of the mesh"): `dress` 0 builds NONE of it (both passes, the reins); 1 is the A/B
+const SADDLE = { k: .4, dress: 0 };     // m1658 (his: "remove the armour and the saddle -- I'll make a much better saddle myself out of pieces of the mesh"): `dress` 0 builds NONE of it (both passes, the reins); 1 is the A/B
 function dojoDragonDress(B, m, root, P) { const H = (B.hd = (P.h || 3.2) * B.mul), K1 = dragKit(m, root, H, B.bag), { bone, wq, up, side, fwd, hitAlong, pin, bw } = K1;     // m1610: the kit is shared with pass 2 (and `bag` collects the pieces for the zone's look switch)
   const mat = { leather: new THREE.MeshStandardMaterial({ color: 0x5a3220, roughness: .7 }), red: new THREE.MeshStandardMaterial({ color: 0xb3261c, roughness: .6, side: THREE.DoubleSide }), gold: new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .85, roughness: .3 }),
     jin: new THREE.MeshBasicMaterial({ color: JINHEX, toneMapped: false }), iron: new THREE.MeshStandardMaterial({ color: 0x2a2624, metalness: .6, roughness: .5 }) };
