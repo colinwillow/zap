@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the FORGE-WORKSHOP, pass 1 (a HERO / TOWN place: the look; a collider audit)
+- Kit materials: `K.timber`, a `stone_blocks` triMat in two tones, `K.bronze`, `K.iron`, `K.lamp`; the furnace fire stays fire-orange
+  (it is a forge, not Jinra). `korLantern`s on posts at the open front, bunting along the front beam, grass, stones, tall grass, ferns
+  and boulders round the outside (the open front and the crane kept clear). Statics merged except the forge mouth (it glows in
+  `fworkStep`), the ingots and the ore crates. 79 meshes.
+- **COLLIDER AUDIT:** the furnace (a sphere, r 1.7) had a full 3.4 m square box, so 0.7 m of its diagonals was solid air; its plinth (r 2.2)
+  0.9 m; the crane's post and base the same in small. Round things now get **`roundBox`**: a CROSS of two boxes (r x .6r and .6r x r),
+  whose corners reach 1.17 r and whose faces are flush with the curve. The furnace's boxes start above the plinth's.
+Render-checked headless (three-quarter). Shipped unverified.
+
 ## m1622 -- THE DRAGON RIDE, build 6: TAMING (DRAGON.md box 6; the last box before his sign-off)
 - **Wild = the EVIL look**, and an unvisited zone starts there (`mel.dragon` unset -> EVIL; the dojo still reads unset as CAPTURED). Wild
   (`dragWild`, not ridden, not taming): he turns to face you inside `watchR` 16 m, growls every ~`growlT` s, and inside `wildR` 6.5 m SHOVES you

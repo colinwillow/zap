@@ -23463,10 +23463,14 @@ function gearMesh(r, th, n, mat) { const parts = [new THREE.CylinderGeometry(r, 
 function fworkBuild() {
   if (FWORK.on) return; const A = FWORK, [cx, cz] = A.at, hw = A.hw, hd = A.hd, H = A.H, g = new THREE.Group(); scene.add(g);
   const O = { meshes: [], boxes: [], walls: [] }, T = hallTex();
-  const wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 }), stone = new THREE.MeshStandardMaterial({ color: 0x8a8580, roughness: .95 }), stoneD = new THREE.MeshStandardMaterial({ color: 0x5a5550, roughness: .95 });
-  const bronze = new THREE.MeshStandardMaterial({ color: 0xb07a3a, metalness: .8, roughness: .35 }), iron = new THREE.MeshStandardMaterial({ color: 0x3a3c40, metalness: .7, roughness: .45 });
-  const fire = new THREE.MeshBasicMaterial({ color: 0xff7a1a, toneMapped: false }), lamp = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false });
-  const add = (geo, m, x, y, z, solid) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; g.add(o);
+  // m@X4@ (the RE-PASS, pass 1): a HERO / TOWN place -- the hero kit in painted maps (timber, stone block), the kit bronze and iron, lanterns
+  // on the front posts, bunting, plants; statics merge (`mg`)
+  const K = korMats(), wood = K.timber, stone = triMat('stone_blocks', { scale: 2.5, color: 0xe2d8c8 }), stoneD = triMat('stone_blocks', { scale: 2.5, color: 0x8c8274 });
+  const bronze = K.bronze, iron = K.iron, MG = new Map(), put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); }, plants = [];
+  const fire = new THREE.MeshBasicMaterial({ color: 0xff7a1a, toneMapped: false }), lamp = K.lamp;
+  // m@X4@ (collider audit): a ROUND thing gets a cross of two boxes (corners within .17 r), not its full square
+  const roundBox = (x, z, rr, y0, y1) => O.boxes.push({ minx: x - rr, maxx: x + rr, miny: y0, maxy: y1, minz: z - rr * .6, maxz: z + rr * .6 }, { minx: x - rr * .6, maxx: x + rr * .6, miny: y0, maxy: y1, minz: z - rr, maxz: z + rr });
+  const add = (geo, m, x, y, z, solid) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; g.add(o);
     if (solid) { geo.computeBoundingBox(); const b = geo.boundingBox; O.boxes.push({ minx: x + b.min.x, maxx: x + b.max.x, miny: y + b.min.y, maxy: y + b.max.y, minz: z + b.min.z, maxz: z + b.max.z }); } return o; };
   add(new THREE.BoxGeometry(hw * 2, .08, hd * 2), stoneD, cx, .04, cz, 0);
   // walls: back (+x) and the two sides, breakable; the front (-x) open between posts
@@ -23476,9 +23480,9 @@ function fworkBuild() {
   add(new THREE.BoxGeometry(.4, .4, hd * 2 + .4), wood, cx - hw, H - .2, cz, 0);
   bldRoof(g, cx, cz, hw + 1.4, hd + 1.4, hw * .5, H + 3, H + .2, .5, wood);
   // THE FURNACE: a pot-bellied bronze body on a stone plinth, a glowing mouth toward the open front, a flue up through the roof
-  const fx = cx + 2.6, fz = cz; add(new THREE.CylinderGeometry(2, 2.2, .6, 16), stone, fx, .3, fz, 1);
-  add(new THREE.SphereGeometry(1.7, 18, 14), bronze, fx, 2, fz, 0); O.boxes.push({ minx: fx - 1.7, maxx: fx + 1.7, miny: 0, maxy: 3.6, minz: fz - 1.7, maxz: fz + 1.7 });
-  const mouth = add(new THREE.CircleGeometry(.75, 18), fire, fx - 1.62, 1.8, fz, 0); mouth.rotation.y = -Math.PI / 2; mouth.castShadow = false;
+  const fx = cx + 2.6, fz = cz; add(new THREE.CylinderGeometry(2, 2.2, .6, 16), stone, fx, .3, fz, 0); roundBox(fx, fz, 2.1, 0, .6);
+  add(new THREE.SphereGeometry(1.7, 18, 14), bronze, fx, 2, fz, 0); roundBox(fx, fz, 1.6, .6, 3.4);
+  const mouth = add(new THREE.CircleGeometry(.75, 18), fire, fx - 1.62, 1.8, fz, 0); mouth.rotation.y = -Math.PI / 2; mouth.castShadow = false; mouth.userData.mg = 0;     /* it glows in fworkStep */
   for (let k = 0; k < 3; k++) add(new THREE.TorusGeometry(1.72 - k * .05, .07, 6, 24).rotateX(Math.PI / 2), iron, fx, 1.3 + k * .7, fz, 0);
   add(new THREE.CylinderGeometry(.42, .5, 8, 12), iron, fx, 7.3, fz, 0); add(new THREE.CylinderGeometry(.6, .6, .3, 12), bronze, fx, 11.3, fz, 0);
   // the ANVIL and the QUENCH TROUGH
@@ -23488,7 +23492,7 @@ function fworkBuild() {
   const gears = [gearMesh(1.3, .3, 12, bronze), gearMesh(.8, .3, 8, iron)];
   gears[0].position.set(cx + hw - .45, 3.2, cz - 2.6); gears[0].rotation.y = Math.PI / 2; gears[1].position.set(cx + hw - .45, 3.2 - .55, cz - .55); gears[1].rotation.y = Math.PI / 2; g.add(gears[0], gears[1]);
   // THE JIB CRANE outside: a post, a slewing arm, a hook and chain, a BAR hung under it that rides round
-  const C = A.crane, kx = cx + C.at[0], kz = cz + C.at[1]; add(new THREE.CylinderGeometry(.3, .4, C.h, 10), iron, kx, C.h / 2, kz, 1); add(new THREE.CylinderGeometry(.7, .8, .4, 12), stone, kx, .2, kz, 0);
+  const C = A.crane, kx = cx + C.at[0], kz = cz + C.at[1]; add(new THREE.CylinderGeometry(.3, .4, C.h, 10), iron, kx, C.h / 2, kz, 0); roundBox(kx, kz, .35, 0, C.h); add(new THREE.CylinderGeometry(.7, .8, .4, 12), stone, kx, .2, kz, 0); roundBox(kx, kz, .75, 0, .4);
   const arm = new THREE.Group(); arm.position.set(kx, C.h, kz); g.add(arm);
   { const bm = new THREE.Mesh(new THREE.BoxGeometry(C.arm + .6, .35, .35), iron); bm.position.x = C.arm / 2; bm.castShadow = true; arm.add(bm);
     const cw = new THREE.Mesh(new THREE.BoxGeometry(.9, .7, .7), stoneD); cw.position.x = -.6; arm.add(cw);
@@ -23512,7 +23516,7 @@ function fworkBuild() {
   { const steel = new THREE.MeshStandardMaterial({ color: 0xd4dae0, metalness: .9, roughness: .2 }); add(new THREE.BoxGeometry(3, .1, .2), wood, cx + 2, ly + 1.4, lz1 - .1, 0); add(new THREE.BoxGeometry(3, .1, .2), wood, cx + 2, ly + .4, lz1 - .1, 0);
     for (let k = 0; k < 6; k++) { const bl = add(new THREE.BoxGeometry(.05, 1.3, .03), steel, cx + .8 + k * .45, ly + 1, lz1 - .2, 0); bl.rotation.z = .12; add(new THREE.BoxGeometry(.06, .3, .05), new THREE.MeshStandardMaterial({ color: 0x17130f }), cx + .8 + k * .45 - .07, ly + .32, lz1 - .2, 0); } }
   const smash = []; { const cm = new THREE.MeshStandardMaterial({ color: 0x6a5040, roughness: .85 }), ore = new THREE.MeshStandardMaterial({ color: 0x9a6a3a, metalness: .5, roughness: .5 });
-    for (const [dx, dz] of [[-4, -3.9], [-3.1, -4], [-4.5, -2.9]]) { const X = cx + dx, Z = cz + dz, m = add(new THREE.BoxGeometry(.8, .7, .8), cm, X, .35, Z, 0);
+    for (const [dx, dz] of [[-4, -3.9], [-3.1, -4], [-4.5, -2.9]]) { const X = cx + dx, Z = cz + dz, m = add(new THREE.BoxGeometry(.8, .7, .8), cm, X, .35, Z, 0); m.userData.mg = 0;
       for (let k = 0; k < 3; k++) { const o = new THREE.Mesh(new THREE.DodecahedronGeometry(.15, 0), ore); o.position.set((k - 1) * .22, .4, (k % 2) * .15 - .07); m.add(o); }
       smashAdd(smash, m, { minx: X - .4, maxx: X + .4, miny: 0, maxy: .7, minz: Z - .4, maxz: Z + .4 }, 2, 15, [.6, .42, .25]); } }
   // ---- PASS 3 (m1160): the polish -- leather BELLOWS breathing into the furnace, glowing INGOTS cooling on a rack, tools hung on the side
@@ -23522,13 +23526,20 @@ function fworkBuild() {
     const nz = new THREE.Mesh(new THREE.CylinderGeometry(.08, .12, .9, 8), bronze); nz.rotation.x = Math.PI / 2; nz.position.z = .8; bel.add(nz); }
   O.boxes.push({ minx: fx - 1, maxx: fx + .4, miny: 0, maxy: 1.3, minz: fz - 3.1, maxz: fz - 1.8 });
   const ingots = []; { add(new THREE.BoxGeometry(1.6, .9, .6), wood, cx + 4.6, .45, cz - 3.6, 1);
-    for (let k = 0; k < 4; k++) { const m = new THREE.MeshStandardMaterial({ color: 0x8a4a2a, emissive: 0xff5a10, emissiveIntensity: 1.5 - k * .35, metalness: .6, roughness: .5 }); ingots.push(add(new THREE.BoxGeometry(.3, .12, .5), m, cx + 4.05 + k * .38, .96, cz - 3.6, 0)); } }
+    for (let k = 0; k < 4; k++) { const m = new THREE.MeshStandardMaterial({ color: 0x8a4a2a, emissive: 0xff5a10, emissiveIntensity: 1.5 - k * .35, metalness: .6, roughness: .5 }); const io = add(new THREE.BoxGeometry(.3, .12, .5), m, cx + 4.05 + k * .38, .96, cz - 3.6, 0); io.userData.mg = 0; ingots.push(io); } }
   for (let k = 0; k < 5; k++) { const tl = add(new THREE.BoxGeometry(.06, .8 + (k % 2) * .3, .06), iron, cx - 3 + k * .5, 2.8, cz - hd + .3, 0); add(new THREE.BoxGeometry(.25, .12, .08), iron, cx - 3 + k * .5, 2.35 - (k % 2) * .15, cz - hd + .3, 0); }
   { const ban = new THREE.MeshStandardMaterial({ map: hwBanner(), side: THREE.DoubleSide, roughness: .9, transparent: true, alphaTest: .4 }); const bm = add(new THREE.PlaneGeometry(1.3, 2.6), ban, cx - hw - .25, H - 1.6, cz, 0); bm.rotation.y = Math.PI / 2; bm.castShadow = false; }
   for (const sz of [-1, 1]) { const E = [cx - hw, H + .3, cz + sz * hd], G2 = [cx - hw - 7, .3, cz + sz * (hd + 4)]; bldCable(g, E, G2, 1, 4, lamp); add(new THREE.CylinderGeometry(.08, .1, .8, 6), wood, G2[0], .4, G2[2], 0); }
   const drone = bldDrone(g);
+  // m@X4@: LANTERNS on posts at the open front, BUNTING along the front beam, plants round the outside (the front and the crane kept clear)
+  for (const sz of [-1, 1]) { korPost(put, K, cx - hw - 1.6, 0, cz + sz * (hd + .4), 2.2, .1); korLantern(put, K, cx - hw - 1.6, 2.45, cz + sz * (hd + .4), .75); }
+  korBunting(put, K, [cx - hw - .3, H - .05, cz - hd - .3], [cx - hw - .3, H - .05, cz + hd + .3], 14, .4);
+  { let sd = 31; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647; for (let i = 0; i < 30; i++) { const a2 = rnd() * 6.28, rr = Math.max(hw, hd) + 2 + rnd() * 3.5, x = cx + Math.cos(a2) * rr * 1.1, z = cz + Math.sin(a2) * rr;
+      if (x < cx - hw && Math.abs(z - cz) < hd + 1.5) continue; if (Math.hypot(x - kx, z - kz) < 2) continue; plantPlant(plants, ['grass', 'stones', 'tallgrass', 'fern', 'boulder'][i % 5], x, 0, z, .8 + rnd() * .5, a2); } }
+  for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list.map(q => { const n = q.index ? q.toNonIndexed() : q; for (const a2 of Object.keys(n.attributes)) if (a2 !== 'position' && a2 !== 'normal') n.deleteAttribute(a2); if (!n.attributes.normal) n.computeVertexNormals(); return n; })), m); o.castShadow = o.receiveShadow = true; g.add(o); }
+  bldMergeStatic(g); const plantMs = plantFlush(g, plants);
   for (const b of O.boxes) BOXES.push(b); boxGrid();
-  FWORK.on = { g, O, bars: [bar], gears, arm, bar, flue: [fx, 11.5, fz], mouth, t: 0, hm, anvil: [ax0, az0], smash, hp: 0, bel, ingots, drone };
+  FWORK.on = { plantMs, g, O, bars: [bar], gears, arm, bar, flue: [fx, 11.5, fz], mouth, t: 0, hm, anvil: [ax0, az0], smash, hp: 0, bel, ingots, drone };
   fworkStep(0); arenaBeam(cx, cz, [1, .6, .3], 1); snd('clang', { g: .8, r: .5 });
 }
 function fworkStep(dt) { const W = FWORK.on; if (!W) return; W.t += dt; const C = FWORK.crane;
@@ -23557,7 +23568,7 @@ function fworkStep(dt) { const W = FWORK.on; if (!W) return; W.t += dt; const C 
     const [cx, cz] = FWORK.at, a2 = W.t * .3; W.drone.position.set(cx + Math.cos(a2) * 9, 11 + Math.sin(W.t * 1.2) * .4, cz + Math.sin(a2) * 8); W.drone.rotation.y = -a2; W.drone.children[1].rotation.z = W.t * .6; }
   if ((W.sT = (W.sT || 0) - dt) <= 0) { W.sT = .08; const [x, y, z] = W.flue; spk(x + (Math.random() - .5) * .5, y, z + (Math.random() - .5) * .5, (Math.random() - .5) * .6, 2 + Math.random() * 2, (Math.random() - .5) * .6, .12, .9, [1, .6, .2]);
     if (Math.random() < .3) smokeAt(x, y + .5, z, 1.4, 2, [.35, .33, .31]); } }
-function fworkClear() { const W = FWORK.on; if (!W) return; smashDrop(W.smash); if (player.bar && player.bar.B === W.bar) player.bar = null; bldClear(W); FWORK.on = null; }
+function fworkClear() { const W = FWORK.on; if (!W) return; if (W.plantMs) plantDrop(W.plantMs); smashDrop(W.smash); if (player.bar && player.bar.B === W.bar) player.bar = null; bldClear(W); FWORK.on = null; }
 // m1161: THE SPIDER-BOT HANGAR (BUILDINGS.md #13, pass 1) at (-32, -24) (2 m west of its slot: the Rampart's bastion stands at -25). A low
 // vaulted bunker of grey concrete-stone, its long axis north-south, a HANGAR DOOR in its +z end between breakable wall panels (cwallBuild),
 // a flat walkable crown, warning stripes and red lamps -- and the SPIDER BOTS: three six-legged bronze crawlers (`spiderMake`: a body, a
