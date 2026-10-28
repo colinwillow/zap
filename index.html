@@ -24014,14 +24014,16 @@ function cliffBuild() {
   if (CLIFF.on) return; const A = CLIFF, [cx, cz] = A.at, hx = A.hx, hz = A.hz, H = A.H, g = new THREE.Group(); scene.add(g);
   const O = { meshes: [], boxes: [], walls: [] }, tris = [];
   const rock = new THREE.MeshStandardMaterial({ color: 0x7a746c, roughness: 1, flatShading: true }), rockD = new THREE.MeshStandardMaterial({ color: 0x5e5a54, roughness: 1, flatShading: true });
-  const wood = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .8 }), plaster = new THREE.MeshStandardMaterial({ color: 0xeae6de, roughness: .9 }), lamp = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xff9a3a, emissiveIntensity: 2, toneMapped: false });
-  const add = (geo, m, x, y, z, solid) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; g.add(o);
+  // m@X4@ (the RE-PASS, pass 1): a HERO place -- the hero kit (painted timber, warm plaster, a tiled roof, the kit lamp and bronze), kit lanterns
+  // at the foot of the path, bunting under the lodge's eave, plants round the crag; statics merge (`mg`)
+  const K = korMats(), wood = K.timber, plaster = new THREE.MeshStandardMaterial({ color: 0xf3ead8, roughness: .9 }), lamp = K.lamp, MG = new Map(), put = (geo, m) => { if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); }, plants = [];
+  const add = (geo, m, x, y, z, solid) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; o.userData.mg = 1; g.add(o);
     if (solid) { geo.computeBoundingBox(); const b = geo.boundingBox; O.boxes.push({ minx: x + b.min.x, maxx: x + b.max.x, miny: y + b.min.y, maxy: y + b.max.y, minz: z + b.min.z, maxz: z + b.max.z }); } return o; };
   let sd = 11; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
   // THE CRAG: a block jittered everywhere but its flat top, one solid box
   { const geo = new THREE.BoxGeometry(hx * 2, H, hz * 2, 5, 6, 5).toNonIndexed(), P = geo.attributes.position, jit = new Map();
     for (let k = 0; k < P.count; k++) { const x = P.getX(k), y = P.getY(k), z = P.getZ(k), key = x.toFixed(2) + ',' + y.toFixed(2) + ',' + z.toFixed(2);
-      if (!jit.has(key)) jit.set(key, y > H / 2 - .01 ? [0, 0, 0] : [(rnd() - .5) * .9, (rnd() - .5) * .8, (rnd() - .5) * .9]); const j = jit.get(key); P.setXYZ(k, x + Math.min(0, j[0] * Math.sign(x)) , y + j[1] * (y < -H / 2 + .01 ? 0 : 1), z + Math.min(0, j[2] * Math.sign(z))); }
+      if (!jit.has(key)) jit.set(key, y > H / 2 - .01 ? [0, 0, 0] : [(rnd() - .5) * .3, (rnd() - .5) * .8, (rnd() - .5) * .3]); const j = jit.get(key); P.setXYZ(k, x + j[0], y + j[1] * (y < -H / 2 + .01 ? 0 : 1), z + j[2]); }     // m@X4@ (collider audit): the jitter was INWARD-only to .45 m, so the box stood up to .45 proud of the drawn rock; now +-.15 about the face
     geo.computeVertexNormals(); add(geo, rock, cx, H / 2, cz, 0); O.boxes.push({ minx: cx - hx, maxx: cx + hx, miny: 0, maxy: H, minz: cz - hz, maxz: cz + hz }); }
   for (let k = 0; k < 9; k++) { const a = rnd() * 6.28, r = 1 + rnd() * 1.6, b = add(new THREE.DodecahedronGeometry(r, 0), rockD, cx + Math.sin(a) * (hx + 3.6 + rnd() * 2), r * .5, cz + Math.cos(a) * (hz + 3.6 + rnd() * 2), 0); b.rotation.set(rnd() * 3, rnd() * 3, 0); }
   // THE PATH: round the four faces, 3 m a face, corner landings; flat stone slabs
@@ -24043,7 +24045,8 @@ function cliffBuild() {
     for (const sx of [-1, 1]) add(new THREE.BoxGeometry(lw - .8, wh, .25), plaster, cx + sx * (lw + .8) / 2, Y + wh / 2, cz - ld, 1);
     for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) add(new THREE.BoxGeometry(.3, wh + .1, .3), wood, cx + sx * lw, Y + (wh + .1) / 2, cz + sz * ld, 0);
     add(new THREE.BoxGeometry(lw * 2 + .4, .25, ld * 2 + .4), wood, cx, Y + wh, cz, 0);
-    bldRoof(g, cx, cz, lw + 1.8, ld + 1.8, lw * .6, Y + wh + 2.6, Y + wh + .1, .6, wood);
+    bldRoof(g, cx, cz, lw + 1.8, ld + 1.8, lw * .6, Y + wh + 2.6, Y + wh + .1, .6, wood); { const n = g.children.length; g.children[n - 2].material = triMat('roof_tiles', { scale: 2.2, side: THREE.DoubleSide }); g.children[n - 2].userData.mg = g.children[n - 1].userData.mg = 1; }
+    korBunting(put, K, [cx - lw - 1.5, Y + wh + .05, cz - ld - 1.5], [cx + lw + 1.5, Y + wh + .05, cz - ld - 1.5], 12, .35);     // m@X4@: bunting under the front eave
     for (const sx of [-1, 1]) add(new THREE.BoxGeometry(.28, .36, .28), lamp, cx + sx * 1.2, Y + wh - .5, cz - ld - .3, 0); }
   // THE PERCH: a beam out over the -z face, a ring above its tip
   const rings = []; { const pz0 = cz - hz, pz1 = pz0 - 4.5, x = cx - 3.6, Y = H, w2 = .17;
@@ -24083,8 +24086,15 @@ function cliffBuild() {
     lever = new THREE.Group(); lever.position.set(lx, H + .95, lz); g.add(lever); const arm = new THREE.Mesh(new THREE.BoxGeometry(1.4, .12, .12), wood); arm.position.x = .55; arm.castShadow = true; lever.add(arm);
     const knob = new THREE.Mesh(new THREE.SphereGeometry(.13, 8, 6), new THREE.MeshStandardMaterial({ color: 0xb3202a, roughness: .5 })); knob.position.x = 1.25; lever.add(knob);
     const k0 = C[0]; for (const o of [-.6, .6]) { add(new THREE.BoxGeometry(.15, .9, .15), wood, cx + k0[0] + o, H + .45, cz + k0[1] + .5, 0); add(new THREE.BoxGeometry(.15, .9, .15), wood, cx + k0[0] + o, H + .45, cz + k0[1] - .5, 0); }
-    add(new THREE.BoxGeometry(1.4, .12, 1.2), wood, cx + k0[0], H + .1, cz + k0[1], 0); var cradleRock = add(new THREE.DodecahedronGeometry(.6, 0), rockD, cx + k0[0], H + .75, cz + k0[1], 0); }
-  CLIFF.on = { g, O, bars: [], rings, wt, fallAt: [cx + hx + .6, cz + 1.2], t: 0, path, rocks: [], rockT: 4, drone, lever, lvT: 0, cradleRock };
+    add(new THREE.BoxGeometry(1.4, .12, 1.2), wood, cx + k0[0], H + .1, cz + k0[1], 0); var cradleRock = add(new THREE.DodecahedronGeometry(.6, 0), rockD, cx + k0[0], H + .75, cz + k0[1], 0); cradleRock.userData.mg = 0; }
+  // m@X4@: kit LANTERNS on posts either side of the path's foot, PLANTS round the crag (off the path's first face and the pool)
+  { const k0 = C[0]; for (const o of [-1, 1]) { const x = cx + k0[0] - 1.3, z = cz + k0[1] + o * 1.1 + .4; korPost(put, K, x, 0, z, 2, .09); korLantern(put, K, x, 2.25, z, .7); } }
+  for (let i = 0; i < 34; i++) { const a2 = rnd() * 6.28, rr = 3 + rnd() * 4, x = cx + Math.cos(a2) * (hx + rr), z = cz + Math.sin(a2) * (hz + rr);
+    if (x > cx + hx + .5 && Math.abs(z - cz - 1.2) < 4.2) continue; if (Math.abs(x - cx) < hx + A.lane + .3 && Math.abs(z - cz) < hz + A.lane + .3) continue;
+    plantPlant(plants, ['grass', 'fern', 'stones', 'tallgrass', 'boulder', 'fern'][i % 6], x, 0, z, .8 + rnd() * .6, a2); }
+  for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list.map(q => q.index ? q.toNonIndexed() : q)), m); o.castShadow = o.receiveShadow = true; g.add(o); }
+  const nm = bldMergeStatic(g), plantMs = plantFlush(g, plants) || [];
+  CLIFF.on = { g, O, bars: [], rings, wt, fallAt: [cx + hx + .6, cz + 1.2], t: 0, path, rocks: [], rockT: 4, drone, lever, lvT: 0, cradleRock, nm, plantMs };
   arenaBeam(cx, cz, [.7, .9, 1], 1); snd('clang', { g: .6, r: .7 });
 }
 function cliffStep(dt) { const C = CLIFF.on; if (!C) return; C.t += dt; C.wt.offset.y -= dt * 1.4;
@@ -24102,7 +24112,7 @@ function cliffStep(dt) { const C = CLIFF.on; if (!C) return; C.t += dt; C.wt.off
       const p = player; if (Math.hypot(p.pos.x - x, p.pos.z - z) < 1.1 && p.pos.y < y + .6 && p.pos.y > y - 1.6 && !p.rockCool) { p.rockCool = 1; setTimeout(() => { p.rockCool = 0; }, 900); camShake(.3); playerHurt(CLIFF.rockDmg, Math.atan2(dx, dz), 8, 1.5, .25, 0); snd('thud', { g: 1, r: .7, x, z }); }
       for (const dd of DUMMIES) { if (dd.st === 'gone' || dd.st === 'down' || !dd.root.visible) continue; const Q = dd.root.position; if (Math.hypot(Q.x - x, Q.z - z) < 1.2 && Math.abs(Q.y - (y - .75)) < 1.5) dummyBlow(dd, Math.atan2(dx, dz), 1.3, 4); } } }
   if ((C.mT = (C.mT || 0) - dt) <= 0) { C.mT = .1; const [x, z] = C.fallAt; smokeAt(x + 2.8 + (Math.random() - .5) * 2, .3, z + (Math.random() - .5) * 2, .8, 1.2, [.92, .95, 1]); } }
-function cliffClear() { const C = CLIFF.on; if (!C) return; for (const R of C.rocks) R.m.removeFromParent(); bldClear(C); CLIFF.on = null; }
+function cliffClear() { const C = CLIFF.on; if (!C) return; for (const R of C.rocks) R.m.removeFromParent(); if (C.plantMs) plantDrop(C.plantMs); bldClear(C); CLIFF.on = null; }
 // m1178: THE MOATED KEEP (Set 2 #16, pass 1) at (46, 0). A stone KEEP on a 3 m ISLAND in a MOAT, ringed by a 2.8 m CURB wall you climb by
 // a flight of steps on the courtyard side. A DRAWBRIDGE spans the moat from the curb to the island: it starts RAISED -- strike the GONG
 // on the curb beside it and it comes down (strike again and it goes up). Or don't: drop into the moat and climb the island (a ledge grab).

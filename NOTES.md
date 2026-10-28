@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the CLIFF LODGE, pass 1 (HERO look)
+- The hero kit: `korMats` timber for every beam and post (the lodge, the perch, the cradle, the lever), warm plaster walls, a `roof_tiles`
+  roof (bldRoof's own tile map was the grey kit default), the kit lamp. Kit lanterns on posts either side of the path's foot, red-and-cream
+  bunting under the lodge's front eave, 34 plants (grass, ferns, stones, tall grass, boulders) round the crag, kept off the path's lanes
+  and the waterfall pool. `cliffClear` drops the plants.
+- Statics merged: `add` flags `mg` (the cradle rock is unflagged: `cliffStep` hides it while a boulder rolls); 53 meshes folded, 45
+  children with the pines, cables, drone, lever and plants.
+- COLLIDER AUDIT: the crag mesh's vertices were jittered INWARD only (up to .45 m) while its collider is the full box, so walking the
+  path you stopped up to .45 m short of the drawn rock. The jitter is now +-.15 about the face, so box and rock agree to .15.
+Render-checked headless (the crag from the path's side, the summit and lodge). Shipped unverified.
+
 ## m1647 -- THE RE-PASS: the SKY BRIDGES, pass 3 (L1/L3: THE RUN ACROSS) -- its third pass, DONE
 - Three doubloons down each deck at a quarter, the middle and three quarters, set on the deck's own sag (the same curve `bridgeSpan`
   lays the planks on) .9 m up.
