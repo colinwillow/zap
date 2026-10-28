@@ -31,3 +31,12 @@ knows yet what his phone does with that -- so the first build MEASURES, and ever
 - [ ] 100 fighters at 30 fps or better on his phone, all moving and fighting.
 - [ ] Red vs blue fighting each other, and him in it; hits that send men flying.
 - [ ] **He played it on his phone and signed it off.**
+
+## HIS NOTES, Oct 28 2026 -- the war bosses, and the spider bots
+> *"I spawned both war bosses and against the katana they never really block my shots. They both have shields -- still a little glitchy, and they
+> don't block anything, so they die really fast. Make the bosses quite a bit harder and smarter, block a lot of my attacks, and find a special way
+> -- some sequence -- that's the only way to get under their armour. And the robotic spider bad guys, if we haven't already."*
+- [ ] the war bosses' SHIELDS actually block (a blocked hit is a clang, sparks, no damage), and the shield pose stops glitching
+- [ ] smarter bosses: block most frontal attacks, punish spam, pick openings
+- [ ] the ARMOUR KEY: one sequence opens them up (e.g. a guard break / parry-counter staggers them, then a window of real damage) -- his to pick
+- [ ] the SPIDER BOTS as enemies (the Hangar's `spiderMake` crawlers, m1161, are scenery today)

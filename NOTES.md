@@ -5,7 +5,6 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-<<<<<<< HEAD
 ## m1614 -- THE DRAGON RIDE, build 2: MOUNT / DISMOUNT (DRAGON.md box 2)
 - **The mount spot** (`dragSeat`): a mint ring at his LEFT flank, stepped out along his side until it is clear of his body box (+1.1 m),
   level with the dais. It pulses, brightens when you stand on it, and a tip says what to do (or, not CAPTURED, that he will not be ridden).
@@ -21,7 +20,16 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
 - **The lens** (`stepCam`, the one writer of `cam.az`): comes round behind his heading after `camIdle` .8 s of no drag, pulled back `camPull`
   6 m and lifted `camLift` .4 m.
 **Moves:** DRAGON.md box 2 (his look open). **Still open:** 3-6 and his sign-off. Gates: check ok, zone boot ok. Shipped unverified.
-=======
+## m15xx -- the dojo stops beaming him home off the gates; TOOLS > DOJO FX to find the 20 fps
+- **"When I try to go anywhere other than the main dojo it spawns me back in the middle":** the four gate LANDINGS and their BRIDGES were drawn at
+  floor height with NO collider -- he stood on the world's invisible floor at y 0, which is exactly what the off-the-edge rule (m1401: past the
+  rim, at y < .35 -> beam home) exists to catch. They are real ground now (`safe` boxes), and the rule fires only when nothing real is under his feet.
+- **20 fps:** the chip reads ~50 ms a frame with the CPU at ~14 ms, so the GPU is the wait (fill: a dozen transparent card layers over the sky,
+  and the shadow pass). Not guessed at: **TOOLS > DOJO FX** steps the suspects off cumulatively -- FULL / NO SKY FX (every `bbd` card layer, the
+  sun glow, the candles) / NO PLANTS / NO SHADOWS -- live, no reload; the FPS on the chip at each step names the cost. Then the fix is aimed.
+- His notes for the sword's open gesture slots and the reticle went into SWORD.md; the war bosses (shields that don't block, an armour key)
+  and the spider bots into HORDE.md.
+
 ## m1611 -- THE RE-PASS: the BATHHOUSE, pass 1 (a HERO / TOWN place: the look; a collider audit)
 - Kit materials: `K.timber`, a warm planks triMat, a `stone_blocks` triMat in two tones, `K.lamp`, `K.bronze` (chimney cap, boiler, pipe).
 - The cold plunge tub gets bronze hoops and **its own** double-sided material: `.material.side = DoubleSide` on it had been flipping the
@@ -32,7 +40,6 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
   diagonal was solid air. Their boxes are .85 r half-size now (a corner within .2 r, a flat face .15 r inside). Everything else (walls,
   posts, engawa, rim, benches, chimney, fence) sits on drawn geometry.
 Render-checked headless (three-quarter, garden). Shipped unverified.
->>>>>>> origin/main
 
 ## m1610 -- THE DRAGON RIDE, build 1: the zone and the armour (DRAGON.md box 1)
 His: *"build the blue dragon: armour and a mount, a little zone where I can mount it and ride it... flying it, controlling it on the ground,
