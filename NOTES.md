@@ -36,7 +36,7 @@ His queue item. First placement (r = Rt + 1.15) rose INTO the balcony's mushroom
 Rides at 1.8 m/s after .6 s standing at an end; calls itself to the end he stands near (within 2.6 m, his height within 1.5 m of that
 end). FALLEN (RT < .99): parked at the foot, tilted, ropes hidden. +2 draws (cage, ropes) beside the merged 36.
 Box moved: the home's "still open" list (rope lift). Next: breakable pots.
-## m1547 -- LEVEL 1 v2, THE FIRST BEACON: the blueprint, generated (BEACON.md)
+## m1549 -- LEVEL 1 v2, THE FIRST BEACON: the blueprint, generated (BEACON.md)
 His: *"design the foundational whatever you gotta do from here on out... put the loop on it"*, with two ChatGPT sheets made from the blueprint
 brief (`images/korajin/ref/beacon_sheet.jpg`, `beacon_plan.jpg`). The sheets are a picture, not a measurement (STEER 000: never transcribe an
 image), so the level is a BLUEPRINT that the builder turns into geometry from the measured moves:

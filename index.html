@@ -26262,7 +26262,7 @@ function chunkBuild() { if (CHUNK.on) return; const g = new THREE.Group(); scene
   for (const b of O.boxes) BOXES.push(b); boxGrid(); CHUNK.on = { g, O, bars, climbs, zips, rings: [] }; bldXrayTag(g); }
 function chunkClear() { const C = CHUNK.on; if (!C) return; for (const Zp of C.zips) { const i = ZIPS.indexOf(Zp); if (i >= 0) ZIPS.splice(i, 1); if (player.zip && player.zip.Z === Zp) player.zip = null; }
   for (const L of C.climbs) { const i = KCLIMB.indexOf(L); if (i >= 0) KCLIMB.splice(i, 1); } if (player.climb && C.climbs.includes(player.climb)) climbOff(); if (player.bar && C.bars.includes(player.bar.B)) player.bar = null; bldClear(C); CHUNK.on = null; }
-// m1547: LEVEL 1 v2 -- THE FIRST BEACON (his, Oct 28 2026: *"design the foundational whatever you gotta do... we'll work down this one for a while"*).
+// m1549: LEVEL 1 v2 -- THE FIRST BEACON (his, Oct 28 2026: *"design the foundational whatever you gotta do... we'll work down this one for a while"*).
 // The blueprint is `BEACON.plan` (LEVELDESIGN.md "THE BLUEPRINT"; his ChatGPT sheets `images/korajin/ref/beacon_sheet.jpg` / `beacon_plan.jpg` for
 // the layout): STATIONS (mesas, solid to the canyon floor, a ladder up every one) and RUNS between them, each a list of the chunk library's pieces
 // (`CHUNKS`, sized from the measured move table) plus three of its own (`BCH`: a small `hop`, a `walk`, a `chim`ney of any height). The builder

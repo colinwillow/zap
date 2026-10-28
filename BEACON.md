@@ -13,7 +13,7 @@ then the level is GENERATED from `BEACON.plan` in index.html.
 - Verbs on this level: run, jump, double jump, ledge catch, and (served) the WALL JUMP. No weapon.
 
 ## DONE WHEN (layer 1, THE RUN) -- each ticked with evidence in a NOTES entry; the last box is his sign-off on the phone
-- [x] the route exists end to end from the blueprint: S 0 -> A 10.9 -> B 4.9 -> C 22.9 -> D 26.9 -> zips -> T 10.9 -> brazier 33.8 (m1547)
+- [x] the route exists end to end from the blueprint: S 0 -> A 10.9 -> B 4.9 -> C 22.9 -> D 26.9 -> zips -> T 10.9 -> brazier 33.8 (m1549)
 - [ ] every piece WALKED by the route checker (scripted inputs, the shipped frame), not just sized
 - [ ] the spine crosses itself (C -> D passes over B), stations see each other, the tower seen from S
 - [ ] verticality and spread checked from a wide render (no one plane)
