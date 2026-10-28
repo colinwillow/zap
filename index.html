@@ -11256,7 +11256,7 @@ function dojoBeastIdle(B) { const n = B.idles[B.i++ % B.idles.length], c = B.cli
 // posed, skinned mesh (the back's height over the spine, the neck's girth), never guessed. Each piece's turn is solved on the rest pose so it sits
 // upright to him, then it follows the bone. TOOLS > DRAGON: CAPTURED (dressed) / WILD (bare) -- reloads.
 try { const v = localStorage.getItem('mel.dragon'); DOJO.dragonPick = v && v !== 'CAPTURED' ? 'WILD' : 'CAPTURED'; } catch (e) { DOJO.dragonPick = 'CAPTURED'; }     // m1610: the zone's EVIL / BARE read as WILD here
-function dojoDragonDress(B, m, root, P) { const H = (B.hd = (P.h || 3.2) * B.mul), { bone, wq, up, side, fwd, hitAlong, pin, bw } = dragKit(m, root, H, B.bag);     // m1610: the kit is shared with pass 2 (and `bag` collects the pieces for the zone's look switch)
+function dojoDragonDress(B, m, root, P) { const H = (B.hd = (P.h || 3.2) * B.mul), K1 = dragKit(m, root, H, B.bag), { bone, wq, up, side, fwd, hitAlong, pin, bw } = K1;     // m1610: the kit is shared with pass 2 (and `bag` collects the pieces for the zone's look switch)
   const mat = { leather: new THREE.MeshStandardMaterial({ color: 0x5a3220, roughness: .7 }), red: new THREE.MeshStandardMaterial({ color: 0xb3261c, roughness: .6, side: THREE.DoubleSide }), gold: new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: .85, roughness: .3 }),
     jin: new THREE.MeshBasicMaterial({ color: JINHEX, toneMapped: false }), iron: new THREE.MeshStandardMaterial({ color: 0x2a2624, metalness: .6, roughness: .5 }) };
   // THE SADDLE on the back over Spine1: a seat, a raised pommel and cantle, a red blanket with a gold edge, stirrups hanging either side
@@ -11267,7 +11267,7 @@ function dojoDragonDress(B, m, root, P) { const H = (B.hd = (P.h || 3.2) * B.mul
       const pom = new THREE.Mesh(new THREE.CylinderGeometry(w * .18, w * .24, H * .09, 10), mat.leather); pom.position.set(0, H * .08, l * .48); S.add(pom); const pk = new THREE.Mesh(new THREE.SphereGeometry(w * .14, 10, 8), mat.gold); pk.position.set(0, H * .13, l * .48); S.add(pk);
       const can = new THREE.Mesh(new THREE.BoxGeometry(w * .9, H * .07, H * .02), mat.leather); can.position.set(0, H * .07, -l * .48); S.add(can);
       for (const sd of [-1, 1]) { const st = new THREE.Mesh(new THREE.BoxGeometry(H * .006, H * .16, H * .02), mat.leather); st.position.set(sd * w * .78, -H * .07, 0); S.add(st); const ri = new THREE.Mesh(new THREE.TorusGeometry(H * .025, H * .006, 6, 14), mat.gold); ri.position.set(sd * w * .78, -H * .16, 0); S.add(ri); }
-      pin('Bip001_Spine1', S, top); } }
+      S.quaternion.copy(K1.inHis(K1.backQ())); pin('Bip001_Spine1', S, top); } }
   // THE COLLAR round Neck1: a bronze band with a glowing JINRA ring and studs (the bond of the taming)
   { const nk = bw('Bip001_Neck1'), n2 = bw('Bip001_Neck2'); if (nk) { const e = hitAlong(nk, side.clone().negate(), H * .6, nk), r = Math.min(H * .11, e ? Math.max(H * .075, e.distanceTo(nk) * 1.15) : H * .08), C = new THREE.Group();
       const band = new THREE.Mesh(new THREE.CylinderGeometry(r, r, H * .05, 24, 1, true), mat.gold); band.rotation.x = Math.PI / 2; C.add(band);
@@ -11406,7 +11406,7 @@ function dragLook() { const B = DRAGZ.on && DRAGZ.on.B; if (!B) return; const L 
 // less his seated HIP height, MEASURED live off his hips bone in that pose (so the seat is under his hips, not his feet). Tap again: an arc back
 // down to the ring. Only CAPTURED lets you on (the taming, box 6, is what makes him CAPTURED in the story). While mounted the pads are the
 // dragon's: no jump, no roll, no strike; the lens follows behind him after `camIdle` s and pulls back `camPull` m for his size.
-Object.assign(DRAGZ, { reach: 2.6, mountT: .85, offT: .7, arc: 1.8, camIdle: .8, camFollow: 2.2, camPull: 6, camLift: .4 });
+Object.assign(DRAGZ, { reach: 2.6, mountT: .85, offT: .7, arc: 1.8, camIdle: .8, camFollow: 2.2, camPull: 9, camLift: 1.6, camEl: .22, offTap: .45 });
 const _drV = new THREE.Vector3(), _drV2 = new THREE.Vector3();
 const dragH = B => B.root.rotation.y - (B.faceOff || 0);
 function dragSeat(B, m, root, P) { const K = dragKit(m, root, B.hd), sp = K.bw('Bip001_Spine1'); B.faceOff = P.faceOff || 0; if (!sp) return;
@@ -11419,7 +11419,8 @@ function dragSeat(B, m, root, P) { const K = dragKit(m, root, B.hd), sp = K.bw('
 function dragNear() { const B = DRAGZ.on && DRAGZ.on.B, p = player; if (!B || !B.mountAt || p.dragon) return 0;
   return Math.hypot(p.pos.x - B.mountAt.x, p.pos.z - B.mountAt.z) < DRAGZ.reach && Math.abs(p.pos.y - B.mountAt.y) < 1.5; }
 function dragTap() { if (!DRAGZ.on) return false; const p = player, R = p.dragon; if (!R && dragGive()) return true;
-  if (R) { if (R.st === 'sit') { const B = DRAGZ.on.B; if (B.drive && (B.drive.air || B.drive.pad)) { tipShow(B.drive.air ? 'Land first.' : 'Land on the meadow to get off.', 2.5); return true; } dragDriveEnd(B); R.st = 'off'; R.t = 0; R.from = p.pos.clone(); snd('swoosh', { g: .4, r: 1.1 }); } return true; }
+  if (R) { if (R.st === 'sit') { const B = DRAGZ.on.B; if (B.drive && (B.drive.air || B.drive.pad)) { tipShow(B.drive.air ? 'Land first.' : 'Land on the meadow to get off.', 2.5); return true; }
+      const now = performance.now() / 1000; if (!(now - (R.tap1 || -9) < DRAGZ.offTap)) { R.tap1 = now; tipShow('Tap the right pad again to get off.', 1.4); return true; } R.tap1 = -9;     /* mDRG: a DOUBLE tap (his: a push of the right stick threw him off) */ dragDriveEnd(B); R.st = 'off'; R.t = 0; R.from = p.pos.clone(); snd('swoosh', { g: .4, r: 1.1 }); } return true; }
   if (!dragNear() || !p.grounded) return false;
   if (DRAGZ.look !== 'CAPTURED' || DRAGZ.on.B.tame) { tipShow(DRAGZ.look === 'EVIL' ? 'He is wild. Bring him good Jinra -- the spring by the start.' : 'He will not be ridden like that. (TOOLS > DRAGON)', 4); return true; }
   const B = DRAGZ.on.B; if (!B.seat) return false;
@@ -11431,7 +11432,7 @@ function dragRide(dt) { const p = player, R = p.dragon, B = DRAGZ.on && DRAGZ.on
   const seat = B.seat.getWorldPosition(_drV), sx = seat.x, sy = seat.y - R.hip, sz = seat.z, h = dragH(B);
   if (R.st === 'on') { const u = Math.min(1, R.t / DRAGZ.mountT), k = smooth(0, 1, u);
     p.pos.set(R.from.x + (sx - R.from.x) * k, R.from.y + (sy - R.from.y) * k + Math.sin(u * Math.PI) * DRAGZ.arc, R.from.z + (sz - R.from.z) * k);
-    p.faceH = p.heading = R.h0 + wrapAngle(h - R.h0) * k; if (u >= 1) { R.st = 'sit'; R.t = 0; dragDriveStart(B); tipShow('In the saddle. Left pad: ride. Left tap: take off, then beat the wings. Right tap (on the meadow): get off.', 5); } }
+    p.faceH = p.heading = R.h0 + wrapAngle(h - R.h0) * k; if (u >= 1) { R.st = 'sit'; R.t = 0; dragDriveStart(B); tipShow('In the saddle. Left pad: ride. Left tap: take off, then beat the wings. Double-tap the right pad (on the meadow): get off.', 5); } }
   else if (R.st === 'sit') { p.pos.set(sx, sy, sz); p.faceH = p.heading = h; p.speed = B.drive ? B.drive.v * .3 : 0; dragGun(dt); }
   else { const u = Math.min(1, R.t / DRAGZ.offT), k = smooth(0, 1, u), to = B.mountAt;
     p.pos.set(R.from.x + (to.x - R.from.x) * k, R.from.y + (to.y - R.from.y) * k + Math.sin(u * Math.PI) * DRAGZ.arc * .6, R.from.z + (to.z - R.from.z) * k);
@@ -11661,7 +11662,11 @@ function dragKit(m, root, H, bag) { const bone = n => m.getObjectByName(n), rc =
   const bw = n => { const b = bone(n); return b ? b.getWorldPosition(new THREE.Vector3()) : null; };
   // a WORLD turn as the piece's turn in his frame (what `pin` wants)
   const inHis = q => wq.clone().invert().multiply(q);
-  return { H, bone, wq, up, side, fwd, hitAlong, pin, bw, inHis }; }
+  // mDRG (his: "the saddle is crooked"): the BACK's frame -- forward along his spine (Spine -> Spine2) as it lies in the pose he was dressed in,
+  // level side to side -- for anything that sits on his back; his root's frame only matches it when the spine is straight
+  const backQ = () => { const a = bw('Bip001_Spine'), b = bw('Bip001_Spine2'); if (!a || !b) return wq.clone(); const f = b.sub(a).normalize(), sd = new THREE.Vector3().crossVectors(up, f).normalize(), u2 = new THREE.Vector3().crossVectors(f, sd);
+    return new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(sd, u2, f)); };
+  return { H, bone, wq, up, side, fwd, hitAlong, pin, bw, inHis, backQ }; }
 // m1610: DRESSING PASS 2 (BUILDINGS.md THE DRAGON RIDE; KORAJIN.md THE BLUE DRAGON). On top of pass 1 (saddle, collar, bands, cape) for CAPTURED:
 // a red-lacquer HEAD PLATE with a gold ridge and a Jinra gem, a BRIDLE (brow band, nose band, cheek straps, gold bit rings) and REINS that run
 // live from the bit to the saddle, a tall CANTLE and hanging saddle LAMES, PAULDRONS, a CHEST PLATE with our nested-diamond crest, lacquer PLATES
@@ -11685,9 +11690,9 @@ function dragDress2(B, m, root, P) { const H = B.hd, cap = B.sets.CAPTURED, evil
   // PLATES down the neck and the tail (and the EVIL twins, spiked)
   const chain = [['Bip001_Neck', 'Bip001_Neck1'], ['Bip001_Neck1', 'Bip001_Neck2'], ['bone01', 'bone02'], ['bone02', 'bone03'], ['bone03', 'bone04'], ['bone04', 'bone05']];
   for (const [a, b] of chain) { const pa = bw(a), pb = bw(b); if (!pa || !pb) continue; const mid = pa.clone().lerp(pb, .5), dir = pb.clone().sub(pa), L = dir.length(); dir.normalize();
-    const t = topOf(mid), hw = girth(mid), q = inHis(qTo(Zv, dir));
-    const C = shell(hw * 1.5, L * 1.05, mt.lac, mt.gold); C.quaternion.copy(q); KC.pin(a, C, t);
-    const E = shell(hw * 1.5, L * 1.05, mt.iron, mt.rust); E.add(spike(H * .07 * Math.min(1.4, hw / (H * .06)), H * .018, mt.rust)); E.quaternion.copy(q); KE.pin(a, E, t); }
+    const t = topOf(mid).addScaledVector(up, H * .018), hw = girth(mid), q = inHis(qTo(Zv, dir));
+    const C = shell(hw * 1.9, L * 1.05, mt.lac, mt.gold, 2.6); C.quaternion.copy(q); KC.pin(a, C, t);
+    const E = shell(hw * 1.9, L * 1.05, mt.iron, mt.rust, 2.6); E.add(spike(H * .07 * Math.min(1.4, hw / (H * .06)), H * .018, mt.rust)); E.quaternion.copy(q); KE.pin(a, E, t); }
   // THE HEAD: the snout measured (the first skin hit from in front), the skull's top (the hit nearest the bone from above)
   const hp = bw('Bip001_Head');
   if (hp) { const st = hitAlong(hp, fwd.clone().negate(), H) || hp.clone().addScaledVector(fwd, H * .14), sl = Math.max(H * .06, st.distanceTo(hp)), d = st.clone().sub(hp).normalize(), qd = inHis(qTo(Zv, d));
@@ -11718,7 +11723,7 @@ function dragDress2(B, m, root, P) { const H = B.hd, cap = B.sets.CAPTURED, evil
     const crest = new THREE.Mesh(new THREE.TorusGeometry(H * .03, H * .005, 3, 4), mt.gold); crest.position.set(0, H * .1, -l * .5 + H * .013); crest.rotation.x = -.2; G.add(crest);
     for (const sd2 of [-1, 1]) for (let k = 0; k < 3; k++) { const lm = new THREE.Mesh(new THREE.BoxGeometry(H * .012, H * .05, l * .8), k % 2 ? mt.blk : mt.lac); lm.position.set(sd2 * (w * .86 + k * H * .006), -H * .02 - k * H * .045, 0); lm.rotation.z = sd2 * .25; G.add(lm);
       const tr = new THREE.Mesh(new THREE.BoxGeometry(H * .013, H * .006, l * .81), mt.gold); tr.position.set(lm.position.x, lm.position.y - H * .025, 0); tr.rotation.z = sd2 * .25; G.add(tr); }
-    KC.pin('Bip001_Spine1', G, stop);
+    G.quaternion.copy(inHis(KC.backQ())); KC.pin('Bip001_Spine1', G, stop);
     B.reinAt = [];
     for (const sd2 of [-1, 1]) { const rr = new THREE.Mesh(new THREE.TorusGeometry(H * .014, H * .004, 6, 12), mt.gold); rr.rotation.y = Math.PI / 2; const at2 = stop.clone().addScaledVector(up, H * .1).addScaledVector(fwd, l * .5).addScaledVector(side, sd2 * w * .2); KC.pin('Bip001_Spine1', rr, at2); B.reinAt.push(rr); } }
   if (B.bits && B.bits.length === 2 && B.reinAt && B.reinAt.length === 2) B.reins = dragReinsMake(B, H, mt.leather);
@@ -32807,8 +32812,8 @@ function rigAnim(dt) {
   // **AND WITH ZAP'S POOL ON HIM IT IS THE ORDINARY PATH (m119).** `morphAnim` is the three
   // clips a kind carries of its own; once `mphBorrow` has put zap's 50-odd on the skin, every
   // name below resolves and there is nothing left for a second animation path to do.
+  if (p.dragon && (!p.mphK || rig.borrowed || rig.actions.driving)) { dragAnim(dt, t); return; }     // m1614: climbing on, seated, climbing off (mDRG: ahead of a worn form, when the skin has the seat)
   if (p.mphK && !rig.borrowed) { morphAnim(dt); return; }
-  if (p.dragon) { dragAnim(dt, t); return; }     // m1614: climbing on, seated, climbing off
 
   // THE BOARD, ABOVE EVERYTHING THAT ASKS ABOUT THE GROUND -- he is riding, not walking, and
   // the gait below has no idea. Two pairs blended on the CROUCH, which is how hard he is
@@ -64637,7 +64642,7 @@ function stepCam(dt) {
   cam.up = damp(cam.up || 0, upLookW(), (cam.up || 0) < upLookW() ? UPLOOK.in : UPLOOK.out, dt);
   cam.a3 = damp(cam.a3 || 0, aim3Live() || (AIM3.on && p.aim && slotNow().aim) ? 1 : 0, .12, dt);     // m1259: the 3D aim's over-the-shoulder lens
   const a3 = cam.a3, a3p = (p.gPit || 0) * a3;
-  cam.el = damp(cam.el || CAM.el, kit.inside === 'cut' ? KIT.cutEl : CAM.el + KIT.highEl * Math.min(1, kit.high) - UPLOOK.el * cam.up - a3p * AIM3.cam.el - (AIM3.on && slotNow().aim ? (p.gPit || 0) * AIM3.pCam : p.backAim ? (p.gPit || 0) * BACKAIM.cam * (BACKAIM.on ? 1 : 1.2) : 0), .12, dt);
+  cam.el = p.dragon ? damp(cam.el || CAM.el, CAM.el + DRAGZ.camEl, .3, dt) : damp(cam.el || CAM.el, kit.inside === 'cut' ? KIT.cutEl : CAM.el + KIT.highEl * Math.min(1, kit.high) - UPLOOK.el * cam.up - a3p * AIM3.cam.el - (AIM3.on && slotNow().aim ? (p.gPit || 0) * AIM3.pCam : p.backAim ? (p.gPit || 0) * BACKAIM.cam * (BACKAIM.on ? 1 : 1.2) : 0), .12, dt);
   // **AND THE LOOK POINT IS CHEST HEIGHT ON THE BODY BEING DRAWN (m112).** `CAM.look` is his own
   // chest; worn as a 1.78 m drunk that is the man's waist, so the lens frames him low. It is the
   // one term the morph moves -- the collider and every speed stay his, deliberately.

@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## mDRG -- THE DRAGON RIDE: his first look (m1614 on the phone) -- the saddle, the plates, the lens, the dismount
+His (screenshot at M1614 +3, i.e. three builds behind -- the riding, flying and fire are m1618-m1622 and had not reached him): *"When I got on
+I'm pretty much in the dragon, can't even see me. The saddle is crooked. The armour kind of cuts into his body (I'll probably model that on
+my own, but keep trying). I wasn't able to control him, or make him fly or jump. When I pushed the right stick he just got off again."*
+- **The saddle was crooked**: every back piece was turned to his ROOT's frame, which only matches his back while the spine is straight; in the
+  pose he is dressed in it is not. `dragKit.backQ()`: forward along Spine -> Spine2 as posed, level side to side. Pass 1's saddle (the dojo's
+  too) and pass 2's cantle and lames sit on it.
+- **The plates cut in**: the neck and tail shells now stand .018 H off the skin top and are wider (1.9 x the half-girth, not 1.5) on a wider
+  arc (2.6 rad), so the edges come down outside his flanks instead of into them. His own armour model replaces all of it when he makes one.
+- **The lens sat in the saddle**: it pulls back `camPull` 9 m (was 6), lifts `camLift` 1.6 m (was .4) and tips DOWN `camEl` .22 rad more
+  (the one writer of `cam.el` picks the dragon's target when mounted), so it looks down onto the rider on his back from behind and above.
+- **A push of the right stick threw him off**: a short push and release IS a tap. Getting off is a DOUBLE tap now (`offTap` .45 s; the
+  first tap says "tap again"). The flick (fireball) and the held-up gun are untouched.
+- The rider's clip choice goes ahead of a worn form's (`morphAnim`) when the skin has `driving`.
+**Moves:** nothing ticked -- his look again at the newest build. Gates: check ok, zone boot ok. Shipped unverified.
+
 ## m1623 -- THE RE-PASS: the FORGE-WORKSHOP, pass 1 (a HERO / TOWN place: the look; a collider audit)
 - Kit materials: `K.timber`, a `stone_blocks` triMat in two tones, `K.bronze`, `K.iron`, `K.lamp`; the furnace fire stays fire-orange
   (it is a forge, not Jinra). `korLantern`s on posts at the open front, bunting along the front beam, grass, stones, tall grass, ferns
