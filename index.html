@@ -21161,6 +21161,7 @@ function bldHit(x, y, z, rad, dmg) {
   if (ghouseOilHit(x, y, z, rad)) return 1;     // m1234: the murder-hole cauldron
   if (ghouseBell(x, y, z, rad)) return 1;     // m1171: the Gatehouse alarm bell
   if (ghouseBreak(x, y, z, rad)) return 1;     // RE-PASS 2: its posts and torii pillars
+  if (mktBell(x, y, z, rad)) return 1;     // RE-PASS 3: the market lookout's alarm bell
   if (ADOCK.on && ADOCK.on.dbell && !(ADOCK.on.dbT > .4)) { const D = ADOCK.on, B = D.dbell.position; if (Math.hypot(x - B.x, y - B.y, z - B.z) < .8 + rad) { D.dbT = 1; snd('clang', { g: 1, r: 1.3, x: B.x, z: B.z }); if (D.ss === 'docked') D.st = Math.min(D.st, .6); return 1; } }     // m1181: the dispatch bell
   if (siegeHit(x, y, z, rad, dmg)) return 1;     // m1213: the trebuchet
   if (rampHorn(x, y, z, rad)) return 1;     // m1242: the war horn
@@ -21546,6 +21547,28 @@ function mktBuild() {
   plantPlant(plants, 'cherry', cx - 4 * k, 0, zb + 4.5, 1.4, 1); plantPlant(plants, 'pine', cx + 7 * k, 0, zb + 5, 1.2, 2);
   for (let i = 0; i <= A.n; i++) { const px = x0 + i * A.w + (i === A.n ? -.55 : .55); put(new THREE.CylinderGeometry(.28, .22, .4, 10).translate(px, .2, zf - .45), K.iron); plantPlant(plants, i % 2 ? 'flowers' : 'fern', px, .4, zf - .45, .7, i); }
   for (let i = 0; i < 18; i++) { const u = i / 17, e = i % 2 ? zf - .9 - (i % 3) * .4 : zb + .9 + (i % 3) * .3; plantPlant(plants, ['grass', 'stones', 'tallgrass'][i % 3], x0 - 1 + (W + 2) * u, 0, e, .8, i); }
+  // ---- RE-PASS 3 (m@X4@): THE LAYERS -- L3 a FIRE-WATCH LOOKOUT (hinomi yagura) on the roof's east end: four posts, a railed platform 3.4 m
+  // over the roof, a little tiled hip roof, a ladder up its west face, and a bronze ALARM BELL (hansho) hung under its roof that rings when
+  // struck; doubloons up there and along the roof (only when restored); straw RICE BALES to smash at the west end (L1) ----
+  const lx = x0 + W - 1.6, lz = cz + .3, lt = RT + 3.4, coinsU = []; const nb0 = O.boxes.length;
+  for (const [px, pz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) add(new THREE.BoxGeometry(.18, 3.4 + 2, .18), wood, lx + px * 1.1, RT + 2.7, lz + pz * 1.1, 1);
+  add(new THREE.BoxGeometry(2.6, .16, 2.6), plank, lx, lt - .08, lz, 1); for (const b2 of O.boxes.slice(nb0)) BOXES.push(b2);
+  for (const [w, d, x, z] of [[2.6, .08, 0, 1.25], [2.6, .08, 0, -1.25], [.08, 2.6, 1.25, 0]]) add(new THREE.BoxGeometry(w, .08, d), wood, lx + x, lt + .8, lz + z, 0);
+  for (const [px, pz] of [[0, 1.25], [0, -1.25], [1.25, 0]]) add(new THREE.BoxGeometry(pz ? 2.6 : .06, .7, pz ? .06 : 2.6), K.redL, lx + px, lt + .4, lz + pz, 0);
+  add(new THREE.ConeGeometry(2.3, 1.1, 4, 1, true).rotateY(Math.PI / 4), triMat('roof_tiles', { scale: 1.8, rough: .55, side: THREE.DoubleSide }), lx, lt + 2.55, lz, 0); add(new THREE.ConeGeometry(.1, .5, 6), K.bronze, lx, lt + 3.3, lz, 0);
+  for (let y = RT + .35; y < lt; y += .32) add(new THREE.BoxGeometry(.06, .06, .7), wood, lx - 1.25, y, lz, 0);     // the ladder's rungs
+  for (const e of [-1, 1]) add(new THREE.BoxGeometry(.07, 3.4, .07), wood, lx - 1.25, RT + 1.7, lz + e * .35, 0);
+  const lad = kitClimbAdd({ minx: lx - 1.37, maxx: lx - 1.13, miny: RT, maxy: lt, minz: lz - .45, maxz: lz + .45 }, 'mkt_lookout', lt); lad.mark = { x: lx, y: lt, z: lz };
+  const bell = new THREE.Group(); bell.position.set(lx, lt + 1.95, lz); g.add(bell); { const bm = new THREE.Mesh(new THREE.CylinderGeometry(.22, .3, .55, 14), K.bronze); bm.position.y = -.3; bm.castShadow = true; bell.add(bm);
+    const lip = new THREE.Mesh(new THREE.TorusGeometry(.3, .03, 6, 16).rotateX(Math.PI / 2), K.bronze); lip.position.y = -.57; bell.add(lip); }
+  korLantern(put, K, lx + 1.25, lt + 1.5, lz + 1.25, .6); korLantern(put, K, lx + 1.25, lt + 1.5, lz - 1.25, .6);
+  for (const dx of [-.6, 0, .6]) coinsU.push(coinDrop(g, lx + dx, lt + .9, lz));
+  for (const dx of [-9, -1, 5]) coinsU.push(coinDrop(g, cx + dx, RT + .9, cz - 1));
+  { const straw = new THREE.MeshStandardMaterial({ color: 0xd8c08a, roughness: .95 }), rope = K.iron;
+    for (const [x, z, y] of [[x0 - 1.5, zf - 1.3, .35], [x0 - 2.3, zf - 1.3, .35], [x0 - 1.9, zf - 1.3, 1.02]]) { const m = new THREE.Mesh(new THREE.CylinderGeometry(.35, .35, .8, 12).rotateZ(Math.PI / 2), straw); m.position.set(x, y, z); m.castShadow = true; g.add(m);
+      for (const e of [-.25, .25]) { const bd = new THREE.Mesh(new THREE.TorusGeometry(.35, .025, 4, 14).rotateY(Math.PI / 2), rope); bd.position.x = e; m.add(bd); }
+      smashAdd(fruitS, m, { minx: x - .4, maxx: x + .4, miny: y - .35, maxy: y + .35, minz: z - .35, maxz: z + .35 }, 1, 14, [.85, .75, .5]); } }
+  boxGrid();
   // ---- RE-PASS 2 (m1548): RESTORABLE IN PLACE (rubric 7, a HERO place: no lift). The paving, the chunk walls, the ramp and the fireworks booth
   // stay. The ROOF (slab, rail, signboards, teahouse, parasol), the FRONT POSTS and beam, each STALL (counter, goods, shelf, awning, noren,
   // stools), the two RING POLES and the NOBORI are pieces. Fallen: the roof has come down across the stalls, the posts and poles lie in the
@@ -21570,16 +21593,16 @@ function mktBuild() {
     if (key[0] === 'p') { const e = key === 'pole1' ? 1 : -1; return { p: [c.x + e * 3.5, .3, c.z + .5], r: [0, .2, -e * Math.PI / 2 * .96], hop: 1.5, at: .4 }; }
     const i = +key.slice(1); return { p: [c.x + (i % 2 ? .5 : -.5), .6, c.z - 1], r: [(i % 2 ? .6 : -.5), i * .4, (i % 2 ? -.3 : .3)], hop: 1, at: .06 + i * .05 }; };
   const pieces = restorePieces(R, g, pairs, cls, fall); bldMergeStatic(g); const plantMs = plantFlush(g, plants);
-  { const skip = new Set([drone, robot, lline, ...wash, ...cables, ...plantMs, ...crates.map(C => C.m), ...fruitS.map(F => F.m), ...fw.tubes, ...Object.values(pieces)]), wb = new THREE.Box3(), wc = new THREE.Vector3(), ws = new THREE.Vector3();
+  { const skip = new Set([drone, robot, lline, ...wash, ...cables, ...plantMs, ...crates.map(C => C.m), ...fruitS.map(F => F.m), ...coinsU.map(c2 => c2.m), ...fw.tubes, ...Object.values(pieces)]), wb = new THREE.Box3(), wc = new THREE.Vector3(), ws = new THREE.Vector3();
     for (const o of g.children.slice()) { if (skip.has(o) || o.isInstancedMesh) continue; wb.setFromObject(o); if (wb.isEmpty()) continue; wb.getCenter(wc); wb.getSize(ws); const key = cls(wc, ws); if (key && pieces[key]) pieces[key].attach(o); } }
   scene.attach(robot); restoreSkin(R); g.attach(robot);     // the merchant is Worker B's: its materials are left alone
   const bk = b2 => b2.cw ? null : cls(new THREE.Vector3((b2.minx + b2.maxx) / 2, (b2.miny + b2.maxy) / 2, (b2.minz + b2.maxz) / 2), new THREE.Vector3(b2.maxx - b2.minx, b2.maxy - b2.miny, b2.maxz - b2.minz));
   const tb = [], tu = []; for (const q of O.tri || []) { const t3 = q.split(',').map(Number); (Math.min(t3[1], t3[4], t3[7]) > RT - .05 && Math.max(t3[2], t3[5], t3[8]) <= zb + .45 ? tu : tb).push(t3); } bldTrisDrop(O);
-  restoreRide(R, { base: { boxes: [], tris: tb }, up: { boxes: O.boxes.filter(b2 => bk(b2)), tris: tu, climbs: [], bars, rings, coins: [], objs: [drone, lline, ...wash, ...cables] } });
+  restoreRide(R, { base: { boxes: [], tris: tb }, up: { boxes: O.boxes.filter(b2 => bk(b2)), tris: tu, climbs: [lad], bars, rings, coins: coinsU, objs: [drone, lline, ...wash, ...cables] } });
   R.onSet = R2 => restoreRideSet(R2);
   const ground = []; { const px = x0 - 4, pz = zf - 5, plate = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, .12, 24), new THREE.MeshStandardMaterial({ color: 0x3a4a46, emissive: 0x7affd8, emissiveIntensity: .7 })); plate.position.set(px, .06, pz); scene.add(plate); ground.push(plate); R.trig = { x: px, y: 0, z: pz, armed: 1 }; }
   { const t0 = AGE.st === 'fallen' ? 0 : 1; R.goal = t0; restoreSet(R, t0); restoreRideSet(R, true); }
-  MKT.on = { R, pieces, ground, plantMs, A, g, O, bars, crates, t: 0, pot, chochin, robot, rings, drone, wash, fruitS, thief: null, thT: 8, lane: [x0 - 4, x0 + W + 4, zf - 1.6], pouch: null, fw };
+  MKT.on = { bell, bv: 0, bw: 0, lad, coins: coinsU, R, pieces, ground, plantMs, A, g, O, bars, crates, t: 0, pot, chochin, robot, rings, drone, wash, fruitS, thief: null, thT: 8, lane: [x0 - 4, x0 + W + 4, zf - 1.6], pouch: null, fw };
   arenaBeam(cx, cz, [1, .7, .4], 1); snd('clang', { g: .7, r: .7 });
 }
 function mktHit(x, y, z, rad, dmg) {
@@ -21624,7 +21647,7 @@ function mktFireHit(x, y, z, rad) { const M = MKT.on; if (!M || !M.fw || M.fw.cd
   for (let k = 0; k < 8; k++) { const m = new THREE.Mesh(new THREE.ConeGeometry(.08, .35, 6), new THREE.MeshBasicMaterial({ color: 0xffd080, toneMapped: false })); m.position.set(F.x - .5 + (k % 4) * .33, 1.5, F.z - .4 + Math.floor(k / 4) * .6); M.g.add(m);
     const a = Math.random() * 6.28; F.rk.push({ m, t: -k * .12, vx: Math.sin(a) * 1.5, vz: Math.cos(a) * 1.5, tg: near.length ? near[k % near.length] : null, sky: [F.x + (Math.random() - .5) * 20, 14 + Math.random() * 6, F.z + (Math.random() - .5) * 20], col: cols[k % 4] }); }
   snd('swoosh', { g: .9, r: 1.5, x: F.x, z: F.z }); return 1; }
-function mktStep(dt) { const M = MKT.on; if (!M) return; M.t += dt; if (!M.R || M.R.t >= 1) bldJinraMotes(MKT.at[0], MKT.at[1], M.A.n * M.A.w / 2, dt); mktThief(M, dt); if (M.fw) mktFireworks(M, dt);
+function mktStep(dt) { const M = MKT.on; if (!M) return; M.t += dt; if (M.bell) { M.bv += (-10 * M.bw - 1.2 * M.bv) * dt; M.bw += M.bv * dt; M.bell.rotation.z = M.bw; } if (!M.R || M.R.t >= 1) bldJinraMotes(MKT.at[0], MKT.at[1], M.A.n * M.A.w / 2, dt); mktThief(M, dt); if (M.fw) mktFireworks(M, dt);
   for (const C of M.crates) { if (C.cool > 0) C.cool -= dt; if (!C.dead) continue; C.t -= dt;
     if (C.t <= 0) { const P = C.m.position, p = player; if (Math.hypot(p.pos.x - P.x, p.pos.z - P.z) < 1.2) { C.t = 1; continue; }
       const y = C.below && C.below.dead ? 0 : C.y0; P.y = y + .45; C.b.miny = y; C.b.maxy = y + .9; C.fall = null;
@@ -21640,7 +21663,10 @@ function mktStep(dt) { const M = MKT.on; if (!M) return; M.t += dt; if (!M.R || 
   if (M.robot) { const R = M.robot, p = player, P = R.position; R.position.y = Math.sin(M.t * 2.2) * .04;     // the merchant bobs and watches him
     R.userData.head.rotation.y = clamp(wrapAngle(Math.atan2(p.pos.x - P.x, p.pos.z - P.z) - Math.PI), -1.2, 1.2); }
   if (M.drone) { const [cx, cz] = MKT.at, a = M.t * .3; M.drone.position.set(cx + Math.cos(a) * 12, M.A.H + 7 + Math.sin(M.t * 1.3) * .4, cz + Math.sin(a) * 5); M.drone.rotation.y = -a; M.drone.children[1].rotation.z = M.t * .6; } }
-function mktClear() { const M = MKT.on; if (!M) return; if (M.R) { const i = RESTORE.list.indexOf(M.R); if (i >= 0) RESTORE.list.splice(i, 1); if (M.R.ride) { bldTrisDrop(M.R.ride.tb); bldTrisDrop(M.R.ride.tu); } } for (const o of M.ground || []) o.removeFromParent(); smashDrop(M.fruitS); if (M.plantMs) plantDrop(M.plantMs); for (const C of M.crates) { const i = BOXES.indexOf(C.b); if (i >= 0) BOXES.splice(i, 1); } bldClear(M); MKT.on = null; }
+// RE-PASS 3 (m@X4@): THE LOOKOUT'S ALARM BELL -- struck, it swings and rings out over the market (and the sparks fly off the bronze)
+function mktBell(x, y, z, rad) { const M = MKT.on; if (!M || !M.bell || Math.abs(M.bw) > .4) return 0; const B = M.bell.getWorldPosition(new THREE.Vector3()); if (Math.hypot(x - B.x, y - B.y + .3, z - B.z) > .7 + rad) return 0;
+  M.bv += 4 * (Math.random() < .5 ? 1 : -1); snd('clang', { g: 1, r: 1.3, x: B.x, z: B.z }); snd('clang', { g: .6, r: 1.9, x: B.x, z: B.z }); spkBurst(B.x, B.y - .3, B.z, 14, { col: [1, .85, .5], spread: 2.5, size: .1, life: .5 }); return 1; }
+function mktClear() { const M = MKT.on; if (!M) return; for (const c of M.coins || []) { const i = COIN.list.indexOf(c); if (i >= 0) COIN.list.splice(i, 1); } if (M.lad) { const i = KCLIMB.indexOf(M.lad); if (i >= 0) KCLIMB.splice(i, 1); if (player.climb === M.lad) climbOff(); } if (M.R) { const i = RESTORE.list.indexOf(M.R); if (i >= 0) RESTORE.list.splice(i, 1); if (M.R.ride) { bldTrisDrop(M.R.ride.tb); bldTrisDrop(M.R.ride.tu); } } for (const o of M.ground || []) o.removeFromParent(); smashDrop(M.fruitS); if (M.plantMs) plantDrop(M.plantMs); for (const C of M.crates) { const i = BOXES.indexOf(C.b); if (i >= 0) BOXES.splice(i, 1); } bldClear(M); MKT.on = null; }
 // m1141: SMASHABLES -- any building's breakable props (pots, barrels, offering boxes). `smashAdd(list, mesh, box, hp, fix, col)`: the mesh is
 // already in the building's group, its box goes into BOXES; any hit through `bldHit` chips it, at 0 it bursts (chips in `col`, a puff), the
 // box goes, and it is back `fix` s later (not while he stands on it). `smashDrop(list)` on clear. Stepped once a frame from the arena step.

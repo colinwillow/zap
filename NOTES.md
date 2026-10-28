@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: MARKET STALLS, pass 3 (layers, alive; its third pass, so the loop moves on)
+**Moves:** its L3, breakable and alive rows.
+- **L3: a FIRE-WATCH LOOKOUT** (hinomi yagura) on the roof's east end, clear of the roof bar and the ring pole: four solid posts, a railed
+  platform 3.4 m over the roof (red skirts, timber rails), a tiled 4-sided hip roof with a bronze finial, two small lanterns, and a LADDER
+  up its west face (`kitClimbAdd`, an `up` climb, so it goes dead when the market is fallen). It all sorts into the `roof` piece.
+- **The ALARM BELL** (hansho) hung under its roof: struck (`mktBell` through `bldHit`), it swings on a damped pendulum and rings twice with
+  sparks off the bronze.
+- Doubloons: three on the lookout, three along the roof, all `up` coins (only when restored). `mktClear` removes them and the climb.
+- L1: three straw RICE BALES (tawara, rope bands) stacked at the west end, smashable (`smashAdd` into `fruitS`, so they come back).
+- The posts went in after the build's `BOXES` push, so they are pushed themselves (`nb0`); the first draft pushed only the platform.
+Render-checked headless (the lookout from the east). Shipped unverified. **The Market's three passes are done; next in the table: Rampart Wall (ENEMY).**
+
 ## Grumbo's home, pass 30: breakable pots (Worker B, loop tick 7)
 His queue item. Main's `smashAdd` is one Mesh per prop and is stepped only `inArena()`, so the home does its own, with no new draws: `pot()`
 remembers its material and its index in that material's MG list; `ghomePotsDone` (after the merge) turns that into a vertex range of the
@@ -13,6 +25,7 @@ after the bells in `ghomeHit`, local frame like the orb) folds the range to the 
 cracks, and pulls its box (only pots r > .32 have one). `ghomePots` puts it back after `GHOME.potFix` 25 s unless he is on the spot. The
 ranges sit in the chunked buckets, so a pot on a fallen stall breaks where the stall is drawn (it carries its chunk attribute).
 145 pots. Render: restored, right stall's shelf pots every other one smashed. Next: the rocks' 3rd pass.
+
 ## m1548 -- THE RE-PASS: MARKET STALLS, pass 2 (rubric 7: RESTORES IN PLACE)
 **Moves:** its rubric-7 box. The Pagoda's and the Shrine's pattern.
 - Base (stays): the paving, the chunk walls (breakable as before), the back ramp, the fireworks booth, the crates and fruit crates, the potted plants.
