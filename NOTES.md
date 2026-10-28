@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## m15xx -- The First Beacon pass 10: each station sees the next (local landmarks)
+## m1580 -- The First Beacon pass 10: each station sees the next (local landmarks)
 - **Banners:** every station but the brazier gets a hero-kit banner pole (`korBanner`, 10.6 m, the red diamond cloth) on the corner FURTHEST from the
   next station, so the next run never stands between them. The beacon is the GLOBAL landmark (seen from every station, m1566); the banners are the
   LOCAL ones (LEVELDESIGN.md's three tiers).
