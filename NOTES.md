@@ -5,6 +5,12 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The water-mill tower, pass 2 (Worker B): the west stair, the wheel jams, spray, dressing
+- **The west stair.** The bridge's west landing sat on the wall at 15 m with nothing below it. A straight timber flight now runs beside the bridge (z + 2.3), from a connector deck down toward the river at .34 x .3 per step. The wall falls faster than the stair, so it stands clear of the slope on posts every fifth step. Railed (noCam). **Two first tries were wrong.** Starting at the wall, the first step was already under the slope: 0 steps. Running to the ground, it went down into the pond to -1.6. It starts 2.2 m out from the landing and stops at shore level (.55): **48 steps to 0.8**, beside the stepping stones.
+- **The wheel jams** (`gmillHit`, first in `bldHit`). A blow within 3.2 m of the hub toggles `GMILL.jam`. The wheel's speed eases to 0 fast (it shudders to a stop) and back up slowly. Clang and sparks.
+- **Spray**: a small `spkBurst` every .09 s where the falling water meets the pool.
+- **Dressing**: crates, barrels and sacks on both balconies (clear of the ladder lines), five lanterns hung on ropes off the gallery's edge, a tall red banner on a bracket down the upper tower, a rope coil on the base's roof, red pots round the island.
+- Still open: the east bridge's landing has no way down; no interior; the old first-pass canyon bridge still crosses in front of the mill.
 ## The water-mill tower, pass 1 (Worker B): island, wheel, tower, sails, balconies, bridges
 - His ref (`images/korajin/ref/water_mill_1.jpg`): *"this is for the windmill direction."* It goes on the layout test's spire spot, in the stream 66 m below the home (z 62).
 - **`GMILL` / `gmillBuild()`** (world axes: the tower is round), built after the merchant in its own try (MILL BUILD THREW fails the gate). **`gmillStep`** (from `homeStep`) turns the wheel and the rotor and scrolls the water.
