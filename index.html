@@ -21803,6 +21803,7 @@ function bldHit(x, y, z, rad, dmg) {
   if (hallSparHit(x, y, z, rad, dmg)) return 1;     // m1206: the hall's sparring partner
   if (keepEelHit(x, y, z, rad, dmg)) return 1;     // m1197: the moat eel
   if (keepGong(x, y, z, rad)) return 1;     // m1178: the Keep's gong works the drawbridge
+  if (keepBreak(x, y, z, rad)) return 1;     // RE-PASS 2 (m@X4@): the keep's wall seams
   if (shrineKuji(x, y, z, rad)) return 1;     // m1240: the omikuji box
   if (SHRINE.on && SHRINE.on.obox && SHRINE.on.obT <= 0) { const S = SHRINE.on, P = S.obox.position; if (Math.hypot(x - P.x, z - P.z) < 1 + rad && Math.abs(y - P.y - .4) < .9 + rad) { S.obT = .6; for (let k = 0; k < 2; k++) spkBurst(P.x, P.y + .9, P.z, 20, { col: [1, .85, .3], spread: 4, size: .1, life: .7 }); snd('clang', { g: .5, r: 2.2, x: P.x, z: P.z }); snd('clang', { g: .4, r: 2.6, x: P.x, z: P.z }); return 1; } }     // m1177: the offering box
   if (CLIFF.on && !(CLIFF.on.lvT > 0) && !(CLIFF.on.R && CLIFF.on.R.t < 1)) { const C = CLIFF.on, P = new THREE.Vector3(); C.lever.children[1].getWorldPosition(P); if (Math.hypot(x - P.x, y - P.y, z - P.z) < 1 + rad) { C.lvT = 1.2; C.force = 1; C.rockT = 0; snd('clang', { g: .7, r: .9, x: P.x, z: P.z }); snd('thud', { g: .6, r: .5, x: P.x, z: P.z }); return 1; } }     // m1195: the cradle lever
@@ -24189,6 +24190,9 @@ function keepBuild() {
   for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { add(new THREE.BoxGeometry(.5, KH + .3, .5), wood, cx + sx * kh, Y0 + (KH + .3) / 2, cz + sz * kh, 1); add(new THREE.BoxGeometry(.56, .1, .56), E.gold, cx + sx * kh, Y0 + KH + .35, cz + sz * kh, 0); }     // m1653: black corner posts, solid (they are drawn), gold caps
   // m1653: the black lacquer SKIRT (shitami boards) over the lower half of each outer face, a gold band at its top, gold studs above
   for (const sz of [-1, 1]) { add(new THREE.BoxGeometry(kh * 2 - .5, KH * .45, .04), wood, cx, Y0 + KH * .225, cz + sz * (kh + .02), 0); add(new THREE.BoxGeometry(kh * 2 - .5, .07, .06), E.gold, cx, Y0 + KH * .45, cz + sz * (kh + .03), 0); }
+  // m@X4@ (RE-PASS 2): a JINRA SEAM in a gold frame low on the north, south and east faces -- the keystones (`keepBreak`)
+  for (const sz of [-1, 1]) { add(new THREE.BoxGeometry(.9, 2.2, .1), E.gold, cx - 1.6, Y0 + 1.3, cz + sz * (kh + .07), 0); add(new THREE.BoxGeometry(.5, 1.8, .1), E.jin, cx - 1.6, Y0 + 1.3, cz + sz * (kh + .12), 0); }
+  add(new THREE.BoxGeometry(.1, 2.2, .9), E.gold, cx + kh + .07, Y0 + 1.3, cz - 1.6, 0); add(new THREE.BoxGeometry(.1, 1.8, .5), E.jin, cx + kh + .12, Y0 + 1.3, cz - 1.6, 0);
   add(new THREE.BoxGeometry(.04, KH * .45, kh * 2 - .5), wood, cx + kh + .02, Y0 + KH * .225, cz, 0); add(new THREE.BoxGeometry(.06, .07, kh * 2 - .5), E.gold, cx + kh + .03, Y0 + KH * .45, cz, 0);
   for (const sz of [-1, 1]) { const L = kh - dw / 2 - .25; add(new THREE.BoxGeometry(.04, KH * .45, L), wood, cx - kh - .02, Y0 + KH * .225, cz + sz * (dw / 2 + L / 2), 0); add(new THREE.BoxGeometry(.06, .07, L), E.gold, cx - kh - .03, Y0 + KH * .45, cz + sz * (dw / 2 + L / 2), 0); }
   // the stair inside along the +z wall, 15 risers of .3 from the door side up to the hatch
@@ -24246,7 +24250,28 @@ function keepBuild() {
   for (const b of O.boxes.slice(-6)) BOXES.push(b); boxGrid();
   // m1653: mint BRAZIERS on the curb's two west corners, flanking the approach
   const fires = []; for (const sz of [-1, 1]) { const m = (A.cin + A.cout) / 2, bz = enemyBrazier(E, 1.1), x = cx - m, z = cz + sz * m; bz.position.set(x, A.ch + .12, z); g.add(bz); fires.push([x, A.ch + .12 + bz.userData.top, z]); }
-  const nm = bldMergeStatic(g);
+  // ---- RE-PASS 2 (m@X4@): DESTRUCTIBLE TO THE GROUND (the Hangar's and the Rampart's machinery). Pieces: `wN` / `wS` / `wE` / `wW` (each
+  // wall with its skirt, banners, seam, corner posts; the door wall carries the mask and lamps) and `roof` (slab, merlons, the turret-house,
+  // the roof poles and banners). Six blows on a seam and that wall SLUMPS outward off the island; two walls down drops the roof into the
+  // keep (the sentry gun with it); all three seams cut and the door wall follows -- RAZED, the stolen Jinra spills. The curb, island, steps,
+  // stair, sphinxes, braziers, gong, drawbridge and eel stay ----
+  const pairs = []; for (const o of g.children.slice()) if (o.isMesh && o.userData.mg) { const m = o.material, tri = m.customProgramCacheKey && String(m.customProgramCacheKey()).startsWith('tri'); if (m.transparent || (m.map && !tri)) continue;
+    o.updateMatrix(); pairs.push([(o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()).applyMatrix4(o.matrix), m]); o.removeFromParent(); }
+  const cls = c => { const dx = c.x - cx, dz = c.z - cz; if (Math.abs(dx) > kh + .7 || Math.abs(dz) > kh + .7 || c.y < Y0 + .05) return null;
+    if (c.y > RY - .05) return 'roof'; if (Math.abs(dz) > kh - .6) return dz > 0 ? 'wS' : 'wN'; if (Math.abs(dx) > kh - .6) return dx > 0 ? 'wE' : 'wW'; return null; };
+  const fall = (key, c) => { const rn = ((Math.sin(c.x * 12.9898 + c.z * 3.1) * 43758.5453) % 1 + 1) % 1 - .5;
+    if (key === 'roof') return { p: [c.x + rn * .4, c.y - (KH - .9), c.z + rn * .3], r: [rn * .18, rn * .2, .12], hop: .2, at: .15 };
+    const nx = key === 'wE' ? 1 : key === 'wW' ? -1 : 0, nz = key === 'wS' ? 1 : key === 'wN' ? -1 : 0;
+    return { p: [c.x + nx * 1.4, c.y - KH * .62, c.z + nz * 1.4], r: [nz * .5, rn * .15, -nx * .5], hop: .4, at: 0 }; };
+  const Rr = restoreRig(g, { lift: 0, dur: 2.4, bob: 0 }), pieces = restorePieces(Rr, g, pairs, cls, fall);
+  { const skip = new Set([drone, db, gong, winch, ...chains.map(C2 => C2.ln), ...koi, ...smash.map(S2 => S2.m), ...Object.values(pieces)]), wb = new THREE.Box3(), wc = new THREE.Vector3(), ws = new THREE.Vector3();
+    for (const o of g.children.slice()) { if (skip.has(o)) continue; wb.setFromObject(o); if (wb.isEmpty()) continue; wb.getCenter(wc); wb.getSize(ws); const key = cls(wc); if (key && pieces[key]) pieces[key].attach(o); } }
+  const nm = bldMergeStatic(g), rig = {}, bkey = b2 => cls(new THREE.Vector3((b2.minx + b2.maxx) / 2, (b2.miny + b2.maxy) / 2, (b2.minz + b2.maxz) / 2));
+  for (const key of Object.keys(pieces)) { const Rk = rig[key] = restoreRig(g, { lift: 0, dur: 2.4, bob: 0 }); Rk.pieces = Rr.pieces.filter(P => P.obj === pieces[key]);
+    restoreRide(Rk, { up: { boxes: O.boxes.filter(b2 => bkey(b2) === key), tris: [], climbs: [], bars: [], rings: [], objs: [], coins: [] } });
+    Rk.onSet = R2 => restoreRideSet(R2); Rk.goal = 1; restoreSet(Rk, 1); restoreRideSet(Rk, true); }
+  RESTORE.list.splice(RESTORE.list.indexOf(Rr), 1);
+  const sup = [{ key: 'wN', x: cx - 1.6, z: cz - kh - .1, y0: Y0, y1: Y0 + 2.6, r: .9, hp: 6 }, { key: 'wS', x: cx - 1.6, z: cz + kh + .1, y0: Y0, y1: Y0 + 2.6, r: .9, hp: 6 }, { key: 'wE', x: cx + kh + .1, z: cz - 1.6, y0: Y0, y1: Y0 + 2.6, r: .9, hp: 6 }];
   // ---- PASS 4 (m1197): THE MOAT EEL -- a bronze Jin serpent, seven plates and a lantern-eyed head, swims the moat's square; wade in and
   // it comes for you and BITES (`eelDmg`); cut it (`eelHp` hits on any plate) and it sinks, to surface again `eelBack` s later ----
   const eel = { segs: [], hp: A.eelHp, dead: 0, t: 0, s: 0, bc: 0, hc: 0 };
@@ -24255,7 +24280,7 @@ function keepBuild() {
       if (!k) { for (const sx of [-1, 1]) { const e = new THREE.Mesh(new THREE.SphereGeometry(.07, 6, 5), eyeM); e.position.set(sx * .2, .14, .25); m.add(e); } const jaw = new THREE.Mesh(new THREE.ConeGeometry(.2, .5, 6), bm); jaw.rotation.x = Math.PI / 2; jaw.position.z = .45; m.add(jaw); }
       else { const fin = new THREE.Mesh(new THREE.BoxGeometry(.04, .25, .3), bm); fin.position.y = .25; m.add(fin); }
       m.position.set(cx - (A.isl + A.cin) / 2, .3, cz + k * .5); eel.segs.push(m); } }
-  KEEP.on = { g, O, bars: [], db, dbB, gong, down: 0, ang: Math.PI / 2, tur, t: 0, gT: 0, winch, wT: 0, smash, arch: [], chains, koi, drone, eel, fires, nm }; db.rotation.z = Math.PI / 2;
+  KEEP.on = { g, O, bars: [], db, dbB, gong, down: 0, ang: Math.PI / 2, tur, t: 0, gT: 0, winch, wT: 0, smash, arch: [], chains, koi, drone, eel, fires, nm, rig, pieces, sup, fell: {} }; db.rotation.z = Math.PI / 2;
   { const K0 = KEEP.on; for (const [sx, sz] of [[1, 1], [1, -1]]) archerPost(cx + sx * (A.cout - 1), A.ch + .1, cz + sz * (A.cout - 1)).then(d => { if (KEEP.on === K0) K0.arch.push(d); else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {}); }
   arenaBeam(cx, cz, [1, .6, .35], 1); snd('clang', { g: .7, r: .5 });
 }
@@ -24297,7 +24322,21 @@ function keepEelHit(x, y, z, rad, dmg) { const K = KEEP.on; if (!K || !K.eel || 
   for (const m of E.segs) { const P = m.position; if (Math.hypot(x - P.x, y - P.y, z - P.z) > .7 + rad) continue; E.hc = .25; E.hp -= Math.max(.5, dmg || 1); spkBurst(P.x, P.y + .2, P.z, 12, { col: [1, .8, .4], spread: 3, size: .1, life: .35 }); snd('clang', { g: .8, r: 1.3, x: P.x, z: P.z });
     if (E.hp <= 0) { E.dead = KEEP.eelBack; for (let k = 0; k < 3; k++) spkBurst(P.x, .5, P.z, 20, { col: k ? [1, .55, .15] : [.5, .9, 1], spread: 6, size: .2, life: .7 }); smokeAt(P.x, .5, P.z, 1.5, 1.2, [.85, .9, .95]); snd('boom', { g: .7, r: 1, x: P.x, z: P.z }); }
     return 1; } return 0; }
-function keepClear() { const K = KEEP.on; if (!K) return; smashDrop(K.smash); for (const d of K.arch || []) if (d && HORDE.list.includes(d)) { bowDrop(d); bodyGone(d); HORDE.list.splice(HORDE.list.indexOf(d), 1); } const i = BDYN.indexOf(K.dbB); if (i >= 0) BDYN.splice(i, 1); turretDrop(K.tur); bldClear(K); KEEP.on = null; boxGrid(); }
+// RE-PASS 2 (m@X4@): THE KEEP COMES DOWN -- a blow on a wall's Jinra seam chips it; cut through, the wall slumps off the island (`keepFell`)
+function keepBreak(x, y, z, rad) { const K = KEEP.on; if (!K || !K.sup) return 0;
+  for (const P of K.sup) { if (P.cut || K.fell[P.key] || Math.hypot(x - P.x, z - P.z) > P.r + rad || y < P.y0 - .3 || y > P.y1 + .3) continue;
+    P.hp--; snd('thud', { g: .9, r: .8, x, z }); spkBurst(x, y, z, 12, { col: [.48, 1, .85], spread: 2, size: .12, life: .5 }); camShake(.06);
+    if (P.hp <= 0) { P.cut = 1; snd('crack', { g: 1.2, r: .45, x, z }); keepFell(K, P.key); } return 1; }
+  return 0; }
+function keepFell(K, key) { if (K.fell[key] || KEEP.on !== K || !K.rig[key]) return; K.fell[key] = 1; restorePlay(K.rig[key], 0); camShake(.6); const pc = K.pieces[key].position;
+  snd('boom', { g: 1.3, r: .4, x: pc.x, z: pc.z }); jinraEmit(pc.x, pc.y, pc.z, 30);
+  setTimeout(() => { if (KEEP.on !== K) return; snd('thud', { g: 1.4, r: .35, x: pc.x, z: pc.z }); camShake(.4); for (let i = 0; i < 5; i++) spkBurst(pc.x + (Math.random() - .5) * 5, KEEP.ih + .5, pc.z + (Math.random() - .5) * 5, 16, { col: [.8, .72, .55], spread: 6, size: .5, life: 1.4 }); }, 900);
+  const walls = ['wN', 'wS', 'wE', 'wW'].filter(k => K.fell[k]).length;
+  if (walls >= 2 && !K.fell.roof) setTimeout(() => { keepFell(K, 'roof'); turretDrop(K.tur); K.tur = null; }, 600);
+  if (K.fell.wN && K.fell.wS && K.fell.wE && !K.fell.wW) setTimeout(() => keepFell(K, 'wW'), 1300);
+  if (walls === 4 && !K.razed) { K.razed = 1; const [cx, cz] = KEEP.at; setTimeout(() => { if (KEEP.on === K) { jinraEmit(cx, KEEP.ih + 1, cz, 60); snd('crack', { g: 1.2, r: .5, x: cx, z: cz }); } }, 1200); }
+  boxGrid(); }
+function keepClear() { const K = KEEP.on; if (!K) return; for (const Rk of Object.values(K.rig || {})) { const i = RESTORE.list.indexOf(Rk); if (i >= 0) RESTORE.list.splice(i, 1); if (Rk.ride) { bldTrisDrop(Rk.ride.tb); bldTrisDrop(Rk.ride.tu); } } smashDrop(K.smash); for (const d of K.arch || []) if (d && HORDE.list.includes(d)) { bowDrop(d); bodyGone(d); HORDE.list.splice(HORDE.list.indexOf(d), 1); } const i = BDYN.indexOf(K.dbB); if (i >= 0) BDYN.splice(i, 1); turretDrop(K.tur); bldClear(K); KEEP.on = null; boxGrid(); }
 // m1184: THE ROBOT SAMURAI BARRACKS (Set 2 #17, pass 1) at (30, -42). A long BARRACKS HALL (breakable walls, a door onto the yard, a curved
 // roof) along the south of a DRILL YARD where six ROBOT SAMURAI drill in step -- raise, cut, return, all together, a stamp on the cut --
 // straw TRAINING DUMMIES and an ARCHERY BUTT at the yard's ends, a WEAPON RACK by the door. The robots are killable (`bldHit`, `rbHp` hits:

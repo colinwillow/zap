@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the MOATED KEEP, pass 2 (DESTRUCTIBLE TO THE GROUND)
+- The Hangar's machinery (per-piece rigs run backwards, `restoreRide` parking each piece's boxes, a `sup` list hit through `bldHit` ->
+  `keepBreak`). Pieces: `wN` / `wS` / `wE` / `wW` (a wall with its skirt, gold band, banner, seam and the corner posts on its side; the
+  door wall carries the oni mask and the lamps) and `roof` (slab, merlons, the turret-house and its roof, the poles and banners).
+- Keystones: a mint seam in a gold frame low on the north, south and east faces, 6 blows each, reached from the island (2 m round the
+  keep, over the drawbridge or up out of the moat). Two walls down drops the roof (.6 s) and `turretDrop`s the sentry gun; all three
+  cut and the door wall follows (1.3 s): RAZED, a 60-mote Jinra spill. The interior stair stands as a ruin.
+- BLANK-BUILD CATCH: the leftover pass first skipped `eel.segs`, but the eel is declared further down `keepBuild` (a `const` read
+  above its declaration), so the whole build threw and the keep never appeared -- `npm run check` passed it (it does not build the keep);
+  the headless build caught it. The eel is built after the pieces are filed, so it needs no skipping.
+Render-checked headless: intact, and after all three seams (walls slumped, roof down in the keep, door wall down). Shipped unverified.
+
 ## m1653 -- THE RE-PASS: the MOATED KEEP, pass 1 (ENEMY look, classical)
 - ENEMY_STYLE's classical fortress through `enemyMats`: pale sandstone block (`stone_blocks` tinted `ENEMY.pal.stone`) for the curb ring,
   the island and the curb steps; the keep's walls stay white plaster over a BLACK lacquer skirt (the lower 45% of each outer face, a gold
