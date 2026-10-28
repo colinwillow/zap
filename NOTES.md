@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m15xx -- THE OSARI DIE IN GREEN SMOKE, and their limbs always come off (DOCKET 7, part 1)
+His: *"you'll be able to chop off his limbs, and when you finally kill him he turns into green smoke -- he kind of explodes and evaporates."*
+- `osariVanish` (`OSARI`): a burst of green sparks and green Jinra smoke, a pop. The body swells a touch, rises, and its materials fade to
+  nothing over `fadeT` .7 s; then he is gone (`osariStep`, in the arena's frame).
+- It replaces `limbBoom` / the plain vanish for any Osari: at the end of his horde life, and when the last limb comes off.
+- The Osari bowman's kind always has `limbs` (the samurai's dismemberment: each katana cut takes an arm or a leg), with or without
+  HORDE: SLICE.
+- Rendered: two of four bowmen mid-vanish in the green burst.
+- Open: the "inner green" Osari (the war-boss reveal under the armour) -- a new model of his.
+
 ## FRAME card in the Red Hollows: `TAU is not defined` in `ghomeFish` (Worker B; mine, since home pass 21)
 His phone showed the FRAME card in the Red Hollows (stack ending frameBody -> frame). Reproduced headless with a stepped walk on m1667: the
 leaping fish (`ghomeFish`, pass 21) used `TAU`, which is local to the BUILDERS, not module scope -- and the fish only leaps when its random

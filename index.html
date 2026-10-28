@@ -13682,7 +13682,7 @@ function limbCut(d, dirH, power, force) {
   (d.cut = d.cut || {})[nm] = b; LIMB.stat.cuts++;
   b.getWorldPosition(_lmW); jinraEmit(_lmW.x, _lmW.y, _lmW.z, JINRA.seep);     /* m1500: Jinra seeps from the break */ spkBurst(_lmW.x, _lmW.y, _lmW.z, 30, { col: [1, .75, .3], spread: 5, size: .16, life: .45 }); snd('clang', { g: .8, r: 1.3, x: _lmW.x, z: _lmW.z }); camShake(.12);
   const C = d.cut;
-  if (C.head || (C.legL && C.legR)) { limbBoom(d, dirH); return true; }
+  if (C.head || (C.legL && C.legR)) { if (d.K.osari) { if (d.st !== 'gone') osariVanish(d); } else limbBoom(d, dirH); return true; }     // m15xx: an Osari goes to green smoke
   if (nm === 'armR' && !C.armL) d.regrabT = LIMB.regrab;
   if (C.armL && C.armR) { d.swings = LIMB.kicks.filter(n => d.actions[n]); if (!d.swings.length) d.swings = null; if (d.wmount) d.wmount.visible = false; if (d.wmountL) d.wmountL.visible = false; }
   if (nm === 'armL' && d.wmountL) { d.wmountL.visible = false; if (!C.armR && d.wmount) d.wmount.visible = true; }
@@ -13756,8 +13756,22 @@ async function sliceDummy() {
 // dummy's limbs: each katana cut takes an arm or a leg, the last one blows him apart). TOOLS > HORDE: SLICE / PLAIN.
 const HORDE = { mix: [.5, .35, .15], floorK: 1.5, lieK: .45, kind: 'SAMURAI', per: 25, max: 150, list: [], busy: 0, hp: 3, notice: 12, fling: .25, fly: 1.7, life: 8, slice: 1, stat: { kills: 0 } };
 try { if (localStorage.getItem('mel.hslice') === '0') HORDE.slice = 0; } catch (e) {}
+// m15xx: THE OSARI OF THE HOLLOW DO NOT FALL (his: "when you finally kill him he turns into GREEN SMOKE -- he kind of explodes and evaporates").
+// An Osari's death is a burst of green Jinra smoke and sparks; the body swells a touch, its materials fade to nothing over `fadeT`, and he is
+// gone. His limbs still come off before that (an Osari always has `limbs`).
+const OSARI = { fadeT: .7, col: [.12, .85, .32], col2: [.04, .5, .2], fades: [] };
+function osariVanish(d) { const P = d.root.position; HORDE.stat.kills++; bowDrop(d);
+  for (let i = 0; i < 3; i++) spkBurst(P.x, P.y + .9, P.z, 22, { col: i % 2 ? OSARI.col : [.85, 1, .9], spread: 6, size: .24, life: .7 });
+  for (let i = 0; i < 14; i++) { const a = Math.random() * 6.28, r = Math.random() * .7; smokeAt(P.x + Math.cos(a) * r, P.y + .2 + Math.random() * 1.6, P.z + Math.sin(a) * r, 3 + Math.random() * 2, 1.4 + Math.random(), i % 3 ? OSARI.col : OSARI.col2, 1.2); }
+  snd('boom', { g: .55, r: 1.4, x: P.x, z: P.z }); snd('swoosh', { g: .6, r: .55, x: P.x, z: P.z }); camShake(.2);
+  const mats = []; d.model.traverse(o => { if (o.isMesh && o.material) { o.material = o.material.clone(); o.material.transparent = true; o.material.depthWrite = false; mats.push(o.material); } });
+  d.st = 'gone'; d.osariGone = 1; const i = HORDE.list.indexOf(d); if (i >= 0) HORDE.list.splice(i, 1); OSARI.fades.push({ d, mats, t: 0, s0: d.root.scale.x }); }
+function osariStep(dt) { for (let i = OSARI.fades.length - 1; i >= 0; i--) { const F = OSARI.fades[i], u = (F.t += dt) / OSARI.fadeT;
+    for (const m of F.mats) m.opacity = Math.max(0, 1 - u); F.d.root.scale.setScalar(F.s0 * (1 + .25 * Math.min(1, u))); F.d.root.position.y += dt * .6;
+    if (u >= 1) { F.d.root.visible = false; OSARI.fades.splice(i, 1); setTimeout(() => bodyGone(F.d), 0); } } }
 function hordeDie(d) {
   const P = d.root.position; jinraBody(d, Math.round(JINRA.burst * .6));     /* m1500 */
+  if (d.K.osari) { osariVanish(d); return; }
   bowDrop(d);
   if (d.K.limbs) { limbBoom(d, d.h || 0); return; }
   HORDE.stat.kills++; arenaBeam(P.x, P.z, [.9, .3, .3], 0); snd('swoosh', { g: .6, r: .7, x: P.x, z: P.z });
@@ -13942,7 +13956,7 @@ function archerAI(d, dt, t) {
 // m1121: ONE archer POSTED at a spot (a tower's lookout), holding it, shooting from it; a horde body (life, dies)
 async function archerPost(x, y, z) {
   await forgedFetch(ARENA.kinds[ARCH.body].forged); const K0 = await arenaLoad(ARCH.body);
-  const K = ARCH.Kb[ARCH.body] || (ARCH.Kb[ARCH.body] = Object.assign(Object.create(K0), { notice: 30, lose: 90, fling: HORDE.fling, flyV: K0.flyV * HORDE.fly, flyUp: K0.flyUp * HORDE.fly, fly0: .75, limbs: HORDE.slice ? 1 : 0, voice: '', out: (K0.out || 1) * HORDE.lieK }));
+  const K = ARCH.Kb[ARCH.body] || (ARCH.Kb[ARCH.body] = Object.assign(Object.create(K0), { notice: 30, lose: 90, fling: HORDE.fling, flyV: K0.flyV * HORDE.fly, flyUp: K0.flyUp * HORDE.fly, fly0: .75, limbs: HORDE.slice || ARCH.body === 'OSARI_BOW' ? 1 : 0, osari: ARCH.body === 'OSARI_BOW' ? 1 : 0, voice: '', out: (K0.out || 1) * HORDE.lieK }));
   const d = bodySpawn(K.P, K, x, z, y); d.model.traverse(o => { if (ARCH.body === 'ARCHER' && o.isMesh && o.material && o.material.color) { o.material = o.material.clone(); rivalHue(o.material, ARCH.red, 'archerHue'); o.material.color.multiply(ARCH.redMul); } });
   for (const n of ['bow_idle', 'bow_aim', 'bow_walk_f', 'bow_walk_b', 'bow_walk_l', 'bow_walk_r']) { const a = d.actions[n]; if (a) { a.setLoop(THREE.LoopRepeat, Infinity); a.clampWhenFinished = false; } }
   d.horde = 1; d.archer = 1; d.post = 1; d.aggro = 1; d.hp = d.hpMax = HORDE.hp; d.hordeHp = HORDE.life; HORDE.list.push(d); return d;
@@ -13952,7 +13966,7 @@ async function archerAdd() {
   try {
     await forgedFetch(ARENA.kinds[ARCH.body].forged);
     const K0 = await arenaLoad(ARCH.body), p = player;
-    const K = ARCH.Kb[ARCH.body] || (ARCH.Kb[ARCH.body] = Object.assign(Object.create(K0), { notice: 30, lose: 90, fling: HORDE.fling, flyV: K0.flyV * HORDE.fly, flyUp: K0.flyUp * HORDE.fly, fly0: .75, limbs: HORDE.slice ? 1 : 0, voice: '', out: (K0.out || 1) * HORDE.lieK }));
+    const K = ARCH.Kb[ARCH.body] || (ARCH.Kb[ARCH.body] = Object.assign(Object.create(K0), { notice: 30, lose: 90, fling: HORDE.fling, flyV: K0.flyV * HORDE.fly, flyUp: K0.flyUp * HORDE.fly, fly0: .75, limbs: HORDE.slice || ARCH.body === 'OSARI_BOW' ? 1 : 0, osari: ARCH.body === 'OSARI_BOW' ? 1 : 0, voice: '', out: (K0.out || 1) * HORDE.lieK }));
     for (let i = 0; i < ARCH.per; i++) {
       const a = Math.atan2(-p.pos.x, -p.pos.z) + (i - (ARCH.per - 1) / 2) * .7 + (Math.random() - .5) * .3, R = ARENA.r - 2;
       const x = Math.sin(a) * R, z = Math.cos(a) * R, d = bodySpawn(K.P, K, x, z, 0);
@@ -65018,6 +65032,7 @@ function stepDummies(dt) {
     if (d.archer) { d.model.updateMatrixWorld(true); archerBow(d); }     // m1103: after the pose
   }
   if (ARROWS.length) arrowStep(dt);
+  if (OSARI.fades.length) osariStep(dt);     // m15xx
 }
 
 // ============================================================================================
