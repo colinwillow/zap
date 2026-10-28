@@ -301,6 +301,23 @@ Worker B (m1424): *"`MEL_WORLD=home node tools/boot.mjs` printed boot ok while g
 - **Dome straps.** Studded timber meridians over the hall's dome (12, from the eave up to the cone's drum), the store's (8) and the turret's (8).
 - **Eaves.** A plank skirt flaring out to R + .6 where the hall's and the store's walls meet their domes, with an iron edge and rafter ends.
 - Existing materials only: **26 draws, unchanged**. Next, the passes he said yes to: the winch lowers and raises the orb, rolling shop shutters, a rope lift to the balcony, pots that shatter.
+## THE RE-PASS: THE WATCHTOWER, PASS 2 -- THE CROWN BREAKS, THE DOORS OPEN (m@X4@, WORKER A)
+
+Rubric 4 (breakable and alive). Started from his: *"start the loop as well, a few passes on each, then move on to the next."*
+
+- **`korTentB` / `korTentAt` / `korTentBreak` / `korTentStep`** (new, shared, beside the hero kit): korTent's crown with its panels in TWO
+  meshes (red, cream), each panel a known vertex range. A hit finds the panel by angle at the cone's surface (`korTentAt`); two hits collapse
+  its range to the apex and throw a falling, tumbling copy (it lands and slides to rest, gone after 6 s). The ribs, rim and finial stay, so a
+  broken crown shows its SKELETON. On the Watchtower the skeleton is also two ring PURLINS, three COLLAR beams and a KING POST.
+- **DOORS:** two timber leaves (four battens, three ledges, iron straps) in the 2.4 m front gap. They swing IN as he comes within 3.6 m of
+  the door, close behind him, and a blow knocks a leaf off its hinges (it tips and falls flat). The leaves have no colliders, so the doorway
+  never blocks.
+- **`wtowerBreak`** is in `bldHit` after the drum: panels first, then doors.
+- **Measured headless:** five panels and a door struck through `bldHit`: 11 hits landed, 5 panels dead, the left leaf down. The renders
+  show the falling panels, the purlins and collars inside, and the leaf tipping out. The debris first lost its painted map (`material.clone()`
+  drops triMat's `onBeforeCompile`), so it uses the kit material itself, which is already double-sided. Draws 95 (two panel meshes, two
+  door leaves, two straps). Not signed off.
+
 ## THE RE-PASS: THE WATCHTOWER, PASS 1 -- THE HERO KIT AND THE BUDGET (m1487, WORKER A)
 
 His (the re-pass, confirmed in my session: *"Yes"*): every forge building in the new style and rules (BUILDINGS.md "THE RE-PASS"). The

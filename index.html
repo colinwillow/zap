@@ -10366,6 +10366,32 @@ function korTent(put, K, x, y, z, r, h, n = 8) { for (let i = 0; i < n; i++) put
   const fy = y + h, fh = Math.max(1.2, h * .22); put(new THREE.CylinderGeometry(.12, .18, fh, 8).translate(x, fy + fh / 2, z), K.timber);
   for (const k of [.25, .55, .85]) put(new THREE.CylinderGeometry(.24, .24, .12, 10).translate(x, fy + fh * k, z), K.iron);
   for (let i = 0; i < 4; i++) put(new THREE.BoxGeometry(.9, .07, .07).rotateY(i * Math.PI / 4).translate(x, fy + fh * .55, z), K.timber); return fy + fh; }
+// m@X4@ (THE RE-PASS): a BREAKABLE tent crown -- korTent's cone with its panels in two meshes (red, cream) added to `g`, each panel a known
+// vertex range, so `korTentBreak(T, panel, g)` collapses it to the apex and throws a falling copy; the ribs, rim and finial still go through
+// `put`, so a broken crown shows its SKELETON. Returns { top, panels, x, y, z, r, h, n, debris }.
+function korTentB(put, K, g, x, y, z, r, h, n = 8) { const L = [[], []];
+  for (let i = 0; i < n; i++) { const q = new THREE.CylinderGeometry(.05, r, h, 1, 1, true, i * Math.PI * 2 / n, Math.PI * 2 / n).translate(x, y + h / 2, z).toNonIndexed(); q.deleteAttribute('uv'); L[i % 2].push(q); }
+  const panels = [], ms = L.map((list, k) => { const m = new THREE.Mesh(mergeGeometries(list), k ? K.cloth : K.red); m.castShadow = m.receiveShadow = true; g.add(m); return m; });
+  for (let i = 0; i < n; i++) { const k = i % 2, j = (i - k) / 2, cnt = L[k][0].attributes.position.count; panels.push({ m: ms[k], start: j * cnt, cnt, a0: i * Math.PI * 2 / n, a1: (i + 1) * Math.PI * 2 / n, hp: 2, dead: 0 }); }
+  for (let i = 0; i < n; i++) { const t = i * Math.PI * 2 / n; korRod(put, K.timber, [x, y + h + .2, z], [x + Math.sin(t) * r * 1.04, y - .15, z + Math.cos(t) * r * 1.04], Math.max(.05, r * .025)); }
+  put(new THREE.TorusGeometry(r, Math.max(.08, r * .03), 6, 32).rotateX(Math.PI / 2).translate(x, y, z), K.timber);
+  const fy = y + h, fh = Math.max(1.2, h * .22); put(new THREE.CylinderGeometry(.12, .18, fh, 8).translate(x, fy + fh / 2, z), K.timber);
+  for (const k of [.25, .55, .85]) put(new THREE.CylinderGeometry(.24, .24, .12, 10).translate(x, fy + fh * k, z), K.iron);
+  for (let i = 0; i < 4; i++) put(new THREE.BoxGeometry(.9, .07, .07).rotateY(i * Math.PI / 4).translate(x, fy + fh * .55, z), K.timber);
+  return { top: fy + fh, panels, x, y, z, r, h, n, debris: [] }; }
+// a point near the cone's surface: which panel (or -1)
+function korTentAt(T, px, py, pz, rad) { if (py < T.y - rad || py > T.y + T.h + rad) return -1; const dx = px - T.x, dz = pz - T.z, d = Math.hypot(dx, dz), rr = T.r * (1 - (py - T.y) / T.h);
+  if (Math.abs(d - rr) > rad + .9) return -1; let a = Math.atan2(dx, dz); if (a < 0) a += Math.PI * 2; return Math.min(T.n - 1, Math.floor(a / (Math.PI * 2 / T.n))); }
+function korTentBreak(T, i, g) { const P = T.panels[i]; if (!P || P.dead) return 0; const pos = P.m.geometry.attributes.position, apex = [T.x, T.y + T.h, T.z];
+  const geo = new THREE.BufferGeometry(), arr = new Float32Array(P.cnt * 3); for (let v = 0; v < P.cnt; v++) { arr[v * 3] = pos.getX(P.start + v); arr[v * 3 + 1] = pos.getY(P.start + v); arr[v * 3 + 2] = pos.getZ(P.start + v); pos.setXYZ(P.start + v, apex[0], apex[1], apex[2]); }
+  pos.needsUpdate = true; P.m.geometry.computeBoundingSphere(); P.dead = 1;
+  const am = (P.a0 + P.a1) / 2, cx = T.x + Math.sin(am) * T.r * .5, cy = T.y + T.h * .4, cz = T.z + Math.cos(am) * T.r * .5; for (let v = 0; v < P.cnt; v++) { arr[v * 3] -= cx; arr[v * 3 + 1] -= cy; arr[v * 3 + 2] -= cz; }
+  geo.setAttribute('position', new THREE.BufferAttribute(arr, 3)); geo.computeVertexNormals(); const d = new THREE.Mesh(geo, P.m.material);     /* the kit's red and cream are double-sided already (a clone would drop triMat's shader) */ d.position.set(cx, cy, cz); d.castShadow = true; g.add(d);
+  T.debris.push({ m: d, vx: Math.sin(am) * 4, vy: 3, vz: Math.cos(am) * 4, sx: (Math.random() - .5) * 4, sz: (Math.random() - .5) * 4, t: 0 });
+  snd('crack', { g: .9, r: .8, x: cx, z: cz }); spkBurst(cx, cy, cz, 16, { col: [.8, .3, .2], spread: 2.5, size: .14, life: .7 }); return 1; }
+function korTentStep(T, dt) { for (let i = T.debris.length - 1; i >= 0; i--) { const D = T.debris[i]; D.t += dt; D.vy -= 14 * dt; D.m.position.x += D.vx * dt; D.m.position.y += D.vy * dt; D.m.position.z += D.vz * dt;
+    D.m.rotation.x += D.sx * dt; D.m.rotation.z += D.sz * dt; if (D.m.position.y < .2) { D.vy = 0; D.vx *= Math.exp(-6 * dt); D.vz *= Math.exp(-6 * dt); D.sx = D.sz = 0; }
+    if (D.t > 6) { D.m.removeFromParent(); T.debris.splice(i, 1); } } }
 function korStack(put, K, x, y, z, h, r = .45) { let yy = y; for (const [f, k] of [[1, .45], [.85, .35], [.72, .2]]) { const hh = h * k; put(new THREE.CylinderGeometry(r * f, r * f * 1.06, hh, 12).translate(x, yy + hh / 2, z), K.bronze);
     put(new THREE.CylinderGeometry(r * f * 1.14, r * f * 1.14, .14, 12).translate(x, yy + hh, z), K.iron); yy += hh; } put(new THREE.CylinderGeometry(r * .9, r * .6, .25, 12).translate(x, yy + .12, z), K.iron); return yy + .25; }
 function korWheel(put, K, x, y, z, yaw, r) { put(new THREE.TorusGeometry(r, r * .08, 6, 24).rotateY(yaw).translate(x, y, z), K.bronze); put(new THREE.CylinderGeometry(r * .18, r * .18, r * .25, 10).rotateX(Math.PI / 2).rotateY(yaw).translate(x, y, z), K.bronze);
@@ -20239,6 +20265,14 @@ function wtowerBuild() {
   wall(cx, cz - hs, hs * 2, 0); wall(cx - hs, cz, hs * 2 - t, Math.PI / 2); wall(cx + hs, cz, hs * 2 - t, Math.PI / 2);
   const dw = k0 > 1 ? 2.4 : 1.6, sd = (hs * 2 - dw) / 2; wall(cx - hs + sd / 2, cz + hs, sd, 0); wall(cx + hs - sd / 2, cz + hs, sd, 0);
   add(new THREE.BoxGeometry(dw + .4, .3, t + .1), wood, cx, S - .35, cz + hs, 1);
+  // RE-PASS 2 (m@X4@): DOORS -- two timber leaves (battens, iron straps) hung in the gap; they swing IN as he comes near and close behind him,
+  // and a blow breaks a leaf off its hinges
+  const doors = []; { const dh = S - .55, lw = dw / 2; for (const sd of [-1, 1]) { const pv = new THREE.Group(); pv.position.set(cx + sd * lw, 0, cz + hs + .05); g.add(pv); const parts = [];
+      for (let k = 0; k < 4; k++) parts.push(new THREE.BoxGeometry(lw / 4 - .02, dh, .1).translate(-sd * (lw / 8 + k * lw / 4), dh / 2, 0));
+      for (const y of [.5, dh / 2, dh - .5]) parts.push(new THREE.BoxGeometry(lw - .1, .16, .06).translate(-sd * lw / 2, y, .07));
+      const leaf = new THREE.Mesh(mergeGeometries(parts.map(q => q.toNonIndexed())), wood); leaf.castShadow = true; pv.add(leaf);
+      const strap = new THREE.Mesh(mergeGeometries([.5, dh - .5].map(y => new THREE.BoxGeometry(lw * .8, .1, .03).translate(-sd * lw * .45, y, .11).toNonIndexed())), K.iron); pv.add(strap);
+      doors.push({ pv, sd, a: 0, dead: 0, lw, dh }); } }
   add(new THREE.BoxGeometry(hs * 2 + 1.4, .18, hs * 2 + 1.4), stone, cx, .09, cz, 0);
   // the decks (solid slabs: stand on them), the corner posts all the way up, lanterns and a neon line on each deck's edge
   for (const y of [S, S * 2, S * 3]) { add(new THREE.BoxGeometry(hs * 2 + .5, .22, hs * 2 + .5), plank, cx, y - .11, cz, 1);
@@ -20250,7 +20284,12 @@ function wtowerBuild() {
   // THE PAGODA CAP
   for (const sz of [-1, 1]) { put(new THREE.BoxGeometry(hs * 2 + 1.2, .45, .45).translate(cx, S * 3 + 2.1, cz + sz * hs), wood); put(new THREE.BoxGeometry(.45, .45, hs * 2 + 1.2).translate(cx + sz * hs, S * 3 + 2.1, cz), wood); }
   for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) put(new THREE.BoxGeometry(.3, 1.1, .3).translate(cx + sx * hs, S * 3 + 1.85, cz + sz * hs), wood);
-  const crownTop = korTent(put, K, cx, S * 3 + 2.35, cz, (hs + 1.6) * 1.18, 7.5, 12);     // the CROWN: his tent cone, red and cream panels, timber ribs, the spoked finial
+  // RE-PASS 2 (m@X4@): the CROWN BREAKS -- each of its twelve panels takes two hits and falls away (`korTentB`), and what is left is the SKELETON:
+  // the ribs, a ring PURLIN halfway up, COLLAR beams across, and a KING POST from the ring beam to the apex
+  const roof = korTentB(put, K, g, cx, S * 3 + 2.35, cz, (hs + 1.6) * 1.18, 7.5, 12), crownTop = roof.top;
+  { const Rr = roof.r, y0 = roof.y, H = roof.h; for (const f of [.45, .72]) put(new THREE.TorusGeometry(Rr * (1 - f) * .97, .1, 6, 24).rotateX(Math.PI / 2).translate(cx, y0 + H * f, cz), K.timber);
+    for (let i = 0; i < 3; i++) put(new THREE.BoxGeometry(Rr * .55 * 2, .16, .16).rotateY(i * Math.PI / 3).translate(cx, y0 + H * .45, cz), K.timber);
+    put(new THREE.CylinderGeometry(.16, .2, H, 8).translate(cx, y0 + H / 2, cz), K.timber); }
   // THE RAMP: round the outside, corner to corner, 1.6 m a side
   const ro = A.ro, w = A.rw, C = [[ro, ro], [ro, -ro], [-ro, -ro], [-ro, ro]], tris = [];
   for (let k = 0; k < 6; k++) { const a = C[k % 4], b = C[(k + 1) % 4], ya = k * S / 2, yb = (k + 1) * S / 2;
@@ -20354,7 +20393,7 @@ function wtowerBuild() {
   { const Bb = hbarMake(cx + hs + 3.2, cz - 1.2, Math.PI / 2, 0); HBAR.list.push(Bb); wbars.push(Bb); }
   for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); }
   const folded = bldMergeStatic(g);
-  WTOWER.on = { A, rings, g, O, bars: wbars, drone, t: 0, tur, fire, arch: null, sl, core, lift, beacon, folded }; const W = WTOWER.on;
+  WTOWER.on = { A, rings, g, O, bars: wbars, drone, t: 0, tur, fire, arch: null, sl, core, lift, beacon, folded, roof, doors }; const W = WTOWER.on;
   archerPost(cx - hs + 1, S * 3 + .05, cz + hs - 1).then(d => { if (WTOWER.on === W) W.arch = d; else if (d) { bowDrop(d); bodyGone(d); } }).catch(() => {});
   // ---- PASS 4 (m1169): a second archer on deck 2, the WAR DRUM (taiko) on deck 1 -- strike it and the alarm goes up: every archer and sentry
   // gun in the forge looses at once -- and two carp KITES flying off the lookout on long lines ----
@@ -20376,6 +20415,9 @@ function wtowerLift(W, dt) { const L = W.lift, p = player, [cx, cz] = WTOWER.at,
   L.bk.position.y = L.y; L.pul.rotation.z = -L.y * 4; const ry = L.top + 1.35, len = Math.max(.1, ry - (L.y + 1.9)); L.rope.scale.y = len; L.rope.position.set(L.x, ry - len / 2, L.z);
   const cy = Math.max(.3, L.top - L.y), len2 = Math.max(.1, ry - (cy + .3)); L.cw.position.y = cy; L.rope2.scale.y = len2; L.rope2.position.set(L.x - .3, ry - len2 / 2, L.z - .4); }
 function wtowerStep(dt) { const W = WTOWER.on; if (!W) return; W.t += dt; const [cx, cz] = WTOWER.at, a = W.t * .35; if (W.lift) wtowerLift(W, dt);
+  if (W.roof) korTentStep(W.roof, dt);
+  for (const D of W.doors || []) { if (D.dead) { D.t2 = (D.t2 || 0) + dt; D.vy -= 14 * dt; D.pv.position.y = Math.max(-.2, D.pv.position.y + D.vy * dt); D.pv.position.z += D.vz * dt; D.pv.rotation.x = Math.min(1.5, D.pv.rotation.x + dt * 2.5); if (D.t2 > 5) D.pv.visible = false; continue; }
+    const p = player.pos, near = Math.hypot(p.x - cx, p.z - (cz + W.A.hs)) < 3.6 && p.y < 3; D.a += ((near ? 1.75 : 0) - D.a) * Math.min(1, dt * 4); D.pv.rotation.y = -D.sd * D.a; }     // both leaves swing IN (-z)
   if (W.beacon) { const B = W.beacon; if (B.t > 0) { B.t -= dt; B.coal.material.color.setRGB(1, .45 + Math.random() * .15, .1);
       if ((B.fT = (B.fT || 0) - dt) <= 0) { B.fT = .06; spk(B.x + (Math.random() - .5) * .5, B.y, B.z + (Math.random() - .5) * .5, (Math.random() - .5) * .6, 2.5 + Math.random() * 2, (Math.random() - .5) * .6, .16, .6, [1, .55 + Math.random() * .3, .15]); if (Math.random() < .5) smokeAt(B.x, B.y + 1.5 + Math.random() * 3, B.z, 2.2, 3, [.3, .29, .28]); }
       if (B.t <= 0) B.coal.material.color.setRGB(.23, .1, .06); } }
@@ -20399,6 +20441,12 @@ function wtowerBeacon(x, y, z, rad) { const W = WTOWER.on; if (!W || !W.beacon |
   B.t = WTOWER.beaconT; snd('boom', { g: .7, r: .9, x: B.x, z: B.z }); snd('swoosh', { g: .8, r: .6, x: B.x, z: B.z }); spkBurst(B.x, B.y, B.z, 26, { col: [1, .6, .2], spread: 5, size: .16, life: .7 });
   if (ADOCK.on && ADOCK.on.ss === 'docked') { ADOCK.on.st = Math.min(ADOCK.on.st, .6); ADOCK.on.dbT = 1; }     // the signal: the airship casts off
   return 1; }
+// RE-PASS 2 (m@X4@): a blow on the crown takes a panel (two hits), on a door a leaf
+function wtowerBreak(x, y, z, rad) { const W = WTOWER.on; if (!W) return 0;
+  if (W.roof) { const i = korTentAt(W.roof, x, y, z, rad); if (i >= 0 && !W.roof.panels[i].dead) { const P = W.roof.panels[i]; if (--P.hp <= 0) korTentBreak(W.roof, i, W.g); else { snd('thud', { g: .6, r: 1.2, x, z }); spkBurst(x, y, z, 6, { col: [.8, .4, .3], spread: 1, size: .1, life: .4 }); } return 1; } }
+  for (const D of W.doors || []) { if (D.dead) continue; const hx = D.pv.position.x, hz = D.pv.position.z, mx = hx - D.sd * Math.cos(D.pv.rotation.y) * D.lw / 2, mz = hz + D.sd * Math.sin(D.pv.rotation.y) * D.lw / 2;
+    if (Math.hypot(x - mx, z - mz) < D.lw * .6 + rad && y < D.dh + rad) { D.dead = 1; D.vy = 2; D.vz = .8; snd('crack', { g: 1, r: .7, x, z }); snd('thud', { g: .8, r: .5, x, z }); spkBurst(mx, 1.5, mz, 18, { col: [.5, .35, .2], spread: 2, size: .14, life: .7 }); return 1; } }
+  return 0; }
 function wtowerDrum(x, y, z, rad) { const W = WTOWER.on; if (!W || !W.drum || W.drumT > .3) return 0; const D = W.drum.position;
   if (Math.hypot(x - D.x, y - D.y, z - D.z) > 1 + rad) return 0; W.drumT = .8;
   snd('boom', { g: 1, r: .45, x: D.x, z: D.z }); snd('thud', { g: 1, r: .5, x: D.x, z: D.z }); camShake(.2); spkBurst(D.x, D.y, D.z, 14, { col: [1, .8, .5], spread: 3, size: .1, life: .4 });
@@ -20595,6 +20643,7 @@ function bldHit(x, y, z, rad, dmg) {
   if (pagodaBell(x, y, z, rad)) return 1;     // m1134: the Pagoda's bell rings
   if (wtowerBeacon(x, y, z, rad)) return 1;     // m1232: the signal beacon
   if (wtowerDrum(x, y, z, rad)) return 1;     // m1169: the Watchtower's war drum
+  if (wtowerBreak(x, y, z, rad)) return 1;     // RE-PASS 2: its crown panels and its doors
   if (ghouseOilHit(x, y, z, rad)) return 1;     // m1234: the murder-hole cauldron
   if (ghouseBell(x, y, z, rad)) return 1;     // m1171: the Gatehouse alarm bell
   if (ADOCK.on && ADOCK.on.dbell && !(ADOCK.on.dbT > .4)) { const D = ADOCK.on, B = D.dbell.position; if (Math.hypot(x - B.x, y - B.y, z - B.z) < .8 + rad) { D.dbT = 1; snd('clang', { g: 1, r: 1.3, x: B.x, z: B.z }); if (D.ss === 'docked') D.st = Math.min(D.st, .6); return 1; } }     // m1181: the dispatch bell
