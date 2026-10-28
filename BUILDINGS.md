@@ -80,7 +80,8 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - (was) something AT the altars: take a katana from the rack, a chime, a glint on the blade
   - lit lanterns at dusk
 - [x] **pass 12 (m1440):** TRAINING MARKS painted on the floor: stance footprints in a ring, chalk drill rings, dark scuff swirls, four numbered start marks (一 to 四) by the gates
-- [ ] pass 4: life: birds, the clouds moving under you
+- [x] **pass 14 (mXXXX):** BIRDS: a flock of 30 swallows darting between the islands (banking into turns), and a V of 7 red-crowned cranes gliding a slow wide circle
+- [ ] pass 4: life: the clouds moving under you; the cloud cards read as separate cotton balls (merge them into softer banks)
 - [ ] later: the training-dojo function (racks you take weapons from, targets that pop up, a sparring master), the music
 
 ## THE ELEMENTS (his, after m1382) -- sandboxes for water, snow and air

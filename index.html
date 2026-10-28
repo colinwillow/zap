@@ -10425,7 +10425,7 @@ function dojoBlessing(A) {     // m1432: he stepped onto an altar: the chime rin
 // `PANOS` is the list to try; `uOff` turns the image so its sun sits on the dojo's sun line (measured: this one's sun at u .310, v .638 from the top).
 // m1453: his SECOND panorama, painted closer to the game's own sky (lavender, peach, a sea of cloud) -- it is `PANO` now; the fiery first is `FIRE`
 const PANOS = { PANO: { file: 'textures/sky_sunset_02.webp', uOff: -.081, vOff: -.165, env: .5, sun: 0xffc890, hemi: 0xffd6c8, ground: 0x5a4a6e, fog: 0xd8a0a0,
-    cloud: { lo: [.52, .44, .66], hi: [1, .82, .66], rim: [1, .62, .32], far: [.92, .66, .62] } },
+    cloud: { lo: [.5, .4, .62], hi: [.94, .7, .6], rim: [1, .55, .3], far: [.9, .62, .6] } },
   FIRE: { file: 'textures/sky_sunset_01.webp', uOff: -.114, vOff: -.202, env: .5, sun: 0xffa060, hemi: 0xffb890, ground: 0x4a2630, fog: 0xc86a4a,
     cloud: { lo: [.36, .17, .3], hi: [1, .66, .4], rim: [1, .45, .15], far: [.8, .36, .24] } } };
 const SKYPICKS = ['PAINTED', 'PANO', 'FIRE'];
@@ -10773,6 +10773,22 @@ function dojoBuild(g, W) {
     gr.addColorStop(0, 'rgba(255,240,215,1)'); gr.addColorStop(.12, 'rgba(255,214,160,.85)'); gr.addColorStop(.35, 'rgba(255,160,110,.28)'); gr.addColorStop(1, 'rgba(255,140,120,0)'); gx.fillStyle = gr; gx.fillRect(0, 0, 256, 256);
     const gt = new THREE.CanvasTexture(gc); gt.colorSpace = THREE.SRGBColorSpace; const sg = new THREE.Sprite(new THREE.SpriteMaterial({ map: gt, blending: THREE.AdditiveBlending, depthWrite: false, fog: false, transparent: true }));
     sg.scale.setScalar(320); sg.renderOrder = -1; sg.frustumCulled = false; g.add(sg); D.sunG = { m: sg, d: sd.clone() }; }
+  // m1459: BIRDS -- a flock of dark swallows darting round the islands (a leader on a looping path, each bird trailing it on its own drifting
+  // offset), and a V of red-crowned CRANES gliding a slow wide circle, white with black wingtips. One InstancedMesh each; the wings flap in the
+  // vertex shader (each bird its own phase and rate), the CPU only moves 38 matrices
+  { const rnd = plantRnd(59), bird = (span, body, cols, crane) => { const P = [], C = [], W = []; const tri = (a, b, c, ca, cb, cc, wa, wb, wc) => { P.push(...a, ...b, ...c); C.push(...ca, ...cb, ...cc); W.push(wa, wb, wc); };
+      const L = body, h = span / 2, k = cols; tri([0, 0, L * .6], [-.06 * L, 0, -L * .4], [.06 * L, 0, -L * .4], k.b, k.b, k.b, 0, 0, 0); tri([0, .05 * L, L * .5], [0, 0, -L * .4], [0, -.04 * L, L * .1], k.b, k.b, k.b, 0, 0, 0);
+      for (const sd of [-1, 1]) { tri([0, 0, L * .25], [sd * h, 0, -L * .05], [0, 0, -L * .15], k.w, k.t, k.w, 0, sd, 0); tri([sd * h * .55, 0, L * .08], [sd * h, 0, -L * .05], [sd * h * .4, 0, -L * .25], k.w, k.t, k.t, sd * .55, sd, sd * .4); }
+      if (crane) { tri([0, .02, L * .6], [0, .1, L * .95], [0, -.04, L * .7], k.b, k.b, k.b, 0, 0, 0); tri([-.04, .1, L * .9], [.04, .1, L * .9], [0, .16, L * .85], [.9, .1, .1], [.9, .1, .1], [.9, .1, .1], 0, 0, 0); tri([-.02, 0, -L * .4], [.02, 0, -L * .4], [0, -.02, -L * 1.1], k.t, k.t, k.t, 0, 0, 0); }
+      const G = new THREE.BufferGeometry(); G.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); G.setAttribute('color', new THREE.Float32BufferAttribute(C, 3)); G.setAttribute('aW', new THREE.Float32BufferAttribute(W, 1)); G.computeVertexNormals(); return G; };
+    const flockMat = (amp) => { const m = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .8, side: THREE.DoubleSide });
+      m.onBeforeCompile = sh => { sh.uniforms.uTime = U.uTime; sh.vertexShader = 'uniform float uTime; attribute float aW; attribute vec2 iF;\n' + sh.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
+        float fl = sin(uTime * iF.y + iF.x); transformed.y += fl * abs(aW) * ${amp.toFixed(2)}; transformed.x *= 1.0 - (1.0 - fl) * .08 * abs(aW);`); };
+      m.customProgramCacheKey = () => 'flock' + amp; return m; };
+    const mk = (G, n, amp, rate0, rate1) => { const ph = new Float32Array(n * 2); for (let i = 0; i < n; i++) { ph[i * 2] = rnd() * 6.28; ph[i * 2 + 1] = rate0 + rnd() * (rate1 - rate0); } G.setAttribute('iF', new THREE.InstancedBufferAttribute(ph, 2));
+      const m = new THREE.InstancedMesh(G, flockMat(amp), n); m.frustumCulled = false; g.add(m); return m; };
+    const sw = mk(bird(1.1, .5, { b: [.06, .06, .1], w: [.08, .08, .14], t: [.04, .04, .06] }), 30, .32, 14, 20), cr = mk(bird(2.6, 1.2, { b: [.92, .9, .88], w: [.9, .88, .86], t: [.08, .08, .1] }, 1), 7, .9, 2.4, 3.2);
+    D.birds = { sw, cr, off: Array.from({ length: 30 }, () => [(rnd() - .5) * 14, (rnd() - .5) * 5, (rnd() - .5) * 14, rnd() * 6.28]), m4: new THREE.Matrix4(), q: new THREE.Quaternion(), e: new THREE.Euler(), v: new THREE.Vector3(), one: new THREE.Vector3(1, 1, 1) }; }
   D.on = { g }; }     /* m1429: the entry is his TOOLS > ENTRY again -- DOORS (the default) = through the gates */
 let _dcM = null;
 function dojoStep(dt) { const D = DOJO; if (!D.on) return; D.t += dt; D.U.uTime.value = D.t; D.dome.position.copy(camera.position);
@@ -10792,6 +10808,7 @@ function dojoStep(dt) { const D = DOJO; if (!D.on) return; D.t += dt; D.U.uTime.
     A.vsw += (-9 * A.sw - 1.2 * A.vsw) * dt; A.sw += A.vsw * dt; A.ch.rotation.set(A.sw * .5, 0, Math.sin(D.t * .9 + A.x) * .04 + A.sw * .3);
     A.t += dt; const u = A.t / 1.4; if (u < 1) { A.ring.position.y = A.y + .1 + u * 3.2; A.ring.scale.setScalar(1 + u * .6); A.ring.material.opacity = (1 - u) * .9; } else A.ring.visible = false;
     const v = A.t / .55; if (v < 1) { const uu = -1.3 + 2.6 * v, vv = -.33, yy = A.y + .7 + 2 * .65 + .1; A.gl.position.set(A.x + A.ca * uu + A.sa * vv, yy, A.z - A.sa * uu + A.ca * vv); A.gl.material.opacity = Math.sin(v * Math.PI); A.gl.material.rotation = v * 2; } else A.gl.material.opacity = 0; }
+  if (D.birds) dojoBirds(D, D.birds);
   if (D.sunG) D.sunG.m.position.copy(camera.position).addScaledVector(D.sunG.d, 700);
   if (D.manta) { const Mn = D.manta; Mn.a += Mn.w * dt; const rr = Mn.r + Math.sin(Mn.a * 2) * 25; Mn.m.position.set(Math.sin(Mn.a) * rr, Mn.y + Math.sin(D.t * .35) * 5, Math.cos(Mn.a) * rr); Mn.m.rotation.set(Math.cos(D.t * .35) * .1, Mn.a - Math.PI / 2, .35); }
   if (D.whale) { const Wh = D.whale; Wh.a += Wh.w * dt; Wh.m.position.set(Math.sin(Wh.a) * Wh.r, Wh.y + Math.sin(D.t * .25) * 6, Math.cos(Wh.a) * Wh.r); Wh.m.rotation.set(Math.cos(D.t * .25) * .08, Wh.a + Math.PI / 2, 0); }
@@ -10802,6 +10819,18 @@ function dojoStep(dt) { const D = DOJO; if (!D.on) return; D.t += dt; D.U.uTime.
     if (on) { p.pos.x += x - P.lx; p.pos.y += y - P.ly; p.pos.z += z - P.lz; }
     b.minx = x - 1.8; b.maxx = x + 1.8; b.minz = z - 1.8; b.maxz = z + 1.8; b.miny = y - .6; b.maxy = y + .05; P.lx = x; P.ly = y; P.lz = z;
     P.m.position.set(x, y, z); P.m.rotation.y += P.w * dt * 2; } }
+// m1459: the swallows chase a leader on a looping path between the islands (each on its own drifting offset, banking into the turn); the cranes
+// glide a slow wide circle in a V
+function dojoBirds(D, B) { const t = D.t, lead = tt => [Math.sin(tt * .11) * 70 + Math.sin(tt * .27) * 20, 18 + Math.sin(tt * .19) * 9, Math.cos(tt * .13) * 60 + Math.sin(tt * .31) * 18];
+  const M = B.m4, q = B.q, e = B.e, v = B.v;
+  B.off.forEach((o, i) => { const tt = t - i * .04, a = lead(tt), b = lead(tt + .15), w = t * .4 + o[3], x = a[0] + o[0] + Math.sin(w) * 2, y = a[1] + o[1] + Math.sin(w * 1.3) * 1, z = a[2] + o[2] + Math.cos(w) * 2;
+    const hx = b[0] - a[0], hz = b[2] - a[2], h = Math.atan2(hx, hz), c = lead(tt + .3), turn = wrapAngle(Math.atan2(c[0] - b[0], c[2] - b[2]) - h);
+    e.set(-(b[1] - a[1]) * .3, h, -turn * 6); q.setFromEuler(e); M.compose(v.set(x, y, z), q, B.one); B.sw.setMatrixAt(i, M); });
+  B.sw.instanceMatrix.needsUpdate = true;
+  const ca = t * .025, R = 150, cx = Math.sin(ca) * R, cz = Math.cos(ca) * R, ch = ca + Math.PI / 2;
+  for (let i = 0; i < 7; i++) { const k = i === 0 ? 0 : Math.ceil(i / 2), sd = i % 2 ? 1 : -1, back = k * 4.2, side = k * 3.6 * sd, fx = Math.sin(ch), fz = Math.cos(ch);
+    const x = cx - fx * back + fz * side, z = cz - fz * back - fx * side, y = 40 + Math.sin(t * .3 + i) * .8 - k * .4; e.set(0, ch, -.12 + Math.sin(t * .2) * .05); q.setFromEuler(e); M.compose(v.set(x, y, z), q, B.one); B.cr.setMatrixAt(i, M); }
+  B.cr.instanceMatrix.needsUpdate = true; }
 // m1455: the flagship's route (a wide cruise, in to the north altar, a hold, out) and its carry
 function dojoFlagPath(F, t) { const u = ((t % F.T) + F.T) % F.T, sm = v => v * v * (3 - 2 * v); let r, y, a;
   if (u < F.cruise) { a = u / F.cruise * Math.PI * 2; r = F.R + Math.sin(a * 3) * 18; y = F.Y + Math.sin(a * 2) * 8; }
