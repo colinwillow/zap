@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## m@X4@ -- THE RE-PASS: the AIRSHIP DOCK, pass 2 (rubric 7: RESTORES IN PLACE)
+**Moves:** its rubric-7 box. For a flyer, what comes back to life is the airship.
+- Base (stays): the ground hall's chunk walls, the shaft and its bands, the lift and its rails. Pieces: `deck` (slab, rails, lanterns, mast and
+  its ring, the dispatch bell, the wind sock, the kite rack, the bunting) and `arm` (the landing arm, its rails, lanterns, struts and gangway).
+- FALLEN: the deck and the arm lie round the foot; a WRECK group (a slumped cream envelope and the plank gondola on its side) shows in the
+  grass; the real ship is hidden, its two `BDYN` boxes are `_off`, it never casts off (`ss` held at docked), its stern turret and under-
+  gondola rings are parked at -600; the lift goes down and stays down; the cables and drone are `up.objs`. RESTORED: the wreck goes, the
+  ship reappears moored with a mint beam and its cycle resumes.
+- The raider skiff is lifted out of the group for `restoreSkin` (not ours: its colours stay).
+- Plate west of the foot (`R.trig`); `rig` hook; `adockClear` drops the rig and the plate.
+Render-checked headless: fallen and restored. The wreck's three bronze bands stuck out as stray arcs and are gone. Shipped unverified.
+
 ## m1564 -- THE RE-PASS: the AIRSHIP DOCK, pass 1 (a HERO flyer: the look)
 **Moves:** its pass-1 row. It is on the HERO list as a FLYER (it may fly; the airship already does).
 - Kit materials: `K.timber`, a warm planks triMat, a `stone_blocks` footing, `K.bronze` (the neon trims too), `K.redL`, `K.lamp`; the 20 m
