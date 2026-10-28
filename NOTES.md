@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## the Red Hollows' PAINTED MAPS, pass 1: sand, rock, cliff (Worker B)
+His ask (m1704 photo): "look at how much of this is just plain orange -- we need nice painted texture maps; really develop these textures".
+Three tileable 1024 maps generated with his OpenAI key (gpt-image-2, medium). **The proxy drops a long silent request** ("upstream request
+failed" three times): the generation is STREAMED (`stream: true`, `partial_images: 3`) so bytes keep flowing, and that works. Made seamless
+offline (scratchpad `seam.py`: the half-rolled copy takes over within 22% of the borders, its wrap being the original's middle), checked
+2x2: `textures/hollows_sand.webp` (wind ripples, grit, pebbles), `hollows_rock.webp` (strata, cracks, pits), `hollows_cliff.webp` (fluted
+red walls, varnish). `hwPaint(mat, 'land' | 'rock')`: world-space triplanar, MULTIPLYING the existing colour by map / its linear mean
+(measured, `HWPAINT.*.mean`), so the vertex palette, strata, moss and the FALLEN drain stay -- it is spliced BEFORE `color_fragment`, so the
+drain (after it) still has the last word. Land = sand on the flats (x1.6 contrast) and cliff on the steeps by slope; rock = every
+`rockM` in the hollows (home, peak, mill, merchant, refinery) and the valley formations. `HWPAINT.k` .85 (0 = off). The lake style is
+untouched. Next: the flat brown retaining faces of the ledge paths, the cave mouths, the river bed.
 ## the Red Hollows: the STATE button on screen, no more floating rocks, and FALLEN has no floating world (Worker B)
 His report (m1704, phone): "a hybrid of halfway built, floating, and halfway demolished -- I can't tell which it is"; "I need the debug menu
 in there so I can transform it between the two states"; "these rocks are kind of floating".
