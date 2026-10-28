@@ -5,6 +5,11 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The merchant shop, pass 2 (Worker B): its revival, live, and a zipline down
+- **On the shared chunk rig** (`rsTag` in its `put`; `rsChunkRig` after its merge; `rsChunkSync(GMERCH)` from `homeStep`). Its chunks are by position (`A.chunkOf`: the butte, the ladders and the scaffold, all below the cap, stay put), with the two bone arches and their charms **forced** to their own chunks (`A.forceChunk`, which `rsTag` now honours), because an arch's middle lands among the shop.
+- **FALLEN**: the deck sags .9 and tilts; the ground floor slumps; the upper storey slides 3 m off sideways and rolls; arch A falls over to one side and arch B to the other; the red sail drops 8.6 m and drapes over the shop; the banner pole lies flat; the palm fans droop. **The show** (a mint plate on the deck by the back steps) rebuilds it deck first, arches, then the sail, then the pole. Rendered headless at t 0 / .5 / 1. The merchant is no longer `bldAge`-weathered; the rig owns its colour.
+- **The route, pass 2: a ZIPLINE** (`ZIPS`) from the deck's front corner (52 m), over the west wall (it clears the wall's top), down to a lit post 9 m behind the home: the climb's fast way down. Still to come on the route: the hard varied way UP (a rope bridge, floating platforms, a lift).
+- The merchant himself waking into a Jin needs a merchant character, which is not in yet.
 ## m1531 -- THE TRAINING DOJO, part 1: weapon racks and pop-up straw targets (dojo pass 19)
 His (BUILDINGS.md THE DOJO, "later"): *"racks you take weapons from, targets that pop up"*. `dojoTrain` builds both, `dojoTrainStep` runs them, `dojoHit` takes the blows.
 - **RACKS** (`D.racks`, `DTRAIN.rackR` 16.9): on the stone dais at E and W, between the floor's red ring and the invisible rim wall (its boxes' inner face is
