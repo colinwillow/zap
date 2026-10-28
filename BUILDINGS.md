@@ -176,7 +176,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - [x] **pass 11 (m1409):** more FOAM on the sea (whitecaps, streaks) and the first BIG SEA CREATURE: a giant alien whale that surfaces, blows and dives (his: *"one big sea creature at a time"*)
   - [x] **pass 12 (m1416):** a long serpent-fish that arcs up and down through the swell
   - [x] **pass 12b (m1433):** the serpent REBUILT -- one continuous scaled skin, a membrane fin with spines and a tail fan, flapping pectorals, a lofted head (brow, hinged jaw, teeth, sunken eyes, frills, horns, whiskers)
-  - [x] **pass 12c (m@X4@):** the serpent in PAINTED textures -- skin (spine scutes, iridescent scales, belly plates), glowing lateral line, spined fin membrane, slit-pupil eye
+  - [x] **pass 12c (m1439):** the serpent in PAINTED textures -- skin (spine scutes, iridescent scales, belly plates), glowing lateral line, spined fin membrane, slit-pupil eye
   - [ ] pass 13: manta rays that swim AND fly (for the airship sky too)
   - [ ] later: other ships about (junks under sail), a bigger land harbour; air creatures for the airship (his: flying fish, serpent-dragons, pterodactyls)
   - [ ] later: swimming here; the AIRSHIP transform (his)
