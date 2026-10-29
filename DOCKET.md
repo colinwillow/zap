@@ -32,3 +32,24 @@
        slam down; NEITHER = the spin.
 16. [x] (m1688) **The charge locks onto an incoming ARROW or ROCKET:** release and he meets it in the air where it flies and slashes it -- back at
        the shooter.
+
+# THE DOCKET, part 2 (his, Oct 29 2026) -- in this order
+*"When you're done solving all the stuff: a few passes on Level 1 v2 (it's fun, I like it) ... wall running, a rope bridge that moves to my weight,
+ladders, ropes, a tightrope that bends ... tighten the dynamics, then layer 1 of Level 1 v2, then layers 2, 3, 4 into a full level ... a sandbox of all
+the building-kit buildings on terrain with plants to see how they hold up ... other agents on some of it -- but the main chat does the hard stuff
+best."* MAIN = this session (dynamics, the feel); AGENT = a separate session can take it from its spec.
+
+17. [ ] MAIN **The WALL-RUN SANDBOX** (`PARKOUR.md` / `WRUN`): one playground with every wall a run can meet -- a long wall (run along), a tall wall
+       to a ledge (run up), a chimney (wall-jump up it), two walls across a pit (run, jump, run), an inside and an outside corner, a wall over
+       water/pit to fall off -- then tighten the dynamics against it with him.
+18. [ ] MAIN **The ROPE pieces, one sandbox:** a ROPE BRIDGE of planks on two ropes that sags and sways under HIS weight (verlet, like the willow's
+       vines), a TIGHTROPE that bends where he stands and wobbles his balance, a hanging ROPE to climb and swing on, and LADDERS (rungs, a rope
+       ladder that swings).
+19. [ ] MAIN **Level 1 v2 (`BEACON.md`), layer 1 tightened** with what 17 and 18 settle; then **layers 2, 3, 4** (puzzle, enemies, theme) into a
+       full level.
+20. [ ] AGENT **The BUILDING-KIT CITY test:** every kit building on terrain with height differences and plants, in one level; measure draw calls,
+       triangles and FPS on a phone-sized render as the count grows; report what breaks first.
+21. [ ] AGENT **PLACE INTROS** (`CINEMA.md`): the reel player (orbit, dolly, cut, back; title card, letterbox, skip) and the first intros
+       (Arena, Ship, Red Hollows, Snowfield).
+22. [ ] **THE TUTORIAL** (`TUTORIAL.md`): Level 0 teaches the core (move, jump, flips, the sword, evade, counter, charge) in one contained place;
+       every later ability is taught where it is found. Design first (MAIN), build after 17-19.
