@@ -449,6 +449,15 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## THE SKY CASTLE, pass 19: every tower has a room (Worker B)
+The four even towers (0, 2, 4, 6) are hollow too, one room each through a door facing the keep: 0 an ARMOURY (three racks, each with
+three blades on iron hooks with bronze grips, two spear bundles, round bronze shields), 2 a LIBRARY (four shelves, books in three
+bindings on four planks each, a reading desk), 4 a STOREROOM (strapped crates, iron-hooped barrels, stacked), 6 a BUNK ROOM (two bunks
+with his cloth for blankets, a chest, a round rug); a lantern hangs in each; their wall is a ring of 20 boxes with the doorway open; the
+desk, crates, barrels and bunks are solid. FOUND IN THE RENDER: tower 0 stood 1.7 m down in the main lawn (its bastion lobe sits under the
+main lobe's cap), the lawn showing above its floor and its door half buried -- every tower's foot is now `gcLawnTop`: the highest walk
+triangle under its footprint (five points), never under its lobe's own number. That lifted 1, 3 and 5's galleries with them. Headless:
+a body walks into all four rooms (floors 116.01 / 117.21 / 115.79 / 114.53) and the three stair towers still climb out onto their galleries.
 ## THE SKY CASTLE, pass 18: the castle is manned (m1814, Worker B)
 His "next" on people. EIGHT Jin samurai GUARDS (the arena's SAMURAI with his katana; `gcGuards`): two at the hall's open doors (the
 warrior tier), one either side of the throne, two walking a seven-point ROUND of the plaza (`d.patrol`, the courtyard's rounds), a brute
