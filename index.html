@@ -13185,7 +13185,7 @@ function wrunJump() {
   // m1776 (his: "the angle of jumping out away from the wall seems to be only directly orthogonal -- there should be variation"): off ANY state the
   // jump leaves along the normal (`wjOut`) PLUS, along the wall, the left stick's share of it (`jumpSide` x its tangent component) and `keep` of
   // what the run carried along it -- so a straight-out kick, a kick angled ahead, a kick back the way he came. Facing the way he flies.
-  // m15xx (his: "running straight up the wall: holding UP and jump -- he jumps straight up, to grab the ledge above; let go of up and jump -- he jumps
+  // m1826 (his: "running straight up the wall: holding UP and jump -- he jumps straight up, to grab the ledge above; let go of up and jump -- he jumps
   // straight out away from the wall, and the camera turns to see where he's going"): on the RUN-UP, the stick toward the wall (`tin` > .5) + jump =
   // a fresh climb (`upJumpV`), still on the face; anything else = turned round and kicked straight out (no back flip), the lens swung behind him
   if (R.kind === 'up') { const S = stickWorld(), tin = S.mag > .3 ? (S.x * -R.nx + S.z * -R.nz) / S.mag : 0;
@@ -13260,7 +13260,7 @@ function wrunPose() {
     sp.parent.getWorldQuaternion(_wrQ3).invert(); sp.quaternion.copy(_wrQ3.multiply(_wrQ)); sp.updateMatrixWorld(true); }
 }
 const _wrQ2 = new THREE.Quaternion(), _wrQ3 = new THREE.Quaternion();
-Object.assign(WRUN, { upD: .5, upFoot: -.55, upAmp: .28, upLift: .2, upToeIn: .6, upJumpV: 9.5,     /* m15xx (his: "not a chair at 90 degrees -- down at 45 or less, knees with room to run, toes brushing the wall, not flat-footed"): hips closer (upD .8 -> .5), feet lower under him (upFoot -.12 -> -.55), toes turned INTO the wall (`upToeIn`) */ upD0: .8, upRate: 2.4, upW: .14, upTorso: .32, perchD: .42, perchFoot: -.18, perchKnee: -.55, perchFwd: .12, perchDrop: .22, perchLean: .45, perchW: .2, perchHand: .05, perchHandW: .55, ik: 1 });     /* m1683: the perch faces away -- back to the wall, a foot planted on it behind, hands back on it at the hips */
+Object.assign(WRUN, { upD: .5, upFoot: -.55, upAmp: .28, upLift: .2, upToeIn: .6, upJumpV: 9.5,     /* m1826 (his: "not a chair at 90 degrees -- down at 45 or less, knees with room to run, toes brushing the wall, not flat-footed"): hips closer (upD .8 -> .5), feet lower under him (upFoot -.12 -> -.55), toes turned INTO the wall (`upToeIn`) */ upD0: .8, upRate: 2.4, upW: .14, upTorso: .32, perchD: .42, perchFoot: -.18, perchKnee: -.55, perchFwd: .12, perchDrop: .22, perchLean: .45, perchW: .2, perchHand: .05, perchHandW: .55, ik: 1 });     /* m1683: the perch faces away -- back to the wall, a foot planted on it behind, hands back on it at the hips */
 const _wsA = new THREE.Vector3(), _wsB = new THREE.Vector3(), _wsC = new THREE.Vector3(), _wsT = new THREE.Vector3(), _wsK = new THREE.Vector3(), _wsQ = new THREE.Quaternion(), _wsQ2 = new THREE.Quaternion();
 // two bones onto `T`, the middle joint bent toward `pole` (a world direction); `end` turned so its child points along `aim` (optional)
 function wrLimb(up, mid, end, T, pole, aim) { if (!up || !mid || !end) return;

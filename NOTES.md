@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The run-up: on his toes at 45 degrees; two jumps off it (m15xx, DOCKET 17)
+## The run-up: on his toes at 45 degrees; two jumps off it (m1826, DOCKET 17)
 *"Running straight up the wall his feet are flat on it and his hips bent like a chair at 90 degrees. More like 45 or less, knees with room to run,
 toes brushing the wall -- not flat-footed." / "Running up: holding UP and jump = jump straight up to grab the ledge above; let go of up and jump =
 straight out away from the wall, and the camera turns to see where he's going."*
