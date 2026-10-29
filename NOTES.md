@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The bow: one mark, locks on archers, a full blast blows them apart (m15xx)
+## The bow: one mark, locks on archers, a full blast blows them apart (m1782)
 *"The double reticle for the bow seems redundant -- we only need the one that shows the height and distance (the lock reticle is good). I can't lock
 onto the archers, only the statues and the spider. A full charge with the exploding arrows should explode the archers -- those are powerful arrows."*
 - The screen reticle (`#retic`) is off while the bow is out (`BOW.noRetic`): its marks are the landing emblem with its height stake, and the lock.

@@ -14974,7 +14974,7 @@ function bowLoose() { const p = player; const { k, full, type, o, gk, g, T, dx, 
   const n = 'bow_recoil'; if (rig.actions[n + UPS]) { playOnce(n + UPS, 1.4); playOnce(n + UP, 1.4); } p.fireT = 1; p.bowT = 0; BOW.stat.shots++;
   snd('swoosh', { g: .55 + k * .35, r: 1.9 - k * .5 }); snd('clang', { g: .12 + (full ? .2 : 0), r: full ? 1.6 : 2.4 }); if (full) camShake(.05); }
 // a BLAST arrow's burst, wherever it ends
-// m15xx (his: "a full charge with the exploding arrows should explode the archers -- those are powerful arrows"): a FULL draw's blast is `fullK`
+// m1782 (his: "a full charge with the exploding arrows should explode the archers -- those are powerful arrows"): a FULL draw's blast is `fullK`
 // wider and harder, and every archer (or horde body) inside it is blown apart (`limbBoom`)
 function arrowBlast(P, dirH, full) { BOW.stat.blasts++; const R = BOW.blastR * (full ? BOW.fullK : 1);
   if (full) for (const d of DUMMIES.slice()) { if (d.st === 'gone' || d.boomed || !d.root.visible || !(d.archer || d.K.archer || d.horde)) continue; const Q = d.root.position;
@@ -17479,7 +17479,7 @@ function mechAim() { const p = player, h = cam.az; let best = null, bs = 1e9;
 // m1757 (his: "anytime we have a flying animal above you, or an archer above you ... I couldn't hit it at all"): FLYAIM. A hostile body ABOVE him
 // (a flyer -- `d.fy` -- an archer, a beast) more than `dy` m over his chest, within `cone` of the lens's bearing and `range`, at ANY elevation, is
 // where the gun and the bow point (the bow's arc then solves to it). On the ground nothing changes: the body must be `dy` up to qualify.
-const FLYAIM = { on: 1, dy: 1.5, cone: .38, range: 45, mid: .5, bowAny: 1 };     // m15xx `bowAny`: with the BOW any hostile body locks, at any height (his: "I can't lock onto the archers")
+const FLYAIM = { on: 1, dy: 1.5, cone: .38, range: 45, mid: .5, bowAny: 1 };     // m1782 `bowAny`: with the BOW any hostile body locks, at any height (his: "I can't lock onto the archers")
 const flyFoe = d => d.st !== 'gone' && d.st !== 'down' && !d.ko && !d.boomed && d.root.visible && (d.fy !== undefined || d.archer || d.K.archer || d.K.creature);
 function flyAim() { if (!FLYAIM.on || !inArena()) return null; const p = player, h = cam.az, cy = p.pos.y + 1.1; let best = null, bs = 1e9;
   for (const d of DUMMIES) { if (!flyFoe(d)) continue; const R = d.root.position, y = R.y + (d.K.h || 1.8) * FLYAIM.mid; if (y - cy < FLYAIM.dy && !(FLYAIM.bowAny && slotNow().bow && (d.aggro || d.archer || d.K.archer || d.K.creature))) continue;
@@ -20737,7 +20737,7 @@ function paintRetic() {
   // use."* It exists to draw the promise the assist makes, and there is no assist on the aim any
   // more -- the ball curves instead (`WEAP.home`), which is a thing you watch rather than a mark
   // that moves your hands. `mel.LOCK.retic = 1` brings it back on its own, without the lock.
-  if (!LOCK.retic || !p.aim || !reticEl || (slotNow().bow && BOW.noRetic)) { if (reticEl) reticEl.classList.remove('on'); return; }     // m15xx (his: "the double reticle for the bow is redundant -- only the one with the height and distance"): the bow's marks are the landing emblem and the lock
+  if (!LOCK.retic || !p.aim || !reticEl || (slotNow().bow && BOW.noRetic)) { if (reticEl) reticEl.classList.remove('on'); return; }     // m1782 (his: "the double reticle for the bow is redundant -- only the one with the height and distance"): the bow's marks are the landing emblem and the lock
   // LOCKED, THE MARK IS ON HIM -- not on whatever the level walk happened to find. The mark IS
   // the promise, and a mark that sits beside the thing the gun is committed to is worse than
   // no mark at all.
