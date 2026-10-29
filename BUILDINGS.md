@@ -263,6 +263,34 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - **Still open on the home** (agreed after m1459): ~~the shop SHUTTERS~~ (pass 28), ~~the rope LIFT~~ (pass 29), ~~BREAKABLE pots~~ (pass 30), ~~the rocks' 3rd pass~~ (pass 31), ~~the plants' 3rd pass with
     cliff shrubs~~ (pass 32), the rope LIFT to the balcony, BREAKABLE pots, the back ladder and stall rack (ref 2) -- then his sign-off.
 
+## THE RED HOLLOWS: POLISH FIRST (his, after m1760) -- detail passes, weight, and getting around; THEN the sky castle
+*"There's a lot of stuff that needs to be done... a detail pass... it was chugging, maybe 20 fps... optimization... I want to keep building
+too, but it seems like it's getting heavy."* And (after m1765): *"after we're done with the detail passes and optimization and the logistical
+-- walking, connecting towers and bridges and stairs -- start building [the sky castle]."* So this track goes FIRST, in this order:
+- [x] **collision from the side (m1763):** no walking into cliffs or rocks (`hwTerrainOut`), the ledge grab ignores terrain columns, rocks solid
+- [x] **cave chest + crystals (m1763):** turned to face the mouth, detail pass; crystals instead of cones
+- [x] **floating lanterns (m1765):** paper lanterns, halo, fairy dust
+- [ ] the cave BEAST's detail pass; the cave plants' second pass (mushrooms, moss, glow worms)
+- [ ] the LADDERS' top-out (he fell getting off the top of one); every stair he can sink into
+- [ ] WEIGHT: a measured budget for the Hollows (spawn view 0.88M tris / 239 calls at m1763) -- the home's timber, shared materials, 171
+      shader programs, shadow casters, distance culling of the far places; measured every build after
+- [ ] GETTING AROUND: every tower, bridge, stair and ladder leads somewhere and joins up; a walk from the spawn to every place, tested headless
+
+## THE SKY CASTLE (his, after m1765) -- the next HERO building, high over the Red Hollows, on its own big landmass
+His sheet: `images/korajin/ref/sky_castle_sheet.jpg` (front / right / back / left / top-down / bottom / architecture / bridge / rock
+details) and `sky_castle_front|under|left|right.jpg`. A cream-stone castle of round towers with red tiled cone roofs and gold finials, a
+tall central keep, red banners with the white diamond, sail awnings, bonsai trees, a wooden water-wheel, railed walkways and arched bridges
+out to satellite towers; on a huge island of chunky cream rock in hanging lobes, ivy and moss over its lip, TWO big waterfalls pouring off
+the front, iron-and-brass lantern spires and chains hanging under it, and small satellite islets (each with a little pagoda shrine and
+greenery) drifting round it on chains and lanterns. *"It's gonna need its own pretty large landmass... a few passes on the landmass...
+then start building the building, kinda like you built his home -- a ton of passes."*
+- [ ] landmass pass 1: the island -- a big multi-lobe body (`hwIslLobe`, the lumps of his rock detail: rounded blocks, holes), the flat
+      top built as terraces for the castle, two waterfall notches (`hwFallMat`), placement (high, spread from the refinery: verticality)
+- [ ] landmass pass 2: the rock's face (its own cream rock map), ivy and moss over the lip, hanging chains and lantern spires, the bottom
+- [ ] landmass pass 3: the satellite islets with their pagoda shrines, chained and drifting; how he GETS UP there
+- [ ] castle pass 1..N: the keep, the round towers and roofs, the walls and walkways, the bridges to the satellites, banners, awnings,
+      the water-wheel, trees, interiors -- as many passes as the home had; FALLEN / RESTORED like every Red Hollows piece
+
 ## THE RED HOLLOWS' SKY AND WATER (his, after m1557: "work on the water shader, and apply the HDR from the other window")
 The "HDR" is the dojo's PANO (`textures/sky_sunset_02.webp`, 8-bit, 1774 x 887 -- no .hdr/.exr is in the repo; a real one would give the IBL a sun).
 - [x] **pass 1 (next build):** the PANO is the valley's sky dome, the water's reflection (soft), the fog's horizon, the image light and the lights' tint; turned so its sun sits on the valley's sun; TOOLS > HOLLOWS SKY cycles PANO / FIRE / PAINTED. The stream FLOWS (its ripples drift downstream, +z) with foam streaks along the flow in the shallows

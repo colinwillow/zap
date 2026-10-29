@@ -173,6 +173,10 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## The sky castle queued, behind the Hollows' polish (Worker B)
+His (after m1765, five images): the sky castle is the next hero building -- after "the detail passes and optimization and the logistical
+-- walking, connecting towers and bridges and stairs". The images are in `images/korajin/ref/sky_castle_*.jpg`; BUILDINGS.md has both
+tracks in order (THE RED HOLLOWS: POLISH FIRST, then THE SKY CASTLE with its landmass passes first). No code in this build.
 ## The floating lanterns: paper, a halo and fairy dust (m1765, Worker B)
 His (after m1763): "those floating lantern things... they just look like tubes, they don't even look like lanterns... make them mystical --
 floating lanterns with a little fairy dust". `homeLanterns`: the 8-sided cylinder is gone. A ribbed PAPER body (a bulging lathe, 16 ribs
