@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## His height: 13.7 m -- and the meter now says HOW (m15xx)
+*"Here's my height -- pretty easy because you can run up the wall; I don't know if it's taking into account the wall run after the jump or the double
+jump. I got the highest one pretty easily."* BEST **13.7 m up** (the 14 m pillar). The meter measures feet-off to feet-down/grab, so a wall run or
+double inside it is counted -- the 13.7 includes the wall.
+- Each jump now carries its INGREDIENTS (+WALL, +DOUBLE, +FLIPS, seen during the flight) and bests are kept PER KIND (jump / double / wall: far and
+  up), shown under the overall best -- so pure-jump height and wall-assisted height are separate design numbers.
+- The pillars run 3 -> 24 m in 1.5 m steps.
+
 ## His first measurement: 30.5 m (m1824)
 *His screenshot of the Proving Ground's meter: "I cleared the furthest gap -- my best is 30-something. I haven't done the height yet."* BEST **30.5 m
 far, 4.8 m up** (the 24 m lane cleared with ~6 m spare). The lanes now run 6 -> 39 m in 3 m steps (12 lanes) so the ceiling is found, not
