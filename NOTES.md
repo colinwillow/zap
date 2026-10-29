@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The willow's shrine, its bark, its vines and leaves (m15xx)
+*"Make a shader for the willow -- the stump is just brown. You made a square raised part -- maybe build a shrine, don't make it square, spend some
+time on the design. The vines -- the vine and the leaf maybe each want their own colour; in the snow they're hard to see."*
+- **The shrine (`willowBuild`, `WILLOW.tiers`)**: a SHINBOKU -- two low ROUND stone tiers (r 10.5 and 7.5, each a .3 m rise: under his .357 step,
+  so no stairs), a coping ring, concentric dressed PAVING on the tops with snow drifted only against the rim, the raked rings on the upper tier, a
+  red-and-black TORII at the front (+z, the beam's ends upswept), the two stone lanterns flanking the approach, and a SHIMENAWA rope round the
+  trunk with white zigzag shide. Colliders: each tier is `strips` 14 axis-aligned slabs. The Snowfield's pack (.55 m) buried tiers that low, so
+  the shrine is SWEPT: the snow field fades to nothing over its footprint with a soft bank round it (`snowStage`).
+- **The bark (`willowBarkTex`)**: wandering vertical fissures, silver-violet ridges, jade moss in the deep grooves, lenticels; map + bump on the
+  tubes, which now carry a UV (`willowTube`, ~1.8 m of bark per tile). The glowing veins still run in the vertex colour.
+- **The vines (`willowLeafTex`)**: the stem its own plum-bark colour; each leaf painted -- deep jade at the stem to bright mint at the tip, a pale
+  midrib, a dark rim -- so they read on snow; the vertex colour only shades now, and the tip glow is kept to the LEAVES (`diffuseColor.g - .r`).
+- Rendered headless from the front, above and at the trunk.
+
 ## Blade fire: real fire, on the blade, slower -- pass 1 (m1762)
 *"The katana fire -- not green, an actual burning fire. It's not coming out of the right spot -- on the blade, a lot at the tip and the rest of the
 blade. The particles are too fast, they come from a point and shoot up; they look low grade. A few passes on that fire."*
