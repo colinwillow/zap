@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The willow's shrine, its bark, its vines and leaves (m15xx)
+## The willow's shrine, its bark, its vines and leaves (m1764)
 *"Make a shader for the willow -- the stump is just brown. You made a square raised part -- maybe build a shrine, don't make it square, spend some
 time on the design. The vines -- the vine and the leaf maybe each want their own colour; in the snow they're hard to see."*
 - **The shrine (`willowBuild`, `WILLOW.tiers`)**: a SHINBOKU -- two low ROUND stone tiers (r 10.5 and 7.5, each a .3 m rise: under his .357 step,
