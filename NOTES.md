@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE STONE GUARDIAN: his four-armed boss, Tripo + a scripted rig (m15xx)
+His: "Make this guy in Tripo and rig him -- he's got four arms, so I don't know if the auto rigger is gonna have that under control... a boss,
+pretty big... maybe he throws boulders... in pieces, so we can knock off his arms." GUARDIAN.md has the pipeline and the DONE WHEN.
+- Tripo multiview (his four drawings, `--faces 9000`): 29k verts, but **4,746 islands** -- it splits at every UV seam, so "pieces" could
+  not come from the mesh's own islands. The rig is SCRIPTED (`guardian_rig.py`, the spider's method): bones placed from measured
+  cross-sections of the arm bands (upper arms z .57-.61, lower z .33-.45), the legs, the trunk; every vertex to ONE bone (rigid), with the
+  trunk bones weighted "bigger" (x.62) so the chest is not stolen by the arm roots. Checked by a colour-by-bone render, rest and posed.
+- The Forge baked 15 Mixamo clips onto it with no edit beyond the profile (22 bones + the hips). It strips root travel, so `walkV`
+  measures 0 and the walk is `speed0` 1.4.
+- **The lower arms are in no clip** -- they echo the upper pair's delta from rest (`echo` .9, `lag` .12 s): all four swing.
+- Hit frames MEASURED headless (the right hand's fastest frame): swipe .48, smash .34, throw .50 -- the typed .55 smash would have landed
+  after his hands came up.
+- Headless: spawns as stone, a blow wakes him (`wake` -> `walk`), four blows on the lower-left hand took `arm2L` off as a flying piece
+  (hp 48 -> 38, `stag`). Renders: statue, roar, swipe, smash, throw, walk, the cut.
+- Hooked into every blow the spider takes: the sword sweep (+ `guardRockCut`: a boulder can be cut out of the air), slams, the whirl,
+  bolts, rockets, arrows, blast arrows; the swipe/charge lock-on (`mechTargets`). SPAWN > STONE GUARDIAN.
+- Open: armour as separate pieces, lower-arm moves of their own, a disarmed phase, his arena, his sign-off.
 ## Grumbo's home at x1.4, and a SKY PER STATE (Worker B)
 His (m1724): "really small on the inside -- the inside should be much more expansive"; he chose SCALE IT ALL x1.4 (`GHOME.k`). The group
 is scaled; every local -> world conversion in `ghomeBuild` carries `hk` (Wx/Wz, the boxes, the walk triangles, the ladder, the bells,
