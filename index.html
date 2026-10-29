@@ -70020,6 +70020,22 @@ function gcastleBuild() { const A = GCASTLE, [cx, cz] = A.at, Y0 = A.Y0, R = A.R
           for (let i = 0; i < pp.count; i++) { const t = .5 - pp.getY(i) / L; pp.setXYZ(i, pp.getX(i) * (1 - t * .55) + Math.sin(t * 5 + ph) * .25 * t, -t * L, Math.sin(t * 3.2 + ph) * .5 * t + .15); }
           pg.computeVertexNormals(); const o = (rnd() - .5) * .6; put(pg, ivyM, at4(x + Math.sin(th + o * .1) * .3, Rm.y + .15, z + Math.cos(th + o * .1) * .3, th + o * .2)); nI++; } } }
     A.stat.ivy = nI; A.stat.lip = nL; }
+  // UNDERSIDE (m1771, pass 2 of 6; his sheet's BOTTOM view): iron-and-brass LANTERN SPIRES hanging from the rock -- stacked tiers of dark
+  // iron drums, brass rings and discs, glowing lantern boxes, tapering to a spike, the great one under the island's lowest point -- and CHAINS
+  // swinging lanterns from under the rim. Each hangs from the real underside (the lowest rock over its spot, measured off the lobes)
+  { const ironM = new THREE.MeshStandardMaterial({ color: 0x3a3330, metalness: .7, roughness: .45 }), brassM = new THREE.MeshStandardMaterial({ color: 0xc89a48, metalness: .85, roughness: .32 }), glowM = new THREE.MeshStandardMaterial({ color: 0xffd9a0, emissive: 0xffa040, emissiveIntensity: 2.4, toneMapped: false });
+    const under = (x, z, r = 2.2) => { let y = 1e9; for (const q of islG) { const p = q.attributes.position; for (let i = 0; i < p.count; i++) if (Math.hypot(p.getX(i) - x, p.getZ(i) - z) < r) y = Math.min(y, p.getY(i)); } return y; };
+    const lantern = (x, y, z, k) => { put(new THREE.CylinderGeometry(.35 * k, .45 * k, .12 * k, 8), brassM, at4(x, y, z)); put(new THREE.CylinderGeometry(.32 * k, .32 * k, .7 * k, 8, 1, true), glowM, at4(x, y - .42 * k, z)); for (let j = 0; j < 4; j++) { const a = j / 4 * Math.PI * 2; put(new THREE.BoxGeometry(.06 * k, .8 * k, .06 * k), ironM, at4(x + Math.sin(a) * .34 * k, y - .42 * k, z + Math.cos(a) * .34 * k)); }
+      put(new THREE.ConeGeometry(.45 * k, .35 * k, 8), brassM, at4(x, y - .95 * k, z, 0, Math.PI)); put(new THREE.ConeGeometry(.08 * k, .4 * k, 6), brassM, at4(x, y - 1.3 * k, z, 0, Math.PI)); };
+    const spire = (x, z, L, k) => { const y0 = under(x, z) + .8; let y = y0; put(new THREE.CylinderGeometry(.9 * k, .5 * k, 1.2, 10), ironM, at4(x, y - .4, z)); y -= 1;
+      while (y > y0 - L) { const t = (y0 - y) / L, rr = (1 - t * .65) * k; put(new THREE.CylinderGeometry(.42 * rr, .48 * rr, 2.2, 10), ironM, at4(x, y - 1.1, z)); put(new THREE.CylinderGeometry(.5 * rr, .5 * rr, .5, 10), brassM, at4(x, y - 1.1, z)); put(new THREE.CylinderGeometry(.62 * rr, .62 * rr, .14, 14), brassM, at4(x, y - .1, z)); put(new THREE.TorusGeometry(.5 * rr, .05, 4, 14).rotateX(Math.PI / 2), brassM, at4(x, y - 1.6, z));
+        if (((y0 - y) | 0) % 5 < 2.2) { lantern(x, y - 2.3, z, rr * 1.1); y -= 1.6; } y -= 2.4; }
+      put(new THREE.ConeGeometry(.3 * k, 2.4, 8), ironM, at4(x, y - 1, z, 0, Math.PI)); put(new THREE.SphereGeometry(.18 * k, 8, 6), brassM, at4(x, y + .3, z)); return y - 2.2; };
+    let lowest = [0, 0, 1e9]; for (const q of islG) { const p = q.attributes.position; for (let i = 0; i < p.count; i++) if (p.getY(i) < lowest[2] && Math.hypot(p.getX(i), p.getZ(i)) < R * .6) lowest = [p.getX(i), p.getZ(i), p.getY(i)]; }
+    spire(lowest[0], lowest[1], 30, 2.8); for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2 + .5, q = R * (.35 + rnd() * .35); spire(Math.sin(a) * q, Math.cos(a) * q, 10 + rnd() * 14, 1.5 + rnd() * .7); }
+    for (let k = 0; k < 12; k++) { const a = k / 12 * Math.PI * 2 + rnd() * .3, q = R * (.75 + rnd() * .3), x = Math.sin(a) * q, z = Math.cos(a) * q, yt = under(x, z, 2.5); if (yt > 1e8) continue; const L = 3 + rnd() * 7, sw = (rnd() - .5) * 1.2;
+      const cv = new THREE.CatmullRomCurve3([new THREE.Vector3(x, yt + .3, z), new THREE.Vector3(x + sw * .5, yt - L * .5, z + sw * .3), new THREE.Vector3(x + sw, yt - L, z + sw * .6)]); put(new THREE.TubeGeometry(cv, 10, .08, 4), ironM); lantern(x + sw, yt - L, z + sw * .6, 1.5); }
+    A.stat.spires = 7; }
   // TWO WATERFALLS off the front, between the bastions: the rock in their wedge measured, their throw the least that clears it
   A.falls = [-Math.PI / 7, Math.PI / 7].map(a => gjFall(A, g, islG, R, Y0 + .2, put, stone, at4, { a, H: 70, rin: .5, col: [[.5, .72, .9], [.92, .97, 1]], keep: 1 }));
   let draws = 0; for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); draws++; }

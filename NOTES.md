@@ -231,6 +231,12 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## THE SKY CASTLE, landmass pass 3: the underside's spires and chained lanterns (Worker B)
+Pass 2 of his six. His sheet's BOTTOM view hangs iron-and-brass spires and chained lanterns under the rock. Seven LANTERN SPIRES: stacked
+tiers of dark iron drums with brass bands, discs and rings, glowing lantern cages every few metres (brass cap, a lit glass drum, four iron
+bars, a brass bottom and finial), tapering to an iron spike -- the great one (30 m, x2.8) under the island's lowest point, six more (10-24
+m) round it -- each hung from the REAL underside (the lowest lobe vertex within 2.2 m of its spot, `under`). And twelve CHAINS swinging a
+lantern each from under the rim (a sagging tube, 3-10 m). Iron, brass and glow: 3 draws.
 ## THE SKY CASTLE, landmass pass 2: the rim and the ivy (m1774, Worker B)
 His (after m1769): "run like 6 detail passes in a row". Pass 1 of 6. Every capped lobe's rim (`rims`, its outline turned into the island's
 frame) gets chunky cream LIP ROCKS bulging over the edge (60% of rim points; half with a moss cap) and IVY: leafy curtains (painted leaves,
