@@ -10199,7 +10199,7 @@ const PLANTK = {
     return p; } },
 };
 PLANTK.bamboo_snow = Object.assign({}, PLANTK.bamboo, { frost: 1 });     // m1730: the same clump, its upper leaves dusted white (the Snowfield's)
-// m15xx: ROCKS BY PLACE -- the same lumpy blob dressed for each world (the plant library places them; `ROCK` breaks them)
+// m1745: ROCKS BY PLACE -- the same lumpy blob dressed for each world (the plant library places them; `ROCK` breaks them)
 function rockShape(seed, sx, sy, sz, colF) { const b = plantBlob(1, seed, 2); b.scale(sx, sy, sz); const P = b.attributes.position; let lo = 9, hi = -9; for (let i = 0; i < P.count; i++) { lo = Math.min(lo, P.getY(i)); hi = Math.max(hi, P.getY(i)); }
   return [plantPart(b, (x, y, z) => colF((y - lo) / (hi - lo), x, z), 0)]; }
 PLANTK.rock_snow = { h: 1.6, r: 1.3, stiff: 0, bend: 0, make() { return rockShape(83, 1.3, .85, 1.05, (t, x, z) => { const n = Math.sin(x * 9 + z * 7) * .05 + Math.sin(x * 23 - z * 19) * .03; return t > .82 + n * 2 ? [.93, .95, 1] : [.44 + n + t * .08, .46 + n + t * .08, .52 + n + t * .07]; }); } };
@@ -10229,7 +10229,7 @@ function plantFlush(g, rec) { const by = {}, C = PLANT.cell; for (const r of rec
     g.add(m); meshes.push(m); } return meshes; }     /* m1600: ground cover casts NO shadow (the shadow pass drew every blade a second time) */
 function plantDrop(meshes) { PLANT.list = PLANT.list.filter(P => !meshes.includes(P.m)); }
 function plantPush(P, dx, dz, imp) { const L = Math.hypot(dx, dz) || 1; P.vx += dx / L * imp * P.bend; P.vz += dz / L * imp * P.bend; }
-// m15xx (his: "rocks in different forms -- the snow world, the red rock world, the grass world, the temples -- different styles of rocks that
+// m1745 (his: "rocks in different forms -- the snow world, the red rock world, the grass world, the temples -- different styles of rocks that
 // once you slash them or shoot them or explode them break from bigger to smaller, placed just like you do plants, to add interaction, the way
 // buildings and plants are destructible"): ROCKS BREAK, BIG -> SMALLER -> DUST. A rock in the plant library (`boulder`, and the new
 // `rock_snow` / `rock_red` / `rock_temple`) carries stone (`hp` x its size): every blade that crosses it, every arrow, every blast chips it
@@ -10281,7 +10281,7 @@ function rockStep(dt) { const g = ROCK.g, now = performance.now() / 1000, p = pl
 function plantHit(x, y, z, rad) { if (!PLANT.list.length) return 0; let n = 0; const p = player.pos;
   for (const P of PLANT.list.slice()) { const d = Math.hypot(P.x - x, P.z - z); if (d > P.r + rad + .4 || y < P.y - .5 || y > P.y + P.h + .5) continue; if (P.rock) { if (ROCK.on && d < P.r + rad) n += rockHit(P, 1, Math.atan2(P.x - p.x, P.z - p.z), x, y, z); continue; } let dx = P.x - p.x, dz = P.z - p.z; if (Math.hypot(dx, dz) < .2) { dx = P.x - x; dz = P.z - z; }
     plantPush(P, dx, dz, PLANT.hitK * (1 + Math.random() * .3)); n++; if (P.knock) plantKnock(P, 1); if (Math.random() < .5) spk(x, y, z, (Math.random() - .5) * 2, 1 + Math.random(), (Math.random() - .5) * 2, .06, .5, [.5, .85, .4]); }
-  if (ROCK.loose.length) for (const L of ROCK.loose.slice()) { const Q = L.m.position; if (Math.hypot(Q.x - x, Q.y - y, Q.z - z) < L.r + rad + .2) { const h = Math.atan2(Q.x - p.x, Q.z - p.z); L.v.x += Math.sin(h) * 3; L.v.y += 2.5; L.v.z += Math.cos(h) * 3; L.rest = 0; n += rockHit(L, 1, h, Q.x, Q.y, Q.z); } }     // m15xx: a chunk is knocked along and chipped
+  if (ROCK.loose.length) for (const L of ROCK.loose.slice()) { const Q = L.m.position; if (Math.hypot(Q.x - x, Q.y - y, Q.z - z) < L.r + rad + .2) { const h = Math.atan2(Q.x - p.x, Q.z - p.z); L.v.x += Math.sin(h) * 3; L.v.y += 2.5; L.v.z += Math.cos(h) * 3; L.rest = 0; n += rockHit(L, 1, h, Q.x, Q.y, Q.z); } }     // m1745: a chunk is knocked along and chipped
   return n; }
 // m1730: bamboo KNOCKS -- the wood recording, pitched up and short (hollow), louder for a blow than a brush; each clump has its own breath
 function plantKnock(P, k) { const now = performance.now(); if ((P.tokT || 0) > now) return; P.tokT = now + (k > .5 ? 120 : 260); snd('thud', { g: (.1 + .22 * k) * (.8 + Math.random() * .4), r: 1.7 + Math.random() * .5, x: P.x, z: P.z });
@@ -10485,7 +10485,7 @@ function snowStage(g) {
   // 5 groves of 5-9 clumps, kept off the spawn. They sway, bend as he runs through, knock like hollow wood, and shed leaves when struck.
   { const R = plantRnd(733), rec = []; for (let c = 0; c < 5; c++) { const a = .6 + c * 1.27 + R() * .4, d = 16 + R() * 34, cx = Math.cos(a) * d, cz = Math.sin(a) * d, n = 5 + Math.floor(R() * 5);
       for (let k = 0; k < n; k++) { const x = cx + (R() - .5) * 9, z = cz + (R() - .5) * 9; if (Math.hypot(x, z - 8) < 10 || Math.hypot(x - WILLOW.at[0], z - WILLOW.at[1]) < WILLOW.ter + 4) continue; plantPlant(rec, 'bamboo_snow', x, 0, z, .8 + R() * .5, R() * 6.28); } }
-    // m15xx: SNOW ROCKS -- granite boulders with white caps, in clusters between the stands (solid; they break), and fallen TEMPLE blocks
+    // m1745: SNOW ROCKS -- granite boulders with white caps, in clusters between the stands (solid; they break), and fallen TEMPLE blocks
     // round the willow's terrace (a ruin the garden was built on)
     { const W = WILLOW.at, ok = (x, z) => Math.hypot(x, z - 8) > 9 && Math.hypot(x - W[0], z - W[1]) > WILLOW.ter + 3 && Math.abs(x) < Z.size / 2 - 4 && Math.abs(z) < Z.size / 2 - 4;
       for (let c = 0; c < 9; c++) { const a = c * .7 + R() * 2, d = 14 + R() * 55, cx = Math.cos(a) * d, cz = Math.sin(a) * d, n = 2 + Math.floor(R() * 4);
@@ -14728,7 +14728,7 @@ function arrowStep(dt) {
       if (p.block) { ARCH.stat.blocked++; spkBurst(P.x, P.y, P.z, 14, { col: [1, .9, .6], spread: 4, size: .12, life: .35 }); snd('clang', { g: .7, r: 1.3, x: P.x, z: P.z }); }
       else { spkBurst(P.x, P.y, P.z, 10, { col: [1, .3, .25], spread: 3, size: .1, life: .3 }); }     /* m1695: `playerHurt` voices it (his grunt) */
       A.m.removeFromParent(); ARROWS.splice(i, 1); continue; }
-    if (A.mine && ROCK.on) { const rs = rockAt(P.x, P.y, P.z, .05); if (rs.length) { if (A.pl && A.type === 'blast') arrowBlast(P, Math.atan2(A.v.x, A.v.z)); else rockHit(rs[0], A.full ? 1.5 : .6, Math.atan2(A.v.x, A.v.z), P.x, P.y, P.z); spkBurst(P.x, P.y, P.z, 6, { col: [.9, .85, .7], spread: 3, size: .07, life: .3 }); A.m.removeFromParent(); ARROWS.splice(i, 1); continue; } }     // m15xx: an arrow on stone chips it and shatters
+    if (A.mine && ROCK.on) { const rs = rockAt(P.x, P.y, P.z, .05); if (rs.length) { if (A.pl && A.type === 'blast') arrowBlast(P, Math.atan2(A.v.x, A.v.z)); else rockHit(rs[0], A.full ? 1.5 : .6, Math.atan2(A.v.x, A.v.z), P.x, P.y, P.z); spkBurst(P.x, P.y, P.z, 6, { col: [.9, .85, .7], spread: 3, size: .07, life: .3 }); A.m.removeFromParent(); ARROWS.splice(i, 1); continue; } }     // m1745: an arrow on stone chips it and shatters
     const gy = groundAt(P.x, P.z, oy, .5);
     const wall = boxRay(ox, oy, oz, P.x, P.y, P.z, _tuR);
     if (P.y <= gy || wall || A.t > 5) {
@@ -33061,7 +33061,7 @@ function stepPlayer(dt) {
   try { tasselStep(dt); } catch (e) { TASSEL.on = 0; note('TASSEL THREW ' + e.message); }     // m1644
   if (inArena()) { deflStep(dt); hallStep(dt); if (SKIN.list.length) skinStep(dt); if (PIECE.list.length) pieceStep(dt); if (SMASH.list.length) smashStep(dt); for (const E of BLDG.list) if (E.step && E.on()) E.step(dt); if (LVL.want && inForge()) lvlStart(); if (BEACON.want && inForge()) { try { beaconBuild(); } catch (e) { BEACON.want = 0; note("BEACON THREW " + e.message); } } if (BEACON.on) beaconStep(dt); if (LVG.on) lvgStep(dt); if (SHIPZ.want === 1 && inForge()) shipBuild(); if (SHIPZ.on) shipStep(dt); if (SNOWZ.on) snowStep(dt); if (DRAGZ.on) dragStep(dt); }
   if (PLANT.list.length) plantStep(dt);     // m1424
-  if (ROCK.loose.length || ROCK.broken.length) rockStep(dt);     // m15xx
+  if (ROCK.loose.length || ROCK.broken.length) rockStep(dt);     // m1745
   if (RESTORE.list.length) restoreStep(dt);     // m1505     // m1105; m1119; m1120: each building's own life
   const p = player;
   if (p.dragon) { dragRide(dt); return; }     // m1614: on his dragon, the dragon owns the body
@@ -70094,7 +70094,7 @@ function gmerchBuild() {
   A.stat.draws = draws; A.stat.boxes = boxes.length; A.stat.top = +top.toFixed(1); A.stat.deckY = +Y.toFixed(1); A.shopAt = [Wx(0, 6.9), Y, Wz(0, 6.9)];
   console.log('[melee] merchant shop (procedural): ' + draws + ' draws, ' + boxes.length + ' boxes, deck at y ' + Y.toFixed(1) + ', butte ' + (top - base).toFixed(0) + ' m, ladder ' + A.stat.ladder + ' m');
 }
-// m15xx: RED SANDSTONE in the Red Hollows -- clusters on the canyon floor round the spawn, each set on the REAL ground (`groundAt`), and only
+// m1745: RED SANDSTONE in the Red Hollows -- clusters on the canyon floor round the spawn, each set on the REAL ground (`groundAt`), and only
 // where the ground is the terrain itself (`hwHeight`), not a floor, a roof or a deck; kept off the spawn and Grumbo's home
 function rockScatterHome() { const H = HOME, R = plantRnd(1745), rec = [], [sx, sz] = H.spawn, hut = H.hut.at; let n = 0;
   for (let c = 0; c < 16; c++) { const a = R() * 6.283, d = 12 + R() * 60, cx = sx + Math.cos(a) * d, cz = sz + Math.sin(a) * d, k = 2 + Math.floor(R() * 3);
@@ -70127,7 +70127,7 @@ async function buildHome() {
   } catch (e) { console.warn('[melee] hut', e); note('NO HUT GLB'); }
   if (H.style === 'lake') homeDress(); else hollowDress();
   triBuild(); surfBuild(); boxGrid();
-  if (H.style !== 'lake') try { rockScatterHome(); } catch (e) { console.error('[melee] hollows rocks', e); note('ROCKS THREW ' + e.message); }     // m15xx
+  if (H.style !== 'lake') try { rockScatterHome(); } catch (e) { console.error('[melee] hollows rocks', e); note('ROCKS THREW ' + e.message); }     // m1745
   homeLanterns(); homeMist();
   // m1112: HIS OWN BODY through the lake's patch too (chained onto whatever his materials already do), so wading his legs read wet
   if (rig.model) { let n = 0; rig.model.traverse(o => { if (o.isMesh) for (const m of [].concat(o.material)) if (m && m.isMeshStandardMaterial && !m.userData.rw) { m.userData.rw = 1; rwPatch(m, true); m.needsUpdate = true; n++; } }); H.stat.bodyMats = n; }

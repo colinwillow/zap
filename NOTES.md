@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## ROCKS BREAK: big -> chunks -> small -> dust, in every world's own stone (m15xx)
+## ROCKS BREAK: big -> chunks -> small -> dust, in every world's own stone (m1745)
 His: "rocks in different forms -- the snow world, the red rock world, the grass world, the temples -- different styles of rocks that once
 you slash them or shoot them or explode them break from bigger to smaller, placed just like you do plants, to add interaction."
 - **In the plant library** (so anything that scatters plants can scatter them): the old `boulder` (mossy, everywhere in the forge) is now
