@@ -53,3 +53,8 @@ best."* MAIN = this session (dynamics, the feel); AGENT = a separate session can
        (Arena, Ship, Red Hollows, Snowfield).
 22. [ ] **THE TUTORIAL** (`TUTORIAL.md`): Level 0 teaches the core (move, jump, flips, the sword, evade, counter, charge) in one contained place;
        every later ability is taught where it is found. Design first (MAIN), build after 17-19.
+23. [ ] HIS + MAIN **Custom sword attacks for the spare inputs** (his, Oct 29: *"now I have too many button strokes and not enough animations"*).
+       First: the Marth-style SWORD TOSS -- throw the katana straight up, flip-jump up to it, catch, slam down. He animates; the game side is a
+       driven arc (the leap's `slamArc`) with the sword as its own object between throw and catch. Inputs still free: the left-pad flicks while
+       the katana charges beyond the dodge flips, the second tap, the charged release's spare left-stick directions.
+24. [ ] MAIN **The temple dweller and the spider through Tripo segment + complete** (`guardian_parts.py`), once he signs off the guardian (m1793).

@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The katana's neutral release is AUTOMATIC, and chains; the jumped slam lands (m15xx)
+*"Neutral is automatic, like an automatic car versus a manual: nothing in his radius, he stays put; a spider, a dummy, a crate, an enemy in it, he
+goes to it. String them: launch-and-slash, then the spin toward the next target, then the high jump and slam -- and repeat. Holding a direction is
+still manual." / "Tap the left stick to jump, release -- he goes way up and doesn't come all the way back down. He should come down till he hits
+the ground or the box or what he's locked on; off a cliff, all the way down."*
+- **Neutral (`chargeRelease`):** `chargeAim(t0)` -- the charge's own target in its own reach. None: the slash in place (`goStill`, m1773). One:
+  `CHARGE3.auto` CHAIN = `p.autoN` steps launch -> whirl (faced at the target) -> leap, wrapping, reset after `chainT` 3 s without a neutral
+  release; SINGLE = always the launch. TOOLS > K-AUTO. Any held direction is the manual table as before.
+- **The jumped slam:** the leap's T was solved back to the height he LEFT from, and the slam's failsafe `SLAM.max` 1.2 s ended any longer flight
+  in mid-air -- a leap released from a jump flies longer, so the slam stopped and he dropped. T is now solved to where he LANDS (the target's feet
+  if locked, else `groundAt` under the arc's end; off a cliff, 30 m down), and the failsafe for this arc is T + 3 s (`p.slamMax`).
+- DOCKET 23: his custom sword attacks for the spare inputs (the Marth sword toss first). DOCKET 24: the dweller and the spider through Tripo's parts.
+
 ## The guardian rebuilt from TRIPO'S OWN PARTS (m1793)
 *"I thought Tripo had a cut-up-and-make-whole feature that used AI and was quite a bit better than doing it in Blender -- give it a shot."*
 - It has: POST /mesh/segment (semantic parts) then /mesh/complete (AI-fills the surface each part hid). `seg.py` already existed in the pipeline
