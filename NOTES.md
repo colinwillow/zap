@@ -44,6 +44,24 @@ sun/hemi colours follow, then B becomes A and the reflection map is rebuilt); th
 `userData.m0` so the weathering can be undone -- `bldAge` alone could not). Everything else that reads the state per frame (the peak
 fire, the shutters, the lamps, the wheel, the refinery's colliders) follows by itself. `?hs=` is dropped from the address with
 `replaceState` so a reload lands in the state he turned it to. The timings are in `HWAGE`.
+## THE JIN WILLOW: a weeping willow of verlet chains in a snow garden (m15xx)
+His: "a cool alien weeping willow -- a big one, with vines you can actually brush through, like actual chains, so there's a dynamic to it;
+a big magical Japanese garden with a willow; put it in the snow level for now." BUILDINGS.md (SNOW) has the next passes.
+- **Where/height**: (-24, -22), ~38 m from the spawn, on a stone TERRACE 22 m square and 1.2 m up (his verticality rule), four .3 m steps on
+  the side facing the spawn (under his .357 step). Pines and bamboo are kept off it. The stone is a painted block texture (the Snowfield builds
+  at MODULE SCOPE, before `texLoad`'s `texTwin` exists -- loading a file there threw TDZ, caught by the try round `willowBuild`).
+- **The tree**: `willowTube` (rings along a CatmullRom curve, radius tapering, rings twisted, a bumpy section, thin teal veins in the vertex
+  colour), a trunk to 11 m (x1.3), 7 flaring roots, 13 boughs arching up to ~14 m and drooping. One merged mesh. A collider round the trunk.
+- **The vines**: ~310 strands x 12 verlet links pinned along the boughs' outer 70%. Per step: velocity damped by `exp(-dampK h)` (not a bare
+  per-frame factor), gravity, a gusting wind along the Snowfield's own wind, a per-strand sway; 3 length-constraint passes; the terrace floor;
+  and HIM: a link inside his body band within `push` .55 m is moved OUT -- its previous position moved with it so the push is not a fling --
+  and handed `brush` .35 of his velocity, so he parts them and they swing back. Drawn as two crossed ribbons per link (fixed X/Z quads, no
+  per-frame normals) carrying a painted willow-leaf strip (alpha-tested), dark teal at the bough to Jinra-mint glowing tips (`aGlow`), ONE draw
+  for all of them (~15k tris). Simulated only within `simR` 55 m.
+- **Two inline comments ate code** (the third and fourth time today): `// note` added mid-line swallowed `} } }` (a blank page, `check` caught
+  it) and `len[i] = L / S;` (every vine zero-length -- only the headless numbers caught it). A comment goes at the END of a line.
+- Measured headless: the tips hang 1.5-4.1 m (median 2.6), 148/312 reach his body; a link he stands in ends exactly .55 m from him and swings
+  .6 m (not flung 3 m, as the first push did). Renders: from the spawn's side, the curtain, inside it, the lanterns.
 ## The white spots were HOLES: every cut is capped in glowing teal; the BRUTE STANCE for every stone kind (m1739)
 His (a screenshot of the dweller): "are these white spots snow? what's going on?" and "a standard adjustment for the idle poses -- their arms
 are always so close to the body; stand like wrestlers, big ogre guardians, standing really wide, like they're gonna catch you."

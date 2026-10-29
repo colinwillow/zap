@@ -10368,6 +10368,8 @@ function swatchClear() { if (SWATCH.on) { bldClear(SWATCH.on); SWATCH.on = null;
 //  - TRUDGING: deep untouched snow drags at him (`drag`, exp, scaled by how deep); his own track is easy going.
 //  - THE AIR: `flakes` soft points round the lens, each fluttering on its own (two sines) in a wind that GUSTS; a flake that meets his body is
 //    pushed out of it and BOUNCES off (and drifts off again); his footsteps and landings KICK UP puffs that arc and fall.
+// (the Jin willow's numbers live here, above the Snowfield that reads them while it builds -- see `willowBuild`, m1740)
+const WILLOW = { at: [-24, -22], ter: 11, terH: 1.2, k: 1.3, boughs: 13, strands: 300, seg: 12, iters: 3, w: .15, dampK: .9, wind: 1.3, push: .55, brush: .35, simR: 55, list: null, stat: { brushes: 0 } };
 const SNOWZ = { want: 0, on: null, size: 160, res: 640, depth: 1.1, base: .5, drift: .42, pines: 46,     /* m1632: depth 1.1 m with a base fill of .5 (= the old .55 m) so DRIFTS can rise over it */ refill: .012, foot: .17, plough: .32, rim: .2, rimAdd: .14, drag: 2.6,
   flakes: 5000, box: 34, puffs: 600, fall: [.55, 1.2], flutter: .5, wind: [1.2, 0, .4], gust: 1.6 };
 try { if (/[?&]zone=snow\b/.test(location.search)) SNOWZ.want = 1; } catch (e) {}
@@ -10412,7 +10414,7 @@ function snowStage(g) {
   // m1632: SNOWY PINES in stands, each three dark tiers under a white CAP (instanced: trunks, needles, caps = 3 draws), a collider on the trunk.
   // A strike or a body slammed into one SHAKES it: the caps drop in a burst of powder and grow back over half a minute.
   { const R = plantRnd(301), T = [], mk = (n, geo, mat) => { const m = new THREE.InstancedMesh(geo, mat, n); m.castShadow = true; m.receiveShadow = true; m.frustumCulled = false; g.add(m); return m; };
-    for (let c = 0; c < 7; c++) { const a = R() * 6.283, d = 22 + R() * 50, cx = Math.cos(a) * d, cz = Math.sin(a) * d; for (let k = 0; k < Z.pines / 7; k++) { const x = cx + (R() - .5) * 14, z = cz + (R() - .5) * 14; if (Math.hypot(x, z - 8) < 12) continue; T.push({ x, z, s: .8 + R() * .7, yaw: R() * 6.28, cap: 1, t: 0 }); } }
+    for (let c = 0; c < 7; c++) { const a = R() * 6.283, d = 22 + R() * 50, cx = Math.cos(a) * d, cz = Math.sin(a) * d; for (let k = 0; k < Z.pines / 7; k++) { const x = cx + (R() - .5) * 14, z = cz + (R() - .5) * 14; if (Math.hypot(x, z - 8) < 12 || Math.hypot(x - WILLOW.at[0], z - WILLOW.at[1]) < WILLOW.ter + 6) continue; T.push({ x, z, s: .8 + R() * .7, yaw: R() * 6.28, cap: 1, t: 0 }); } }
     const tg = [], cg = []; for (let k = 0; k < 3; k++) { const r = 1.5 - k * .38, y = 1.7 + k * 1.15; tg.push(new THREE.ConeGeometry(r, 1.7, 8).translate(0, y, 0)); cg.push(new THREE.ConeGeometry(r * .82, .95, 8).translate(0, y + .48, 0)); }
     const tr = mk(T.length, new THREE.CylinderGeometry(.13, .22, 2, 6).translate(0, 1, 0), new THREE.MeshStandardMaterial({ color: 0x3e2a1e, roughness: .95 })),
       nd = mk(T.length, mergeGeometries(tg), new THREE.MeshStandardMaterial({ color: 0x1f3f36, roughness: .9 })), cp = mk(T.length, mergeGeometries(cg), new THREE.MeshStandardMaterial({ color: 0xf6f9ff, roughness: .85 }));
@@ -10422,9 +10424,106 @@ function snowStage(g) {
   // m1730 (his: "bamboo... a good little scatter -- I could see it in the snow world"): GROVES of snow-dusted bamboo between the pine stands,
   // 5 groves of 5-9 clumps, kept off the spawn. They sway, bend as he runs through, knock like hollow wood, and shed leaves when struck.
   { const R = plantRnd(733), rec = []; for (let c = 0; c < 5; c++) { const a = .6 + c * 1.27 + R() * .4, d = 16 + R() * 34, cx = Math.cos(a) * d, cz = Math.sin(a) * d, n = 5 + Math.floor(R() * 5);
-      for (let k = 0; k < n; k++) { const x = cx + (R() - .5) * 9, z = cz + (R() - .5) * 9; if (Math.hypot(x, z - 8) < 10) continue; plantPlant(rec, 'bamboo_snow', x, 0, z, .8 + R() * .5, R() * 6.28); } }
+      for (let k = 0; k < n; k++) { const x = cx + (R() - .5) * 9, z = cz + (R() - .5) * 9; if (Math.hypot(x, z - 8) < 10 || Math.hypot(x - WILLOW.at[0], z - WILLOW.at[1]) < WILLOW.ter + 4) continue; plantPlant(rec, 'bamboo_snow', x, 0, z, .8 + R() * .5, R() * 6.28); } }
     Z.bamboo = plantFlush(g, rec); }
+  try { willowBuild(g); } catch (e) { console.error('[melee] willow', e); note('WILLOW THREW ' + e.message); }     // m1740
   Z.on = { g }; Z.t = 0; Z.acc = 0; Z.breath = 1; }
+// m1740 (his: "a cool alien weeping willow -- a big one, with vines you can actually brush through, like actual chains, so there's a dynamic
+// to it; a big magical Japanese garden with a willow; put it in the snow level for now"): THE JIN WILLOW, pass 1, in the Snowfield.
+//   the GARDEN  a raised stone terrace (`ter` m square, `terH` high -- his VERTICALITY rule) up four .3 m steps, raked-snow rings round the tree,
+//               two stone lanterns (toro) with a warm glow
+//   the TREE    a twisted, tapered trunk (`willowTube`: rings along a curve, the radius shrinking) on flaring roots, and `boughs` arching
+//               boughs that rise, spread and droop -- one merged mesh, dark bark with Jinra-teal veins
+//   the VINES   `strands` hanging CHAINS, each `seg` verlet links pinned to a bough: gravity, a gusting wind, `iters` length constraints,
+//               the ground, and HIM -- every link inside his body is pushed out and given a little of his velocity, so walking through them
+//               parts them and they swing back. Drawn as crossed leaf ribbons (a painted willow-leaf strip, alpha-tested) in ONE draw, the
+//               tips glowing Jinra mint. Only simulated within `simR` m of him.
+// a tube along a curve whose radius runs r0 -> r1 (`fn` shapes it); `twist` turns the rings so the bark streaks spiral
+function willowTube(curve, segs, rad, r0, r1, twist = 0, col, glowF) {
+  const fr = curve.computeFrenetFrames(segs, false), pos = [], nor = [], colA = [], idx = [], P = new THREE.Vector3(), N = new THREE.Vector3();
+  for (let i = 0; i <= segs; i++) { const t = i / segs; curve.getPointAt(t, P); const r = r0 + (r1 - r0) * Math.pow(t, .8);
+    for (let j = 0; j <= rad; j++) { const a = j / rad * Math.PI * 2 + t * twist, c = Math.cos(a), s = Math.sin(a);
+      N.copy(fr.normals[i]).multiplyScalar(c).addScaledVector(fr.binormals[i], s); const bump = 1 + .12 * Math.sin(a * 3 + t * 9) + .06 * Math.sin(a * 7 - t * 23);
+      pos.push(P.x + N.x * r * bump, P.y + N.y * r * bump, P.z + N.z * r * bump); nor.push(N.x, N.y, N.z);
+      const vein = glowF ? glowF(a, t) : 0; colA.push(col[0] + (0.25 - col[0]) * vein, col[1] + (1 - col[1]) * vein, col[2] + (.85 - col[2]) * vein); } }
+  for (let i = 0; i < segs; i++) for (let j = 0; j < rad; j++) { const a = i * (rad + 1) + j, b = a + rad + 1; idx.push(a, b, a + 1, b, b + 1, a + 1); }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(colA, 3)); g.setIndex(idx); return g; }
+// the willow-leaf strip: slender lance leaves alternating down a stem, painted once (white; the vertex colour tints it)
+function willowLeafTex() { const cv = document.createElement('canvas'); cv.width = 64; cv.height = 256; const q = cv.getContext('2d'); q.clearRect(0, 0, 64, 256);
+  q.fillStyle = '#fff'; q.fillRect(30, 0, 4, 256);     // the stem
+  for (let k = 0; k < 9; k++) { const y = 10 + k * 28, s = k % 2 ? 1 : -1; q.save(); q.translate(32, y); q.rotate(s * .55); q.beginPath(); q.ellipse(s * 13, 6, 6, 17, 0, 0, Math.PI * 2); q.fill(); q.restore(); }
+  const t = new THREE.CanvasTexture(cv); t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; return t; }
+function willowBuild(g) { const Z = WILLOW, [cx, cz] = Z.at, H = Z.terH, R = plantRnd(1740), base = new THREE.Vector3(cx, H, cz);
+  // ---- the garden: the terrace, its steps (on the side facing the spawn, +z), the raked rings, two lanterns ----
+  // the stone: dressed blocks in courses, painted once (the Snowfield builds at module scope, before any texture loader exists)
+  const stoneTex = (() => { const cv = document.createElement('canvas'); cv.width = cv.height = 256; const q = cv.getContext('2d'), rr = plantRnd(77); q.fillStyle = '#6f6a63'; q.fillRect(0, 0, 256, 256);
+    for (let row = 0; row < 8; row++) { const off = row % 2 ? 24 : 0; for (let c = -1; c < 6; c++) { const x = c * 48 + off, y = row * 32, v = 130 + rr() * 50 | 0; q.fillStyle = `rgb(${v},${v - 6},${v - 14})`; q.fillRect(x + 2, y + 2, 44, 28); } }
+    const t = new THREE.CanvasTexture(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; return t; })();
+  const stone = new THREE.MeshStandardMaterial({ map: stoneTex, roughness: .92 });
+  const box = (x0, x1, y0, y1, z0, z1, mat, solid = 1) => { const m = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), mat); m.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); m.castShadow = m.receiveShadow = true; g.add(m);
+    if (solid) BOXES.push({ minx: x0, maxx: x1, miny: y0, maxy: y1, minz: z0, maxz: z1 }); return m; };
+  const T = Z.ter, snowTop = new THREE.MeshStandardMaterial({ color: 0xf3f6fc, roughness: .85 });
+  { const m = box(cx - T, cx + T, 0, H, cz - T, cz + T, stone); const uvA = m.geometry.attributes.uv; for (let i = 0; i < uvA.count; i++) uvA.setXY(i, uvA.getX(i) * T / 2, uvA.getY(i) * H / 2); } box(cx - T - .15, cx + T + .15, H, H + .06, cz - T - .15, cz + T + .15, snowTop, 0);
+  for (let i = 0; i < 4; i++) { const top = (i + 1) * H / 4, d = (4 - i) * .55; box(cx - 2.6, cx + 2.6, 0, top, cz + T, cz + T + d, stone); box(cx - 2.6, cx + 2.6, top, top + .04, cz + T + d - .55, cz + T + d, snowTop, 0); }
+  { const cv = document.createElement('canvas'); cv.width = cv.height = 512; const q = cv.getContext('2d'); q.fillStyle = '#eef2f8'; q.fillRect(0, 0, 512, 512);
+    for (let r = 40; r < 256; r += 11) { q.strokeStyle = 'rgba(150,165,190,.55)'; q.lineWidth = 3; q.beginPath(); q.arc(256, 256, r, 0, Math.PI * 2); q.stroke(); }
+    const rk = new THREE.Mesh(new THREE.CircleGeometry(T * .82, 64).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(cv), roughness: .9 })); rk.position.set(cx, H + .07, cz); rk.receiveShadow = true; g.add(rk); }
+  const glowM = new THREE.MeshStandardMaterial({ color: 0xffd9a0, emissive: 0xffb860, emissiveIntensity: 2.2 });
+  for (const [ox, oz] of [[-T + 1.6, T - 1.6], [T - 1.6, T - 1.6]]) { const x = cx + ox, z = cz + oz, parts = [[.5, .5, .25, .25], [.12, .12, 1.0, .25], [.45, .45, .5, .2], [.62, .1, .4, .2]];
+    let y = H; const L = new THREE.Group(); parts.forEach(([r0, r1, h], i) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(r1, r0, h, 6), i === 2 ? glowM : stone); m.position.y = y - H + h / 2; m.castShadow = i !== 2; L.add(m); y += h; });     // the third course is the FIREBOX: it glows
+    const cap = new THREE.Mesh(new THREE.ConeGeometry(.66, .3, 6), snowTop); cap.position.y = y - H + .1; L.add(cap);
+    L.position.set(x, H, z); g.add(L); BOXES.push({ minx: x - .35, maxx: x + .35, miny: H, maxy: H + 2.1, minz: z - .35, maxz: z + .35 }); }
+  // ---- the tree ----
+  const bark = [.2, .17, .22], vein = (a, t) => Math.max(0, Math.sin(a * 5 + t * 14) - .985) * 66, geos = [], K = Z.k, kv = v => v.multiplyScalar(K);     // m1740: the tree x`k` about its foot
+  const trunk = new THREE.CatmullRomCurve3([[0, 0, 0], [.5, 2.2, .3], [-.3, 4.5, -.4], [.4, 6.8, .2], [0, 8.6, 0]].map(v => kv(new THREE.Vector3(v[0], v[1], v[2])).add(base)));
+  geos.push(willowTube(trunk, 24, 14, 1.15 * K, .45 * K, 4, bark, vein));
+  for (let k = 0; k < 7; k++) { const a = k / 7 * 6.283 + R() * .4, L = 2.4 + R() * 1.6; geos.push(willowTube(new THREE.CatmullRomCurve3([new THREE.Vector3(0, 1.1, 0), new THREE.Vector3(Math.cos(a) * .9, .45, Math.sin(a) * .9), new THREE.Vector3(Math.cos(a) * L, -.15, Math.sin(a) * L)].map(v => kv(v).add(base))), 8, 7, .55 * K, .1 * K, 1, bark, vein)); }
+  const anchors = [];
+  for (let k = 0; k < Z.boughs; k++) { const a = k / Z.boughs * 6.283 + R() * .35, out = 5.2 + R() * 2.6, top = 9.6 + R() * 1.8, start = 6.4 + R() * 2;
+    const c = new THREE.CatmullRomCurve3([new THREE.Vector3(Math.cos(a) * .3, start, Math.sin(a) * .3), new THREE.Vector3(Math.cos(a) * out * .4, top, Math.sin(a) * out * .4), new THREE.Vector3(Math.cos(a) * out * .8, top - .6, Math.sin(a) * out * .8), new THREE.Vector3(Math.cos(a) * out, top - 2.6, Math.sin(a) * out)].map(v => kv(v).add(base)));
+    geos.push(willowTube(c, 18, 7, .32 * K, .05 * K, 2, bark, vein));
+    for (let s = 0; s < Z.strands / Z.boughs; s++) { const u = .3 + .7 * (s + R()) / (Z.strands / Z.boughs); const P = c.getPointAt(Math.min(1, u)); P.x += (R() - .5) * .5; P.z += (R() - .5) * .5; anchors.push(P); } }
+  const tree = new THREE.Mesh(mergeGeometries(geos), new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .85 })); tree.castShadow = true; tree.receiveShadow = true; g.add(tree);
+  BOXES.push({ minx: cx - .9 * Z.k, maxx: cx + .9 * Z.k, miny: H, maxy: H + 8 * Z.k, minz: cz - .9 * Z.k, maxz: cz + .9 * Z.k });
+  // ---- the vines: verlet chains ----
+  const n = anchors.length, S = Z.seg, NP = n * (S + 1), P = new Float32Array(NP * 3), Q = new Float32Array(NP * 3), len = new Float32Array(n), ph = new Float32Array(n);
+  for (let i = 0; i < n; i++) { const A = anchors[i], L = Math.max(2, (A.y - H - .3) * (.82 + R() * .18)); len[i] = L / S; ph[i] = R() * 100;     // most reach nearly to the floor: a curtain he walks through
+    for (let k = 0; k <= S; k++) { const o = (i * (S + 1) + k) * 3; P[o] = Q[o] = A.x; P[o + 1] = Q[o + 1] = A.y - k * len[i]; P[o + 2] = Q[o + 2] = A.z; } }
+  // the ribbons: per link-point, 4 vertices (a quad across X and a quad across Z); per segment, two quads
+  const V = NP * 4, pos = new Float32Array(V * 3), uv = new Float32Array(V * 2), nor = new Float32Array(V * 3), col = new Float32Array(V * 3), glow = new Float32Array(V), idx = [];
+  for (let i = 0; i < n; i++) for (let k = 0; k <= S; k++) { const p = i * (S + 1) + k, t = k / S, v0 = p * 4, vv = k * len[i] / .9;
+    for (let c = 0; c < 4; c++) { uv[(v0 + c) * 2] = c % 2; uv[(v0 + c) * 2 + 1] = vv; const nz = c < 2; nor[(v0 + c) * 3] = nz ? 0 : 1; nor[(v0 + c) * 3 + 2] = nz ? 1 : 0;
+      col[(v0 + c) * 3] = .07 + .14 * t; col[(v0 + c) * 3 + 1] = .2 + .42 * t; col[(v0 + c) * 3 + 2] = .17 + .3 * t; glow[v0 + c] = Math.pow(t, 5); }
+    if (k < S) for (const c of [0, 2]) { const a = v0 + c, b = a + 1, a2 = a + 4, b2 = b + 4; idx.push(a, a2, b, b, a2, b2); } }
+  const vg = new THREE.BufferGeometry(); vg.setAttribute('position', new THREE.BufferAttribute(pos, 3).setUsage(THREE.DynamicDrawUsage)); vg.setAttribute('uv', new THREE.BufferAttribute(uv, 2)); vg.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
+  vg.setAttribute('color', new THREE.BufferAttribute(col, 3)); vg.setAttribute('aGlow', new THREE.BufferAttribute(glow, 1)); vg.setIndex(idx);
+  const vm = new THREE.MeshStandardMaterial({ map: willowLeafTex(), alphaTest: .5, side: THREE.DoubleSide, vertexColors: true, roughness: .7 });
+  vm.customProgramCacheKey = () => 'willowVine'; vm.onBeforeCompile = sh => { sh.vertexShader = 'attribute float aGlow; varying float vGlow;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n vGlow = aGlow;');
+    sh.fragmentShader = 'varying float vGlow;\n' + sh.fragmentShader.replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n totalEmissiveRadiance += vec3(.35, 1.0, .8) * vGlow * 2.2;'); };
+  const vines = new THREE.Mesh(vg, vm); vines.frustumCulled = false; vines.castShadow = true; g.add(vines);
+  Z.list = { n, S, P, Q, len, ph, anchors, pos, vg, vines, t: 0, rust: 0 }; willowDraw(); }
+function willowDraw() { const L = WILLOW.list, { n, S, P, pos } = L, w = WILLOW.w;
+  for (let i = 0; i < n; i++) for (let k = 0; k <= S; k++) { const p = i * (S + 1) + k, o = p * 3, v = p * 4 * 3, ww = w * (k === 0 ? .4 : 1);
+    pos[v] = P[o] - ww; pos[v + 1] = P[o + 1]; pos[v + 2] = P[o + 2]; pos[v + 3] = P[o] + ww; pos[v + 4] = P[o + 1]; pos[v + 5] = P[o + 2];
+    pos[v + 6] = P[o]; pos[v + 7] = P[o + 1]; pos[v + 8] = P[o + 2] - ww; pos[v + 9] = P[o]; pos[v + 10] = P[o + 1]; pos[v + 11] = P[o + 2] + ww; }
+  L.vg.attributes.position.needsUpdate = true; }
+function willowStep(dt) { const Z = WILLOW, L = Z.list; if (!L) return; const p = player, [cx, cz] = Z.at; if (Math.hypot(p.pos.x - cx, p.pos.z - cz) > Z.simR) return;
+  L.t += dt; const t = L.t, { n, S, P, Q, len, ph } = L, h = Math.min(dt, 1 / 30), h2 = h * h, H = Z.terH + .08, top = p.pos.y + (RIG.height || 1.25) * 1.1, pr = Z.push, pr2 = pr * pr;
+  const gx = Math.sin(t * .37) * .6 + Math.sin(t * 1.3) * .25, wmag = Z.wind * (.6 + .4 * Math.sin(t * .23) + .35 * Math.max(0, Math.sin(t * .9 + 1))), wx = SNOWZ.wind[0] * wmag + gx * .3, wz = SNOWZ.wind[2] * wmag + Math.cos(t * .41) * .3;
+  const dmp = Math.exp(-Z.dampK * h); let touched = 0; const pvx = p.vel.x * h * Z.brush, pvz = p.vel.z * h * Z.brush;
+  for (let i = 0; i < n; i++) { const b0 = i * (S + 1); const sw = Math.sin(t * 1.7 + ph[i]) * .25;
+    for (let k = 1; k <= S; k++) { const o = (b0 + k) * 3, x = P[o], y = P[o + 1], z = P[o + 2], f = k / S;
+      const vx = (x - Q[o]) * dmp, vy = (y - Q[o + 1]) * dmp, vz = (z - Q[o + 2]) * dmp; Q[o] = x; Q[o + 1] = y; Q[o + 2] = z;
+      P[o] = x + vx + (wx + sw) * f * h2; P[o + 1] = y + vy - 9.8 * h2; P[o + 2] = z + vz + (wz + sw * .6) * f * h2; } }
+  for (let it = 0; it < Z.iters; it++) for (let i = 0; i < n; i++) { const b0 = i * (S + 1), A = L.anchors[i], l0 = len[i];
+    P[b0 * 3] = A.x; P[b0 * 3 + 1] = A.y; P[b0 * 3 + 2] = A.z;
+    for (let k = 0; k < S; k++) { const a = (b0 + k) * 3, b = a + 3, dx = P[b] - P[a], dy = P[b + 1] - P[a + 1], dz = P[b + 2] - P[a + 2], d = Math.sqrt(dx * dx + dy * dy + dz * dz) || 1e-6, e = (d - l0) / d;
+      if (k === 0) { P[b] -= dx * e; P[b + 1] -= dy * e; P[b + 2] -= dz * e; } else { const hx = dx * e * .5, hy = dy * e * .5, hz = dz * e * .5; P[a] += hx; P[a + 1] += hy; P[a + 2] += hz; P[b] -= hx; P[b + 1] -= hy; P[b + 2] -= hz; } }
+    if (it === Z.iters - 1) for (let k = 1; k <= S; k++) { const o = (b0 + k) * 3;
+      if (P[o + 1] < H) P[o + 1] = H;
+      const y = P[o + 1]; if (y > p.pos.y - .1 && y < top) { const dx = P[o] - p.pos.x, dz = P[o + 2] - p.pos.z, d2 = dx * dx + dz * dz; if (d2 < pr2) { const d = Math.sqrt(d2) || 1e-4, k2 = pr / d, nx = p.pos.x + dx * k2, nz = p.pos.z + dz * k2; Q[o] += nx - P[o]; Q[o + 2] += nz - P[o + 2]; P[o] = nx; P[o + 2] = nz; Q[o] -= pvx; Q[o + 2] -= pvz; touched++; } } } }     // moved out of his way WITHOUT the move becoming speed (a fling); only a share of HIS velocity carries
+  if (touched > 6 && (L.rust -= dt) <= 0 && Math.hypot(p.vel.x, p.vel.z) > 1) { L.rust = .45; Z.stat.brushes++; snd('swoosh', { g: .1 + Math.min(.15, touched * .004), r: 1.6 + Math.random() * .3, x: p.pos.x, z: p.pos.z }); }
+  willowDraw(); }
 function snowAt(x, z) { const Z = SNOWZ, N = Z.res, u = (x / Z.size + .5) * N, v = (.5 - z / Z.size) * N, i = u | 0, j = v | 0; if (i < 0 || j < 0 || i >= N || j >= N) return 1; return Z.D[j * N + i] / 255; }
 // carve a hole of radius r down to `to` (0..1 of the depth) and pile what it moved into a rim
 function snowStamp(x, z, r, to) { const Z = SNOWZ, N = Z.res, cs = Z.size / N, ci = (x / Z.size + .5) * N, cj = (.5 - z / Z.size) * N, R = (r + Z.rim) / cs, t = to * 255, add = Z.rimAdd * 255, D = Z.D;
@@ -10434,7 +10533,7 @@ function snowStamp(x, z, r, to) { const Z = SNOWZ, N = Z.res, cs = Z.size / N, c
 function snowPuff(x, y, z, n, up, sp) { const A = SNOWZ.air; if (!A) return; const F = A.F; for (let k = 0; k < n; k++) { const i = A.NF + (F.nextP++ % A.NP), a = Math.random() * 6.283, s = Math.random() * sp;
     A.P[i * 3] = x; A.P[i * 3 + 1] = y; A.P[i * 3 + 2] = z; F.vx[i] = Math.cos(a) * s; F.vz[i] = Math.sin(a) * s; F.vy[i] = up * (.5 + Math.random() * .7); F.life[i] = .8 + Math.random() * .6; A.S[i] = .05 + Math.random() * .07; A.A[i] = .9; } }
 const _snF = new THREE.Vector3();
-function snowStep(dt) { const Z = SNOWZ, A = Z.air, p = player; if (!A) return; Z.t += dt; const t = Z.t;
+function snowStep(dt) { const Z = SNOWZ, A = Z.air, p = player; if (!A) return; Z.t += dt; const t = Z.t; willowStep(dt);
   // the PACK: feet, the plough, the drag, the refill
   const under = snowAt(p.pos.x, p.pos.z), sp = Math.hypot(p.vel.x, p.vel.z), inField = Math.abs(p.pos.x) < Z.size / 2 && Math.abs(p.pos.z) < Z.size / 2;
   if (inField && p.pos.y < Z.depth + .2) {
