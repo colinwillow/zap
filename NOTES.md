@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The guardian's and the spider's breaks burn TURQUOISE (m15xx)
+*"I like the turquoise in the guardian -- the green mist cloud needs to match it better colour-wise."*
+- `gfire` takes a palette (`pal`): 0 the Osari's green, 1 TURQUOISE -- white-cyan -> turquoise -> deep teal, the hard-surface caps' colour.
+  `tfire` is the turquoise call; every flame and spark in the guardian's and the spider's hit / cut / death / rock code uses it (their sparks
+  [.5, 1, .55] -> [.3, 1, .9]). The flame's hot core is now the particle's own colour lifted (it was a fixed yellow-green), so the green flame
+  is unchanged and the turquoise one burns turquoise. The spider's acid spit stays green.
+
 ## The wall by VELOCITY, angled jump-offs, the wall cam (m1776, DOCKET 17)
 *"The camera on a wall run or wall jump -- jumping back and forth between opposite walls it was so scrunched I couldn't see." / "Change the wall run
 again: entirely velocity and angle based -- if you have the speed it's a wall run, when the velocity finishes it's a wall sit, riding down the wall.

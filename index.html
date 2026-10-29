@@ -14280,10 +14280,13 @@ function gfireInit() { const N = GFIRE.n, g = new THREE.BufferGeometry(), P = ne
   g.setAttribute('position', new THREE.BufferAttribute(P, 3)); g.setAttribute('aCol', new THREE.BufferAttribute(C, 3)); g.setAttribute('aSize', new THREE.BufferAttribute(S, 1)); g.setAttribute('aA', new THREE.BufferAttribute(A, 1)); g.setAttribute('aF', new THREE.BufferAttribute(Fr, 1)); g.setAttribute('aR', new THREE.BufferAttribute(Ro, 1));
   const m = new THREE.ShaderMaterial({ uniforms: { uT: { value: gfireTex() }, uPx: { value: 600 } }, transparent: true, depthWrite: false, blending: THREE.NormalBlending,     /* not additive: on his white snow additive fire is WHITE (rendered) -- saturated green over alpha reads on any ground */
     vertexShader: 'attribute vec3 aCol; attribute float aSize, aA, aF, aR; uniform float uPx; varying vec3 vC; varying float vA, vF, vR; void main() { vec4 mv = modelViewMatrix * vec4(position, 1.0); gl_PointSize = aSize * uPx / max(.1, -mv.z); vC = aCol; vA = aA; vF = aF; vR = aR; gl_Position = projectionMatrix * mv; }',
-    fragmentShader: 'uniform sampler2D uT; varying vec3 vC; varying float vA, vF, vR; void main() { vec2 pc = gl_PointCoord - .5; float cs = cos(vR), sn = sin(vR); pc = vec2(cs * pc.x - sn * pc.y, sn * pc.x + cs * pc.y) + .5; if (pc.x < 0.0 || pc.x > 1.0 || pc.y < 0.0 || pc.y > 1.0) discard; vec2 uv = vec2(pc.x, 1.0 - pc.y) * .5 + vec2(mod(vF, 2.0), floor(vF / 2.0)) * .5; vec4 tx = texture2D(uT, uv); float a = tx.r * vA; if (a < .01) discard; gl_FragColor = vec4(mix(vC, vec3(.8, 1.0, .35), tx.g * .55), min(1.0, a * 1.3)); }' });
+    fragmentShader: 'uniform sampler2D uT; varying vec3 vC; varying float vA, vF, vR; void main() { vec2 pc = gl_PointCoord - .5; float cs = cos(vR), sn = sin(vR); pc = vec2(cs * pc.x - sn * pc.y, sn * pc.x + cs * pc.y) + .5; if (pc.x < 0.0 || pc.x > 1.0 || pc.y < 0.0 || pc.y > 1.0) discard; vec2 uv = vec2(pc.x, 1.0 - pc.y) * .5 + vec2(mod(vF, 2.0), floor(vF / 2.0)) * .5; vec4 tx = texture2D(uT, uv); float a = tx.r * vA; if (a < .01) discard; gl_FragColor = vec4(mix(vC, min(vec3(1.0), vC + vec3(.45, .1, .05)), tx.g * .55), min(1.0, a * 1.3)); }' });     /* m15xx: the hot core is the particle's own colour lifted, so the turquoise burns turquoise */
   const pts = new THREE.Points(g, m); pts.frustumCulled = false; pts.renderOrder = 50; scene.add(pts);     /* after the fading (transparent) body it burns off, or he paints over his own fire */
-  GFIRE.pts = pts; GFIRE.P = P; GFIRE.C = C; GFIRE.S = S; GFIRE.A = A; GFIRE.F = Fr; GFIRE.R = Ro; GFIRE.w = new Float32Array(N); GFIRE.v = new Float32Array(N * 3); GFIRE.life = new Float32Array(N); GFIRE.L0 = new Float32Array(N); GFIRE.s0 = new Float32Array(N); GFIRE.live = 0; }
-function gfire(x, y, z, k = 1) { if (!GFIRE.pts) gfireInit(); const G = GFIRE, i = G.i = (G.i + 1) % G.n;
+  GFIRE.pts = pts; GFIRE.P = P; GFIRE.C = C; GFIRE.S = S; GFIRE.A = A; GFIRE.F = Fr; GFIRE.R = Ro; GFIRE.w = new Float32Array(N); GFIRE.pal = new Uint8Array(N); GFIRE.v = new Float32Array(N * 3); GFIRE.life = new Float32Array(N); GFIRE.L0 = new Float32Array(N); GFIRE.s0 = new Float32Array(N); GFIRE.live = 0; }
+// m15xx (his: "I like the turquoise in the guardian -- the green mist cloud needs to match it"): a second palette, TURQUOISE (the hard-surface
+// caps' own colour), for the guardian's and the spider's breaks (`tfire`); the Osari keep the green
+const tfire = (x, y, z, k = 1) => gfire(x, y, z, k, 1);
+function gfire(x, y, z, k = 1, pal = 0) { if (!GFIRE.pts) gfireInit(); const G = GFIRE, i = G.i = (G.i + 1) % G.n; G.pal[i] = pal;
   G.P[i * 3] = x; G.P[i * 3 + 1] = y; G.P[i * 3 + 2] = z; G.v[i * 3] = (Math.random() - .5) * 1.6 * k; G.v[i * 3 + 1] = (2.6 + Math.random() * 2.4) * k; G.v[i * 3 + 2] = (Math.random() - .5) * 1.6 * k;
   G.L0[i] = G.life[i] = .32 + Math.random() * .42; G.s0[i] = (.24 + Math.random() * .26) * k; G.R[i] = (Math.random() - .5) * 1.4; G.w[i] = (Math.random() - .5) * 5;     /* m1691 (his: "a little tall, no rotation -- random rotation, smaller") */ G.F[i] = Math.floor(Math.random() * 4); G.live = 1; }
 function gfireStep(dt) { const G = GFIRE; if (!G.pts || !G.live) return; let any = 0, t = performance.now() / 1000;
@@ -14294,7 +14297,7 @@ function gfireStep(dt) { const G = GFIRE; if (!G.pts || !G.live) return; let any
     G.A[i] = G.life[i] <= 0 ? 0 : Math.min(1, u * 8) * Math.pow(1 - u, .7) * .85 * (.8 + .2 * Math.sin(t * 25 + i * 3));
     G.R[i] += G.w[i] * dt;     // each tongue turns as it rises
     if (Math.random() < .08) G.F[i] = Math.floor(Math.random() * 4);     // the flicker: a new flame shape now and then
-    const c0 = u < .25 ? [.55, 1, .3] : u < .55 ? [.15, .95, .25] : [.1, .9, .35], c1 = u < .25 ? [.15, .95, .25] : u < .55 ? [.1, .9, .35] : [.12, .8, .45],     /* bright to the end: it FADES, it does not soot */ w = u < .25 ? u / .25 : u < .55 ? (u - .25) / .3 : (u - .55) / .45;
+    const tq = G.pal[i] === 1, c0 = tq ? (u < .25 ? [.6, 1, .95] : u < .55 ? [.2, .95, .9] : [.12, .82, .85]) : u < .25 ? [.55, 1, .3] : u < .55 ? [.15, .95, .25] : [.1, .9, .35], c1 = tq ? (u < .25 ? [.2, .95, .9] : u < .55 ? [.12, .82, .85] : [.15, .7, .8]) : u < .25 ? [.15, .95, .25] : u < .55 ? [.1, .9, .35] : [.12, .8, .45],     /* bright to the end: it FADES, it does not soot */ w = u < .25 ? u / .25 : u < .55 ? (u - .25) / .3 : (u - .55) / .45;
     G.C[o] = c0[0] + (c1[0] - c0[0]) * w; G.C[o + 1] = c0[1] + (c1[1] - c0[1]) * w; G.C[o + 2] = c0[2] + (c1[2] - c0[2]) * w;
     if (G.life[i] <= 0) { G.P[o + 1] = -999; G.A[i] = 0; } }
   const g = G.pts.geometry; for (const n of ['position', 'aCol', 'aSize', 'aA', 'aF', 'aR']) g.attributes[n].needsUpdate = true;
@@ -14443,13 +14446,13 @@ function spiderCut(S, dirH, hx, hz, whole) { const C = [...S.legs, ...S.stumps];
     if (whole || !SPIDER.halves) { spiderBake(S, best.L + '_hi', dirH, 2); best.b1.scale.setScalar(1e-3); } else S.stumps.push(best); }
   else { best.b1.getWorldPosition(_sdC); spiderBake(S, best.L + '_hi', dirH, 2); best.b1.scale.setScalar(1e-3); S.stumps = S.stumps.filter(l => l !== best); }
   SPIDER.stat.cuts++;
-  spkBurst(_sdC.x, _sdC.y, _sdC.z, 26, { col: [.5, 1, .55], spread: 5, size: .16, life: .5 }); for (let i = 0; i < 16; i++) gfire(_sdC.x + (Math.random() - .5) * .2, _sdC.y, _sdC.z + (Math.random() - .5) * .2, .8);
+  spkBurst(_sdC.x, _sdC.y, _sdC.z, 26, { col: [.3, 1, .9], spread: 5, size: .16, life: .5 }); for (let i = 0; i < 16; i++) tfire(_sdC.x + (Math.random() - .5) * .2, _sdC.y, _sdC.z + (Math.random() - .5) * .2, .8);
   snd('clang', { g: .8, r: 1.2, x: _sdC.x, z: _sdC.z }); camShake(.14); }
 function spiderDie(S, dirH) { if (S.dead) return; S.dead = 1; spiderTris(S.mesh); S.root.updateMatrixWorld(true);
   for (const g of ['body', 'head', 'abd']) spiderBake(S, g, dirH + (Math.random() - .5) * 1.5, g === 'body' ? 1 : 3);
   for (const l of S.legs) { const a = Math.atan2(l.foot.x - S.root.position.x, l.foot.z - S.root.position.z); spiderBake(S, l.L + '_lo', a, 2); spiderBake(S, l.L + '_hi', a, 2.5); }
   for (const l of S.stumps) spiderBake(S, l.L + '_hi', Math.atan2(l.restL.x, l.restL.z) + S.root.rotation.y, 2.5);
-  const P = spiderMid(S, _sdC); killBlast(S.root.position, P.y, 1.25, 1); for (let i = 0; i < 60; i++) { const a = Math.random() * 6.283, r = Math.random() * 1.1; gfire(P.x + Math.cos(a) * r, P.y + (Math.random() - .5) * .5, P.z + Math.sin(a) * r, 1.1); }
+  const P = spiderMid(S, _sdC); killBlast(S.root.position, P.y, 1.25, 1); for (let i = 0; i < 60; i++) { const a = Math.random() * 6.283, r = Math.random() * 1.1; tfire(P.x + Math.cos(a) * r, P.y + (Math.random() - .5) * .5, P.z + Math.sin(a) * r, 1.1); }
   S.root.removeFromParent(); SPIDER.list.splice(SPIDER.list.indexOf(S), 1); SPIDER.stat.kills++; HORDE.stat.kills++; }
 // ONE BLOW on a spider: `dirH` the way it travels, `hx/hz` where it landed (nearest leg comes off). Returns 'block', 1 (landed) or 0.
 function spiderBlow(S, dirH, power, dmg, hx, hz) { if (S.dead || S.hitCd > 0) return 0; S.hitCd = .2; { const q = partHitAt(S); if (q) { hx = q.x; hz = q.z; } } const R = S.root, Z = SPIDER, p = player;     // m1738: the chosen leg
@@ -14469,7 +14472,7 @@ function spiderArea(x, y, z, r, power, dmg) { let n = 0; for (const S of SPIDER.
 // a limb or a blade sweeping from `a` to `b` (the strike's own sweep)
 function spiderSweep(a, b, rad, power, dmg, dirH) { let n = 0; for (const S of SPIDER.list.slice()) { const R = S.root.position;
     if (!segBody(a, b, R.x, R.z, SPIDER.w * S.k * SPIDER.hitR + rad, R.y + S.lift + SPIDER.P.h * S.k, rad, R.y)) continue;     // m1711: to the LEG span (.48 of its width), not the body's .38 -- a cut that met a leg missed, and at 20 fps every one did
-    const r = spiderBlow(S, dirH, power, dmg, _hitP.x, _hitP.z); if (r && bladeFire()) for (let k = 0; k < 16; k++) gfire(_hitP.x, _hitP.y, _hitP.z, .6); if (r) { n++; if (r === 1) meleeHit(null, _hitP.x, _hitP.y, _hitP.z, .55 + Math.min(1, power) * .75); } } return n; }
+    const r = spiderBlow(S, dirH, power, dmg, _hitP.x, _hitP.z); if (r && bladeFire()) for (let k = 0; k < 16; k++) tfire(_hitP.x, _hitP.y, _hitP.z, .6); if (r) { n++; if (r === 1) meleeHit(null, _hitP.x, _hitP.y, _hitP.z, .55 + Math.min(1, power) * .75); } } return n; }
 // a bolt in flight: true when a spider stopped it
 function spiderShot(b) { for (const S of SPIDER.list) { const M = spiderMid(S, _sdC); if (Math.hypot(b.pos.x - M.x, (b.pos.y - M.y) * 1.4, b.pos.z - M.z) > SPIDER.w * S.k * .42 + b.size * .5) continue;
     spiderBlow(S, Math.atan2(b.vel.x, b.vel.z), b.rocket ? 1.4 : .6, FOE.dmg.bolt * (b.rocket ? ROCKET.dmgK : 1) * (1 + (b.chg || 0)), b.pos.x, b.pos.z); return true; } return false; }
@@ -14662,13 +14665,13 @@ const GROOT = { armL: 'LeftShoulder', armR: 'RightShoulder', arm2L: 'LeftArm2', 
 function guardCut(G, nm, dirH) { if (G.cut[nm]) return; guardTris(G, G.mesh); G.root.updateMatrixWorld(true); const D = guardBake(G, nm, dirH, 2);
   const b = G.bn[GROOT[nm]]; if (b) { b.getWorldPosition(_gdA); b.scale.setScalar(1e-3); } G.cut[nm] = 1; G.arm[nm] = 0; GUARD.stat.arms++; G.aggro = 1;
   for (const D2 of ARENA.debris) if (D2.m === D) { D2.r = 1; D2.v.multiplyScalar(.7); }
-  spkBurst(_gdA.x, _gdA.y, _gdA.z, 34, { col: [.5, 1, .55], spread: 6, size: .2, life: .6 }); for (let i = 0; i < 22; i++) gfire(_gdA.x + (Math.random() - .5) * .5, _gdA.y, _gdA.z + (Math.random() - .5) * .5, 1.1);
+  spkBurst(_gdA.x, _gdA.y, _gdA.z, 34, { col: [.3, 1, .9], spread: 6, size: .2, life: .6 }); for (let i = 0; i < 22; i++) tfire(_gdA.x + (Math.random() - .5) * .5, _gdA.y, _gdA.z + (Math.random() - .5) * .5, 1.1);
   for (let i = 0; i < 3; i++) smokeAt(_gdA.x, _gdA.y, _gdA.z, 3, 1.2, [.82, .76, .66]); jinraEmit(_gdA.x, _gdA.y, _gdA.z, 4); snd('boom', { g: .6, r: .9, x: _gdA.x, z: _gdA.z }); camShake(.3);
   if (G.rock && (nm === 'armR')) { G.rock.m.removeFromParent(); G.rock = null; } }
 function guardDie(G, dirH) { if (G.dead) return; G.dead = 1; guardTris(G, G.mesh); G.root.updateMatrixWorld(true);
   for (const g of ['body', 'head', 'legL', 'legR']) guardBake(G, g, dirH + (Math.random() - .5) * 1.6, g === 'head' ? 4 : 1.5);
   for (const nm of G.roots) if (!G.cut[nm]) guardBake(G, nm, dirH + (Math.random() - .5) * 2.4, 3);
-  const M = guardMid(G, _gdA); killBlast(G.root.position, M.y, 2.4, 1); for (let i = 0; i < 120; i++) { const a = Math.random() * 6.283, r = Math.random() * 1.8; gfire(M.x + Math.cos(a) * r, M.y + (Math.random() - .5) * 3, M.z + Math.sin(a) * r, 1.4); }
+  const M = guardMid(G, _gdA); killBlast(G.root.position, M.y, 2.4, 1); for (let i = 0; i < 120; i++) { const a = Math.random() * 6.283, r = Math.random() * 1.8; tfire(M.x + Math.cos(a) * r, M.y + (Math.random() - .5) * 3, M.z + Math.sin(a) * r, 1.4); }
   jinraEmit(M.x, M.y, M.z, 14); camShake(.6); if (G.rock) G.rock.m.removeFromParent();
   G.root.removeFromParent(); GUARD.list.splice(GUARD.list.indexOf(G), 1); GUARD.stat.kills++; HORDE.stat.kills++; }
 // ONE BLOW on him: the stone takes it from the arm nearest the hit (hx, hy, hz). 'block' when he is still stone (the blow wakes him), else 1.
@@ -14730,7 +14733,7 @@ function guardThink(G, d, dt) { const Z = G.Z, R = G.root, p = player, roll = a 
       if (u('swipe') >= 1) { G.st = 'walk'; G.cool = roll(Z.swipe.cool); } break;
     case 'smash': if (!G.hit && u('smash') > Z.smash.hit) { G.hit = 1; GUARD.stat.smashes++; const f = Z.P.h * .5, cx = R.position.x + Math.sin(R.rotation.y) * f, cz = R.position.z + Math.cos(R.rotation.y) * f, gy = R.position.y;
         for (let k = 0; k < 24; k++) { const a = k / 24 * 6.283; smokeAt(cx + Math.cos(a) * Z.smash.R * .7, gy + .2, cz + Math.sin(a) * Z.smash.R * .7, 2.4, 1.2, [.8, .74, .64]); }
-        for (let i = 0; i < 3; i++) spkBurst(cx, gy + .3, cz, 26, { col: [.8, .74, .64], spread: 9, size: .18, life: .55 }); for (let i = 0; i < 30; i++) gfire(cx + (Math.random() - .5) * 2, gy + .1, cz + (Math.random() - .5) * 2, 1);
+        for (let i = 0; i < 3; i++) spkBurst(cx, gy + .3, cz, 26, { col: [.8, .74, .64], spread: 9, size: .18, life: .55 }); for (let i = 0; i < 30; i++) tfire(cx + (Math.random() - .5) * 2, gy + .1, cz + (Math.random() - .5) * 2, 1);
         snd('boom', { g: 1, r: .55, x: cx, z: cz }); camShake(.55); if (DEBRIS.on) debrisArea(cx, gy, cz, Z.smash.R); rockArea(cx, gy, cz, Z.smash.R, 3);
         const q = Math.hypot(p.pos.x - cx, p.pos.z - cz), air = p.pos.y - groundAt(p.pos.x, p.pos.z, p.pos.y + .5, 1) > .45; if (q < Z.smash.R && !air && !p.roll) playerHurt(Z.smash.dmg * (q < Z.smash.R * .5 ? 1 : .6), Math.atan2(p.pos.x - cx, p.pos.z - cz), Z.smash.push, 5, .7, 1); }
       if (u('smash') >= 1) { G.st = 'walk'; G.cool = roll(Z.smash.cool); } break;
