@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The ledge hang measured off the body he is wearing (m15xx)
+*His screenshot, hanging on the Wall Park's wall: "The ledge hang definitely isn't lined up."*
+- `LEDGE.hang` / `out` were fractions of RIG.height measured off ZAP's hang clip (m122). Grumbo is another body on another bake: measured
+  headless, his hands sit **1.43 m** above his root in `ledge_hang_idle`, where the typed numbers put them at 1.21 -- so his hands hung 22 cm
+  ABOVE the lip, in the air.
+- Now `ledgeAt` uses `ledgeHands()`: both hands in his own frame, averaged over the hang clip, cached per body (and per `bodyK`, so a
+  disguise measures its own). The root goes where those hands land ON the lip: wrists `grip` .04 m above its top, `onto` .06 m in over the edge.
+  The typed numbers stay as the fallback. Measured after: hands at y 4.54 on a 4.5 m lip, 6 cm in over the face; rendered.
+
 ## A drawn bow no longer pins his chest through a flip (m1771)
 *"Bow drawn and pulled back, I flick the left stick to flip -- the upper torso doesn't flip, only the legs. Lol."*
 - `bowSquare` (m1746) turns Spine1 onto a WORLD frame every frame -- the aim heading and world up -- and the flips (`airFlipGo`, `cartGo`) turn

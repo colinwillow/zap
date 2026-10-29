@@ -1359,6 +1359,7 @@ const LEDGE = {
   // The grab needs the stick pushed INTO the face by this much (the cover's own `into` test, a cosine); a jump
   // straight up beside a wall, or drifting past a canopy, no longer hangs him. 0 is the old free catch.
   want: .35,
+  measure: 1, grip: .04, onto: .06,     // m15xx: the hang measured off the worn rig (`ledgeHands`); `grip` the wrists sit that far above the lip (the fingers curl over it), `onto` that far in over its edge
   hang: .861,       // = 1.076 / 1.25. How far BELOW the lip his root hangs
   out:  .170,       // = 0.212 / 1.25. And how far OUT from the face it sits
   // **AND THE CATCH BAND IS CENTRED ON THAT SAME OFFSET**, because the question is not "how
@@ -30351,11 +30352,28 @@ function ledgeAt(L, o) {
   // 1.446 m above her root while the root was placed 1.076 m under the lip -- so her hands
   // ended **0.37 m over it** and the lip crossed her at 64% of her height, which is her hips.
   // His word for it was the measurement.
-  const k = RIG.height * bodyK();
+  const k = RIG.height * bodyK(), M = LEDGE.measure ? ledgeHands() : null;
+  // m15xx (his screenshot: "the ledge hang definitely isn't lined up"): `hang` / `out` were measured off ZAP's hang clip and scaled by height --
+  // Grumbo is another body on another bake, and his hands missed the lip. Now the hang is MEASURED off the rig he is wearing (`ledgeHands`: his
+  // two hands in his own frame over the hang clip), and the root is put where those hands land ON the lip: `grip` m down onto it, `onto` m in
+  // over the face edge. The two typed numbers are the fallback (no clip, no bones).
+  if (M) { const fwd = M.z - LEDGE.onto; o.x = L.cx + L.nx * fwd; o.z = L.cz + L.nz * fwd; o.y = L.y - M.y + LEDGE.grip; return o; }
   o.x = L.cx + L.nx * (k * LEDGE.out);
   o.z = L.cz + L.nz * (k * LEDGE.out);
   o.y = L.y - k * LEDGE.hang;
   return o;
+}
+// his two hands, in his own frame (metres: up from the root, forward of it), averaged over the hang clip; cached per body
+function ledgeHands() {
+  const key = rig.model && rig.model.uuid + ':' + bodyK().toFixed(3); if (rig.hangM && rig.hangM.key === key) return rig.hangM.v;
+  const a = rig.actions[LEDGE.clips.hang], LH = rig.bones && rig.bones.mixamorig_LeftHand, RH = rig.bones && rig.bones.mixamorig_RightHand; if (!a || !LH || !RH) return null;
+  const c = a.getClip(), was = []; for (const k in rig.actions) { const x = rig.actions[k]; was.push([x, x.getEffectiveWeight(), x.time, x.enabled, x.paused]); x.setEffectiveWeight(0); }
+  const mxr = rig.mixer, v = new THREE.Vector3(), w = new THREE.Vector3(), o = new THREE.Vector3(), qi = new THREE.Quaternion(), n = 12; let sy = 0, sz = 0; a.enabled = true; a.paused = false; if (!a.isRunning()) a.play(); a.setEffectiveWeight(1);
+  for (let i = 0; i < n; i++) { a.time = c.duration * (i + .5) / n; mxr.update(0); rig.root.updateMatrixWorld(true);
+    rig.root.getWorldPosition(o); rig.root.getWorldQuaternion(qi).invert(); LH.getWorldPosition(v).add(RH.getWorldPosition(w)).multiplyScalar(.5).sub(o).applyQuaternion(qi); sy += v.y; sz += v.z; }
+  for (const [x, wt, t, en, pz] of was) { x.setEffectiveWeight(wt); x.time = t; x.enabled = en; x.paused = pz; } mxr.update(0);
+  const r = { y: sy / n, z: sz / n }; if (!(r.y > .3) || !(r.z > -.2)) return null;     // a nonsense reading: keep the typed numbers
+  rig.hangM = { key, v: r }; LEDGE.stat = r; return r;
 }
 const _lp = { x: 0, y: 0, z: 0 };
 // LETTING GO. The drop is simply the air code taking over, which is right: `in_air` IS the pose
