@@ -67935,6 +67935,16 @@ const HWPAINT = { k: .85, sand: { n: 'hollows_sand', s: 7, mean: [.8579, .2564, 
   planks: { n: 'wood_planks', s: 2.2, mean: [.0648, .022, .016] }, timber: { n: 'wood_timber', s: 1.6, mean: [.1474, .0826, .0409] }, stone: { n: 'stone_blocks', s: 2.4, mean: [.1351, .1359, .1267] } };
 // pass 3: the texture library's planks / timber / stone by the same rule (the bridges, poles, the stone lanterns), and the caves and sky islands
 // pass 2: kinds 'cliff' (triplanar cliff: the ledge paths' retaining faces), 'sand' (the walkways), and on 'land' the PEBBLE bed below the waterline
+// THINGS THAT FLOAT, FLOAT (his: "if they're gonna be floating they need some wiggle to them"). `bobPatch(mat, amp, speed)` lifts every vertex
+// whose `aBob` attribute is set (>= 1, its PHASE) by sin(t * speed + aBob * 2.3) * amp in the vertex shader -- so a merged bucket of many
+// floating stones stays ONE draw and each still rides its own swell. `hwBobY` is the same number in JS, for the colliders that ride with them
+const HWBOB = { t: { value: 0 } };
+function hwBobY(ph, amp, speed) { return Math.sin(HWBOB.t.value * speed + ph * 2.3) * amp; }
+function bobPatch(mat, amp, speed) { const ob = mat.onBeforeCompile, ok = mat.customProgramCacheKey;
+  mat.onBeforeCompile = function (sh, r) { if (ob) ob.call(this, sh, r); sh.uniforms.uBobT = HWBOB.t;
+    sh.vertexShader = 'attribute float aBob; uniform float uBobT;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n  transformed.y += step(0.5, aBob) * sin(uBobT * ' + speed.toFixed(3) + ' + aBob * 2.3) * ' + amp.toFixed(3) + ';'); };
+  mat.customProgramCacheKey = () => String(ok ? ok.call(mat) : '') + 'bob' + amp + '_' + speed; mat.needsUpdate = true; return mat; }
+const aBobOf = (geo, ph) => { geo.setAttribute('aBob', new THREE.BufferAttribute(new Float32Array(geo.attributes.position.count).fill(ph), 1)); return geo; };
 function hwPaint(mat, kind) { if (!HWPAINT.k) return mat; const P = HWPAINT, ob = mat.onBeforeCompile, ok = mat.customProgramCacheKey, land = kind === 'land', A1 = land ? P.cliff : P[kind] || P.rock;
   mat.onBeforeCompile = function (sh, r) { if (ob) ob.call(this, sh, r);
     Object.assign(sh.uniforms, { uHwA: { value: texGet(A1.n) }, uHwAs: { value: 1 / A1.s }, uHwAm: { value: new THREE.Vector3(...A1.mean) }, uHwK: { value: P.k } });
@@ -68828,7 +68838,7 @@ function jvesPut(put, M, kind, x, y, z, s = 1, ry = 0) { const m4 = (dx, dy, dz,
 // deck on stilts, a sandstone DOME, the giant GLASS GLOBE of Jinra on top in its copper cage, copper PIPES and a CHIMNEY, teal Jinra AWNINGS
 // and the BANNER, mint lanterns, vessels along the front. Reached from the lookout by a spiral of FLOATING STONES. What it sells (Jinra,
 // refined Jinra, powers, special weapons) is his to flesh out: `GJINRA.goods` and `gjinraBuy` are the hook ----
-const GJINRA = { on: 1, pass: 2, dx: 30, dz: 26, y: 124, R: 14, yaw: -1.95, g: null, stat: {}, goods: [] };
+const GJINRA = { on: 1, pass: 3, bob: .28, bobS: .9, dx: 30, dz: 26, y: 124, R: 14, yaw: -1.95, g: null, stat: {}, goods: [] };
 function gjinraTex(kind) { const cv = document.createElement('canvas'), W = cv.width = 256, Hh = cv.height = kind === 'banner' ? 512 : 256, q = cv.getContext('2d');
   q.fillStyle = '#2f7d78'; q.fillRect(0, 0, W, Hh); q.fillStyle = '#e8dcc0'; const cx = W / 2, cy = kind === 'banner' ? 180 : Hh / 2, s = kind === 'banner' ? 1 : .7;
   q.beginPath(); q.moveTo(cx, cy - 90 * s); q.lineTo(cx + 70 * s, cy); q.lineTo(cx, cy + 90 * s); q.lineTo(cx - 70 * s, cy); q.closePath(); q.fill(); q.fillStyle = '#2f7d78'; q.beginPath(); q.moveTo(cx, cy - 66 * s); q.lineTo(cx + 50 * s, cy); q.lineTo(cx, cy + 66 * s); q.lineTo(cx - 50 * s, cy); q.closePath(); q.fill();
@@ -68843,7 +68853,7 @@ function gjinraBuild() {
   const MG = new Map(), _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _v = new THREE.Vector3(), _one = new THREE.Vector3(1, 1, 1), boxes = [], tris = [];
   const put = (geo, m, mat4) => { geo = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(geo.attributes)) if (k !== 'position' && k !== 'normal' && !(k === 'uv' && m.map && !m.userData.tri)) geo.deleteAttribute(k);
     if (mat4) geo.applyMatrix4(mat4); if (!geo.attributes.normal) geo.computeVertexNormals(); if (m.userData.strata) { const gg = geo.clone(); gg.rotateY(A.yaw); gg.translate(cxW, 0, czW); ghStrataCol(gg); geo.setAttribute('color', gg.attributes.color); }
-    rsTag(A, geo); const B = A._mg || MG; if (!B.has(m)) B.set(m, []); B.get(m).push(geo); };
+    rsTag(A, geo); if (A._bob) aBobOf(geo, A._bob); const B = A._mg || MG; if (!B.has(m)) B.set(m, []); B.get(m).push(geo); };
   A.chNames = ['ground']; A.chBox = [new THREE.Box3()]; A.chunkOf = () => 0; A.rsKey = 'rsjin'; const MGs = new Map();     // one chunk: the whole island rises (the kit's lift)
   const at4 = (x, y, z, ry = 0, rx = 0, rz = 0, sx = 1, sy = 1, sz = 1) => _m4.compose(_v.set(x, y, z), _q.setFromEuler(_e.set(rx, ry, rz)), new THREE.Vector3(sx, sy, sz));
   const box = (x0, x1, y0b, y1, z0, z1, ex) => { const xs = [Wx(x0, z0), Wx(x1, z0), Wx(x0, z1), Wx(x1, z1)], zs = [Wz(x0, z0), Wz(x1, z0), Wz(x0, z1), Wz(x1, z1)]; boxes.push(Object.assign({ minx: Math.min(...xs), maxx: Math.max(...xs), miny: y0b, maxy: y1, minz: Math.min(...zs), maxz: Math.max(...zs) }, ex || {})); };
@@ -68893,9 +68903,9 @@ function gjinraBuild() {
   // ---- THE FLOATING STONES: from the lookout's deck up to the island's edge, a spiral of flat-topped rocks, each a jump up ----
   const nMain = boxes.length; A._mg = MGs; { const L0 = [px + 4.2, GPEAK.top + 8, pz + 4.2], E = [Wx(0, dz1 + 3.5), Y0, Wz(0, dz1 + 3.5)], n = Math.ceil((E[1] - L0[1]) / 2.1), stones = [];
     for (let i = 1; i <= n; i++) { const t = i / (n + 1), sw = Math.sin(t * Math.PI) * 9, dxx = E[0] - L0[0], dzz = E[2] - L0[2], dl = Math.hypot(dxx, dzz), nx = -dzz / dl, nz = dxx / dl, x = L0[0] + dxx * t + nx * sw, z = L0[2] + dzz * t + nz * sw, y = L0[1] + (E[1] - L0[1]) * i / (n + .4), r = 1.25;
-      stones.push([x, y, z]); const gs = ghRockGeo(7200 + i, r * 1.2, 1.6, r, 2); gs.rotateX(Math.PI); gs.translate(x - cxW, y - .5, z - czW); gs.rotateY(-A.yaw); put(gs, rockM); const tg = new THREE.CylinderGeometry(r * .95, r, .3, 12); tg.translate(x - cxW, y - .15, z - czW); tg.rotateY(-A.yaw); put(tg, grass);
-      boxes.push({ minx: x - r * .8, maxx: x + r * .8, miny: y - 1.4, maxy: y, minz: z - r * .8, maxz: z + r * .8 }); }
-    A.stones = stones; A.stat.stones = n; } A._mg = null;
+      stones.push([x, y, z]); A._bob = i; const gs = ghRockGeo(7200 + i, r * 1.2, 1.6, r, 2); gs.rotateX(Math.PI); gs.translate(x - cxW, y - .5, z - czW); gs.rotateY(-A.yaw); put(gs, rockM); const tg = new THREE.CylinderGeometry(r * .95, r, .3, 12); tg.translate(x - cxW, y - .15, z - czW); tg.rotateY(-A.yaw); put(tg, grass);
+      boxes.push({ minx: x - r * .8, maxx: x + r * .8, miny: y - 1.4, maxy: y, minz: z - r * .8, maxz: z + r * .8, y0: y - 1.4, y1: y, ph: i }); }
+    A.stones = stones; A.stat.stones = n; A._bob = 0; for (const m of MGs.keys()) bobPatch(m, GJINRA.bob, GJINRA.bobS); } A._mg = null;
   // ---- merge ----
   let draws = 0; for (const [m, list] of MG) { if (m.map && !m.userData.tri) m.map.wrapS = m.map.wrapT = THREE.RepeatWrapping; const geo = mergeGeometries(list); if (!geo) { console.warn('[melee] gjinra: a bucket would not merge', m.color); continue; } const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; if (m.transparent) o.renderOrder = 3; g.add(o); draws++; }
   // the floating stones: their own group, fixed in the sky (they do not rise with the island); shown once it is afloat
@@ -68911,7 +68921,11 @@ function gjinraBuy(item) { snd('clang', { g: .6, r: 2.2 }); console.log('[melee]
 // the refinery's colliders: the island's set where it stands (F on the mountain, R in the sky, plus the floating stones), none while it flies
 function gjinraBoxes(k) { const A = GJINRA; if (A.bOn === k) return; for (const set of [A.bR, A.bF, A.bS]) for (const b of set || []) { const i = BOXES.indexOf(b); if (i >= 0) BOXES.splice(i, 1); }
   if (k === 'R') for (const b of A.bR.concat(A.bS)) BOXES.push(b); else if (k === 'F') for (const b of A.bF) BOXES.push(b); A.bOn = k; if (typeof boxGrid === 'function' && A.built) boxGrid(); }
-function gjinraStep(dt, t) { const A = GJINRA; if (!A.g) return; A.built = 1; const RT = rsChunkSync(A); gjinraBoxes(RT >= .999 ? 'R' : RT <= .001 ? 'F' : 'none'); if (A.sg) A.sg.visible = RT > .99; if (A.fall) A.fall.visible = RT > .95; if (RT < .95) return; if (A.fall) A.fall.material.opacity = .45 + .12 * Math.sin(t * 3.1); A.st = (A.st || 0) - dt;
+function gjinraStep(dt, t) { const A = GJINRA; if (!A.g) return; A.built = 1; const RT = rsChunkSync(A); gjinraBoxes(RT >= .999 ? 'R' : RT <= .001 ? 'F' : 'none');
+  if (A.bOn === 'R') { const p = player, on = b => p.grounded && p.pos.x > b.minx - .1 && p.pos.x < b.maxx + .1 && p.pos.z > b.minz - .1 && p.pos.z < b.maxz + .1 && Math.abs(p.pos.y - b.maxy) < .35; let ride = 0;
+    for (const b of A.bS) { const y1 = b.y1 + hwBobY(b.ph, A.bob, A.bobS), d = y1 - b.maxy; if (on(b)) ride = d; b.miny = b.y0 + (y1 - b.y1); b.maxy = y1; }
+    const R = A.R_, dy = R ? A.g.position.y - (R.baseY + R.lift) : 0; for (const b of A.bR) { if (b.yb0 === undefined) { b.yb0 = b.miny; b.yb1 = b.maxy; } const d = b.yb1 + dy - b.maxy; if (!ride && on(b)) ride = d; b.miny = b.yb0 + dy; b.maxy = b.yb1 + dy; }
+    if (ride) p.pos.y += ride; } if (A.sg) A.sg.visible = RT > .99; if (A.fall) A.fall.visible = RT > .95; if (RT < .95) return; if (A.fall) A.fall.material.opacity = .45 + .12 * Math.sin(t * 3.1); A.st = (A.st || 0) - dt;
   if (A.st <= 0) { A.st = .14; if (A.fallTop) spkBurst(A.fallTop[0], A.fallTop[1] - Math.random() * 30, A.fallTop[2], 2, { col: [.55, 1, .8], spread: 1.2, size: .1, life: .7 }); if (A.smokeAt) spkBurst(A.smokeAt[0], A.smokeAt[1], A.smokeAt[2], 1, { col: [.7, 1, .85], spread: .6, size: .16, life: 1.2 }); }
   if (A.stones && A.g) { } }
 // THE PEAK (his, after m1475: "another element of height... a hill, a mountain on the top up there... a lookout tower at the very top"): a
@@ -69659,11 +69673,11 @@ function hollowDress() {
     H.gears = gears; }
   // FLOATING ISLANDS over the rim, waterfalls off them
   { const isl = [], top = [], fall = []; for (let i = 0; i < 9; i++) { const a = r() * 6.2832, R = 120 + r() * 160, x = Math.cos(a) * R * .7, z = Math.sin(a) * R, y = 60 + r() * 70, s = 10 + r() * 16;
-      const c = new THREE.ConeGeometry(s, s * 2.2, 7, 2); c.rotateX(Math.PI); c.translate(x, y - s * 1.1, z); isl.push(c); const t = new THREE.CylinderGeometry(s, s * .96, 2, 7); t.translate(x, y + .9, z); top.push(t);
-      if (r() < .7) { const f = new THREE.PlaneGeometry(s * .25, y * 1.1); f.translate(x + s * .7, y - y * .55, z); f.rotateY(0); fall.push(f); } }
+      const c = new THREE.ConeGeometry(s, s * 2.2, 7, 2); c.rotateX(Math.PI); c.translate(x, y - s * 1.1, z); isl.push(aBobOf(c, i + 1)); const t = new THREE.CylinderGeometry(s, s * .96, 2, 7); t.translate(x, y + .9, z); top.push(aBobOf(t, i + 1));
+      if (r() < .7) { const f = new THREE.PlaneGeometry(s * .25, y * 1.1); f.translate(x + s * .7, y - y * .55, z); f.rotateY(0); fall.push(aBobOf(f, i + 1)); } }
     // his (after m1704): fallen and restored read as a HYBRID -- these sky islands floated over a fallen valley. KORAJIN: the floating world is
     // what RESTORATION raises, so FALLEN has none
-    const sky = AGE.st !== 'fallen'; rwMesh(isl, hwPaint(rwMat(0xb7744e, { flatShading: true }), 'cliff')).visible = sky; rwMesh(top, hwPaint(rwMat(0x5f8a45), 'sand')).visible = sky; if (fall.length) { const fm = rwMesh(fall, new THREE.MeshBasicMaterial({ color: 0xeaf6ff, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false }), false); fm.renderOrder = 3; fm.visible = sky; } }
+    const sky = AGE.st !== 'fallen'; rwMesh(isl, bobPatch(hwPaint(rwMat(0xb7744e, { flatShading: true }), 'cliff'), 1.4, .32)).visible = sky; rwMesh(top, bobPatch(hwPaint(rwMat(0x5f8a45), 'sand'), 1.4, .32)).visible = sky; if (fall.length) { const fm = rwMesh(fall, bobPatch(new THREE.MeshBasicMaterial({ color: 0xeaf6ff, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false }), 1.4, .32), false); fm.renderOrder = 3; fm.visible = sky; } }
   // HIS STONE LANTERNS on the approach
   { const st = [], lit = []; for (const [dx, dz] of [[9, -3.2], [9, 3.2], [6.2, -3.2], [6.2, 3.2]]) { const x = H.hut.at[0] + dx + (H.hutS ? 0 : 0), z = H.hut.at[1] + dz * (H.hutS || 1), y = rwHeight(x, z);     // in front of the door (the hut faces the river, +x)
       st.push(B(.9, .3, .9, x, y + .15, z), Cy(.16, .2, 1.1, x, y + .85, z, 6), B(.7, .18, .7, x, y + 1.45, z), B(1.05, .2, 1.05, x, y + 2.2, z), Cy(.0, .62, .45, x, y + 2.5, z, 4));
@@ -69750,7 +69764,7 @@ function homeLanterns() {
 }
 function homeStep(dt) {
   const H = HOME; H.t += dt; if (RW.U) RW.U.uTime.value = H.t;
-  gmillStep(dt, H.t); gpeakStep(dt); gjinraStep(dt, H.t); caveStep(dt); mshopStep(dt); if (GMERCH.g) rsChunkSync(GMERCH);
+  gmillStep(dt, H.t); gpeakStep(dt); gjinraStep(dt, H.t); caveStep(dt); mshopStep(dt); HWBOB.t.value += dt; if (GMERCH.g) rsChunkSync(GMERCH);
   if (GHOME.U) GHOME.U.uWind.value = H.t; ghomeSmoke(dt, H.t); ghomeShut(dt); ghomeLift(dt); ghomePots(dt); for (const G of GHOME.gates || []) bgateStep(G, dt);     // pass 9: his back door
   if (GHOME.canoe) { const C = GHOME.canoe, t = H.t; C.g.position.y = C.y + rwWaveAt(C.x, C.z, t) * .8 * (1 - Math.min(1, (C.lift || 0) * 2)) + .02 + (C.lift || 0); C.ht = (C.ht == null ? 12 : C.ht) - dt; if (C.ht <= 0 && !C.hu) { C.hu = 1e-3; } if (C.hu) { C.hu += dt; if (C.hu > 6) { C.hu = 0; C.ht = 18 + Math.random() * 20; const P = C.g.getWorldPosition(new THREE.Vector3()); spkBurst(P.x, GHOME.g.position.y + C.y + .05, P.z, 30, { col: [.85, .93, 1], spread: 4, size: .09, life: .6 }); snd('thud', { g: .5, r: .7, x: P.x, z: P.z }); } }     // pass 24: now and then it LIFTS on its discs, hangs dripping, and settles
   const lift = C.hu ? .5 * Math.min(1, C.hu / 1.4) * Math.min(1, Math.max(0, (6 - C.hu) / 1.2)) : 0; if (lift > .05 && Math.random() < dt * 14) { const P = C.g.localToWorld(new THREE.Vector3((Math.random() - .5) * .8, -.4, (Math.random() - .5) * 4)); spkBurst(P.x, P.y, P.z, 2, { col: [.8, .9, 1], spread: .4, size: .05, life: .5 }); }
