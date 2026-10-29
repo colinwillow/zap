@@ -68450,7 +68450,7 @@ const rwIslandR = a => RW.R * (1 + .16 * Math.sin(a * 2 + .7) + .1 * Math.sin(a 
 // caves, suspended wooden bridges, weathered red banners, strange bronze machinery"*; refs in images/korajin/ref/). A winding canyon along z:
 // a river in its bed (`rc` its centre line), a wide floor on the west where the hut stands, a narrow one on the east, then rounded sandstone
 // walls in lumps (`HOLLOW.wall`) up to a rim plateau. `HOME.style` 'lake' is m1111's mountain lake (`?style=lake`).
-const HOLLOW = { floorW: 24, floorE: 13, bed: -1.7, rim: 30, wall: 9, colCell: 1.5, colMin: 2.2 };
+const HOLLOW = { floorW: 24, floorE: 13, bed: -1.7, rim: 30, wall: 9, colCell: 1.5, colMin: 2.2, steep: 1.1 };
 const hwRc = z => 7 * Math.sin(z * .028) + 3 * Math.sin(z * .071 + 1.3);
 // THE CAVES YOU GO INTO (his, after m1712: "make the caves something you can go in -- a continuous, actual physical hole; little treasures,
 // maybe animals"). Each cave is CARVED out of the height itself (`caveCarve`: the floor runs flat in through the wall, so walking, the
@@ -68606,12 +68606,19 @@ function rwBuild() {
   // m1114: THE CANYON WALLS ARE SOLID. A heightfield is a surface, not a volume: walking into a wall's footprint there is terrain ABOVE him and
   // nothing under, so he fell through it. Columns along the wall band (`HOLLOW.colCell` m), each topped at the LOWEST corner of its cell, so
   // a column never stands proud of the ground over it -- the ledge paths, cut along the face, are never blocked by one.
-  if (hw) { const c = HOLLOW.colCell; let nb = 0;
+  if (hw) { const c = HOLLOW.colCell; let nb = 0, ns = 0;
     for (let z = -150; z < 150; z += c) for (const side of [-1, 1]) { const fw = side < 0 ? HOLLOW.floorW : HOLLOW.floorE, rc = hwRc(z + c / 2);
       for (let d = fw - 6; d < fw + HOLLOW.wall + 16; d += c) { const x0 = rc + side * d, x1 = x0 + side * c, xa = Math.min(x0, x1), xb = Math.max(x0, x1);
         const lo = Math.min(hwHeight(xa, z), hwHeight(xb, z), hwHeight(xa, z + c), hwHeight(xb, z + c)); if (lo < HOLLOW.colMin) continue;
-        BOXES.push({ minx: xa, maxx: xb, miny: -6, maxy: lo, minz: z, maxz: z + c }); nb++; } }
-    RW.stat.wallCols = nb; }
+        BOXES.push({ minx: xa, maxx: xb, miny: -6, maxy: lo, minz: z, maxz: z + c, _wc: 1 }); nb++; } }
+    // m1757 (his: "going through the sides of the ravine, sides of certain rocks, parts of the mountain"): the band above only covers the canyon
+    // walls. EVERY steep cell anywhere on the land (its corners differ by more than `HOLLOW.steep`: the rim's edge, the mountain's flanks, the
+    // gullies) gets the same column, topped at its lowest corner, unless the band already has one there or a cave is cut into it
+    const have = new Set(); for (const b of BOXES) if (b._wc) have.add(Math.round(b.minx / c) + ',' + Math.round(b.minz / c));
+    for (let z = -150; z < 150; z += c) for (let x = -150; x < 150; x += c) { if (have.has(Math.round(x / c) + ',' + Math.round(z / c))) continue;
+      const h = [hwHeight(x, z), hwHeight(x + c, z), hwHeight(x, z + c), hwHeight(x + c, z + c)], lo = Math.min(...h), hi = Math.max(...h); if (hi - lo < HOLLOW.steep || lo < RW.sea - .5 || caveNear(x + c / 2, z + c / 2, 1.5)) continue;
+      BOXES.push({ minx: x, maxx: x + c, miny: -6, maxy: lo, minz: z, maxz: z + c, _sc: 1 }); ns++; }
+    RW.stat.wallCols = nb; RW.stat.steepCols = ns; }
   // the surface
   RW.rip = Array.from({ length: RW.ripN }, () => new THREE.Vector4(0, 0, -99, 0));
   RW.WU = { uNrm: { value: rwBakeNormals() }, uHgt: { value: rwBakeHeight() }, uRip: { value: RW.rip }, uWind: { value: .8 }, uAmp: { value: .7 },
@@ -69867,6 +69874,8 @@ function gpeakBuild() {
       A.stat.steps = steps; }
     A.stat.trail = +L.toFixed(0); }
   // ---- PASS 2: OUTCROPS on the ridges (big stratified rocks half sunk in the slope, solid) and SCREE fanned below each, down the gully ----
+  // m1757: the hike stays open through the steep cells it crosses
+  for (let i = BOXES.length - 1; i >= 0; i--) { const b = BOXES[i]; if (!b._sc) continue; const cx = (b.minx + b.maxx) / 2, cz = (b.minz + b.maxz) / 2; for (const [tx, tz] of A.trailPts) if (Math.hypot(cx - tx, cz - tz) < 2.6) { BOXES.splice(i, 1); break; } }
   { const rnd = rwRng(4242), J = [px + GJINRA.dx, pz + GJINRA.dz], far = (x, z) => { for (const [tx, tz] of A.trailPts || []) if (Math.hypot(x - tx, z - tz) < 4.5) return 0; return Math.hypot(x - J[0], z - J[1]) > 19; };
     let nO = 0, nS = 0; for (let k = 0; k < 240 && nO < 26; k++) { const th = rnd() * TAU, r = 14 + rnd() * (A.R - 20), x = px + Math.sin(th) * r, z = pz + Math.cos(th) * r;
       if (gpeakRidge(x - px, z - pz, x, z) < .55 || !far(x, z)) continue; const s = 2.2 + rnd() * 3.4, sy = s * (.6 + rnd() * .5), ry = th + (rnd() - .5) * .8; let y = gH(x, z); for (const [ax, az] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) y = Math.min(y, gH(x + ax * s, z + az * s) + sy * .15);
@@ -70540,6 +70549,14 @@ function hwIslLobe(seed, rx, dp, rz) { const g = new THREE.IcosahedronGeometry(1
   g.deleteAttribute('uv'); g.computeVertexNormals(); g.userData.rim = rim; return g; }
 function hwIslCap(seed, rs, rim) { const n = rim.length, pos = [0, rs * .1, 0]; for (const [x, z] of rim) pos.push(x, .02 + ghNoise3(x * .4 + seed, 0, z * .4) * rs * .03, z);
   const idx = []; for (let k = 0; k < n; k++) idx.push(0, 1 + (k + 1) % n, 1 + k); const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); return g.toNonIndexed(); }
+// m1757: a ROCK MADE SOLID -- its own triangles rastered onto a grid of `c` m cells; each cell a column from `y0` up to the highest triangle
+// over the cell's centre. The rim lumps were 40 rocks of 3-8 m with no
+// collider at all: he walked through them
+function hwSolid(geo, c, y0) { const p = geo.attributes.position, top = new Map(), ix = geo.index ? geo.index.array : null, n = ix ? ix.length : p.count;
+  for (let i = 0; i < n; i += 3) { const a = ix ? ix[i] : i, b = ix ? ix[i + 1] : i + 1, d = ix ? ix[i + 2] : i + 2, ax = p.getX(a), az = p.getZ(a), bx = p.getX(b), bz = p.getZ(b), dx = p.getX(d), dz = p.getZ(d), den = (bz - dz) * (ax - dx) + (dx - bx) * (az - dz); if (Math.abs(den) < 1e-6) continue;
+    for (let gx = Math.floor(Math.min(ax, bx, dx) / c); gx <= Math.floor(Math.max(ax, bx, dx) / c); gx++) for (let gz = Math.floor(Math.min(az, bz, dz) / c); gz <= Math.floor(Math.max(az, bz, dz) / c); gz++) { const x = (gx + .5) * c, z = (gz + .5) * c, u = ((bz - dz) * (x - dx) + (dx - bx) * (z - dz)) / den, v = ((dz - az) * (x - dx) + (ax - dx) * (z - dz)) / den, w = 1 - u - v;
+      if (u < -.05 || v < -.05 || w < -.05) continue; const y = u * p.getY(a) + v * p.getY(b) + w * p.getY(d), k = gx + ',' + gz; if ((top.get(k) ?? -1e9) < y) top.set(k, y); } }
+  let nb = 0; for (const [k, y] of top) { const [gx, gz] = k.split(',').map(Number); if (y - y0 < .4) continue; BOXES.push({ minx: gx * c, maxx: gx * c + c, miny: y0, maxy: y - .1, minz: gz * c, maxz: gz * c + c, _rk: 1 }); nb++; } return nb; }
 function hollowDress() {
   const H = HOME, r = rwRng(13), wallX = (z, side, inset = 0) => hwWallAt(z, side, 2.5, inset - 2);
   const B = (w, h, d, x, y, z, ry = 0) => { const g = new THREE.BoxGeometry(w, h, d); g.rotateY(ry); g.translate(x, y, z); return g; };
@@ -70556,7 +70573,7 @@ function hollowDress() {
         g.computeBoundingBox(); const bb = g.boundingBox, hh = bb.max.y - bb.min.y, sink = k ? hh * .12 : hh * .18; g.translate(s + (r() - .5) * .4, yc - sink - bb.min.y, z); yc = yc - sink + hh; rk.push(ghStrataCol(g)); }
       BOXES.push({ minx: s - 1.3, maxx: s + 1.3, miny: -2, maxy: yc - .1, minz: z - 1.3, maxz: z + 1.3 }); }
     for (let i = 0; i < 40; i++) { const z = -150 + r() * 300, side = r() < .5 ? -1 : 1, s = hwRc(z) + side * ((side < 0 ? HOLLOW.floorW : HOLLOW.floorE) + HOLLOW.wall + 6 + r() * 20), y = rwHeight(s, z), R = 3 + r() * 5;
-      const g = ghRockGeo(i + 500, R * (1.1 + r() * .4), R * (.5 + r() * .25), R * (.85 + r() * .3), 2); if (caveNear(s, z, R + 1)) continue;     /* on the carved height it sat INSIDE a cave */ g.rotateY(r() * 6); g.computeBoundingBox(); let yl = y; for (const [ax, az] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) yl = Math.min(yl, hwHeight0(s + ax * R, z + az * R)); g.translate(s, yl - g.boundingBox.min.y - (g.boundingBox.max.y - g.boundingBox.min.y) * .12, z); rk.push(ghStrataCol(g)); }     /* on the LOWEST ground under it: on the rim's slope the downhill side hovered */
+      const g = ghRockGeo(i + 500, R * (1.1 + r() * .4), R * (.5 + r() * .25), R * (.85 + r() * .3), 2); if (caveNear(s, z, R + 1)) continue;     /* on the carved height it sat INSIDE a cave */ g.rotateY(r() * 6); g.computeBoundingBox(); let yl = y; for (const [ax, az] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) yl = Math.min(yl, hwHeight0(s + ax * R, z + az * R)); g.translate(s, yl - g.boundingBox.min.y - (g.boundingBox.max.y - g.boundingBox.min.y) * .12, z); rk.push(ghStrataCol(g)); hwSolid(g, 1.2, yl - 3); }     /* on the LOWEST ground under it: on the rim's slope the downhill side hovered */
     const m = rwMesh(rk, hwPaint(rwMat(0xffffff, { vertexColors: true, roughness: .95 }), 'rock')); m.geometry.computeVertexNormals(); }
   // CAVE MOUTHS in the walls at the floor: a dark arch with a rim of darker stone -- and where the rock is deep enough, a CAVE (`caveBuild`)
   { const dark = [], rim = []; for (const K of caveList()) { const { z, side } = K; if (K.ok) { caveBuild(K); continue; } const x = wallX(z, side, 1.5), y = rwHeight(x, z) - .3, ry = side < 0 ? Math.PI / 2 : -Math.PI / 2;

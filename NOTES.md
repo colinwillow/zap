@@ -107,6 +107,17 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## Red Hollows: the ravine walls, the rocks and the mountain are solid (Worker B)
+His (m1751 phone shots, standing on the rim's moss with the cliff through his body): "going through the sides of the ravine, sides of
+certain rocks, parts of the mountain -- we need to do some work with the colliders". A heightfield is a surface, not a volume (m1114):
+inside a steep face's footprint the terrain is ABOVE him and nothing is under, so he slides in. m1114's columns only covered the canyon
+wall BAND (`HOLLOW.floorW/E` .. + wall + 16). Now EVERY 1.5 m cell on the land whose corners differ by more than `HOLLOW.steep` (1.1 m,
+~36 deg) gets the same column topped at its lowest corner (6,137 more; the band's 5,597 kept; caves skipped) -- gentle ground has none,
+so walking is unchanged, and a too-steep face is a riser he cannot step. The peak's hike is cleared of them (2.6 m round `trailPts`).
+And the 40 RIM LUMPS (3-8 m rocks) had NO collider at all: `hwSolid(geo, 1.2, base)` rasters a rock's own triangles onto 1.2 m cells
+(height at the cell centre, barycentric) -- 3,904 columns. Headless walk test (`stepPlayer` at 60 Hz, no render): the hike reaches trail
+point 69 of 70 at y 61; walking straight at six rim rocks from 12 m, 0 of 6 end up inside one (a low rock's edge can be stepped onto).
+All lookups go through `boxesNear` (the grid), so 10k more boxes cost no per-frame scan.
 ## The fishing dock is back as it was (m1756, Worker B)
 His (after m1755): "were there fishing docks here? it looks like there's just floating stairs... put the docks back -- something is
 missing. You can ignore the thing I said about a continuous stream; we just want it to look good first and foremost." The dock block is
