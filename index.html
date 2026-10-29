@@ -28762,7 +28762,7 @@ function ropeStep(dt) { const B = ROPEB.on; if (!B || !(dt > 1e-4)) return; ROPE
   // from under his feet), and its roll and its sideways acceleration under him are kept for his balance (`ropePose`)
   { const m1 = midZ(), vz = (m1.z - m0.z) / h; if (on && p.grounded) p.pos.z += m1.z - m0.z; Z.bal = Z.bal || { vz: 0, az: 0, roll: 0 };
     const az = (vz - Z.bal.vz) / h; Z.bal.az = isFinite(az) && isFinite(Z.bal.az) ? damp(Z.bal.az, az, .08, h) : 0; Z.bal.vz = isFinite(vz) ? vz : 0; Z.bal.roll = Math.atan2(m1.roll, Z.w); }
-  // m15xx PASS 3b: CATCH THE HAND ROPE. Falling past a hand rope with his hands at its height (`catchR` m of it sideways, `catchY` up or down)
+  // m1816 PASS 3b: CATCH THE HAND ROPE. Falling past a hand rope with his hands at its height (`catchR` m of it sideways, `catchY` up or down)
   // he grabs it -- the LEDGE hang, its ledge being the rope: `ropeRail` re-reads where the rope is under him every frame (it sags and swings with
   // his weight, which loads the hand rope's nodes, `hangLoad`), so the hang, the shimmy hops along it, the jump off and the climb UP ONTO THE DECK
   // are the ledge's own. Off either end of the span he lets go.
@@ -30812,7 +30812,7 @@ function stepLedge(dt) {
     // **AND THE HEIGHT IS THE ROOF'S, NOT THE LIP'S.** A box top and the thing he ends up
     // standing on are the same here and need not be for ever (a mantle onto a stack of boxes
     // lands on whichever is highest), so it is asked rather than assumed.
-    const ty = L.rope ? (ropeDeck(tx, tz) ?? groundAt(tx, tz, L.y + .05, MOVE.step)) : groundAt(tx, tz, L.y + .05, MOVE.step);     // m15xx: off the hand rope, onto the DECK
+    const ty = L.rope ? (ropeDeck(tx, tz) ?? groundAt(tx, tz, L.y + .05, MOVE.step)) : groundAt(tx, tz, L.y + .05, MOVE.step);     // m1816: off the hand rope, onto the DECK
     if (u < LEDGE.upOut) {
       const v = u / LEDGE.upOut, e = v * v * (3 - 2 * v);
       p.pos.x = H.x; p.pos.z = H.z;
@@ -30842,7 +30842,7 @@ function stepLedge(dt) {
       // RE-FOUND AT THE END rather than clamped to the box he left, because a building's wall
       // is a RUN of boxes -- and a face whose normal disagrees is a DIFFERENT ledge, so running
       // out of edge is simply nothing to find, which IS the end of it.
-      if (L.rope) { p.ledgeSt = 'hold'; p.ledgeT = 0; return; }     // m15xx: the hand rope runs on: ropeStep re-reads it under him
+      if (L.rope) { p.ledgeSt = 'hold'; p.ledgeT = 0; return; }     // m1816: the hand rope runs on: ropeStep re-reads it under him
       const L2 = ledgeFind(nx, p.pos.y, nz, p.r + LEDGE.reach);
       if (L2 && L2.nx * L.nx + L2.nz * L.nz > .7) { p.ledge = L2; p.ledgeSt = 'hold'; p.ledgeT = 0; }
       else ledgeDrop(0);

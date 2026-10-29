@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## Rope bridge pass 3b: catch the hand rope (m15xx, ROPEWORKS 1 / DOCKET 25)
+## Rope bridge pass 3b: catch the hand rope (m1816, ROPEWORKS 1 / DOCKET 25)
 - Falling past a hand rope with his hands at its height (`catchR` .75 m sideways, `catchY` .45 m up or down, outside or on it) he GRABS it: the
   LEDGE hang, its ledge being the rope (`L.rope`). `ropeStep` re-reads the rope under him every frame (`ropeRail`) into the ledge's five fields
   (`cx`, `cz`, `y`, `nx`, `nz` -- all `stepLedge` reads), so the hang rides the sag and swing; his weight loads the hand rope's nodes (`hangLoad`).
