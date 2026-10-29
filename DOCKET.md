@@ -58,3 +58,9 @@ best."* MAIN = this session (dynamics, the feel); AGENT = a separate session can
        driven arc (the leap's `slamArc`) with the sword as its own object between throw and catch. Inputs still free: the left-pad flicks while
        the katana charges beyond the dodge flips, the second tap, the charged release's spare left-stick directions.
 24. [ ] MAIN **The temple dweller and the spider through Tripo segment + complete** (`guardian_parts.py`), once he signs off the guardian (m1793).
+25. [ ] MAIN **ROPE BRIDGE PASSES** (`ROPEWORKS.md` 1): dynamics (weight, bounce, recoil, sway, balance, real hand ropes) and the look
+       (Japanese, then Korajin, then life), one pass a build. His priority -- *"a bunch of passes, don't lose track of that."*
+26. [ ] MAIN **THE DRAWBRIDGE WHEEL** (`ROPEWORKS.md` 2): the flat ship's-wheel capstan -- hold the right stick to grip, circle the left to wind --
+       roped to a drawbridge; then remote wheels that lock and finish themselves, a jingle and a reveal cut.
+27. [ ] MAIN **MODULAR TOWERS** (`ROPEWORKS.md` 3): shafts and heads with 1-4 ports, connectors (rope bridge, sky bridge, balcony, ledge,
+       turret), multi-storey with ladders; destructible, lanterns, archers -- a kit to build a 3-D web of bridges.
