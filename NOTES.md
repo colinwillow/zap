@@ -159,7 +159,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## Red Hollows: side-on collision, the cave chest and crystals, and the first weight cut (Worker B)
+## Red Hollows: side-on collision, the cave chest and crystals, and the first weight cut (m1763, Worker B)
 His (m1760 phone shots: in a red rock to the neck, inside the canyon wall, inside a hoodoo stack): "if you land on top of something you
 don't go through it, but if you hit it from the side you go through it... stuck in the side of the mountain... stairs, my body goes halfway
 through... the treasure chest needs a detail pass and it's 180 degrees the wrong way... plants in the caves look like pyramids... it was
