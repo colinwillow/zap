@@ -345,6 +345,11 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## THE SKY CASTLE, pass 14: the brazier burns, the rubble is solid (Worker B)
+The throne room's BRAZIER burns: flame-coloured sparks lift off it every .07 s with a curl of smoke now and then (`gcastleStep`, only while
+the castle is up and he is within 40 m). The FALLEN RUBBLE is solid: each mound rastered by `hwSolid` (1.2 m cells, 2,227 columns), kept
+in `A.rubBoxes` and put into BOXES only FALLEN (`gcastleState` adds or takes them out and re-grids). Headless: FALLEN, walking at the
+tallest mound stops 3.3 m from its centre; RESTORED (the rubble gone) the same walk goes straight through, as it should.
 ## THE SKY CASTLE, pass 13: the keep is hollow -- a spiral stair to the balcony (m1801, Worker B)
 The keep was a solid drum (its solid had run through the hall until m1787). Its wall is now three lathe bands (the middle one, at the
 balcony, with a DOOR cut out to the front, +-.2 rad), each with an inner face; a planked landing RING at the top (r 2.35 .. the wall) with a
