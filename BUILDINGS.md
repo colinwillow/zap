@@ -190,7 +190,7 @@ different functions: bars and ramps, interior and exterior, turrets, ballistae, 
   - [x] **pass 2a (m1632):** WIND-SHAPED DRIFTS and banks (the pack's resting depth is a field stretched along the wind, up to ~1 m; the refill
     returns to it; deeper drags harder), SNOWY PINES in seven stands (46, 3 draws) that DROP their snow when struck or slammed into (powder, a thud;
     the caps grow back over half a minute), and his BREATH fogging every ~1.6 s (quicker as he runs)
-  - [x] **THE JIN WILLOW, garden pass 1 (m15xx)** -- his: *"a cool alien weeping willow with vines you can brush through, like actual chains;
+  - [x] **THE JIN WILLOW, garden pass 1 (m1743)** -- his: *"a cool alien weeping willow with vines you can brush through, like actual chains;
     a big magical Japanese garden; in the snow level for now."* At (-24, -22): a stone terrace (22 m, 1.2 m up four .3 m steps), raked-snow
     rings, two stone lanterns with glowing fireboxes, and a 14 m twisted willow whose ~310 vines are VERLET CHAINS -- wind, gusts, and he
     parts them as he walks through (one draw for all of them, Jinra-mint tips). `WILLOW`.

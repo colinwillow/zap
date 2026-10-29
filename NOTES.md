@@ -44,7 +44,7 @@ sun/hemi colours follow, then B becomes A and the reflection map is rebuilt); th
 `userData.m0` so the weathering can be undone -- `bldAge` alone could not). Everything else that reads the state per frame (the peak
 fire, the shutters, the lamps, the wheel, the refinery's colliders) follows by itself. `?hs=` is dropped from the address with
 `replaceState` so a reload lands in the state he turned it to. The timings are in `HWAGE`.
-## THE JIN WILLOW: a weeping willow of verlet chains in a snow garden (m15xx)
+## THE JIN WILLOW: a weeping willow of verlet chains in a snow garden (m1743)
 His: "a cool alien weeping willow -- a big one, with vines you can actually brush through, like actual chains, so there's a dynamic to it;
 a big magical Japanese garden with a willow; put it in the snow level for now." BUILDINGS.md (SNOW) has the next passes.
 - **Where/height**: (-24, -22), ~38 m from the spawn, on a stone TERRACE 22 m square and 1.2 m up (his verticality rule), four .3 m steps on
