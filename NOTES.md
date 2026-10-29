@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The Proving Ground: measure him, then design (m15xx)
+*"The distances this character can get are a lot bigger and higher than you think -- run, jump off a ledge, double jump, flick flick flick; a high
+jump and a jump at its top; wall runs. A sandbox with two platforms a gap apart, the measurement written next to it, then a bit farther -- I'll
+see the biggest I can clear and report back; the same with height. Then design levels that really push this character."*
+- KORAJIN > The Proving Ground (`?w=forge&zone=prove`, `PROVE`): ten GAP LANES (3 m-high runways 22 m long, gaps 6, 8 ... 24 m to landing
+  pads, the width written at both edges and on the floor of the gap; stairs at the back to climb up again) and a HEIGHT ROW of pillars 3 ... 14 m.
+- THE METER (`proveStep`): every jump, feet off to feet down (or a ledge / bar catch), top-centre: how FAR in plan, how HIGH over the take-off,
+  the drop -- and his bests. `PROVE.log` keeps the last 20.
+- Measured headless, a plain sprint and ONE jump off lane 1: 7.45 m far, 2.55 m up, landed on the 6 m pad. His doubles, flicks, high jump and
+  wall runs are for him to measure -- those numbers then set the Level 1 v2 distances (BEACON.md) and the levels after it.
+
 ## Rope bridge pass 2: sway and balance (m1805, ROPEWORKS 1 / DOCKET 25)
 - The deck CARRIES him as it swings (`ropeStep` measures the deck's middle under him before and after the step and moves him with it), so it no
   longer slides out from under his feet; his sideways speed pushes the span harder (`sway` .9 -> 6).
