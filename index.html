@@ -15275,7 +15275,7 @@ function arenaUi() {
       else if (a === 'course') { ARENA.menu = ''; if (COURSE.on) courseClear(); else courseBuild('ACRO'); }     // m1078
       else if (a === 'wrun') { ARENA.menu = ''; if ((WRUN.boxes || []).length) wrunClear(); else wrunSpawn(); }     // m1064; m1072
       else if (a === 'smear') { SMEAR.on = SMEAR.on ? 0 : 1; try { localStorage.setItem('mel.smear', SMEAR.on ? '1' : '0'); } catch (err) {} }
-      else if (a === 'idleamp') { const I = IDLEPICK; I.energy = I.energies[(I.energies.indexOf(I.energy) + 1) % I.energies.length]; try { localStorage.setItem('mel.idleamp', I.energy); } catch (err) {} }     // m15xx
+      else if (a === 'idleamp') { const I = IDLEPICK; I.energy = I.energies[(I.energies.indexOf(I.energy) + 1) % I.energies.length]; try { localStorage.setItem('mel.idleamp', I.energy); } catch (err) {} }     // m1823
       else if (a === 'idlepick') { const I = IDLEPICK; I.pick = I.picks[(I.picks.indexOf(I.pick) + 1) % I.picks.length]; try { localStorage.setItem('mel.idlepick2', I.pick); } catch (err) {} }     // m1815
       else if (a === 'asprint') { AUTOSPRINT.on = AUTOSPRINT.on ? 0 : 1; try { localStorage.setItem('mel.autosprint', AUTOSPRINT.on); } catch (err) {} }     // m1809
       else if (a === 'kauto') { CHARGE3.auto = CHARGE3.auto === 'CHAIN' ? 'SINGLE' : 'CHAIN'; try { localStorage.setItem('mel.kauto', CHARGE3.auto); } catch (err) {} }     // m1798
@@ -32891,7 +32891,7 @@ function idleFixPose() { const I = IDLEPICK, F = I.fix; if (!F.on || HERO.pick !
     UA.getWorldPosition(_ifA); FA.getWorldPosition(_ifB); const up = _ifB.clone().sub(_ifA).normalize(); aim(FA, HA, up, F.elbow * w);
     const bq = rig.bindL[nm + 'Hand']; if (bq) HA.quaternion.slerp(bq, F.wrist * w); } }
 try { const v = localStorage.getItem('mel.idlepick2'); if (IDLEPICK.picks.includes(v)) IDLEPICK.pick = v; const e = +localStorage.getItem('mel.idleamp'); if (IDLEPICK.energies.includes(e)) IDLEPICK.energy = e; } catch (e) {}
-// m15xx (his: "idle 8 and 14 might be the same -- there's no motion, it's like frozen; on Mixamo you can increase the breathing so there's more energy.
+// m1823 (his: "idle 8 and 14 might be the same -- there's no motion, it's like frozen; on Mixamo you can increase the breathing so there's more energy.
 // The other one is the same idle but he LOOKS AROUND -- it played once and froze; you'd play it when the player has stood still a while, bored"):
 //   ENERGY  `energy` x1 / x2 / x3: each bone's rotation (and the hips' position) pushed further from its own AVERAGE over the clip -- the same
 //           breathing and sway, bigger. Applied once per clip to its keyframes (`idleAmp`), remembered, re-applied from the kept original on a change.

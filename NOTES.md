@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The idle comes alive: ENERGY, and the bored look-around (m15xx)
+## The idle comes alive: ENERGY, and the bored look-around (m1823)
 *"Idle 8 and 14 might be the same, and there's no motion -- like frozen. On Mixamo you can increase the breathing for more energy. The other one is the
 same idle but he looks around -- it played once and froze; you'd play it when the player's stood still a while, bored."*
 - MEASURED: on Idle_8 his head moves 0.5 cm over the clip -- frozen, as he saw.
