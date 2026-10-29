@@ -299,7 +299,7 @@ then start building the building, kinda like you built his home -- a ton of pass
 - [x] style pass 3 (m1788): CLUTTER and life -- pots on shelves under the awnings, crates, barrels, lantern posts, stone lanterns, bells, cacti and agaves
 - [x] style pass 4 (m1789): the home's CRANE with its hanging brass ball and banner, BUNTING strung between the towers, flags on poles
 - [x] style pass 5 (m1790): the home's SHAPES -- walls that bulge (lathe bellies, not straight cylinders), round boulders round the bases
-- [x] style pass 6 (m1781): timber SCAFFOLDING, galleries and plank walkways off the towers (the key art)
+- [x] style pass 6 (m1791): timber SCAFFOLDING, galleries and plank walkways off the towers (the key art)
 - [ ] style passes 7+: the satellite shrines in the home's language (cloth roofs, lanterns); smoke from the chimneys; the crane's orb swinging; the scaffold ladder climbable; a FALLEN look
 - [ ] next: the way UP from the ground, interiors, the FALLEN state, wide sails, colliders that follow the live turn
 - [ ] castle pass 1..N: the keep, the round towers and roofs, the walls and walkways, the bridges to the satellites, banners, awnings,
