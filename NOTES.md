@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The katana's charge release, by the left stick, again; the bow's emblem flat (m15xx)
+*"Press up on the right stick to charge. Nothing on the left stick: a downward slash, he does not launch forward -- mostly in place, forward just a
+little. Forward on the left stick and release: the launch, as now. The high attack: tap the left stick to jump and release, or hold down and
+release, as now." / "Not liking the black pencil-thin line round the reticle -- a flat colour."*
+- `chargeRelease`: neutral (`CHARGE3.dead`) = the same release with its travel capped at `CHARGE3.still` .6 m (`p.goStill`); forward = the full
+  launch; left / right = the whirlwind (unchanged); down = the leap (unchanged); IN THE AIR = the leap. The charge is now HELD through a jump
+  (the right thumb still down, `!grounded`), as it was through the dodge flips (m1761), so tap-jump-release is the high attack.
+- `bowMkTex` drops its dark under-pass; the stake's foot drops its dark ring. (The sword's lock was always flat white.)
+
 ## The ledge hang measured off the body he is wearing (m1772)
 *His screenshot, hanging on the Wall Park's wall: "The ledge hang definitely isn't lined up."*
 - `LEDGE.hang` / `out` were fractions of RIG.height measured off ZAP's hang clip (m122). Grumbo is another body on another bake: measured
