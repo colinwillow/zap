@@ -367,7 +367,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## THE SKY CASTLE, pass 16: the gallery towers are hollow (Worker B)
+## THE SKY CASTLE, pass 16: the gallery towers are hollow (m1807, Worker B)
 The plank galleries on towers 1, 3 and 5 (style pass 6) had no way on. Those three towers are now hollow: their wall is four lathe bands
 (a DOOR at the foot facing the keep, a full band, a DOOR at the gallery's height facing the gallery, a full band), each with an inner face,
 timber lintels over both doors, a planked floor and a ceiling; inside, a SPIRAL STAIR (a post, .42 rad wedge treads, risers just under
