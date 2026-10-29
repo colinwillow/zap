@@ -307,7 +307,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## THE SKY CASTLE, pass 8: THE WAY UP -- the Jinra lift (Worker B)
+## THE SKY CASTLE, pass 8: THE WAY UP -- the Jinra lift (m1794, Worker B)
 It had no way up but GOD/FLY. The JINRA LIFT at the front-left gap (angle -pi/7, between towers 6 and 0): a railed timber BRIDGE from the
 lawn (r .8R) out past the rim to a gantry at R+6, and a bronze CAGE (a disc, six posts, a rail open toward the island, his cloth cone on
 top, a lantern) riding two iron guide rails from the plateau (31 m) to the bridge (115 m), 6 m/s. `gcLiftStep`: stand on it .7 s and it
