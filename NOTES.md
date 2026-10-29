@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## Stairs and slopes have their own walk; the zoom charge retired (m15xx)
+## Stairs and slopes have their own walk; the zoom charge retired (m1813)
 *"When he walks upstairs he just does the flat-ground walk and cuts through the stairs -- we need animations for walking up stairs and hills." /
 "There's still a residual thing: hold down on the left stick unarmed and he charges his run. I want that gone -- retired in general."*
 - Three library clips Forge-baked onto Grumbo IN PLACE (`tools/agoblin_forge_prof.json`, 21 -> 24 roles, 2.33 MB): `stairs_up` (Walking Up The
