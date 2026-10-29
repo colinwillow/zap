@@ -277,7 +277,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## THE SKY CASTLE, pass 4 of 6: the keep (Worker B)
+## THE SKY CASTLE, pass 4 of 6: the keep (m1781, Worker B)
 His sheet's FRONT and ARCHITECTURE DETAIL. On the plaza: a round HALL (r 10, 8 m, cream stone painted with the stone-block map, a plinth,
 crenellations, glowing arched windows round it, a big arched wooden door to the front in a stone arch with gold strap and ring pulls) and
 its roof a walkable TERRACE (walk tris); out of it the KEEP (r 4.8, 24 m, banded twice) -- 21 glowing arched windows in three staggered
