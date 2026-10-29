@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The bow points down the shot again; the arc is a line, not dots, with a height stake (m1758)
+*"When you pull a bow shot he's 90 degrees to the wrong direction. I don't like the dots -- those balls look really out of place ... the arc shows
+how a lighter shot goes up more, that's really smart ... maybe one height thing at the end, a depth plane ... half opacity."*
+- **The 90 degrees was m1746's `bowSquare`**: it turned his CHEST'S FRONT to the aim, but an archer stands side-on and the arrow runs along the bow
+  arm, so the shot pointed 90 deg left. It now turns the ARROW LINE (right hand -> left hand, levelled) onto the aim. Measured headless, drawn,
+  camera at 3.14: the hand line's heading 3.14.
+- **The arc (`bowArc`)**: the 40 pips are gone; the path is a thin translucent camera-facing RIBBON (`BARC.w` .05 m, `op` .45), thin at the bow.
+  Under the landing ring, when the shot lands ABOVE the ground (a flyer, a wall, a body), a half-transparent STAKE drops to the ground with a small
+  foot ring: its length is the height, its foot is where in plan. TOOLS > BOW ARC LINE / OFF (the ring and stake stay either way).
+
 ## Flyers overhead: the lens tips up, the gun and bow lock on, the lightning announces itself, an edge arrow (m1757)
 *"Anytime we have a flying animal above you, or an archer, or a cannon ... the camera tilts to show them -- we need the same when an enemy is above you,
 like this dragon flying overhead; it's just out of screen. I couldn't hit it at all. I couldn't even see when its bolts were coming."*
