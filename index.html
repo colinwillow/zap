@@ -622,6 +622,20 @@ body.dyn.desk .zone { display: none; }
   width: calc(var(--mr) * 2); height: calc(var(--mr) * 2);
 }
 #aimRow.on { display: block; }
+/* m15xx: THE QUICK-DRAW RING over the right stick -- SWORD | BOW (two big halves) and HANDS above them -- positioned like the mode row */
+#qdRow, #qdTop {
+  position: fixed; z-index: 6; display: none; --mr: 116px; --rc: var(--sky); pointer-events: none;
+  right: calc(20px + var(--padr) - var(--mr) + env(safe-area-inset-right));
+  bottom: calc(26px + var(--padr) - var(--mr) + env(safe-area-inset-bottom));
+  width: calc(var(--mr) * 2); height: calc(var(--mr) * 2);
+}
+#qdTop { --mr: 152px; }
+#qdRow.on, #qdTop.on { display: block; }
+#qdRow path, #qdTop path { fill: rgba(11,13,18,.35); stroke: var(--rc); stroke-width: 2; pointer-events: all; cursor: pointer; }
+#qdRow path.sel, #qdTop path.sel { fill: var(--rc); }
+#qdRow text, #qdTop text { font-family: var(--ui); font-size: 13px; font-weight: 700; letter-spacing: .08em; fill: var(--rc); text-anchor: middle; dominant-baseline: central; pointer-events: none; user-select: none; }
+#qdRow text.sel, #qdTop text.sel { fill: var(--ink); }
+#wepRow path.on2 { fill: rgba(255,192,64,.45); }
 
 /* THE SAME ROW ON THE LEFT STICK, MIRRORED (m104). *"In the same way that we have the buttons
    above the right stick, I wanna make the equivalent of those on the left stick."* Same builder,
@@ -14479,6 +14493,7 @@ function arenaUi() {
       else if (a === 'course') { ARENA.menu = ''; if (COURSE.on) courseClear(); else courseBuild('ACRO'); }     // m1078
       else if (a === 'wrun') { ARENA.menu = ''; if ((WRUN.boxes || []).length) wrunClear(); else wrunSpawn(); }     // m1064; m1072
       else if (a === 'smear') { SMEAR.on = SMEAR.on ? 0 : 1; try { localStorage.setItem('mel.smear', SMEAR.on ? '1' : '0'); } catch (err) {} }
+      else if (a === 'qd') { QD.on = QD.on ? 0 : 1; try { localStorage.setItem('mel.qd', QD.on ? '1' : '0'); } catch (err) {} wepRow._qd = undefined; GEAR.mask = -1; gearSync(1); paintKit(); }
       else if (a === 'lflick') { COVER.left = COVER.left === 'FLIPS' ? 'ROLL' : 'FLIPS'; try { localStorage.setItem('mel.left', COVER.left); } catch (err) {} }
       else if (a === 'tshot') { TURRET.shot = TURRET.shot === 'ROCKET' ? 'BOLT' : 'ROCKET'; try { localStorage.setItem('mel.turret.shot', TURRET.shot); } catch (err) {} }
       else if (a === 'morph') { tmGo(); }
@@ -14546,7 +14561,7 @@ function arenaUi() {
   // in the RED HOLLOWS (his: "I need the debug menu in there so I can transform it between the two states") the bar is the STATE switch + TOOLS
   let h = '<div class="ar-bar">' + (inHome() ? B('age', (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + '<small>tap: ' + (AGE.st === 'fallen' ? 'restore it all' : 'make it fall') + '</small>', '', 'ar-main' + (AGE.st === 'fallen' ? '' : ' on'))
     : B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('vend', 'VEND')) + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
-    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('climbspd', 'CLIMB ' + CLIMB.speed.toFixed(1) + ' m/s') + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('btrail', 'TRAIL ' + (BTRAIL.jin ? 'JIN' : 'BLUE')) + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('sample', 'DNA SAMPLE ' + (SAMPLE.on ? 'ON' : 'OFF')) + B('runslash', 'RUN SLASH ' + (RUNSLASH.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('dsky', 'SKY ' + DOJO.skyPick) + B('dfx', 'DOJO FX ' + (DOJO.fx || 'FULL')) + B('rwsky', 'HOLLOWS SKY ' + RW.skyPick) + B('dragon', 'DRAGON ' + (DRAGZ.on ? DRAGZ.look : DOJO.dragonPick)) + B('dwing', 'DRAGON WINGS ' + DRAGZ.wingPick) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
+    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('climbspd', 'CLIMB ' + CLIMB.speed.toFixed(1) + ' m/s') + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('qd', 'QUICK DRAW ' + (QD.on ? 'ON' : 'OFF')) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('btrail', 'TRAIL ' + (BTRAIL.jin ? 'JIN' : 'BLUE')) + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('sample', 'DNA SAMPLE ' + (SAMPLE.on ? 'ON' : 'OFF')) + B('runslash', 'RUN SLASH ' + (RUNSLASH.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('dsky', 'SKY ' + DOJO.skyPick) + B('dfx', 'DOJO FX ' + (DOJO.fx || 'FULL')) + B('rwsky', 'HOLLOWS SKY ' + RW.skyPick) + B('dragon', 'DRAGON ' + (DRAGZ.on ? DRAGZ.look : DOJO.dragonPick)) + B('dwing', 'DRAGON WINGS ' + DRAGZ.wingPick) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
   if (m === 'bld') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back') + B('age', 'STATE: ' + (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + '<small>tap to switch -- rebuilds what stands</small>', '', AGE.st === 'fallen' ? '' : 'ar-on');
     for (const E of BLDG.list) h += B('bld', E.t + '<small>' + (E.on() ? 'tap to remove' : E.pass >= 3 ? E.sub : 'IN PROGRESS · pass ' + E.pass + ' of 3') + '</small>', E.key, E.on() ? 'ar-on' : '');
     h += '</div>'; }
@@ -20165,7 +20180,7 @@ function paintKit() {
   paintPalRow();
   // **THE WEAPON WHEEL LIGHTS WHERE HE IS GOING, NOT WHERE HE WAS (m173)** -- mid-reach that is
   // `swapTo`, so the press he just made is the segment that answers it on the same frame.
-  { const ix = wepRow._ix, n = player.swap ? player.swapTo : player.slot; paintArcRow(wepRow, 1, ix ? ix.indexOf(n) : n); }
+  if (!QD.on) { if (wepRow._qd != null) { wepRow._qd = null; GEAR.mask = -1; gearSync(1); } const ix = wepRow._ix, n = player.swap ? player.swapTo : player.slot; paintArcRow(wepRow, 1, ix ? ix.indexOf(n) : n); }
   // **AND THE LABEL IS THE SLOT AGAIN, EVEN WHILE HE IS SOMEBODY ELSE (m122).** *"We need to
   // still be able to swap through the weapons when you're like the NPC characters, which the
   // buttons don't show up."* m112 gave this line to the character's NAME because the kit was
@@ -20203,6 +20218,7 @@ function paintKit() {
     if (w && w.group) w.group.visible = (key === s.key) && !player.swapHid;
   }
   padR.classList.toggle('ready', !!(s.aim || s.charge));
+  qdPaint();     // m15xx: the quick-draw ring, and the left wheel as the sub-menu
 }
 // THE MODE BUTTONS: ANNULAR SECTORS ROUND THE RIGHT STICK (m53).
 // *"Take two rings, one smaller, one larger, and cut pizza slices out of that."*
@@ -20321,6 +20337,10 @@ try { AIM3.on = localStorage.getItem('mel.aim3b') === '1' ? 1 : 0; } catch (e) {
 const aimRow = (() => { const d = document.createElement('div'); d.id = 'aimRow'; d.setAttribute('aria-hidden', 'true'); document.body.appendChild(d); return d; })();
 const AIMROW = { mid: MODES.mid, r0: MODES.r1 + 6, r1: MODES.r1 + 40, span: 44 };
 document.body.classList.toggle('kit3', !!KIT3.on);
+const QD = { on: 1, proj: 'bow', r0: 74, r1: 116, span: 108, top: { r0: 122, r1: 152, span: 46 } };
+try { const v = localStorage.getItem('mel.qd'); if (v === '0') QD.on = 0; const pj = localStorage.getItem('mel.qdProj'); if (pj === 'bow' || pj === 'launcher') QD.proj = pj; } catch (e) {}
+const qdRow = (() => { const d = document.createElement('div'); d.id = 'qdRow'; d.setAttribute('aria-hidden', 'true'); document.body.appendChild(d); return d; })();
+const qdTop = (() => { const d = document.createElement('div'); d.id = 'qdTop'; d.setAttribute('aria-hidden', 'true'); document.body.appendChild(d); return d; })();
 WEAP.modesAll = WEAP.modes.slice();      // every mode, for GOD (m298)
 if (!/[?&]dna\b/.test(location.search)) WEAP.modes = WEAP.modes.filter(m => !m.dna);
 gunRowBuild();
@@ -20331,8 +20351,8 @@ function gearSync(quiet, boot) {
   if (m === GEAR.mask) return;
   const was = GEAR.mask; GEAR.mask = m;
   const ix = WEAP.slots.map((w, i) => i).filter(i => m & (1 << i));
-  wepRow._ix = ix;
-  buildArcRow(wepRow, ix.map(i => ({ label: (KIT3.on && KIT3.label[WEAP.slots[i].key]) || (KIT3.on && WEAP.slots[i].blade ? 'SWORD' : '') || WEAP.slots[i].short || WEAP.slots[i].label })), WEPROW.mid, j => kitPick(ix[j]), WEPROW);
+  wepRow._ix = ix; wepRow._qd = null; if (QD.on) qdRow._lab = null;
+  if (!QD.on) buildArcRow(wepRow, ix.map(i => ({ label: (KIT3.on && KIT3.label[WEAP.slots[i].key]) || (KIT3.on && WEAP.slots[i].blade ? 'SWORD' : '') || WEAP.slots[i].short || WEAP.slots[i].label })), WEPROW.mid, j => kitPick(ix[j]), WEPROW);
   // at boot nothing below `paintKit` exists yet (a const read above its declaration is a blank page): the slot only
   if (boot) { if (!(m & (1 << player.slot))) player.slot = 0; return; }
   if (!(m & (1 << player.slot))) applySlot(0); else paintKit();
@@ -20352,6 +20372,32 @@ function gunRowBuild() {
   buildArcRow(modeRow, WEAP.modes, MODES.mid, gunPick);
   buildArcRow(aimRow, [{ key: 'aim3', label: '3D AIM' }], AIMROW.mid, () => { AIM3.on = AIM3.on ? 0 : 1; try { localStorage.setItem('mel.aim3b', AIM3.on ? '1' : '0'); } catch (e) {} triggerStop(); paintKit(); }, AIMROW);
 }
+// m15xx (his: "a really quick draw between projectile and melee -- above the right stick, the left thumb stays free for motion: two meaningfully
+// sized buttons, the first row of a ring cut in half, projectile on one and melee on the other -- fight, tap, shoot, tap, fight -- you can only
+// block with the melee weapon out. A third above them for unarmed. The sub-menu for whatever weapon is selected moves to the LEFT: the arrow
+// types on the left"). `QD.on` (TOOLS > QUICK DRAW): the right pad carries SWORD | <projectile> on its inner ring and HANDS on an outer one;
+// the left wheel stops being the weapon list and becomes the EQUIPPED weapon's sub-menu -- with a projectile out: BOW / GUN (which one the
+// projectile button draws; it remembers) and 3D AIM (the toggle that used to sit over the right pad); the arrow types join it as they exist.
+// With the sword or bare hands out there is nothing to choose yet, so the left wheel is hidden.
+const qdIx = k => WEAP.slots.findIndex(q => k === 'sword' ? q.blade : q.key === k);
+function qdProj() { const k = gearHas(QD.proj) ? QD.proj : ['bow', 'launcher'].find(gearHas); return k ? qdIx(k) : -1; }
+function qdBuild() { const pj = qdProj(), lab = pj >= 0 ? (WEAP.slots[pj].key === 'launcher' ? 'GUN' : WEAP.slots[pj].short || WEAP.slots[pj].label) : 'BOW';
+  buildArcRow(qdRow, [{ label: 'SWORD' }, { label: lab }], 90, i => { const n = i ? qdProj() : qdIx('sword'); if (n >= 0) kitPick(n); }, QD);
+  buildArcRow(qdTop, [{ label: 'HANDS' }], 90, () => kitPick(0), QD.top); qdRow._lab = lab; }
+// the left wheel as the equipped weapon's sub-menu
+function qdSub() { const s = slotNow(), proj = s.key === 'bow' || s.key === 'launcher';
+  const sig = proj ? 'proj' : ''; if (wepRow._qd !== sig) { wepRow._qd = sig; wepRow._ix = null;
+    if (proj) buildArcRow(wepRow, [{ label: 'BOW' }, { label: 'GUN' }, { label: '3D AIM' }], WEPROW.mid, i => {
+      if (i === 2) { AIM3.on = AIM3.on ? 0 : 1; try { localStorage.setItem('mel.aim3b', AIM3.on ? '1' : '0'); } catch (e) {} triggerStop(); paintKit(); return; }
+      const k = i ? 'launcher' : 'bow'; if (!gearHas(k)) return; QD.proj = k; try { localStorage.setItem('mel.qdProj', k); } catch (e) {} kitPick(qdIx(k)); qdBuild(); }, WEPROW); }
+  if (!proj) { paintArcRow(wepRow, 0, -1); return; }
+  paintArcRow(wepRow, 1, s.key === 'bow' ? 0 : 1); const kids = wepRow.firstChild ? wepRow.firstChild.childNodes : []; if (kids[4]) kids[4].classList.toggle('on2', !!AIM3.on); }
+function qdPaint() { const show = QD.on && !player.mphSt && !player.riding;
+  if (!show) { qdRow.classList.remove('on'); qdTop.classList.remove('on'); return false; }
+  const pj = qdProj(), lab = pj >= 0 ? (WEAP.slots[pj].key === 'launcher' ? 'GUN' : 'BOW') : 'BOW'; if (!qdRow.firstChild || qdRow._lab !== lab) qdBuild();
+  const n = player.swap ? player.swapTo : player.slot, k = WEAP.slots[n] && WEAP.slots[n].key;
+  paintArcRow(qdRow, 1, WEAP.slots[n] && WEAP.slots[n].blade ? 0 : (k === 'bow' || k === 'launcher') ? 1 : -1); paintArcRow(qdTop, 1, n === 0 ? 0 : -1);
+  qdSub(); paintArcRow(aimRow, 0, -1); return true; }
 function gunPick(i) {
   const gun = WEAP.slots.findIndex(q => q.aim && !q.rocket), rk = WEAP.slots.findIndex(q => q.rocket);
   if (i >= WEAP.modes.length) { if (rk >= 0 && player.slot !== rk && !player.swap) swapGo(rk); return; }

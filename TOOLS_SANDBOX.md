@@ -55,7 +55,7 @@ its own before the next.
   above them for UNARMED. One tap swaps; the swap is fast enough to block, shoot, block.
 - **Above the left pad:** the equipped weapon's SUB-MENU (the arrow types for the bow; the katana's or the launcher's options later). It moves
   from the right side to the left, the opposite of today.
-- Built after the bow is signed off.
+- **Built at m1724** (he asked for it before the bow's sign-off). TOOLS > QUICK DRAW turns it off.
 
 ## Open (his calls)
 - Which piece first (the bow is the proposal).

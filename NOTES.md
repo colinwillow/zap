@@ -97,6 +97,29 @@ in there so I can transform it between the two states"; "these rocks are kind of
 - **THE HYBRID:** the sky islands over the rim (m1113) showed in FALLEN. KORAJIN: the floating world is what restoration raises -> hidden
   while fallen. (The refinery already sits on the flank when fallen.)
 Next: the painted textures (rock, sand, cliff), his ask in the same message.
+## m15xx -- THE QUICK-DRAW RING (his UI plan, TOOLS_SANDBOX.md; "yes, do this next")
+- **Right pad:** `#qdRow`, two big halves on the inner ring (r 74-116, span 108): SWORD | the PROJECTILE (BOW, or GUN when that is the
+  remembered pick, `QD.proj`, saved). `#qdTop` above them (r 122-152) holds HANDS. Each tap is `kitPick` (the ordinary swap). The selected
+  one is filled.
+- **Left wheel:** with QUICK DRAW on it is the EQUIPPED weapon's sub-menu (`qdSub`).
+  - A projectile out: BOW / GUN (which one the projectile half draws) and 3D AIM. The toggle moved here from over the right pad, and
+    `aimRow` is hidden while this is on. Arrow types join this row as they exist.
+  - The sword or hands out: hidden (nothing to choose yet).
+- **Wiring:**
+  - `paintKit` calls `qdPaint` last.
+  - `gearSync` no longer draws the weapon list on the left while this is on.
+  - TOOLS > QUICK DRAW ON/OFF restores the old wheel (`mel.qd`).
+- **Boot:** the first build read `QD` above its declaration (`gearSync(1, 1)` runs at boot). `npm run check` caught it -- the eleventh
+  time; the declarations moved above `gearSync`.
+- **Measured headless** (390 x 844 touch viewport, real `pointerdown` on the SVG paths):
+  - Start: katana, SWORD lit, left hidden.
+  - Projectile tap -> bow, BOW lit, left BOW* / GUN / 3D AIM.
+  - Sub GUN -> launcher, the right half relabelled GUN. Sub BOW -> bow.
+  - SWORD -> katana, left hidden. HANDS -> none.
+  - Geometry: right ring x 205-387 / y 592-698, left wheel x 3-185; no overlap, all on a 390 px screen, the side buttons above at y <= 342.
+  - A page screenshot times out under SwiftShader, so the picture is unchecked.
+- **Not checked:** on his phone (the feel of the two halves' size; the floating-pad mode).
+
 ## m1723 -- THE CHARGE BY THE LEFT STICK, AND THE FLIP DODGES EVERYWHERE (his controls pass)
 - **The katana charge's release (his: "up on the left stick: the lunge forward down the middle; left: the spinning whirlwind; right: the same
   mirrored; down: the high one; neutral stays the lunge for now"):**
