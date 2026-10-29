@@ -293,7 +293,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## THE SKY CASTLE, style pass 1: it takes the HOME's materials and frame (Worker B)
+## THE SKY CASTLE, style pass 1: it takes the HOME's materials and frame (m1786, Worker B)
 His (after six passes, with Grumbo's home, its sheet and the key art beside it): "good start, but it needs a ton more passes to look like
 it belongs in our game". The castle was generic grey stone blocks. Now `gcMat`: ONE shared set of the home's own materials -- his pocked
 cream SANDSTONE with the purple spots (`triMat('sandstone')`), dark TIMBER and PLANKS, BRONZE, iron, gold, and the home's ragged painted
