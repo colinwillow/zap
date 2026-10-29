@@ -14268,7 +14268,7 @@ const GUARD = { name: 'the guardian', wander: 0, notice: 99, roam: 0, amble: 1, 
   // big X"): THE X. Each arm bone is AIMED at a direction in his own frame (forward +Z, his left +X) after the clip: the upper pair up and
   // out, fists up; the lower pair down and out, claws forward. Idle and walking hold it fully (`xUp`); in an attack the upper arms go
   // back to the clip while the lower pair keep the X at `xLoAtk` and swing with the echo.
-  X: { arm: [.8, .45, .4], fore: [.35, .8, .5], arm2: [.85, -.3, .45], fore2: [.5, -.5, .7] }, xUp: 1, xLo: 1, xLoAtk: .6,
+  X: { arm: [.8, .45, .4], fore: [.35, .8, .5], arm2: [.85, -.3, .45], fore2: [.5, -.5, .7], leg: [.32, -1, .06], shin: [.1, -1, -.04], drop: .015 }, xUp: 1, xWalk: .8, xLo: 1, xLoAtk: .6,
   swipe: { r: 10, hit: .45, R: 9, arc: 1.3, dmg: 16, push: 8, cool: [1.4, 2.6] },
   smash: { r: 12, hit: .36, R: 8, dmg: 20, push: 10, cool: [4, 6.5] },
   throw: { min: 15, max: 50, grab: .2, rel: .5, T: [.9, 1.9], g: .7, dmg: 18, R: 3.6, size: 2.2, cool: [3.5, 5.5] },
@@ -14279,18 +14279,27 @@ const GUARD = { name: 'the guardian', wander: 0, notice: 99, roam: 0, amble: 1, 
 // two arms that come off, a punch-swipe and a ground smash, no boulders. He WANDERS round where he was put (`roam`, at `amble` pace, pausing)
 // until you come within `notice` m or hit him, then roars and comes for you. SPAWN > TEMPLE DWELLER: three, the first as his statue.
 const OLMEC = Object.assign(Object.create(GUARD), { name: 'the dweller', file: 'models/creatures/stone_olmec.glb', clips: 'models/characters/forged/stone_olmec.glb', P: null,
-  h: 2.3, headK: 1, arm2K: 1, X: null, speed: 0, speed0: 1.1, turn: 2.4, near: 1.7, hp: 10, armHp: 4, r: .3, stagEvery: 3, wander: 1, notice: 9, roam: 6, amble: .55,
+  h: 2.3, headK: 1, arm2K: 1, X: { arm: [.82, -.3, .48], fore: [.28, -.12, .95], leg: [.36, -1, .06], shin: [.1, -1, -.05], drop: .02 },     // m1739: the wrestler -- elbows out, hands forward to catch you, feet wide
+  speed: 0, speed0: 1.1, turn: 2.4, near: 1.7, hp: 10, armHp: 4, r: .3, stagEvery: 3, wander: 1, notice: 9, roam: 6, amble: .55,
   n: 3, statueN: 1, spawnR: 9, swipe: { r: 2.7, hit: .45, R: 2.4, arc: 1.2, dmg: 7, push: 4, cool: [1.2, 2.2] }, smash: { r: 3, hit: .34, R: 2.4, dmg: 9, push: 5, cool: [3, 5] }, throw: null });
 const _gdA = new THREE.Vector3(), _gdB = new THREE.Vector3(), _gdQ = new THREE.Quaternion(), _gdI = new THREE.Quaternion(), _gdC = new THREE.Vector3(), _gdQ2 = new THREE.Quaternion(), _gdQ3 = new THREE.Quaternion();
 // turn bone `b` (by `w`) so it points from itself to its child `c` along `d` (his own frame: x his left, y up, z forward)
 function guardAim(G, b, c, d, side, w) { if (!b || !c || w <= .001) return; b.getWorldPosition(_gdA); c.getWorldPosition(_gdB); _gdB.sub(_gdA); if (_gdB.lengthSq() < 1e-10) return; _gdB.normalize();
   _gdC.set(d[0] * side, d[1], d[2]).normalize().applyQuaternion(G.root.quaternion); _gdQ.setFromUnitVectors(_gdB, _gdC);
   b.getWorldQuaternion(_gdQ2).premultiply(_gdQ); b.parent.getWorldQuaternion(_gdQ3); _gdQ2.premultiply(_gdQ3.invert()); b.quaternion.slerp(_gdQ2, w); b.updateMatrixWorld(true); }
-function guardX(G, dt) { const Z = G.Z, X = Z.X; if (!X) return; const calm = G.st === 'walk' || G.st === 'statue' || (G.st === 'wake' && G.stT > guardDur(G, 'roar') * .7);
-  G.xu = damp(G.xu == null ? 1 : G.xu, calm ? Z.xUp : 0, .12, dt); G.xl = damp(G.xl == null ? 1 : G.xl, calm ? Z.xLo : Z.xLoAtk, .12, dt); G.root.updateMatrixWorld(true);
+// m1739 (his: "we need a standard adjustment for the idle poses -- their arms are always so close to the body; they need to stand like
+// wrestlers, big ogre warrior guardians, standing really wide, like they're gonna catch you"): THE BRUTE STANCE, every stone kind. After the
+// clip each limb bone is AIMED (`guardAim`) at a direction in his own frame: the arms (`arm` / `fore`; the guardian's lower pair `arm2` /
+// `fore2`) and, standing, the LEGS spread wide (`leg` / `shin`) -- he drops by `drop` x his height so the wider feet stay on the floor.
+// Standing it holds fully (`xUp`); walking the arms keep `xWalk` of it over the swing and the legs go back to the clip; in an attack the
+// upper arms are the clip's (the lower pair keep `xLoAtk`).
+function guardX(G, dt) { const Z = G.Z, X = Z.X; if (!X) return; const calm = G.st === 'walk' || G.st === 'statue' || (G.st === 'wake' && G.stT > guardDur(G, 'roar') * .7), stand = calm && (G.cur !== 'walk' || G.statue);
+  G.xu = damp(G.xu == null ? 1 : G.xu, calm ? (stand ? Z.xUp : Z.xWalk) : 0, .12, dt); G.xl = damp(G.xl == null ? 1 : G.xl, calm ? Z.xLo : Z.xLoAtk, .12, dt);
+  G.xg = damp(G.xg == null ? 1 : G.xg, stand && X.leg ? 1 : 0, .15, dt); G.m.position.y = -(X.drop || 0) * Z.P.h / G.m.scale.y * G.xg; G.root.updateMatrixWorld(true);
   for (const [s, k] of [['Left', 1], ['Right', -1]]) { const B = n => G.bn[s + n];
+    if (X.leg) { guardAim(G, B('UpLeg'), B('Leg'), X.leg, k, G.xg); guardAim(G, B('Leg'), B('Foot'), X.shin, k, G.xg); }
     guardAim(G, B('Arm'), B('ForeArm'), X.arm, k, G.xu); guardAim(G, B('ForeArm'), B('Hand'), X.fore, k, G.xu);
-    guardAim(G, B('Arm2'), B('ForeArm2'), X.arm2, k, G.xl); guardAim(G, B('ForeArm2'), B('Hand2'), X.fore2, k, G.xl); } }
+    if (X.arm2) { guardAim(G, B('Arm2'), B('ForeArm2'), X.arm2, k, G.xl); guardAim(G, B('ForeArm2'), B('Hand2'), X.fore2, k, G.xl); } } }
 const GPIECE = { Shoulder: 'arm', Arm: 'arm', ForeArm: 'arm', Hand: 'arm', Arm2: 'arm2', ForeArm2: 'arm2', Hand2: 'arm2', Neck: 'head', Head: 'head', UpLeg: 'leg', Leg: 'leg', Foot: 'leg', ToeBase: 'leg' };
 function guardPiece(name) { const n = name.replace(/^mixamorig[_:]?/, ''), m = /^(Left|Right)(.*)$/.exec(n); if (!m) return GPIECE[n] || 'body'; const g = GPIECE[m[2]]; return g ? g + (m[1] === 'Left' ? 'L' : 'R') : 'body'; }
 async function guardLoad(Z = GUARD) { if (Z.P) return Z.P;

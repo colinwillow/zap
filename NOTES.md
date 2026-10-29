@@ -17,6 +17,20 @@ sun/hemi colours follow, then B becomes A and the reflection map is rebuilt); th
 `userData.m0` so the weathering can be undone -- `bldAge` alone could not). Everything else that reads the state per frame (the peak
 fire, the shutters, the lamps, the wheel, the refinery's colliders) follows by itself. `?hs=` is dropped from the address with
 `replaceState` so a reload lands in the state he turned it to. The timings are in `HWAGE`.
+## The white spots were HOLES: every cut is capped in glowing teal; the BRUTE STANCE for every stone kind (m1739)
+His (a screenshot of the dweller): "are these white spots snow? what's going on?" and "a standard adjustment for the idle poses -- their arms
+are always so close to the body; stand like wrestlers, big ogre guardians, standing really wide, like they're gonna catch you."
+- **Holes, not snow.** A Tripo shell is hollow; once each stone piece was split onto its own bone (m1733), a bending joint opened the cut and
+  showed the background straight through him (neck, knees). `blender-addons/pipeline/hs_caps.py`, used by all three hard-surface rigs:
+  `weld` first (Tripo's mesh is split at every UV seam -- 29,154 verts -> 10,250 on the guardian), so after the piece split the only open
+  edges are the CUTS; then `caps` fills every open loop (holes_fill + triangulate) and puts the lids' UVs on the most teal texel of HIS OWN
+  texture (guardian rgb .09/.91/.89, dweller .13/1/.98, spider .32/.96/.73). An opened joint now shows a glowing core -- the teal bands
+  between his blocks in the drawings. Guardian 1,431 lid triangles, dweller 1,228, spider 980; all three re-squashed (~0.9 MB each).
+- **The brute stance** (`guardX`, now for every kind with `X`): the arms AIMED after the clip -- the dweller elbows out (.82, -.3, .48),
+  forearms forward to catch (.28, -.12, .95); standing, the LEGS spread (`leg` .36 out, `shin` down) and the model drops `drop` x his
+  height so the wider feet stay down. Walking: the arms keep `xWalk` .8, the legs go back to the clip. The guardian keeps his X and gets
+  the wide legs too.
+- Renders: the dweller front / side / mid-hit -- no holes, teal at the opened joints; the guardian standing wide.
 ## PART AIM: the charge's lock steps between a big thing's parts (m1738)
 His: "on bigger enemies -- bosses, big spiders -- the crosshair moves between their different hit points: his elbow, his hand, his face; you
 move the cursor around while you hold the charge, so it's more refined what you're going for."
