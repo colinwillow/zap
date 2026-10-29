@@ -13245,6 +13245,8 @@ function wrunPose() {
   // face with the hips at .5, the legs trailing AWAY from the wall. Now each leg is a two-bone IK onto a point ON the face (`wrLimb`, its knee bent
   // toward a pole), the foot turned so its toes point up the wall, and the hips held a set distance off it -- so the soles are on the wall by
   // construction, whatever the clip under it does. The perch adds both hands on the face above his head.
+  if (R.kind === 'up' && WRUN.upClip && rig.actions && rig.actions.wall_up) { const k = Math.min(1, (R.t - (R.t0 || 0)) / .12), off = (WRUN.upClipD * (rig.hipY || .77) * bodyK() - (player.r + WRUN.gap)) * k;     // m15xx: the clip's body, held its own distance off the face
+    rig.root.position.x += R.nx * off; rig.root.position.z += R.nz * off; return; }
   if (R.kind === 'up' || R.kind === 'slide') { if (!rig.bones) return; wrunSolve(R); return; }
   if (R.kind !== 'side') return;
   // rolled about his forward axis so his head leans OFF the wall and his feet stay on it; ramps in and out over .12 s
@@ -13260,7 +13262,7 @@ function wrunPose() {
     sp.parent.getWorldQuaternion(_wrQ3).invert(); sp.quaternion.copy(_wrQ3.multiply(_wrQ)); sp.updateMatrixWorld(true); }
 }
 const _wrQ2 = new THREE.Quaternion(), _wrQ3 = new THREE.Quaternion();
-Object.assign(WRUN, { upD: .8, upFoot: -.12, upAmp: .34, upLift: .26, upToeIn: .15, upJumpV: 9.5,     /* m1827: m1826's pose REVERTED (his: "even worse, horrendous") -- the jumps stay */     /* m1826 (his: "not a chair at 90 degrees -- down at 45 or less, knees with room to run, toes brushing the wall, not flat-footed"): hips closer (upD .8 -> .5), feet lower under him (upFoot -.12 -> -.55), toes turned INTO the wall (`upToeIn`) */ upD0: .8, upRate: 2.4, upW: .14, upTorso: .32, perchD: .42, perchFoot: -.18, perchKnee: -.55, perchFwd: .12, perchDrop: .22, perchLean: .45, perchW: .2, perchHand: .05, perchHandW: .55, ik: 1 });     /* m1683: the perch faces away -- back to the wall, a foot planted on it behind, hands back on it at the hips */
+Object.assign(WRUN, { upClip: 1, upClipD: .45, upClipRef: 2.2, upClipTs: [.8, 2.6], upD: .8, upFoot: -.12, upAmp: .34, upLift: .26, upToeIn: .15, upJumpV: 9.5,     /* m1827: m1826's pose REVERTED (his: "even worse, horrendous") -- the jumps stay */     /* m1826 (his: "not a chair at 90 degrees -- down at 45 or less, knees with room to run, toes brushing the wall, not flat-footed"): hips closer (upD .8 -> .5), feet lower under him (upFoot -.12 -> -.55), toes turned INTO the wall (`upToeIn`) */ upD0: .8, upRate: 2.4, upW: .14, upTorso: .32, perchD: .42, perchFoot: -.18, perchKnee: -.55, perchFwd: .12, perchDrop: .22, perchLean: .45, perchW: .2, perchHand: .05, perchHandW: .55, ik: 1 });     /* m1683: the perch faces away -- back to the wall, a foot planted on it behind, hands back on it at the hips */
 const _wsA = new THREE.Vector3(), _wsB = new THREE.Vector3(), _wsC = new THREE.Vector3(), _wsT = new THREE.Vector3(), _wsK = new THREE.Vector3(), _wsQ = new THREE.Quaternion(), _wsQ2 = new THREE.Quaternion();
 // two bones onto `T`, the middle joint bent toward `pole` (a world direction); `end` turned so its child points along `aim` (optional)
 function wrLimb(up, mid, end, T, pole, aim) { if (!up || !mid || !end) return;
@@ -35408,6 +35410,10 @@ function rigAnim(dt) {
   if (p.rope) { t[hbarClip()] = 1; setWeights(t, dt); return; }     // m1129: hanging on the rope
   if (p.hook) { t[hbarClip()] = 1; setWeights(t, dt); return; }     // m1063: reaching for the bar
   if (p.wrun && p.wrun.kind === 'slide') { const nm = rig.actions[LEDGE.clips.hang] ? LEDGE.clips.hang : CLIPS.air; t[nm] = 1; setWeights(t, dt); return; }     // m1372: clinging to the face
+  // m15xx (his reference: the vertical wall run -- upright, close, one knee driven high with its foot on the wall, the other leg reaching down, hands
+  // up the face): the library's Climbing_Up_Wall, baked IN PLACE onto Grumbo (`wall_up`), plays the RUN-UP whole -- no IK on top (`WRUN.upClip`);
+  // its rate follows how fast he is rising (`upClipRef` m/s of climb at 1x, held to `upClipTs`)
+  if (p.wrun && p.wrun.kind === 'up' && WRUN.upClip && rig.actions.wall_up) { const a = rig.actions.wall_up; a.timeScale = clamp(Math.max(0, p.vel.y) / WRUN.upClipRef, WRUN.upClipTs[0], WRUN.upClipTs[1]); t.wall_up = 1; setWeights(t, dt); return; }
   if (p.wrun) { const nm = rig.actions[CLIPS.run] ? CLIPS.run : CLIPS.air, a = rig.actions[nm]; if (a && nm === CLIPS.run) a.timeScale = clamp((p.wrun.kind === 'side' ? p.wrun.v : 4) / Math.max(1, GAIT.runRef || 3), .7, 2.4); t[nm] = 1; setWeights(t, dt); return; }     // m1064     // m1034: hanging; m1048: FIRST, so no leftover state can draw over the hang
   if (p.mantle) { t[rig.actions[LEDGE.clips.up] ? LEDGE.clips.up : CLIPS.air] = 1; setWeights(t, dt); return; }     // m1039: the climb-up owns him
   if (p.vault) { t[rig.actions[VAULT.clip] ? VAULT.clip : CLIPS.air] = 1; setWeights(t, dt); return; }     // m1027: the vault owns him

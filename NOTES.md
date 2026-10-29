@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The run-up is a real climbing clip (m15xx, DOCKET 17)
+*His reference (a vertical wall run, side-on): upright, close to the wall, one knee driven high with its foot planted, the other leg reaching down,
+hands up the face.*
+- The library's real wall clips were baked onto Grumbo in a throwaway file and rendered side-on at 35/60/85% (Sprint_To_Wall_Climb,
+  Climbing_Up_Wall, Diagonal_Wall_Run, Wall_Run): **Climbing_Up_Wall** is his reference almost frame for frame.
+- Baked for good as `wall_up` (in place; 31 roles, 3.48 MB). On the RUN-UP it plays whole (`WRUN.upClip` 1; the IK solve is skipped), its rate
+  following his climb speed (`upClipRef` 2.2 m/s at 1x, held to .8-2.6x), the body held `upClipD` .45 of the hip height off the face.
+  `WRUN.upClip = 0` is the IK pose. Rendered on the 4.5 m wall side-on: upright, close, knee up, foot on the wall, a hand up the face.
+
 ## The m1826 run-up pose, reverted (m1827)
 *His screenshot: "This looks even worse, absolutely horrendous."* The legs folded up under him like a curled shrimp: pulling the feet low and the hips
 in made the two-bone IK fold the knees up, not drive them. Back to the m1683 numbers (`upD` .8, `upFoot` -.12, `upAmp` .34, `upLift` .26, `upToeIn`

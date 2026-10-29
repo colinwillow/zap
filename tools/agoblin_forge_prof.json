@@ -260,6 +260,14 @@
    "edit": {
     "inPlace": 1
    }
+  },
+  {
+   "role": "wall_up",
+   "stem": "Climbing_Up_Wall",
+   "name": "Climbing_Up_Wall",
+   "edit": {
+    "inPlace": 1
+   }
   }
  ]
 }
