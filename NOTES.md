@@ -89,7 +89,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## Red Hollows: posts to the ground, the bank's wet edge, painted bushes, a cinematic start (Worker B)
+## Red Hollows: posts to the ground, the bank's wet edge, painted bushes, a cinematic start (m1755, Worker B)
 His (m1751 phone shots): "floating things... parts of the house deck are floating -- they need to extend down into the ground"; "where the
 water meets the beach there needs to be... foam or the sand needs to discolour, more of a transition"; "green bushes... just green, really
 low poly -- add texture maps so they look like actual painted bushes; anything not painted needs painting"; "you start in a really weird
