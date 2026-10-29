@@ -64,3 +64,6 @@ best."* MAIN = this session (dynamics, the feel); AGENT = a separate session can
        roped to a drawbridge; then remote wheels that lock and finish themselves, a jingle and a reveal cut.
 27. [ ] MAIN **MODULAR TOWERS** (`ROPEWORKS.md` 3): shafts and heads with 1-4 ports, connectors (rope bridge, sky bridge, balcony, ledge,
        turret), multi-storey with ladders; destructible, lanterns, archers -- a kit to build a 3-D web of bridges.
+28. [ ] (his, to consider -- no change yet) **A left flick while running = instant sprint**: the flick plays a move (the front handspring is the
+       candidate -- some fist moves stop his momentum, so it has to be one that carries it) and he comes out of it already sprinting (`AUTOSPRINT`,
+       m1809), skipping the 4.6 m run-up. Or: run, jump, flip, land sprinting. Decide with him before building.
