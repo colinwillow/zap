@@ -293,6 +293,12 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## THE SKY CASTLE, style pass 5: the home's bellies and boulders (Worker B)
+The home's walls bulge; the castle's were ruler cylinders. `gcBelly(r0, r1, b)` -- a radius at t with a belly (b of the radius, peaking
+mid-height) and a flared foot -- and `gcLathe` build every round wall as a lathe: towers bellied .09-.15 (each its own), the keep .06, the
+hall .04. `gcFrame` now runs its ribs ALONG that profile (tubes, not boxes) and sets its hoops and straps on it. And `gcBoulders` heaps
+round boulders of his sandstone at every foot (7 per tower, 16 round the hall), as the home sits on its rocks. Windows, the door (moved out
+.5 m with its arch -- the belly had swallowed it), the wheels, the shelves and the banners all sit on the bellied surface now.
 ## THE SKY CASTLE, style pass 4: the home's crane, bunting and flags (m1789, Worker B)
 The home's signatures. Its CRANE on the hall's roof terrace (a timber mast with iron hoops, a braced boom reaching 17 m out over the lawns
 at the back-left, a stay, a chain down to a banded BRONZE ORB, his ragged chevron banner hanging under it); BUNTING -- a sagging rope from
