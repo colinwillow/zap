@@ -89,6 +89,14 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## The fishing dock is back as it was (Worker B)
+His (after m1755): "were there fishing docks here? it looks like there's just floating stairs... put the docks back -- something is
+missing. You can ignore the thing I said about a continuous stream; we just want it to look good first and foremost." The dock block is
+the pre-m1751 code again, verbatim (full length, the deck .62 over the water, posts and braces all the way, the T-head and its canopy,
+the canoe off its end) -- m1751 shortened it, m1752/53 raised it on stepped approaches, which read as stairs floating over the beach.
+The mill keeps its arch-channel (he liked the wheel in the stream). And the mound's front/back flights now carry on down past the pad's
+edge to the real ground (`gl`), with their own ramp, where the x1.4 pad edge is out over the slope. THE RULE GOING FORWARD: looks first;
+a boat lane is not a constraint.
 ## Red Hollows: posts to the ground, the bank's wet edge, painted bushes, a cinematic start (m1755, Worker B)
 His (m1751 phone shots): "floating things... parts of the house deck are floating -- they need to extend down into the ground"; "where the
 water meets the beach there needs to be... foam or the sand needs to discolour, more of a transition"; "green bushes... just green, really

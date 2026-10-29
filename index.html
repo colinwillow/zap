@@ -69001,7 +69001,11 @@ function ghomeBuild(at, yaw, y0) {
   // ---- the STEPS up the mound: timber treads, .30 risers, a walkable ramp under them; front (to the shop) and back (to the round door) ----
   const steps = (sg) => { const n = Math.ceil(P / A.rise), r = P / n, w = 1.7, z0 = sg * A.rz * .985, run = .38;
     for (let i = 0; i < n; i++) { const za = z0 + sg * (n - 1 - i) * run, zb = za + sg * run; vbox(-w, w, 0, (i + 1) * r, Math.min(za, zb), Math.max(za, zb), woodP); }
-    const zf = z0 + sg * n * run; quad([-w, .06, zf], [w, .06, zf], [w, P + .04, z0], [-w, P + .04, z0]); };
+    const zf = z0 + sg * n * run; quad([-w, .06, zf], [w, .06, zf], [w, P + .04, z0], [-w, P + .04, z0]);
+    // m1756 (his: "floating stairs"): at x1.4 the pad's edge is out over the bank's slope, so the flight ended in the air -- it carries on
+    // down, tread by tread, until it meets the ground (`gl`, local), with its own walk ramp
+    const gl = z => (rwHeight(Wx(0, z), Wz(0, z)) - y0) / hk; let zc = zf, y = 0, k = 0; while (k < 14 && gl(zc + sg * run / 2) < y - r * .6) { y -= r; vbox(-w, w, gl(zc + sg * run / 2) - .3, y, Math.min(zc, zc + sg * run), Math.max(zc, zc + sg * run), woodP); zc += sg * run; k++; }
+    if (k) quad([-w, y + .06, zc], [w, y + .06, zc], [w, .06, zf], [-w, .06, zf]); };
   steps(1); steps(-1);
   // ---- a ROUND SHELL: a wall ring (outer + inner faces, the gaps cut for doors and the shop front) and a dome on it; solid by RUNS ----
   const TAU = Math.PI * 2;
@@ -69363,28 +69367,21 @@ function ghomeBuild(at, yaw, y0) {
   // ---- PASS 19 (his ask): a FISHING PIER straight out from the shop steps into the stream -- plank deck on posts down to the bed, following
   // the bank down until it clears the water, then level; a rail on one side, a T-head with lantern posts, a stool, a bait barrel, rope coils
   // and a rod leaning out; and his ALIEN CANOE moored alongside (`GHOME.canoe`: it bobs on the waves) ----
-  // m1752 (his: "you can have things cross the river like the dock -- just make bridges or make them go up in the air so a canoe could go
-  // under them"): the jetty is its full length again and RAISED -- `dY` is 3.1 m (world) over the water, the deck climbs to it from the bank
-  // in .35 m steps (`deckY`), the T-head is at that height too with a LADDER down to the canoe moored at its end, and no post stands in the
-  // boat lane (`rv`, the signed distance from the river's centre line, -1..3.2 m) -- the deck spans it on two stringers
-  { const gH = (x, z) => (rwHeight(Wx(x, z), Wz(x, z)) - y0) / hk, wY = -y0 / hk, z0 = 8.6, hw = 1.1, NC = { noCam: 1 }, rv0 = Math.sign(Wx(0, z0) - hwRc(Wz(0, z0))) || -1, rv = (x, z) => (Wx(x, z) - hwRc(Wz(x, z))) * rv0;
-    const z1 = 13.0, dY = wY + 2.3, hs = Math.max(wY + .62, gH(0, z0) + .06), deckY = z => Math.max(gH(0, z) + .06, Math.min(dY, hs + Math.floor((z - z0) / .25 + 1e-6) * .25)), lane = (x, z) => { const v = rv(x, z); return v > -1 && v < 3.2; };
-    const rnd2 = rwRng(1921); let zz = z0, pi = 0; while (zz < z1) { const za = zz, zb = Math.min(z1, zz + .25), yd = deckY(za), jy = (rnd2() - .5) * .025;     // pass 21: weathered -- mixed timber, each a little off, one gone
+  { const gH = (x, z) => (rwHeight(Wx(x, z), Wz(x, z)) - y0) / hk, wY = -y0 / hk, dY = wY + .62, z0 = 8.6, z1 = 13.0, hw = 1.1, NC = { noCam: 1 };
+    const rnd2 = rwRng(1921); let zz = z0, pi = 0; while (zz < z1) { const za = zz, zb = Math.min(z1, zz + .34), yd = Math.max(dY, gH(0, (za + zb) / 2) + .06), jy = (rnd2() - .5) * .025;     // pass 21: weathered -- mixed timber, each a little off, one gone
       if (pi++ !== 7) put(new THREE.BoxGeometry(hw * 2 - rnd2() * .12, .09, zb - za - .03), rnd2() < .25 ? wood : woodP, at4((rnd2() - .5) * .08, yd - .045 + jy, (za + zb) / 2, (rnd2() - .5) * .04, 0, (rnd2() - .5) * .03));
-      quad([-hw, yd + .01, za], [hw, yd + .01, za], [hw, yd + .01, zb], [-hw, yd + .01, zb]); if (yd > deckY(za - .01) + .01) box(-hw, hw, deckY(za - .01), yd, za - .02, za + .02, NC); zz = zb; }
-    for (const x of [-hw + .1, hw - .1]) vbox(x - .09, x + .09, dY - .32, dY - .09, z0 + 1.6, z1, wood, 0);
+      quad([-hw, yd + .01, za], [hw, yd + .01, za], [hw, yd + .01, zb], [-hw, yd + .01, zb]); zz = zb; }
     // the T-head
     const tz0 = z1 - .2, tz1 = z1 + 2.6, tx = 3.6; for (let x = -tx; x < tx - .01; x += .34) { vbox(x + .015, x + .325, dY - .09, dY, tz0, tz1, woodP, 0); } quad([-tx, dY + .01, tz0], [tx, dY + .01, tz0], [tx, dY + .01, tz1], [-tx, dY + .01, tz1]);
     for (const x of [-tx, tx]) vbox(x - .06, x + .06, dY - .32, dY - .09, tz0, tz1, wood, 0); for (const z of [tz0, tz1]) vbox(-tx, tx, dY - .32, dY - .09, z - .06, z + .06, wood, 0);
     // posts (to the bed), an iron band at the waterline; a rail down the left
     const post = (x, z, top) => { const yb = Math.min(gH(x, z), wY) - 1.4; vbox(x - .11, x + .11, yb, top, z - .11, z + .11, wood, 0); vbox(x - .14, x + .14, wY - .05, wY + .12, z - .14, z + .14, iron, 0); };
-    for (let z = z0 + .8; z < z1; z += 1.7) { const yd = deckY(z); for (const x of [-hw, hw]) if (!lane(x, z)) post(x, z, yd - .09); }
-    for (const [x, z] of [[-tx, tz0], [tx, tz0], [-tx, tz1], [tx, tz1], [0, tz1]]) if (!lane(x, z)) post(x, z, dY - .09);
-    for (let z = z0 + .8; z < z1 + .1; z += 1.7) { const yd = deckY(z); vbox(-hw - .06, -hw + .06, yd, yd + 1.0, z - .06, z + .06, wood, 0); }
-    { let zp = z0 + .8, yp = deckY(zp) + .95; for (let z = zp + 1.7; z < z1 + .1; z += 1.7) { const y = deckY(z) + .95, d = new THREE.Vector3(0, y - yp, z - zp), L = d.length();
+    for (let z = z0 + .8; z < z1; z += 1.7) { const yd = Math.max(dY, gH(0, z) + .06); for (const x of [-hw, hw]) post(x, z, yd - .09); }
+    for (const [x, z] of [[-tx, tz0], [tx, tz0], [-tx, tz1], [tx, tz1], [0, tz1]]) post(x, z, dY - .09);
+    for (let z = z0 + .8; z < z1 + .1; z += 1.7) { const yd = Math.max(dY, gH(0, z) + .06); vbox(-hw - .06, -hw + .06, yd, yd + 1.0, z - .06, z + .06, wood, 0); }
+    { let zp = z0 + .8, yp = Math.max(dY, gH(0, zp) + .06) + .95; for (let z = zp + 1.7; z < z1 + .1; z += 1.7) { const y = Math.max(dY, gH(0, z) + .06) + .95, d = new THREE.Vector3(0, y - yp, z - zp), L = d.length();
         put(new THREE.BoxGeometry(.08, L, .08), wood, _m4.compose(new THREE.Vector3(-hw, (y + yp) / 2, (z + zp) / 2), _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()), _one)); zp = z; yp = y; } }
-    for (let z = z0 + .5; z < z1; z += .5) box(-hw - .1, -hw + .1, deckY(z), deckY(z) + 1.0, z, Math.min(z1, z + .5), NC);
-    for (let y = wY + .1; y < dY - .1; y += .3) vbox(tx + .02, tx + .1, y - .03, y + .03, tz0 + .9, tz0 + 1.7, iron, 0); for (const z of [tz0 + .9, tz0 + 1.7]) vbox(tx + .02, tx + .12, wY - .2, dY + .9, z - .05, z + .05, wood, 0);
+    box(-hw - .1, -hw + .1, dY, dY + 1.0, z0 + .5, z1, NC);
     // lantern posts on the T-head's corners, a stool, the bait barrel, rope coils, the rod and its line and float
     const lamp = (x, z) => { vbox(x - .08, x + .08, dY, dY + 2.1, z - .08, z + .08, wood, 1, NC); vbox(x - .08, x + .5, dY + 2.0, dY + 2.1, z - .05, z + .05, wood, 0);
       put(new THREE.CylinderGeometry(.012, .012, .3, 4), iron, at4(x + .42, dY + 1.85, z)); put(new THREE.ConeGeometry(.14, .12, 6), bronzeT, at4(x + .42, dY + 1.68, z)); put(new THREE.CylinderGeometry(.09, .09, .22, 6), glowM, at4(x + .42, dY + 1.5, z)); put(new THREE.CylinderGeometry(.11, .08, .04, 6), bronzeT, at4(x + .42, dY + 1.37, z)); };
@@ -69398,7 +69395,7 @@ function ghomeBuild(at, yaw, y0) {
     // into the water, a fish DRYING RACK with a catch hung on it and a crate of fish, a BELL on a post at the pier's foot (it rings: `bellPts`),
     // and a FISH that jumps now and then off the T-head (`GHOME.fish`, stepped in `ghomeFish`) ----
     { const fishM = new THREE.MeshStandardMaterial({ color: 0x9fb3bd, metalness: .55, roughness: .3 });
-      for (let z = z0 + .8; z < z1; z += 1.7) { const yd = deckY(z) - .12, yb = Math.max(wY - .1, gH(0, z) - .1); if (yd - yb < .35 || lane(0, z)) continue;
+      for (let z = z0 + .8; z < z1; z += 1.7) { const yd = Math.max(dY, gH(0, z) + .06) - .12, yb = Math.max(wY - .1, gH(0, z) - .1); if (yd - yb < .35) continue;
         for (const sd of [-1, 1]) { const a = [-hw * sd, yd, z + .08], b = [hw * sd, yb, z + .08], d = new THREE.Vector3(b[0] - a[0], b[1] - a[1], 0), L = d.length(); put(new THREE.BoxGeometry(.08, L, .06), wood, _m4.compose(new THREE.Vector3(0, (a[1] + b[1]) / 2, z + .08), _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()), _one)); } }
       for (const sd of [-1, 1]) { const a = [sd * tx, dY - .15, tz0 + .1], b = [sd * tx, wY - .1, tz1 - .1], d = new THREE.Vector3(0, b[1] - a[1], b[2] - a[2]), L = d.length(); put(new THREE.BoxGeometry(.06, L, .08), wood, _m4.compose(new THREE.Vector3(sd * tx, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2), _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()), _one)); }
       for (const [x, z] of [[-1.6, tz1 - .12], [1.6, tz1 - .12], [tx - .12, tz0 + .6], [-tx + .12, tz0 + .6]]) { put(new THREE.CylinderGeometry(.11, .13, .32, 10), iron, at4(x, dY + .16, z)); put(new THREE.CylinderGeometry(.17, .17, .05, 10), iron, at4(x, dY + .34, z)); }
@@ -69420,14 +69417,14 @@ function ghomeBuild(at, yaw, y0) {
     { const cx0 = -tx + .2, cx1 = .6, cz0 = tz0 + .05, cz1 = tz1 - .35, yt = dY + 2.35, yl = dY + 2.0; for (const [x, z] of [[cx0, cz0], [cx1, cz0], [cx0, cz1], [cx1, cz1]]) vbox(x - .07, x + .07, dY, (z === cz0 ? yt : yl) + .05, z - .07, z + .07, wood, 1, NC);
       awning([cx0 - .15, yt, cz0 - .1], [cx1 + .15, yt, cz0 - .1], [cx1 + .2, yl, cz1 + .25], [cx0 - .2, yl, cz1 + .25], clothM('awning'), .14);
       for (const z of [cz0, cz1]) vbox(cx0 - .1, cx1 + .1, (z === cz0 ? yt : yl) - .06, (z === cz0 ? yt : yl) + .04, z - .05, z + .05, wood, 0); }
-    { const za = z0 + 2.5, zb = z0 + 4.2, ytop = deckY((za + zb) / 2) + .95, NU = 9, NV = 6, xo = -hw - .08;
+    { const za = z0 + 2.5, zb = z0 + 4.2, ytop = Math.max(dY, gH(0, (za + zb) / 2) + .06) + .95, NU = 9, NV = 6, xo = -hw - .08;
       const at = (u, v) => [xo - .05 - .12 * Math.sin(Math.PI * v) - .04 * Math.sin(u * 11), ytop - v * .85 - .12 * Math.sin(Math.PI * u) * v, za + (zb - za) * u];
       const cord = (a, b) => { const d = new THREE.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]), L = d.length(); put(new THREE.CylinderGeometry(.007, .007, L, 3), wood, _m4.compose(new THREE.Vector3((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2), _q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()), _one)); };
       for (let i = 0; i <= NU; i++) for (let j = 0; j < NV; j++) cord(at(i / NU, j / NV), at(i / NU, (j + 1) / NV)); for (let j = 0; j <= NV; j++) for (let i = 0; i < NU; i++) cord(at(i / NU, j / NV), at((i + 1) / NU, j / NV));
       for (let i = 0; i <= NU; i += 3) { const p0 = at(i / NU, 0); put(new THREE.SphereGeometry(.05, 6, 4), redW, at4(p0[0], p0[1], p0[2], 0, 0, 0, 1.4, 1, 1)); } }
     // the CANOE: his alien skiff -- a long bowl of a hull with an upswept prow and stern, brass gunwales, swept fins at its waist and a tail
     // fin (it looks as if it flies), lavender runes along its flank and two glowing hover discs under it. Its own group: it rides the water
-    { const cg = new THREE.Group(), cx = tx + 2.6, cz = tz0 + 1.3; cg.position.set(cx, wY, cz); cg.rotation.y = Math.PI / 2; g.add(cg);     // alongside the T-head, along the current
+    { const cg = new THREE.Group(), cx = -.4, cz = tz1 + 1.55; cg.position.set(cx, wY, cz); cg.rotation.y = Math.PI / 2; g.add(cg);     // alongside the T-head, along the current
       const hullM = new THREE.MeshStandardMaterial({ color: 0x3f6f78, roughness: .45, metalness: .3, side: THREE.DoubleSide }), innerM = new THREE.MeshStandardMaterial({ color: 0x6a4a34, roughness: .9 }), runeM = new THREE.MeshStandardMaterial({ color: 0xc9b6ff, emissive: 0x8a6aff, emissiveIntensity: 1.6, toneMapped: false }), deckM = new THREE.MeshStandardMaterial({ color: 0x6a4a34, roughness: .9, side: THREE.BackSide });
       const CB = new Map(), cadd = (geo, m) => { geo = geo.index ? geo.toNonIndexed() : geo; geo.deleteAttribute('uv'); if (!geo.attributes.normal) geo.computeVertexNormals(); if (!CB.has(m)) CB.set(m, []); CB.get(m).push(geo); };     // merged per material: five draws for the whole boat
       const L = 2.7, W = .62, D = .42, sw = z => .55 * Math.pow(Math.abs(z / L), 3.2), up = gg => { const q = gg.attributes.position; for (let i = 0; i < q.count; i++) q.setY(i, q.getY(i) + sw(q.getZ(i))); gg.computeVertexNormals(); return gg; };
