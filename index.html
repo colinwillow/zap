@@ -182,7 +182,7 @@ canvas { display: block; width: 100%; height: 100%; touch-action: none; }
 #splash .kjtap { position: absolute; left: 0; right: 0; margin: 0 auto; width: max-content; bottom: calc(7% + env(safe-area-inset-bottom)); padding: 12px calc(30px - .12em) 12px 30px;     /* m1319: centred by margin, not transform -- the pulse's own transform was overwriting translateX(-50%) and pushing it right */
   border-radius: 999px;
   font: 700 18px var(--disp), sans-serif; letter-spacing: .16em; color: #e6fbff; background: rgba(9,12,20,.62); border: 1.5px solid hsl(196 100% 72%); animation: splashPulse 1.6s ease-in-out infinite; pointer-events: none;
-  /* m15xx (his: "the start button needs to look more like the reticle -- subtle, stylized"): the reticle's portal -- a thin azure line, a dark
+  /* m1729 (his: "the start button needs to look more like the reticle -- subtle, stylized"): the reticle's portal -- a thin azure line, a dark
      gap, a second fainter ring outside it, and the neon drawn as a wide faint copy (box-shadow spreads, never a filter) */
   box-shadow: 0 0 0 4px rgba(9,12,20,.55), 0 0 0 5px hsl(196 100% 70% / .45), 0 0 0 11px hsl(196 100% 62% / .10), 0 0 18px 3px hsl(196 100% 60% / .28); text-shadow: 0 0 8px hsl(196 100% 70% / .7); }
 #splash .glow { position: absolute; border-radius: 999px; pointer-events: none; box-shadow: 0 0 0 2px #ffffffaa, 0 0 26px 6px #8fe8ffaa;
@@ -14374,11 +14374,11 @@ function archerBow(d) {
 // over whatever his legs are doing; letting go LOOSES: `bow_recoil`, and an arrow from the nock to the reticle's point -- a lob solved to land
 // there, faster and flatter the longer it was drawn (`full` s to full power). His arrows are `mine`: they hit the bowmen, the spiders (a hit takes
 // a leg on the way to the burst), chip statues, smash what `bldHit` breaks, and stick in walls and the ground.
-const BOW = { full: 1.1, drawRate: 1.5, v0: 22, v1: 72, g0: .55, g1: .05, dmg0: 1, dmg1: 3, pow0: .12, pow1: 1.2, keep: .3, limbK: .78, blastR: 2.6, blastDmg: 4, fireDmg: 1, stat: { shots: 0, hits: 0, blasts: 0, fires: 0 } };     // m15xx: the charge is the shot -- a tap lobs slow, a full draw flies fast and almost true; only a FULL draw knocks back
+const BOW = { full: 1.1, drawRate: 1.5, v0: 22, v1: 72, g0: .55, g1: .05, dmg0: 1, dmg1: 3, pow0: .12, pow1: 1.2, keep: .3, limbK: .78, blastR: 2.6, blastDmg: 4, fireDmg: 1, stat: { shots: 0, hits: 0, blasts: 0, fires: 0 } };     // m1729: the charge is the shot -- a tap lobs slow, a full draw flies fast and almost true; only a FULL draw knocks back
 const _bwL = new THREE.Vector3(), _bwR = new THREE.Vector3(), _bwA = new THREE.Vector3(), _bwB = new THREE.Vector3(), _bwM = new THREE.Vector3(), _bwD = new THREE.Vector3();
 function bowDraw() { const p = player; p.bowT = 0; const n = 'bow_draw', r = BOW.drawRate; if (rig.actions[n + UPS]) { playOnce(n + UPS, r); playOnce(n + UP, r); }
   snd('swoosh', { g: .25, r: .55 }); }
-// m15xx (his: "the arrows shoot with an arc and they're kind of slow, not fun; a regular arrow should just do the hit -- the guy takes a punch, maybe
+// m1729 (his: "the arrows shoot with an arc and they're kind of slow, not fun; a regular arrow should just do the hit -- the guy takes a punch, maybe
 // three arrows -- not fly back; the more you charge, the faster and stronger it flies, a full charge really true, and maybe it sends them back
 // or explodes; and the types: regular, fire, ballistic / exploding"). The DRAW is the charge (`full` s): speed v0 -> v1, gravity g0 -> g1 (a
 // full draw barely drops), damage dmg0 -> dmg1, and the blow's power stays a flinch (`pow0`, under every body's `fling`) until the draw is FULL
@@ -14399,7 +14399,7 @@ function arrowBlast(P, dirH) { BOW.stat.blasts++; const R = BOW.blastR;
   snd('boom', { g: .6, r: 1.2 + Math.random() * .1, x: P.x, z: P.z }); camShake(.18);
   BLOW_SRC = 'rocket'; dummyHit(P.x, P.z, dirH, 1.3, R, BOW.blastDmg, WEAP.palBlast); BLOW_SRC = '';
   if (SPIDER.list.length) spiderArea(P.x, P.y, P.z, R, 1.2, BOW.blastDmg); if (ARENA.debris.length) debrisArea(P.x, P.y, P.z, R); bldHit(P.x, P.y, P.z, R * .6, 3); if (CWALL.list.length) wallHit(P.x, P.y, P.z, 1, 2, 'blast', dirH); }
-// m15xx (his: "versions of the weapons -- the katana, maybe a flaming katana, maybe green flame"): JIN FIRE on the blade (the left sub-menu while the
+// m1729 (his: "versions of the weapons -- the katana, maybe a flaming katana, maybe green flame"): JIN FIRE on the blade (the left sub-menu while the
 // sword is out). Green flame (`gfire`) licks along the edge from the guard to the tip (`muzzleWorld`, the far end of the blade along its mount),
 // thicker while it swings; every man the blade catches is set BURNING (`burnStart`) and the spiders take a gout of it.
 const BFIRE = { on: 0, rate: 110, swing: 2.5, k: .5 };
@@ -20350,7 +20350,7 @@ function buildArcRow(el, items, mid, onPick, G) {
     // one thing that must never happen here is a tap that also reaches the pad behind it.
     path.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); onPick(i); });
     svg.appendChild(path);
-    if (G.deco) { const dg = svg._deco || (svg._deco = document.createElementNS(SVGNS, 'g')); dg.setAttribute('class', 'deco');     // m15xx: the reticle's drawn neon -- a wide faint copy of the outline, and an inner hairline
+    if (G.deco) { const dg = svg._deco || (svg._deco = document.createElementNS(SVGNS, 'g')); dg.setAttribute('class', 'deco');     // m1729: the reticle's drawn neon -- a wide faint copy of the outline, and an inner hairline
       const gp = document.createElementNS(SVGNS, 'path'); gp.setAttribute('d', d); gp.setAttribute('class', 'g'); dg.appendChild(gp);
       const a0 = lo + 2, a1 = hi - 2, q0 = R0 + 4, q1 = R1 - 4, di = 'M' + px(q1, a0) + ' ' + py(q1, a0) + 'A' + q1 + ' ' + q1 + ' 0 0 0 ' + px(q1, a1) + ' ' + py(q1, a1) + 'M' + px(q0, a1) + ' ' + py(q0, a1) + 'A' + q0 + ' ' + q0 + ' 0 0 1 ' + px(q0, a0) + ' ' + py(q0, a0);
       const ip = document.createElementNS(SVGNS, 'path'); ip.setAttribute('d', di); ip.setAttribute('class', 'in'); dg.appendChild(ip); }
@@ -20385,7 +20385,7 @@ try { AIM3.on = localStorage.getItem('mel.aim3b') === '1' ? 1 : 0; } catch (e) {
 const aimRow = (() => { const d = document.createElement('div'); d.id = 'aimRow'; d.setAttribute('aria-hidden', 'true'); document.body.appendChild(d); return d; })();
 const AIMROW = { mid: MODES.mid, r0: MODES.r1 + 6, r1: MODES.r1 + 40, span: 44 };
 document.body.classList.toggle('kit3', !!KIT3.on);
-const QD = { on: 1, proj: 'bow', arrow: 'normal', r0: 86, r1: 124, span: 96, gap: 7, deco: 1, top: { r0: 131, r1: 158, span: 40, gap: 0, deco: 1 }, sub: { r0: 86, r1: 124, span: 96, gap: 6, deco: 1 }, sub2: { r0: 131, r1: 146, span: 64, gap: 6, deco: 1 } };     // m15xx: up off the stick, a little air between segments
+const QD = { on: 1, proj: 'bow', arrow: 'normal', r0: 86, r1: 124, span: 96, gap: 7, deco: 1, top: { r0: 131, r1: 158, span: 40, gap: 0, deco: 1 }, sub: { r0: 86, r1: 124, span: 96, gap: 6, deco: 1 }, sub2: { r0: 131, r1: 146, span: 64, gap: 6, deco: 1 } };     // m1729: up off the stick, a little air between segments
 try { const v = localStorage.getItem('mel.qd'); if (v === '0') QD.on = 0; const ak = localStorage.getItem('mel.qdArrow'); if (ak === 'fire' || ak === 'blast' || ak === 'normal') QD.arrow = ak; const pj = localStorage.getItem('mel.qdProj'); if (pj === 'bow' || pj === 'launcher') QD.proj = pj; } catch (e) {}
 const qdRow = (() => { const d = document.createElement('div'); d.id = 'qdRow'; d.setAttribute('aria-hidden', 'true'); document.body.appendChild(d); return d; })();
 const qdSub2 = (() => { const d = document.createElement('div'); d.id = 'qdSub2'; d.setAttribute('aria-hidden', 'true'); document.body.appendChild(d); return d; })();
@@ -31389,7 +31389,7 @@ function stepKit(dt) {
   if (s.aim && !noTrig) {
     // THE SAME GATE THE HAMMER USES -- see `padUp`. Two copies of this is two places for
     // the trigger and the wind-up to start disagreeing about what a push up is.
-    if (s.bow && p.aim ? (stick.R.down && Math.hypot(stick.R.x, stick.R.y) > BOW.keep) : padUp(p.aim)) {     // m15xx: a drawn bow stays drawn while the thumb steers the lens -- the arc test loosed (and re-drew) it on every turn
+    if (s.bow && p.aim ? (stick.R.down && Math.hypot(stick.R.x, stick.R.y) > BOW.keep) : padUp(p.aim)) {     // m1729: a drawn bow stays drawn while the thumb steers the lens -- the arc test loosed (and re-drew) it on every turn
       p.armT += dt;
       if (p.armT >= WEAP.armT && !p.aim) {
           // **ONE SOUND FOR ONE EVENT.** `chargeStart` already spins up the synth hum -- the
@@ -44639,7 +44639,7 @@ function strikeSweep(dt, power, live, dmg, body) {
           const bh = MELEE.limbDir ? Math.atan2(_sw.x - q.x, _sw.z - q.z)
                                    : (p.melH != null ? p.melH : p.faceH);
           dummyBlow(d, bh, power, dmg);
-          if (bladeFire()) burnStart(d);     // m15xx: JIN FIRE sets him alight
+          if (bladeFire()) burnStart(d);     // m1729: JIN FIRE sets him alight
           // **AND IT IS DRAWN WHERE THE LIMB REACHED HIM (m94).** `segBody` left the point in
           // `_hitP` on the line above, so this is the collider's own answer rather than a second
           // guess at it -- a blow and the mark it leaves cannot disagree about where they were.
@@ -47991,7 +47991,7 @@ function formStep() {
   if (on !== form.rowOn) { form.rowOn = on; paintArcRow(form.row, on, form.open ? 0 : -1); if (!on) formClose(); }
 }
 // a third ring, one segment, straight up -- see the block above for the geometry
-const FORMROW = { mid: 90, r0: 156, r1: 184, span: 30 };     // m15xx: up a ring, over the quick-draw sub-menu's outer row
+const FORMROW = { mid: 90, r0: 156, r1: 184, span: 30 };     // m1729: up a ring, over the quick-draw sub-menu's outer row
 
 // ============================================================================================
 // JUICE (m284, ROADMAP A7b) -- a disguise is a resource, not a costume

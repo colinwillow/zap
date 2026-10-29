@@ -120,7 +120,7 @@ in there so I can transform it between the two states"; "these rocks are kind of
 - **THE HYBRID:** the sky islands over the rim (m1113) showed in FALLEN. KORAJIN: the floating world is what restoration raises -> hidden
   while fallen. (The refinery already sits on the flank when fallen.)
 Next: the painted textures (rock, sand, cliff), his ask in the same message.
-## m15xx -- THE BOW CHARGES, ARROW TYPES, THE JIN FIRE BLADE, AND THE RINGS LIFTED (his weapons pass)
+## m1729 -- THE BOW CHARGES, ARROW TYPES, THE JIN FIRE BLADE, AND THE RINGS LIFTED (his weapons pass)
 - **The draw re-pulled while he moved (his: "I'd push up to start the shot, then move around and turn, and he'd re-pull back his bow"):**
   - Turning the lens is the right thumb going SIDEWAYS, and `padUp`'s `arc` test (thumb within the up cone) called that a release. The
     arrow fired (weak) and the next frame re-armed the draw.
