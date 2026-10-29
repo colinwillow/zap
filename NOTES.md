@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THINGS THAT FLOAT, FLOAT: the sky islands, the refinery's stepping stones, its island -- and you ride them (Worker B)
+His (m1704): "if they're gonna be floating they need some wiggle to them". `bobPatch(mat, amp, speed)` lifts every vertex whose `aBob`
+attribute is set (its PHASE, >= 1) by sin(t * speed + phase * 2.3) * amp in the vertex shader, so a merged bucket of many floating things
+stays ONE draw and each rides its own swell; `HWBOB.t` is the clock (homeStep), `hwBobY` the same number in JS.
+- The sky islands over the rim (restored only): each island (cone, grass top, waterfall) its own phase, 1.4 m, a ~20 s swell.
+- The refinery's 14 stepping stones from the lookout: each its own phase, .28 m, ~7 s (`GJINRA.bob` / `bobS`); their COLLIDERS move the
+  same way every frame, and standing on one carries him.
+- The refinery's island already hovered .28 m (the RESTORE kit) while its colliders stood still -- his feet sank into it and floated
+  off it by turns. Its boxes now follow the hover, and carry him too.
+Sim (shipped frame, restored, standing still on stone 8 for 6 s): his y tracked the stone's top to the centimetre through a whole swell
+(113.79 -> 113.31 -> 113.82), grounded throughout. Render: no shader errors (the shared rock/grass materials take `aBob` = 0 off the stones).
 ## the CAVES, pass 2: each its own (Worker B)
 His "Go!" on the plan (his three-pass rule). `K.i` / `K.kind` per cave:
   0 z-30 W  POOL     a glowing mint pool (3.1 m) ringed with stones, drips falling from the vault into it
