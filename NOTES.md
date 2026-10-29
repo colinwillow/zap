@@ -293,6 +293,15 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## THE SKY CASTLE, style pass 1: it takes the HOME's materials and frame (Worker B)
+His (after six passes, with Grumbo's home, its sheet and the key art beside it): "good start, but it needs a ton more passes to look like
+it belongs in our game". The castle was generic grey stone blocks. Now `gcMat`: ONE shared set of the home's own materials -- his pocked
+cream SANDSTONE with the purple spots (`triMat('sandstone')`), dark TIMBER and PLANKS, BRONZE, iron, gold, and the home's ragged painted
+CLOTH (`ghClothTex` banner and awning, alpha-cut). `gcFrame`: the home's timber frame on every round body -- ribs standing proud of the wall
+with iron straps, timber hoops with iron studs (the keep 8 ribs/3 hoops, the hall 16/2, each tower 6/2). `gcWheel`: the home's bronze
+ship's-wheel ornament over the hall door and on three towers. Banners are his chevron cloth. The long keep-to-tower sails read as
+ribbons: gone; instead six home-style AWNINGS slope off the hall on timber posts with a front beam (the door's widest), his awning cloth.
+The plaza paving warmer. The put helpers drop uvs for the triplanar maps (`m.userData.tri`), as the home's do.
 ## THE SKY CASTLE, pass 6 of 6: banners, sails, bonsai, bridges (m1785, Worker B)
 His sheet's FRONT and BRIDGE DETAIL. His red diamond BANNERS on four towers' outer faces (rippled); SAIL AWNINGS -- cream and red cloth,
 sagging, from the keep's balcony out to six towers; BONSAI TREES on the lawns (a crooked tube trunk, four layered pads of painted leaves;
