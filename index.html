@@ -14081,8 +14081,15 @@ function statueCam() { const Z = STATUE, K = Z.cine, p = player; if (!K) return;
 // the nearest to the blow, baked from the skin where it is (`limbBake`) and flung; that bone shrinks away, the gait goes on without it, and
 // the body sags to the missing side and slows. A full katana charge takes a leg every time. At `minLegs` left, or no hp, it BURSTS:
 // every piece (body, head, abdomen, the legs left) lifted out of the skin and thrown, in the Osari's green blast. SPAWN > OSARI SPIDER.
+// m1736 (his: "explode the spider so we can hard-surface rig it, duplicate the legs so he can have six, chop off half the leg and then the
+// whole leg -- that gives the spiders the right hit points: 6 or 12 hits for a big one; small spiders have four legs, 4 x 2"): THE PIECES ARE
+// THE HIT POINTS. The model is six-legged and hard-surface now (blender-addons/pipeline/spider6_rig.py: the middle pair copied from the
+// front legs' own pieces, every face on one bone, split where bones meet). Each leg is two pieces -- the LOWER (knee to foot) and the UPPER
+// (hip to knee) -- and every blow that lands takes ONE: the lower half of the nearest standing leg (it stops walking on it), or the stump of
+// the nearest cut one. A full charge or a heavy blast takes the whole leg. When no piece is left it BURSTS. Six legs = 12 blows (`halves` 0:
+// 6); a SMALL spider (`small`: x.6, four legs) = 8. They walk on a TRIPOD (front and back of one side with the middle of the other).
 const SPIDER = { file: 'models/creatures/osari_spider.glb', w: 2.6, speed: 2.4, turn: 1.8, near: 2.6, stride: .42, stepT: .24, lift: .28, bob: .05, list: [], P: null,
-  hp: 9, hitR: .48, cutEvery: 2.2, minLegs: 2, guardP: .12, guardT: .5, guardEvery: 3, flash: .9, knock: 5,
+  hp: 9, hitR: .48, cutEvery: 2.2, minLegs: 2, halves: 1, small: { k: .6, legs: 4, n: 2 }, guardP: .12, guardT: .5, guardEvery: 3, flash: .9, knock: 5,
   bite: { r: 3.4, wind: .5, strike: .16, rec: .45, lunge: 1.3, R: 2.3, dmg: 11, push: 6, cool: [1.4, 2.6] },
   pounce: { min: 7, max: 13, crouch: .45, up: 7, dmg: 14, R: 1.9, cool: [4, 7] },
   spit: { min: 5, max: 18, wind: .55, v: 13, dmg: 8, R: 1.1, cool: [2.5, 4.5] }, globs: [], stat: { hits: 0, cuts: 0, kills: 0, bites: 0, spits: 0, pounces: 0, blocks: 0 } };
@@ -14092,36 +14099,42 @@ async function spiderLoad() { if (SPIDER.P) return SPIDER.P; const g = await loa
   const k = SPIDER.w / Math.max(.1, w); return (SPIDER.P = { proto: g.scene, scale: k, h: h * k, tris: null }); }
 // per proto, once: every triangle to its piece by the bone that dominates two of its three vertices
 function spiderTris(M) { const P = SPIDER.P; if (P.tris) return P.tris; const G = M.geometry, bones = M.skeleton.bones, SI = G.attributes.skinIndex, SW = G.attributes.skinWeight, n = G.attributes.position.count;
-  const grp = bones.map(b => { const m = /^leg_(FL|FR|BL|BR)_/.exec(b.name); return m ? m[1] : b.name === 'head' || b.name === 'fangs' ? 'head' : b.name === 'abdomen' ? 'abd' : 'body'; });
+  const grp = bones.map(b => { const m = /^leg_([FMB][LR])_(\w+)/.exec(b.name); return m ? m[1] + (m[2] === '1' ? '_hi' : '_lo') : b.name === 'head' || b.name === 'fangs' ? 'head' : b.name === 'abdomen' ? 'abd' : 'body'; });
   const vg = new Array(n); for (let v = 0; v < n; v++) { let bw = -1, bi = 0; for (let c = 0; c < 4; c++) { const w = SW.getComponent(v, c); if (w > bw) { bw = w; bi = SI.getComponent(v, c); } } vg[v] = grp[bi]; }
   const idx = G.index ? G.index.array : null, tri = (idx ? idx.length : n) / 3, T = {};
   for (let t = 0; t < tri; t++) { const a = idx ? idx[t * 3] : t * 3, b = idx ? idx[t * 3 + 1] : t * 3 + 1, c = idx ? idx[t * 3 + 2] : t * 3 + 2, g = vg[b] === vg[c] ? vg[b] : vg[a]; (T[g] = T[g] || []).push(a, b, c); }
   return (P.tris = T); }
-function spiderSpawn(P, x, z, h, y) { const m = skeletonClone(P.proto); m.scale.setScalar(P.scale); const root = new THREE.Group(); root.add(m);
+function spiderSpawn(P, x, z, h, y, k = 1, nLegs = 6) { const m = skeletonClone(P.proto); m.scale.setScalar(P.scale * k); const root = new THREE.Group(); root.add(m);
       root.position.set(x, y == null ? groundAt(x, z, player.pos.y + 2, 3) : y, z); root.rotation.y = h;
       let mesh = null; const mats = []; m.traverse(o => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; o.material = o.material.clone(); mats.push(o.material); if (o.isSkinnedMesh) mesh = o; } }); scene.add(root); root.updateMatrixWorld(true);
       const bn = {}; m.traverse(o => { if (o.isBone) bn[o.name] = o; }); const rest = []; m.traverse(o => { if (o.isBone) rest.push([o, o.quaternion.clone()]); });
-      const legs = []; for (const L of ['FL', 'FR', 'BL', 'BR']) { const b1 = bn['leg_' + L + '_1'], b2 = bn['leg_' + L + '_2'], b3 = bn['leg_' + L + '_3'], tip = bn['leg_' + L + '_tip']; if (!b1 || !b2 || !b3 || !tip) continue;
+      const six = nLegs >= 6 && bn.leg_ML_1, legs = []; for (const L of ['FL', 'FR', 'ML', 'MR', 'BL', 'BR']) { const b1 = bn['leg_' + L + '_1'], b2 = bn['leg_' + L + '_2'], b3 = bn['leg_' + L + '_3'], tip = bn['leg_' + L + '_tip']; if (!b1 || !b2 || !b3 || !tip) continue;
+        if (L[0] === 'M' && !six) { b1.scale.setScalar(1e-3); continue; }     // a four-legged (small) spider: the middle pair folded away
         const tw = tip.getWorldPosition(new THREE.Vector3()), restL = root.worldToLocal(tw.clone()), len3 = b3.getWorldPosition(new THREE.Vector3()).distanceTo(tw), out = new THREE.Vector3(L[1] === 'L' ? 1 : -1, 0, 0);
-        legs.push({ L, b1, b2, b3, tip, restL, len3, out, front: L[0] === 'F', grp: L === 'FL' || L === 'BR' ? 0 : 1, foot: tw.clone(), from: tw.clone(), to: tw.clone(), t: -1 }); }
-      const S = { root, m, mesh, mats, bn, rest, legs, t: Math.random() * 3, y0: root.position.y, hp: SPIDER.hp, acc: 0, cut: [], st: 'walk', stT: 0, cool: 1 + Math.random() * 2, hitCd: 0, flash: 0, kx: 0, kz: 0, recoil: 0, pitch: 0, lift: 0, vy: 0, air: 0, ax: 0, az: 0, front: 0, dead: 0 }; SPIDER.list.push(S); return S; }
+        legs.push({ L, b1, b2, b3, tip, restL, len3, out, front: L[0] === 'F', grp: six ? (L === 'FL' || L === 'MR' || L === 'BL' ? 0 : 1) : (L === 'FL' || L === 'BR' ? 0 : 1), foot: tw.clone(), from: tw.clone(), to: tw.clone(), t: -1 }); }
+      const S = { root, m, mesh, mats, bn, rest, legs, stumps: [], k, n0: legs.length, t: Math.random() * 3, y0: root.position.y, hp: SPIDER.hp, acc: 0, cut: [], st: 'walk', stT: 0, cool: 1 + Math.random() * 2, hitCd: 0, flash: 0, kx: 0, kz: 0, recoil: 0, pitch: 0, lift: 0, vy: 0, air: 0, ax: 0, az: 0, front: 0, dead: 0 }; SPIDER.list.push(S); return S; }
 async function spiderAdd() { try { const P = await spiderLoad(), p = player;
-    for (let k = 0; k < 2; k++) { const a = Math.atan2(-p.pos.x, -p.pos.z) + (k ? .6 : -.6), x = p.pos.x + Math.sin(a) * 12, z = p.pos.z + Math.cos(a) * 12; spiderSpawn(P, x, z, Math.atan2(p.pos.x - x, p.pos.z - z)); }
+    const sm = SPIDER.small, a0 = Math.atan2(-p.pos.x, -p.pos.z);     // m1736: one big six-legged spider and `small.n` small four-legged ones round it
+    for (let k = 0; k <= sm.n; k++) { const a = a0 + (k ? (k % 2 ? .7 : -.7) * Math.ceil(k / 2) : 0), r = k ? 10 : 13, x = p.pos.x + Math.sin(a) * r, z = p.pos.z + Math.cos(a) * r; spiderSpawn(P, x, z, Math.atan2(p.pos.x - x, p.pos.z - z), null, k ? sm.k : 1, k ? sm.legs : 6); }
     snd('clang', { g: .5, r: .5 }); } catch (e) { console.error('[melee] spider', e); note('SPIDER FAILED ' + e.message); } }
 function spiderClear() { if (STATUE.g) statueClear(); for (const S of SPIDER.list) S.root.removeFromParent(); SPIDER.list.length = 0; for (const G of SPIDER.globs) G.m.removeFromParent(); SPIDER.globs.length = 0; }
-function spiderMid(S, v) { const R = S.root.position; return v.set(R.x, R.y + S.lift + SPIDER.P.h * .5, R.z); }
+function spiderMid(S, v) { const R = S.root.position; return v.set(R.x, R.y + S.lift + SPIDER.P.h * S.k * .5, R.z); }
 // a piece of it, lifted out of the skin as it stands and thrown along `dirH`
 function spiderBake(S, g, dirH, kick) { const T = SPIDER.P.tris && SPIDER.P.tris[g]; if (!T || !S.mesh) return null; for (const m of S.mats) if (m.emissive) m.emissive.setScalar(0);
   return limbBake({ model: S.m, limbMesh: S.mesh }, g, dirH, kick, T); }
-function spiderCut(S, dirH, hx, hz) { const live = S.legs; if (!live.length) return;
-  let best = live[0], bd = 1e9; for (const l of live) { const q = Math.hypot(l.foot.x - hx, l.foot.z - hz); if (q < bd) { bd = q; best = l; } }
-  spiderTris(S.mesh); S.root.updateMatrixWorld(true); spiderBake(S, best.L, dirH, 1.5);
-  best.b1.scale.setScalar(1e-3); S.legs = live.filter(l => l !== best); S.cut.push(best); SPIDER.stat.cuts++;
-  best.b1.getWorldPosition(_sdC); spkBurst(_sdC.x, _sdC.y, _sdC.z, 26, { col: [.5, 1, .55], spread: 5, size: .16, life: .5 }); for (let i = 0; i < 16; i++) gfire(_sdC.x + (Math.random() - .5) * .2, _sdC.y, _sdC.z + (Math.random() - .5) * .2, .8);
+function spiderCut(S, dirH, hx, hz, whole) { const C = [...S.legs, ...S.stumps]; if (!C.length) return;
+  let best = C[0], bd = 1e9; for (const l of C) { const P = S.stumps.includes(l) ? l.b1.getWorldPosition(_sdA) : l.foot, q = Math.hypot(P.x - hx, P.z - hz); if (q < bd) { bd = q; best = l; } }
+  spiderTris(S.mesh); S.root.updateMatrixWorld(true); const stump = S.stumps.includes(best);
+  if (!stump) { spiderBake(S, best.L + '_lo', dirH, 1.5); best.b2.scale.setScalar(1e-3); S.legs = S.legs.filter(l => l !== best); S.cut.push(best); best.b2.getWorldPosition(_sdC);
+    if (whole || !SPIDER.halves) { spiderBake(S, best.L + '_hi', dirH, 2); best.b1.scale.setScalar(1e-3); } else S.stumps.push(best); }
+  else { best.b1.getWorldPosition(_sdC); spiderBake(S, best.L + '_hi', dirH, 2); best.b1.scale.setScalar(1e-3); S.stumps = S.stumps.filter(l => l !== best); }
+  SPIDER.stat.cuts++;
+  spkBurst(_sdC.x, _sdC.y, _sdC.z, 26, { col: [.5, 1, .55], spread: 5, size: .16, life: .5 }); for (let i = 0; i < 16; i++) gfire(_sdC.x + (Math.random() - .5) * .2, _sdC.y, _sdC.z + (Math.random() - .5) * .2, .8);
   snd('clang', { g: .8, r: 1.2, x: _sdC.x, z: _sdC.z }); camShake(.14); }
 function spiderDie(S, dirH) { if (S.dead) return; S.dead = 1; spiderTris(S.mesh); S.root.updateMatrixWorld(true);
   for (const g of ['body', 'head', 'abd']) spiderBake(S, g, dirH + (Math.random() - .5) * 1.5, g === 'body' ? 1 : 3);
-  for (const l of S.legs) spiderBake(S, l.L, Math.atan2(l.foot.x - S.root.position.x, l.foot.z - S.root.position.z), 2);
+  for (const l of S.legs) { const a = Math.atan2(l.foot.x - S.root.position.x, l.foot.z - S.root.position.z); spiderBake(S, l.L + '_lo', a, 2); spiderBake(S, l.L + '_hi', a, 2.5); }
+  for (const l of S.stumps) spiderBake(S, l.L + '_hi', Math.atan2(l.restL.x, l.restL.z) + S.root.rotation.y, 2.5);
   const P = spiderMid(S, _sdC); killBlast(S.root.position, P.y, 1.25, 1); for (let i = 0; i < 60; i++) { const a = Math.random() * 6.283, r = Math.random() * 1.1; gfire(P.x + Math.cos(a) * r, P.y + (Math.random() - .5) * .5, P.z + Math.sin(a) * r, 1.1); }
   S.root.removeFromParent(); SPIDER.list.splice(SPIDER.list.indexOf(S), 1); SPIDER.stat.kills++; HORDE.stat.kills++; }
 // ONE BLOW on a spider: `dirH` the way it travels, `hx/hz` where it landed (nearest leg comes off). Returns 'block', 1 (landed) or 0.
@@ -14134,18 +14147,17 @@ function spiderBlow(S, dirH, power, dmg, hx, hz) { if (S.dead || S.hitCd > 0) re
   if (S.st !== 'air') { S.st = 'stag'; S.stT = 0; }     // a blow breaks a wind-up
   spkBurst(M.x, M.y, M.z, 18, { col: [.55, 1, .6], spread: 4, size: .14, life: .4 }); spkBurst(M.x, M.y, M.z, 10, { col: [1, 1, .85], spread: 5, size: .1, life: .3 });
   snd('hit', { g: .8, r: .8 + Math.random() * .2, x: M.x, z: M.z }); snd('clang', { g: .25, r: .7, x: M.x, z: M.z });
-  if (S.legs.length <= Z.minLegs && S.cut.length) { spiderDie(S, dirH); return 1; }
-  if (full || S.acc >= Z.cutEvery) { S.acc = 0; spiderCut(S, dirH, hx == null ? M.x : hx, hz == null ? M.z : hz); }
-  if (S.hp <= 0) spiderDie(S, dirH); return 1; }
+  spiderCut(S, dirH, hx == null ? M.x : hx, hz == null ? M.z : hz, full || (power || 0) >= 1.3);     // m1736: every blow takes one piece; a full charge or a heavy blast the whole leg
+  if (!S.legs.length && !S.stumps.length) spiderDie(S, dirH); return 1; }
 // every spider in a ring (slams, the whirl, a rocket): the blow goes outward from the middle
 function spiderArea(x, y, z, r, power, dmg) { let n = 0; for (const S of SPIDER.list.slice()) { const R = S.root.position, dx = R.x - x, dz = R.z - z, q = Math.hypot(dx, dz);
-    if (q < r + SPIDER.w * .4 && Math.abs(R.y - y) < 2.5 && spiderBlow(S, q > 1e-3 ? Math.atan2(dx, dz) : player.faceH, power, dmg, x, z)) n++; } return n; }
+    if (q < r + SPIDER.w * S.k * .4 && Math.abs(R.y - y) < 2.5 && spiderBlow(S, q > 1e-3 ? Math.atan2(dx, dz) : player.faceH, power, dmg, x, z)) n++; } return n; }
 // a limb or a blade sweeping from `a` to `b` (the strike's own sweep)
 function spiderSweep(a, b, rad, power, dmg, dirH) { let n = 0; for (const S of SPIDER.list.slice()) { const R = S.root.position;
-    if (!segBody(a, b, R.x, R.z, SPIDER.w * SPIDER.hitR + rad, R.y + S.lift + SPIDER.P.h, rad, R.y)) continue;     // m1711: to the LEG span (.48 of its width), not the body's .38 -- a cut that met a leg missed, and at 20 fps every one did
+    if (!segBody(a, b, R.x, R.z, SPIDER.w * S.k * SPIDER.hitR + rad, R.y + S.lift + SPIDER.P.h * S.k, rad, R.y)) continue;     // m1711: to the LEG span (.48 of its width), not the body's .38 -- a cut that met a leg missed, and at 20 fps every one did
     const r = spiderBlow(S, dirH, power, dmg, _hitP.x, _hitP.z); if (r && bladeFire()) for (let k = 0; k < 16; k++) gfire(_hitP.x, _hitP.y, _hitP.z, .6); if (r) { n++; if (r === 1) meleeHit(null, _hitP.x, _hitP.y, _hitP.z, .55 + Math.min(1, power) * .75); } } return n; }
 // a bolt in flight: true when a spider stopped it
-function spiderShot(b) { for (const S of SPIDER.list) { const M = spiderMid(S, _sdC); if (Math.hypot(b.pos.x - M.x, (b.pos.y - M.y) * 1.4, b.pos.z - M.z) > SPIDER.w * .42 + b.size * .5) continue;
+function spiderShot(b) { for (const S of SPIDER.list) { const M = spiderMid(S, _sdC); if (Math.hypot(b.pos.x - M.x, (b.pos.y - M.y) * 1.4, b.pos.z - M.z) > SPIDER.w * S.k * .42 + b.size * .5) continue;
     spiderBlow(S, Math.atan2(b.vel.x, b.vel.z), b.rocket ? 1.4 : .6, FOE.dmg.bolt * (b.rocket ? ROCKET.dmgK : 1) * (1 + (b.chg || 0)), b.pos.x, b.pos.z); return true; } return false; }
 function spiderGlob(S) { const p = player, M = spiderMid(S, _sdC), Z = SPIDER.spit, h = S.root.rotation.y; M.x += Math.sin(h) * .7; M.z += Math.cos(h) * .7; M.y += .25;
   const d = Math.hypot(p.pos.x - M.x, p.pos.z - M.z), T = clamp(d / Z.v, .45, 1.4), tx = p.pos.x + p.vel.x * T * .7, tz = p.pos.z + p.vel.z * T * .7, ty = p.pos.y + .9;
@@ -14188,7 +14200,7 @@ function spiderThink(S, d, dt) { const Z = SPIDER, R = S.root, p = player, roll 
 function spiderStep(dt) { const p = player, Z = SPIDER; if (Z.globs.length) spiderGlobStep(dt);
   for (const S of Z.list.slice()) { S.t += dt; S.hitCd -= dt; const R = S.root, dx = p.pos.x - R.position.x, dz = p.pos.z - R.position.z, d = Math.hypot(dx, dz);
     if (S.statue) { S.st = S.pose || 'guard'; S.stT = 9; S.t = 0; S.kx = S.kz = 0; } else spiderThink(S, d, dt); if (S.dead) continue;
-    const st = S.st, busy = st !== 'walk', legK = S.legs.length / 4;
+    const st = S.st, busy = st !== 'walk', legK = S.legs.length / Math.max(1, S.n0);
     const want = Math.atan2(dx, dz); if (!S.statue && (st === 'walk' || st === 'bwind' || st === 'swind' || st === 'crouch' || st === 'guard')) R.rotation.y += clamp(wrapAngle(want - R.rotation.y), -Z.turn * dt, Z.turn * dt);
     const go = st === 'walk' && d > Z.near ? Z.speed * (.35 + .65 * legK) * clamp(1 - Math.abs(wrapAngle(want - R.rotation.y)) / 1.6, .25, 1) : 0, fx = Math.sin(R.rotation.y), fz = Math.cos(R.rotation.y);
     R.position.x += fx * go * dt + S.kx * dt; R.position.z += fz * go * dt + S.kz * dt; const kd = Math.exp(-6 * dt); S.kx *= kd; S.kz *= kd;
@@ -14508,7 +14520,7 @@ function arrowStep(dt) {
     const cx = p.pos.x, cy = p.pos.y + H * .55, cz = p.pos.z, u = clamp(((cx - ox) * sx + (cy - oy) * sy + (cz - oz) * sz) / L2, 0, 1);
     const qx = ox + sx * u - cx, qy = oy + sy * u - cy, qz = oz + sz * u - cz;
     if (A.mine && ARENA.debris.length) { let dh = null; for (const D of ARENA.debris) if (D.die == null && D.m.position.distanceTo(P) < D.r + .3) { dh = D; break; } if (dh) { debrisCut(dh, Math.atan2(A.v.x, A.v.z) + Math.PI / 2); A.m.removeFromParent(); ARROWS.splice(i, 1); continue; } }
-    if (A.mine && SPIDER.list.length) { let sh = null; for (const S of SPIDER.list) { const M = spiderMid(S, _sdC); if (Math.hypot(P.x - M.x, (P.y - M.y) * 1.3, P.z - M.z) < SPIDER.w * SPIDER.hitR) { sh = S; break; } }     // m1719: his arrows find the spiders too
+    if (A.mine && SPIDER.list.length) { let sh = null; for (const S of SPIDER.list) { const M = spiderMid(S, _sdC); if (Math.hypot(P.x - M.x, (P.y - M.y) * 1.3, P.z - M.z) < SPIDER.w * S.k * SPIDER.hitR) { sh = S; break; } }     // m1719: his arrows find the spiders too
       if (sh) { if (A.type === 'blast') arrowBlast(P, Math.atan2(A.v.x, A.v.z)); else { spiderBlow(sh, Math.atan2(A.v.x, A.v.z), A.pow || .7, A.dmg || 3, P.x, P.z); if (A.type === 'fire') for (let k = 0; k < 14; k++) gfire(P.x, P.y, P.z, .7); } if (A.pl) BOW.stat.hits++; A.m.removeFromParent(); ARROWS.splice(i, 1); continue; } }
     if (A.mine && GUARD.list.length) { const gh = guardHit(P.x, P.y, P.z); if (gh) { if (A.type === 'blast') arrowBlast(P, Math.atan2(A.v.x, A.v.z)); else guardBlow(gh, Math.atan2(A.v.x, A.v.z), A.pow || .7, A.dmg || 3, P.x, P.y, P.z); if (A.pl) BOW.stat.hits++; A.m.removeFromParent(); ARROWS.splice(i, 1); continue; } }     // m1732: the guardian
     if (A.mine) { let hit = null; for (const d of DUMMIES) { if (d.st === 'gone' || d.st === 'down' || !d.root.visible) continue; const R = d.root.position, hh = (d.K.h || 1.8);
@@ -21296,7 +21308,7 @@ function mechTargets(dyMax, wide) { const out = [], p = player, DY = dyMax || ME
   if (SIEGE.on) { const S = SIEGE.on; for (const L of S.bals) if (!(L.dead > 0)) put(L, L.x, 0, L.z, .9); if (!(S.dead > 0)) put(S, S.tp[0], 0, S.tp[1], 1.7); }
   if (FSHIP.on && FSHIP.on.cans) for (const C of FSHIP.on.cans) if (!C.dead) { const W = C.g.getWorldPosition(new THREE.Vector3()); put(C, W.x, W.y - .55, W.z, .6); }
   if (RAMP.on && RAMP.on.sen) for (const S of RAMP.on.sen) if (S.st !== 'fall') { const P = S.g.position; put(S, P.x, P.y, P.z, .5); }
-  for (const S of SPIDER.list) if (!S.dead && !S.statue) { const P = S.root.position; put(S, P.x, P.y, P.z, SPIDER.w * .38); }
+  for (const S of SPIDER.list) if (!S.dead && !S.statue) { const P = S.root.position; put(S, P.x, P.y, P.z, SPIDER.w * S.k * .38); }
   for (const G of GUARD.list) if (!G.dead) { const P = G.root.position; put(G, P.x, P.y, P.z, GUARD.P.h * GUARD.r); }     // m1732: the guardian (his statue too: a blow wakes him)     // m1711: the spiders -- a swipe tracks and lunges to them like any man
   // m1260: *"if I'm trying to hit this box and I'm clearly targeted on it, it should lock, and when I let go he should launch and hit it --
   // not launch through it. Whatever he's indicating: a turret, a human, a box, a wall."* For the CHARGE (`wide`): every standing smashable

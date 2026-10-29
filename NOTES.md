@@ -17,6 +17,20 @@ sun/hemi colours follow, then B becomes A and the reflection map is rebuilt); th
 `userData.m0` so the weathering can be undone -- `bldAge` alone could not). Everything else that reads the state per frame (the peak
 fire, the shutters, the lamps, the wheel, the refinery's colliders) follows by itself. `?hs=` is dropped from the address with
 `replaceState` so a reload lands in the state he turned it to. The timings are in `HWAGE`.
+## The spider: hard surface, SIX legs, and the pieces are the hit points (m1736)
+His: "explode the spider model so we can hard-surface rig it, then duplicate the legs so he can have six -- you don't have to regenerate the
+spider -- chop off half the leg and then the whole leg, so it takes 6 or 12 hits to kill a big spider; small spiders have four legs, 4 x 2."
+- `blender-addons/pipeline/spider6_rig.py`: spider_rig.py's skeleton; every FACE to one bone (346 edges split where bones meet); the MIDDLE
+  pair (ML, MR) copied from the front legs' own pieces, turned about the hip to point straight out and moved to x +/-.23, y 0, with their
+  own three bones and tip. Counts: each copy matches its source exactly (785/552/361, 761/550/359). 763 KB (was 635).
+  **`bmesh.ops.duplicate`'s face_map holds BOTH directions**: labelling by it blindly relabelled the source leg too (FL kept 264 of 785
+  faces) -- label only a face that was not in the source set.
+- Game: two pieces per leg (`_hi` = bone 1, `_lo` = bones 2-3, in `spiderTris`); EVERY landed blow takes one -- the lower half of the
+  nearest standing leg (it stops walking: `S.legs` -> `S.stumps`) or the nearest stump. A full charge or a blow of power 1.3+ takes the
+  whole leg. No piece left -> it bursts. `cutEvery` / `minLegs` / hp no longer decide anything.
+- **Tripod gait** for six (FL+MR+BL / FR+ML+BR), diagonals kept for four. SPAWN > OSARI SPIDER: one big six-legged + two SMALL four-legged
+  (`SPIDER.small`: x.6, the middle pair folded away); the hit sizes scale with `S.k`.
+- Headless: tripod measured (100110 / 011001); the big one died on blow 12, a small one on blow 8.
 ## The guardian: long arms, big hands, twice the size; the strategy layer written down (m1735)
 His: "his arms look really short -- longer and bigger, big exaggerated long arms with big hands for throwing boulders... double his size for
 fun"; and the god-tier / vulnerability / bomb / re-attach idea (GUARDIAN.md, HOW YOU BEAT HIM).
