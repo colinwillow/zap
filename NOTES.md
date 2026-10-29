@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## the mill's waterfall reaches the water; the peak trail is a footpath, not a railway; rocks sit on their lowest ground (Worker B)
+His (m1724): "the water just falls and stops above the stream -- it looks weird"; "these lines on the ground... they look like they were
+gonna be train track". Found by render: the PEAK TRAIL -- a dark worn-path ribbon crossed by 41 evenly spaced logs, with posts down its
+sides, is a railway. Now: the logs are flat stones set into the slope, staggered left and right and never the full width, and the ribbon
+is a lighter clone (x1.5/1.4/1.3: dust, not a rail bed). The waterfall plane ran 5.2 m and ended .6 m over the mill's base: it now runs
+from the chute down to the pool surface, with a churning foam ring where it lands (turning, pulsing, gone when the wheel is dead/jammed).
+And the peak's outcrops and the canyon rim's boulders sit on the LOWEST ground under their footprint (on a slope the downhill side hovered).
 ## the CAVES: solid floors and walls, and a lens that stays inside (Worker B)
 His (m1724 phone): "the walls of the caves don't stop you, you walk through them"; "we need a smart camera that stays within the confines of
 the inside of the cave -- right now it goes outside".
