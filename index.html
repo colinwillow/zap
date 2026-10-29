@@ -14869,7 +14869,7 @@ const BFIRE = { on: 0, rate: 110, swing: 2.5, k: .5 };
 try { BFIRE.on = localStorage.getItem('mel.bfire') === '1' ? 1 : 0; } catch (e) {}
 const bladeFire = () => !!(BFIRE.on && slotNow().blade);
 const _bfA = new THREE.Vector3(), _bfB = new THREE.Vector3();
-// m15xx (his: "the katana fire -- not green, an actual burning fire. It's not coming out of the right spot: it should be on the blade, a lot at
+// m1762 (his: "the katana fire -- not green, an actual burning fire. It's not coming out of the right spot: it should be on the blade, a lot at
 // the tip and along the rest of it. The particles are too fast, they come from a point and shoot up -- they look low grade"): BLADE FIRE, its
 // own pool (`BFL`, one draw). The blade is the SAME segment the swing trail uses (the sword's own base..tip, `heroSword`), not the grip-to-muzzle
 // line. Tongues are born along it, weighted to the tip (`tipW`), small (`size`), slow (`rise` m/s, a gentle buoyancy, a little curl), and take

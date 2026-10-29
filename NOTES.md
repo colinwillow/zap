@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## Blade fire: real fire, on the blade, slower -- pass 1 (m15xx)
+## Blade fire: real fire, on the blade, slower -- pass 1 (m1762)
 *"The katana fire -- not green, an actual burning fire. It's not coming out of the right spot -- on the blade, a lot at the tip and the rest of the
 blade. The particles are too fast, they come from a point and shoot up; they look low grade. A few passes on that fire."*
 - **Where:** `bladeFireStep` spawned between the GRIP and `muzzleWorld()`, which on the katana is not the blade. It now uses the swing trail's
