@@ -5,6 +5,12 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The m1826 run-up pose, reverted (m15xx)
+*His screenshot: "This looks even worse, absolutely horrendous."* The legs folded up under him like a curled shrimp: pulling the feet low and the hips
+in made the two-bone IK fold the knees up, not drive them. Back to the m1683 numbers (`upD` .8, `upFoot` -.12, `upAmp` .34, `upLift` .26, `upToeIn`
+.15); the two jumps off the run-up stay. NEXT: his side-profile reference, and the library's real clips -- `Sprint_To_Wall_Climb`,
+`Climbing_Up_Wall`, `Wall_Run`, `Diagonal_Wall_Run`, `Jump_From_Wall` -- baked and tried before more IK guessing.
+
 ## The run-up: on his toes at 45 degrees; two jumps off it (m1826, DOCKET 17)
 *"Running straight up the wall his feet are flat on it and his hips bent like a chair at 90 degrees. More like 45 or less, knees with room to run,
 toes brushing the wall -- not flat-footed." / "Running up: holding UP and jump = jump straight up to grab the ledge above; let go of up and jump =
