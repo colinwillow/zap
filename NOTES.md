@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## Red Hollows pass: the refinery's cone, the island falls, the doubled stripes (Worker B)
+## Red Hollows pass: the refinery's cone, the island falls, the doubled stripes (m1741, Worker B)
 His (after m1740): "do the next pass and fix some stuff". The refinery island was still an inverted 14-sided CONE under its cap: now a big
 `hwIslLobe` plus four smaller hanging lobes, the same lumpy earth as the sky islands. The sky islands' waterfalls were flat white bars
 the full height to the ground: now each falls .35-.55 of its height, widening x3.2 and fading out (an RGBA vertex-colour plane), so it
