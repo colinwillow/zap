@@ -286,6 +286,12 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## THE SKY CASTLE, pass 5 of 6: the bastion towers and the curtain walls (Worker B)
+A round TOWER on every bastion lobe (r <= 3.4, 9-17 m tall -- `(k * 5) % 9`, so no two tops are level), cream stone, banded, eight glowing
+arched windows in two rows, a crenellated gallery, a flared red tiled roof (lathe, his tiles) with a gold band, ball and finial. Between
+neighbours a crenellated CURTAIN WALL (1.4 m thick, its top a walk: walk tris) along the island's edge -- not across the front, where the
+waterfalls run. Towers and walls solid. FOUND IN THE RENDER: every roof was a lathe built at the island's centre and never moved to its
+tower -- seven roofs inside the keep and seven gold finials floating over bare towers; `at4(x, 0, z)` on the lathe. 4 draws.
 ## THE SKY CASTLE, pass 4 of 6: the keep (m1781, Worker B)
 His sheet's FRONT and ARCHITECTURE DETAIL. On the plaza: a round HALL (r 10, 8 m, cream stone painted with the stone-block map, a plinth,
 crenellations, glowing arched windows round it, a big arched wooden door to the front in a stone arch with gold strap and ring pulls) and
