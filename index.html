@@ -70225,6 +70225,7 @@ function gcRoofFlush(A, g, rnd) { A.roofs = []; for (const [k, R] of Object.entr
 function gcRoofs(A, f) { for (const R of A.roofs || []) { R.grp.rotation.set(R.f.rx * f, 0, R.f.rz * f); R.grp.position.set(R.p[0] + R.f.dx * f, R.p[1] + R.f.dy * f, R.p[2] + R.f.dz * f); } }
 function gcastleState(fall, build) { const A = GCASTLE; if (!A.g) return; const want = fall ? A.dyF : 0, dy = want - A.colY; if (Math.abs(dy) > .001) {
     for (const b of A.boxes) { b.miny += dy; b.maxy += dy; } const V = TRI.v && !_triRaw.length ? TRI.v : _triRaw; for (let i = A.tri[0] + 1; i < A.tri[1]; i += 3) V[i] += dy;
+    const V2 = TRI.v && !_triRaw.length ? TRI.v : _triRaw, rWant = fall ? -3000 : 0, rd = rWant - (A.rColY || 0); if (A.rtri && rd) { for (let i = A.rtri[0] + 1; i < A.rtri[1]; i += 3) V2[i] += rd; A.rColY = rWant; }
     const L = A.ladder; if (L) { L.miny += dy; L.maxy += dy; if (L.mark) L.mark.y += dy; if (L.rung) L.rung.y0 += dy; if (L.top != null) L.top += dy; } A.colY = want; if (!build && typeof boxGrid === 'function') boxGrid(); }
   for (const f of A.falls || []) f.m.visible = !fall; for (const o of A.isle || []) o.visible = !fall; if (A.rubble) A.rubble.visible = !!fall; for (const b of A.rubBoxes || []) { const i = BOXES.indexOf(b); if (fall && i < 0) BOXES.push(b); else if (!fall && i >= 0) BOXES.splice(i, 1); } if (!build && typeof boxGrid === 'function') boxGrid(); if (build) { A.g.position.y = want; gcRoofs(A, fall ? 1 : 0); if (fall) hwPeakAge(1, A.g); } }
 // the castle each frame (m1782): smoke from the hall's three chimneys
@@ -70322,7 +70323,17 @@ function gcastleBuild() { const b0 = BOXES.length, A = GCASTLE, [cx, cz] = A.at,
         const C4 = [[-.75, ra, ya], [.75, ra, ya], [.75, rb2, yb2], [-.75, rb2, yb2]].map(([w, r, y]) => { wv.set(ux * r + vx * w, y + .05, uz * r + vz * w).applyMatrix4(g.matrixWorld); return [wv.x, wv.y, wv.z]; }); tris.push(...C4[0], ...C4[1], ...C4[2], ...C4[0], ...C4[2], ...C4[3]);
         for (const [j, e] of [[0, -1], [1, 1]]) { rails[j].push(new THREE.Vector3(ux * ra + vx * e * .8, ya + 1, uz * ra + vz * e * .8)); if (i % 4 === 0) putR(new THREE.CylinderGeometry(.015, .015, 1, 3).translate(ux * ra + vx * e * .8, ya + .5, uz * ra + vz * e * .8), rope); } }
       for (const rl of rails) putR(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(rl), N, .04, 4), rope); }
-    for (const [m, list] of MR) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = true; g.add(o); } }
+    // pass 17 (m1792): a RING of rope bridges joins every islet to its neighbours (0-1-2-...-8-0), so all nine shrines and rocks are walkable
+    // from the two on the lawn's bridges; each spans edge to edge at the islets' tops (their bob is .3, inside a step)
+    const MR0 = new Map(MR); MR.clear(); A.rtris = []; const isl = [...A.islets].sort((p, q) => p[6] - q[6]); A.ringBridges = 0;
+    for (let i = 0; i < isl.length; i++) { const P0 = isl[i], P1 = isl[(i + 1) % isl.length], dx = P1[0] - P0[0], dz = P1[2] - P0[2], D = Math.hypot(dx, dz), ux = dx / D, uz = dz / D, vx = -uz, vz = ux;
+      const sx = P0[0] + ux * P0[3] * .55, sz = P0[2] + uz * P0[3] * .55, ex = P1[0] - ux * P1[3] * .55, ez = P1[2] - uz * P1[3] * .55, L = Math.hypot(ex - sx, ez - sz), N = Math.ceil(L / .5), rails = [[], []], ry = Math.atan2(ux, uz);
+      const P = j => { const t = j / N; return [sx + (ex - sx) * t, P0[4] + (P1[4] - P0[4]) * t - Math.sin(Math.PI * t) * Math.min(2.2, L * .05), sz + (ez - sz) * t]; };
+      for (let j = 0; j < N; j++) { const [xa, ya, za] = P(j), [xb, yb2, zb] = P(j + 1), pl = new THREE.BoxGeometry(1.5, .08, .42); pl.rotateX(-Math.atan2(yb2 - ya, Math.hypot(xb - xa, zb - za))); pl.rotateY(ry); pl.translate((xa + xb) / 2, (ya + yb2) / 2, (za + zb) / 2); putR(pl, plk);
+        const C4 = [[-.75, xa, ya, za], [.75, xa, ya, za], [.75, xb, yb2, zb], [-.75, xb, yb2, zb]].map(([w, x2, y2, z2]) => { wv.set(x2 + vx * w, y2 + .05, z2 + vz * w).applyMatrix4(g.matrixWorld); return [wv.x, wv.y, wv.z]; }); A.rtris.push(...C4[0], ...C4[1], ...C4[2], ...C4[0], ...C4[2], ...C4[3]);
+        for (const [q, e] of [[0, -1], [1, 1]]) { rails[q].push(new THREE.Vector3(xa + vx * e * .8, ya + 1, za + vz * e * .8)); if (j % 4 === 0) putR(new THREE.CylinderGeometry(.015, .015, 1, 3).translate(xa + vx * e * .8, ya + .5, za + vz * e * .8), rope); } }
+      for (const rl of rails) putR(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(rl), N, .04, 4), rope); A.ringBridges++; }
+    for (const [m, list] of MR0) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = true; g.add(o); } for (const [m, list] of MR) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = true; g.add(o); A.isle.push(o); } }
   // THE KEEP (m1773, pass 4 of 6; his sheet's FRONT and ARCHITECTURE DETAIL): on the plaza a round HALL (cream stone, a big arched wooden
   // door to the front, a walkable roof terrace behind a parapet), and out of it the tall KEEP -- glowing arched windows in rows round it, a
   // timber BALCONY ring near the top, a flared bell ROOF of red tiles with a gold band at its eaves, a gold ball and spire, and a long red
@@ -70540,6 +70551,7 @@ function gcastleBuild() { const b0 = BOXES.length, A = GCASTLE, [cx, cz] = A.at,
     for (let i = BOXES.length - 1; i >= 0; i--) { const b = BOXES[i]; if (b._rk && Math.hypot((b.minx + b.maxx) / 2 - wx, (b.minz + b.maxz) / 2 - wz) < 2.6) BOXES.splice(i, 1); } }
   let draws = 0; for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); draws++; }
   const t0 = _triRaw.length; for (let i = 0; i < tris.length; i += 9) { const q = tris.slice(i, i + 9); triAdd(...q); triAdd(q[0], q[1], q[2], q[6], q[7], q[8], q[3], q[4], q[5]); } A.tri = [t0, _triRaw.length];
+  { const R0 = _triRaw.length, rt = A.rtris || []; for (let i = 0; i < rt.length; i += 9) { const q = rt.slice(i, i + 9); triAdd(...q); triAdd(q[0], q[1], q[2], q[6], q[7], q[8], q[3], q[4], q[5]); } A.rtri = [R0, _triRaw.length]; A.rColY = 0; }
   let nb = 0; for (const L of solid) { const base = L.userData.base; L.applyMatrix4(g.matrixWorld); nb += hwSolid(L, 1.5, base != null ? base + g.matrixWorld.elements[13] : Y0 - 60); }
   if (A.lift) { const L = A.lift; for (let i = BOXES.length - 1; i >= 0; i--) { const b = BOXES[i]; if (b._rk && Math.hypot((b.minx + b.maxx) / 2 - L.x, (b.minz + b.maxz) / 2 - L.z) < 2.6) BOXES.splice(i, 1); } A.liftAt = [L.x, L.y0 + .3, L.z]; }
   // pass 10 (m1785): FALLEN the island met the ground -- a RUBBLE ring where its rim sits on the plateau (heaped cream rock, broken timber,
