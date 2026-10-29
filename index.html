@@ -11411,7 +11411,7 @@ function dojoTrain(D, g, put, M, W, at) {
   const straw = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .95, map: dojoStrawTex() }), rope = new THREE.MeshStandardMaterial({ color: 0xa8201a, roughness: .7 });
   const bandG = mergeGeometries([.82, 1.25, 1.68].map(y => new THREE.CylinderGeometry(.265, .265, .07, 14).translate(0, y, 0)));
   D.tgts = []; D.tgtDown = 0;
-  for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2, [x, z] = at(a, DTRAIN.tgtR);
+  for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2 + Math.PI / 4, [x, z] = at(a, DTRAIN.tgtR);     // m15xx: turned 45 deg -- one stood at (0, 10), between the spawn (0, 8) and the lens: the first thing he saw was a straw post
     put(new THREE.CylinderGeometry(.58, .62, .05, 24).translate(x, .03, z), M.gold); put(new THREE.CylinderGeometry(.44, .44, .055, 24).translate(x, .035, z), M.dark);
     const T = new THREE.Group(); T.position.set(x, 0, z);
     T.add(new THREE.Mesh(new THREE.CylinderGeometry(.1, .12, 2, 8).translate(0, 1, 0), wood), new THREE.Mesh(new THREE.CylinderGeometry(.24, .26, 1, 12).translate(0, 1.25, 0), straw), new THREE.Mesh(bandG, rope),
@@ -13604,9 +13604,9 @@ function turretBlast(x, y, z, rad, dmg) {
   for (const T of TURRET.list) { if (T.dead) continue; const d = Math.hypot(x - T.x, z - T.z); if (d < TURRET.r + rad + .15 && y < (T.y || 0) + TURRET.h + .3 && y > (T.y || 0) - .6) turretHurt(T, dmg); }     // m1128: a posted turret is hit at ITS height
   bldHit(x, y, z, rad, dmg);
 }
-function turretMelee(x, y, z, rad, dmg) {
-  for (const T of TURRET.list) { if (T.dead || T.mcool > 0) continue; if (Math.hypot(x - T.x, z - T.z) < TURRET.r + rad && y < (T.y || 0) + TURRET.h + .2 && y > (T.y || 0) - .6) { T.mcool = .35; turretHurt(T, (dmg || 1) * .8); } }
-  bldHit(x, y, z, rad, dmg);
+function turretMelee(x, y, z, rad, dmg) { let n = 0;
+  for (const T of TURRET.list) { if (T.dead || T.mcool > 0) continue; if (Math.hypot(x - T.x, z - T.z) < TURRET.r + rad && y < (T.y || 0) + TURRET.h + .2 && y > (T.y || 0) - .6) { T.mcool = .35; turretHurt(T, (dmg || 1) * .8); n++; } }
+  return n + (bldHit(x, y, z, rad, dmg) ? 1 : 0);     // m15xx: how many it hit (an arrow asks)
 }
 function turretFire(T) {
   const K = TURRET.kinds[TURRET.shot] || TURRET.kinds.ROCKET, h = T.yaw, rocket = TURRET.shot === 'ROCKET';
@@ -14701,7 +14701,8 @@ function arrowStep(dt) {
     if (A.stuck) { A.t += dt; if (A.t > ARCH.stay) { A.m.removeFromParent(); ARROWS.splice(i, 1); } continue; }
     const ox = A.m.position.x, oy = A.m.position.y, oz = A.m.position.z;
     A.v.y -= MOVE.g * (A.ric ? 1 : A.gk != null ? A.gk : .55) * dt; A.m.position.addScaledVector(A.v, dt); A.t += dt;
-    const P = A.m.position; if (A.ric) { A.m.rotateX(A.ric * dt); A.m.rotateY(A.ric * .37 * dt); } else A.m.lookAt(P.x + A.v.x, P.y + A.v.y, P.z + A.v.z);     // a glanced arrow TUMBLES
+    const P = A.m.position; { const tr = A.m.userData.tracer; if (tr) tr.scale.z = Math.min(BOW.tracerMax, A.v.length() * BOW.tracerT * Math.min(1, A.t / BOW.tracerT)) / BOW.big; }
+    if (A.ric) { A.m.rotateX(A.ric * dt); A.m.rotateY(A.ric * .37 * dt); } else A.m.lookAt(P.x + A.v.x, P.y + A.v.y, P.z + A.v.z);     // a glanced arrow TUMBLES
     if (A.type === 'fire') { gfire(P.x, P.y, P.z, .45); if (Math.random() < .5) gfire(ox, oy, oz, .35); } else if (A.pl) { const c = A.col || [.6, .9, 1]; for (let q = 0; q < BOW.trail; q++) { const u = q / BOW.trail; spk(ox + (P.x - ox) * u, oy + (P.y - oy) * u, oz + (P.z - oz) * u, 0, 0, 0, .1, .45, [.4 + c[0] * .6, .4 + c[1] * .6, .4 + c[2] * .6]); } }     // m1744: a bright streak
     else if (Math.random() < .6) spk(ox, oy, oz, 0, 0, 0, .05, .25, [1, .45, .35]);
     // the player: the closest point of this frame's segment to his middle
@@ -14728,6 +14729,11 @@ function arrowStep(dt) {
       if (p.block) { ARCH.stat.blocked++; spkBurst(P.x, P.y, P.z, 14, { col: [1, .9, .6], spread: 4, size: .12, life: .35 }); snd('clang', { g: .7, r: 1.3, x: P.x, z: P.z }); }
       else { spkBurst(P.x, P.y, P.z, 10, { col: [1, .3, .25], spread: 3, size: .1, life: .3 }); }     /* m1695: `playerHurt` voices it (his grunt) */
       A.m.removeFromParent(); ARROWS.splice(i, 1); continue; }
+    if (A.mine && A.pl) { const dmg = A.full ? 2 : 1, D = DOJO; let hit = 0;     // m15xx: HIS arrows hit what his blade hits -- the straw targets, the machine, the turrets, the Hollows' buildings
+      if (D.on && D.tgts) for (const T of D.tgts) { if (T.goal < 1 || T.up < .7 || T.cool > 0 || P.y < .3 || P.y > 2.2 || Math.hypot(T.x - P.x, T.z - P.z) > .34) continue; dojoTgtHit(T, P.y, A.v.x, A.v.z, dmg * (A.type === 'blast' ? 2 : 1)); hit = 1; break; }
+      if (!hit && inArena()) { if (vendHit(P.x, P.y, P.z, .15)) hit = 1; else if (turretMelee(P.x, P.y, P.z, .15, dmg * 2)) hit = 1; }
+      if (!hit && inHome() && bldHit(P.x, P.y, P.z, .15, dmg)) hit = 1;
+      if (hit) { if (A.type === 'blast') arrowBlast(P, Math.atan2(A.v.x, A.v.z)); else spkBurst(P.x, P.y, P.z, 8, { col: [.95, .85, .55], spread: 2.5, size: .08, life: .35 }); BOW.stat.hits++; A.m.removeFromParent(); ARROWS.splice(i, 1); continue; } }
     if (A.mine && ROCK.on) { const rs = rockAt(P.x, P.y, P.z, .05); if (rs.length) { if (A.pl && A.type === 'blast') arrowBlast(P, Math.atan2(A.v.x, A.v.z)); else rockHit(rs[0], A.full ? 1.5 : .6, Math.atan2(A.v.x, A.v.z), P.x, P.y, P.z); spkBurst(P.x, P.y, P.z, 6, { col: [.9, .85, .7], spread: 3, size: .07, life: .3 }); A.m.removeFromParent(); ARROWS.splice(i, 1); continue; } }     // m1745: an arrow on stone chips it and shatters
     const gy = groundAt(P.x, P.z, oy, .5);
     const wall = boxRay(ox, oy, oz, P.x, P.y, P.z, _tuR);
@@ -14735,7 +14741,7 @@ function arrowStep(dt) {
       if (wall) P.set(_tuR.x, _tuR.y, _tuR.z); else if (P.y <= gy) P.y = gy + .02;
       if (A.pl && A.type === 'blast') { arrowBlast(P, Math.atan2(A.v.x, A.v.z)); A.m.removeFromParent(); ARROWS.splice(i, 1); continue; }
       if (A.pl && A.type === 'fire') for (let k = 0; k < 12; k++) gfire(P.x + (Math.random() - .5) * .3, P.y, P.z + (Math.random() - .5) * .3, .6);
-      A.stuck = 1; A.t = 0; ARCH.stat.stuck++; if (A.m.userData.glow) A.m.userData.glow.visible = false; if (A.ric) { A.ric = 0; A.m.lookAt(P.x + A.v.x, P.y + A.v.y, P.z + A.v.z); } A.m.userData.head.material.emissive.setHex(0);
+      A.stuck = 1; A.t = 0; ARCH.stat.stuck++; if (A.m.userData.glow) A.m.userData.glow.visible = false; if (A.m.userData.tracer) A.m.userData.tracer.visible = false; if (A.ric) { A.ric = 0; A.m.lookAt(P.x + A.v.x, P.y + A.v.y, P.z + A.v.z); } A.m.userData.head.material.emissive.setHex(0);
       spkBurst(P.x, P.y, P.z, 6, { col: [.8, .7, .55], spread: 2, size: .07, life: .3 }); snd('thud', { g: .35, r: 1.6, x: P.x, z: P.z }); }
   }
 }
@@ -14775,7 +14781,7 @@ function archerBow(d) {
 // over whatever his legs are doing; letting go LOOSES: `bow_recoil`, and an arrow from the nock to the reticle's point -- a lob solved to land
 // there, faster and flatter the longer it was drawn (`full` s to full power). His arrows are `mine`: they hit the bowmen, the spiders (a hit takes
 // a leg on the way to the burst), chip statues, smash what `bldHit` breaks, and stick in walls and the ground.
-const BOW = { full: 1.1, drawRate: 1.5, v0: 22, v1: 72, g0: .55, g1: .05, dmg0: 1, dmg1: 3, pow0: .12, pow1: 1.2, keep: .3, limbK: .95, big: 1.35, glow: .55, trail: 3, sq: 1, carry: { out: .07, fwd: .02, tilt: .45, lean: -.3, up: .75 }, blastR: 2.6, blastDmg: 4, fireDmg: 1, stat: { shots: 0, hits: 0, blasts: 0, fires: 0 } };     // m1729: the charge is the shot -- a tap lobs slow, a full draw flies fast and almost true; only a FULL draw knocks back
+const BOW = { full: 1.1, drawRate: 1.5, v0: 22, v1: 72, g0: .55, g1: .05, dmg0: 1, dmg1: 3, pow0: .12, pow1: 1.2, keep: .3, limbK: .95, big: 1.35, glow: .55, trail: 3, tracerR: .05, tracerT: .06, tracerMax: 4, sq: 1, carry: { out: .07, fwd: .02, tilt: .45, lean: -.3, up: .75 }, blastR: 2.6, blastDmg: 4, fireDmg: 1, stat: { shots: 0, hits: 0, blasts: 0, fires: 0 } };     // m1729: the charge is the shot -- a tap lobs slow, a full draw flies fast and almost true; only a FULL draw knocks back
 const _bwL = new THREE.Vector3(), _bwR = new THREE.Vector3(), _bwA = new THREE.Vector3(), _bwB = new THREE.Vector3(), _bwM = new THREE.Vector3(), _bwD = new THREE.Vector3();
 // m1744 (his: "the thing that's killing me -- once you've initiated a shot and you move the left stick around he keeps pulling the bow back
 // again; strafe left or right and he pulls it again; he should never pull it back again once it's back"). MEASURED: standing, the draw is the
@@ -14799,9 +14805,12 @@ function bowSolve() { const p = player, B = BOW.mesh; const k = clamp((p.bowT ||
   const o = B && B.nock.visible ? B.nock.position.clone() : p.pos.clone().setY(p.pos.y + (RIG.height || 1.4) * .8);
   const a = aimTarget(), tx = a.p.x, ty = a.p.y, tz = a.p.z, dx = tx - o.x, dz = tz - o.z, R = Math.hypot(dx, dz) || 1, sp = BOW.v0 + (BOW.v1 - BOW.v0) * k * k, gk = BOW.g0 + (BOW.g1 - BOW.g0) * k, T = Math.max(.04, Math.hypot(R, ty - o.y) / sp), g = MOVE.g * gk;
   return { k, full, type, o, gk, g, T, dx, dz, ty }; }
+// m15xx (his: "with any meaningful amount of speed you can't even see the arrow"): a TRACER -- a solid streak behind each of his arrows, as long as
+// the last `tracerT` s of its flight (a fast arrow draws a long line), in its own colour (normal blending: additive vanished on snow)
+let _arTr = null; function arrowTracerGeo() { return _arTr || (_arTr = new THREE.CylinderGeometry(1, .25, 1, 6, 1, true).rotateX(Math.PI / 2).translate(0, 0, -.5)); }
 function bowLoose() { const p = player; const { k, full, type, o, gk, g, T, dx, dz, ty } = bowSolve();
   const m = arrowMesh(); m.position.copy(o); scene.add(m); const hc = type === 'fire' ? [.2, 1, .55] : type === 'blast' ? [1, .35, .1] : full ? [.3, .9, 1] : [.12, .5, .4]; m.userData.head.material.emissive.setRGB(hc[0], hc[1], hc[2]); m.userData.head.material.emissiveIntensity = 1.6;
-  m.scale.setScalar(BOW.big); { const gl = glowSprite(new THREE.Color(hc[0], hc[1], hc[2]).lerp(new THREE.Color(1, 1, 1), .35), BOW.glow); gl.position.z = .46; m.add(gl); m.userData.glow = gl; }     // m1744: HIS arrows glow and are bigger -- they vanished against the rock
+  m.scale.setScalar(BOW.big); { const tr = new THREE.Mesh(arrowTracerGeo(), new THREE.MeshBasicMaterial({ color: new THREE.Color(hc[0], hc[1], hc[2]).lerp(new THREE.Color(1, 1, 1), .45), transparent: true, opacity: .85, depthWrite: false, toneMapped: false })); tr.renderOrder = 61; tr.scale.set(BOW.tracerR / BOW.big, BOW.tracerR / BOW.big, .01); m.add(tr); m.userData.tracer = tr; } { const gl = glowSprite(new THREE.Color(hc[0], hc[1], hc[2]).lerp(new THREE.Color(1, 1, 1), .35), BOW.glow); gl.position.z = .46; m.add(gl); m.userData.glow = gl; }     // m1744: HIS arrows glow and are bigger -- they vanished against the rock
   ARROWS.push({ m, v: new THREE.Vector3(dx / T, (ty - o.y) / T + .5 * g * T, dz / T), t: 0, stuck: 0, from: null, mine: 1, pl: 1, gk, type, full, col: hc,
     dmg: BOW.dmg0 + (BOW.dmg1 - BOW.dmg0) * k + (type === 'fire' ? BOW.fireDmg : 0), pow: full ? BOW.pow1 : BOW.pow0 });
   const n = 'bow_recoil'; if (rig.actions[n + UPS]) { playOnce(n + UPS, 1.4); playOnce(n + UP, 1.4); } p.fireT = 1; p.bowT = 0; BOW.stat.shots++;
@@ -14812,7 +14821,9 @@ function arrowBlast(P, dirH) { BOW.stat.blasts++; const R = BOW.blastR;
   for (let i = 0; i < 6; i++) smokeAt(P.x + (Math.random() - .5), P.y + Math.random() * .5, P.z + (Math.random() - .5), 3, 1.3, [.35, .32, .3]);
   snd('boom', { g: .6, r: 1.2 + Math.random() * .1, x: P.x, z: P.z }); camShake(.18);
   BLOW_SRC = 'rocket'; dummyHit(P.x, P.z, dirH, 1.3, R, BOW.blastDmg, WEAP.palBlast); BLOW_SRC = '';
-  if (SPIDER.list.length) spiderArea(P.x, P.y, P.z, R, 1.2, BOW.blastDmg); if (GUARD.list.length) guardArea(P.x, P.y, P.z, R, 1.2, BOW.blastDmg); rockArea(P.x, P.y, P.z, R, 3); if (ARENA.debris.length) debrisArea(P.x, P.y, P.z, R); bldHit(P.x, P.y, P.z, R * .6, 3); if (CWALL.list.length) wallHit(P.x, P.y, P.z, 1, 2, 'blast', dirH); }
+  if (SPIDER.list.length) spiderArea(P.x, P.y, P.z, R, 1.2, BOW.blastDmg); if (GUARD.list.length) guardArea(P.x, P.y, P.z, R, 1.2, BOW.blastDmg); rockArea(P.x, P.y, P.z, R, 3);
+  if (DOJO.on && DOJO.tgts) for (const T of DOJO.tgts) { if (T.goal < 1 || T.up < .7) continue; const dx = T.x - P.x, dz = T.z - P.z, q = Math.hypot(dx, dz); if (q < R + .3) { T.cool = 0; dojoTgtHit(T, 1.2, dx || .01, dz, 2.5); } }     // m15xx: the blast knocks the straw targets flying
+  if (inArena()) { vendHit(P.x, P.y, P.z, R); turretMelee(P.x, P.y, P.z, R, 4); } if (inHome()) bldHit(P.x, P.y, P.z, R, 4); if (ARENA.debris.length) debrisArea(P.x, P.y, P.z, R); bldHit(P.x, P.y, P.z, R * .6, 3); if (CWALL.list.length) wallHit(P.x, P.y, P.z, 1, 2, 'blast', dirH); }
 // m1729 (his: "versions of the weapons -- the katana, maybe a flaming katana, maybe green flame"): JIN FIRE on the blade (the left sub-menu while the
 // sword is out). Green flame (`gfire`) licks along the edge from the guard to the tip (`muzzleWorld`, the far end of the blade along its mount),
 // thicker while it swings; every man the blade catches is set BURNING (`burnStart`) and the spiders take a gout of it.

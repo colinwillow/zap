@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Arrows you can SEE and that HIT the targets; the arena no longer opens on a straw post; CINEMA.md (m15xx)
+His: "with any meaningful amount of speed you can't even see the arrow"; "I was shooting the test dummies -- you hit them with the sword and they
+move; with explosive arrows they don't; the arrows don't hit things they're supposed to hit"; "when you start the arena the sparring dummy is the
+first thing you see"; and should cutscenes be rendered in Blender or done in game.
+- **What the arrows missed**: the straw targets (makiwara) were reached only by the blade (`dojoHit`) and bolts (`dojoShot`); arrows and the blast
+  arrow's burst never asked. His arrows now test (per frame, at the head) the straw targets (`dojoTgtHit`: 1, 2 at full draw, 2x for blast), the
+  machine (`vendHit`), the turrets (`turretMelee` -- it returned nothing; it returns how many it hit now) and, in the Hollows, `bldHit`. The
+  BLAST knocks every straw target in its radius flying (2.5) and hits the machine, the turrets, the Hollows' buildings. Headless: a full-draw
+  arrow took a target 3 -> 1 and knocked it (vx 4); a blast beside another took it 3 -> .5.
+- **The tracer**: a solid streak behind each of his arrows, as long as the last .06 s of its flight (up to 4 m: a fast arrow draws a long line),
+  in its colour lightened, normal-blended (additive vanished on the snow). Gone when it sticks.
+- **The arena's first frame**: the four straw targets stood at the compass points at 10 m -- one at (0, 10), between the spawn (0, 8) and the lens
+  at z 12.9. Turned 45 degrees; the first frame is Grumbo on the dais (render).
+- **CINEMA.md**: the answer is IN GAME (the world changes -- fallen/restored, water, his kit -- and a video does not; portrait and landscape; the
+  statue wake and part aim's lens already are cutscene pieces) and a proposal: REELS of shots (orbit, dolly, cut, track, close, back) with a
+  title card, letterbox and a skip; place intros first.
 ## The bow IN his fist, and squared to the aim while he strafes (m1746)
 His (screenshots on M1741 -- before m1744's no-second-pull fix had reached his phone): "his hand isn't around the bow like he's gripping it --
 the bow is on the outer side of his hand; the angle isn't right from the back"; "it doesn't aim true down the muzzle when moving left or right
