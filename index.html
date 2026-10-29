@@ -12438,7 +12438,7 @@ function arenaStep(dt) {
   while (ARENA.gone.length) { const d = ARENA.gone.pop(); if (d.stars) scene.remove(d.stars.g); bodyGone(d); const i = ARENA.live.indexOf(d); if (i >= 0) ARENA.live.splice(i, 1); arenaUi(); }
   let gone = 0;
   for (const D of ARENA.debris) {
-    if (D.die != null) { D.die += dt / DEBRIS.dieT; const u = Math.min(1, D.die), P = D.m.position;     // m15xx: dissolving -- shrinks, fades, burns off green
+    if (D.die != null) { D.die += dt / DEBRIS.dieT; const u = Math.min(1, D.die), P = D.m.position;     // m1720: dissolving -- shrinks, fades, burns off green
       D.m.scale.copy(D.s1).multiplyScalar(Math.max(.02, 1 - u * u)); for (const m of D.fade) m.opacity = 1 - u;
       if (Math.random() < dt * 30) gfire(P.x + (Math.random() - .5) * D.r, P.y, P.z + (Math.random() - .5) * D.r, .45 + (1 - u) * .3);
       if (Math.random() < dt * 4) smokeAt(P.x, P.y + .1, P.z, 1.2, .8, OSARI.shade(), .9, gsmoke);
@@ -13759,7 +13759,7 @@ function limbBake(d, nm, dirH, kick, tris) {
   while (ARENA.debris.length > 60) { const o = ARENA.debris.shift(); scene.remove(o.m); }
   return m;
 }
-// m15xx (his: "after a big battle there's just pieces of legs and bodies laying everywhere -- they could fade away after some time, but more
+// m1720 (his: "after a big battle there's just pieces of legs and bodies laying everywhere -- they could fade away after some time, but more
 // interesting: you can target them with your sword and slice them, they crack in half, release the green stuff and go away -- split, and the two
 // sides disintegrate"): DEBRIS IS DESTRUCTIBLE. Any baked piece (a limb, a half, a spider's leg) that a blade sweeps, a slam or a whirl reaches,
 // or an arrow or a bolt finds, is CUT: its triangles split by a vertical plane square to the blow (each by its centroid), two halves fly
@@ -44545,7 +44545,7 @@ function strikeSweep(dt, power, live, dmg, body) {
           if (!MELEE.hitAll) break;
         }
         if (SPIDER.list.length) spiderSweep(q, _sw, rad, power, dmg, p.melH != null ? p.melH : p.faceH);
-        if (ARENA.debris.length) debrisSweep(q, _sw, rad, p.melH != null ? p.melH : p.faceH);     // m15xx: the pieces on the floor are cut too     // m1701: the spiders
+        if (ARENA.debris.length) debrisSweep(q, _sw, rad, p.melH != null ? p.melH : p.faceH);     // m1720: the pieces on the floor are cut too     // m1701: the spiders
       }
     }
     q.copy(_sw);
