@@ -543,6 +543,7 @@ means anything you can carry from one situation to the next.
 | hold in place | **charge the ZOOM (m1093; any weapon)** — release: launched (TOOLS > LEFT HOLD: TORNADO) | at rest: backflip wind-up; moving: the sprint (TOOLS > RIGHT HOLD: CROUCH) |
 | flick | **LEFT / RIGHT = the side-flip barrel roll, DOWN = the backflip dodge (facing kept), anywhere -- the guard's `cartGo` (m1723)**; ahead: as before | strike, in the flicked direction; **out of the GUARD: low stab / side slashes (m1094)** |
 | charge release (katana) | **the LEFT stick picks it (m1723): up / neutral = the lunge, left / right = the whirlwind that way, down = the high leap** | -- |
+| charge on a big thing (katana) | **PART AIM (m1738): a quick FLICK (out and back) steps the lock between its parts -- hand, elbow, head, chest, knee, a spider's leg; the release lands ON that part.** A HOLD still picks the release kind | (TOOLS > PART AIM: RIGHT = roll the thumb along the top of the pad instead) |
 | drag | — | orbit the camera |
 
 **ON THE BOARD (m167) THE TWO HALVES MEAN THE SAME THINGS**, which is the whole point of having

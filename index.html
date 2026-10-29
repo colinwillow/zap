@@ -14138,7 +14138,7 @@ function spiderDie(S, dirH) { if (S.dead) return; S.dead = 1; spiderTris(S.mesh)
   const P = spiderMid(S, _sdC); killBlast(S.root.position, P.y, 1.25, 1); for (let i = 0; i < 60; i++) { const a = Math.random() * 6.283, r = Math.random() * 1.1; gfire(P.x + Math.cos(a) * r, P.y + (Math.random() - .5) * .5, P.z + Math.sin(a) * r, 1.1); }
   S.root.removeFromParent(); SPIDER.list.splice(SPIDER.list.indexOf(S), 1); SPIDER.stat.kills++; HORDE.stat.kills++; }
 // ONE BLOW on a spider: `dirH` the way it travels, `hx/hz` where it landed (nearest leg comes off). Returns 'block', 1 (landed) or 0.
-function spiderBlow(S, dirH, power, dmg, hx, hz) { if (S.dead || S.hitCd > 0) return 0; S.hitCd = .2; const R = S.root, Z = SPIDER, p = player;
+function spiderBlow(S, dirH, power, dmg, hx, hz) { if (S.dead || S.hitCd > 0) return 0; S.hitCd = .2; { const q = partHitAt(S); if (q) { hx = q.x; hz = q.z; } } const R = S.root, Z = SPIDER, p = player;     // m1738: the chosen leg
   if (S.statue) { const M = spiderMid(S, _sdC); spkBurst(M.x, M.y, M.z, 16, { col: [.8, .74, .64], spread: 4, size: .1, life: .4 }); smokeAt(M.x, M.y, M.z, 1.5, .8, [.82, .76, .66]); snd('clang', { g: .6, r: .6, x: M.x, z: M.z }); return 'block'; }     // m1705: stone chips
   const full = p.chargeGo && slotNow().blade && (p.chargeGoK || 0) >= HALVE.full, front = Math.abs(wrapAngle(dirH + Math.PI - R.rotation.y)) < 1.1, M = spiderMid(S, _sdC);
   if (S.st === 'guard' && front && !full) { SPIDER.stat.blocks++; S.stT = 0; S.recoil = .5; spkBurst(M.x + Math.sin(R.rotation.y) * 1, M.y + .3, M.z + Math.cos(R.rotation.y) * 1, 20, { col: [1, .9, .6], spread: 5, size: .13, life: .35 });
@@ -14349,7 +14349,7 @@ function guardDie(G, dirH) { if (G.dead) return; G.dead = 1; guardTris(G, G.mesh
   jinraEmit(M.x, M.y, M.z, 14); camShake(.6); if (G.rock) G.rock.m.removeFromParent();
   G.root.removeFromParent(); GUARD.list.splice(GUARD.list.indexOf(G), 1); GUARD.stat.kills++; HORDE.stat.kills++; }
 // ONE BLOW on him: the stone takes it from the arm nearest the hit (hx, hy, hz). 'block' when he is still stone (the blow wakes him), else 1.
-function guardBlow(G, dirH, power, dmg, hx, hy, hz) { if (G.dead || G.hitCd > 0) return 0; G.hitCd = .18; const p = player, M = guardMid(G, _gdA);
+function guardBlow(G, dirH, power, dmg, hx, hy, hz) { if (G.dead || G.hitCd > 0) return 0; G.hitCd = .18; { const q = partHitAt(G); if (q) { hx = q.x; hy = q.y; hz = q.z; } } const p = player, M = guardMid(G, _gdA);     // m1738: the chosen part
   if (G.statue) { spkBurst(hx == null ? M.x : hx, hy == null ? M.y : hy, hz == null ? M.z : hz, 18, { col: [.8, .74, .64], spread: 4, size: .12, life: .4 }); snd('clang', { g: .7, r: .5, x: M.x, z: M.z }); guardWake(G); return 'block'; }
   dmg = dmg == null ? 1 : dmg; const full = p.chargeGo && slotNow().blade && (p.chargeGoK || 0) >= HALVE.full; GUARD.stat.hits++; G.hp -= dmg; G.flash = G.Z.flash; G.aggro = 1; G.dmgRun += dmg;
   G.kx = Math.sin(dirH) * Math.min(1.5, power || 1) * 1.2; G.kz = Math.cos(dirH) * Math.min(1.5, power || 1) * 1.2;
@@ -14766,6 +14766,7 @@ function arenaUi() {
       else if (a === 'course') { ARENA.menu = ''; if (COURSE.on) courseClear(); else courseBuild('ACRO'); }     // m1078
       else if (a === 'wrun') { ARENA.menu = ''; if ((WRUN.boxes || []).length) wrunClear(); else wrunSpawn(); }     // m1064; m1072
       else if (a === 'smear') { SMEAR.on = SMEAR.on ? 0 : 1; try { localStorage.setItem('mel.smear', SMEAR.on ? '1' : '0'); } catch (err) {} }
+      else if (a === 'partaim') { if (!PARTAIM.on) { PARTAIM.on = 1; PARTAIM.by = 'L'; } else if (PARTAIM.by === 'L') PARTAIM.by = 'R'; else PARTAIM.on = 0; try { localStorage.setItem('mel.partaim', PARTAIM.on ? PARTAIM.by : '0'); } catch (err) {} }     // m1738
       else if (a === 'qd') { QD.on = QD.on ? 0 : 1; document.body.classList.toggle('qd', !!QD.on); try { localStorage.setItem('mel.qd', QD.on ? '1' : '0'); } catch (err) {} wepRow._qd = undefined; GEAR.mask = -1; gearSync(1); paintKit(); }
       else if (a === 'lflick') { COVER.left = COVER.left === 'FLIPS' ? 'ROLL' : 'FLIPS'; try { localStorage.setItem('mel.left', COVER.left); } catch (err) {} }
       else if (a === 'tshot') { TURRET.shot = TURRET.shot === 'ROCKET' ? 'BOLT' : 'ROCKET'; try { localStorage.setItem('mel.turret.shot', TURRET.shot); } catch (err) {} }
@@ -14834,7 +14835,7 @@ function arenaUi() {
   // in the RED HOLLOWS (his: "I need the debug menu in there so I can transform it between the two states") the bar is the STATE switch + TOOLS
   let h = '<div class="ar-bar">' + (inHome() ? B('age', (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + '<small>tap: ' + (AGE.st === 'fallen' ? 'restore it all' : 'make it fall') + '</small>', '', 'ar-main' + (AGE.st === 'fallen' ? '' : ' on'))
     : B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('vend', 'VEND')) + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
-    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('climbspd', 'CLIMB ' + CLIMB.speed.toFixed(1) + ' m/s') + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('qd', 'QUICK DRAW ' + (QD.on ? 'ON' : 'OFF')) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('btrail', 'TRAIL ' + (BTRAIL.jin ? 'JIN' : 'BLUE')) + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('sample', 'DNA SAMPLE ' + (SAMPLE.on ? 'ON' : 'OFF')) + B('runslash', 'RUN SLASH ' + (RUNSLASH.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('dsky', 'SKY ' + DOJO.skyPick) + B('dfx', 'DOJO FX ' + (DOJO.fx || 'FULL')) + B('rwsky', 'HOLLOWS SKY ' + RW.skyPick + (RW.skyKey && /restored/.test(RW.skyKey) ? ' (restored)' : ' (fallen)')) + B('dragon', 'DRAGON ' + (DRAGZ.on ? DRAGZ.look : DOJO.dragonPick)) + B('dwing', 'DRAGON WINGS ' + DRAGZ.wingPick) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
+    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('climbspd', 'CLIMB ' + CLIMB.speed.toFixed(1) + ' m/s') + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('qd', 'QUICK DRAW ' + (QD.on ? 'ON' : 'OFF')) + B('partaim', 'PART AIM ' + (PARTAIM.on ? (PARTAIM.by === 'L' ? 'LEFT' : 'RIGHT') : 'OFF')) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('btrail', 'TRAIL ' + (BTRAIL.jin ? 'JIN' : 'BLUE')) + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('sample', 'DNA SAMPLE ' + (SAMPLE.on ? 'ON' : 'OFF')) + B('runslash', 'RUN SLASH ' + (RUNSLASH.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('dsky', 'SKY ' + DOJO.skyPick) + B('dfx', 'DOJO FX ' + (DOJO.fx || 'FULL')) + B('rwsky', 'HOLLOWS SKY ' + RW.skyPick + (RW.skyKey && /restored/.test(RW.skyKey) ? ' (restored)' : ' (fallen)')) + B('dragon', 'DRAGON ' + (DRAGZ.on ? DRAGZ.look : DOJO.dragonPick)) + B('dwing', 'DRAGON WINGS ' + DRAGZ.wingPick) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
   if (m === 'bld') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back') + B('age', 'STATE: ' + (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + '<small>tap to switch -- rebuilds what stands</small>', '', AGE.st === 'fallen' ? '' : 'ar-on');
     for (const E of BLDG.list) h += B('bld', E.t + '<small>' + (E.on() ? 'tap to remove' : E.pass >= 3 ? E.sub : 'IN PROGRESS · pass ' + E.pass + ' of 3') + '</small>', E.key, E.on() ? 'ar-on' : '');
     h += '</div>'; }
@@ -17117,6 +17118,57 @@ function lockPull(o, k) { _lpV.copy(camera.position).sub(o.position); const L = 
   // stops `lockGap` m behind him (measured along the lens line); right up against the target it barely moves, and the target's body may hide part of it
   const pd = player.pos.distanceTo(camera.position), lim = Math.max(0, L - pd - LOCKGAP); o.position.addScaledVector(_lpV, Math.min(k, lim) / L); }
 const LOCKGAP = .7;
+// m1738 (his: "on bigger enemies -- bosses, big spiders -- when you're targeting them with the katana, the crosshair moves between their different
+// hit points: his elbow, his hand, his face; you move the cursor around while you hold the charge, so it's more refined what you're going for"):
+// PART AIM. While the katana charge holds a lock on a creature with parts (a guardian or dweller: head, chest, each hand and elbow, the knees; a
+// spider: each leg, the head), the lock sits on ONE part, and faint pips mark the others. A step moves it to the nearest part in the direction
+// pushed, on the screen. The release then lands ON that part: the arm whose hand or elbow you chose, the leg you chose.
+//   by 'L'  a quick FLICK of the left stick (out and back inside `flickT`): the left stick HELD at release still picks the charge's kind
+//           (lunge / whirl / leap, m1723), so a flick and a hold never mean the same thing
+//   by 'R'  roll the right thumb along the top of the pad (it is holding the charge up there): past `rOut` rad off straight up steps that
+//           way, back inside `rBack` re-arms -- well inside the trigger's own arc (1.05), so the charge is never dropped
+// TOOLS > PART AIM: LEFT / RIGHT / OFF.
+const PARTAIM = { on: 1, by: 'L', flickT: .35, out: .55, back: .25, rOut: .5, rBack: .2, pips: 12, camHi: 1.2, camBack: .7, camUp: .25, camMix: .55, stat: { steps: 0, hits: 0 } };
+try { const v = localStorage.getItem('mel.partaim'); if (v === '0') PARTAIM.on = 0; else if (v === 'R' || v === 'L') PARTAIM.by = v; } catch (e) {}
+const _paV = new THREE.Vector3(), _paS = new THREE.Vector3();
+function partsOf(src) { if (!src || src.dead) return null; const out = [];
+  if (src.Z && src.bn) { const B = src.bn, H = src.Z.P.h, TH = { head: .1, chest: .2, hand: .07, elbow: .06, knee: .07 }, add = (n, nm, arm) => { if (B[n]) out.push({ o: B[n], nm, arm, src, r: TH[nm] * H }); };
+    add('Head', 'head'); add('Spine2', 'chest');
+    for (const nm of src.roots) { if (src.cut[nm]) continue; const s = nm.endsWith('L') ? 'Left' : 'Right', two = nm.startsWith('arm2') ? '2' : ''; add(s + 'Hand' + two, 'hand', nm); add(s + 'ForeArm' + two, 'elbow', nm); }
+    add('LeftLeg', 'knee'); add('RightLeg', 'knee'); }
+  else if (src.legs && src.bn) { const W = SPIDER.w * (src.k || 1); if (src.bn.head) out.push({ o: src.bn.head, nm: 'head', src, r: W * .15 }); for (const l of src.legs) out.push({ o: l.b2, nm: 'leg', leg: l, src, r: W * .05 }); for (const l of src.stumps || []) out.push({ o: l.b1, nm: 'stump', leg: l, src, r: W * .05 }); }
+  return out.length > 1 ? out : null; }
+const partPips = []; function partPip(i) { if (!partPips[i]) { const m = new THREE.Sprite(lockMk.material.clone()); m.renderOrder = 60; m.frustumCulled = false; scene.add(m); partPips[i] = m; } return partPips[i]; }
+function partHidePips(from) { for (let i = from; i < partPips.length; i++) partPips[i].visible = false; }
+function partScreen(o, v) { o.getWorldPosition(v); return _paS.copy(v).project(camera); }
+// pick the part nearest the screen direction (dx, dy) from the current one (screen x right, y DOWN)
+function partStepDir(P, dx, dy) { const p = player, cur = p.part; if (!cur) return; const L = Math.hypot(dx, dy) || 1; dx /= L; dy /= L;
+  partScreen(cur.o, _paV); const cx = _paS.x, cy = -_paS.y; let best = null, bs = 1e9;
+  for (const q of P) { if (q.o === cur.o) continue; partScreen(q.o, _paV); const vx = _paS.x - cx, vy = -_paS.y - cy, vl = Math.hypot(vx, vy); if (vl < 1e-4) continue;
+    const c = (vx * dx + vy * dy) / vl; if (c < .3) continue; const sc = vl * (1 + 2 * (1 - c)); if (sc < bs) { bs = sc; best = q; } }
+  if (best) { p.part = best; PARTAIM.stat.steps++; snd('clang', { g: .12, r: 2.4 }); } }
+// every frame of a lock: which part, and where to draw it (null when the target has no parts)
+function partStep(d, dt) { const p = player, Z = PARTAIM; if (!Z.on || !d || !d.src) { p.part = null; partHidePips(0); return null; }
+  const P = partsOf(d.src); if (!P) { p.part = null; partHidePips(0); return null; }
+  if (!p.part || p.part.src !== d.src || !P.some(q => q.o === p.part.o)) p.part = P.find(q => q.nm === 'chest') || P[0];
+  if (Z.by === 'L') { const L = stick.L, m = Math.hypot(L.x, L.y);
+    if (m > Z.out) { if (!p.pfOut) { p.pfOut = 1; p.pfT = 0; } p.pfT += dt; if (m > (p.pfM || 0)) { p.pfM = m; p.pfX = L.x; p.pfY = L.y; } }
+    else if (m < Z.back && p.pfOut) { if (p.pfT < Z.flickT) partStepDir(P, p.pfX, p.pfY); p.pfOut = 0; p.pfM = 0; } }
+  else { const R = stick.R, a = R.down ? Math.atan2(R.x, -R.y) : 0;
+    if (!p.prOut && Math.abs(a) > Z.rOut) { p.prOut = 1; partStepDir(P, Math.sign(a), 0); } else if (p.prOut && Math.abs(a) < Z.rBack) p.prOut = 0; }
+  let k = 0; for (const q of P) { if (q.o === p.part.o || k >= Z.pips) continue; const m = partPip(k++); q.o.getWorldPosition(m.position); m.scale.setScalar(.32); m.material.opacity = .35; m.material.color.setRGB(1, .85, .6); m.visible = true; lockPull(m, (q.r || .2) + .2); }
+  partHidePips(k); return p.part.o.getWorldPosition(_paV); }
+// a blow from the charge's release on the creature whose part was chosen: where it lands (or null)
+// the lens, after everything else (it never writes `cam.pos`, so nothing feeds back): when the chosen part is well above him -- a guardian's
+// hands at 6 m -- it backs off along its own line (`camBack` x the height) and rises, and looks at a point between his chest and the part
+const _pcA = new THREE.Vector3(), _pcB = new THREE.Vector3();
+function partCam(dt) { const p = player, Z = PARTAIM, q = p.part, on = !!(q && (p.charge || p.chargeGo));
+  let hi = 0; if (on) { q.o.getWorldPosition(_pcA); hi = Math.max(0, _pcA.y - (p.pos.y + 1.2)); }
+  Z.camK = damp(Z.camK || 0, on && hi > Z.camHi ? 1 : 0, .2, dt); if (Z.camK < .01) return; if (!on) { _pcA.copy(Z.camP || p.pos); hi = Z.camH || 0; } else { Z.camP = (Z.camP || new THREE.Vector3()).copy(_pcA); Z.camH = hi; }
+  const k = Z.camK, back = hi * Z.camBack * k; _pcB.subVectors(camera.position, p.pos); _pcB.y = 0; const L = _pcB.length() || 1;
+  camera.position.x += _pcB.x / L * back; camera.position.z += _pcB.z / L * back; camera.position.y += hi * Z.camUp * k;
+  _pcB.set(p.pos.x, p.pos.y + 1.1, p.pos.z).lerp(_pcA, Z.camMix); camera.lookAt(_pcB.lerp(cam.tgt, 1 - k)); }
+function partHitAt(src) { const p = player, q = p.part; if (!PARTAIM.on || !q || q.src !== src || !(p.chargeGo || p.charge)) return null; PARTAIM.stat.hits++; return q.leg ? (src.stumps && src.stumps.includes(q.leg) ? q.leg.b1.getWorldPosition(_paV) : q.leg.foot) : q.o.getWorldPosition(_paV); }
 function markStep(dt, t) {
   lockMk.visible = false; lockGlow.visible = false;
   // m1293: *"When I press up with the launcher, if it's going to catch onto a guy it should show you -- a reticle on him, the camera tilting
@@ -17128,7 +17180,7 @@ function markStep(dt, t) {
   // ONLY WHILE THE HAMMER IS WINDING. A ring that is always up is a HUD element, and this one
   // exists to be read during the one moment there is a decision in it -- gauging the distance.
   if (!(p.charge && (s.charge || s.blade)) || p.chargeGo) {     // m1260: the KATANA's charge too -- it never drew its target
-    p.chgTgt = null;
+    p.chgTgt = null; if (!p.chargeGo) p.part = null; partHidePips(0);
     // **AND THE GUARD BORROWS IT (m101).** *"It sort of locks on them."* A lock you cannot see
     // is a lock you cannot trust, and this ring is already the right idiom for exactly that:
     // m51's own argument is that a mark ON a man is a LOCK you stop playing around, and one on
@@ -17149,7 +17201,7 @@ function markStep(dt, t) {
   }
   const A = chargeAim();
   p.chgTgt = A.t ? A.t.dist : null;
-  if (!A.t) { markRing.visible = false; return A; }
+  if (!A.t) { markRing.visible = false; p.part = null; partHidePips(0); return A; }
   const d = A.t.d, full = A.chg01 >= .995;
   const c = full ? MARK.hot : MARK.cool;
   markRing.material.color.setRGB(c[0], c[1], c[2]);
@@ -17167,9 +17219,9 @@ function markStep(dt, t) {
     if (lockMk.userData.d !== d) { lockMk.userData.d = d; lockMk.userData.snap = 1; }     // a new lock SNAPS in from wide
     lockMk.userData.snap = Math.max(0, (lockMk.userData.snap || 0) - dt * 5);
     const fill = full ? .95 : lerp(1.7, 1.1, A.chg01) * (1 + Math.sin(t * 6) * .03), sz = (fill + lockMk.userData.snap * .9) * big;
-    lockMk.position.set(P.x, P.y + hh, P.z); lockMk.scale.setScalar(sz); lockMk.material.rotation = 0;
+    const pp = partStep(d, dt); if (pp) lockMk.position.copy(pp); else lockMk.position.set(P.x, P.y + hh, P.z); lockMk.scale.setScalar(pp ? sz * .55 : sz); lockMk.material.rotation = 0;     // m1738: on the chosen PART
     lockMk.material.color.setRGB(full ? 1 : c[0], full ? .93 : c[1], full ? .7 : c[2]); lockMk.material.opacity = full ? 1 : .55 + A.chg01 * .35; lockMk.visible = true;
-    lockPull(lockMk, (d.K && d.K.r || .5) + .35);
+    lockPull(lockMk, pp ? (p.part.r || .2) + .25 : (d.K && d.K.r || .5) + .35);     // m1738: out of the stone by the part's own thickness
     lockGlow.visible = full; if (full) { lockGlow.position.copy(lockMk.position); lockGlow.scale.setScalar(sz * 1.5 * (1 + Math.sin(t * 9) * .06)); lockGlow.material.color.setRGB(1, .7, .3); } }
   return A;
 }
@@ -21318,7 +21370,7 @@ function swingSeg(dt) {
 // (`dr`), and only at about his own height -- the dash is flat, so a gun on the tower above him is not a promise it can keep.
 const MECH = { proxy: new WeakMap(), dy: 2.2 };
 function mechTargets(dyMax, wide) { const out = [], p = player, DY = dyMax || MECH.dy;
-  const put = (key, x, y, z, r) => { if (Math.abs(y - p.pos.y) > DY) return; let d = MECH.proxy.get(key); if (!d) MECH.proxy.set(key, d = { mech: 1, root: { position: new THREE.Vector3() }, K: { r, h: 1.4 }, dr: Math.max(0, r - .4) }); d.root.position.set(x, y, z); out.push(d); };
+  const put = (key, x, y, z, r) => { if (Math.abs(y - p.pos.y) > DY) return; let d = MECH.proxy.get(key); if (!d) MECH.proxy.set(key, d = { mech: 1, src: key, root: { position: new THREE.Vector3() }, K: { r, h: 1.4 }, dr: Math.max(0, r - .4) }); d.root.position.set(x, y, z); out.push(d); };
   for (const T of TURRET.list) if (!T.dead) put(T, T.x, T.y || 0, T.z, TURRET.r);
   if (GHOUSE.on && GHOUSE.on.bal && !GHOUSE.on.balDead) { const P = GHOUSE.on.bal.position; put(GHOUSE.on.bal, P.x, P.y, P.z, 1); }
   if (SIEGE.on) { const S = SIEGE.on; for (const L of S.bals) if (!(L.dead > 0)) put(L, L.x, 0, L.z, .9); if (!(S.dead > 0)) put(S, S.tp[0], 0, S.tp[1], 1.7); }
@@ -66175,6 +66227,7 @@ function stepCam(dt) {
   } else cam.shakeA = 0;
   camera.lookAt(cam.tgt);
   if (STATUE.cine) statueCam();     // m1705: the wake's cut-away
+  partCam(dt);     // m1738: a part aimed high on something tall: the lens leans back and looks up at it
   // the lens widens with speed -- the cheapest speed cue there is, and it costs nothing
   const rush = smooth(CAM.rush0, CAM.rush0 + CAM.rushSpan, p.speed);
   // m1035: *"horizontal it's very widescreen and far away -- change the FOV so the character is more or less the same distance and size, with

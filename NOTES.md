@@ -17,6 +17,25 @@ sun/hemi colours follow, then B becomes A and the reflection map is rebuilt); th
 `userData.m0` so the weathering can be undone -- `bldAge` alone could not). Everything else that reads the state per frame (the peak
 fire, the shutters, the lamps, the wheel, the refinery's colliders) follows by itself. `?hs=` is dropped from the address with
 `replaceState` so a reload lands in the state he turned it to. The timings are in `HWAGE`.
+## PART AIM: the charge's lock steps between a big thing's parts (m1738)
+His: "on bigger enemies -- bosses, big spiders -- the crosshair moves between their different hit points: his elbow, his hand, his face; you
+move the cursor around while you hold the charge, so it's more refined what you're going for."
+- `partsOf(src)`: a guardian/dweller -> head, chest, every standing arm's HAND and ELBOW (tagged with its arm), the knees; a spider -> the head,
+  every walking leg's knee, every stump. The charge's lock (`markStep`) sits on ONE (`p.part`), the marker at x.55, faint pips (up to 12) on
+  the rest. The mech proxy now carries its `src` so a lock knows WHAT it is on.
+- **Stepping**: `by` 'L' = a FLICK of the left stick (out past .55 and back under .25 inside .35 s) -- because the left stick HELD picks the
+  release kind (m1723) and a flick never means that; `by` 'R' = rolling the right thumb along the top of the pad past .5 rad (inside the
+  trigger's 1.05 arc, so the charge holds). The step goes to the nearest part in that SCREEN direction (cos > .3, distance x angle penalty).
+  TOOLS > PART AIM: LEFT / RIGHT / OFF.
+- **The release lands on it**: `partHitAt` overrides the blow's hit point in `guardBlow` / `spiderBlow` while the charge (or its release) is
+  live and the part belongs to that creature -- the arm of the chosen hand/elbow, the chosen leg.
+- **The lens** (`partCam`, after everything, never writing `cam.pos`): a part well above him backs the camera off by .7 x the height
+  and raises it, looking between his chest and the part. The marker is pulled out of the stone by the part's own thickness (`r`), else
+  the depth-tested sight sat inside the guardian's arm, unseen (render).
+- **A comment ate a declaration**: the first cut put `// m1738` mid-line in `guardBlow` and `spiderBlow`, commenting out `const p = player`
+  after it -- `check:boot` cannot see it (it throws only when a blow lands); the headless charge found it at once.
+- Headless (an awake guardian at 6.5 m, the katana charged): chest -> flick right -> elbow (arm2L) -> down -> hand -> left -> elbow -> left
+  -> knee -> up -> elbow; released: `arm2L` 7 -> 0 and cut, the other three untouched. Renders: the sight on the chest, the elbow, the hand.
 ## THE TEMPLE DWELLER: a mini Olmec, the second stone kind (m1737)
 His: "another character -- a mini Olmec; maybe not a big boss, just a little temple dweller that walks around; same procedure: hard-surface
 rig, statue version."
