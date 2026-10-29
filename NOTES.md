@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## His idle, found by sight: Idle 8 (m15xx)
+*He pointed at the Mixamo thumbnail called just "Idle" (wide stance, a foot a little forward, arms loose). The library holds 18 clips named Idle /
+Idle_1..Idle_18 with nothing in their data to tell them apart, so all 18 were baked onto Grumbo in a throwaway file and rendered as a contact sheet
+(30% into each loop) for him to pick by eye. He picked Idle_8 / Idle_14 (same base pose, perhaps different motion) and noted Idle / Idle_1 /
+Idle_13 look identical.*
+- Baked (30 roles, 3.39 MB): `idle_i8` (Idle_8), `idle_i14` (Idle_14), `idle_i13` (Idle_13, standing for that group). TOOLS > IDLE cycles IDLE 8
+  (default) / IDLE 14 / IDLE 13 / DWARF (with the arm-and-wrist fix) / RELAXED / READY / FIGHT; the saved pick moved to a new key so the new
+  default shows.
+
 ## The idle fix: shoulders back out (m1821)
 *"I like the fix, but now his stance is like a minnow -- his shoulders need to go out a little. It was the wrists that were killing me."* `IDLEPICK.fix.arm` .45 -> .12 (the upper arms barely pulled in now), `elbow` .3 -> .2; the wrists stay at .85.
 

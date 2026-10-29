@@ -236,6 +236,30 @@
    "edit": {
     "inPlace": 1
    }
+  },
+  {
+   "role": "idle_i8",
+   "stem": "Idle_8",
+   "name": "Idle_8",
+   "edit": {
+    "inPlace": 1
+   }
+  },
+  {
+   "role": "idle_i14",
+   "stem": "Idle_14",
+   "name": "Idle_14",
+   "edit": {
+    "inPlace": 1
+   }
+  },
+  {
+   "role": "idle_i13",
+   "stem": "Idle_13",
+   "name": "Idle_13",
+   "edit": {
+    "inPlace": 1
+   }
   }
  ]
 }

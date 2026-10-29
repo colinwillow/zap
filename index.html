@@ -15275,7 +15275,7 @@ function arenaUi() {
       else if (a === 'course') { ARENA.menu = ''; if (COURSE.on) courseClear(); else courseBuild('ACRO'); }     // m1078
       else if (a === 'wrun') { ARENA.menu = ''; if ((WRUN.boxes || []).length) wrunClear(); else wrunSpawn(); }     // m1064; m1072
       else if (a === 'smear') { SMEAR.on = SMEAR.on ? 0 : 1; try { localStorage.setItem('mel.smear', SMEAR.on ? '1' : '0'); } catch (err) {} }
-      else if (a === 'idlepick') { const I = IDLEPICK; I.pick = I.picks[(I.picks.indexOf(I.pick) + 1) % I.picks.length]; try { localStorage.setItem('mel.idlepick', I.pick); } catch (err) {} }     // m1815
+      else if (a === 'idlepick') { const I = IDLEPICK; I.pick = I.picks[(I.picks.indexOf(I.pick) + 1) % I.picks.length]; try { localStorage.setItem('mel.idlepick2', I.pick); } catch (err) {} }     // m1815
       else if (a === 'asprint') { AUTOSPRINT.on = AUTOSPRINT.on ? 0 : 1; try { localStorage.setItem('mel.autosprint', AUTOSPRINT.on); } catch (err) {} }     // m1809
       else if (a === 'kauto') { CHARGE3.auto = CHARGE3.auto === 'CHAIN' ? 'SINGLE' : 'CHAIN'; try { localStorage.setItem('mel.kauto', CHARGE3.auto); } catch (err) {} }     // m1798
       else if (a === 'wallmode') { WRUN.mode = WRUN.mode === 'VEL' ? 'STICK' : 'VEL'; try { localStorage.setItem('mel.wallmode', WRUN.mode); } catch (err) {} }     // m1776
@@ -32870,7 +32870,7 @@ const MIRROR = { clips: ['katana_slash_1', 'katana_combo', 'katana_360h', 'hurri
 // down by his side like a normal human -- or the one I use for action games, one foot forward, one back, ready to throw a punch"): three
 // library idles Forge-baked onto Grumbo (`idle_relaxed` = Neutral Idle, `idle_ready` = Ready Idle, `idle_fight` = Fight Idle). TOOLS > IDLE
 // picks; DWARF is the old one. Grumbo only (another hero keeps its own idle).
-const IDLEPICK = { pick: 'DWARF', picks: ['DWARF', 'RELAXED', 'READY', 'FIGHT'], base: null,     /* m1820: none of the three were his; DWARF back as default, FIXED below */
+const IDLEPICK = { pick: 'IDLE 8', picks: ['IDLE 8', 'IDLE 14', 'IDLE 13', 'DWARF', 'RELAXED', 'READY', 'FIGHT'], role: { 'IDLE 8': 'idle_i8', 'IDLE 14': 'idle_i14', 'IDLE 13': 'idle_i13' }, base: null,     /* m15xx: his picks off the contact sheet of the library's 18 'Idle's (wide stance, arms loose) */     /* m1820: none of the three were his; DWARF back as default, FIXED below */
   fix: { on: 1, arm: .12, elbow: .2, wrist: .85 } };     /* m1821 (his: "the wrists are fixed, but now his shoulders are too narrow -- like a minnow"): arm .45 -> .12, elbow .3 -> .2 */
 // m1820 (his: "the best would be adjusting the Dwarf idle -- his arms and his hands and wrists curving in"): IDLE FIX, on top of the clip, weighted by
 // how much the idle is playing: each upper arm's direction is pulled `arm` of the way toward straight DOWN (it hangs at his side instead of flaring),
@@ -32889,9 +32889,9 @@ function idleFixPose() { const I = IDLEPICK, F = I.fix; if (!F.on || HERO.pick !
     aim(UA, FA, _ifA.set(0, -1, 0).clone(), F.arm * w);
     UA.getWorldPosition(_ifA); FA.getWorldPosition(_ifB); const up = _ifB.clone().sub(_ifA).normalize(); aim(FA, HA, up, F.elbow * w);
     const bq = rig.bindL[nm + 'Hand']; if (bq) HA.quaternion.slerp(bq, F.wrist * w); } }
-try { const v = localStorage.getItem('mel.idlepick'); if (IDLEPICK.picks.includes(v)) IDLEPICK.pick = v; } catch (e) {}
+try { const v = localStorage.getItem('mel.idlepick2'); if (IDLEPICK.picks.includes(v)) IDLEPICK.pick = v; } catch (e) {}
 function idlePick() { const I = IDLEPICK; if (HERO.pick !== 'agoblin' || !rig.actions) return; if (I.base == null) I.base = CLIPS.idle;
-  const nm = I.pick === 'DWARF' ? I.base : 'idle_' + I.pick.toLowerCase(); CLIPS.idle = rig.actions[nm] ? nm : I.base; }
+  const nm = I.pick === 'DWARF' ? I.base : I.role[I.pick] || 'idle_' + I.pick.toLowerCase(); CLIPS.idle = rig.actions[nm] ? nm : I.base; }
 const STAIRS = { on: 0,     /* m1820: OFF (his: "walking upstairs is absolutely f---ed -- revert to what it was; the same on the rope bridge") */ look: .7, upAt: .22, downAt: .22, out: .1, half: .08, runAt: 4.2, tsLo: .6, tsHi: 1.9, ref: {} };
 function stairsWant(sp) { const p = player; if (!STAIRS.on || !p.grounded || sp < .6 || p.melee || p.roll || p.slide || p.beam || p.wrun || p.ledge || p.board || p.riding || p.dragon) { p.slopeS = 0; p.stairs = ''; return ''; }
   const h = Math.atan2(p.vel.x, p.vel.z), fx = Math.sin(h), fz = Math.cos(h), L = STAIRS.look, y = p.pos.y;
