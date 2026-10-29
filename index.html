@@ -14250,16 +14250,16 @@ function spiderStep(dt) { const p = player, Z = SPIDER; if (Z.globs.length) spid
 //   PIECES   each arm has its own stone (`armHp`); a blow takes from the arm nearest it, and an arm that runs out comes off and flies. Four arms
 //            gone, or no hp, and he BURSTS. A full katana charge takes an arm every time.
 // SPAWN > STONE GUARDIAN. `GUARD` is live on `mel.GUARD`; `h` is his height, `headK` / `arm2K` the boss proportions he asked about.
-const GUARD = { file: 'models/creatures/stone_guardian.glb', clips: 'models/characters/forged/stone_guardian.glb', h: 4.4, headK: 1.22, arm2K: 1.3,
-  speed: 0, speed0: 1.4, turn: 1.2, near: 3.4, hp: 48, armHp: 7, r: .32, flash: .8, stagEvery: 6, echo: .9, lag: .12, wake: 1.6,
+const GUARD = { file: 'models/creatures/stone_guardian.glb', clips: 'models/characters/forged/stone_guardian.glb', h: 8.8, headK: 1.22, arm2K: 1.1,     // m1735 (his: "double his size for fun"; the long arms and big hands are in the MODEL now, guardian_rig.py)
+  speed: 0, speed0: 2.6, turn: 1.1, near: 6.5, hp: 48, armHp: 7, r: .32, flash: .8, stagEvery: 6, echo: .9, lag: .12, wake: 1.6,
   // m1733 (his: "two little tiny middle arms, you can't even tell they're there -- all four need to stand out like a wrestler stance, equally, like a
   // big X"): THE X. Each arm bone is AIMED at a direction in his own frame (forward +Z, his left +X) after the clip: the upper pair up and
   // out, fists up; the lower pair down and out, claws forward. Idle and walking hold it fully (`xUp`); in an attack the upper arms go
   // back to the clip while the lower pair keep the X at `xLoAtk` and swing with the echo.
   X: { arm: [.8, .45, .4], fore: [.35, .8, .5], arm2: [.85, -.3, .45], fore2: [.5, -.5, .7] }, xUp: 1, xLo: 1, xLoAtk: .6,
-  swipe: { r: 5, hit: .45, R: 4.4, arc: 1.3, dmg: 16, push: 8, cool: [1.4, 2.6] },
-  smash: { r: 6, hit: .36, R: 4.6, dmg: 20, push: 10, cool: [4, 6.5] },
-  throw: { min: 9, max: 32, grab: .2, rel: .5, T: [.7, 1.5], g: .7, dmg: 18, R: 2.4, size: 1.1, cool: [3.5, 5.5] },
+  swipe: { r: 10, hit: .45, R: 9, arc: 1.3, dmg: 16, push: 8, cool: [1.4, 2.6] },
+  smash: { r: 12, hit: .36, R: 8, dmg: 20, push: 10, cool: [4, 6.5] },
+  throw: { min: 15, max: 50, grab: .2, rel: .5, T: [.9, 1.9], g: .7, dmg: 18, R: 3.6, size: 2.2, cool: [3.5, 5.5] },
   list: [], P: null, rocks: [], stat: { hits: 0, arms: 0, kills: 0, swipes: 0, smashes: 0, throws: 0 } };
 const _gdA = new THREE.Vector3(), _gdB = new THREE.Vector3(), _gdQ = new THREE.Quaternion(), _gdI = new THREE.Quaternion(), _gdC = new THREE.Vector3(), _gdQ2 = new THREE.Quaternion(), _gdQ3 = new THREE.Quaternion();
 // turn bone `b` (by `w`) so it points from itself to its child `c` along `d` (his own frame: x his left, y up, z forward)
@@ -14338,7 +14338,7 @@ function guardBlow(G, dirH, power, dmg, hx, hy, hz) { if (G.dead || G.hitCd > 0)
     for (const bnm of ['ForeArm' + two, 'Hand' + two]) { const b = G.bn[s + bnm]; if (!b) continue; b.getWorldPosition(_gdB); const q = Math.hypot(_gdB.x - Hx, (_gdB.y - Hy) * .7, _gdB.z - Hz); if (q < bd) { bd = q; best = nm; } } }
   spkBurst(Hx, Hy, Hz, 22, { col: [.85, .8, .7], spread: 5, size: .15, life: .45 }); spkBurst(Hx, Hy, Hz, 10, { col: [.55, 1, .6], spread: 4, size: .12, life: .35 }); smokeAt(Hx, Hy, Hz, 1.2, .7, [.82, .76, .66]);
   snd('clang', { g: .7, r: .55 + Math.random() * .15, x: M.x, z: M.z }); snd('hit', { g: .5, r: .6, x: M.x, z: M.z });
-  if (best && (bd < 2.4 || full)) { G.arm[best] -= full ? 99 : dmg; if (G.arm[best] <= 0) guardCut(G, best, dirH); }
+  if (best && (bd < GUARD.P.h * .55 || full)) { G.arm[best] -= full ? 99 : dmg; if (G.arm[best] <= 0) guardCut(G, best, dirH); }
   if (G.hp <= 0 || Object.keys(GROOT).every(nm => G.cut[nm])) { guardDie(G, dirH); return 1; }
   if (G.dmgRun >= GUARD.stagEvery && G.st !== 'throw') { G.dmgRun = 0; G.st = 'stag'; G.stT = 0; guardPlay(G, 'hit', .1); }
   return 1; }
@@ -14384,7 +14384,7 @@ function guardThink(G, d, dt) { const Z = GUARD, R = G.root, p = player, roll = 
         const dx = p.pos.x - R.position.x, dz = p.pos.z - R.position.z, q = Math.hypot(dx, dz), off = Math.abs(wrapAngle(Math.atan2(dx, dz) - R.rotation.y));
         if (q < Z.swipe.R && off < Z.swipe.arc && Math.abs(p.pos.y - R.position.y) < Z.P_h * .6 && !p.roll) playerHurt(Z.swipe.dmg, Math.atan2(dx, dz) + .6, Z.swipe.push, 3, .5, 1); }
       if (u('swipe') >= 1) { G.st = 'walk'; G.cool = roll(Z.swipe.cool); } break;
-    case 'smash': if (!G.hit && u('smash') > Z.smash.hit) { G.hit = 1; GUARD.stat.smashes++; const f = 2.2, cx = R.position.x + Math.sin(R.rotation.y) * f, cz = R.position.z + Math.cos(R.rotation.y) * f, gy = R.position.y;
+    case 'smash': if (!G.hit && u('smash') > Z.smash.hit) { G.hit = 1; GUARD.stat.smashes++; const f = Z.P_h * .5, cx = R.position.x + Math.sin(R.rotation.y) * f, cz = R.position.z + Math.cos(R.rotation.y) * f, gy = R.position.y;
         for (let k = 0; k < 24; k++) { const a = k / 24 * 6.283; smokeAt(cx + Math.cos(a) * Z.smash.R * .7, gy + .2, cz + Math.sin(a) * Z.smash.R * .7, 2.4, 1.2, [.8, .74, .64]); }
         for (let i = 0; i < 3; i++) spkBurst(cx, gy + .3, cz, 26, { col: [.8, .74, .64], spread: 9, size: .18, life: .55 }); for (let i = 0; i < 30; i++) gfire(cx + (Math.random() - .5) * 2, gy + .1, cz + (Math.random() - .5) * 2, 1);
         snd('boom', { g: 1, r: .55, x: cx, z: cz }); camShake(.55); if (DEBRIS.on) debrisArea(cx, gy, cz, Z.smash.R);

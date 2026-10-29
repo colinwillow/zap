@@ -31,6 +31,34 @@
       keeping range) and answers to it, patterns that change with how many arms he has left, punishes for button-mashing.
 - [ ] His sign-off on his phone.
 
+## HOW YOU BEAT HIM -- the strategy layer (his, m1735; a proposal to build once the body is signed off)
+> *"Eventually I want god-tier enemies as big as canyons -- like God of War, you can't really just hurt them: you find the vulnerability, shoot
+> it, plant a bomb, blow off their arm. For now double his size, and sub-bosses that are just pretty big. Your sword just bounces off the stone
+> arms; once we have the bomb, maybe three blows knocks an arm off -- but he picks it back up, so you knock it off and then blow the whole
+> thing. There's gotta be strategy and intrigue."*
+
+**Three tiers of big thing**
+| tier | size | how it is fought |
+|---|---|---|
+| **sub-boss** (this guardian, today) | 2-5x you | on foot: dodge, read the attacks, work on the pieces |
+| **boss** | 5-10x you (he is at 8.8 m) | the vulnerability loop below, one arena |
+| **titan** (god tier) | canyon-sized | the arena IS the body: climb it, ride the arms, the weak points are places |
+
+**The loop for a stone boss (one cycle per arm)**
+1. **Stone is armour.** A sword on the stone CLANGS OFF (a spark, a recoil on you, no damage) -- the blade only bites where the stone is
+   CRACKED or where the Jinra GLOWS (his chest core, the green seams at his joints, his eyes).
+2. **Open it.** A weak point opens on a READ: after a SMASH his hands are stuck in the ground for a beat (the joints exposed); after a THROW the
+   empty hand glows; an arrow in the EYE staggers him (the God of War shot).
+3. **Break it.** Strikes on an open joint crack the arm (three, as he said); a BOMB stuck to a cracked joint (the lantern bomb, TOOLS_SANDBOX
+   piece 5) blows it OFF.
+4. **Deny it.** A fallen arm is not gone: he walks to it and PUTS IT BACK (a slow, readable reach -- the window). Blow it up or cut it to
+   pieces on the ground (it is debris already: `debrisCut`) and it is gone for good.
+5. **Each arm lost changes him**: fewer swipes, more throws with what he has left; at one arm, desperate (the charge); at none, the chest core
+   is open and that is the kill.
+
+**What exists to build it on**: the pieces (`guardCut`), debris you can cut, arrows and blast arrows, the statue wake. **What is missing**: the
+clang-off rule, weak points as places on the body, the bomb, the re-attach walk, a camera for something 9 m tall.
+
 ## Dials (`GUARD`)
-`h` 4.4 m tall · `headK` 1.22 (his bigger head) · `arm2K` 1.12 (the lower arms a little longer) · `hp` 48 · `armHp` 7 · hit frames measured
+`h` 8.8 m tall (m1735: doubled) · `headK` 1.22 (his bigger head) · `arm2K` 1.1 · the LONG ARMS are in the model (`guardian_rig.py`: upper arm x1.4, forearm x1.5, hands x1.8) · `hp` 48 · `armHp` 7 · hit frames measured
 (the right hand's fastest frame): swipe .48, smash .34, throw .50.

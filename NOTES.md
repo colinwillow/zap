@@ -17,6 +17,15 @@ sun/hemi colours follow, then B becomes A and the reflection map is rebuilt); th
 `userData.m0` so the weathering can be undone -- `bldAge` alone could not). Everything else that reads the state per frame (the peak
 fire, the shutters, the lamps, the wheel, the refinery's colliders) follows by itself. `?hs=` is dropped from the address with
 `replaceState` so a reload lands in the state he turned it to. The timings are in `HWAGE`.
+## The guardian: long arms, big hands, twice the size; the strategy layer written down (m1735)
+His: "his arms look really short -- longer and bigger, big exaggerated long arms with big hands for throwing boulders... double his size for
+fun"; and the god-tier / vulnerability / bomb / re-attach idea (GUARDIAN.md, HOW YOU BEAT HIM).
+- **In the MODEL, not by bone scale** (a bone scaled non-uniformly shears its children): `guardian_rig.py` reshapes each arm PIECE about its
+  own joint -- upper arm x1.4 long / x1.15 thick, forearm x1.5 / x1.2, hand x1.8 whole -- carries the pieces further out to their new
+  joints, and moves the bones with them. The pieces are split per bone already, so nothing tears. Re-forged, 917 KB.
+- `GUARD.h` 4.4 -> 8.8; the ranges with him (swipe 10/9, smash 12/8 centred half his height ahead, throw 15-50 m, a 2.2 m boulder, walk 2.6,
+  the arm-pick reach .55 of his height). `arm2K` 1.3 -> 1.1 (the lower arms are long in the model now).
+- Render: next to Grumbo for scale, from the front (the X, the hands), mid-throw with the boulder.
 ## The guardian goes HARD SURFACE and stands in an X; the bow is carried, not shouldered (m1733)
 His: "the auto rig made him like a human with skin -- he needs a hard-surface rig, each joint paired; his jaw is stretching, it looks horrible";
 "two little tiny middle arms, you can't even tell they're there -- all four arms need to stand out like a wrestler stance, a big X";
