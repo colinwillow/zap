@@ -304,7 +304,7 @@ then start building the building, kinda like you built his home -- a ton of pass
 - [x] **FALLEN (m1795):** crashed on the plateau, weathered; the live turn raises it; colliders follow
 - [x] (m1796) the crane's orb swings; FALLEN rubble ring
 - [x] (m1797) broken towers in the FALLEN pose
-- [x] (m1787) the hall's interior: a throne room through open doors
+- [x] (m1799) the hall's interior: a throne room through open doors
 - [ ] the keep's interior and stair; the rubble solid; the brazier's fire
 - [x] **the way UP (m1794):** the Jinra lift -- bridge, gantry, a bronze cage on rails from the plateau; plaza steps, interiors, the FALLEN state, wide sails, colliders that follow the live turn
 - [ ] castle pass 1..N: the keep, the round towers and roofs, the walls and walkways, the bridges to the satellites, banners, awnings,

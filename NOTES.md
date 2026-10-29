@@ -322,7 +322,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## THE SKY CASTLE, pass 12: the hall opens -- a throne room (Worker B)
+## THE SKY CASTLE, pass 12: the hall opens -- a throne room (m1799, Worker B)
 The hall was a solid drum with a painted door. Now its wall is a lathe with the DOORWAY cut out (+-.19 rad at the front) under a lintel
 section, an INNER face (the same lathe mirrored, normals recomputed), the plinth an open ring, a planked roof slab that is the ceiling, and
 the doors swung OPEN on their hinges (two iron-strapped leaves; the gold strap and rings went). The hall's frame is turned half a rib so no
