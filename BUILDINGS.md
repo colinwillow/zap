@@ -297,7 +297,7 @@ then start building the building, kinda like you built his home -- a ton of pass
 - [x] **style pass 1 (m1786):** the home's materials (pocked sandstone, timber, bronze, ragged cloth), timber frames on every round body, bronze wheels, home-style awnings
 - [x] style pass 2 (m1787): ROOFS the home's way on some towers (his red/cream cloth cone with timber poles poking out, iron bands), brass CHIMNEYS on the hall
 - [x] style pass 3 (m1788): CLUTTER and life -- pots on shelves under the awnings, crates, barrels, lantern posts, stone lanterns, bells, cacti and agaves
-- [ ] style pass 4: the home's CRANE with its hanging brass ball and banner, BUNTING strung between the towers, flags on poles
+- [x] style pass 4 (m1779): the home's CRANE with its hanging brass ball and banner, BUNTING strung between the towers, flags on poles
 - [ ] style pass 5: the home's SHAPES -- walls that bulge (lathe bellies, not straight cylinders), round boulders round the bases
 - [ ] style pass 6: timber SCAFFOLDING, galleries and plank walkways off the towers (the key art)
 - [ ] next: the way UP from the ground, interiors, the FALLEN state, wide sails, colliders that follow the live turn

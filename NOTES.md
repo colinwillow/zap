@@ -293,6 +293,11 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## THE SKY CASTLE, style pass 4: the home's crane, bunting and flags (Worker B)
+The home's signatures. Its CRANE on the hall's roof terrace (a timber mast with iron hoops, a braced boom reaching 17 m out over the lawns
+at the back-left, a stay, a chain down to a banded BRONZE ORB, his ragged chevron banner hanging under it); BUNTING -- a sagging rope from
+the keep's balcony to every tower with alternating red and cream pennants (15 per rope); and a ragged FLAG on a mast over every
+cloth-roofed tower, rippled. +2 draws (the pennants).
 ## THE SKY CASTLE, style pass 3: clutter and life (m1788, Worker B)
 The home's stalls are full; the castle's lawns were bare. Under every awning a two-tier plank SHELF against the hall (two at the door)
 with glazed POTS in four glazes (terracotta, violet, teal, ochre: lathes, a few gaps); CRATES (strapped) and iron-hooped BARRELS at every
