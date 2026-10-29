@@ -5,6 +5,24 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Flyers overhead: the lens tips up, the gun and bow lock on, the lightning announces itself, an edge arrow (m15xx)
+*"Anytime we have a flying animal above you, or an archer, or a cannon ... the camera tilts to show them -- we need the same when an enemy is above you,
+like this dragon flying overhead; it's just out of screen. I couldn't hit it at all. I couldn't even see when its bolts were coming."*
+- **The up-look (`UPLOOK`, `upLookW`)** only ever answered SHOTS in the air (m1276) and a turret that had seen him (m1350). A hostile body ABOVE him
+  (`flyFoe`: a flyer -- `d.fy` -- an archer, a beast; its middle more than `dy` 2 m over his chest, inside `flyR` 24 m) now tips it while it is there,
+  weighted by its elevation; a flyer adds `flyEl` .14 rad more (`cam.upF`). Measured headless with the mech at 5.2 m, 6.5 m off: the weight reaches .96.
+- **The aim (`FLYAIM`, `flyAim`, in `aimRaw`)**: the aim lock is off (m36) and the vertical assist only took MACHINES (m1259), so a gun or a bow
+  held up at a flyer shot level under it. Now a `flyFoe` above him within `cone` .38 rad of the lens and 45 m is where the shot goes, at any
+  elevation (the bow's arc solves to it). Measured: aimRaw lands at (6.8, 6.1, 9.1) on the dragon at (6.8, 5.0, 9.1), lock 1. On the ground nothing changes.
+- **The lightning (`beastStrike`)**: a pale ring on the floor, under his own body, with no sign of who called it. Now the ring is solid with a dark
+  rim and FILLS in as the strike comes, a thin column of light runs from the dragon's head to it for the whole wind-up, his head glows, and a crackle
+  starts it.
+- **`FLYEDGE`**: a flyer within 30 m that the lens cannot see puts a chevron on the screen edge pointing at it.
+- **The loop it opens**: hits on the mech fill its stun meter and it DROPS to the floor (`cDown`, m974) -- shoot it down, then the blade. Still not
+  built, his three ideas, for him to pick: a ninja flip UP to a flyer (the katana's high leap aimed at it), a rope it dangles to climb, mounting it.
+- Headless note: the first frame after a new model becomes visible costs ~56 s of shader compile in SwiftShader -- that, not a loop, is what
+  "hung" the wall probe (e4) too. Give such a probe 10 minutes.
+
 ## The Wall Park, and a run-up you can start from a stride away (m1751)
 *"We still need to figure out a bunch of wall riding stuff so maybe some wall riding sandboxes ... definitely need to figure out the wall run."*
 - **KORAJIN > The Wall Park** (`?w=forge&zone=wall`, `WPARK` / `wparkBuild`): five stations on the white floor, each colour-coded with a floor

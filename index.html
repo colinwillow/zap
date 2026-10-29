@@ -9739,11 +9739,23 @@ function beastBoom(f, hitP) {
   if (!player.roll && (hitP || Math.hypot(dx, dz) < f.splash && P.y < 1.5)) playerHurt(f.dmg * (hitP ? 1 : .5), Math.atan2(f.v.x, f.v.z), f.push, 2, .4, 1);
   scene.remove(f.m);
 }
+const _UPV = new THREE.Vector3(0, 1, 0), _bkD = new THREE.Vector3();
 function beastStrike(d) {     // lightning: a ring where you stand, then the bolt into it
   const C = beastC(d), at = player.pos.clone(); at.y = .03;
-  const ring = new THREE.Mesh(new THREE.RingGeometry(C.strikeR * .82, C.strikeR, 48), new THREE.MeshBasicMaterial({ color: 0xbfe8ff, toneMapped: false, transparent: true, opacity: .8, depthWrite: false, side: THREE.DoubleSide }));
-  ring.rotation.x = -Math.PI / 2; ring.position.copy(at); scene.add(ring);
-  ARENA.beast.bolts.push({ d, at, ring, t: 0, T: C.strikeT, line: null });
+  // m15xx (his: "I couldn't even see when its bolts were coming"): a pale ring vanished on the light floor and under his own body. Now the ring is
+  // SOLID with a dark rim (the bow arc's lesson, m1744) and fills inward as the strike comes; a thin column of light stands from the dragon's
+  // head down to it the whole wind-up (so the eye goes from the ring to WHO is calling it); his head glows; a crackle starts it.
+  const ring = new THREE.Mesh(new THREE.RingGeometry(C.strikeR * .82, C.strikeR, 48), new THREE.MeshBasicMaterial({ color: 0x9fdcff, toneMapped: false, transparent: true, opacity: .9, depthWrite: false, side: THREE.DoubleSide }));
+  ring.rotation.x = -Math.PI / 2; ring.position.copy(at); ring.renderOrder = 62; scene.add(ring);
+  const rim = new THREE.Mesh(new THREE.RingGeometry(C.strikeR, C.strikeR * 1.07, 48), new THREE.MeshBasicMaterial({ color: 0x0c1a2e, transparent: true, opacity: .85, depthWrite: false, side: THREE.DoubleSide }));
+  rim.renderOrder = 61; ring.add(rim);
+  const fill = new THREE.Mesh(new THREE.CircleGeometry(C.strikeR * .82, 40), new THREE.MeshBasicMaterial({ color: 0x5ab8ff, toneMapped: false, transparent: true, opacity: .0, depthWrite: false, side: THREE.DoubleSide }));
+  fill.renderOrder = 60; ring.add(fill);
+  const col = new THREE.Mesh(new THREE.CylinderGeometry(.06, .06, 1, 6, 1, true).translate(0, .5, 0), new THREE.MeshBasicMaterial({ color: 0xcfeeff, toneMapped: false, transparent: true, opacity: .5, depthWrite: false }));
+  col.renderOrder = 61; scene.add(col);
+  const glow = glowBall(.5); glow.renderOrder = 62; scene.add(glow);
+  snd('zap', { g: .35, r: 1.6, x: at.x, z: at.z });
+  ARENA.beast.bolts.push({ d, at, ring, fill, col, glow, t: 0, T: C.strikeT, line: null });
 }
 function beastFxStep(dt) {
   const B = ARENA.beast;
@@ -9760,7 +9772,12 @@ function beastFxStep(dt) {
       continue; }
     if (hit || wall || P.y < f.r || f.life <= 0) { beastBoom(f, hit); B.fx.splice(i, 1); } }
   for (let i = B.bolts.length - 1; i >= 0; i--) { const b = B.bolts[i]; b.t += dt; const u = b.t / b.T;
-    b.ring.material.opacity = .35 + .45 * Math.abs(Math.sin(b.t * 18)); b.ring.scale.setScalar(1.25 - .25 * Math.min(1, u));
+    b.ring.material.opacity = .55 + .45 * Math.abs(Math.sin(b.t * (12 + 18 * Math.min(1, u)))); b.ring.scale.setScalar(1.25 - .25 * Math.min(1, u));
+    if (b.fill) { b.fill.material.opacity = u < 1 ? .15 + .45 * u * u : 0; b.fill.scale.setScalar(Math.max(.02, Math.min(1, u))); }     // fills in as it comes
+    if (b.col) { const live = u < 1, o = live && b.d.root.visible ? beastHead(b.d) : null; b.col.visible = !!o; b.glow.visible = !!o;
+      if (o) { const dx = o.x - b.at.x, dy = o.y - b.at.y, dz = o.z - b.at.z, L = Math.hypot(dx, dy, dz) || 1; b.col.position.copy(b.at); b.col.scale.set(.6 + u, L, .6 + u);
+        b.col.quaternion.setFromUnitVectors(_UPV, _bkD.set(dx / L, dy / L, dz / L)); b.col.material.opacity = .25 + .45 * u * Math.abs(Math.sin(b.t * 30));
+        b.glow.position.copy(o); b.glow.scale.setScalar(.6 + u * 1.2 + Math.sin(b.t * 40) * .15); } }
     if (u >= 1 && !b.line) { const o = b.d.root.visible ? beastHead(b.d) : b.at.clone().setY(12), pts = [];
       for (let k = 0; k <= 12; k++) { const p = o.clone().lerp(b.at, k / 12); if (k && k < 12) { p.x += (Math.random() - .5) * .9; p.z += (Math.random() - .5) * .9; p.y += (Math.random() - .5) * .5; } pts.push(p); }
       b.line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0xdff4ff, toneMapped: false })); scene.add(b.line);
@@ -9768,7 +9785,7 @@ function beastFxStep(dt) {
       const dx = player.pos.x - b.at.x, dz = player.pos.z - b.at.z;
       if (!player.roll && Math.hypot(dx, dz) < beastC(b.d).strikeR && player.pos.y < 1.6) playerHurt(b.d.K.hitDmg * .8, Math.atan2(dx, dz), b.d.K.push * .8, 3, .6, 1); }
     if (b.line) b.line.visible = Math.sin(b.t * 60) > -.3;
-    if (u >= 1.25) { scene.remove(b.ring); if (b.line) scene.remove(b.line); B.bolts.splice(i, 1); } }
+    if (u >= 1.25) { scene.remove(b.ring); if (b.line) scene.remove(b.line); if (b.col) { scene.remove(b.col); scene.remove(b.glow); } B.bolts.splice(i, 1); } }
 }
 function beastStep(d, dt, t) {
   const K = d.K, C = beastC(d), L = d.root, P = L.position, fly = K.creature === 'mech';
@@ -17241,6 +17258,16 @@ function mechAim() { const p = player, h = cam.az; let best = null, bs = 1e9;
   for (const d of mechTargets(1e9)) { const P = d.root.position, dx = P.x - p.pos.x, dz = P.z - p.pos.z, dd = Math.hypot(dx, dz); if (dd < 1.5 || dd > WEAP.range) continue;
     const off = Math.abs(wrapAngle(Math.atan2(dx, dz) - h)); if (off > MECHAIM.cone) continue; if (Math.abs(Math.atan2(P.y + MECHAIM.up - (p.pos.y + 1.1), dd)) > MECHAIM.maxEl) continue; const sc = dd * Math.sin(off) + .05 * dd; if (sc < bs) { bs = sc; best = { x: P.x, y: P.y + MECHAIM.up, z: P.z, d: dd }; } }
   return best; }
+// m15xx (his: "anytime we have a flying animal above you, or an archer above you ... I couldn't hit it at all"): FLYAIM. A hostile body ABOVE him
+// (a flyer -- `d.fy` -- an archer, a beast) more than `dy` m over his chest, within `cone` of the lens's bearing and `range`, at ANY elevation, is
+// where the gun and the bow point (the bow's arc then solves to it). On the ground nothing changes: the body must be `dy` up to qualify.
+const FLYAIM = { on: 1, dy: 1.5, cone: .38, range: 45, mid: .5 };
+const flyFoe = d => d.st !== 'gone' && d.st !== 'down' && !d.ko && d.root.visible && (d.fy !== undefined || d.archer || d.K.archer || d.K.creature);
+function flyAim() { if (!FLYAIM.on || !inArena()) return null; const p = player, h = cam.az, cy = p.pos.y + 1.1; let best = null, bs = 1e9;
+  for (const d of DUMMIES) { if (!flyFoe(d)) continue; const R = d.root.position, y = R.y + (d.K.h || 1.8) * FLYAIM.mid; if (y - cy < FLYAIM.dy) continue;
+    const dx = R.x - p.pos.x, dz = R.z - p.pos.z, dd = Math.hypot(dx, dz); if (dd > FLYAIM.range) continue;
+    const off = Math.abs(wrapAngle(Math.atan2(dx, dz) - h)); if (off > FLYAIM.cone && dd > 2.5) continue; const sc = off * 6 + dd * .05; if (sc < bs) { bs = sc; best = { x: R.x, y, z: R.z, d: dd }; } }
+  return best; }
 function aimPoint() {
   // FLYING AS HER, THE AIM IS THE 3D DIRECTION HER RIGHT THUMB HOLDS (m271, Rollergirl r146 `p.gDir`), and
   // the walk then stops on the ground as well as on a box -- a shot can point down at the street
@@ -17286,6 +17313,7 @@ function aimRaw() {
   // just auto-aimed up to him."* Bodies already lock at their chest; a MACHINE in the lens's line (within `MECHAIM.cone`, in range, any
   // height) now pulls the shot up (or down) to it the same way -- the turret on the tower, the ballista on the wall
   if (!L) { const T = mechAim(); if (T) return { p: _ap.set(T.x, T.y, T.z), hit: 1, lock: 1, dist: T.d }; }
+  if (!L) { const T = flyAim(); if (T) return { p: _ap.set(T.x, T.y, T.z), hit: 1, lock: 1, dist: T.d }; }     // m15xx: a flyer / archer above him
   if (!L && AIRT.length) { const T = airAim(); if (T) return { p: _ap.set(T.x, T.y, T.z), hit: 1, lock: 0, dist: Math.hypot(T.x - player.pos.x, T.z - player.pos.z) }; }   // m350
   if (!L) return aimPoint();
   return { p: _ap.set(L.root.position.x, L.root.position.y + L.K.h * LOCK.chest, L.root.position.z),
@@ -66372,7 +66400,7 @@ function acamPip() {
   renderer.setScissorTest(false); renderer.setViewport(0, 0, W, H);
   const B = ACAM.box.style; B.display = 'block'; B.width = w + 'px'; B.height = h + 'px'; B.top = (H - y - h) + 'px'; B.right = '10px';
 }
-const UPLOOK = { on: 1, dy: 2, tta: 3.4, el: .24, lift: 1.4, in: .32, out: .9, gun: .85 };     // m1276: *"a little earlier, more ease, so it's a warning and not a jerk"*
+const UPLOOK = { on: 1, dy: 2, tta: 3.4, el: .24, lift: 1.4, in: .32, out: .9, gun: .85, fly: 1, flyR: 24, flyEl: .14, fw: 0 };     // m1276: *"a little earlier, more ease, so it's a warning and not a jerk"*
 function upLookW() { if (!UPLOOK.on || !inArena()) return 0; const p = player, cy = p.pos.y + 1; let w = 0;
   if (p.aim && aimHas && aimLock) { const dy = _aimP.y - cy; if (dy > 1.2) w = Math.max(w, Math.min(.8, dy / 6)); }     // m1293: the lens tips to a target the gun is locked on above him
   for (const T of threatList()) { const dy = T.p.y - cy; if (dy < UPLOOK.dy) continue; const t = threatTTA(T); if (t > UPLOOK.tta) continue;
@@ -66383,7 +66411,24 @@ function upLookW() { if (!UPLOOK.on || !inArena()) return 0; const p = player, c
   // keeps him in sight -- the warning is the gun's attention, not the shot.
   for (const T of TURRET.list) { if (T.dead || !(T.see > 0)) continue; const dy = (T.y || 0) + TURRET.muzzle - cy; if (dy < UPLOOK.dy) continue;
     const d = Math.hypot(T.x - p.pos.x, T.z - p.pos.z); if (d > TURRET.range + 6) continue; w = Math.max(w, Math.min(1, (dy - UPLOOK.dy) / 6 + .4) * UPLOOK.gun); }
+  // m15xx: a hostile body ABOVE him (the mech dragon overhead, an archer on a roof) inside `flyR` tips the lens up while it is there -- not only
+  // when its shot is in the air. Weighted by how high it is over how far (the elevation), so one hovering 5 m up at 7 m tips it most.
+  UPLOOK.fw = 0; if (inArena()) for (const d of DUMMIES) { if (!flyFoe(d)) continue; const R = d.root.position, dy = R.y + (d.K.h || 1.8) * .5 - cy; if (dy < UPLOOK.dy) continue;
+    const dd = Math.hypot(R.x - p.pos.x, R.z - p.pos.z); if (dd > UPLOOK.flyR) continue; const fw = Math.min(1, Math.atan2(dy, Math.max(1, dd)) / .7) * UPLOOK.fly * Math.min(1, (UPLOOK.flyR - dd) / 4); UPLOOK.fw = Math.max(UPLOOK.fw, fw); w = Math.max(w, fw); }
   return Math.min(1, w); }
+// m15xx: the FLYER'S EDGE ARROW. A hostile body above him (`flyFoe`) inside `r` m that the lens cannot see (behind, or off the top) puts a chevron
+// on the screen's edge pointing at it, brighter the closer it is -- a phone has no ears for "it is behind you".
+const FLYEDGE = { on: 1, r: 30, el: null, v: new THREE.Vector3() };
+function flyEdge() { const E = FLYEDGE; if (!E.on || !inArena()) { if (E.el) E.el.style.display = 'none'; return; }
+  let best = null, bd = 1e9; for (const d of DUMMIES) { if (!flyFoe(d)) continue; const R = d.root.position; if (R.y - player.pos.y < 1.5) continue; const dd = Math.hypot(R.x - player.pos.x, R.z - player.pos.z); if (dd < bd && dd < E.r) { bd = dd; best = d; } }
+  if (!E.el) { E.el = document.createElement('div'); E.el.style.cssText = 'position:fixed;z-index:9;width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-bottom:30px solid #9fdcff;filter:drop-shadow(0 0 3px #0c1a2e) drop-shadow(0 0 1px #0c1a2e);pointer-events:none;display:none;margin:-15px 0 0 -16px'; document.body.appendChild(E.el); }
+  if (!best) { E.el.style.display = 'none'; return; }
+  const v = E.v.copy(best.root.position); v.y += (best.K.h || 1.8) * .5; v.project(camera);
+  const behind = v.z > 1, on = !behind && Math.abs(v.x) < .92 && Math.abs(v.y) < .9; if (on) { E.el.style.display = 'none'; return; }
+  let x = behind ? -v.x : v.x, y = behind ? -v.y : v.y; if (behind && Math.abs(y) < .2) y = -.6;     // behind him: point down-and-round, not at the middle
+  const k = Math.max(Math.abs(x) / .9, Math.abs(y) / .86) || 1; x /= k; y /= k;
+  const W = innerWidth, H = innerHeight; E.el.style.display = 'block'; E.el.style.left = ((x + 1) * .5 * W) + 'px'; E.el.style.top = ((1 - y) * .5 * H) + 'px';
+  E.el.style.transform = 'rotate(' + Math.atan2(x, y) + 'rad)'; E.el.style.opacity = (.45 + .55 * (1 - bd / E.r)).toFixed(2); }
 function stepCam(dt) {
   const p = player;
   const rx = stick.R.down ? stick.R.x : ((keys.j ? -1 : 0) + (keys.l ? 1 : 0));
@@ -66485,9 +66530,10 @@ function stepCam(dt) {
   // him, due within `tta` s) that is more than `dy` m above his chest; the lens drops by `el` and the look point lifts by `lift` x that, in
   // fast (`in`), back out slowly (`out`), so it reads as a glance and not a cut. Its azimuth is never touched (one writer: `cam.az`).
   cam.up = damp(cam.up || 0, upLookW(), (cam.up || 0) < upLookW() ? UPLOOK.in : UPLOOK.out, dt);
+  cam.upF = damp(cam.upF || 0, UPLOOK.fw, (cam.upF || 0) < UPLOOK.fw ? UPLOOK.in : UPLOOK.out, dt);     // m15xx: a flyer overhead tips it further
   cam.a3 = damp(cam.a3 || 0, aim3Live() || (AIM3.on && p.aim && slotNow().aim) ? 1 : 0, .12, dt);     // m1259: the 3D aim's over-the-shoulder lens
   const a3 = cam.a3, a3p = (p.gPit || 0) * a3;
-  cam.el = p.dragon ? damp(cam.el || CAM.el, CAM.el + DRAGZ.camEl, .3, dt) : damp(cam.el || CAM.el, kit.inside === 'cut' ? KIT.cutEl : CAM.el + KIT.highEl * Math.min(1, kit.high) - UPLOOK.el * cam.up - a3p * AIM3.cam.el - (AIM3.on && slotNow().aim ? (p.gPit || 0) * AIM3.pCam : p.backAim ? (p.gPit || 0) * BACKAIM.cam * (BACKAIM.on ? 1 : 1.2) : 0), .12, dt);
+  cam.el = p.dragon ? damp(cam.el || CAM.el, CAM.el + DRAGZ.camEl, .3, dt) : damp(cam.el || CAM.el, kit.inside === 'cut' ? KIT.cutEl : CAM.el + KIT.highEl * Math.min(1, kit.high) - UPLOOK.el * cam.up - UPLOOK.flyEl * (cam.upF || 0) - a3p * AIM3.cam.el - (AIM3.on && slotNow().aim ? (p.gPit || 0) * AIM3.pCam : p.backAim ? (p.gPit || 0) * BACKAIM.cam * (BACKAIM.on ? 1 : 1.2) : 0), .12, dt);
   // **AND THE LOOK POINT IS CHEST HEIGHT ON THE BODY BEING DRAWN (m112).** `CAM.look` is his own
   // chest; worn as a 1.78 m drunk that is the man's waist, so the lens frames him low. It is the
   // one term the morph moves -- the collider and every speed stay his, deliberately.
@@ -67486,7 +67532,7 @@ function frameBody() {
   txStep(dt);                   // m889 (F6e-2): the other regions' held blocks, dressed by their holders
   turfDressStep(dt); hothStep(dt); kswapStep(dt); flashStep(dt); e115Step(dt); radioStep(dt);            // the buildings wear their block's holder, cross-fading when it changes hands (m409)
   kitCamStep();
-  stepCam(dt);
+  stepCam(dt); flyEdge();     // m15xx
   mkrStep();                    // his npc markers get their roles once their bodies exist (m293)
   talkStep(dt);                 // after the camera: the bubble is projected through it (m277)
   questStep(dt);                // after talk: a talk step reads what this frame finished (m278)
