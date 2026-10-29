@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The wall on the LEFT stick; the catch is immediate (m15xx, DOCKET 17)
+## The wall on the LEFT stick; the catch is immediate (m1767, DOCKET 17)
 *"If you jump against the wall and do nothing, instead of immediately going into the pose he does a weird glitchy thing -- like he's falling but
 stuck, then falling, then the pose. Something is fighting it." / "Instead of the flick on the right stick, it's entirely the locomotion stick and
 the velocity and trajectory: do nothing -> he skids down it, ready to jump off; keep holding up -> he runs up it if the velocity carries, release

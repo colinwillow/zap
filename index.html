@@ -13083,7 +13083,7 @@ function wrunTap() {
 // `upMax`), so the run lasts in proportion: a sprint jump climbs about 2 m, a full zoom about 12. The tap still kicks off into the back flip.
 function wrunAuto() {
   const p = player; if (!WRUN.on || !WRUN.auto || p.wrun || p.knock || p.riding || p.wing || p.bar || p.ledge || p.mantle || p.vault || p.climb || p.zip || p.rope || p.hook || p.melee || p.roll || p.chargeGo || p.slam || mphBare()) return 0;
-  if (WRUN.stick) return wrunCatch();     // m15xx: the left stick drives the wall (his redesign)
+  if (WRUN.stick) return wrunCatch();     // m1767: the left stick drives the wall (his redesign)
   if (p.wrunQ) { if (performance.now() > p.wrunQ.until) p.wrunQ = null; else { const W = wrunFind(p.pos.x, p.pos.y, p.pos.z, p.r + WRUN.swipeReach, null); if (W) { const q = p.wrunQ; p.wrunQ = null; return wrunGo(W, 'up', 0, 0, q.upV); } } }     // m1757: the remembered up-swipe
   // m1372: *"If you jump against the wall and you're not holding a direction, up or to the side, he purchases against the wall and slides down it --
   // a little friction -- so you can jump, purchase, wall jump to the opposing wall, jump, jump, back and forth like Prince of Persia."* In the air
@@ -13114,7 +13114,7 @@ function wrunSwipe(dx, dy) { const p = player; if (!WRUN.on || !WRUN.swipe || WR
   if (dy > Math.abs(dx) * 1.2) { if (p.wrun) { wrunEnd(1.2); return 1; } return 0; }     // DOWN: drop off the perch (on the ground it is still the strike)
   if (-dy >= Math.abs(dx) * WRUN.upCone) { const into = Math.max(0, -(p.vel.x * W.nx + p.vel.z * W.nz)); return wrunGo(W, 'up',     /* m1683 (his: "the horizontal wall run seems gone, it kept engaging only the vertical"): a thumb flicks sideways AND up; UP must be clearly up (`upCone`), anything else is the side run */ 0, 0, Math.min(WRUN.upMax, Math.max(WRUN.upV, into * WRUN.upK))); }
   const h = flickH(dx, dy), mx = Math.sin(h), mz = Math.cos(h); return wrunGo(W, 'side', mx, mz); }
-// m15xx: THE WALL ON THE LEFT STICK (his redesign: *"instead of requiring the flick on the right stick it's entirely the locomotion stick and the
+// m1767: THE WALL ON THE LEFT STICK (his redesign: *"instead of requiring the flick on the right stick it's entirely the locomotion stick and the
 // velocity and trajectory. Jump at a wall and do nothing: he hits it and immediately skids down it, ready to jump off -- seamless. Keep holding up:
 // he runs up it, if the velocity carries; let go at any point and he's back in the slide. Move the thumb right: a horizontal run along it, still
 // slipping down -- gravity is always carrying you. Come at it at an angle, running along it, holding up or diagonal: a horizontal run. To run
@@ -13174,7 +13174,7 @@ function stepWrun(dt) {
     if (R.kind === 'up' && (p.vel.y < 0 || R.t - (R.t0 || 0) > WRUN.upT * Math.max(1, R.upV / WRUN.upV))) R.upOK = 0, k = k === 'up' ? 'slide' : k;     // the climb spent
     if (k === 'up' && !R.upOK) k = 'slide'; if (k !== R.kind || (k === 'side' && R.want && R.dx * -R.nz + R.dz * R.nx !== 0 && Math.sign(R.dx * -R.nz + R.dz * R.nx) !== R.want)) wrunSet(R, k); }
   if (R.kind === 'slide' && p.jump && R.t > .05) { p.jump = 0; wrunJump(); return; }     // m1372: either pad's tap kicks off the slide
-  if (R.kind === 'side') { p.vel.x = R.dx * R.v; p.vel.z = R.dz * R.v; p.vel.y += (MOVE.g - WRUN.g) * dt; if (WRUN.stick) p.vel.y = Math.max(p.vel.y, -WRUN.sideFall); }     // m15xx: gravity always carrying him down, but a run never drops faster than `sideFall`     // `integrate` takes MOVE.g; he feels only WRUN.g
+  if (R.kind === 'side') { p.vel.x = R.dx * R.v; p.vel.z = R.dz * R.v; p.vel.y += (MOVE.g - WRUN.g) * dt; if (WRUN.stick) p.vel.y = Math.max(p.vel.y, -WRUN.sideFall); }     // m1767: gravity always carrying him down, but a run never drops faster than `sideFall`     // `integrate` takes MOVE.g; he feels only WRUN.g
   else if (R.kind === 'slide') { p.vel.x = -R.nx * .5; p.vel.z = -R.nz * .5;
     // m1683 (his: "a friction stops his upward momentum -- standing at the base of the wall and jumping, his height is hindered; only on the way
     // DOWN should the friction hold him"): RISING he flies on under gravity alone; from the top of it, a moment's hold (`hold`), then the skim
@@ -13191,7 +13191,7 @@ function stepWrun(dt) {
   if (R.kind === 'up' && LEDGE.on && rig.actions[LEDGE.clips.hang]) { const L = ledgeFind(p.pos.x, p.pos.y, p.pos.z, p.r + LEDGE.reach); if (L && L.b === R.b) { wrunEnd(0); p.vel.set(0, 0, 0); ledgeGo(L); return; } }
   if (!on) { wrunEnd(1); return; }
   if (R.kind === 'slide') { if (R.t - (R.top || 0) > WRUN.slideT || (!WRUN.stick && stickWorld().mag > .6)) wrunEnd(.6); return; }
-  if (WRUN.stick && R.head !== undefined) return;     // m15xx: runs fall back to the slide (above), they do not let go     /* m1372: a slide lasts `slideT`; a push on the stick lets go */
+  if (WRUN.stick && R.head !== undefined) return;     // m1767: runs fall back to the slide (above), they do not let go     /* m1372: a slide lasts `slideT`; a push on the stick lets go */
   if (R.kind === 'side' ? R.t > WRUN.T : (R.t > WRUN.upT * Math.max(1, (R.vy0 || WRUN.upV) / WRUN.upV) || p.vel.y < -1)) wrunEnd(R.kind === 'side' ? 1.5 : 1);
 }
 const _wrQ = new THREE.Quaternion(), _wrA = new THREE.Vector3();
