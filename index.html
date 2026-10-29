@@ -28626,7 +28626,7 @@ function ropeBuild() { const Z = ROPEB; Z.want = 2; if (Z.on) return; const g = 
   const planks = new THREE.InstancedMesh(new THREE.BoxGeometry(1, .06, 1), wood, N - 1); planks.castShadow = planks.receiveShadow = true; planks.frustumCulled = false; g.add(planks);
   const ropes = new THREE.InstancedMesh(new THREE.CylinderGeometry(.035, .035, 1, 5).translate(0, .5, 0), new THREE.MeshStandardMaterial({ color: 0xc9a46a, roughness: .95 }), 4 * N + (N - 1) * 2); ropes.frustumCulled = false; ropes.castShadow = true; g.add(ropes);
   const p = player; p.pos.set(x0 - 12, 0, zc); p.vel.set(0, 0, 0); p.faceH = p.heading = Math.PI / 2; cam.az = Math.PI / 2;
-  Z.on = { g, P, Q, seg, planks, ropes, t: 0 }; boxGrid(); for (let k = 0; k < 150; k++) ropeStep(1 / 30); Z.stat.lands = Z.stat.kicks = 0; Z.stat.dip = 0; ropeDraw(); }     // m15xx: settled before he arrives (it drifted 25 cm in the first seconds)
+  Z.on = { g, P, Q, seg, planks, ropes, t: 0 }; boxGrid(); for (let k = 0; k < 150; k++) ropeStep(1 / 30); Z.stat.lands = Z.stat.kicks = 0; Z.stat.dip = 0; ropeDraw(); }     // m1802: settled before he arrives (it drifted 25 cm in the first seconds)
 const _rbM = new THREE.Matrix4(), _rbA = new THREE.Vector3(), _rbB = new THREE.Vector3(), _rbX = new THREE.Vector3(), _rbY = new THREE.Vector3(), _rbZ = new THREE.Vector3(), _rbQ = new THREE.Quaternion(), _rbS = new THREE.Vector3();
 function ropeDraw() { const B = ROPEB.on, Z = ROPEB, N = Z.N, [L, Rr, HL, HR] = B.P;
   for (let i = 1; i < N; i++) { const a = i * 3; _rbA.set(L[a], L[a + 1], L[a + 2]); _rbB.set(Rr[a], Rr[a + 1], Rr[a + 2]); _rbZ.subVectors(_rbB, _rbA); const w = _rbZ.length(); _rbZ.normalize();
@@ -28641,7 +28641,7 @@ function ropeStep(dt) { const B = ROPEB.on; if (!B) return; const Z = ROPEB, N =
   const wz = Math.sin(B.t * .7) * Z.wind + Math.sin(B.t * 1.9) * Z.wind * .4;
   // HIS WEIGHT: standing on the deck, the nodes round him go down (more on the near side), and his sideways speed pushes the deck sideways
   const dk = ropeDeck(p.pos.x, p.pos.z), on = dk !== null && Math.abs(p.pos.y - dk) < .3 && (p.grounded || p.pos.y - dk < .05); Z.stat.on = on ? 1 : 0;
-  // m15xx PASS 1 (ROPEWORKS 1, dynamics A -- weight and bounce): IMPULSES on top of his standing weight. A LANDING slams the deck down by his speed
+  // m1802 PASS 1 (ROPEWORKS 1, dynamics A -- weight and bounce): IMPULSES on top of his standing weight. A LANDING slams the deck down by his speed
   // into it (`landK` x the fall speed), a JUMP OFF kicks it down under the take-off (`kickK`) and it springs back, and every STEP sends a small
   // pulse (`stepK`, at his gait's footfalls) so a run ripples the span. Each is a velocity given to the nodes round him (verlet: Q moved), spread
   // over `spread` nodes; `iters` is low enough that the rope gives a little and comes back -- the bounce.

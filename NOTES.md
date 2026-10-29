@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## Rope bridge pass 1: weight and bounce (m15xx, ROPEWORKS 1 / DOCKET 25)
+## Rope bridge pass 1: weight and bounce (m1802, ROPEWORKS 1 / DOCKET 25)
 - On top of his standing weight (`load` 160 -> 220), IMPULSES: a LANDING slams the deck down by his fall speed (`landK`), a JUMP OFF kicks it
   down under the take-off (`kickK`) and it springs back once his weight is gone, and every STEP (his speed over `stride`) sends a pulse
   (`stepK`) so a run ripples. Each is a velocity given to the nodes round him (verlet: Q moved); `iters` 18 -> 14 so the rope gives and returns.
