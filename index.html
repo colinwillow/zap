@@ -69324,12 +69324,16 @@ function gjinraBuild() {
   const teal = new THREE.MeshStandardMaterial({ map: gjinraTex('awning'), alphaTest: .5, side: THREE.DoubleSide, roughness: .9 }), banM = new THREE.MeshStandardMaterial({ map: gjinraTex('banner'), alphaTest: .5, side: THREE.DoubleSide, roughness: .9 });
   const lampM = new THREE.MeshStandardMaterial({ color: 0xbfffe4, emissive: 0x40f0b0, emissiveIntensity: 2, toneMapped: false });
   // ---- THE ISLAND: lumpy lobes of stratified rock (the cone went at m1741), its top a flat cap of grass and sand; Jinra spilling off one edge ----
-  const R = A.R; put(ghRockGeo(7101, R * 1.05, 4, R, 4), rockM, at4(0, Y0 - 1.6, 0)); put(hwIslLobe(7121, R * .98, R * 1.15, R * .95), rockM, at4(0, Y0 - 2.4, 0, .3)); for (let k = 0; k < 4; k++) { const a = k * 1.61 + .7, q = R * (.42 + (k % 2) * .16), rs = R * (.3 + (k % 3) * .07); put(hwIslLobe(7130 + k, rs, rs * (1.2 + (k % 2) * .8), rs * .9), rockM, at4(Math.sin(a) * q, Y0 - 4 - k * 1.3, Math.cos(a) * q, k)); }
-  for (let k = 0; k < 5; k++) { const a = k * 1.27 + .4, r = R * (.55 + (k % 2) * .2); put(ghRockGeo(7110 + k, 2.5, 4 + k, 2.2, 2), rockM, at4(Math.sin(a) * r, Y0 - 8 - k * 2, Math.cos(a) * r, k, Math.PI)); }
+  const R = A.R, islG = [], pi = (geo, m4) => { islG.push(geo.clone().applyMatrix4(m4)); put(geo, rockM, m4); }; pi(ghRockGeo(7101, R * 1.05, 4, R, 4), at4(0, Y0 - 1.6, 0)); pi(hwIslLobe(7121, R * .98, R * 1.15, R * .95), at4(0, Y0 - 2.4, 0, .3)); for (let k = 0; k < 4; k++) { const a = k * 1.61 + .7, q = R * (.42 + (k % 2) * .16), rs = R * (.3 + (k % 3) * .07); pi(hwIslLobe(7130 + k, rs, rs * (1.2 + (k % 2) * .8), rs * .9), at4(Math.sin(a) * q, Y0 - 4 - k * 1.3, Math.cos(a) * q, k)); }
+  for (let k = 0; k < 5; k++) { const a = k * 1.27 + .4, r = R * (.55 + (k % 2) * .2); pi(ghRockGeo(7110 + k, 2.5, 4 + k, 2.2, 2), at4(Math.sin(a) * r, Y0 - 8 - k * 2, Math.cos(a) * r, k, Math.PI)); }
   put(new THREE.CylinderGeometry(R * .93, R * .98, .5, 28), grass, at4(0, Y0 - .25, 0));
   { const N = 28; for (let i = 0; i < N; i++) { const a0 = i / N * TAU, a1 = (i + 1) / N * TAU, r = R * .92; quad([0, Y0 + .01, 0], [Math.sin(a0) * r, Y0 + .01, Math.cos(a0) * r], [Math.sin(a1) * r, Y0 + .01, Math.cos(a1) * r], [0, Y0 + .01, 0]); } }
   for (let gz = -R; gz < R; gz += 1.5) { const hw = Math.sqrt(Math.max(0, (R * .92) ** 2 - (gz + .75) ** 2)); if (hw > .5) box(-hw, hw, Y0 - 4, Y0, gz, gz + 1.5); }
-  { const fall = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 40, 1, 8), new THREE.MeshBasicMaterial({ color: 0x8affd8, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false })); const a = 2.4; fall.position.set(Math.sin(a) * (R + .2), Y0 - 20, Math.cos(a) * (R + .2)); fall.rotation.y = a; g.add(fall); A.fall = fall; A.fallTop = [Wx(Math.sin(a) * R, Math.cos(a) * R), Y0, Wz(Math.sin(a) * R, Math.cos(a) * R)]; }
+  // his (m1741): "make the waterfall actually cut out of the island and actually look like water". It was a flat plane at R + .2 straight
+  // down THROUGH the lumpy lobes. Now `gjFall`: a stone-lined RUNNEL across the cap to the island's real lip (the rock measured in that
+  // wedge), then a sheet that ARCS out over the edge -- its throw `v0` is the least that clears every rock vertex below it -- widening as it
+  // falls and fading to mist, drawn by a flow shader (streaks scrolling down, foam at the lip and the edges)
+  gjFall(A, g, islG, R, Y0, put, stone, at4);
   // ---- THE DECK on stilts, its front steps; the DOME; the GLOBE TANK and its copper cage; PIPES and the CHIMNEY ----
   const Y = Y0 + 1.0, dx0 = -8, dx1 = 8, dz0 = -6, dz1 = 7; A.deckY = Y;
   for (let z = dz0; z < dz1 - .01; z += .34) vbox(dx0, dx1, Y - .12, Y, z + .015, z + .325, woodP, 0); box(dx0, dx1, Y0, Y, dz0, dz1); quad([dx0, Y + .01, dz0], [dx1, Y + .01, dz0], [dx1, Y + .01, dz1], [dx0, Y + .01, dz1]);
@@ -69379,12 +69383,41 @@ function gjinraBuy(item) { snd('clang', { g: .6, r: 2.2 }); console.log('[melee]
 // the refinery's colliders: the island's set where it stands (F on the mountain, R in the sky, plus the floating stones), none while it flies
 function gjinraBoxes(k) { const A = GJINRA; if (A.bOn === k) return; for (const set of [A.bR, A.bF, A.bS]) for (const b of set || []) { const i = BOXES.indexOf(b); if (i >= 0) BOXES.splice(i, 1); }
   if (k === 'R') for (const b of A.bR.concat(A.bS)) BOXES.push(b); else if (k === 'F') for (const b of A.bF) BOXES.push(b); A.bOn = k; if (typeof boxGrid === 'function' && A.built) boxGrid(); }
+// A WATERFALL'S WATER (m1742; the refinery's Jinra and the sky islands' falls): streaks of two widths scrolling down at their own speeds,
+// foam at the lip (`uLip`, a fraction of the length: a runnel before it flows slowly) and at the edges, faded out over the last 45% into
+// mist. `flip` for a PlaneGeometry (its uv.y is 1 at the top); `bob` [amp, speed] rides `HWBOB` like the islands it falls from
+const HWFALL = { t: { value: 0 } };
+function hwFallMat(lip, flip, bob, deep = [.18, .78, .62], light = [.72, 1, .9]) { return new THREE.ShaderMaterial({ uniforms: { uT: HWFALL.t, uLip: { value: lip }, uBobT: HWBOB.t, uDeep: { value: new THREE.Vector3(...deep) }, uLight: { value: new THREE.Vector3(...light) } }, transparent: true, depthWrite: false, side: THREE.DoubleSide, toneMapped: false,
+    vertexShader: (bob ? 'attribute float aBob; ' : '') + 'uniform float uBobT; varying vec2 vUv; void main() { vUv = vec2(uv.x, ' + (flip ? '1.0 - uv.y' : 'uv.y') + '); vec3 p = position;' + (bob ? ' p.y += step(0.5, aBob) * sin(uBobT * ' + bob[1].toFixed(3) + ' + aBob * 2.3) * ' + bob[0].toFixed(3) + ';' : '') + ' gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0); }',
+    fragmentShader: `varying vec2 vUv; uniform float uT; uniform float uLip; uniform vec3 uDeep; uniform vec3 uLight;
+      float h1(float x) { return fract(sin(x * 127.1) * 43758.5453); }
+      float lane(float u, float n, float v, float sp) { float c = floor(u * n), s = .7 + h1(c) * .8, q = fract(v * 2.4 * s - uT * sp * s + h1(c + 3.1)); return smoothstep(0., .12, q) * smoothstep(1., .4, q); }
+      void main() { float u = vUv.x, v = vUv.y, fall = smoothstep(uLip - .01, uLip + .04, v), sp = mix(.35, 1.7, fall);
+        float edge = smoothstep(0., .2, u) * smoothstep(1., .8, u), st = .6 * lane(u, 9., v, sp) + .4 * lane(u + .37, 23., v * 1.7, sp * 1.3);
+        float foam = smoothstep(.06, 0., abs(v - uLip)) + (1. - edge) * .5 * fall, rip = .5 + .5 * sin(u * 60. + sin(v * 30. - uT * 5.) * 2.);
+        vec3 c = mix(uDeep, uLight, clamp(st * .7 + foam, 0., 1.)) * (1.05 + .25 * rip * (1. - fall));
+        float a = edge * (.55 + .35 * st + .1 * rip) * (1. - smoothstep(.55, 1., v)) + foam * .35;
+        gl_FragColor = vec4(c, clamp(a, 0., .92)); }` }); }
+function gjFall(A, g, islG, R, Y0, put, stone, at4) { const a = 2.4, sa = Math.sin(a), ca = Math.cos(a), tx = ca, tz = -sa, wedge = .16, pts = [];
+  for (const q of islG) { const p = q.attributes.position; for (let i = 0; i < p.count; i++) { const x = p.getX(i), z = p.getZ(i); let d = Math.atan2(x, z) - a; d = Math.atan2(Math.sin(d), Math.cos(d)); if (Math.abs(d) < wedge) pts.push([Math.hypot(x, z), p.getY(i)]); } }
+  let r0 = R * .9; for (const [r, y] of pts) if (y > Y0 - 3) r0 = Math.max(r0, r); r0 += .25;
+  let v0 = 1.5; for (const [r, y] of pts) { const h = Y0 - y; if (h > .4 && r + .6 > r0) v0 = Math.max(v0, (r + .6 - r0) / Math.sqrt(2 * h / 9.8)); } v0 = Math.min(v0, 7);
+  const H = 44, rin = R * .55, path = []; for (let k = 0; k <= 4; k++) path.push([rin + (r0 - rin) * k / 4, Y0 + .08]); for (let k = 1; k <= 30; k++) { const h = H * (k / 30) ** 1.4; path.push([r0 + v0 * Math.sqrt(2 * h / 9.8), Y0 + .08 - h]); }
+  let L = 0; const len = [0]; for (let k = 1; k < path.length; k++) { L += Math.hypot(path[k][0] - path[k - 1][0], path[k][1] - path[k - 1][1]); len.push(L); }
+  const pos = [], uv = [], idx = [], lip = (r0 - rin) / L; A.fallPts = [];
+  path.forEach(([r, y], k) => { const f = Math.max(0, (r - r0) / (v0 * Math.sqrt(2 * H / 9.8) + 1e-3)), w = 1.5 + f * 2.6 + (r < r0 ? 0 : .3); for (const sgn of [-1, 1]) { pos.push(sa * r + tx * w * sgn, y, ca * r + tz * w * sgn); uv.push(sgn < 0 ? 0 : 1, len[k] / L); } if (k > 3) A.fallPts.push([sa * r, y, ca * r]); });
+  for (let k = 0; k < path.length - 1; k++) { const i = k * 2; idx.push(i, i + 2, i + 1, i + 1, i + 2, i + 3); }
+  const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); geo.setIndex(idx);
+  const mat = hwFallMat(lip);
+  const m = new THREE.Mesh(geo, mat); m.renderOrder = 3; g.add(m); A.fall = m;
+  for (const sgn of [-1, 1]) { put(new THREE.BoxGeometry(.45, .38, r0 - rin + .4), stone, at4(sa * (rin + r0) / 2 + tx * 1.8 * sgn, Y0 + .1, ca * (rin + r0) / 2 + tz * 1.8 * sgn, a));
+    put(ghRockGeo(7190 + sgn, 1.3, 1.6, 1.1, 2), stone, at4(sa * (r0 - .4) + tx * 2.5 * sgn, Y0 - .2, ca * (r0 - .4) + tz * 2.5 * sgn, a + sgn)); } }
 function gjinraStep(dt, t) { const A = GJINRA; if (!A.g) return; A.built = 1; const RT = rsChunkSync(A); gjinraBoxes(RT >= .999 ? 'R' : RT <= .001 ? 'F' : 'none');
   if (A.bOn === 'R') { const p = player, on = b => p.grounded && p.pos.x > b.minx - .1 && p.pos.x < b.maxx + .1 && p.pos.z > b.minz - .1 && p.pos.z < b.maxz + .1 && Math.abs(p.pos.y - b.maxy) < .35; let ride = 0;
     for (const b of A.bS) { const y1 = b.y1 + hwBobY(b.ph, A.bob, A.bobS), d = y1 - b.maxy; if (on(b)) ride = d; b.miny = b.y0 + (y1 - b.y1); b.maxy = y1; }
     const R = A.R_, dy = R ? A.g.position.y - (R.baseY + R.lift) : 0; for (const b of A.bR) { if (b.yb0 === undefined) { b.yb0 = b.miny; b.yb1 = b.maxy; } const d = b.yb1 + dy - b.maxy; if (!ride && on(b)) ride = d; b.miny = b.yb0 + dy; b.maxy = b.yb1 + dy; }
-    if (ride) p.pos.y += ride; } if (A.sg) A.sg.visible = RT > .99; if (A.fall) A.fall.visible = RT > .95; if (RT < .95) return; if (A.fall) A.fall.material.opacity = .45 + .12 * Math.sin(t * 3.1); A.st = (A.st || 0) - dt;
-  if (A.st <= 0) { A.st = .14; if (A.fallTop) spkBurst(A.fallTop[0], A.fallTop[1] - Math.random() * 30, A.fallTop[2], 2, { col: [.55, 1, .8], spread: 1.2, size: .1, life: .7 }); if (A.smokeAt) spkBurst(A.smokeAt[0], A.smokeAt[1], A.smokeAt[2], 1, { col: [.7, 1, .85], spread: .6, size: .16, life: 1.2 }); }
+    if (ride) p.pos.y += ride; } if (A.sg) A.sg.visible = RT > .99; if (A.fall) A.fall.visible = RT > .95; if (RT < .95) return; A.st = (A.st || 0) - dt;
+  if (A.st <= 0) { A.st = .14; if (A.fallPts) { const P = A.fallPts, i = Math.floor(Math.random() * P.length), w = A.g.localToWorld(_hwAgeV.set(P[i][0], P[i][1], P[i][2])), mist = i > P.length * .7; spkBurst(w.x, w.y, w.z, mist ? 4 : 2, { col: [.62, 1, .86], spread: mist ? 3.5 : 1.2, size: mist ? .3 : .1, life: mist ? 1.4 : .7 }); } if (A.smokeAt) spkBurst(A.smokeAt[0], A.smokeAt[1], A.smokeAt[2], 1, { col: [.7, 1, .85], spread: .6, size: .16, life: 1.2 }); }
   if (A.stones && A.g) { } }
 // THE PEAK (his, after m1475: "another element of height... a hill, a mountain on the top up there... a lookout tower at the very top"): a
 // MOUNTAIN rising out of the east plateau (in `hwHeight`, so its slopes are the ground: a hike), a sheer stratified PINNACLE on its top (a
@@ -70168,10 +70201,10 @@ function hollowDress() {
         const C = hwIslCap(sd, rs, L.userData.rim); C.rotateY(ry); C.translate(x + lx, y + ly + .05, z + lz); top.push(aBobOf(C, ph));
         for (let t = 0, nt = Math.floor(rs / 4 + r() * 2); t < nt; t++) { const tb = r() * 6.28, tq = r() * rs * .6, th = 2 + r() * 3.5, T = hwIslLobe(sd * 7 + t, th * .55, th * .25, th * .55); T.translate(x + lx + Math.cos(tb) * tq, y + ly + th * .75, z + lz + Math.sin(tb) * tq); tree.push(aBobOf(T, ph)); } });
       for (let k = 0, nh = 1 + Math.floor(r() * 3); k < nh; k++) { const b = r() * 6.2832, q = s * (.3 + r() * .7), hs = 1 + r() * 2.4, H2 = hwIslLobe(i * 31 + k, hs, hs * 1.4, hs); H2.translate(x + Math.cos(b) * q, y - s * (.9 + r() * .9), z + Math.sin(b) * q); body.push(aBobOf(H2, ph)); }
-      if (r() < .7) { const fh = y * (.35 + r() * .2), f = new THREE.PlaneGeometry(s * .25, fh, 1, 10), fp = f.attributes.position, fc = []; for (let k = 0; k < fp.count; k++) { const v = .5 - fp.getY(k) / fh; fp.setX(k, fp.getX(k) * (1 + v * 2.2)); fc.push(1, 1, 1, Math.pow(1 - v, 1.6)); } f.setAttribute('color', new THREE.Float32BufferAttribute(fc, 4)); f.translate(x + s * .85, y - fh / 2, z); fall.push(aBobOf(f, ph)); } }
+      if (r() < .7) { const fh = y * (.35 + r() * .2), f = new THREE.PlaneGeometry(s * .25, fh, 1, 10), fp = f.attributes.position; for (let k = 0; k < fp.count; k++) { const v = .5 - fp.getY(k) / fh; fp.setX(k, fp.getX(k) * (1 + v * 2.2)); }  f.translate(x + s * .85, y - fh / 2, z); fall.push(aBobOf(f, ph)); } }
     // his (after m1704): fallen and restored read as a HYBRID -- these sky islands floated over a fallen valley. KORAJIN: the floating world is
     // what RESTORATION raises, so FALLEN has none
-        const sky = AGE.st !== 'fallen', SI = H.skyIsl = []; SI.push(rwMesh(isl[0], bobPatch(hwPaint(rwMat(0xc08860, { flatShading: true }), 'rock'), 1.4, .32)), rwMesh(isl[1], bobPatch(hwPaint(rwMat(0xb7744e, { flatShading: true }), 'cliff'), 1.4, .32)), rwMesh(top, bobPatch(hwPaint(rwMat(0x6a9448), 'sand'), 1.4, .32)), rwMesh(tree, bobPatch(rwMat(0x3f6e34, { flatShading: true }), 1.4, .32))); for (const o of SI) o.visible = sky; if (fall.length) { const fm = rwMesh(fall, bobPatch(new THREE.MeshBasicMaterial({ color: 0xeaf6ff, vertexColors: true, transparent: true, opacity: .6, side: THREE.DoubleSide, depthWrite: false }), 1.4, .32), false); fm.renderOrder = 3; fm.visible = sky; SI.push(fm); } }
+        const sky = AGE.st !== 'fallen', SI = H.skyIsl = []; SI.push(rwMesh(isl[0], bobPatch(hwPaint(rwMat(0xc08860, { flatShading: true }), 'rock'), 1.4, .32)), rwMesh(isl[1], bobPatch(hwPaint(rwMat(0xb7744e, { flatShading: true }), 'cliff'), 1.4, .32)), rwMesh(top, bobPatch(hwPaint(rwMat(0x6a9448), 'sand'), 1.4, .32)), rwMesh(tree, bobPatch(rwMat(0x3f6e34, { flatShading: true }), 1.4, .32))); for (const o of SI) o.visible = sky; if (fall.length) { const fm = rwMesh(fall, hwFallMat(-1, 1, [1.4, .32], [.5, .72, .9], [.92, .97, 1]), false); fm.renderOrder = 3; fm.visible = sky; SI.push(fm); } }
   // HIS STONE LANTERNS on the approach
   { const st = [], lit = []; for (const [dx, dz] of [[9, -3.2], [9, 3.2], [6.2, -3.2], [6.2, 3.2]]) { const x = H.hut.at[0] + dx + (H.hutS ? 0 : 0), z = H.hut.at[1] + dz * (H.hutS || 1), y = rwHeight(x, z);     // in front of the door (the hut faces the river, +x)
       st.push(B(.9, .3, .9, x, y + .15, z), Cy(.16, .2, 1.1, x, y + .85, z, 6), B(.7, .18, .7, x, y + 1.45, z), B(1.05, .2, 1.05, x, y + 2.2, z), Cy(.0, .62, .45, x, y + 2.5, z, 4));
@@ -70258,7 +70291,7 @@ function homeLanterns() {
 }
 function homeStep(dt) {
   const H = HOME; H.t += dt; if (RW.U) RW.U.uTime.value = H.t;
-  hwAgeStep(dt); rwSkyStep(dt); gmillStep(dt, H.t); gpeakStep(dt); gjinraStep(dt, H.t); caveStep(dt); mshopStep(dt); HWBOB.t.value += dt; if (GMERCH.g) rsChunkSync(GMERCH);
+  hwAgeStep(dt); rwSkyStep(dt); gmillStep(dt, H.t); gpeakStep(dt); gjinraStep(dt, H.t); caveStep(dt); mshopStep(dt); HWBOB.t.value += dt; HWFALL.t.value = H.t; if (GMERCH.g) rsChunkSync(GMERCH);
   if (GHOME.U) GHOME.U.uWind.value = H.t; ghomeSmoke(dt, H.t); ghomeShut(dt); ghomeLift(dt); ghomePots(dt); for (const G of GHOME.gates || []) bgateStep(G, dt);     // pass 9: his back door
   if (GHOME.canoe) { const C = GHOME.canoe, t = H.t; C.g.position.y = C.y + rwWaveAt(C.x, C.z, t) * .8 * (1 - Math.min(1, (C.lift || 0) * 2)) + .02 + (C.lift || 0); C.ht = (C.ht == null ? 12 : C.ht) - dt; if (C.ht <= 0 && !C.hu) { C.hu = 1e-3; } if (C.hu) { C.hu += dt; if (C.hu > 6) { C.hu = 0; C.ht = 18 + Math.random() * 20; const P = C.g.getWorldPosition(new THREE.Vector3()); spkBurst(P.x, GHOME.g.position.y + C.y + .05, P.z, 30, { col: [.85, .93, 1], spread: 4, size: .09, life: .6 }); snd('thud', { g: .5, r: .7, x: P.x, z: P.z }); } }     // pass 24: now and then it LIFTS on its discs, hangs dripping, and settles
   const lift = C.hu ? .5 * Math.min(1, C.hu / 1.4) * Math.min(1, Math.max(0, (6 - C.hu) / 1.2)) : 0; if (lift > .05 && Math.random() < dt * 14) { const P = C.g.localToWorld(new THREE.Vector3((Math.random() - .5) * .8, -.4, (Math.random() - .5) * 4)); spkBurst(P.x, P.y, P.z, 2, { col: [.8, .9, 1], spread: .4, size: .05, life: .5 }); }

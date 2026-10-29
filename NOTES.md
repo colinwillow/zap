@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The waterfalls: cut out of the island, and water (Worker B)
+His (m1741 screenshot): "make the waterfall actually cut out of the island and have it actually look like water". The refinery's Jinra
+fall was a flat 2.2 x 40 m plane at R + .2 running straight down THROUGH the lumpy lobes. `gjFall` now: every island geometry is kept
+(`islG`, via `pi`) so the rock in the fall's wedge (+-.16 rad round a = 2.4) is MEASURED -- the lip `r0` is the furthest rock in the top
+3 m, and the throw `v0` is the least that clears every rock vertex below by .6 m (a ballistic arc, h = 44 m). The sheet is one ribbon:
+a stone-lined RUNNEL across the cap from .55R to the lip (two low walls, two boulders framing the notch), then over the edge and out,
+widening 3 -> 8 m. `hwFallMat` draws it: two widths of streak scrolling down at their own speeds, slow in the runnel, foam at the lip
+and the edges, the last 45% fading to mist (the sparks follow the arc, mist puffs low). The sky islands' falls take the same material,
+white-blue, riding their island's bob in the shader. `HWFALL.t` has one writer (`homeStep`).
 ## Red Hollows pass: the refinery's cone, the island falls, the doubled stripes (m1741, Worker B)
 His (after m1740): "do the next pass and fix some stuff". The refinery island was still an inverted 14-sided CONE under its cap: now a big
 `hwIslLobe` plus four smaller hanging lobes, the same lumpy earth as the sky islands. The sky islands' waterfalls were flat white bars
