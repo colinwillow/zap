@@ -89,7 +89,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## The spout is back, and the dock crosses the river as a bridge (Worker B)
+## The spout is back, and the dock crosses the river as a bridge (m1753, Worker B)
 His (m1752): "you removed the spout -- I did like the spout, a little extra waterfall... incorporate it in the new design"; "you can have
 things cross the river like the dock -- just make bridges or make them go up in the air so a canoe could go under them". THE SPOUT: a
 timber trough under the arch's roof (its underside 4.8 m over the water, clear of the wheel's top at 4.5), hung on iron rods, fed from a
