@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The high leap slams (m15xx)
+## The high leap slams (m1784)
 *"The high jump katana attack isn't doing the slam -- it's the old kind of spin slam katana attack, not as dramatic. I want the slam slash."*
 - `aimLeap` played `KATANA.air.clip` (`katana_jump_attack`, the spinning one). It now plays the release's own jump-slam (`CLIPS.chargeGo`,
   `weapon_melee_finish`) with its blade-to-floor frame (`goContact`, cached per weapon -- the same number the ground release uses) landing at T,

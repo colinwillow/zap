@@ -21468,7 +21468,7 @@ const KATANA = { dmgK: 1.6,
   // (God of War / Arkham-style soft targeting: +-60-70 deg, ~4.5 m for a dash attack); the old katana lock was +-34 deg, ~2.7 m.
   lock: { cone: 1.05, reach: 3.5, moving: .8, front: .3 },
   lgrip: { on: 1, at: -8, w: 1, palm: .75, ease: .08 },     // m1001: palm = how far from the wrist to the finger root the palm sits; ease = s     // m999: the left hand on the grip, `at` katana units down the handle from the right fist (the pommel is -14.5)
-  leapClip: 'SLAM', leapLead: .55,     // m15xx: the high leap's clip -- SLAM = the release's jump-slam, SPIN = katana_jump_attack; `leapLead` = how much of the slam clip before its strike is spread over the flight
+  leapClip: 'SLAM', leapLead: .55,     // m1784: the high leap's clip -- SLAM = the release's jump-slam, SPIN = katana_jump_attack; `leapLead` = how much of the slam clip before its strike is spread over the flight
   air: { clip: 'katana_jump_attack', strike: .53, upFrom: .22, downFrom: .40 },     // m995: the air slam; strike = the measured hand peak
   runK: 1,     // m995: the katana stance's top speed as a fraction of what its run clip can sell (1 = no slide)
   capRun: 0,     // m1041: 0 = no katana speed cap (his: as fast as everything else); 1 = m995's cap
@@ -31132,7 +31132,7 @@ function aimLeap(t0, k) {
   // kinks. This leap is BALLISTIC (`p.slamArc`): one parabola, gravity only, the forward speed constant from the first frame (`d / T`), and the
   // jump attack's clip run from its raise so its STRIKE frame lands at T, the moment his feet do
   const T = 2 * vy / MOVE.g, v = L.d / T; p.slamArc = 1; p.slamUp = 0; p.slamT = SLAM.hang; p.slamDur = T; p.cLeap = null; p.vel.x = L.fx * v; p.vel.z = L.fz * v;
-  // m15xx (his: "the high jump katana attack isn't doing the slam -- it's the old spin slam, not as dramatic; I want the slam slash"): the leap plays
+  // m1784 (his: "the high jump katana attack isn't doing the slam -- it's the old spin slam, not as dramatic; I want the slam slash"): the leap plays
   // the RELEASE's own jump-slam (`CLIPS.chargeGo`, `weapon_melee_finish`) when `KATANA.leapClip` is SLAM, its blade-to-floor frame (`goContact`,
   // cached per weapon like the ground release's) landing at T, the moment his feet do; SPIN = `katana_jump_attack`, as before
   { const A = KATANA.air, slam = KATANA.leapClip === 'SLAM' && rig.actions[CLIPS.chargeGo], nm = slam ? CLIPS.chargeGo : rig.actions[A.clip] ? A.clip : null;
