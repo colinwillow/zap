@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## the MERCHANT'S COUNTER: spend the doubloons (Worker B)
+His pick after m1713 ("explore -> loot -> shop"). Stand at the counter in the shop's open front (`GMERCH.shopAt`, local (0, deck, 6.9))
+and a SHOP button rises above the pads with his doubloons on it; it opens the merchant's wares (`MSHOP`, its own DOM, touches stopped
+so the pads never see them; walking away closes it). Prices against the caves' chests (5 chests x 6 = 30 doubloons in the valley):
+HEALING TONIC 3 (full health), LANTERN 12 (once; `mel.lantern`; a warm PointLight at his shoulder wherever he goes in the hollows),
+FIREWORKS 2 (three rockets off the deck that burst over the canyon), MYSTERY BOX 8 (35% nothing, else half to three times its price).
+Too poor: a thud and "N more". Headless test on m1717 (the shipped frame): at the counter the button showed "SHOP ◆ 20"; tonic + lantern
+took 20 -> 5, the second lantern was refused ("you already have it"); screenshot of the panel taken. No merchant NPC yet (the counter
+serves itself); the refinery's Jinra wares are next.
 ## the Red Hollows: CAVES YOU WALK INTO (Worker B)
 His ask (after m1712): "make the caves something you can go in -- a continuous, actual physical hole; little treasures, maybe animals".
 All five cave mouths (z -30 W, 18 W, -55 E, 40 E, 95 W) are now caves: a 7 m tunnel (5.2 wide, 3.8 high) opening into a chamber
