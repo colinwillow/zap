@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Rope bridge pass 3c: hang under the deck, swing up (m15xx, ROPEWORKS 1 / DOCKET 25)
+- The catch takes the DECK's edge ropes too (after the hand ropes): falling past the planks' edge he hangs from it, under the deck.
+- The SWING-UP: hanging from any rope, a jump tap with the stick toward the bridge (`swingIn` .4 of it inward) drops the hang and flips him up and
+  in -- one arc solved to come down `swingOver` .5 m over the deck's middle at his x, a front flip on the way. A neutral or outward stick keeps the
+  ledge's jump off.
+- Measured: dropped beside the right deck rope -> caught it (`rope1`), hanging ~1.5 m under the deck; the swing-up rose 1.9 -> 4.4 m and came
+  down on the deck at its middle (`on`, z -.08), `swings` 1.
+
 ## Rope bridge pass 3b: catch the hand rope (m1816, ROPEWORKS 1 / DOCKET 25)
 - Falling past a hand rope with his hands at its height (`catchR` .75 m sideways, `catchY` .45 m up or down, outside or on it) he GRABS it: the
   LEDGE hang, its ledge being the rope (`L.rope`). `ropeStep` re-reads the rope under him every frame (`ropeRail`) into the ledge's five fields
