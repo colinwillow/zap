@@ -5,6 +5,22 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The Wall Park, and a run-up you can start from a stride away (m15xx)
+*"We still need to figure out a bunch of wall riding stuff so maybe some wall riding sandboxes ... definitely need to figure out the wall run."*
+- **KORAJIN > The Wall Park** (`?w=forge&zone=wall`, `WPARK` / `wparkBuild`): five stations on the white floor, each colour-coded with a floor
+  label. 1 LONG WALL (blue, 24 m, platforms at both ends), 2 TALL WALLS (yellow, 4.5 m with a deck and 7 m), 3 CHIMNEY (green, two 12 m walls
+  2.8 m apart), 4 RUN-JUMP-RUN (purple, two walls across a gap), 5 CORNERS (orange, inside and outside).
+- **What was measured before any change** (headless, the shipped frame): an UP swipe only started a run-up from within ~.7 m of the face, so
+  at a sprint the window was about 0.1 s and a slightly early swipe did nothing. The run-up peaked at 2.1 m (base `upV` 7.2 against `gUp` 12,
+  with the into-speed lost on impact). The side run lasted 1.13 s and covered 8.4 m.
+- **The fix:** an UP swipe that sees a wall ahead within `WRUN.upReach` (2 m) is QUEUED for `upQ` (.4 s) with the speed he had (`upK` 1.25 x
+  his into-speed, capped at `upMax`), and `wrunAuto` fires it when he reaches the face. Measured: the swipe at 1.7 m out queues upV 9.0; the
+  run-up fires on contact (vy 8.8), peaks at 2.8 m, the hang catches the lip, and he pulls up onto the 4.5 m deck. The 7 m wall is out of a
+  single run-up on purpose (the contrast; the chimney is the way up high).
+- **Still open:** the long wall's 24 m is longer than the measured 8.4 m side run -- deliberately, so he can feel where a run gives out; if
+  it should be crossable, the run's duration is the knob, not the wall. The e4 probe (several run-ups in one evaluate) hung twice headless;
+  a single run measures fine. Nothing in DOCKET 17's dynamics is signed off; this build is the playground plus the first fix.
+
 ## The bow at rest, on his diagonal (m1748)
 His (a red line drawn on a side view): "when he's just standing idle it doesn't need to be straight up and down -- hold it almost like he holds the
 sword, in the middle." Carried, the bow's riser (still through the fist, m1746) now runs along a low DIAGONAL: the top limb up and AHEAD of him at
