@@ -190,7 +190,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## THE SKY CASTLE, landmass pass 1 (Worker B)
+## THE SKY CASTLE, landmass pass 1 (m1769, Worker B)
 His (after m1767): "start working on the building / flying island" (BUILDINGS.md THE SKY CASTLE; his sheet in images/korajin/ref/). `GCASTLE`
 / `gcastleBuild`: over the west plateau at (-118, -88), its top at 116 m, local +z turned to face the canyon (so from the spawn it hangs over
 Grumbo's home, the hero of the skyline). A main lobe of radius 30 (`hwIslLobe` detail 4) ringed by SEVEN bastion lobes at three heights
