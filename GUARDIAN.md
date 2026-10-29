@@ -25,6 +25,10 @@
 - [ ] The lower arms with moves of their own (a grab, a clap) -- hand-keyed or procedural, since no Mixamo clip has a second pair.
 - [ ] A disarmed phase: with no arms he stomps and charges.
 - [ ] His arena (a temple floor with height -- the VERTICALITY rule) and the chalice that wakes him.
+- [x] HARD-SURFACE rig (m1733): every face to one bone, the mesh split where two bones meet -- no stretching (his: "the jaw is all stretching").
+- [x] The X stance (m1733): all four arms out like a wrestler, the lower pair as big as the upper (`GUARD.X`, `arm2K` 1.3).
+- [ ] BOSS LOGIC (his: "really, really easy to beat -- eventually they need some tic-tac-toe logic"): reads of what you do (guarding, rolling,
+      keeping range) and answers to it, patterns that change with how many arms he has left, punishes for button-mashing.
 - [ ] His sign-off on his phone.
 
 ## Dials (`GUARD`)

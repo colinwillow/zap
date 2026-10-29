@@ -17,6 +17,20 @@ sun/hemi colours follow, then B becomes A and the reflection map is rebuilt); th
 `userData.m0` so the weathering can be undone -- `bldAge` alone could not). Everything else that reads the state per frame (the peak
 fire, the shutters, the lamps, the wheel, the refinery's colliders) follows by itself. `?hs=` is dropped from the address with
 `replaceState` so a reload lands in the state he turned it to. The timings are in `HWAGE`.
+## The guardian goes HARD SURFACE and stands in an X; the bow is carried, not shouldered (m1733)
+His: "the auto rig made him like a human with skin -- he needs a hard-surface rig, each joint paired; his jaw is stretching, it looks horrible";
+"two little tiny middle arms, you can't even tell they're there -- all four arms need to stand out like a wrestler stance, a big X";
+"the bow idle -- his unused arm is up in the air like a wizard holding a fireball"; "the bow cuts into his arm, into his body; it's small".
+- **Hard surface** (`guardian_rig.py`): each FACE to one bone (its centroid's nearest), the whole head -- jaw and beard -- above the neck line
+  to `Head` (it was split face/chest, so the jaw stretched), then `split_edges` on the 653 edges where two bones' faces meet. No triangle
+  spans two bones; the pieces turn like stone blocks. Re-forged (same 15 clips), re-squashed (893 KB).
+- **The X** (`guardX`): after the clip, each arm bone is AIMED (`guardAim`: the bone-to-child direction turned onto a target in his own
+  frame) -- upper pair up-out with fists up, lower pair down-out with claws forward. Full in idle/walk/statue; in an attack the upper pair
+  go back to the clip and the lower keep the X at .6 under the echo. The lower arms x1.3 (was 1.12). Render: the X reads from the front.
+- **The bow idle was `idle_rifle`** (measured: the only weight while carried) -- the GUN carry, a raised fist with no rifle. `bowRest()`: a
+  bow not being drawn takes the ordinary gait whole-body (`idle_01`), both upper-half pickers and the carry branch.
+- **The bow carried leaned INTO him** (`rotateZ(+.35)` tips the top toward his right, his body). Now `BOW.carry`: out .07 to his left,
+  top tilted forward .45 and away -.3; drawn it is upright in the fist. `limbK` .78 -> .95. Renders: carried front/side/back, drawn x3.
 ## THE STONE GUARDIAN: his four-armed boss, Tripo + a scripted rig (m1732)
 His: "Make this guy in Tripo and rig him -- he's got four arms, so I don't know if the auto rigger is gonna have that under control... a boss,
 pretty big... maybe he throws boulders... in pieces, so we can knock off his arms." GUARDIAN.md has the pipeline and the DONE WHEN.

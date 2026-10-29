@@ -14250,13 +14250,27 @@ function spiderStep(dt) { const p = player, Z = SPIDER; if (Z.globs.length) spid
 //   PIECES   each arm has its own stone (`armHp`); a blow takes from the arm nearest it, and an arm that runs out comes off and flies. Four arms
 //            gone, or no hp, and he BURSTS. A full katana charge takes an arm every time.
 // SPAWN > STONE GUARDIAN. `GUARD` is live on `mel.GUARD`; `h` is his height, `headK` / `arm2K` the boss proportions he asked about.
-const GUARD = { file: 'models/creatures/stone_guardian.glb', clips: 'models/characters/forged/stone_guardian.glb', h: 4.4, headK: 1.22, arm2K: 1.12,
+const GUARD = { file: 'models/creatures/stone_guardian.glb', clips: 'models/characters/forged/stone_guardian.glb', h: 4.4, headK: 1.22, arm2K: 1.3,
   speed: 0, speed0: 1.4, turn: 1.2, near: 3.4, hp: 48, armHp: 7, r: .32, flash: .8, stagEvery: 6, echo: .9, lag: .12, wake: 1.6,
+  // m1733 (his: "two little tiny middle arms, you can't even tell they're there -- all four need to stand out like a wrestler stance, equally, like a
+  // big X"): THE X. Each arm bone is AIMED at a direction in his own frame (forward +Z, his left +X) after the clip: the upper pair up and
+  // out, fists up; the lower pair down and out, claws forward. Idle and walking hold it fully (`xUp`); in an attack the upper arms go
+  // back to the clip while the lower pair keep the X at `xLoAtk` and swing with the echo.
+  X: { arm: [.8, .45, .4], fore: [.35, .8, .5], arm2: [.85, -.3, .45], fore2: [.5, -.5, .7] }, xUp: 1, xLo: 1, xLoAtk: .6,
   swipe: { r: 5, hit: .45, R: 4.4, arc: 1.3, dmg: 16, push: 8, cool: [1.4, 2.6] },
   smash: { r: 6, hit: .36, R: 4.6, dmg: 20, push: 10, cool: [4, 6.5] },
   throw: { min: 9, max: 32, grab: .2, rel: .5, T: [.7, 1.5], g: .7, dmg: 18, R: 2.4, size: 1.1, cool: [3.5, 5.5] },
   list: [], P: null, rocks: [], stat: { hits: 0, arms: 0, kills: 0, swipes: 0, smashes: 0, throws: 0 } };
-const _gdA = new THREE.Vector3(), _gdB = new THREE.Vector3(), _gdQ = new THREE.Quaternion(), _gdI = new THREE.Quaternion();
+const _gdA = new THREE.Vector3(), _gdB = new THREE.Vector3(), _gdQ = new THREE.Quaternion(), _gdI = new THREE.Quaternion(), _gdC = new THREE.Vector3(), _gdQ2 = new THREE.Quaternion(), _gdQ3 = new THREE.Quaternion();
+// turn bone `b` (by `w`) so it points from itself to its child `c` along `d` (his own frame: x his left, y up, z forward)
+function guardAim(G, b, c, d, side, w) { if (!b || !c || w <= .001) return; b.getWorldPosition(_gdA); c.getWorldPosition(_gdB); _gdB.sub(_gdA); if (_gdB.lengthSq() < 1e-10) return; _gdB.normalize();
+  _gdC.set(d[0] * side, d[1], d[2]).normalize().applyQuaternion(G.root.quaternion); _gdQ.setFromUnitVectors(_gdB, _gdC);
+  b.getWorldQuaternion(_gdQ2).premultiply(_gdQ); b.parent.getWorldQuaternion(_gdQ3); _gdQ2.premultiply(_gdQ3.invert()); b.quaternion.slerp(_gdQ2, w); b.updateMatrixWorld(true); }
+function guardX(G, dt) { const Z = GUARD, X = Z.X, calm = G.st === 'walk' || G.st === 'statue' || (G.st === 'wake' && G.stT > guardDur(G, 'roar') * .7);
+  G.xu = damp(G.xu == null ? 1 : G.xu, calm ? Z.xUp : 0, .12, dt); G.xl = damp(G.xl == null ? 1 : G.xl, calm ? Z.xLo : Z.xLoAtk, .12, dt); G.root.updateMatrixWorld(true);
+  for (const [s, k] of [['Left', 1], ['Right', -1]]) { const B = n => G.bn[s + n];
+    guardAim(G, B('Arm'), B('ForeArm'), X.arm, k, G.xu); guardAim(G, B('ForeArm'), B('Hand'), X.fore, k, G.xu);
+    guardAim(G, B('Arm2'), B('ForeArm2'), X.arm2, k, G.xl); guardAim(G, B('ForeArm2'), B('Hand2'), X.fore2, k, G.xl); } }
 const GPIECE = { Shoulder: 'arm', Arm: 'arm', ForeArm: 'arm', Hand: 'arm', Arm2: 'arm2', ForeArm2: 'arm2', Hand2: 'arm2', Neck: 'head', Head: 'head', UpLeg: 'leg', Leg: 'leg', Foot: 'leg', ToeBase: 'leg' };
 function guardPiece(name) { const n = name.replace(/^mixamorig[_:]?/, ''), m = /^(Left|Right)(.*)$/.exec(n); if (!m) return GPIECE[n] || 'body'; const g = GPIECE[m[2]]; return g ? g + (m[1] === 'Left' ? 'L' : 'R') : 'body'; }
 async function guardLoad() { if (GUARD.P) return GUARD.P;
@@ -14397,6 +14411,7 @@ function guardStep(dt) { const p = player, Z = GUARD; if (Z.rocks.length) guardR
     G.mixer.update(dt);
     // the lower arms echo the upper pair a beat behind
     const e = 1 - Math.exp(-dt / Math.max(.01, Z.lag)); for (const E of G.echo) { _gdQ.copy(E.rU).invert().multiply(E.U.quaternion); _gdI.identity().slerp(_gdQ, Z.echo); E.q.slerp(_gdI, e); E.L.quaternion.copy(E.rL).multiply(E.q); }
+    guardX(G, dt);
     if (G.rock) { const H = G.bn.RightHand; if (H) { H.getWorldPosition(_gdA); G.rock.m.position.copy(_gdA); } }
     G.flash = Math.max(0, G.flash - dt * 3); if (!G.statue) for (const m of G.mats) if (m.emissive) m.emissive.setRGB(G.flash * .5, G.flash * .45, G.flash * .3); } }
 function G_walkV() { return GUARD.P && GUARD.P.walkV > .2 ? GUARD.P.walkV : GUARD.speed0; }
@@ -14558,7 +14573,7 @@ function archerBow(d) {
 // over whatever his legs are doing; letting go LOOSES: `bow_recoil`, and an arrow from the nock to the reticle's point -- a lob solved to land
 // there, faster and flatter the longer it was drawn (`full` s to full power). His arrows are `mine`: they hit the bowmen, the spiders (a hit takes
 // a leg on the way to the burst), chip statues, smash what `bldHit` breaks, and stick in walls and the ground.
-const BOW = { full: 1.1, drawRate: 1.5, v0: 22, v1: 72, g0: .55, g1: .05, dmg0: 1, dmg1: 3, pow0: .12, pow1: 1.2, keep: .3, limbK: .78, blastR: 2.6, blastDmg: 4, fireDmg: 1, stat: { shots: 0, hits: 0, blasts: 0, fires: 0 } };     // m1729: the charge is the shot -- a tap lobs slow, a full draw flies fast and almost true; only a FULL draw knocks back
+const BOW = { full: 1.1, drawRate: 1.5, v0: 22, v1: 72, g0: .55, g1: .05, dmg0: 1, dmg1: 3, pow0: .12, pow1: 1.2, keep: .3, limbK: .95, carry: { out: .07, fwd: .02, tilt: .45, lean: -.3 }, blastR: 2.6, blastDmg: 4, fireDmg: 1, stat: { shots: 0, hits: 0, blasts: 0, fires: 0 } };     // m1729: the charge is the shot -- a tap lobs slow, a full draw flies fast and almost true; only a FULL draw knocks back
 const _bwL = new THREE.Vector3(), _bwR = new THREE.Vector3(), _bwA = new THREE.Vector3(), _bwB = new THREE.Vector3(), _bwM = new THREE.Vector3(), _bwD = new THREE.Vector3();
 function bowDraw() { const p = player; p.bowT = 0; const n = 'bow_draw', r = BOW.drawRate; if (rig.actions[n + UPS]) { playOnce(n + UPS, r); playOnce(n + UP, r); }
   snd('swoosh', { g: .25, r: .55 }); }
@@ -14599,7 +14614,10 @@ function bowStep(dt) { bladeFireStep(dt); const p = player, s = slotNow(), on = 
   const B = BOW.mesh, L = rig.bones.mixamorig_LeftHand, Rh = rig.bones.mixamorig_RightHand, vis = on && rig.root.visible && !p.dragon; B.g.visible = B.str.visible = vis; if (!vis || !L || !Rh) { B.nock.visible = false; return; }
   L.getWorldPosition(_bwL); Rh.getWorldPosition(_bwR);
   const drawing = !!p.aim, h = drawing ? Math.atan2(_bwL.x - _bwR.x, _bwL.z - _bwR.z) : p.faceH;
-  B.g.position.copy(_bwL); B.g.rotation.set(0, h, 0); B.g.rotateZ(drawing ? .12 : .35); B.g.updateMatrixWorld(true);
+  // m1733 (his: "the bow is cutting into his arm, into his body; it's kind of small"): drawn, the riser sits in the fist upright (a touch canted);
+  // CARRIED it hangs OUTSIDE his left fist (`carry.out` to his left), its top tilted forward (`tilt`) and AWAY from his body (`lean`) --
+  // it leaned into him at +.35. Bigger: `limbK` .78 -> .95.
+  B.g.position.copy(_bwL); B.g.rotation.set(0, h, 0); if (drawing) B.g.rotateZ(.12); else { const C = BOW.carry; B.g.translateX(C.out); B.g.translateZ(C.fwd); B.g.rotateX(C.tilt); B.g.rotateZ(C.lean); } B.g.updateMatrixWorld(true);
   _bwA.copy(B.tipA).applyMatrix4(B.g.matrixWorld); _bwB.copy(B.tipB).applyMatrix4(B.g.matrixWorld);
   const pull = drawing ? clamp((p.bowT || 0) / (BOW.full * .45), 0, 1) : 0; _bwM.copy(_bwA).add(_bwB).multiplyScalar(.5); if (pull > 0) _bwM.lerp(_bwR, pull);
   const a = B.str.geometry.attributes.position.array; a.set([_bwA.x, _bwA.y, _bwA.z, _bwM.x, _bwM.y, _bwM.z, _bwB.x, _bwB.y, _bwB.z]); B.str.geometry.attributes.position.needsUpdate = true;
@@ -20316,6 +20334,9 @@ function virusNow() { const m = modeNow(); return !!(m && m.virus); }
 // This is what `idle_rifle` is FOR, and it is the difference between carrying a weapon and
 // occasionally producing one.
 function gunOut() { return !!slotNow().aim; }
+// m1733 (his: "the bow idle -- his unused arm is up in the air like a wizard holding a fireball"): that was `idle_rifle`, the GUN carry (a raised
+// fist with no rifle in it). A bow that is not being drawn is carried over the ORDINARY gait, whole body: no gun pose on his top half.
+function bowRest() { const s = slotNow(); return !!(s.bow && !player.aim && !(player.fireT > 0)); }
 // COMMITTED means the trigger is held or the hammer is wound. Both are a decision to engage,
 // so both lock -- which is the whole reason the strafes exist.
 // THE RECOIL COUNTS AS COMMITTED, AND IT HAS TO. The trigger is RELEASED by the act of firing,
@@ -33293,7 +33314,7 @@ function stepPlayer(dt) {
 function bladeAnim(dt, t) {
   const p = player, A = BLADE.anim, has = n => !!(n && rig.actions[n]);
   const B = rig.bl || (rig.bl = {});
-  const upNm = gunOut() ? (rocketUp() || (p.fireT > 0 ? CLIPS.shoot : p.aim ? CLIPS.aimPose : CLIPS.aimIdle)) : '';
+  const upNm = gunOut() && !bowRest() ? (rocketUp() || (p.fireT > 0 ? CLIPS.shoot : p.aim ? CLIPS.aimPose : CLIPS.aimIdle)) : '';
   // HER HIPS, ZAP'S ARMS (m265): the gun pose WITHOUT its hips (`__ups`) over her stride WITH
   // them (`__legh`) -- Rollergirl's r140 split exactly: her skating owns hips-down, the gun spine-up.
   const gu = upNm && rig.actions[upNm + UPS] ? upNm + UPS : upNm && rig.actions[upKey(upNm)] ? upKey(upNm) : '';
@@ -34298,7 +34319,7 @@ function rigAnim(dt) {
     // the two halves are DISJOINT, so summing to 2 is not a table that breaks the sum rule.
     // the same three the committed branch picks between, in the same order, so the two cannot
     // disagree about what holding a gun looks like: the recoil, the sighted hold, the carry.
-    const upNm = gunOut() ? (rocketUp() || (p.fireT > 0 ? CLIPS.shoot : p.aim ? CLIPS.aimPose : CLIPS.aimIdle)) : '';
+    const upNm = gunOut() && !bowRest() ? (rocketUp() || (p.fireT > 0 ? CLIPS.shoot : p.aim ? CLIPS.aimPose : CLIPS.aimIdle)) : '';
     const gu = upNm && rig.actions[upKey(upNm)] ? upKey(upNm) : '';
     const gSq = !!upNm && isSq(upNm);
     if (gu) t[gu] = 1;
@@ -34661,7 +34682,7 @@ function rigAnim(dt) {
 
   // ---- carrying it, but not committed: the ordinary armed gait, whole body ----
   // THE LAUNCHER CARRIED IS THE RIFLE CARRY'S LEGS NOW (m203), under its own square pose
-  if (gunOut()) {
+  if (gunOut() && !bowRest()) {
     // CARRYING IT: the rifle idle standing, the rifle run moving. There is no rifle WALK in
     // the set, so the run takes the whole moving range and `tsLo` holds it down at the bottom.
     const wMove = smooth(0, GAIT.walkAt * 2.2, sp);
