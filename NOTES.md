@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The fist moves travel when they fly, not on frame one (m15xx)
+## The fist moves travel when they fly, not on frame one (m1770)
 *"Flick the left stick -- the front handspring, the flying punch, the flip kick: the physical locomotion doesn't line up with the attack; it lunges
 forward stupidly at the beginning and then the attack comes later. Line them up like we did the katana's lunges."*
 - **Why:** every strike's lunge started at full speed on frame one and bled off over the beat (`carry`), while these clips crouch first and leave

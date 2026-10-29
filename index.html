@@ -21817,7 +21817,7 @@ function flowArc(dt) {
 // 4, katana_slash_3 2...), cached per clip (`swingPeaks`). The clip plays WHOLE; `lead` s of clip time before every swing after the first,
 // he lurches again: toward the left stick if it is held, else along his nose, magnetised onto a man in `cone` / `reach` (`meleeLock`), up
 // to `max` m (`free` m at nobody), spent in `dur` s. The first swing keeps the strike's own lunge. TOOLS > SWING LURCH.
-// m15xx (his: "flick the left stick -- the front handspring, the flying punch, the flip kick -- the locomotion doesn't line up with the attack: it
+// m1770 (his: "flick the left stick -- the front handspring, the flying punch, the flip kick -- the locomotion doesn't line up with the attack: it
 // lunges forward stupidly at the beginning and the attack comes later"): each fist move's travel is spent in ITS window, measured off the clip
 // (headless, the hips' height and every limb's speed against the hips, fractions of the clip): [from, to, flight]. A FLIGHT (the hips leave
 // and come back down) carries him at an even speed from take-off to landing (eased `ease` at each end); a standing strike carries him the
@@ -22143,7 +22143,7 @@ function meleeGo0(h) {
   snd('swoosh', { r: .95 + ix * .1, g: .8 });
   // and he covers ground: full speed for `carry` of the strike, then linear to zero, which
   // averages .725 rather than .5 and is what a lunge actually looks like
-  { const v0 = p.melWin && p.melWin[0] > .02 ? 0 : p.melV; p.vel.x = Math.sin(p.faceH) * v0; p.vel.z = Math.cos(p.faceH) * v0; }     // m15xx: a windowed move waits for its take-off
+  { const v0 = p.melWin && p.melWin[0] > .02 ? 0 : p.melV; p.vel.x = Math.sin(p.faceH) * v0; p.vel.z = Math.cos(p.faceH) * v0; }     // m1770: a windowed move waits for its take-off
 }
 // **A FLICK DOWN IN THE AIR IS A SLAM (m81).** Returns truthy when it took the gesture, so the
 // pad's one flick handler reads as a sentence and the ground strike is what is left.
@@ -33531,7 +33531,7 @@ function stepPlayer(dt) {
     const arr = (p.chargeGo && MELEE.dash) ? MELEE.dashLand : (p.melee && p.melFront) ? p.melFront : 1;     // m993: the katana's lash
     const uu = arr >= 1 ? u : clamp(u / arr, 0, 1);
     let k = uu >= 1 ? 0 : uu < MELEE.carry ? 1 : 1 - (uu - MELEE.carry) / (1 - MELEE.carry);
-    if (p.melee && p.melWin) { const W = p.melWin, uw = (u - W[0]) / (W[1] - W[0]); k = uw < 0 || uw > 1 ? 0 : W[2] ? Math.min(1, uw / FISTWIN.ease, (1 - uw) / FISTWIN.ease) : uw < MELEE.carry ? 1 : 1 - (uw - MELEE.carry) / (1 - MELEE.carry); }     // m15xx: the move's travel in ITS window
+    if (p.melee && p.melWin) { const W = p.melWin, uw = (u - W[0]) / (W[1] - W[0]); k = uw < 0 || uw > 1 ? 0 : W[2] ? Math.min(1, uw / FISTWIN.ease, (1 - uw) / FISTWIN.ease) : uw < MELEE.carry ? 1 : 1 - (uw - MELEE.carry) / (1 - MELEE.carry); }     // m1770: the move's travel in ITS window
     // THE BLOW LANDS WHEN THE LIMB REACHES HIM, AND NOT BEFORE. `at` no longer FIRES the hit --
     // it opens the window the sweep is allowed to count in, so a swing that misses misses.
     if (!p.roll) {
