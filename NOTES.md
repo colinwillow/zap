@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Rope bridge pass 2: sway and balance (m15xx, ROPEWORKS 1 / DOCKET 25)
+- The deck CARRIES him as it swings (`ropeStep` measures the deck's middle under him before and after the step and moves him with it), so it no
+  longer slides out from under his feet; his sideways speed pushes the span harder (`sway` .9 -> 6).
+- `ropePose` (after `beamPose` in `frameBody`): on the bridge he LEANS toward the deck's HIGH side (`leanRoll` x its roll under him) and against
+  its sideways acceleration (`leanAcc`, inertia), eased (`leanHalf`), about his feet; past `leanArms` of lean his arms go out (the beam's
+  `caSwing`).
+- Two bugs found by measuring: a ZERO time step made the sway's acceleration NaN, and the lean with it, for good (guarded); and the first sign
+  leaned him toward the LOW side (rotation about +x by +a tips the head toward +z -- measured, then flipped).
+- Measured (landing .45 m off-centre, shuffling sideways, standing): the deck rolls -.07 to -.17 rad toward his side; he leans -.12 standing,
+  -.21 at most shuffling (toward the high side); the span swings -.02 to +.11 m and he stays put on it (`rel` .43-.47 standing).
+
 ## Rope bridge pass 1: weight and bounce (m1802, ROPEWORKS 1 / DOCKET 25)
 - On top of his standing weight (`load` 160 -> 220), IMPULSES: a LANDING slams the deck down by his fall speed (`landK`), a JUMP OFF kicks it
   down under the take-off (`kickK`) and it springs back once his weight is gone, and every STEP (his speed over `stride`) sends a pulse

@@ -15770,7 +15770,7 @@ const _bnpF = { d: 0, nx: 0, nz: 0, cx: 0, cz: 0 };
 // the nodes round him are pulled down (`load` m/s2, spread over `spread` nodes, more on the side he stands nearer -- it tilts), and moving across
 // it pushes it sideways (`sway`); a little wind. The DECK IS A FLOOR (`ropeDeck` in `groundAt`): its height under him is read off the planks every
 // frame, so he rides the sag and the swing. The planks are one instanced draw, the ropes another.
-const ROPEB = { want: 0, on: null, x0: -7, z: -18, L: 14, H: 4.5, w: 1.4, N: 22, slack: 1.01, iters: 14, damp: .988, load: 220, landK: .55, kickK: 3.2, stepK: .55, stride: .9, spread: 2.6, sway: .9, wind: .35, rail: 1.0, plank: .4, stat: { on: 0, dip: 0 } };
+const ROPEB = { want: 0, on: null, x0: -7, z: -18, L: 14, H: 4.5, w: 1.4, N: 22, slack: 1.01, iters: 14, damp: .988, load: 220, landK: .55, kickK: 3.2, stepK: .55, stride: .9, leanRoll: 1.4, leanAcc: .025, leanHalf: .12, leanArms: .12, spread: 2.6, sway: 6, wind: .35, rail: 1.0, plank: .4, stat: { on: 0, dip: 0 } };
 try { if (/[?&]zone=rope\b/.test(location.search)) ROPEB.want = 1; } catch (e) {}
 function ropeDeck(x, z) { const B = ROPEB.on; if (!B) return null; const Z = ROPEB, N = Z.N, s = (x - Z.x0) / Z.L * N; if (s < 0 || s > N) return null;
   const i = Math.min(N - 1, Math.floor(s)), t = s - i, A = B.P[0], C = B.P[1], a = i * 3, b = a + 3;
@@ -28637,8 +28637,11 @@ function ropeDraw() { const B = ROPEB.on, Z = ROPEB, N = Z.N, [L, Rr, HL, HR] = 
   for (const C of B.P) for (let i = 0; i < N; i++) { const a = i * 3; cyl(C[a], C[a + 1], C[a + 2], C[a + 3], C[a + 4], C[a + 5]); }
   for (let i = 1; i < N; i++) { const a = i * 3; cyl(L[a], L[a + 1], L[a + 2], HL[a], HL[a + 1], HL[a + 2]); cyl(Rr[a], Rr[a + 1], Rr[a + 2], HR[a], HR[a + 1], HR[a + 2]); }     // the suspenders
   B.ropes.instanceMatrix.needsUpdate = true; }
-function ropeStep(dt) { const B = ROPEB.on; if (!B) return; const Z = ROPEB, N = Z.N, p = player, h = Math.min(dt, 1 / 30), h2 = h * h; B.t += h;
+function ropeStep(dt) { const B = ROPEB.on; if (!B || !(dt > 1e-4)) return; ROPEB.dtPose = dt;     /* m15xx: a zero step made the sway's acceleration NaN, and the lean with it */ const Z = ROPEB, N = Z.N, p = player, h = Math.min(dt, 1 / 30), h2 = h * h; B.t += h;
   const wz = Math.sin(B.t * .7) * Z.wind + Math.sin(B.t * 1.9) * Z.wind * .4;
+  const midZ = () => { const N2 = Z.N, s2 = Math.max(0, Math.min(N2 - 1e-6, (p.pos.x - Z.x0) / Z.L * N2)), i2 = Math.floor(s2), t2 = s2 - i2, A = B.P[0], C = B.P[1], a = i2 * 3, b = a + 3;
+    return { z: (A[a + 2] + (A[b + 2] - A[a + 2]) * t2 + C[a + 2] + (C[b + 2] - C[a + 2]) * t2) / 2, roll: (C[a + 1] + (C[b + 1] - C[a + 1]) * t2) - (A[a + 1] + (A[b + 1] - A[a + 1]) * t2) }; };
+  const m0 = midZ();
   // HIS WEIGHT: standing on the deck, the nodes round him go down (more on the near side), and his sideways speed pushes the deck sideways
   const dk = ropeDeck(p.pos.x, p.pos.z), on = dk !== null && Math.abs(p.pos.y - dk) < .3 && (p.grounded || p.pos.y - dk < .05); Z.stat.on = on ? 1 : 0;
   // m1802 PASS 1 (ROPEWORKS 1, dynamics A -- weight and bounce): IMPULSES on top of his standing weight. A LANDING slams the deck down by his speed
@@ -28660,8 +28663,20 @@ function ropeStep(dt) { const B = ROPEB.on; if (!B) return; const Z = ROPEB, N =
   for (let it = 0; it < Z.iters; it++) {
     for (const C of B.P) for (let i = 0; i < N; i++) { const a = i * 3; sat([C, C], a, a + 3, B.seg, i === 0 ? 0 : 1, i + 1 === N ? 0 : 1); }     // along each rope (the ends pinned)
     for (let i = 1; i < N; i++) { const a = i * 3; sat([B.P[0], B.P[1]], a, a, Z.w, 1, 1); sat([B.P[2], B.P[3]], a, a, Z.w, 1, 1); sat([B.P[2], B.P[0]], a, a, Z.rail, .3, 1); sat([B.P[3], B.P[1]], a, a, Z.rail, .3, 1); } }     // rungs and suspenders
+  // m15xx PASS 2 (ROPEWORKS 1, dynamics B -- sway and balance): the deck CARRIES him sideways as it swings (he rides it, it does not slide out
+  // from under his feet), and its roll and its sideways acceleration under him are kept for his balance (`ropePose`)
+  { const m1 = midZ(), vz = (m1.z - m0.z) / h; if (on && p.grounded) p.pos.z += m1.z - m0.z; Z.bal = Z.bal || { vz: 0, az: 0, roll: 0 };
+    const az = (vz - Z.bal.vz) / h; Z.bal.az = isFinite(az) && isFinite(Z.bal.az) ? damp(Z.bal.az, az, .08, h) : 0; Z.bal.vz = isFinite(vz) ? vz : 0; Z.bal.roll = Math.atan2(m1.roll, Z.w); }
   if (on) { const d2 = ropeDeck(p.pos.x, p.pos.z); if (d2 !== null) { Z.stat.dip = Math.min(Z.stat.dip, d2 - Z.H); if (p.grounded && Math.abs(p.pos.y - d2) < .3) p.pos.y = d2; } }     // he rides it: the deck under him moved this frame
   ropeDraw(); }
+// his BALANCE on the bridge: he leans toward the HIGH side of the tilted deck (`lean.roll`) and against the deck's sideways acceleration
+// (`lean.acc`, inertia), eased (`lean.half`), about his feet; past `lean.arms` of lean his arms go out (the beam's own `caSwing`)
+function ropePose() { const Z = ROPEB, p = player; if (!Z.on || !Z.bal) return; const want = Z.stat.on && !p.melee && !p.roll ? clamp(Z.bal.roll * Z.leanRoll - Z.bal.az * Z.leanAcc, -.45, .45) : 0;
+  const dt = Math.min(.05, Z.dtPose || .016); Z.lean = damp(isFinite(Z.lean) ? Z.lean : 0, isFinite(want) ? want : 0, Z.leanHalf, dt); if (Math.abs(Z.lean) < 1e-3) return;
+  _bmA.set(1, 0, 0); _bmQ.setFromAxisAngle(_bmA, Z.lean); rig.root.quaternion.premultiply(_bmQ);     // about +x by +a tips his head toward +z
+  const k = Math.min(1, Math.abs(Z.lean) / Z.leanArms), Bn = rig.bones || {}, RA = Bn.mixamorig_RightArm, RF = Bn.mixamorig_RightForeArm, LA = Bn.mixamorig_LeftArm, LF = Bn.mixamorig_LeftForeArm;
+  if (k > .05 && RA && RF && LA && LF) { rig.root.updateMatrixWorld(true); RA.getWorldPosition(_caR); LA.getWorldPosition(_bmL); _caR.sub(_bmL); _caR.y = 0;
+    if (_caR.lengthSq() > 1e-8) { _caR.normalize(); caSwing(RA, RF, _caR, BEAM.arms * k); caSwing(LA, LF, _bmL.copy(_caR).negate(), BEAM.arms * k); } } }
 function wparkBuild() { const Z = WPARK; Z.want = 2; if (Z.on) return; const g = new THREE.Group(); scene.add(g); const boxes = [], H = Z.H;
   const mats = {}, mat = c => mats[c] || (mats[c] = new THREE.MeshStandardMaterial({ color: c, roughness: .85 }));
   const box = (x0, x1, y0, y1, z0, z1, c) => { const m = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), mat(c)); m.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); m.castShadow = m.receiveShadow = true; g.add(m);
@@ -67848,6 +67863,7 @@ function frameBody() {
     duckPose(dt);                      // m1070: the cover duck (right pad down in half cover)
     gsidePose();                       // m1073: the mirrored guard's blade, laid along the reflection of his own
     beamPose();                        // m1037: on the beam, tilted with the balance, arms out
+    ropePose();                        // m15xx: on the rope bridge, leaning against its tilt and swing
     // **AFTER THE ROOT IS PLACED, NOT ONLY AFTER THE MIXER.** The pin is a bone's WORLD
     // position and the speed cap is measured against how far it moved, so solving before the
     // root is written measures last frame's travel -- which at a knock-down's 12 m/s is most
