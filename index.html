@@ -32834,6 +32834,20 @@ const MIRROR = { clips: ['katana_slash_1', 'katana_combo', 'katana_360h', 'hurri
 // m1026: *"I don't really like the ninja run... get rid of it for now and just have the regular run a little faster, and if you let go he
 // does the long jump -- no tap."* `look` RUN (default) = the hold is the ORDINARY run (or the katana's) at `runSpeed`, the lens and lines
 // toned down; NINJA = her arms-back sprint at `speed`, as m1007 built it (TOOLS > SPRINT). Letting go of the hold while sprinting IS the long jump.
+// m15xx (his: "when he walks upstairs he just does the flat-ground walk and cuts through the stairs -- we need animations for stairs and hills"): three
+// library clips Forge-baked onto Grumbo IN PLACE (`stairs_up` = Walking Up The Stairs, `stairs_run` = Running Up Stairs, `stairs_down` = Descending
+// Stairs). `stairsWant` reads the GROUND under him `look` m ahead and behind along his travel; the slope (rise over run, eased) past `upAt` plays the
+// climb (the run version over `runAt` m/s), past `-downAt` the descent, with hysteresis (`out`) so a single step does not flicker it. The rate is
+// each clip's own stride, measured off his planted foot the first time (`arenaRef`'s method). TOOLS-free: no clip, no change.
+const STAIRS = { on: 1, look: .7, upAt: .22, downAt: .22, out: .1, half: .08, runAt: 4.2, tsLo: .6, tsHi: 1.9, ref: {} };
+function stairsWant(sp) { const p = player; if (!STAIRS.on || !p.grounded || sp < .6 || p.melee || p.roll || p.slide || p.beam || p.wrun || p.ledge || p.board || p.riding || p.dragon) { p.slopeS = 0; p.stairs = ''; return ''; }
+  const h = Math.atan2(p.vel.x, p.vel.z), fx = Math.sin(h), fz = Math.cos(h), L = STAIRS.look, y = p.pos.y;
+  const a = groundAt(p.pos.x + fx * L, p.pos.z + fz * L, y + .7, .01), b = groundAt(p.pos.x - fx * L, p.pos.z - fz * L, y + .7, .01);
+  const sl = isFinite(a) && isFinite(b) && a > y - 1.5 && b > y - 1.5 ? (a - b) / (2 * L) : 0; p.slopeS = damp(p.slopeS || 0, clamp(sl, -1.2, 1.2), STAIRS.half, 1 / 60);
+  const s = p.slopeS, cur = p.stairs || '', up = cur.startsWith('stairs_u') || cur === 'stairs_run' ? s > STAIRS.out : s > STAIRS.upAt, dn = cur === 'stairs_down' ? s < -STAIRS.out : s < -STAIRS.downAt;
+  const nm = up ? (sp > STAIRS.runAt && rig.actions.stairs_run ? 'stairs_run' : 'stairs_up') : dn ? 'stairs_down' : ''; p.stairs = nm && rig.actions[nm] ? nm : ''; return p.stairs; }
+function stairsRef(nm) { if (STAIRS.ref[nm] != null) return STAIRS.ref[nm]; const hd = { K: { h: RIG.height, file: RIG.file, gaitM: STAIRS.gm || (STAIRS.gm = {}) }, actions: rig.actions, mixer: rig.mixer, model: rig.model };
+  const r = arenaRef(hd, nm); return (STAIRS.ref[nm] = r > .2 ? r : nm === 'stairs_run' ? 3.5 : 1.3); }
 const AUTOSPRINT = { on: 1, d: 4.6, minV: 3, turn: 1.4, dbl: 1 };     // m1809: d = 15 ft of running before the sprint
 try { if (localStorage.getItem('mel.autosprint') === '0') AUTOSPRINT.on = 0; } catch (e) {}
 const NINJA = { on: 1, look: 'RUN', looks: ['RUN', 'NINJA'], runClip: 'run_fast', runSpeed: 9, runFov: .5, runLines: .35, clip: 'ninja_run', jump: 'ninja_jump', speed: 11, minMag: .35, win: .4, jumpUp: 10.5, jumpFwd: 13.5, fov: 9, lines: .55, tsLo: .7, tsHi: 3.4 };     // tsHi: her stride is short (2.1 m/s on the goblin) -- anime legs, not sliding feet
@@ -32845,7 +32859,7 @@ const NINJA = { on: 1, look: 'RUN', looks: ['RUN', 'NINJA'], runClip: 'run_fast'
 // hammer's full-charge ping, a spark ring) and turns gold. Let go past `min` and he LAUNCHES along his facing at `v0`..`v1` m/s (sprint is
 // 7.2), held `hold` s, then bled at `bleed` m/s^2 back to an ordinary run; the stick steers it, a landing does not slow it (`p.zoomV`).
 // The ramps, the quarter pipe and the loop that spend it are the next builds.
-const ZOOM = { on: 1, right: 0, T: 1.1, min: .25, v0: 10, v1: 17, hold: .7, bleed: 3.2, still: 1.2, rate0: .7, rate1: 2.6, rOut: 1.05, rIn: .3, rings: null, dustT: 0, stat: { launches: 0, full: 0 } };
+const ZOOM = { on: 0, right: 0,     /* m15xx: RETIRED (his: "hold down on the left stick unarmed and he charges his run -- I want that gone, retired in general"); `mel.ZOOM.on = 1` is the A/B */ T: 1.1, min: .25, v0: 10, v1: 17, hold: .7, bleed: 3.2, still: 1.2, rate0: .7, rate1: 2.6, rOut: 1.05, rIn: .3, rings: null, dustT: 0, stat: { launches: 0, full: 0 } };
 function zoomRings() {
   if (ZOOM.rings) return ZOOM.rings;
   const m = c => new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: .85, toneMapped: false, depthWrite: false });
@@ -35579,6 +35593,7 @@ function rigAnim(dt) {
   // m1031: *"the one we had is the best [STD]... the other one that was decent, that we could use for the faster run, was the one called
   // FASTRUN."* The right-pad sprint (look RUN) plays the library's "Fast Run" (`run_fast`) at its measured ref -- not the katana's stance
   // run, which keeps its own -- and the RUN key's pick stays the ordinary run.
+  { const st = stairsWant(sp); if (st) { add(L(st), rest, 0); setScale(L(st), clamp(sp / (stairsRef(st) * (rig.gaitK || 1)), STAIRS.tsLo, STAIRS.tsHi)); setWeights(t, dt); return; } }     // m15xx: on stairs and slopes
   if (p.ninja && NINJA.look === 'RUN' && !katStance() && rig.actions[NINJA.runClip]) {
     const R = GAIT.runSets.fastrun, ref = R && R.runRef > .2 ? R.runRef : GAIT.sprintRef;
     add(L(NINJA.runClip), rest, 0); setScale(L(NINJA.runClip), clamp(sp / (Math.max(.5, ref) * (rig.gaitK || 1)), NINJA.tsLo, NINJA.tsHi));

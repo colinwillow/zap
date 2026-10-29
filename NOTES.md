@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Stairs and slopes have their own walk; the zoom charge retired (m15xx)
+*"When he walks upstairs he just does the flat-ground walk and cuts through the stairs -- we need animations for walking up stairs and hills." /
+"There's still a residual thing: hold down on the left stick unarmed and he charges his run. I want that gone -- retired in general."*
+- Three library clips Forge-baked onto Grumbo IN PLACE (`tools/agoblin_forge_prof.json`, 21 -> 24 roles, 2.33 MB): `stairs_up` (Walking Up The
+  Stairs), `stairs_run` (Running Up Stairs), `stairs_down` (Descending Stairs).
+- `stairsWant` (in the gait, before the sprint): the ground `look` .7 m ahead and behind along his travel, the slope eased; past `upAt` .22 the
+  climb (the run version over `runAt` 4.2 m/s), past -.22 the descent, hysteresis down to .1 so one step does not flicker it. Rate = each clip's
+  stride measured off his planted foot (`arenaRef`). Off on the beam, a wall, a ledge, the board, the dragon, mid-strike.
+- Measured on the Rope Course's stairs (.3 m risers, the shipped frame): slope .27 at the first riser -> `stairs_up` blending in (weight .34 ->
+  .92 -> 1.0), steady .69-.75 up the flight; past 4.2 m/s `stairs_run`; flat on top -> the ordinary gait; the bridge's sag down -> `stairs_down`.
+- `ZOOM.on` 0: the zoom charge (left pad held in place, and the right-pad up it replaced) is retired everywhere. `mel.ZOOM.on = 1` is the A/B.
+- Not yet: foot IK onto each step (the clip lifts his legs; his soles are not placed on the treads).
+
 ## Rope bridge pass 3a: the hand ropes hold him (m1811, ROPEWORKS 1 / DOCKET 25)
 - On the deck he cannot walk off the side: his feet are kept `edge` .3 m inside the deck ropes where he stands (read off the ropes every frame,
   so the bound moves with the swing), his speed out through the side is taken away, and that push BOWS the hand rope out (`bow`, the nodes near

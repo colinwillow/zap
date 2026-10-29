@@ -188,6 +188,30 @@
     "Left": "fist",
     "Right": "fist"
    }
+  },
+  {
+   "role": "stairs_up",
+   "stem": "Walking_Up_The_Stairs",
+   "name": "Walking_Up_The_Stairs",
+   "edit": {
+    "inPlace": 1
+   }
+  },
+  {
+   "role": "stairs_run",
+   "stem": "Running_Up_Stairs",
+   "name": "Running_Up_Stairs",
+   "edit": {
+    "inPlace": 1
+   }
+  },
+  {
+   "role": "stairs_down",
+   "stem": "Descending_Stairs",
+   "name": "Descending_Stairs",
+   "edit": {
+    "inPlace": 1
+   }
   }
  ]
 }
