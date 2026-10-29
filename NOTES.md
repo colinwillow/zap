@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## A wall RUN is not a climb: no hands (m15xx, DOCKET 17)
+*"A wall run is not climbing up a wall -- you're going so fast you break gravity for a second, Sonic-style; a wall climb is Spider-Man. Use the clip for
+the feet, and have the hands doing the typical run -- the ninja thing. No hands is what makes it a wall run."*
+- `WRUN.upArms` RUN (default; TOOLS > WALL UP ARMS RUN / CLIMB): the run-up plays TWO HALVES built once at runtime (`wallUpHalves`) -- the
+  climb's LEGS and hips (`wall_up__wl`, rate by climb speed) and a sprint's UPPER body (`wall_up__wu`: the ninja run if he has it, else the fast
+  run, at `upArmTs` 1.5) -- each bone owned by exactly one. (The game's own leg/upper split runs at load, before forged clips arrive, so it had to
+  be built here.) CLIMB = m1828's whole clip, hands up the face.
+- Rendered side-on on the 4.5 m wall: legs driving up the face, arms down at his sides in the run, no hand on the wall.
+
 ## The side run is a real clip too (m1829, DOCKET 17)
 *His horizontal reference: tilted along the wall, the near hand reaching to it, legs running.*
 - Wall_Run, Wall_Run_1 and Diagonal_Wall_Run baked onto Grumbo in a throwaway file, rendered from behind: Wall_Run drifts upward even in place;
