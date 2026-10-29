@@ -13211,7 +13211,7 @@ function stepWrun(dt) {
     // (`vFric`); the LEFT STICK, read onto the wall (toward the wall = up, along it = across), turns that vector toward itself at `steer` rad/s
     // without changing its length -- so the path curves as the thumb sweeps. `R.a` (0 = straight up, +-pi/2 = across) drives the facing and the
     // blend of the two runs' clips.
-    // m15xx (WALLRUN.md step 1, his: "straight up it always converts into a horizontal run; it launches, launches; I want damping and good control"):
+    // m1833 (WALLRUN.md step 1, his: "straight up it always converts into a horizontal run; it launches, launches; I want damping and good control"):
     //   the STICK on the wall is read in SCREEN terms -- thumb up = up the wall, thumb left / right = along it the way the screen shows (the wall cam
     //   turns the lens along the wall, so the world reading made "up" mean "across" -- the bug); GRIP: no gravity for `gripT` s, then it ramps in
     //   over `rampT` (the Titanfall shape); the wall speed eases to under `capV` instead of keeping every m/s it arrived with.
@@ -13244,7 +13244,7 @@ function stepWrun(dt) {
   if (p.grounded && R.t > .15) { wrunEnd(0); return; }
   // the run UP ends on the lip: his hands pass the top -> the ledge's own hang (and its climb), the PoP move
   if (R.kind === 'up' && LEDGE.on && rig.actions[LEDGE.clips.hang]) { const L = ledgeFind(p.pos.x, p.pos.y, p.pos.z, p.r + LEDGE.reach); if (L && L.b === R.b) { wrunEnd(0); p.vel.set(0, 0, 0); ledgeGo(L); return; } }
-  if (!on) { if (R.b && p.pos.y > R.b.maxy - 1.2 && p.vel.y > WRUN.topV) p.vel.y = WRUN.topV; wrunEnd(1); return; }     // m15xx: off the TOP it is a hop, not a launch
+  if (!on) { if (R.b && p.pos.y > R.b.maxy - 1.2 && p.vel.y > WRUN.topV) p.vel.y = WRUN.topV; wrunEnd(1); return; }     // m1833: off the TOP it is a hop, not a launch
   if (R.kind === 'slide') { if (R.t - (R.top || 0) > WRUN.slideT || (!WRUN.stick && stickWorld().mag > .6)) wrunEnd(.6); return; }
   if ((WRUN.stick && R.head !== undefined) || R.velMode) return;     // m1767: runs fall back to the slide (above), they do not let go     /* m1372: a slide lasts `slideT`; a push on the stick lets go */
   if (R.kind === 'side' ? R.t > WRUN.T : (R.t > WRUN.upT * Math.max(1, (R.vy0 || WRUN.upV) / WRUN.upV) || p.vel.y < -1)) wrunEnd(R.kind === 'side' ? 1.5 : 1);
@@ -15309,7 +15309,7 @@ function arenaUi() {
       else if (a === 'idlepick') { const I = IDLEPICK; I.pick = I.picks[(I.picks.indexOf(I.pick) + 1) % I.picks.length]; try { localStorage.setItem('mel.idlepick2', I.pick); } catch (err) {} }     // m1815
       else if (a === 'asprint') { AUTOSPRINT.on = AUTOSPRINT.on ? 0 : 1; try { localStorage.setItem('mel.autosprint', AUTOSPRINT.on); } catch (err) {} }     // m1809
       else if (a === 'kauto') { CHARGE3.auto = CHARGE3.auto === 'CHAIN' ? 'SINGLE' : 'CHAIN'; try { localStorage.setItem('mel.kauto', CHARGE3.auto); } catch (err) {} }     // m1798
-      else if (a === 'wproxy') { WRUN.proxy = WRUN.proxy ? 0 : 1; if (!WRUN.proxy) rig.root.visible = true; }     // m15xx
+      else if (a === 'wproxy') { WRUN.proxy = WRUN.proxy ? 0 : 1; if (!WRUN.proxy) rig.root.visible = true; }     // m1833
       else if (a === 'uparms') { WRUN.upArms = WRUN.upArms === 'RUN' ? 'CLIMB' : 'RUN'; try { localStorage.setItem('mel.uparms', WRUN.upArms); } catch (err) {} }     // m1830
       else if (a === 'wallmode') { WRUN.mode = WRUN.mode === 'VEL' ? 'STICK' : 'VEL'; try { localStorage.setItem('mel.wallmode', WRUN.mode); } catch (err) {} }     // m1776
       else if (a === 'arcline') { BARC.line = BARC.line ? 0 : 1; try { localStorage.setItem('mel.arcline', BARC.line); } catch (err) {} }     // m1759
@@ -28854,7 +28854,7 @@ function ledgeHandsPose() { const p = player, L = p.ledge; if (!LHANDS.on || !L 
     const s0 = (_lhS.x - L.cx) * tx + (_lhS.z - L.cz) * tz;
     _lhT.set(L.cx + tx * s0 - L.nx * LHANDS.in, L.y + LHANDS.up, L.cz + tz * s0 - L.nz * LHANDS.in);
     wrLimb(UA, FA, HA, _lhT.clone(), new THREE.Vector3(L.nx * .6 + tx * sd * .5, -.4, L.nz * .6 + tz * sd * .5)); } }
-// m15xx (his: "I'm picturing doing this with just a circle on a wall to get the locomotion -- we're solving too many problems at once"): THE WALL
+// m1833 (his: "I'm picturing doing this with just a circle on a wall to get the locomotion -- we're solving too many problems at once"): THE WALL
 // PROXY (TOOLS > WALL PROXY). On a wall the character is hidden and a plain BALL rides where he is, drawing its PATH (the last `n` points, kept
 // a few seconds after he leaves) -- the movement judged alone, before any animation is asked to sell it.
 const WPROXY = { n: 160, keep: 3 };
@@ -32533,7 +32533,7 @@ function stepKit(dt) {
     if (AUTOSPRINT.on) { const sp = Math.hypot(p.vel.x, p.vel.z), hd = p.heading || p.faceH || 0;
       if (p.grounded && moving && sp > AUTOSPRINT.minV && !busy) { if (p.runH != null && Math.abs(wrapAngle(hd - p.runH)) > AUTOSPRINT.turn) p.runD = 0; p.runD = (p.runD || 0) + sp * dt; p.runH = hd; }
       else if (p.grounded && (!moving || sp < AUTOSPRINT.minV * .6)) { p.runD = 0; p.runH = null; }
-      p.sprintAuto = (p.runD || 0) >= AUTOSPRINT.d ? 1 : 0; if (p.sprintAuto && moving && p.grounded) p.ninja = 1; }     /* m15xx: only on the ground (in the air it drew the sprint pose: "a weird ninja-sprint pose in the air") */
+      p.sprintAuto = (p.runD || 0) >= AUTOSPRINT.d ? 1 : 0; if (p.sprintAuto && moving && p.grounded) p.ninja = 1; }     /* m1833: only on the ground (in the air it drew the sprint pose: "a weird ninja-sprint pose in the air") */
     // m1016: REPAIR -- the LEFT pad held STILL (never a move: inside `tapR` the whole touch) beside a broken wall puts it back, a chunk at a
     // time, bottom first. *"Like Fortnite, hold down on the stick and it rebuilds the walls."* The left pad's free slot (CLAUDE.md).
     const LS = stick.L;
@@ -68148,7 +68148,7 @@ function frameBody() {
     duckPose(dt);                      // m1070: the cover duck (right pad down in half cover)
     gsidePose();                       // m1073: the mirrored guard's blade, laid along the reflection of his own
     beamPose();                        // m1037: on the beam, tilted with the balance, arms out
-    wallProxyStep();                   // m15xx: the wall lab's ball and path
+    wallProxyStep();                   // m1833: the wall lab's ball and path
     ledgeHandsPose();                  // m1832: hands on the lip (one hand with a blade)
     idleFixPose();                     // m1820: the Dwarf idle's arms and wrists corrected
     ropePose();                        // m1805: on the rope bridge, leaning against its tilt and swing

@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The wall run starts over with a ball on a wall (m15xx, WALLRUN.md step 1)
+## The wall run starts over with a ball on a wall (m1833, WALLRUN.md step 1)
 *"When I try to run straight up the wall he goes up for a second and then always converts into a horizontal run... the weird in-air
 pose, the ninja sprint... I'm picturing doing this with just a circle on a wall... damping... very good control."*
 - **Straight up turned sideways because of the WALL CAM.** The stick was read through `stickWorld`, which is camera-relative, and the
