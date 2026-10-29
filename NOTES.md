@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Turquoise is the flame now -- the bow, the sword, the debris; the Osari stay green (m15xx)
+*"I'd like this turquoise to be the flame colour for the other things that use the green -- the bow or the sword."*
+- `gfire`'s default palette is TURQUOISE (1); `ofire` is the Osari's green (0), used only by the Osari's vanish / fade and the spider's acid spit.
+  So the fire arrow (its trail, its burn, its head `hc` [.3, 1, .9]), sword-cut debris dissolving, statues waking, the guardian's and spider's
+  breaks all burn turquoise. `killBlast` takes the palette (its flames, sparks and smoke -- `TURQ.shade()` -- turquoise; the Osari's green).
+- The katana's left row is STEEL / FIRE / **JIN**: JIN is the blade fire (`BFL`) in turquoise; FIRE stays the orange (m1762). Both cores are the
+  particle's own colour lifted.
+
 ## The guardian's and the spider's breaks burn TURQUOISE (m1777)
 *"I like the turquoise in the guardian -- the green mist cloud needs to match it better colour-wise."*
 - `gfire` takes a palette (`pal`): 0 the Osari's green, 1 TURQUOISE -- white-cyan -> turquoise -> deep teal, the hard-surface caps' colour.

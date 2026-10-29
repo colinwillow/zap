@@ -12728,7 +12728,7 @@ function arenaStep(dt) {
     if (D.die != null) { D.die += dt / DEBRIS.dieT; const u = Math.min(1, D.die), P = D.m.position;     // m1720: dissolving -- shrinks, fades, burns off green
       D.m.scale.copy(D.s1).multiplyScalar(Math.max(.02, 1 - u * u)); for (const m of D.fade) m.opacity = 1 - u;
       if (Math.random() < dt * 30) gfire(P.x + (Math.random() - .5) * D.r, P.y, P.z + (Math.random() - .5) * D.r, .45 + (1 - u) * .3);
-      if (Math.random() < dt * 4) smokeAt(P.x, P.y + .1, P.z, 1.2, .8, OSARI.shade(), .9, gsmoke);
+      if (Math.random() < dt * 4) smokeAt(P.x, P.y + .1, P.z, 1.2, .8, TURQ.shade(), .9, gsmoke);
       D.v.y -= 6 * dt; D.v.multiplyScalar(Math.exp(-2 * dt)); P.addScaledVector(D.v, dt); if (P.y < .05) { P.y = .05; D.v.y = 0; } D.m.rotation.x += D.w.x * dt * .5; D.m.rotation.y += D.w.y * dt * .5;
       if (u >= 1) { D.m.removeFromParent(); D.gone = 1; gone = 1; } continue; }
     if (D.rest && DEBRIS.on && DEBRIS.life > 0 && (D.restT = (D.restT || 0) + dt) > DEBRIS.life) { debrisDie(D); DEBRIS.stat.fades++; }
@@ -14167,7 +14167,7 @@ function limbHalve(d, dirH) { const H = halfPrep(d); if (!H.up.length || !H.lo.l
   for (const D of ARENA.debris) { if (D.m === bot) { D.v.multiplyScalar(.18); D.v.y = 1.2; D.w.multiplyScalar(.25); } if (D.m === top) { D.v.x *= 1.5; D.v.z *= 1.5; } }
   const P = d.root.position, cy = P.y + (d.K.h || 1.8) * .55;
   for (let i = 0; i < 3; i++) spkBurst(P.x, cy, P.z, 24, { col: i % 2 ? [1, .8, .35] : [1, 1, .9], spread: 7, size: .2, life: .55 });
-  jinraEmit(P.x, cy, P.z, JINRA.seep * 2); snd('clang', { g: .8, r: .75, x: P.x, z: P.z }); killBlast(P, cy, 1, d.K.osari ? 1 : 0);     // m1695: the samurai's explosion, in green for the Osari
+  jinraEmit(P.x, cy, P.z, JINRA.seep * 2); snd('clang', { g: .8, r: .75, x: P.x, z: P.z }); killBlast(P, cy, 1, d.K.osari ? 1 : 0, 0);     // m1695: the samurai's explosion, in green for the Osari
   if (d.K.osari) for (let i = 0; i < 70; i++) { const a = Math.random() * 6.283, rr = Math.random() * .35; gfire(P.x + Math.cos(a) * rr, cy + (Math.random() - .5) * .3, P.z + Math.sin(a) * rr, 1 + Math.random() * .5); }
   HALVE.stat.halves++; HORDE.stat.kills++; d.st = 'gone'; d.gone = 1; d.root.visible = false;     /* `gone`: the far-cull (PERF.bodyFar) would show him again before `bodyGone` runs */ const i = HORDE.list.indexOf(d); if (i >= 0) HORDE.list.splice(i, 1); setTimeout(() => bodyGone(d), 0); return true; }
 // a blow that landed on a dismemberable body: cut a limb (true when it did)
@@ -14285,8 +14285,8 @@ function gfireInit() { const N = GFIRE.n, g = new THREE.BufferGeometry(), P = ne
   GFIRE.pts = pts; GFIRE.P = P; GFIRE.C = C; GFIRE.S = S; GFIRE.A = A; GFIRE.F = Fr; GFIRE.R = Ro; GFIRE.w = new Float32Array(N); GFIRE.pal = new Uint8Array(N); GFIRE.v = new Float32Array(N * 3); GFIRE.life = new Float32Array(N); GFIRE.L0 = new Float32Array(N); GFIRE.s0 = new Float32Array(N); GFIRE.live = 0; }
 // m1777 (his: "I like the turquoise in the guardian -- the green mist cloud needs to match it"): a second palette, TURQUOISE (the hard-surface
 // caps' own colour), for the guardian's and the spider's breaks (`tfire`); the Osari keep the green
-const tfire = (x, y, z, k = 1) => gfire(x, y, z, k, 1);
-function gfire(x, y, z, k = 1, pal = 0) { if (!GFIRE.pts) gfireInit(); const G = GFIRE, i = G.i = (G.i + 1) % G.n; G.pal[i] = pal;
+const tfire = (x, y, z, k = 1) => gfire(x, y, z, k, 1), ofire = (x, y, z, k = 1) => gfire(x, y, z, k, 0);     // m15xx: turquoise is the DEFAULT now (his: "this turquoise for the other things that use the green -- the bow, the sword"); `ofire` = the Osari's green
+function gfire(x, y, z, k = 1, pal = 1) { if (!GFIRE.pts) gfireInit(); const G = GFIRE, i = G.i = (G.i + 1) % G.n; G.pal[i] = pal;
   G.P[i * 3] = x; G.P[i * 3 + 1] = y; G.P[i * 3 + 2] = z; G.v[i * 3] = (Math.random() - .5) * 1.6 * k; G.v[i * 3 + 1] = (2.6 + Math.random() * 2.4) * k; G.v[i * 3 + 2] = (Math.random() - .5) * 1.6 * k;
   G.L0[i] = G.life[i] = .32 + Math.random() * .42; G.s0[i] = (.24 + Math.random() * .26) * k; G.R[i] = (Math.random() - .5) * 1.4; G.w[i] = (Math.random() - .5) * 5;     /* m1691 (his: "a little tall, no rotation -- random rotation, smaller") */ G.F[i] = Math.floor(Math.random() * 4); G.live = 1; }
 function gfireStep(dt) { const G = GFIRE; if (!G.pts || !G.live) return; let any = 0, t = performance.now() / 1000;
@@ -14302,28 +14302,29 @@ function gfireStep(dt) { const G = GFIRE; if (!G.pts || !G.live) return; let any
     if (G.life[i] <= 0) { G.P[o + 1] = -999; G.A[i] = 0; } }
   const g = G.pts.geometry; for (const n of ['position', 'aCol', 'aSize', 'aA', 'aF', 'aR']) g.attributes[n].needsUpdate = true;
   G.pts.material.uniforms.uPx.value = renderer.domElement.height / (2 * Math.tan(camera.fov * Math.PI / 360)); if (!any) G.live = 0; }
+const TURQ = { shade: () => { const r = Math.random(); return r < .6 ? [.2 + Math.random() * .1, .95, .9 + Math.random() * .1] : r < .85 ? [.45, 1, .95] : [.1, .75, .8]; } };     // m15xx: turquoise smoke
 const OSARI = { shade: () => { const r = Math.random(); return r < .55 ? [.3 + Math.random() * .15, 1, .35 + Math.random() * .15] : r < .8 ? [.1, 1, .7 + Math.random() * .2] : [.7 + Math.random() * .15, 1, .2]; },     /* m1702 (his: "not shades -- HUES: a little more turquoise, a little more slime green-yellow; glowing neon"): neon green, turquoise, slime */ fadeT: .7, col: [.12, .85, .32], col2: [.04, .5, .2], fades: [] };
 // m1695 (his: "there used to be this EXPLOSION when you killed the samurai -- that's what I want when you slice through them; a little explosion in
 // the green smoke, and it billows up"): THE KILL BLAST, shared by the halving and the Osari's end. A hot flash of sparks (the samurai's
 // `limbBoom` palette), a ring of green fire thrown out low, a column of green smoke that BILLOWS -- big puffs rising and growing over ~2 s --
 // and the explosion recording (`boom`), a shake and a hit-stop. `k` sizes it.
-function killBlast(P, y, k = 1, green = 1) {
-  for (let i = 0; i < 3; i++) spkBurst(P.x, y, P.z, Math.round(24 * k), { col: i === 0 ? [1, 1, .85] : i === 1 ? [1, .6, .2] : green ? [.4, 1, .5] : [1, .45, .15], spread: 8 * k, size: .26, life: .7 });
-  if (green) { for (let i = 0; i < Math.round(36 * k); i++) { const a = i / (36 * k) * 6.283, r = .2 + Math.random() * .3; gfire(P.x + Math.cos(a) * r, y - .3 + Math.random() * .4, P.z + Math.sin(a) * r, 1.1 * k); }
-    for (let i = 0; i < Math.round(10 * k); i++) { const a = Math.random() * 6.283, r = Math.random() * .6 * k; smokeAt(P.x + Math.cos(a) * r, y - .2 + i * .18, P.z + Math.sin(a) * r, (7 + Math.random() * 5) * k, 2.2 + Math.random() * .8, OSARI.shade(), 1.6, gsmoke); } }
+function killBlast(P, y, k = 1, green = 1, pal = 1) {
+  for (let i = 0; i < 3; i++) spkBurst(P.x, y, P.z, Math.round(24 * k), { col: i === 0 ? [1, 1, .85] : i === 1 ? [1, .6, .2] : green ? (pal ? [.3, 1, .9] : [.4, 1, .5]) : [1, .45, .15], spread: 8 * k, size: .26, life: .7 });
+  if (green) { for (let i = 0; i < Math.round(36 * k); i++) { const a = i / (36 * k) * 6.283, r = .2 + Math.random() * .3; gfire(P.x + Math.cos(a) * r, y - .3 + Math.random() * .4, P.z + Math.sin(a) * r, 1.1 * k, pal); }
+    for (let i = 0; i < Math.round(10 * k); i++) { const a = Math.random() * 6.283, r = Math.random() * .6 * k; smokeAt(P.x + Math.cos(a) * r, y - .2 + i * .18, P.z + Math.sin(a) * r, (7 + Math.random() * 5) * k, 2.2 + Math.random() * .8, pal ? TURQ.shade() : OSARI.shade(), 1.6, gsmoke); } }
   else for (let i = 0; i < 6; i++) smokeAt(P.x + (Math.random() - .5), y + Math.random() * .8, P.z + (Math.random() - .5), 2 * k, 1.6);
   snd('boom', { g: .75 * k, r: 1.15 + Math.random() * .15, x: P.x, z: P.z }); camShake(.3 * k); if (inArena()) ARENA.stop = Math.max(ARENA.stop, .08); }
 function osariVanish(d) { const P = d.root.position; HORDE.stat.kills++; bowDrop(d);
   for (let i = 0; i < 3; i++) spkBurst(P.x, P.y + .9, P.z, 22, { col: i % 2 ? OSARI.col : [.85, 1, .9], spread: 6, size: .24, life: .7 });
   const bones = []; d.model.traverse(o => { if (o.isBone) bones.push(o); }); const bw = new THREE.Vector3();
-  for (let i = 0; i < 90; i++) { const b = bones[(Math.random() * bones.length) | 0]; if (b) b.getWorldPosition(bw); else bw.set(P.x, P.y + 1, P.z); gfire(bw.x + (Math.random() - .5) * .2, bw.y, bw.z + (Math.random() - .5) * .2, 1 + Math.random() * .6); }     // m1689: GREEN FIRE off every bone
+  for (let i = 0; i < 90; i++) { const b = bones[(Math.random() * bones.length) | 0]; if (b) b.getWorldPosition(bw); else bw.set(P.x, P.y + 1, P.z); ofire(bw.x + (Math.random() - .5) * .2, bw.y, bw.z + (Math.random() - .5) * .2, 1 + Math.random() * .6); }     // m1689: GREEN FIRE off every bone
   for (let i = 0; i < 4; i++) { const a = Math.random() * 6.28, r = Math.random() * .5; smokeAt(P.x + Math.cos(a) * r, P.y + .4 + Math.random() * 1.4, P.z + Math.sin(a) * r, 2.5, 1.2, OSARI.shade(), .8, gsmoke); }
-  killBlast(P, P.y + .9, .8, 1); snd('swoosh', { g: .6, r: .55, x: P.x, z: P.z });     // m1695: an explosion in the green fire
+  killBlast(P, P.y + .9, .8, 1, 0); snd('swoosh', { g: .6, r: .55, x: P.x, z: P.z });     // m1695: an explosion in the green fire
   const mats = []; d.model.traverse(o => { if (o.isMesh && o.material) { o.material = o.material.clone(); o.material.transparent = true; o.material.depthWrite = false; mats.push(o.material); } });
   d.st = 'gone'; d.osariGone = 1; const i = HORDE.list.indexOf(d); if (i >= 0) HORDE.list.splice(i, 1); OSARI.fades.push({ d, mats, t: 0, s0: d.root.scale.x }); }
 function osariStep(dt) { for (let i = OSARI.fades.length - 1; i >= 0; i--) { const F = OSARI.fades[i], u = (F.t += dt) / OSARI.fadeT;
     for (const m of F.mats) m.opacity = Math.max(0, 1 - u); F.d.root.scale.setScalar(F.s0 * (1 + .25 * Math.min(1, u))); F.d.root.position.y += dt * .6;
-    if (!F.bones) { F.bones = []; F.d.model.traverse(o => { if (o.isBone) F.bones.push(o); }); } const bw = _sdA; for (let k = 0; k < 3; k++) { const b = F.bones[(Math.random() * F.bones.length) | 0]; if (b) { b.getWorldPosition(bw); gfire(bw.x, bw.y, bw.z, .7 + (1 - u) * .4); } }     // he BURNS off as he goes
+    if (!F.bones) { F.bones = []; F.d.model.traverse(o => { if (o.isBone) F.bones.push(o); }); } const bw = _sdA; for (let k = 0; k < 3; k++) { const b = F.bones[(Math.random() * F.bones.length) | 0]; if (b) { b.getWorldPosition(bw); ofire(bw.x, bw.y, bw.z, .7 + (1 - u) * .4); } }     // he BURNS off as he goes
     if (u >= 1) { F.d.root.visible = false; OSARI.fades.splice(i, 1); setTimeout(() => bodyGone(F.d), 0); } } }
 // m1677: THE OSARI SPIDER (his Tripo model; "I'm working on a four-legged spider... we're gonna need to hand-rig the spider"). RIGGED HERE, BY
 // SCRIPT (scratchpad spider/rig.py, Blender): Auto-Rig Pro is a humanoid rig, so the skeleton is placed from MEASURED geometry -- the four feet
@@ -14365,7 +14366,7 @@ function statueClear() { const Z = STATUE; for (const S of Z.list) { const i = S
   if (Z.g) { Z.g.removeFromParent(); Z.g = null; } for (const b of Z.boxes) { const i = BOXES.indexOf(b); if (i >= 0) BOXES.splice(i, 1); } if (Z.boxes.length) boxGrid(); Z.boxes.length = 0; Z.chal = null; Z.cine = null; }
 function statueWake(S) { const Z = STATUE; S.statue = 0; statueSet(S, 0); S.flash = 1.6; S.st = 'stag'; S.stT = 0; S.cool = 1.2 + Math.random(); Z.stat.wakes++;
   const M = spiderMid(S, _sdC); for (let i = 0; i < 6; i++) smokeAt(M.x + (Math.random() - .5) * 2, M.y - .3 + Math.random() * .6, M.z + (Math.random() - .5) * 2, 3, 1.2, [.82, .76, .66]);
-  for (let i = 0; i < 4; i++) smokeAt(M.x + (Math.random() - .5), M.y + Math.random() * .6, M.z + (Math.random() - .5), 4, 1.4, OSARI.shade(), 1.3, gsmoke);
+  for (let i = 0; i < 4; i++) smokeAt(M.x + (Math.random() - .5), M.y + Math.random() * .6, M.z + (Math.random() - .5), 4, 1.4, TURQ.shade(), 1.3, gsmoke);
   for (let i = 0; i < 30; i++) gfire(M.x + (Math.random() - .5) * 1.6, M.y + (Math.random() - .5) * .4, M.z + (Math.random() - .5) * 1.6, .9);
   spkBurst(M.x, M.y, M.z, 30, { col: [.8, .74, .64], spread: 6, size: .16, life: .6 }); spkBurst(M.x, M.y, M.z, 16, { col: [.5, 1, .85], spread: 4, size: .14, life: .5 });
   snd('boom', { g: .45, r: 1.3, x: M.x, z: M.z }); snd('clang', { g: .5, r: .55, x: M.x, z: M.z }); camShake(.22); }
@@ -14480,15 +14481,15 @@ function spiderGlob(S) { const p = player, M = spiderMid(S, _sdC), Z = SPIDER.sp
   const d = Math.hypot(p.pos.x - M.x, p.pos.z - M.z), T = clamp(d / Z.v, .45, 1.4), tx = p.pos.x + p.vel.x * T * .7, tz = p.pos.z + p.vel.z * T * .7, ty = p.pos.y + .9;
   const v = new THREE.Vector3((tx - M.x) / T, (ty - M.y) / T + .5 * MOVE.g * .6 * T, (tz - M.z) / T);
   const m = new THREE.Mesh(new THREE.SphereGeometry(.16, 10, 8), new THREE.MeshBasicMaterial({ color: 0x9dff7a })); m.position.copy(M); scene.add(m);
-  SPIDER.globs.push({ m, v, t: 0 }); SPIDER.stat.spits++; snd('swoosh', { g: .5, r: 1.6, x: M.x, z: M.z }); for (let i = 0; i < 10; i++) gfire(M.x, M.y, M.z, .7); }
+  SPIDER.globs.push({ m, v, t: 0 }); SPIDER.stat.spits++; snd('swoosh', { g: .5, r: 1.6, x: M.x, z: M.z }); for (let i = 0; i < 10; i++) ofire(M.x, M.y, M.z, .7); }
 function spiderGlobStep(dt) { const p = player, H = RIG.height || 1.25, Z = SPIDER.spit;
   for (let i = SPIDER.globs.length - 1; i >= 0; i--) { const G = SPIDER.globs[i], P = G.m.position; G.t += dt; G.v.y -= MOVE.g * .6 * dt; P.addScaledVector(G.v, dt);
-    gfire(P.x, P.y, P.z, .55 + Math.random() * .3); if (Math.random() < .5) gfire(P.x, P.y, P.z, .4);
+    ofire(P.x, P.y, P.z, .55 + Math.random() * .3); if (Math.random() < .5) ofire(P.x, P.y, P.z, .4);
     const hitMe = Math.hypot(P.x - p.pos.x, P.z - p.pos.z) < .55 && P.y > p.pos.y && P.y < p.pos.y + H * 1.1, gy = groundAt(P.x, P.z, P.y + .5, 1);
     if (!hitMe && P.y > gy && G.t < 3) continue;
     if (hitMe && !p.roll) playerHurt(Z.dmg, Math.atan2(G.v.x, G.v.z), 3, 1, .25, 0);
     else if (!hitMe && Math.hypot(P.x - p.pos.x, P.z - p.pos.z) < Z.R && Math.abs(p.pos.y - gy) < 1 && !p.roll) playerHurt(Z.dmg * .5, Math.atan2(p.pos.x - P.x, p.pos.z - P.z), 2, .6, .15, 0);
-    for (let k = 0; k < 26; k++) { const a = Math.random() * 6.283, r = Math.random() * .7; gfire(P.x + Math.cos(a) * r, Math.max(P.y, gy) + .05, P.z + Math.sin(a) * r, .8); }
+    for (let k = 0; k < 26; k++) { const a = Math.random() * 6.283, r = Math.random() * .7; ofire(P.x + Math.cos(a) * r, Math.max(P.y, gy) + .05, P.z + Math.sin(a) * r, .8); }
     spkBurst(P.x, Math.max(P.y, gy) + .1, P.z, 12, { col: [.5, 1, .5], spread: 3, size: .1, life: .35 }); snd('hit', { g: .35, r: 1.4, x: P.x, z: P.z });
     G.m.removeFromParent(); G.m.geometry.dispose(); SPIDER.globs.splice(i, 1); } }
 // the brain: walk in, and when the cooldown is spent pick what its range allows
@@ -14966,7 +14967,7 @@ function bowSolve() { const p = player, B = BOW.mesh; const k = clamp((p.bowT ||
 // the last `tracerT` s of its flight (a fast arrow draws a long line), in its own colour (normal blending: additive vanished on snow)
 let _arTr = null; function arrowTracerGeo() { return _arTr || (_arTr = new THREE.CylinderGeometry(1, .25, 1, 6, 1, true).rotateX(Math.PI / 2).translate(0, 0, -.5)); }
 function bowLoose() { const p = player; const { k, full, type, o, gk, g, T, dx, dz, ty } = bowSolve();
-  const m = arrowMesh(); m.position.copy(o); scene.add(m); const hc = type === 'fire' ? [.2, 1, .55] : type === 'blast' ? [1, .35, .1] : full ? [.3, .9, 1] : [.12, .5, .4]; m.userData.head.material.emissive.setRGB(hc[0], hc[1], hc[2]); m.userData.head.material.emissiveIntensity = 1.6;
+  const m = arrowMesh(); m.position.copy(o); scene.add(m); const hc = type === 'fire' ? [.3, 1, .9] : type === 'blast' ? [1, .35, .1] : full ? [.3, .9, 1] : [.12, .5, .4]; m.userData.head.material.emissive.setRGB(hc[0], hc[1], hc[2]); m.userData.head.material.emissiveIntensity = 1.6;
   m.scale.setScalar(BOW.big); { const tr = new THREE.Mesh(arrowTracerGeo(), new THREE.MeshBasicMaterial({ color: new THREE.Color(hc[0], hc[1], hc[2]).lerp(new THREE.Color(1, 1, 1), .45), transparent: true, opacity: .85, depthWrite: false, toneMapped: false })); tr.renderOrder = 61; tr.scale.set(BOW.tracerR / BOW.big, BOW.tracerR / BOW.big, .01); m.add(tr); m.userData.tracer = tr; } { const gl = glowSprite(new THREE.Color(hc[0], hc[1], hc[2]).lerp(new THREE.Color(1, 1, 1), .35), BOW.glow); gl.position.z = .46; m.add(gl); m.userData.glow = gl; }     // m1744: HIS arrows glow and are bigger -- they vanished against the rock
   ARROWS.push({ m, v: new THREE.Vector3(dx / T, (ty - o.y) / T + .5 * g * T, dz / T), t: 0, stuck: 0, from: null, mine: 1, pl: 1, gk, type, full, col: hc,
     dmg: BOW.dmg0 + (BOW.dmg1 - BOW.dmg0) * k + (type === 'fire' ? BOW.fireDmg : 0), pow: full ? BOW.pow1 : BOW.pow0 });
@@ -14985,7 +14986,7 @@ function arrowBlast(P, dirH) { BOW.stat.blasts++; const R = BOW.blastR;
 // sword is out). Green flame (`gfire`) licks along the edge from the guard to the tip (`muzzleWorld`, the far end of the blade along its mount),
 // thicker while it swings; every man the blade catches is set BURNING (`burnStart`) and the spiders take a gout of it.
 const BFIRE = { on: 0, rate: 110, swing: 2.5, k: .5 };
-try { BFIRE.on = localStorage.getItem('mel.bfire') === '1' ? 1 : 0; } catch (e) {}
+try { const v = +localStorage.getItem('mel.bfire'); BFIRE.on = v === 1 || v === 2 ? v : 0; } catch (e) {}     // m15xx: 2 = JIN, the turquoise flame
 const bladeFire = () => !!(BFIRE.on && slotNow().blade);
 const _bfA = new THREE.Vector3(), _bfB = new THREE.Vector3();
 // m1762 (his: "the katana fire -- not green, an actual burning fire. It's not coming out of the right spot: it should be on the blade, a lot at
@@ -15000,7 +15001,7 @@ const BFL = { n: 620, i: 0, pts: null, rate: 100, swing: 3, tipW: .35, size: [.1
 function bflInit() { const N = BFL.n, g = new THREE.BufferGeometry(); for (const [k, d] of [['position', 3], ['aCol', 3], ['aSize', 1], ['aA', 1], ['aF', 1], ['aR', 1]]) g.setAttribute(k, new THREE.BufferAttribute(new Float32Array(N * d).fill(k === 'position' ? -999 : 0), d));
   const m = new THREE.ShaderMaterial({ uniforms: { uT: { value: gfireTex() }, uPx: { value: 600 } }, transparent: true, depthWrite: false,
     vertexShader: 'attribute vec3 aCol; attribute float aSize, aA, aF, aR; uniform float uPx; varying vec3 vC; varying float vA, vF, vR; void main() { vec4 mv = modelViewMatrix * vec4(position, 1.0); gl_PointSize = aSize * uPx / max(.1, -mv.z); vC = aCol; vA = aA; vF = aF; vR = aR; gl_Position = projectionMatrix * mv; }',
-    fragmentShader: 'uniform sampler2D uT; varying vec3 vC; varying float vA, vF, vR; void main() { vec2 pc = gl_PointCoord - .5; float cs = cos(vR), sn = sin(vR); pc = vec2(cs * pc.x - sn * pc.y, sn * pc.x + cs * pc.y) + .5; if (pc.x < 0.0 || pc.x > 1.0 || pc.y < 0.0 || pc.y > 1.0) discard; if (vF < 0.0) { float d = length(gl_PointCoord - .5); float e = smoothstep(.5, .1, d) * vA; if (e < .01) discard; gl_FragColor = vec4(vC, e); return; } vec2 uv = vec2(pc.x, 1.0 - pc.y) * .5 + vec2(mod(vF, 2.0), floor(vF / 2.0)) * .5; vec4 tx = texture2D(uT, uv); float a = tx.r * vA; if (a < .01) discard; gl_FragColor = vec4(mix(vC, vec3(1.0, .95, .72), tx.g * .7), min(1.0, a * 1.35)); }' });
+    fragmentShader: 'uniform sampler2D uT; varying vec3 vC; varying float vA, vF, vR; void main() { vec2 pc = gl_PointCoord - .5; float cs = cos(vR), sn = sin(vR); pc = vec2(cs * pc.x - sn * pc.y, sn * pc.x + cs * pc.y) + .5; if (pc.x < 0.0 || pc.x > 1.0 || pc.y < 0.0 || pc.y > 1.0) discard; if (vF < 0.0) { float d = length(gl_PointCoord - .5); float e = smoothstep(.5, .1, d) * vA; if (e < .01) discard; gl_FragColor = vec4(vC, e); return; } vec2 uv = vec2(pc.x, 1.0 - pc.y) * .5 + vec2(mod(vF, 2.0), floor(vF / 2.0)) * .5; vec4 tx = texture2D(uT, uv); float a = tx.r * vA; if (a < .01) discard; gl_FragColor = vec4(mix(vC, min(vec3(1.0), vC + vec3(.35, .25, .25)), tx.g * .7), min(1.0, a * 1.35)); }' });
   const pts = new THREE.Points(g, m); pts.frustumCulled = false; pts.renderOrder = 52; scene.add(pts); BFL.pts = pts;
   BFL.v = new Float32Array(N * 3); BFL.life = new Float32Array(N); BFL.L0 = new Float32Array(N); BFL.s0 = new Float32Array(N); BFL.w = new Float32Array(N); BFL.em = new Uint8Array(N); BFL.live = 0; }
 const bflR = (a) => a[0] + Math.random() * (a[1] - a[0]);
@@ -15012,10 +15013,10 @@ function bflStep(dt) { const B = BFL; if (!B.pts || !B.live) return; const g = B
     B.v[o] *= Math.exp(-3 * dt); B.v[o + 2] *= Math.exp(-3 * dt); B.v[o + 1] = B.v[o + 1] * Math.exp(-2 * dt) + B.buoy * dt;     // the blade's push dies off; heat lifts it
     B.v[o] += Math.sin(t * 6 + i * 1.3) * B.curl * dt; B.v[o + 2] += Math.cos(t * 5 + i * 2.1) * B.curl * dt;
     P[o] += B.v[o] * dt; P[o + 1] += B.v[o + 1] * dt; P[o + 2] += B.v[o + 2] * dt;
-    if (e) { g.aSize.array[i] = B.s0[i]; g.aA.array[i] = B.life[i] <= 0 ? 0 : (1 - u) * (.7 + .3 * Math.sin(t * 40 + i)); C[o] = 1; C[o + 1] = .55 + .3 * (1 - u); C[o + 2] = .15; }
+    if (e) { g.aSize.array[i] = B.s0[i]; g.aA.array[i] = B.life[i] <= 0 ? 0 : (1 - u) * (.7 + .3 * Math.sin(t * 40 + i)); if (BFIRE.on === 2) { C[o] = .5; C[o + 1] = 1; C[o + 2] = .95; } else { C[o] = 1; C[o + 1] = .55 + .3 * (1 - u); C[o + 2] = .15; } }
     else { g.aSize.array[i] = B.s0[i] * (.8 + .5 * Math.sin(Math.min(1, u * 1.6) * Math.PI * .5)) * (1 - u * .45);     // swells a little, then narrows as it burns out
       g.aA.array[i] = B.life[i] <= 0 ? 0 : Math.min(1, u * 9) * Math.pow(1 - u, .9) * .95; g.aR.array[i] += B.w[i] * dt; if (Math.random() < .06) g.aF.array[i] = Math.floor(Math.random() * 4);
-      const c = u < .3 ? [1, .78 - u * .6, .25 - u * .4] : u < .65 ? [1 - (u - .3) * .5, .6 - (u - .3) * 1, .13 - (u - .3) * .2] : [.82 - (u - .65) * 1.2, .25 - (u - .65) * .4, .06];
+      const c = BFIRE.on === 2 ? (u < .3 ? [.55 - u, 1, .95] : u < .65 ? [.25 - (u - .3) * .3, .95 - (u - .3) * .3, .9] : [.12, .82 - (u - .65) * .6, .85 - (u - .65) * .5]) : u < .3 ? [1, .78 - u * .6, .25 - u * .4] : u < .65 ? [1 - (u - .3) * .5, .6 - (u - .3) * 1, .13 - (u - .3) * .2] : [.82 - (u - .65) * 1.2, .25 - (u - .65) * .4, .06];     // m15xx: JIN = turquoise
       C[o] = c[0]; C[o + 1] = Math.max(.05, c[1]); C[o + 2] = Math.max(.02, c[2]); }
     if (B.life[i] <= 0) { P[o + 1] = -999; g.aA.array[i] = 0; } }
   for (const n of ['position', 'aCol', 'aSize', 'aA', 'aF', 'aR']) g[n].needsUpdate = true;
@@ -21243,9 +21244,9 @@ function qdSub() { const s = slotNow(), bow = s.key === 'bow', proj = bow || s.k
     if (bow) { buildArcRow(wepRow, [{ label: 'ARROW' }, { label: 'FIRE' }, { label: 'BLAST' }], WEPROW.mid, i => { QD.arrow = ARROWK[i]; try { localStorage.setItem('mel.qdArrow', QD.arrow); } catch (e) {} snd('clang', { g: .2, r: 1.8 }); paintKit(); }, QD.sub);
       buildArcRow(qdSub2, [{ label: 'GUN' }, { label: '3D AIM' }], WEPROW.mid, i => i ? aim3Toggle() : qdProjPick('launcher'), QD.sub2); }
     else if (proj) buildArcRow(wepRow, [{ label: 'BOW' }, { label: 'GUN' }, { label: '3D AIM' }], WEPROW.mid, i => i === 2 ? aim3Toggle() : qdProjPick(i ? 'launcher' : 'bow'), QD.sub);
-    else if (sw) buildArcRow(wepRow, [{ label: 'STEEL' }, { label: 'FIRE' }], WEPROW.mid, i => { BFIRE.on = i; try { localStorage.setItem('mel.bfire', String(i)); } catch (e) {} snd(i ? 'swoosh' : 'clang', { g: .4, r: i ? .6 : 1.6 }); paintKit(); }, QD.sub); }
+    else if (sw) buildArcRow(wepRow, [{ label: 'STEEL' }, { label: 'FIRE' }, { label: 'JIN' }], WEPROW.mid, i => { BFIRE.on = i; try { localStorage.setItem('mel.bfire', String(i)); } catch (e) {} snd(i ? 'swoosh' : 'clang', { g: .4, r: i ? .6 : 1.6 }); paintKit(); }, QD.sub); }
   paintArcRow(qdSub2, bow, -1); { const k2 = qdSub2.firstChild ? qdSub2.firstChild.childNodes : []; for (const j of [2, 3]) if (k2[j]) k2[j].classList.toggle('sel', !!AIM3.on); }
-  if (sw) { paintArcRow(wepRow, 1, BFIRE.on ? 1 : 0); return; }
+  if (sw) { paintArcRow(wepRow, 1, BFIRE.on || 0); return; }
   if (!proj) { paintArcRow(wepRow, 0, -1); return; }
   if (bow) { paintArcRow(wepRow, 1, Math.max(0, ARROWK.indexOf(QD.arrow))); return; }
   paintArcRow(wepRow, 1, 1); const kids = wepRow.firstChild ? wepRow.firstChild.childNodes : []; for (const j of [4, 5]) if (kids[j]) kids[j].classList.toggle('sel', !!AIM3.on); }
