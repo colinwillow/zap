@@ -13251,18 +13251,19 @@ function wrunPose() {
   if (R.kind !== 'side') return;
   // rolled about his forward axis so his head leans OFF the wall and his feet stay on it; ramps in and out over .12 s
   const fx = R.dx, fz = R.dz, right = R.nx * -fz + R.nz * fx, k = Math.min(1, (R.t - (R.t0 || 0)) / .15), sg = Math.sign(right);     // his right is (-fz, fx)
-  _wrA.set(fx, 0, fz); _wrQ.setFromAxisAngle(_wrA, sg * WRUN.lean * k); rig.root.quaternion.premultiply(_wrQ);
+  _wrA.set(fx, 0, fz); _wrQ.setFromAxisAngle(_wrA, sg * (WRUN.sideClip && rig.actions && rig.actions.wall_side ? WRUN.sideLean : WRUN.lean) * k); rig.root.quaternion.premultiply(_wrQ);     /* m15xx: the clip's own lean is smaller */
   // m1072: *"his feet could make better contact with the wall, and his whole body is straight -- just at an angle. From the torso up he should rotate
   // back so he's pointed more straight up; the legs do the slant. And a mirror."* The roll pivots at his feet, which the run holds `p.r + gap`
   // off the face -- so the drawn body is slid that far IN (`footIn` short of it), and the spine is turned back `torso` rad about the same axis:
   // legs slanted, chest near upright. The side sign (`sg`) mirrors both.
   rig.root.position.x -= R.nx * (p.r + WRUN.gap - WRUN.footIn) * k; rig.root.position.z -= R.nz * (p.r + WRUN.gap - WRUN.footIn) * k;
   const sp = rig.bones && (rig.bones.mixamorig_Spine || rig.bones.mixamorig_Spine1);
-  if (sp && WRUN.torso) { rig.root.updateMatrixWorld(true); sp.getWorldQuaternion(_wrQ2); _wrQ.setFromAxisAngle(_wrA, -sg * WRUN.torso * k).multiply(_wrQ2);
+  const tq = WRUN.sideClip && rig.actions && rig.actions.wall_side ? WRUN.sideTorso : WRUN.torso;     /* m15xx: less upright-ing over the clip */
+  if (sp && tq) { rig.root.updateMatrixWorld(true); sp.getWorldQuaternion(_wrQ2); _wrQ.setFromAxisAngle(_wrA, -sg * tq * k).multiply(_wrQ2);
     sp.parent.getWorldQuaternion(_wrQ3).invert(); sp.quaternion.copy(_wrQ3.multiply(_wrQ)); sp.updateMatrixWorld(true); }
 }
 const _wrQ2 = new THREE.Quaternion(), _wrQ3 = new THREE.Quaternion();
-Object.assign(WRUN, { upClip: 1, upClipD: .45, upClipRef: 2.2, upClipTs: [.8, 2.6], upD: .8, upFoot: -.12, upAmp: .34, upLift: .26, upToeIn: .15, upJumpV: 9.5,     /* m1827: m1826's pose REVERTED (his: "even worse, horrendous") -- the jumps stay */     /* m1826 (his: "not a chair at 90 degrees -- down at 45 or less, knees with room to run, toes brushing the wall, not flat-footed"): hips closer (upD .8 -> .5), feet lower under him (upFoot -.12 -> -.55), toes turned INTO the wall (`upToeIn`) */ upD0: .8, upRate: 2.4, upW: .14, upTorso: .32, perchD: .42, perchFoot: -.18, perchKnee: -.55, perchFwd: .12, perchDrop: .22, perchLean: .45, perchW: .2, perchHand: .05, perchHandW: .55, ik: 1 });     /* m1683: the perch faces away -- back to the wall, a foot planted on it behind, hands back on it at the hips */
+Object.assign(WRUN, { sideClip: 1, sideLean: .65, sideTorso: .25, sideRef: 5.5, upClip: 1, upClipD: .45, upClipRef: 2.2, upClipTs: [.8, 2.6], upD: .8, upFoot: -.12, upAmp: .34, upLift: .26, upToeIn: .15, upJumpV: 9.5,     /* m1827: m1826's pose REVERTED (his: "even worse, horrendous") -- the jumps stay */     /* m1826 (his: "not a chair at 90 degrees -- down at 45 or less, knees with room to run, toes brushing the wall, not flat-footed"): hips closer (upD .8 -> .5), feet lower under him (upFoot -.12 -> -.55), toes turned INTO the wall (`upToeIn`) */ upD0: .8, upRate: 2.4, upW: .14, upTorso: .32, perchD: .42, perchFoot: -.18, perchKnee: -.55, perchFwd: .12, perchDrop: .22, perchLean: .45, perchW: .2, perchHand: .05, perchHandW: .55, ik: 1 });     /* m1683: the perch faces away -- back to the wall, a foot planted on it behind, hands back on it at the hips */
 const _wsA = new THREE.Vector3(), _wsB = new THREE.Vector3(), _wsC = new THREE.Vector3(), _wsT = new THREE.Vector3(), _wsK = new THREE.Vector3(), _wsQ = new THREE.Quaternion(), _wsQ2 = new THREE.Quaternion();
 // two bones onto `T`, the middle joint bent toward `pole` (a world direction); `end` turned so its child points along `aim` (optional)
 function wrLimb(up, mid, end, T, pole, aim) { if (!up || !mid || !end) return;
@@ -32862,7 +32863,7 @@ function buildBoard(g) {
 // becomes (x, -y, -z, w)), given to the bone on the OTHER side over THAT bone's rest (Q' = m(D) W'), and turned back into a local
 // rotation under its mirrored parent. No assumption about how any bone's axes point (an auto-rig's left and right axes need not
 // match), only that the rest pose is symmetric. The Hips' travel is flipped across the same plane. Run at load, on the BIND pose.
-const MIRROR = { clips: ['katana_slash_1', 'katana_combo', 'katana_360h', 'hurricane_kick', 'cover_R', 'katana_guard'], suffix: '_m' };     // m1073: + the guard (GSIDE)     // m1008: cover_R -> the move left along cover
+const MIRROR = { clips: ['katana_slash_1', 'katana_combo', 'katana_360h', 'hurricane_kick', 'cover_R', 'katana_guard', 'wall_side'], suffix: '_m' };     // m1073: + the guard (GSIDE)     // m1008: cover_R -> the move left along cover
 // m1007: THE NINJA SPRINT. *"There's this one run where both of her arms are back... when you hold down the right stick she does this
 // run... and you go really fast."* Her run is the library's `Running_Arc` (*Female Ninja Run Arc Right*: found by measuring every run
 // for both hands behind the hips through the cycle -- it is the only one); her running jump is `Jump_6`. The run CURVES, so
@@ -35413,6 +35414,11 @@ function rigAnim(dt) {
   // m1828 (his reference: the vertical wall run -- upright, close, one knee driven high with its foot on the wall, the other leg reaching down, hands
   // up the face): the library's Climbing_Up_Wall, baked IN PLACE onto Grumbo (`wall_up`), plays the RUN-UP whole -- no IK on top (`WRUN.upClip`);
   // its rate follows how fast he is rising (`upClipRef` m/s of climb at 1x, held to `upClipTs`)
+  // m15xx (his horizontal reference: tilted along the wall, the near hand reaching to it, legs running): the library's Wall_Run_1 (`wall_side`, in
+  // place) on the SIDE run -- its near arm reaches LEFT, so a wall on his right plays its mirror (`wall_side_m`, MIRROR) -- under the game's own
+  // roll toward the wall (`WRUN.lean`, eased to `sideLean` with the clip); rate by his speed along the wall (`sideRef` m/s at 1x)
+  if (p.wrun && p.wrun.kind === 'side' && WRUN.sideClip && rig.actions.wall_side) { const R = p.wrun, right = R.nx * -R.dz + R.nz * R.dx, nm = right > 0 || !rig.actions.wall_side_m ? 'wall_side' : 'wall_side_m', a = rig.actions[nm];
+    a.timeScale = clamp((R.v || WRUN.v) / WRUN.sideRef, .7, 2.2); t[nm] = 1; setWeights(t, dt); return; }
   if (p.wrun && p.wrun.kind === 'up' && WRUN.upClip && rig.actions.wall_up) { const a = rig.actions.wall_up; a.timeScale = clamp(Math.max(0, p.vel.y) / WRUN.upClipRef, WRUN.upClipTs[0], WRUN.upClipTs[1]); t.wall_up = 1; setWeights(t, dt); return; }
   if (p.wrun) { const nm = rig.actions[CLIPS.run] ? CLIPS.run : CLIPS.air, a = rig.actions[nm]; if (a && nm === CLIPS.run) a.timeScale = clamp((p.wrun.kind === 'side' ? p.wrun.v : 4) / Math.max(1, GAIT.runRef || 3), .7, 2.4); t[nm] = 1; setWeights(t, dt); return; }     // m1064     // m1034: hanging; m1048: FIRST, so no leftover state can draw over the hang
   if (p.mantle) { t[rig.actions[LEDGE.clips.up] ? LEDGE.clips.up : CLIPS.air] = 1; setWeights(t, dt); return; }     // m1039: the climb-up owns him

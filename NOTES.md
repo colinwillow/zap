@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The side run is a real clip too (m15xx, DOCKET 17)
+*His horizontal reference: tilted along the wall, the near hand reaching to it, legs running.*
+- Wall_Run, Wall_Run_1 and Diagonal_Wall_Run baked onto Grumbo in a throwaway file, rendered from behind: Wall_Run drifts upward even in place;
+  **Wall_Run_1** runs upright with the near arm reaching out to the side -- the reference's reach; the tilt is the game's own roll.
+- Baked as `wall_side` (32 roles, 3.54 MB) and added to `MIRROR.clips` (its arm reaches LEFT, so a wall on his right plays `wall_side_m`). On the
+  SIDE run it plays whole at his speed along the wall (`sideRef` 5.5 m/s at 1x), under the roll eased to `sideLean` .65 rad (was .95 over the run
+  clip) with the chest turned back only `sideTorso` .25 (was .75). `WRUN.sideClip = 0` = the old run-clip pose.
+- Rendered on the Wall Park's walls from behind and the side: tilted along the face, running, the near arm to the wall.
+
 ## The run-up is a real climbing clip (m1828, DOCKET 17)
 *His reference (a vertical wall run, side-on): upright, close to the wall, one knee driven high with its foot planted, the other leg reaching down,
 hands up the face.*
