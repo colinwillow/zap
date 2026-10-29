@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## Flyers overhead: the lens tips up, the gun and bow lock on, the lightning announces itself, an edge arrow (m15xx)
+## Flyers overhead: the lens tips up, the gun and bow lock on, the lightning announces itself, an edge arrow (m1757)
 *"Anytime we have a flying animal above you, or an archer, or a cannon ... the camera tilts to show them -- we need the same when an enemy is above you,
 like this dragon flying overhead; it's just out of screen. I couldn't hit it at all. I couldn't even see when its bolts were coming."*
 - **The up-look (`UPLOOK`, `upLookW`)** only ever answered SHOTS in the air (m1276) and a turret that had seen him (m1350). A hostile body ABOVE him

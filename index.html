@@ -9742,7 +9742,7 @@ function beastBoom(f, hitP) {
 const _UPV = new THREE.Vector3(0, 1, 0), _bkD = new THREE.Vector3();
 function beastStrike(d) {     // lightning: a ring where you stand, then the bolt into it
   const C = beastC(d), at = player.pos.clone(); at.y = .03;
-  // m15xx (his: "I couldn't even see when its bolts were coming"): a pale ring vanished on the light floor and under his own body. Now the ring is
+  // m1757 (his: "I couldn't even see when its bolts were coming"): a pale ring vanished on the light floor and under his own body. Now the ring is
   // SOLID with a dark rim (the bow arc's lesson, m1744) and fills inward as the strike comes; a thin column of light stands from the dragon's
   // head down to it the whole wind-up (so the eye goes from the ring to WHO is calling it); his head glows; a crackle starts it.
   const ring = new THREE.Mesh(new THREE.RingGeometry(C.strikeR * .82, C.strikeR, 48), new THREE.MeshBasicMaterial({ color: 0x9fdcff, toneMapped: false, transparent: true, opacity: .9, depthWrite: false, side: THREE.DoubleSide }));
@@ -12982,7 +12982,7 @@ function stepCart(dt) {
 // TALL = `minH` above his feet, a face at least `minLen` long (a post is not a wall). `wrunFind` is cover's `lowFind` with a height test.
 const WRUN = { on: 1, minH: 1.9, minLen: 1.2, reach: .85, minSp: 2.5, along: .72, into: .7, T: 1.15, v: 7.5, up: 4.2, g: 9, lean: .95, gap: .06,
   kick: 6.5, jumpV: 8.2, keep: .8, cool: .35, upV: 7.2, gUp: 12, upT: .75, offV: 5, offUp: 7.5, torso: .75, footIn: .06,
-  auto: 1, autoAir: 3, autoGround: 9, autoReach: .5, autoInto: .9, upK: 1.25, upMax: 17, upReach: 2, upQ: .4,     /* m15xx: upK 1 -> 1.25 (a sprint now climbs higher than a walk-in: 8.8 vs 7.2 m/s up) */
+  auto: 1, autoAir: 3, autoGround: 9, autoReach: .5, autoInto: .9, upK: 1.25, upMax: 17, upReach: 2, upQ: .4,     /* m1757: upK 1 -> 1.25 (a sprint now climbs higher than a walk-in: 8.8 vs 7.2 m/s up) */
   slide: 1, slideReach: .5, hold: .28, slideG: 7, slideV: 3.2, slideT: 2.2, slideMaxFall: 9, wjOut: 6.2, wjUp: 8.8,
   swipe: 1, swipeReach: .7, upLeg: 1.35, upLegIn: .12, upCone: 1.8 };     /* m1604: runs START from a right-pad SWIPE at the wall (`swipe` 0 = the old tap / auto); `upLeg` the run-up's legs swung out to the wall (rad) */     /* m1372: the WALL SLIDE and the wall jump */     // m1251: the run-up with no tap, its height from his speed     // m1072: torso, footIn
 const _wrN = { d: 0, nx: 0, nz: 0, cx: 0, cz: 0 }, _wrB = [];
@@ -13024,7 +13024,7 @@ function wrunTap() {
 // `upMax`), so the run lasts in proportion: a sprint jump climbs about 2 m, a full zoom about 12. The tap still kicks off into the back flip.
 function wrunAuto() {
   const p = player; if (!WRUN.on || !WRUN.auto || p.wrun || p.knock || p.riding || p.wing || p.bar || p.ledge || p.mantle || p.vault || p.climb || p.zip || p.rope || p.hook || p.melee || p.roll || p.chargeGo || p.slam || mphBare()) return 0;
-  if (p.wrunQ) { if (performance.now() > p.wrunQ.until) p.wrunQ = null; else { const W = wrunFind(p.pos.x, p.pos.y, p.pos.z, p.r + WRUN.swipeReach, null); if (W) { const q = p.wrunQ; p.wrunQ = null; return wrunGo(W, 'up', 0, 0, q.upV); } } }     // m15xx: the remembered up-swipe
+  if (p.wrunQ) { if (performance.now() > p.wrunQ.until) p.wrunQ = null; else { const W = wrunFind(p.pos.x, p.pos.y, p.pos.z, p.r + WRUN.swipeReach, null); if (W) { const q = p.wrunQ; p.wrunQ = null; return wrunGo(W, 'up', 0, 0, q.upV); } } }     // m1757: the remembered up-swipe
   // m1372: *"If you jump against the wall and you're not holding a direction, up or to the side, he purchases against the wall and slides down it --
   // a little friction -- so you can jump, purchase, wall jump to the opposing wall, jump, jump, back and forth like Prince of Persia."* In the air
   // with the left stick at rest, a tall face within `slideReach` catches him: a moment's hold (`hold` s), then a slide down at up to `slideV`
@@ -13045,7 +13045,7 @@ function wrunAuto() {
 function wrunSwipe(dx, dy) { const p = player; if (!WRUN.on || !WRUN.swipe || p.knock || p.riding || p.wing || p.bar || p.ledge || p.mantle || p.vault || p.climb || p.zip || p.rope || mphBare()) return 0;
   if (p.wrun && p.wrun.kind !== 'slide') return 0;
   let W = p.wrun ? { b: p.wrun.b, nx: p.wrun.nx, nz: p.wrun.nz, d: p.r + WRUN.gap } : wrunFind(p.pos.x, p.pos.y, p.pos.z, p.r + WRUN.swipeReach, null);
-  // m15xx (MEASURED in the Wall Park: the up-swipe only took from .7 m, ~0.1 s at a sprint, and by then the wall had eaten his speed -- every run-up
+  // m1757 (MEASURED in the Wall Park: the up-swipe only took from .7 m, ~0.1 s at a sprint, and by then the wall had eaten his speed -- every run-up
   // peaked at 2.1 m): an UP swipe at a wall AHEAD within `upReach` is REMEMBERED (`p.wrunQ`, `upQ` s) with his speed into it NOW, and the run-up
   // starts when he reaches the face (`wrunAuto`), with that speed
   if (!W && !p.wrun && -dy >= Math.abs(dx) * WRUN.upCone) { const F = wrunFind(p.pos.x, p.pos.y, p.pos.z, p.r + WRUN.upReach, null);
@@ -17258,7 +17258,7 @@ function mechAim() { const p = player, h = cam.az; let best = null, bs = 1e9;
   for (const d of mechTargets(1e9)) { const P = d.root.position, dx = P.x - p.pos.x, dz = P.z - p.pos.z, dd = Math.hypot(dx, dz); if (dd < 1.5 || dd > WEAP.range) continue;
     const off = Math.abs(wrapAngle(Math.atan2(dx, dz) - h)); if (off > MECHAIM.cone) continue; if (Math.abs(Math.atan2(P.y + MECHAIM.up - (p.pos.y + 1.1), dd)) > MECHAIM.maxEl) continue; const sc = dd * Math.sin(off) + .05 * dd; if (sc < bs) { bs = sc; best = { x: P.x, y: P.y + MECHAIM.up, z: P.z, d: dd }; } }
   return best; }
-// m15xx (his: "anytime we have a flying animal above you, or an archer above you ... I couldn't hit it at all"): FLYAIM. A hostile body ABOVE him
+// m1757 (his: "anytime we have a flying animal above you, or an archer above you ... I couldn't hit it at all"): FLYAIM. A hostile body ABOVE him
 // (a flyer -- `d.fy` -- an archer, a beast) more than `dy` m over his chest, within `cone` of the lens's bearing and `range`, at ANY elevation, is
 // where the gun and the bow point (the bow's arc then solves to it). On the ground nothing changes: the body must be `dy` up to qualify.
 const FLYAIM = { on: 1, dy: 1.5, cone: .38, range: 45, mid: .5 };
@@ -17313,7 +17313,7 @@ function aimRaw() {
   // just auto-aimed up to him."* Bodies already lock at their chest; a MACHINE in the lens's line (within `MECHAIM.cone`, in range, any
   // height) now pulls the shot up (or down) to it the same way -- the turret on the tower, the ballista on the wall
   if (!L) { const T = mechAim(); if (T) return { p: _ap.set(T.x, T.y, T.z), hit: 1, lock: 1, dist: T.d }; }
-  if (!L) { const T = flyAim(); if (T) return { p: _ap.set(T.x, T.y, T.z), hit: 1, lock: 1, dist: T.d }; }     // m15xx: a flyer / archer above him
+  if (!L) { const T = flyAim(); if (T) return { p: _ap.set(T.x, T.y, T.z), hit: 1, lock: 1, dist: T.d }; }     // m1757: a flyer / archer above him
   if (!L && AIRT.length) { const T = airAim(); if (T) return { p: _ap.set(T.x, T.y, T.z), hit: 1, lock: 0, dist: Math.hypot(T.x - player.pos.x, T.z - player.pos.z) }; }   // m350
   if (!L) return aimPoint();
   return { p: _ap.set(L.root.position.x, L.root.position.y + L.K.h * LOCK.chest, L.root.position.z),
@@ -28353,7 +28353,7 @@ function lvlBar() { let el = LVL.el; if (!el) { el = LVL.el = document.createEle
 // alien dragon prow, lanterns and bronze guns. Bow is +Z. The hull is LOFTED: rings along its length, each a rounded U from gunwale to keel,
 // the beam (`w`) tapering to a point at the bow and to a blunt transom aft, the gunwale rising fore and aft (the sheer). Walking is the decks'
 // boxes and the ramps' triangles; the bulwarks are boxes along each side, so he does not stroll off -- he jumps over them into the sea.
-// m15xx (his, DOCKET 17: "we still need to figure out a bunch of wall-running stuff -- wall-running sandboxes; tighten all the dynamics up"): THE WALL
+// m1757 (his, DOCKET 17: "we still need to figure out a bunch of wall-running stuff -- wall-running sandboxes; tighten all the dynamics up"): THE WALL
 // PARK. A forge zone (KORAJIN > The Wall Park, `?w=forge&zone=wall`) with one station for every kind of wall a run meets, each its own colour with
 // its number and name painted on the floor, so a report can say "the blue wall":
 //   1 LONG WALL     an 18 m wall between two 2 m platforms -- run along it across the drop
@@ -66411,12 +66411,12 @@ function upLookW() { if (!UPLOOK.on || !inArena()) return 0; const p = player, c
   // keeps him in sight -- the warning is the gun's attention, not the shot.
   for (const T of TURRET.list) { if (T.dead || !(T.see > 0)) continue; const dy = (T.y || 0) + TURRET.muzzle - cy; if (dy < UPLOOK.dy) continue;
     const d = Math.hypot(T.x - p.pos.x, T.z - p.pos.z); if (d > TURRET.range + 6) continue; w = Math.max(w, Math.min(1, (dy - UPLOOK.dy) / 6 + .4) * UPLOOK.gun); }
-  // m15xx: a hostile body ABOVE him (the mech dragon overhead, an archer on a roof) inside `flyR` tips the lens up while it is there -- not only
+  // m1757: a hostile body ABOVE him (the mech dragon overhead, an archer on a roof) inside `flyR` tips the lens up while it is there -- not only
   // when its shot is in the air. Weighted by how high it is over how far (the elevation), so one hovering 5 m up at 7 m tips it most.
   UPLOOK.fw = 0; if (inArena()) for (const d of DUMMIES) { if (!flyFoe(d)) continue; const R = d.root.position, dy = R.y + (d.K.h || 1.8) * .5 - cy; if (dy < UPLOOK.dy) continue;
     const dd = Math.hypot(R.x - p.pos.x, R.z - p.pos.z); if (dd > UPLOOK.flyR) continue; const fw = Math.min(1, Math.atan2(dy, Math.max(1, dd)) / .7) * UPLOOK.fly * Math.min(1, (UPLOOK.flyR - dd) / 4); UPLOOK.fw = Math.max(UPLOOK.fw, fw); w = Math.max(w, fw); }
   return Math.min(1, w); }
-// m15xx: the FLYER'S EDGE ARROW. A hostile body above him (`flyFoe`) inside `r` m that the lens cannot see (behind, or off the top) puts a chevron
+// m1757: the FLYER'S EDGE ARROW. A hostile body above him (`flyFoe`) inside `r` m that the lens cannot see (behind, or off the top) puts a chevron
 // on the screen's edge pointing at it, brighter the closer it is -- a phone has no ears for "it is behind you".
 const FLYEDGE = { on: 1, r: 30, el: null, v: new THREE.Vector3() };
 function flyEdge() { const E = FLYEDGE; if (!E.on || !inArena()) { if (E.el) E.el.style.display = 'none'; return; }
@@ -66530,7 +66530,7 @@ function stepCam(dt) {
   // him, due within `tta` s) that is more than `dy` m above his chest; the lens drops by `el` and the look point lifts by `lift` x that, in
   // fast (`in`), back out slowly (`out`), so it reads as a glance and not a cut. Its azimuth is never touched (one writer: `cam.az`).
   cam.up = damp(cam.up || 0, upLookW(), (cam.up || 0) < upLookW() ? UPLOOK.in : UPLOOK.out, dt);
-  cam.upF = damp(cam.upF || 0, UPLOOK.fw, (cam.upF || 0) < UPLOOK.fw ? UPLOOK.in : UPLOOK.out, dt);     // m15xx: a flyer overhead tips it further
+  cam.upF = damp(cam.upF || 0, UPLOOK.fw, (cam.upF || 0) < UPLOOK.fw ? UPLOOK.in : UPLOOK.out, dt);     // m1757: a flyer overhead tips it further
   cam.a3 = damp(cam.a3 || 0, aim3Live() || (AIM3.on && p.aim && slotNow().aim) ? 1 : 0, .12, dt);     // m1259: the 3D aim's over-the-shoulder lens
   const a3 = cam.a3, a3p = (p.gPit || 0) * a3;
   cam.el = p.dragon ? damp(cam.el || CAM.el, CAM.el + DRAGZ.camEl, .3, dt) : damp(cam.el || CAM.el, kit.inside === 'cut' ? KIT.cutEl : CAM.el + KIT.highEl * Math.min(1, kit.high) - UPLOOK.el * cam.up - UPLOOK.flyEl * (cam.upF || 0) - a3p * AIM3.cam.el - (AIM3.on && slotNow().aim ? (p.gPit || 0) * AIM3.pCam : p.backAim ? (p.gPit || 0) * BACKAIM.cam * (BACKAIM.on ? 1 : 1.2) : 0), .12, dt);
@@ -67532,7 +67532,7 @@ function frameBody() {
   txStep(dt);                   // m889 (F6e-2): the other regions' held blocks, dressed by their holders
   turfDressStep(dt); hothStep(dt); kswapStep(dt); flashStep(dt); e115Step(dt); radioStep(dt);            // the buildings wear their block's holder, cross-fading when it changes hands (m409)
   kitCamStep();
-  stepCam(dt); flyEdge();     // m15xx
+  stepCam(dt); flyEdge();     // m1757
   mkrStep();                    // his npc markers get their roles once their bodies exist (m293)
   talkStep(dt);                 // after the camera: the bubble is projected through it (m277)
   questStep(dt);                // after talk: a talk step reads what this frame finished (m278)
