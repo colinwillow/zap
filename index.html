@@ -21748,7 +21748,7 @@ const WHIRL = { on: 1, idle: .3, spins: [2, 3], R: 3, Rk: 1, dmg: 3, power: 1.1,
 function whirlGo(k, mir) { const p = player; WHIRL.stat.whirls++; const g = WHIRL.go * (.7 + .3 * k); p.torn = { n: Math.round(lerp(WHIRL.spins[0], WHIRL.spins[1], k)), whirl: 1, k, i: 0, mir: !!(mir && rig.actions[TORNADO.sword + '_m']), vx: Math.sin(p.faceH) * g, vz: Math.cos(p.faceH) * g }; p.ltHold = 0; p.jump = 0; whirlSpin(); }
 function whirlSpin() {
   const p = player, nm = TORNADO.sword + (p.torn && p.torn.mir ? '_m' : ''); if (!rig.actions[nm]) { p.torn = null; return; }     // m1723: `mir` = the leftward whirl
-  p.melee = 1; p.meleeIx = 0; p.meleeT = 0; p.meleeName = nm; p.meleeAir = 0; p.meleeBody = 0; p.melWall = 0; p.melFist = 0; p.melFront = 0; p.multi = 1;
+  p.melee = 1; p.meleeIx = 0; p.meleeT = 0; p.meleeName = nm; p.meleeAir = 0; p.meleeBody = 0; p.melWall = 0; p.melFist = 0; p.melFront = 0; p.melWin = null; p.multi = 1;
   p.meleeDur = WHIRL.dur; p.meleeChain = 0; p.melFired = 0; p.melU = 0; p.swPrev = null; p.swRootX = null; p.swRootZ = null; p.melV = 0; p.melTgt = null; p.melH = p.faceH;
   { const W = WHIRL, T = p.torn || { i: 0, n: 1 }, first = !T.i, lastS = T.n <= 1, a0 = first ? 0 : W.from, a1 = lastS ? W.last : W.to, L0 = clipLen(nm);
     if (!first) { p.faceH -= (T.mir ? -1 : 1) * W.turn * Math.PI / 180; p.heading = p.faceH; p.melH = p.faceH; }     /* cancel the pose's snap-back: one unbroken turn */
@@ -21766,7 +21766,7 @@ function whirlSpin() {
 }
 function tornSpin() {
   const p = player, SK = MELEE.spinKick, nm = SK.clip; if (!rig.actions[nm]) { p.torn = null; return; }
-  TORN.stat.spins++; p.melee = 1; p.meleeIx = 0; p.meleeT = 0; p.meleeName = nm; p.meleeAir = 0; p.meleeBody = 0; p.melWall = 0; p.melFist = 0; p.melFront = 0; p.multi = 1;
+  TORN.stat.spins++; p.melee = 1; p.meleeIx = 0; p.meleeT = 0; p.meleeName = nm; p.meleeAir = 0; p.meleeBody = 0; p.melWall = 0; p.melFist = 0; p.melFront = 0; p.melWin = null; p.multi = 1;
   p.meleeDur = SK.dur; p.meleeChain = 0; p.melFired = 0; p.melU = 0; p.swPrev = null; p.swRootX = null; p.swRootZ = null; p.melV = 0; p.melTgt = null; p.melH = p.faceH;
   const L0 = clipLen(nm); playOnce(nm, L0 * (SK.to - SK.from) / p.meleeDur); rig.actions[nm].time = L0 * SK.from;
   snd('swoosh', { r: .85, g: .8 });
@@ -21817,6 +21817,18 @@ function flowArc(dt) {
 // 4, katana_slash_3 2...), cached per clip (`swingPeaks`). The clip plays WHOLE; `lead` s of clip time before every swing after the first,
 // he lurches again: toward the left stick if it is held, else along his nose, magnetised onto a man in `cone` / `reach` (`meleeLock`), up
 // to `max` m (`free` m at nobody), spent in `dur` s. The first swing keeps the strike's own lunge. TOOLS > SWING LURCH.
+// m15xx (his: "flick the left stick -- the front handspring, the flying punch, the flip kick -- the locomotion doesn't line up with the attack: it
+// lunges forward stupidly at the beginning and the attack comes later"): each fist move's travel is spent in ITS window, measured off the clip
+// (headless, the hips' height and every limb's speed against the hips, fractions of the clip): [from, to, flight]. A FLIGHT (the hips leave
+// and come back down) carries him at an even speed from take-off to landing (eased `ease` at each end); a standing strike carries him the
+// lunge's own way up to the blow. The distance is the same as before -- spent in the window, not from frame one.
+//   melee_01  2.25 s  hips .53 -> .96 (.25-.46) -> .33 by .80, hands @.33 / .58     a flight  [.26, .76]
+//   melee_02  1.58 s  crouch .31, rising to .66 @.52, the kick (right foot) @.35        a hop     [.12, .52]
+//   melee_03  1.40 s  .53 -> .76 @.56 -> .38 @.80, the flip kick (right foot) @.50      a flight  [.36, .80]
+//   melee_04  1.96 s  level, the hands @.29 / .35                                         a strike  [.08, .36]
+//   melee_05  1.17 s  .57 -> 1.18 @.56 -> .58 @1.0, the hands push @.13 (the handspring)  a flight  [.12, .86]
+//   melee_extra 1.00 s level, the right hand @.27                                         a strike  [.04, .29]
+const FISTWIN = { on: 1, ease: .12, w: { melee_01: [.26, .76, 1], melee_02: [.12, .52, 0], melee_03: [.36, .8, 1], melee_04: [.08, .36, 0], melee_05: [.12, .86, 1], melee_extra: [.04, .29, 0] } };
 const SWSEG = { on: 1, lead: .16, dur: .2, max: 2.6, free: 1.1, cone: .9, reach: 3.6, thresh: .45, gap: .3, cache: {}, stat: { lurches: 0, locked: 0 } };
 try { if (localStorage.getItem('mel.swseg') === '0') SWSEG.on = 0; } catch (e) {}
 function swingPeaks(nm) {
@@ -21905,7 +21917,7 @@ function kickGo(h, spinNm) {
   // m1051: a strike out of a flip keeps the turn going -- a spinning kick -- and the flip still lands him upright
   if (h == null) h = p.faceH;
   p.airKick = 1; p.airKicks = (p.airKicks || 0) + 1; p.meleeAir = 1; p.flip = ''; p.bkHang = 0; p.melWall = 0; p.melFist = 0;   // the kick owns the body (m1025: no stale left-pad flag)
-  p.melFront = 0;     // m993: a kick spends its travel on its own clock, never a katana lash's
+  p.melFront = 0; p.melWin = null;     // m993: a kick spends its travel on its own clock, never a katana lash's
   p.melee = 1; p.meleeIx = 0; p.meleeT = 0; p.meleeName = nm; p.meleeDur = spinNm ? SK.dur : MELEE.airDur;
   p.meleeChain = 0; p.melFired = 0; p.melU = 0; p.swPrev = null; p.swRootX = null; p.swRootZ = null;
   p.meleeBody = 1;                    // the blow is him arriving -- see `STRIKE.bodyAt`
@@ -22108,7 +22120,8 @@ function meleeGo0(h) {
   p.melV = tackle && MELEE.slideFree ? clamp(thru / spend, 0, vCap) : solved;
   // m993: THE KATANA LASHES IN. The same travel, spent in the first `front` of the swing (the dash's `dashLand` clock) -- in fast,
   // then planted for the cut -- rather than drifted across the whole beat. *"I was just standing there swinging my sword."*
-  p.melFront = katL ? KATANA.lock.front : 0; if (katL) p.melV = Math.min(flowL ? FLOW.maxV / KATANA.lock.front : MELEE.maxV, p.melV / KATANA.lock.front);
+  p.melWin = null; { const Wn = FISTWIN.on && (!katL || p.fistNow || CLIPS.fist.includes(baseNm(name))) && FISTWIN.w[baseNm(name)]; if (Wn) { p.melWin = Wn; const ww = Wn[1] - Wn[0], avg = Wn[2] ? 1 - FISTWIN.ease : MELEE.carryAvg; p.melV = Math.min(MELEE.maxV * 1.6, p.melV * MELEE.carryAvg / (ww * avg)); } }
+  p.melFront = katL && !p.melWin ? KATANA.lock.front : 0; if (katL && !p.melWin) p.melV = Math.min(flowL ? FLOW.maxV / KATANA.lock.front : MELEE.maxV, p.melV / KATANA.lock.front);
   if (flow && L && JUGGLE.on && p.grounded) { const dy = L.d.root.position.y + (L.d.K.h || 1.8) * .35 - p.pos.y;     // m1088: up to meet a juggled man
     if (dy > .8) { p.vel.y = Math.min(JUGGLE.hopMax, Math.sqrt(2 * MOVE.g * (dy + .3))); p.grounded = false; p.coyote = 0; JUGGLE.stat.hops++; } }
   if (flow && L) { FLOW.stat.links++; if (L.dist > FLOW.leapAt) { FLOW.stat.leaps++; p.flowLeap = { t: 0, dur: Math.max(.12, p.meleeDur * (katL ? KATANA.lock.front : .5)), h: FLOW.leapH * Math.min(1, L.dist / FLOW.reach) }; } }
@@ -22130,7 +22143,7 @@ function meleeGo0(h) {
   snd('swoosh', { r: .95 + ix * .1, g: .8 });
   // and he covers ground: full speed for `carry` of the strike, then linear to zero, which
   // averages .725 rather than .5 and is what a lunge actually looks like
-  p.vel.x = Math.sin(p.faceH) * p.melV; p.vel.z = Math.cos(p.faceH) * p.melV;
+  { const v0 = p.melWin && p.melWin[0] > .02 ? 0 : p.melV; p.vel.x = Math.sin(p.faceH) * v0; p.vel.z = Math.cos(p.faceH) * v0; }     // m15xx: a windowed move waits for its take-off
 }
 // **A FLICK DOWN IN THE AIR IS A SLAM (m81).** Returns truthy when it took the gesture, so the
 // pad's one flick handler reads as a sentence and the ground strike is what is left.
@@ -33517,7 +33530,8 @@ function stepPlayer(dt) {
     // For every other move `arr` is 1 and `uu` is `u`, so this is the old line exactly.
     const arr = (p.chargeGo && MELEE.dash) ? MELEE.dashLand : (p.melee && p.melFront) ? p.melFront : 1;     // m993: the katana's lash
     const uu = arr >= 1 ? u : clamp(u / arr, 0, 1);
-    const k = uu >= 1 ? 0 : uu < MELEE.carry ? 1 : 1 - (uu - MELEE.carry) / (1 - MELEE.carry);
+    let k = uu >= 1 ? 0 : uu < MELEE.carry ? 1 : 1 - (uu - MELEE.carry) / (1 - MELEE.carry);
+    if (p.melee && p.melWin) { const W = p.melWin, uw = (u - W[0]) / (W[1] - W[0]); k = uw < 0 || uw > 1 ? 0 : W[2] ? Math.min(1, uw / FISTWIN.ease, (1 - uw) / FISTWIN.ease) : uw < MELEE.carry ? 1 : 1 - (uw - MELEE.carry) / (1 - MELEE.carry); }     // m15xx: the move's travel in ITS window
     // THE BLOW LANDS WHEN THE LIMB REACHES HIM, AND NOT BEFORE. `at` no longer FIRES the hit --
     // it opens the window the sweep is allowed to count in, so a swing that misses misses.
     if (!p.roll) {

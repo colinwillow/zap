@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The fist moves travel when they fly, not on frame one (m15xx)
+*"Flick the left stick -- the front handspring, the flying punch, the flip kick: the physical locomotion doesn't line up with the attack; it lunges
+forward stupidly at the beginning and then the attack comes later. Line them up like we did the katana's lunges."*
+- **Why:** every strike's lunge started at full speed on frame one and bled off over the beat (`carry`), while these clips crouch first and leave
+  the ground a quarter to a third of the way in. So he slid forward standing, then flew in place.
+- **Measured (headless, each fist clip, 48 samples: the hips' height and every limb's speed against the hips, as fractions of the clip):**
+    melee_01  2.25 s  hips .53 -> .96 (.25-.46) -> .33 @.80, hands .33 / .58   flight  [.26, .76]
+    melee_02  1.58 s  crouched .31, rising to .66 @.52, right foot @.35        hop     [.12, .52]
+    melee_03  1.40 s  .53 -> .76 @.56 -> .38 @.80, right foot @.50 (flip kick) flight  [.36, .80]
+    melee_04  1.96 s  level, hands @.29 / .35                                   strike  [.08, .36]
+    melee_05  1.17 s  .57 -> 1.18 @.56 -> .58 @1.0, hands push @.13 (handspring) flight [.12, .86]
+    melee_extra 1.0 s level, right hand @.27                                    strike  [.04, .29]
+- **Now (`FISTWIN`):** the same distance, spent in the move's window: a FLIGHT at an even speed from take-off to landing (eased `ease` .12 at
+  each end), a strike with the lunge's own shape up to the blow; nothing before the window (the opening velocity waits too). With the katana in
+  hand the left flick's fist moves use the window as well (the katana's own front-loaded lash is skipped for them). `FISTWIN.on` 0 = as before.
+- Not watched headless (SwiftShader frames ran 3-40 s; the run timed out) -- his phone is the test.
+
 ## The wall on the LEFT stick; the catch is immediate (m1767, DOCKET 17)
 *"If you jump against the wall and do nothing, instead of immediately going into the pose he does a weird glitchy thing -- like he's falling but
 stuck, then falling, then the pose. Something is fighting it." / "Instead of the flick on the right stick, it's entirely the locomotion stick and
