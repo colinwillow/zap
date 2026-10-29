@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The side run is a real clip too (m15xx, DOCKET 17)
+## The side run is a real clip too (m1829, DOCKET 17)
 *His horizontal reference: tilted along the wall, the near hand reaching to it, legs running.*
 - Wall_Run, Wall_Run_1 and Diagonal_Wall_Run baked onto Grumbo in a throwaway file, rendered from behind: Wall_Run drifts upward even in place;
   **Wall_Run_1** runs upright with the near arm reaching out to the side -- the reference's reach; the tilt is the game's own roll.

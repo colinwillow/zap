@@ -13251,14 +13251,14 @@ function wrunPose() {
   if (R.kind !== 'side') return;
   // rolled about his forward axis so his head leans OFF the wall and his feet stay on it; ramps in and out over .12 s
   const fx = R.dx, fz = R.dz, right = R.nx * -fz + R.nz * fx, k = Math.min(1, (R.t - (R.t0 || 0)) / .15), sg = Math.sign(right);     // his right is (-fz, fx)
-  _wrA.set(fx, 0, fz); _wrQ.setFromAxisAngle(_wrA, sg * (WRUN.sideClip && rig.actions && rig.actions.wall_side ? WRUN.sideLean : WRUN.lean) * k); rig.root.quaternion.premultiply(_wrQ);     /* m15xx: the clip's own lean is smaller */
+  _wrA.set(fx, 0, fz); _wrQ.setFromAxisAngle(_wrA, sg * (WRUN.sideClip && rig.actions && rig.actions.wall_side ? WRUN.sideLean : WRUN.lean) * k); rig.root.quaternion.premultiply(_wrQ);     /* m1829: the clip's own lean is smaller */
   // m1072: *"his feet could make better contact with the wall, and his whole body is straight -- just at an angle. From the torso up he should rotate
   // back so he's pointed more straight up; the legs do the slant. And a mirror."* The roll pivots at his feet, which the run holds `p.r + gap`
   // off the face -- so the drawn body is slid that far IN (`footIn` short of it), and the spine is turned back `torso` rad about the same axis:
   // legs slanted, chest near upright. The side sign (`sg`) mirrors both.
   rig.root.position.x -= R.nx * (p.r + WRUN.gap - WRUN.footIn) * k; rig.root.position.z -= R.nz * (p.r + WRUN.gap - WRUN.footIn) * k;
   const sp = rig.bones && (rig.bones.mixamorig_Spine || rig.bones.mixamorig_Spine1);
-  const tq = WRUN.sideClip && rig.actions && rig.actions.wall_side ? WRUN.sideTorso : WRUN.torso;     /* m15xx: less upright-ing over the clip */
+  const tq = WRUN.sideClip && rig.actions && rig.actions.wall_side ? WRUN.sideTorso : WRUN.torso;     /* m1829: less upright-ing over the clip */
   if (sp && tq) { rig.root.updateMatrixWorld(true); sp.getWorldQuaternion(_wrQ2); _wrQ.setFromAxisAngle(_wrA, -sg * tq * k).multiply(_wrQ2);
     sp.parent.getWorldQuaternion(_wrQ3).invert(); sp.quaternion.copy(_wrQ3.multiply(_wrQ)); sp.updateMatrixWorld(true); }
 }
@@ -35414,7 +35414,7 @@ function rigAnim(dt) {
   // m1828 (his reference: the vertical wall run -- upright, close, one knee driven high with its foot on the wall, the other leg reaching down, hands
   // up the face): the library's Climbing_Up_Wall, baked IN PLACE onto Grumbo (`wall_up`), plays the RUN-UP whole -- no IK on top (`WRUN.upClip`);
   // its rate follows how fast he is rising (`upClipRef` m/s of climb at 1x, held to `upClipTs`)
-  // m15xx (his horizontal reference: tilted along the wall, the near hand reaching to it, legs running): the library's Wall_Run_1 (`wall_side`, in
+  // m1829 (his horizontal reference: tilted along the wall, the near hand reaching to it, legs running): the library's Wall_Run_1 (`wall_side`, in
   // place) on the SIDE run -- its near arm reaches LEFT, so a wall on his right plays its mirror (`wall_side_m`, MIRROR) -- under the game's own
   // roll toward the wall (`WRUN.lean`, eased to `sideLean` with the clip); rate by his speed along the wall (`sideRef` m/s at 1x)
   if (p.wrun && p.wrun.kind === 'side' && WRUN.sideClip && rig.actions.wall_side) { const R = p.wrun, right = R.nx * -R.dz + R.nz * R.dx, nm = right > 0 || !rig.actions.wall_side_m ? 'wall_side' : 'wall_side_m', a = rig.actions[nm];
