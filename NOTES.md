@@ -159,6 +159,24 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## Red Hollows: side-on collision, the cave chest and crystals, and the first weight cut (Worker B)
+His (m1760 phone shots: in a red rock to the neck, inside the canyon wall, inside a hoodoo stack): "if you land on top of something you
+don't go through it, but if you hit it from the side you go through it... stuck in the side of the mountain... stairs, my body goes halfway
+through... the treasure chest needs a detail pass and it's 180 degrees the wrong way... plants in the caves look like pyramids... it was
+chugging, maybe 20 fps". FOUND: (1) the wall columns are 1.5 m cells topped at their LOWEST corner, so a step carried him into the face,
+and (2) the LEDGE GRAB took a column's top edge -- inside the cliff -- as a lip and pulled him up into the rock. Fixes: `hwTerrainOut`
+(every frame in the Hollows): the land MESH height at his feet (`hwMeshH`: the same 2 m grid and diagonal as the walk triangles); more than
+.45 m over his feet and he is put back on the last spot that was not (the free axis kept, so he slides along the face); skipped in a cave,
+on a ladder, a ledge or a mantle. `ledgeFind` ignores terrain columns (`_wc` / `_sc`). The hoodoo stacks were one 2.6 m box under rocks up
+to ~5 m wide: each piece is `hwSolid` now. The breakable red rocks' box .7 -> .9 of their radius. Headless walk (`stepPlayer` +
+`homeStep`, 60 Hz): at 14 canyon-wall approaches he now stops at the face (the two over 2 m were cave mouths, where the check is off by
+design); 0 of 6 rim rocks entered; the peak hike still reaches its top. The mound stairs' walk ramp starts at half a riser, so his feet
+stop sinking into the treads. THE CHEST faces the mouth (it faced the wall) and has a detail pass -- painted planks, iron corner brackets,
+rims and banded lid, rivets, a brass lock plate and keyhole, feet, spilled coins -- merged per material (5 draws). THE CRYSTALS are
+`hwCrystal`: a tapered six-sided prism with an off-centre faceted point, not a cone. WEIGHT, measured from the spawn view: 1.31M triangles
+-> 0.88M, 245 -> 239 calls. The worst offender was mine: m1755's detail-2 bushes (200k) -- back to detail 1 with sphere normals (they stay
+round); the sky islands' trees detail 3 -> 1 and lobes 3 -> 2; bushes, reeds and cattails no longer cast shadows. Still open: the cave
+BEAST's detail pass, the ladder top-out he fell from, and a fuller optimisation pass (171 shader programs, the home's 100k of timber).
 ## Red Hollows: the ravine walls, the rocks and the mountain are solid (m1759, Worker B)
 His (m1751 phone shots, standing on the rim's moss with the cliff through his body): "going through the sides of the ravine, sides of
 certain rocks, parts of the mountain -- we need to do some work with the colliders". A heightfield is a surface, not a volume (m1114):

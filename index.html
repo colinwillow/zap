@@ -10271,7 +10271,7 @@ function rockGeos() { if (ROCK.geos) return ROCK.geos; ROCK.geos = [0, 1, 2].map
 function rockMat(kind) { return ROCK.mats[kind] || (ROCK.mats[kind] = new THREE.MeshStandardMaterial({ color: ROCK.kinds[kind].col, roughness: .95, flatShading: true })); }
 // a stone in the plant list gets its stone (called from `plantFlush`)
 function rockInit(P, kind, s) { const R = ROCK.kinds[kind]; if (!R) return; P.rock = kind; P.s = s; P.hp = R.hp * Math.max(.6, s); P.rk = 0;
-  if (R.solid) { P.box = { minx: P.x - P.r * .7, maxx: P.x + P.r * .7, miny: P.y - .2, maxy: P.y + P.h * .8, minz: P.z - P.r * .7, maxz: P.z + P.r * .7 }; BOXES.push(P.box); } }
+  if (R.solid) { P.box = { minx: P.x - P.r * .9, maxx: P.x + P.r * .9, miny: P.y - .2, maxy: P.y + P.h * .8, minz: P.z - P.r * .9, maxz: P.z + P.r * .9 }; BOXES.push(P.box); } }
 function rockChips(x, y, z, R, k) { spkBurst(x, y, z, Math.round(8 + 10 * k), { col: R.dust, spread: 3 + 3 * k, size: .1, life: .45 }); smokeAt(x, y, z, 1 + k, .8, R.dust); snd('thud', { g: .35 + .3 * k, r: .9 + Math.random() * .2, x, z }); snd('clang', { g: .12 + .15 * k, r: .5 + Math.random() * .15, x, z }); }
 // a blow on a standing rock (`P` from the plant list) or a loose chunk (`L`): `dmg` of stone, from direction `h`
 function rockHit(P, dmg, h, x, y, z) { const now = performance.now() / 1000; if ((P.rk || 0) > now) return 0; P.rk = now + ROCK.hitCd; const R = ROCK.kinds[P.rock];
@@ -15767,6 +15767,7 @@ function ledgeFind(px, py, pz, R) {
   for (const b of boxesNear(px - R, px + R, pz - R, pz + R, _bnL)) {
     if (b.maxy - b.miny < LEDGE.tall) continue;      // a kerb is not a ledge
     if (thinBox(b)) continue;                         // nor is the top of a pole (m205)
+    if (b._wc || b._sc) continue;                     // nor a Red Hollows terrain column, whose top is inside the cliff (m1761)
     const dy = b.maxy - hands;
     if (dy < -LEDGE.band || dy > LEDGE.band) continue;
     if (px + R < b.minx || px - R > b.maxx) continue;
@@ -69148,7 +69149,7 @@ function ghomeBuild(at, yaw, y0) {
   // ---- the STEPS up the mound: timber treads, .30 risers, a walkable ramp under them; front (to the shop) and back (to the round door) ----
   const steps = (sg) => { const n = Math.ceil(P / A.rise), r = P / n, w = 1.7, z0 = sg * A.rz * .985, run = .38;
     for (let i = 0; i < n; i++) { const za = z0 + sg * (n - 1 - i) * run, zb = za + sg * run; vbox(-w, w, 0, (i + 1) * r, Math.min(za, zb), Math.max(za, zb), woodP); }
-    const zf = z0 + sg * n * run; quad([-w, .06, zf], [w, .06, zf], [w, P + .04, z0], [-w, P + .04, z0]);
+    const zf = z0 + sg * n * run; quad([-w, r * .55, zf], [w, r * .55, zf], [w, P + .04, z0], [-w, P + .04, z0]);
     // m1756 (his: "floating stairs"): at x1.4 the pad's edge is out over the bank's slope, so the flight ended in the air -- it carries on
     // down, tread by tread, until it meets the ground (`gl`, local), with its own walk ramp
     const gl = z => (rwHeight(Wx(0, z), Wz(0, z)) - y0) / hk; let zc = zf, y = 0, k = 0; while (k < 14 && gl(zc + sg * run / 2) < y - r * .6) { y -= r; vbox(-w, w, gl(zc + sg * run / 2) - .3, y, Math.min(zc, zc + sg * run), Math.max(zc, zc + sg * run), woodP); zc += sg * run; k++; }
@@ -69604,9 +69605,9 @@ function ghomeBuild(at, yaw, y0) {
   // greens), golden GRASS tufts, YUCCAS (a rosette of blades and a cream flower spike), the valley's own ALIEN BULBS (lavender, faintly lit,
   // on curling stalks), and REEDS and cattails where the bank meets the water. All merged: one draw per look ----
   { const gH = (x, z) => (rwHeight(Wx(x, z), Wz(x, z)) - y0) / hk, wY = -y0 / hk, rnd = rwRng(2020), NC = { noCam: 1 };
-    const sage = hwPaint(new THREE.MeshStandardMaterial({ color: 0x8f9c64, roughness: .95 }), 'leaves'), olive = hwPaint(new THREE.MeshStandardMaterial({ color: 0x6a7845, roughness: .95 }), 'leaves'), straw = new THREE.MeshStandardMaterial({ color: 0xc2a55e, roughness: .95 });
+    const sage = hwPaint(new THREE.MeshStandardMaterial({ color: 0x8f9c64, roughness: .95 }), 'leaves'), olive = hwPaint(new THREE.MeshStandardMaterial({ color: 0x6a7845, roughness: .95 }), 'leaves'); sage.userData.ns = olive.userData.ns = 1; const straw = new THREE.MeshStandardMaterial({ color: 0xc2a55e, roughness: .95 });
     const reedM = new THREE.MeshStandardMaterial({ color: 0x6f7a3e, roughness: .9 }), brownM = new THREE.MeshStandardMaterial({ color: 0x5a3a22, roughness: .9 }), bulbM = new THREE.MeshStandardMaterial({ color: 0xc8a8ff, emissive: 0x7a52d8, emissiveIntensity: .9, roughness: .5 }), creamM = new THREE.MeshStandardMaterial({ color: 0xf1e6c4, roughness: .8 });
-    straw.userData.sway = reedM.userData.sway = 1;     // pass 23: every blade carries its height (set before any is put, or the bucket will not merge)
+    straw.userData.sway = reedM.userData.sway = 1; straw.userData.ns = reedM.userData.ns = brownM.userData.ns = bulbM.userData.ns = 1;     // pass 23: every blade carries its height (set before any is put, or the bucket will not merge)
     const free = (x, z) => { if (Math.abs(x) < 2.8 && z > 5) return false; if (x > 9 && x < 17 && z > 3.6 && z < 7.6) return false; if (z > 3 && z < 8 && Math.abs(x) < 10.2) return false; if (x < -8.4 && x > -11 && z > 8.6 && z < 10.4) return false;
       const e = (x / A.rx) ** 2 + (z / A.rz) ** 2; return e > 1.15 && gH(x, z) > wY + .25 && !A.onPath(x, z, .25); };
     // the SHELVES: wide, flat, stratified, sunk -- they make ground, not balls
@@ -69614,7 +69615,7 @@ function ghomeBuild(at, yaw, y0) {
     const shelf = (x, z, w, h, d, ry) => { if (!flat(x, z, Math.max(w, d)) || A.onPath(x, z, Math.max(w, d) * .8)) return; const y = gH(x, z); put(ghRockGeo(sd++, w, h, d, 3), A.rockM, at4(x, y - h * .35, z, ry, (rnd() - .5) * .08, (rnd() - .5) * .08)); const c = Math.abs(Math.cos(ry)), s2 = Math.abs(Math.sin(ry)), ex = w * c + d * s2, ez = w * s2 + d * c; box(x - ex * .7, x + ex * .7, y - 1, y + h * .45, z - ez * .7, z + ez * .7); };
     for (const [x, z, w, h, d, ry] of [[-16, -2, 4.2, 1.1, 2.6, .4], [-14, -9, 5.2, 1.5, 3, -.3], [15, -7, 4.6, 1.2, 2.4, .9], [-21, 5, 3.4, .8, 2.2, 1.3], [6, -11.5, 4.8, 1.0, 2.2, .1], [-6, -12, 3.6, .9, 2, -.6], [21, -1, 3, .7, 1.8, .5]]) if (gH(x, z) > wY + .3 && flat(x, z, Math.max(w, d))) { shelf(x, z, w, h, d, ry); for (let k = 0; k < 2; k++) { const a = rnd() * 6; shelf(x + Math.sin(a) * w * .8, z + Math.cos(a) * d * .8, w * .45, h * .6, d * .5, ry + rnd()); } }
     // the plants
-    const bush = (seed, r) => { const gg = new THREE.IcosahedronGeometry(1, 2), q = gg.attributes.position, nn = gg.attributes.normal; for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = q.getY(i), z = q.getZ(i), d = .78 + ghNoise3(x * 2.1 + seed, y * 2.1, z * 2.1 - seed) * .5; q.setXYZ(i, x * d * r, Math.max(-.35, y) * d * r * .85, z * d * r); nn.setXYZ(i, x, y, z); } return gg; };     // round and lumpy, smooth-shaded, painted leaves (m1755): a bush, not a pad
+    const bush = (seed, r) => { const gg = new THREE.IcosahedronGeometry(1, 1), q = gg.attributes.position, nn = gg.attributes.normal; for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = q.getY(i), z = q.getZ(i), d = .78 + ghNoise3(x * 2.1 + seed, y * 2.1, z * 2.1 - seed) * .5; q.setXYZ(i, x * d * r, Math.max(-.35, y) * d * r * .85, z * d * r); nn.setXYZ(i, x, y, z); } return gg; };     // round and lumpy, smooth-shaded, painted leaves (m1755): a bush, not a pad
     const sagebrush = (x, y, z, k) => { const n = 4 + ((rnd() * 4) | 0); for (let i = 0; i < n; i++) { const a = rnd() * 6, r = rnd() * .35 * k, s = (.2 + rnd() * .2) * k; put(bush(sd++ * 1.7, s), rnd() < .5 ? sage : olive, at4(x + Math.sin(a) * r, y + s * .55 + rnd() * s * .4, z + Math.cos(a) * r, rnd() * 6)); }
       for (let i = 0; i < 5; i++) { const a = rnd() * 6; put(new THREE.CylinderGeometry(.008, .015, .3 * k, 3), brownM, at4(x + Math.sin(a) * .15 * k, y + .1, z + Math.cos(a) * .15 * k, 0, Math.cos(a) * .5, Math.sin(a) * .5)); } };
     const grass = (x, y, z, k) => { for (let i = 0; i < 9; i++) { const a = rnd() * 6, t = .25 + rnd() * .45, h = (.35 + rnd() * .35) * k; put(new THREE.ConeGeometry(.025 * k, h, 3), straw, _m4.compose(new THREE.Vector3(x + Math.sin(a) * .06, y + h * .45, z + Math.cos(a) * .06), _q.setFromEuler(_e.set(Math.cos(a) * t, 0, -Math.sin(a) * t)), _one)); } };
@@ -69713,7 +69714,7 @@ function ghomeBuild(at, yaw, y0) {
     for (const S of A.shut) { S.o = o; for (let i = 0; i < S.n; i++, o++) { nrm.set(tpl.attributes.normal.array, o * nv * 3); ch.fill(S.k, o * nv, (o + 1) * nv); } }
     geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(N * nv * 3), 3)); geo.setAttribute('normal', new THREE.BufferAttribute(nrm, 3)); geo.setAttribute('aChunk', new THREE.BufferAttribute(ch, 1));
     const sm = new THREE.Mesh(geo, shutM); sm.frustumCulled = false; sm.castShadow = sm.receiveShadow = true; g.add(sm); A.shutMesh = sm; A.shutTpl = tpl.attributes.position.array; ghomeShutFill(); }
-  let draws = 0; for (const [m, list] of MG) { if (m.map && !m.userData.tri) m.map.wrapS = THREE.RepeatWrapping; const geo = mergeGeometries(list); if (!geo) { console.warn('[melee] ghome: a bucket would not merge', m.name || m.color); continue; } const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; g.add(o); draws++; }
+  let draws = 0; for (const [m, list] of MG) { if (m.map && !m.userData.tri) m.map.wrapS = THREE.RepeatWrapping; const geo = mergeGeometries(list); if (!geo) { console.warn('[melee] ghome: a bucket would not merge', m.name || m.color); continue; } const o = new THREE.Mesh(geo, m); o.castShadow = !m.userData.ns; o.receiveShadow = true; g.add(o); draws++; }
   ghomeRestoreRig(MG); ghomePotsDone(MG);
   for (const b of boxes) BOXES.push(b);
   for (let i = 0; i < tris.length; i += 9) { const q = tris.slice(i, i + 9); triAdd(...q); triAdd(q[0], q[1], q[2], q[6], q[7], q[8], q[3], q[4], q[5]); }
@@ -70517,17 +70518,28 @@ function caveBuild(K) { const C = HCAVE, { side, z: z0, mx, fy, cc } = K, X = u 
   // THE CONTENTS: Jinra crystal clusters on the floor and hanging from the vault, glowing mushrooms along the foot of the walls
   const cry = [], cry2 = [], mush = [], stem = [];
   for (let k = 0; k < 7; k++) { const a = rnd() * Math.PI * 2, r = .55 + rnd() * .35, u = cc + Math.cos(a) * C.rd * r * .85, w = Math.sin(a) * C.rz * r * .85, hi = rnd() < .3;
-    for (let q = 0; q < 4 + ((rnd() * 4) | 0); q++) { const h = .4 + rnd() * 1.1, g = new THREE.CylinderGeometry(0, .12 + rnd() * .1, h, 6); g.translate(0, h / 2, 0); g.rotateZ((rnd() - .5) * .9); g.rotateX((rnd() - .5) * .9);
+    for (let q = 0; q < 4 + ((rnd() * 4) | 0); q++) { const h = .4 + rnd() * 1.1, g = hwCrystal(.12 + rnd() * .1, h, rnd()); g.rotateZ((rnd() - .5) * .9); g.rotateX((rnd() - .5) * .9);
       if (hi) { g.rotateX(Math.PI); g.translate(X(u), fy + B(u) * .92, z0 + w); } else g.translate(X(u) + (rnd() - .5) * .5, fy - .05, z0 + w + (rnd() - .5) * .5); (k % 3 ? cry : cry2).push(g); } }
   for (let k = 0; k < 16; k++) { const u = C.tl * .5 + rnd() * (uEnd - C.tl * .5 - 1), sd = rnd() < .5 ? -1 : 1, w = sd * (A(u) - .35), h = .15 + rnd() * .25, r = .1 + rnd() * .12;
     const s1 = new THREE.CylinderGeometry(.025, .035, h, 5); s1.translate(X(u), fy + h / 2, z0 + w); stem.push(s1); const c1 = new THREE.SphereGeometry(r, 8, 4, 0, Math.PI * 2, 0, Math.PI / 2); c1.translate(X(u), fy + h, z0 + w); mush.push(c1); }
   const glow = (c, e, k) => new THREE.MeshStandardMaterial({ color: c, emissive: e, emissiveIntensity: k, roughness: .3, toneMapped: false });
   rwMesh(cry, glow(0x9affd8, 0x30d0a0, 1.6), false); rwMesh(cry2, glow(0xd0a8ff, 0x8050e0, 1.4), false); rwMesh(stem, rwMat(0xd8d0c0), false); rwMesh(mush, glow(0x9ff4ff, 0x2fb8d8, 1.2), false);
   // THE CHEST at the back of the chamber: strike it and the lid flies open, doubloons spill out (once; `caveHit`)
-  const cy = K.i === 4 ? fy + 2.88 : fy, ch = new THREE.Group(); ch.position.set(X(cc + C.rd * .6), cy, z0); ch.rotation.y = side < 0 ? -Math.PI / 2 : Math.PI / 2; scene.add(ch);
-  { const wd = new THREE.MeshStandardMaterial({ color: 0x6a3a1e, roughness: .8 }), br = new THREE.MeshStandardMaterial({ color: 0xc89a3a, metalness: .8, roughness: .35 }), bx = (w, h, d, x, y, zz, m, par) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); o.position.set(x, y, zz); o.castShadow = true; (par || ch).add(o); return o; };
-    bx(1.2, .6, .75, 0, .3, 0, wd); for (const x of [-.5, .5]) bx(.08, .62, .77, x, .3, 0, br); const lid = new THREE.Group(); lid.position.set(0, .6, -.37); ch.add(lid);
-    const lg = new THREE.Mesh(new THREE.CylinderGeometry(.375, .375, 1.2, 10, 1, false, 0, Math.PI), wd); lg.rotation.z = Math.PI / 2; lg.position.set(0, 0, .37); lid.add(lg); bx(.16, .2, .06, 0, -.05, .76, br, lid);
+  const cy = K.i === 4 ? fy + 2.88 : fy, ch = new THREE.Group(); ch.position.set(X(cc + C.rd * .6), cy, z0); ch.rotation.y = side < 0 ? Math.PI / 2 : -Math.PI / 2; scene.add(ch);
+  // the chest's DETAIL PASS (m1761, his: "the treasure chest in the cave needs a detail pass -- and it's 180 degrees the wrong way"): painted
+  // planks, iron corner brackets, rims and bands with rivets, a brass lock plate with its keyhole, feet, banded lid, coins spilled at its foot;
+  // merged per material (body: 3 draws, lid: 2), so five caves' chests are not a hundred little meshes
+  { const wd = hwPaint(new THREE.MeshStandardMaterial({ color: 0x9a5a32, roughness: .8 }), 'planks'), br = new THREE.MeshStandardMaterial({ color: 0xc89a3a, metalness: .8, roughness: .35 }), ir = new THREE.MeshStandardMaterial({ color: 0x3a3430, metalness: .7, roughness: .45 }), dk = new THREE.MeshStandardMaterial({ color: 0x120c08, roughness: 1 });
+    const B = new Map(), L = new Map(), add = (M, g, m, x, y, zz) => { g.translate(x, y, zz); const q = g.index ? g.toNonIndexed() : g; q.deleteAttribute('uv'); if (!M.has(m)) M.set(m, []); M.get(m).push(q); }, bxg = (M, w, h, d, x, y, zz, m) => add(M, new THREE.BoxGeometry(w, h, d), m, x, y, zz);
+    bxg(B, 1.2, .6, .75, 0, .3, 0, wd); for (const x of [-.5, .5]) bxg(B, .08, .62, .77, x, .3, 0, ir); for (const y of [.035, .575]) bxg(B, 1.24, .06, .79, 0, y, 0, ir);
+    for (const x of [-.6, .6]) for (const z of [-.375, .375]) { bxg(B, .08, .64, .08, x, .31, z, ir); bxg(B, .14, .08, .14, x, -.03, z, ir); }
+    for (const x of [-.5, .5]) for (const y of [.13, .3, .47]) for (const z of [-.39, .39]) add(B, new THREE.SphereGeometry(.022, 6, 4), br, x, y, z);
+    bxg(B, .24, .28, .03, 0, .42, .39, br); bxg(B, .045, .1, .012, 0, .41, .408, dk); add(B, new THREE.CylinderGeometry(.03, .03, .012, 10).rotateX(Math.PI / 2), dk, 0, .47, .408);
+    for (let k = 0; k < 9; k++) { const a = k * 2.4, r2 = .25 + (k % 3) * .14, c = new THREE.CylinderGeometry(.07, .07, .018, 12); c.rotateX((k % 2) * .5); c.rotateZ((k % 3 - 1) * .4); add(B, c, br, Math.cos(a) * r2 * 1.6, .01 + (k < 3 ? k * .02 : 0), .62 + Math.sin(a) * r2 * .5); }
+    const lid = new THREE.Group(); lid.position.set(0, .6, -.37); ch.add(lid);
+    add(L, new THREE.CylinderGeometry(.375, .375, 1.2, 14, 1, false, 0, Math.PI).rotateZ(Math.PI / 2), wd, 0, 0, .37); for (const x of [-.5, .5]) add(L, new THREE.TorusGeometry(.388, .028, 4, 14, Math.PI).rotateY(Math.PI / 2), ir, x, 0, .37);
+    bxg(L, .16, .2, .06, 0, -.05, .76, br);
+    for (const [M, par] of [[B, ch], [L, lid]]) for (const [m, list] of M) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = true; par.add(o); }
     K.chest = { g: ch, lid, open: 0, t: 0, x: ch.position.x, y: cy + .4, z: z0 }; BOXES.push({ minx: ch.position.x - .45, maxx: ch.position.x + .45, miny: cy - 1, maxy: cy + .6, minz: z0 - .65, maxz: z0 + .65 }); }
   // BATS hanging from the vault; they scatter round the chamber when he comes in, then settle back
   K.bats = []; { const bm = new THREE.MeshStandardMaterial({ color: 0x2a1c22, roughness: .9 }), wm = new THREE.MeshStandardMaterial({ color: 0x3a2430, roughness: .9, side: THREE.DoubleSide });
@@ -70634,7 +70646,7 @@ function mshopStep(dt) { const M = MSHOP, p = player, S = GMERCH.shopAt; if (!in
   if (M.lantern) { if (!M.light) { M.light = new THREE.PointLight(0xffc070, 0, 12, 1.5); scene.add(M.light); } M.light.position.set(p.pos.x, p.pos.y + 1.8, p.pos.z); M.light.intensity = 7; } }
 // a sky island's LOBE: a noisy sphere, its top squashed nearly flat, its underside a short lumpy taper (depth `dp`), never a cone. `userData.rim`
 // is its outline at the top (radius per angle), so `hwIslCap` can cut the grass to fit it
-function hwIslLobe(seed, rx, dp, rz) { const g = new THREE.IcosahedronGeometry(1, 3), p = g.attributes.position, o = seed * 5.17, rim = [];
+function hwIslLobe(seed, rx, dp, rz, det = 2) { const g = new THREE.IcosahedronGeometry(1, det), p = g.attributes.position, o = seed * 5.17, rim = [];
   for (let i = 0; i < p.count; i++) { let x = p.getX(i), y = p.getY(i), z = p.getZ(i); const n1 = ghNoise3(x * 1.6 + o, y * 1.6 + o * .3, z * 1.6 - o), n2 = ghNoise3(x * 4.1 - o, y * 4.1 + o, z * 4.1 + o * .7), d = 1 + (n1 - .5) * .55 + (n2 - .5) * .2;
     if (y >= 0) { x *= d; z *= d; y = y * .03 + (n2 - .5) * .02; }
     else { const t = -y, tp = Math.max(.12, Math.sqrt(Math.max(0, 1 - t * t * .8))), hang = .45 + 1.1 * ghNoise3(x * 2.2 + o, o * .5, z * 2.2 - o) ** 2; x *= d * tp; z *= d * tp; y = -t * hang * (.8 + (n2 - .5) * .5); x += Math.sin(y * 2.3 + o) * .1 * t; z += Math.cos(y * 1.9 - o) * .1 * t; }
@@ -70646,6 +70658,11 @@ function hwIslCap(seed, rs, rim) { const n = rim.length, pos = [0, rs * .1, 0]; 
 // m1757: a ROCK MADE SOLID -- its own triangles rastered onto a grid of `c` m cells; each cell a column from `y0` up to the highest triangle
 // over the cell's centre. The rim lumps were 40 rocks of 3-8 m with no
 // collider at all: he walked through them
+// a CRYSTAL (m1761, his: "plants in the caves that just look like pyramids... geometric shapes"): a six-sided prism, a little twisted and
+// tapered, its tip cut as a short faceted point set off-centre -- the shape a quartz point has, not a cone. Base at y 0
+function hwCrystal(r, h, t) { const hb = h * (.62 + t * .12), body = new THREE.CylinderGeometry(r * .82, r, hb, 6, 1, true), tip = new THREE.ConeGeometry(r * .82, h - hb, 6); body.translate(0, hb / 2, 0);
+  tip.translate((t - .5) * r * .5, hb + (h - hb) / 2, (.5 - t) * r * .4); const p = tip.attributes.position; for (let i = 0; i < p.count; i++) if (p.getY(i) > hb + .01) p.setXYZ(i, p.getX(i) + (t - .5) * r * .6, p.getY(i), p.getZ(i));
+  const g = mergeGeometries([body.toNonIndexed(), tip.toNonIndexed()].map(q => { q.deleteAttribute('uv'); return q; })); g.rotateY(t * 3); g.computeVertexNormals(); return g; }
 function hwSolid(geo, c, y0) { const p = geo.attributes.position, top = new Map(), ix = geo.index ? geo.index.array : null, n = ix ? ix.length : p.count;
   for (let i = 0; i < n; i += 3) { const a = ix ? ix[i] : i, b = ix ? ix[i + 1] : i + 1, d = ix ? ix[i + 2] : i + 2, ax = p.getX(a), az = p.getZ(a), bx = p.getX(b), bz = p.getZ(b), dx = p.getX(d), dz = p.getZ(d), den = (bz - dz) * (ax - dx) + (dx - bx) * (az - dz); if (Math.abs(den) < 1e-6) continue;
     for (let gx = Math.floor(Math.min(ax, bx, dx) / c); gx <= Math.floor(Math.max(ax, bx, dx) / c); gx++) for (let gz = Math.floor(Math.min(az, bz, dz) / c); gz <= Math.floor(Math.max(az, bz, dz) / c); gz++) { const x = (gx + .5) * c, z = (gz + .5) * c, u = ((bz - dz) * (x - dx) + (dx - bx) * (z - dz)) / den, v = ((dz - az) * (x - dx) + (ax - dx) * (z - dz)) / den, w = 1 - u - v;
@@ -70664,8 +70681,7 @@ function hollowDress() {
       // (`ghRockGeo` clips its top and bottom), so each piece hung ~a metre over the one under it. Now every piece sits on the measured top of
       // the one below (sunk a little into it), the first sunk into the ground by a sixth of its height; the collider is the stack's real top
       let yc = y; for (let k = 0; k < n; k++) { const R = (n > 1 ? 1.6 - k * .35 : 1.2 + r() * 2.2); const g = ghRockGeo(i * 5 + k + 300, R * (1.1 + r() * .4), R * (n > 1 ? .75 : .6 + r() * .35), R * (.85 + r() * .3), 2); g.rotateY(r() * 6);     /* pass 18 (Worker B): rocks, not eggs */
-        g.computeBoundingBox(); const bb = g.boundingBox, hh = bb.max.y - bb.min.y, sink = k ? hh * .12 : hh * .18; g.translate(s + (r() - .5) * .4, yc - sink - bb.min.y, z); yc = yc - sink + hh; rk.push(ghStrataCol(g)); }
-      BOXES.push({ minx: s - 1.3, maxx: s + 1.3, miny: -2, maxy: yc - .1, minz: z - 1.3, maxz: z + 1.3 }); }
+        g.computeBoundingBox(); const bb = g.boundingBox, hh = bb.max.y - bb.min.y, sink = k ? hh * .12 : hh * .18; g.translate(s + (r() - .5) * .4, yc - sink - bb.min.y, z); yc = yc - sink + hh; rk.push(ghStrataCol(g)); hwSolid(g, .9, y - 2); } }
     for (let i = 0; i < 40; i++) { const z = -150 + r() * 300, side = r() < .5 ? -1 : 1, s = hwRc(z) + side * ((side < 0 ? HOLLOW.floorW : HOLLOW.floorE) + HOLLOW.wall + 6 + r() * 20), y = rwHeight(s, z), R = 3 + r() * 5;
       const g = ghRockGeo(i + 500, R * (1.1 + r() * .4), R * (.5 + r() * .25), R * (.85 + r() * .3), 2); if (caveNear(s, z, R + 1)) continue;     /* on the carved height it sat INSIDE a cave */ g.rotateY(r() * 6); g.computeBoundingBox(); let yl = y; for (const [ax, az] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) yl = Math.min(yl, hwHeight0(s + ax * R, z + az * R)); g.translate(s, yl - g.boundingBox.min.y - (g.boundingBox.max.y - g.boundingBox.min.y) * .12, z); rk.push(ghStrataCol(g)); hwSolid(g, 1.2, yl - 3); }     /* on the LOWEST ground under it: on the rim's slope the downhill side hovered */
     const m = rwMesh(rk, hwPaint(rwMat(0xffffff, { vertexColors: true, roughness: .95 }), 'rock')); m.geometry.computeVertexNormals(); }
@@ -70713,7 +70729,7 @@ function hollowDress() {
       for (let k = 1; k < nl; k++) { const b = r() * 6.2832, q = s * (.55 + r() * .4), rs = s * (.3 + r() * .35); lobes.push([Math.cos(b) * q, -r() * s * .25 - .4, Math.sin(b) * q, rs, rs * (.7 + r() * 1.1)]); }
       lobes.forEach(([lx, ly, lz, rs, dp], k) => { const sd = i * 13 + k * 3 + 1, L = hwIslLobe(sd, rs, dp, rs * (.75 + r() * .5)), ry = r() * 6.28; L.rotateY(ry); L.translate(x + lx, y + ly, z + lz); body.push(aBobOf(L, ph));
         const C = hwIslCap(sd, rs, L.userData.rim); C.rotateY(ry); C.translate(x + lx, y + ly + .05, z + lz); top.push(aBobOf(C, ph));
-        for (let t = 0, nt = Math.floor(rs / 4 + r() * 2); t < nt; t++) { const tb = r() * 6.28, tq = r() * rs * .6, th = 2 + r() * 3.5, T = hwIslLobe(sd * 7 + t, th * .55, th * .25, th * .55); T.translate(x + lx + Math.cos(tb) * tq, y + ly + th * .75, z + lz + Math.sin(tb) * tq); tree.push(aBobOf(T, ph)); } });
+        for (let t = 0, nt = Math.floor(rs / 4 + r() * 2); t < nt; t++) { const tb = r() * 6.28, tq = r() * rs * .6, th = 2 + r() * 3.5, T = hwIslLobe(sd * 7 + t, th * .55, th * .25, th * .55, 1); T.translate(x + lx + Math.cos(tb) * tq, y + ly + th * .75, z + lz + Math.sin(tb) * tq); tree.push(aBobOf(T, ph)); } });
       for (let k = 0, nh = 1 + Math.floor(r() * 3); k < nh; k++) { const b = r() * 6.2832, q = s * (.3 + r() * .7), hs = 1 + r() * 2.4, H2 = hwIslLobe(i * 31 + k, hs, hs * 1.4, hs); H2.translate(x + Math.cos(b) * q, y - s * (.9 + r() * .9), z + Math.sin(b) * q); body.push(aBobOf(H2, ph)); }
       if (r() < .7) { const fh = y * (.35 + r() * .2), f = new THREE.PlaneGeometry(s * .25, fh, 1, 10), fp = f.attributes.position; for (let k = 0; k < fp.count; k++) { const v = .5 - fp.getY(k) / fh; fp.setX(k, fp.getX(k) * (1 + v * 2.2)); }  f.translate(x + s * .85, y - fh / 2, z); fall.push(aBobOf(f, ph)); } }
     // his (after m1704): fallen and restored read as a HYBRID -- these sky islands floated over a fallen valley. KORAJIN: the floating world is
@@ -70803,9 +70819,21 @@ function homeLanterns() {
   const L = []; for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2 + Math.random() * .3, r = 14 + Math.random() * 30; L.push({ x: Math.cos(a) * r, z: Math.sin(a) * r, y: 2.5 + Math.random() * 4, ph: Math.random() * 6.28, w: .2 + Math.random() * .3, a }); }
   H.lan = { im, L, m: new THREE.Matrix4(), q: new THREE.Quaternion(), e: new THREE.Euler(), s: new THREE.Vector3(1, 1, 1), p: new THREE.Vector3() };
 }
+// m1761 (his: "if you land on top of something you don't go through it, but if you hit it from the side you go through it -- I keep getting
+// stuck in the side of the mountain"): the wall columns are 1.5 m cells topped at their LOWEST corner, so a step carried him most of a cell
+// into the face. After every step he is checked against the land itself -- the height of the land MESH at his feet (the same 2 m grid and
+// diagonal the walk triangles use, `hwMeshH`): if it stands more than .45 m over his feet he is inside the rock, and he is put back on the
+// last spot that was not (keeping whichever axis is free, so he slides along the face). Not in a cave, on a ladder, a ledge or a mantle
+const _hwOk = { x: 0, z: 0, on: 0 };
+function hwMeshH(x, z) { const i = Math.floor((x + 170) / 2), j = Math.floor((z + 170) / 2), u = (x + 170) / 2 - i, v = (z + 170) / 2 - j, X = -170 + i * 2, Z = -170 + j * 2, ha = rwHeight(X, Z), hb = rwHeight(X, Z + 2), hd = rwHeight(X + 2, Z);
+  if (u + v <= 1) return ha + (hd - ha) * u + (hb - ha) * v; const hc = rwHeight(X + 2, Z + 2); return hc + (hb - hc) * (1 - u) + (hd - hc) * (1 - v); }
+function hwTerrainOut() { const p = player, K = _hwOk; if (p.climb || p.ledge || p.mantle || p.climbOver || Math.hypot(p.pos.x, p.pos.z) > 148 || caveNear(p.pos.x, p.pos.z, 1)) return;
+  const inside = (x, z) => hwMeshH(x, z) > p.pos.y + .45;
+  if (!inside(p.pos.x, p.pos.z)) { K.x = p.pos.x; K.z = p.pos.z; K.on = 1; return; } if (!K.on) return;
+  if (!inside(p.pos.x, K.z)) p.pos.z = K.z; else if (!inside(K.x, p.pos.z)) p.pos.x = K.x; else { p.pos.x = K.x; p.pos.z = K.z; } }
 function homeStep(dt) {
   const H = HOME; H.t += dt; if (RW.U) RW.U.uTime.value = H.t;
-  hwAgeStep(dt); rwSkyStep(dt); gmillStep(dt, H.t); gpeakStep(dt); gjinraStep(dt, H.t); caveStep(dt); mshopStep(dt); HWBOB.t.value += dt; HWFALL.t.value = H.t; if (GMERCH.g) rsChunkSync(GMERCH);
+  hwAgeStep(dt); rwSkyStep(dt); if (H.style !== 'lake') hwTerrainOut(); gmillStep(dt, H.t); gpeakStep(dt); gjinraStep(dt, H.t); caveStep(dt); mshopStep(dt); HWBOB.t.value += dt; HWFALL.t.value = H.t; if (GMERCH.g) rsChunkSync(GMERCH);
   if (GHOME.U) GHOME.U.uWind.value = H.t; ghomeSmoke(dt, H.t); ghomeShut(dt); ghomeLift(dt); ghomePots(dt); for (const G of GHOME.gates || []) bgateStep(G, dt);     // pass 9: his back door
   if (GHOME.canoe) { const C = GHOME.canoe, t = H.t; C.g.position.y = C.y + rwWaveAt(C.x, C.z, t) * .8 * (1 - Math.min(1, (C.lift || 0) * 2)) + .02 + (C.lift || 0); C.ht = (C.ht == null ? 12 : C.ht) - dt; if (C.ht <= 0 && !C.hu) { C.hu = 1e-3; } if (C.hu) { C.hu += dt; if (C.hu > 6) { C.hu = 0; C.ht = 18 + Math.random() * 20; const P = C.g.getWorldPosition(new THREE.Vector3()); spkBurst(P.x, GHOME.g.position.y + C.y + .05, P.z, 30, { col: [.85, .93, 1], spread: 4, size: .09, life: .6 }); snd('thud', { g: .5, r: .7, x: P.x, z: P.z }); } }     // pass 24: now and then it LIFTS on its discs, hangs dripping, and settles
   const lift = C.hu ? .5 * Math.min(1, C.hu / 1.4) * Math.min(1, Math.max(0, (6 - C.hu) / 1.2)) : 0; if (lift > .05 && Math.random() < dt * 14) { const P = C.g.localToWorld(new THREE.Vector3((Math.random() - .5) * .8, -.4, (Math.random() - .5) * 4)); spkBurst(P.x, P.y, P.z, 2, { col: [.8, .9, 1], spread: .4, size: .05, life: .5 }); }
