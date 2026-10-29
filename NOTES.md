@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## His idle: four to choose from, RELAXED by default (m15xx)
+## His idle: four to choose from, RELAXED by default (m1815)
 *His screenshot: "the Dwarf idle -- I've never liked his hands or his arms; it looks like he's fluffing his fat, his wrists bend in. Hands down by his
 side like a normal human -- or the one I use for action games, one foot forward and one back, ready to throw a punch."*
 - Three library idles Forge-baked onto Grumbo (27 roles, 2.83 MB): `idle_relaxed` (Neutral Idle), `idle_ready` (Ready Idle), `idle_fight` (Fight
