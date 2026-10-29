@@ -14775,7 +14775,7 @@ function archerBow(d) {
 // over whatever his legs are doing; letting go LOOSES: `bow_recoil`, and an arrow from the nock to the reticle's point -- a lob solved to land
 // there, faster and flatter the longer it was drawn (`full` s to full power). His arrows are `mine`: they hit the bowmen, the spiders (a hit takes
 // a leg on the way to the burst), chip statues, smash what `bldHit` breaks, and stick in walls and the ground.
-const BOW = { full: 1.1, drawRate: 1.5, v0: 22, v1: 72, g0: .55, g1: .05, dmg0: 1, dmg1: 3, pow0: .12, pow1: 1.2, keep: .3, limbK: .95, big: 1.35, glow: .55, trail: 3, carry: { out: .07, fwd: .02, tilt: .45, lean: -.3 }, blastR: 2.6, blastDmg: 4, fireDmg: 1, stat: { shots: 0, hits: 0, blasts: 0, fires: 0 } };     // m1729: the charge is the shot -- a tap lobs slow, a full draw flies fast and almost true; only a FULL draw knocks back
+const BOW = { full: 1.1, drawRate: 1.5, v0: 22, v1: 72, g0: .55, g1: .05, dmg0: 1, dmg1: 3, pow0: .12, pow1: 1.2, keep: .3, limbK: .95, big: 1.35, glow: .55, trail: 3, sq: 1, carry: { out: .07, fwd: .02, tilt: .45, lean: -.3, up: .75 }, blastR: 2.6, blastDmg: 4, fireDmg: 1, stat: { shots: 0, hits: 0, blasts: 0, fires: 0 } };     // m1729: the charge is the shot -- a tap lobs slow, a full draw flies fast and almost true; only a FULL draw knocks back
 const _bwL = new THREE.Vector3(), _bwR = new THREE.Vector3(), _bwA = new THREE.Vector3(), _bwB = new THREE.Vector3(), _bwM = new THREE.Vector3(), _bwD = new THREE.Vector3();
 // m1744 (his: "the thing that's killing me -- once you've initiated a shot and you move the left stick around he keeps pulling the bow back
 // again; strafe left or right and he pulls it again; he should never pull it back again once it's back"). MEASURED: standing, the draw is the
@@ -14859,16 +14859,43 @@ function bowArc(show) { if (!BARC.pts) { if (!show) return; bowArcInit(); } cons
   const E = path[path.length - 1], sc = (1.5 - .6 * S.k) * (where === 'air' ? .6 : 1) * (1 + Math.sin(performance.now() * .012) * .05);
   ring.position.copy(E); if (where === 'ground') { ring.position.y += .05; ring.rotation.set(-Math.PI / 2, 0, 0); } else { ring.lookAt(camera.position); lockPull(ring, .45); }
   ring.scale.setScalar(sc); ring.userData.c.material.color.setRGB(c0[0] * .85, c0[1] * .85, c0[2] * .85); ring.visible = true; if (hit) BARC.stat.body++; }
+const _bhX = new THREE.Vector3(), _bhY = new THREE.Vector3(), _bhZ = new THREE.Vector3(), _bhM = new THREE.Matrix4(), _bgA = new THREE.Vector3(), _bgB = new THREE.Vector3();
+function bowFist(B, drawing, h) { const b = rig.bones, m1 = b.mixamorig_LeftHandMiddle1, m2 = b.mixamorig_LeftHandMiddle2, m3 = b.mixamorig_LeftHandMiddle3, t2 = b.mixamorig_LeftHandThumb2, pk = b.mixamorig_LeftHandPinky1;
+  if (!m1 || !m2 || !m3 || !t2 || !pk) return 0;
+  const P = B.g.position.set(0, 0, 0); for (const o of [m1, m2, m3, t2]) P.add(o.getWorldPosition(_bgA)); P.multiplyScalar(.25);     // inside the curled fingers
+  m1.getWorldPosition(_bgA); pk.getWorldPosition(_bgB); _bhY.subVectors(_bgA, _bgB).normalize();     // the knuckle line: pinky -> middle
+  if (!drawing) { const C = BOW.carry; _bhY.lerp(_bhX.set(0, 1, 0), C.up).normalize(); }     // carried: mostly upright, still through the fist
+  _bhZ.set(Math.sin(h), 0, Math.cos(h)); if (!drawing) _bhZ.set(Math.sin(player.faceH), 0, Math.cos(player.faceH)).multiplyScalar(1).add(_bhX.set(0, BOW.carry.tilt, 0));
+  _bhZ.addScaledVector(_bhY, -_bhZ.dot(_bhY)).normalize(); _bhX.crossVectors(_bhY, _bhZ);
+  _bhM.makeBasis(_bhX, _bhY, _bhZ); B.g.quaternion.setFromRotationMatrix(_bhM); return 1; }
+// while he draws, his CHEST is turned square to the aim and levelled (after the clip: the strafe legs' hips lean and turn, and the drawn arms rode
+// that off the line -- his: "lined up standing, but strafing left or right he starts tilting"). The shoulder line and the spine's up make the
+// chest's frame; it is turned onto (aim heading, world up) at `Spine1`, by `sq`.
+const _bqS = new THREE.Vector3(), _bqU = new THREE.Vector3(), _bqF = new THREE.Vector3(), _bqM1 = new THREE.Matrix4(), _bqM2 = new THREE.Matrix4(), _bqQ = new THREE.Quaternion(), _bqQ2 = new THREE.Quaternion(), _bqA = new THREE.Vector3();
+function bowSquare() { const b = rig.bones, sp = b.mixamorig_Spine1, ls = b.mixamorig_LeftArm, rs = b.mixamorig_RightArm, nk = b.mixamorig_Neck, s0 = b.mixamorig_Spine; if (!sp || !ls || !rs || !nk || !s0 || !BOW.sq) return;
+  rig.root.updateMatrixWorld(true);
+  ls.getWorldPosition(_bqS); rs.getWorldPosition(_bqA); _bqS.sub(_bqA).normalize();     // to his left
+  nk.getWorldPosition(_bqU); s0.getWorldPosition(_bqA); _bqU.sub(_bqA); _bqU.addScaledVector(_bqS, -_bqU.dot(_bqS)).normalize(); _bqF.crossVectors(_bqS, _bqU);
+  _bqM1.makeBasis(_bqS, _bqU, _bqF);
+  const a = aimTarget(), p = player, hx = a.p.x - p.pos.x, hz = a.p.z - p.pos.z, hl = Math.hypot(hx, hz); if (hl < .5) return;
+  _bqF.set(hx / hl, 0, hz / hl); _bqU.set(0, 1, 0); _bqS.crossVectors(_bqU, _bqF); _bqM2.makeBasis(_bqS, _bqU, _bqF);
+  _bqQ.setFromRotationMatrix(_bqM2.multiply(_bqM1.transpose()));     // the world turn: current chest frame -> wanted
+  sp.getWorldQuaternion(_bqQ2).premultiply(_bqQ); const pq = sp.parent.getWorldQuaternion(_bqQ).invert();
+  sp.quaternion.slerp(_bqQ2.premultiply(pq), BOW.sq); sp.updateMatrixWorld(true); }
 function bowStep(dt) { bladeFireStep(dt); const p = player, s = slotNow(), on = !!s.bow;
   CLIPS._bow = on && rig.actions['bow_draw' + UPS] ? 1 : 0; if (p.aim && on) p.bowT = (p.bowT || 0) + dt;
   if (!BOW.mesh) { if (!on) { bowArc(false); return; } const d = { model: rig.root, root: rig.root, st: '', K: {}, h: 0, ar: '', arT: 0 }; archerBow(d); BOW.mesh = d.bow; BOW.mesh.g.scale.setScalar(BOW.limbK); }
   const B = BOW.mesh, L = rig.bones.mixamorig_LeftHand, Rh = rig.bones.mixamorig_RightHand, vis = on && rig.root.visible && !p.dragon; B.g.visible = B.str.visible = vis; bowArc(vis && !!p.aim && !(p.fireT > 0)); if (!vis || !L || !Rh) { B.nock.visible = false; return; }
+  const drawing = !!p.aim; if (drawing) bowSquare();     // m1746: the chest squared to the aim and levelled BEFORE the bow is put in his hand
   L.getWorldPosition(_bwL); Rh.getWorldPosition(_bwR);
-  const drawing = !!p.aim, h = drawing ? Math.atan2(_bwL.x - _bwR.x, _bwL.z - _bwR.z) : p.faceH;
+  const h = drawing ? Math.atan2(_bwL.x - _bwR.x, _bwL.z - _bwR.z) : p.faceH;
   // m1733 (his: "the bow is cutting into his arm, into his body; it's kind of small"): drawn, the riser sits in the fist upright (a touch canted);
   // CARRIED it hangs OUTSIDE his left fist (`carry.out` to his left), its top tilted forward (`tilt`) and AWAY from his body (`lean`) --
   // it leaned into him at +.35. Bigger: `limbK` .78 -> .95.
-  B.g.position.copy(_bwL); B.g.rotation.set(0, h, 0); if (drawing) B.g.rotateZ(.12); else { const C = BOW.carry; B.g.translateX(C.out); B.g.translateZ(C.fwd); B.g.rotateX(C.tilt); B.g.rotateZ(C.lean); } B.g.updateMatrixWorld(true);
+  // m1746 (his: "his hand isn't around the bow like he's gripping it -- the bow is on the OUTER side of his hand"): the riser goes THROUGH THE FIST
+  // -- the centre of his curled fingers (`bowFist`), not the wrist pushed outward. Drawn, the riser runs along his KNUCKLES (pinky -> middle,
+  // the top limb on the index side) and the bow's belly faces the shot; carried, it stands mostly upright through the same fist.
+  if (!bowFist(B, drawing, h)) { B.g.position.copy(_bwL); B.g.rotation.set(0, h, 0); if (drawing) B.g.rotateZ(.12); } B.g.updateMatrixWorld(true);
   _bwA.copy(B.tipA).applyMatrix4(B.g.matrixWorld); _bwB.copy(B.tipB).applyMatrix4(B.g.matrixWorld);
   const pull = drawing ? clamp((p.bowT || 0) / (BOW.full * .45), 0, 1) : 0; _bwM.copy(_bwA).add(_bwB).multiplyScalar(.5); if (pull > 0) _bwM.lerp(_bwR, pull);
   const a = B.str.geometry.attributes.position.array; a.set([_bwA.x, _bwA.y, _bwA.z, _bwM.x, _bwM.y, _bwM.z, _bwB.x, _bwB.y, _bwB.z]); B.str.geometry.attributes.position.needsUpdate = true;

@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The bow IN his fist, and squared to the aim while he strafes (m15xx)
+His (screenshots on M1741 -- before m1744's no-second-pull fix had reached his phone): "his hand isn't around the bow like he's gripping it --
+the bow is on the outer side of his hand; the angle isn't right from the back"; "it doesn't aim true down the muzzle when moving left or right
+-- lined up stationary, but strafing he starts tilting, which he shouldn't."
+- **The grip** (`bowFist`): the bow was placed at the WRIST bone (the hand's origin) and m1733 pushed it `out` .07 to his left -- outside the
+  hand by construction. Now its riser goes through the centre of his curled fingers (the mean of Middle1-3 and Thumb2). Drawn, the riser runs
+  along his knuckles (pinky -> middle) and the belly faces the shot; carried, the knuckle line is blended `carry.up` .75 toward upright.
+- **The strafe tilt** (`bowSquare`, before the bow is placed): the strafe legs' hips lean and turn, and the drawn arms rode them off the line.
+  The chest's frame (shoulder line, spine up) is turned at `Spine1` onto (aim heading, world up). Measured strafing left-right while drawn:
+  chest ROLL 13.0 -> 0.0 deg, tilt 29.5 -> 10.5 deg (what is left is the lower spine's lean, under `Spine1`). `BOW.sq` 0 is the A/B.
+- Renders: carried from the back and the side (through the fist), drawn from behind, strafing drawn.
 ## ROCKS BREAK: big -> chunks -> small -> dust, in every world's own stone (m1745)
 His: "rocks in different forms -- the snow world, the red rock world, the grass world, the temples -- different styles of rocks that once
 you slash them or shoot them or explode them break from bigger to smaller, placed just like you do plants, to add interaction."
