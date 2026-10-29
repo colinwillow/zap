@@ -1113,11 +1113,12 @@ const RIG = {
 // which did not -- plus how many of the file's own tracks point at a bone the model has not got.
 // m923: ZAP 2 is the new hero (his: "this is going to be the new character") -- first in the carousel and the default; the
 // key moved to `mel.hero2` so a phone that remembered 'zap' starts on him once, and can still pick the old one.
-const HERO = { key: 'mel.hero2', files: { zap2: 'models/characters/zap_02.glb', zap2lib: 'models/characters/zap_02_lib.glb', zap: 'models/characters/zap.glb', lizard: 'models/alien_lizard.glb', grey: 'models/characters/alien_grey_medium.glb', zoar: 'models/characters/zoar_game.glb', samurai: 'models/characters/samurai_game.glb', orc: 'models/characters/orc_game.glb', goblin: 'models/characters/goblin_game.glb', agoblin: 'models/characters/alien_goblin_game.glb' }, names: { zap2: 'ZAP', zap2lib: 'ZAP (LIBRARY)', zap: 'ZAP (OLD)', lizard: 'ALIEN LIZARD', grey: 'ALIEN GREY', zoar: 'ZOAR', samurai: 'SAMURAI', orc: 'ORC', goblin: 'GOBLIN', agoblin: 'KORAJIN GRUMBO' }, glow: { zoar: 0, samurai: 0, orc: 0, goblin: 0, agoblin: 0 },
+const HERO = { key: 'mel.hero2', files: { zap2: 'models/characters/zap_02.glb', zap2lib: 'models/characters/zap_02_lib.glb', zap: 'models/characters/zap.glb', lizard: 'models/alien_lizard.glb', grey: 'models/characters/alien_grey_medium.glb', zoar: 'models/characters/zoar_game.glb', samurai: 'models/characters/samurai_game.glb', orc: 'models/characters/orc_game.glb', goblin: 'models/characters/goblin_game.glb', agoblin: 'models/characters/alien_goblin_game.glb', toad: 'models/characters/toad_wanderer_game.glb' }, names: { zap2: 'ZAP', zap2lib: 'ZAP (LIBRARY)', zap: 'ZAP (OLD)', lizard: 'ALIEN LIZARD', grey: 'ALIEN GREY', zoar: 'ZOAR', samurai: 'SAMURAI', orc: 'ORC', goblin: 'GOBLIN', agoblin: 'KORAJIN GRUMBO', toad: 'TOAD WANDERER' }, glow: { zoar: 0, samurai: 0, orc: 0, goblin: 0, agoblin: 0, toad: 0 },
   // m963: a hero's own height (metres; `RIG.height` otherwise -- Zap's 1.25) and whether he is HUMAN (people do not run from him)
   // m964: and `crown` -- his HEAD-TOP bone's height in metres, solved for at load (hair and hats are not height; Colin / Jack / Moussa
   // go by theirs too). *"Moussa 6'6, Colin and Jack 5'11, Zoar 5'7."* `height` stays his size for the body numbers (`SZ`).
-  height: { zoar: 1.72, samurai: 1.8, orc: 2.2, goblin: 1.35, agoblin: 1.4 },     // m1058: the alien goblin (his own C4D rig, arms and legs a little longer)     // m1004: the orc a head over the samurai (the brute), the goblin a head under
+  height: { zoar: 1.72, samurai: 1.8, orc: 2.2, goblin: 1.35, agoblin: 1.4, toad: 1.55 },     // m@X4@: the toad wanderer, squat (hat included)
+      // m1058: the alien goblin (his own C4D rig, arms and legs a little longer)     // m1004: the orc a head over the samurai (the brute), the goblin a head under
   crown: { zoar: 1.70 }, human: { zoar: 1 }, pick: 'zap2', stat: '' };   // m797: the grey
 { let h = null; try { const m = (location.search || '').match(/[?&]hero=(\w+)/); h = m ? m[1] : localStorage.getItem(HERO.key); } catch (e) {}
   if (h && HERO.files[h]) HERO.pick = h; RIG.file = HERO.files[HERO.pick];
@@ -7552,6 +7553,7 @@ const ARENA = {
     HOBO: { t: 'Hobo', civ: 'HOBO', beam: [.4, .8, 1] },
     ZAPNPC: { t: 'Zap', sub: 'as a body, for the MORPH test', civ: 'ZAP', beam: [.4, .8, 1] },
     ZAP2: { t: 'Zap 2', sub: 'new proportions + a tail (m922)', civ: 'ZAP2', beam: [.4, .8, 1] },
+    TOAD: { t: 'Toad Wanderer', sub: 'a village NPC: wanders, reacts, falls and gets up (m@X4@)', civ: 'TOAD', beam: [.4, .8, 1] },
     CEO: { t: 'The CEO', sub: 'MORPH him: the boss super transform', civ: 'CEO', both: 1, beam: [1, .8, .3] },
     CEOALIEN: { bones: 'reptile', t: 'The CEO, unleashed', sub: 'his reptilian self', file: 'models/characters/ceo_alien.glb', weapon: 'models/weapons/w_brute_cleaver.glb', h: 2.3, hp: 18, hitDmg: 20, beam: [1, .8, .3], noShield: 1 },
     // m974: BEASTS -- his robits creatures, through the doors, on their own brains (`beastStep`)
@@ -8426,6 +8428,9 @@ const CEOK = { file: 'models/characters/ceo_human.glb', h: 1.75, r: .42, hp: 6, 
 // 8-bone tail chain (c_tail_00..07), the OLD Zap's 61 clips baked on (bake.py: rotation from rest), root + ground, weapon
 // bones, 2048 webp + draco. Same clip names as Zap, so ZAPK's table drives him. The tail has no keys: `tailSway` moves it.
 const ZAP2K = { file: 'models/characters/zap_02.glb', h: 1.35, r: .32 };
+// m@X4@: THE TOAD WANDERER as a body (a village NPC): his Tripo model through `hero.sh` (Auto-Rig Pro, the samurai Forge profile), whose
+// clip names are ZAPK's exactly (idle_01, walk_fwd, run_fwd, take_damage_*, lay_to_get_up) -- so he is the hick's brain on ZAPK's table
+const TOADK = { file: 'models/characters/toad_wanderer_game.glb', h: 1.55, r: .42 };
 const ZAPK = {   // Zap as a body in the arena (his own clips, by name)
   file: 'models/characters/zap.glb', h: 1.25, r: .3, hp: 4, smoke: null, drop: /^CINEMA_4D/, hRel: 0, hCrown: 0, borrow: null,
   clips: { idle: 'idle_01', look: null, walk: 'walk_fwd', run: 'run_fwd', flee: 'run_fwd', hits: ['take_damage_body', 'take_damage_head'],
@@ -9167,7 +9172,7 @@ ARENA.morph.self = 1;
 const TMZAP = { tm: 'zap' };     // his own base body has no kind: this carries its cached proxy geometry
 function tmKeyOf(K) {
   const M = ARENA.morph, f = K ? K.file : RIG.file;
-  if (!M.byFile) { M.byFile = {}; for (const k in M.files) { const A = ARENA.kinds[k]; const kf = A.civ ? (A.civ === 'ZAP' ? ZAPK.file : A.civ === 'ZAP2' ? ZAP2K.file : A.civ === 'CEO' ? CEOK.file : ({ HICK, HOBO }[A.civ] || {}).file) : A.file; if (kf) M.byFile[kf] = k; } }
+  if (!M.byFile) { M.byFile = {}; for (const k in M.files) { const A = ARENA.kinds[k]; const kf = A.civ ? (A.civ === 'ZAP' ? ZAPK.file : A.civ === 'ZAP2' ? ZAP2K.file : A.civ === 'TOAD' ? TOADK.file : A.civ === 'CEO' ? CEOK.file : ({ HICK, HOBO }[A.civ] || {}).file) : A.file; if (kf) M.byFile[kf] = k; } }
   if (f === HERO.files.zap2lib) return 'ZAP2';     // m926: the same body as Zap 2 -- same mesh, same proxy
   return M.byFile[f] || null;
 }
@@ -12308,7 +12313,7 @@ if (inArena()) arenaStage();
 function arenaKind(key) {
   const A = ARENA.kinds[key]; if (A.K) return A.K;
   if (A.creature) return (A.K = beastKind(key, A));     // m974
-  if (A.civ) { const B = A.civ === 'ZAP' ? Object.assign({}, HICK, ZAPK) : A.civ === 'ZAP2' ? Object.assign({}, HICK, ZAPK, ZAP2K) : A.civ === 'CEO' ? Object.assign({}, HICK, CEOK) : { HICK, HOBO }[A.civ]; A.file = B.file; A.K = Object.assign({}, B, { arena: key, at: [], stunHits: A.stunHits || 1 }); return A.K; }     // m901: people, as themselves
+  if (A.civ) { const B = A.civ === 'ZAP' ? Object.assign({}, HICK, ZAPK) : A.civ === 'ZAP2' ? Object.assign({}, HICK, ZAPK, ZAP2K) : A.civ === 'TOAD' ? Object.assign({}, HICK, ZAPK, TOADK) : A.civ === 'CEO' ? Object.assign({}, HICK, CEOK) : { HICK, HOBO }[A.civ]; A.file = B.file; A.K = Object.assign({}, B, { arena: key, at: [], stunHits: A.stunHits || 1 }); return A.K; }     // m901: people, as themselves
   const s = A.h / FOE.h;
   A.K = Object.assign({}, FOE, {
     file: A.file, weapon: A.weapon, h: A.h, r: FOE.r * s, hp: A.hp, hitDmg: A.hitDmg, bones: A.bones, resist: A.resist,
@@ -72902,7 +72907,7 @@ const START = {
 // framed by its MEASURED height -- every skinned mesh's raw geometry bounds, `bodyProto`'s rule (never `Box3.setFromObject`: zap's
 // armature is .01 and the lizard and the grey are metre rigs) -- so all three stand the same size; it plays the first clip with
 // "idle" in its name, turns slowly, spins under a drag, and a quick swipe or the arrows change hero (a scale pop) and save the pick.
-const HERO_SUB = { zap2: 'The new one: proportions and a tail.', zap2lib: 'Zap 2 on the motion library: 28 clips from it, the rest as Zap 2.', zap: 'The original.', lizard: 'His pipeline test.', grey: 'Medium. The second pipeline hero.', zoar: 'Every one of old Zap\'s clips, through the Forge.', samurai: 'The robot samurai: Tripo, Auto-Rig Pro, the Forge. 84 clips, 19 of them katana.', orc: 'The brute: his tail, his mega sword, the samurai\'s whole move set.', goblin: 'The goblin warrior: small, quick, the katana and the samurai\'s whole move set.' };
+const HERO_SUB = { toad: 'His Tripo toad villager: Auto-Rig Pro, the samurai clips (121).', zap2: 'The new one: proportions and a tail.', zap2lib: 'Zap 2 on the motion library: 28 clips from it, the rest as Zap 2.', zap: 'The original.', lizard: 'His pipeline test.', grey: 'Medium. The second pipeline hero.', zoar: 'Every one of old Zap\'s clips, through the Forge.', samurai: 'The robot samurai: Tripo, Auto-Rig Pro, the Forge. 84 clips, 19 of them katana.', orc: 'The brute: his tail, his mega sword, the samurai\'s whole move set.', goblin: 'The goblin warrior: small, quick, the katana and the samurai\'s whole move set.' };
 function heroStage(box, pick) {
   const keys = Object.keys(HERO.files), cv = document.createElement('canvas'), ld = document.createElement('div'); ld.className = 'ld'; box.appendChild(cv); box.appendChild(ld);
   let R; try { R = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true }); } catch (e) { box.textContent = HERO.names[HERO.pick]; return { dispose() {} }; }

@@ -974,6 +974,29 @@ in there so I can transform it between the two states"; "these rocks are kind of
 - **THE HYBRID:** the sky islands over the rim (m1113) showed in FALLEN. KORAJIN: the floating world is what restoration raises -> hidden
   while fallen. (The refinery already sits on the flank when fallen.)
 Next: the painted textures (rock, sand, cliff), his ask in the same message.
+## m@X4@ -- THE TOAD WANDERER: his renders -> Tripo -> Auto-Rig Pro (headless) -> the Forge -> a village NPC and a hero
+His: *"This character needs to be run through Tripo, textured and rigged with Auto-Rig Pro in the headless Blender... he's gonna be like a
+village person, an NPC; we could make it so you could swap him for the main character to try animations."*
+- **Tripo** (API, his four renders as the four views; `models/characters/toad_wanderer_views/`): **Tripo's `left` is the CHARACTER'S left**
+  -- checked first with a 10-credit `image-to-multiview` of his front: its `left_view_url` shows the face to frame-left and the bells
+  (on his left chest). So his 4th render is `left`, his 3rd `right`. P2-20260801 quad, face_limit 8000 (lots of hanging charms), then the
+  "detailed" (4K) texture pass, delight off. ~130 credits (1,070 -> 940). Source FBX zipped at `models/characters/toad_wanderer.zip`.
+- **The rig**: `blender-addons/pipeline/hero.sh toad_wanderer.zip toad_wanderer --rot -90 --profile samurai` (API meshes face +X: -90,
+  checked on `in_front.png`). ARP 52 of 52 bones renamed to mixamorig; `handrig` found NO thumbs (mitts, like the bowman); the Forge put
+  the samurai profile's **121 clips** on him; 2048 webp + draco; hipshift/hipfix ok. -> `models/characters/toad_wanderer_game.glb`,
+  6.5 MB, 24.6k verts, 1 mesh / 1 material (no `doubleSided`, no ARP dummy sphere), 56 joints.
+- Checked off-game: `posecheck.py` (arms down, elbows and knees bent: clean, the hat rides the head rigidly, the robe and charms follow,
+  no tears) and `animcheck.py` (walk_fwd, idle_01, katana_walk, take_damage_and_fall_down all read on his body).
+- **In the game:** a HERO (`HERO.files.toad`, "TOAD WANDERER", 1.55 m with the hat) to wear him and try every clip; and an NPC kind
+  `ARENA.kinds.TOAD` (`civ: 'TOAD'`, `TOADK`): the hick's brain on ZAPK's clip table -- his clip names ARE ZAPK's (idle_01, walk_fwd,
+  run_fwd, take_damage_*, lay_to_get_up) -- so he wanders, reacts to hits, falls and gets up like Zap 2's body. Headless: `?hero=toad`
+  boots with him as the player (textured, on the floor), and `arenaSpawn('TOAD')` beams him in.
+- Setup in a fresh container: `apt-get update` first (the lists were empty), then `blender-addons/pipeline/setup.sh`. The new Forge
+  profile `retarget-anims/library/profiles/toad_wanderer.json` was written locally only (this session had read access to that repo).
+- OPEN: no village system to put him in yet (he is in SPAWN as an NPC and in the hero switcher); his own villager clips (talk, wave,
+  sweep, sit) are a Forge profile away; his name is a placeholder.
+Shipped unverified.
+
 ## m1730 -- BAMBOO (his: "a good bamboo model seems very appropriate for the game -- fun, and the wood-hit noise when you brush through it; a
 good little scatter; I could see it in the snow world")
 - **There already was a `bamboo`** in `PLANTK` (a quick one: seven tubes and PLANK leaves .9 x .14 m, no joints), planted round four buildings
