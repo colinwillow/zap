@@ -72,6 +72,22 @@ in there so I can transform it between the two states"; "these rocks are kind of
 - **THE HYBRID:** the sky islands over the rim (m1113) showed in FALLEN. KORAJIN: the floating world is what restoration raises -> hidden
   while fallen. (The refinery already sits on the flank when fallen.)
 Next: the painted textures (rock, sand, cliff), his ask in the same message.
+## m15xx -- THE LEFTOVERS CAN BE CUT (his: "after a big battle there's pieces of legs and bodies everywhere -- they could fade away, but more
+interesting: target them with your sword, slice them, they crack in half, release the green stuff and disintegrate")
+- **`DEBRIS`:** every baked piece in `ARENA.debris` (limbs, halves, the spiders' legs and bodies) can be CUT (`debrisCut`).
+  - The blade sweep (`debrisSweep`, in the same `strikeSweep` pass as the spiders), slams, the whirl, bolts / rockets (`debrisArea`) and
+    his arrows all cut.
+  - The piece's triangles are split by an upright plane square to the blow, each by its centroid. The two halves fly apart along the
+    normal and each DISSOLVES over `dieT` 1.1 s: shrinking, its own cloned material fading, burning off in green fire and green-glow smoke.
+  - `jinraEmit` releases `DEBRIS.jinra` 3 wisps at the cut (the collectible Jinra), with sparks, a clang and a swoosh.
+  - A piece with no single indexed mesh (armour, a carried sword) just dissolves.
+- **Untouched pieces dissolve by themselves** after `DEBRIS.life` 45 s at rest (0 = never: his "maybe they fade" is the backstop, not the
+  answer).
+- **Measured headless** (forge, the katana): two spiders burst -> 14 pieces at rest. Four real `meleeGo` swings walked up to them gave 5 cuts;
+  the halves dissolved and 9 pieces were left. Rendered: the pieces, the cut, the dissolve with the green fire and the wisps, after.
+- **Not built:** picking a piece up and THROWING it (his second idea; the carry / toss machinery exists, so it is a later build if he wants it).
+  **Not checked:** on his phone.
+
 ## m1719 -- THE JIN BOW, FIRST CUT (TOOLS_SANDBOX.md piece 1; his: "go with the geta, start with the bow")
 - **The clips:** the bowmen's Mixamo longbow set, baked onto Grumbo by the Forge.
   - Profile: `tools/agoblin_forge_prof.json` gained 9 roles: bow_draw, bow_overdraw, bow_recoil, bow_aim, bow_walk_f/b/l/r, bow_shoot.

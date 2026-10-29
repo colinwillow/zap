@@ -12436,7 +12436,15 @@ function arenaStep(dt) {
   ARENA.threatT = (player.aim || player.fireT > 0 || ARENA.hold > 0) ? 0 : ARENA.threatT + dt;     // m896: are you shooting at him
   arenaFx(dt);
   while (ARENA.gone.length) { const d = ARENA.gone.pop(); if (d.stars) scene.remove(d.stars.g); bodyGone(d); const i = ARENA.live.indexOf(d); if (i >= 0) ARENA.live.splice(i, 1); arenaUi(); }
+  let gone = 0;
   for (const D of ARENA.debris) {
+    if (D.die != null) { D.die += dt / DEBRIS.dieT; const u = Math.min(1, D.die), P = D.m.position;     // m15xx: dissolving -- shrinks, fades, burns off green
+      D.m.scale.copy(D.s1).multiplyScalar(Math.max(.02, 1 - u * u)); for (const m of D.fade) m.opacity = 1 - u;
+      if (Math.random() < dt * 30) gfire(P.x + (Math.random() - .5) * D.r, P.y, P.z + (Math.random() - .5) * D.r, .45 + (1 - u) * .3);
+      if (Math.random() < dt * 4) smokeAt(P.x, P.y + .1, P.z, 1.2, .8, OSARI.shade(), .9, gsmoke);
+      D.v.y -= 6 * dt; D.v.multiplyScalar(Math.exp(-2 * dt)); P.addScaledVector(D.v, dt); if (P.y < .05) { P.y = .05; D.v.y = 0; } D.m.rotation.x += D.w.x * dt * .5; D.m.rotation.y += D.w.y * dt * .5;
+      if (u >= 1) { D.m.removeFromParent(); D.gone = 1; gone = 1; } continue; }
+    if (D.rest && DEBRIS.on && DEBRIS.life > 0 && (D.restT = (D.restT || 0) + dt) > DEBRIS.life) { debrisDie(D); DEBRIS.stat.fades++; }
     if (D.hot > 0) {     // m912: hot off him -- orange glow cooling over 1.6 s, a pop in size, sparks off it while it flies
       D.hot = Math.max(0, D.hot - dt / 1.6); const k = D.hot * D.hot;
       for (const m of D.mats) if (m.emissive && m.userData.e0) { m.emissive.copy(m.userData.e0).lerp(_arHot, k); m.emissiveIntensity = m.userData.i0 + 3 * k; }
@@ -12450,6 +12458,7 @@ function arenaStep(dt) {
     if (D.m.position.y < fy) { D.m.position.y = fy; D.v.y = Math.abs(D.v.y) * .3; D.v.x *= .6; D.v.z *= .6; D.w.multiplyScalar(.5); if (D.v.length() < .6) D.rest = 1; }
     const rr = Math.hypot(D.m.position.x, D.m.position.z), W = ARENA.r + 1.9;
     if (rr > W) { D.m.position.x *= W / rr; D.m.position.z *= W / rr; D.v.x *= -.4; D.v.z *= -.4; } }
+  if (gone) ARENA.debris = ARENA.debris.filter(D => !D.gone);
 }
 // THE CLOCK: a knock-out is slow motion for `slowT` real seconds, easing back
 function arenaTime(raw) {
@@ -13750,6 +13759,34 @@ function limbBake(d, nm, dirH, kick, tris) {
   while (ARENA.debris.length > 60) { const o = ARENA.debris.shift(); scene.remove(o.m); }
   return m;
 }
+// m15xx (his: "after a big battle there's just pieces of legs and bodies laying everywhere -- they could fade away after some time, but more
+// interesting: you can target them with your sword and slice them, they crack in half, release the green stuff and go away -- split, and the two
+// sides disintegrate"): DEBRIS IS DESTRUCTIBLE. Any baked piece (a limb, a half, a spider's leg) that a blade sweeps, a slam or a whirl reaches,
+// or an arrow or a bolt finds, is CUT: its triangles split by a vertical plane square to the blow (each by its centroid), two halves fly
+// apart along the plane's normal, and each DISSOLVES over `dieT` s -- shrinking, fading, burning off in green fire and green smoke -- with
+// Jinra wisps released at the cut (`jinraEmit`, the collectible). A piece nobody touches dissolves by itself after `life` s (`life` 0 = never).
+// A group piece (armour, a carried sword) has no single mesh to cut: it just dissolves.
+const DEBRIS = { on: 1, life: 45, dieT: 1.1, reach: .35, kick: 3.2, jinra: 3, stat: { cuts: 0, fades: 0 } };
+const _dbN = new THREE.Vector3(), _dbQ = new THREE.Quaternion(), _dbC = new THREE.Vector3();
+function debrisDie(D) { if (D.die != null) return; D.die = 0; D.rest = 0; D.hot = 0; D.v.y = Math.max(D.v.y, 1.2); const ms = []; D.m.traverse(o => { if (o.isMesh) { o.material = o.material.clone(); o.material.transparent = true; o.material.depthWrite = false; ms.push(o.material); } }); D.fade = ms; D.s1 = D.m.scale.clone(); }
+function debrisCut(D, dirH) { if (D.die != null) return; const P = D.m.position; DEBRIS.stat.cuts++;
+  jinraEmit(P.x, P.y + .2, P.z, DEBRIS.jinra); spkBurst(P.x, P.y + .1, P.z, 18, { col: [.55, 1, .7], spread: 4, size: .12, life: .4 }); snd('clang', { g: .35, r: 1.5 + Math.random() * .3, x: P.x, z: P.z }); snd('swoosh', { g: .3, r: 1.7, x: P.x, z: P.z });
+  for (let k = 0; k < 10; k++) gfire(P.x + (Math.random() - .5) * .4, P.y, P.z + (Math.random() - .5) * .4, .6);
+  _dbN.set(Math.cos(dirH), 0, -Math.sin(dirH));     // the cut plane is upright and holds the blow's line: its normal is square to the swing
+  const M = D.m; if (!(M.isMesh && M.geometry.index && M.geometry.index.count >= 12)) { debrisDie(D); return; }
+  const nL = _dbN.clone().applyQuaternion(_dbQ.copy(M.quaternion).invert()), G = M.geometry, pos = G.attributes.position, ix = G.index.array, A = [], B = [];
+  for (let t = 0; t < ix.length; t += 3) { const a = ix[t], b = ix[t + 1], c = ix[t + 2];
+    const d = (pos.getX(a) + pos.getX(b) + pos.getX(c)) * nL.x + (pos.getY(a) + pos.getY(b) + pos.getY(c)) * nL.y + (pos.getZ(a) + pos.getZ(b) + pos.getZ(c)) * nL.z; (d >= 0 ? A : B).push(a, b, c); }
+  if (!A.length || !B.length) { debrisDie(D); return; }
+  const i = ARENA.debris.indexOf(D); if (i >= 0) ARENA.debris.splice(i, 1); M.removeFromParent();
+  for (const [tri, sg] of [[A, 1], [B, -1]]) { const g = G.clone(); g.setIndex(tri); const m = new THREE.Mesh(g, M.material); m.position.copy(M.position); m.quaternion.copy(M.quaternion); m.scale.copy(M.scale); m.castShadow = true; scene.add(m);
+    const H = { m, v: new THREE.Vector3(_dbN.x * sg * DEBRIS.kick + (Math.random() - .5), 2.5 + Math.random() * 1.5, _dbN.z * sg * DEBRIS.kick + (Math.random() - .5)), w: new THREE.Vector3((Math.random() - .5) * 8, (Math.random() - .5) * 8, (Math.random() - .5) * 8), r: D.r * .7, rest: 0, hot: 0, mats: [], s0: m.scale.clone() };
+    ARENA.debris.push(H); debrisDie(H); } }
+// a blade sweeping from `a` to `b` (radius `rad`): every piece it passes through is cut
+function debrisSweep(a, b, rad, dirH) { if (!DEBRIS.on || !ARENA.debris.length) return 0; let n = 0;
+  for (const D of ARENA.debris.slice()) { if (D.die != null) continue; const P = D.m.position; if (!segBody(a, b, P.x, P.z, D.r + rad + DEBRIS.reach, P.y + D.r + .3, rad, P.y - D.r - .3)) continue; debrisCut(D, dirH); n++; } return n; }
+function debrisArea(x, y, z, r) { if (!DEBRIS.on || !ARENA.debris.length) return 0; let n = 0;
+  for (const D of ARENA.debris.slice()) { if (D.die != null) continue; const P = D.m.position, q = Math.hypot(P.x - x, P.z - z); if (q > r + D.r || Math.abs(P.y - y) > 2.5) continue; debrisCut(D, q > 1e-3 ? Math.atan2(P.x - x, P.z - z) + Math.PI / 2 : player.faceH); n++; } return n; }
 // m1693 (his: "a full charge katana attack should just slice through -- cut one in HALF; anything less, or a normal sword, shouldn't. Classes of
 // guys -- small, medium, heavy -- for the small and medium a full charge cuts them in half"): THE HALVING. Per kind, once: every triangle goes
 // to the UPPER half (dominated by a bone under `Spine1`: chest, arms, head) or the LOWER (hips, belly, legs), by two of its three vertices.
@@ -14244,6 +14281,7 @@ function arrowStep(dt) {
     const sx = P.x - ox, sy = P.y - oy, sz = P.z - oz, L2 = sx * sx + sy * sy + sz * sz || 1;
     const cx = p.pos.x, cy = p.pos.y + H * .55, cz = p.pos.z, u = clamp(((cx - ox) * sx + (cy - oy) * sy + (cz - oz) * sz) / L2, 0, 1);
     const qx = ox + sx * u - cx, qy = oy + sy * u - cy, qz = oz + sz * u - cz;
+    if (A.mine && ARENA.debris.length) { let dh = null; for (const D of ARENA.debris) if (D.die == null && D.m.position.distanceTo(P) < D.r + .3) { dh = D; break; } if (dh) { debrisCut(dh, Math.atan2(A.v.x, A.v.z) + Math.PI / 2); A.m.removeFromParent(); ARROWS.splice(i, 1); continue; } }
     if (A.mine && SPIDER.list.length) { let sh = null; for (const S of SPIDER.list) { const M = spiderMid(S, _sdC); if (Math.hypot(P.x - M.x, (P.y - M.y) * 1.3, P.z - M.z) < SPIDER.w * SPIDER.hitR) { sh = S; break; } }     // m1719: his arrows find the spiders too
       if (sh) { spiderBlow(sh, Math.atan2(A.v.x, A.v.z), .7, A.dmg || 3, P.x, P.z); if (A.pl) BOW.stat.hits++; A.m.removeFromParent(); ARROWS.splice(i, 1); continue; } }
     if (A.mine) { let hit = null; for (const d of DUMMIES) { if (d.st === 'gone' || d.st === 'down' || !d.root.visible) continue; const R = d.root.position, hh = (d.K.h || 1.8);
@@ -17643,6 +17681,7 @@ const BOLT_COL = [.35, .85, 1], BOLT_HOT = [1, .96, .85], BOLT_VIO = [.62, .38, 
 function boltHit(b) {
   const c = b.chg, big = .35 + c * .65;
   if (b.rocket && SPIDER.list.length) spiderArea(b.pos.x, b.pos.y, b.pos.z, 2.2, 1.4, 3);     // m1701
+  if (ARENA.debris.length) debrisArea(b.pos.x, b.pos.y, b.pos.z, b.rocket ? 2.4 : .6 + (b.chg || 0) * .6);
   turretBlast(b.pos.x, b.pos.y, b.pos.z, b.rocket ? 1.4 : .25, b.rocket ? 4 : 1 + c);     // m1301: ALWAYS -- it ends in `bldHit`, so with no turret standing a shot could not touch a building's blocks, bells or levers (Worker A's finding, m1289)
   if (CWALL.list.length) wallHit(b.pos.x, b.pos.y, b.pos.z, b.rocket ? 1.3 : .35, b.rocket ? 3 : 1 + c, b.rocket ? 'rblast' : 'shot', Math.atan2(b.vel.x, b.vel.z));     // m1016: a bolt chips a chunk, a rocket blows; m1029: never a half wall a hole     // m1011: a rocket of his takes most of one; a full charge 2 bolts' worth
   // A ROCKET'S PICTURE IS SIZED AS A BIG BALL, NOT AS ITS OWN THIN BODY (m189)
@@ -20850,6 +20889,7 @@ function whirlSpin() {
   for (const d of DUMMIES) { if (d.st === 'gone' || !d.root.visible || d === p.carryD) continue; const Q = d.root.position, dd = Math.hypot(Q.x - P.x, Q.z - P.z); if (dd > R || Math.abs(Q.y - P.y) > 1.6) continue;
     WHIRL.stat.hits++; dummyBlow(d, Math.atan2(Q.x - P.x, Q.z - P.z), WHIRL.power, WHIRL.dmg); }
   if (SPIDER.list.length) spiderArea(P.x, P.y, P.z, R, WHIRL.power, WHIRL.dmg);     // m1701
+  if (ARENA.debris.length) debrisArea(P.x, P.y, P.z, R);
   camShake(.18); for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2, x = P.x + Math.sin(a) * R * .8, z = P.z + Math.cos(a) * R * .8; if (TURRET.list.length) turretMelee(x, P.y + 1, z, .6, 2); else bldHit(x, P.y + 1, z, .6, 2);
     spk(x, P.y + 1, z, Math.sin(a + 1.57) * 4, .5, Math.cos(a + 1.57) * 4, .12, .35, [1, .85, .5]); }
 }
@@ -29879,6 +29919,7 @@ function slamLand() {
   const p = player;
   p.slam = 0;
   if (SPIDER.list.length) spiderArea(p.pos.x, p.pos.y, p.pos.z, SLAM.r, SLAM.power, SLAM.dmg);     // m1701
+  if (ARENA.debris.length) debrisArea(p.pos.x, p.pos.y, p.pos.z, SLAM.r);
   if (CWALL.list.length && wallHit(p.pos.x, p.pos.y + .4, p.pos.z, 1.1, 3, 'blast', p.faceH)) { CWALL.dirty = 0; boxGrid(); }     // m1021: and the walls round where he lands take the blow
   for (const d of DUMMIES) {
     if (d.cool > 0) continue;
@@ -44503,7 +44544,8 @@ function strikeSweep(dt, power, live, dmg, body) {
           if (!hit) hit = d;
           if (!MELEE.hitAll) break;
         }
-        if (SPIDER.list.length) spiderSweep(q, _sw, rad, power, dmg, p.melH != null ? p.melH : p.faceH);     // m1701: the spiders
+        if (SPIDER.list.length) spiderSweep(q, _sw, rad, power, dmg, p.melH != null ? p.melH : p.faceH);
+        if (ARENA.debris.length) debrisSweep(q, _sw, rad, p.melH != null ? p.melH : p.faceH);     // m15xx: the pieces on the floor are cut too     // m1701: the spiders
       }
     }
     q.copy(_sw);
