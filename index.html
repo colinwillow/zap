@@ -32870,7 +32870,7 @@ const MIRROR = { clips: ['katana_slash_1', 'katana_combo', 'katana_360h', 'hurri
 // down by his side like a normal human -- or the one I use for action games, one foot forward, one back, ready to throw a punch"): three
 // library idles Forge-baked onto Grumbo (`idle_relaxed` = Neutral Idle, `idle_ready` = Ready Idle, `idle_fight` = Fight Idle). TOOLS > IDLE
 // picks; DWARF is the old one. Grumbo only (another hero keeps its own idle).
-const IDLEPICK = { pick: 'IDLE 8', picks: ['IDLE 8', 'IDLE 14', 'IDLE 13', 'DWARF', 'RELAXED', 'READY', 'FIGHT'], role: { 'IDLE 8': 'idle_i8', 'IDLE 14': 'idle_i14', 'IDLE 13': 'idle_i13' }, base: null,     /* m15xx: his picks off the contact sheet of the library's 18 'Idle's (wide stance, arms loose) */     /* m1820: none of the three were his; DWARF back as default, FIXED below */
+const IDLEPICK = { pick: 'IDLE 8', picks: ['IDLE 8', 'IDLE 14', 'IDLE 13', 'DWARF', 'RELAXED', 'READY', 'FIGHT'], role: { 'IDLE 8': 'idle_i8', 'IDLE 14': 'idle_i14', 'IDLE 13': 'idle_i13' }, base: null,     /* m1822: his picks off the contact sheet of the library's 18 'Idle's (wide stance, arms loose) */     /* m1820: none of the three were his; DWARF back as default, FIXED below */
   fix: { on: 1, arm: .12, elbow: .2, wrist: .85 } };     /* m1821 (his: "the wrists are fixed, but now his shoulders are too narrow -- like a minnow"): arm .45 -> .12, elbow .3 -> .2 */
 // m1820 (his: "the best would be adjusting the Dwarf idle -- his arms and his hands and wrists curving in"): IDLE FIX, on top of the clip, weighted by
 // how much the idle is playing: each upper arm's direction is pulled `arm` of the way toward straight DOWN (it hangs at his side instead of flaring),

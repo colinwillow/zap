@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## His idle, found by sight: Idle 8 (m15xx)
+## His idle, found by sight: Idle 8 (m1822)
 *He pointed at the Mixamo thumbnail called just "Idle" (wide stance, a foot a little forward, arms loose). The library holds 18 clips named Idle /
 Idle_1..Idle_18 with nothing in their data to tell them apart, so all 18 were baked onto Grumbo in a throwaway file and rendered as a contact sheet
 (30% into each loop) for him to pick by eye. He picked Idle_8 / Idle_14 (same base pose, perhaps different motion) and noted Idle / Idle_1 /
