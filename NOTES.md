@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The bow at rest, on his diagonal (m15xx)
+## The bow at rest, on his diagonal (m1748)
 His (a red line drawn on a side view): "when he's just standing idle it doesn't need to be straight up and down -- hold it almost like he holds the
 sword, in the middle." Carried, the bow's riser (still through the fist, m1746) now runs along a low DIAGONAL: the top limb up and AHEAD of him at
 `carry.ang` .6 rad (~34 deg) above level, the lower limb trailing behind his hip, leaned `carry.out` .18 out from his side; the string faces up,

@@ -14875,7 +14875,7 @@ function bowFist(B, drawing, h) { const b = rig.bones, m1 = b.mixamorig_LeftHand
   if (!m1 || !m2 || !m3 || !t2 || !pk) return 0;
   const P = B.g.position.set(0, 0, 0); for (const o of [m1, m2, m3, t2]) P.add(o.getWorldPosition(_bgA)); P.multiplyScalar(.25);     // inside the curled fingers
   m1.getWorldPosition(_bgA); pk.getWorldPosition(_bgB); _bhY.subVectors(_bgA, _bgB).normalize();     // the knuckle line: pinky -> middle
-  // m15xx (his drawing): CARRIED the bow rests on a low DIAGONAL, like the sword at rest -- the top limb up and AHEAD of him (`carry.ang` above
+  // m1748 (his drawing): CARRIED the bow rests on a low DIAGONAL, like the sword at rest -- the top limb up and AHEAD of him (`carry.ang` above
   // level), the lower limb trailing behind his hip, leaning a little out from his side (`carry.out`); the string faces up (the belly down)
   if (!drawing) { const C = BOW.carry, f = player.faceH, fx = Math.sin(f), fz = Math.cos(f), ca = Math.cos(C.ang), sa = Math.sin(C.ang);
     _bhY.set(fx * ca + fz * C.out, sa, fz * ca - fx * C.out).normalize(); _bhZ.set(0, -1, 0); }
