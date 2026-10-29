@@ -337,6 +337,15 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## THE SKY CASTLE, pass 13: the keep is hollow -- a spiral stair to the balcony (Worker B)
+The keep was a solid drum (its solid had run through the hall until m1787). Its wall is now three lathe bands (the middle one, at the
+balcony, with a DOOR cut out to the front, +-.2 rad), each with an inner face; a planked landing RING at the top (r 2.35 .. the wall) with a
+threshold out through the door, and a ceiling under the roof. A SPIRAL STAIR -- a timber post and 96 wedge treads (.3 m risers, .35 rad
+apart, r .4-2.25), a handrail on posts -- climbs from the throne room's floor through a hole in the hall's ceiling (the slab is an annulus
+now; the throne's dais moved back to z -5.4 and the brazier forward to z 5.6 to clear it), up the keep's core to the landing, and out of
+the door onto the balcony (which the ladder outside also reaches). The terrace's walk tris are a ring outside the keep; inside the keep at
+the hall-roof level a landing ring too. The keep's walls are 36 boxes, the door's band open. Headless: a body driven round the spiral from
+the hall floor (117.5) reaches the top landing (145.18; the landing is 145.17).
 ## THE SKY CASTLE, pass 12: the hall opens -- a throne room (m1799, Worker B)
 The hall was a solid drum with a painted door. Now its wall is a lathe with the DOORWAY cut out (+-.19 rad at the front) under a lintel
 section, an INNER face (the same lathe mirrored, normals recomputed), the plinth an open ring, a planked roof slab that is the ceiling, and
