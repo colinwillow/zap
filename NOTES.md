@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The guardian rebuilt from TRIPO'S OWN PARTS (m15xx)
+*"I thought Tripo had a cut-up-and-make-whole feature that used AI and was quite a bit better than doing it in Blender -- give it a shot."*
+- It has: POST /mesh/segment (semantic parts) then /mesh/complete (AI-fills the surface each part hid). `seg.py` already existed in the pipeline
+  (the boss and the CEO had been through it); the guardian never was. Run on his TEXTURED task: 117 parts, textured, 30,385 tris; ~90 credits.
+- `guardian_parts.py` (new, blender-addons/pipeline): the parts turned -90 about Z and fitted onto in.glb's box (scale .998) so guardian_rig.py's
+  bone layout lands; ONE 2048 ATLAS -- each part keeps its own uvs and image, given a square sized by its surface area (shelf-packed, 82% fill),
+  its image resampled in; each part RIGID on the bone nearest its centre; a part straddling a limb joint (thigh/shin, forearm/hand, hips/spine:
+  26 of them) blended across it along the parent bone so knees and elbows bend; the long arms as before. No face split, no caps.
+- Two things this container cannot do, measured: Cycles BAKES BLACK (a red emissive cube bakes to 0) -- so the atlas is copied in numpy, not baked;
+  and Tripo's completed parts carry their uvs as thousands of per-TRIANGLE islands, so an island pack is specks -- hence one square per part.
+- webp + draco 1.0 MB (was .9), Forged with the same 15 clips. Rendered headless: the statue, the live colours, the parts clean -- none of the old
+  jagged split edges or inward caps. One arm band shows its hollow inside from some angles.
+- The temple dweller and the spider are next if he likes it.
+
 ## The high leap slams (m1784)
 *"The high jump katana attack isn't doing the slam -- it's the old kind of spin slam katana attack, not as dramatic. I want the slam slash."*
 - `aimLeap` played `KATANA.air.clip` (`katana_jump_attack`, the spinning one). It now plays the release's own jump-slam (`CLIPS.chargeGo`,
