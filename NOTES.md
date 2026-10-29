@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The Dwarf idle, fixed; the stair clips off (m15xx)
+*"None of those idles are the ones I meant. The best would be adjusting the Dwarf idle -- his arms, hands and wrists curving in." / "Walking
+upstairs is absolutely f---ed -- revert to what it was; the same on the rope bridge."*
+- `STAIRS.on` 0: back to the ordinary gait on stairs and slopes (and on the bridge's sag). The baked clips stay in his file, unused.
+- IDLE back to DWARF (default) with `idleFixPose` on top, weighted by the idle's own weight: each upper arm's direction pulled `fix.arm` .45 toward
+  straight down, each forearm `fix.elbow` .3 toward its upper arm's line, each hand `fix.wrist` .85 back to its BIND rotation (the bind pose's
+  straight wrist, read once off the skeleton's inverse binds). Direction blends -- no rotation sign to get wrong -- and relative to the clip, so
+  the breathing stays. Rendered side by side: the arms hang at his sides, the wrists no longer curl in. TOOLS > IDLE still offers the three
+  library idles; his left-foot-forward, arms-down one is for him to name (the library has ~150 idles).
+
 ## Rope bridge LOOK B: the Korajin layer (m1818, ROPEWORKS 1 / DOCKET 25)
 - A turquoise JINRA THREAD twisted through the straw ropes (painted into `ropeTex.rope`, lit by its own emissive map `ropeGlow`).
 - The planks WEATHERED: each its own shade, about one in five mossy-green (`setColorAt`), each a touch askew (a small yaw) and not all one length.

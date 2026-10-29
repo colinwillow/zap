@@ -32870,11 +32870,29 @@ const MIRROR = { clips: ['katana_slash_1', 'katana_combo', 'katana_360h', 'hurri
 // down by his side like a normal human -- or the one I use for action games, one foot forward, one back, ready to throw a punch"): three
 // library idles Forge-baked onto Grumbo (`idle_relaxed` = Neutral Idle, `idle_ready` = Ready Idle, `idle_fight` = Fight Idle). TOOLS > IDLE
 // picks; DWARF is the old one. Grumbo only (another hero keeps its own idle).
-const IDLEPICK = { pick: 'RELAXED', picks: ['RELAXED', 'READY', 'FIGHT', 'DWARF'], base: null };
+const IDLEPICK = { pick: 'DWARF', picks: ['DWARF', 'RELAXED', 'READY', 'FIGHT'], base: null,     /* m15xx: none of the three were his; DWARF back as default, FIXED below */
+  fix: { on: 1, arm: .45, elbow: .3, wrist: .85 } };
+// m15xx (his: "the best would be adjusting the Dwarf idle -- his arms and his hands and wrists curving in"): IDLE FIX, on top of the clip, weighted by
+// how much the idle is playing: each upper arm's direction is pulled `arm` of the way toward straight DOWN (it hangs at his side instead of flaring),
+// each forearm `elbow` of the way toward the line of its upper arm (less bent), each hand `wrist` of the way back to its BIND rotation (the bind
+// pose's straight wrist) -- all relative to whatever the clip does, so his breathing and sway stay. Direction-blends, so no sign to get wrong.
+const _ifA = new THREE.Vector3(), _ifB = new THREE.Vector3(), _ifD = new THREE.Vector3(), _ifQ = new THREE.Quaternion(), _ifQ2 = new THREE.Quaternion(), _ifM = new THREE.Matrix4();
+function idleFixPose() { const I = IDLEPICK, F = I.fix; if (!F.on || HERO.pick !== 'agoblin' || I.pick !== 'DWARF' || !rig.bones || !rig.actions) return;
+  const a = rig.actions[CLIPS.idle], w = a ? a.getEffectiveWeight() : 0; if (w < .02) return; const B = rig.bones;
+  if (!rig.bindL) { rig.bindL = {}; const sk = (() => { let k = null; rig.model.traverse(o => { if (!k && o.isSkinnedMesh) k = o.skeleton; }); return k; })();
+    if (sk) for (const nm of ['Left', 'Right']) for (const part of ['Hand']) { const b = B['mixamorig_' + nm + part], i = sk.bones.indexOf(b), pi = b && sk.bones.indexOf(b.parent);
+      if (i >= 0 && pi >= 0) { const bw = _ifM.copy(sk.boneInverses[i]).invert(), pw = new THREE.Matrix4().copy(sk.boneInverses[pi]).invert(); rig.bindL[nm + part] = new THREE.Quaternion().setFromRotationMatrix(pw.invert().multiply(bw)); } } }
+  rig.root.updateMatrixWorld(true);
+  const aim = (bone, child, target, k) => { bone.getWorldPosition(_ifA); child.getWorldPosition(_ifB); const cur = _ifB.sub(_ifA).normalize(), want = _ifD.copy(cur).lerp(target, k).normalize();
+    _ifQ.setFromUnitVectors(cur, want); bone.getWorldQuaternion(_ifQ2); _ifQ2.premultiply(_ifQ); bone.parent.getWorldQuaternion(_ifQ).invert(); bone.quaternion.copy(_ifQ.multiply(_ifQ2)); bone.updateMatrixWorld(true); };
+  for (const nm of ['Left', 'Right']) { const UA = B['mixamorig_' + nm + 'Arm'], FA = B['mixamorig_' + nm + 'ForeArm'], HA = B['mixamorig_' + nm + 'Hand']; if (!UA || !FA || !HA) continue;
+    aim(UA, FA, _ifA.set(0, -1, 0).clone(), F.arm * w);
+    UA.getWorldPosition(_ifA); FA.getWorldPosition(_ifB); const up = _ifB.clone().sub(_ifA).normalize(); aim(FA, HA, up, F.elbow * w);
+    const bq = rig.bindL[nm + 'Hand']; if (bq) HA.quaternion.slerp(bq, F.wrist * w); } }
 try { const v = localStorage.getItem('mel.idlepick'); if (IDLEPICK.picks.includes(v)) IDLEPICK.pick = v; } catch (e) {}
 function idlePick() { const I = IDLEPICK; if (HERO.pick !== 'agoblin' || !rig.actions) return; if (I.base == null) I.base = CLIPS.idle;
   const nm = I.pick === 'DWARF' ? I.base : 'idle_' + I.pick.toLowerCase(); CLIPS.idle = rig.actions[nm] ? nm : I.base; }
-const STAIRS = { on: 1, look: .7, upAt: .22, downAt: .22, out: .1, half: .08, runAt: 4.2, tsLo: .6, tsHi: 1.9, ref: {} };
+const STAIRS = { on: 0,     /* m15xx: OFF (his: "walking upstairs is absolutely f---ed -- revert to what it was; the same on the rope bridge") */ look: .7, upAt: .22, downAt: .22, out: .1, half: .08, runAt: 4.2, tsLo: .6, tsHi: 1.9, ref: {} };
 function stairsWant(sp) { const p = player; if (!STAIRS.on || !p.grounded || sp < .6 || p.melee || p.roll || p.slide || p.beam || p.wrun || p.ledge || p.board || p.riding || p.dragon) { p.slopeS = 0; p.stairs = ''; return ''; }
   const h = Math.atan2(p.vel.x, p.vel.z), fx = Math.sin(h), fz = Math.cos(h), L = STAIRS.look, y = p.pos.y;
   const a = groundAt(p.pos.x + fx * L, p.pos.z + fz * L, y + .7, .01), b = groundAt(p.pos.x - fx * L, p.pos.z - fz * L, y + .7, .01);
@@ -68026,6 +68044,7 @@ function frameBody() {
     duckPose(dt);                      // m1070: the cover duck (right pad down in half cover)
     gsidePose();                       // m1073: the mirrored guard's blade, laid along the reflection of his own
     beamPose();                        // m1037: on the beam, tilted with the balance, arms out
+    idleFixPose();                     // m15xx: the Dwarf idle's arms and wrists corrected
     ropePose();                        // m1805: on the rope bridge, leaning against its tilt and swing
     // **AFTER THE ROOT IS PLACED, NOT ONLY AFTER THE MIXER.** The pin is a bone's WORLD
     // position and the speed cap is measured against how far it moved, so solving before the
