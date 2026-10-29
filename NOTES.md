@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The idle comes alive: ENERGY, and the bored look-around (m15xx)
+*"Idle 8 and 14 might be the same, and there's no motion -- like frozen. On Mixamo you can increase the breathing for more energy. The other one is the
+same idle but he looks around -- it played once and froze; you'd play it when the player's stood still a while, bored."*
+- MEASURED: on Idle_8 his head moves 0.5 cm over the clip -- frozen, as he saw.
+- `idleAmp` (TOOLS > IDLE ENERGY x1-x4, default x3): every bone's rotation (and the hips' position) pushed `energy` times further from its own
+  AVERAGE over the clip, in the clip's keyframes (the original kept, re-applied on a change) -- the same breathing and sway, bigger. x2 measured
+  1.3 cm of head movement.
+- BORED (`IDLEPICK.bored` = Idle_13's look-around): after `boredT` 8 s standing still (grounded, no thumb down, nothing playing) it plays ONCE,
+  then back to the pick and the clock restarts. Every idle is now forced to LOOP (the look-around had frozen on its last frame). Measured: fired.
+
 ## His idle, found by sight: Idle 8 (m1822)
 *He pointed at the Mixamo thumbnail called just "Idle" (wide stance, a foot a little forward, arms loose). The library holds 18 clips named Idle /
 Idle_1..Idle_18 with nothing in their data to tell them apart, so all 18 were baked onto Grumbo in a throwaway file and rendered as a contact sheet
