@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The high leap slams (m15xx)
+*"The high jump katana attack isn't doing the slam -- it's the old kind of spin slam katana attack, not as dramatic. I want the slam slash."*
+- `aimLeap` played `KATANA.air.clip` (`katana_jump_attack`, the spinning one). It now plays the release's own jump-slam (`CLIPS.chargeGo`,
+  `weapon_melee_finish`) with its blade-to-floor frame (`goContact`, cached per weapon -- the same number the ground release uses) landing at T,
+  the moment his feet do; the `leapLead` .55 of the clip before that strike is spread over the flight. `KATANA.leapClip` 'SPIN' = the old one.
+  The arrow intercept's leap keeps the spin (it cuts a shot in the air, not the ground).
+
 ## The bow: one mark, locks on archers, a full blast blows them apart (m1782)
 *"The double reticle for the bow seems redundant -- we only need the one that shows the height and distance (the lock reticle is good). I can't lock
 onto the archers, only the statues and the spider. A full charge with the exploding arrows should explode the archers -- those are powerful arrows."*
