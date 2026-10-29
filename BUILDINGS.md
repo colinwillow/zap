@@ -295,7 +295,7 @@ then start building the building, kinda like you built his home -- a ton of pass
 - [x] **castle pass 2 (m1783):** seven bastion towers at different heights with red tiled roofs, crenellated curtain walls between them
 - [x] **castle pass 3 (m1785):** banners on the towers, sail awnings from the keep, bonsai trees, two arched bridges over the runnels
 - [x] **style pass 1 (m1786):** the home's materials (pocked sandstone, timber, bronze, ragged cloth), timber frames on every round body, bronze wheels, home-style awnings
-- [x] style pass 2 (m1777): ROOFS the home's way on some towers (his red/cream cloth cone with timber poles poking out, iron bands), brass CHIMNEYS on the hall
+- [x] style pass 2 (m1787): ROOFS the home's way on some towers (his red/cream cloth cone with timber poles poking out, iron bands), brass CHIMNEYS on the hall
 - [ ] style pass 3: CLUTTER and life -- pots on shelves under the awnings, crates, barrels, lantern posts, stone lanterns, bells, cacti and agaves
 - [ ] style pass 4: the home's CRANE with its hanging brass ball and banner, BUNTING strung between the towers, flags on poles
 - [ ] style pass 5: the home's SHAPES -- walls that bulge (lathe bellies, not straight cylinders), round boulders round the bases
