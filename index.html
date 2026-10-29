@@ -15103,7 +15103,7 @@ function bowStep(dt) { bladeFireStep(dt); BOW.dt = dt; const p = player, s = slo
   CLIPS._bow = on && rig.actions['bow_draw' + UPS] ? 1 : 0; if (p.aim && on) p.bowT = (p.bowT || 0) + dt;
   if (!BOW.mesh) { if (!on) { bowArc(false); return; } const d = { model: rig.root, root: rig.root, st: '', K: {}, h: 0, ar: '', arT: 0 }; archerBow(d); BOW.mesh = d.bow; BOW.mesh.g.scale.setScalar(BOW.limbK); }
   const B = BOW.mesh, L = rig.bones.mixamorig_LeftHand, Rh = rig.bones.mixamorig_RightHand, vis = on && rig.root.visible && !p.dragon; B.g.visible = B.str.visible = vis; bowArc(vis && !!p.aim && !(p.fireT > 0)); if (!vis || !L || !Rh) { B.nock.visible = false; return; }
-  const drawing = !!p.aim; if (drawing) bowSquare();     // m1746: the chest squared to the aim and levelled BEFORE the bow is put in his hand
+  const drawing = !!p.aim; if (drawing && !p.aflip && !p.cart && !p.roll && !p.wrun && !p.flip) bowSquare();     // m15xx (his: "bow drawn, flick to flip -- only the legs flip, lol"): the squaring holds the chest LEVEL in the world, which undid the flip above the waist; it stands aside while he flips, rolls or runs a wall     // m1746: the chest squared to the aim and levelled BEFORE the bow is put in his hand
   L.getWorldPosition(_bwL); Rh.getWorldPosition(_bwR);
   const h = drawing ? Math.atan2(_bwL.x - _bwR.x, _bwL.z - _bwR.z) : p.faceH;
   // m1733 (his: "the bow is cutting into his arm, into his body; it's kind of small"): drawn, the riser sits in the fist upright (a touch canted);

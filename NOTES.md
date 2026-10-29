@@ -5,6 +5,12 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## A drawn bow no longer pins his chest through a flip (m15xx)
+*"Bow drawn and pulled back, I flick the left stick to flip -- the upper torso doesn't flip, only the legs. Lol."*
+- `bowSquare` (m1746) turns Spine1 onto a WORLD frame every frame -- the aim heading and world up -- and the flips (`airFlipGo`, `cartGo`) turn
+  the ROOT. So below the spine he flipped and above it the squaring put the chest back upright. It now stands aside while he flips (`p.aflip`,
+  `p.cart`, `p.flip`), rolls or runs a wall; the bow, gripped in the fist, turns with the hands.
+
 ## The fist moves travel when they fly, not on frame one (m1770)
 *"Flick the left stick -- the front handspring, the flying punch, the flip kick: the physical locomotion doesn't line up with the attack; it lunges
 forward stupidly at the beginning and then the attack comes later. Line them up like we did the katana's lunges."*
