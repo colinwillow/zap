@@ -6137,10 +6137,10 @@ function sfxRevive(touch) {
   try { c.resume().catch(() => {}); } catch (e) {}
   if (!touch || SFX.reviveT) return;
   SFX.reviveT = setTimeout(() => { SFX.reviveT = 0; if (SFX.ctx !== c || c.state === 'running') return;
-    sfxWasHidden = 1; }, 400);     // m15xx: still not running -- the NEXT real tap rebuilds it (a context built here, outside a gesture, is born locked)
+    sfxWasHidden = 1; }, 400);     // m1760: still not running -- the NEXT real tap rebuilds it (a context built here, outside a gesture, is born locked)
 }
 for (const t of ['visibilitychange', 'pageshow', 'focus']) addEventListener(t, () => { if (document.visibilityState !== 'hidden') sfxRevive(0); });
-// m15xx (his, again: "if I leave the game and come back the sounds are all muted"): m1699 rebuilt the context on the FIRST event after a return --
+// m1760 (his, again: "if I leave the game and come back the sounds are all muted"): m1699 rebuilt the context on the FIRST event after a return --
 // usually `pointerdown`, which iOS does not count as a gesture that may start audio, so the fresh context was born locked and the rebuild was
 // spent. Now a return is answered only inside a REAL activation (`touchend`, `click`, `keydown`): first a silent HTML <audio> is played (that is
 // what re-activates iOS's audio SESSION after an interruption -- WebAudio alone does not), then the context is rebuilt in the same gesture.
@@ -14926,7 +14926,7 @@ function bowFist(B, drawing, h) { const b = rig.bones, m1 = b.mixamorig_LeftHand
   else _bhZ.set(Math.sin(h), 0, Math.cos(h));
   _bhZ.addScaledVector(_bhY, -_bhZ.dot(_bhY)).normalize(); _bhX.crossVectors(_bhY, _bhZ);
   _bhM.makeBasis(_bhX, _bhY, _bhZ); B.g.quaternion.setFromRotationMatrix(_bhM);
-  // m15xx (his: "when you flip or jump or move around the bow doesn't follow the rotation of his body -- it just stays straight up and down"): the
+  // m1760 (his: "when you flip or jump or move around the bow doesn't follow the rotation of his body -- it just stays straight up and down"): the
   // carry diagonal is built off his FACING, which a flip never turns. On the ground the diagonal is kept and remembered IN THE HAND's frame
   // (`BOW.inHand`); off the ground or rolling it rides the hand with that offset (`BOW.lockK` eases 0 <-> 1 over `lockT`), so it turns with him.
   if (!drawing) { const Lh = b.mixamorig_LeftHand, p = player, dt = Math.min(.05, BOW.dt || .016); if (Lh) { Lh.getWorldQuaternion(_bhQ);
@@ -31947,7 +31947,7 @@ function stepKit(dt) {
   {
     const Z = ZOOM, free = Z.on && !s.aim && !s.charge && !s.blade && !p.riding && !mphBare();
     const startOK = p.grounded && Math.hypot(p.vel.x, p.vel.z) < Z.still && stickWorld().mag < .25;
-    const hold = Z.right && free && !p.melee && !p.roll && !p.knock && !p.chargeGo && padUp(1);     // m15xx: `right` 0 -- his: "take that away for now, I always trigger it by accident"
+    const hold = Z.right && free && !p.melee && !p.roll && !p.knock && !p.chargeGo && padUp(1);     // m1760: `right` 0 -- his: "take that away for now, I always trigger it by accident"
     // m1093: and the LEFT pad held in place, any weapon (`LHOLD`) -- its own clock, past the tap time so a tap is still a jump
     const LS = stick.L, holdL = Z.on && LHOLD.pick === 'ZOOM' && LS.down && (LS.far || 0) < MOVE.tapR && p.grounded && !p.melee && !p.roll && !p.knock && !p.riding && !p.wall && !mphBare();
     p.lzHold = holdL ? (p.lzHold || 0) + dt : 0;

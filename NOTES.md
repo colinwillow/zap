@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The carried bow turns with him; sound after leaving the app (third try); the unarmed right-pad zoom off (m15xx)
+## The carried bow turns with him; sound after leaving the app (third try); the unarmed right-pad zoom off (m1760)
 *"When you flip or jump the bow doesn't follow the rotation of his body -- it stays straight up and down. If I leave the game and come back the
 sounds are all muted. When you're unarmed and hold up on the right stick he does the run charge -- take that away for now, I trigger it by accident."*
 - **Bow (`bowFist`, carried):** the m1748 diagonal is built off his FACING, which no flip turns. On the ground it is kept and remembered in the
