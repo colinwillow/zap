@@ -309,7 +309,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## THE SKY CASTLE, pass 10: the orb swings, and FALLEN has its rubble (Worker B)
+## THE SKY CASTLE, pass 10: the orb swings, and FALLEN has its rubble (m1796, Worker B)
 The crane's orb, chain, bands and banner are their own group hung from the boom's tip (`A.orb`), swinging slowly on two axes in
 `gcastleStep`. FALLEN, a RUBBLE ring where the crashed island meets the plateau: 44 heaped cream-rock mounds round its rim (on the real
 ground), broken timber planks among them, two of his cloth roof cones toppled on the ground -- in the world, not the castle's group (it
