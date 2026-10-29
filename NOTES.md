@@ -293,7 +293,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## THE SKY CASTLE, pass 6 of 6: banners, sails, bonsai, bridges (Worker B)
+## THE SKY CASTLE, pass 6 of 6: banners, sails, bonsai, bridges (m1785, Worker B)
 His sheet's FRONT and BRIDGE DETAIL. His red diamond BANNERS on four towers' outer faces (rippled); SAIL AWNINGS -- cream and red cloth,
 sagging, from the keep's balcony out to six towers; BONSAI TREES on the lawns (a crooked tube trunk, four layered pads of painted leaves;
 kept off the front, the towers and the plaza); and two arched timber BRIDGES across the waterfalls' runnels (12 arched planks, posts,
