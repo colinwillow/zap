@@ -801,6 +801,7 @@ body.kit3 #wepRow text { font-size: 12px; }
 #retic.fglow { filter: drop-shadow(0 0 3px var(--gl)) drop-shadow(0 0 9px var(--gl)); }
 #retic circle.g { stroke-opacity: .28; stroke-width: calc(7 * var(--w)) !important; }
 #retic.on { opacity: 1; }
+#retic.bow { --size: 54px; --w: 1.7; --h: 150; }     /* m1744: the bow's sight -- bigger, heavier, jade */
 /* LOCKED IS A DIFFERENT MARK, NOT A BRIGHTER ONE -- the whole thing changes hue and the rings
    pull in, so "the gun has something" is a glance rather than a comparison against a memory. */
 #retic.lock { --h: var(--lh); }
@@ -14636,7 +14637,7 @@ function arrowStep(dt) {
     const ox = A.m.position.x, oy = A.m.position.y, oz = A.m.position.z;
     A.v.y -= MOVE.g * (A.ric ? 1 : A.gk != null ? A.gk : .55) * dt; A.m.position.addScaledVector(A.v, dt); A.t += dt;
     const P = A.m.position; if (A.ric) { A.m.rotateX(A.ric * dt); A.m.rotateY(A.ric * .37 * dt); } else A.m.lookAt(P.x + A.v.x, P.y + A.v.y, P.z + A.v.z);     // a glanced arrow TUMBLES
-    if (A.type === 'fire') { gfire(P.x, P.y, P.z, .45); if (Math.random() < .5) gfire(ox, oy, oz, .35); } else if (A.pl) { if (Math.random() < .6) spk(ox, oy, oz, 0, 0, 0, .05, .25, A.full ? [.6, .9, 1] : [.6, .8, .7]); }
+    if (A.type === 'fire') { gfire(P.x, P.y, P.z, .45); if (Math.random() < .5) gfire(ox, oy, oz, .35); } else if (A.pl) { const c = A.col || [.6, .9, 1]; for (let q = 0; q < BOW.trail; q++) { const u = q / BOW.trail; spk(ox + (P.x - ox) * u, oy + (P.y - oy) * u, oz + (P.z - oz) * u, 0, 0, 0, .1, .45, [.4 + c[0] * .6, .4 + c[1] * .6, .4 + c[2] * .6]); } }     // m1744: a bright streak
     else if (Math.random() < .6) spk(ox, oy, oz, 0, 0, 0, .05, .25, [1, .45, .35]);
     // the player: the closest point of this frame's segment to his middle
     const sx = P.x - ox, sy = P.y - oy, sz = P.z - oz, L2 = sx * sx + sy * sy + sz * sz || 1;
@@ -14668,7 +14669,7 @@ function arrowStep(dt) {
       if (wall) P.set(_tuR.x, _tuR.y, _tuR.z); else if (P.y <= gy) P.y = gy + .02;
       if (A.pl && A.type === 'blast') { arrowBlast(P, Math.atan2(A.v.x, A.v.z)); A.m.removeFromParent(); ARROWS.splice(i, 1); continue; }
       if (A.pl && A.type === 'fire') for (let k = 0; k < 12; k++) gfire(P.x + (Math.random() - .5) * .3, P.y, P.z + (Math.random() - .5) * .3, .6);
-      A.stuck = 1; A.t = 0; ARCH.stat.stuck++; if (A.ric) { A.ric = 0; A.m.lookAt(P.x + A.v.x, P.y + A.v.y, P.z + A.v.z); } A.m.userData.head.material.emissive.setHex(0);
+      A.stuck = 1; A.t = 0; ARCH.stat.stuck++; if (A.m.userData.glow) A.m.userData.glow.visible = false; if (A.ric) { A.ric = 0; A.m.lookAt(P.x + A.v.x, P.y + A.v.y, P.z + A.v.z); } A.m.userData.head.material.emissive.setHex(0);
       spkBurst(P.x, P.y, P.z, 6, { col: [.8, .7, .55], spread: 2, size: .07, life: .3 }); snd('thud', { g: .35, r: 1.6, x: P.x, z: P.z }); }
   }
 }
@@ -14708,8 +14709,16 @@ function archerBow(d) {
 // over whatever his legs are doing; letting go LOOSES: `bow_recoil`, and an arrow from the nock to the reticle's point -- a lob solved to land
 // there, faster and flatter the longer it was drawn (`full` s to full power). His arrows are `mine`: they hit the bowmen, the spiders (a hit takes
 // a leg on the way to the burst), chip statues, smash what `bldHit` breaks, and stick in walls and the ground.
-const BOW = { full: 1.1, drawRate: 1.5, v0: 22, v1: 72, g0: .55, g1: .05, dmg0: 1, dmg1: 3, pow0: .12, pow1: 1.2, keep: .3, limbK: .95, carry: { out: .07, fwd: .02, tilt: .45, lean: -.3 }, blastR: 2.6, blastDmg: 4, fireDmg: 1, stat: { shots: 0, hits: 0, blasts: 0, fires: 0 } };     // m1729: the charge is the shot -- a tap lobs slow, a full draw flies fast and almost true; only a FULL draw knocks back
+const BOW = { full: 1.1, drawRate: 1.5, v0: 22, v1: 72, g0: .55, g1: .05, dmg0: 1, dmg1: 3, pow0: .12, pow1: 1.2, keep: .3, limbK: .95, big: 1.35, glow: .55, trail: 3, carry: { out: .07, fwd: .02, tilt: .45, lean: -.3 }, blastR: 2.6, blastDmg: 4, fireDmg: 1, stat: { shots: 0, hits: 0, blasts: 0, fires: 0 } };     // m1729: the charge is the shot -- a tap lobs slow, a full draw flies fast and almost true; only a FULL draw knocks back
 const _bwL = new THREE.Vector3(), _bwR = new THREE.Vector3(), _bwA = new THREE.Vector3(), _bwB = new THREE.Vector3(), _bwM = new THREE.Vector3(), _bwD = new THREE.Vector3();
+// m1744 (his: "the thing that's killing me -- once you've initiated a shot and you move the left stick around he keeps pulling the bow back
+// again; strafe left or right and he pulls it again; he should never pull it back again once it's back"). MEASURED: standing, the draw is the
+// whole-body `bow_draw`; moving, the gait swaps to its upper half `bow_draw__ups` -- which had never been playing, so it started at frame 0:
+// a second draw. And a pose whose weight reaches 0 is STOPPED (rewound) by `skinWeights`, so stopping and starting again redrew it too.
+// So the draw is no longer a one-shot that each copy plays for itself: every copy is put at the DRAW'S OWN time (`bowT` x `drawRate`),
+// every frame, just before the mixer -- whichever half is drawn, and however often the gait swaps them, it is the same moment of the pull.
+function bowSync(dt) { const p = player; if (!CLIPS._bow || !p.aim || p.fireT > 0) return; const T = (p.bowT || 0) * BOW.drawRate;
+  for (const k of ['bow_draw', 'bow_draw' + UPS, 'bow_draw' + UP]) { const a = rig.actions[k]; if (!a) continue; const d = a.getClip().duration, ts = a.getEffectiveTimeScale() || BOW.drawRate; a.time = Math.max(0, Math.min(d - 1e-3, T) - dt * ts); } }
 function bowDraw() { const p = player; p.bowT = 0; const n = 'bow_draw', r = BOW.drawRate; if (rig.actions[n + UPS]) { playOnce(n + UPS, r); playOnce(n + UP, r); }
   snd('swoosh', { g: .25, r: .55 }); }
 // m1729 (his: "the arrows shoot with an arc and they're kind of slow, not fun; a regular arrow should just do the hit -- the guy takes a punch, maybe
@@ -14718,11 +14727,16 @@ function bowDraw() { const p = player; p.bowT = 0; const n = 'bow_draw', r = BOW
 // full draw barely drops), damage dmg0 -> dmg1, and the blow's power stays a flinch (`pow0`, under every body's `fling`) until the draw is FULL
 // (`pow1`: knocked back). The TYPE (`QD.arrow`, the left sub-menu): FIRE trails green flame, sets what it hits burning (`burnStart`) and does
 // `fireDmg` more; BLAST bursts on whatever it meets -- bodies, spiders, debris, walls, the ground -- in `blastR` m.
-function bowLoose() { const p = player, B = BOW.mesh; const k = clamp((p.bowT || 0) / BOW.full, .15, 1), full = k >= .97, type = QD.arrow || 'normal';
+// the shot as it stands: from the nock, solved to the reticle's point at this draw's speed and drop -- the LOOSE and the PREVIEW (m1744) read
+// the same answer, so the arc drawn is the arc flown
+function bowSolve() { const p = player, B = BOW.mesh; const k = clamp((p.bowT || 0) / BOW.full, .15, 1), full = k >= .97, type = QD.arrow || 'normal';
   const o = B && B.nock.visible ? B.nock.position.clone() : p.pos.clone().setY(p.pos.y + (RIG.height || 1.4) * .8);
   const a = aimTarget(), tx = a.p.x, ty = a.p.y, tz = a.p.z, dx = tx - o.x, dz = tz - o.z, R = Math.hypot(dx, dz) || 1, sp = BOW.v0 + (BOW.v1 - BOW.v0) * k * k, gk = BOW.g0 + (BOW.g1 - BOW.g0) * k, T = Math.max(.04, Math.hypot(R, ty - o.y) / sp), g = MOVE.g * gk;
+  return { k, full, type, o, gk, g, T, dx, dz, ty }; }
+function bowLoose() { const p = player; const { k, full, type, o, gk, g, T, dx, dz, ty } = bowSolve();
   const m = arrowMesh(); m.position.copy(o); scene.add(m); const hc = type === 'fire' ? [.2, 1, .55] : type === 'blast' ? [1, .35, .1] : full ? [.3, .9, 1] : [.12, .5, .4]; m.userData.head.material.emissive.setRGB(hc[0], hc[1], hc[2]); m.userData.head.material.emissiveIntensity = 1.6;
-  ARROWS.push({ m, v: new THREE.Vector3(dx / T, (ty - o.y) / T + .5 * g * T, dz / T), t: 0, stuck: 0, from: null, mine: 1, pl: 1, gk, type, full,
+  m.scale.setScalar(BOW.big); { const gl = glowSprite(new THREE.Color(hc[0], hc[1], hc[2]).lerp(new THREE.Color(1, 1, 1), .35), BOW.glow); gl.position.z = .46; m.add(gl); m.userData.glow = gl; }     // m1744: HIS arrows glow and are bigger -- they vanished against the rock
+  ARROWS.push({ m, v: new THREE.Vector3(dx / T, (ty - o.y) / T + .5 * g * T, dz / T), t: 0, stuck: 0, from: null, mine: 1, pl: 1, gk, type, full, col: hc,
     dmg: BOW.dmg0 + (BOW.dmg1 - BOW.dmg0) * k + (type === 'fire' ? BOW.fireDmg : 0), pow: full ? BOW.pow1 : BOW.pow0 });
   const n = 'bow_recoil'; if (rig.actions[n + UPS]) { playOnce(n + UPS, 1.4); playOnce(n + UP, 1.4); } p.fireT = 1; p.bowT = 0; BOW.stat.shots++;
   snd('swoosh', { g: .55 + k * .35, r: 1.9 - k * .5 }); snd('clang', { g: .12 + (full ? .2 : 0), r: full ? 1.6 : 2.4 }); if (full) camShake(.05); }
@@ -14743,10 +14757,46 @@ const _bfA = new THREE.Vector3(), _bfB = new THREE.Vector3();
 function bladeFireStep(dt) { if (!bladeFire() || player.swapHid) return; const w = WEAP.worn[slotNow().key]; if (!w || !w.group || !w.group.visible) return;
   w.group.getWorldPosition(_bfA); _bfB.copy(muzzleWorld()); const n = BFIRE.rate * dt * (player.melee ? BFIRE.swing : 1);
   for (let i = 0; i < n || Math.random() < n - i; i++) { const u = .15 + Math.random() * .85; gfire(_bfA.x + (_bfB.x - _bfA.x) * u, _bfA.y + (_bfB.y - _bfA.y) * u, _bfA.z + (_bfB.z - _bfA.z) * u, BFIRE.k * (.7 + u * .5)); if (i > 12) break; } }
+// m1744 (his: "it's hard to tell, if you were to release right now, where the arrow would land; and the crosshair should show an interaction with
+// what you're aiming at -- it's hard to see"): THE ARC. While he draws, the shot as `bowSolve` would loose it is FLOWN in advance -- the same
+// speed and drop, sample by sample -- and stopped at the first thing it meets: the ground (`groundAt`), a wall (`boxRay`), a body, a spider, a
+// guardian. A trail of glowing dots along the path (one draw) and a RING where it ends: flat on the ground, facing him on a wall or a body --
+// AMBER when it is a body (that is a hit), pale jade otherwise. The ring tightens as the draw fills.
+const BARC = { on: 1, dots: 40, dot: .22, maxN: 140, pts: null, ring: null, col: [.35, 1, .8], hot: [1, .55, .12], stat: { body: 0 } };
+const _baP = new THREE.Vector3(), _baQ = new THREE.Vector3(), _baR = new THREE.Vector3();
+function bowArcInit() { const N = BARC.dots, g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(N * 3), 3)); g.setAttribute('color', new THREE.BufferAttribute(new Float32Array(N * 3), 3));
+  // NOT additive: additive glow vanishes on the white forge floor and on snow. A solid PIP with a dark rim reads on white, red rock and grass
+  const pip = (() => { const cv = document.createElement('canvas'); cv.width = cv.height = 64; const q = cv.getContext('2d'); q.fillStyle = 'rgba(10,16,20,.85)'; q.beginPath(); q.arc(32, 32, 30, 0, 7); q.fill(); q.fillStyle = '#fff'; q.beginPath(); q.arc(32, 32, 20, 0, 7); q.fill(); const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+  const pts = new THREE.Points(g, new THREE.PointsMaterial({ size: BARC.dot, sizeAttenuation: true, vertexColors: true, map: pip, transparent: true, alphaTest: .05, depthWrite: false, toneMapped: false }));
+  pts.frustumCulled = false; pts.renderOrder = 62; scene.add(pts);
+  const ring = new THREE.Group(), mk = (r0, r1, col, op) => { const m = new THREE.Mesh(new THREE.RingGeometry(r0, r1, 40), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: op, depthWrite: false, side: THREE.DoubleSide, toneMapped: false })); m.renderOrder = 62; ring.add(m); return m; };
+  mk(.26, .56, 0x0a1014, .6); ring.userData.c = mk(.32, .48, 0xffffff, .95); mk(.05, .1, 0x0a1014, .7);     // a dark outline, the coloured ring, a centre pip
+  ring.frustumCulled = false; scene.add(ring); BARC.pts = pts; BARC.ring = ring; }
+function bowArcHit(x, y, z) { for (const d of DUMMIES) { if (d.st === 'gone' || d.st === 'down' || !d.root.visible) continue; const R = d.root.position, hh = (d.K.h || 1.8); if (Math.abs(y - (R.y + hh * .5)) < hh * .55 && Math.hypot(x - R.x, z - R.z) < (d.K.r || .4) + .25) return 1; }
+  for (const S of SPIDER.list) { const M = spiderMid(S, _baR); if (Math.hypot(x - M.x, (y - M.y) * 1.3, z - M.z) < SPIDER.w * S.k * SPIDER.hitR) return 1; }
+  if (GUARD.list.length && guardHit(x, y, z)) return 1; return 0; }
+function bowArc(show) { if (!BARC.pts) { if (!show) return; bowArcInit(); } const pts = BARC.pts, ring = BARC.ring;
+  if (!show || !BARC.on) { pts.visible = ring.visible = false; return; }
+  const S = bowSolve(), vx = S.dx / S.T, vy = (S.ty - S.o.y) / S.T + .5 * S.g * S.T, vz = S.dz / S.T, step = clamp(S.T / 40, .008, .05), path = [S.o.clone()];
+  let hit = 0, where = 'air'; _baP.copy(S.o);
+  for (let i = 1; i <= BARC.maxN; i++) { const t = i * step; _baQ.set(S.o.x + vx * t, S.o.y + vy * t - .5 * S.g * t * t, S.o.z + vz * t);
+    if (i > 2 && bowArcHit(_baQ.x, _baQ.y, _baQ.z)) { hit = 1; where = 'body'; path.push(_baQ.clone()); break; }
+    if (boxRay(_baP.x, _baP.y, _baP.z, _baQ.x, _baQ.y, _baQ.z, _baR)) { where = 'wall'; path.push(_baR.clone()); break; }
+    const gy = groundAt(_baQ.x, _baQ.z, _baP.y, .5); if (_baQ.y <= gy) { _baQ.y = gy; where = 'ground'; path.push(_baQ.clone()); break; }
+    path.push(_baQ.clone()); _baP.copy(_baQ); }
+  // the dots, evenly along the path's length
+  let L = 0; const cum = [0]; for (let i = 1; i < path.length; i++) { L += path[i].distanceTo(path[i - 1]); cum.push(L); }
+  const N = BARC.dots, P = pts.geometry.attributes.position.array, C = pts.geometry.attributes.color.array, c0 = hit ? BARC.hot : BARC.col; let j = 1;
+  for (let k = 0; k < N; k++) { const d = (k + 1) / (N + 1) * L; while (j < path.length - 1 && cum[j] < d) j++; const a = path[j - 1], b = path[j], u = (d - cum[j - 1]) / Math.max(1e-6, cum[j] - cum[j - 1]);
+    P[k * 3] = a.x + (b.x - a.x) * u; P[k * 3 + 1] = a.y + (b.y - a.y) * u; P[k * 3 + 2] = a.z + (b.z - a.z) * u; const f = .35 + .65 * (k / N); C[k * 3] = c0[0] * f; C[k * 3 + 1] = c0[1] * f; C[k * 3 + 2] = c0[2] * f; }
+  pts.geometry.attributes.position.needsUpdate = true; pts.geometry.attributes.color.needsUpdate = true; pts.visible = true;
+  const E = path[path.length - 1], sc = (1.5 - .6 * S.k) * (where === 'air' ? .6 : 1) * (1 + Math.sin(performance.now() * .012) * .05);
+  ring.position.copy(E); if (where === 'ground') { ring.position.y += .05; ring.rotation.set(-Math.PI / 2, 0, 0); } else { ring.lookAt(camera.position); lockPull(ring, .45); }
+  ring.scale.setScalar(sc); ring.userData.c.material.color.setRGB(c0[0] * .85, c0[1] * .85, c0[2] * .85); ring.visible = true; if (hit) BARC.stat.body++; }
 function bowStep(dt) { bladeFireStep(dt); const p = player, s = slotNow(), on = !!s.bow;
   CLIPS._bow = on && rig.actions['bow_draw' + UPS] ? 1 : 0; if (p.aim && on) p.bowT = (p.bowT || 0) + dt;
-  if (!BOW.mesh) { if (!on) return; const d = { model: rig.root, root: rig.root, st: '', K: {}, h: 0, ar: '', arT: 0 }; archerBow(d); BOW.mesh = d.bow; BOW.mesh.g.scale.setScalar(BOW.limbK); }
-  const B = BOW.mesh, L = rig.bones.mixamorig_LeftHand, Rh = rig.bones.mixamorig_RightHand, vis = on && rig.root.visible && !p.dragon; B.g.visible = B.str.visible = vis; if (!vis || !L || !Rh) { B.nock.visible = false; return; }
+  if (!BOW.mesh) { if (!on) { bowArc(false); return; } const d = { model: rig.root, root: rig.root, st: '', K: {}, h: 0, ar: '', arT: 0 }; archerBow(d); BOW.mesh = d.bow; BOW.mesh.g.scale.setScalar(BOW.limbK); }
+  const B = BOW.mesh, L = rig.bones.mixamorig_LeftHand, Rh = rig.bones.mixamorig_RightHand, vis = on && rig.root.visible && !p.dragon; B.g.visible = B.str.visible = vis; bowArc(vis && !!p.aim && !(p.fireT > 0)); if (!vis || !L || !Rh) { B.nock.visible = false; return; }
   L.getWorldPosition(_bwL); Rh.getWorldPosition(_bwR);
   const drawing = !!p.aim, h = drawing ? Math.atan2(_bwL.x - _bwR.x, _bwL.z - _bwR.z) : p.faceH;
   // m1733 (his: "the bow is cutting into his arm, into his body; it's kind of small"): drawn, the riser sits in the fist upright (a touch canted);
@@ -20336,7 +20386,7 @@ function paintRetic() {
   const x = (_rv.x * .5 + .5) * innerWidth, y = (-_rv.y * .5 + .5) * innerHeight;
   reticEl.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
   reticEl.style.setProperty('--c', p.chg.toFixed(3));
-  reticEl.classList.add('on');
+  reticEl.classList.add('on'); reticEl.classList.toggle('bow', !!slotNow().bow);     // m1744: bigger and bolder for the bow
   // LOCKED IS A DIFFERENT MARK -- and it means the shot is COMMITTED to a body, not merely
   // that the level walk found a wall, which is what `hit` says and is true almost everywhere.
   reticEl.classList.toggle('lock', !!a.lock);
@@ -67199,7 +67249,7 @@ function frameBody() {
     // at zero -- which is the mixer blending back to BIND, which is the T-pose.
     stepMorph(dt);
     _pt = pT('body', _pt);
-    rigAnim(dt);
+    rigAnim(dt); bowSync(dt);     // m1744: every copy of the bow's draw at the draw's own time
     bladeUndo();          // her edits come off before the mixer, in reverse (m271)
     spineUndo();
     coverArmUndo();       // m1020

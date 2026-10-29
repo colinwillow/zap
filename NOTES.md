@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The bow: no second pull, a flight ARC and a ring where it lands, arrows that can be seen (m15xx)
+His: "once you've initiated a shot and you move the left stick, he keeps pulling the bow back again -- strafe left or right and he pulls it
+again; he should never pull it back once it's back"; "the crosshair should show an interaction with what you're aiming at -- it's hard to
+see"; "in the Red ... I can't tell where the arrow would land if I released now"; "the arrows get lost in the background".
+- **The second pull, MEASURED** (headless: hold the draw, strafe): standing, the draw is the whole-body `bow_draw` (1.07 s, done); the
+  moment he moves the gait swaps to its upper half `bow_draw__ups`, which had never been playing -- it started at 0: a second pull. Moving
+  forward then stopping did it again (a pose whose weight reaches 0 is STOPPED and rewound by `skinWeights`). `bowSync`, right after
+  `rigAnim`: every copy of the draw is put at the DRAW'S OWN time (`bowT` x `drawRate`) each frame. Re-measured: switching between them all
+  stays at 1.04-1.07 s. (`check:syntax` wants `rigAnim` within 4 lines above `rig.mixer.update` -- the first placement failed it.)
+- **The ARC** (`bowArc`, one Points + a ring): `bowSolve` is now the one answer for the shot (`bowLoose` reads it too), and while he draws
+  it is FLOWN in advance sample by sample until it meets the ground (`groundAt`), a wall (`boxRay`), a body / spider / guardian -- the same
+  tests the arrow uses. Pips along the path; a RING where it ends, flat on the ground or facing him on a body, AMBER on a body (a hit), jade
+  otherwise, tightening as the draw fills. **Not additive**: additive glow vanished on the white forge floor -- solid pips with a dark rim,
+  a solid ring over a dark outline. Headless: the ring sat on the dweller's chest, amber, 9 m out.
+- **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
+  out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
+- Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
 ## The waterfalls: cut out of the island, and water (m1742, Worker B)
 His (m1741 screenshot): "make the waterfall actually cut out of the island and have it actually look like water". The refinery's Jinra
 fall was a flat 2.2 x 40 m plane at R + .2 running straight down THROUGH the lumpy lobes. `gjFall` now: every island geometry is kept
