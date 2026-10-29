@@ -13,7 +13,9 @@ landmine list, in the same shape: what he said, what was actually wrong, what wa
   bone layout lands; ONE 2048 ATLAS -- each part keeps its own uvs and image, given a square sized by its surface area (shelf-packed, 82% fill),
   its image resampled in; each part RIGID on the bone nearest its centre; a part straddling a limb joint (thigh/shin, forearm/hand, hips/spine:
   26 of them) blended across it along the parent bone so knees and elbows bend; the long arms as before. No face split, no caps.
-- Two things this container cannot do, measured: Cycles BAKES BLACK (a red emissive cube bakes to 0) -- so the atlas is copied in numpy, not baked;
+- CORRECTION (his question, same day): Cycles bakes black HERE because this Blender build has no OpenImageDenoiser and Cycles' default denoise
+  aborts the job silently -- `scene.cycles.use_denoising = False` and the red cube bakes to .94. (EEVEE cannot bake at all in Blender 4.0.) So the
+  atlas is copied in numpy, which equals an emission bake; a real bake is available now if wanted. And
   and Tripo's completed parts carry their uvs as thousands of per-TRIANGLE islands, so an island pack is specks -- hence one square per part.
 - webp + draco 1.0 MB (was .9), Forged with the same 15 clips. Rendered headless: the statue, the live colours, the parts clean -- none of the old
   jagged split edges or inward caps. One arm band shows its hollow inside from some angles.
