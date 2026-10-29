@@ -67710,13 +67710,15 @@ const hwRc = z => 7 * Math.sin(z * .028) + 3 * Math.sin(z * .071 + 1.3);
 const HCAVE = { on: 1, at: [[-30, -1], [18, -1], [-55, 1], [40, 1], [95, -1]], tw: 2.6, th: 3.8, tl: 7, rd: 6, rz: 6.5, chH: 5.6, list: null, stat: {} };
 function caveList() { if (HCAVE.list) return HCAVE.list; const C = HCAVE, out = []; C.list = out;
   for (const [z, side] of C.at) { const rc = hwRc(z), fw = side < 0 ? HOLLOW.floorW : HOLLOW.floorE, fy = hwHeight0(rc + side * (fw - 3), z); let d = fw - 4; while (d < 70 && hwHeight0(rc + side * d, z) < fy + 1.2) d += .25;
-    const K = { z, side, mx: rc + side * d, fy, ok: 1, cc: C.tl + C.rd * .8 };
+    const K = { z, side, mx: rc + side * d, fy, ok: 1, cc: C.tl + C.rd * .8, i: out.length };
     // inside the rock enough: the tunnel 2 m over its floor from 2 m in, the chamber 60% of its height (where it is thinner the cap bulges a little)
     for (let u = 2; u <= K.cc + C.rd * .9 && K.ok; u += 1.5) for (const w of u < C.tl ? [-C.tw, 0, C.tw] : [-C.rz * .8, 0, C.rz * .8]) if (hwHeight0(K.mx + side * u, z + w) < fy + (u < C.tl ? 2 : C.chH * .6)) K.ok = 0;
     out.push(K); }
   C.stat.ok = out.filter(K => K.ok).length; return out; }
 // in the cave's own frame: u = metres into the wall from the mouth, w = across; `m` grows it (the carve runs a metre past the shell)
 function caveIn(K, u, w, m) { const C = HCAVE; if (u > -.6 - (u < 0 ? 0 : m) && u < C.tl + m && Math.abs(w) < C.tw + (u < .5 ? 0 : m)) return true; const a = (u - K.cc) / (C.rd + m), b = w / (C.rz + m); return a * a + b * b < 1; }
+// is (x, z) within `m` m of any open cave's volume (placements that read the carved height must keep out of it)
+function caveNear(x, z, m) { if (!HCAVE.on || HOME.style === 'lake') return false; for (const K of caveList()) if (K.ok && Math.abs(z - K.z) < HCAVE.rz + m + 2 && caveIn(K, (x - K.mx) * K.side, z - K.z, m)) return true; return false; }
 function caveCarve(x, z, h) { for (const K of caveList()) { if (!K.ok || Math.abs(z - K.z) > HCAVE.rz + 3) continue; if (caveIn(K, (x - K.mx) * K.side, z - K.z, 1)) return Math.min(h, K.fy); } return h; }
 function hwHeight(x, z) { const h = hwHeight0(x, z); return HCAVE.on && HOME.style !== 'lake' ? caveCarve(x, z, h) : h; }
 function hwHeight0(x, z) {
@@ -68708,7 +68710,7 @@ function ghomeBuild(at, yaw, y0) {
     { const R4 = rwRng(3232), L = (wx, wz) => { const dx = wx - at[0], dz = wz - at[1]; return [dx * c - dz * s, dx * s + dz * c]; }, orange = new THREE.MeshStandardMaterial({ color: 0xe8843a, roughness: .8 }); let nC = 0, nV = 0;
       for (let zw = at[1] - 46; zw < at[1] + 46; zw += 2.6) for (const side of [-1, 1]) { const fl = hwHeight(hwRc(zw), zw);
         for (let t = 0; t < 3; t++) { if (R4() < .35) continue; const yw = fl + 3 + Math.pow(R4(), 1.3) * 31, z2 = zw + (R4() - .5) * 2, xw = hwWallAt(z2, side, yw, -.1);
-          if (Math.abs(xw - hwRc(z2)) > 39) continue; const [lx, lz] = L(xw, z2), ly = yw - y0, k = 1.2 + R4() * 1.4; sagebrush(lx, ly - .2, lz, k); nC++;
+          if (Math.abs(xw - hwRc(z2)) > 39 || caveNear(xw, z2, 1.5)) continue; const [lx, lz] = L(xw, z2), ly = yw - y0, k = 1.2 + R4() * 1.4; sagebrush(lx, ly - .2, lz, k); nC++;
           if (R4() < .45) { const pts = []; let n = 3 + ((R4() * 5) | 0); for (let j = 0; j <= n; j++) { const yy = yw - j * .55, xx = hwWallAt(z2 + Math.sin(j * 1.3) * .2, side, yy, .12), [qx, qz] = L(xx, z2 + Math.sin(j * 1.3) * .2); pts.push(new THREE.Vector3(qx, yy - y0, qz)); }
             const cv = new THREE.CatmullRomCurve3(pts); put(new THREE.TubeGeometry(cv, n * 3, .035, 3), olive); for (let j = 1; j < n * 2; j++) { const q = cv.getPoint(j / (n * 2)); put(new THREE.ConeGeometry(.09, .28, 3), R4() < .5 ? sage : olive, at4(q.x, q.y, q.z, R4() * 6, (R4() - .5) * 2.4, (R4() - .5) * 2.4)); } nV++; }
           if (R4() < .12) { const tip = [lx, ly - .35, lz]; put(new THREE.CylinderGeometry(.012, .012, .35, 3), reedM, at4(tip[0], tip[1] + .17, tip[2])); put(new THREE.SphereGeometry(.1, 8, 6), bulbM, at4(tip[0], tip[1], tip[2], 0, 0, 0, 1, 1.3, 1)); } } }
@@ -69441,7 +69443,7 @@ function hwPath(side, zb, y0, dir) {
     const ia = xa + side * .25, oa = xa - side * H.w, ib = xb + side * .25, ob = xb - side * H.w;
     const A = [ia, a.y, a.z], Bv = [oa, a.y, a.z], C = [ob, b.y, b.z], D = [ib, b.y, b.z];
     quad(A, Bv, C, D, top);
-    quad([oa, a.y, a.z], [oa, rwHeight(oa, a.z) - .3, a.z], [ob, rwHeight(ob, b.z) - .3, b.z], [ob, b.y, b.z], skirt);
+    quad([oa, a.y, a.z], [oa, hwHeight0(oa, a.z) - .3, a.z], [ob, hwHeight0(ob, b.z) - .3, b.z], [ob, b.y, b.z], skirt);
     for (const tri of [[A, Bv, C], [A, C, D], [A, C, Bv], [A, D, C]]) triAdd(...tri[0], ...tri[1], ...tri[2]);     // the ramp, both windings
     while (nextTread > b.y && nextTread <= a.y + 1e-6) { const u = (a.y - nextTread) / Math.max(1e-6, a.y - b.y), z = a.z + (b.z - a.z) * u, xm = xa + (xb - xa) * u;
       const g = new THREE.BoxGeometry(H.w + .2, .1, .34); g.translate(xm - side * (H.w / 2 - .12), nextTread + .03, z); treads.push(g); nextTread -= H.tread; }
@@ -69454,7 +69456,9 @@ function hwPath(side, zb, y0, dir) {
   H.n++; H.len.push({ side, zb, y0, from: pts[pts.length - 1].z, steps: treads.length, bottomY: +pts[pts.length - 1].y.toFixed(2), top: [sm[0] - side * H.w / 2, y0, zb] });
 }
 // where the wall face reaches height `y` at this z, on this side (marched out from the river), `off` m back into the open
-function hwWallAt(z, side, y, off = 0) { const c = hwRc(z); for (let d = 4; d < 80; d += .25) { const x = c + side * d; if (hwHeight(x, z) >= y) return x - side * off; } return c + side * 40; }
+// the wall's face reads the UNCARVED height (`hwHeight0`): over a cave the carved floor would read as no wall at all, and the ledge paths and the
+// bridge anchors walked into the tunnels
+function hwWallAt(z, side, y, off = 0) { const c = hwRc(z); for (let d = 4; d < 80; d += .25) { const x = c + side * d; if (hwHeight0(x, z) >= y) return x - side * off; } return c + side * 40; }
 // the open caves for the land shader's dimming: (mouth x, floor y, z, side), side 0 = none
 function hwCaveU() { const L = HCAVE.on && HOME.style !== 'lake' ? caveList() : []; return [0, 1, 2, 3, 4].map(i => { const K = L[i]; return K && K.ok ? new THREE.Vector4(K.mx, K.fy, K.z, K.side) : new THREE.Vector4(0, 0, 0, 0); }); }
 function caveBuild(K) { const C = HCAVE, { side, z: z0, mx, fy, cc } = K, X = u => mx + side * u, uEnd = cc + C.rd, rnd = rwRng(4400 + Math.round(z0));
@@ -69491,17 +69495,44 @@ function caveBuild(K) { const C = HCAVE, { side, z: z0, mx, fy, cc } = K, X = u 
   const glow = (c, e, k) => new THREE.MeshStandardMaterial({ color: c, emissive: e, emissiveIntensity: k, roughness: .3, toneMapped: false });
   rwMesh(cry, glow(0x9affd8, 0x30d0a0, 1.6), false); rwMesh(cry2, glow(0xd0a8ff, 0x8050e0, 1.4), false); rwMesh(stem, rwMat(0xd8d0c0), false); rwMesh(mush, glow(0x9ff4ff, 0x2fb8d8, 1.2), false);
   // THE CHEST at the back of the chamber: strike it and the lid flies open, doubloons spill out (once; `caveHit`)
-  const ch = new THREE.Group(); ch.position.set(X(cc + C.rd * .6), fy, z0); ch.rotation.y = side < 0 ? -Math.PI / 2 : Math.PI / 2; scene.add(ch);
+  const cy = K.i === 4 ? fy + 2.88 : fy, ch = new THREE.Group(); ch.position.set(X(cc + C.rd * .6), cy, z0); ch.rotation.y = side < 0 ? -Math.PI / 2 : Math.PI / 2; scene.add(ch);
   { const wd = new THREE.MeshStandardMaterial({ color: 0x6a3a1e, roughness: .8 }), br = new THREE.MeshStandardMaterial({ color: 0xc89a3a, metalness: .8, roughness: .35 }), bx = (w, h, d, x, y, zz, m, par) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); o.position.set(x, y, zz); o.castShadow = true; (par || ch).add(o); return o; };
     bx(1.2, .6, .75, 0, .3, 0, wd); for (const x of [-.5, .5]) bx(.08, .62, .77, x, .3, 0, br); const lid = new THREE.Group(); lid.position.set(0, .6, -.37); ch.add(lid);
     const lg = new THREE.Mesh(new THREE.CylinderGeometry(.375, .375, 1.2, 10, 1, false, 0, Math.PI), wd); lg.rotation.z = Math.PI / 2; lg.position.set(0, 0, .37); lid.add(lg); bx(.16, .2, .06, 0, -.05, .76, br, lid);
-    K.chest = { g: ch, lid, open: 0, t: 0, x: ch.position.x, y: fy + .4, z: z0 }; BOXES.push({ minx: ch.position.x - .45, maxx: ch.position.x + .45, miny: fy - 1, maxy: fy + .6, minz: z0 - .65, maxz: z0 + .65 }); }
+    K.chest = { g: ch, lid, open: 0, t: 0, x: ch.position.x, y: cy + .4, z: z0 }; BOXES.push({ minx: ch.position.x - .45, maxx: ch.position.x + .45, miny: cy - 1, maxy: cy + .6, minz: z0 - .65, maxz: z0 + .65 }); }
   // BATS hanging from the vault; they scatter round the chamber when he comes in, then settle back
   K.bats = []; { const bm = new THREE.MeshStandardMaterial({ color: 0x2a1c22, roughness: .9 }), wm = new THREE.MeshStandardMaterial({ color: 0x3a2430, roughness: .9, side: THREE.DoubleSide });
     for (let k = 0; k < 3; k++) { const b = new THREE.Group(), body = new THREE.Mesh(new THREE.SphereGeometry(.12, 8, 6), bm); body.scale.set(1, .8, 1.4); b.add(body);
       const wings = []; for (const e of [-1, 1]) { const wg = new THREE.Group(), sh = new THREE.Shape(); sh.moveTo(0, 0); sh.lineTo(.42, .08); sh.lineTo(.34, -.05); sh.lineTo(.22, .02); sh.lineTo(.14, -.06); sh.lineTo(0, -.04); const wgm = new THREE.Mesh(new THREE.ShapeGeometry(sh), wm); wgm.rotation.x = -Math.PI / 2; wgm.scale.x = e; wg.add(wgm); b.add(wg); wings.push(wg); }
       const a = rnd() * Math.PI * 2, r = rnd() * .5, hu = cc + Math.cos(a) * C.rd * r, hw = Math.sin(a) * C.rz * r, home = new THREE.Vector3(X(hu), fy + B(hu) - .25, z0 + hw); b.position.copy(home); b.rotation.x = Math.PI; scene.add(b);
       K.bats.push({ g: b, wings, home, ph: rnd() * 6, r: 1.5 + rnd() * 2.5, y: 1.8 + rnd() * 2, t: 0 }); } }
+  // PASS 2: EACH CAVE ITS OWN (his three-pass rule): 0 a glowing POOL with drips, 1 GLOW-WORMS over the vault with their threads, 2 a SLEEPING
+  // BEAST before the chest (it wakes if he runs or strikes near it), 3 an old Jinra SHRINE (pillars, an altar, a floating orb), 4 the chest up on
+  // a LEDGE at the back, climbed by rock steps of .32 (his step is .357)
+  const v = K.i; K.kind = ['pool', 'worms', 'beast', 'shrine', 'ledge'][v];
+  if (v === 0) { const pg = new THREE.CircleGeometry(3.1, 28); pg.rotateX(-Math.PI / 2); pg.translate(X(cc - .6), fy + .06, z0 - .4); const pm = new THREE.Mesh(pg, new THREE.MeshStandardMaterial({ color: 0x1f6a5c, emissive: 0x1ba088, emissiveIntensity: .9, transparent: true, opacity: .82, roughness: .1, metalness: .2 })); scene.add(pm); K.pool = pm;
+    const rr = []; for (let k = 0; k < 22; k++) { const a = k / 22 * Math.PI * 2, q = .25 + rnd() * .2, g = ghRockGeo(4500 + k, q * 1.4, q * .7, q, 1); g.translate(X(cc - .6) + Math.cos(a) * 3.2, fy + q * .1, z0 - .4 + Math.sin(a) * 3.2); rr.push(ghStrataCol(g)); } rwMesh(rr, hwPaint(rwMat(0xffffff, { vertexColors: true }), 'rock'));
+    K.drip = 0; }
+  if (v === 1) { const N = 420, pos = new Float32Array(N * 3), th = []; for (let k = 0; k < N; k++) { const u = C.tl * .3 + rnd() * (uEnd - C.tl * .3 - .5), a = A(u) * .92, b = B(u) * .97, t = Math.PI * (.12 + rnd() * .76), ct = Math.cos(t);
+      const x = X(u), y = fy - .35 + b * Math.pow(Math.sin(t), .55) - .05, z = z0 + a * Math.sign(ct) * Math.pow(Math.abs(ct), .6) * .97; pos.set([x, y, z], k * 3); if (k % 7 === 0) { const L = .25 + rnd() * .7, g = new THREE.CylinderGeometry(.006, .006, L, 3); g.translate(x, y - L / 2, z); th.push(g); } }
+    const pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(pos, 3)); const pm = new THREE.Points(pg, new THREE.PointsMaterial({ color: 0x9cf0ff, size: .09, transparent: true, opacity: .95, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })); scene.add(pm); K.worms = pm;
+    rwMesh(th, new THREE.MeshBasicMaterial({ color: 0x5fb8c8, transparent: true, opacity: .5 }), false); }
+  if (v === 2) { const bg = new THREE.Group(), hide = new THREE.MeshStandardMaterial({ color: 0x4a3a44, roughness: .85 }), plate = new THREE.MeshStandardMaterial({ color: 0x6a4a3a, roughness: .7 }), eyeM = new THREE.MeshStandardMaterial({ color: 0x331100, emissive: 0xff7a20, emissiveIntensity: 0 });
+    const body = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 10), hide); body.scale.set(1.5, .9, 2.2); body.position.y = .8; bg.add(body);
+    for (let k = 0; k < 6; k++) { const pl = new THREE.Mesh(new THREE.ConeGeometry(.28, .7, 5), plate); pl.position.set(0, 1.6 - Math.abs(k - 2.5) * .08, -1.5 + k * .6); pl.rotation.x = -.3; bg.add(pl); }
+    const neck = new THREE.Group(); neck.position.set(0, .8, 2); bg.add(neck); const head = new THREE.Mesh(new THREE.SphereGeometry(.6, 12, 8), hide); head.scale.set(1, .75, 1.4); head.position.set(0, 0, .55); neck.add(head);
+    for (const e of [-1, 1]) { const ey = new THREE.Mesh(new THREE.SphereGeometry(.09, 8, 6), eyeM); ey.position.set(e * .32, .18, .9); neck.add(ey); const hr = new THREE.Mesh(new THREE.ConeGeometry(.1, .6, 6), plate); hr.position.set(e * .3, .45, .25); hr.rotation.x = -1.1; neck.add(hr); }
+    const tail = new THREE.Mesh(new THREE.ConeGeometry(.45, 2.6, 8), hide); tail.rotation.x = -Math.PI / 2 - .2; tail.position.set(.9, .45, -2.6); tail.rotation.z = .6; bg.add(tail);
+    neck.rotation.x = .45; bg.position.set(X(cc + C.rd * .1), fy, z0 + 1.6); bg.rotation.y = side < 0 ? Math.PI / 2 + .5 : -Math.PI / 2 - .5; scene.add(bg);
+    K.beast = { g: bg, body, neck, eyeM, wake: 0, t: 0 }; BOXES.push({ minx: bg.position.x - 1.6, maxx: bg.position.x + 1.6, miny: fy - 1, maxy: fy + 1.6, minz: bg.position.z - 1.6, maxz: bg.position.z + 1.6 }); }
+  if (v === 3) { const st = new THREE.MeshStandardMaterial({ color: 0xb89a7a, roughness: .9 }), gl = new THREE.MeshStandardMaterial({ color: 0x9affd8, emissive: 0x30d0a0, emissiveIntensity: 2.2, toneMapped: false }), pill = [];
+    for (let k = 0; k < 4; k++) { const a = k / 4 * Math.PI * 2 + .4, x = X(cc + Math.cos(a) * 2.6), z = z0 + Math.sin(a) * 2.6, h = k === 2 ? 1.6 : 3.6, g = new THREE.CylinderGeometry(.32, .38, h, 8); g.translate(x, fy + h / 2, z); pill.push(g); BOXES.push({ minx: x - .35, maxx: x + .35, miny: fy - 1, maxy: fy + h, minz: z - .35, maxz: z + .35 }); }
+    { const g = new THREE.BoxGeometry(1.4, .9, 1.4); g.translate(X(cc), fy + .45, z0); pill.push(g); BOXES.push({ minx: X(cc) - .7, maxx: X(cc) + .7, miny: fy - 1, maxy: fy + .9, minz: z0 - .7, maxz: z0 + .7 }); }
+    rwMesh(pill, hwPaint(rwMat(0xd8b898), 'stone')); const orb = new THREE.Mesh(new THREE.IcosahedronGeometry(.32, 2), gl); orb.position.set(X(cc), fy + 1.7, z0); scene.add(orb); K.orb = orb; }
+  if (v === 4) { const sh0 = cc + C.rd * .3, sh1 = cc + C.rd * .78, Y = fy + 2.88, xa = X(sh0), xb = X(sh1);
+    BOXES.push({ minx: Math.min(xa, xb), maxx: Math.max(xa, xb), miny: fy - 1, maxy: Y, minz: z0 - 2.3, maxz: z0 + 2.3 }); const sg = new THREE.BoxGeometry(Math.abs(xb - xa), Y - fy + .3, 4.6); sg.translate((xa + xb) / 2, (Y + fy - .3) / 2, z0); const parts = [sg];
+    for (let k = 1; k <= 9; k++) { const u = cc - 2.4 + k * .52, x = X(u), z = z0 - 3.05, h = k * .32, g = new THREE.BoxGeometry(.9, h + .3, .9); g.translate(x, fy + (h - .3) / 2, z); parts.push(g); BOXES.push({ minx: x - .45, maxx: x + .45, miny: fy - 1, maxy: fy + h, minz: z - .45, maxz: z + .45 }); }
+    rwMesh(parts, hwPaint(rwMat(0x9a5a3a, { roughness: .95 }), 'rock')); }
   K.light = [X(cc), fy + 3.2, z0]; HCAVE.stat.built = (HCAVE.stat.built || 0) + 1;
 }
 // the caves: the bats, the chest's lid, and one shared mint light in the nearest cave while he is near it
@@ -69511,11 +69542,21 @@ function caveStep(dt) { const C = HCAVE; if (!C.list || !inHome()) return; const
     for (const B of K.bats) { if (inside && !B.t) B.t = 7 + Math.random() * 4; B.ph += dt; const fly = B.t > 0; if (fly) { B.t = Math.max(0, B.t - dt); B.t = B.t || 0; }
       const tgt = fly ? new THREE.Vector3(K.light[0] + Math.cos(B.ph * 1.7) * B.r, K.fy + B.y + Math.sin(B.ph * 2.3) * .5, K.z + Math.sin(B.ph * 1.7) * B.r * 1.2) : B.home;
       B.g.position.lerp(tgt, 1 - Math.exp(-(fly ? 4 : 2) * dt)); B.g.rotation.x = fly ? 0 : Math.PI; if (fly) B.g.rotation.y = -B.ph * 1.7; const f = fly || B.g.position.distanceTo(B.home) > .1 ? Math.sin(B.ph * 26) * .9 : .1; B.wings[0].rotation.z = f; B.wings[1].rotation.z = -f; }
+    if (K.pool && (K.drip -= dt) <= 0) { K.drip = .6 + Math.random() * 1.6; const x = K.pool.position.x + K.light[0] - K.light[0], a = Math.random() * 6.28, r = Math.random() * 2.6, px = K.mx + K.side * (K.cc - .6) + Math.cos(a) * r, pz = K.z - .4 + Math.sin(a) * r;
+      spkBurst(px, K.fy + 4.4, pz, 1, { col: [.6, 1, .9], spread: .05, size: .06, life: .5 }); spkBurst(px, K.fy + .12, pz, 6, { col: [.5, 1, .85], spread: .8, size: .05, life: .35 }); }
+    if (K.worms) K.worms.material.opacity = .7 + .25 * Math.sin(performance.now() * .0017 + K.z);
+    if (K.orb) { K.orb.position.y = K.fy + 1.7 + Math.sin(performance.now() * .0015) * .18; K.orb.rotation.y += dt * .8; }
+    if (K.beast) { const Bt = K.beast; Bt.t += dt; const bd = Math.hypot(p.x - Bt.g.position.x, p.z - Bt.g.position.z);
+      if (!Bt.wake && bd < 5.5 && (player.speed > 4.5 || player.melee || Bt.poke)) { Bt.wake = 6; Bt.poke = 0; snd('thud', { g: 1, r: .35, x: Bt.g.position.x, z: Bt.g.position.z }); camShake(.08); }
+      if (Bt.wake > 0) Bt.wake = Math.max(0, Bt.wake - dt); const aw = Bt.wake > 0 ? Math.min(1, (6 - Bt.wake) * 3, Bt.wake) : 0;
+      Bt.body.scale.y = .9 + Math.sin(Bt.t * (aw ? 3 : 1.1)) * (aw ? .05 : .035); Bt.neck.rotation.x = .45 - aw * 1.05; Bt.neck.rotation.y = aw * Math.atan2(p.x - Bt.g.position.x, p.z - Bt.g.position.z) * 0 + aw * Math.sin(Bt.t * 1.3) * .3; Bt.eyeM.emissiveIntensity = aw * 3;
+      if (aw > .9 && Math.random() < dt * .8) snd('thud', { g: .6, r: .45, x: Bt.g.position.x, z: Bt.g.position.z }); }
     const Ch = K.chest; if (Ch && Ch.open && Ch.t < 1) { Ch.t = Math.min(1, Ch.t + dt * 2.5); Ch.lid.rotation.x = -1.9 * (1 - (1 - Ch.t) ** 3); } }
   if (!C.lamp) { C.lamp = new THREE.PointLight(0x9affd8, 0, 16, 1.6); scene.add(C.lamp); }
   if (near) { C.lamp.position.set(...near.light); C.lamp.intensity = 14 * (1 - smooth(18, 34, nd)); }
   if (COIN.list.length && !inArena()) coinStep(dt); }
 function caveHit(x, y, z, rad) { const C = HCAVE; if (!C.list || !inHome()) return 0;
+  for (const K of C.list) if (K.beast && Math.hypot(x - K.beast.g.position.x, z - K.beast.g.position.z) < 4) K.beast.poke = 1;
   for (const K of C.list) { const Ch = K.chest; if (!Ch || Ch.open || Math.hypot(x - Ch.x, y - Ch.y, z - Ch.z) > .9 + rad) continue; Ch.open = 1; snd('clang', { g: .9, r: .7, x: Ch.x, z: Ch.z }); spkBurst(Ch.x, Ch.y + .4, Ch.z, 40, { col: [1, .82, .3], spread: 4, size: .16, life: .9 });
     for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2; coinDrop(scene, Ch.x + Math.cos(a) * 1.1, Ch.y + .5, Ch.z + Math.sin(a) * 1.1); } C.stat.chests = (C.stat.chests || 0) + 1; return 1; }
   return 0; }
@@ -69561,7 +69602,7 @@ function hollowDress() {
   // SANDSTONE FORMATIONS: rounded boulders on the floor, stacked hoodoos, lumps on the rim
   { const rk = [], cs = []; const sCol = (gg, hex) => { const cc = new THREE.Color(hex), a = new Float32Array(gg.attributes.position.count * 3); for (let k = 0; k < a.length; k += 3) a.set([cc.r, cc.g, cc.b], k); gg.setAttribute('color', new THREE.BufferAttribute(a, 3)); return gg; };
     for (let i = 0; i < 34; i++) { const z = -110 + r() * 220, side = r() < .55 ? -1 : 1, s = hwRc(z) + side * (8 + r() * ((side < 0 ? HOLLOW.floorW : HOLLOW.floorE) - 9));
-      if (Math.hypot(s - H.hut.at[0], z - H.hut.at[1]) < 9 * (H.hutS || 1) || Math.hypot(s - H.spawn[0], z - H.spawn[1]) < 5) continue;
+      if (Math.hypot(s - H.hut.at[0], z - H.hut.at[1]) < 9 * (H.hutS || 1) || Math.hypot(s - H.spawn[0], z - H.spawn[1]) < 5 || caveNear(s, z, 2)) continue;
       const y = rwHeight(s, z), n = r() < .35 ? 3 : 1;
       // his report (after m1704): "these rocks are kind of floating". The stack was placed by a SPHERE's numbers and pass 18 flattened the rocks
       // (`ghRockGeo` clips its top and bottom), so each piece hung ~a metre over the one under it. Now every piece sits on the measured top of
@@ -69570,7 +69611,7 @@ function hollowDress() {
         g.computeBoundingBox(); const bb = g.boundingBox, hh = bb.max.y - bb.min.y, sink = k ? hh * .12 : hh * .18; g.translate(s + (r() - .5) * .4, yc - sink - bb.min.y, z); yc = yc - sink + hh; rk.push(ghStrataCol(g)); }
       BOXES.push({ minx: s - 1.3, maxx: s + 1.3, miny: -2, maxy: yc - .1, minz: z - 1.3, maxz: z + 1.3 }); }
     for (let i = 0; i < 40; i++) { const z = -150 + r() * 300, side = r() < .5 ? -1 : 1, s = hwRc(z) + side * ((side < 0 ? HOLLOW.floorW : HOLLOW.floorE) + HOLLOW.wall + 6 + r() * 20), y = rwHeight(s, z), R = 3 + r() * 5;
-      const g = ghRockGeo(i + 500, R * (1.1 + r() * .4), R * (.5 + r() * .25), R * (.85 + r() * .3), 2); g.rotateY(r() * 6); g.computeBoundingBox(); g.translate(s, y - g.boundingBox.min.y - (g.boundingBox.max.y - g.boundingBox.min.y) * .2, z); rk.push(ghStrataCol(g)); }
+      const g = ghRockGeo(i + 500, R * (1.1 + r() * .4), R * (.5 + r() * .25), R * (.85 + r() * .3), 2); if (caveNear(s, z, R + 1)) continue;     /* on the carved height it sat INSIDE a cave */ g.rotateY(r() * 6); g.computeBoundingBox(); g.translate(s, y - g.boundingBox.min.y - (g.boundingBox.max.y - g.boundingBox.min.y) * .2, z); rk.push(ghStrataCol(g)); }
     const m = rwMesh(rk, hwPaint(rwMat(0xffffff, { vertexColors: true, roughness: .95 }), 'rock')); m.geometry.computeVertexNormals(); }
   // CAVE MOUTHS in the walls at the floor: a dark arch with a rim of darker stone -- and where the rock is deep enough, a CAVE (`caveBuild`)
   { const dark = [], rim = []; for (const K of caveList()) { const { z, side } = K; if (K.ok) { caveBuild(K); continue; } const x = wallX(z, side, 1.5), y = rwHeight(x, z) - .3, ry = side < 0 ? Math.PI / 2 : -Math.PI / 2;
