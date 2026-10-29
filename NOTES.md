@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The sprint builds itself on a runway; the long jump keeps the double (m15xx)
+*"Instead of holding the right stick and letting go for the long jump: he runs at a normal speed, and after he's been running fifteen feet or so he
+naturally breaks into the sprint, and a jump while sprinting IS the long jump -- so we design levels with runways. And the long jump must still allow
+the double jump."*
+- `AUTOSPRINT` (TOOLS > SPRINT AUTO / HOLD): ground distance run with the stick pushed at `minV` 3 m/s+ accumulates (`p.runD`); past `d` 4.6 m
+  (15 ft) he sprints (`p.ninja`: `NINJA.runSpeed` 9 m/s, its run clip, lens and lines). A turn sharper than `turn` 1.4 rad, letting go or slowing
+  resets it; the air keeps it, so a sprint lands into a sprint. A jump TAP while sprinting is the long jump (`NINJA.jumpFwd` / `jumpUp`), which now
+  sets `p.jumps` 1 (`dbl`), so the double jump is still there. The right-stick hold sprint is off while AUTO is on (HOLD = m1026's).
+- Measured on the Proving Ground's first lane (the shipped frame): the sprint at runD 4.6 m (7.1 m by the 20-frame sample), 7.2 -> 9.0 m/s; the
+  tap at the edge = the long jump at 13.5 m/s; the double fired (`jumps` 1); the meter: **25.0 m far, 4.8 m up** -- past every pad on that lane.
+  The lanes' 24 m may already be inside his reach with the double; his flicks and wall runs on top are for him to measure.
+
 ## The Proving Ground: measure him, then design (m1806)
 *"The distances this character can get are a lot bigger and higher than you think -- run, jump off a ledge, double jump, flick flick flick; a high
 jump and a jump at its top; wall runs. A sandbox with two platforms a gap apart, the measurement written next to it, then a bit farther -- I'll
