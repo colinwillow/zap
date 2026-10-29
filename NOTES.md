@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Red Hollows: the tiling lines and the sky islands (Worker B)
+His (m1733 screenshots): "fix some of this texture tiling -- on the rock it looks like lines, and on the cliffs the bluffs, more lines";
+"this upside-down triangle cone thing -- those floating islands need to be broken up and made way more organic... shorter... irregular...
+lumpy pieces sticking out... different textures". TILING: the rock map is horizontal STRATA, and the triplanar's top projection laid it
+flat across every boulder's top as straight parallel lines (the barcode). For 'rock', 'cliff' and 'land' the TOP projection is now the
+sand (dust on a ledge); the strata only run round the sides, where strata belong. And every sample goes through `hwTile` (`HW_TILE`): the
+coordinate is warped by a slow sin field and a second sample at .37x, offset, is blended in by a broad noise, so the repeats of the cliff
+map no longer line up. ISLANDS: the 7-sided cone + cylinder is gone. Each island is 2-5 LOBES (`hwIslLobe`: a noisy sphere, its top nearly
+flat, its underside a round taper whose depth varies by angle so it hangs in uneven lumps, never a point), the main one only .6-1.1x its
+radius deep; a grass cap cut to each lobe's outline (`hwIslCap`), round trees on top, 1-3 loose rocks hanging under it; alternate islands
+are strata rock and red cliff. 5 draws for all nine (two bodies, grass, trees, falls). Render: from the rim, restored.
 ## THE LIVE TURN: watch the Red Hollows fall or rise, no reload (m1733, Worker B)
 His (after m1731): "we need to build a transition between the two so you can actually physically watch one kind of rumble and shake and then
 convert into the other one". The STATE button (and GOD > RED HOLLOWS) no longer reloads: `hwAgeLive()` flips `AGE.st` and `hwAgeStep` plays

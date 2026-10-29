@@ -68387,14 +68387,23 @@ function bobPatch(mat, amp, speed) { const ob = mat.onBeforeCompile, ok = mat.cu
     sh.vertexShader = 'attribute float aBob; uniform float uBobT;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n  transformed.y += step(0.5, aBob) * sin(uBobT * ' + speed.toFixed(3) + ' + aBob * 2.3) * ' + amp.toFixed(3) + ';'); };
   mat.customProgramCacheKey = () => String(ok ? ok.call(mat) : '') + 'bob' + amp + '_' + speed; mat.needsUpdate = true; return mat; }
 const aBobOf = (geo, ph) => { geo.setAttribute('aBob', new THREE.BufferAttribute(new Float32Array(geo.attributes.position.count).fill(ph), 1)); return geo; };
-function hwPaint(mat, kind) { if (!HWPAINT.k) return mat; const P = HWPAINT, ob = mat.onBeforeCompile, ok = mat.customProgramCacheKey, land = kind === 'land', A1 = land ? P.cliff : P[kind] || P.rock;
+// his (m1733): "fix some of this texture tiling -- on the rock it looks like lines, and on the cliffs you can see more lines". Two causes. A
+// STRATA map (rock, cliff) projected DOWN onto a top face is a barcode of straight lines, so the top projection of rock / cliff / land is the
+// SAND (dust on a ledge) and the strata only ever run round the sides. And one scale repeats: `hwTile` warps the coordinate by a slow
+// sin field and blends a second sample at .37x, offset, by a broad noise, so no two repeats of the map read the same
+const HW_TILE = `
+float hwN2(vec2 p) { return 0.5 + 0.25 * (sin(p.x * 1.31 + sin(p.y * 0.73) * 2.0) + sin(p.y * 1.17 + sin(p.x * 0.61) * 2.0)); }
+vec3 hwTile(sampler2D T, vec2 uv) { vec2 w = uv + 0.11 * vec2(sin(uv.y * 1.7 + sin(uv.x * 0.9)), sin(uv.x * 1.3 + cos(uv.y * 0.7)));
+  vec3 a = texture2D(T, w).rgb, b = texture2D(T, w * 0.37 + vec2(0.31, 0.57)).rgb; return mix(a, b, 0.15 + 0.6 * smoothstep(0.25, 0.75, hwN2(uv * 0.23))); }
+`;
+function hwPaint(mat, kind) { if (!HWPAINT.k) return mat; const P = HWPAINT, ob = mat.onBeforeCompile, ok = mat.customProgramCacheKey, land = kind === 'land', A1 = land ? P.cliff : P[kind] || P.rock, top = land || kind === 'rock' || kind === 'cliff' ? P.sand : null;
   mat.onBeforeCompile = function (sh, r) { if (ob) ob.call(this, sh, r);
-    Object.assign(sh.uniforms, { uHwA: { value: texGet(A1.n) }, uHwAs: { value: 1 / A1.s }, uHwAm: { value: new THREE.Vector3(...A1.mean) }, uHwK: { value: P.k } });
+    Object.assign(sh.uniforms, { uHwA: { value: texGet(A1.n) }, uHwAs: { value: 1 / A1.s }, uHwAm: { value: new THREE.Vector3(...A1.mean) }, uHwK: { value: P.k } }); if (top) Object.assign(sh.uniforms, { uHwT: { value: texGet(top.n) }, uHwTs: { value: 1 / top.s }, uHwTm: { value: new THREE.Vector3(...top.mean) } });
     if (land) Object.assign(sh.uniforms, { uHwB: { value: texGet(P.sand.n) }, uHwBs: { value: 1 / P.sand.s }, uHwBm: { value: new THREE.Vector3(...P.sand.mean) }, uHwC: { value: texGet(P.pebble.n) }, uHwCs: { value: 1 / P.pebble.s }, uHwCm: { value: new THREE.Vector3(...P.pebble.mean) }, uCv: { value: hwCaveU() }, uCvR: { value: new THREE.Vector3(HCAVE.tl + HCAVE.rd * .8, HCAVE.rz, HCAVE.rd) }, uCvS: { value: new THREE.Vector4(HCAVE.tl, HCAVE.tw, HCAVE.th, HCAVE.chH) } });
     sh.vertexShader = 'varying vec3 vHwP; varying vec3 vHwN;\n' + sh.vertexShader.replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\n  vHwP = (modelMatrix * vec4(transformed, 1.0)).xyz; vHwN = normalize(mat3(modelMatrix) * ' + (mat.isMeshBasicMaterial ? 'normal' : 'objectNormal') + ');');
-    sh.fragmentShader = 'varying vec3 vHwP; varying vec3 vHwN; uniform sampler2D uHwA; uniform float uHwAs; uniform vec3 uHwAm; uniform float uHwK;' + (land ? ' uniform sampler2D uHwB; uniform float uHwBs; uniform vec3 uHwBm; uniform sampler2D uHwC; uniform float uHwCs; uniform vec3 uHwCm; uniform vec4 uCv[5]; uniform vec3 uCvR; uniform vec4 uCvS;' : '') + '\n' +
+    sh.fragmentShader = 'varying vec3 vHwP; varying vec3 vHwN; uniform sampler2D uHwA; uniform float uHwAs; uniform vec3 uHwAm; uniform float uHwK;' + (top ? ' uniform sampler2D uHwT; uniform float uHwTs; uniform vec3 uHwTm;' : '') + HW_TILE + (land ? ' uniform sampler2D uHwB; uniform float uHwBs; uniform vec3 uHwBm; uniform sampler2D uHwC; uniform float uHwCs; uniform vec3 uHwCm; uniform vec4 uCv[5]; uniform vec3 uCvR; uniform vec4 uCvS;' : '') + '\n' +
       sh.fragmentShader.replace('#include <color_fragment>', `{ vec3 hn = normalize(vHwN), bw = pow(abs(hn), vec3(4.0)); bw /= (bw.x + bw.y + bw.z);
-        vec3 ta = (texture2D(uHwA, vHwP.zy * uHwAs).rgb * bw.x + texture2D(uHwA, vHwP.xz * uHwAs).rgb * bw.y + texture2D(uHwA, vHwP.xy * uHwAs).rgb * bw.z) / uHwAm;` +
+        vec3 ta = (hwTile(uHwA, vHwP.zy * uHwAs) * bw.x + hwTile(uHwA, vHwP.xy * uHwAs) * bw.z) / uHwAm + ` + (top ? `hwTile(uHwT, vHwP.xz * uHwTs) / uHwTm * bw.y;` : `hwTile(uHwA, vHwP.xz * uHwAs) / uHwAm * bw.y;`) +
         (land ? ` vec3 tb = texture2D(uHwB, vHwP.xz * uHwBs).rgb / uHwBm; tb = mix(vec3(1.0), tb, 1.6); vec3 tc = texture2D(uHwC, vHwP.xz * uHwCs).rgb / uHwCm; tb = mix(tb, tc, smoothstep(0.4, 0.0, vHwP.y)); ta = mix(ta, tb, smoothstep(0.62, 0.82, hn.y));` : '') + `
         diffuseColor.rgb *= mix(vec3(1.0), clamp(ta, 0.0, 2.2), uHwK);` + (land ? `
         for (int i = 0; i < 5; i++) { vec4 K = uCv[i]; if (K.w == 0.0) continue; float u = (vHwP.x - K.x) * K.w, w = vHwP.z - K.z; if (u < -1.0 || abs(w) > uCvR.y + 2.0 || vHwP.y > K.y + 8.0) continue;
@@ -70080,6 +70089,17 @@ function mshopStep(dt) { const M = MSHOP, p = player, S = GMERCH.shopAt; if (!in
     if (R.vy < 2) { for (let k = 0; k < 3; k++) spkBurst(R.x, R.y, R.z, 40, { col: R.col, spread: 14, size: .22, life: 1.4 }); snd('boom', { g: .5, r: 1.3, x: R.x, z: R.z }); M.rockets.splice(i, 1); } }
   // the LANTERN: a warm light at his shoulder, wherever he goes in the hollows
   if (M.lantern) { if (!M.light) { M.light = new THREE.PointLight(0xffc070, 0, 12, 1.5); scene.add(M.light); } M.light.position.set(p.pos.x, p.pos.y + 1.8, p.pos.z); M.light.intensity = 7; } }
+// a sky island's LOBE: a noisy sphere, its top squashed nearly flat, its underside a short lumpy taper (depth `dp`), never a cone. `userData.rim`
+// is its outline at the top (radius per angle), so `hwIslCap` can cut the grass to fit it
+function hwIslLobe(seed, rx, dp, rz) { const g = new THREE.IcosahedronGeometry(1, 3), p = g.attributes.position, o = seed * 5.17, rim = [];
+  for (let i = 0; i < p.count; i++) { let x = p.getX(i), y = p.getY(i), z = p.getZ(i); const n1 = ghNoise3(x * 1.6 + o, y * 1.6 + o * .3, z * 1.6 - o), n2 = ghNoise3(x * 4.1 - o, y * 4.1 + o, z * 4.1 + o * .7), d = 1 + (n1 - .5) * .55 + (n2 - .5) * .2;
+    if (y >= 0) { x *= d; z *= d; y = y * .03 + (n2 - .5) * .02; }
+    else { const t = -y, tp = Math.max(.12, Math.sqrt(Math.max(0, 1 - t * t * .8))), hang = .45 + 1.1 * ghNoise3(x * 2.2 + o, o * .5, z * 2.2 - o) ** 2; x *= d * tp; z *= d * tp; y = -t * hang * (.8 + (n2 - .5) * .5); x += Math.sin(y * 2.3 + o) * .1 * t; z += Math.cos(y * 1.9 - o) * .1 * t; }
+    p.setXYZ(i, x * rx, y * (y >= 0 ? rx : dp), z * rz); }
+  for (let k = 0; k < 24; k++) { const b = k / 24 * 6.2832, x = Math.cos(b), z = Math.sin(b), n1 = ghNoise3(x * 1.6 + o, o * .3, z * 1.6 - o), n2 = ghNoise3(x * 4.1 - o, o, z * 4.1 + o * .7); rim.push([x * rx * (1 + (n1 - .5) * .55 + (n2 - .5) * .2) * .97, z * rz * (1 + (n1 - .5) * .55 + (n2 - .5) * .2) * .97]); }
+  g.deleteAttribute('uv'); g.computeVertexNormals(); g.userData.rim = rim; return g; }
+function hwIslCap(seed, rs, rim) { const n = rim.length, pos = [0, rs * .1, 0]; for (const [x, z] of rim) pos.push(x, .02 + ghNoise3(x * .4 + seed, 0, z * .4) * rs * .03, z);
+  const idx = []; for (let k = 0; k < n; k++) idx.push(0, 1 + (k + 1) % n, 1 + k); const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); return g.toNonIndexed(); }
 function hollowDress() {
   const H = HOME, r = rwRng(13), wallX = (z, side, inset = 0) => hwWallAt(z, side, 2.5, inset - 2);
   const B = (w, h, d, x, y, z, ry = 0) => { const g = new THREE.BoxGeometry(w, h, d); g.rotateY(ry); g.translate(x, y, z); return g; };
@@ -70133,12 +70153,21 @@ function hollowDress() {
       g.position.set(hwWallAt(z, side, y, -R * .35), y, z); g.rotation.y = side < 0 ? Math.PI / 2 : -Math.PI / 2; scene.add(g); gears.push({ g, w: (.12 + r() * .15) * (r() < .5 ? -1 : 1) }); }
     H.gears = gears; }
   // FLOATING ISLANDS over the rim, waterfalls off them
-  { const isl = [], top = [], fall = []; for (let i = 0; i < 9; i++) { const a = r() * 6.2832, R = 120 + r() * 160, x = Math.cos(a) * R * .7, z = Math.sin(a) * R, y = 60 + r() * 70, s = 10 + r() * 16;
-      const c = new THREE.ConeGeometry(s, s * 2.2, 7, 2); c.rotateX(Math.PI); c.translate(x, y - s * 1.1, z); isl.push(aBobOf(c, i + 1)); const t = new THREE.CylinderGeometry(s, s * .96, 2, 7); t.translate(x, y + .9, z); top.push(aBobOf(t, i + 1));
-      if (r() < .7) { const f = new THREE.PlaneGeometry(s * .25, y * 1.1); f.translate(x + s * .7, y - y * .55, z); f.rotateY(0); fall.push(aBobOf(f, i + 1)); } }
+  // his (m1733): "this upside-down cone just looks so geometric -- break them up, way more organic, shorter, irregular, lumpy pieces sticking
+  // out, different textures". Each island is now a cluster of LOBES (`hwIslLobe`: a noisy sphere with a flat top and a short, tapering,
+  // lumpy underside, never a straight edge), a grass cap cut to each lobe's own outline, loose rocks hanging under it, a few round trees and
+  // boulders on top; half are strata rock, half red cliff. Everything rides its island's own bob phase
+  { const isl = [[], []], top = [], tree = [], fall = []; for (let i = 0; i < 9; i++) { const a = r() * 6.2832, R = 120 + r() * 160, x = Math.cos(a) * R * .7, z = Math.sin(a) * R, y = 55 + r() * 80, s = 8 + r() * 14, body = isl[i % 2], ph = i + 1;
+      const nl = 2 + Math.floor(r() * 4), lobes = [[0, 0, 0, s, s * (.6 + r() * .5)]];
+      for (let k = 1; k < nl; k++) { const b = r() * 6.2832, q = s * (.55 + r() * .4), rs = s * (.3 + r() * .35); lobes.push([Math.cos(b) * q, -r() * s * .25 - .4, Math.sin(b) * q, rs, rs * (.7 + r() * 1.1)]); }
+      lobes.forEach(([lx, ly, lz, rs, dp], k) => { const sd = i * 13 + k * 3 + 1, L = hwIslLobe(sd, rs, dp, rs * (.75 + r() * .5)), ry = r() * 6.28; L.rotateY(ry); L.translate(x + lx, y + ly, z + lz); body.push(aBobOf(L, ph));
+        const C = hwIslCap(sd, rs, L.userData.rim); C.rotateY(ry); C.translate(x + lx, y + ly + .05, z + lz); top.push(aBobOf(C, ph));
+        for (let t = 0, nt = Math.floor(rs / 4 + r() * 2); t < nt; t++) { const tb = r() * 6.28, tq = r() * rs * .6, th = 2 + r() * 3.5, T = hwIslLobe(sd * 7 + t, th * .55, th * .25, th * .55); T.translate(x + lx + Math.cos(tb) * tq, y + ly + th * .75, z + lz + Math.sin(tb) * tq); tree.push(aBobOf(T, ph)); } });
+      for (let k = 0, nh = 1 + Math.floor(r() * 3); k < nh; k++) { const b = r() * 6.2832, q = s * (.3 + r() * .7), hs = 1 + r() * 2.4, H2 = hwIslLobe(i * 31 + k, hs, hs * 1.4, hs); H2.translate(x + Math.cos(b) * q, y - s * (.9 + r() * .9), z + Math.sin(b) * q); body.push(aBobOf(H2, ph)); }
+      if (r() < .7) { const f = new THREE.PlaneGeometry(s * .25, y * 1.1); f.translate(x + s * .85, y - y * .55, z); fall.push(aBobOf(f, ph)); } }
     // his (after m1704): fallen and restored read as a HYBRID -- these sky islands floated over a fallen valley. KORAJIN: the floating world is
     // what RESTORATION raises, so FALLEN has none
-    const sky = AGE.st !== 'fallen', SI = H.skyIsl = []; SI.push(rwMesh(isl, bobPatch(hwPaint(rwMat(0xb7744e, { flatShading: true }), 'cliff'), 1.4, .32)), rwMesh(top, bobPatch(hwPaint(rwMat(0x5f8a45), 'sand'), 1.4, .32))); for (const o of SI) o.visible = sky; if (fall.length) { const fm = rwMesh(fall, bobPatch(new THREE.MeshBasicMaterial({ color: 0xeaf6ff, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false }), 1.4, .32), false); fm.renderOrder = 3; fm.visible = sky; SI.push(fm); } }
+        const sky = AGE.st !== 'fallen', SI = H.skyIsl = []; SI.push(rwMesh(isl[0], bobPatch(hwPaint(rwMat(0xc08860, { flatShading: true }), 'rock'), 1.4, .32)), rwMesh(isl[1], bobPatch(hwPaint(rwMat(0xb7744e, { flatShading: true }), 'cliff'), 1.4, .32)), rwMesh(top, bobPatch(hwPaint(rwMat(0x6a9448), 'sand'), 1.4, .32)), rwMesh(tree, bobPatch(rwMat(0x3f6e34, { flatShading: true }), 1.4, .32))); for (const o of SI) o.visible = sky; if (fall.length) { const fm = rwMesh(fall, bobPatch(new THREE.MeshBasicMaterial({ color: 0xeaf6ff, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false }), 1.4, .32), false); fm.renderOrder = 3; fm.visible = sky; SI.push(fm); } }
   // HIS STONE LANTERNS on the approach
   { const st = [], lit = []; for (const [dx, dz] of [[9, -3.2], [9, 3.2], [6.2, -3.2], [6.2, 3.2]]) { const x = H.hut.at[0] + dx + (H.hutS ? 0 : 0), z = H.hut.at[1] + dz * (H.hutS || 1), y = rwHeight(x, z);     // in front of the door (the hut faces the river, +x)
       st.push(B(.9, .3, .9, x, y + .15, z), Cy(.16, .2, 1.1, x, y + .85, z, 6), B(.7, .18, .7, x, y + 1.45, z), B(1.05, .2, 1.05, x, y + 2.2, z), Cy(.0, .62, .45, x, y + 2.5, z, 4));
