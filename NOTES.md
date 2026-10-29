@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Rope bridge pass 3a: the hand ropes hold him (m15xx, ROPEWORKS 1 / DOCKET 25)
+- On the deck he cannot walk off the side: his feet are kept `edge` .3 m inside the deck ropes where he stands (read off the ropes every frame,
+  so the bound moves with the swing), his speed out through the side is taken away, and that push BOWS the hand rope out (`bow`, the nodes near
+  him). A jump that carries him over the hand rope's height still goes over and off.
+- Measured (pushing hard sideways for 1.5 s at mid-span, then a sideways jump): held at .3 m inside the edge the whole push (the deck swung
+  away under him, its edge .70 -> .95 m off the centreline); the hand rope bowed .40 m out and relaxed; the jump cleared it and he fell.
+- Next (3b): grab the hand rope -- shimmy along it, hang under the deck, swing up.
+
 ## Rope bridge LOOK A: the Japanese pass (m1810, ROPEWORKS 1 / DOCKET 25)
 *"A visual pass -- red, Japanese, stylized, interesting; alien and Japanese. Towers, railings, the wood -- how do we embellish it? Those Japanese
 pagoda-looking things."* (His reference image did not come through; this is from the words.)
