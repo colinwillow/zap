@@ -15764,7 +15764,7 @@ const _bnpF = { d: 0, nx: 0, nz: 0, cx: 0, cz: 0 };
 // ground is a triangle mesh and its buildings and props are still boxes, so a roof and a ramp
 // are the same question asked of two stores -- and `triGround` returning -1e30 for "no ground
 // here" rather than 0 is what leaves the floor at zero doing its job off the edge of the slice.
-// m15xx: THE ROPE BRIDGE (DOCKET 18, his: "a rope bridge -- dynamically moving, it moves to my weight"). KORAJIN > The Rope Course
+// m1800: THE ROPE BRIDGE (DOCKET 18, his: "a rope bridge -- dynamically moving, it moves to my weight"). KORAJIN > The Rope Course
 // (`?w=forge&zone=rope`). Two DECK ropes and two HAND ropes, each `N` segments of verlet (`slack` over the span so it hangs), pinned at the two
 // towers; a rung constraint holds the deck ropes `w` apart (the planks), suspenders hang the deck from the hand ropes. HIS WEIGHT: standing on it,
 // the nodes round him are pulled down (`load` m/s2, spread over `spread` nodes, more on the side he stands nearer -- it tilts), and moving across
@@ -15784,7 +15784,7 @@ function groundAt(x, z, y, step) {
   // `UNDER.box` only, so no caller above ground sees a change.
   if (UNDER.box && best > y + step && x > UNDER.box[0] && x < UNDER.box[1] && z > UNDER.box[2] && z < UNDER.box[3] && y < UNDER.box[4]) best = -1e9;
   if (TRI.on) { const t = triGround(x, z, y, step); if (t > best) best = t; }
-  if (ROPEB.on) { const r = ropeDeck(x, z); if (r !== null && r <= y + step && r > best) best = r; }     // m15xx: the rope bridge's deck
+  if (ROPEB.on) { const r = ropeDeck(x, z); if (r !== null && r <= y + step && r > best) best = r; }     // m1800: the rope bridge's deck
   for (const b of boxesNear(x, x, z, z, _bnG)) {
     if (x < b.minx || x > b.maxx || z < b.minz || z > b.maxz) continue;
     // AND A TURNED BOX'S ROOF IS THE ROOF OF THE CAR, not of the square round it -- `boxNear`

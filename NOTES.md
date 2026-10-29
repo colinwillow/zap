@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The rope bridge (m15xx, DOCKET 18a)
+## The rope bridge (m1800, DOCKET 18a)
 *"A rope bridge -- dynamically moving, it moves to my weight."* KORAJIN > The Rope Course (`?w=forge&zone=rope`): two stone towers, stairs up the
 first (.3 m risers), a 14 m bridge between them at 4.5 m.
 - **`ROPEB`:** four verlet ropes of `N` 22 segments (two DECK ropes `w` 1.4 m apart, two HAND ropes `rail` 1 m above), `slack` 1.01 over the
