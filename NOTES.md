@@ -5,6 +5,13 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Red Hollows pass: the refinery's cone, the island falls, the doubled stripes (Worker B)
+His (after m1740): "do the next pass and fix some stuff". The refinery island was still an inverted 14-sided CONE under its cap: now a big
+`hwIslLobe` plus four smaller hanging lobes, the same lumpy earth as the sky islands. The sky islands' waterfalls were flat white bars
+the full height to the ground: now each falls .35-.55 of its height, widening x3.2 and fading out (an RGBA vertex-colour plane), so it
+breaks into mist. Islands are kept 70 m (plan) clear of the refinery (one sat right over it). And the merchant's butte, the refinery and
+every strata rock read WOVEN: the vertex-colour strata bands (`ghStrataCol`) and the painted strata map are two sets of bands that never
+line up. Painted rocks now take `ghStrataCol(geo, .35)`: their bands pulled toward their own mean, so the map carries the layering.
 ## Red Hollows: the tiling lines and the sky islands (m1740, Worker B)
 His (m1733 screenshots): "fix some of this texture tiling -- on the rock it looks like lines, and on the cliffs the bluffs, more lines";
 "this upside-down triangle cone thing -- those floating islands need to be broken up and made way more organic... shorter... irregular...
