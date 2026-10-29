@@ -5,6 +5,29 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The wall by VELOCITY, angled jump-offs, the wall cam (m15xx, DOCKET 17)
+*"The camera on a wall run or wall jump -- jumping back and forth between opposite walls it was so scrunched I couldn't see." / "Change the wall run
+again: entirely velocity and angle based -- if you have the speed it's a wall run, when the velocity finishes it's a wall sit, riding down the wall.
+Straight up, straight over, diagonal or anywhere between is set by the angle he first hits the wall at, with what speed. And the jump away from
+the wall is only ever orthogonal -- there should be variation."*
+- **Prince of Persia** does it by animation: a fixed run along, a fixed climb up, a kick-off back -- speed and angle decide nothing there. His
+  version is the physical one, which suits this game better than PoP's fixed distances.
+- **`WRUN.mode` VEL (default; TOOLS > WALL: VELOCITY / STICK -- STICK is m1767's):** at the catch his velocity is turned onto the wall's plane --
+  along it what he carried along it (`alongK`), up it what he drove INTO it (`upK`) plus what he was already rising. Over `runMin` 3.5 m/s it is a
+  run in THAT direction (head-on = straight up, glancing = along, between = diagonal); the wall's gravity (`vG` 11) bends it and `vFric` bleeds
+  the along part; under `keepMin` 2.2 (or `runMax` 1.6 s) it becomes the wall SIT (the slide). The pose follows the direction (steeper than
+  `upAng` .9 rad = the run-up, else the side run). Under `runMin` at the catch: straight into the sit.
+- **The jump off (`wrunJump`, both modes):** out along the normal (`wjOut`) PLUS along the wall the left stick's share (`jumpSide` 5 x its
+  tangent component) and `keep` of what the run carried -- straight out, angled ahead, angled back. The run-up's back flip stays when the stick
+  has no sideways part.
+- **The wall cam (`stepCam`):** on a wall and for `camHold` 1.1 s after, the lens turns to look ALONG the wall -- between two facing walls, down
+  the corridor with both on screen -- the way he is moving along it (else the nearer end), pulls out `camPull` 2.2 m and up `camEl` .12 rad
+  (`cam.wallK`, eased). A drag outranks it.
+- **Measured (Wall Park, the shipped frame):** head-on sprint jump: caught at 12.1 m/s up -> the run-up -> the lip. A shallow angle (stick
+  .9 / -.4): caught with 6.4 m/s along -> a SIDE run along the face, sagging 1.1 -> .7 m, off its end. Falling onto it slowly: straight into the
+  sit, skidding down. Wall cam weight .9-.99 on all three. (Harness note: a fake stick needs `far` set, or the left pad reads as HELD IN PLACE and
+  the zoom charge pins him; and the stick is camera-relative, so reset `cam.az` between runs.)
+
 ## The katana's charge release, by the left stick, again; the bow's emblem flat (m1773)
 *"Press up on the right stick to charge. Nothing on the left stick: a downward slash, he does not launch forward -- mostly in place, forward just a
 little. Forward on the left stick and release: the launch, as now. The high attack: tap the left stick to jump and release, or hold down and
