@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The bow points down the shot again; the arc is a line, not dots, with a height stake (m1758)
+## The bow points down the shot again; the arc is a line, not dots, with a height stake (m1759)
 *"When you pull a bow shot he's 90 degrees to the wrong direction. I don't like the dots -- those balls look really out of place ... the arc shows
 how a lighter shot goes up more, that's really smart ... maybe one height thing at the end, a depth plane ... half opacity."*
 - **The 90 degrees was m1746's `bowSquare`**: it turned his CHEST'S FRONT to the aim, but an archer stands side-on and the arrow runs along the bow
@@ -117,7 +117,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## Red Hollows: the ravine walls, the rocks and the mountain are solid (m1758, Worker B)
+## Red Hollows: the ravine walls, the rocks and the mountain are solid (m1759, Worker B)
 His (m1751 phone shots, standing on the rim's moss with the cliff through his body): "going through the sides of the ravine, sides of
 certain rocks, parts of the mountain -- we need to do some work with the colliders". A heightfield is a surface, not a volume (m1114):
 inside a steep face's footprint the terrain is ABOVE him and nothing is under, so he slides in. m1114's columns only covered the canyon

@@ -14867,7 +14867,7 @@ const BARC = { on: 1, line: 1, w: .05, op: .45, dots: 40, dot: .22, maxN: 140, p
 try { if (localStorage.getItem('mel.arcline') === '0') BARC.line = 0; } catch (e) {}
 const _baP = new THREE.Vector3(), _baQ = new THREE.Vector3(), _baR = new THREE.Vector3();
 function bowArcInit() {
-  // m1758 (his: "I don't like the dots -- those balls look really out of place; it's repetitive with the stylised reticle"): the arc is a THIN
+  // m1759 (his: "I don't like the dots -- those balls look really out of place; it's repetitive with the stylised reticle"): the arc is a THIN
   // translucent RIBBON now (camera-facing, `w` m wide, `op` opacity), and under the landing ring a half-transparent STAKE drops to the ground with a
   // small foot ring -- the stake's length is the HEIGHT the shot lands at, its foot is WHERE in plan. `BARC.line` 0 hides the ribbon (TOOLS).
   const M = BARC.maxN + 2, rg = new THREE.BufferGeometry(); rg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(M * 6), 3));
@@ -14923,7 +14923,7 @@ function bowFist(B, drawing, h) { const b = rig.bones, m1 = b.mixamorig_LeftHand
 const _bqS = new THREE.Vector3(), _bqU = new THREE.Vector3(), _bqF = new THREE.Vector3(), _bqM1 = new THREE.Matrix4(), _bqM2 = new THREE.Matrix4(), _bqQ = new THREE.Quaternion(), _bqQ2 = new THREE.Quaternion(), _bqA = new THREE.Vector3();
 function bowSquare() { const b = rig.bones, sp = b.mixamorig_Spine1, ls = b.mixamorig_LeftArm, rs = b.mixamorig_RightArm, nk = b.mixamorig_Neck, s0 = b.mixamorig_Spine; if (!sp || !ls || !rs || !nk || !s0 || !BOW.sq) return;
   rig.root.updateMatrixWorld(true);
-  // m1758 (his: "when you pull a bow shot he's 90 degrees to the wrong direction"): m1746 squared his CHEST'S FRONT to the aim -- but an archer
+  // m1759 (his: "when you pull a bow shot he's 90 degrees to the wrong direction"): m1746 squared his CHEST'S FRONT to the aim -- but an archer
   // stands SIDE-ON and the shot runs along his bow arm, so that put the arrow 90 deg to his left. What goes to the aim now is the ARROW LINE:
   // from the drawing (right) hand to the bow (left) hand, in the chest's frame, levelled to world up.
   const lh = b.mixamorig_LeftHand, rh = b.mixamorig_RightHand; if (!lh || !rh) return;
@@ -15070,7 +15070,7 @@ function arenaUi() {
       else if (a === 'course') { ARENA.menu = ''; if (COURSE.on) courseClear(); else courseBuild('ACRO'); }     // m1078
       else if (a === 'wrun') { ARENA.menu = ''; if ((WRUN.boxes || []).length) wrunClear(); else wrunSpawn(); }     // m1064; m1072
       else if (a === 'smear') { SMEAR.on = SMEAR.on ? 0 : 1; try { localStorage.setItem('mel.smear', SMEAR.on ? '1' : '0'); } catch (err) {} }
-      else if (a === 'arcline') { BARC.line = BARC.line ? 0 : 1; try { localStorage.setItem('mel.arcline', BARC.line); } catch (err) {} }     // m1758
+      else if (a === 'arcline') { BARC.line = BARC.line ? 0 : 1; try { localStorage.setItem('mel.arcline', BARC.line); } catch (err) {} }     // m1759
       else if (a === 'partaim') { if (!PARTAIM.on) { PARTAIM.on = 1; PARTAIM.by = 'L'; } else if (PARTAIM.by === 'L') PARTAIM.by = 'R'; else PARTAIM.on = 0; try { localStorage.setItem('mel.partaim', PARTAIM.on ? PARTAIM.by : '0'); } catch (err) {} }     // m1738
       else if (a === 'qd') { QD.on = QD.on ? 0 : 1; document.body.classList.toggle('qd', !!QD.on); try { localStorage.setItem('mel.qd', QD.on ? '1' : '0'); } catch (err) {} wepRow._qd = undefined; GEAR.mask = -1; gearSync(1); paintKit(); }
       else if (a === 'lflick') { COVER.left = COVER.left === 'FLIPS' ? 'ROLL' : 'FLIPS'; try { localStorage.setItem('mel.left', COVER.left); } catch (err) {} }
