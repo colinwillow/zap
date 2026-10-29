@@ -14622,7 +14622,7 @@ const GPIECE = { Shoulder: 'arm', Arm: 'arm', ForeArm: 'arm', Hand: 'arm', Arm2:
 function guardPiece(name) { const n = name.replace(/^mixamorig[_:]?/, ''), m = /^(Left|Right)(.*)$/.exec(n); if (!m) return GPIECE[n] || 'body'; const g = GPIECE[m[2]]; return g ? g + (m[1] === 'Left' ? 'L' : 'R') : 'body'; }
 async function guardLoad(Z = GUARD) { if (Z.P) return Z.P;
   const [g, c] = await Promise.all([loadGLB(Z.file, 'loading ' + Z.name), loadGLB(Z.clips, 'loading his moves')]); let h = 1;
-  g.scene.traverse(o => { if (o.isSkinnedMesh) { o.geometry.computeBoundingBox(); const b = o.geometry.boundingBox; h = b.max.y - b.min.y; for (const m of [].concat(o.material)) m.side = THREE.FrontSide; } });     // Tripo writes doubleSided on everything
+  g.scene.traverse(o => { if (o.isSkinnedMesh) { o.geometry.computeBoundingBox(); const b = o.geometry.boundingBox; h = b.max.y - b.min.y; for (const m of [].concat(o.material)) m.side = Z.twoSide === 0 ? THREE.FrontSide : THREE.DoubleSide; } });     // Tripo writes doubleSided on everything; m15xx (his: "he is see-through in various polygons"): the hard-surface split and its filled CAPS leave triangles wound inward, so the stone draws BOTH sides (`twoSide` 0 = culled, as before)
   const k = Z.h / Math.max(.1, h), clips = {}; let walkV = 0;
   for (const a of c.animations) { for (const t of a.tracks) if (/Hips\.position$/.test(t.name)) { const v = t.values, n = v.length;
       if (a.name === 'walk' && n >= 6) walkV = Math.hypot(v[n - 3] - v[0], v[n - 1] - v[2]) / Math.max(.1, a.duration) * k;     // the clip's own travel: his feet do not slide

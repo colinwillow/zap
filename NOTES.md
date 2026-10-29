@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The guardian's stone draws both sides (m15xx)
+*His close-up: "What is going on with the render -- he is see-through in various polygons."*
+- `guardLoad` forced `FrontSide` (Tripo writes doubleSided on everything, m25's rule). But the hard-surface rig SPLITS the mesh at every bone
+  boundary and `hs_caps.py` fills the open loops (`holes_fill`), whose winding is whatever the fill gave it, and the Tripo scan has inward
+  triangles of its own -- so with back faces culled, those patches vanished and the far side showed through. The guardian kinds now draw
+  `DoubleSide` (`Z.twoSide` 0 = culled). The spider never overrode its export's two-sided material.
+- The root fix is in the pipeline (`bmesh.ops.recalc_face_normals` after the caps, then a re-export) -- noted, not done.
+
 ## Turquoise is the flame now -- the bow, the sword, the debris; the Osari stay green (m1779)
 *"I'd like this turquoise to be the flame colour for the other things that use the green -- the bow or the sword."*
 - `gfire`'s default palette is TURQUOISE (1); `ofire` is the Osari's green (0), used only by the Osari's vanish / fade and the spider's acid spit.
