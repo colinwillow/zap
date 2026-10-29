@@ -69273,7 +69273,7 @@ function gmerchBuild() {
     A.zip = { A: zA, B: zB }; ZIPS.push(A.zip); A.stat.zip = +Math.hypot(zA[0] - zB[0], zA[1] - zB[1], zA[2] - zB[2]).toFixed(0); }
   for (const b of boxes) BOXES.push(b);
   for (let i = 0; i < tris.length; i += 9) { const q = tris.slice(i, i + 9); triAdd(...q); triAdd(q[0], q[1], q[2], q[6], q[7], q[8], q[3], q[4], q[5]); }
-  A.stat.draws = draws; A.stat.boxes = boxes.length; A.stat.top = +top.toFixed(1); A.stat.deckY = +Y.toFixed(1);
+  A.stat.draws = draws; A.stat.boxes = boxes.length; A.stat.top = +top.toFixed(1); A.stat.deckY = +Y.toFixed(1); A.shopAt = [Wx(0, 6.9), Y, Wz(0, 6.9)];
   console.log('[melee] merchant shop (procedural): ' + draws + ' draws, ' + boxes.length + ' boxes, deck at y ' + Y.toFixed(1) + ', butte ' + (top - base).toFixed(0) + ' m, ladder ' + A.stat.ladder + ' m');
 }
 async function buildHome() {
@@ -69437,6 +69437,41 @@ function caveHit(x, y, z, rad) { const C = HCAVE; if (!C.list || !inHome()) retu
   for (const K of C.list) { const Ch = K.chest; if (!Ch || Ch.open || Math.hypot(x - Ch.x, y - Ch.y, z - Ch.z) > .9 + rad) continue; Ch.open = 1; snd('clang', { g: .9, r: .7, x: Ch.x, z: Ch.z }); spkBurst(Ch.x, Ch.y + .4, Ch.z, 40, { col: [1, .82, .3], spread: 4, size: .16, life: .9 });
     for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2; coinDrop(scene, Ch.x + Math.cos(a) * 1.1, Ch.y + .5, Ch.z + Math.sin(a) * 1.1); } C.stat.chests = (C.stat.chests || 0) + 1; return 1; }
   return 0; }
+// THE MERCHANT'S COUNTER (his, after m1713: "spend the doubloons"): stand at the counter in the shop's open front and a SHOP button rises;
+// it opens his wares, priced in doubloons (`COIN.n`, the caves' chests pay them). TONIC: full health. LANTERN: a warm light that goes with
+// him for good (`mel.lantern`) -- the caves are dark. FIREWORKS: three rockets off the deck. MYSTERY BOX: anything from nothing to twice
+// its price. Walking away closes it. The DOM is its own (pads never see its touches)
+const MSHOP = { el: null, btn: null, open: 0, near: 0, rockets: [], light: null,
+  wares: [{ k: 'tonic', n: 'HEALING TONIC', d: 'full health', p: 3 }, { k: 'lantern', n: 'LANTERN', d: 'a warm light that goes with you', p: 12, once: 1 },
+    { k: 'fire', n: 'FIREWORKS', d: 'three rockets off the deck', p: 2 }, { k: 'box', n: 'MYSTERY BOX', d: 'nothing -- or twice its price', p: 8 }] };
+try { MSHOP.lantern = localStorage.getItem('mel.lantern') === '1'; } catch (e) {}
+function mshopUi() { if (MSHOP.btn) return; const stop = el => { for (const ev of ['pointerdown', 'pointermove', 'pointerup', 'touchstart', 'touchmove', 'touchend']) el.addEventListener(ev, e => e.stopPropagation(), { passive: true }); };
+  const b = MSHOP.btn = document.createElement('button'); b.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:calc(250px + env(safe-area-inset-bottom));z-index:9;display:none;font:800 18px "Barlow Condensed",system-ui,sans-serif;letter-spacing:.06em;color:#2a1608;background:#ffcf5a;border:3px solid #6a3a10;border-radius:12px;padding:10px 22px;box-shadow:0 4px 0 #6a3a10';
+  b.onclick = e => { e.stopPropagation(); mshopOpen(1); }; stop(b); document.body.appendChild(b);
+  const el = MSHOP.el = document.createElement('div'); el.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-55%);z-index:10;display:none;width:min(92vw,380px);font-family:"Barlow Condensed",system-ui,sans-serif;color:#2a1608;background:#f6e2b8;border:4px solid #6a3a10;border-radius:16px;padding:14px;box-shadow:0 8px 0 #6a3a10,0 0 40px #0008';
+  stop(el); document.body.appendChild(el);
+  el.addEventListener('click', e => { e.stopPropagation(); const t = e.target.closest('[data-w]'); if (!t) return; if (t.dataset.w === 'x') return mshopOpen(0); mshopBuy(t.dataset.w); }); }
+function mshopDraw(msg) { const M = MSHOP; let h = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b style="font-size:24px;letter-spacing:.05em">THE MERCHANT</b><span style="font:800 20px inherit">' + COIN.n + ' &#x25C6;</span></div>';
+  for (const W of M.wares) { const own = W.once && M[W.k], can = !own && COIN.n >= W.p;
+    h += '<button data-w="' + W.k + '" style="display:flex;width:100%;justify-content:space-between;align-items:center;margin:6px 0;padding:9px 12px;font:700 17px inherit;text-align:left;border-radius:10px;border:2px solid #6a3a10;background:' + (own ? '#cbd8b0' : can ? '#ffe9a8' : '#e2cfa8') + ';color:' + (can || own ? '#2a1608' : '#8a6a4a') + '"><span>' + W.n + '<br><small style="font-weight:500;font-size:13px">' + W.d + '</small></span><b>' + (own ? 'YOURS' : W.p + ' &#x25C6;') + '</b></button>'; }
+  h += '<div style="min-height:20px;margin-top:6px;font:600 15px inherit;text-align:center">' + (msg || 'doubloons are in the chests in the caves') + '</div><button data-w="x" style="display:block;margin:8px auto 0;padding:6px 22px;font:800 16px inherit;border-radius:10px;border:2px solid #6a3a10;background:#fff">CLOSE</button>';
+  M.el.innerHTML = h; }
+function mshopOpen(on) { mshopUi(); MSHOP.open = on; MSHOP.el.style.display = on ? 'block' : 'none'; if (on) { mshopDraw(); snd('clang', { g: .35, r: 1.6 }); } }
+function mshopBuy(k) { const M = MSHOP, W = M.wares.find(q => q.k === k), p = player; if (!W) return; if (W.once && M[k]) return mshopDraw('you already have it');
+  if (COIN.n < W.p) { snd('thud', { g: .5, r: .7 }); return mshopDraw('not enough doubloons -- ' + (W.p - COIN.n) + ' more'); }
+  COIN.n -= W.p; try { localStorage.setItem('mel.coins', COIN.n); } catch (e) {} snd('clang', { g: .6, r: 2.2 }); let msg = W.n + ' -- thank you!';
+  if (k === 'tonic') { p.hp = HEALTH.max; spkBurst(p.pos.x, p.pos.y + 1, p.pos.z, 24, { col: [.5, 1, .7], spread: 2, size: .12, life: .8 }); msg = 'you feel whole again'; }
+  if (k === 'lantern') { M.lantern = true; try { localStorage.setItem('mel.lantern', '1'); } catch (e) {} msg = 'the lantern is yours -- it goes where you go'; }
+  if (k === 'fire') { const S = GMERCH.shopAt; for (let i = 0; i < 3; i++) M.rockets.push({ x: S[0] + (Math.random() - .5) * 6, y: S[1] + 1, z: S[2] + 4 + Math.random() * 3, vy: 16 + Math.random() * 6, t: -i * .45, col: [[1, .5, .3], [.5, 1, .8], [1, .9, .4]][i] }); msg = 'look up!'; }
+  if (k === 'box') { const r = Math.random(), win = r < .35 ? 0 : r < .7 ? Math.round(W.p * (.5 + Math.random())) : r < .92 ? W.p * 2 : W.p * 3; COIN.n += win; try { localStorage.setItem('mel.coins', COIN.n); } catch (e) {}
+    spkBurst(p.pos.x, p.pos.y + 1.2, p.pos.z, 10 + win * 3, { col: win ? [1, .82, .3] : [.5, .5, .5], spread: 2.5, size: .12, life: .7 }); msg = win ? 'the box holds ' + win + ' doubloons!' : 'the box is empty. bad luck'; }
+  mshopDraw(msg); }
+function mshopStep(dt) { const M = MSHOP, p = player, S = GMERCH.shopAt; if (!inHome()) return;
+  if (S) { const near = Math.hypot(p.pos.x - S[0], p.pos.z - S[2]) < 2.2 && Math.abs(p.pos.y - S[1]) < 1.5; if (near !== !!M.near) { M.near = near; mshopUi(); M.btn.style.display = near ? 'block' : 'none'; if (!near && M.open) mshopOpen(0); } if (near) M.btn.textContent = 'SHOP  \u25C6 ' + COIN.n; }
+  for (let i = M.rockets.length - 1; i >= 0; i--) { const R = M.rockets[i]; R.t += dt; if (R.t < 0) continue; R.y += R.vy * dt; R.vy -= 9 * dt; spkBurst(R.x, R.y, R.z, 2, { col: [1, .8, .5], spread: .3, size: .1, life: .4 });
+    if (R.vy < 2) { for (let k = 0; k < 3; k++) spkBurst(R.x, R.y, R.z, 40, { col: R.col, spread: 14, size: .22, life: 1.4 }); snd('boom', { g: .5, r: 1.3, x: R.x, z: R.z }); M.rockets.splice(i, 1); } }
+  // the LANTERN: a warm light at his shoulder, wherever he goes in the hollows
+  if (M.lantern) { if (!M.light) { M.light = new THREE.PointLight(0xffc070, 0, 12, 1.5); scene.add(M.light); } M.light.position.set(p.pos.x, p.pos.y + 1.8, p.pos.z); M.light.intensity = 7; } }
 function hollowDress() {
   const H = HOME, r = rwRng(13), wallX = (z, side, inset = 0) => hwWallAt(z, side, 2.5, inset - 2);
   const B = (w, h, d, x, y, z, ry = 0) => { const g = new THREE.BoxGeometry(w, h, d); g.rotateY(ry); g.translate(x, y, z); return g; };
@@ -69582,7 +69617,7 @@ function homeLanterns() {
 }
 function homeStep(dt) {
   const H = HOME; H.t += dt; if (RW.U) RW.U.uTime.value = H.t;
-  gmillStep(dt, H.t); gpeakStep(dt); gjinraStep(dt, H.t); caveStep(dt); if (GMERCH.g) rsChunkSync(GMERCH);
+  gmillStep(dt, H.t); gpeakStep(dt); gjinraStep(dt, H.t); caveStep(dt); mshopStep(dt); if (GMERCH.g) rsChunkSync(GMERCH);
   if (GHOME.U) GHOME.U.uWind.value = H.t; ghomeSmoke(dt, H.t); ghomeShut(dt); ghomeLift(dt); ghomePots(dt); for (const G of GHOME.gates || []) bgateStep(G, dt);     // pass 9: his back door
   if (GHOME.canoe) { const C = GHOME.canoe, t = H.t; C.g.position.y = C.y + rwWaveAt(C.x, C.z, t) * .8 * (1 - Math.min(1, (C.lift || 0) * 2)) + .02 + (C.lift || 0); C.ht = (C.ht == null ? 12 : C.ht) - dt; if (C.ht <= 0 && !C.hu) { C.hu = 1e-3; } if (C.hu) { C.hu += dt; if (C.hu > 6) { C.hu = 0; C.ht = 18 + Math.random() * 20; const P = C.g.getWorldPosition(new THREE.Vector3()); spkBurst(P.x, GHOME.g.position.y + C.y + .05, P.z, 30, { col: [.85, .93, 1], spread: 4, size: .09, life: .6 }); snd('thud', { g: .5, r: .7, x: P.x, z: P.z }); } }     // pass 24: now and then it LIFTS on its discs, hangs dripping, and settles
   const lift = C.hu ? .5 * Math.min(1, C.hu / 1.4) * Math.min(1, Math.max(0, (6 - C.hu) / 1.2)) : 0; if (lift > .05 && Math.random() < dt * 14) { const P = C.g.localToWorld(new THREE.Vector3((Math.random() - .5) * .8, -.4, (Math.random() - .5) * 4)); spkBurst(P.x, P.y, P.z, 2, { col: [.8, .9, 1], spread: .4, size: .05, life: .5 }); }
