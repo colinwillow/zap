@@ -14601,7 +14601,7 @@ function arenaUi() {
       else if (a === 'dwing') { DRAGZ.wingPick = DRAGZ.wingPick === 'CODE' ? 'CLIP' : 'CODE'; try { localStorage.setItem('mel.dwing', DRAGZ.wingPick); } catch (err) {} }     // m1619
       else if (a === 'dragon' && DRAGZ.on) { const T = DRAGZ.looks; DRAGZ.look = T[(T.indexOf(DRAGZ.look) + 1) % T.length]; try { localStorage.setItem('mel.dragz', DRAGZ.look); } catch (err) {} dragLook(); }     // m1610: live in the zone
       else if (a === 'dragon') { try { localStorage.setItem('mel.dragon', DOJO.dragonPick === 'WILD' ? 'CAPTURED' : 'WILD'); } catch (err) {} location.reload(); }     // m1518
-      else if (a === 'rwsky') { try { localStorage.setItem('mel.rwsky', RWSKYS[(RWSKYS.indexOf(RW.skyPick) + 1) % RWSKYS.length]); } catch (err) {} location.reload(); }     // his panorama over the Red Hollows
+      else if (a === 'rwsky') { try { localStorage.setItem(RW.skyKey || 'mel.rwsky.fallen', RWSKYS[(RWSKYS.indexOf(RW.skyPick) + 1) % RWSKYS.length]); } catch (err) {} location.reload(); }     // his panorama over the Red Hollows
       else if (a === 'dfx') { const L = ['FULL', 'NO SKY FX', 'NO PLANTS', 'NO SHADOWS']; DOJO.fx = L[(L.indexOf(DOJO.fx || 'FULL') + 1) % L.length]; dojoFxApply(); }     // m1615: find what costs the frames, one layer at a time
       else if (a === 'dsky') { try { localStorage.setItem('mel.dojo.sky', SKYPICKS[(SKYPICKS.indexOf(DOJO.skyPick) + 1) % SKYPICKS.length]); } catch (err) {} location.reload(); }     // m1446
       else if (a === 'entry') { ARENA.door.entry = ARENA.door.entry === 'DOORS' ? 'BEAM' : 'DOORS'; try { localStorage.setItem('mel.arena.entry', ARENA.door.entry); } catch (err) {} }
@@ -14622,7 +14622,7 @@ function arenaUi() {
   // in the RED HOLLOWS (his: "I need the debug menu in there so I can transform it between the two states") the bar is the STATE switch + TOOLS
   let h = '<div class="ar-bar">' + (inHome() ? B('age', (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + '<small>tap: ' + (AGE.st === 'fallen' ? 'restore it all' : 'make it fall') + '</small>', '', 'ar-main' + (AGE.st === 'fallen' ? '' : ' on'))
     : B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('vend', 'VEND')) + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
-    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('climbspd', 'CLIMB ' + CLIMB.speed.toFixed(1) + ' m/s') + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('qd', 'QUICK DRAW ' + (QD.on ? 'ON' : 'OFF')) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('btrail', 'TRAIL ' + (BTRAIL.jin ? 'JIN' : 'BLUE')) + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('sample', 'DNA SAMPLE ' + (SAMPLE.on ? 'ON' : 'OFF')) + B('runslash', 'RUN SLASH ' + (RUNSLASH.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('dsky', 'SKY ' + DOJO.skyPick) + B('dfx', 'DOJO FX ' + (DOJO.fx || 'FULL')) + B('rwsky', 'HOLLOWS SKY ' + RW.skyPick) + B('dragon', 'DRAGON ' + (DRAGZ.on ? DRAGZ.look : DOJO.dragonPick)) + B('dwing', 'DRAGON WINGS ' + DRAGZ.wingPick) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
+    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('climbspd', 'CLIMB ' + CLIMB.speed.toFixed(1) + ' m/s') + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('qd', 'QUICK DRAW ' + (QD.on ? 'ON' : 'OFF')) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('btrail', 'TRAIL ' + (BTRAIL.jin ? 'JIN' : 'BLUE')) + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('sample', 'DNA SAMPLE ' + (SAMPLE.on ? 'ON' : 'OFF')) + B('runslash', 'RUN SLASH ' + (RUNSLASH.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('dsky', 'SKY ' + DOJO.skyPick) + B('dfx', 'DOJO FX ' + (DOJO.fx || 'FULL')) + B('rwsky', 'HOLLOWS SKY ' + RW.skyPick + (RW.skyKey && /restored/.test(RW.skyKey) ? ' (restored)' : ' (fallen)')) + B('dragon', 'DRAGON ' + (DRAGZ.on ? DRAGZ.look : DOJO.dragonPick)) + B('dwing', 'DRAGON WINGS ' + DRAGZ.wingPick) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
   if (m === 'bld') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back') + B('age', 'STATE: ' + (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + '<small>tap to switch -- rebuilds what stands</small>', '', AGE.st === 'fallen' ? '' : 'ar-on');
     for (const E of BLDG.list) h += B('bld', E.t + '<small>' + (E.on() ? 'tap to remove' : E.pass >= 3 ? E.sub : 'IN PROGRESS · pass ' + E.pass + ' of 3') + '</small>', E.key, E.on() ? 'ar-on' : '');
     h += '</div>'; }
@@ -67854,6 +67854,7 @@ function caveIn(K, u, w, m) { const C = HCAVE; if (u > -.6 - (u < 0 ? 0 : m) && 
 function caveNear(x, z, m) { if (!HCAVE.on || HOME.style === 'lake') return false; for (const K of caveList()) if (K.ok && Math.abs(z - K.z) < HCAVE.rz + m + 2 && caveIn(K, (x - K.mx) * K.side, z - K.z, m)) return true; return false; }
 function caveCarve(x, z, h) { for (const K of caveList()) { if (!K.ok || Math.abs(z - K.z) > HCAVE.rz + 3) continue; if (caveIn(K, (x - K.mx) * K.side, z - K.z, 2)) return Math.min(h, K.fy); } return h; }     /* 2 m past the shell: the land's 2 m grid slopes up between a carved and an uncarved vertex, and that slope must be behind the walls (at 1 he fell through it) */
 function hwHeight(x, z) { const h = hwHeight0(x, z); return HCAVE.on && HOME.style !== 'lake' ? caveCarve(x, z, h) : h; }
+function hwHomeK() { return HOME.style !== 'lake' && GHOME.on ? GHOME.k || 1 : 1; }
 function hwHeight0(x, z) {
   const H = HOLLOW, s = x - hwRc(z), d = Math.abs(s), fw = s < 0 ? H.floorW : H.floorE;
   const lump = rwFbm(x * .09, z * .09) * 14 + rwFbm(x * .23 + 7, z * .23) * 5;
@@ -67861,7 +67862,7 @@ function hwHeight0(x, z) {
   h += (.6 + .5 * rwFbm(x * .2, z * .2)) * smooth(6.5, 10, d);                    // the floor, gently uneven
   const wk = smooth(fw - 1, fw + H.wall, d + lump * .35);                          // the wall: rounded, lumpy, by the noise
   h += (H.rim + lump * .6) * wk * wk * (3 - 2 * wk) * .9 + (H.rim * .1) * smooth(fw + H.wall, fw + H.wall + 30, d);
-  const hd = Math.hypot(x - HOME.hut.at[0], z - HOME.hut.at[1]); h = h + (HOME.padY - h) * (1 - smooth(HOME.hut.w * .6, HOME.hut.w * .95, hd)) * (d < fw - 2 ? 1 : 0);
+  const hd = Math.hypot(x - HOME.hut.at[0], z - HOME.hut.at[1]); h = h + (HOME.padY - h) * (1 - smooth(HOME.hut.w * hwHomeK() * .6, HOME.hut.w * hwHomeK() * .95, hd)) * (d < fw - 2 ? 1 : 0);
   h += gpeakLift(x, z);     // THE PEAK's mountain (BUILDINGS.md: THE PEAK)
   { const mz = 62, md = Math.hypot(x - hwRc(mz), z - mz); if (md < 17) h = Math.min(h, h + (H.bed - h) * (1 - smooth(11, 16.5, md))); }     // the water mill's POND (BUILDINGS.md: THE WATER-MILL TOWER): the stream opens out round its island
   return h;
@@ -67920,10 +67921,16 @@ function rwRipple(x, z, k = 1) { if (!RW.rip) return; RW.rip[RW.ripI].set(x, z, 
 // TOOLS > HOLLOWS SKY cycles PANO / FIRE / PAINTED (`mel.rwsky`). The image is the dome, the water's reflection (`skyRefl`, mip 3: soft, the ripples would alias it), the
 // fog's horizon (`skyCol`, mip 5: a blurred band), the image light (PMREM) and the lights' tint (the dojo's numbers per pano). It is turned
 // so its own sun (measured u .310, v .638 from the top) lands on the valley's sun (`RW.time.az`, `RW.panoEl`): the light and the picture agree
-const RWSKYS = ['PANO', 'FIRE', 'PAINTED'];
-try { const v = new URLSearchParams(location.search).get('rwsky') || localStorage.getItem('mel.rwsky'); RW.skyPick = RWSKYS.includes(v) ? v : 'PANO'; } catch (e) { RW.skyPick = 'PANO'; }
-function rwPano() { const Pn = PANOS[RW.skyPick]; if (!Pn || HOME.style === 'lake') return; const T = RW.time, az = T.az * Math.PI / 180, el = RW.panoEl * Math.PI / 180;
-  RW.U.uSunDir.value.set(Math.cos(el) * Math.sin(az), Math.sin(el), Math.cos(el) * Math.cos(az)); RW.U.uPanoOff.value.set(RW.panoSun[0] - (.5 + az / (Math.PI * 2)), (1 - RW.panoSun[1]) - (.5 + el / Math.PI));
+// m1729 (his: "the fallen and the restored need different HDRIs -- the restored brighter"): a sky PER STATE, each its own pick
+// (`mel.rwsky.fallen` / `mel.rwsky.restored`; TOOLS > HOLLOWS SKY cycles the one he is in). RESTORED: DAY, the bright blue panorama
+// (`images/hdri_game.png`) with the sun raised high; FALLEN: FIRE, the burning sunset with the sun on the horizon. `uv` is where each image's
+// own sun is (measured: the brightest 5x5 patch at 443 px; the dojo's for PANO), `el` the valley sun's height it is turned to
+const RWSKYS = ['DAY', 'PANO', 'FIRE', 'PAINTED'];
+const RWSKY = { DAY: { file: 'images/hdri_game.png', env: .65, sun: 0xfff0d8, hemi: 0xdce8ff, ground: 0x7a5a4a, fog: 0xc8dcf8, uv: [.272, .597], el: 18 } };     /* its horizon (the mountains) is ~70% down the image, so its sun is ~18 deg up: at 38 the mountains rose into the sky */
+// picked when the sky is built (after `?hs=` has set the state), never at module scope
+function rwSkyPick() { try { const st = AGE.st === 'restored' ? 'restored' : 'fallen', v = new URLSearchParams(location.search).get('rwsky') || localStorage.getItem('mel.rwsky.' + st); RW.skyKey = 'mel.rwsky.' + st; RW.skyPick = RWSKYS.includes(v) ? v : st === 'restored' ? 'DAY' : 'FIRE'; } catch (e) { RW.skyPick = 'FIRE'; RW.skyKey = 'mel.rwsky.fallen'; } return RW.skyPick; }
+function rwPano() { rwSkyPick(); const Pn = RWSKY[RW.skyPick] || PANOS[RW.skyPick]; if (!Pn || HOME.style === 'lake') return; const uv = Pn.uv || ({ PANO: [.310, .638], FIRE: [.306, .646] })[RW.skyPick] || RW.panoSun, T = RW.time, az = T.az * Math.PI / 180, el = (Pn.el || ({ PANO: 9, FIRE: 6 })[RW.skyPick] || RW.panoEl) * Math.PI / 180;
+  RW.U.uSunDir.value.set(Math.cos(el) * Math.sin(az), Math.sin(el), Math.cos(el) * Math.cos(az)); RW.U.uPanoOff.value.set(uv[0] - (.5 + az / (Math.PI * 2)), (1 - uv[1]) - (.5 + el / Math.PI));
   new THREE.TextureLoader().load(A(Pn.file), t => { t.colorSpace = THREE.SRGBColorSpace; t.wrapS = THREE.RepeatWrapping; t.minFilter = THREE.LinearMipmapLinearFilter; t.generateMipmaps = true; t.anisotropy = 4;
     RW.U.uPano.value = t; RW.U.uPanoOn.value = 1; const c = new THREE.Color(Pn.sun); RW.U.uSunCol.value.set(c.r, c.g, c.b);
     try { const t2 = t.clone(); t2.mapping = THREE.EquirectangularReflectionMapping; t2.needsUpdate = true; const pm = new THREE.PMREMGenerator(renderer), rt = pm.fromEquirectangular(t2); pm.dispose(); scene.environment = rt.texture; scene.environmentIntensity = Pn.env; RW.envRt = rt; } catch (e) { note('NO RW PANO IBL'); }
@@ -68033,7 +68040,7 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 try { const q = new URLSearchParams(location.search).get('hs'); if (q === 'restored' || q === 'fallen') AGE.st = q; } catch (e) {}     // the state is main's AGE (m1501); `?hs=` overrides for a look
 const hsF = () => AGE.st === 'fallen';
 function hsFallen(g) { if (!g || !hsF()) return; bldAge(g); }     // main's weathering (`bldAge`, m1501): the paint drained in the shader, metal to rust, glows out
-const GHOME = { on: 1, pass: 32, liftA: 1.4, potFix: 25, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
+const GHOME = { on: 1, pass: 33, k: 1.4, liftA: 1.4, potFix: 25, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   Rtu: 2.5, door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
 // the speckled sandstone: cream, a fine dark speckle and big purple spots, as VERTEX colour from a 3D value noise on the local position
@@ -68161,8 +68168,8 @@ function ghomeHit(x, y, z, rad) { if (!GHOME.g || !inHome()) return 0; const w0h
     if (Math.hypot(x - P.x, y - P.y, z - P.z) < 1.0 + rad) { const yaw = GHOME.g.rotation.y, c = Math.cos(yaw), s = Math.sin(yaw), dx = P.x - player.pos.x, dz = P.z - player.pos.z, n = Math.hypot(dx, dz) || 1;
       const lx = (dx * c - dz * s) / n, lz = (dx * s + dz * c) / n; w.vz += lx * 1.9; w.vx -= lz * 1.9; w.hc = .25;
       snd('clang', { g: 1, r: .7, x: P.x, z: P.z }); spkBurst(x, y, z, 18, { col: [1, .8, .35], spread: 4, size: .12, life: .5 }); camShake(.06); return 1; } }
-  { const C = GHOME.canoe; if (C && GHOME.sw && GHOME.sw.hc <= 0 && Math.hypot(x - C.x, z - C.z) < 2.6 + rad && y < GHOME.g.position.y + C.y + 2) { C.kv += (Math.random() < .5 ? -1 : 1) * 1.1; GHOME.sw.hc = .3; snd('thud', { g: .7, r: 1.1, x: C.x, z: C.z }); spkBurst(x, y, z, 10, { col: [.85, .93, 1], spread: 3, size: .08, life: .4 }); return 1; } }     // pass 21: a blow rocks the canoe
-  for (const S of GHOME.shut || []) { if (!w0hc()) break; const G = GHOME.g, dx = x - G.position.x, dz = z - G.position.z, c = Math.cos(G.rotation.y), sn = Math.sin(G.rotation.y), lx = dx * c - dz * sn, lz = dx * sn + dz * c, ly = y - G.position.y;
+  { const C = GHOME.canoe; if (C && GHOME.sw && GHOME.sw.hc <= 0 && Math.hypot(x - C.x, z - C.z) < 2.6 + rad && y < GHOME.g.position.y + C.y * (GHOME.k || 1) + 2) { C.kv += (Math.random() < .5 ? -1 : 1) * 1.1; GHOME.sw.hc = .3; snd('thud', { g: .7, r: 1.1, x: C.x, z: C.z }); spkBurst(x, y, z, 10, { col: [.85, .93, 1], spread: 3, size: .08, life: .4 }); return 1; } }     // pass 21: a blow rocks the canoe
+  for (const S of GHOME.shut || []) { if (!w0hc()) break; const G = GHOME.g, kk = GHOME.k || 1, dx = (x - G.position.x) / kk, dz = (z - G.position.z) / kk, c = Math.cos(G.rotation.y), sn = Math.sin(G.rotation.y), lx = dx * c - dz * sn, lz = dx * sn + dz * c, ly = (y - G.position.y) / kk;
     if (lx < S.xa - .2 || lx > S.xb + .2 || Math.abs(lz - S.z) > .6 + rad || ly < S.yb - .2 || ly > S.yt + .5) continue; GHOME.sw.hc = .4;
     if ((GHOME.R_ ? GHOME.R_.t : 1) < .99) { snd('thud', { g: .6, r: .6, x, z }); spkBurst(x, y, z, 8, { col: [.6, .4, .3], spread: 2, size: .08, life: .4 }); return 1; }
     S.want = S.want > .5 ? 0 : 1; snd('clang', { g: .7, r: .5, x, z }); spkBurst(x, y, z, 10, { col: [1, .7, .4], spread: 2.5, size: .08, life: .4 }); return 1; }
@@ -68177,15 +68184,15 @@ function ghomeShutFill() { const A = GHOME, pa = A.shutMesh.geometry.attributes.
         pa.array[q] = cx + T[v * 3] * w; pa.array[q + 1] = yb + (T[v * 3 + 1] + .5) * hh; pa.array[q + 2] = S.z + dz + T[v * 3 + 2] * th; } } }
   pa.needsUpdate = true; }
 // pass 29: the rope lift -- ride it, or call it to the end you stand at; it carries him (moves him by its own dy while he stands on it)
-function ghomeLift(dt) { const A = GHOME, L = A.lift; if (!L) return; const RT = A.R_ ? A.R_.t : 1, p = player, y0 = A.g.position.y, b = L.box, h = .6;
-  const on = p.grounded && Math.abs(p.pos.x - L.wx) < h + .1 && Math.abs(p.pos.z - L.wz) < h + .1 && L.ly !== null && Math.abs(p.pos.y - (y0 + L.ly)) < .35;
+function ghomeLift(dt) { const A = GHOME, L = A.lift; if (!L) return; const RT = A.R_ ? A.R_.t : 1, p = player, y0 = A.g.position.y, k = A.k || 1, b = L.box, h = .6 * k;
+  const on = p.grounded && Math.abs(p.pos.x - L.wx) < h + .1 && Math.abs(p.pos.z - L.wz) < h + .1 && L.ly !== null && Math.abs(p.pos.y - (y0 + L.ly * k)) < .35;
   if (RT < .99) { L.want = L.y = L.yb; L.wait = 0; }
   else { const atB = Math.abs(L.y - L.yb) < .01, atT = Math.abs(L.y - L.yt) < .01, d = Math.hypot(p.pos.x - L.wx, p.pos.z - L.wz);
     if (on && (atB || atT)) { L.wait += dt; if (L.wait > .6) { L.want = atB ? L.yt : L.yb; L.wait = 0; snd('clang', { g: .45, r: .5, x: L.wx, z: L.wz }); } } else L.wait = 0;
-    if (!on && d < 2.6 && (atB || atT) && L.want === L.y) { const py = p.pos.y - y0; if (atT && Math.abs(py - L.yb) < 1.5) L.want = L.yb; if (atB && Math.abs(py - L.yt) < 1.5) L.want = L.yt; }
+    if (!on && d < 2.6 && (atB || atT) && L.want === L.y) { const py = (p.pos.y - y0) / k; if (atT && Math.abs(py - L.yb) < 1.5) L.want = L.yb; if (atB && Math.abs(py - L.yt) < 1.5) L.want = L.yt; }
     if (L.y !== L.want) { const v = 1.8 * dt; L.y = L.want > L.y ? Math.min(L.want, L.y + v) : Math.max(L.want, L.y - v); if (L.y === L.want) snd('thud', { g: .5, r: .9, x: L.wx, z: L.wz }); } }
-  if (on && L.ly !== null) p.pos.y += L.y - L.ly; L.ly = L.y;
-  b.minx = L.wx - h; b.maxx = L.wx + h; b.minz = L.wz - h; b.maxz = L.wz + h; b.miny = y0 + L.y - .3; b.maxy = y0 + L.y;
+  if (on && L.ly !== null) p.pos.y += (L.y - L.ly) * k; L.ly = L.y;
+  b.minx = L.wx - h; b.maxx = L.wx + h; b.minz = L.wz - h; b.maxz = L.wz + h; b.miny = y0 + L.y * k - .3; b.maxy = y0 + L.y * k;
   L.g.position.y = L.y; L.g.rotation.z = RT < .99 ? .12 : 0; L.rg.visible = RT > .99; for (const m of L.ropes) m.scale.y = Math.max(.1, L.yg - .25 - L.y - 1); }
 // pass 30: the pots' vertex ranges in their merged buckets (non-indexed, merged in order, so a range is the sum of the pieces before it);
 // a blow (`ghomeHit`) folds one to its own middle and throws clay; it is back `potFix` s later unless he stands on the spot
@@ -68193,16 +68200,16 @@ function ghomePotsDone(MG) { const A = GHOME, meshes = new Map(); for (const o o
   const offs = new Map(); for (const [m, list] of MG) { const a = []; let n = 0; for (const geo of list) { a.push(n); n += geo.attributes.position.count; } offs.set(m, [a, list]); }
   A.pots = A.pots.filter(Q => { const o = meshes.get(Q.m), of = offs.get(Q.m); if (!o || !of) return false; Q.mesh = o; Q.i0 = of[0][Q.li]; Q.n = of[1][Q.li].attributes.position.count; Q.base = o.geometry.attributes.position.array.slice(Q.i0 * 3, (Q.i0 + Q.n) * 3); Q.dead = 0; Q.t = 0; return true; });
   A.stat.pots = A.pots.length; }
-function ghomePotHit(x, y, z, rad) { const A = GHOME, G = A.g, dx = x - G.position.x, dz = z - G.position.z, c = Math.cos(G.rotation.y), sn = Math.sin(G.rotation.y), lx = dx * c - dz * sn, lz = dx * sn + dz * c, ly = y - G.position.y; let hit = 0;
+function ghomePotHit(x, y, z, rad) { const A = GHOME, G = A.g, kk = A.k || 1, dx = (x - G.position.x) / kk, dz = (z - G.position.z) / kk, c = Math.cos(G.rotation.y), sn = Math.sin(G.rotation.y), lx = dx * c - dz * sn, lz = dx * sn + dz * c, ly = (y - G.position.y) / kk; rad /= kk; let hit = 0;
   for (const Q of A.pots) { if (Q.dead || Math.hypot(lx - Q.x, lz - Q.z) > Q.r + .25 + rad || ly < Q.y - .3 - rad || ly > Q.y + Q.h + .3 + rad) continue;
     Q.dead = 1; Q.t = A.potFix; hit = 1; const a = Q.mesh.geometry.attributes.position, cy = Q.y + Q.h / 2; for (let v = Q.i0; v < Q.i0 + Q.n; v++) a.setXYZ(v, Q.x, cy, Q.z); a.needsUpdate = true;
     if (Q.b) { const i = BOXES.indexOf(Q.b); if (i >= 0) { BOXES.splice(i, 1); boxGrid(); } }
-    const wx = G.position.x + Q.x * c + Q.z * sn, wz = G.position.z - Q.x * sn + Q.z * c, wy = G.position.y + cy; for (let k = 0; k < 2; k++) spkBurst(wx, wy, wz, 10 + Q.r * 30, { col: k ? Q.col : [.95, .85, .7], spread: 3 + Q.r * 6, size: .06 + Q.r * .25, life: .6 });
+    const wx = G.position.x + (Q.x * c + Q.z * sn) * kk, wz = G.position.z + (-Q.x * sn + Q.z * c) * kk, wy = G.position.y + cy * kk; for (let k = 0; k < 2; k++) spkBurst(wx, wy, wz, 10 + Q.r * 30, { col: k ? Q.col : [.95, .85, .7], spread: 3 + Q.r * 6, size: .06 + Q.r * .25, life: .6 });
     snd('thud', { g: .5 + Q.r, r: 1.6 - Q.r, x: wx, z: wz }); snd('clang', { g: .25, r: 2.6, x: wx, z: wz }); if (Q.r > .3) camShake(.05); }
   return hit; }
 function ghomePots(dt) { const A = GHOME, p = player, G = A.g; if (!A.pots || !G) return;
-  for (const Q of A.pots) { if (!Q.dead || (Q.t -= dt) > 0) continue; const c = Math.cos(G.rotation.y), sn = Math.sin(G.rotation.y), wx = G.position.x + Q.x * c + Q.z * sn, wz = G.position.z - Q.x * sn + Q.z * c;
-    if (Math.hypot(p.pos.x - wx, p.pos.z - wz) < Q.r + .8) { Q.t = 1; continue; } const a = Q.mesh.geometry.attributes.position; a.array.set(Q.base, Q.i0 * 3); a.needsUpdate = true; Q.dead = 0;
+  for (const Q of A.pots) { if (!Q.dead || (Q.t -= dt) > 0) continue; const kk = A.k || 1, c = Math.cos(G.rotation.y), sn = Math.sin(G.rotation.y), wx = G.position.x + (Q.x * c + Q.z * sn) * kk, wz = G.position.z + (-Q.x * sn + Q.z * c) * kk;
+    if (Math.hypot(p.pos.x - wx, p.pos.z - wz) < Q.r * kk + .8) { Q.t = 1; continue; } const a = Q.mesh.geometry.attributes.position; a.array.set(Q.base, Q.i0 * 3); a.needsUpdate = true; Q.dead = 0;
     if (Q.b) { BOXES.push(Q.b); boxGrid(); } } }
 function ghomeShut(dt) { const A = GHOME; if (!A.shut) return; const RT = A.R_ ? A.R_.t : 1; let grid = 0;
   for (const S of A.shut) { if (RT > .99 && !S.woke) { S.woke = 1; if (A.R_.goal === 1 && S.u < .5) S.want = 1; } if (RT < .01) { S.woke = 0; S.want = S.u = 0; S.dirty = 1; }
@@ -68223,7 +68230,7 @@ function ghomeRestoreRig(MG) { const A = GHOME, N = A.chNames.length, U = A.chU 
   for (let k = 1; k < N; k++) { const b = A.chBox[k], d = new THREE.Object3D(); if (b.isEmpty()) { A.stand.push(null); continue; } const piv = new THREE.Vector3((b.min.x + b.max.x) / 2, b.min.y, (b.min.z + b.max.z) / 2); d.position.copy(piv); d.userData.piv = piv; A.stand.push(d);
     const F = fallen[k]; restorePiece(R, d, { p: [piv.x + F.p[0], piv.y + F.p[1], piv.z + F.p[2]], r: F.r, hop: F.hop }, (k - 1) / (N - 1)); }
   for (const m of MG.keys()) { if (!m.color || m.userData.rest) continue; m.userData.rest = 1; const c = m.color.clone(), rust = (m.metalness || 0) > .5 ? new THREE.Color(0x6e4632) : c.clone().lerp(new THREE.Color(0x8a7a6a), .35).multiplyScalar(.85); restoreMat(R, m, rust); }
-  { const pz = 8.4, px = 3.2, wx = A.at[0] + px * Math.cos(A.yaw) + pz * Math.sin(A.yaw), wz = A.at[1] - px * Math.sin(A.yaw) + pz * Math.cos(A.yaw), wy = rwHeight(wx, wz) + .06;
+  { const pz = 8.4, px = 3.2, kk = A.k || 1, wx = A.at[0] + (px * Math.cos(A.yaw) + pz * Math.sin(A.yaw)) * kk, wz = A.at[1] + (-px * Math.sin(A.yaw) + pz * Math.cos(A.yaw)) * kk, wy = rwHeight(wx, wz) + .06;
     const pl = new THREE.Mesh(new THREE.CylinderGeometry(.9, .95, .12, 24), new THREE.MeshStandardMaterial({ color: 0x9afce0, emissive: 0x30d0a0, emissiveIntensity: 1.2, roughness: .4 })); pl.position.set(wx, wy, wz); scene.add(pl); A.plate = pl; R.trig = { x: wx, y: wy, z: wz, armed: 1 }; }
   const t0 = hsF() ? 0 : 1; R.goal = t0; restoreSet(R, t0); for (const P of R.pieces) P.landed = t0; ghomeRestoreSync(); }
 function ghomeRestoreSync() { const A = GHOME; if (!A.chU || !A.stand) return; const M = new THREE.Matrix4(), T = new THREE.Matrix4();
@@ -68276,9 +68283,11 @@ function ghomeSmoke(dt, t) { ghomeRestoreSync(); const RT = GHOME.R_ ? GHOME.R_.
     S.pts.geometry.attributes.position.needsUpdate = true; S.pts.material.size = 1.4; }
   for (const [L, k] of GHOME.lights || []) L.intensity = k * (.88 + .08 * Math.sin(t * 9.3 + k) + .04 * Math.sin(t * 23.7)); }
 function ghomeBuild(at, yaw, y0) {
-  const A = GHOME; A.at = at; const g = new THREE.Group(); g.position.set(at[0], y0, at[1]); g.rotation.y = yaw; scene.add(g); A.g = g; A.bellPts = []; A.pots = []; A.wins = []; A.sw = { z: 0, vz: 0, x: 0, vx: 0, hc: 0 }; A.bellT = 0;
+  const A = GHOME; A.at = at; const g = new THREE.Group(); g.position.set(at[0], y0, at[1]); g.rotation.y = yaw; const hk = A.k || 1; g.scale.setScalar(hk); scene.add(g); A.g = g; A.bellPts = []; A.pots = []; A.wins = []; A.sw = { z: 0, vz: 0, x: 0, vx: 0, hc: 0 }; A.bellT = 0;
   const c = Math.round(Math.cos(yaw) * 1e6) / 1e6, s = Math.round(Math.sin(yaw) * 1e6) / 1e6, P = A.P;
-  const Wx = (x, z) => at[0] + x * c + z * s, Wz = (x, z) => at[1] - x * s + z * c;
+  // THE WHOLE HOME AT x`A.k` (his, after m1728: "the inside should be much more expansive" -- he chose scaling it all): the group is scaled, and
+  // every local -> world conversion here carries k (Wx / Wz, the boxes, the walk triangles, every y0 + y), every world -> local divides by it
+  const Wx = (x, z) => at[0] + (x * c + z * s) * hk, Wz = (x, z) => at[1] + (-x * s + z * c) * hk;
   // ---- the buckets: only position + normal (+ colour on the stone) survive, so every piece merges (mixed attribute sets merge to NULL) ----
   const MG = new Map(), _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _v = new THREE.Vector3(), _one = new THREE.Vector3(1, 1, 1), col = [0, 0, 0];
   const put = (geo, m, mat4) => { geo = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(geo.attributes)) if (k !== 'position' && k !== 'normal' && !(k === 'uv' && m.map && !m.userData.tri)) geo.deleteAttribute(k);
@@ -68315,10 +68324,10 @@ function ghomeBuild(at, yaw, y0) {
   // ---- colliders: local boxes into the world; and solid RUNS (a test over a cell grid, merged along x) for the round shells ----
   const boxes = [], tris = [];
   const box = (x0, x1, y0b, y1, z0, z1, ex) => { const xa = Wx(x0, z0), xb = Wx(x1, z1), za = Wz(x0, z0), zb = Wz(x1, z1);
-    const b = Object.assign({ minx: Math.min(xa, xb), maxx: Math.max(xa, xb), miny: y0 + y0b, maxy: y0 + y1, minz: Math.min(za, zb), maxz: Math.max(za, zb) }, ex); boxes.push(b); return b; };
+    const b = Object.assign({ minx: Math.min(xa, xb), maxx: Math.max(xa, xb), miny: y0 + y0b * hk, maxy: y0 + y1 * hk, minz: Math.min(za, zb), maxz: Math.max(za, zb) }, ex); boxes.push(b); return b; };
   const runs = (test, X0, X1, Z0, Z1, ya, yb, cell = .3, ex) => { let n = 0; for (let z = Z0; z < Z1; z += cell) { let s0 = null; for (let x = X0; x <= X1 + cell; x += cell) { const on = x <= X1 && test(x + cell / 2, z + cell / 2);
       if (on && s0 === null) s0 = x; if (!on && s0 !== null) { box(s0, x, ya, yb, z, z + cell, ex); s0 = null; n++; } } } return n; };
-  const tri = (a, b, d) => { for (const q of [a, b, d]) tris.push(Wx(q[0], q[2]), y0 + q[1], Wz(q[0], q[2])); };
+  const tri = (a, b, d) => { for (const q of [a, b, d]) tris.push(Wx(q[0], q[2]), y0 + q[1] * hk, Wz(q[0], q[2])); };
   const quad = (a, b, d, e) => { tri(a, b, d); tri(a, d, e); };
   // a solid VISUAL box in local
   const vbox = (x0, x1, ya, yb, z0, z1, m, solid, ex) => { put(new THREE.BoxGeometry(x1 - x0, yb - ya, z1 - z0), m, at4((x0 + x1) / 2, (ya + yb) / 2, (z0 + z1) / 2)); if (solid) box(x0, x1, ya, yb, z0, z1, ex); };
@@ -68494,10 +68503,10 @@ function ghomeBuild(at, yaw, y0) {
     { const lx = A.Wc[0], lz = A.Wc[1] + A.Rw + .14, ya = P, yb = P + A.Hwg + .4;
       for (const ox of [-.32, .32]) vbox(lx + ox - .04, lx + ox + .04, ya, yb + .5, lz - .04, lz + .04, wood, 0);
       for (let y = ya + .3; y < yb + .3; y += .34) vbox(lx - .32, lx + .32, y - .03, y + .03, lz - .03, lz + .03, wood, 0);
-      const nx = s, nz = c, cxw = Wx(lx, lz), czw = Wz(lx, lz), hx = .12, hz = .45;     // the local +z normal in the world
+      const nx = s, nz = c, cxw = Wx(lx, lz), czw = Wz(lx, lz), hx = .12 * hk, hz = .45 * hk;     // the local +z normal in the world
       const ex = Math.abs(nx) * hx + Math.abs(nz) * hz, ez = Math.abs(nz) * hx + Math.abs(nx) * hz;
-      const Lb = kitClimbAdd({ cs: nx, sn: nz, hx, hz, cx: cxw, cz: czw, minx: cxw - ex, maxx: cxw + ex, miny: y0 + ya, maxy: y0 + yb, minz: czw - ez, maxz: czw + ez }, 'ghome_ladder', y0 + P + A.Hwg); Lb.rung = { y0: y0 + ya + .3, s: .34 };
-      const mr = A.Rw - 1, my = P + A.Hwg + 2.2 * Math.cos(Math.asin(mr / A.Rw)); Lb.mark = { x: Wx(A.Wc[0], A.Wc[1] + mr), y: y0 + my, z: Wz(A.Wc[0], A.Wc[1] + mr) }; A.climbs = [Lb]; }
+      const Lb = kitClimbAdd({ cs: nx, sn: nz, hx, hz, cx: cxw, cz: czw, minx: cxw - ex, maxx: cxw + ex, miny: y0 + ya * hk, maxy: y0 + yb * hk, minz: czw - ez, maxz: czw + ez }, 'ghome_ladder', y0 + (P + A.Hwg) * hk); Lb.rung = { y0: y0 + (ya + .3) * hk, s: .34 * hk };
+      const mr = A.Rw - 1, my = P + A.Hwg + 2.2 * Math.cos(Math.asin(mr / A.Rw)); Lb.mark = { x: Wx(A.Wc[0], A.Wc[1] + mr), y: y0 + my * hk, z: Wz(A.Wc[0], A.Wc[1] + mr) }; A.climbs = [Lb]; }
     // the long RAMP off the right deck down to the ground, railed (noCam)
     { const x0 = 9.8, x1 = 16.2, z0 = 4.5, z1 = 6.6, n = Math.ceil((x1 - x0) / .34);
       for (let i = 0; i < n; i++) { const xa = x0 + (x1 - x0) * i / n, xb = x0 + (x1 - x0) * (i + 1) / n, ym = P * (1 - (i + .5) / n); vbox(xa + .01, xb - .01, ym - .14, ym + .02, z0, z1, woodP, 0); }
@@ -68551,7 +68560,7 @@ function ghomeBuild(at, yaw, y0) {
         const tg = new THREE.PlaneGeometry(.7, 1.9, 2, 6); tg.translate(0, -2.25 - .7 - .95, 0); const tm = mk(tg, banM); tm.material = banM;
         // pass 17: the CABLE paid out between the boom's tip and the chain (a unit cylinder, scaled to the drop), and where the winch is
         const cg = new THREE.CylinderGeometry(.035, .035, 1, 5); cg.translate(0, -.5, 0); const cab = new THREE.Mesh(cg, iron); cab.scale.y = .001; cab.visible = false; pend.add(cab); GHOME.cable = cab;
-        GHOME.winch = [Wx(mx, mz), y0 + my1 + .15, Wz(mx, mz)]; GHOME.drop = 0; GHOME.dropT = 0; GHOME.dropMax = tip[1] - 2.25 - 3.0; }
+        GHOME.winch = [Wx(mx, mz), y0 + (my1 + .15) * hk, Wz(mx, mz)]; GHOME.drop = 0; GHOME.dropT = 0; GHOME.dropMax = tip[1] - 2.25 - 3.0; }
       for (const dx of [-.16, .16]) { const wx = tip[0] + 1.6 + dx; rodW([tip[0] + 1.6, tip[1] - .3, tip[2]], [wx, tip[1] - 1.5, tip[2]], .03, iron, 1); cyl(wx, tip[1] - 2.3, tip[2], .13, .13, .8, bronze, 10); } }
     // the BALCONY CANOPY: four posts at the rail, a red roof on them sloping from the tower wall
     { const [Tx, Tz] = A.T, Yb = P + A.Yb, ro = A.Rt + 2.25, angs = [-.4, .55, 1.5, 2.45];
@@ -68580,7 +68589,7 @@ function ghomeBuild(at, yaw, y0) {
     const lantern = (x, y, z, s = 1) => { put(new THREE.CylinderGeometry(.012, .012, .4, 4), iron, at4(x, y + .2, z)); put(new THREE.ConeGeometry(.16 * s, .14 * s, 6), bronze, at4(x, y - .02, z));
       put(new THREE.CylinderGeometry(.11 * s, .11 * s, .26 * s, 6), glow, at4(x, y - .22 * s, z)); for (let k = 0; k < 4; k++) { const q = k / 4 * Math.PI * 2 + .4; put(new THREE.BoxGeometry(.025, .3 * s, .025), bronze, at4(x + Math.sin(q) * .12 * s, y - .22 * s, z + Math.cos(q) * .12 * s)); }
       put(new THREE.CylinderGeometry(.13 * s, .1 * s, .05, 6), bronze, at4(x, y - .38 * s, z)); };
-    const bells = (x, y, z) => { A.bellPts.push([Wx(x, z), y0 + y - .47, Wz(x, z)]); put(new THREE.CylinderGeometry(.01, .01, .5, 3), iron, at4(x, y - .25, z)); for (const [dx, dy] of [[0, -.55], [-.07, -.42], [.07, -.47]]) put(new THREE.CylinderGeometry(.04, .07, .2, 8), bronze, at4(x + dx, y + dy, z)); };
+    const bells = (x, y, z) => { A.bellPts.push([Wx(x, z), y0 + (y - .47) * hk, Wz(x, z)]); put(new THREE.CylinderGeometry(.01, .01, .5, 3), iron, at4(x, y - .25, z)); for (const [dx, dy] of [[0, -.55], [-.07, -.42], [.07, -.47]]) put(new THREE.CylinderGeometry(.04, .07, .2, 8), bronze, at4(x + dx, y + dy, z)); };
     // the STALLS: a two-shelf rack along the back of each deck, heaped with pots; crates and big pots on the deck
     for (const sx of [-1, 1]) { const xa = sx < 0 ? -9.4 : 2.9, xb = sx < 0 ? -2.9 : 9.4, zr = 3.75;
       vbox(xa, xb, P, P + .05, zr - .3, zr + .3, wood, 0); for (const hh of [.75, 1.45]) vbox(xa, xb, P + hh - .05, P + hh, zr - .3, zr + .3, wood, 0);
@@ -68626,8 +68635,8 @@ function ghomeBuild(at, yaw, y0) {
     for (const sx of [-1.25, 1.25]) { vbox(sx - .04, sx + .04, P + 2.4, P + 2.9, -A.R - .25, -A.R - .17, wood, 0); lamp(sx, P + 2.55, -A.R - .45); }
     { const [Tx, Tz] = A.T, ro = A.Rt + 2.25; for (const a of [.07, 1.0, 2.0]) lamp(Tx + Math.sin(a) * (ro - .1), P + A.Yb + 2.55, Tz + Math.cos(a) * (ro - .1)); }
     // the door: in the WORLD (the helper builds there), lifted to the floor, its box in with the rest
-    const wg = new THREE.Group(); wg.position.y = y0 + P; scene.add(wg); const lz = -(A.R - A.t / 2), wx = Wx(0, lz), wz = Wz(0, lz), alongX = Math.abs(c) > .5;
-    const G = bgateMake(wg, wx, wz, A.door - .12, A.doorH - .05, alongX, { boxes: [] }, { r: 3, fix: 30 }); G.box.miny += y0 + P; G.box.maxy += y0 + P; boxes.push(G.box);
+    const wg = new THREE.Group(); wg.position.y = y0 + P * hk; scene.add(wg); const lz = -(A.R - A.t / 2), wx = Wx(0, lz), wz = Wz(0, lz), alongX = Math.abs(c) > .5;
+    const G = bgateMake(wg, wx, wz, (A.door - .12) * hk, (A.doorH - .05) * hk, alongX, { boxes: [] }, { r: 3, fix: 30 }); G.box.miny += y0 + P * hk; G.box.maxy += y0 + P * hk; boxes.push(G.box);
     wg.traverse(o => { if (o.isMesh && o.material && o.material.color && o.material.metalness < .5) { o.material = o.material.clone(); o.material.color.setHex(0x5a3a22); } });
     GHOME.gates = [G]; }
   // ---- PASS 10: THE RIGGING (refs: ropes everywhere) -- sagging ropes from the cone's pole tips down to the front frame, the stacks and the
@@ -68733,7 +68742,7 @@ function ghomeBuild(at, yaw, y0) {
   // ---- PASS 19 (his ask): a FISHING PIER straight out from the shop steps into the stream -- plank deck on posts down to the bed, following
   // the bank down until it clears the water, then level; a rail on one side, a T-head with lantern posts, a stool, a bait barrel, rope coils
   // and a rod leaning out; and his ALIEN CANOE moored alongside (`GHOME.canoe`: it bobs on the waves) ----
-  { const gH = (x, z) => rwHeight(Wx(x, z), Wz(x, z)) - y0, wY = -y0, dY = wY + .62, z0 = 8.6, z1 = 13.0, hw = 1.1, NC = { noCam: 1 };
+  { const gH = (x, z) => (rwHeight(Wx(x, z), Wz(x, z)) - y0) / hk, wY = -y0 / hk, dY = wY + .62, z0 = 8.6, z1 = 13.0, hw = 1.1, NC = { noCam: 1 };
     const rnd2 = rwRng(1921); let zz = z0, pi = 0; while (zz < z1) { const za = zz, zb = Math.min(z1, zz + .34), yd = Math.max(dY, gH(0, (za + zb) / 2) + .06), jy = (rnd2() - .5) * .025;     // pass 21: weathered -- mixed timber, each a little off, one gone
       if (pi++ !== 7) put(new THREE.BoxGeometry(hw * 2 - rnd2() * .12, .09, zb - za - .03), rnd2() < .25 ? wood : woodP, at4((rnd2() - .5) * .08, yd - .045 + jy, (za + zb) / 2, (rnd2() - .5) * .04, 0, (rnd2() - .5) * .03));
       quad([-hw, yd + .01, za], [hw, yd + .01, za], [hw, yd + .01, zb], [-hw, yd + .01, zb]); zz = zb; }
@@ -68774,7 +68783,7 @@ function ghomeBuild(at, yaw, y0) {
       // the BELL at the pier's foot: a post, a bracket, a bronze bell -- strike it and it rings
       { const bx = hw + .35, bz = z0 + .25, by = gH(bx, bz); vbox(bx - .08, bx + .08, by, by + 2.2, bz - .08, bz + .08, wood, 1, NC); vbox(bx - .06, bx + .55, by + 2.1, by + 2.2, bz - .05, bz + .05, wood, 0);
         put(new THREE.CylinderGeometry(.012, .012, .2, 4), iron, at4(bx + .45, by + 2.0, bz)); put(new THREE.CylinderGeometry(.08, .2, .32, 12, 1, true), bronzeT, at4(bx + .45, by + 1.75, bz)); put(new THREE.SphereGeometry(.05, 6, 4), iron, at4(bx + .45, by + 1.58, bz));
-        A.bellPts.push([Wx(bx + .45, bz), y0 + by + 1.75, Wz(bx + .45, bz)]); }
+        A.bellPts.push([Wx(bx + .45, bz), y0 + (by + 1.75) * hk, Wz(bx + .45, bz)]); }
       // the jumping FISH: one mesh, hidden until it leaps
       { const fg = [new THREE.SphereGeometry(1, 10, 6).scale(.07, .1, .26).toNonIndexed(), new THREE.ConeGeometry(.1, .16, 4).rotateX(-Math.PI / 2).translate(0, 0, -.3).toNonIndexed()]; for (const q of fg) q.deleteAttribute('uv');
         const fm = new THREE.Mesh(mergeGeometries(fg), fishM); fm.visible = false; g.add(fm); GHOME.fish = { m: fm, t: 3, d: .9, on: 0, wY, zr: [tz1 + .6, tz1 + 2.8] }; } }
@@ -68822,7 +68831,7 @@ function ghomeBuild(at, yaw, y0) {
   // round the home (wide flat strata, `ghRockGeo` stretched), and a planting that thins out from the mound: SAGEBRUSH (lumpy low clumps, two
   // greens), golden GRASS tufts, YUCCAS (a rosette of blades and a cream flower spike), the valley's own ALIEN BULBS (lavender, faintly lit,
   // on curling stalks), and REEDS and cattails where the bank meets the water. All merged: one draw per look ----
-  { const gH = (x, z) => rwHeight(Wx(x, z), Wz(x, z)) - y0, wY = -y0, rnd = rwRng(2020), NC = { noCam: 1 };
+  { const gH = (x, z) => (rwHeight(Wx(x, z), Wz(x, z)) - y0) / hk, wY = -y0 / hk, rnd = rwRng(2020), NC = { noCam: 1 };
     const sage = new THREE.MeshStandardMaterial({ color: 0x7f8c5c, roughness: .95 }), olive = new THREE.MeshStandardMaterial({ color: 0x55633a, roughness: .95 }), straw = new THREE.MeshStandardMaterial({ color: 0xc2a55e, roughness: .95 });
     const reedM = new THREE.MeshStandardMaterial({ color: 0x6f7a3e, roughness: .9 }), brownM = new THREE.MeshStandardMaterial({ color: 0x5a3a22, roughness: .9 }), bulbM = new THREE.MeshStandardMaterial({ color: 0xc8a8ff, emissive: 0x7a52d8, emissiveIntensity: .9, roughness: .5 }), creamM = new THREE.MeshStandardMaterial({ color: 0xf1e6c4, roughness: .8 });
     straw.userData.sway = reedM.userData.sway = 1;     // pass 23: every blade carries its height (set before any is put, or the bucket will not merge)
@@ -68851,11 +68860,11 @@ function ghomeBuild(at, yaw, y0) {
     // ---- PASS 32 (the plants' third pass, his "cliff shrubs"): SHRUBS CLINGING TO THE CANYON WALLS at every height from 3 to 34 m over the
     // floor (verticality), some trailing VINES down the rock with leaves along them, the odd lavender bulb hanging off a ledge; and DESERT
     // FLOWERS (cream and orange heads on thin stalks) through the grass round the mound. Same buckets as the rest of the planting ----
-    { const R4 = rwRng(3232), L = (wx, wz) => { const dx = wx - at[0], dz = wz - at[1]; return [dx * c - dz * s, dx * s + dz * c]; }, orange = new THREE.MeshStandardMaterial({ color: 0xe8843a, roughness: .8 }); let nC = 0, nV = 0;
+    { const R4 = rwRng(3232), L = (wx, wz) => { const dx = (wx - at[0]) / hk, dz = (wz - at[1]) / hk; return [dx * c - dz * s, dx * s + dz * c]; }, orange = new THREE.MeshStandardMaterial({ color: 0xe8843a, roughness: .8 }); let nC = 0, nV = 0;
       for (let zw = at[1] - 46; zw < at[1] + 46; zw += 2.6) for (const side of [-1, 1]) { const fl = hwHeight(hwRc(zw), zw);
         for (let t = 0; t < 3; t++) { if (R4() < .35) continue; const yw = fl + 3 + Math.pow(R4(), 1.3) * 31, z2 = zw + (R4() - .5) * 2, xw = hwWallAt(z2, side, yw, -.1);
-          if (Math.abs(xw - hwRc(z2)) > 39 || caveNear(xw, z2, 1.5)) continue; const [lx, lz] = L(xw, z2), ly = yw - y0, k = 1.2 + R4() * 1.4; sagebrush(lx, ly - .2, lz, k); nC++;
-          if (R4() < .45) { const pts = []; let n = 3 + ((R4() * 5) | 0); for (let j = 0; j <= n; j++) { const yy = yw - j * .55, xx = hwWallAt(z2 + Math.sin(j * 1.3) * .2, side, yy, .12), [qx, qz] = L(xx, z2 + Math.sin(j * 1.3) * .2); pts.push(new THREE.Vector3(qx, yy - y0, qz)); }
+          if (Math.abs(xw - hwRc(z2)) > 39 || caveNear(xw, z2, 1.5)) continue; const [lx, lz] = L(xw, z2), ly = (yw - y0) / hk, k = 1.2 + R4() * 1.4; sagebrush(lx, ly - .2, lz, k); nC++;
+          if (R4() < .45) { const pts = []; let n = 3 + ((R4() * 5) | 0); for (let j = 0; j <= n; j++) { const yy = yw - j * .55, xx = hwWallAt(z2 + Math.sin(j * 1.3) * .2, side, yy, .12), [qx, qz] = L(xx, z2 + Math.sin(j * 1.3) * .2); pts.push(new THREE.Vector3(qx, (yy - y0) / hk, qz)); }
             const cv = new THREE.CatmullRomCurve3(pts); put(new THREE.TubeGeometry(cv, n * 3, .035, 3), olive); for (let j = 1; j < n * 2; j++) { const q = cv.getPoint(j / (n * 2)); put(new THREE.ConeGeometry(.09, .28, 3), R4() < .5 ? sage : olive, at4(q.x, q.y, q.z, R4() * 6, (R4() - .5) * 2.4, (R4() - .5) * 2.4)); } nV++; }
           if (R4() < .12) { const tip = [lx, ly - .35, lz]; put(new THREE.CylinderGeometry(.012, .012, .35, 3), reedM, at4(tip[0], tip[1] + .17, tip[2])); put(new THREE.SphereGeometry(.1, 8, 6), bulbM, at4(tip[0], tip[1], tip[2], 0, 0, 0, 1, 1.3, 1)); } } }
       let nF = 0; for (let i = 0; i < 90; i++) { const a = R4() * TAU, rr = 1.2 + Math.pow(R4(), 1.4) * 2.2, x = Math.sin(a) * A.rx * rr, z = Math.cos(a) * A.rz * rr; if (!free(x, z)) continue; const y = gH(x, z), m = R4() < .55 ? creamM : orange;
@@ -68876,7 +68885,7 @@ function ghomeBuild(at, yaw, y0) {
         const tm = new THREE.Mesh(mergeGeometries(tw), new THREE.MeshStandardMaterial({ color: 0x9a7a4a, roughness: 1 })); tm.castShadow = true; tm.visible = false; g.add(tm); GHOME.tumble = { m: tm, t: 6, on: 0, gH }; } }
     A.stat.plants = nP; A.stat.reeds = nR; }
   // pass 25: the paths' ribbons -- their own canvas, laid on the ground a hair above it
-  { const gH = (x, z) => rwHeight(Wx(x, z), Wz(x, z)) - y0, R = rwRng(2525), pm = ghPathMat();
+  { const gH = (x, z) => (rwHeight(Wx(x, z), Wz(x, z)) - y0) / hk, R = rwRng(2525), pm = ghPathMat();
     const pos = [], uv = [], idx = []; let base = 0;
     for (const p of A.paths) { const W = 3, L = p.cv.getLength(); for (let i = 0; i <= p.n; i++) { const t = i / p.n, c = p.cv.getPointAt(t), tg = p.cv.getTangentAt(t), nx = -tg.z, nz = tg.x, hw = p.w / 2 * (1 + .25 * ghNoise3(t * L * .3, 1, 9));
         for (let j = 0; j <= W; j++) { const s = j / W * 2 - 1, x = c.x + nx * hw * s, z = c.z + nz * hw * s; pos.push(x, gH(x, z) + .07, z); uv.push(j / W, t * L / 3.2); } }
@@ -68906,7 +68915,7 @@ function ghomeBuild(at, yaw, y0) {
   // ---- PASS 29 (his queue): the ROPE LIFT up the tower's east side to the balcony (a gap in its rail, `liftA`) -- a timber gantry out of the turret with a brass
   // pulley, two ropes, a railed plank cage. Stand on it and it rides to the other end; at either end, walk up to it and it comes to you.
   // FALLEN it lies at the foot, ropes gone (the gantry falls with the turret). Stepped by `ghomeLift`; its floor is a moving box (`BDYN`) ----
-  { const a = A.liftA, r = A.Rt + 2.4 + .75, lx = A.T[0] + Math.sin(a) * r, lz = A.T[1] + Math.cos(a) * r, yt = P + A.Yb + .02, ybt = rwHeight(Wx(lx, lz), Wz(lx, lz)) - y0 + .05, yg = yt + 3.9, ux = Math.cos(a), uz = -Math.sin(a), ry = a;
+  { const a = A.liftA, r = A.Rt + 2.4 + .75, lx = A.T[0] + Math.sin(a) * r, lz = A.T[1] + Math.cos(a) * r, yt = P + A.Yb + .02, ybt = (rwHeight(Wx(lx, lz), Wz(lx, lz)) - y0) / hk + .05, yg = yt + 3.9, ux = Math.cos(a), uz = -Math.sin(a), ry = a;
     const g0 = [A.T[0] + Math.sin(a) * (A.Rtu - .2), A.T[1] + Math.cos(a) * (A.Rtu - .2)];
     for (const o of [-.45, .45]) { const p0 = [g0[0] + ux * o, yg, g0[1] + uz * o], p1 = [lx + ux * o, yg, lz + uz * o], d = new THREE.Vector3(p1[0] - p0[0], 0, p1[2] - p0[2]), L = d.length();
       put(new THREE.BoxGeometry(.2, .22, L + .3), wood, at4((p0[0] + p1[0]) / 2, yg, (p0[2] + p1[2]) / 2, ry)); put(new THREE.BoxGeometry(.12, 1.6, .12), wood, at4(g0[0] + ux * o + Math.sin(a) * .5, yg - .8, g0[1] + uz * o + Math.cos(a) * .5, ry, -.6)); }
