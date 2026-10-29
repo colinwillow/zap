@@ -14310,7 +14310,7 @@ function arrowStep(dt) {
 function archerBow(d) {
   if (!d.bow) {
     const g = new THREE.Group(), mat = new THREE.MeshStandardMaterial({ color: 0x24160f, roughness: .55, metalness: .1 }), wrap = new THREE.MeshStandardMaterial({ color: 0xc81e28, roughness: .6 });
-    const N = 12, pts = []; for (let i = 0; i <= N; i++) { const a = -1 + 2 * i / N; pts.push(new THREE.Vector3(0, a * ARCH.limb, -ARCH.bend * a * a - ARCH.bend * .25 * Math.pow(Math.abs(a), 3))); }     // m15xx (his: "the bow is backwards, inverted"): the GRIP is in the fist (z 0) and the limbs sweep BACK toward the archer, tips behind the hand, the string behind them -- it was the other way round, the belly bowed at him
+    const N = 12, pts = []; for (let i = 0; i <= N; i++) { const a = -1 + 2 * i / N; pts.push(new THREE.Vector3(0, a * ARCH.limb, -ARCH.bend * a * a - ARCH.bend * .25 * Math.pow(Math.abs(a), 3))); }     // m1721 (his: "the bow is backwards, inverted"): the GRIP is in the fist (z 0) and the limbs sweep BACK toward the archer, tips behind the hand, the string behind them -- it was the other way round, the belly bowed at him
     const limb = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 24, .018, 6), mat); limb.castShadow = true;
     const grip = new THREE.Mesh(new THREE.CylinderGeometry(.026, .026, .14, 8), wrap);
     const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(9), 3));

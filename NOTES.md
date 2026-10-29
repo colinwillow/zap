@@ -72,7 +72,7 @@ in there so I can transform it between the two states"; "these rocks are kind of
 - **THE HYBRID:** the sky islands over the rim (m1113) showed in FALLEN. KORAJIN: the floating world is what restoration raises -> hidden
   while fallen. (The refinery already sits on the flank when fallen.)
 Next: the painted textures (rock, sand, cliff), his ask in the same message.
-## m15xx -- THE BOW WAS BACKWARDS (his: "you have him holding the bow backwards -- the wooden part facing backwards, inverted")
+## m1721 -- THE BOW WAS BACKWARDS (his: "you have him holding the bow backwards -- the wooden part facing backwards, inverted")
 - `archerBow`'s limb curve had the GRIP (a = 0) at z = -bend and the tips at +bend/4. In the bow's frame (+Z = the draw line, forward) that put
   the grip BEHIND the tips: the belly bowed at the archer. That has been wrong on every bowman since m1103 and on his bow since m1719. Now the
   grip is at z 0 in the fist and the tips sweep back to -1.25 x bend, so the string sits behind the grip. Fixed in the one place both bows are
