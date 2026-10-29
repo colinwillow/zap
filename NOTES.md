@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The bow: no second pull, a flight ARC and a ring where it lands, arrows that can be seen (m15xx)
+## The bow: no second pull, a flight ARC and a ring where it lands, arrows that can be seen (m1744)
 His: "once you've initiated a shot and you move the left stick, he keeps pulling the bow back again -- strafe left or right and he pulls it
 again; he should never pull it back once it's back"; "the crosshair should show an interaction with what you're aiming at -- it's hard to
 see"; "in the Red ... I can't tell where the arrow would land if I released now"; "the arrows get lost in the background".
