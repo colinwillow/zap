@@ -413,7 +413,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## THE SKY CASTLE, pass 18: the castle is manned (Worker B)
+## THE SKY CASTLE, pass 18: the castle is manned (m1814, Worker B)
 His "next" on people. EIGHT Jin samurai GUARDS (the arena's SAMURAI with his katana; `gcGuards`): two at the hall's open doors (the
 warrior tier), one either side of the throne, two walking a seven-point ROUND of the plaza (`d.patrol`, the courtyard's rounds), a brute
 at the lift's bridge, one on the keep's balcony. They are `calm` -- a new flag on the body brain's notice test (`!d.calm`): seeing him does
