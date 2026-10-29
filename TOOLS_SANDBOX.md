@@ -31,10 +31,10 @@ its own before the next.
 
 ### DONE WHEN -- piece 1: THE JIN BOW (proposed first: the enemies already use bows, and the arrow ladder starts here)
 - [x] Equip from the weapon wheel; hold UP on the right stick to draw (the trigger's own gesture), release to loose -- a longer draw flies
-      flatter and further. (m15xx, the BOW slot; Forge-baked bow clips on Grumbo)
+      flatter and further. (m1719, the BOW slot; Forge-baked bow clips on Grumbo)
 - [ ] Aim: the reticle sits behind him (his rule, m1693), and a full draw shows the arc.
-- [~] Arrows fly ballistic and stick in walls and the ground (m15xx). Picking them up: not yet (arrows are unlimited for now).
-- [~] Hits: an Osari bowman and a spider (m15xx, measured on the bowman). A switch, a rope, a target at height: not yet.
+- [~] Arrows fly ballistic and stick in walls and the ground (m1719). Picking them up: not yet (arrows are unlimited for now).
+- [~] Hits: an Osari bowman and a spider (m1719, measured on the bowman). A switch, a rope, a target at height: not yet.
 - [ ] The **line arrow**: one that hits wood strings a zip line from him to it, and he can ride it at once.
 - [ ] Fire arrows (from a brazier: draw through the flame) burn ivy and light braziers.
 - [ ] His sign-off on his phone.

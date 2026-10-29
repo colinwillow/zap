@@ -72,7 +72,7 @@ in there so I can transform it between the two states"; "these rocks are kind of
 - **THE HYBRID:** the sky islands over the rim (m1113) showed in FALLEN. KORAJIN: the floating world is what restoration raises -> hidden
   while fallen. (The refinery already sits on the flank when fallen.)
 Next: the painted textures (rock, sand, cliff), his ask in the same message.
-## m15xx -- THE JIN BOW, FIRST CUT (TOOLS_SANDBOX.md piece 1; his: "go with the geta, start with the bow")
+## m1719 -- THE JIN BOW, FIRST CUT (TOOLS_SANDBOX.md piece 1; his: "go with the geta, start with the bow")
 - **The clips:** the bowmen's Mixamo longbow set, baked onto Grumbo by the Forge.
   - Profile: `tools/agoblin_forge_prof.json` gained 9 roles: bow_draw, bow_overdraw, bow_recoil, bow_aim, bow_walk_f/b/l/r, bow_shoot.
   - Re-forged `forged/alien_goblin_game.glb`: 12 -> 21 clips, 1.31 -> 2.16 MB. The 12 old clips were read back with their names and
