@@ -10199,6 +10199,14 @@ const PLANTK = {
     return p; } },
 };
 PLANTK.bamboo_snow = Object.assign({}, PLANTK.bamboo, { frost: 1 });     // m1730: the same clump, its upper leaves dusted white (the Snowfield's)
+// m15xx: ROCKS BY PLACE -- the same lumpy blob dressed for each world (the plant library places them; `ROCK` breaks them)
+function rockShape(seed, sx, sy, sz, colF) { const b = plantBlob(1, seed, 2); b.scale(sx, sy, sz); const P = b.attributes.position; let lo = 9, hi = -9; for (let i = 0; i < P.count; i++) { lo = Math.min(lo, P.getY(i)); hi = Math.max(hi, P.getY(i)); }
+  return [plantPart(b, (x, y, z) => colF((y - lo) / (hi - lo), x, z), 0)]; }
+PLANTK.rock_snow = { h: 1.6, r: 1.3, stiff: 0, bend: 0, make() { return rockShape(83, 1.3, .85, 1.05, (t, x, z) => { const n = Math.sin(x * 9 + z * 7) * .05 + Math.sin(x * 23 - z * 19) * .03; return t > .82 + n * 2 ? [.93, .95, 1] : [.44 + n + t * .08, .46 + n + t * .08, .52 + n + t * .07]; }); } };
+PLANTK.rock_red = { h: 1.7, r: 1.3, stiff: 0, bend: 0, make() { return rockShape(91, 1.25, 1, 1.1, (t, x, z) => { const band = Math.sin(t * 26 + Math.sin(x * 3) * 1.5) * .5 + .5, n = Math.sin(x * 11 + z * 9) * .03; return [.55 + band * .14 + n, .25 + band * .1 + n, .15 + band * .05]; }); } };
+PLANTK.rock_temple = { h: 1.1, r: 1, stiff: 0, bend: 0, make() { const b = new THREE.BoxGeometry(1.5, 1, 1.1, 2, 2, 2), P = b.attributes.position, R = plantRnd(97);
+    for (let i = 0; i < P.count; i++) { const k = .94 + R() * .1; P.setXYZ(i, P.getX(i) * k, P.getY(i) * (.96 + R() * .06), P.getZ(i) * k); } b.translate(0, .5, 0); b.computeVertexNormals();
+    return [plantPart(b, (x, y, z) => { const groove = Math.abs(((y * 3.2) % 1) - .5) < .06 || Math.abs(((x * 2.4) % 1) - .5) < .04, n = Math.sin(x * 13 + z * 11) * .03; return groove ? [.38, .35, .3] : y > .95 ? [.32, .42, .2] : [.64 + n, .58 + n, .48 + n]; }, 0)]; } };
 function plantKind(name) { if (PLANT.kinds[name]) return PLANT.kinds[name]; const K = PLANTK[name], geo = mergeGeometries(K.make()); PLANT.kinds[name] = { K, geo, n: 0, list: [] }; return PLANT.kinds[name]; }
 // put the instanced meshes down for every kind used under `g` (call once after all plantPlant calls for that group)
 function plantPlant(rec, kind, x, y, z, s, yaw) { rec.push({ kind, x, y, z, s, yaw }); }
@@ -10215,15 +10223,66 @@ function plantFlush(g, rec) { const by = {}, C = PLANT.cell; for (const r of rec
     rs.forEach((r, i) => iB.set([0, 0, (r.x * 1.7 + r.z * 2.3) % 6.28, Kd.K.stiff], i * 4)); const at = new THREE.InstancedBufferAttribute(iB, 4); geo.setAttribute('iB', at);
     const m = new THREE.InstancedMesh(geo, plantMat(), rs.length), mx = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(); m.name = "plant:" + kind;
     rs.forEach((r, i) => { mx.compose(new THREE.Vector3(r.x, r.y, r.z), q.setFromEuler(e.set(0, r.yaw, 0)), new THREE.Vector3(r.s, r.s, r.s)); m.setMatrixAt(i, mx);
-      if (!Kd.K.nohit) PLANT.list.push({ at, i, x: r.x, y: r.y, z: r.z, h: Kd.K.h * r.s, r: Kd.K.r * r.s, bend: Kd.K.bend, bx: 0, bz: 0, vx: 0, vz: 0, m, knock: Kd.K.knock || 0 }); });
+      if (!Kd.K.nohit) { const P = { at, i, x: r.x, y: r.y, z: r.z, h: Kd.K.h * r.s, r: Kd.K.r * r.s, bend: Kd.K.bend, bx: 0, bz: 0, vx: 0, vz: 0, m, knock: Kd.K.knock || 0 }; PLANT.list.push(P); if (ROCK.kinds[kind]) rockInit(P, kind, r.s); } });
     m.castShadow = !PLANT.noShadow.includes(kind); m.receiveShadow = true; m.userData.kind = kind;
     if (C) { m.computeBoundingSphere(); m.boundingSphere.radius += Kd.K.h * 1.5 + 1; m.frustumCulled = true; PLANT.cells.push(m); } else m.frustumCulled = false;     /* the sway moves a blade off its rest: the sphere carries a margin */
     g.add(m); meshes.push(m); } return meshes; }     /* m1600: ground cover casts NO shadow (the shadow pass drew every blade a second time) */
 function plantDrop(meshes) { PLANT.list = PLANT.list.filter(P => !meshes.includes(P.m)); }
 function plantPush(P, dx, dz, imp) { const L = Math.hypot(dx, dz) || 1; P.vx += dx / L * imp * P.bend; P.vz += dz / L * imp * P.bend; }
+// m15xx (his: "rocks in different forms -- the snow world, the red rock world, the grass world, the temples -- different styles of rocks that
+// once you slash them or shoot them or explode them break from bigger to smaller, placed just like you do plants, to add interaction, the way
+// buildings and plants are destructible"): ROCKS BREAK, BIG -> SMALLER -> DUST. A rock in the plant library (`boulder`, and the new
+// `rock_snow` / `rock_red` / `rock_temple`) carries stone (`hp` x its size): every blade that crosses it, every arrow, every blast chips it
+// (dust, stone chips, a crack of sound); at 0 it BURSTS -- its instance is taken out of the batch and `n` CHUNKS fly from it, tumble, bounce
+// and settle. A chunk can be hit again: a mid chunk splits into small ones, a small one crumbles to dust. Loose chunks sink away after
+// `life` s; a broken rock grows back after `back` s when he is not looking at it (> `backR` m away). The new kinds are SOLID (a box).
+const ROCK = { on: 1, back: 150, backR: 30, max: 80, g: 18, loose: [], broken: [], hitCd: .22,
+  kinds: { boulder: { hp: 3, n: 4, col: 0x6e6b5e, dust: [.62, .6, .52] }, rock_snow: { hp: 3, n: 4, col: 0x6f7480, dust: [.85, .88, .95], solid: 1 },
+    rock_red: { hp: 3, n: 5, col: 0x9a4a2c, dust: [.78, .45, .3], solid: 1 }, rock_temple: { hp: 4, n: 4, col: 0xa39a86, dust: [.75, .7, .6], solid: 1 } },
+  geos: null, mats: {}, stat: { chips: 0, breaks: 0, crumbles: 0 } };
+const _rkM = new THREE.Matrix4(), _rkZ = new THREE.Matrix4().makeScale(0, 0, 0), _rkV = new THREE.Vector3();
+function rockGeos() { if (ROCK.geos) return ROCK.geos; ROCK.geos = [0, 1, 2].map(s => { const g = plantBlob(1, 300 + s * 7, 1); g.scale(1, .8, 1.1); return g.toNonIndexed(); }); for (const g of ROCK.geos) g.computeVertexNormals(); return ROCK.geos; }
+function rockMat(kind) { return ROCK.mats[kind] || (ROCK.mats[kind] = new THREE.MeshStandardMaterial({ color: ROCK.kinds[kind].col, roughness: .95, flatShading: true })); }
+// a stone in the plant list gets its stone (called from `plantFlush`)
+function rockInit(P, kind, s) { const R = ROCK.kinds[kind]; if (!R) return; P.rock = kind; P.s = s; P.hp = R.hp * Math.max(.6, s); P.rk = 0;
+  if (R.solid) { P.box = { minx: P.x - P.r * .7, maxx: P.x + P.r * .7, miny: P.y - .2, maxy: P.y + P.h * .8, minz: P.z - P.r * .7, maxz: P.z + P.r * .7 }; BOXES.push(P.box); } }
+function rockChips(x, y, z, R, k) { spkBurst(x, y, z, Math.round(8 + 10 * k), { col: R.dust, spread: 3 + 3 * k, size: .1, life: .45 }); smokeAt(x, y, z, 1 + k, .8, R.dust); snd('thud', { g: .35 + .3 * k, r: .9 + Math.random() * .2, x, z }); snd('clang', { g: .12 + .15 * k, r: .5 + Math.random() * .15, x, z }); }
+// a blow on a standing rock (`P` from the plant list) or a loose chunk (`L`): `dmg` of stone, from direction `h`
+function rockHit(P, dmg, h, x, y, z) { const now = performance.now() / 1000; if ((P.rk || 0) > now) return 0; P.rk = now + ROCK.hitCd; const R = ROCK.kinds[P.rock];
+  P.hp -= dmg; ROCK.stat.chips++; rockChips(x == null ? P.x : x, y == null ? P.y + (P.h || .5) * .5 : y, z == null ? P.z : z, R, Math.min(1, dmg / 2));
+  if (P.hp <= 0) { if (P.L) rockSplit(P, h); else rockBreak(P, h); } return 1; }
+function rockBreak(P, h) { const R = ROCK.kinds[P.rock]; ROCK.stat.breaks++; P.m.getMatrixAt(P.i, _rkM); P.mx = _rkM.clone(); P.m.setMatrixAt(P.i, _rkZ); P.m.instanceMatrix.needsUpdate = true;
+  const j = PLANT.list.indexOf(P); if (j >= 0) PLANT.list.splice(j, 1); if (P.box) { boxDel(P.box); boxGrid(); } P.brokeAt = performance.now() / 1000; ROCK.broken.push(P);
+  const cy = P.y + P.h * .45; for (let i = 0; i < 3; i++) spkBurst(P.x, cy, P.z, 18, { col: R.dust, spread: 6, size: .14, life: .6 }); for (let i = 0; i < 4; i++) smokeAt(P.x + (Math.random() - .5) * P.r, cy, P.z + (Math.random() - .5) * P.r, 2.2, 1.2, R.dust);
+  snd('boom', { g: .45, r: 1.3 + Math.random() * .2, x: P.x, z: P.z }); snd('thud', { g: .8, r: .6, x: P.x, z: P.z }); camShake(.08);
+  for (let i = 0; i < R.n; i++) { const a = (h == null ? 0 : h) + (i / R.n - .5) * 2.4 + (Math.random() - .5) * .6; rockLoose(P.rock, P.x + Math.sin(a) * P.r * .3, cy, P.z + Math.cos(a) * P.r * .3, P.s * (.42 + Math.random() * .12), 'mid', a, 3 + Math.random() * 2.5); } }
+// a loose chunk of `kind`, size `s` m, tier 'mid' | 'small', flung along `a`
+function rockLoose(kind, x, y, z, s, tier, a, sp) { const G = rockGeos(), m = new THREE.Mesh(G[(Math.random() * 3) | 0], rockMat(kind)); m.position.set(x, y, z); m.scale.setScalar(s); m.rotation.set(Math.random() * 6, Math.random() * 6, Math.random() * 6); m.castShadow = true; scene.add(m);
+  const L = { L: 1, m, rock: kind, tier, s, r: s * .9, h: s * 1.6, hp: tier === 'mid' ? 1.5 : .6, v: new THREE.Vector3(Math.sin(a) * sp, 2.5 + Math.random() * 3, Math.cos(a) * sp), w: new THREE.Vector3((Math.random() - .5) * 9, (Math.random() - .5) * 9, (Math.random() - .5) * 9), rest: 0, t: 0 };
+  ROCK.loose.push(L); while (ROCK.loose.length > ROCK.max) rockGone(ROCK.loose[0]); return L; }
+function rockGone(L) { L.m.removeFromParent(); const i = ROCK.loose.indexOf(L); if (i >= 0) ROCK.loose.splice(i, 1); }
+function rockSplit(L, h) { const R = ROCK.kinds[L.rock], P = L.m.position; rockGone(L);
+  if (L.tier === 'mid') { for (let i = 0; i < 3; i++) rockLoose(L.rock, P.x, P.y + .1, P.z, L.s * (.45 + Math.random() * .1), 'small', (h || 0) + (i - 1) * 1.1, 2 + Math.random() * 2); }
+  else { ROCK.stat.crumbles++; spkBurst(P.x, P.y, P.z, 14, { col: R.dust, spread: 3, size: .08, life: .4 }); smokeAt(P.x, P.y, P.z, 1.2, .7, R.dust); } }
+// every rock or chunk a blade (or shot) passes: `x,y,z` the contact, `rad` its reach
+function rockAt(x, y, z, rad) { const out = []; for (const P of PLANT.list) { if (!P.rock) continue; if (Math.hypot(P.x - x, P.z - z) < P.r + rad && y > P.y - .6 && y < P.y + P.h + .4) out.push(P); }
+  for (const L of ROCK.loose) { const Q = L.m.position; if (Math.hypot(Q.x - x, Q.y - y, Q.z - z) < L.r + rad + .2) out.push(L); } return out; }
+function rockArea(x, y, z, r, dmg) { if (!ROCK.on) return 0; let n = 0; for (const P of rockAt(x, y, z, r)) { const Q = P.L ? P.m.position : P, h = Math.atan2(Q.x - x, Q.z - z); if (P.L) { P.v.x += Math.sin(h) * 4; P.v.y += 3; P.v.z += Math.cos(h) * 4; P.rest = 0; } n += rockHit(P, dmg, h); } return n; }
+function rockStep(dt) { const g = ROCK.g, now = performance.now() / 1000, p = player;
+  for (let i = ROCK.loose.length - 1; i >= 0; i--) { const L = ROCK.loose[i], m = L.m, P = m.position; L.t += dt;
+    if (L.t > (L.tier === 'mid' ? 45 : 25)) { P.y -= dt * .25; if (L.t > (L.tier === 'mid' ? 48 : 28)) rockGone(L); continue; }
+    if (L.rest) continue;
+    L.v.y -= g * dt; P.addScaledVector(L.v, dt); m.rotation.x += L.w.x * dt; m.rotation.y += L.w.y * dt; m.rotation.z += L.w.z * dt;
+    const gy = groundAt(P.x, P.z, P.y + .5, 1) + L.r * .55; if (P.y < gy) { P.y = gy; if (L.v.y < -1.5) { L.v.y *= -.3; L.v.x *= .55; L.v.z *= .55; L.w.multiplyScalar(.5); snd('thud', { g: .12 * Math.min(1, L.s), r: 1.2, x: P.x, z: P.z }); } else { L.v.set(0, 0, 0); L.w.set(0, 0, 0); L.rest = 1; } }
+    const kd = Math.exp(-.6 * dt); L.v.x *= kd; L.v.z *= kd; }
+  // broken rocks grow back, unseen
+  for (let i = ROCK.broken.length - 1; i >= 0; i--) { const P = ROCK.broken[i]; if (now - P.brokeAt < ROCK.back || Math.hypot(p.pos.x - P.x, p.pos.z - P.z) < ROCK.backR) continue;
+    P.m.setMatrixAt(P.i, P.mx); P.m.instanceMatrix.needsUpdate = true; P.hp = ROCK.kinds[P.rock].hp * Math.max(.6, P.s); PLANT.list.push(P); if (P.box) { BOXES.push(P.box); P.box._off = 0; boxGrid(); } ROCK.broken.splice(i, 1); } }
 function plantHit(x, y, z, rad) { if (!PLANT.list.length) return 0; let n = 0; const p = player.pos;
-  for (const P of PLANT.list) { const d = Math.hypot(P.x - x, P.z - z); if (d > P.r + rad + .4 || y < P.y - .5 || y > P.y + P.h + .5) continue; let dx = P.x - p.x, dz = P.z - p.z; if (Math.hypot(dx, dz) < .2) { dx = P.x - x; dz = P.z - z; }
-    plantPush(P, dx, dz, PLANT.hitK * (1 + Math.random() * .3)); n++; if (P.knock) plantKnock(P, 1); if (Math.random() < .5) spk(x, y, z, (Math.random() - .5) * 2, 1 + Math.random(), (Math.random() - .5) * 2, .06, .5, [.5, .85, .4]); } return n; }
+  for (const P of PLANT.list.slice()) { const d = Math.hypot(P.x - x, P.z - z); if (d > P.r + rad + .4 || y < P.y - .5 || y > P.y + P.h + .5) continue; if (P.rock) { if (ROCK.on && d < P.r + rad) n += rockHit(P, 1, Math.atan2(P.x - p.x, P.z - p.z), x, y, z); continue; } let dx = P.x - p.x, dz = P.z - p.z; if (Math.hypot(dx, dz) < .2) { dx = P.x - x; dz = P.z - z; }
+    plantPush(P, dx, dz, PLANT.hitK * (1 + Math.random() * .3)); n++; if (P.knock) plantKnock(P, 1); if (Math.random() < .5) spk(x, y, z, (Math.random() - .5) * 2, 1 + Math.random(), (Math.random() - .5) * 2, .06, .5, [.5, .85, .4]); }
+  if (ROCK.loose.length) for (const L of ROCK.loose.slice()) { const Q = L.m.position; if (Math.hypot(Q.x - x, Q.y - y, Q.z - z) < L.r + rad + .2) { const h = Math.atan2(Q.x - p.x, Q.z - p.z); L.v.x += Math.sin(h) * 3; L.v.y += 2.5; L.v.z += Math.cos(h) * 3; L.rest = 0; n += rockHit(L, 1, h, Q.x, Q.y, Q.z); } }     // m15xx: a chunk is knocked along and chipped
+  return n; }
 // m1730: bamboo KNOCKS -- the wood recording, pitched up and short (hollow), louder for a blow than a brush; each clump has its own breath
 function plantKnock(P, k) { const now = performance.now(); if ((P.tokT || 0) > now) return; P.tokT = now + (k > .5 ? 120 : 260); snd('thud', { g: (.1 + .22 * k) * (.8 + Math.random() * .4), r: 1.7 + Math.random() * .5, x: P.x, z: P.z });
   if (k > .5) for (let i = 0; i < 6; i++) spk(P.x + (Math.random() - .5) * .6, P.y + P.h * (.5 + Math.random() * .4), P.z + (Math.random() - .5) * .6, (Math.random() - .5) * 1.5, -.3, (Math.random() - .5) * 1.5, .07, 1.2, [.3, .55, .2]); }
@@ -10426,6 +10485,12 @@ function snowStage(g) {
   // 5 groves of 5-9 clumps, kept off the spawn. They sway, bend as he runs through, knock like hollow wood, and shed leaves when struck.
   { const R = plantRnd(733), rec = []; for (let c = 0; c < 5; c++) { const a = .6 + c * 1.27 + R() * .4, d = 16 + R() * 34, cx = Math.cos(a) * d, cz = Math.sin(a) * d, n = 5 + Math.floor(R() * 5);
       for (let k = 0; k < n; k++) { const x = cx + (R() - .5) * 9, z = cz + (R() - .5) * 9; if (Math.hypot(x, z - 8) < 10 || Math.hypot(x - WILLOW.at[0], z - WILLOW.at[1]) < WILLOW.ter + 4) continue; plantPlant(rec, 'bamboo_snow', x, 0, z, .8 + R() * .5, R() * 6.28); } }
+    // m15xx: SNOW ROCKS -- granite boulders with white caps, in clusters between the stands (solid; they break), and fallen TEMPLE blocks
+    // round the willow's terrace (a ruin the garden was built on)
+    { const W = WILLOW.at, ok = (x, z) => Math.hypot(x, z - 8) > 9 && Math.hypot(x - W[0], z - W[1]) > WILLOW.ter + 3 && Math.abs(x) < Z.size / 2 - 4 && Math.abs(z) < Z.size / 2 - 4;
+      for (let c = 0; c < 9; c++) { const a = c * .7 + R() * 2, d = 14 + R() * 55, cx = Math.cos(a) * d, cz = Math.sin(a) * d, n = 2 + Math.floor(R() * 4);
+        for (let k = 0; k < n; k++) { const x = cx + (R() - .5) * 7, z = cz + (R() - .5) * 7; if (ok(x, z)) { const sc = .6 + R() * .9; plantPlant(rec, 'rock_snow', x, snowAt(x, z) * Z.depth + .3 * sc, z, sc, R() * 6.28); } } }     // set ON the snow pack (it is up to a metre deep), not buried in it
+      for (let k = 0; k < 8; k++) { const a = R() * 6.28, d = WILLOW.ter + 2 + R() * 6, x = W[0] + Math.cos(a) * d, z = W[1] + Math.sin(a) * d; if (Math.abs(x - W[0]) < 3 && z > W[1]) continue; plantPlant(rec, 'rock_temple', x, snowAt(x, z) * Z.depth - .25, z, .7 + R() * .6, R() * 6.28); } }
     Z.bamboo = plantFlush(g, rec); }
   try { willowBuild(g); } catch (e) { console.error('[melee] willow', e); note('WILLOW THREW ' + e.message); }     // m1740
   Z.on = { g }; Z.t = 0; Z.acc = 0; Z.breath = 1; }
@@ -10453,7 +10518,7 @@ function willowTube(curve, segs, rad, r0, r1, twist = 0, col, glowF) {
 function willowLeafTex() { const cv = document.createElement('canvas'); cv.width = 64; cv.height = 256; const q = cv.getContext('2d'); q.clearRect(0, 0, 64, 256);
   q.fillStyle = '#fff'; q.fillRect(30, 0, 4, 256);     // the stem
   for (let k = 0; k < 9; k++) { const y = 10 + k * 28, s = k % 2 ? 1 : -1; q.save(); q.translate(32, y); q.rotate(s * .55); q.beginPath(); q.ellipse(s * 13, 6, 6, 17, 0, 0, Math.PI * 2); q.fill(); q.restore(); }
-  const t = new THREE.CanvasTexture(cv); t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; return t; }
+  const t = new THREE.CanvasTexture(cv); t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; t.generateMipmaps = false; t.minFilter = THREE.LinearFilter; return t; }     // no mips: an alpha-tested leaf averaged into its mips drops under .5 and the whole curtain vanished past ~45 m
 function willowBuild(g) { const Z = WILLOW, [cx, cz] = Z.at, H = Z.terH, R = plantRnd(1740), base = new THREE.Vector3(cx, H, cz);
   // ---- the garden: the terrace, its steps (on the side facing the spawn, +z), the raked rings, two lanterns ----
   // the stone: dressed blocks in courses, painted once (the Snowfield builds at module scope, before any texture loader exists)
@@ -14517,7 +14582,7 @@ function guardThink(G, d, dt) { const Z = G.Z, R = G.root, p = player, roll = a 
     case 'smash': if (!G.hit && u('smash') > Z.smash.hit) { G.hit = 1; GUARD.stat.smashes++; const f = Z.P.h * .5, cx = R.position.x + Math.sin(R.rotation.y) * f, cz = R.position.z + Math.cos(R.rotation.y) * f, gy = R.position.y;
         for (let k = 0; k < 24; k++) { const a = k / 24 * 6.283; smokeAt(cx + Math.cos(a) * Z.smash.R * .7, gy + .2, cz + Math.sin(a) * Z.smash.R * .7, 2.4, 1.2, [.8, .74, .64]); }
         for (let i = 0; i < 3; i++) spkBurst(cx, gy + .3, cz, 26, { col: [.8, .74, .64], spread: 9, size: .18, life: .55 }); for (let i = 0; i < 30; i++) gfire(cx + (Math.random() - .5) * 2, gy + .1, cz + (Math.random() - .5) * 2, 1);
-        snd('boom', { g: 1, r: .55, x: cx, z: cz }); camShake(.55); if (DEBRIS.on) debrisArea(cx, gy, cz, Z.smash.R);
+        snd('boom', { g: 1, r: .55, x: cx, z: cz }); camShake(.55); if (DEBRIS.on) debrisArea(cx, gy, cz, Z.smash.R); rockArea(cx, gy, cz, Z.smash.R, 3);
         const q = Math.hypot(p.pos.x - cx, p.pos.z - cz), air = p.pos.y - groundAt(p.pos.x, p.pos.z, p.pos.y + .5, 1) > .45; if (q < Z.smash.R && !air && !p.roll) playerHurt(Z.smash.dmg * (q < Z.smash.R * .5 ? 1 : .6), Math.atan2(p.pos.x - cx, p.pos.z - cz), Z.smash.push, 5, .7, 1); }
       if (u('smash') >= 1) { G.st = 'walk'; G.cool = roll(Z.smash.cool); } break;
     case 'throw': { const T = Z.throw;
@@ -14663,6 +14728,7 @@ function arrowStep(dt) {
       if (p.block) { ARCH.stat.blocked++; spkBurst(P.x, P.y, P.z, 14, { col: [1, .9, .6], spread: 4, size: .12, life: .35 }); snd('clang', { g: .7, r: 1.3, x: P.x, z: P.z }); }
       else { spkBurst(P.x, P.y, P.z, 10, { col: [1, .3, .25], spread: 3, size: .1, life: .3 }); }     /* m1695: `playerHurt` voices it (his grunt) */
       A.m.removeFromParent(); ARROWS.splice(i, 1); continue; }
+    if (A.mine && ROCK.on) { const rs = rockAt(P.x, P.y, P.z, .05); if (rs.length) { if (A.pl && A.type === 'blast') arrowBlast(P, Math.atan2(A.v.x, A.v.z)); else rockHit(rs[0], A.full ? 1.5 : .6, Math.atan2(A.v.x, A.v.z), P.x, P.y, P.z); spkBurst(P.x, P.y, P.z, 6, { col: [.9, .85, .7], spread: 3, size: .07, life: .3 }); A.m.removeFromParent(); ARROWS.splice(i, 1); continue; } }     // m15xx: an arrow on stone chips it and shatters
     const gy = groundAt(P.x, P.z, oy, .5);
     const wall = boxRay(ox, oy, oz, P.x, P.y, P.z, _tuR);
     if (P.y <= gy || wall || A.t > 5) {
@@ -14746,7 +14812,7 @@ function arrowBlast(P, dirH) { BOW.stat.blasts++; const R = BOW.blastR;
   for (let i = 0; i < 6; i++) smokeAt(P.x + (Math.random() - .5), P.y + Math.random() * .5, P.z + (Math.random() - .5), 3, 1.3, [.35, .32, .3]);
   snd('boom', { g: .6, r: 1.2 + Math.random() * .1, x: P.x, z: P.z }); camShake(.18);
   BLOW_SRC = 'rocket'; dummyHit(P.x, P.z, dirH, 1.3, R, BOW.blastDmg, WEAP.palBlast); BLOW_SRC = '';
-  if (SPIDER.list.length) spiderArea(P.x, P.y, P.z, R, 1.2, BOW.blastDmg); if (GUARD.list.length) guardArea(P.x, P.y, P.z, R, 1.2, BOW.blastDmg); if (ARENA.debris.length) debrisArea(P.x, P.y, P.z, R); bldHit(P.x, P.y, P.z, R * .6, 3); if (CWALL.list.length) wallHit(P.x, P.y, P.z, 1, 2, 'blast', dirH); }
+  if (SPIDER.list.length) spiderArea(P.x, P.y, P.z, R, 1.2, BOW.blastDmg); if (GUARD.list.length) guardArea(P.x, P.y, P.z, R, 1.2, BOW.blastDmg); rockArea(P.x, P.y, P.z, R, 3); if (ARENA.debris.length) debrisArea(P.x, P.y, P.z, R); bldHit(P.x, P.y, P.z, R * .6, 3); if (CWALL.list.length) wallHit(P.x, P.y, P.z, 1, 2, 'blast', dirH); }
 // m1729 (his: "versions of the weapons -- the katana, maybe a flaming katana, maybe green flame"): JIN FIRE on the blade (the left sub-menu while the
 // sword is out). Green flame (`gfire`) licks along the edge from the guard to the tip (`muzzleWorld`, the far end of the blade along its mount),
 // thicker while it swings; every man the blade catches is set BURNING (`burnStart`) and the spiders take a gout of it.
@@ -18178,7 +18244,7 @@ const BOLT_COL = [.35, .85, 1], BOLT_HOT = [1, .96, .85], BOLT_VIO = [.62, .38, 
 // come from, so a fumble is a spit and a full charge is an event.
 function boltHit(b) {
   const c = b.chg, big = .35 + c * .65;
-  if (b.rocket && SPIDER.list.length) spiderArea(b.pos.x, b.pos.y, b.pos.z, 2.2, 1.4, 3); if (b.rocket && GUARD.list.length) guardArea(b.pos.x, b.pos.y, b.pos.z, 2.2, 1.4, 3);     // m1701
+  if (b.rocket && SPIDER.list.length) spiderArea(b.pos.x, b.pos.y, b.pos.z, 2.2, 1.4, 3); if (b.rocket && GUARD.list.length) guardArea(b.pos.x, b.pos.y, b.pos.z, 2.2, 1.4, 3); if (b.rocket) rockArea(b.pos.x, b.pos.y, b.pos.z, 2.6, 3);     // m1701
   if (ARENA.debris.length) debrisArea(b.pos.x, b.pos.y, b.pos.z, b.rocket ? 2.4 : .6 + (b.chg || 0) * .6);
   turretBlast(b.pos.x, b.pos.y, b.pos.z, b.rocket ? 1.4 : .25, b.rocket ? 4 : 1 + c);     // m1301: ALWAYS -- it ends in `bldHit`, so with no turret standing a shot could not touch a building's blocks, bells or levers (Worker A's finding, m1289)
   if (CWALL.list.length) wallHit(b.pos.x, b.pos.y, b.pos.z, b.rocket ? 1.3 : .35, b.rocket ? 3 : 1 + c, b.rocket ? 'rblast' : 'shot', Math.atan2(b.vel.x, b.vel.z));     // m1016: a bolt chips a chunk, a rocket blows; m1029: never a half wall a hole     // m1011: a rocket of his takes most of one; a full charge 2 bolts' worth
@@ -21435,7 +21501,7 @@ function whirlSpin() {
   const P = p.pos, R = WHIRL.R + WHIRL.Rk * (p.torn ? p.torn.k : 0);
   for (const d of DUMMIES) { if (d.st === 'gone' || !d.root.visible || d === p.carryD) continue; const Q = d.root.position, dd = Math.hypot(Q.x - P.x, Q.z - P.z); if (dd > R || Math.abs(Q.y - P.y) > 1.6) continue;
     WHIRL.stat.hits++; dummyBlow(d, Math.atan2(Q.x - P.x, Q.z - P.z), WHIRL.power, WHIRL.dmg); }
-  if (SPIDER.list.length) spiderArea(P.x, P.y, P.z, R, WHIRL.power, WHIRL.dmg); if (GUARD.list.length) guardArea(P.x, P.y, P.z, R, WHIRL.power, WHIRL.dmg);     // m1701
+  if (SPIDER.list.length) spiderArea(P.x, P.y, P.z, R, WHIRL.power, WHIRL.dmg); if (GUARD.list.length) guardArea(P.x, P.y, P.z, R, WHIRL.power, WHIRL.dmg); rockArea(P.x, P.y, P.z, R, 1.5);     // m1701
   if (ARENA.debris.length) debrisArea(P.x, P.y, P.z, R);
   camShake(.18); for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2, x = P.x + Math.sin(a) * R * .8, z = P.z + Math.cos(a) * R * .8; if (TURRET.list.length) turretMelee(x, P.y + 1, z, .6, 2); else bldHit(x, P.y + 1, z, .6, 2);
     spk(x, P.y + 1, z, Math.sin(a + 1.57) * 4, .5, Math.cos(a + 1.57) * 4, .12, .35, [1, .85, .5]); }
@@ -30473,7 +30539,7 @@ function slamMark(x, y, z) {
 function slamLand() {
   const p = player;
   p.slam = 0;
-  if (SPIDER.list.length) spiderArea(p.pos.x, p.pos.y, p.pos.z, SLAM.r, SLAM.power, SLAM.dmg); if (GUARD.list.length) guardArea(p.pos.x, p.pos.y, p.pos.z, SLAM.r, SLAM.power, SLAM.dmg);     // m1701
+  if (SPIDER.list.length) spiderArea(p.pos.x, p.pos.y, p.pos.z, SLAM.r, SLAM.power, SLAM.dmg); if (GUARD.list.length) guardArea(p.pos.x, p.pos.y, p.pos.z, SLAM.r, SLAM.power, SLAM.dmg); rockArea(p.pos.x, p.pos.y, p.pos.z, SLAM.r, 2);     // m1701
   if (ARENA.debris.length) debrisArea(p.pos.x, p.pos.y, p.pos.z, SLAM.r);
   if (CWALL.list.length && wallHit(p.pos.x, p.pos.y + .4, p.pos.z, 1.1, 3, 'blast', p.faceH)) { CWALL.dirty = 0; boxGrid(); }     // m1021: and the walls round where he lands take the blow
   for (const d of DUMMIES) {
@@ -32995,6 +33061,7 @@ function stepPlayer(dt) {
   try { tasselStep(dt); } catch (e) { TASSEL.on = 0; note('TASSEL THREW ' + e.message); }     // m1644
   if (inArena()) { deflStep(dt); hallStep(dt); if (SKIN.list.length) skinStep(dt); if (PIECE.list.length) pieceStep(dt); if (SMASH.list.length) smashStep(dt); for (const E of BLDG.list) if (E.step && E.on()) E.step(dt); if (LVL.want && inForge()) lvlStart(); if (BEACON.want && inForge()) { try { beaconBuild(); } catch (e) { BEACON.want = 0; note("BEACON THREW " + e.message); } } if (BEACON.on) beaconStep(dt); if (LVG.on) lvgStep(dt); if (SHIPZ.want === 1 && inForge()) shipBuild(); if (SHIPZ.on) shipStep(dt); if (SNOWZ.on) snowStep(dt); if (DRAGZ.on) dragStep(dt); }
   if (PLANT.list.length) plantStep(dt);     // m1424
+  if (ROCK.loose.length || ROCK.broken.length) rockStep(dt);     // m15xx
   if (RESTORE.list.length) restoreStep(dt);     // m1505     // m1105; m1119; m1120: each building's own life
   const p = player;
   if (p.dragon) { dragRide(dt); return; }     // m1614: on his dragon, the dragon owns the body
@@ -33152,7 +33219,7 @@ function stepPlayer(dt) {
       snd('thud', { g: 1.4, r: .55, x: fx, z: fz }); snd('clang', { g: .6, r: .6, x: fx, z: fz });
       for (const d of DUMMIES) { if (d.cool > 0 || !d.root) continue; const dx = d.root.position.x - fx, dz = d.root.position.z - fz, q = Math.hypot(dx, dz);
         if (q < SLAM.r * 1.2 + (d.K.r || .4)) dummyBlow(d, q > 1e-3 ? Math.atan2(dx, dz) : p.faceH, SLAM.power * (.8 + .4 * (p.chargeGoK || 1)), SLAM.dmg * KATANA.dmgK); }
-      if (SPIDER.list.length) spiderArea(fx, p.pos.y, fz, SLAM.r * 1.2, SLAM.power, SLAM.dmg * KATANA.dmgK); if (GUARD.list.length) guardArea(fx, p.pos.y, fz, SLAM.r * 1.2, SLAM.power, SLAM.dmg * KATANA.dmgK); if (TURRET.list.length) turretMelee(fx, p.pos.y + .5, fz, SLAM.r, 3); wallHit(fx, p.pos.y + .4, fz, SLAM.r * .8, 3, 'blast', p.faceH); }
+      if (SPIDER.list.length) spiderArea(fx, p.pos.y, fz, SLAM.r * 1.2, SLAM.power, SLAM.dmg * KATANA.dmgK); if (GUARD.list.length) guardArea(fx, p.pos.y, fz, SLAM.r * 1.2, SLAM.power, SLAM.dmg * KATANA.dmgK); rockArea(fx, p.pos.y, fz, SLAM.r * 1.2, 2.5); if (TURRET.list.length) turretMelee(fx, p.pos.y + .5, fz, SLAM.r, 3); wallHit(fx, p.pos.y + .4, fz, SLAM.r * .8, 3, 'blast', p.faceH); }
     // full speed for `carry` of the move, then linear to zero. A flat linear bleed averages
     // half the launch speed, so every metre of travel has to be bought with a speed spike at
     // the front -- which reads as a rocket rather than a lunge.
@@ -70027,6 +70094,14 @@ function gmerchBuild() {
   A.stat.draws = draws; A.stat.boxes = boxes.length; A.stat.top = +top.toFixed(1); A.stat.deckY = +Y.toFixed(1); A.shopAt = [Wx(0, 6.9), Y, Wz(0, 6.9)];
   console.log('[melee] merchant shop (procedural): ' + draws + ' draws, ' + boxes.length + ' boxes, deck at y ' + Y.toFixed(1) + ', butte ' + (top - base).toFixed(0) + ' m, ladder ' + A.stat.ladder + ' m');
 }
+// m15xx: RED SANDSTONE in the Red Hollows -- clusters on the canyon floor round the spawn, each set on the REAL ground (`groundAt`), and only
+// where the ground is the terrain itself (`hwHeight`), not a floor, a roof or a deck; kept off the spawn and Grumbo's home
+function rockScatterHome() { const H = HOME, R = plantRnd(1745), rec = [], [sx, sz] = H.spawn, hut = H.hut.at; let n = 0;
+  for (let c = 0; c < 16; c++) { const a = R() * 6.283, d = 12 + R() * 60, cx = sx + Math.cos(a) * d, cz = sz + Math.sin(a) * d, k = 2 + Math.floor(R() * 3);
+    for (let i = 0; i < k; i++) { const x = cx + (R() - .5) * 8, z = cz + (R() - .5) * 8; if (Math.hypot(x - sx, z - sz) < 8 || Math.hypot(x - hut[0], z - hut[1]) < 20) continue;
+      const th = hwHeight(x, z), gy = groundAt(x, z, th + 3, 6); if (!isFinite(gy) || Math.abs(gy - th) > .3) continue;
+      plantPlant(rec, 'rock_red', x, gy + .15, z, .6 + R() * 1, R() * 6.28); n++; } }
+  const g = new THREE.Group(); scene.add(g); plantFlush(g, rec); boxGrid(); HOME.stat.rocks = n; }
 async function buildHome() {
   const H = HOME; try { const q = new URLSearchParams(location.search).get('style'); if (q === 'lake' || q === 'hollows') H.style = q; } catch (e) {}
   if (H.style !== 'lake') { H.padY = 1.3; H.hut.at = [hwRc(-4) - 14, -4]; H.hut.yaw = Math.PI / 2; H.spawn = [hwRc(10) - 7, 10]; RW.time = { el: 18, az: 200, sun: [1, .8, .58], zen: [.28, .46, .78], hor: [1, .86, .7] }; }
@@ -70052,6 +70127,7 @@ async function buildHome() {
   } catch (e) { console.warn('[melee] hut', e); note('NO HUT GLB'); }
   if (H.style === 'lake') homeDress(); else hollowDress();
   triBuild(); surfBuild(); boxGrid();
+  if (H.style !== 'lake') try { rockScatterHome(); } catch (e) { console.error('[melee] hollows rocks', e); note('ROCKS THREW ' + e.message); }     // m15xx
   homeLanterns(); homeMist();
   // m1112: HIS OWN BODY through the lake's patch too (chained onto whatever his materials already do), so wading his legs read wet
   if (rig.model) { let n = 0; rig.model.traverse(o => { if (o.isMesh) for (const m of [].concat(o.material)) if (m && m.isMeshStandardMaterial && !m.userData.rw) { m.userData.rw = 1; rwPatch(m, true); m.needsUpdate = true; n++; } }); H.stat.bodyMats = n; }

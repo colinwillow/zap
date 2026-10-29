@@ -5,6 +5,25 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## ROCKS BREAK: big -> chunks -> small -> dust, in every world's own stone (m15xx)
+His: "rocks in different forms -- the snow world, the red rock world, the grass world, the temples -- different styles of rocks that once
+you slash them or shoot them or explode them break from bigger to smaller, placed just like you do plants, to add interaction."
+- **In the plant library** (so anything that scatters plants can scatter them): the old `boulder` (mossy, everywhere in the forge) is now
+  breakable, and three new kinds -- `rock_snow` (granite, a white cap), `rock_red` (banded sandstone), `rock_temple` (a cut, grooved, mossy
+  block) -- which are also SOLID (a box each). `plantFlush` hands each one to `rockInit` (stone = `hp` x its size).
+- **`ROCK`**: a blow (`rockHit`, a .22 s guard per rock) takes stone and throws chips, dust and a crack; at 0 the rock's INSTANCE is zeroed
+  out of its batch (no new draw), its box goes, and `n` CHUNKS fly from it (3 flat-shaded blob shapes, one material per kind), tumble, bounce
+  and settle (`rockStep`). A mid chunk splits into 3 small ones; a small one crumbles to dust. Chunks sink away (45 / 25 s); a broken rock
+  grows back after 150 s when he is > 30 m off. Max 80 loose chunks.
+- **Hits**: the blade's sweep and bolts (through `plantHit`: 1 stone), blast arrows (3), rockets (3), the whirl (1.5), the slams (2 / 2.5),
+  the guardian's smash (3), and arrows (`rockAt` in `arrowStep`: .6, 1.5 at full draw; the arrow shatters on stone).
+- **Placed**: the Snowfield -- 31 snow rocks in 9 clusters (SET ON the snow pack, `snowAt` x depth: at y .25 they were buried under up to a
+  metre of snow) and 8 fallen temple blocks round the willow's terrace; the Red Hollows -- 39 sandstone rocks in 16 clusters, each on the
+  real ground and only where that ground IS the terrain (`groundAt` within .3 of `hwHeight`), off the spawn and Grumbo's home.
+- Measured headless: one blow 3 -> 2.16 stone; broken -> 4 chunks, all at rest on the snow in 2.5 s; a mid chunk -> 3 small; a small ->
+  dust. Renders: the Snowfield rock before / bursting / settled; a Red Hollows sandstone rock and its red chunks.
+- **And the willow's curtain vanished past ~45 m**: its alpha-tested leaf texture was mip-mapped, and the leaves' alpha averaged under .5 in
+  the small mips. No mips on that texture now.
 ## The bow: no second pull, a flight ARC and a ring where it lands, arrows that can be seen (m1744)
 His: "once you've initiated a shot and you move the left stick, he keeps pulling the bow back again -- strafe left or right and he pulls it
 again; he should never pull it back once it's back"; "the crosshair should show an interaction with what you're aiming at -- it's hard to
