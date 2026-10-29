@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The katana's charge release, by the left stick, again; the bow's emblem flat (m15xx)
+## The katana's charge release, by the left stick, again; the bow's emblem flat (m1773)
 *"Press up on the right stick to charge. Nothing on the left stick: a downward slash, he does not launch forward -- mostly in place, forward just a
 little. Forward on the left stick and release: the launch, as now. The high attack: tap the left stick to jump and release, or hold down and
 release, as now." / "Not liking the black pencil-thin line round the reticle -- a flat colour."*

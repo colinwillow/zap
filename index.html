@@ -15016,7 +15016,7 @@ function bowMkTex() { const cv = document.createElement('canvas'); cv.width = cv
   arc(34, 4.5, [[.62, .95], [2.2, 2.53], [3.77, 4.1], [5.34, 5.67]]); arc(104, 2.5, [[.3, .7], [2.6, 3.0], [4.4, 4.7]]);
   for (let k = 0; k < 8; k++) { if (k === 5) continue; const a = k / 8 * Math.PI * 2 - Math.PI / 2, long = k % 2 === 0, r0 = long ? 52 : 58, r1 = long ? 90 : 80, sp = long ? .16 : .12, j = (rnd() - .5) * 3;
     const at = (r, da) => [c + Math.cos(a + da) * r, c + Math.sin(a + da) * r]; P(long ? 6 : 4.5, 0, [at(r1 + j, -sp), at(r0, 0), at(r1 + j, sp)]); }     // a fletching chevron, its point in
-  for (const pass of [1]) for (const { w, fill, pts } of paths) { q.strokeStyle = q.fillStyle = pass ? '#fff' : 'rgba(8,14,18,.75)';     /* m15xx (his: "not liking the black pencil-thin line round the reticle -- flat colour"): the dark under-pass is gone */ q.lineWidth = w + (pass ? 0 : 5); q.beginPath(); pts.forEach(([x, y], i) => i ? q.lineTo(x, y) : q.moveTo(x, y)); if (fill) { q.closePath(); q.fill(); if (!pass) q.stroke(); } else q.stroke(); }
+  for (const pass of [1]) for (const { w, fill, pts } of paths) { q.strokeStyle = q.fillStyle = pass ? '#fff' : 'rgba(8,14,18,.75)';     /* m1773 (his: "not liking the black pencil-thin line round the reticle -- flat colour"): the dark under-pass is gone */ q.lineWidth = w + (pass ? 0 : 5); q.beginPath(); pts.forEach(([x, y], i) => i ? q.lineTo(x, y) : q.moveTo(x, y)); if (fill) { q.closePath(); q.fill(); if (!pass) q.stroke(); } else q.stroke(); }
   const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t; }
 function bowArcInit() {
   // m1759 (his: "I don't like the dots -- those balls look really out of place; it's repetitive with the stylised reticle"): the arc is a THIN
@@ -31117,7 +31117,7 @@ function chargeRelease() {
   // m1723 (his: "press UP on the left stick and release: the lunge forward down the middle; LEFT: the spinning whirlwind; RIGHT: the same,
   // mirrored; DOWN: the high one; neutral stays the lunge for now"). The LEFT stick at the release picks it: up / neutral = the lunge, left /
   // right = the whirlwind turning that way (`katana_360h_m` / `katana_360h`, the right pad's own left / right spins), down = the leap.
-  // m15xx (his): "nothing on the left stick: a downward slash, mostly in place -- forward just a little. Forward and release: the launch, as now.
+  // m1773 (his): "nothing on the left stick: a downward slash, mostly in place -- forward just a little. Forward and release: the launch, as now.
   // The high attack: hold DOWN and release (as now), or TAP the left stick to jump and release in the air." So: in the air (`!grounded`, the charge
   // is held through a jump) = the leap; neutral = the release with its travel cut to `still` m (`p.goStill`); forward = the full launch.
   p.goStill = 0;
@@ -31215,7 +31215,7 @@ function chargeRelease() {
   // THE DASH HAS ITS OWN CEILING. `maxV` is the ordinary lunge's, and it is also the radius a
   // strike may acquire inside -- so the dash cannot borrow it without turning every jab into a
   // rocket at a man across the street.
-  const vx = clamp((p.goStill ? Math.min(far, CHARGE3.still) : far) / spend, 0, dash ? MELEE.dashV : MELEE.maxV);     // m15xx: neutral = the slash nearly in place
+  const vx = clamp((p.goStill ? Math.min(far, CHARGE3.still) : far) / spend, 0, dash ? MELEE.dashV : MELEE.maxV);     // m1773: neutral = the slash nearly in place
   // the chip reports what it will ACTUALLY cover, not what was asked for -- `maxV` clamps and
   // a number that ignores its own clamp is a number that lies on exactly the interesting frame
   p.melV = vx; p.goGap = vx * spend; p.goHi = hi;
@@ -32390,7 +32390,7 @@ function stepKit(dt) {
     }
   } else if (p.charge && kaimHold()) {     // m1071: the katana's charge, once it would swing, is HELD wherever the thumb goes -- it aims the height
     p.chargeT = Math.min(MELEE.charge, p.chargeT + dt);
-  } else if (p.charge && slotNow().blade && (p.cart || (!p.grounded && stick.R.down && CHARGE3.on))) {     /* m15xx: and through a JUMP -- the release in the air is the high attack */     // m1761: mid dodge-flip the charge is HELD (it fired the release the moment the flip left the ground)
+  } else if (p.charge && slotNow().blade && (p.cart || (!p.grounded && stick.R.down && CHARGE3.on))) {     /* m1773: and through a JUMP -- the release in the air is the high attack */     // m1761: mid dodge-flip the charge is HELD (it fired the release the moment the flip left the ground)
   } else if (p.charge) chargeRelease();
 
   if (p.fireT > 0) p.fireT = Math.max(0, p.fireT - dt / (WEAP.shootBeat + WEAP.shootHold));
