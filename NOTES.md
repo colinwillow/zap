@@ -89,6 +89,20 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## The stream is continuous: a boat can go the whole way (Worker B)
+His (m1750): "the stream continuous -- no point in the entire stream that a reasonable size boat could not go through... room where you
+could go under the structure, almost like it was built over". MEASURED, not eyeballed: a headless audit walks z -160..160 every .5 m and
+finds, across the river, the widest run of cells that are wet (`rwHeight` < sea - .4: a .4 m draft) with no BOX between the water and
+sea + 3 (3 m of air). Before: the mill's z 63.5..65 had ZERO (the island filled the river, and the canyon stairs' rail colliders were
+each ONE AABB of the whole sloped rail -- 16 m tall, spanning the river: an invisible wall, a bug on land too), and z -2.5 had 2 m (at
+x1.4 Grumbo's jetty, T-head and moored canoe reached across the river). Fixes: (1) the mill's island is TWO halves (`CH` 2.5) with the
+stream running between them straight through the base's arch (4.8 m wide, ~6 m of headroom); the base's side walls go down into the
+water; the wheel hangs against the arch's east wall, its paddles in the stream itself, leaving ~3 m of channel beside it (the m1750
+race, intake and kerbs are gone); (2) `wallStair` puts a rail box per tread instead of one per rail; (3) the jetty's length `z1` is cut
+back until the T-head's corners stay 2.2 m short of the river's centre line on the home's side (`rv`; it is now about its minimum), and
+the canoe is moored at the T-head's end along the bank. After: 0 points under 3 m; the narrowest are the mill arch (4.5) and the dock
+(7.5); everywhere else 9.75. Still true and noted: the east canyon stair's flight passes through the mill base and over the channel (its
+treads there are 3.2-7.5 m up, so boats clear it) -- a stair to re-route another day.
 ## The mill runs on the stream, and HAND-BUILT edges (m1750, Worker B)
 His (m1749): "the whole idea was it was being powered by the motion of the stream -- weird that the wheel isn't actually in the stream";
 "the spout -- the water is flowing off the backside of it"; and "very, very rigid straight lines... is there a way to solve this with a

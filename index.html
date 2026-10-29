@@ -69361,7 +69361,11 @@ function ghomeBuild(at, yaw, y0) {
   // ---- PASS 19 (his ask): a FISHING PIER straight out from the shop steps into the stream -- plank deck on posts down to the bed, following
   // the bank down until it clears the water, then level; a rail on one side, a T-head with lantern posts, a stool, a bait barrel, rope coils
   // and a rod leaning out; and his ALIEN CANOE moored alongside (`GHOME.canoe`: it bobs on the waves) ----
-  { const gH = (x, z) => (rwHeight(Wx(x, z), Wz(x, z)) - y0) / hk, wY = -y0 / hk, dY = wY + .62, z0 = 8.6, z1 = 13.0, hw = 1.1, NC = { noCam: 1 };
+  // m1751 (his: "no point in the entire stream a reasonable size boat could not go through"): at x1.4 the jetty, its T-head and the moored
+  // canoe reached across all but 2 m of the river. `z1` is now cut back until the canoe's outer side stays 2.2 m short of the river's centre
+  // line on the home's own side (`rv` is the signed distance, checked at the T-head's corners), and the canoe is moored ALONG the T-head's end, so the far half of the stream is always open water
+  { const gH = (x, z) => (rwHeight(Wx(x, z), Wz(x, z)) - y0) / hk, wY = -y0 / hk, dY = wY + .62, z0 = 8.6, hw = 1.1, NC = { noCam: 1 }, rv0 = Math.sign(Wx(0, z0) - hwRc(Wz(0, z0))) || -1, rv = (x, z) => (Wx(x, z) - hwRc(Wz(x, z))) * rv0;
+    let z1 = 13.0; while (z1 > z0 + .5 && Math.min(rv(-3.6, z1 + 2.6), rv(3.6, z1 + 2.6)) < 2.2) z1 -= .25; A.dockZ1 = z1;
     const rnd2 = rwRng(1921); let zz = z0, pi = 0; while (zz < z1) { const za = zz, zb = Math.min(z1, zz + .34), yd = Math.max(dY, gH(0, (za + zb) / 2) + .06), jy = (rnd2() - .5) * .025;     // pass 21: weathered -- mixed timber, each a little off, one gone
       if (pi++ !== 7) put(new THREE.BoxGeometry(hw * 2 - rnd2() * .12, .09, zb - za - .03), rnd2() < .25 ? wood : woodP, at4((rnd2() - .5) * .08, yd - .045 + jy, (za + zb) / 2, (rnd2() - .5) * .04, 0, (rnd2() - .5) * .03));
       quad([-hw, yd + .01, za], [hw, yd + .01, za], [hw, yd + .01, zb], [-hw, yd + .01, zb]); zz = zb; }
@@ -69418,7 +69422,7 @@ function ghomeBuild(at, yaw, y0) {
       for (let i = 0; i <= NU; i += 3) { const p0 = at(i / NU, 0); put(new THREE.SphereGeometry(.05, 6, 4), redW, at4(p0[0], p0[1], p0[2], 0, 0, 0, 1.4, 1, 1)); } }
     // the CANOE: his alien skiff -- a long bowl of a hull with an upswept prow and stern, brass gunwales, swept fins at its waist and a tail
     // fin (it looks as if it flies), lavender runes along its flank and two glowing hover discs under it. Its own group: it rides the water
-    { const cg = new THREE.Group(), cx = -.4, cz = tz1 + 1.55; cg.position.set(cx, wY, cz); cg.rotation.y = Math.PI / 2; g.add(cg);     // alongside the T-head, along the current
+    { const cg = new THREE.Group(), cx = tx + 2.6, cz = (tz0 + tz1) / 2; cg.position.set(cx, wY, cz); cg.rotation.y = Math.PI / 2; g.add(cg);     // alongside the T-head, along the current
       const hullM = new THREE.MeshStandardMaterial({ color: 0x3f6f78, roughness: .45, metalness: .3, side: THREE.DoubleSide }), innerM = new THREE.MeshStandardMaterial({ color: 0x6a4a34, roughness: .9 }), runeM = new THREE.MeshStandardMaterial({ color: 0xc9b6ff, emissive: 0x8a6aff, emissiveIntensity: 1.6, toneMapped: false }), deckM = new THREE.MeshStandardMaterial({ color: 0x6a4a34, roughness: .9, side: THREE.BackSide });
       const CB = new Map(), cadd = (geo, m) => { geo = geo.index ? geo.toNonIndexed() : geo; geo.deleteAttribute('uv'); if (!geo.attributes.normal) geo.computeVertexNormals(); if (!CB.has(m)) CB.set(m, []); CB.get(m).push(geo); };     // merged per material: five draws for the whole boat
       const L = 2.7, W = .62, D = .42, sw = z => .55 * Math.pow(Math.abs(z / L), 3.2), up = gg => { const q = gg.attributes.position; for (let i = 0; i < q.count; i++) q.setY(i, q.getY(i) + sw(q.getZ(i))); gg.computeVertexNormals(); return gg; };
@@ -69895,40 +69899,36 @@ function gmillBuild() {
   const sunM = new THREE.MeshStandardMaterial({ map: gmillTex('sun'), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, roughness: .9 }), sailM = new THREE.MeshStandardMaterial({ map: gmillTex('sail'), alphaTest: .5, side: THREE.DoubleSide, roughness: .9 });
   const awnM = new THREE.MeshStandardMaterial({ map: ghClothTex('awning'), alphaTest: .5, side: THREE.DoubleSide, roughness: .9 }), banM = new THREE.MeshStandardMaterial({ map: ghClothTex('banner'), alphaTest: .5, side: THREE.DoubleSide, roughness: .9 });
   // ---- THE ISLAND: a low sandy mound in the stream on a skirt of rock, walkable on top; STEPPING STONES out to the west bank ----
-  const iy = .7, IR = 8.5; put(ghRockGeo(3001, IR * 1.1, 1.6, IR, 3), rockM, at4(0, -.6, 0)); put(new THREE.CylinderGeometry(IR * .86, IR * .98, .5, 32), sand, at4(0, iy - .25, 0));
-  { const N = 32; for (let i = 0; i < N; i++) { const a0 = i / N * TAU, a1 = (i + 1) / N * TAU, r = IR * .86; quad([0, iy + .01, 0], [Math.sin(a0) * r, iy + .01, Math.cos(a0) * r], [Math.sin(a1) * r, iy + .01, Math.cos(a1) * r], [0, iy + .01, 0]); } }
-  for (let gz = -IR; gz < IR; gz += 1.5) { const hw = Math.sqrt(Math.max(0, (IR * .86) ** 2 - (gz + .75) ** 2)); if (hw > .5) box(-hw, hw, -3, iy, gz, gz + 1.5); }
+  // his (m1750): "the stream continuous -- no point in the entire stream a reasonable size boat could not go through... room where you could
+  // go under the structure, almost like it was built over". The island is TWO halves now, with the stream itself running between them
+  // straight through the base's arch (4.8 m wide, 6 m of headroom): rock clipped flat on the channel side, a sand top, walk tris, boxes each
+  const iy = .7, IR = 8.5, CH = 2.5;
+  for (const sd of [-1, 1]) { const hx = sd * 5.9, rx = 3.35, rz = 8.4, rg = ghRockGeo(3001 + (sd > 0 ? 1 : 0), 3.9, 1.6, 8.9, 3); rg.translate(hx, -.6, 0); const rp = rg.attributes.position; for (let i = 0; i < rp.count; i++) if (sd * rp.getX(i) < CH + .1) rp.setX(i, sd * (CH + .1)); rg.computeVertexNormals(); put(rg, rockM);
+    put(new THREE.CylinderGeometry(1, 1, .5, 28), sand, _m4.compose(_v.set(hx, iy - .25, 0), _q.identity(), new THREE.Vector3(rx, 1, rz)));
+    const N = 28; for (let i = 0; i < N; i++) { const a0 = i / N * TAU, a1 = (i + 1) / N * TAU; quad([hx, iy + .01, 0], [hx + Math.sin(a0) * rx * .97, iy + .01, Math.cos(a0) * rz * .97], [hx + Math.sin(a1) * rx * .97, iy + .01, Math.cos(a1) * rz * .97], [hx, iy + .01, 0]); }
+    for (let gz = -rz; gz < rz; gz += 1.5) { const hw = rx * .97 * Math.sqrt(Math.max(0, 1 - ((gz + .75) / rz) ** 2)); if (hw > .4) box(hx - hw, hx + hw, -3, iy, gz, gz + 1.5); } }
   { let x = -IR - 1.4; const stones = []; while (x > -40) { const gy = gH(x, 0); if (gy > iy + .2) break; stones.push(x); x -= 1.9 + (stones.length % 2) * .5; }
     for (const [i, sx] of stones.entries()) { const sz = (i % 2 ? .5 : -.5), r = .75 + (i % 3) * .12; put(ghRockGeo(3100 + i, r * 1.2, .8, r, 2), rockM, at4(sx, -.35, sz, i)); put(new THREE.CylinderGeometry(r * .85, r * .95, .2, 10), rockM, at4(sx, .45, sz)); box(sx - r * .8, sx + r * .8, -2, .55, sz - r * .8, sz + r * .8);
       const N = 10; for (let k = 0; k < N; k++) { const a0 = k / N * TAU, a1 = (k + 1) / N * TAU, rr = r * .8; quad([sx, .56, sz], [sx + Math.sin(a0) * rr, .56, sz + Math.cos(a0) * rr], [sx + Math.sin(a1) * rr, .56, sz + Math.cos(a1) * rr], [sx, .56, sz]); } }
     A.stat.stones = stones.length; }
   // ---- THE BASE: a square stone block with a batter, the arched RACE through it along the stream (z), the wheel in it ----
   const BY = iy, BH = 8, bw = 5.2, aw = 2.4, ah = 5.6;
-  for (const sd of [-1, 1]) vbox(sd < 0 ? -bw : aw, sd < 0 ? -aw : bw, BY, BY + BH, -bw, bw, plaster, 1);
+  for (const sd of [-1, 1]) vbox(sd < 0 ? -bw : aw, sd < 0 ? -aw : bw, RW.sea - 1.2, BY + BH, -bw, bw, plaster, 1);
   vbox(-aw, aw, BY + ah, BY + BH, -bw, bw, plaster, 1); for (const [qx, qz] of [[-bw, -bw], [bw, -bw], [-bw, bw], [bw, bw]]) for (let y = BY; y < BY + BH; y += 1.1) vbox(qx - .35, qx + .35, y, y + .9, qz - .35, qz + .35, stone, 0); put(new THREE.CylinderGeometry(aw, aw, bw * 2, 18, 1, true, Math.PI / 2, Math.PI), stone, at4(0, BY + ah - aw * .0, 0, 0, Math.PI / 2, 0));
   for (const sz of [-1, 1]) { put(new THREE.TorusGeometry(aw + .2, .28, 6, 18, Math.PI), stone, at4(0, BY + ah - .1, sz * (bw + .02))); }
   vbox(-bw - .3, bw + .3, BY + BH, BY + BH + .5, -bw - .3, bw + .3, stone, 1); quad([-bw - .3, BY + BH + .51, -bw - .3], [bw + .3, BY + BH + .51, -bw - .3], [bw + .3, BY + BH + .51, bw + .3], [-bw - .3, BY + BH + .51, bw + .3]);
   // the WATERWHEEL in the race (its own group: it turns), and the water pouring over it
-  { const wh = new THREE.Group(); wh.position.set(0, BY + 2.1, -bw + 1.1); wh.rotation.y = Math.PI / 2; g.add(wh); A.wheelH = wh; const wg = new THREE.Group(); wh.add(wg); A.wheel = wg; const R = 2.4, parts = [], add = (geo, m) => parts.push([geo, m]);
+  { const wh = new THREE.Group(); wh.position.set(1.45, RW.sea + 2.1, -bw + 1.1); wh.rotation.y = Math.PI / 2; g.add(wh); A.wheelH = wh; const wg = new THREE.Group(); wh.add(wg); A.wheel = wg; const R = 2.4, parts = [], add = (geo, m) => parts.push([geo, m]);
     for (const sx of [-.75, .75]) { const t = new THREE.TorusGeometry(R, .12, 6, 32); t.translate(0, 0, sx); add(t, wood); const t2 = new THREE.TorusGeometry(R * .55, .08, 5, 24); t2.translate(0, 0, sx); add(t2, wood); }
     for (let k = 0; k < 14; k++) { const a = k / 14 * TAU, p = new THREE.BoxGeometry(.8, .1, 1.7); p.translate(0, R - .25, 0); p.rotateZ(a); add(p, woodP); const s2 = new THREE.BoxGeometry(.12, R, .1); s2.translate(0, R / 2, -.75); s2.rotateZ(a); add(s2, wood); const s3 = new THREE.BoxGeometry(.12, R, .1); s3.translate(0, R / 2, .75); s3.rotateZ(a); add(s3, wood); }
     const hub = new THREE.CylinderGeometry(.35, .35, 2.4, 12); hub.rotateX(Math.PI / 2); add(hub, iron);
     const byM = new Map(); for (const [geo, m] of parts) { const q = geo.index ? geo.toNonIndexed() : geo; q.deleteAttribute('uv'); if (!byM.has(m)) byM.set(m, []); byM.get(m).push(q); } for (const [m, list] of byM) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = true; wg.add(o); }
-    // his (m1749): "the whole idea was it was powered by the motion of the stream -- weird that the wheel isn't in the stream"; and the
-    // spout "pours off the backside". The chute, its fall and the pool are gone: the wheel is turned to face along the stream (axle across
-    // it) and stands in a MILL RACE -- the stream's water let in under a stone intake upstream, run through the arch in a kerbed channel
-    // under the wheel (the low paddles dip in and are pushed: water +z, `wheel.rotation.z -=`), and spilled back into the stream over a lip
-    { const wy = iy + .04, z0 = -IR - 1.1, z1 = IR + 1.1, L0 = z1 - z0, path = []; for (let k = 0; k <= 12; k++) path.push([z0 + L0 * k / 12, wy]); for (let k = 1; k <= 8; k++) { const h = (wy + .45) * (k / 8) ** 1.5; path.push([z1 + 1.2 * Math.sqrt(h / (wy + .45)), wy - h]); }
-      let L = 0; const len = [0]; for (let k = 1; k < path.length; k++) { L += Math.hypot(path[k][0] - path[k - 1][0], path[k][1] - path[k - 1][1]); len.push(L); }
-      const pos = [], uv = [], idx = []; path.forEach(([z, y], k) => { const w = 2.15 + (z > z1 ? .3 : 0); pos.push(-w, y, z, w, y, z); uv.push(0, len[k] / L, 1, len[k] / L); }); for (let k = 0; k < path.length - 1; k++) { const i = k * 2; idx.push(i, i + 2, i + 1, i + 1, i + 2, i + 3); }
-      const rg = new THREE.BufferGeometry(); rg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); rg.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); rg.setIndex(idx);
-      const race = new THREE.Mesh(rg, hwFallMat(L0 / L, 0, null, [.24, .62, .72], [.84, .97, 1], 2, 1, 5)); race.renderOrder = 3; g.add(race);
-      const boil = new THREE.Mesh(new THREE.CircleGeometry(1.7, 36), hwBoilMat()); boil.rotation.x = -Math.PI / 2; boil.position.set(0, wy + .03, -bw + 1.1); boil.scale.set(1.25, .9, 1); boil.renderOrder = 4; g.add(boil); A.foam = boil;
-      const land = new THREE.Mesh(new THREE.CircleGeometry(1.7, 36), hwBoilMat()); land.rotation.x = -Math.PI / 2; land.position.set(0, RW.sea + .05, z1 + 1.3); land.scale.set(1.6, 1.1, 1); land.renderOrder = 4; g.add(land); A.water = [race, boil, land];
-      for (const sd of [-1, 1]) for (const [za, zb] of [[z0, -bw], [bw, z1]]) vbox(sd * 2.2 - .2, sd * 2.2 + .2, iy - .1, iy + .32, za, zb, stone, 0);
-      vbox(-2.6, 2.6, iy + .9, iy + 1.5, z0 - .2, z0 + 1.1, stone, 1); for (const sd of [-1, 1]) vbox(sd * 2.4 - .25, sd * 2.4 + .25, iy - .1, iy + .9, z0 - .2, z0 + 1.1, stone, 1);
-      A.splash = [cx, wy + .25, cz - bw + 1.1]; A.splash2 = [cx, RW.sea + .2, cz + z1 + 1.3]; }
-    A.hub = [cx, BY + 2.1, cz - bw + 1.1]; }
+    // his (m1749): "powered by the motion of the stream". The wheel hangs in the arch against its EAST wall, axle across the stream, its low
+    // paddles in the stream's own water (water +z; `wheel.rotation.z -=` about the turned axle pushes them +z, with it). That leaves 3 m of
+    // open channel beside it for a boat (m1751; the m1750 race, intake and kerbs went with the island's middle)
+    { const boil = new THREE.Mesh(new THREE.CircleGeometry(1.7, 36), hwBoilMat()); boil.rotation.x = -Math.PI / 2; boil.position.set(1.45, RW.sea + .05, -bw + 1.1); boil.scale.set(.75, 1.4, 1); boil.renderOrder = 4; g.add(boil); A.foam = boil; A.water = [boil];
+      A.splash = [cx + 1.45, RW.sea + .25, cz - bw + 1.1]; }
+    A.hub = [cx + 1.45, RW.sea + 2.1, cz - bw + 1.1]; }
   // ---- THE TOWER: a tapering cream lathe from the base's top to the gallery, the red sun-spiral painted on it, small windows ----
   const T0 = BY + BH + .5, T1 = T0 + A.H - 10, r0 = 4.4, r1 = 2.8, Rt = y => r0 + (r1 - r0) * Math.pow((y - T0) / (T1 - T0), .9) + .25 * Math.sin(Math.PI * (y - T0) / (T1 - T0));
   { const pts = []; for (let i = 0; i <= 24; i++) { const y = T0 + (T1 - T0) * i / 24; pts.push(new THREE.Vector2(Rt(y), y)); } put(new THREE.LatheGeometry(pts, 40), plaster);
@@ -69992,8 +69992,9 @@ function gmillBuild() {
     vbox(xa, xb, ya - .14, ya, z0 + 1.3, zs + w / 2, woodP, 1); quad([xa, ya + .01, z0 + 1.3], [xb, ya + .01, z0 + 1.3], [xb, ya + .01, zs + w / 2], [xa, ya + .01, zs + w / 2]); for (const px of [X1 + e * .4, X1 + e * 2.3]) vbox(px - .1, px + .1, gH(px, zs) - .4, ya - .1, zs - .1, zs + .1, wood, 0);
     while (n < 80) { const xn = x + e * tr, gy = gH(xn, zs); if (y - .3 <= Math.max(gy, .55) + .05) break; y -= .3; x = xn; n++;
       vbox(x - tr / 2, x + tr / 2, y - .12, y, zs - w / 2, zs + w / 2, woodP, 1); quad([x - tr / 2, y + .01, zs - w / 2], [x + tr / 2, y + .01, zs - w / 2], [x + tr / 2, y + .01, zs + w / 2], [x - tr / 2, y + .01, zs + w / 2]);
+      for (const zz of [zs - w / 2 + .05, zs + w / 2 - .05]) box(x - tr / 2, x + tr / 2, y, y + 1, zz - .08, zz + .08, NC);
       if (n % 5 === 0) for (const zz of [zs - w / 2 + .1, zs + w / 2 - .1]) vbox(x - .08, x + .08, gy - .4, y + 1, zz - .08, zz + .08, wood, 0); }
-    for (const zz of [zs - w / 2 + .05, zs + w / 2 - .05]) { rod([X1 + e * 2.2, ya + 1, zz], [x, y + 1, zz], .07, wood); box(Math.min(X1, x), Math.max(X1, x), y, ya + 1, zz - .08, zz + .08, NC); }
+    for (const zz of [zs - w / 2 + .05, zs + w / 2 - .05]) rod([X1 + e * 2.2, ya + 1, zz], [x, y + 1, zz], .07, wood);
     return [n, +y.toFixed(1)]; };
   { const [n, f] = wallStair(A.landW, 1); A.stat.stairW = n; A.stat.stairFoot = f; } { const [n, f] = wallStair(A.landE, -1); A.stat.stairE = n; A.stat.stairFootE = f; }
   // ---- PASS 3 (his: "anchor those bridges to buildings"): a stone GATE TURRET on each canyon wall where the mill's bridges land -- a round
@@ -70064,7 +70065,7 @@ function gmillStep(dt, t) { const A = GMILL; if (!A.g) return; const RT = rsChun
     for (const o of D.chains) { const th = D.up * 1.35, a = new THREE.Vector3(D.X1 - D.L * Math.cos(th), D.ya + D.L * Math.sin(th), D.z0 + o.userData.zz), b = new THREE.Vector3(D.X1 + .2, D.ya + 3.3, D.z0 + o.userData.zz), d = b.clone().sub(a); o.position.copy(a).addScaledVector(d, .5); o.scale.y = d.length(); o.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); }
     const i = BOXES.indexOf(D.box), down = D.up < .08; if (down && i < 0) { BOXES.push(D.box); boxGrid(); } else if (!down && i >= 0) { BOXES.splice(i, 1); boxGrid(); } if (Math.abs(u0 - D.want) > .001 && Math.abs(D.up - D.want) < .001) snd('thud', { g: .9, r: .6, x: D.winch[0], z: D.winch[2] }); }
   if (A.foam) { A.foam.visible = !!A.splash; A.foam.rotation.z += dt * .7; const k = 1 + Math.sin(performance.now() * .009) * .08; A.foam.scale.set(k, k, 1); }
-  if (A.splash) { A.st = (A.st || 0) - dt; if (A.st <= 0) { A.st = .09; spkBurst(A.splash[0] + (Math.random() - .5) * .8, A.splash[1], A.splash[2] - Math.random() * .5, 3, { col: [.88, .95, 1], spread: 2.4, size: .08, life: .45 }); } } if (A.rotor && !A.dead) A.rotor.rotation.y += dt * .35; if (A.splash2 && !A.dead && Math.random() < dt * 8) spkBurst(A.splash2[0] + (Math.random() - .5) * 3, A.splash2[1], A.splash2[2] + Math.random(), 3, { col: [.88, .95, 1], spread: 2, size: .1, life: .5 }); }
+  if (A.splash) { A.st = (A.st || 0) - dt; if (A.st <= 0) { A.st = .09; spkBurst(A.splash[0] + (Math.random() - .5) * .8, A.splash[1], A.splash[2] - Math.random() * .5, 3, { col: [.88, .95, 1], spread: 2.4, size: .08, life: .45 }); } } if (A.rotor && !A.dead) A.rotor.rotation.y += dt * .35; }
 // THE MERCHANT SHOP (his ref `images/korajin/ref/merchant_shop_1.jpg`, after m1459): high on a sandstone BUTTE that rises out of the canyon's
 // WEST rim upstream of the home, its deck jutting over the drop toward the valley. A two-storey timber-and-stone shop on a plank deck,
 // under two huge curved BONE ARCHES holding a red SAIL canopy; teal and pink awnings; the round target SIGN in a wheel; the tall target
