@@ -120,7 +120,7 @@ in there so I can transform it between the two states"; "these rocks are kind of
 - **THE HYBRID:** the sky islands over the rim (m1113) showed in FALLEN. KORAJIN: the floating world is what restoration raises -> hidden
   while fallen. (The refinery already sits on the flank when fallen.)
 Next: the painted textures (rock, sand, cliff), his ask in the same message.
-## m15xx -- BAMBOO (his: "a good bamboo model seems very appropriate for the game -- fun, and the wood-hit noise when you brush through it; a
+## m1730 -- BAMBOO (his: "a good bamboo model seems very appropriate for the game -- fun, and the wood-hit noise when you brush through it; a
 good little scatter; I could see it in the snow world")
 - **There already was a `bamboo`** in `PLANTK` (a quick one: seven tubes and PLANK leaves .9 x .14 m, no joints), planted round four buildings
   and in the plant library. The new definition was written ABOVE it, and the old key -- later in the same object literal -- silently won:
