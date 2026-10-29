@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## THE LIVE TURN: watch the Red Hollows fall or rise, no reload (Worker B)
+## THE LIVE TURN: watch the Red Hollows fall or rise, no reload (m1733, Worker B)
 His (after m1731): "we need to build a transition between the two so you can actually physically watch one kind of rumble and shake and then
 convert into the other one". The STATE button (and GOD > RED HOLLOWS) no longer reloads: `hwAgeLive()` flips `AGE.st` and `hwAgeStep` plays
 it. `HWAGE.rumble` (1.8 s): the camera shakes, low thuds, dust bursts round a random place, and every chunk of every chunked place shudders
