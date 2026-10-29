@@ -5,6 +5,11 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The bow at rest, on his diagonal (m15xx)
+His (a red line drawn on a side view): "when he's just standing idle it doesn't need to be straight up and down -- hold it almost like he holds the
+sword, in the middle." Carried, the bow's riser (still through the fist, m1746) now runs along a low DIAGONAL: the top limb up and AHEAD of him at
+`carry.ang` .6 rad (~34 deg) above level, the lower limb trailing behind his hip, leaned `carry.out` .18 out from his side; the string faces up,
+so the limbs' own curve lifts both ends (the back end flattens as in his line). Renders: both sides, the back, the front, walking.
 ## Arrows you can SEE and that HIT the targets; the arena no longer opens on a straw post; CINEMA.md (m1747)
 His: "with any meaningful amount of speed you can't even see the arrow"; "I was shooting the test dummies -- you hit them with the sword and they
 move; with explosive arrows they don't; the arrows don't hit things they're supposed to hit"; "when you start the arena the sparring dummy is the

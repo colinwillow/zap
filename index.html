@@ -14781,7 +14781,7 @@ function archerBow(d) {
 // over whatever his legs are doing; letting go LOOSES: `bow_recoil`, and an arrow from the nock to the reticle's point -- a lob solved to land
 // there, faster and flatter the longer it was drawn (`full` s to full power). His arrows are `mine`: they hit the bowmen, the spiders (a hit takes
 // a leg on the way to the burst), chip statues, smash what `bldHit` breaks, and stick in walls and the ground.
-const BOW = { full: 1.1, drawRate: 1.5, v0: 22, v1: 72, g0: .55, g1: .05, dmg0: 1, dmg1: 3, pow0: .12, pow1: 1.2, keep: .3, limbK: .95, big: 1.35, glow: .55, trail: 3, tracerR: .05, tracerT: .06, tracerMax: 4, sq: 1, carry: { out: .07, fwd: .02, tilt: .45, lean: -.3, up: .75 }, blastR: 2.6, blastDmg: 4, fireDmg: 1, stat: { shots: 0, hits: 0, blasts: 0, fires: 0 } };     // m1729: the charge is the shot -- a tap lobs slow, a full draw flies fast and almost true; only a FULL draw knocks back
+const BOW = { full: 1.1, drawRate: 1.5, v0: 22, v1: 72, g0: .55, g1: .05, dmg0: 1, dmg1: 3, pow0: .12, pow1: 1.2, keep: .3, limbK: .95, big: 1.35, glow: .55, trail: 3, tracerR: .05, tracerT: .06, tracerMax: 4, sq: 1, carry: { ang: .6, out: .18 }, blastR: 2.6, blastDmg: 4, fireDmg: 1, stat: { shots: 0, hits: 0, blasts: 0, fires: 0 } };     // m1729: the charge is the shot -- a tap lobs slow, a full draw flies fast and almost true; only a FULL draw knocks back
 const _bwL = new THREE.Vector3(), _bwR = new THREE.Vector3(), _bwA = new THREE.Vector3(), _bwB = new THREE.Vector3(), _bwM = new THREE.Vector3(), _bwD = new THREE.Vector3();
 // m1744 (his: "the thing that's killing me -- once you've initiated a shot and you move the left stick around he keeps pulling the bow back
 // again; strafe left or right and he pulls it again; he should never pull it back again once it's back"). MEASURED: standing, the draw is the
@@ -14875,8 +14875,11 @@ function bowFist(B, drawing, h) { const b = rig.bones, m1 = b.mixamorig_LeftHand
   if (!m1 || !m2 || !m3 || !t2 || !pk) return 0;
   const P = B.g.position.set(0, 0, 0); for (const o of [m1, m2, m3, t2]) P.add(o.getWorldPosition(_bgA)); P.multiplyScalar(.25);     // inside the curled fingers
   m1.getWorldPosition(_bgA); pk.getWorldPosition(_bgB); _bhY.subVectors(_bgA, _bgB).normalize();     // the knuckle line: pinky -> middle
-  if (!drawing) { const C = BOW.carry; _bhY.lerp(_bhX.set(0, 1, 0), C.up).normalize(); }     // carried: mostly upright, still through the fist
-  _bhZ.set(Math.sin(h), 0, Math.cos(h)); if (!drawing) _bhZ.set(Math.sin(player.faceH), 0, Math.cos(player.faceH)).multiplyScalar(1).add(_bhX.set(0, BOW.carry.tilt, 0));
+  // m15xx (his drawing): CARRIED the bow rests on a low DIAGONAL, like the sword at rest -- the top limb up and AHEAD of him (`carry.ang` above
+  // level), the lower limb trailing behind his hip, leaning a little out from his side (`carry.out`); the string faces up (the belly down)
+  if (!drawing) { const C = BOW.carry, f = player.faceH, fx = Math.sin(f), fz = Math.cos(f), ca = Math.cos(C.ang), sa = Math.sin(C.ang);
+    _bhY.set(fx * ca + fz * C.out, sa, fz * ca - fx * C.out).normalize(); _bhZ.set(0, -1, 0); }
+  else _bhZ.set(Math.sin(h), 0, Math.cos(h));
   _bhZ.addScaledVector(_bhY, -_bhZ.dot(_bhY)).normalize(); _bhX.crossVectors(_bhY, _bhZ);
   _bhM.makeBasis(_bhX, _bhY, _bhZ); B.g.quaternion.setFromRotationMatrix(_bhM); return 1; }
 // while he draws, his CHEST is turned square to the aim and levelled (after the clip: the strafe legs' hips lean and turn, and the drawn arms rode
