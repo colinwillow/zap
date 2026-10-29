@@ -65976,7 +65976,7 @@ function godMenuOpen(on) {
   btn('FLY ' + (GOD.fly ? 'ON' : 'OFF'), () => { godFly(!GOD.fly); godMenuOpen(1); });
   // the Red Hollows' state on the phone (his ask: "how can I see it in all its glory"): main's AGE, saved; reloads (a `?hs=` would win, so it goes)
   if (inHome()) btn('RED HOLLOWS: ' + (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + ' (tap: watch it turn ' + (AGE.st === 'fallen' ? 'RESTORED' : 'FALLEN') + ')', () => hwAgeLive());
-  if (inHome() && GCASTLE.plaza) btn('GO: SKY CASTLE (the landmass, ' + (AGE.st === 'fallen' ? 'hidden while FALLEN' : 'restored') + ')', () => { const [x, y, z] = GCASTLE.plaza; player.pos.set(x, y + 1, z); player.vel.set(0, 0, 0); godMenuOpen(0); });
+  if (inHome() && GCASTLE.plaza) btn('GO: SKY CASTLE (' + (AGE.st === 'fallen' ? 'crashed on the plateau: FALLEN' : 'in the sky: RESTORED') + ')', () => { const [x, y, z] = GCASTLE.plaza; player.pos.set(x, y + 1 + GCASTLE.colY, z); player.vel.set(0, 0, 0); godMenuOpen(0); });
   if (inHome() && GCASTLE.liftAt) btn('GO: SKY CASTLE LIFT (its foot, on the plateau)', () => { const [x, y, z] = GCASTLE.liftAt; player.pos.set(x + 3, y + 1, z); player.vel.set(0, 0, 0); godMenuOpen(0); });
   if (inAW()) btn('ALIEN BUILDINGS ' + (AW.bldOn ? 'ON' : 'OFF') + ' (reloads; ' + AW.bld + ' placed, ' + AW.missing.length + ' missing)', () => { try { localStorage.setItem('mel.awbld', AW.bldOn ? '0' : '1'); } catch (e) {} location.replace(location.pathname); });   // m434
   { const al = /alien_pano/.test(SKY.img); btn('SKY: ' + (al ? 'THE ALIEN PANO' : 'THE GAME HDRI') + ' (tap for ' + (al ? 'the game HDRI' : 'the alien pano') + ', reloads)', () => { try { localStorage.setItem('mel.skypick', al ? 'game' : 'alien'); } catch (e) {} location.replace(location.pathname); }); }   // m435
@@ -68969,9 +68969,9 @@ function hwAgeLive() { const W = HWAGE; if (W.t >= 0) { try { localStorage.setIt
 function hwAgeStep(dt) { const W = HWAGE; if (W.t < 0) return; W.t += dt; const P = [GHOME, GMILL, GMERCH, GJINRA].filter(A => A.g && A.R_);
   if (W.t < W.rumble) { AGE.jit = W.jit * Math.min(1, W.t / .4); camShake(.16 + .1 * Math.random()); W.rt -= dt; if (W.rt <= 0) { W.rt = .32 + Math.random() * .2; const A = P[Math.floor(Math.random() * P.length)]; snd('thud', { g: .9, r: .32 + Math.random() * .12 });
       if (A) { const b = A.g.getWorldPosition(_hwAgeV); for (let i = 0; i < 2; i++) spkBurst(b.x + (Math.random() - .5) * 14, b.y + .4, b.z + (Math.random() - .5) * 14, 14, { col: [.72, .62, .5], spread: 5, size: .5, life: 1.1 }); } } }
-  else if (!W.go) { W.go = 1; AGE.jit = 0; camShake(.55); snd('boom', { g: 1.1, r: .6 }); for (const A of P) restorePlay(A.R_, W.goal); rwSkyTo(W.sky); }
-  if (W.go) { const u = rsEase((W.t - W.rumble) / W.isl), y = -W.sink * (W.goal ? 1 - u : u); for (const o of HOME.skyIsl || []) { o.position.y = y; o.visible = W.goal || u < 1; } }
-  if (!W.pk && W.t > W.rumble + W.peakAt) { W.pk = 1; hwPeakAge(!W.goal); if (GPEAK.g) { spkBurst(gpeakX(), GPEAK.H * .6, GPEAK.z, 40, { col: W.goal ? [.55, 1, .8] : [.72, .62, .5], spread: 30, size: .7, life: 1.6 }); } }
+  else if (!W.go) { W.go = 1; AGE.jit = 0; camShake(.55); snd('boom', { g: 1.1, r: .6 }); for (const A of P) restorePlay(A.R_, W.goal); rwSkyTo(W.sky); gcastleState(!W.goal); }
+  if (W.go) { const u = rsEase((W.t - W.rumble) / W.isl), y = -W.sink * (W.goal ? 1 - u : u); for (const o of HOME.skyIsl || []) { o.position.y = y; o.visible = W.goal || u < 1; } if (GCASTLE.g) GCASTLE.g.position.y = GCASTLE.dyF * (W.goal ? 1 - u : u); }
+  if (!W.pk && W.t > W.rumble + W.peakAt) { W.pk = 1; hwPeakAge(!W.goal); if (GCASTLE.g) hwPeakAge(!W.goal, GCASTLE.g); if (GPEAK.g) { spkBurst(gpeakX(), GPEAK.H * .6, GPEAK.z, 40, { col: W.goal ? [.55, 1, .8] : [.72, .62, .5], spread: 30, size: .7, life: 1.6 }); } }
   if (W.t > W.rumble + W.end) { W.t = -1; AGE.jit = 0; } }
 const _hwAgeV = new THREE.Vector3();
 const GHOME = { on: 1, pass: 33, k: 1.4, liftA: 1.4, potFix: 25, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
@@ -70084,6 +70084,14 @@ function gcTex(k) { if (_gcTex[k]) return _gcTex[k]; const c = document.createEl
     x.strokeStyle = '#f6eee0'; x.lineWidth = 9; const d = (r) => { x.beginPath(); x.moveTo(64, 230 - r); x.lineTo(64 + r, 230); x.lineTo(64, 230 + r); x.lineTo(64 - r, 230); x.closePath(); x.stroke(); }; d(46); d(22); x.fillStyle = '#f6eee0'; x.fillRect(58, 224, 12, 12); }
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; if (k === 'tiles') { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(6, 3); } return (_gcTex[k] = t); }
 const GCASTLE = { on: 1, pass: 1, at: [-118, -88], Y0: 116, R: 30, g: null, stat: {} };
+// FALLEN (m1784; KORAJIN: the floating world is what restoration raises): the castle does not vanish -- it lies CRASHED on the west plateau,
+// its top 4 m over the lowest ground under its rim and never under the ground at its centre (`dyF`), the rest buried, weathered (`hwPeakAge`), its falls dry, its islets gone. The live turn RAISES it out
+// of the ground into the sky (and drops it back). Its colliders follow: every box it made (`A.boxes`) and its walk tris (`A.tri`, a range of
+// the store -- only their y moves, so the store's xz grid holds) are shifted by the pose's dy; the keep ladder too
+function gcastleState(fall, build) { const A = GCASTLE; if (!A.g) return; const want = fall ? A.dyF : 0, dy = want - A.colY; if (Math.abs(dy) > .001) {
+    for (const b of A.boxes) { b.miny += dy; b.maxy += dy; } const V = TRI.v && !_triRaw.length ? TRI.v : _triRaw; for (let i = A.tri[0] + 1; i < A.tri[1]; i += 3) V[i] += dy;
+    const L = A.ladder; if (L) { L.miny += dy; L.maxy += dy; if (L.mark) L.mark.y += dy; if (L.rung) L.rung.y0 += dy; if (L.top != null) L.top += dy; } A.colY = want; if (!build && typeof boxGrid === 'function') boxGrid(); }
+  for (const f of A.falls || []) f.m.visible = !fall; for (const o of A.isle || []) o.visible = !fall; if (build) { A.g.position.y = want; if (fall) hwPeakAge(1, A.g); } }
 // the castle each frame (m1782): smoke from the hall's three chimneys
 function gcLiftStep(dt) { const A = GCASTLE, L = A.lift; if (!L) return; const live = A.g.visible && Math.abs(A.g.position.y) < .01; L.cage.visible = live; if (!live) { L.box.miny = L.box.maxy = -999; return; }
   const p = player, onIt = Math.abs(p.pos.x - L.x) < 1.45 && Math.abs(p.pos.z - L.z) < 1.45 && Math.abs(p.pos.y - L.y) < .55, mid = (L.y0 + L.y1) / 2; L.cd -= dt;
@@ -70092,9 +70100,9 @@ function gcLiftStep(dt) { const A = GCASTLE, L = A.lift; if (!L) return; const l
   if (L.dir) { const ny = Math.min(L.y1, Math.max(L.y0, L.y + L.dir * L.speed * dt)), dy = ny - L.y; L.y = ny; if (onIt) { p.pos.y += dy; if (p.vel.y < 0) p.vel.y = 0; } if (L.y === L.y1 || L.y === L.y0) { L.dir = 0; L.cd = 1; L.armed = 0; snd('thud', { g: .7, r: .7, x: L.x, z: L.z }); }
     if (Math.random() < dt * 6) spkBurst(L.x, L.y - .3, L.z, 3, { col: [.55, 1, .8], spread: 1.5, size: .12, life: .8 }); }
   L.box.miny = L.y - .3; L.box.maxy = L.y; L.cage.position.y = L.y; }
-function gcastleStep(dt) { const A = GCASTLE; gcLiftStep(dt); if (!A.g || !A.g.visible || !A.chim) return; A.st = (A.st || 0) - dt; if (A.st > 0) return; A.st = .3;
+function gcastleStep(dt) { const A = GCASTLE; gcLiftStep(dt); if (!A.g || Math.abs(A.g.position.y) > .01 || !A.chim) return; A.st = (A.st || 0) - dt; if (A.st > 0) return; A.st = .3;
   const c = A.chim[(Math.random() * A.chim.length) | 0], w = A.g.localToWorld(new THREE.Vector3(c[0], c[1], c[2])); smokeAt(w.x, w.y, w.z, 1, 1.6, [.78, .74, .7]); }
-function gcastleBuild() { const A = GCASTLE, [cx, cz] = A.at, Y0 = A.Y0, R = A.R, yaw = Math.atan2(-cx, -cz), c = Math.cos(yaw), s = Math.sin(yaw), rnd = rwRng(1769);
+function gcastleBuild() { const b0 = BOXES.length, A = GCASTLE, [cx, cz] = A.at, Y0 = A.Y0, R = A.R, yaw = Math.atan2(-cx, -cz), c = Math.cos(yaw), s = Math.sin(yaw), rnd = rwRng(1769);
   const g = new THREE.Group(); g.position.set(cx, 0, cz); g.rotation.y = yaw; scene.add(g); A.g = g; A.yaw = yaw;
   const Wx = (x, z) => cx + x * c + z * s, Wz = (x, z) => cz - x * s + z * c, MG = new Map(), _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _v = new THREE.Vector3();
   const at4 = (x, y, z, ry = 0, rx = 0, rz = 0) => _m4.compose(_v.set(x, y, z), _q.setFromEuler(_e.set(rx, ry, rz)), new THREE.Vector3(1, 1, 1));
@@ -70159,8 +70167,8 @@ function gcastleBuild() { const A = GCASTLE, [cx, cz] = A.at, Y0 = A.Y0, R = A.R
         putB(new THREE.ConeGeometry(.1, 1, 6), goldB, at4(x, yb + 4.9, z), ph); putB(new THREE.SphereGeometry(.18, 8, 6), goldB, at4(x, yb + 4.55, z), ph); putB(new THREE.CylinderGeometry(.22, .22, .45, 8), glB, at4(x, yb + 1.7, z), ph); }
       A.islets.push([x, y, z, rs]);
       if (k % 3 !== 0) { const ra = Math.atan2(x, z), rx0 = Math.sin(ra) * R * .95, rz0 = Math.cos(ra) * R * .95, yt = Y0 - 2; const cv = new THREE.CatmullRomCurve3([new THREE.Vector3(rx0, yt, rz0), new THREE.Vector3((rx0 + x) / 2, Math.min(yt, y) - 4, (rz0 + z) / 2), new THREE.Vector3(x - Math.sin(ra) * rs * .8, y - .2, z - Math.cos(ra) * rs * .8)]); chains.push(new THREE.TubeGeometry(cv, 24, .09, 4).toNonIndexed()); } }
-    for (const [m, list] of MB) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = true; o.receiveShadow = true; g.add(o); }
-    if (chains.length) { for (const q of chains) q.deleteAttribute('uv'); g.add(new THREE.Mesh(mergeGeometries(chains), chainM)); } }
+    A.isle = []; for (const [m, list] of MB) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = true; o.receiveShadow = true; g.add(o); A.isle.push(o); }
+    if (chains.length) { for (const q of chains) q.deleteAttribute('uv'); const ch = new THREE.Mesh(mergeGeometries(chains), chainM); g.add(ch); A.isle.push(ch); } }
   // THE KEEP (m1773, pass 4 of 6; his sheet's FRONT and ARCHITECTURE DETAIL): on the plaza a round HALL (cream stone, a big arched wooden
   // door to the front, a walkable roof terrace behind a parapet), and out of it the tall KEEP -- glowing arched windows in rows round it, a
   // timber BALCONY ring near the top, a flared bell ROOF of red tiles with a gold band at its eaves, a gold ball and spire, and a long red
@@ -70316,10 +70324,10 @@ function gcastleBuild() { const A = GCASTLE, [cx, cz] = A.at, Y0 = A.Y0, R = A.R
     A.lift = { x: wx, z: wz, y0: gy, y1: yTop, y: yTop, cage, box, dir: 0, wait: 0, cd: 0, speed: 6, armed: 1 };
     for (let i = BOXES.length - 1; i >= 0; i--) { const b = BOXES[i]; if (b._rk && Math.hypot((b.minx + b.maxx) / 2 - wx, (b.minz + b.maxz) / 2 - wz) < 2.6) BOXES.splice(i, 1); } }
   let draws = 0; for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); draws++; }
-  for (let i = 0; i < tris.length; i += 9) { const q = tris.slice(i, i + 9); triAdd(...q); triAdd(q[0], q[1], q[2], q[6], q[7], q[8], q[3], q[4], q[5]); }
+  const t0 = _triRaw.length; for (let i = 0; i < tris.length; i += 9) { const q = tris.slice(i, i + 9); triAdd(...q); triAdd(q[0], q[1], q[2], q[6], q[7], q[8], q[3], q[4], q[5]); } A.tri = [t0, _triRaw.length];
   let nb = 0; for (const L of solid) { L.applyMatrix4(g.matrixWorld); nb += hwSolid(L, 1.5, Y0 - 60); }
   if (A.lift) { const L = A.lift; for (let i = BOXES.length - 1; i >= 0; i--) { const b = BOXES[i]; if (b._rk && Math.hypot((b.minx + b.maxx) / 2 - L.x, (b.minz + b.maxz) / 2 - L.z) < 2.6) BOXES.splice(i, 1); } A.liftAt = [L.x, L.y0 + .3, L.z]; }
-  const sky = AGE.st !== 'fallen'; g.visible = sky; (HOME.skyIsl = HOME.skyIsl || []).push(g);
+  A.boxes = BOXES.slice(b0); A.colY = 0; A.dyF = (() => { let lo = 1e9; for (let k = 0; k < 16; k++) { const q = k / 16 * Math.PI * 2; lo = Math.min(lo, rwHeight(Wx(Math.sin(q) * R * .95, Math.cos(q) * R * .95), Wz(Math.sin(q) * R * .95, Math.cos(q) * R * .95))); } return Math.max(rwHeight(cx, cz) + 2, lo + 4) - Y0; })(); gcastleState(AGE.st === 'fallen', 1);
   A.stat = { draws, boxes: nb, tris: (tris.length / 9) | 0, bastions: bast.length };
   console.log('[melee] the sky castle (landmass pass 1): ' + draws + ' draws, ' + nb + ' rock columns, ' + A.stat.tris + ' walk tris, top ' + Y0 + ' m at ' + A.at); }
 function gjFall(A, g, islG, R, Y0, put, stone, at4, o = {}) { const a = o.a ?? 2.4, sa = Math.sin(a), ca = Math.cos(a), tx = ca, tz = -sa, wedge = .16, pts = [];

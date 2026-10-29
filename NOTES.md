@@ -309,6 +309,16 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## THE SKY CASTLE, pass 9: FALLEN -- crashed on the plateau, and the live turn raises it (Worker B)
+It only existed RESTORED, and FALLEN left its colliders hanging invisible in the sky. Now FALLEN it lies CRASHED on the west plateau
+(`dyF`: its top 4 m over the lowest ground under its rim, never under the ground at its centre -- 80.8 m down), weathered (`hwPeakAge` on
+its group: the paint drained, metal rusted), its waterfalls dry and its islets gone (`A.isle`). It is no longer a sky island: the live
+turn RAISES it out of the plateau into the sky over the islands' 9 s (and drops it back), its weathering flips at `peakAt` with the peak's.
+COLLIDERS FOLLOW (`gcastleState`): every box the castle made (`A.boxes`, sliced from BOXES since its build began) and its walk tris (`A.tri`,
+the range of the store it wrote -- only y moves, so the store's xz grid stays valid; `_triRaw` at build, `TRI.v` after) shift by the pose's
+dy, the keep ladder's volume, mark and rungs too, then `boxGrid`. The switch happens when the castle starts to move. Headless FALLEN:
+groundAt on the plaza 35.74 (expected 35.73), a body put there stands at 35.74. GOD > GO: SKY CASTLE finds it in either state. Smoke and
+the lift run only when it is up.
 ## THE SKY CASTLE, pass 8: THE WAY UP -- the Jinra lift (m1794, Worker B)
 It had no way up but GOD/FLY. The JINRA LIFT at the front-left gap (angle -pi/7, between towers 6 and 0): a railed timber BRIDGE from the
 lawn (r .8R) out past the rim to a gantry at R+6, and a bronze CAGE (a disc, six posts, a rail open toward the island, his cloth cone on
