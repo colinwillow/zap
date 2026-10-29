@@ -212,6 +212,30 @@
    "edit": {
     "inPlace": 1
    }
+  },
+  {
+   "role": "idle_relaxed",
+   "stem": "Neutral_Idle",
+   "name": "Neutral_Idle",
+   "edit": {
+    "inPlace": 1
+   }
+  },
+  {
+   "role": "idle_ready",
+   "stem": "Ready_Idle",
+   "name": "Ready_Idle",
+   "edit": {
+    "inPlace": 1
+   }
+  },
+  {
+   "role": "idle_fight",
+   "stem": "Fight_Idle",
+   "name": "Fight_Idle",
+   "edit": {
+    "inPlace": 1
+   }
   }
  ]
 }
