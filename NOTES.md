@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## A drawn bow no longer pins his chest through a flip (m15xx)
+## A drawn bow no longer pins his chest through a flip (m1771)
 *"Bow drawn and pulled back, I flick the left stick to flip -- the upper torso doesn't flip, only the legs. Lol."*
 - `bowSquare` (m1746) turns Spine1 onto a WORLD frame every frame -- the aim heading and world up -- and the flips (`airFlipGo`, `cartGo`) turn
   the ROOT. So below the spine he flipped and above it the squaring put the chest back upright. It now stands aside while he flips (`p.aflip`,
