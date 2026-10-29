@@ -68339,7 +68339,8 @@ function ghomeBuild(at, yaw, y0) {
   // ---- INSIDE THE HALL: the screen wall between the shop and his quarters (a wide way through), a counter, his bed, a table ----
   { const z = A.part, hw = A.R - A.t - .05, d = 1.2; vbox(-hw, -d, P, P + 3.2, z - .15, z + .15, stoneM, 1); vbox(d, 3.1, P, P + 3.2, z - .15, z + .15, stoneM, 1);     // (it stops short of the tower door)
     vbox(-d, d, P + 2.7, P + 3.2, z - .15, z + .15, wood, 0);
-    vbox(-2.2, 2.2, P, P + 1.05, 1.6, 2.3, wood, 1);     // the shop counter, behind the shop front
+    // the shop counter, behind the shop front -- in TWO wings with a 2.6 m walkway between (his, after m1724: it ran right across the doorway)
+    for (const [a, b] of [[-3.4, -1.3], [1.3, 3.4]]) vbox(a, b, P, P + 1.05, 1.6, 2.3, wood, 1);
   }
   // ---- PASS 8: HIS QUARTERS, LIVED IN (behind the screen): his bed (a timber frame, a red blanket, a cream pillow), a woven rug, a brazier of
   // glowing coals with its own warm light, his KATANA on a rack by the bed, a chest at its foot, a table with two stools and a lantern over it;
@@ -68513,8 +68514,8 @@ function ghomeBuild(at, yaw, y0) {
       for (let x = xa + .2; x < xb; x += .55) bells(x, P + 2.72, 7.55);
       for (let x = xa; x <= xb; x += 1.85) lantern(x, P + 4.6 - .2, 4.75, .9); }
     // THE SHOP: lit shelves of pots along the screen wall, more on the counter; a warm light in the room
-    { const z = A.part + .32; for (const hh of [.6, 1.3, 2.0, 2.7]) { vbox(-3.6, 3.6, P + hh - .05, P + hh, z - .26, z + .26, wood, 0); for (let x = -3.4; x < 3.4; x += .34 + rnd() * .15) { if (Math.abs(x) < 1.25 && hh < 2.5) continue; const r = .1 + rnd() * .07; pot(x, P + hh, z, r, r * (1.6 + rnd()), (rnd() * 5) | 0); } }
-      for (let x = -2; x < 2; x += .5) { const r = .1 + rnd() * .08; pot(x, P + 1.05, 1.95, r, r * 2, (rnd() * 5) | 0); }
+    { const z = A.part + .32; for (const hh of [.6, 1.3, 2.0, 2.7]) { for (const [xa, xb] of hh < 2.5 ? [[-3.6, -1.25], [1.25, 3.6]] : [[-3.6, 3.6]]) vbox(xa, xb, P + hh - .05, P + hh, z - .26, z + .26, wood, 0);     /* the low boards stop at the door (they ran across it) */ for (let x = -3.4; x < 3.4; x += .34 + rnd() * .15) { if (Math.abs(x) < 1.25 && hh < 2.5) continue; const r = .1 + rnd() * .07; pot(x, P + hh, z, r, r * (1.6 + rnd()), (rnd() * 5) | 0); } }
+      for (let x = -3.2; x < 3.2; x += .5) { if (Math.abs(x) < 1.5) continue; const r = .1 + rnd() * .08; pot(x, P + 1.05, 1.95, r, r * 2, (rnd() * 5) | 0); }
       lantern(-1.2, P + 3.4, 1.2); lantern(1.2, P + 3.4, 1.2); lantern(0, P + 3.6, -.2);
       const L = new THREE.PointLight(0xffa860, 14, 9, 1.6); L.position.set(0, P + 2.8, 1); g.add(L); (A.lights || (A.lights = [])).push([L, 14]); }
     // CACTI and SUCCULENTS round the mound and in pots on the decks; more BOULDERS half-buried round the foot
