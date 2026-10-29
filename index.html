@@ -15777,8 +15777,10 @@ const _bnpF = { d: 0, nx: 0, nz: 0, cx: 0, cz: 0 };
 // the nodes round him are pulled down (`load` m/s2, spread over `spread` nodes, more on the side he stands nearer -- it tilts), and moving across
 // it pushes it sideways (`sway`); a little wind. The DECK IS A FLOOR (`ropeDeck` in `groundAt`): its height under him is read off the planks every
 // frame, so he rides the sag and the swing. The planks are one instanced draw, the ropes another.
-const ROPEB = { want: 0, on: null, x0: -7, z: -18, L: 14, H: 4.5, w: 1.4, N: 22, slack: 1.01, iters: 14, damp: .988, load: 220, landK: .55, kickK: 3.2, stepK: .55, stride: .9, leanRoll: 1.4, leanAcc: .025, leanHalf: .12, leanArms: .12, spread: 2.6, sway: 6, edge: .3, bow: 1.2, wind: .35, rail: 1.0, plank: .4, stat: { on: 0, dip: 0 } };
+const ROPEB = { want: 0, on: null, x0: -7, z: -18, L: 14, H: 4.5, w: 1.4, N: 22, slack: 1.01, iters: 14, damp: .988, load: 220, landK: .55, kickK: 3.2, stepK: .55, stride: .9, leanRoll: 1.4, leanAcc: .025, leanHalf: .12, leanArms: .12, spread: 2.6, sway: 6, edge: .3, bow: 1.2, catchR: .75, catchY: .45, hangLoad: 90, wind: .35, rail: 1.0, plank: .4, stat: { on: 0, dip: 0 } };
 try { if (/[?&]zone=rope\b/.test(location.search)) ROPEB.want = 1; } catch (e) {}
+function ropeRail(c, x) { const B = ROPEB.on; if (!B) return null; const Z = ROPEB, N = Z.N, s = (x - Z.x0) / Z.L * N; if (s < 0 || s > N) return null; const i = Math.min(N - 1, Math.floor(s)), t = s - i, A = B.P[c], a = i * 3, b = a + 3;
+  return { y: A[a + 1] + (A[b + 1] - A[a + 1]) * t, z: A[a + 2] + (A[b + 2] - A[a + 2]) * t }; }
 function ropeDeck(x, z) { const B = ROPEB.on; if (!B) return null; const Z = ROPEB, N = Z.N, s = (x - Z.x0) / Z.L * N; if (s < 0 || s > N) return null;
   const i = Math.min(N - 1, Math.floor(s)), t = s - i, A = B.P[0], C = B.P[1], a = i * 3, b = a + 3;
   const lz = A[a + 2] + (A[b + 2] - A[a + 2]) * t, rz = C[a + 2] + (C[b + 2] - C[a + 2]) * t, f = (z - lz) / ((rz - lz) || 1e-3); if (f < -.12 || f > 1.12) return null;
@@ -28760,6 +28762,17 @@ function ropeStep(dt) { const B = ROPEB.on; if (!B || !(dt > 1e-4)) return; ROPE
   // from under his feet), and its roll and its sideways acceleration under him are kept for his balance (`ropePose`)
   { const m1 = midZ(), vz = (m1.z - m0.z) / h; if (on && p.grounded) p.pos.z += m1.z - m0.z; Z.bal = Z.bal || { vz: 0, az: 0, roll: 0 };
     const az = (vz - Z.bal.vz) / h; Z.bal.az = isFinite(az) && isFinite(Z.bal.az) ? damp(Z.bal.az, az, .08, h) : 0; Z.bal.vz = isFinite(vz) ? vz : 0; Z.bal.roll = Math.atan2(m1.roll, Z.w); }
+  // m15xx PASS 3b: CATCH THE HAND ROPE. Falling past a hand rope with his hands at its height (`catchR` m of it sideways, `catchY` up or down)
+  // he grabs it -- the LEDGE hang, its ledge being the rope: `ropeRail` re-reads where the rope is under him every frame (it sags and swings with
+  // his weight, which loads the hand rope's nodes, `hangLoad`), so the hang, the shimmy hops along it, the jump off and the climb UP ONTO THE DECK
+  // are the ledge's own. Off either end of the span he lets go.
+  if (p.ledge && p.ledge.rope) { const L = p.ledge, rr = ropeRail(L.rope, p.pos.x);
+    if (!rr || p.pos.x < Z.x0 + .3 || p.pos.x > Z.x0 + Z.L - .3) ledgeDrop(0);
+    else { L.cx = p.pos.x; L.cz = rr.z; L.y = rr.y; const H2 = B.P[L.rope], uu = (p.pos.x - Z.x0) / Z.L * Z.N; for (let i = 1; i < Z.N; i++) { const wt = Math.max(0, 1 - Math.abs(i - uu) / 2); H2[i * 3 + 1] -= Z.hangLoad * wt * h2; } } }
+  else if (!on && !p.grounded && !p.ledge && !(p.ledgeCool > 0) && p.vel.y < .5 && LEDGE.on && rig.actions[LEDGE.clips.hang] && p.pos.x > Z.x0 + .4 && p.pos.x < Z.x0 + Z.L - .4) {
+    const hy = (LEDGE.measure && ledgeHands() ? ledgeHands().y : 1.4);
+    for (const c of [2, 3]) { const rr = ropeRail(c, p.pos.x); if (!rr) continue; const nz = Math.sign(rr.z - Z.z) || 1;
+      if (Math.abs(p.pos.z - rr.z) < Z.catchR && Math.abs(p.pos.y + hy - rr.y) < Z.catchY && (p.pos.z - rr.z) * nz > -.15) { ledgeGo({ cx: p.pos.x, cz: rr.z, y: rr.y, nx: 0, nz, rope: c, b: null }); Z.stat.catches = (Z.stat.catches || 0) + 1; break; } } }
   // m1811 PASS 3 (ROPEWORKS 1, dynamics C -- the hand ropes are real): on the deck he cannot walk off the side -- his feet are held `edge` m inside
   // the deck ropes where he stands, his speed out through the side is taken away, and that push BOWS the hand rope out (`bow`, on the rope nodes
   // near him, the way he pressed). A jump that carries him over the hand rope's height still goes over it.
@@ -30799,7 +30812,7 @@ function stepLedge(dt) {
     // **AND THE HEIGHT IS THE ROOF'S, NOT THE LIP'S.** A box top and the thing he ends up
     // standing on are the same here and need not be for ever (a mantle onto a stack of boxes
     // lands on whichever is highest), so it is asked rather than assumed.
-    const ty = groundAt(tx, tz, L.y + .05, MOVE.step);
+    const ty = L.rope ? (ropeDeck(tx, tz) ?? groundAt(tx, tz, L.y + .05, MOVE.step)) : groundAt(tx, tz, L.y + .05, MOVE.step);     // m15xx: off the hand rope, onto the DECK
     if (u < LEDGE.upOut) {
       const v = u / LEDGE.upOut, e = v * v * (3 - 2 * v);
       p.pos.x = H.x; p.pos.z = H.z;
@@ -30829,6 +30842,7 @@ function stepLedge(dt) {
       // RE-FOUND AT THE END rather than clamped to the box he left, because a building's wall
       // is a RUN of boxes -- and a face whose normal disagrees is a DIFFERENT ledge, so running
       // out of edge is simply nothing to find, which IS the end of it.
+      if (L.rope) { p.ledgeSt = 'hold'; p.ledgeT = 0; return; }     // m15xx: the hand rope runs on: ropeStep re-reads it under him
       const L2 = ledgeFind(nx, p.pos.y, nz, p.r + LEDGE.reach);
       if (L2 && L2.nx * L.nx + L2.nz * L.nz > .7) { p.ledge = L2; p.ledgeSt = 'hold'; p.ledgeT = 0; }
       else ledgeDrop(0);

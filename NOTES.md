@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Rope bridge pass 3b: catch the hand rope (m15xx, ROPEWORKS 1 / DOCKET 25)
+- Falling past a hand rope with his hands at its height (`catchR` .75 m sideways, `catchY` .45 m up or down, outside or on it) he GRABS it: the
+  LEDGE hang, its ledge being the rope (`L.rope`). `ropeStep` re-reads the rope under him every frame (`ropeRail`) into the ledge's five fields
+  (`cx`, `cz`, `y`, `nx`, `nz` -- all `stepLedge` reads), so the hang rides the sag and swing; his weight loads the hand rope's nodes (`hangLoad`).
+  The ledge's own moves do the rest: the shimmy HOP along it (a rope ledge stays a ledge at the end of a hop instead of re-finding a box), the
+  jump off, and the CLIMB -- onto the DECK (`ropeDeck` under the climb's target, not `groundAt`, which would have found the floor below). Off
+  either end of the span he lets go.
+- Measured (dropped beside the right hand rope at mid-span, then the stick pushed toward the bridge): caught on the first frame (`catches` 1),
+  into the hang; his weight pulled the hand rope down 4.23 -> 3.95 m; the climb went up and in and he stood on the deck (y 3.1, `on`), then
+  walked on across it until the far hand rope held him.
+- Not yet: hanging UNDER the deck, a swing-up from the hang.
+
 ## His idle: four to choose from, RELAXED by default (m1815)
 *His screenshot: "the Dwarf idle -- I've never liked his hands or his arms; it looks like he's fluffing his fat, his wrists bend in. Hands down by his
 side like a normal human -- or the one I use for action games, one foot forward and one back, ready to throw a punch."*
