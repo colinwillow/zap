@@ -15770,7 +15770,7 @@ const _bnpF = { d: 0, nx: 0, nz: 0, cx: 0, cz: 0 };
 // the nodes round him are pulled down (`load` m/s2, spread over `spread` nodes, more on the side he stands nearer -- it tilts), and moving across
 // it pushes it sideways (`sway`); a little wind. The DECK IS A FLOOR (`ropeDeck` in `groundAt`): its height under him is read off the planks every
 // frame, so he rides the sag and the swing. The planks are one instanced draw, the ropes another.
-const ROPEB = { want: 0, on: null, x0: -7, z: -18, L: 14, H: 4.5, w: 1.4, N: 22, slack: 1.01, iters: 18, damp: .985, load: 160, spread: 2.6, sway: .9, wind: .35, rail: 1.0, plank: .4, stat: { on: 0, dip: 0 } };
+const ROPEB = { want: 0, on: null, x0: -7, z: -18, L: 14, H: 4.5, w: 1.4, N: 22, slack: 1.01, iters: 14, damp: .988, load: 220, landK: .55, kickK: 3.2, stepK: .55, stride: .9, spread: 2.6, sway: .9, wind: .35, rail: 1.0, plank: .4, stat: { on: 0, dip: 0 } };
 try { if (/[?&]zone=rope\b/.test(location.search)) ROPEB.want = 1; } catch (e) {}
 function ropeDeck(x, z) { const B = ROPEB.on; if (!B) return null; const Z = ROPEB, N = Z.N, s = (x - Z.x0) / Z.L * N; if (s < 0 || s > N) return null;
   const i = Math.min(N - 1, Math.floor(s)), t = s - i, A = B.P[0], C = B.P[1], a = i * 3, b = a + 3;
@@ -28626,7 +28626,7 @@ function ropeBuild() { const Z = ROPEB; Z.want = 2; if (Z.on) return; const g = 
   const planks = new THREE.InstancedMesh(new THREE.BoxGeometry(1, .06, 1), wood, N - 1); planks.castShadow = planks.receiveShadow = true; planks.frustumCulled = false; g.add(planks);
   const ropes = new THREE.InstancedMesh(new THREE.CylinderGeometry(.035, .035, 1, 5).translate(0, .5, 0), new THREE.MeshStandardMaterial({ color: 0xc9a46a, roughness: .95 }), 4 * N + (N - 1) * 2); ropes.frustumCulled = false; ropes.castShadow = true; g.add(ropes);
   const p = player; p.pos.set(x0 - 12, 0, zc); p.vel.set(0, 0, 0); p.faceH = p.heading = Math.PI / 2; cam.az = Math.PI / 2;
-  Z.on = { g, P, Q, seg, planks, ropes, t: 0 }; boxGrid(); ropeDraw(); }
+  Z.on = { g, P, Q, seg, planks, ropes, t: 0 }; boxGrid(); for (let k = 0; k < 150; k++) ropeStep(1 / 30); Z.stat.lands = Z.stat.kicks = 0; Z.stat.dip = 0; ropeDraw(); }     // m15xx: settled before he arrives (it drifted 25 cm in the first seconds)
 const _rbM = new THREE.Matrix4(), _rbA = new THREE.Vector3(), _rbB = new THREE.Vector3(), _rbX = new THREE.Vector3(), _rbY = new THREE.Vector3(), _rbZ = new THREE.Vector3(), _rbQ = new THREE.Quaternion(), _rbS = new THREE.Vector3();
 function ropeDraw() { const B = ROPEB.on, Z = ROPEB, N = Z.N, [L, Rr, HL, HR] = B.P;
   for (let i = 1; i < N; i++) { const a = i * 3; _rbA.set(L[a], L[a + 1], L[a + 2]); _rbB.set(Rr[a], Rr[a + 1], Rr[a + 2]); _rbZ.subVectors(_rbB, _rbA); const w = _rbZ.length(); _rbZ.normalize();
@@ -28641,6 +28641,15 @@ function ropeStep(dt) { const B = ROPEB.on; if (!B) return; const Z = ROPEB, N =
   const wz = Math.sin(B.t * .7) * Z.wind + Math.sin(B.t * 1.9) * Z.wind * .4;
   // HIS WEIGHT: standing on the deck, the nodes round him go down (more on the near side), and his sideways speed pushes the deck sideways
   const dk = ropeDeck(p.pos.x, p.pos.z), on = dk !== null && Math.abs(p.pos.y - dk) < .3 && (p.grounded || p.pos.y - dk < .05); Z.stat.on = on ? 1 : 0;
+  // m15xx PASS 1 (ROPEWORKS 1, dynamics A -- weight and bounce): IMPULSES on top of his standing weight. A LANDING slams the deck down by his speed
+  // into it (`landK` x the fall speed), a JUMP OFF kicks it down under the take-off (`kickK`) and it springs back, and every STEP sends a small
+  // pulse (`stepK`, at his gait's footfalls) so a run ripples the span. Each is a velocity given to the nodes round him (verlet: Q moved), spread
+  // over `spread` nodes; `iters` is low enough that the rope gives a little and comes back -- the bounce.
+  { const was = B.wasOn, u0 = (p.pos.x - Z.x0) / Z.L * N, kick = (k) => { for (const c of [0, 1, 2, 3]) { const Q = B.Q[c], w = c < 2 ? 1 : .4; for (let i = 1; i < N; i++) { const wt = Math.max(0, 1 - Math.abs(i - u0) / (Z.spread * 1.4)); Q[i * 3 + 1] += k * wt * w * h; } } };
+    if (on && !was && B.vyPrev < -1) { kick(Math.min(9, -B.vyPrev) * Z.landK); Z.stat.lands = (Z.stat.lands || 0) + 1; }
+    if (!on && was && p.vel.y > 2) { kick(Z.kickK); Z.stat.kicks = (Z.stat.kicks || 0) + 1; }
+    if (on && p.grounded) { const sp = Math.hypot(p.vel.x, p.vel.z); B.stepAcc = (B.stepAcc || 0) + sp * h / Z.stride; if (B.stepAcc >= 1) { B.stepAcc -= 1; kick(Z.stepK * Math.min(1.6, sp / 3)); } }
+    B.wasOn = on; B.vyPrev = p.vel.y; }
   const u = (p.pos.x - Z.x0) / Z.L * N, A0 = B.P[0], A1 = B.P[1], ii = Math.max(0, Math.min(N, Math.round(u))) * 3, f = on ? Math.min(1, Math.max(0, (p.pos.z - A0[ii + 2]) / ((A1[ii + 2] - A0[ii + 2]) || 1e-3))) : .5;
   for (let c = 0; c < 4; c++) { const P = B.P[c], Q = B.Q[c], side = c % 2 ? f : 1 - f, deck = c < 2;
     for (let i = 1; i < N; i++) { const a = i * 3; let ay = -9.8, az = wz;

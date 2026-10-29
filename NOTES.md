@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Rope bridge pass 1: weight and bounce (m15xx, ROPEWORKS 1 / DOCKET 25)
+- On top of his standing weight (`load` 160 -> 220), IMPULSES: a LANDING slams the deck down by his fall speed (`landK`), a JUMP OFF kicks it
+  down under the take-off (`kickK`) and it springs back once his weight is gone, and every STEP (his speed over `stride`) sends a pulse
+  (`stepK`) so a run ripples. Each is a velocity given to the nodes round him (verlet: Q moved); `iters` 18 -> 14 so the rope gives and returns.
+- The bridge is SETTLED at build (150 steps) -- measured drifting 25 cm in its first seconds.
+- Measured (drop from 3 m onto mid-span, the shipped frame): the deck slams to -.45 m, rebounds to -.29, settles at -.36 under him; jumping off
+  it springs back up to its unloaded height while he is in the air; the next landing takes it to -.46. lands 2, kicks 1.
+
 ## The rope bridge (m1800, DOCKET 18a)
 *"A rope bridge -- dynamically moving, it moves to my weight."* KORAJIN > The Rope Course (`?w=forge&zone=rope`): two stone towers, stairs up the
 first (.3 m risers), a 14 m bridge between them at 4.5 m.
