@@ -190,6 +190,14 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## The cave beast's detail pass (Worker B)
+His (m1760): "there's like a weird monster in one of the caves that needs a detail pass". It was one squashed sphere, six cones, a sphere
+head and a cone tail. Now a sleeping armoured cave SALAMANDER: eleven overlapping body segments (hide painted with the strata map, a pale
+belly half-shell under each), bone plates down the spine, seven Jinra CRYSTALS (`hwCrystal`) grown out of its back that breathe with it and
+flare when it wakes, four folded legs with three black claws each, a nine-segment tail curling round it with spines, and a head -- neck,
+skull, snout, brow ridges, nostrils, swept-up horns with tips, eight teeth, glowing eyes set on the skull's surface -- and a JAW (its own
+group, six teeth) that drops open when it wakes; the tail lashes when awake. Merged per material per moving part (~14 draws). The collider
+is the body group's measured box. Still open: it does nothing but wake and roar -- no attack, no movement.
 ## The sky castle queued, behind the Hollows' polish (Worker B)
 His (after m1765, five images): the sky castle is the next hero building -- after "the detail passes and optimization and the logistical
 -- walking, connecting towers and bridges and stairs". The images are in `images/korajin/ref/sky_castle_*.jpg`; BUILDINGS.md has both
