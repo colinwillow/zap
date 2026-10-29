@@ -13042,6 +13042,7 @@ const WRUN = { on: 1, minH: 1.9, minLen: 1.2, reach: .85, minSp: 2.5, along: .72
   kick: 6.5, jumpV: 8.2, keep: .8, cool: .35, upV: 7.2, gUp: 12, upT: .75, offV: 5, offUp: 7.5, torso: .75, footIn: .06,
   auto: 1, autoAir: 3, autoGround: 9, autoReach: .5, autoInto: .9, upK: 1.25, upMax: 17, upReach: 2, upQ: .4,     /* m1757: upK 1 -> 1.25 (a sprint now climbs higher than a walk-in: 8.8 vs 7.2 m/s up) */
   slide: 1, slideReach: .5, hold: .28, slideG: 7, slideV: 3.2, slideT: 2.2, slideMaxFall: 9, wjOut: 6.2, wjUp: 8.8,
+  stick: 1, headK: .8, upIn: .7, upMin: 4.5, sideK: .4, sideMin: 4.5, sideUp: 2.5, sideFall: 2.2,
   swipe: 1, swipeReach: .7, upLeg: 1.35, upLegIn: .12, upCone: 1.8 };     /* m1604: runs START from a right-pad SWIPE at the wall (`swipe` 0 = the old tap / auto); `upLeg` the run-up's legs swung out to the wall (rad) */     /* m1372: the WALL SLIDE and the wall jump */     // m1251: the run-up with no tap, its height from his speed     // m1072: torso, footIn
 const _wrN = { d: 0, nx: 0, nz: 0, cx: 0, cz: 0 }, _wrB = [];
 // m1250: *"you should be able to wall run on pretty much any wall, even the destructible ones."* A breakable wall (`cwallBuild`) is in
@@ -13082,6 +13083,7 @@ function wrunTap() {
 // `upMax`), so the run lasts in proportion: a sprint jump climbs about 2 m, a full zoom about 12. The tap still kicks off into the back flip.
 function wrunAuto() {
   const p = player; if (!WRUN.on || !WRUN.auto || p.wrun || p.knock || p.riding || p.wing || p.bar || p.ledge || p.mantle || p.vault || p.climb || p.zip || p.rope || p.hook || p.melee || p.roll || p.chargeGo || p.slam || mphBare()) return 0;
+  if (WRUN.stick) return wrunCatch();     // m15xx: the left stick drives the wall (his redesign)
   if (p.wrunQ) { if (performance.now() > p.wrunQ.until) p.wrunQ = null; else { const W = wrunFind(p.pos.x, p.pos.y, p.pos.z, p.r + WRUN.swipeReach, null); if (W) { const q = p.wrunQ; p.wrunQ = null; return wrunGo(W, 'up', 0, 0, q.upV); } } }     // m1757: the remembered up-swipe
   // m1372: *"If you jump against the wall and you're not holding a direction, up or to the side, he purchases against the wall and slides down it --
   // a little friction -- so you can jump, purchase, wall jump to the opposing wall, jump, jump, back and forth like Prince of Persia."* In the air
@@ -13100,7 +13102,7 @@ function wrunAuto() {
 // perches on the wall and can jump off or slide down"*). A right-pad FLICK with a tall face in reach (or while perched on one): UP the screen = the
 // RUN UP; left / right = a SIDE RUN that way along the face (the flick's world heading onto the wall's tangent); DOWN = let go. No wall: the
 // flick is the strike, as before.
-function wrunSwipe(dx, dy) { const p = player; if (!WRUN.on || !WRUN.swipe || p.knock || p.riding || p.wing || p.bar || p.ledge || p.mantle || p.vault || p.climb || p.zip || p.rope || mphBare()) return 0;
+function wrunSwipe(dx, dy) { const p = player; if (!WRUN.on || !WRUN.swipe || WRUN.stick || p.knock || p.riding || p.wing || p.bar || p.ledge || p.mantle || p.vault || p.climb || p.zip || p.rope || mphBare()) return 0;
   if (p.wrun && p.wrun.kind !== 'slide') return 0;
   let W = p.wrun ? { b: p.wrun.b, nx: p.wrun.nx, nz: p.wrun.nz, d: p.r + WRUN.gap } : wrunFind(p.pos.x, p.pos.y, p.pos.z, p.r + WRUN.swipeReach, null);
   // m1757 (MEASURED in the Wall Park: the up-swipe only took from .7 m, ~0.1 s at a sprint, and by then the wall had eaten his speed -- every run-up
@@ -13112,6 +13114,38 @@ function wrunSwipe(dx, dy) { const p = player; if (!WRUN.on || !WRUN.swipe || p.
   if (dy > Math.abs(dx) * 1.2) { if (p.wrun) { wrunEnd(1.2); return 1; } return 0; }     // DOWN: drop off the perch (on the ground it is still the strike)
   if (-dy >= Math.abs(dx) * WRUN.upCone) { const into = Math.max(0, -(p.vel.x * W.nx + p.vel.z * W.nz)); return wrunGo(W, 'up',     /* m1683 (his: "the horizontal wall run seems gone, it kept engaging only the vertical"): a thumb flicks sideways AND up; UP must be clearly up (`upCone`), anything else is the side run */ 0, 0, Math.min(WRUN.upMax, Math.max(WRUN.upV, into * WRUN.upK))); }
   const h = flickH(dx, dy), mx = Math.sin(h), mz = Math.cos(h); return wrunGo(W, 'side', mx, mz); }
+// m15xx: THE WALL ON THE LEFT STICK (his redesign: *"instead of requiring the flick on the right stick it's entirely the locomotion stick and the
+// velocity and trajectory. Jump at a wall and do nothing: he hits it and immediately skids down it, ready to jump off -- seamless. Keep holding up:
+// he runs up it, if the velocity carries; let go at any point and he's back in the slide. Move the thumb right: a horizontal run along it, still
+// slipping down -- gravity is always carrying you. Come at it at an angle, running along it, holding up or diagonal: a horizontal run. To run
+// straight UP you have to hit it straight on."*) -- and the glitch he hit first: the old perch LET GO whenever the stick was pushed (`> .6`), and he
+// was always pushing toward the wall as he jumped at it, so it let go, the wall's cool-down refused it, he fell, caught again: the stuck-falling
+// flicker. Now: any touch of a tall face in the air catches him AT ONCE (`wrunCatch`), and every frame the stick picks the state (`wrunWant`):
+//   at rest                          -> SLIDE (the perch: rising he flies on, then a hold, then the skid down)
+//   toward the wall, came in HEAD-ON -> UP (once per catch, at the speed he hit it with: `upK`, floor `upMin`); its climb spent -> SLIDE
+//   along the face (|tangent| > `sideK`), or toward it after an ANGLED approach -> SIDE, that way (an angled approach: the way he was going),
+//                                       at the speed he carried along it (floor `sideMin`), sagging under `g`; `T` s of it, then SLIDE
+//   away from the wall               -> let go
+// A change of state re-faces him and re-ramps the pose (`wrunSet`). The tap is still the jump off, from any of them. The right flick is the
+// strike again (`WRUN.stick` 0 = m1604's swipe).
+function wrunCatch() { const p = player; if (p.grounded || p.vel.y < -WRUN.slideMaxFall) return 0;
+  const W = wrunFind(p.pos.x, p.pos.y, p.pos.z, p.r + WRUN.slideReach, p.wrunCoolB && p.wrunCool > 0 ? p.wrunCoolB : null); if (!W) return 0;
+  const into = -(p.vel.x * W.nx + p.vel.z * W.nz), hs = Math.hypot(p.vel.x, p.vel.z), al = p.vel.x * -W.nz + p.vel.z * W.nx; if (into < -.5) return 0;
+  const C = { head: into > .5 && into >= hs * WRUN.headK, upV: Math.min(WRUN.upMax, Math.max(WRUN.upMin, into * WRUN.upK)), sideV: Math.max(WRUN.sideMin, Math.abs(al)), al: al >= 0 ? 1 : -1 };
+  wrunGo(W, 'slide', 0, 0); const R = p.wrun; Object.assign(R, C, { upOK: C.head ? 1 : 0, sideT: 0 }); const k = wrunWant(R); if (k !== 'slide') wrunSet(R, k); return 1; }
+function wrunWant(R) { const S = stickWorld(); if (S.mag < .3) return 'slide';
+  const m = S.mag, tin = (S.x * -R.nx + S.z * -R.nz) / m, ta = (S.x * -R.nz + S.z * R.nx) / m;
+  if (tin < -.6) return 'off';
+  if (R.upOK && R.head && tin > WRUN.upIn && Math.abs(ta) < WRUN.sideK) return 'up';
+  if (R.sideT < WRUN.T && (Math.abs(ta) > WRUN.sideK || (!R.head && tin > .3))) { R.want = Math.abs(ta) > WRUN.sideK ? (ta > 0 ? 1 : -1) : R.al; return 'side'; }
+  return 'slide'; }
+function wrunSet(R, kind) { const p = player, tx = -R.nz, tz = R.nx;
+  if (R.kind === 'up' && kind !== 'up') R.upOK = 0;     // one climb per catch
+  if (kind === 'up') p.vel.y = Math.max(p.vel.y, R.upV);
+  if (kind === 'side') { const s = R.want || R.al; R.dx = tx * s; R.dz = tz * s; R.v = R.sideV; if (R.kind !== 'side' && p.vel.y < WRUN.sideUp) p.vel.y = Math.max(p.vel.y, R.t < .15 ? WRUN.sideUp : p.vel.y); }
+  if (kind === 'slide') { R.top = p.vel.y > 0 ? R.t : R.t; }
+  R.kind = kind; R.t0 = R.t; R.vy0 = p.vel.y;
+  p.faceH = p.heading = kind === 'side' ? Math.atan2(R.dx, R.dz) : kind === 'slide' ? Math.atan2(R.nx, R.nz) : Math.atan2(-R.nx, -R.nz); if (kind !== 'slide') p.camWant = p.faceH; }
 function wrunGo(W, kind, mx, mz, upV) {
   const p = player, tx = -W.nz, tz = W.nx, s = kind === 'side' ? (mx * tx + mz * tz >= 0 ? 1 : -1) : 0;
   p.melee = 0; p.roll = 0; p.land = 0; p.slide = null; p.aflip = null; p.cart = null; p.hook = null; p.rope = null; p.zip = null; p.flip = ''; p.slam = 0; p.jump = 0; swapStop(); triggerStop();
@@ -13135,8 +13169,12 @@ function wrunJump() {
 }
 function stepWrun(dt) {
   const p = player, R = p.wrun; R.t += dt;
+  if (WRUN.stick && R.head !== undefined) { if (p.jump && R.t > .05) { p.jump = 0; wrunJump(); return; }
+    if (R.kind === 'side') R.sideT += dt; let k = wrunWant(R); if (k === 'off') { wrunEnd(.8); return; }
+    if (R.kind === 'up' && (p.vel.y < 0 || R.t - (R.t0 || 0) > WRUN.upT * Math.max(1, R.upV / WRUN.upV))) R.upOK = 0, k = k === 'up' ? 'slide' : k;     // the climb spent
+    if (k === 'up' && !R.upOK) k = 'slide'; if (k !== R.kind || (k === 'side' && R.want && R.dx * -R.nz + R.dz * R.nx !== 0 && Math.sign(R.dx * -R.nz + R.dz * R.nx) !== R.want)) wrunSet(R, k); }
   if (R.kind === 'slide' && p.jump && R.t > .05) { p.jump = 0; wrunJump(); return; }     // m1372: either pad's tap kicks off the slide
-  if (R.kind === 'side') { p.vel.x = R.dx * R.v; p.vel.z = R.dz * R.v; p.vel.y += (MOVE.g - WRUN.g) * dt; }     // `integrate` takes MOVE.g; he feels only WRUN.g
+  if (R.kind === 'side') { p.vel.x = R.dx * R.v; p.vel.z = R.dz * R.v; p.vel.y += (MOVE.g - WRUN.g) * dt; if (WRUN.stick) p.vel.y = Math.max(p.vel.y, -WRUN.sideFall); }     // m15xx: gravity always carrying him down, but a run never drops faster than `sideFall`     // `integrate` takes MOVE.g; he feels only WRUN.g
   else if (R.kind === 'slide') { p.vel.x = -R.nx * .5; p.vel.z = -R.nz * .5;
     // m1683 (his: "a friction stops his upward momentum -- standing at the base of the wall and jumping, his height is hindered; only on the way
     // DOWN should the friction hold him"): RISING he flies on under gravity alone; from the top of it, a moment's hold (`hold`), then the skim
@@ -13152,7 +13190,8 @@ function stepWrun(dt) {
   // the run UP ends on the lip: his hands pass the top -> the ledge's own hang (and its climb), the PoP move
   if (R.kind === 'up' && LEDGE.on && rig.actions[LEDGE.clips.hang]) { const L = ledgeFind(p.pos.x, p.pos.y, p.pos.z, p.r + LEDGE.reach); if (L && L.b === R.b) { wrunEnd(0); p.vel.set(0, 0, 0); ledgeGo(L); return; } }
   if (!on) { wrunEnd(1); return; }
-  if (R.kind === 'slide') { if (R.t - (R.top || 0) > WRUN.slideT || stickWorld().mag > .6) wrunEnd(.6); return; }     /* m1372: a slide lasts `slideT`; a push on the stick lets go */
+  if (R.kind === 'slide') { if (R.t - (R.top || 0) > WRUN.slideT || (!WRUN.stick && stickWorld().mag > .6)) wrunEnd(.6); return; }
+  if (WRUN.stick && R.head !== undefined) return;     // m15xx: runs fall back to the slide (above), they do not let go     /* m1372: a slide lasts `slideT`; a push on the stick lets go */
   if (R.kind === 'side' ? R.t > WRUN.T : (R.t > WRUN.upT * Math.max(1, (R.vy0 || WRUN.upV) / WRUN.upV) || p.vel.y < -1)) wrunEnd(R.kind === 'side' ? 1.5 : 1);
 }
 const _wrQ = new THREE.Quaternion(), _wrA = new THREE.Vector3();
@@ -13170,7 +13209,7 @@ function wrunPose() {
   if (R.kind === 'up' || R.kind === 'slide') { if (!rig.bones) return; wrunSolve(R); return; }
   if (R.kind !== 'side') return;
   // rolled about his forward axis so his head leans OFF the wall and his feet stay on it; ramps in and out over .12 s
-  const fx = R.dx, fz = R.dz, right = R.nx * -fz + R.nz * fx, k = Math.min(1, R.t / .12), sg = Math.sign(right);     // his right is (-fz, fx)
+  const fx = R.dx, fz = R.dz, right = R.nx * -fz + R.nz * fx, k = Math.min(1, (R.t - (R.t0 || 0)) / .15), sg = Math.sign(right);     // his right is (-fz, fx)
   _wrA.set(fx, 0, fz); _wrQ.setFromAxisAngle(_wrA, sg * WRUN.lean * k); rig.root.quaternion.premultiply(_wrQ);
   // m1072: *"his feet could make better contact with the wall, and his whole body is straight -- just at an angle. From the torso up he should rotate
   // back so he's pointed more straight up; the legs do the slant. And a mirror."* The roll pivots at his feet, which the run holds `p.r + gap`
@@ -13194,7 +13233,7 @@ function wrLimb(up, mid, end, T, pole, aim) { if (!up || !mid || !end) return;
   setW(up, _wsB.clone().sub(_wsA), _wsK.clone().sub(_wsA));
   mid.getWorldPosition(_wsB); end.getWorldPosition(_wsC); setW(mid, _wsC.clone().sub(_wsB), F.clone().sub(_wsB));
   if (aim) { const c = end.children.find(o => o.isBone); if (c) { end.getWorldPosition(_wsB); c.getWorldPosition(_wsC); setW(end, _wsC.clone().sub(_wsB), aim.clone()); } } }
-function wrunSolve(R) { const Bn = rig.bones, H = (rig.hipY || .77) * bodyK(), up = R.kind === 'up', k = Math.min(1, R.t / .06), nx = R.nx, nz = R.nz, rx = up ? nz : -nz, rz = up ? -nx : nx;     // the run-up faces the wall (-n): his right (nz, -nx); the PERCH faces AWAY (+n): his right (-nz, nx)
+function wrunSolve(R) { const Bn = rig.bones, H = (rig.hipY || .77) * bodyK(), up = R.kind === 'up', k = Math.min(1, (R.t - (R.t0 || 0)) / .12), nx = R.nx, nz = R.nz, rx = up ? nz : -nz, rz = up ? -nx : nx;     // the run-up faces the wall (-n): his right (nz, -nx); the PERCH faces AWAY (+n): his right (-nz, nx)
   // the hips a set distance off the face: slide the drawn body out from where the collider holds it (`p.r + gap`)
   const D = (up ? WRUN.upD : WRUN.perchD) * H, off = (D - (player.r + WRUN.gap)) * k; rig.root.position.x += nx * off; rig.root.position.z += nz * off; rig.root.updateMatrixWorld(true);
   // the torso UPRIGHT on the run-up (his: "torso straight up and down"): the run clip leans him INTO the wall; the spine is turned back `upTorso`

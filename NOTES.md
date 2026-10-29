@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The wall on the LEFT stick; the catch is immediate (m15xx, DOCKET 17)
+*"If you jump against the wall and do nothing, instead of immediately going into the pose he does a weird glitchy thing -- like he's falling but
+stuck, then falling, then the pose. Something is fighting it." / "Instead of the flick on the right stick, it's entirely the locomotion stick and
+the velocity and trajectory: do nothing -> he skids down it, ready to jump off; keep holding up -> he runs up it if the velocity carries, release
+-> back to the slide; thumb right -> a horizontal run, still slipping down; come at it at an angle holding up or diagonal -> a horizontal run; to
+run straight up you have to hit it straight on."*
+- **The glitch:** the m1372 perch LET GO whenever the left stick was pushed past .6 -- and jumping at a wall, the stick is always pushed toward it.
+  It let go, the wall's `cool` refused the re-catch for .35 s, he fell, caught again: the stuck/falling flicker.
+- **Now (`WRUN.stick` 1):** any touch of a tall face in the air catches him at once (`wrunCatch`), remembering whether he came in HEAD-ON (`headK`
+  .8 of his speed into it), the climb that buys (`upK` x his speed into it, floor `upMin` 4.5) and his speed along it (floor `sideMin` 4.5). Every
+  frame the stick picks the state (`wrunWant`): at rest = the SLIDE; toward the wall after a head-on catch = UP (one climb per catch; spent -> the
+  slide); along it (`sideK`) or toward it after an ANGLED catch = SIDE, the way the stick (or his travel) says, sagging but never faster than
+  `sideFall` 2.2 m/s, `T` s of it -> the slide; pulled away = let go. A change re-faces him and re-ramps the pose (`wrunSet`, `R.t0`). The tap is
+  the jump off from any of them. The right flick is the strike again (`stick` 0 = m1604's swipe).
+- **Measured (Wall Park, the 4.5 m wall, the shipped frame):** no stick: caught at 1.4 m, held, skid down at ~.5 m/s. Stick held head-on: UP from
+  1.6 to 2.9 m, the lip, onto the deck. Released mid-climb: up -> slide at 2.4 m, rose on to 3.6, held, skid. Angled: a side run along the face.
+
 ## The willow's shrine, its bark, its vines and leaves (m1764)
 *"Make a shader for the willow -- the stump is just brown. You made a square raised part -- maybe build a shrine, don't make it square, spend some
 time on the design. The vines -- the vine and the leaf maybe each want their own colour; in the snow they're hard to see."*
