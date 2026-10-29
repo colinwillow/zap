@@ -277,6 +277,13 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## THE SKY CASTLE, pass 4 of 6: the keep (Worker B)
+His sheet's FRONT and ARCHITECTURE DETAIL. On the plaza: a round HALL (r 10, 8 m, cream stone painted with the stone-block map, a plinth,
+crenellations, glowing arched windows round it, a big arched wooden door to the front in a stone arch with gold strap and ring pulls) and
+its roof a walkable TERRACE (walk tris); out of it the KEEP (r 4.8, 24 m, banded twice) -- 21 glowing arched windows in three staggered
+rows with sills, a timber BALCONY ring under the roof (deck, railing, braces), a flared bell ROOF of red tiles (a lathe; `gcTex('tiles')`,
+canvas scallop rows) with a gold band at the eaves, a gold ball and spire on top (~51 m over the plaza), and a red BANNER (`gcTex('banner')`:
+gold hem, his white diamond in a diamond, a swallow-tail foot) hung on a gold rod down its front. Hall and keep are solid. 6 draws.
 ## THE SKY CASTLE, pass 3 of 6: the satellite islets and their shrines (m1778, Worker B)
 His sheet: little rocks drift round the castle, each with a pagoda shrine, chained to it. Nine ISLETS (cream rock cones, r 3-6.2) at three
 heights (Y0 -22 / -9 / +4) round the island at 1.45-2.2 R; green caps, bushes and ivy; seven carry an octagonal SHRINE -- a stone floor,
