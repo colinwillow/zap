@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The guardian's stone draws both sides (m15xx)
+## The guardian's stone draws both sides (m1780)
 *His close-up: "What is going on with the render -- he is see-through in various polygons."*
 - `guardLoad` forced `FrontSide` (Tripo writes doubleSided on everything, m25's rule). But the hard-surface rig SPLITS the mesh at every bone
   boundary and `hs_caps.py` fills the open loops (`holes_fill`), whose winding is whatever the fill gave it, and the Tripo scan has inward
