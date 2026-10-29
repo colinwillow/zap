@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The wall by VELOCITY, angled jump-offs, the wall cam (m15xx, DOCKET 17)
+## The wall by VELOCITY, angled jump-offs, the wall cam (m1776, DOCKET 17)
 *"The camera on a wall run or wall jump -- jumping back and forth between opposite walls it was so scrunched I couldn't see." / "Change the wall run
 again: entirely velocity and angle based -- if you have the speed it's a wall run, when the velocity finishes it's a wall sit, riding down the wall.
 Straight up, straight over, diagonal or anywhere between is set by the angle he first hits the wall at, with what speed. And the jump away from

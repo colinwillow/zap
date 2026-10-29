@@ -13138,7 +13138,7 @@ function wrunCatch() { const p = player; if (p.grounded || p.vel.y < -WRUN.slide
   if (WRUN.mode === 'VEL') { const vyR = Math.min(WRUN.upMax, p.vel.y + Math.max(0, into) * WRUN.upK), vt = al * WRUN.alongK; wrunGo(W, 'slide', 0, 0); const R = p.wrun; R.velMode = 1; R.vt = vt; R.top = 0;
     if (Math.hypot(vt, Math.max(0, vyR)) >= WRUN.runMin) { p.vel.y = vyR; wrunVelKind(R, 1); } return 1; }     // too slow: straight into the wall sit
   wrunGo(W, 'slide', 0, 0); const R = p.wrun; Object.assign(R, C, { upOK: C.head ? 1 : 0, sideT: 0 }); const k = wrunWant(R); if (k !== 'slide') wrunSet(R, k); return 1; }
-// m15xx: the VELOCITY wall (his: "entirely velocity and angle based: if you have the speed it's a wall run, and when the velocity finishes it
+// m1776: the VELOCITY wall (his: "entirely velocity and angle based: if you have the speed it's a wall run, and when the velocity finishes it
 // transitions into a wall sit where he's riding down the wall. Straight up, straight over, diagonal or anywhere between is set by the angle he hits
 // the wall at, with what speed"). At the catch his speed is turned onto the wall's plane: along it what he carried along it (`alongK`), up it what
 // he carried INTO it (`upK`) plus what he was already rising -- so a head-on hit runs straight up, a glancing one runs along, and anything between
@@ -13177,7 +13177,7 @@ function wrunEnd(push) {
 }
 function wrunJump() {
   const p = player, R = p.wrun;
-  // m15xx (his: "the angle of jumping out away from the wall seems to be only directly orthogonal -- there should be variation"): off ANY state the
+  // m1776 (his: "the angle of jumping out away from the wall seems to be only directly orthogonal -- there should be variation"): off ANY state the
   // jump leaves along the normal (`wjOut`) PLUS, along the wall, the left stick's share of it (`jumpSide` x its tangent component) and `keep` of
   // what the run carried along it -- so a straight-out kick, a kick angled ahead, a kick back the way he came. Facing the way he flies.
   if (WRUN.jumpVar && (R.velMode || R.head !== undefined)) { const S = stickWorld(), tx = -R.nz, tz = R.nx, ts = S.mag > .25 ? S.x * tx + S.z * tz : 0, along = ts * WRUN.jumpSide + (R.kind !== 'slide' ? (R.vt != null ? R.vt : (R.dx * tx + R.dz * tz) * (R.v || 0)) * WRUN.keep : 0);
@@ -13208,7 +13208,7 @@ function stepWrun(dt) {
     // down at up to `slideV`
     if (p.vel.y > 0) R.top = R.t; else { const since = R.t - (R.top || 0), vy = since < WRUN.hold ? damp(p.vel.y, 0, .06, dt) : Math.max(p.vel.y - WRUN.slideG * dt, -WRUN.slideV); p.vel.y = vy + MOVE.g * dt; } }
   else { p.vel.x = -R.nx * .5; p.vel.z = -R.nz * .5; p.vel.y += (MOVE.g - WRUN.gUp) * dt; }     // pressed to the face
-  if (vyKeep != null) { p.vel.y = vyKeep; p.vel.x = -R.nz * R.vt - R.nx * .5; p.vel.z = R.nx * R.vt - R.nz * .5; }     // m15xx: the velocity run -- his own speed on the wall's plane
+  if (vyKeep != null) { p.vel.y = vyKeep; p.vel.x = -R.nz * R.vt - R.nx * .5; p.vel.z = R.nx * R.vt - R.nz * .5; }     // m1776: the velocity run -- his own speed on the wall's plane
   p.faceH = p.heading = R.kind === 'side' ? Math.atan2(R.dx, R.dz) : R.kind === 'slide' ? Math.atan2(R.nx, R.nz) : Math.atan2(-R.nx, -R.nz);
   integrate(dt, 0, 0, 0, false);
   // still on the face? (its end, or past the top of it, lets him go)
@@ -15262,7 +15262,7 @@ function arenaUi() {
       else if (a === 'course') { ARENA.menu = ''; if (COURSE.on) courseClear(); else courseBuild('ACRO'); }     // m1078
       else if (a === 'wrun') { ARENA.menu = ''; if ((WRUN.boxes || []).length) wrunClear(); else wrunSpawn(); }     // m1064; m1072
       else if (a === 'smear') { SMEAR.on = SMEAR.on ? 0 : 1; try { localStorage.setItem('mel.smear', SMEAR.on ? '1' : '0'); } catch (err) {} }
-      else if (a === 'wallmode') { WRUN.mode = WRUN.mode === 'VEL' ? 'STICK' : 'VEL'; try { localStorage.setItem('mel.wallmode', WRUN.mode); } catch (err) {} }     // m15xx
+      else if (a === 'wallmode') { WRUN.mode = WRUN.mode === 'VEL' ? 'STICK' : 'VEL'; try { localStorage.setItem('mel.wallmode', WRUN.mode); } catch (err) {} }     // m1776
       else if (a === 'arcline') { BARC.line = BARC.line ? 0 : 1; try { localStorage.setItem('mel.arcline', BARC.line); } catch (err) {} }     // m1759
       else if (a === 'partaim') { if (!PARTAIM.on) { PARTAIM.on = 1; PARTAIM.by = 'L'; } else if (PARTAIM.by === 'L') PARTAIM.by = 'R'; else PARTAIM.on = 0; try { localStorage.setItem('mel.partaim', PARTAIM.on ? PARTAIM.by : '0'); } catch (err) {} }     // m1738
       else if (a === 'qd') { QD.on = QD.on ? 0 : 1; document.body.classList.toggle('qd', !!QD.on); try { localStorage.setItem('mel.qd', QD.on ? '1' : '0'); } catch (err) {} wepRow._qd = undefined; GEAR.mask = -1; gearSync(1); paintKit(); }
@@ -66740,7 +66740,7 @@ function stepCam(dt) {
     if (Math.abs(cd) < .01) p.camWant = null;
     else cam.az += cd * Math.min(1, CAM.melEase * dt);
   }
-  // m15xx (his: "the camera on a wall run or wall jump -- jumping back and forth between walls opposite each other it was so scrunched I couldn't see
+  // m1776 (his: "the camera on a wall run or wall jump -- jumping back and forth between walls opposite each other it was so scrunched I couldn't see
   // what I was doing"): THE WALL CAM. On a wall, and for `camHold` s after leaving one, the lens turns to look ALONG the wall (between two facing
   // walls that is down the corridor, both walls on screen) -- the way he is travelling along it, else whichever end of it is nearer the lens now
   // -- and pulls out `camPull` m and up `camEl` rad (`cam.wallK`, eased). A drag outranks it (`cam.idle`).
