@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The idle fix: shoulders back out (m15xx)
+## The idle fix: shoulders back out (m1821)
 *"I like the fix, but now his stance is like a minnow -- his shoulders need to go out a little. It was the wrists that were killing me."* `IDLEPICK.fix.arm` .45 -> .12 (the upper arms barely pulled in now), `elbow` .3 -> .2; the wrists stay at .85.
 
 ## The Dwarf idle, fixed; the stair clips off (m1820)
