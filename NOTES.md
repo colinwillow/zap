@@ -89,7 +89,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## HAND-BUILT down to a tenth (Worker B)
+## HAND-BUILT down to a tenth (m1754, Worker B)
 His (m1753): "only apply it to one very specific point -- it looks like it's everywhere... just turn it off for now, multiply by .1, it's
 so strong and it looks kinda not great". `HWWOB.amp` 7 cm -> 7 mm, under a new key (`mel.wob2`) so a phone that stored 7 cm starts at 7 mm;
 TOOLS > HAND-BUILT cycles 7 mm / 7 cm / OFF. Still only the mill's materials. Next, if wanted: a single chosen piece, not a whole building.
