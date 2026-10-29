@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The bow IN his fist, and squared to the aim while he strafes (m15xx)
+## The bow IN his fist, and squared to the aim while he strafes (m1746)
 His (screenshots on M1741 -- before m1744's no-second-pull fix had reached his phone): "his hand isn't around the bow like he's gripping it --
 the bow is on the outer side of his hand; the angle isn't right from the back"; "it doesn't aim true down the muzzle when moving left or right
 -- lined up stationary, but strafing he starts tilting, which he shouldn't."
