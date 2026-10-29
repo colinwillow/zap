@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## Rope bridge LOOK A: the Japanese pass (m15xx, ROPEWORKS 1 / DOCKET 25)
+## Rope bridge LOOK A: the Japanese pass (m1810, ROPEWORKS 1 / DOCKET 25)
 *"A visual pass -- red, Japanese, stylized, interesting; alien and Japanese. Towers, railings, the wood -- how do we embellish it? Those Japanese
 pagoda-looking things."* (His reference image did not come through; this is from the words.)
 - **Towers (`ropeDeco`):** dressed-stone texture, a dark cornice band and two turquoise JINRA bands round each; on top a PAGODA pavilion -- four

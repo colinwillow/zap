@@ -28647,7 +28647,7 @@ function proveStep() { const Z = PROVE, p = player; if (!Z.on) return;
       if (d > 1 || up > .8) { Z.log.unshift({ d, up, dy }); Z.log.length = Math.min(Z.log.length, 20); Z.best.d = Math.max(Z.best.d, d); Z.best.up = Math.max(Z.best.up, up);
         Z.el.innerHTML = 'JUMP <b>' + d.toFixed(1) + ' m</b> &nbsp;&uarr; ' + up.toFixed(1) + ' m &nbsp;' + (dy >= 0 ? '+' : '') + dy.toFixed(1) + ' m<br><span style="opacity:.7">BEST ' + Z.best.d.toFixed(1) + ' m far &middot; ' + Z.best.up.toFixed(1) + ' m up</span>'; } } } }
 function ropeBuild() { const Z = ROPEB; Z.want = 2; if (Z.on) return; const g = new THREE.Group(); scene.add(g);
-  // m15xx LOOK A (his: "red, Japanese, stylized, interesting -- alien and Japanese; towers, railings, the wood -- the pagoda style"): painted once
+  // m1810 LOOK A (his: "red, Japanese, stylized, interesting -- alien and Japanese; towers, railings, the wood -- the pagoda style"): painted once
   const T = ropeTex(), wood = new THREE.MeshStandardMaterial({ map: T.wood, roughness: .6, metalness: .05 }), dark = new THREE.MeshStandardMaterial({ color: 0x1a1416, roughness: .5 }),
     stone = new THREE.MeshStandardMaterial({ map: T.stone, roughness: .95 }), red = new THREE.MeshStandardMaterial({ color: 0xb3261e, roughness: .35, metalness: .05 }),
     gold = new THREE.MeshStandardMaterial({ color: 0xd8a640, roughness: .3, metalness: .8 }), jin = new THREE.MeshBasicMaterial({ color: 0x3ff0d8, toneMapped: false }),
