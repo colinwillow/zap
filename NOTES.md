@@ -367,6 +367,13 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## THE SKY CASTLE, pass 16: the gallery towers are hollow (Worker B)
+The plank galleries on towers 1, 3 and 5 (style pass 6) had no way on. Those three towers are now hollow: their wall is four lathe bands
+(a DOOR at the foot facing the keep, a full band, a DOOR at the gallery's height facing the gallery, a full band), each with an inner face,
+timber lintels over both doors, a planked floor and a ceiling; inside, a SPIRAL STAIR (a post, .42 rad wedge treads, risers just under
+.3) whose top tread is laid to run out through the gallery door onto the deck. Collision: 20 wall boxes per tower with the two doorways
+open, the post solid; the old solid drum only for the even towers. Headless, all three: a body walks in at the door (lands on the floor,
+e.g. 115.77 on 115.67), climbs to the gallery's height (124.42 on 124.41; 123.72 on 123.71; 127.02 on 127.01) and walks out onto the gallery.
 ## THE SKY CASTLE, pass 15: rope bridges out to the shrines (m1804, Worker B)
 Two ROPE BRIDGES from planked landings on the lawn out to the nearest islets -- islet 8 a tier UP (+4 m) and islet 1 a tier DOWN (-10 m;
 the curtain wall between towers 1 and 2 left open for it): planks along a sagging line, rope handrails on posts, walkable (walk tris per
