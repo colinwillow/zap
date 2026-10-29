@@ -14236,7 +14236,7 @@ function spiderStep(dt) { const p = player, Z = SPIDER; if (Z.globs.length) spid
       else { ank.copy(l.foot); ank.y += l.len3; }
       const out = l.out.clone().applyQuaternion(R.quaternion);
       wrLimb(l.b1, l.b2, l.b3, ank, out.multiplyScalar(.6).add(_sdA.set(0, 1, 0)), _sdC.set(0, -1, 0)); } } }
-// m15xx (his: "Do you wanna make this guy in TRIPO and then we can rig him -- he's got four arms, so I don't know if the auto rigger is gonna
+// m1732 (his: "Do you wanna make this guy in TRIPO and then we can rig him -- he's got four arms, so I don't know if the auto rigger is gonna
 // have that under control... a boss, pretty big, maybe elongate his arms, make his head bigger. Maybe he throws boulders. Make him in pieces,
 // so we can knock off his arms."): THE STONE GUARDIAN. His four drawings -> Tripo -> a SCRIPTED rig (blender-addons/pipeline/guardian_rig.py:
 // Auto-Rig Pro has no second pair of arms) -> 15 Mixamo clips baked by the Forge (tools/guardian_forge_prof.json). Mixamo names drive the body
@@ -14495,7 +14495,7 @@ function arrowStep(dt) {
     if (A.mine && ARENA.debris.length) { let dh = null; for (const D of ARENA.debris) if (D.die == null && D.m.position.distanceTo(P) < D.r + .3) { dh = D; break; } if (dh) { debrisCut(dh, Math.atan2(A.v.x, A.v.z) + Math.PI / 2); A.m.removeFromParent(); ARROWS.splice(i, 1); continue; } }
     if (A.mine && SPIDER.list.length) { let sh = null; for (const S of SPIDER.list) { const M = spiderMid(S, _sdC); if (Math.hypot(P.x - M.x, (P.y - M.y) * 1.3, P.z - M.z) < SPIDER.w * SPIDER.hitR) { sh = S; break; } }     // m1719: his arrows find the spiders too
       if (sh) { if (A.type === 'blast') arrowBlast(P, Math.atan2(A.v.x, A.v.z)); else { spiderBlow(sh, Math.atan2(A.v.x, A.v.z), A.pow || .7, A.dmg || 3, P.x, P.z); if (A.type === 'fire') for (let k = 0; k < 14; k++) gfire(P.x, P.y, P.z, .7); } if (A.pl) BOW.stat.hits++; A.m.removeFromParent(); ARROWS.splice(i, 1); continue; } }
-    if (A.mine && GUARD.list.length) { const gh = guardHit(P.x, P.y, P.z); if (gh) { if (A.type === 'blast') arrowBlast(P, Math.atan2(A.v.x, A.v.z)); else guardBlow(gh, Math.atan2(A.v.x, A.v.z), A.pow || .7, A.dmg || 3, P.x, P.y, P.z); if (A.pl) BOW.stat.hits++; A.m.removeFromParent(); ARROWS.splice(i, 1); continue; } }     // m15xx: the guardian
+    if (A.mine && GUARD.list.length) { const gh = guardHit(P.x, P.y, P.z); if (gh) { if (A.type === 'blast') arrowBlast(P, Math.atan2(A.v.x, A.v.z)); else guardBlow(gh, Math.atan2(A.v.x, A.v.z), A.pow || .7, A.dmg || 3, P.x, P.y, P.z); if (A.pl) BOW.stat.hits++; A.m.removeFromParent(); ARROWS.splice(i, 1); continue; } }     // m1732: the guardian
     if (A.mine) { let hit = null; for (const d of DUMMIES) { if (d.st === 'gone' || d.st === 'down' || !d.root.visible) continue; const R = d.root.position, hh = (d.K.h || 1.8);
         if (Math.abs(P.y - (R.y + hh * .5)) < hh * .55 && Math.hypot(P.x - R.x, P.z - R.z) < (d.K.r || .4) + .25) { hit = d; break; } }
       if (!hit && bldHit(P.x, P.y, P.z, .3, 3)) { A.m.removeFromParent(); ARROWS.splice(i, 1); continue; }     // m1128: a bolt sent home smashes the ballista
@@ -14712,7 +14712,7 @@ function arenaUi() {
       else if (a === 'archers') { archerAdd(); }     // m1103
       else if (a === 'statue') { ARENA.menu = ''; if (STATUE.g) statueClear(); else statueAdd(); }     // m1705
       else if (a === 'spider') { ARENA.menu = ''; if (SPIDER.list.length) spiderClear(); else spiderAdd(); }
-      else if (a === 'guard') { ARENA.menu = ''; if (GUARD.list.length) guardClear(); else guardAdd(); }     // m15xx     // m1677
+      else if (a === 'guard') { ARENA.menu = ''; if (GUARD.list.length) guardClear(); else guardAdd(); }     // m1732     // m1677
       else if (a === 'hall') { ARENA.menu = ''; if (HALL.on) hallClear(); else hallBuild(); }     // m1116
       else if (a === 'age') { AGE.st = AGE.st === 'fallen' ? 'restored' : 'fallen'; try { localStorage.setItem('mel.age', AGE.st); } catch (err) {} for (const E of BLDG.list) if (E.on()) { const rg = E.rig && E.rig(); if (rg) restorePlay(rg, AGE.st === 'fallen' ? 0 : 1); else { E.clear(); E.build(); } } if (inHome()) { const u = new URL(location.href); u.searchParams.delete('hs'); location.replace(u.toString()); } }     // m1501: FALLEN / RESTORED; a restorable building PLAYS it (m1512); the Red Hollows' pieces read it as they build: reload (Worker B)
       else if (a === 'bld') { ARENA.menu = ''; const E = BLDG.list.find(q => q.key === b.dataset.k); if (E) { if (E.on()) E.clear(); else E.build(); } }     // m1117
@@ -21276,7 +21276,7 @@ function mechTargets(dyMax, wide) { const out = [], p = player, DY = dyMax || ME
   if (FSHIP.on && FSHIP.on.cans) for (const C of FSHIP.on.cans) if (!C.dead) { const W = C.g.getWorldPosition(new THREE.Vector3()); put(C, W.x, W.y - .55, W.z, .6); }
   if (RAMP.on && RAMP.on.sen) for (const S of RAMP.on.sen) if (S.st !== 'fall') { const P = S.g.position; put(S, P.x, P.y, P.z, .5); }
   for (const S of SPIDER.list) if (!S.dead && !S.statue) { const P = S.root.position; put(S, P.x, P.y, P.z, SPIDER.w * .38); }
-  for (const G of GUARD.list) if (!G.dead) { const P = G.root.position; put(G, P.x, P.y, P.z, GUARD.P.h * GUARD.r); }     // m15xx: the guardian (his statue too: a blow wakes him)     // m1711: the spiders -- a swipe tracks and lunges to them like any man
+  for (const G of GUARD.list) if (!G.dead) { const P = G.root.position; put(G, P.x, P.y, P.z, GUARD.P.h * GUARD.r); }     // m1732: the guardian (his statue too: a blow wakes him)     // m1711: the spiders -- a swipe tracks and lunges to them like any man
   // m1260: *"if I'm trying to hit this box and I'm clearly targeted on it, it should lock, and when I let go he should launch and hit it --
   // not launch through it. Whatever he's indicating: a turret, a human, a box, a wall."* For the CHARGE (`wide`): every standing smashable
   // (crates, pots, barrels, supply drops) at its middle, and every breakable wall at the point of it nearest him (its standoff its half depth)
@@ -44845,7 +44845,7 @@ function strikeSweep(dt, power, live, dmg, body) {
           if (!MELEE.hitAll) break;
         }
         if (SPIDER.list.length) spiderSweep(q, _sw, rad, power, dmg, p.melH != null ? p.melH : p.faceH);
-        if (GUARD.list.length) guardSweep(q, _sw, rad, power, dmg, p.melH != null ? p.melH : p.faceH); if (GUARD.rocks.length) guardRockCut(q, _sw, rad);     // m15xx
+        if (GUARD.list.length) guardSweep(q, _sw, rad, power, dmg, p.melH != null ? p.melH : p.faceH); if (GUARD.rocks.length) guardRockCut(q, _sw, rad);     // m1732
         if (ARENA.debris.length) debrisSweep(q, _sw, rad, p.melH != null ? p.melH : p.faceH);     // m1720: the pieces on the floor are cut too     // m1701: the spiders
       }
     }

@@ -18,9 +18,9 @@
 - **15 clips** (Mutant idle / walk / run / roar / swipe / punch / jump attack / flex / turns, Throw Object, Stomp, Smash, a hit, a death).
 
 ## DONE WHEN (the boss on a white floor, alone)
-- [x] He exists as his stone twin first (STATUES.md): grey, still; a blow WAKES him (cracks, dust, a roar). (m15xx)
-- [x] Swipe (close), Smash (a ring: jump it), Throw (a boulder at your lead: roll it, or cut it out of the air). (m15xx)
-- [x] Four arms come off one by one, each to its own stone; all four gone or no hp and he bursts. A full katana charge takes an arm. (m15xx)
+- [x] He exists as his stone twin first (STATUES.md): grey, still; a blow WAKES him (cracks, dust, a roar). (m1732)
+- [x] Swipe (close), Smash (a ring: jump it), Throw (a boulder at your lead: roll it, or cut it out of the air). (m1732)
+- [x] Four arms come off one by one, each to its own stone; all four gone or no hp and he bursts. A full katana charge takes an arm. (m1732)
 - [ ] Armour plates as their own pieces (today the shoulder plates leave WITH their arm; a plate of its own needs the mesh split by part).
 - [ ] The lower arms with moves of their own (a grab, a clap) -- hand-keyed or procedural, since no Mixamo clip has a second pair.
 - [ ] A disarmed phase: with no arms he stomps and charges.

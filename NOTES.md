@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## THE STONE GUARDIAN: his four-armed boss, Tripo + a scripted rig (m15xx)
+## THE STONE GUARDIAN: his four-armed boss, Tripo + a scripted rig (m1732)
 His: "Make this guy in Tripo and rig him -- he's got four arms, so I don't know if the auto rigger is gonna have that under control... a boss,
 pretty big... maybe he throws boulders... in pieces, so we can knock off his arms." GUARDIAN.md has the pipeline and the DONE WHEN.
 - Tripo multiview (his four drawings, `--faces 9000`): 29k verts, but **4,746 islands** -- it splits at every UV seam, so "pieces" could
