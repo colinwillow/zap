@@ -345,7 +345,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## THE SKY CASTLE, pass 15: rope bridges out to the shrines (Worker B)
+## THE SKY CASTLE, pass 15: rope bridges out to the shrines (m1804, Worker B)
 Two ROPE BRIDGES from planked landings on the lawn out to the nearest islets -- islet 8 a tier UP (+4 m) and islet 1 a tier DOWN (-10 m;
 the curtain wall between towers 1 and 2 left open for it): planks along a sagging line, rope handrails on posts, walkable (walk tris per
 plank). Every islet's top is now a dynamic BDYN box riding its own bob (`gcIsleStep`, `hwBobY`) and carrying him; the islets' bob is
