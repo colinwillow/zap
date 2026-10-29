@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The wall run STEERS -- his diagram; the hang off the wall; a running cadence; a clean air pose (m15xx, DOCKET 17)
+*His diagram: straight up, a curve bending over to straight across. "The angle you hit the wall at is step one; then your left thumb goes from straight up
+over to straight right and the line BENDS -- diagonal, then all the way across. Velocity, the initial angle, and the steering." Also: "the ledge hang --
+he's through the wall"; "the vertical run is at the pace of the climb, really slow"; "when you jump off he does a weird pose in the air".*
+- **Steering (`stepWrun`, VEL mode):** his speed on the wall's plane is one vector (up `vu`, along `R.vt`); gravity takes the up part (`vG`),
+  friction the along part; the LEFT STICK read onto the wall (toward it = up, along it = across) turns that vector toward itself at `steer` 2.6
+  rad/s, keeping its length -- the path curves as the thumb sweeps. `R.a` (0 up, +-pi/2 across) sets the FACING (between the wall and the way he
+  runs) and BLENDS the clips (run-up halves cos^2 a, side clip the rest); the side lean grows as sin^2 a.
+  Measured: head-on up the 7 m wall, stick swept right after 6 frames: a 0 -> -.50 while rising 1.7 -> 5.0 m and drifting .6 m along, then he
+  caught the 7 m lip (LEDGE).
+- **The hang (`ledgeAt` / `ledgeHands`):** now also measures how far FORWARD his toes, feet, shins, chest and hips reach in the hang clip (`body`
+  .39 m on Grumbo) and holds the root far enough out that they stay `bodyClear` .04 m off the face. Rendered side-on: toes on the face, the body
+  outside the wall, hands at the lip (about .2 m out from the face now -- the price of the clearance).
+- **Cadence:** the run-up's legs at a running rate (`upClipRef` 2.2 -> 3.2 m/s, held to 1.8-3.4x).
+- **Off a wall:** `wrunEnd` sets `p.wallAirSnap` .25 s, during which every weight change snaps (`setWeights`), so the wall clips do not linger
+  into the jump.
+
 ## A wall RUN is not a climb: no hands (m1830, DOCKET 17)
 *"A wall run is not climbing up a wall -- you're going so fast you break gravity for a second, Sonic-style; a wall climb is Spider-Man. Use the clip for
 the feet, and have the hands doing the typical run -- the ninja thing. No hands is what makes it a wall run."*
