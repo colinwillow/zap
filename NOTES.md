@@ -413,6 +413,15 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## THE SKY CASTLE, pass 18: the castle is manned (Worker B)
+His "next" on people. EIGHT Jin samurai GUARDS (the arena's SAMURAI with his katana; `gcGuards`): two at the hall's open doors (the
+warrior tier), one either side of the throne, two walking a seven-point ROUND of the plaza (`d.patrol`, the courtyard's rounds), a brute
+at the lift's bridge, one on the keep's balcony. They are `calm` -- a new flag on the body brain's notice test (`!d.calm`): seeing him does
+not make them foes; a blow does (the hit path still sets `aggro`). Spawned when the castle is UP and he is within 130 m (the model loads
+then, not at boot); taken away when it falls. Their posts are castle-local, turned into the world at spawn, facing local + yaw. FOUND: the
+throne's dais had no walk tris -- two guards placed on it stood in it at floor height; its two tiers are walkable now (117.11 on the top).
+Headless: 8 spawn; all at aggro 0 with him standing at the door; positions on the plaza (116.51), dais (117.11), lawn by the lift (116.03)
+and balcony (145.17). Not verified headless: the rounds' walking (the body step runs in the frame, not `homeStep`).
 ## THE SKY CASTLE, pass 17: a ring of rope bridges round the islets (m1808, Worker B)
 A RING of nine rope bridges joins every islet to its neighbours (0-1-2-...-8-0), edge to edge at their tops (sag up to 2.2 m, planks,
 rope rails), so all nine shrines and rocks are walkable from the two lawn bridges -- a loop round the castle that climbs and drops through

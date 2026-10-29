@@ -46059,7 +46059,7 @@ function foeAI(d, dt, t) {
   // m401: AND WITHIN `noticeY` OF HIS HEIGHT -- across alone, a grunt in the Mothership's belly "noticed" a man on the needle
   // 330 m under it, and went for the shaft
   const dyT = Math.abs(TP.y - d.root.position.y), nY = K.noticeY || 8;
-  if (!d.aggro && dd < K.notice && dyT < nY) { d.aggro = 1; d.gap = V.react; }
+  if (!d.aggro && !d.calm && dd < K.notice && dyT < nY) { d.aggro = 1; d.gap = V.react; }     // m1793: a `calm` body (the sky castle's guards) does not take him for a foe on sight -- only a blow wakes it
   if (d.aggro && (dd > K.lose || dyT > nY * 1.6)) d.aggro = 0;
   d.gap = Math.max(0, d.gap - dt);
 
@@ -70333,7 +70333,23 @@ function gcLiftStep(dt) { const A = GCASTLE, L = A.lift; if (!L) return; const l
 function gcIsleStep() { const A = GCASTLE; if (!A.isleBox) return; const up = A.g && A.g.visible && Math.abs(A.g.position.y) < .01, p = player; let ride = 0;
   for (const I of A.isleBox) { const b = I.b; if (!up) { b.miny = b.maxy = -999; continue; } const y1 = I.top + hwBobY(I.ph, .3, .38), d = y1 - b.maxy; if (b.maxy > -900 && p.grounded && p.pos.x > b.minx && p.pos.x < b.maxx && p.pos.z > b.minz && p.pos.z < b.maxz && Math.abs(p.pos.y - b.maxy) < .35) ride = d; b.maxy = y1; b.miny = y1 - 3; }
   if (ride) p.pos.y += ride; }
-function gcastleStep(dt) { const A = GCASTLE; gcLiftStep(dt); gcIsleStep();
+// pass 18 (m1793): THE CASTLE IS MANNED -- Jin samurai guards (the arena's SAMURAI, his katana, `aggro` 0: they stand their posts and walk
+// their rounds until he strikes one, then they fight): two at the hall's open doors, one either side of the throne, two on a round of the
+// plaza, one at the lift's bridge, one on the keep's balcony. Spawned when the castle is UP and he comes within 130 m; taken away when it
+// falls (they do not stand on a ruin). Their posts are castle-local, turned into the world at spawn
+function gcGuards() { const A = GCASTLE; if (!A.g) return; const up = Math.abs(A.g.position.y) < .01, near = Math.hypot(player.pos.x - A.g.position.x, player.pos.z - A.g.position.z) < 130;
+  if (!up && A.guards) { for (const d of A.guards) { const i = HORDE.list.indexOf(d); if (i >= 0) HORDE.list.splice(i, 1); bowDrop(d); bodyGone(d); } A.guards = null; return; }
+  if (!up || !near || A.guards || A.guardsBusy) return; A.guardsBusy = 1;
+  (async () => { try { const K0 = await arenaLoad('SAMURAI'), AK = ARENA.kinds.SAMURAI, K = HORDE.KS || (HORDE.KS = Object.assign(Object.create(K0), { notice: HORDE.notice, lose: 90, limbs: 1 }));
+      if (Math.abs(A.g.position.y) > .01) return; const g = A.g, V = THREE.Vector3, W = (x, y, z) => g.localToWorld(new V(x, y, z)), out = A.guards = [], yb = A.Y0 + .5, kt = A.keepTop;
+      const man = (x, y, z, face, tier) => { const w = W(x, y, z), d = bodySpawn(K.P, K, w.x, w.z, w.y); arenaKatana(d, AK); d.horde = 1; d.aggro = 0; d.calm = 1; d.hp = d.hpMax = 40; d.gap = 1; d.h = face + A.yaw; if (tier) tierLook(d, tier); HORDE.list.push(d); out.push(d); return d; };
+      man(-2.6, yb, 12.4, 0, 'warrior'); man(2.6, yb, 12.4, 0, 'warrior'); man(-2.2, yb + .6, -4.6, 0); man(2.2, yb + .6, -4.6, 0);
+      const loop = [[0, 14.5], [11, 9], [13.5, -2], [8, -11], [-8, -11], [-13.5, -2], [-11, 9]].map(([x, z]) => { const w = W(x, yb, z); return [w.x, w.z]; });
+      for (const i0 of [0, 4]) { const w = loop[i0], d = man(...(() => { const l = g.worldToLocal(new V(w[0], 0, w[1])); return [l.x, yb, l.z]; })(), 0); d.patrol = { pts: loop, i: (i0 + 1) % loop.length, wait: 0, sp: 1.2 }; }
+      if (A.lift) { const l = g.worldToLocal(new V(A.lift.x, 0, A.lift.z)), r = Math.hypot(l.x, l.z), ux = l.x / r, uz = l.z / r; man(ux * (A.R * .66), A.Y0 - .3, uz * (A.R * .66), Math.atan2(ux, uz), 'brute'); }
+      man(Math.sin(.6) * 5.6, kt - 3.3, Math.cos(.6) * 5.6, .6);
+    } catch (e) { console.error('[melee] sky castle guards', e); note('CASTLE GUARDS FAILED'); } finally { A.guardsBusy = 0; } })(); }
+function gcastleStep(dt) { const A = GCASTLE; gcLiftStep(dt); gcIsleStep(); gcGuards();
   // m1789: the throne room's brazier burns -- flame-coloured sparks lift off it, a curl of smoke now and then (only while the castle is up)
   if (A.brazier && A.g && Math.abs(A.g.position.y) < .01 && Math.hypot(player.pos.x - A.g.position.x, player.pos.z - A.g.position.z) < 40) { A.bt = (A.bt || 0) - dt; if (A.bt <= 0) { A.bt = .07; const w = A.g.localToWorld(new THREE.Vector3(...A.brazier)); spkBurst(w.x, w.y - .3, w.z, 2, { col: Math.random() < .5 ? [1, .55, .15] : [1, .85, .35], spread: .7, up: 2.2, size: .13, life: .55 }); if (Math.random() < .08) smokeAt(w.x, w.y + .4, w.z, 1, .8, [.4, .36, .34]); } } if (A.orb) { const t = performance.now() * .001; A.orb.rotation.x = Math.sin(t * .9) * .09; A.orb.rotation.z = Math.sin(t * .63 + 1) * .06; } if (!A.g || Math.abs(A.g.position.y) > .01 || !A.chim) return; A.st = (A.st || 0) - dt; if (A.st > 0) return; A.st = .3;
   const c = A.chim[(Math.random() * A.chim.length) | 0], w = A.g.localToWorld(new THREE.Vector3(c[0], c[1], c[2])); smokeAt(w.x, w.y, w.z, 1, 1.6, [.78, .74, .7]); }
@@ -70447,7 +70463,7 @@ function gcastleBuild() { const b0 = BOXES.length, A = GCASTLE, [cx, cz] = A.at,
       for (let j = 0; j < 48; j++) { const a = (j + .5) / 48 * Math.PI * 2; if (Math.abs(Math.atan2(Math.sin(a), Math.cos(a))) < gp + .03) continue; const r = hr - .2, x = Math.sin(a) * r, z = Math.cos(a) * r; wv.set(x, 0, z).applyMatrix4(g.matrixWorld); BOXES.push({ minx: wv.x - .7, maxx: wv.x + .7, miny: yb - .5, maxy: k0, minz: wv.z - .7, maxz: wv.z + .7 }); }
       { wv.set(0, 0, hr - .2).applyMatrix4(g.matrixWorld); BOXES.push({ minx: wv.x - .9, maxx: wv.x + .9, miny: yb + 4.2, maxy: k0, minz: wv.z - .9, maxz: wv.z + .9, noCam: 1 }); }
       const tim = gcMat('timber'), br = gcMat('bronze'), glow = new THREE.MeshStandardMaterial({ color: 0xffd9a0, emissive: 0xffa040, emissiveIntensity: 2.2, toneMapped: false }), fire = new THREE.MeshStandardMaterial({ color: 0xffb040, emissive: 0xff6010, emissiveIntensity: 3, toneMapped: false });
-      putK(new THREE.CylinderGeometry(3.2, 3.4, .3, 24), wallM, at4(0, yb + .15, -5.4)); putK(new THREE.CylinderGeometry(2.4, 2.6, .3, 24), wallM, at4(0, yb + .45, -5.4)); const ty = yb + .6;
+      putK(new THREE.CylinderGeometry(3.2, 3.4, .3, 24), wallM, at4(0, yb + .15, -5.4)); putK(new THREE.CylinderGeometry(2.4, 2.6, .3, 24), wallM, at4(0, yb + .45, -5.4)); const ty = yb + .6; for (const [ra, rb, yt] of [[0, 2.4, yb + .6], [2.4, 3.2, yb + .3]]) for (let i = 0; i < 24; i++) { const a0 = i / 24 * Math.PI * 2, a1 = (i + 1) / 24 * Math.PI * 2, Q = [[a0, ra], [a1, ra], [a1, rb], [a0, rb]].map(([q, r]) => { wv.set(Math.sin(q) * r, yt + .01, -5.4 + Math.cos(q) * r).applyMatrix4(g.matrixWorld); return [wv.x, wv.y, wv.z]; }); tris.push(...Q[0], ...Q[1], ...Q[2], ...Q[0], ...Q[2], ...Q[3]); }
       putK(new THREE.BoxGeometry(1.6, .5, 1.2), tim, at4(0, ty + .25, -6)); putK(new THREE.BoxGeometry(1.7, 2.6, .25), tim, at4(0, ty + 1.3, -6.55)); for (const e of [-1, 1]) putK(new THREE.BoxGeometry(.25, .7, 1.2), tim, at4(e * .85, ty + .6, -6)); gcWheel(putK, at4(0, ty + 2.3, -6.4), .7);
       putK(new THREE.BoxGeometry(1.2, .1, 1), gcMat('banner'), at4(0, ty + .52, -5.95));
       for (let j = 0; j < 8; j++) { const a = (j + .5) / 8 * Math.PI * 2, x = Math.sin(a) * 6.2, z = Math.cos(a) * 6.2; putK(new THREE.CylinderGeometry(.38, .45, hh, 10), wallM, at4(x, yb + hh / 2, z)); putK(new THREE.CylinderGeometry(.6, .6, .3, 10), tim, at4(x, k0 - .5, z)); putK(new THREE.CylinderGeometry(.55, .6, .3, 10), wallM, at4(x, yb + .15, z)); wv.set(x, 0, z).applyMatrix4(g.matrixWorld); BOXES.push({ minx: wv.x - .4, maxx: wv.x + .4, miny: yb - .5, maxy: k0, minz: wv.z - .4, maxz: wv.z + .4 }); }
