@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## the CAVES, pass 2: each its own (Worker B)
+His "Go!" on the plan (his three-pass rule). `K.i` / `K.kind` per cave:
+  0 z-30 W  POOL     a glowing mint pool (3.1 m) ringed with stones, drips falling from the vault into it
+  1 z18 W   WORMS    420 glow-worm points over the vault (additive, twinkling) with their silk threads hanging
+  2 z-55 E  BEAST    a big curled cave beast before the chest: breathes; RUNNING (speed > 4.5) or a swing/strike within ~5 m wakes
+                     it -- the head rises, the eyes burn orange, a low growl and a shake, 6 s -- then it settles. Solid. No fight (yet)
+  3 z40 E   SHRINE   an old Jinra shrine: four stone pillars (one broken), an altar, a floating mint orb turning and bobbing
+  4 z95 W   LEDGE    the chest up on a 2.88 m shelf at the back, climbed by nine rock steps of .32 (his step .357)
+**What the renders found on the way:** (1) the valley's rim lumps and floor formations were placed on the CARVED height, so two sat
+INSIDE caves -> `caveNear` keeps them (and the cliff shrubs) out; (2) bright flat walls in caves 0 and 3 were the m1114 LEDGE PATHS
+and their retaining faces: `hwWallAt` read the carved height, so over a cave the wall "moved" into the tunnel and the path followed
+it in. `hwWallAt` now reads `hwHeight0` (the uncarved cliff) -- which also keeps the rope bridges' anchors (z -24 is inside cave 0's
+margin) in the rock. Sim (shipped frame): cave 4, up the nine steps to y 4.19 in ~1 s, across onto the shelf beside the chest.
+Still open: the two rim nicks from above; the beast does nothing but wake.
 ## the MERCHANT'S COUNTER: spend the doubloons (Worker B)
 His pick after m1713 ("explore -> loot -> shop"). Stand at the counter in the shop's open front (`GMERCH.shopAt`, local (0, deck, 6.9))
 and a SHOP button rises above the pads with his doubloons on it; it opens the merchant's wares (`MSHOP`, its own DOM, touches stopped
