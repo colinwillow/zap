@@ -89,6 +89,17 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## The spout is back, and the dock crosses the river as a bridge (Worker B)
+His (m1752): "you removed the spout -- I did like the spout, a little extra waterfall... incorporate it in the new design"; "you can have
+things cross the river like the dock -- just make bridges or make them go up in the air so a canoe could go under them". THE SPOUT: a
+timber trough under the arch's roof (its underside 4.8 m over the water, clear of the wheel's top at 4.5), hung on iron rods, fed from a
+stone head in the east wall, running UPSTREAM so it pours off its FRONT lip (z -bw - .3) -- the wheel's top moves -z, so the water meets
+the paddles going their way; the sheet (`hwFallMat`, runnel then a v0 = 1 m/s arc) skims the wheel's front and lands in a boil in the
+stream; it is inside the wheel's x span, so the boat lane beside the wheel stays open. THE DOCK: full length again (z1 = 13) and RAISED --
+`dY` = water + 3.1 m; the deck climbs from the bank in .35 m steps (`deckY`; a thin collider on each riser), the T-head sits at that
+height with an iron-runged LADDER down to the canoe moored at its end, and no post or brace stands in the boat lane (`lane`: -1..3.2 m
+from the river's centre line on the home's side) -- two stringers carry the deck across it. River audit after: 0 points under 3 m (the
+dock's z is 8.25 m clear now, the mill arch 4.5).
 ## The stream is continuous: a boat can go the whole way (m1752, Worker B)
 His (m1750): "the stream continuous -- no point in the entire stream that a reasonable size boat could not go through... room where you
 could go under the structure, almost like it was built over". MEASURED, not eyeballed: a headless audit walks z -160..160 every .5 m and
