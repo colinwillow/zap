@@ -5,6 +5,11 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home: the doorway is clear (Worker B)
+His (m1724): "there's a thing in the way in the main door -- a table, a row of jugs, right in the doorway". Render from the front door: the
+shop COUNTER (x -2.2..2.2) with its row of pots spanned the whole opening, and the screen wall's low shelf boards (.6, 1.3, 2.0 m) ran
+straight across the door to his quarters behind it. The counter is now two wings (x -3.4..-1.3 and 1.3..3.4) with a 2.6 m walkway down
+the middle, its pots on the wings only; the low boards stop at the door. Next: the size of the inside (his "much more expansive").
 ## the mill's waterfall reaches the water; the peak trail is a footpath, not a railway; rocks sit on their lowest ground (Worker B)
 His (m1724): "the water just falls and stops above the stream -- it looks weird"; "these lines on the ground... they look like they were
 gonna be train track". Found by render: the PEAK TRAIL -- a dark worn-path ribbon crossed by 41 evenly spaced logs, with posts down its
