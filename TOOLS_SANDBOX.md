@@ -30,11 +30,11 @@ to jump, switches out of reach, a rope to cut, an Osari bowman and a shield-bear
 its own before the next.
 
 ### DONE WHEN -- piece 1: THE JIN BOW (proposed first: the enemies already use bows, and the arrow ladder starts here)
-- [ ] Equip from the weapon wheel; hold UP on the right stick to draw (the trigger's own gesture), release to loose -- a longer draw flies
-      flatter and further.
+- [x] Equip from the weapon wheel; hold UP on the right stick to draw (the trigger's own gesture), release to loose -- a longer draw flies
+      flatter and further. (m15xx, the BOW slot; Forge-baked bow clips on Grumbo)
 - [ ] Aim: the reticle sits behind him (his rule, m1693), and a full draw shows the arc.
-- [ ] Arrows fly ballistic, stick in wood and enemies, and can be picked up again.
-- [ ] Hits: an Osari bowman, a spider (a leg), a switch, a rope, a target at height.
+- [~] Arrows fly ballistic and stick in walls and the ground (m15xx). Picking them up: not yet (arrows are unlimited for now).
+- [~] Hits: an Osari bowman and a spider (m15xx, measured on the bowman). A switch, a rope, a target at height: not yet.
 - [ ] The **line arrow**: one that hits wood strings a zip line from him to it, and he can ride it at once.
 - [ ] Fire arrows (from a brazier: draw through the flame) burn ivy and light braziers.
 - [ ] His sign-off on his phone.
@@ -44,6 +44,18 @@ its own before the next.
 3. **Kusarigama** -- hook and swing, yank, reel.
 4. **Jin disc** -- throw, steer, return, ricochet.
 5. **Lantern bombs**, **the tanegashima**, **the spirit lantern**, **the war kite**.
+
+## THE QUICK-DRAW RING (his, Oct 29 2026 -- the UI refactor after the bow)
+> *"A really quick, easy way to always go between projectile and melee weapon -- above the right stick. The left thumb is always your motion, so
+> keep it free. Two meaningfully sized buttons, the first row of a ring cut in half: projectile on one, melee on the other, so you can be
+> fighting, fighting, tap the other, shoot shoot shoot, back to fighting -- you can only block with the melee weapon out. A third above them
+> for unarmed (ninja stuff). The sub-menu for whatever weapon is equipped moves to the LEFT: the bow's arrows (regular, fire, exploding)
+> picked there."*
+- **Above the right pad:** a ring split into two big halves -- MELEE (the katana) and PROJECTILE (the bow / the launcher) -- and a third segment
+  above them for UNARMED. One tap swaps; the swap is fast enough to block, shoot, block.
+- **Above the left pad:** the equipped weapon's SUB-MENU (the arrow types for the bow; the katana's or the launcher's options later). It moves
+  from the right side to the left, the opposite of today.
+- Built after the bow is signed off.
 
 ## Open (his calls)
 - Which piece first (the bow is the proposal).

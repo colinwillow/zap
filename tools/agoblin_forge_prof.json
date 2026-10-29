@@ -107,6 +107,87 @@
    "role": "ride_gun",
    "stem": "Sitting_Gun_Motion",
    "name": "Sitting_Gun_Motion"
+  },
+  {
+   "role": "bow_draw",
+   "stem": "Standing_Draw_Arrow",
+   "name": "Standing_Draw_Arrow",
+   "hands": {
+    "Left": "fist",
+    "Right": "fist"
+   }
+  },
+  {
+   "role": "bow_overdraw",
+   "stem": "Standing_Aim_Overdraw",
+   "name": "Standing_Aim_Overdraw",
+   "hands": {
+    "Left": "fist",
+    "Right": "fist"
+   }
+  },
+  {
+   "role": "bow_recoil",
+   "stem": "Standing_Aim_Recoil",
+   "name": "Standing_Aim_Recoil",
+   "hands": {
+    "Left": "fist",
+    "Right": "fist"
+   }
+  },
+  {
+   "role": "bow_aim",
+   "stem": "Standing_Aim_Idle_01",
+   "name": "Standing_Aim_Idle_01",
+   "hands": {
+    "Left": "fist",
+    "Right": "fist"
+   }
+  },
+  {
+   "role": "bow_walk_f",
+   "stem": "Standing_Aim_Walk_Forward",
+   "name": "Standing_Aim_Walk_Forward",
+   "hands": {
+    "Left": "fist",
+    "Right": "fist"
+   }
+  },
+  {
+   "role": "bow_walk_b",
+   "stem": "Standing_Aim_Walk_Back",
+   "name": "Standing_Aim_Walk_Back",
+   "hands": {
+    "Left": "fist",
+    "Right": "fist"
+   }
+  },
+  {
+   "role": "bow_walk_l",
+   "stem": "Standing_Aim_Walk_Left",
+   "name": "Standing_Aim_Walk_Left",
+   "hands": {
+    "Left": "fist",
+    "Right": "fist"
+   }
+  },
+  {
+   "role": "bow_walk_r",
+   "stem": "Standing_Aim_Walk_Right",
+   "name": "Standing_Aim_Walk_Right",
+   "hands": {
+    "Left": "fist",
+    "Right": "fist"
+   }
+  },
+  {
+   "role": "bow_shoot",
+   "stem": "Shooting_Arrow_1",
+   "name": "Shooting_Arrow_1",
+   "hands": {
+    "Left": "fist",
+    "Right": "fist"
+   }
   }
  ]
 }

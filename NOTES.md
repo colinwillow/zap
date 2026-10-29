@@ -72,6 +72,31 @@ in there so I can transform it between the two states"; "these rocks are kind of
 - **THE HYBRID:** the sky islands over the rim (m1113) showed in FALLEN. KORAJIN: the floating world is what restoration raises -> hidden
   while fallen. (The refinery already sits on the flank when fallen.)
 Next: the painted textures (rock, sand, cliff), his ask in the same message.
+## m15xx -- THE JIN BOW, FIRST CUT (TOOLS_SANDBOX.md piece 1; his: "go with the geta, start with the bow")
+- **The clips:** the bowmen's Mixamo longbow set, baked onto Grumbo by the Forge.
+  - Profile: `tools/agoblin_forge_prof.json` gained 9 roles: bow_draw, bow_overdraw, bow_recoil, bow_aim, bow_walk_f/b/l/r, bow_shoot.
+  - Re-forged `forged/alien_goblin_game.glb`: 12 -> 21 clips, 1.31 -> 2.16 MB. The 12 old clips were read back with their names and
+    channel counts unchanged.
+  - `forgedHero` now makes the `__up` / `__ups` halves for bow_draw / bow_recoil / bow_aim.
+- **The slot:** `bow` in `WEAP.slots`, a `rocket` slot (no charge ball, the held upper pose over the gait, the release edge) with `bow: 1`.
+  - `CLIPS.rocket` / `rocketFire` are now getters that read `bow_draw` / `bow_recoil` while `CLIPS._bow` is set. `bowStep` sets it each
+    frame, and only when the hero has the baked halves; any other hero falls back to the launcher's pose.
+  - `rocketSame`'s cache is keyed on the name.
+  - Carried, `rocketUp` gives no pose, so the bow hangs in his left hand over the ordinary gait.
+- **The draw:** the right pad UP (`padUp`, the trigger) calls `bowDraw` (bow_draw at x1.5 on the top half). `bowStep` places the bow in the
+  world from his LEFT fist each frame (built by `archerBow` on a stand-in body, scaled .78). The string pulls to his RIGHT fist, an arrow is
+  nocked, and its head glows mint at full draw (`BOW.full` .9 s).
+- **The release:** `bowLoose` -- bow_recoil, and an arrow from the nock to `aimTarget()`'s point. It is a lob solved to land there, at
+  18 -> 40 m/s and 2 -> 6 damage by draw time. Arrows are `mine` + `pl`: they hit DUMMIES (`A.dmg`) and now the SPIDERS (`spiderBlow`),
+  smash `bldHit`'s things, and stick in walls and ground.
+- **Measured headless** (forge, the shipped frame):
+  - Equipped, `_bow` 1, the halves present.
+  - 70 frames held: aim 1, draw 1.09 s, arrow nocked.
+  - Released: 1 arrow at 40 m/s; it landed 63.8 m out. An Osari bowman stood on that spot and the second shot dropped him (`down`).
+  - Rendered: rest, drawn from the side and from behind, the loose. The draw reads as a draw: bow arm out, string to the chin.
+- **Not yet (piece 1's other boxes):** picking arrows up / a quiver, switches / ropes / targets, LINE arrows (zip lines), fire arrows. The
+  QUICK-DRAW RING (his UI plan) is written in TOOLS_SANDBOX.md for after the sign-off. **Not checked:** on his phone.
+
 ## m1711 -- ARENA SPEED, THE INTERCEPT YOU EARNED, SWINGS THAT LAND, THE CHARGE SWAP (his arena report, 20 fps)
 - **20 fps / chugging -- MEASURED (`?w=arena`, the game camera):** 1,033k triangles rendered and 104 calls.
   - ~900k of the triangles were the PLANTS: one InstancedMesh per kind over the whole world with `frustumCulled = false`, so every blade

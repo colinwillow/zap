@@ -2288,6 +2288,9 @@ const WEAP = {
     // digit, so it parents with identity like every weapon here. `rocket` is the whole difference:
     // it has no modes, no charge ball, and the release is a rocket (`ROCKET`, `fireRocket`).
     { key: 'launcher', label: 'LAUNCHER', short: 'ROCKET', file: 'models/weapons/alien_launcher.glb', melee: 'fist', aim: true, rocket: true },
+    // m15xx: THE JIN BOW (TOOLS_SANDBOX.md piece 1). A `rocket` slot (no charge ball, the held pose over the gait, the release edge) with `bow`: its own
+    // clips, its own release (`bowLoose`), and the bow itself drawn in his LEFT hand by `bowStep` (nothing in the right-hand mount).
+    { key: 'bow', label: 'BOW', short: 'BOW', file: null, gen: () => new THREE.Group(), melee: 'fist', aim: true, rocket: true, bow: true },
     { key: 'hammer',  label: 'HAMMER',  file: 'models/weapons/alien_antenna_hammer_game.glb',  melee: 'weap', charge: true },
     // m978: THE KATANA (SWORD.md build a). Built in code (`katanaScene`) to the weapon-bone convention until he has a model, so a
     // GLB of his drops in as `file:` with no other change. `melee: 'katana'`: the flick's DIRECTION picks the swing (`KATANA`).
@@ -5252,7 +5255,7 @@ const CLIPS = {
   // THE LAUNCHER (m189): one-key poses, spine-up over whatever the legs are doing. In his first
   // export the two are BYTE-IDENTICAL (same single key on all 186 channels) -- the kickback did
   // not make it out of the file, so the fire beat looks like the hold until it is re-exported.
-  rocket: 'rocket_launcher', rocketFire: 'rocket_launcher_fire',
+  get rocket() { return this._bow ? 'bow_draw' : 'rocket_launcher'; }, get rocketFire() { return this._bow ? 'bow_recoil' : 'rocket_launcher_fire'; }, _bow: 0,     // m15xx: the BOW rides the launcher's held-pose machinery with its own clips (`_bow` is set by `bowStep`)
   strafeL: 'strafe_left', strafeR: 'strafe_right',
   // **`Standing_Melee_Attack_360_High` IS `weapon_melee_04` (m86) -- RENAMED, NOT LOST.** m85 read
   // it as the one clip of the old 24 missing from the new 45 and took it out of the punch pool.
@@ -14241,10 +14244,12 @@ function arrowStep(dt) {
     const sx = P.x - ox, sy = P.y - oy, sz = P.z - oz, L2 = sx * sx + sy * sy + sz * sz || 1;
     const cx = p.pos.x, cy = p.pos.y + H * .55, cz = p.pos.z, u = clamp(((cx - ox) * sx + (cy - oy) * sy + (cz - oz) * sz) / L2, 0, 1);
     const qx = ox + sx * u - cx, qy = oy + sy * u - cy, qz = oz + sz * u - cz;
+    if (A.mine && SPIDER.list.length) { let sh = null; for (const S of SPIDER.list) { const M = spiderMid(S, _sdC); if (Math.hypot(P.x - M.x, (P.y - M.y) * 1.3, P.z - M.z) < SPIDER.w * SPIDER.hitR) { sh = S; break; } }     // m15xx: his arrows find the spiders too
+      if (sh) { spiderBlow(sh, Math.atan2(A.v.x, A.v.z), .7, A.dmg || 3, P.x, P.z); if (A.pl) BOW.stat.hits++; A.m.removeFromParent(); ARROWS.splice(i, 1); continue; } }
     if (A.mine) { let hit = null; for (const d of DUMMIES) { if (d.st === 'gone' || d.st === 'down' || !d.root.visible) continue; const R = d.root.position, hh = (d.K.h || 1.8);
         if (Math.abs(P.y - (R.y + hh * .5)) < hh * .55 && Math.hypot(P.x - R.x, P.z - R.z) < (d.K.r || .4) + .25) { hit = d; break; } }
       if (!hit && bldHit(P.x, P.y, P.z, .3, 3)) { A.m.removeFromParent(); ARROWS.splice(i, 1); continue; }     // m1128: a bolt sent home smashes the ballista
-      if (hit) { dummyBlow(hit, Math.atan2(A.v.x, A.v.z), 1, 6); spkBurst(P.x, P.y, P.z, 14, { col: [.6, .85, 1], spread: 4, size: .12, life: .35 }); snd('hit', { g: 1, r: 1, x: P.x, z: P.z }); ARCH.stat.back = (ARCH.stat.back || 0) + 1;
+      if (hit) { dummyBlow(hit, Math.atan2(A.v.x, A.v.z), 1, A.dmg || 6); if (A.pl) BOW.stat.hits++; spkBurst(P.x, P.y, P.z, 14, { col: [.6, .85, 1], spread: 4, size: .12, life: .35 }); snd('hit', { g: 1, r: 1, x: P.x, z: P.z }); ARCH.stat.back = (ARCH.stat.back || 0) + 1;
         A.m.removeFromParent(); ARROWS.splice(i, 1); continue; } }
     else if ((p.inter || p.interHold > 0 || (p.chargeGo && p.chLock)) && Math.abs(qy) < H * .8 && Math.hypot(qx, qz) < 1.1) {     // m1711 (his: "I'd release at the right time and as I flew through the air the arrows would still hit me"): in the intercept every arrow that reaches him is CUT and sent back -- at 20 fps an arrow covers 1.3 m a frame and could pass `deflStep`'s point test between frames
       const inter = p.inter; deflectThreat({ A, p: P }, 1); DEFL.stat.lockHits++; p.defl = null; p.chLock = null; p.inter = null; if (inter) { p.vel.x = 0; p.vel.z = 0; p.vel.y = Math.max(0, p.vel.y) * .2 + 1.5; p.interHold = INTER.hold; } continue; }
@@ -14293,6 +14298,37 @@ function archerBow(d) {
     B.nock.position.copy(_abM).addScaledVector(_abD, .41); B.nock.lookAt(B.nock.position.x + _abD.x, B.nock.position.y + _abD.y, B.nock.position.z + _abD.z);
     B.nock.userData.head.material.emissive.setRGB(d.ar === 'aim' ? 1 : 0, d.ar === 'aim' ? .1 : 0, d.ar === 'aim' ? .05 : 0); B.nock.userData.head.material.emissiveIntensity = d.ar === 'aim' ? 2 + Math.sin(d.arT * 30) : 0; }
 }
+// m15xx: THE JIN BOW (TOOLS_SANDBOX.md, piece 1; his: "start with the bow"). His hands hold a bow built like the bowmen's (`archerBow`): placed in the
+// WORLD every frame from his LEFT fist, the string from tip to tip, pulled back to his RIGHT fist while he draws, an arrow nocked on it. The right
+// pad pushed UP (the trigger's own `padUp`) DRAWS: Forge-baked `bow_draw` (Mixamo's Standing_Draw_Arrow, the bowmen's own clip) on his top half
+// over whatever his legs are doing; letting go LOOSES: `bow_recoil`, and an arrow from the nock to the reticle's point -- a lob solved to land
+// there, faster and flatter the longer it was drawn (`full` s to full power). His arrows are `mine`: they hit the bowmen, the spiders (a hit takes
+// a leg on the way to the burst), chip statues, smash what `bldHit` breaks, and stick in walls and the ground.
+const BOW = { full: .9, drawRate: 1.5, v0: 18, v1: 40, dmg0: 2, dmg1: 6, limbK: .78, stat: { shots: 0, hits: 0 } };
+const _bwL = new THREE.Vector3(), _bwR = new THREE.Vector3(), _bwA = new THREE.Vector3(), _bwB = new THREE.Vector3(), _bwM = new THREE.Vector3(), _bwD = new THREE.Vector3();
+function bowDraw() { const p = player; p.bowT = 0; const n = 'bow_draw', r = BOW.drawRate; if (rig.actions[n + UPS]) { playOnce(n + UPS, r); playOnce(n + UP, r); }
+  snd('swoosh', { g: .25, r: .55 }); }
+function bowLoose() { const p = player, B = BOW.mesh; const k = clamp((p.bowT || 0) / BOW.full, .2, 1);
+  const o = B && B.nock.visible ? B.nock.position.clone() : p.pos.clone().setY(p.pos.y + (RIG.height || 1.4) * .8);
+  const a = aimTarget(), tx = a.p.x, ty = a.p.y, tz = a.p.z, dx = tx - o.x, dz = tz - o.z, R = Math.hypot(dx, dz) || 1, sp = BOW.v0 + (BOW.v1 - BOW.v0) * k, T = Math.max(.05, Math.hypot(R, ty - o.y) / sp), g = MOVE.g * .55;
+  const m = arrowMesh(); m.position.copy(o); scene.add(m); m.userData.head.material.emissive.setRGB(.15, .6, .45);
+  ARROWS.push({ m, v: new THREE.Vector3(dx / T, (ty - o.y) / T + .5 * g * T, dz / T), t: 0, stuck: 0, from: null, mine: 1, pl: 1, dmg: BOW.dmg0 + (BOW.dmg1 - BOW.dmg0) * k });
+  const n = 'bow_recoil'; if (rig.actions[n + UPS]) { playOnce(n + UPS, 1.4); playOnce(n + UP, 1.4); } p.fireT = 1; p.bowT = 0; BOW.stat.shots++;
+  snd('swoosh', { g: .55 + k * .35, r: 1.9 - k * .4 }); snd('clang', { g: .12, r: 2.4 }); }
+function bowStep(dt) { const p = player, s = slotNow(), on = !!s.bow;
+  CLIPS._bow = on && rig.actions['bow_draw' + UPS] ? 1 : 0; if (p.aim && on) p.bowT = (p.bowT || 0) + dt;
+  if (!BOW.mesh) { if (!on) return; const d = { model: rig.root, root: rig.root, st: '', K: {}, h: 0, ar: '', arT: 0 }; archerBow(d); BOW.mesh = d.bow; BOW.mesh.g.scale.setScalar(BOW.limbK); }
+  const B = BOW.mesh, L = rig.bones.mixamorig_LeftHand, Rh = rig.bones.mixamorig_RightHand, vis = on && rig.root.visible && !p.dragon; B.g.visible = B.str.visible = vis; if (!vis || !L || !Rh) { B.nock.visible = false; return; }
+  L.getWorldPosition(_bwL); Rh.getWorldPosition(_bwR);
+  const drawing = !!p.aim, h = drawing ? Math.atan2(_bwL.x - _bwR.x, _bwL.z - _bwR.z) : p.faceH;
+  B.g.position.copy(_bwL); B.g.rotation.set(0, h, 0); B.g.rotateZ(drawing ? .12 : .35); B.g.updateMatrixWorld(true);
+  _bwA.copy(B.tipA).applyMatrix4(B.g.matrixWorld); _bwB.copy(B.tipB).applyMatrix4(B.g.matrixWorld);
+  const pull = drawing ? clamp((p.bowT || 0) / (BOW.full * .45), 0, 1) : 0; _bwM.copy(_bwA).add(_bwB).multiplyScalar(.5); if (pull > 0) _bwM.lerp(_bwR, pull);
+  const a = B.str.geometry.attributes.position.array; a.set([_bwA.x, _bwA.y, _bwA.z, _bwM.x, _bwM.y, _bwM.z, _bwB.x, _bwB.y, _bwB.z]); B.str.geometry.attributes.position.needsUpdate = true;
+  B.nock.visible = drawing && pull > .05;
+  if (B.nock.visible) { _bwD.subVectors(_bwL, _bwM); const len = _bwD.length() || 1; _bwD.multiplyScalar(1 / len); B.nock.position.copy(_bwM).addScaledVector(_bwD, .41 * BOW.limbK);
+    B.nock.lookAt(B.nock.position.x + _bwD.x, B.nock.position.y + _bwD.y, B.nock.position.z + _bwD.z); B.nock.scale.setScalar(BOW.limbK);
+    const full = (p.bowT || 0) >= BOW.full; B.nock.userData.head.material.emissive.setRGB(full ? .3 : .05, full ? 1 : .3, full ? .75 : .2); B.nock.userData.head.material.emissiveIntensity = full ? 1.5 + Math.sin(p.bowT * 24) * .5 : .5; } }
 const _abL = new THREE.Vector3(), _abR = new THREE.Vector3(), _abA = new THREE.Vector3(), _abB = new THREE.Vector3(), _abM = new THREE.Vector3(), _abD = new THREE.Vector3();
 // m1352: *"The archers shoot me through the bottom of the roof I'm standing on. They can't see you if their view is obstructed by a roof; if they've
 // seen you they know you're there, but they definitely can't shoot you through walls and roofs."* `losClear` walks the straight line from his
@@ -19984,6 +20020,7 @@ function upKey(nm) { return isSq(nm) && rig.actions[nm + UPS] ? nm + UPS : nm + 
 function legKey(n, sq) { return sq && rig.actions[n + LEGH] ? n + LEGH : n + LEGS; }
 function rocketUp() {
   const s = slotNow(); if (!s.rocket) return null;
+  if (s.bow && !player.aim && !(player.fireT > 0)) return null;     // m15xx: the bow is drawn only while he draws; carried, it hangs in his left hand over the ordinary gait
   const nm = player.fireT > 0 && rig.actions[CLIPS.rocketFire + UP] ? CLIPS.rocketFire : CLIPS.rocket;
   return rig.actions[nm + UP] ? nm : null;
 }
@@ -30892,7 +30929,7 @@ function aim3Gun(dt) {
   const p = player, F = AIM3, R = stick.R, s = slotNow();
   p.block = 0; p.blockT = 0; p.center = 0; p.centerT = 0; p.bkT = 0; p.bkOn = 0;
   if (p.rocketT > 0) p.rocketT -= dt;
-  if (!p.aim) { p.aim = 1; p.chg = 0; if (p.gYaw == null) { p.gYaw = 0; p.gPit = 0; } if (!s.rocket) chargeStart(); else for (const a of ROCKET.arm) snd(a.k, { g: a.g, r: a.r, dur: a.dur }); }
+  if (!p.aim) { p.aim = 1; p.chg = 0; if (p.gYaw == null) { p.gYaw = 0; p.gPit = 0; } if (s.bow) bowDraw(); else if (!s.rocket) chargeStart(); else for (const a of ROCKET.arm) snd(a.k, { g: a.g, r: a.r, dur: a.dur }); }
   if (p.knock) return;
   // m1293: *"Like a drawing tablet's second mode -- the stick is a mini version of the screen: touch top-left, the cursor's top-left."* ABSOLUTE:
   // where the thumb is on the pad IS where the cursor is in the view (`absYaw` / `absPit` at the pad's rim, about the screen's own reach),
@@ -30952,7 +30989,7 @@ function aimBackPitch(dt) { const p = player, B = BACKAIM, S = stickWorld(), bac
 const aim3RingEl = document.getElementById('aim3ring');
 function aim3Stick(dt) { const p = player, F = AIM3, R = stick.R, s = slotNow();
   p.block = 0; p.blockT = 0; p.center = 0; p.centerT = 0; p.bkT = 0; p.bkOn = 0; if (p.rocketT > 0) p.rocketT -= dt;
-  if (R.down && !p.knock) { if (!p.aim) { p.aim = 1; p.chg = 0; p.a3T = 0; if (s.rocket) for (const a of ROCKET.arm) snd(a.k, { g: a.g, r: a.r, dur: a.dur }); else chargeStart(); }
+  if (R.down && !p.knock) { if (!p.aim) { p.aim = 1; p.chg = 0; p.a3T = 0; if (s.bow) bowDraw(); else if (s.rocket) for (const a of ROCKET.arm) snd(a.k, { g: a.g, r: a.r, dur: a.dur }); else chargeStart(); }
     p.a3T = (p.a3T || 0) + dt; const up = -R.y, dz = Math.abs(up) < F.dead ? 0 : (up - Math.sign(up) * F.dead) / (1 - F.dead);
     p.gPit = clamp((p.gPit || 0) + dz * F.pRate * dt, -F.pMax, F.pMax);
     if (!s.rocket) { p.chg = Math.min(1, p.chg + dt / WEAP.chargeT); chargeStep(p.chg); } }
@@ -30969,6 +31006,7 @@ function aim3Pitch(dt) { const p = player, F = AIM3, R = stick.R;
   else { p.a3up0 = null; if (!(p.fireT > 0)) p.gPit = damp(p.gPit || 0, 0, F.pBack, dt); }
   p.gYaw = 0; if (p.aim || p.fireT > 0) { const a = cam.az, c = Math.cos(p.gPit || 0); (p.gDir || (p.gDir = new THREE.Vector3())).set(Math.sin(a) * c, Math.sin(p.gPit || 0), Math.cos(a) * c); } }
 function aim3Fire() { const p = player, s = slotNow(); if (!p.aim || p.knock || p.roll) return;
+  if (s.bow) { bowLoose(); return; }
   if (s.rocket) { if (p.rocketT > 0) return; fireRocket(); p.fireT = 1; p.rocketT = ROCKET.cool; snd('big', { g: .62, r: .62 + Math.random() * .06 });
     const kh = cam.az + (p.gYaw || 0); p.vel.x -= Math.sin(kh) * ROCKET.kick; p.vel.z -= Math.cos(kh) * ROCKET.kick; return; }
   if (p.chg >= WEAP.minChg) { fireBolt(p.chg); p.fireT = 1; snd(p.chg > .82 ? 'big' : 'shot', { g: .42 + p.chg * .3, r: 1.12 - p.chg * .3 }); playPair(CLIPS.shoot, clipLen(CLIPS.shoot) / WEAP.shootBeat); p.chg = 0; chargeStop(); chargeStart(); } }
@@ -31205,17 +31243,18 @@ function stepKit(dt) {
           // fired beside it is a second voice describing the same thing. Capping its length at
           // m26 made it shorter and no less redundant. The `zap` sample is still loaded and
           // `mel.snd('zap')` still plays it; nothing in the blaster asks for it.
-          p.aim = 1; if (!s.rocket) chargeStart();
+          p.aim = 1; if (s.bow) bowDraw(); else if (!s.rocket) chargeStart();
           // **THE LAUNCHER LOCKS IN WITH A SOUND (m203).** *"We need sound for when you hold it up,
           // to know it's locked into place and ready to fire."* A stand-in until his own: a clang
           // dropped to a heavy short CLUNK, and a quiet ping over it for the "ready". `ROCKET.arm`
           // is the two voices; a file of his replaces them with one line.
-          else for (const a of ROCKET.arm) snd(a.k, { g: a.g, r: a.r, dur: a.dur });
+          else if (!s.bow) for (const a of ROCKET.arm) snd(a.k, { g: a.g, r: a.r, dur: a.dur });
         }
     } else {
       // the edge. Everything that ends the hold -- letting go, rolling the thumb back down,
       // sweeping off the arc, backgrounding the app -- comes through here as one release.
-      if (p.aim && s.rocket) {
+      if (p.aim && s.bow) { bowLoose(); p.chg = 0; }
+      else if (p.aim && s.rocket) {
         // **THE LAUNCHER: THE RELEASE IS THE ROCKET, NO CHARGE (m189).** One per `ROCKET.cool`,
         // the kickback pose for the shot beat, and a real shove back along the shot.
         if (!(p.rocketT > 0)) {
@@ -34483,8 +34522,8 @@ function rigHipsSpine() {
 }
 // ARE THE HOLD AND THE FIRE POSES THE SAME DRAWING? Asked once per clip set.
 function rocketSame() {
-  if (rig._rkFor === rig.clips) return rig._rkSame;
-  rig._rkFor = rig.clips; rig._rkSame = true;
+  if (rig._rkFor === rig.clips && rig._rkNm === CLIPS.rocket) return rig._rkSame;
+  rig._rkFor = rig.clips; rig._rkNm = CLIPS.rocket; rig._rkSame = true;
   const a = rig.clips && rig.clips[CLIPS.rocket], b = rig.clips && rig.clips[CLIPS.rocketFire];
   if (a && b) {
     const m = new Map(a.tracks.map(t => [t.name, t.values]));
@@ -41074,7 +41113,7 @@ function forgedHero() {
   if (!fz || !rig.mixer) return 0; let n = 0;
   for (const c of fz) { if (rig.actions[c.name]) continue; rig.clips[c.name] = c; const a = rig.mixer.clipAction(c);
     const loop = /^(run_std|sprint_std)$/.test(c.name); if (!loop) { a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true; ONCE.add(c.name); } a.enabled = true; a.setEffectiveWeight(0); a.play(); rig.actions[c.name] = a; n++;
-    if (c.name === CLIPS.carry || c.name === KATANA.guard) for (const [suf, f] of [[UPS, isUpperSq], [UP, isUpper]]) {     // its upper halves, as `deriveClips` makes them at load
+    if (c.name === CLIPS.carry || c.name === KATANA.guard || /^bow_(draw|recoil|aim)$/.test(c.name)) for (const [suf, f] of [[UPS, isUpperSq], [UP, isUpper]]) {     // its upper halves, as `deriveClips` makes them at load
       const h = new THREE.AnimationClip(c.name + suf, c.duration, c.tracks.filter(t => f(t.name)).map(t => t.clone())); rig.clips[h.name] = h;
       const b = rig.mixer.clipAction(h); b.setLoop(THREE.LoopOnce, 1); b.clampWhenFinished = true; b.enabled = true; b.setEffectiveWeight(0); b.play(); rig.actions[h.name] = b; } }
   if (n) { note('FORGED ' + forgedKey(RIG.file) + ' ' + n + ' (hero)'); if (rig.ready || GAIT.refK) runStd(); }
@@ -66666,6 +66705,7 @@ function frameBody() {
     // root is written measures last frame's travel -- which at a knock-down's 12 m/s is most
     // of a metre of phantom motion through the limbs on every single frame.
     if (DRAGZ.ui && !(player.dragon && player.dragon.st === 'sit')) dragAimUi();     // m1703: the FIRE button goes when he leaves the saddle
+    bowStep(dt);                       // m15xx: the bow in his hands, after every pose
     dragRiderPose();                   // m1619: in the saddle, pitched and banked with his dragon (after every pose that writes the root)
     rig.root.updateMatrixWorld(true); springsStep(dt);     // m1058: hair / cape chains, on the FINAL root (after every pose above)
     dollStep(dt);
