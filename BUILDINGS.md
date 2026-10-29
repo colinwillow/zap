@@ -293,6 +293,8 @@ then start building the building, kinda like you built his home -- a ton of pass
 - [ ] (rest of) landmass pass 3: the satellite islets with their pagoda shrines, chained and drifting; how he GETS UP there
 - [x] **castle pass 1 (m1781):** the hall (door, windows, crenellations, roof terrace) and the keep (windows, balcony, red tiled bell roof, gold spire, his banner)
 - [x] **castle pass 2 (m1783):** seven bastion towers at different heights with red tiled roofs, crenellated curtain walls between them
+- [x] **castle pass 3 (m1775):** banners on the towers, sail awnings from the keep, bonsai trees, two arched bridges over the runnels
+- [ ] next: the way UP from the ground, interiors, the FALLEN state, wide sails, colliders that follow the live turn
 - [ ] castle pass 1..N: the keep, the round towers and roofs, the walls and walkways, the bridges to the satellites, banners, awnings,
       the water-wheel, trees, interiors -- as many passes as the home had; FALLEN / RESTORED like every Red Hollows piece
 
