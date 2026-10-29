@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The guardian's and the spider's breaks burn TURQUOISE (m15xx)
+## The guardian's and the spider's breaks burn TURQUOISE (m1777)
 *"I like the turquoise in the guardian -- the green mist cloud needs to match it better colour-wise."*
 - `gfire` takes a palette (`pal`): 0 the Osari's green, 1 TURQUOISE -- white-cyan -> turquoise -> deep teal, the hard-surface caps' colour.
   `tfire` is the turquoise call; every flame and spark in the guardian's and the spider's hit / cut / death / rock code uses it (their sparks
