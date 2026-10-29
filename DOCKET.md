@@ -69,4 +69,4 @@ best."* MAIN = this session (dynamics, the feel); AGENT = a separate session can
        m1809), skipping the 4.6 m run-up. Or: run, jump, flip, land sprinting. Decide with him before building.
 29. [ ] (his, later) **Sheaths and back-carry:** a scabbard on his back the katana goes into when put away (drawn and sheathed for real, the blade
        visible on his back); the bow slung on the back too. Not all weapons need showing -- decide which. Then hanging, climbing and wall runs can
-       PUT AWAY the sword (both hands free) instead of the one-hand hang (m15xx).
+       PUT AWAY the sword (both hands free) instead of the one-hand hang (m1832).

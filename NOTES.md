@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## Hands on the lip; one hand with the katana (m15xx)
+## Hands on the lip; one hand with the katana (m1832)
 *"You do need to adjust the hands. When he's holding the katana he'd hang from the top with one hand -- the left -- and the sword down where it would be
 normally."* (The sheath on his back, his idea for later: DOCKET 29.)
 - `ledgeHandsPose` (after the clip and the hang placement, in `frameBody`): each hand put by two-bone IK (`wrLimb`) on the lip at the point nearest

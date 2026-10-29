@@ -28832,7 +28832,7 @@ function ropePose() { const Z = ROPEB, p = player; if (!Z.on || !Z.bal) return; 
   const k = Math.min(1, Math.abs(Z.lean) / Z.leanArms), Bn = rig.bones || {}, RA = Bn.mixamorig_RightArm, RF = Bn.mixamorig_RightForeArm, LA = Bn.mixamorig_LeftArm, LF = Bn.mixamorig_LeftForeArm;
   if (k > .05 && RA && RF && LA && LF) { rig.root.updateMatrixWorld(true); RA.getWorldPosition(_caR); LA.getWorldPosition(_bmL); _caR.sub(_bmL); _caR.y = 0;
     if (_caR.lengthSq() > 1e-8) { _caR.normalize(); caSwing(RA, RF, _caR, BEAM.arms * k); caSwing(LA, LF, _bmL.copy(_caR).negate(), BEAM.arms * k); } } }
-// m15xx (his: "adjust the hands" on the ledge hang; "holding the katana he'd hang from the top with ONE hand -- the left -- and the sword down where
+// m1832 (his: "adjust the hands" on the ledge hang; "holding the katana he'd hang from the top with ONE hand -- the left -- and the sword down where
 // it would be normally"): HANDS ON THE LIP. Hanging (or coming in to the hang, or hopping), each hand is put by two-bone IK (`wrLimb`) on the lip
 // at the point nearest its shoulder, `in` m over the edge and `up` above the top, the elbow bent out and down. With a BLADE in hand only the LEFT
 // grips; the RIGHT arm hangs straight down at his side (`armDown` of its length below the shoulder, a little off the wall) with the sword in it.
@@ -68130,7 +68130,7 @@ function frameBody() {
     duckPose(dt);                      // m1070: the cover duck (right pad down in half cover)
     gsidePose();                       // m1073: the mirrored guard's blade, laid along the reflection of his own
     beamPose();                        // m1037: on the beam, tilted with the balance, arms out
-    ledgeHandsPose();                  // m15xx: hands on the lip (one hand with a blade)
+    ledgeHandsPose();                  // m1832: hands on the lip (one hand with a blade)
     idleFixPose();                     // m1820: the Dwarf idle's arms and wrists corrected
     ropePose();                        // m1805: on the rope bridge, leaning against its tilt and swing
     // **AFTER THE ROOT IS PLACED, NOT ONLY AFTER THE MIXER.** The pin is a bone's WORLD
