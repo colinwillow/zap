@@ -107,7 +107,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## Red Hollows: the ravine walls, the rocks and the mountain are solid (Worker B)
+## Red Hollows: the ravine walls, the rocks and the mountain are solid (m1758, Worker B)
 His (m1751 phone shots, standing on the rim's moss with the cliff through his body): "going through the sides of the ravine, sides of
 certain rocks, parts of the mountain -- we need to do some work with the colliders". A heightfield is a surface, not a volume (m1114):
 inside a steep face's footprint the terrain is ABOVE him and nothing is under, so he slides in. m1114's columns only covered the canyon
