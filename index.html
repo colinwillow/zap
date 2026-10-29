@@ -14869,9 +14869,48 @@ const BFIRE = { on: 0, rate: 110, swing: 2.5, k: .5 };
 try { BFIRE.on = localStorage.getItem('mel.bfire') === '1' ? 1 : 0; } catch (e) {}
 const bladeFire = () => !!(BFIRE.on && slotNow().blade);
 const _bfA = new THREE.Vector3(), _bfB = new THREE.Vector3();
-function bladeFireStep(dt) { if (!bladeFire() || player.swapHid) return; const w = WEAP.worn[slotNow().key]; if (!w || !w.group || !w.group.visible) return;
-  w.group.getWorldPosition(_bfA); _bfB.copy(muzzleWorld()); const n = BFIRE.rate * dt * (player.melee ? BFIRE.swing : 1);
-  for (let i = 0; i < n || Math.random() < n - i; i++) { const u = .15 + Math.random() * .85; gfire(_bfA.x + (_bfB.x - _bfA.x) * u, _bfA.y + (_bfB.y - _bfA.y) * u, _bfA.z + (_bfB.z - _bfA.z) * u, BFIRE.k * (.7 + u * .5)); if (i > 12) break; } }
+// m15xx (his: "the katana fire -- not green, an actual burning fire. It's not coming out of the right spot: it should be on the blade, a lot at
+// the tip and along the rest of it. The particles are too fast, they come from a point and shoot up -- they look low grade"): BLADE FIRE, its
+// own pool (`BFL`, one draw). The blade is the SAME segment the swing trail uses (the sword's own base..tip, `heroSword`), not the grip-to-muzzle
+// line. Tongues are born along it, weighted to the tip (`tipW`), small (`size`), slow (`rise` m/s, a gentle buoyancy, a little curl), and take
+// `carry` of the blade's own velocity, so a swing leaves a ribbon of flame hanging in the air behind it. The sprite is the flame atlas
+// (`gfireTex`), coloured white-yellow at the core -> orange -> deep red, fading (NORMAL blending: additive goes white on snow). Embers: a few
+// bright motes that drift higher and longer. TOOLS > BLADE FIRE.
+const BFL = { n: 620, i: 0, pts: null, rate: 100, swing: 3, tipW: .35, size: [.1, .2], tipK: 1.5, rise: [.35, .8], buoy: 1.4, curl: 1.2, carry: .22,
+  lifeR: [.28, .55], ember: .1, prev: null };
+function bflInit() { const N = BFL.n, g = new THREE.BufferGeometry(); for (const [k, d] of [['position', 3], ['aCol', 3], ['aSize', 1], ['aA', 1], ['aF', 1], ['aR', 1]]) g.setAttribute(k, new THREE.BufferAttribute(new Float32Array(N * d).fill(k === 'position' ? -999 : 0), d));
+  const m = new THREE.ShaderMaterial({ uniforms: { uT: { value: gfireTex() }, uPx: { value: 600 } }, transparent: true, depthWrite: false,
+    vertexShader: 'attribute vec3 aCol; attribute float aSize, aA, aF, aR; uniform float uPx; varying vec3 vC; varying float vA, vF, vR; void main() { vec4 mv = modelViewMatrix * vec4(position, 1.0); gl_PointSize = aSize * uPx / max(.1, -mv.z); vC = aCol; vA = aA; vF = aF; vR = aR; gl_Position = projectionMatrix * mv; }',
+    fragmentShader: 'uniform sampler2D uT; varying vec3 vC; varying float vA, vF, vR; void main() { vec2 pc = gl_PointCoord - .5; float cs = cos(vR), sn = sin(vR); pc = vec2(cs * pc.x - sn * pc.y, sn * pc.x + cs * pc.y) + .5; if (pc.x < 0.0 || pc.x > 1.0 || pc.y < 0.0 || pc.y > 1.0) discard; if (vF < 0.0) { float d = length(gl_PointCoord - .5); float e = smoothstep(.5, .1, d) * vA; if (e < .01) discard; gl_FragColor = vec4(vC, e); return; } vec2 uv = vec2(pc.x, 1.0 - pc.y) * .5 + vec2(mod(vF, 2.0), floor(vF / 2.0)) * .5; vec4 tx = texture2D(uT, uv); float a = tx.r * vA; if (a < .01) discard; gl_FragColor = vec4(mix(vC, vec3(1.0, .95, .72), tx.g * .7), min(1.0, a * 1.35)); }' });
+  const pts = new THREE.Points(g, m); pts.frustumCulled = false; pts.renderOrder = 52; scene.add(pts); BFL.pts = pts;
+  BFL.v = new Float32Array(N * 3); BFL.life = new Float32Array(N); BFL.L0 = new Float32Array(N); BFL.s0 = new Float32Array(N); BFL.w = new Float32Array(N); BFL.em = new Uint8Array(N); BFL.live = 0; }
+const bflR = (a) => a[0] + Math.random() * (a[1] - a[0]);
+function bflPut(x, y, z, vx, vy, vz, k, em) { if (!BFL.pts) bflInit(); const B = BFL, i = B.i = (B.i + 1) % B.n, g = B.pts.geometry.attributes, o = i * 3;
+  g.position.array[o] = x; g.position.array[o + 1] = y; g.position.array[o + 2] = z; B.v[o] = vx; B.v[o + 1] = vy; B.v[o + 2] = vz; B.em[i] = em ? 1 : 0;
+  B.L0[i] = B.life[i] = bflR(B.lifeR) * (em ? 2.6 : 1); B.s0[i] = em ? .035 + Math.random() * .03 : bflR(B.size) * k; g.aR.array[i] = (Math.random() - .5) * .8; B.w[i] = (Math.random() - .5) * 3; g.aF.array[i] = em ? -1 : Math.floor(Math.random() * 4); B.live = 1; }
+function bflStep(dt) { const B = BFL; if (!B.pts || !B.live) return; const g = B.pts.geometry.attributes, P = g.position.array, C = g.aCol.array, t = performance.now() / 1000; let any = 0;
+  for (let i = 0; i < B.n; i++) { if (B.life[i] <= 0) continue; any = 1; B.life[i] -= dt; const u = 1 - Math.max(0, B.life[i]) / B.L0[i], o = i * 3, e = B.em[i];
+    B.v[o] *= Math.exp(-3 * dt); B.v[o + 2] *= Math.exp(-3 * dt); B.v[o + 1] = B.v[o + 1] * Math.exp(-2 * dt) + B.buoy * dt;     // the blade's push dies off; heat lifts it
+    B.v[o] += Math.sin(t * 6 + i * 1.3) * B.curl * dt; B.v[o + 2] += Math.cos(t * 5 + i * 2.1) * B.curl * dt;
+    P[o] += B.v[o] * dt; P[o + 1] += B.v[o + 1] * dt; P[o + 2] += B.v[o + 2] * dt;
+    if (e) { g.aSize.array[i] = B.s0[i]; g.aA.array[i] = B.life[i] <= 0 ? 0 : (1 - u) * (.7 + .3 * Math.sin(t * 40 + i)); C[o] = 1; C[o + 1] = .55 + .3 * (1 - u); C[o + 2] = .15; }
+    else { g.aSize.array[i] = B.s0[i] * (.8 + .5 * Math.sin(Math.min(1, u * 1.6) * Math.PI * .5)) * (1 - u * .45);     // swells a little, then narrows as it burns out
+      g.aA.array[i] = B.life[i] <= 0 ? 0 : Math.min(1, u * 9) * Math.pow(1 - u, .9) * .95; g.aR.array[i] += B.w[i] * dt; if (Math.random() < .06) g.aF.array[i] = Math.floor(Math.random() * 4);
+      const c = u < .3 ? [1, .78 - u * .6, .25 - u * .4] : u < .65 ? [1 - (u - .3) * .5, .6 - (u - .3) * 1, .13 - (u - .3) * .2] : [.82 - (u - .65) * 1.2, .25 - (u - .65) * .4, .06];
+      C[o] = c[0]; C[o + 1] = Math.max(.05, c[1]); C[o + 2] = Math.max(.02, c[2]); }
+    if (B.life[i] <= 0) { P[o + 1] = -999; g.aA.array[i] = 0; } }
+  for (const n of ['position', 'aCol', 'aSize', 'aA', 'aF', 'aR']) g[n].needsUpdate = true;
+  B.pts.material.uniforms.uPx.value = renderer.domElement.height / (2 * Math.tan(camera.fov * Math.PI / 360)); if (!any) B.live = 0; }
+function bladeFireStep(dt) { bflStep(dt); if (!bladeFire() || player.swapHid) { BFL.prev = null; return; } const w = WEAP.worn[slotNow().key]; if (!w || !w.group || !w.group.visible) { BFL.prev = null; return; }
+  const HS = heroSword(); w.group.updateWorldMatrix(true, false); w.group.localToWorld(_bfA.set(0, HS ? HS.base : BTRAIL.base, 0)); w.group.localToWorld(_bfB.set(0, HS ? HS.tip : BTRAIL.tip, 0));
+  const pv = BFL.prev, n = BFL.rate * dt * (player.melee || player.chargeGo ? BFL.swing : 1), id = 1 / Math.max(dt, .008);
+  for (let i = 0; i < n || Math.random() < n - i; i++) { const r = Math.random(), u = 1 - Math.pow(1 - r, 1 + BFL.tipW * 2), q = Math.random();     // weighted to the tip
+    const x = _bfA.x + (_bfB.x - _bfA.x) * u, y = _bfA.y + (_bfB.y - _bfA.y) * u, z = _bfA.z + (_bfB.z - _bfA.z) * u;
+    let vx = 0, vy = 0, vz = 0; if (pv) { const ox = pv[0] + (pv[3] - pv[0]) * u, oy = pv[1] + (pv[4] - pv[1]) * u, oz = pv[2] + (pv[5] - pv[2]) * u; vx = (x - ox) * id * BFL.carry; vy = (y - oy) * id * BFL.carry; vz = (z - oz) * id * BFL.carry;
+      const lx = x - (x - ox) * q, ly = y - (y - oy) * q, lz = z - (z - oz) * q; bflPut(lx, ly, lz, vx, vy + bflR(BFL.rise), vz, 1 + u * (BFL.tipK - 1), Math.random() < BFL.ember); }     // spread back along this frame's sweep: no gaps in a fast swing
+    else bflPut(x, y, z, 0, bflR(BFL.rise), 0, 1 + u * (BFL.tipK - 1), Math.random() < BFL.ember);
+    if (i > 40) break; }
+  BFL.prev = [_bfA.x, _bfA.y, _bfA.z, _bfB.x, _bfB.y, _bfB.z]; }
 // m1744 (his: "it's hard to tell, if you were to release right now, where the arrow would land; and the crosshair should show an interaction with
 // what you're aiming at -- it's hard to see"): THE ARC. While he draws, the shot as `bowSolve` would loose it is FLOWN in advance -- the same
 // speed and drop, sample by sample -- and stopped at the first thing it meets: the ground (`groundAt`), a wall (`boxRay`), a body, a spider, a
@@ -21083,7 +21122,7 @@ function qdSub() { const s = slotNow(), bow = s.key === 'bow', proj = bow || s.k
     if (bow) { buildArcRow(wepRow, [{ label: 'ARROW' }, { label: 'FIRE' }, { label: 'BLAST' }], WEPROW.mid, i => { QD.arrow = ARROWK[i]; try { localStorage.setItem('mel.qdArrow', QD.arrow); } catch (e) {} snd('clang', { g: .2, r: 1.8 }); paintKit(); }, QD.sub);
       buildArcRow(qdSub2, [{ label: 'GUN' }, { label: '3D AIM' }], WEPROW.mid, i => i ? aim3Toggle() : qdProjPick('launcher'), QD.sub2); }
     else if (proj) buildArcRow(wepRow, [{ label: 'BOW' }, { label: 'GUN' }, { label: '3D AIM' }], WEPROW.mid, i => i === 2 ? aim3Toggle() : qdProjPick(i ? 'launcher' : 'bow'), QD.sub);
-    else if (sw) buildArcRow(wepRow, [{ label: 'STEEL' }, { label: 'JIN FIRE' }], WEPROW.mid, i => { BFIRE.on = i; try { localStorage.setItem('mel.bfire', String(i)); } catch (e) {} snd(i ? 'swoosh' : 'clang', { g: .4, r: i ? .6 : 1.6 }); paintKit(); }, QD.sub); }
+    else if (sw) buildArcRow(wepRow, [{ label: 'STEEL' }, { label: 'FIRE' }], WEPROW.mid, i => { BFIRE.on = i; try { localStorage.setItem('mel.bfire', String(i)); } catch (e) {} snd(i ? 'swoosh' : 'clang', { g: .4, r: i ? .6 : 1.6 }); paintKit(); }, QD.sub); }
   paintArcRow(qdSub2, bow, -1); { const k2 = qdSub2.firstChild ? qdSub2.firstChild.childNodes : []; for (const j of [2, 3]) if (k2[j]) k2[j].classList.toggle('sel', !!AIM3.on); }
   if (sw) { paintArcRow(wepRow, 1, BFIRE.on ? 1 : 0); return; }
   if (!proj) { paintArcRow(wepRow, 0, -1); return; }

@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Blade fire: real fire, on the blade, slower -- pass 1 (m15xx)
+*"The katana fire -- not green, an actual burning fire. It's not coming out of the right spot -- on the blade, a lot at the tip and the rest of the
+blade. The particles are too fast, they come from a point and shoot up; they look low grade. A few passes on that fire."*
+- **Where:** `bladeFireStep` spawned between the GRIP and `muzzleWorld()`, which on the katana is not the blade. It now uses the swing trail's
+  own segment (`heroSword()` base..tip in the weapon group), weighted to the tip (`BFL.tipW`).
+- **What:** its own pool, `BFL` (one draw): the flame atlas (`gfireTex`, soft tongues with a hot core), white-yellow core -> orange -> deep red,
+  NORMAL blending (additive goes white on snow); small (`size` .1-.2 m, a third bigger at the tip), slow (`rise` .35-.8 m/s plus a gentle
+  `buoy`ancy and a curl), short-lived; each takes `carry` .22 of the blade's own velocity and is spread back along the frame's sweep, so a swing
+  leaves a ribbon of flame. One in ten is an ember. The left sub-menu says STEEL / FIRE.
+- Measured headless: the pool was born dead at first -- the config's `life` range and the per-particle `life` array shared a name (now `lifeR`).
+  Rendered: flame along the upper blade at rest, tongues trailing a swing.
+- Next passes (open): a heat shimmer / glow card on the blade itself, smoke wisps off the tongue tips, the flame's own sound, his own sprite sheet.
+
 ## The katana's charge flips without letting go; the bow's arc over a low wall; the bow's emblem (m1761)
 *"Holding up to charge and I flick the left stick, he does a layout flip -- which I don't mind -- but then he releases the attack even though I
 haven't released. It should just do the flips, like dodging in parry mode." / "A wall in front of me, the terrace round the willow -- the reticle
