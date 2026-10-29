@@ -5,6 +5,20 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The katana's charge flips without letting go; the bow's arc over a low wall; the bow's emblem (m15xx)
+*"Holding up to charge and I flick the left stick, he does a layout flip -- which I don't mind -- but then he releases the attack even though I
+haven't released. It should just do the flips, like dodging in parry mode." / "A wall in front of me, the terrace round the willow -- the reticle
+stayed fixed on that little ledge." / "The rings are too thick -- something closer to the sword's stylised one, like our emblem, a different colour."*
+- **The release was the GROUND test**: a katana charge is only held while `p.grounded` (`katC`, `kaimHold`), so the flip's take-off fell through
+  to `chargeRelease`. Now any left flick while the katana charges goes to the guard's `cartGo` (side / front / back flips, facing kept), and while
+  `p.cart` runs the charge is simply held. On landing: still held -> it carries on charging; let go mid-flip -> it releases on landing.
+- **The ledge**: `aimPoint` walks the lens's heading from the muzzle and STOPS at the first box, so the terrace's low wall became the bow's target
+  and every draw solved onto it. Unlocked (and not 3D aim / back aim), `bowSolve` now aims at the open-air point at full range -- what it already
+  did in the open -- and `bowArc`'s flight shows where it really lands (on the ledge, or over it).
+- **The emblem (`bowMkTex`)**: the three thick rings are gone; the landing mark is one plane, the sword lock's family (hand wobble, worn gaps) but
+  its own: an arrowhead at the middle, a thin broken ring, eight fletching chevrons pointing in (one worn away), a hairline outer ring; every stroke
+  dark-under-light so it reads on snow and on wood. Jade on the open, amber on a body.
+
 ## The carried bow turns with him; sound after leaving the app (third try); the unarmed right-pad zoom off (m1760)
 *"When you flip or jump the bow doesn't follow the rotation of his body -- it stays straight up and down. If I leave the game and come back the
 sounds are all muted. When you're unarmed and hold up on the right stick he does the run charge -- take that away for now, I trigger it by accident."*
