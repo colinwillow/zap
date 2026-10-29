@@ -293,6 +293,11 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## THE SKY CASTLE, style pass 6: galleries and the keep's scaffold (Worker B)
+His key art: timber galleries and scaffolds cling to everything. On every odd tower a cantilevered plank GALLERY (3 x 2.2 m) on two
+angled braces, railed, a lantern on a post at its corner, a ragged banner hanging off its front -- walkable (both windings). Up the back of
+the keep a timber SCAFFOLD: two posts from the hall roof to under the balcony, cross-braced bays every 3 m, a railed plank LANDING every
+6 m and a rung LADDER beside it (visual; the climb is a later pass). +24 walk tris.
 ## THE SKY CASTLE, style pass 5: the home's bellies and boulders (m1790, Worker B)
 The home's walls bulge; the castle's were ruler cylinders. `gcBelly(r0, r1, b)` -- a radius at t with a belly (b of the radius, peaking
 mid-height) and a flared foot -- and `gcLathe` build every round wall as a lathe: towers bellied .09-.15 (each its own), the keep .06, the
