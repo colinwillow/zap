@@ -14714,7 +14714,7 @@ function arenaUi() {
       else if (a === 'spider') { ARENA.menu = ''; if (SPIDER.list.length) spiderClear(); else spiderAdd(); }
       else if (a === 'guard') { ARENA.menu = ''; if (GUARD.list.length) guardClear(); else guardAdd(); }     // m1732     // m1677
       else if (a === 'hall') { ARENA.menu = ''; if (HALL.on) hallClear(); else hallBuild(); }     // m1116
-      else if (a === 'age') { AGE.st = AGE.st === 'fallen' ? 'restored' : 'fallen'; try { localStorage.setItem('mel.age', AGE.st); } catch (err) {} for (const E of BLDG.list) if (E.on()) { const rg = E.rig && E.rig(); if (rg) restorePlay(rg, AGE.st === 'fallen' ? 0 : 1); else { E.clear(); E.build(); } } if (inHome()) { const u = new URL(location.href); u.searchParams.delete('hs'); location.replace(u.toString()); } }     // m1501: FALLEN / RESTORED; a restorable building PLAYS it (m1512); the Red Hollows' pieces read it as they build: reload (Worker B)
+      else if (a === 'age') { AGE.st = AGE.st === 'fallen' ? 'restored' : 'fallen'; try { localStorage.setItem('mel.age', AGE.st); } catch (err) {} for (const E of BLDG.list) if (E.on()) { const rg = E.rig && E.rig(); if (rg) restorePlay(rg, AGE.st === 'fallen' ? 0 : 1); else { E.clear(); E.build(); } } if (inHome()) { AGE.st = AGE.st === 'fallen' ? 'restored' : 'fallen'; hwAgeLive(); } }     // m1501: FALLEN / RESTORED; a restorable building PLAYS it (m1512); the Red Hollows' pieces read it as they build: reload (Worker B)
       else if (a === 'bld') { ARENA.menu = ''; const E = BLDG.list.find(q => q.key === b.dataset.k); if (E) { if (E.on()) E.clear(); else E.build(); } }     // m1117
       else if (a === 'slice') { ARENA.menu = ''; sliceDummy(); }     // m1090
       else if (a === 'course') { ARENA.menu = ''; if (COURSE.on) courseClear(); else courseBuild('ACRO'); }     // m1078
@@ -65280,7 +65280,7 @@ function godMenuOpen(on) {
   sec('SWITCHES');
   btn('FLY ' + (GOD.fly ? 'ON' : 'OFF'), () => { godFly(!GOD.fly); godMenuOpen(1); });
   // the Red Hollows' state on the phone (his ask: "how can I see it in all its glory"): main's AGE, saved; reloads (a `?hs=` would win, so it goes)
-  if (inHome()) btn('RED HOLLOWS: ' + (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + ' (tap for ' + (AGE.st === 'fallen' ? 'RESTORED, all of it built' : 'FALLEN') + ', reloads)', () => { try { localStorage.setItem('mel.age', AGE.st === 'fallen' ? 'restored' : 'fallen'); } catch (e) {} const u = new URL(location.href); u.searchParams.delete('hs'); location.replace(u.toString()); });
+  if (inHome()) btn('RED HOLLOWS: ' + (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + ' (tap: watch it turn ' + (AGE.st === 'fallen' ? 'RESTORED' : 'FALLEN') + ')', () => hwAgeLive());
   if (inAW()) btn('ALIEN BUILDINGS ' + (AW.bldOn ? 'ON' : 'OFF') + ' (reloads; ' + AW.bld + ' placed, ' + AW.missing.length + ' missing)', () => { try { localStorage.setItem('mel.awbld', AW.bldOn ? '0' : '1'); } catch (e) {} location.replace(location.pathname); });   // m434
   { const al = /alien_pano/.test(SKY.img); btn('SKY: ' + (al ? 'THE ALIEN PANO' : 'THE GAME HDRI') + ' (tap for ' + (al ? 'the game HDRI' : 'the alien pano') + ', reloads)', () => { try { localStorage.setItem('mel.skypick', al ? 'game' : 'alien'); } catch (e) {} location.replace(location.pathname); }); }   // m435
   btn('ALL KIT ' + (GEAR.all ? 'ON' : 'OFF') + ' (campaign: everything, not just what he has found)', () => { GEAR.all = GEAR.all ? 0 : 1; try { localStorage.setItem('mel.allkit', GEAR.all ? '1' : '0'); } catch (e) {} GEAR.pack = gearHas('pack'); gearSync(1); godMenuOpen(1); });   // m465
@@ -68051,8 +68051,9 @@ function rwBakeHeight() { const S = HOME.ht, data = new Uint8Array(S.n * S.n * 4
   return rwTex(data, S.n, 1); }
 const RW_GLSL = `
 uniform float uTime; uniform vec3 uSunDir; uniform vec3 uSunCol; uniform vec3 uZenith; uniform vec3 uHorizon; uniform float uFogD; uniform sampler2D uNoise;
-uniform sampler2D uPano; uniform float uPanoOn; uniform vec2 uPanoOff;
-vec3 panoAt(vec3 d, float lod) { float u = 0.5 + atan(d.x, d.z) / 6.2831853 + uPanoOff.x, v = 0.5 + asin(clamp(d.y, -1.0, 1.0)) / 3.1415927 + uPanoOff.y; return textureLod(uPano, vec2(fract(u), clamp(v, 0.002, 0.998)), lod).rgb; }
+uniform sampler2D uPano; uniform float uPanoOn; uniform vec2 uPanoOff; uniform sampler2D uPanoB; uniform vec2 uPanoOffB; uniform float uPanoMix;
+vec3 panoOne(sampler2D T, vec2 o, vec3 d, float lod) { float u = 0.5 + atan(d.x, d.z) / 6.2831853 + o.x, v = 0.5 + asin(clamp(d.y, -1.0, 1.0)) / 3.1415927 + o.y; return textureLod(T, vec2(fract(u), clamp(v, 0.002, 0.998)), lod).rgb; }
+vec3 panoAt(vec3 d, float lod) { vec3 c = panoOne(uPano, uPanoOff, d, lod); if (uPanoMix > 0.001) c = mix(c, panoOne(uPanoB, uPanoOffB, d, lod), uPanoMix); return c; }
 vec3 skyCol(vec3 d) { if (uPanoOn > 0.5) return panoAt(normalize(vec3(d.x, 0.04, d.z)), 5.0); float y = max(d.y, 0.0); vec3 c = mix(uHorizon, uZenith, pow(y, 0.5)); float s = max(dot(d, uSunDir), 0.0); c += uSunCol * (pow(s, 6.0) * 0.22 + pow(s, 60.0) * 0.55); return c; }
 float cloudAmt(vec3 d) { if (d.y <= 0.0) return 0.0; vec2 p = d.xz / (d.y + 0.08) * 0.11 + uTime * vec2(0.0016, 0.0009);
   float n = texture(uNoise, p).g * 0.62 + texture(uNoise, p * 2.9 + 0.31).b * 0.38; return smoothstep(0.50, 0.74, n) * smoothstep(0.0, 0.18, d.y); }
@@ -68097,19 +68098,32 @@ const RWSKYS = ['DAY', 'PANO', 'FIRE', 'PAINTED'];
 const RWSKY = { DAY: { file: 'images/hdri_game.png', env: .65, sun: 0xfff0d8, hemi: 0xdce8ff, ground: 0x7a5a4a, fog: 0xc8dcf8, uv: [.272, .597], el: 18 } };     /* its horizon (the mountains) is ~70% down the image, so its sun is ~18 deg up: at 38 the mountains rose into the sky */
 // picked when the sky is built (after `?hs=` has set the state), never at module scope
 function rwSkyPick() { try { const st = AGE.st === 'restored' ? 'restored' : 'fallen', v = new URLSearchParams(location.search).get('rwsky') || localStorage.getItem('mel.rwsky.' + st); RW.skyKey = 'mel.rwsky.' + st; RW.skyPick = RWSKYS.includes(v) ? v : st === 'restored' ? 'DAY' : 'FIRE'; } catch (e) { RW.skyPick = 'FIRE'; RW.skyKey = 'mel.rwsky.fallen'; } return RW.skyPick; }
-function rwPano() { rwSkyPick(); const Pn = RWSKY[RW.skyPick] || PANOS[RW.skyPick]; if (!Pn || HOME.style === 'lake') return; const uv = Pn.uv || ({ PANO: [.310, .638], FIRE: [.306, .646] })[RW.skyPick] || RW.panoSun, T = RW.time, az = T.az * Math.PI / 180, el = (Pn.el || ({ PANO: 9, FIRE: 6 })[RW.skyPick] || RW.panoEl) * Math.PI / 180;
-  RW.U.uSunDir.value.set(Math.cos(el) * Math.sin(az), Math.sin(el), Math.cos(el) * Math.cos(az)); RW.U.uPanoOff.value.set(uv[0] - (.5 + az / (Math.PI * 2)), (1 - uv[1]) - (.5 + el / Math.PI));
-  new THREE.TextureLoader().load(A(Pn.file), t => { t.colorSpace = THREE.SRGBColorSpace; t.wrapS = THREE.RepeatWrapping; t.minFilter = THREE.LinearMipmapLinearFilter; t.generateMipmaps = true; t.anisotropy = 4;
-    RW.U.uPano.value = t; RW.U.uPanoOn.value = 1; const c = new THREE.Color(Pn.sun); RW.U.uSunCol.value.set(c.r, c.g, c.b);
-    try { const t2 = t.clone(); t2.mapping = THREE.EquirectangularReflectionMapping; t2.needsUpdate = true; const pm = new THREE.PMREMGenerator(renderer), rt = pm.fromEquirectangular(t2); pm.dispose(); scene.environment = rt.texture; scene.environmentIntensity = Pn.env; RW.envRt = rt; } catch (e) { note('NO RW PANO IBL'); }
-    sun.color.setHex(Pn.sun); hemi.color.setHex(Pn.hemi); hemi.groundColor.setHex(Pn.ground); { const d = RW.U.uSunDir.value, L = Math.hypot(_sunOff.x, _sunOff.y, _sunOff.z) || 40; _sunOff.set(d.x * L, Math.max(d.y, .35) * L, d.z * L); }
+function rwSkyOf(pick) { const Pn = RWSKY[pick] || PANOS[pick]; if (!Pn) return null; const uv = Pn.uv || ({ PANO: [.310, .638], FIRE: [.306, .646] })[pick] || RW.panoSun, T = RW.time, az = T.az * Math.PI / 180, el = (Pn.el || ({ PANO: 9, FIRE: 6 })[pick] || RW.panoEl) * Math.PI / 180;
+  return { Pn, dir: new THREE.Vector3(Math.cos(el) * Math.sin(az), Math.sin(el), Math.cos(el) * Math.cos(az)), off: new THREE.Vector2(uv[0] - (.5 + az / (Math.PI * 2)), (1 - uv[1]) - (.5 + el / Math.PI)) }; }
+function rwSkyTex(t) { t.colorSpace = THREE.SRGBColorSpace; t.wrapS = THREE.RepeatWrapping; t.minFilter = THREE.LinearMipmapLinearFilter; t.generateMipmaps = true; t.anisotropy = 4; return t; }
+function rwSkyEnv(t, Pn) { try { const t2 = t.clone(); t2.mapping = THREE.EquirectangularReflectionMapping; t2.needsUpdate = true; const pm = new THREE.PMREMGenerator(renderer), rt = pm.fromEquirectangular(t2); pm.dispose(); if (RW.envRt) RW.envRt.dispose(); scene.environment = rt.texture; scene.environmentIntensity = Pn.env; RW.envRt = rt; } catch (e) { note('NO RW PANO IBL'); } }
+function rwSkySun() { const d = RW.U.uSunDir.value, L = Math.hypot(_sunOff.x, _sunOff.y, _sunOff.z) || 40; _sunOff.set(d.x * L, Math.max(d.y, .35) * L, d.z * L); }
+function rwPano() { rwSkyPick(); const S = rwSkyOf(RW.skyPick); if (!S || HOME.style === 'lake') return; const Pn = S.Pn;
+  RW.U.uSunDir.value.copy(S.dir); RW.U.uPanoOff.value.copy(S.off);
+  new THREE.TextureLoader().load(A(Pn.file), t => { rwSkyTex(t); RW.U.uPano.value = t; RW.U.uPanoOn.value = 1; const c = new THREE.Color(Pn.sun); RW.U.uSunCol.value.set(c.r, c.g, c.b); rwSkyEnv(t, Pn);
+    sun.color.setHex(Pn.sun); hemi.color.setHex(Pn.hemi); hemi.groundColor.setHex(Pn.ground); rwSkySun();
     console.log('[melee] the Red Hollows sky: ' + RW.skyPick + ' (' + Pn.file + ')'); }, undefined, () => note('NO RW PANO ' + Pn.file)); }
+// his (after m1731): "you can actually physically watch one ... convert into the other" -- the sky CROSSFADES too: the next state's panorama loads
+// into `uPanoB` and `uPanoMix` runs 0 -> 1 while the sun's direction and colours follow; at the end B becomes A and the reflections are rebuilt
+function rwSkyTo(dur) { const was = RW.skyPick; rwSkyPick(); if (RW.skyPick === was || HOME.style === 'lake' || !RW.U) return; const S = rwSkyOf(RW.skyPick); if (!S) return;
+  new THREE.TextureLoader().load(A(S.Pn.file), t => { rwSkyTex(t); RW.U.uPanoB.value = t; RW.U.uPanoOffB.value.copy(S.off); const u = RW.U.uSunCol.value;
+    RW.skyX = { t: 0, dur, S, tex: t, d0: RW.U.uSunDir.value.clone(), c0: new THREE.Color(u.x, u.y, u.z), s0: sun.color.clone(), h0: hemi.color.clone(), g0: hemi.groundColor.clone() }; }, undefined, () => note('NO RW PANO ' + S.Pn.file)); }
+function rwSkyStep(dt) { const X = RW.skyX; if (!X) return; X.t = Math.min(1, X.t + dt / X.dur); const m = rsEase(X.t), P = X.S.Pn, c = _rwSkyC;
+  RW.U.uPanoMix.value = m; RW.U.uSunDir.value.copy(X.d0).lerp(X.S.dir, m).normalize(); rwSkySun();
+  c.copy(X.c0).lerp(_rwSkyC2.setHex(P.sun), m); RW.U.uSunCol.value.set(c.r, c.g, c.b); sun.color.copy(X.s0).lerp(_rwSkyC2, m); hemi.color.copy(X.h0).lerp(_rwSkyC2.setHex(P.hemi), m); hemi.groundColor.copy(X.g0).lerp(_rwSkyC2.setHex(P.ground), m);
+  if (X.t >= 1) { RW.U.uPano.value = X.tex; RW.U.uPanoOff.value.copy(X.S.off); RW.U.uPanoMix.value = 0; rwSkyEnv(X.tex, P); RW.skyX = null; console.log('[melee] the Red Hollows sky: ' + RW.skyPick); } }
+const _rwSkyC = new THREE.Color(), _rwSkyC2 = new THREE.Color();
 function rwBuild() {
   const T = RW.time, el = T.el * Math.PI / 180, az = T.az * Math.PI / 180;
   RW.U = { uTime: { value: 0 }, uSunDir: { value: new THREE.Vector3(Math.cos(el) * Math.sin(az), Math.sin(el), Math.cos(el) * Math.cos(az)) }, uSunCol: { value: new THREE.Vector3(...T.sun) },
     uZenith: { value: new THREE.Vector3(...T.zen) }, uHorizon: { value: new THREE.Vector3(...T.hor) }, uFogD: { value: RW.fog }, uNoise: { value: rwBakeNoise() },
-    uAbs: { value: RW.abs }, uScat: { value: RW.scat }, uCaus: { value: RW.caus }, uPano: { value: new THREE.DataTexture(new Uint8Array([0, 0, 0, 255]), 1, 1) }, uPanoOn: { value: 0 }, uPanoOff: { value: new THREE.Vector2() } };
-  RW.U.uPano.value.needsUpdate = true; rwPano();
+    uAbs: { value: RW.abs }, uScat: { value: RW.scat }, uCaus: { value: RW.caus }, uPano: { value: new THREE.DataTexture(new Uint8Array([0, 0, 0, 255]), 1, 1) }, uPanoOn: { value: 0 }, uPanoOff: { value: new THREE.Vector2() }, uPanoOffB: { value: new THREE.Vector2() }, uPanoMix: { value: 0 } };
+  RW.U.uPanoB = { value: RW.U.uPano.value }; RW.U.uPano.value.needsUpdate = true; rwPano();
   // the sky dome: the same horizon the water and the fog fade to
   const sky = new THREE.Mesh(new THREE.SphereGeometry(2500, 32, 16), new THREE.ShaderMaterial({ uniforms: RW.U, side: THREE.BackSide, depthWrite: false, fog: false,
     vertexShader: 'varying vec3 vDir; void main(){ vDir = position; vec4 p = projectionMatrix * modelViewMatrix * vec4(position, 1.0); gl_Position = p.xyww; }',
@@ -68207,7 +68221,26 @@ const rwMesh = (geos, mat, shadow = true) => { const m = new THREE.Mesh(mergeGeo
 // STATE -- now main's `AGE` (m1501): SPAWN > BUILDINGS > STATE, which reloads in the Red Hollows; `?hs=` for a look. `hsFallen(g)` is main's `bldAge` ----
 try { const q = new URLSearchParams(location.search).get('hs'); if (q === 'restored' || q === 'fallen') AGE.st = q; } catch (e) {}     // the state is main's AGE (m1501); `?hs=` overrides for a look
 const hsF = () => AGE.st === 'fallen';
-function hsFallen(g) { if (!g || !hsF()) return; bldAge(g); }     // main's weathering (`bldAge`, m1501): the paint drained in the shader, metal to rust, glows out
+function hsFallen(g) { if (!g || !hsF()) return; hwPeakAge(1, g); }     // main's weathering (`bldAge`, m1501): the paint drained in the shader, metal to rust, glows out
+// THE LIVE TURN (his, after m1731: "you can actually physically watch one kind of rumble and shake and then convert into the other one"). The STATE
+// button no longer reloads in the Red Hollows: `hwAgeLive()` flips `AGE.st` and `hwAgeStep` plays it -- `rumble` seconds of the ground shaking and
+// every chunk shuddering in place (`AGE.jit`, read by both chunk syncs), then every chunked place (home, mill, merchant, refinery) plays its own
+// RESTORE show at once, the sky crossfades (`rwSkyTo`), the sky islands rise out of the valley or sink into it, and the peak's paint drains or
+// floods back at `peakAt`. Anything that reads the state each frame (the peak fire, the shutters, the lamps, the wheel) follows by itself
+const HWAGE = { rumble: 1.8, jit: .14, sky: 7, isl: 9, peakAt: 3.5, end: 12, sink: 140, t: -1, goal: 1 };
+function ageJit(M, k) { const j = AGE.jit, e = M.elements, s = Math.sin(performance.now() * .061 + k * 2.3), c = Math.cos(performance.now() * .047 + k * 1.7); e[12] += s * j; e[13] += Math.abs(c) * j * .5; e[14] += c * j; }
+function hwPeakAge(on, g = GPEAK.g) { if (!g) return; if (on) { g.traverse(o => { if ((o.isMesh || o.isLine) && !o.userData.m0) o.userData.m0 = o.material; }); bldAge(g); } else g.traverse(o => { if (o.userData.m0) o.material = o.userData.m0; if (o.isPoints) o.visible = true; }); }
+function hwAgeLive() { const W = HWAGE; if (W.t >= 0) { try { localStorage.setItem('mel.age', AGE.st); } catch (e) {} return; } AGE.st = AGE.st === 'fallen' ? 'restored' : 'fallen'; try { localStorage.setItem('mel.age', AGE.st); } catch (e) {} W.goal = AGE.st === 'fallen' ? 0 : 1; W.t = 0; W.go = W.pk = W.rt = 0;
+  try { const u = new URL(location.href); if (u.searchParams.has('hs')) { u.searchParams.delete('hs'); history.replaceState(null, '', u.toString()); } } catch (e) {}
+  for (const o of HOME.skyIsl || []) { o.visible = true; if (W.goal) o.position.y = -W.sink; } snd('boom', { g: .8, r: .45 }); }
+function hwAgeStep(dt) { const W = HWAGE; if (W.t < 0) return; W.t += dt; const P = [GHOME, GMILL, GMERCH, GJINRA].filter(A => A.g && A.R_);
+  if (W.t < W.rumble) { AGE.jit = W.jit * Math.min(1, W.t / .4); camShake(.16 + .1 * Math.random()); W.rt -= dt; if (W.rt <= 0) { W.rt = .32 + Math.random() * .2; const A = P[Math.floor(Math.random() * P.length)]; snd('thud', { g: .9, r: .32 + Math.random() * .12 });
+      if (A) { const b = A.g.getWorldPosition(_hwAgeV); for (let i = 0; i < 2; i++) spkBurst(b.x + (Math.random() - .5) * 14, b.y + .4, b.z + (Math.random() - .5) * 14, 14, { col: [.72, .62, .5], spread: 5, size: .5, life: 1.1 }); } } }
+  else if (!W.go) { W.go = 1; AGE.jit = 0; camShake(.55); snd('boom', { g: 1.1, r: .6 }); for (const A of P) restorePlay(A.R_, W.goal); rwSkyTo(W.sky); }
+  if (W.go) { const u = rsEase((W.t - W.rumble) / W.isl), y = -W.sink * (W.goal ? 1 - u : u); for (const o of HOME.skyIsl || []) { o.position.y = y; o.visible = W.goal || u < 1; } }
+  if (!W.pk && W.t > W.rumble + W.peakAt) { W.pk = 1; hwPeakAge(!W.goal); if (GPEAK.g) { spkBurst(gpeakX(), GPEAK.H * .6, GPEAK.z, 40, { col: W.goal ? [.55, 1, .8] : [.72, .62, .5], spread: 30, size: .7, life: 1.6 }); } }
+  if (W.t > W.rumble + W.end) { W.t = -1; AGE.jit = 0; } }
+const _hwAgeV = new THREE.Vector3();
 const GHOME = { on: 1, pass: 33, k: 1.4, liftA: 1.4, potFix: 25, P: 1.2, rx: 10, rz: 6.2, R: 4.6, t: .5, Hw: 6, Hd: 3.4, T: [7.2, -.6], Rt: 3.2, Ht: 9, Yb: 5.4, Wc: [-6.6, .8], Rw: 3.2, Hwg: 3.2,
   Rtu: 2.5, door: 1.8, doorH: 2.6, shopW: 3.8, shopH: 3.4, part: -1, rise: .3, g: null, stat: {} };
 try { const q = new URLSearchParams(location.search).get('hut') || localStorage.getItem('mel.hut'); if (q === 'glb') GHOME.on = 0; } catch (e) {}
@@ -68402,7 +68435,7 @@ function ghomeRestoreRig(MG) { const A = GHOME, N = A.chNames.length, U = A.chU 
     const pl = new THREE.Mesh(new THREE.CylinderGeometry(.9, .95, .12, 24), new THREE.MeshStandardMaterial({ color: 0x9afce0, emissive: 0x30d0a0, emissiveIntensity: 1.2, roughness: .4 })); pl.position.set(wx, wy, wz); scene.add(pl); A.plate = pl; R.trig = { x: wx, y: wy, z: wz, armed: 1 }; }
   const t0 = hsF() ? 0 : 1; R.goal = t0; restoreSet(R, t0); for (const P of R.pieces) P.landed = t0; ghomeRestoreSync(); }
 function ghomeRestoreSync() { const A = GHOME; if (!A.chU || !A.stand) return; const M = new THREE.Matrix4(), T = new THREE.Matrix4();
-  for (let k = 1; k < A.chNames.length; k++) { const d = A.stand[k - 1]; if (!d) continue; M.compose(d.position, d.quaternion, new THREE.Vector3(1, 1, 1)); T.makeTranslation(-d.userData.piv.x, -d.userData.piv.y, -d.userData.piv.z); A.chU.value[k].multiplyMatrices(M, T); }
+  for (let k = 1; k < A.chNames.length; k++) { const d = A.stand[k - 1]; if (!d) continue; M.compose(d.position, d.quaternion, new THREE.Vector3(1, 1, 1)); if (AGE.jit) ageJit(M, k); T.makeTranslation(-d.userData.piv.x, -d.userData.piv.y, -d.userData.piv.z); A.chU.value[k].multiplyMatrices(M, T); }
   const R = A.R_, t = R ? R.t : 1; if (A.orb) A.orb.visible = t > .9; if (A.cable) A.cable.visible = t > .9 && (A.drop || 0) > .02;
   if (A.drain) A.drain.value = 1 - rsEase((t - .15) / .6);
   if (R && A.g) { for (let i = 0; i < R.pieces.length; i++) { const P = R.pieces[i], u = Math.min(1, Math.max(0, (t - P.at * .55) / .45)); if (!P.landed && u > .985 && R.goal === 1) { P.landed = 1; const w = A.g.localToWorld(P.obj.userData.piv.clone()); spkBurst(w.x, w.y + .5, w.z, 26, { col: [.5, 1, .78], spread: 5, size: .16, life: .8 }); snd('thud', { g: .7, r: 1.2 + Math.random() * .3, x: w.x, z: w.z }); camShake(.08); } if (u < .5) P.landed = 0; }
@@ -68427,7 +68460,7 @@ function rsChunkRig(A, MG, fallen, plate, extra) { const N = A.chNames.length, U
   if (plate) { const pl = new THREE.Mesh(new THREE.CylinderGeometry(.9, .95, .12, 24), new THREE.MeshStandardMaterial({ color: 0x9afce0, emissive: 0x30d0a0, emissiveIntensity: 1.2, roughness: .4 })); pl.position.set(...plate); scene.add(pl); A.plate = pl; R.trig = { x: plate[0], y: plate[1], z: plate[2], armed: 1 }; }
   const t0 = hsF() ? 0 : 1; R.goal = t0; restoreSet(R, t0); for (const P of R.pieces) P.landed = t0; rsChunkSync(A); return R; }
 function rsChunkSync(A) { if (!A.chU || !A.stand) return; const M = new THREE.Matrix4(), T = new THREE.Matrix4(), one = new THREE.Vector3(1, 1, 1);
-  for (let k = 1; k < A.chNames.length; k++) { const d = A.stand[k - 1]; if (!d) continue; M.compose(d.position, d.quaternion, one); T.makeTranslation(-d.userData.piv.x, -d.userData.piv.y, -d.userData.piv.z); A.chU.value[k].multiplyMatrices(M, T); }
+  for (let k = 1; k < A.chNames.length; k++) { const d = A.stand[k - 1]; if (!d) continue; M.compose(d.position, d.quaternion, one); if (AGE.jit) ageJit(M, k); T.makeTranslation(-d.userData.piv.x, -d.userData.piv.y, -d.userData.piv.z); A.chU.value[k].multiplyMatrices(M, T); }
   const R = A.R_, t = R ? R.t : 1; if (A.drain) A.drain.value = 1 - rsEase((t - .15) / .6);
   if (R && A.g) { for (const P of R.pieces) { const u = Math.min(1, Math.max(0, (t - P.at * .55) / .45)); if (!P.landed && u > .985 && R.goal === 1) { P.landed = 1; const w = P.obj.userData.piv ? A.g.localToWorld(P.obj.userData.piv.clone()) : P.obj.getWorldPosition(new THREE.Vector3()); spkBurst(w.x, w.y + .5, w.z, 26, { col: [.5, 1, .78], spread: 5, size: .16, life: .8 }); snd('thud', { g: .7, r: 1.2 + Math.random() * .3, x: w.x, z: w.z }); camShake(.06); } if (u < .5) P.landed = 0; }
     if (A.plate) A.plate.material.emissiveIntensity = R.trig && R.trig.armed ? .9 + .6 * Math.sin(performance.now() * .004) : .3; }
@@ -69994,7 +70027,7 @@ function hollowDress() {
       if (r() < .7) { const f = new THREE.PlaneGeometry(s * .25, y * 1.1); f.translate(x + s * .7, y - y * .55, z); f.rotateY(0); fall.push(aBobOf(f, i + 1)); } }
     // his (after m1704): fallen and restored read as a HYBRID -- these sky islands floated over a fallen valley. KORAJIN: the floating world is
     // what RESTORATION raises, so FALLEN has none
-    const sky = AGE.st !== 'fallen'; rwMesh(isl, bobPatch(hwPaint(rwMat(0xb7744e, { flatShading: true }), 'cliff'), 1.4, .32)).visible = sky; rwMesh(top, bobPatch(hwPaint(rwMat(0x5f8a45), 'sand'), 1.4, .32)).visible = sky; if (fall.length) { const fm = rwMesh(fall, bobPatch(new THREE.MeshBasicMaterial({ color: 0xeaf6ff, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false }), 1.4, .32), false); fm.renderOrder = 3; fm.visible = sky; } }
+    const sky = AGE.st !== 'fallen', SI = H.skyIsl = []; SI.push(rwMesh(isl, bobPatch(hwPaint(rwMat(0xb7744e, { flatShading: true }), 'cliff'), 1.4, .32)), rwMesh(top, bobPatch(hwPaint(rwMat(0x5f8a45), 'sand'), 1.4, .32))); for (const o of SI) o.visible = sky; if (fall.length) { const fm = rwMesh(fall, bobPatch(new THREE.MeshBasicMaterial({ color: 0xeaf6ff, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false }), 1.4, .32), false); fm.renderOrder = 3; fm.visible = sky; SI.push(fm); } }
   // HIS STONE LANTERNS on the approach
   { const st = [], lit = []; for (const [dx, dz] of [[9, -3.2], [9, 3.2], [6.2, -3.2], [6.2, 3.2]]) { const x = H.hut.at[0] + dx + (H.hutS ? 0 : 0), z = H.hut.at[1] + dz * (H.hutS || 1), y = rwHeight(x, z);     // in front of the door (the hut faces the river, +x)
       st.push(B(.9, .3, .9, x, y + .15, z), Cy(.16, .2, 1.1, x, y + .85, z, 6), B(.7, .18, .7, x, y + 1.45, z), B(1.05, .2, 1.05, x, y + 2.2, z), Cy(.0, .62, .45, x, y + 2.5, z, 4));
@@ -70081,7 +70114,7 @@ function homeLanterns() {
 }
 function homeStep(dt) {
   const H = HOME; H.t += dt; if (RW.U) RW.U.uTime.value = H.t;
-  gmillStep(dt, H.t); gpeakStep(dt); gjinraStep(dt, H.t); caveStep(dt); mshopStep(dt); HWBOB.t.value += dt; if (GMERCH.g) rsChunkSync(GMERCH);
+  hwAgeStep(dt); rwSkyStep(dt); gmillStep(dt, H.t); gpeakStep(dt); gjinraStep(dt, H.t); caveStep(dt); mshopStep(dt); HWBOB.t.value += dt; if (GMERCH.g) rsChunkSync(GMERCH);
   if (GHOME.U) GHOME.U.uWind.value = H.t; ghomeSmoke(dt, H.t); ghomeShut(dt); ghomeLift(dt); ghomePots(dt); for (const G of GHOME.gates || []) bgateStep(G, dt);     // pass 9: his back door
   if (GHOME.canoe) { const C = GHOME.canoe, t = H.t; C.g.position.y = C.y + rwWaveAt(C.x, C.z, t) * .8 * (1 - Math.min(1, (C.lift || 0) * 2)) + .02 + (C.lift || 0); C.ht = (C.ht == null ? 12 : C.ht) - dt; if (C.ht <= 0 && !C.hu) { C.hu = 1e-3; } if (C.hu) { C.hu += dt; if (C.hu > 6) { C.hu = 0; C.ht = 18 + Math.random() * 20; const P = C.g.getWorldPosition(new THREE.Vector3()); spkBurst(P.x, GHOME.g.position.y + C.y + .05, P.z, 30, { col: [.85, .93, 1], spread: 4, size: .09, life: .6 }); snd('thud', { g: .5, r: .7, x: P.x, z: P.z }); } }     // pass 24: now and then it LIFTS on its discs, hangs dripping, and settles
   const lift = C.hu ? .5 * Math.min(1, C.hu / 1.4) * Math.min(1, Math.max(0, (6 - C.hu) / 1.2)) : 0; if (lift > .05 && Math.random() < dt * 14) { const P = C.g.localToWorld(new THREE.Vector3((Math.random() - .5) * .8, -.4, (Math.random() - .5) * 4)); spkBurst(P.x, P.y, P.z, 2, { col: [.8, .9, 1], spread: .4, size: .05, life: .5 }); }

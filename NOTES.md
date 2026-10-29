@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## THE LIVE TURN: watch the Red Hollows fall or rise, no reload (Worker B)
+His (after m1731): "we need to build a transition between the two so you can actually physically watch one kind of rumble and shake and then
+convert into the other one". The STATE button (and GOD > RED HOLLOWS) no longer reloads: `hwAgeLive()` flips `AGE.st` and `hwAgeStep` plays
+it. `HWAGE.rumble` (1.8 s): the camera shakes, low thuds, dust bursts round a random place, and every chunk of every chunked place shudders
+in place (`AGE.jit`, added to the chunk matrix in `rsChunkSync` and `ghomeRestoreSync` by `ageJit`). Then one boom and all four chunked
+places (home, mill, merchant, refinery) play their own RESTORE show at once (`restorePlay`), forwards or backwards; the SKY CROSSFADES
+(`rwSkyTo`: the other state's panorama loads into `uPanoB`, `uPanoMix` 0 -> 1 over `HWAGE.sky` 7 s while the sun's direction and the
+sun/hemi colours follow, then B becomes A and the reflection map is rebuilt); the sky islands rise 140 m out of the valley or sink into it
+(`HWAGE.isl` 9 s); and at `peakAt` the peak's paint floods back or drains (`hwPeakAge`, which keeps each mesh's own material in
+`userData.m0` so the weathering can be undone -- `bldAge` alone could not). Everything else that reads the state per frame (the peak
+fire, the shutters, the lamps, the wheel, the refinery's colliders) follows by itself. `?hs=` is dropped from the address with
+`replaceState` so a reload lands in the state he turned it to. The timings are in `HWAGE`.
 ## THE STONE GUARDIAN: his four-armed boss, Tripo + a scripted rig (m1732)
 His: "Make this guy in Tripo and rig him -- he's got four arms, so I don't know if the auto rigger is gonna have that under control... a boss,
 pretty big... maybe he throws boulders... in pieces, so we can knock off his arms." GUARDIAN.md has the pipeline and the DONE WHEN.
