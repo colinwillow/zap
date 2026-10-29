@@ -65895,6 +65895,7 @@ function godMenuOpen(on) {
   btn('FLY ' + (GOD.fly ? 'ON' : 'OFF'), () => { godFly(!GOD.fly); godMenuOpen(1); });
   // the Red Hollows' state on the phone (his ask: "how can I see it in all its glory"): main's AGE, saved; reloads (a `?hs=` would win, so it goes)
   if (inHome()) btn('RED HOLLOWS: ' + (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + ' (tap: watch it turn ' + (AGE.st === 'fallen' ? 'RESTORED' : 'FALLEN') + ')', () => hwAgeLive());
+  if (inHome() && GCASTLE.plaza) btn('GO: SKY CASTLE (the landmass, ' + (AGE.st === 'fallen' ? 'hidden while FALLEN' : 'restored') + ')', () => { const [x, y, z] = GCASTLE.plaza; player.pos.set(x, y + 1, z); player.vel.set(0, 0, 0); godMenuOpen(0); });
   if (inAW()) btn('ALIEN BUILDINGS ' + (AW.bldOn ? 'ON' : 'OFF') + ' (reloads; ' + AW.bld + ' placed, ' + AW.missing.length + ' missing)', () => { try { localStorage.setItem('mel.awbld', AW.bldOn ? '0' : '1'); } catch (e) {} location.replace(location.pathname); });   // m434
   { const al = /alien_pano/.test(SKY.img); btn('SKY: ' + (al ? 'THE ALIEN PANO' : 'THE GAME HDRI') + ' (tap for ' + (al ? 'the game HDRI' : 'the alien pano') + ', reloads)', () => { try { localStorage.setItem('mel.skypick', al ? 'game' : 'alien'); } catch (e) {} location.replace(location.pathname); }); }   // m435
   btn('ALL KIT ' + (GEAR.all ? 'ON' : 'OFF') + ' (campaign: everything, not just what he has found)', () => { GEAR.all = GEAR.all ? 0 : 1; try { localStorage.setItem('mel.allkit', GEAR.all ? '1' : '0'); } catch (e) {} GEAR.pack = gearHas('pack'); gearSync(1); godMenuOpen(1); });   // m465
@@ -68903,7 +68904,7 @@ function ghPathMat() { if (ghPathMat.m) return ghPathMat.m; const cv = document.
 // geometry has no UVs) and MULTIPLIES the existing colour by map / its own linear mean -- so the palette, the strata bands, the moss and the
 // FALLEN drain all stay what they were and the paint is the detail. 'land': sand on the flats, cliff on the steeps (by slope); 'rock': the rock
 // map. It goes in BEFORE `color_fragment`, so a drain spliced after it still has the last word. `HWPAINT.k` is the strength (0 = off)
-const HWPAINT = { k: .85, sand: { n: 'hollows_sand', s: 7, mean: [.8579, .2564, .0882] }, rock: { n: 'hollows_rock', s: 3.2, mean: [.485, .1559, .0497] }, cliff: { n: 'hollows_cliff', s: 12, mean: [.4453, .0731, .0466] }, pebble: { n: 'hollows_pebble', s: 3, mean: [.2112, .1599, .0906] }, leaves: { n: 'hollows_leaves', s: 1.6, mean: [.1402, .222, .0632] },
+const HWPAINT = { k: .85, sand: { n: 'hollows_sand', s: 7, mean: [.8579, .2564, .0882] }, rock: { n: 'hollows_rock', s: 3.2, mean: [.485, .1559, .0497] }, cliff: { n: 'hollows_cliff', s: 12, mean: [.4453, .0731, .0466] }, pebble: { n: 'hollows_pebble', s: 3, mean: [.2112, .1599, .0906] }, leaves: { n: 'hollows_leaves', s: 1.6, mean: [.1402, .222, .0632] }, cream: { n: 'hollows_cream', s: 6, mean: [.7388, .5185, .2415] },
   planks: { n: 'wood_planks', s: 2.2, mean: [.0648, .022, .016] }, timber: { n: 'wood_timber', s: 1.6, mean: [.1474, .0826, .0409] }, stone: { n: 'stone_blocks', s: 2.4, mean: [.1351, .1359, .1267] } };
 // pass 3: the texture library's planks / timber / stone by the same rule (the bridges, poles, the stone lanterns), and the caves and sky islands
 // pass 2: kinds 'cliff' (triplanar cliff: the ledge paths' retaining faces), 'sand' (the walkways), and on 'land' the PEBBLE bed below the waterline
@@ -69951,20 +69952,50 @@ function hwPoolMat(R, F) { return new THREE.ShaderMaterial({ uniforms: { uT: HWF
         float st = .5 + .5 * sin(vP.x * 2.3 + sin(vP.y * 1.7 + uT * .6) * 1.8 - uT * .8);
         vec3 c = mix(vec3(.16, .48, .62), vec3(.42, .78, .9), smoothstep(.2, 1., r)) + vec3(.55, .6, .6) * (ring * ring * rf * .6 + st * .08);
         gl_FragColor = vec4(c, smoothstep(1., .82, r) * (.78 + .15 * ring * rf)); }` }); }
-function gjFall(A, g, islG, R, Y0, put, stone, at4) { const a = 2.4, sa = Math.sin(a), ca = Math.cos(a), tx = ca, tz = -sa, wedge = .16, pts = [];
+// THE SKY CASTLE (his, after m1765: images/korajin/ref/sky_castle_*.jpg; BUILDINGS.md THE SKY CASTLE) -- the next hero building, high over
+// the west plateau on its own big landmass. LANDMASS PASS 1 (m1769): a great lobe of cream rock (`hwIslLobe`, detail 4, his cream rock map)
+// ringed by seven bastion lobes at slightly different heights (each a tower's foot later), twenty pendant lobes hanging under it in uneven
+// spikes, a green cap cut to every lobe's outline, a paved PLAZA at the centre for the keep, and TWO waterfalls off the front (`gjFall`, white
+// water, a 70 m drop) between the bastions. Local +z faces the canyon. Restored-only, it rises and sinks with the sky islands (`skyIsl`).
+// Walkable: the plaza and every cap; the lobes are solid (`hwSolid`). GOD > GO: SKY CASTLE puts him on the plaza
+const GCASTLE = { on: 1, pass: 1, at: [-118, -88], Y0: 116, R: 30, g: null, stat: {} };
+function gcastleBuild() { const A = GCASTLE, [cx, cz] = A.at, Y0 = A.Y0, R = A.R, yaw = Math.atan2(-cx, -cz), c = Math.cos(yaw), s = Math.sin(yaw), rnd = rwRng(1769);
+  const g = new THREE.Group(); g.position.set(cx, 0, cz); g.rotation.y = yaw; scene.add(g); A.g = g; A.yaw = yaw;
+  const Wx = (x, z) => cx + x * c + z * s, Wz = (x, z) => cz - x * s + z * c, MG = new Map(), _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _v = new THREE.Vector3();
+  const at4 = (x, y, z, ry = 0, rx = 0, rz = 0) => _m4.compose(_v.set(x, y, z), _q.setFromEuler(_e.set(rx, ry, rz)), new THREE.Vector3(1, 1, 1));
+  const put = (geo, m, mat4) => { geo = geo.index ? geo.toNonIndexed() : geo; for (const k of Object.keys(geo.attributes)) if (k !== 'position' && k !== 'normal') geo.deleteAttribute(k); if (mat4) geo.applyMatrix4(mat4); if (!geo.attributes.normal) geo.computeVertexNormals(); if (!MG.has(m)) MG.set(m, []); MG.get(m).push(geo); };
+  const rockM = hwPaint(new THREE.MeshStandardMaterial({ color: 0xe2bc94, roughness: .9, flatShading: true }), 'cream'), capM = hwPaint(new THREE.MeshStandardMaterial({ color: 0x86a858, roughness: .95 }), 'sand'), paveM = hwPaint(new THREE.MeshStandardMaterial({ color: 0xf0e2c8, roughness: .85 }), 'stone'), stone = paveM;
+  const islG = [], tris = [], solid = [], wv = new THREE.Vector3(), lobe = (sd, rx, dp, rz, x, y, z, det, cap) => { const L = hwIslLobe(sd, rx, dp, rz, det), ry = rnd() * 6.28; L.rotateY(ry); L.translate(x, y, z); islG.push(L.clone()); solid.push(L.clone()); put(L, rockM);
+      if (cap) { const C = hwIslCap(sd, rx, L.userData.rim, cap); C.rotateY(ry); C.translate(x, y + .05 + (cap < .05 ? .5 : 0), z); put(C.clone(), capM); const p = C.attributes.position; for (let i = 0; i < p.count; i += 3) for (let j = 0; j < 3; j++) { wv.set(p.getX(i + j), p.getY(i + j) + .02, p.getZ(i + j)).applyMatrix4(g.matrixWorld); tris.push(wv.x, wv.y, wv.z); } } };
+  g.updateMatrixWorld(true);
+  lobe(9001, R, R * 1.6, R * .92, 0, Y0 - 1.3, 0, 4, .03);
+  const bast = []; for (let k = 0; k < 7; k++) { const a = k / 7 * Math.PI * 2 + .22, q = R * (.88 + rnd() * .14), rs = R * (.28 + rnd() * .12), y = Y0 - 1.3 + ((k % 3) - 1) * 1.3; bast.push([Math.sin(a) * q, y, Math.cos(a) * q, rs]); lobe(9010 + k, rs, rs * (1.6 + rnd() * 1.4), rs * (.85 + rnd() * .2), Math.sin(a) * q, y, Math.cos(a) * q, 3, .1); }
+  for (let k = 0; k < 20; k++) { const a = rnd() * 6.28, q = rnd() * R * .75, rs = 2.5 + rnd() * 4.5; lobe(9030 + k, rs, rs * (2 + rnd() * 2.2), rs * (.8 + rnd() * .3), Math.sin(a) * q, Y0 - 10 - rnd() * 18, Math.cos(a) * q, 2, 0); }
+  // the PLAZA: a paved disc at the centre, a step up from the green, where the keep will stand
+  { const pr = R * .55, N = 40; put(new THREE.CylinderGeometry(pr, pr + .3, .8, N), paveM, at4(0, Y0 + .1, 0)); for (let i = 0; i < N; i++) { const a0 = i / N * Math.PI * 2, a1 = (i + 1) / N * Math.PI * 2; for (const [x, z] of [[0, 0], [Math.sin(a0) * pr, Math.cos(a0) * pr], [Math.sin(a1) * pr, Math.cos(a1) * pr]]) { wv.set(x, Y0 + .51, z).applyMatrix4(g.matrixWorld); tris.push(wv.x, wv.y, wv.z); } } A.plaza = [Wx(0, 0), Y0 + .5, Wz(0, 0)]; }
+  // TWO WATERFALLS off the front, between the bastions: the rock in their wedge measured, their throw the least that clears it
+  A.falls = [-.42, .42].map(a => gjFall(A, g, islG, R, Y0 + .2, put, stone, at4, { a, H: 70, rin: .5, col: [[.5, .72, .9], [.92, .97, 1]], keep: 1 }));
+  let draws = 0; for (const [m, list] of MG) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = o.receiveShadow = true; g.add(o); draws++; }
+  for (let i = 0; i < tris.length; i += 9) { const q = tris.slice(i, i + 9); triAdd(...q); triAdd(q[0], q[1], q[2], q[6], q[7], q[8], q[3], q[4], q[5]); }
+  let nb = 0; for (const L of solid) { L.applyMatrix4(g.matrixWorld); nb += hwSolid(L, 1.5, Y0 - 60); }
+  const sky = AGE.st !== 'fallen'; g.visible = sky; (HOME.skyIsl = HOME.skyIsl || []).push(g);
+  A.stat = { draws, boxes: nb, tris: (tris.length / 9) | 0, bastions: bast.length };
+  console.log('[melee] the sky castle (landmass pass 1): ' + draws + ' draws, ' + nb + ' rock columns, ' + A.stat.tris + ' walk tris, top ' + Y0 + ' m at ' + A.at); }
+function gjFall(A, g, islG, R, Y0, put, stone, at4, o = {}) { const a = o.a ?? 2.4, sa = Math.sin(a), ca = Math.cos(a), tx = ca, tz = -sa, wedge = .16, pts = [];
   for (const q of islG) { const p = q.attributes.position; for (let i = 0; i < p.count; i++) { const x = p.getX(i), z = p.getZ(i); let d = Math.atan2(x, z) - a; d = Math.atan2(Math.sin(d), Math.cos(d)); if (Math.abs(d) < wedge) pts.push([Math.hypot(x, z), p.getY(i)]); } }
   let r0 = R * .9; for (const [r, y] of pts) if (y > Y0 - 3) r0 = Math.max(r0, r); r0 += .25;
   let v0 = 1.5; for (const [r, y] of pts) { const h = Y0 - y; if (h > .4 && r + .6 > r0) v0 = Math.max(v0, (r + .6 - r0) / Math.sqrt(2 * h / 9.8)); } v0 = Math.min(v0, 7);
-  const H = 44, rin = R * .55, path = []; for (let k = 0; k <= 4; k++) path.push([rin + (r0 - rin) * k / 4, Y0 + .08]); for (let k = 1; k <= 30; k++) { const h = H * (k / 30) ** 1.4; path.push([r0 + v0 * Math.sqrt(2 * h / 9.8), Y0 + .08 - h]); }
+  const H = o.H ?? 44, rin = R * (o.rin ?? .55), path = []; for (let k = 0; k <= 4; k++) path.push([rin + (r0 - rin) * k / 4, Y0 + .08]); for (let k = 1; k <= 30; k++) { const h = H * (k / 30) ** 1.4; path.push([r0 + v0 * Math.sqrt(2 * h / 9.8), Y0 + .08 - h]); }
   let L = 0; const len = [0]; for (let k = 1; k < path.length; k++) { L += Math.hypot(path[k][0] - path[k - 1][0], path[k][1] - path[k - 1][1]); len.push(L); }
-  const pos = [], uv = [], idx = [], lip = (r0 - rin) / L; A.fallPts = [];
-  path.forEach(([r, y], k) => { const f = Math.max(0, (r - r0) / (v0 * Math.sqrt(2 * H / 9.8) + 1e-3)), w = 1.5 + f * 2.6 + (r < r0 ? 0 : .3); for (const sgn of [-1, 1]) { pos.push(sa * r + tx * w * sgn, y, ca * r + tz * w * sgn); uv.push(sgn < 0 ? 0 : 1, len[k] / L); } if (k > 3) A.fallPts.push([sa * r, y, ca * r]); });
+  const pos = [], uv = [], idx = [], lip = (r0 - rin) / L, FP = [];
+  path.forEach(([r, y], k) => { const f = Math.max(0, (r - r0) / (v0 * Math.sqrt(2 * H / 9.8) + 1e-3)), w = 1.5 + f * 2.6 + (r < r0 ? 0 : .3); for (const sgn of [-1, 1]) { pos.push(sa * r + tx * w * sgn, y, ca * r + tz * w * sgn); uv.push(sgn < 0 ? 0 : 1, len[k] / L); } if (k > 3) FP.push([sa * r, y, ca * r]); });
   for (let k = 0; k < path.length - 1; k++) { const i = k * 2; idx.push(i, i + 2, i + 1, i + 1, i + 2, i + 3); }
   const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); geo.setIndex(idx);
-  const mat = hwFallMat(lip);
-  const m = new THREE.Mesh(geo, mat); m.renderOrder = 3; g.add(m); A.fall = m;
+  const mat = o.col ? hwFallMat(lip, 0, null, o.col[0], o.col[1]) : hwFallMat(lip);
+  const m = new THREE.Mesh(geo, mat); m.renderOrder = 3; g.add(m); if (!o.keep) { A.fall = m; A.fallPts = FP; }
   for (const sgn of [-1, 1]) { put(new THREE.BoxGeometry(.45, .38, r0 - rin + .4), stone, at4(sa * (rin + r0) / 2 + tx * 1.8 * sgn, Y0 + .1, ca * (rin + r0) / 2 + tz * 1.8 * sgn, a));
-    put(ghRockGeo(7190 + sgn, 1.3, 1.6, 1.1, 2), stone, at4(sa * (r0 - .4) + tx * 2.5 * sgn, Y0 - .2, ca * (r0 - .4) + tz * 2.5 * sgn, a + sgn)); } }
+    put(ghRockGeo(7190 + sgn, 1.3, 1.6, 1.1, 2), stone, at4(sa * (r0 - .4) + tx * 2.5 * sgn, Y0 - .2, ca * (r0 - .4) + tz * 2.5 * sgn, a + sgn)); }
+  return { m, pts: FP }; }
 function gjinraStep(dt, t) { const A = GJINRA; if (!A.g) return; A.built = 1; const RT = rsChunkSync(A); gjinraBoxes(RT >= .999 ? 'R' : RT <= .001 ? 'F' : 'none');
   if (A.bOn === 'R') { const p = player, on = b => p.grounded && p.pos.x > b.minx - .1 && p.pos.x < b.maxx + .1 && p.pos.z > b.minz - .1 && p.pos.z < b.maxz + .1 && Math.abs(p.pos.y - b.maxy) < .35; let ride = 0;
     for (const b of A.bS) { const y1 = b.y1 + hwBobY(b.ph, A.bob, A.bobS), d = y1 - b.maxy; if (on(b)) ride = d; b.miny = b.y0 + (y1 - b.y1); b.maxy = y1; }
@@ -70484,6 +70515,7 @@ async function buildHome() {
   if (GMILL.on && H.style !== 'lake') try { gmillBuild(); } catch (e) { console.error('[melee] water mill', e); note('MILL BUILD THREW'); }
   if (GPEAK.on && H.style !== 'lake') try { gpeakBuild(); } catch (e) { console.error('[melee] the peak', e); note('PEAK BUILD THREW'); }
   if (GJINRA.on && GPEAK.on && H.style !== 'lake') try { gjinraBuild(); } catch (e) { console.error('[melee] jinra refinery', e); note('JINRA BUILD THREW'); }
+  if (GCASTLE.on && H.style !== 'lake') try { gcastleBuild(); } catch (e) { console.error('[melee] sky castle', e); note('SKY CASTLE BUILD THREW'); }
   if (H.style !== 'lake') { for (const P of [GPEAK]) hsFallen(P.g); }     // FALLEN: weathered, unlit
   else try { const g = await loadGLB(H.hut.file, 'loading the refuge');
     const m = g.scene, drop = []; m.traverse(o => { if (o.isLight) drop.push(o); }); for (const o of drop) o.removeFromParent();
@@ -70762,7 +70794,7 @@ function hwIslLobe(seed, rx, dp, rz, det = 2) { const g = new THREE.IcosahedronG
     p.setXYZ(i, x * rx, y * (y >= 0 ? rx : dp), z * rz); }
   for (let k = 0; k < 24; k++) { const b = k / 24 * 6.2832, x = Math.cos(b), z = Math.sin(b), n1 = ghNoise3(x * 1.6 + o, o * .3, z * 1.6 - o), n2 = ghNoise3(x * 4.1 - o, o, z * 4.1 + o * .7); rim.push([x * rx * (1 + (n1 - .5) * .55 + (n2 - .5) * .2) * .97, z * rz * (1 + (n1 - .5) * .55 + (n2 - .5) * .2) * .97]); }
   g.deleteAttribute('uv'); g.computeVertexNormals(); g.userData.rim = rim; return g; }
-function hwIslCap(seed, rs, rim) { const n = rim.length, pos = [0, rs * .1, 0]; for (const [x, z] of rim) pos.push(x, .02 + ghNoise3(x * .4 + seed, 0, z * .4) * rs * .03, z);
+function hwIslCap(seed, rs, rim, ch = .1) { const n = rim.length, pos = [0, rs * ch, 0]; for (const [x, z] of rim) pos.push(x, .02 + ghNoise3(x * .4 + seed, 0, z * .4) * rs * .03, z);
   const idx = []; for (let k = 0; k < n; k++) idx.push(0, 1 + (k + 1) % n, 1 + k); const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); return g.toNonIndexed(); }
 // m1757: a ROCK MADE SOLID -- its own triangles rastered onto a grid of `c` m cells; each cell a column from `y0` up to the highest triangle
 // over the cell's centre. The rim lumps were 40 rocks of 3-8 m with no
@@ -70833,7 +70865,7 @@ function hollowDress() {
   // out, different textures". Each island is now a cluster of LOBES (`hwIslLobe`: a noisy sphere with a flat top and a short, tapering,
   // lumpy underside, never a straight edge), a grass cap cut to each lobe's own outline, loose rocks hanging under it, a few round trees and
   // boulders on top; half are strata rock, half red cliff. Everything rides its island's own bob phase
-  { const isl = [[], []], top = [], tree = [], fall = []; const jx = gpeakX() + GJINRA.dx, jz = GPEAK.z + GJINRA.dz; for (let i = 0; i < 9; i++) { let a = r() * 6.2832, R = 120 + r() * 160; for (let t = 0; t < 12 && Math.hypot(Math.cos(a) * R * .7 - jx, Math.sin(a) * R - jz) < 70; t++) a += .5; const x = Math.cos(a) * R * .7, z = Math.sin(a) * R, y = 55 + r() * 80, s = 8 + r() * 14, body = isl[i % 2], ph = i + 1;
+  { const isl = [[], []], top = [], tree = [], fall = []; const jx = gpeakX() + GJINRA.dx, jz = GPEAK.z + GJINRA.dz; for (let i = 0; i < 9; i++) { let a = r() * 6.2832, R = 120 + r() * 160; for (let t = 0; t < 12 && (Math.hypot(Math.cos(a) * R * .7 - jx, Math.sin(a) * R - jz) < 70 || Math.hypot(Math.cos(a) * R * .7 - GCASTLE.at[0], Math.sin(a) * R - GCASTLE.at[1]) < 80); t++) a += .5; const x = Math.cos(a) * R * .7, z = Math.sin(a) * R, y = 55 + r() * 80, s = 8 + r() * 14, body = isl[i % 2], ph = i + 1;
       const nl = 2 + Math.floor(r() * 4), lobes = [[0, 0, 0, s, s * (.6 + r() * .5)]];
       for (let k = 1; k < nl; k++) { const b = r() * 6.2832, q = s * (.55 + r() * .4), rs = s * (.3 + r() * .35); lobes.push([Math.cos(b) * q, -r() * s * .25 - .4, Math.sin(b) * q, rs, rs * (.7 + r() * 1.1)]); }
       lobes.forEach(([lx, ly, lz, rs, dp], k) => { const sd = i * 13 + k * 3 + 1, L = hwIslLobe(sd, rs, dp, rs * (.75 + r() * .5)), ry = r() * 6.28; L.rotateY(ry); L.translate(x + lx, y + ly, z + lz); body.push(aBobOf(L, ph));
@@ -70843,7 +70875,7 @@ function hollowDress() {
       if (r() < .7) { const fh = y * (.35 + r() * .2), f = new THREE.PlaneGeometry(s * .25, fh, 1, 10), fp = f.attributes.position; for (let k = 0; k < fp.count; k++) { const v = .5 - fp.getY(k) / fh; fp.setX(k, fp.getX(k) * (1 + v * 2.2)); }  f.translate(x + s * .85, y - fh / 2, z); fall.push(aBobOf(f, ph)); } }
     // his (after m1704): fallen and restored read as a HYBRID -- these sky islands floated over a fallen valley. KORAJIN: the floating world is
     // what RESTORATION raises, so FALLEN has none
-        const sky = AGE.st !== 'fallen', SI = H.skyIsl = []; SI.push(rwMesh(isl[0], bobPatch(hwPaint(rwMat(0xc08860, { flatShading: true }), 'rock'), 1.4, .32)), rwMesh(isl[1], bobPatch(hwPaint(rwMat(0xb7744e, { flatShading: true }), 'cliff'), 1.4, .32)), rwMesh(top, bobPatch(hwPaint(rwMat(0x6a9448), 'sand'), 1.4, .32)), rwMesh(tree, bobPatch(hwPaint(rwMat(0x4f7e3c, { flatShading: true }), 'leaves'), 1.4, .32))); for (const o of SI) o.visible = sky; if (fall.length) { const fm = rwMesh(fall, hwFallMat(-1, 1, [1.4, .32], [.5, .72, .9], [.92, .97, 1]), false); fm.renderOrder = 3; fm.visible = sky; SI.push(fm); } }
+        const sky = AGE.st !== 'fallen', SI = H.skyIsl = H.skyIsl || []; SI.push(rwMesh(isl[0], bobPatch(hwPaint(rwMat(0xc08860, { flatShading: true }), 'rock'), 1.4, .32)), rwMesh(isl[1], bobPatch(hwPaint(rwMat(0xb7744e, { flatShading: true }), 'cliff'), 1.4, .32)), rwMesh(top, bobPatch(hwPaint(rwMat(0x6a9448), 'sand'), 1.4, .32)), rwMesh(tree, bobPatch(hwPaint(rwMat(0x4f7e3c, { flatShading: true }), 'leaves'), 1.4, .32))); for (const o of SI) o.visible = sky; if (fall.length) { const fm = rwMesh(fall, hwFallMat(-1, 1, [1.4, .32], [.5, .72, .9], [.92, .97, 1]), false); fm.renderOrder = 3; fm.visible = sky; SI.push(fm); } }
   // HIS STONE LANTERNS on the approach
   { const st = [], lit = []; for (const [dx, dz] of [[9, -3.2], [9, 3.2], [6.2, -3.2], [6.2, 3.2]]) { const x = H.hut.at[0] + dx + (H.hutS ? 0 : 0), z = H.hut.at[1] + dz * (H.hutS || 1), y = rwHeight(x, z);     // in front of the door (the hut faces the river, +x)
       st.push(B(.9, .3, .9, x, y + .15, z), Cy(.16, .2, 1.1, x, y + .85, z, 6), B(.7, .18, .7, x, y + 1.45, z), B(1.05, .2, 1.05, x, y + 2.2, z), Cy(.0, .62, .45, x, y + 2.5, z, 4));

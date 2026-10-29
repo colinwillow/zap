@@ -285,7 +285,8 @@ out to satellite towers; on a huge island of chunky cream rock in hanging lobes,
 the front, iron-and-brass lantern spires and chains hanging under it, and small satellite islets (each with a little pagoda shrine and
 greenery) drifting round it on chains and lanterns. *"It's gonna need its own pretty large landmass... a few passes on the landmass...
 then start building the building, kinda like you built his home -- a ton of passes."*
-- [ ] landmass pass 1: the island -- a big multi-lobe body (`hwIslLobe`, the lumps of his rock detail: rounded blocks, holes), the flat
+- [x] **landmass pass 1 (m1769):** main lobe r30 + 7 bastions + 20 pendants, cream rock map, green caps, the paved plaza, two 70 m waterfalls; GOD > GO: SKY CASTLE
+- [ ] (was) landmass pass 1: the island -- a big multi-lobe body (`hwIslLobe`, the lumps of his rock detail: rounded blocks, holes), the flat
       top built as terraces for the castle, two waterfall notches (`hwFallMat`), placement (high, spread from the refinery: verticality)
 - [ ] landmass pass 2: the rock's face (its own cream rock map), ivy and moss over the lip, hanging chains and lantern spires, the bottom
 - [ ] landmass pass 3: the satellite islets with their pagoda shrines, chained and drifting; how he GETS UP there
