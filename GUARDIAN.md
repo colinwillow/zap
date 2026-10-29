@@ -8,7 +8,7 @@
     blender-addons/pipeline:  tripo.py out/guardian_3d front left back right --faces 9000     (120 credits)
                               orient.py textured.fbx in.glb -90                                 (faces -Y, grounded)
                               guardian_rig.py in.glb rig.glb                                    (the SCRIPTED rig: Auto-Rig Pro has no second arm pair)
-    m15xx, the PARTS route (his: "Tripo has a cut-up and make-whole feature"): seg.py out/guardian_seg <the texture task id>   (segment ~40 + complete 50 credits)
+    m1793, the PARTS route (his: "Tripo has a cut-up and make-whole feature"): seg.py out/guardian_seg <the texture task id>   (segment ~40 + complete 50 credits)
                               blender -b --python guardian_parts.py -- out/guardian_seg/complete.glb out/guardian_3d/in.glb out/guardian_parts/rig.glb out/guardian_parts/atlas.jpg 2048
                               (Tripo's 117 AI-completed parts fitted onto in.glb's box, ONE 2048 atlas packed per part, each part rigid on its nearest bone,
                                a part straddling a limb joint blended across it; no split, no caps) -> webp -> draco -> stone_guardian.glb, then the Forge as below

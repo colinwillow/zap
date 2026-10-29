@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The guardian rebuilt from TRIPO'S OWN PARTS (m15xx)
+## The guardian rebuilt from TRIPO'S OWN PARTS (m1793)
 *"I thought Tripo had a cut-up-and-make-whole feature that used AI and was quite a bit better than doing it in Blender -- give it a shot."*
 - It has: POST /mesh/segment (semantic parts) then /mesh/complete (AI-fills the surface each part hid). `seg.py` already existed in the pipeline
   (the boss and the CEO had been through it); the guardian never was. Run on his TEXTURED task: 117 parts, textured, 30,385 tris; ~90 credits.
