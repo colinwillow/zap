@@ -28647,20 +28647,29 @@ function proveStep() { const Z = PROVE, p = player; if (!Z.on) return;
       if (d > 1 || up > .8) { Z.log.unshift({ d, up, dy }); Z.log.length = Math.min(Z.log.length, 20); Z.best.d = Math.max(Z.best.d, d); Z.best.up = Math.max(Z.best.up, up);
         Z.el.innerHTML = 'JUMP <b>' + d.toFixed(1) + ' m</b> &nbsp;&uarr; ' + up.toFixed(1) + ' m &nbsp;' + (dy >= 0 ? '+' : '') + dy.toFixed(1) + ' m<br><span style="opacity:.7">BEST ' + Z.best.d.toFixed(1) + ' m far &middot; ' + Z.best.up.toFixed(1) + ' m up</span>'; } } } }
 function ropeBuild() { const Z = ROPEB; Z.want = 2; if (Z.on) return; const g = new THREE.Group(); scene.add(g);
-  const wood = new THREE.MeshStandardMaterial({ color: 0x8a5a34, roughness: .9 }), dark = new THREE.MeshStandardMaterial({ color: 0x5a3a22, roughness: .9 }), stone = new THREE.MeshStandardMaterial({ color: 0x9a948c, roughness: .95 });
+  // m15xx LOOK A (his: "red, Japanese, stylized, interesting -- alien and Japanese; towers, railings, the wood -- the pagoda style"): painted once
+  const T = ropeTex(), wood = new THREE.MeshStandardMaterial({ map: T.wood, roughness: .6, metalness: .05 }), dark = new THREE.MeshStandardMaterial({ color: 0x1a1416, roughness: .5 }),
+    stone = new THREE.MeshStandardMaterial({ map: T.stone, roughness: .95 }), red = new THREE.MeshStandardMaterial({ color: 0xb3261e, roughness: .35, metalness: .05 }),
+    gold = new THREE.MeshStandardMaterial({ color: 0xd8a640, roughness: .3, metalness: .8 }), jin = new THREE.MeshBasicMaterial({ color: 0x3ff0d8, toneMapped: false }),
+    lamp = new THREE.MeshStandardMaterial({ color: 0xd8382a, emissive: 0xff5a30, emissiveIntensity: 1.6, roughness: .6 }), paper = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .8, side: THREE.DoubleSide }),
+    straw = new THREE.MeshStandardMaterial({ map: T.rope, color: 0xe8c890, roughness: .95 });
   const box = (x0, x1, y0, y1, z0, z1, m) => { const o = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), m); o.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); o.castShadow = o.receiveShadow = true; g.add(o); BOXES.push({ minx: x0, maxx: x1, miny: y0, maxy: y1, minz: z0, maxz: z1 }); };
   const x0 = Z.x0, x1 = x0 + Z.L, zc = Z.z, H = Z.H, hw = Z.w / 2;
   box(x0 - 4, x0, 0, H, zc - 2.5, zc + 2.5, stone); box(x1, x1 + 4, 0, H, zc - 2.5, zc + 2.5, stone);     // the two towers
   for (let k = 0; k < 15; k++) box(x0 - 4 - (k + 1) * .42, x0 - 4 - k * .42, 0, H - k * .3, zc - 1.2, zc + 1.2, stone);     // stairs up to the first (a .3 rise: under his .357 step)
-  for (const sx of [x0 - .25, x1 + .25]) for (const sz of [-1, 1]) { const o = new THREE.Mesh(new THREE.CylinderGeometry(.12, .14, Z.rail + .5, 8), dark); o.position.set(sx, H + (Z.rail + .5) / 2, zc + sz * (hw + .05)); o.castShadow = true; g.add(o); }     // the posts
+  ropeDeco(g, { x0, x1, zc, H, hw, red, dark, gold, jin, lamp, paper, straw, stone });
   const N = Z.N, P = [], Q = [], sag = Math.sqrt(3 / 8 * Z.L * Z.L * (Z.slack - 1));
   for (let c = 0; c < 4; c++) { const a = new Float32Array((N + 1) * 3), sz = c % 2 ? 1 : -1, y0 = H - .02 + (c >= 2 ? Z.rail : 0);
     for (let i = 0; i <= N; i++) { const u = i / N; a[i * 3] = x0 + u * Z.L; a[i * 3 + 1] = y0 - sag * 4 * u * (1 - u); a[i * 3 + 2] = zc + sz * hw; } P.push(a); Q.push(a.slice()); }
   const seg = Z.L * Z.slack / N;
   const planks = new THREE.InstancedMesh(new THREE.BoxGeometry(1, .06, 1), wood, N - 1); planks.castShadow = planks.receiveShadow = true; planks.frustumCulled = false; g.add(planks);
-  const ropes = new THREE.InstancedMesh(new THREE.CylinderGeometry(.035, .035, 1, 5).translate(0, .5, 0), new THREE.MeshStandardMaterial({ color: 0xc9a46a, roughness: .95 }), 4 * N + (N - 1) * 2); ropes.frustumCulled = false; ropes.castShadow = true; g.add(ropes);
+  const ropes = new THREE.InstancedMesh(new THREE.CylinderGeometry(.05, .05, 1, 6).translate(0, .5, 0), straw, 4 * N + (N - 1) * 2); ropes.frustumCulled = false; ropes.castShadow = true; g.add(ropes);
   const p = player; p.pos.set(x0 - 12, 0, zc); p.vel.set(0, 0, 0); p.faceH = p.heading = Math.PI / 2; cam.az = Math.PI / 2;
-  Z.on = { g, P, Q, seg, planks, ropes, t: 0 }; boxGrid(); for (let k = 0; k < 150; k++) ropeStep(1 / 30); Z.stat.lands = Z.stat.kicks = 0; Z.stat.dip = 0; ropeDraw(); }     // m1802: settled before he arrives (it drifted 25 cm in the first seconds)
+  const nk = 2 * (N - 1), knots = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(.075, 0), new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false }), nk); knots.frustumCulled = false; g.add(knots);     // the Jinra knots at the deck joints
+  for (let i = 0; i < nk; i++) knots.setColorAt(i, new THREE.Color(0x2fd8c0));
+  const lamps = [], lb = new THREE.InstancedMesh(new THREE.CylinderGeometry(.13, .13, .32, 10), lamp, 10), lc = new THREE.InstancedMesh(new THREE.CylinderGeometry(.07, .14, .07, 10), dark, 20); lb.frustumCulled = lc.frustumCulled = false; g.add(lb, lc);     // paper lanterns hung from the hand ropes
+  for (const c of [2, 3]) for (const i of [3, 7, 11, 15, 19]) lamps.push({ c, i, sw: 0, v: 0 });
+  Z.on = { g, P, Q, seg, planks, ropes, knots, lamps, lb, lc, t: 0 }; boxGrid(); for (let k = 0; k < 150; k++) ropeStep(1 / 30); Z.stat.lands = Z.stat.kicks = 0; Z.stat.dip = 0; ropeDraw(); }     // m1802: settled before he arrives (it drifted 25 cm in the first seconds)
 const _rbM = new THREE.Matrix4(), _rbA = new THREE.Vector3(), _rbB = new THREE.Vector3(), _rbX = new THREE.Vector3(), _rbY = new THREE.Vector3(), _rbZ = new THREE.Vector3(), _rbQ = new THREE.Quaternion(), _rbS = new THREE.Vector3();
 function ropeDraw() { const B = ROPEB.on, Z = ROPEB, N = Z.N, [L, Rr, HL, HR] = B.P;
   for (let i = 1; i < N; i++) { const a = i * 3; _rbA.set(L[a], L[a + 1], L[a + 2]); _rbB.set(Rr[a], Rr[a + 1], Rr[a + 2]); _rbZ.subVectors(_rbB, _rbA); const w = _rbZ.length(); _rbZ.normalize();
@@ -28670,7 +28679,51 @@ function ropeDraw() { const B = ROPEB.on, Z = ROPEB, N = Z.N, [L, Rr, HL, HR] = 
   const cyl = (ax, ay, az, bx, by, bz) => { _rbA.set(ax, ay, az); _rbB.set(bx - ax, by - ay, bz - az); const l = _rbB.length() || 1e-3; _rbQ.setFromUnitVectors(_UPV, _rbB.multiplyScalar(1 / l)); _rbM.compose(_rbA, _rbQ, _rbS.set(1, l, 1)); B.ropes.setMatrixAt(k++, _rbM); };
   for (const C of B.P) for (let i = 0; i < N; i++) { const a = i * 3; cyl(C[a], C[a + 1], C[a + 2], C[a + 3], C[a + 4], C[a + 5]); }
   for (let i = 1; i < N; i++) { const a = i * 3; cyl(L[a], L[a + 1], L[a + 2], HL[a], HL[a + 1], HL[a + 2]); cyl(Rr[a], Rr[a + 1], Rr[a + 2], HR[a], HR[a + 1], HR[a + 2]); }     // the suspenders
-  B.ropes.instanceMatrix.needsUpdate = true; }
+  B.ropes.instanceMatrix.needsUpdate = true;
+  if (B.knots) { let j = 0; const p = player, u = (p.pos.x - Z.x0) / Z.L * N, on = Z.stat.on;
+    for (const C of [L, Rr]) for (let i = 1; i < N; i++) { const a = i * 3, w = on ? Math.max(0, 1 - Math.abs(i - u) / (Z.spread * 1.6)) : 0, s = .8 + w * .9;
+      _rbM.makeScale(s, s, s); _rbM.setPosition(C[a], C[a + 1] + .02, C[a + 2]); B.knots.setMatrixAt(j, _rbM); _rbC.setRGB(.15 + w * .6, .75 + w * .25, .7 + w * .3); B.knots.setColorAt(j, _rbC); j++; }     // they brighten under his weight
+    B.knots.instanceMatrix.needsUpdate = true; if (B.knots.instanceColor) B.knots.instanceColor.needsUpdate = true;
+    let k2 = 0; B.lamps.forEach((Lp, n) => { const C = B.P[Lp.c], a = Lp.i * 3, ax = C[a], ay = C[a + 1], az = C[a + 2], vz = Lp.pz == null ? 0 : (az - Lp.pz); Lp.pz = az;
+      Lp.v += (-Lp.sw * 30 - vz * 140) * .016; Lp.v *= .96; Lp.sw += Lp.v * .016; const L2 = .38;     // a pendulum: the rope's sideways jerk swings it
+      _rbQ.setFromAxisAngle(_rbX.set(1, 0, 0), Lp.sw); _rbA.set(0, -L2, 0).applyQuaternion(_rbQ); _rbM.compose(_rbB.set(ax + _rbA.x, ay + _rbA.y, az + _rbA.z), _rbQ, _rbS.set(1, 1, 1)); B.lb.setMatrixAt(n, _rbM);
+      for (const dy of [.19, -.19]) { _rbA.set(0, -L2 + dy, 0).applyQuaternion(_rbQ); _rbM.compose(_rbB.set(ax + _rbA.x, ay + _rbA.y, az + _rbA.z), _rbQ, _rbS.set(1, 1, 1)); B.lc.setMatrixAt(k2++, _rbM); } });
+    B.lb.instanceMatrix.needsUpdate = true; B.lc.instanceMatrix.needsUpdate = true; } }
+const _rbC = new THREE.Color();
+// the painted textures: lacquered plank (grain, two dark LASHING bands where the rope binds it), twisted straw rope, dressed stone
+let _ropeTex = null; function ropeTex() { if (_ropeTex) return _ropeTex; const mk = (w, h, f, rep) => { const cv = document.createElement('canvas'); cv.width = w; cv.height = h; f(cv.getContext('2d'), w, h); const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; if (rep) t.repeat.set(rep[0], rep[1]); t.anisotropy = 4; return t; };
+  const R = plantRnd(818);
+  const wood = mk(128, 256, (q, w, h) => { q.fillStyle = '#5a2a1c'; q.fillRect(0, 0, w, h); for (let k = 0; k < 40; k++) { q.strokeStyle = `rgba(${30 + R() * 40 | 0},${12 + R() * 14 | 0},${8 + R() * 10 | 0},.55)`; q.lineWidth = 1 + R() * 2; q.beginPath(); const x = R() * w; q.moveTo(x, 0); for (let y = 0; y <= h; y += 16) q.lineTo(x + Math.sin(y * .05 + k) * 4, y); q.stroke(); }
+    const g2 = q.createLinearGradient(0, 0, w, 0); g2.addColorStop(0, 'rgba(255,200,150,.12)'); g2.addColorStop(.5, 'rgba(0,0,0,0)'); g2.addColorStop(1, 'rgba(0,0,0,.25)'); q.fillStyle = g2; q.fillRect(0, 0, w, h);
+    for (const y0 of [.06, .86]) { q.fillStyle = '#c8a46a'; q.fillRect(0, y0 * h, w, .08 * h); q.strokeStyle = 'rgba(80,55,30,.7)'; q.lineWidth = 2; for (let x = -20; x < w + 20; x += 7) { q.beginPath(); q.moveTo(x, y0 * h); q.lineTo(x + 9, (y0 + .08) * h); q.stroke(); } } });
+  const rope = mk(64, 64, (q, w, h) => { q.fillStyle = '#d9b67a'; q.fillRect(0, 0, w, h); q.strokeStyle = 'rgba(110,75,35,.55)'; q.lineWidth = 5; for (let k = -2; k < 6; k++) { q.beginPath(); q.moveTo(0, k * 16); q.lineTo(w, k * 16 + 32); q.stroke(); } }, [1, 8]);
+  const stone = mk(256, 256, (q, w, h) => { q.fillStyle = '#4a4650'; q.fillRect(0, 0, w, h); for (let row = 0; row < 8; row++) { const off = row % 2 ? 24 : 0; for (let c = -1; c < 6; c++) { const v = 110 + R() * 45 | 0; q.fillStyle = `rgb(${v},${v - 4},${v + 6})`; q.fillRect(c * 48 + off + 2, row * 32 + 2, 44, 28); } } }, [2, 2]);
+  return (_ropeTex = { wood, rope, stone }); }
+// THE TOWERS AND THE GATES: a dark stone cornice and a turquoise Jinra band round each tower; on each a PAGODA pavilion (four red-lacquer posts,
+// a red beam ring, two black roofs with upswept eaves, a gold finial, a lantern under it); at the bridgehead a red GATE (posts with black caps and
+// gold rings, a curved black lintel, a red tie beam) with a sagging shimenawa rope and white shide, and two lanterns. Posts that stand where he
+// walks are colliders.
+function ropeDeco(g, o) { const { x0, x1, zc, H, hw, red, dark, gold, jin, lamp, paper, straw } = o, add = (m, x, y, z) => { m.position.set(x, y, z); m.castShadow = true; g.add(m); return m; };
+  const col = (x0c, x1c, y0, y1, z0, z1) => BOXES.push({ minx: x0c, maxx: x1c, miny: y0, maxy: y1, minz: z0, maxz: z1 });
+  const roof = (r, h, flare) => { const geo = new THREE.ConeGeometry(r, h, 4, 3, true).rotateY(Math.PI / 4), P = geo.attributes.position;
+    for (let i = 0; i < P.count; i++) { const y = P.getY(i), u = (h / 2 - y) / h; P.setY(i, y + Math.pow(u, 3) * flare - u * u * h * .25); } P.needsUpdate = true; geo.computeVertexNormals(); return new THREE.Mesh(geo, dark); };
+  for (const [ta, tb, side] of [[x0 - 4, x0, 1], [x1, x1 + 4, -1]]) { const cx = (ta + tb) / 2;
+    add(new THREE.Mesh(new THREE.BoxGeometry(4.3, .24, 5.3), dark), cx, H - .32, zc); for (const yy of [H - .7, 1.2]) add(new THREE.Mesh(new THREE.BoxGeometry(4.04, .12, 5.04), jin), cx, yy, zc);     // cornice, Jinra bands
+    const px = [ta + .45, tb - .45], pz = [zc - 2.05, zc + 2.05], PH = 3.1;     // the pavilion
+    for (const x of px) for (const z of pz) { add(new THREE.Mesh(new THREE.CylinderGeometry(.14, .16, PH, 10), red), x, H + PH / 2, z); add(new THREE.Mesh(new THREE.CylinderGeometry(.22, .22, .16, 10), dark), x, H + .08, z); col(x - .18, x + .18, H, H + PH, z - .18, z + .18); }
+    for (const z of pz) add(new THREE.Mesh(new THREE.BoxGeometry(tb - ta - .5, .22, .22), red), cx, H + PH - .2, z); for (const x of px) add(new THREE.Mesh(new THREE.BoxGeometry(.22, .22, 4.4), red), x, H + PH - .2, zc);
+    add(roof(3.7, 1.25, .55), cx, H + PH + .55, zc); add(new THREE.Mesh(new THREE.BoxGeometry(1.5, .7, 1.5), red), cx, H + PH + 1.35, zc); add(roof(2.3, 1.0, .4), cx, H + PH + 2.05, zc);
+    for (const [r, h, y] of [[.09, .5, 2.75], [.16, .08, 2.6], [.13, .08, 2.9], [.07, .3, 3.15]]) add(new THREE.Mesh(new THREE.CylinderGeometry(r * .8, r, h, 8), gold), cx, H + PH + y, zc);
+    add(new THREE.Mesh(new THREE.CylinderGeometry(.24, .24, .55, 12), lamp), cx, H + PH - .8, zc);
+    const gx = side > 0 ? tb - .25 : ta + .25, GH = 2.7;     // the gate at the bridgehead
+    for (const sz of [-1, 1]) { const z = zc + sz * (hw + .12); add(new THREE.Mesh(new THREE.CylinderGeometry(.11, .13, GH, 10), red), gx, H + GH / 2, z); add(new THREE.Mesh(new THREE.CylinderGeometry(.17, .17, .1, 10), dark), gx, H + GH + .05, z);
+      for (const y of [.35, GH - .45]) add(new THREE.Mesh(new THREE.TorusGeometry(.13, .025, 6, 14).rotateX(Math.PI / 2), gold), gx, H + y, z); }
+    const kasa = new THREE.Mesh(new THREE.BoxGeometry(.26, .2, hw * 2 + 1.5, 1, 1, 14), dark); { const P = kasa.geometry.attributes.position; for (let i = 0; i < P.count; i++) { const z = P.getZ(i); P.setY(i, P.getY(i) + Math.pow(Math.abs(z) / (hw + .75), 3) * .3); } P.needsUpdate = true; kasa.geometry.computeVertexNormals(); }
+    add(kasa, gx, H + GH + .2, zc); add(new THREE.Mesh(new THREE.BoxGeometry(.16, .14, hw * 2 + .5), red), gx, H + GH - .35, zc);
+    const curve = new THREE.CatmullRomCurve3([new THREE.Vector3(gx, H + GH - .62, zc - hw - .12), new THREE.Vector3(gx, H + GH - .95, zc), new THREE.Vector3(gx, H + GH - .62, zc + hw + .12)]);
+    add(new THREE.Mesh(new THREE.TubeGeometry(curve, 16, .07, 6), straw), 0, 0, 0);     // the shimenawa
+    for (const t of [.25, .5, .75]) { const pt = curve.getPoint(t), sp = new THREE.Group(); for (let k = 0; k < 4; k++) { const pc = new THREE.Mesh(new THREE.PlaneGeometry(.12, .12), paper); pc.position.set(0, -k * .12 - .08, k % 2 ? .05 : -.05); sp.add(pc); } sp.rotation.y = Math.PI / 2; add(sp, pt.x, pt.y, pt.z); }
+    for (const sz of [-1, 1]) add(new THREE.Mesh(new THREE.CylinderGeometry(.13, .13, .34, 10), lamp), gx, H + GH - .7, zc + sz * (hw + .55)); } }
 function ropeStep(dt) { const B = ROPEB.on; if (!B || !(dt > 1e-4)) return; ROPEB.dtPose = dt;     /* m1805: a zero step made the sway's acceleration NaN, and the lean with it */ const Z = ROPEB, N = Z.N, p = player, h = Math.min(dt, 1 / 30), h2 = h * h; B.t += h;
   const wz = Math.sin(B.t * .7) * Z.wind + Math.sin(B.t * 1.9) * Z.wind * .4;
   const midZ = () => { const N2 = Z.N, s2 = Math.max(0, Math.min(N2 - 1e-6, (p.pos.x - Z.x0) / Z.L * N2)), i2 = Math.floor(s2), t2 = s2 - i2, A = B.P[0], C = B.P[1], a = i2 * 3, b = a + 3;

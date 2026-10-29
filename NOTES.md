@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Rope bridge LOOK A: the Japanese pass (m15xx, ROPEWORKS 1 / DOCKET 25)
+*"A visual pass -- red, Japanese, stylized, interesting; alien and Japanese. Towers, railings, the wood -- how do we embellish it? Those Japanese
+pagoda-looking things."* (His reference image did not come through; this is from the words.)
+- **Towers (`ropeDeco`):** dressed-stone texture, a dark cornice band and two turquoise JINRA bands round each; on top a PAGODA pavilion -- four
+  red-lacquer posts (colliders) on black plinths, a red beam ring, two black roofs with upswept eaves (a flared 4-sided cone), a red drum between,
+  a gold stacked finial, a lantern hanging under the roof.
+- **Bridgehead gates:** red posts with black caps and gold rings, a curved black lintel (upswept ends), a red tie beam, a sagging SHIMENAWA rope
+  with white SHIDE, two lanterns.
+- **The bridge:** planks in a painted lacquered-wood texture with grain and two straw LASHING bands; thicker twisted-straw ropes (`ropeTex`);
+  ten red PAPER LANTERNS hung from the hand ropes on a pendulum that the rope's sideways jerk swings; turquoise JINRA KNOTS at every deck joint
+  that swell and brighten under his weight (the alien touch).
+- Rendered headless from wide, the bridgehead and below. Draws added: ~4 instanced sets + the two towers' static pieces.
+
 ## The sprint builds itself on a runway; the long jump keeps the double (m1809)
 *"Instead of holding the right stick and letting go for the long jump: he runs at a normal speed, and after he's been running fifteen feet or so he
 naturally breaks into the sprint, and a jump while sprinting IS the long jump -- so we design levels with runways. And the long jump must still allow
