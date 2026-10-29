@@ -73,7 +73,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## The mill's fall lands in its pool (Worker B)
+## The mill's fall lands in its pool (m1749, Worker B)
 His (after m1742): "the watermill's waterfall didn't really look like it was pouring into the stream -- it had a straight line at the
 bottom... make the water more watery like you did here". It was still the textured MeshBasic plane ending exactly at the pool's surface
 (iy + .05), so its bottom edge drew a ruler line across a flat opaque disc (`0x6fc2d8`). Now: the sheet is `hwFallMat` (the refinery's
