@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The bow: one mark, locks on archers, a full blast blows them apart (m15xx)
+*"The double reticle for the bow seems redundant -- we only need the one that shows the height and distance (the lock reticle is good). I can't lock
+onto the archers, only the statues and the spider. A full charge with the exploding arrows should explode the archers -- those are powerful arrows."*
+- The screen reticle (`#retic`) is off while the bow is out (`BOW.noRetic`): its marks are the landing emblem with its height stake, and the lock.
+- `flyAim` with the BOW (`FLYAIM.bowAny`) takes a hostile body at ANY height -- archers on the ground, beasts -- not only one above him; the lock
+  mark (`lockMk`) shows on him and the arc solves to him. A blown-apart body no longer locks (`flyFoe` skips `boomed`).
+- `arrowBlast(P, dirH, full)`: a FULL draw's blast is `fullK` 1.35 wider, and every archer / horde body inside it is killed and blown apart
+  (`limbBoom`). A part-draw blast is as before.
+
 ## The guardian's stone draws both sides (m1780)
 *His close-up: "What is going on with the render -- he is see-through in various polygons."*
 - `guardLoad` forced `FrontSide` (Tripo writes doubleSided on everything, m25's rule). But the hard-surface rig SPLITS the mesh at every bone
