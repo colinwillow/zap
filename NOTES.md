@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## Rope bridge pass 3a: the hand ropes hold him (m15xx, ROPEWORKS 1 / DOCKET 25)
+## Rope bridge pass 3a: the hand ropes hold him (m1811, ROPEWORKS 1 / DOCKET 25)
 - On the deck he cannot walk off the side: his feet are kept `edge` .3 m inside the deck ropes where he stands (read off the ropes every frame,
   so the bound moves with the swing), his speed out through the side is taken away, and that push BOWS the hand rope out (`bow`, the nodes near
   him). A jump that carries him over the hand rope's height still goes over and off.

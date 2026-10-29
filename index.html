@@ -28754,7 +28754,7 @@ function ropeStep(dt) { const B = ROPEB.on; if (!B || !(dt > 1e-4)) return; ROPE
   // from under his feet), and its roll and its sideways acceleration under him are kept for his balance (`ropePose`)
   { const m1 = midZ(), vz = (m1.z - m0.z) / h; if (on && p.grounded) p.pos.z += m1.z - m0.z; Z.bal = Z.bal || { vz: 0, az: 0, roll: 0 };
     const az = (vz - Z.bal.vz) / h; Z.bal.az = isFinite(az) && isFinite(Z.bal.az) ? damp(Z.bal.az, az, .08, h) : 0; Z.bal.vz = isFinite(vz) ? vz : 0; Z.bal.roll = Math.atan2(m1.roll, Z.w); }
-  // m15xx PASS 3 (ROPEWORKS 1, dynamics C -- the hand ropes are real): on the deck he cannot walk off the side -- his feet are held `edge` m inside
+  // m1811 PASS 3 (ROPEWORKS 1, dynamics C -- the hand ropes are real): on the deck he cannot walk off the side -- his feet are held `edge` m inside
   // the deck ropes where he stands, his speed out through the side is taken away, and that push BOWS the hand rope out (`bow`, on the rope nodes
   // near him, the way he pressed). A jump that carries him over the hand rope's height still goes over it.
   if (on && p.grounded) { const N2 = Z.N, s2 = Math.max(0, Math.min(N2 - 1e-6, (p.pos.x - Z.x0) / Z.L * N2)), i2 = Math.floor(s2), t2 = s2 - i2, A = B.P[0], C = B.P[1], a2 = i2 * 3, b2 = a2 + 3;
