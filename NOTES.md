@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The wall run starts over with a ball on a wall (m15xx, WALLRUN.md step 1)
+*"When I try to run straight up the wall he goes up for a second and then always converts into a horizontal run... the weird in-air
+pose, the ninja sprint... I'm picturing doing this with just a circle on a wall... damping... very good control."*
+- **Straight up turned sideways because of the WALL CAM.** The stick was read through `stickWorld`, which is camera-relative, and the
+  wall cam swings the camera round as he climbs -- so "up" turned into "along". On a wall the stick is now read in SCREEN terms:
+  pad up = up the wall, pad sideways = along it, signed by the camera's right vector.
+- **The in-air ninja pose was AUTOSPRINT** setting `p.ninja` whenever the stick was held, grounded or not. Grounded only now.
+- **Damping, from the research (PoP / Titanfall):** grip `gripT` .35 s with no gravity, gravity ramps in over `rampT` .9 s, wall
+  speed eased toward `capV` 8 (`capHalf` .12), and off the top the rise is clipped to `topV` 3.5 -- a hop over the lip, not a launch.
+- **TOOLS > WALL PROXY**: a teal ball plus a 3 s trail replace him while on a wall, so the movement can be judged on its own.
+- Open: entry blend, steering tune, then animation (WALLRUN.md steps 2-4). Shipped unverified.
+
 ## Hands on the lip; one hand with the katana (m1832)
 *"You do need to adjust the hands. When he's holding the katana he'd hang from the top with one hand -- the left -- and the sword down where it would be
 normally."* (The sheath on his back, his idea for later: DOCKET 29.)
