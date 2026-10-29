@@ -6137,13 +6137,22 @@ function sfxRevive(touch) {
   try { c.resume().catch(() => {}); } catch (e) {}
   if (!touch || SFX.reviveT) return;
   SFX.reviveT = setTimeout(() => { SFX.reviveT = 0; if (SFX.ctx !== c || c.state === 'running') return;
-    try { c.close(); } catch (e) {}
-    SFX.ctx = null; SFX.ready = 0; try { HUM.nodes = null; CHERO.hum = null; } catch (e) {}
-    SFX.rebuilt = (SFX.rebuilt || 0) + 1; sfxWake(); try { SFX.ctx && SFX.ctx.resume(); } catch (e) {} }, 400);
+    sfxWasHidden = 1; }, 400);     // m15xx: still not running -- the NEXT real tap rebuilds it (a context built here, outside a gesture, is born locked)
 }
 for (const t of ['visibilitychange', 'pageshow', 'focus']) addEventListener(t, () => { if (document.visibilityState !== 'hidden') sfxRevive(0); });
-function sfxWake() {
-  if (SFX.ctx && sfxWasHidden && document.visibilityState === 'visible') { sfxWasHidden = 0; sfxRebuild(); return; }
+// m15xx (his, again: "if I leave the game and come back the sounds are all muted"): m1699 rebuilt the context on the FIRST event after a return --
+// usually `pointerdown`, which iOS does not count as a gesture that may start audio, so the fresh context was born locked and the rebuild was
+// spent. Now a return is answered only inside a REAL activation (`touchend`, `click`, `keydown`): first a silent HTML <audio> is played (that is
+// what re-activates iOS's audio SESSION after an interruption -- WebAudio alone does not), then the context is rebuilt in the same gesture.
+// `pointerdown` only nudges a resume. The chip says `AU<state><rebuilds>` so "never woke" and "woke silent" can be told apart.
+const SFXQ = { el: null };
+function sfxSession() { try { if (!SFXQ.el) { const a = SFXQ.el = document.createElement('audio'); a.setAttribute('playsinline', ''); a.muted = false; a.volume = .01; a.loop = false;
+  a.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA='; }
+  SFXQ.el.currentTime = 0; const q = SFXQ.el.play(); if (q && q.catch) q.catch(() => {}); } catch (e) {} }
+function sfxWake(ev) {
+  const real = !ev || ev.type !== 'pointerdown';
+  if (SFX.ctx && sfxWasHidden && document.visibilityState === 'visible') { if (!real) { try { SFX.ctx.resume().catch(() => {}); } catch (e) {} return; }
+    sfxWasHidden = 0; sfxSession(); sfxRebuild(); return; }
   if (SFX.ctx) { sfxRevive(1); if (SFX.ctx && SFX.ctx.state !== 'running') sfxUnlock(); return; }
   const AC = window.AudioContext || window.webkitAudioContext;
   if (!AC) { note('NO AUDIO'); return; }
@@ -14805,7 +14814,7 @@ function archerBow(d) {
 // over whatever his legs are doing; letting go LOOSES: `bow_recoil`, and an arrow from the nock to the reticle's point -- a lob solved to land
 // there, faster and flatter the longer it was drawn (`full` s to full power). His arrows are `mine`: they hit the bowmen, the spiders (a hit takes
 // a leg on the way to the burst), chip statues, smash what `bldHit` breaks, and stick in walls and the ground.
-const BOW = { full: 1.1, drawRate: 1.5, v0: 22, v1: 72, g0: .55, g1: .05, dmg0: 1, dmg1: 3, pow0: .12, pow1: 1.2, keep: .3, limbK: .95, big: 1.35, glow: .55, trail: 3, tracerR: .05, tracerT: .06, tracerMax: 4, sq: 1, carry: { ang: .6, out: .18 }, blastR: 2.6, blastDmg: 4, fireDmg: 1, stat: { shots: 0, hits: 0, blasts: 0, fires: 0 } };     // m1729: the charge is the shot -- a tap lobs slow, a full draw flies fast and almost true; only a FULL draw knocks back
+const BOW = { full: 1.1, drawRate: 1.5, v0: 22, v1: 72, g0: .55, g1: .05, dmg0: 1, dmg1: 3, pow0: .12, pow1: 1.2, keep: .3, limbK: .95, big: 1.35, glow: .55, trail: 3, tracerR: .05, tracerT: .06, tracerMax: 4, sq: 1, carry: { ang: .6, out: .18 }, lockT: .12, blastR: 2.6, blastDmg: 4, fireDmg: 1, stat: { shots: 0, hits: 0, blasts: 0, fires: 0 } };     // m1729: the charge is the shot -- a tap lobs slow, a full draw flies fast and almost true; only a FULL draw knocks back
 const _bwL = new THREE.Vector3(), _bwR = new THREE.Vector3(), _bwA = new THREE.Vector3(), _bwB = new THREE.Vector3(), _bwM = new THREE.Vector3(), _bwD = new THREE.Vector3();
 // m1744 (his: "the thing that's killing me -- once you've initiated a shot and you move the left stick around he keeps pulling the bow back
 // again; strafe left or right and he pulls it again; he should never pull it back again once it's back"). MEASURED: standing, the draw is the
@@ -14916,7 +14925,16 @@ function bowFist(B, drawing, h) { const b = rig.bones, m1 = b.mixamorig_LeftHand
     _bhY.set(fx * ca + fz * C.out, sa, fz * ca - fx * C.out).normalize(); _bhZ.set(0, -1, 0); }
   else _bhZ.set(Math.sin(h), 0, Math.cos(h));
   _bhZ.addScaledVector(_bhY, -_bhZ.dot(_bhY)).normalize(); _bhX.crossVectors(_bhY, _bhZ);
-  _bhM.makeBasis(_bhX, _bhY, _bhZ); B.g.quaternion.setFromRotationMatrix(_bhM); return 1; }
+  _bhM.makeBasis(_bhX, _bhY, _bhZ); B.g.quaternion.setFromRotationMatrix(_bhM);
+  // m15xx (his: "when you flip or jump or move around the bow doesn't follow the rotation of his body -- it just stays straight up and down"): the
+  // carry diagonal is built off his FACING, which a flip never turns. On the ground the diagonal is kept and remembered IN THE HAND's frame
+  // (`BOW.inHand`); off the ground or rolling it rides the hand with that offset (`BOW.lockK` eases 0 <-> 1 over `lockT`), so it turns with him.
+  if (!drawing) { const Lh = b.mixamorig_LeftHand, p = player, dt = Math.min(.05, BOW.dt || .016); if (Lh) { Lh.getWorldQuaternion(_bhQ);
+    const air = !p.grounded || !!p.roll || !!p.flip || !!p.wall; BOW.lockK = clamp((BOW.lockK || 0) + (air ? 1 : -1) * dt / BOW.lockT, 0, 1);
+    if (!air && BOW.lockK === 0) BOW.inHand = (BOW.inHand || new THREE.Quaternion()).copy(_bhQ).invert().multiply(B.g.quaternion);
+    if (BOW.inHand && BOW.lockK > 0) { const e = BOW.lockK * BOW.lockK * (3 - 2 * BOW.lockK); _bhQ.multiply(BOW.inHand); B.g.quaternion.slerp(_bhQ, e); } } }
+  return 1; }
+const _bhQ = new THREE.Quaternion();
 // while he draws, his CHEST is turned square to the aim and levelled (after the clip: the strafe legs' hips lean and turn, and the drawn arms rode
 // that off the line -- his: "lined up standing, but strafing left or right he starts tilting"). The shoulder line and the spine's up make the
 // chest's frame; it is turned onto (aim heading, world up) at `Spine1`, by `sq`.
@@ -14935,7 +14953,7 @@ function bowSquare() { const b = rig.bones, sp = b.mixamorig_Spine1, ls = b.mixa
   _bqQ.setFromRotationMatrix(_bqM2.multiply(_bqM1.transpose()));     // the world turn: current chest frame -> wanted
   sp.getWorldQuaternion(_bqQ2).premultiply(_bqQ); const pq = sp.parent.getWorldQuaternion(_bqQ).invert();
   sp.quaternion.slerp(_bqQ2.premultiply(pq), BOW.sq); sp.updateMatrixWorld(true); }
-function bowStep(dt) { bladeFireStep(dt); const p = player, s = slotNow(), on = !!s.bow;
+function bowStep(dt) { bladeFireStep(dt); BOW.dt = dt; const p = player, s = slotNow(), on = !!s.bow;
   CLIPS._bow = on && rig.actions['bow_draw' + UPS] ? 1 : 0; if (p.aim && on) p.bowT = (p.bowT || 0) + dt;
   if (!BOW.mesh) { if (!on) { bowArc(false); return; } const d = { model: rig.root, root: rig.root, st: '', K: {}, h: 0, ar: '', arT: 0 }; archerBow(d); BOW.mesh = d.bow; BOW.mesh.g.scale.setScalar(BOW.limbK); }
   const B = BOW.mesh, L = rig.bones.mixamorig_LeftHand, Rh = rig.bones.mixamorig_RightHand, vis = on && rig.root.visible && !p.dragon; B.g.visible = B.str.visible = vis; bowArc(vis && !!p.aim && !(p.fireT > 0)); if (!vis || !L || !Rh) { B.nock.visible = false; return; }
@@ -31929,7 +31947,7 @@ function stepKit(dt) {
   {
     const Z = ZOOM, free = Z.on && !s.aim && !s.charge && !s.blade && !p.riding && !mphBare();
     const startOK = p.grounded && Math.hypot(p.vel.x, p.vel.z) < Z.still && stickWorld().mag < .25;
-    const hold = free && !p.melee && !p.roll && !p.knock && !p.chargeGo && padUp(1);
+    const hold = Z.right && free && !p.melee && !p.roll && !p.knock && !p.chargeGo && padUp(1);     // m15xx: `right` 0 -- his: "take that away for now, I always trigger it by accident"
     // m1093: and the LEFT pad held in place, any weapon (`LHOLD`) -- its own clock, past the tap time so a tap is still a jump
     const LS = stick.L, holdL = Z.on && LHOLD.pick === 'ZOOM' && LS.down && (LS.far || 0) < MOVE.tapR && p.grounded && !p.melee && !p.roll && !p.knock && !p.riding && !p.wall && !mphBare();
     p.lzHold = holdL ? (p.lzHold || 0) + dt : 0;
@@ -32392,7 +32410,7 @@ const NINJA = { on: 1, look: 'RUN', looks: ['RUN', 'NINJA'], runClip: 'run_fast'
 // hammer's full-charge ping, a spark ring) and turns gold. Let go past `min` and he LAUNCHES along his facing at `v0`..`v1` m/s (sprint is
 // 7.2), held `hold` s, then bled at `bleed` m/s^2 back to an ordinary run; the stick steers it, a landing does not slow it (`p.zoomV`).
 // The ramps, the quarter pipe and the loop that spend it are the next builds.
-const ZOOM = { on: 1, T: 1.1, min: .25, v0: 10, v1: 17, hold: .7, bleed: 3.2, still: 1.2, rate0: .7, rate1: 2.6, rOut: 1.05, rIn: .3, rings: null, dustT: 0, stat: { launches: 0, full: 0 } };
+const ZOOM = { on: 1, right: 0, T: 1.1, min: .25, v0: 10, v1: 17, hold: .7, bleed: 3.2, still: 1.2, rate0: .7, rate1: 2.6, rOut: 1.05, rIn: .3, rings: null, dustT: 0, stat: { launches: 0, full: 0 } };
 function zoomRings() {
   if (ZOOM.rings) return ZOOM.rings;
   const m = c => new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: .85, toneMapped: false, depthWrite: false });
@@ -67881,6 +67899,7 @@ function frameBody() {
       (WORKER.up ? ' REP' + ((DUMMIES.find(d => d.K === WORKER) || {}).rst || '?') + (kit.fixed || 0) +
         // p: paths planned, !: times he gave up and stepped to the marker (m188)
         ' p' + (kit.navPlans || 0) + (kit.navGive ? '!' + kit.navGive : '') : '') +
+      (SFX.ctx ? ' AU' + SFX.ctx.state.slice(0, 3) + (SFX.rebuilt || 0) : ' AUnone') +
       (KPARTS.length ? ' P' + KPARTS.filter(q => !q.dead).length + '/' + KPARTS.length : '') +
       (KDEB.length ? ' D' + KDEB.length : '') +
       // IVY: how many leaf vertices found their chunk -- 0 with ivy on screen is "the tags never

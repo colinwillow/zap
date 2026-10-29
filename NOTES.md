@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The carried bow turns with him; sound after leaving the app (third try); the unarmed right-pad zoom off (m15xx)
+*"When you flip or jump the bow doesn't follow the rotation of his body -- it stays straight up and down. If I leave the game and come back the
+sounds are all muted. When you're unarmed and hold up on the right stick he does the run charge -- take that away for now, I trigger it by accident."*
+- **Bow (`bowFist`, carried):** the m1748 diagonal is built off his FACING, which no flip turns. On the ground it is kept and remembered in the
+  LEFT HAND's frame (`BOW.inHand`); off the ground, rolling, flipping or on a wall it rides the hand with that offset (`BOW.lockK`, eased over
+  `lockT` .12 s), so it turns with the flip; on landing it eases back to the diagonal.
+- **Sound:** m1699 rebuilt the context on the FIRST event after a return -- usually `pointerdown`, which iOS does not accept as a gesture that may
+  start audio, so the new context was born locked. And m1097's 400 ms fallback rebuilt it from a TIMER -- outside any gesture, born locked too.
+  Now: a return is answered only inside `touchend` / `click` / `keydown` -- a silent HTML <audio> is played first (that re-activates iOS's audio
+  session after an interruption; WebAudio alone does not), then the context is rebuilt in the same gesture. `pointerdown` only nudges a resume,
+  and the timer only flags the next real tap. The debug chip carries `AU<state><rebuilds>` (`AUrun2`, `AUsus1`) -- if it is still muted, that
+  token says whether the context never woke (`sus`) or woke silent (`run`). Not testable headless.
+- **Zoom:** `ZOOM.right` 0 -- the right pad held up, unarmed, no longer charges it. The LEFT pad's hold-in-place zoom (`LHOLD` ZOOM) still does;
+  `mel.ZOOM.right = 1` brings the right one back.
+
 ## The bow points down the shot again; the arc is a line, not dots, with a height stake (m1759)
 *"When you pull a bow shot he's 90 degrees to the wrong direction. I don't like the dots -- those balls look really out of place ... the arc shows
 how a lighter shot goes up more, that's really smart ... maybe one height thing at the end, a depth plane ... half opacity."*
