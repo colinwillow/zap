@@ -231,6 +231,12 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## THE SKY CASTLE, landmass pass 2: the rim and the ivy (Worker B)
+His (after m1769): "run like 6 detail passes in a row". Pass 1 of 6. Every capped lobe's rim (`rims`, its outline turned into the island's
+frame) gets chunky cream LIP ROCKS bulging over the edge (60% of rim points; half with a moss cap) and IVY: leafy curtains (painted leaves,
+double-sided strips 1.1-2.7 m wide, 2-13 m long, tapering, curling out and in as they fall), up to three per rim point. The bastion ring is
+turned so the front is a GAP (bastions at 0 and +-2pi/7 from the front was +.22): the two waterfalls (+-pi/7) now pour between bastions,
+not over one, so their runnels end at the real lip. Ivy is one draw, moss one.
 ## THE SKY CASTLE, landmass pass 1 (m1769, Worker B)
 His (after m1767): "start working on the building / flying island" (BUILDINGS.md THE SKY CASTLE; his sheet in images/korajin/ref/). `GCASTLE`
 / `gcastleBuild`: over the west plateau at (-118, -88), its top at 116 m, local +z turned to face the canyon (so from the spawn it hangs over
