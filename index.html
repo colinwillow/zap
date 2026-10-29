@@ -69644,17 +69644,34 @@ function gjinraBoxes(k) { const A = GJINRA; if (A.bOn === k) return; for (const 
 // foam at the lip (`uLip`, a fraction of the length: a runnel before it flows slowly) and at the edges, faded out over the last 45% into
 // mist. `flip` for a PlaneGeometry (its uv.y is 1 at the top); `bob` [amp, speed] rides `HWBOB` like the islands it falls from
 const HWFALL = { t: { value: 0 } };
-function hwFallMat(lip, flip, bob, deep = [.18, .78, .62], light = [.72, 1, .9]) { return new THREE.ShaderMaterial({ uniforms: { uT: HWFALL.t, uLip: { value: lip }, uBobT: HWBOB.t, uDeep: { value: new THREE.Vector3(...deep) }, uLight: { value: new THREE.Vector3(...light) } }, transparent: true, depthWrite: false, side: THREE.DoubleSide, toneMapped: false,
+function hwFallMat(lip, flip, bob, deep = [.18, .78, .62], light = [.72, 1, .9], fade = .55, bot = 0) { return new THREE.ShaderMaterial({ uniforms: { uT: HWFALL.t, uLip: { value: lip }, uBobT: HWBOB.t, uFade: { value: fade }, uBot: { value: bot }, uDeep: { value: new THREE.Vector3(...deep) }, uLight: { value: new THREE.Vector3(...light) } }, transparent: true, depthWrite: false, side: THREE.DoubleSide, toneMapped: false,
     vertexShader: (bob ? 'attribute float aBob; ' : '') + 'uniform float uBobT; varying vec2 vUv; void main() { vUv = vec2(uv.x, ' + (flip ? '1.0 - uv.y' : 'uv.y') + '); vec3 p = position;' + (bob ? ' p.y += step(0.5, aBob) * sin(uBobT * ' + bob[1].toFixed(3) + ' + aBob * 2.3) * ' + bob[0].toFixed(3) + ';' : '') + ' gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0); }',
-    fragmentShader: `varying vec2 vUv; uniform float uT; uniform float uLip; uniform vec3 uDeep; uniform vec3 uLight;
+    fragmentShader: `varying vec2 vUv; uniform float uT; uniform float uLip; uniform vec3 uDeep; uniform vec3 uLight; uniform float uFade; uniform float uBot;
       float h1(float x) { return fract(sin(x * 127.1) * 43758.5453); }
       float lane(float u, float n, float v, float sp) { float c = floor(u * n), s = .7 + h1(c) * .8, q = fract(v * 2.4 * s - uT * sp * s + h1(c + 3.1)); return smoothstep(0., .12, q) * smoothstep(1., .4, q); }
       void main() { float u = vUv.x, v = vUv.y, fall = smoothstep(uLip - .01, uLip + .04, v), sp = mix(.35, 1.7, fall);
         float edge = smoothstep(0., .2, u) * smoothstep(1., .8, u), st = .6 * lane(u, 9., v, sp) + .4 * lane(u + .37, 23., v * 1.7, sp * 1.3);
-        float foam = smoothstep(.06, 0., abs(v - uLip)) + (1. - edge) * .5 * fall, rip = .5 + .5 * sin(u * 60. + sin(v * 30. - uT * 5.) * 2.);
+        float foam = smoothstep(.06, 0., abs(v - uLip)) + (1. - edge) * .5 * fall + uBot * smoothstep(.8, .97, v) * (.6 + .4 * sin(u * 40. + uT * 9.)), rip = .5 + .5 * sin(u * 60. + sin(v * 30. - uT * 5.) * 2.);
         vec3 c = mix(uDeep, uLight, clamp(st * .7 + foam, 0., 1.)) * (1.05 + .25 * rip * (1. - fall));
-        float a = edge * (.55 + .35 * st + .1 * rip) * (1. - smoothstep(.55, 1., v)) + foam * .35;
+        float a = edge * (.55 + .35 * st + .1 * rip) * (1. - smoothstep(0., 1., clamp((v - uFade) / max(1. - uFade, .001), 0., 1.))) + foam * .35;
         gl_FragColor = vec4(c, clamp(a, 0., .92)); }` }); }
+// where a fall meets water (m1743; his: the mill's fall "didn't look like it was pouring into the stream -- a straight line at the bottom"):
+// the sheet now runs .5 m under the surface and this BOIL sits on the contact -- a soft-edged disc of churning foam rings, wobbling by angle
+function hwBoilMat() { return new THREE.ShaderMaterial({ uniforms: { uT: HWFALL.t }, transparent: true, depthWrite: false, toneMapped: false,
+    vertexShader: 'varying vec2 vP; void main() { vP = position.xy / 1.7; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: `varying vec2 vP; uniform float uT;
+      void main() { float r = length(vP), a = atan(vP.y, vP.x), w = sin(a * 5. + uT * 1.3) * .06 + sin(a * 9. - uT * 2.1) * .04, rr = r + w;
+        float ring = .5 + .5 * sin(rr * 16. - uT * 6.), core = smoothstep(.45, 0., rr), al = smoothstep(1., .35, rr) * (.25 + .5 * ring * ring) + core * .55;
+        gl_FragColor = vec4(mix(vec3(.75, .92, .98), vec3(1.), core + ring * .3), clamp(al, 0., .9)); }` }); }
+// a POOL a fall lands in (m1743): rings spread from the landing point `F` (circle-local x, y), slow drifting streaks, a soft rim, the colour
+// deepening toward the middle -- the mill's pool was a flat opaque blue disc
+function hwPoolMat(R, F) { return new THREE.ShaderMaterial({ uniforms: { uT: HWFALL.t, uR: { value: R }, uF: { value: new THREE.Vector2(...F) } }, transparent: true, depthWrite: false, toneMapped: false,
+    vertexShader: 'varying vec2 vP; void main() { vP = position.xy; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: `varying vec2 vP; uniform float uT; uniform float uR; uniform vec2 uF;
+      void main() { float r = length(vP) / uR, d = length(vP - uF), ring = .5 + .5 * sin(d * 7. - uT * 4.5), rf = exp(-d * .45);
+        float st = .5 + .5 * sin(vP.x * 2.3 + sin(vP.y * 1.7 + uT * .6) * 1.8 - uT * .8);
+        vec3 c = mix(vec3(.16, .48, .62), vec3(.42, .78, .9), smoothstep(.2, 1., r)) + vec3(.55, .6, .6) * (ring * ring * rf * .6 + st * .08);
+        gl_FragColor = vec4(c, smoothstep(1., .82, r) * (.78 + .15 * ring * rf)); }` }); }
 function gjFall(A, g, islG, R, Y0, put, stone, at4) { const a = 2.4, sa = Math.sin(a), ca = Math.cos(a), tx = ca, tz = -sa, wedge = .16, pts = [];
   for (const q of islG) { const p = q.attributes.position; for (let i = 0; i < p.count; i++) { const x = p.getX(i), z = p.getZ(i); let d = Math.atan2(x, z) - a; d = Math.atan2(Math.sin(d), Math.cos(d)); if (Math.abs(d) < wedge) pts.push([Math.hypot(x, z), p.getY(i)]); } }
   let r0 = R * .9; for (const [r, y] of pts) if (y > Y0 - 3) r0 = Math.max(r0, r); r0 += .25;
@@ -69849,11 +69866,11 @@ function gmillBuild() {
     for (let k = 0; k < 14; k++) { const a = k / 14 * TAU, p = new THREE.BoxGeometry(.8, .1, 1.7); p.translate(0, R - .25, 0); p.rotateZ(a); add(p, woodP); const s2 = new THREE.BoxGeometry(.12, R, .1); s2.translate(0, R / 2, -.75); s2.rotateZ(a); add(s2, wood); const s3 = new THREE.BoxGeometry(.12, R, .1); s3.translate(0, R / 2, .75); s3.rotateZ(a); add(s3, wood); }
     const hub = new THREE.CylinderGeometry(.35, .35, 2.4, 12); hub.rotateX(Math.PI / 2); add(hub, iron);
     const byM = new Map(); for (const [geo, m] of parts) { const q = geo.index ? geo.toNonIndexed() : geo; q.deleteAttribute('uv'); if (!byM.has(m)) byM.set(m, []); byM.get(m).push(q); } for (const [m, list] of byM) { const o = new THREE.Mesh(mergeGeometries(list), m); o.castShadow = true; wg.add(o); }
-    const fm = new THREE.MeshBasicMaterial({ map: gmillTex('water'), transparent: true, depthWrite: false, side: THREE.DoubleSide }), fall = new THREE.Mesh(new THREE.PlaneGeometry(1.5, BY + 5.85 - (iy + .05)), fm); fall.position.set(1.2, (BY + 5.85 + iy + .05) / 2, -bw - .05); g.add(fall);     /* his: it 'falls and stops above the stream' -- it ran 5.2 m and ended .6 m over the base; now it reaches the pool */
-    { const fo = new THREE.Mesh(new THREE.RingGeometry(.25, 1.3, 20), new THREE.MeshBasicMaterial({ color: 0xf2fbff, transparent: true, opacity: .55, depthWrite: false })); fo.rotation.x = -Math.PI / 2; fo.position.set(1.2, iy + .07, -bw + .25); g.add(fo); A.foam = fo; }
+    const fm = new THREE.MeshBasicMaterial({ map: gmillTex('water'), transparent: true, depthWrite: false, side: THREE.DoubleSide }), fall = new THREE.Mesh(new THREE.PlaneGeometry(1.5, BY + 5.85 - (iy - .45), 1, 8), hwFallMat(-1, 1, null, [.3, .74, .8], [.86, 1, .97], 2, 1)); fall.position.set(1.2, (BY + 5.85 + iy - .45) / 2, -bw - .05); fall.renderOrder = 3; g.add(fall); A.fallMesh = fall;
+    { const fo = new THREE.Mesh(new THREE.CircleGeometry(1.7, 36), hwBoilMat()); fo.scale.setScalar(1.3); fo.rotation.x = -Math.PI / 2; fo.position.set(1.2, iy + .08, -bw - .05); fo.renderOrder = 4; g.add(fo); A.foam = fo; }
     const chute = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 2.2), fm); chute.position.set(1.2, BY + 6.05, -bw - 1); chute.rotation.x = -Math.PI / 2 + .25; g.add(chute); A.fall = fm;
     vbox(.45, 1.95, BY + 5.75, BY + 5.95, -bw - 2.2, -bw, wood, 0); for (const sx of [.45, 1.95]) vbox(sx - .06, sx + .06, BY + 5.75, BY + 6.3, -bw - 2.2, -bw, wood, 0); vbox(1.1, 1.3, BY + 3.8, BY + 5.75, -bw - 2.1, -bw - 1.9, wood, 0);
-    const pool = new THREE.Mesh(new THREE.CircleGeometry(3.4, 24), new THREE.MeshStandardMaterial({ color: 0x6fc2d8, roughness: .15, metalness: .1, transparent: true, opacity: .85 })); pool.rotation.x = -Math.PI / 2; pool.position.set(0, iy + .03, -bw + 1.1); g.add(pool); A.pool = pool; A.splash = [cx + 1.2, iy + .25, cz - bw - .05]; A.hub = [cx, BY + 2.5, cz - bw + 1.1]; }
+    const pool = new THREE.Mesh(new THREE.CircleGeometry(3.4, 40), hwPoolMat(3.4, [1.2, 1.15])); pool.rotation.x = -Math.PI / 2; pool.position.set(0, iy + .03, -bw + 1.1); g.add(pool); A.pool = pool; A.splash = [cx + 1.2, iy + .25, cz - bw - .05]; A.hub = [cx, BY + 2.5, cz - bw + 1.1]; }
   // ---- THE TOWER: a tapering cream lathe from the base's top to the gallery, the red sun-spiral painted on it, small windows ----
   const T0 = BY + BH + .5, T1 = T0 + A.H - 10, r0 = 4.4, r1 = 2.8, Rt = y => r0 + (r1 - r0) * Math.pow((y - T0) / (T1 - T0), .9) + .25 * Math.sin(Math.PI * (y - T0) / (T1 - T0));
   { const pts = []; for (let i = 0; i <= 24; i++) { const y = T0 + (T1 - T0) * i / 24; pts.push(new THREE.Vector2(Rt(y), y)); } put(new THREE.LatheGeometry(pts, 40), plaster);
@@ -69983,7 +70000,7 @@ function gmillHit(x, y, z, rad) { const A = GMILL; if (!A.hub || !inHome() || A.
   const [hx, hy, hz] = A.hub; if (Math.hypot(x - hx, z - hz) > 3.2 + rad || Math.abs(y - hy) > 3 + rad) return 0;
   A.hc = .4; A.jam = !A.jam; snd('clang', { g: 1, r: A.jam ? .5 : .8, x: hx, z: hz }); spkBurst(x, y, z, 20, { col: [1, .8, .4], spread: 4, size: .12, life: .5 }); camShake(.08); return 1; }
 function gmillStep(dt, t) { const A = GMILL; if (!A.g) return; const RT = rsChunkSync(A), alive = RT == null || RT > .95;
-  if (A.waterOn !== alive) { A.waterOn = alive; A.g.traverse(o => { if (o.isMesh && o.material && o.material.isMeshBasicMaterial && o.material.transparent) o.visible = alive; }); if (A.pool) A.pool.visible = alive; if (A.fall) A.fall.color.setHex(alive ? 0xb8ffe4 : 0xffffff); }
+  if (A.waterOn !== alive) { A.waterOn = alive; A.g.traverse(o => { if (o.isMesh && o.material && o.material.isMeshBasicMaterial && o.material.transparent) o.visible = alive; }); if (A.pool) A.pool.visible = alive; if (A.fallMesh) A.fallMesh.visible = alive; if (A.fall) A.fall.color.setHex(alive ? 0xb8ffe4 : 0xffffff); }
   if (!alive && A.splash) { A.splashS = A.splash; A.splash = null; } else if (alive && !A.splash && A.splashS) A.splash = A.splashS; A.dead = !alive; A.hc = (A.hc || 0) - dt; A.wv = (A.wv == null ? 1.1 : A.wv) + ((A.jam || A.dead ? 0 : 1.1) - (A.wv == null ? 1.1 : A.wv)) * Math.min(1, dt * (A.jam ? 6 : 1.2)); if (A.wheel) A.wheel.rotation.z -= dt * A.wv;
   if (A.draw) { const D = A.draw, u0 = D.up; D.up += Math.sign(D.want - D.up) * Math.min(Math.abs(D.want - D.up), dt * .45); D.g.rotation.z = -D.up * 1.35;
     for (const o of D.chains) { const th = D.up * 1.35, a = new THREE.Vector3(D.X1 - D.L * Math.cos(th), D.ya + D.L * Math.sin(th), D.z0 + o.userData.zz), b = new THREE.Vector3(D.X1 + .2, D.ya + 3.3, D.z0 + o.userData.zz), d = b.clone().sub(a); o.position.copy(a).addScaledVector(d, .5); o.scale.y = d.length(); o.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); }

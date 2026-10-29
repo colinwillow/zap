@@ -73,6 +73,13 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## The mill's fall lands in its pool (Worker B)
+His (after m1742): "the watermill's waterfall didn't really look like it was pouring into the stream -- it had a straight line at the
+bottom... make the water more watery like you did here". It was still the textured MeshBasic plane ending exactly at the pool's surface
+(iy + .05), so its bottom edge drew a ruler line across a flat opaque disc (`0x6fc2d8`). Now: the sheet is `hwFallMat` (the refinery's
+streaks, white-blue, `fade` 2 so it never mists out, `bot` 1 for foam churning in its last 15%) and runs .5 m UNDER the surface; a BOIL
+(`hwBoilMat`: a soft disc of churning foam rings, 2.2 m) sits on the contact; and the pool is `hwPoolMat` -- rings spreading from where
+the water lands, slow drifting streaks, deeper in the middle, a soft rim. The state switch hides the sheet with the rest (`A.fallMesh`).
 ## The waterfalls: cut out of the island, and water (m1742, Worker B)
 His (m1741 screenshot): "make the waterfall actually cut out of the island and have it actually look like water". The refinery's Jinra
 fall was a flat 2.2 x 40 m plane at R + .2 running straight down THROUGH the lumpy lobes. `gjFall` now: every island geometry is kept
