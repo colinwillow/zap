@@ -89,7 +89,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## The fishing dock is back as it was (Worker B)
+## The fishing dock is back as it was (m1756, Worker B)
 His (after m1755): "were there fishing docks here? it looks like there's just floating stairs... put the docks back -- something is
 missing. You can ignore the thing I said about a continuous stream; we just want it to look good first and foremost." The dock block is
 the pre-m1751 code again, verbatim (full length, the deck .62 over the water, posts and braces all the way, the T-head and its canopy,
