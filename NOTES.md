@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The rope bridge (m15xx, DOCKET 18a)
+*"A rope bridge -- dynamically moving, it moves to my weight."* KORAJIN > The Rope Course (`?w=forge&zone=rope`): two stone towers, stairs up the
+first (.3 m risers), a 14 m bridge between them at 4.5 m.
+- **`ROPEB`:** four verlet ropes of `N` 22 segments (two DECK ropes `w` 1.4 m apart, two HAND ropes `rail` 1 m above), `slack` 1.01 over the
+  span, pinned at the towers; rungs hold the deck ropes apart (the planks), suspenders hang the deck from the hand ropes; `iters` 18. HIS WEIGHT:
+  on the deck, the nodes within `spread` of him are pulled down by `load` 160 m/s2 (more on the side he stands nearer -- it tilts) and his
+  sideways speed pushes them sideways (`sway`); a little wind. One instanced draw for the 21 planks, one for the ropes and suspenders.
+- **The deck is a floor:** `ropeDeck(x, z)` (the planks' height there, read off the two deck ropes) is a candidate in `groundAt`, so walking,
+  landing and the step all see it; `ropeStep` keeps his feet on it as it moves under him.
+- **Measured headless (walking across, the shipped frame):** on the deck the whole way (`on1`), his feet = the deck height to the centimetre;
+  at rest the middle hangs at 3.33-3.39 (1.1-1.2 m of sag); under him at mid-span 3.26 -- about 13 cm of HIS dip, the low point travelling with
+  him. Tuning history: 12 iterations let the rope STRETCH (1.38 m sag at rest, his weight lost in it); 40 made it inextensible (8 cm dip).
+- Still to come (18b-d): the tightrope, the swing rope, the ladders. Not yet: hand ropes as colliders (he can walk off the side), a sway he
+  feels in his balance, planks that break.
+
 ## The katana's neutral release is AUTOMATIC, and chains; the jumped slam lands (m1798)
 *"Neutral is automatic, like an automatic car versus a manual: nothing in his radius, he stays put; a spider, a dummy, a crate, an enemy in it, he
 goes to it. String them: launch-and-slash, then the spin toward the next target, then the high jump and slam -- and repeat. Holding a direction is

@@ -15764,6 +15764,18 @@ const _bnpF = { d: 0, nx: 0, nz: 0, cx: 0, cz: 0 };
 // ground is a triangle mesh and its buildings and props are still boxes, so a roof and a ramp
 // are the same question asked of two stores -- and `triGround` returning -1e30 for "no ground
 // here" rather than 0 is what leaves the floor at zero doing its job off the edge of the slice.
+// m15xx: THE ROPE BRIDGE (DOCKET 18, his: "a rope bridge -- dynamically moving, it moves to my weight"). KORAJIN > The Rope Course
+// (`?w=forge&zone=rope`). Two DECK ropes and two HAND ropes, each `N` segments of verlet (`slack` over the span so it hangs), pinned at the two
+// towers; a rung constraint holds the deck ropes `w` apart (the planks), suspenders hang the deck from the hand ropes. HIS WEIGHT: standing on it,
+// the nodes round him are pulled down (`load` m/s2, spread over `spread` nodes, more on the side he stands nearer -- it tilts), and moving across
+// it pushes it sideways (`sway`); a little wind. The DECK IS A FLOOR (`ropeDeck` in `groundAt`): its height under him is read off the planks every
+// frame, so he rides the sag and the swing. The planks are one instanced draw, the ropes another.
+const ROPEB = { want: 0, on: null, x0: -7, z: -18, L: 14, H: 4.5, w: 1.4, N: 22, slack: 1.01, iters: 18, damp: .985, load: 160, spread: 2.6, sway: .9, wind: .35, rail: 1.0, plank: .4, stat: { on: 0, dip: 0 } };
+try { if (/[?&]zone=rope\b/.test(location.search)) ROPEB.want = 1; } catch (e) {}
+function ropeDeck(x, z) { const B = ROPEB.on; if (!B) return null; const Z = ROPEB, N = Z.N, s = (x - Z.x0) / Z.L * N; if (s < 0 || s > N) return null;
+  const i = Math.min(N - 1, Math.floor(s)), t = s - i, A = B.P[0], C = B.P[1], a = i * 3, b = a + 3;
+  const lz = A[a + 2] + (A[b + 2] - A[a + 2]) * t, rz = C[a + 2] + (C[b + 2] - C[a + 2]) * t, f = (z - lz) / ((rz - lz) || 1e-3); if (f < -.12 || f > 1.12) return null;
+  const ly = A[a + 1] + (A[b + 1] - A[a + 1]) * t, ry = C[a + 1] + (C[b + 1] - C[a + 1]) * t; return ly + (ry - ly) * Math.min(1, Math.max(0, f)) + .05; }
 function groundAt(x, z, y, step) {
   // outside the city on the island there is no floor at zero -- the sea is not glass (m264)
   let best = ISLE.live ? gFloor0(x, z) : (WORLD.now === 'alien' || WORLD.now === 'plaza' || WORLD.now === 'home') ? -1e3 : 0;     // m1111: the refuge's lake bed too      // m432: the alien terrain dips under 0 (m438: and the plaza's)
@@ -15772,6 +15784,7 @@ function groundAt(x, z, y, step) {
   // `UNDER.box` only, so no caller above ground sees a change.
   if (UNDER.box && best > y + step && x > UNDER.box[0] && x < UNDER.box[1] && z > UNDER.box[2] && z < UNDER.box[3] && y < UNDER.box[4]) best = -1e9;
   if (TRI.on) { const t = triGround(x, z, y, step); if (t > best) best = t; }
+  if (ROPEB.on) { const r = ropeDeck(x, z); if (r !== null && r <= y + step && r > best) best = r; }     // m15xx: the rope bridge's deck
   for (const b of boxesNear(x, x, z, z, _bnG)) {
     if (x < b.minx || x > b.maxx || z < b.minz || z > b.maxz) continue;
     // AND A TURNED BOX'S ROOF IS THE ROOF OF THE CAR, not of the square round it -- `boxNear`
@@ -28599,6 +28612,47 @@ const WPARK = { want: 0, on: null, H: { long: 4.5, low: 4.5, tall: 7, chim: 12, 
 try { if (/[?&]zone=wall\b/.test(location.search)) WPARK.want = 1; } catch (e) {}
 function wparkLabel(g, text, x, z, rot, col) { const cv = document.createElement('canvas'); cv.width = 512; cv.height = 128; const q = cv.getContext('2d'); q.fillStyle = col; q.font = 'bold 72px sans-serif'; q.textAlign = 'center'; q.textBaseline = 'middle'; q.fillText(text, 256, 66);
   const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; const m = new THREE.Mesh(new THREE.PlaneGeometry(6, 1.5).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false })); m.rotation.y = rot || 0; m.position.set(x, .03, z); g.add(m); }
+function ropeBuild() { const Z = ROPEB; Z.want = 2; if (Z.on) return; const g = new THREE.Group(); scene.add(g);
+  const wood = new THREE.MeshStandardMaterial({ color: 0x8a5a34, roughness: .9 }), dark = new THREE.MeshStandardMaterial({ color: 0x5a3a22, roughness: .9 }), stone = new THREE.MeshStandardMaterial({ color: 0x9a948c, roughness: .95 });
+  const box = (x0, x1, y0, y1, z0, z1, m) => { const o = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), m); o.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); o.castShadow = o.receiveShadow = true; g.add(o); BOXES.push({ minx: x0, maxx: x1, miny: y0, maxy: y1, minz: z0, maxz: z1 }); };
+  const x0 = Z.x0, x1 = x0 + Z.L, zc = Z.z, H = Z.H, hw = Z.w / 2;
+  box(x0 - 4, x0, 0, H, zc - 2.5, zc + 2.5, stone); box(x1, x1 + 4, 0, H, zc - 2.5, zc + 2.5, stone);     // the two towers
+  for (let k = 0; k < 15; k++) box(x0 - 4 - (k + 1) * .42, x0 - 4 - k * .42, 0, H - k * .3, zc - 1.2, zc + 1.2, stone);     // stairs up to the first (a .3 rise: under his .357 step)
+  for (const sx of [x0 - .25, x1 + .25]) for (const sz of [-1, 1]) { const o = new THREE.Mesh(new THREE.CylinderGeometry(.12, .14, Z.rail + .5, 8), dark); o.position.set(sx, H + (Z.rail + .5) / 2, zc + sz * (hw + .05)); o.castShadow = true; g.add(o); }     // the posts
+  const N = Z.N, P = [], Q = [], sag = Math.sqrt(3 / 8 * Z.L * Z.L * (Z.slack - 1));
+  for (let c = 0; c < 4; c++) { const a = new Float32Array((N + 1) * 3), sz = c % 2 ? 1 : -1, y0 = H - .02 + (c >= 2 ? Z.rail : 0);
+    for (let i = 0; i <= N; i++) { const u = i / N; a[i * 3] = x0 + u * Z.L; a[i * 3 + 1] = y0 - sag * 4 * u * (1 - u); a[i * 3 + 2] = zc + sz * hw; } P.push(a); Q.push(a.slice()); }
+  const seg = Z.L * Z.slack / N;
+  const planks = new THREE.InstancedMesh(new THREE.BoxGeometry(1, .06, 1), wood, N - 1); planks.castShadow = planks.receiveShadow = true; planks.frustumCulled = false; g.add(planks);
+  const ropes = new THREE.InstancedMesh(new THREE.CylinderGeometry(.035, .035, 1, 5).translate(0, .5, 0), new THREE.MeshStandardMaterial({ color: 0xc9a46a, roughness: .95 }), 4 * N + (N - 1) * 2); ropes.frustumCulled = false; ropes.castShadow = true; g.add(ropes);
+  const p = player; p.pos.set(x0 - 12, 0, zc); p.vel.set(0, 0, 0); p.faceH = p.heading = Math.PI / 2; cam.az = Math.PI / 2;
+  Z.on = { g, P, Q, seg, planks, ropes, t: 0 }; boxGrid(); ropeDraw(); }
+const _rbM = new THREE.Matrix4(), _rbA = new THREE.Vector3(), _rbB = new THREE.Vector3(), _rbX = new THREE.Vector3(), _rbY = new THREE.Vector3(), _rbZ = new THREE.Vector3(), _rbQ = new THREE.Quaternion(), _rbS = new THREE.Vector3();
+function ropeDraw() { const B = ROPEB.on, Z = ROPEB, N = Z.N, [L, Rr, HL, HR] = B.P;
+  for (let i = 1; i < N; i++) { const a = i * 3; _rbA.set(L[a], L[a + 1], L[a + 2]); _rbB.set(Rr[a], Rr[a + 1], Rr[a + 2]); _rbZ.subVectors(_rbB, _rbA); const w = _rbZ.length(); _rbZ.normalize();
+    _rbX.set(L[a + 3] + Rr[a + 3] - L[a - 3] - Rr[a - 3], L[a + 4] + Rr[a + 4] - L[a - 2] - Rr[a - 2], L[a + 5] + Rr[a + 5] - L[a - 1] - Rr[a - 1]).normalize(); _rbY.crossVectors(_rbZ, _rbX).normalize(); _rbX.crossVectors(_rbY, _rbZ);
+    _rbM.makeBasis(_rbX, _rbY, _rbZ); _rbM.scale(_rbS.set(Z.plank * (.9 + (i * 37 % 7) * .02), 1, w + .12)); _rbM.setPosition((_rbA.x + _rbB.x) / 2, (_rbA.y + _rbB.y) / 2, (_rbA.z + _rbB.z) / 2); B.planks.setMatrixAt(i - 1, _rbM); }
+  B.planks.instanceMatrix.needsUpdate = true; let k = 0;
+  const cyl = (ax, ay, az, bx, by, bz) => { _rbA.set(ax, ay, az); _rbB.set(bx - ax, by - ay, bz - az); const l = _rbB.length() || 1e-3; _rbQ.setFromUnitVectors(_UPV, _rbB.multiplyScalar(1 / l)); _rbM.compose(_rbA, _rbQ, _rbS.set(1, l, 1)); B.ropes.setMatrixAt(k++, _rbM); };
+  for (const C of B.P) for (let i = 0; i < N; i++) { const a = i * 3; cyl(C[a], C[a + 1], C[a + 2], C[a + 3], C[a + 4], C[a + 5]); }
+  for (let i = 1; i < N; i++) { const a = i * 3; cyl(L[a], L[a + 1], L[a + 2], HL[a], HL[a + 1], HL[a + 2]); cyl(Rr[a], Rr[a + 1], Rr[a + 2], HR[a], HR[a + 1], HR[a + 2]); }     // the suspenders
+  B.ropes.instanceMatrix.needsUpdate = true; }
+function ropeStep(dt) { const B = ROPEB.on; if (!B) return; const Z = ROPEB, N = Z.N, p = player, h = Math.min(dt, 1 / 30), h2 = h * h; B.t += h;
+  const wz = Math.sin(B.t * .7) * Z.wind + Math.sin(B.t * 1.9) * Z.wind * .4;
+  // HIS WEIGHT: standing on the deck, the nodes round him go down (more on the near side), and his sideways speed pushes the deck sideways
+  const dk = ropeDeck(p.pos.x, p.pos.z), on = dk !== null && Math.abs(p.pos.y - dk) < .3 && (p.grounded || p.pos.y - dk < .05); Z.stat.on = on ? 1 : 0;
+  const u = (p.pos.x - Z.x0) / Z.L * N, A0 = B.P[0], A1 = B.P[1], ii = Math.max(0, Math.min(N, Math.round(u))) * 3, f = on ? Math.min(1, Math.max(0, (p.pos.z - A0[ii + 2]) / ((A1[ii + 2] - A0[ii + 2]) || 1e-3))) : .5;
+  for (let c = 0; c < 4; c++) { const P = B.P[c], Q = B.Q[c], side = c % 2 ? f : 1 - f, deck = c < 2;
+    for (let i = 1; i < N; i++) { const a = i * 3; let ay = -9.8, az = wz;
+      if (on && deck) { const wt = Math.max(0, 1 - Math.abs(i - u) / Z.spread); ay -= Z.load * wt * (.35 + .65 * side * 2) * .5; az += (p.vel.z) * Z.sway * wt; }
+      for (let d = 0; d < 3; d++) { const v = (P[a + d] - Q[a + d]) * Z.damp; Q[a + d] = P[a + d]; P[a + d] += v + (d === 1 ? ay : d === 2 ? az : 0) * h2; } } }
+  const sat = (P, a, b, len, wa, wb) => { const dx = P[1][b] - P[0][a], dy = P[1][b + 1] - P[0][a + 1], dz = P[1][b + 2] - P[0][a + 2], d = Math.hypot(dx, dy, dz) || 1e-6, k = (d - len) / d / (wa + wb || 1);
+    P[0][a] += dx * k * wa; P[0][a + 1] += dy * k * wa; P[0][a + 2] += dz * k * wa; P[1][b] -= dx * k * wb; P[1][b + 1] -= dy * k * wb; P[1][b + 2] -= dz * k * wb; };
+  for (let it = 0; it < Z.iters; it++) {
+    for (const C of B.P) for (let i = 0; i < N; i++) { const a = i * 3; sat([C, C], a, a + 3, B.seg, i === 0 ? 0 : 1, i + 1 === N ? 0 : 1); }     // along each rope (the ends pinned)
+    for (let i = 1; i < N; i++) { const a = i * 3; sat([B.P[0], B.P[1]], a, a, Z.w, 1, 1); sat([B.P[2], B.P[3]], a, a, Z.w, 1, 1); sat([B.P[2], B.P[0]], a, a, Z.rail, .3, 1); sat([B.P[3], B.P[1]], a, a, Z.rail, .3, 1); } }     // rungs and suspenders
+  if (on) { const d2 = ropeDeck(p.pos.x, p.pos.z); if (d2 !== null) { Z.stat.dip = Math.min(Z.stat.dip, d2 - Z.H); if (p.grounded && Math.abs(p.pos.y - d2) < .3) p.pos.y = d2; } }     // he rides it: the deck under him moved this frame
+  ropeDraw(); }
 function wparkBuild() { const Z = WPARK; Z.want = 2; if (Z.on) return; const g = new THREE.Group(); scene.add(g); const boxes = [], H = Z.H;
   const mats = {}, mat = c => mats[c] || (mats[c] = new THREE.MeshStandardMaterial({ color: c, roughness: .85 }));
   const box = (x0, x1, y0, y1, z0, z1, c) => { const m = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), mat(c)); m.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); m.castShadow = m.receiveShadow = true; g.add(m);
@@ -33444,7 +33498,7 @@ function boardPose(dt) {
 
 function stepPlayer(dt) {
   try { tasselStep(dt); } catch (e) { TASSEL.on = 0; note('TASSEL THREW ' + e.message); }     // m1644
-  if (inArena()) { deflStep(dt); hallStep(dt); if (SKIN.list.length) skinStep(dt); if (PIECE.list.length) pieceStep(dt); if (SMASH.list.length) smashStep(dt); for (const E of BLDG.list) if (E.step && E.on()) E.step(dt); if (LVL.want && inForge()) lvlStart(); if (BEACON.want && inForge()) { try { beaconBuild(); } catch (e) { BEACON.want = 0; note("BEACON THREW " + e.message); } } if (BEACON.on) beaconStep(dt); if (LVG.on) lvgStep(dt); if (SHIPZ.want === 1 && inForge()) shipBuild(); if (WPARK.want === 1 && inForge()) wparkBuild(); if (SHIPZ.on) shipStep(dt); if (SNOWZ.on) snowStep(dt); if (DRAGZ.on) dragStep(dt); }
+  if (inArena()) { deflStep(dt); hallStep(dt); if (SKIN.list.length) skinStep(dt); if (PIECE.list.length) pieceStep(dt); if (SMASH.list.length) smashStep(dt); for (const E of BLDG.list) if (E.step && E.on()) E.step(dt); if (LVL.want && inForge()) lvlStart(); if (BEACON.want && inForge()) { try { beaconBuild(); } catch (e) { BEACON.want = 0; note("BEACON THREW " + e.message); } } if (BEACON.on) beaconStep(dt); if (LVG.on) lvgStep(dt); if (SHIPZ.want === 1 && inForge()) shipBuild(); if (WPARK.want === 1 && inForge()) wparkBuild(); if (ROPEB.want === 1 && inForge()) ropeBuild(); if (ROPEB.on) ropeStep(dt); if (SHIPZ.on) shipStep(dt); if (SNOWZ.on) snowStep(dt); if (DRAGZ.on) dragStep(dt); }
   if (PLANT.list.length) plantStep(dt);     // m1424
   if (ROCK.loose.length || ROCK.broken.length) rockStep(dt);     // m1745
   if (RESTORE.list.length) restoreStep(dt);     // m1505     // m1105; m1119; m1120: each building's own life
@@ -72720,6 +72774,7 @@ function startGate() {
       btn(el, 'Level 1 -- The Grid', 'The first level, built in layers: the run first, then the puzzle, the enemies, the theme, the boss. Toggle each layer at the top.', () => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter('forge', '?w=forge&lvl=1'); });
       btn(el, 'Level 1 v2 -- The First Beacon', 'The blueprint level: the canyon to the enemy torch tower, generated from the measured moves. The run only (layer 1), a greybox.', () => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter('forge', '?w=forge&lvl=beacon'); });
       btn(el, 'The Wall Park', 'Every wall a run meets: a long wall across a drop, tall walls to a ledge, a chimney, run-jump-run, corners. (The wall-run sandbox.)', () => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter('forge', '?w=forge&zone=wall'); });
+      btn(el, 'The Rope Course', 'A rope bridge between two towers that sags and sways under you. (The rope sandbox: the tightrope, the swing rope and the ladders come next.)', () => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter('forge', '?w=forge&zone=rope'); });
       btn(el, 'The Snowfield', 'Deep snow under a falling sky: trudge, leave tracks, plough, dive -- the snow bounces off you. (An element sandbox.)', () => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter('forge', '?w=forge&zone=snow'); });
       btn(el, 'The Dragon Ride', 'His blue dragon on a sky island: armoured, the evil and captured looks (TOOLS > DRAGON). Mount, ride, fly, fireballs, taming -- being built.', () => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter('forge', '?w=forge&zone=dragon'); });
       btn(el, 'The Ship', 'A samurai pirate ship on a sunrise sea: climb the rigging, the sails, the castle, the cabin. (Being built.)', () => { try { localStorage.setItem(HERO.key, 'agoblin'); localStorage.setItem('mel.game', 'korajin'); } catch (e) {} enter('forge', '?w=forge&zone=ship'); });

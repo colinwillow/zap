@@ -42,7 +42,7 @@ best."* MAIN = this session (dynamics, the feel); AGENT = a separate session can
 17. [~] MAIN **The WALL-RUN SANDBOX** (m1751: the park + the queued run-up) (`PARKOUR.md` / `WRUN`): one playground with every wall a run can meet -- a long wall (run along), a tall wall
        to a ledge (run up), a chimney (wall-jump up it), two walls across a pit (run, jump, run), an inside and an outside corner, a wall over
        water/pit to fall off -- then tighten the dynamics against it with him.
-18. [ ] MAIN **The ROPE pieces, one sandbox:** a ROPE BRIDGE of planks on two ropes that sags and sways under HIS weight (verlet, like the willow's
+18. [~] MAIN (m15xx: 18a the ROPE BRIDGE, KORAJIN > The Rope Course) **The ROPE pieces, one sandbox:** a ROPE BRIDGE of planks on two ropes that sags and sways under HIS weight (verlet, like the willow's
        vines), a TIGHTROPE that bends where he stands and wobbles his balance, a hanging ROPE to climb and swing on, and LADDERS (rungs, a rope
        ladder that swings).
 19. [ ] MAIN **Level 1 v2 (`BEACON.md`), layer 1 tightened** with what 17 and 18 settle; then **layers 2, 3, 4** (puzzle, enemies, theme) into a
