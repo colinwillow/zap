@@ -261,7 +261,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## THE SKY CASTLE, pass 3 of 6: the satellite islets and their shrines (Worker B)
+## THE SKY CASTLE, pass 3 of 6: the satellite islets and their shrines (m1778, Worker B)
 His sheet: little rocks drift round the castle, each with a pagoda shrine, chained to it. Nine ISLETS (cream rock cones, r 3-6.2) at three
 heights (Y0 -22 / -9 / +4) round the island at 1.45-2.2 R; green caps, bushes and ivy; seven carry an octagonal SHRINE -- a stone floor,
 eight red posts, two flared red roof tiers with a gold band, a gold ball and finial, a lantern glowing under the roof. Every islet BOBS on
