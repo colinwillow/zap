@@ -5,6 +5,11 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## His first measurement: 30.5 m (m15xx)
+*His screenshot of the Proving Ground's meter: "I cleared the furthest gap -- my best is 30-something. I haven't done the height yet."* BEST **30.5 m
+far, 4.8 m up** (the 24 m lane cleared with ~6 m spare). The lanes now run 6 -> 39 m in 3 m steps (12 lanes) so the ceiling is found, not
+cleared. **Design number for levels: a sprint + long jump + double + flicks reaches ~30 m** (the headless sprint+long+double alone was 25 m).
+
 ## The idle comes alive: ENERGY, and the bored look-around (m1823)
 *"Idle 8 and 14 might be the same, and there's no motion -- like frozen. On Mixamo you can increase the breathing for more energy. The other one is the
 same idle but he looks around -- it played once and froze; you'd play it when the player's stood still a while, bored."*
