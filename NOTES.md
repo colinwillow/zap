@@ -73,7 +73,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## The mill runs on the stream, and HAND-BUILT edges (Worker B)
+## The mill runs on the stream, and HAND-BUILT edges (m1750, Worker B)
 His (m1749): "the whole idea was it was being powered by the motion of the stream -- weird that the wheel isn't actually in the stream";
 "the spout -- the water is flowing off the backside of it"; and "very, very rigid straight lines... is there a way to solve this with a
 shader rather than geometry... an erosion shader... make that perfectly generated straight line look a little less perfect". THE MILL:
