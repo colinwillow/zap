@@ -89,6 +89,19 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## Red Hollows: posts to the ground, the bank's wet edge, painted bushes, a cinematic start (Worker B)
+His (m1751 phone shots): "floating things... parts of the house deck are floating -- they need to extend down into the ground"; "where the
+water meets the beach there needs to be... foam or the sand needs to discolour, more of a transition"; "green bushes... just green, really
+low poly -- add texture maps so they look like actual painted bushes; anything not painted needs painting"; "you start in a really weird
+spot, all this stuff in your way -- the [first picture] is a cinematic start". (1) The stall decks' front posts (`post(x, Zo, 0, ...)`)
+stood on the home's local 0 -- at x1.4 Zo is off the pad and over the bank's slope, so they hung in the air: their foot is now the real
+ground there minus .3. (2) The bank: `hwPaint` 'land' DARKENS the sand toward the water (wet: y .7 -> .08, x.58 blue-grey) with a pale
+wavering wash line at y ~.1, and the water's shore foam band is twice as wide (`shore` 0 -> .55 m of depth). (3) A painted leaf map
+(`textures/hollows_leaves.webp`, generated, made tileable) is a new `HWPAINT` kind, 'leaves' -- the home's sage/olive bushes, vines and
+cliff shrubs, the sky islands' trees and the hollows' leafy plants; the home's bushes are detail 2 and smooth-shaded (normals off the
+sphere) instead of 80 flat facets. (4) `H.spawn` is the east bank at z 18 facing upstream: the river on his left, Grumbo's home across it,
+the rope bridge ahead (his first picture). Still unpainted: the cacti, the white bead strings, the vines lying on the sand (they read as
+barbed wire -- next pass). The docks: m1753 already gave them their full length back (raised over the river); he has not seen it yet.
 ## HAND-BUILT down to a tenth (m1754, Worker B)
 His (m1753): "only apply it to one very specific point -- it looks like it's everywhere... just turn it off for now, multiply by .1, it's
 so strong and it looks kinda not great". `HWWOB.amp` 7 cm -> 7 mm, under a new key (`mel.wob2`) so a phone that stored 7 cm starts at 7 mm;

@@ -68590,7 +68590,7 @@ function rwBuild() {
         vec3 spec = uSunCol * (pow(nh, 900.0) * 60.0 + pow(nh, 120.0) * 0.6) * smoothstep(0.0, 0.08, uSunDir.y);
         vec2 huv = p / uHT.x + 0.5; float hgt = mix(uHT.y, uHT.z, texture(uHgt, huv).r); float inMap = step(abs(huv.x - 0.5), 0.5) * step(abs(huv.y - 0.5), 0.5);
         float dep = mix(30.0, -hgt + vW.y, inMap); float fn = texture(uNoise, p * 0.21 + uTime * vec2(0.013, 0.009)).g, fn2 = texture(uNoise, p * 0.63 - uTime * vec2(0.02, 0.011)).b;
-        float band = sin(dep * 9.0 - uTime * 1.6 + fn * 6.0) * 0.5 + 0.5; float shore = 1.0 - smoothstep(0.0, 0.28, dep);
+        float band = sin(dep * 9.0 - uTime * 1.6 + fn * 6.0) * 0.5 + 0.5; float shore = 1.0 - smoothstep(0.0, 0.55, dep);
         float foam = shore * smoothstep(0.55, 0.85, fn2 * 0.55 + band * 0.45 + shore * 0.35) * 0.85; float fsx = texture(uNoise, vec2(dot(p, vec2(uFlow.y, -uFlow.x)) * 0.32, dot(pf2, normalize(uFlow + 1e-5)) * 0.045)).g; foam += smoothstep(0.6, 0.82, fsx) * (1.0 - smoothstep(0.15, 1.5, dep)) * step(0.01, length(uFlow)) * 0.55; foam = clamp(foam + rfoam * (0.6 + fn2 * 0.6), 0.0, 1.0); float edge = smoothstep(0.0, 0.06, dep);
         float lit = max(uSunDir.y, 0.0) * 0.8 + 0.25; vec3 foamCol = vec3(0.92) * lit + uSunCol * 0.25 * lit + uScat * 0.6;
         vec3 rgb = refl * F + spec * (1.0 - foam); float a = F; rgb = rgb * (1.0 - foam) + foamCol * foam; a = a * (1.0 - foam) + foam; rgb *= edge; a *= edge;
@@ -68667,7 +68667,7 @@ function ghPathMat() { if (ghPathMat.m) return ghPathMat.m; const cv = document.
 // geometry has no UVs) and MULTIPLIES the existing colour by map / its own linear mean -- so the palette, the strata bands, the moss and the
 // FALLEN drain all stay what they were and the paint is the detail. 'land': sand on the flats, cliff on the steeps (by slope); 'rock': the rock
 // map. It goes in BEFORE `color_fragment`, so a drain spliced after it still has the last word. `HWPAINT.k` is the strength (0 = off)
-const HWPAINT = { k: .85, sand: { n: 'hollows_sand', s: 7, mean: [.8579, .2564, .0882] }, rock: { n: 'hollows_rock', s: 3.2, mean: [.485, .1559, .0497] }, cliff: { n: 'hollows_cliff', s: 12, mean: [.4453, .0731, .0466] }, pebble: { n: 'hollows_pebble', s: 3, mean: [.2112, .1599, .0906] },
+const HWPAINT = { k: .85, sand: { n: 'hollows_sand', s: 7, mean: [.8579, .2564, .0882] }, rock: { n: 'hollows_rock', s: 3.2, mean: [.485, .1559, .0497] }, cliff: { n: 'hollows_cliff', s: 12, mean: [.4453, .0731, .0466] }, pebble: { n: 'hollows_pebble', s: 3, mean: [.2112, .1599, .0906] }, leaves: { n: 'hollows_leaves', s: 1.6, mean: [.1402, .222, .0632] },
   planks: { n: 'wood_planks', s: 2.2, mean: [.0648, .022, .016] }, timber: { n: 'wood_timber', s: 1.6, mean: [.1474, .0826, .0409] }, stone: { n: 'stone_blocks', s: 2.4, mean: [.1351, .1359, .1267] } };
 // pass 3: the texture library's planks / timber / stone by the same rule (the bridges, poles, the stone lanterns), and the caves and sky islands
 // pass 2: kinds 'cliff' (triplanar cliff: the ledge paths' retaining faces), 'sand' (the walkways), and on 'land' the PEBBLE bed below the waterline
@@ -68700,6 +68700,8 @@ function hwPaint(mat, kind) { if (!HWPAINT.k) return mat; const P = HWPAINT, ob 
         vec3 ta = (hwTile(uHwA, vHwP.zy * uHwAs) * bw.x + hwTile(uHwA, vHwP.xy * uHwAs) * bw.z) / uHwAm + ` + (top ? `hwTile(uHwT, vHwP.xz * uHwTs) / uHwTm * bw.y;` : `hwTile(uHwA, vHwP.xz * uHwAs) / uHwAm * bw.y;`) +
         (land ? ` vec3 tb = texture2D(uHwB, vHwP.xz * uHwBs).rgb / uHwBm; tb = mix(vec3(1.0), tb, 1.6); vec3 tc = texture2D(uHwC, vHwP.xz * uHwCs).rgb / uHwCm; tb = mix(tb, tc, smoothstep(0.4, 0.0, vHwP.y)); ta = mix(ta, tb, smoothstep(0.62, 0.82, hn.y));` : '') + `
         diffuseColor.rgb *= mix(vec3(1.0), clamp(ta, 0.0, 2.2), uHwK);` + (land ? `
+        { float wet = (1.0 - smoothstep(0.08, 0.7, vHwP.y)) * smoothstep(-0.9, -0.2, vHwP.y), lap = smoothstep(0.035, 0.0, abs(vHwP.y - 0.1 - 0.04 * sin(vHwP.x * 1.3 + vHwP.z * 0.9 + sin(vHwP.z * 0.37) * 3.0)));
+          diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.58, 0.55, 0.6), wet * 0.85) + vec3(0.32, 0.3, 0.28) * lap; }
         for (int i = 0; i < 5; i++) { vec4 K = uCv[i]; if (K.w == 0.0) continue; float u = (vHwP.x - K.x) * K.w, w = vHwP.z - K.z; if (u < -1.0 || abs(w) > uCvR.y + 2.0 || vHwP.y > K.y + 8.0) continue;
           { float a = 0.0, b = 0.0; if (u < uCvS.x) { a = uCvS.y; b = uCvS.z; } float t = (u - uCvR.x) / uCvR.z; if (abs(t) < 1.0) { float q = sqrt(1.0 - t * t); a = max(a, uCvR.y * q); b = max(b, uCvS.w * sqrt(q)); }
             if (u > 0.3 && abs(w) < a && vHwP.y > K.y + 0.4 && vHwP.y < K.y + b) discard; }     // the coarse land's own slope, inside the cave's volume: not there
@@ -69111,7 +69113,7 @@ function ghomeBuild(at, yaw, y0) {
     for (const sx of [-1, 1]) { const xa = sx < 0 ? -9.8 : 2.4, xb = sx < 0 ? -2.4 : 9.8;
       box(xa, xb, -1, P, 3.4, Zo + .2); for (let x = xa; x < xb - .01; x += .32) vbox(x + .01, Math.min(xb, x + .31), P - .12, P, 3.4, Zo + .2, woodP, 0);
       vbox(xa, xb, P - .45, P - .12, Zo, Zo + .2, wood, 0);
-      for (const x of sx < 0 ? [-9.6, -6.2, -2.6] : [2.6, 6.2, 9.6]) { post(x, Zo, 0, Yo + .25); }
+      for (const x of sx < 0 ? [-9.6, -6.2, -2.6] : [2.6, 6.2, 9.6]) { post(x, Zo, Math.min(0, (rwHeight(Wx(x, Zo), Wz(x, Zo)) - y0) / hk) - .3, Yo + .25); }
       beamX(xa - .1, xb + .1, Yo, Zo);
       // the AWNING: from just under the front beam, sagging, down to the outer beam; walkable
       awning([xa - .15, Yu - .18, Zf + .15], [xb + .15, Yu - .18, Zf + .15], [xb + .25, Yo + .05, Zo + .35], [xa - .25, Yo + .05, Zo + .35], awnM, .22); }
@@ -69458,7 +69460,7 @@ function ghomeBuild(at, yaw, y0) {
   // greens), golden GRASS tufts, YUCCAS (a rosette of blades and a cream flower spike), the valley's own ALIEN BULBS (lavender, faintly lit,
   // on curling stalks), and REEDS and cattails where the bank meets the water. All merged: one draw per look ----
   { const gH = (x, z) => (rwHeight(Wx(x, z), Wz(x, z)) - y0) / hk, wY = -y0 / hk, rnd = rwRng(2020), NC = { noCam: 1 };
-    const sage = new THREE.MeshStandardMaterial({ color: 0x7f8c5c, roughness: .95 }), olive = new THREE.MeshStandardMaterial({ color: 0x55633a, roughness: .95 }), straw = new THREE.MeshStandardMaterial({ color: 0xc2a55e, roughness: .95 });
+    const sage = hwPaint(new THREE.MeshStandardMaterial({ color: 0x8f9c64, roughness: .95 }), 'leaves'), olive = hwPaint(new THREE.MeshStandardMaterial({ color: 0x6a7845, roughness: .95 }), 'leaves'), straw = new THREE.MeshStandardMaterial({ color: 0xc2a55e, roughness: .95 });
     const reedM = new THREE.MeshStandardMaterial({ color: 0x6f7a3e, roughness: .9 }), brownM = new THREE.MeshStandardMaterial({ color: 0x5a3a22, roughness: .9 }), bulbM = new THREE.MeshStandardMaterial({ color: 0xc8a8ff, emissive: 0x7a52d8, emissiveIntensity: .9, roughness: .5 }), creamM = new THREE.MeshStandardMaterial({ color: 0xf1e6c4, roughness: .8 });
     straw.userData.sway = reedM.userData.sway = 1;     // pass 23: every blade carries its height (set before any is put, or the bucket will not merge)
     const free = (x, z) => { if (Math.abs(x) < 2.8 && z > 5) return false; if (x > 9 && x < 17 && z > 3.6 && z < 7.6) return false; if (z > 3 && z < 8 && Math.abs(x) < 10.2) return false; if (x < -8.4 && x > -11 && z > 8.6 && z < 10.4) return false;
@@ -69468,7 +69470,7 @@ function ghomeBuild(at, yaw, y0) {
     const shelf = (x, z, w, h, d, ry) => { if (!flat(x, z, Math.max(w, d)) || A.onPath(x, z, Math.max(w, d) * .8)) return; const y = gH(x, z); put(ghRockGeo(sd++, w, h, d, 3), A.rockM, at4(x, y - h * .35, z, ry, (rnd() - .5) * .08, (rnd() - .5) * .08)); const c = Math.abs(Math.cos(ry)), s2 = Math.abs(Math.sin(ry)), ex = w * c + d * s2, ez = w * s2 + d * c; box(x - ex * .7, x + ex * .7, y - 1, y + h * .45, z - ez * .7, z + ez * .7); };
     for (const [x, z, w, h, d, ry] of [[-16, -2, 4.2, 1.1, 2.6, .4], [-14, -9, 5.2, 1.5, 3, -.3], [15, -7, 4.6, 1.2, 2.4, .9], [-21, 5, 3.4, .8, 2.2, 1.3], [6, -11.5, 4.8, 1.0, 2.2, .1], [-6, -12, 3.6, .9, 2, -.6], [21, -1, 3, .7, 1.8, .5]]) if (gH(x, z) > wY + .3 && flat(x, z, Math.max(w, d))) { shelf(x, z, w, h, d, ry); for (let k = 0; k < 2; k++) { const a = rnd() * 6; shelf(x + Math.sin(a) * w * .8, z + Math.cos(a) * d * .8, w * .45, h * .6, d * .5, ry + rnd()); } }
     // the plants
-    const bush = (seed, r) => { const gg = new THREE.IcosahedronGeometry(1, 1), q = gg.attributes.position; for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = q.getY(i), z = q.getZ(i), d = .78 + ghNoise3(x * 2.1 + seed, y * 2.1, z * 2.1 - seed) * .5; q.setXYZ(i, x * d * r, Math.max(-.35, y) * d * r * .85, z * d * r); } gg.computeVertexNormals(); return gg; };     // round and lumpy, faceted: a bush, not a pad
+    const bush = (seed, r) => { const gg = new THREE.IcosahedronGeometry(1, 2), q = gg.attributes.position, nn = gg.attributes.normal; for (let i = 0; i < q.count; i++) { const x = q.getX(i), y = q.getY(i), z = q.getZ(i), d = .78 + ghNoise3(x * 2.1 + seed, y * 2.1, z * 2.1 - seed) * .5; q.setXYZ(i, x * d * r, Math.max(-.35, y) * d * r * .85, z * d * r); nn.setXYZ(i, x, y, z); } return gg; };     // round and lumpy, smooth-shaded, painted leaves (m1755): a bush, not a pad
     const sagebrush = (x, y, z, k) => { const n = 4 + ((rnd() * 4) | 0); for (let i = 0; i < n; i++) { const a = rnd() * 6, r = rnd() * .35 * k, s = (.2 + rnd() * .2) * k; put(bush(sd++ * 1.7, s), rnd() < .5 ? sage : olive, at4(x + Math.sin(a) * r, y + s * .55 + rnd() * s * .4, z + Math.cos(a) * r, rnd() * 6)); }
       for (let i = 0; i < 5; i++) { const a = rnd() * 6; put(new THREE.CylinderGeometry(.008, .015, .3 * k, 3), brownM, at4(x + Math.sin(a) * .15 * k, y + .1, z + Math.cos(a) * .15 * k, 0, Math.cos(a) * .5, Math.sin(a) * .5)); } };
     const grass = (x, y, z, k) => { for (let i = 0; i < 9; i++) { const a = rnd() * 6, t = .25 + rnd() * .45, h = (.35 + rnd() * .35) * k; put(new THREE.ConeGeometry(.025 * k, h, 3), straw, _m4.compose(new THREE.Vector3(x + Math.sin(a) * .06, y + h * .45, z + Math.cos(a) * .06), _q.setFromEuler(_e.set(Math.cos(a) * t, 0, -Math.sin(a) * t)), _one)); } };
@@ -70237,7 +70239,7 @@ function rockScatterHome() { const H = HOME, R = plantRnd(1745), rec = [], [sx, 
   const g = new THREE.Group(); scene.add(g); plantFlush(g, rec); boxGrid(); HOME.stat.rocks = n; }
 async function buildHome() {
   const H = HOME; try { const q = new URLSearchParams(location.search).get('style'); if (q === 'lake' || q === 'hollows') H.style = q; } catch (e) {}
-  if (H.style !== 'lake') { H.padY = 1.3; H.hut.at = [hwRc(-4) - 14, -4]; H.hut.yaw = Math.PI / 2; H.spawn = [hwRc(10) - 7, 10]; RW.time = { el: 18, az: 200, sun: [1, .8, .58], zen: [.28, .46, .78], hor: [1, .86, .7] }; }
+  if (H.style !== 'lake') { H.padY = 1.3; H.hut.at = [hwRc(-4) - 14, -4]; H.hut.yaw = Math.PI / 2; H.spawn = [hwRc(18) + 7.5, 18]; RW.time = { el: 18, az: 200, sun: [1, .8, .58], zen: [.28, .46, .78], hor: [1, .86, .7] }; }
   else H.padY = 1.15;
   if (GHOME.on) { if (H.style !== 'lake') H.hut.at = [hwRc(-4) - 15, -4]; H.hut.w = 12; H.hutS = 1.6; }     // GRUMBO'S HOME (procedural): a bigger pad, his things set further out
   rwBuild();
@@ -70562,7 +70564,7 @@ function hollowDress() {
       if (r() < .7) { const fh = y * (.35 + r() * .2), f = new THREE.PlaneGeometry(s * .25, fh, 1, 10), fp = f.attributes.position; for (let k = 0; k < fp.count; k++) { const v = .5 - fp.getY(k) / fh; fp.setX(k, fp.getX(k) * (1 + v * 2.2)); }  f.translate(x + s * .85, y - fh / 2, z); fall.push(aBobOf(f, ph)); } }
     // his (after m1704): fallen and restored read as a HYBRID -- these sky islands floated over a fallen valley. KORAJIN: the floating world is
     // what RESTORATION raises, so FALLEN has none
-        const sky = AGE.st !== 'fallen', SI = H.skyIsl = []; SI.push(rwMesh(isl[0], bobPatch(hwPaint(rwMat(0xc08860, { flatShading: true }), 'rock'), 1.4, .32)), rwMesh(isl[1], bobPatch(hwPaint(rwMat(0xb7744e, { flatShading: true }), 'cliff'), 1.4, .32)), rwMesh(top, bobPatch(hwPaint(rwMat(0x6a9448), 'sand'), 1.4, .32)), rwMesh(tree, bobPatch(rwMat(0x3f6e34, { flatShading: true }), 1.4, .32))); for (const o of SI) o.visible = sky; if (fall.length) { const fm = rwMesh(fall, hwFallMat(-1, 1, [1.4, .32], [.5, .72, .9], [.92, .97, 1]), false); fm.renderOrder = 3; fm.visible = sky; SI.push(fm); } }
+        const sky = AGE.st !== 'fallen', SI = H.skyIsl = []; SI.push(rwMesh(isl[0], bobPatch(hwPaint(rwMat(0xc08860, { flatShading: true }), 'rock'), 1.4, .32)), rwMesh(isl[1], bobPatch(hwPaint(rwMat(0xb7744e, { flatShading: true }), 'cliff'), 1.4, .32)), rwMesh(top, bobPatch(hwPaint(rwMat(0x6a9448), 'sand'), 1.4, .32)), rwMesh(tree, bobPatch(hwPaint(rwMat(0x4f7e3c, { flatShading: true }), 'leaves'), 1.4, .32))); for (const o of SI) o.visible = sky; if (fall.length) { const fm = rwMesh(fall, hwFallMat(-1, 1, [1.4, .32], [.5, .72, .9], [.92, .97, 1]), false); fm.renderOrder = 3; fm.visible = sky; SI.push(fm); } }
   // HIS STONE LANTERNS on the approach
   { const st = [], lit = []; for (const [dx, dz] of [[9, -3.2], [9, 3.2], [6.2, -3.2], [6.2, 3.2]]) { const x = H.hut.at[0] + dx + (H.hutS ? 0 : 0), z = H.hut.at[1] + dz * (H.hutS || 1), y = rwHeight(x, z);     // in front of the door (the hut faces the river, +x)
       st.push(B(.9, .3, .9, x, y + .15, z), Cy(.16, .2, 1.1, x, y + .85, z, 6), B(.7, .18, .7, x, y + 1.45, z), B(1.05, .2, 1.05, x, y + 2.2, z), Cy(.0, .62, .45, x, y + 2.5, z, 4));
@@ -70606,7 +70608,7 @@ function homeDress() {
       const sg = new THREE.CylinderGeometry(.07, .09, h, 6); sg.rotateZ(lean); sg.translate(x + Math.sin(lean) * -h / 2, y + h / 2, z); stalk.push(sg);
       for (let k = 1; k < h / .7; k++) { const nd = new THREE.CylinderGeometry(.1, .1, .05, 6); nd.translate(x - lean * k * .7, y + k * .7, z); node.push(nd); }
       for (let k = 0; k < 3; k++) { const lf = new THREE.ConeGeometry(.45, 1.1, 4); lf.rotateZ(Math.PI / 2 + (r() - .5)); lf.rotateY(r() * 6.28); lf.translate(x - lean * h + (r() - .5), y + h - k * .8, z + (r() - .5)); leaf.push(lf); } }
-    rwMesh(stalk, rwMat(0x7fa64a, { roughness: .6 })); rwMesh(node, rwMat(0x58773a), false); rwMesh(leaf, rwMat(0x5f9640, { flatShading: true }));
+    rwMesh(stalk, rwMat(0x7fa64a, { roughness: .6 })); rwMesh(node, rwMat(0x58773a), false); rwMesh(leaf, hwPaint(rwMat(0x6fa64a, { flatShading: true }), 'leaves'));
     BOXES.push({ minx: cx - 3, maxx: cx + 3, miny: -2, maxy: 9, minz: cz - 2, maxz: cz + 2 }); }
   // THE BLACK PINE: a gnarled trunk and flat cloud pads of needles, with a few glowing alien pods; and a little cherry
   homePine(H.pine[0], H.pine[1]); homeCherry(H.cherry[0], H.cherry[1]);
