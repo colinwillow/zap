@@ -5,6 +5,18 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Grumbo's home at x1.4, and a SKY PER STATE (Worker B)
+His (m1724): "really small on the inside -- the inside should be much more expansive"; he chose SCALE IT ALL x1.4 (`GHOME.k`). The group
+is scaled; every local -> world conversion in `ghomeBuild` carries `hk` (Wx/Wz, the boxes, the walk triangles, the ladder, the bells,
+the winch, the gate, the lift), every world -> local divides (the four `gH`s, the cliff shrubs' `L`, the water `wY`), and the outside
+users (the lift's box and carry, the shutters' and pots' hit tests and world points, the restoration plate, the canoe's strike) too. The
+terrain pad under the home widens with it (`hwHomeK`). **`k` itself could not be the name**: the builder has `const k = rnd()` in the same
+blocks as its height helpers, and the first try was a blank page (check:boot caught it). Sim: from the ground in front, up the steps and in
+through the door to the hall's middle at floor height (2.98), through the counter's gap.
+**THE SKIES** (his: "different HDRIs; the restored brighter"): `rwSkyPick` per state, chosen when the sky builds (after `?hs=`): RESTORED
+DAY -- the bright blue panorama (`images/hdri_game.png`, sun measured at u .272 v .597; its horizon is ~70% down the image, so its sun is
+~18 deg up: at 38 the mountains rose into the sky, the render showed it); FALLEN FIRE (the burning sunset, the sun on the horizon).
+TOOLS > HOLLOWS SKY cycles DAY / PANO / FIRE / PAINTED for the state he is in (`mel.rwsky.fallen` / `.restored`).
 ## Grumbo's home: the doorway is clear (Worker B)
 His (m1724): "there's a thing in the way in the main door -- a table, a row of jugs, right in the doorway". Render from the front door: the
 shop COUNTER (x -2.2..2.2) with its row of pots spanned the whole opening, and the screen wall's low shelf boards (.6, 1.3, 2.0 m) ran
