@@ -181,7 +181,10 @@ canvas { display: block; width: 100%; height: 100%; touch-action: none; }
 @media (min-aspect-ratio: 3/4) { #splash img.main { object-fit: contain; } #splash img.blur { display: block; } }
 #splash .kjtap { position: absolute; left: 0; right: 0; margin: 0 auto; width: max-content; bottom: calc(7% + env(safe-area-inset-bottom)); padding: 12px calc(30px - .12em) 12px 30px;     /* m1319: centred by margin, not transform -- the pulse's own transform was overwriting translateX(-50%) and pushing it right */
   border-radius: 999px;
-  font: 700 18px var(--disp), sans-serif; letter-spacing: .12em; color: #f4e9d8; background: #8f1d22cc; border: 2px solid #f4e9d8aa; animation: splashPulse 1.6s ease-in-out infinite; pointer-events: none; }
+  font: 700 18px var(--disp), sans-serif; letter-spacing: .16em; color: #e6fbff; background: rgba(9,12,20,.62); border: 1.5px solid hsl(196 100% 72%); animation: splashPulse 1.6s ease-in-out infinite; pointer-events: none;
+  /* m15xx (his: "the start button needs to look more like the reticle -- subtle, stylized"): the reticle's portal -- a thin azure line, a dark
+     gap, a second fainter ring outside it, and the neon drawn as a wide faint copy (box-shadow spreads, never a filter) */
+  box-shadow: 0 0 0 4px rgba(9,12,20,.55), 0 0 0 5px hsl(196 100% 70% / .45), 0 0 0 11px hsl(196 100% 62% / .10), 0 0 18px 3px hsl(196 100% 60% / .28); text-shadow: 0 0 8px hsl(196 100% 70% / .7); }
 #splash .glow { position: absolute; border-radius: 999px; pointer-events: none; box-shadow: 0 0 0 2px #ffffffaa, 0 0 26px 6px #8fe8ffaa;
   animation: splashPulse 1.6s ease-in-out infinite; }
 @keyframes splashPulse { 0%, 100% { opacity: .35; transform: scale(.98); } 50% { opacity: 1; transform: scale(1.03); } }
@@ -631,10 +634,20 @@ body.dyn.desk .zone { display: none; }
 }
 #qdTop { --mr: 152px; }
 #qdRow.on, #qdTop.on { display: block; }
-#qdRow path, #qdTop path { fill: rgba(11,13,18,.35); stroke: var(--rc); stroke-width: 2; pointer-events: all; cursor: pointer; }
-#qdRow path.sel, #qdTop path.sel { fill: var(--rc); }
-#qdRow text, #qdTop text { font-family: var(--ui); font-size: 13px; font-weight: 700; letter-spacing: .08em; fill: var(--rc); text-anchor: middle; dominant-baseline: central; pointer-events: none; user-select: none; }
-#qdRow text.sel, #qdTop text.sel { fill: var(--ink); }
+#qdRow path, #qdTop path, #qdSub2 path { fill: rgba(9,12,20,.5); stroke: var(--rc); stroke-width: 1.6; pointer-events: all; cursor: pointer; }
+#qdRow .deco path, #qdTop .deco path, #qdSub2 .deco path, body.qd #wepRow .deco path { fill: none; pointer-events: none; }
+.deco path.g { stroke: var(--rc); stroke-width: 7; stroke-opacity: .2; }
+.deco path.in { stroke: var(--rc); stroke-width: .8; stroke-opacity: .55; }
+#qdRow path.sel, #qdTop path.sel, #qdSub2 path.sel { fill: var(--rc); fill-opacity: .82; }
+#qdSub2 { position: fixed; z-index: 6; display: none; --mr: 146px; --rc: var(--hot); pointer-events: none;
+  left: calc(20px + var(--padr) - var(--mr) + env(safe-area-inset-left)); bottom: calc(26px + var(--padr) - var(--mr) + env(safe-area-inset-bottom));
+  width: calc(var(--mr) * 2); height: calc(var(--mr) * 2); }
+#qdSub2.on { display: block; }
+body.qd #wepRow path { fill: rgba(9,12,20,.5); stroke-width: 1.6; }
+body.qd #wepRow path.sel { fill-opacity: .82; }
+#qdRow text, #qdTop text, #qdSub2 text { font-family: var(--ui); font-size: 13px; font-weight: 700; letter-spacing: .12em; fill: var(--rc); text-anchor: middle; dominant-baseline: central; pointer-events: none; user-select: none; }
+#qdRow text.sel, #qdTop text.sel, #qdSub2 text.sel { fill: var(--ink); }
+#qdSub2 text { font-size: 11px; }
 #wepRow path.on2 { fill: rgba(255,192,64,.45); }
 
 /* THE SAME ROW ON THE LEFT STICK, MIRRORED (m104). *"In the same way that we have the buttons
@@ -14111,7 +14124,7 @@ function spiderArea(x, y, z, r, power, dmg) { let n = 0; for (const S of SPIDER.
 // a limb or a blade sweeping from `a` to `b` (the strike's own sweep)
 function spiderSweep(a, b, rad, power, dmg, dirH) { let n = 0; for (const S of SPIDER.list.slice()) { const R = S.root.position;
     if (!segBody(a, b, R.x, R.z, SPIDER.w * SPIDER.hitR + rad, R.y + S.lift + SPIDER.P.h, rad, R.y)) continue;     // m1711: to the LEG span (.48 of its width), not the body's .38 -- a cut that met a leg missed, and at 20 fps every one did
-    const r = spiderBlow(S, dirH, power, dmg, _hitP.x, _hitP.z); if (r) { n++; if (r === 1) meleeHit(null, _hitP.x, _hitP.y, _hitP.z, .55 + Math.min(1, power) * .75); } } return n; }
+    const r = spiderBlow(S, dirH, power, dmg, _hitP.x, _hitP.z); if (r && bladeFire()) for (let k = 0; k < 16; k++) gfire(_hitP.x, _hitP.y, _hitP.z, .6); if (r) { n++; if (r === 1) meleeHit(null, _hitP.x, _hitP.y, _hitP.z, .55 + Math.min(1, power) * .75); } } return n; }
 // a bolt in flight: true when a spider stopped it
 function spiderShot(b) { for (const S of SPIDER.list) { const M = spiderMid(S, _sdC); if (Math.hypot(b.pos.x - M.x, (b.pos.y - M.y) * 1.4, b.pos.z - M.z) > SPIDER.w * .42 + b.size * .5) continue;
     spiderBlow(S, Math.atan2(b.vel.x, b.vel.z), b.rocket ? 1.4 : .6, FOE.dmg.bolt * (b.rocket ? ROCKET.dmgK : 1) * (1 + (b.chg || 0)), b.pos.x, b.pos.z); return true; } return false; }
@@ -14288,20 +14301,23 @@ function arrowStep(dt) {
   for (let i = ARROWS.length - 1; i >= 0; i--) { const A = ARROWS[i];
     if (A.stuck) { A.t += dt; if (A.t > ARCH.stay) { A.m.removeFromParent(); ARROWS.splice(i, 1); } continue; }
     const ox = A.m.position.x, oy = A.m.position.y, oz = A.m.position.z;
-    A.v.y -= MOVE.g * (A.ric ? 1 : .55) * dt; A.m.position.addScaledVector(A.v, dt); A.t += dt;
+    A.v.y -= MOVE.g * (A.ric ? 1 : A.gk != null ? A.gk : .55) * dt; A.m.position.addScaledVector(A.v, dt); A.t += dt;
     const P = A.m.position; if (A.ric) { A.m.rotateX(A.ric * dt); A.m.rotateY(A.ric * .37 * dt); } else A.m.lookAt(P.x + A.v.x, P.y + A.v.y, P.z + A.v.z);     // a glanced arrow TUMBLES
-    if (Math.random() < .6) spk(ox, oy, oz, 0, 0, 0, .05, .25, [1, .45, .35]);
+    if (A.type === 'fire') { gfire(P.x, P.y, P.z, .45); if (Math.random() < .5) gfire(ox, oy, oz, .35); } else if (A.pl) { if (Math.random() < .6) spk(ox, oy, oz, 0, 0, 0, .05, .25, A.full ? [.6, .9, 1] : [.6, .8, .7]); }
+    else if (Math.random() < .6) spk(ox, oy, oz, 0, 0, 0, .05, .25, [1, .45, .35]);
     // the player: the closest point of this frame's segment to his middle
     const sx = P.x - ox, sy = P.y - oy, sz = P.z - oz, L2 = sx * sx + sy * sy + sz * sz || 1;
     const cx = p.pos.x, cy = p.pos.y + H * .55, cz = p.pos.z, u = clamp(((cx - ox) * sx + (cy - oy) * sy + (cz - oz) * sz) / L2, 0, 1);
     const qx = ox + sx * u - cx, qy = oy + sy * u - cy, qz = oz + sz * u - cz;
     if (A.mine && ARENA.debris.length) { let dh = null; for (const D of ARENA.debris) if (D.die == null && D.m.position.distanceTo(P) < D.r + .3) { dh = D; break; } if (dh) { debrisCut(dh, Math.atan2(A.v.x, A.v.z) + Math.PI / 2); A.m.removeFromParent(); ARROWS.splice(i, 1); continue; } }
     if (A.mine && SPIDER.list.length) { let sh = null; for (const S of SPIDER.list) { const M = spiderMid(S, _sdC); if (Math.hypot(P.x - M.x, (P.y - M.y) * 1.3, P.z - M.z) < SPIDER.w * SPIDER.hitR) { sh = S; break; } }     // m1719: his arrows find the spiders too
-      if (sh) { spiderBlow(sh, Math.atan2(A.v.x, A.v.z), .7, A.dmg || 3, P.x, P.z); if (A.pl) BOW.stat.hits++; A.m.removeFromParent(); ARROWS.splice(i, 1); continue; } }
+      if (sh) { if (A.type === 'blast') arrowBlast(P, Math.atan2(A.v.x, A.v.z)); else { spiderBlow(sh, Math.atan2(A.v.x, A.v.z), A.pow || .7, A.dmg || 3, P.x, P.z); if (A.type === 'fire') for (let k = 0; k < 14; k++) gfire(P.x, P.y, P.z, .7); } if (A.pl) BOW.stat.hits++; A.m.removeFromParent(); ARROWS.splice(i, 1); continue; } }
     if (A.mine) { let hit = null; for (const d of DUMMIES) { if (d.st === 'gone' || d.st === 'down' || !d.root.visible) continue; const R = d.root.position, hh = (d.K.h || 1.8);
         if (Math.abs(P.y - (R.y + hh * .5)) < hh * .55 && Math.hypot(P.x - R.x, P.z - R.z) < (d.K.r || .4) + .25) { hit = d; break; } }
       if (!hit && bldHit(P.x, P.y, P.z, .3, 3)) { A.m.removeFromParent(); ARROWS.splice(i, 1); continue; }     // m1128: a bolt sent home smashes the ballista
-      if (hit) { dummyBlow(hit, Math.atan2(A.v.x, A.v.z), 1, A.dmg || 6); if (A.pl) BOW.stat.hits++; spkBurst(P.x, P.y, P.z, 14, { col: [.6, .85, 1], spread: 4, size: .12, life: .35 }); snd('hit', { g: 1, r: 1, x: P.x, z: P.z }); ARCH.stat.back = (ARCH.stat.back || 0) + 1;
+      if (hit && A.type === 'blast') { arrowBlast(P, Math.atan2(A.v.x, A.v.z)); BOW.stat.hits++; A.m.removeFromParent(); ARROWS.splice(i, 1); continue; }
+      if (hit && A.type === 'fire') { burnStart(hit); BOW.stat.fires++; }
+      if (hit) { dummyBlow(hit, Math.atan2(A.v.x, A.v.z), A.pow != null ? A.pow : 1, A.dmg || 6); if (A.pl) BOW.stat.hits++; spkBurst(P.x, P.y, P.z, 14, { col: [.6, .85, 1], spread: 4, size: .12, life: .35 }); snd('hit', { g: 1, r: 1, x: P.x, z: P.z }); ARCH.stat.back = (ARCH.stat.back || 0) + 1;
         A.m.removeFromParent(); ARROWS.splice(i, 1); continue; } }
     else if ((p.inter || p.interHold > 0 || (p.chargeGo && p.chLock)) && Math.abs(qy) < H * .8 && Math.hypot(qx, qz) < 1.1) {     // m1711 (his: "I'd release at the right time and as I flew through the air the arrows would still hit me"): in the intercept every arrow that reaches him is CUT and sent back -- at 20 fps an arrow covers 1.3 m a frame and could pass `deflStep`'s point test between frames
       const inter = p.inter; deflectThreat({ A, p: P }, 1); DEFL.stat.lockHits++; p.defl = null; p.chLock = null; p.inter = null; if (inter) { p.vel.x = 0; p.vel.z = 0; p.vel.y = Math.max(0, p.vel.y) * .2 + 1.5; p.interHold = INTER.hold; } continue; }
@@ -14316,6 +14332,8 @@ function arrowStep(dt) {
     const wall = boxRay(ox, oy, oz, P.x, P.y, P.z, _tuR);
     if (P.y <= gy || wall || A.t > 5) {
       if (wall) P.set(_tuR.x, _tuR.y, _tuR.z); else if (P.y <= gy) P.y = gy + .02;
+      if (A.pl && A.type === 'blast') { arrowBlast(P, Math.atan2(A.v.x, A.v.z)); A.m.removeFromParent(); ARROWS.splice(i, 1); continue; }
+      if (A.pl && A.type === 'fire') for (let k = 0; k < 12; k++) gfire(P.x + (Math.random() - .5) * .3, P.y, P.z + (Math.random() - .5) * .3, .6);
       A.stuck = 1; A.t = 0; ARCH.stat.stuck++; if (A.ric) { A.ric = 0; A.m.lookAt(P.x + A.v.x, P.y + A.v.y, P.z + A.v.z); } A.m.userData.head.material.emissive.setHex(0);
       spkBurst(P.x, P.y, P.z, 6, { col: [.8, .7, .55], spread: 2, size: .07, life: .3 }); snd('thud', { g: .35, r: 1.6, x: P.x, z: P.z }); }
   }
@@ -14356,18 +14374,42 @@ function archerBow(d) {
 // over whatever his legs are doing; letting go LOOSES: `bow_recoil`, and an arrow from the nock to the reticle's point -- a lob solved to land
 // there, faster and flatter the longer it was drawn (`full` s to full power). His arrows are `mine`: they hit the bowmen, the spiders (a hit takes
 // a leg on the way to the burst), chip statues, smash what `bldHit` breaks, and stick in walls and the ground.
-const BOW = { full: .9, drawRate: 1.5, v0: 18, v1: 40, dmg0: 2, dmg1: 6, limbK: .78, stat: { shots: 0, hits: 0 } };
+const BOW = { full: 1.1, drawRate: 1.5, v0: 22, v1: 72, g0: .55, g1: .05, dmg0: 1, dmg1: 3, pow0: .12, pow1: 1.2, keep: .3, limbK: .78, blastR: 2.6, blastDmg: 4, fireDmg: 1, stat: { shots: 0, hits: 0, blasts: 0, fires: 0 } };     // m15xx: the charge is the shot -- a tap lobs slow, a full draw flies fast and almost true; only a FULL draw knocks back
 const _bwL = new THREE.Vector3(), _bwR = new THREE.Vector3(), _bwA = new THREE.Vector3(), _bwB = new THREE.Vector3(), _bwM = new THREE.Vector3(), _bwD = new THREE.Vector3();
 function bowDraw() { const p = player; p.bowT = 0; const n = 'bow_draw', r = BOW.drawRate; if (rig.actions[n + UPS]) { playOnce(n + UPS, r); playOnce(n + UP, r); }
   snd('swoosh', { g: .25, r: .55 }); }
-function bowLoose() { const p = player, B = BOW.mesh; const k = clamp((p.bowT || 0) / BOW.full, .2, 1);
+// m15xx (his: "the arrows shoot with an arc and they're kind of slow, not fun; a regular arrow should just do the hit -- the guy takes a punch, maybe
+// three arrows -- not fly back; the more you charge, the faster and stronger it flies, a full charge really true, and maybe it sends them back
+// or explodes; and the types: regular, fire, ballistic / exploding"). The DRAW is the charge (`full` s): speed v0 -> v1, gravity g0 -> g1 (a
+// full draw barely drops), damage dmg0 -> dmg1, and the blow's power stays a flinch (`pow0`, under every body's `fling`) until the draw is FULL
+// (`pow1`: knocked back). The TYPE (`QD.arrow`, the left sub-menu): FIRE trails green flame, sets what it hits burning (`burnStart`) and does
+// `fireDmg` more; BLAST bursts on whatever it meets -- bodies, spiders, debris, walls, the ground -- in `blastR` m.
+function bowLoose() { const p = player, B = BOW.mesh; const k = clamp((p.bowT || 0) / BOW.full, .15, 1), full = k >= .97, type = QD.arrow || 'normal';
   const o = B && B.nock.visible ? B.nock.position.clone() : p.pos.clone().setY(p.pos.y + (RIG.height || 1.4) * .8);
-  const a = aimTarget(), tx = a.p.x, ty = a.p.y, tz = a.p.z, dx = tx - o.x, dz = tz - o.z, R = Math.hypot(dx, dz) || 1, sp = BOW.v0 + (BOW.v1 - BOW.v0) * k, T = Math.max(.05, Math.hypot(R, ty - o.y) / sp), g = MOVE.g * .55;
-  const m = arrowMesh(); m.position.copy(o); scene.add(m); m.userData.head.material.emissive.setRGB(.15, .6, .45);
-  ARROWS.push({ m, v: new THREE.Vector3(dx / T, (ty - o.y) / T + .5 * g * T, dz / T), t: 0, stuck: 0, from: null, mine: 1, pl: 1, dmg: BOW.dmg0 + (BOW.dmg1 - BOW.dmg0) * k });
+  const a = aimTarget(), tx = a.p.x, ty = a.p.y, tz = a.p.z, dx = tx - o.x, dz = tz - o.z, R = Math.hypot(dx, dz) || 1, sp = BOW.v0 + (BOW.v1 - BOW.v0) * k * k, gk = BOW.g0 + (BOW.g1 - BOW.g0) * k, T = Math.max(.04, Math.hypot(R, ty - o.y) / sp), g = MOVE.g * gk;
+  const m = arrowMesh(); m.position.copy(o); scene.add(m); const hc = type === 'fire' ? [.2, 1, .55] : type === 'blast' ? [1, .35, .1] : full ? [.3, .9, 1] : [.12, .5, .4]; m.userData.head.material.emissive.setRGB(hc[0], hc[1], hc[2]); m.userData.head.material.emissiveIntensity = 1.6;
+  ARROWS.push({ m, v: new THREE.Vector3(dx / T, (ty - o.y) / T + .5 * g * T, dz / T), t: 0, stuck: 0, from: null, mine: 1, pl: 1, gk, type, full,
+    dmg: BOW.dmg0 + (BOW.dmg1 - BOW.dmg0) * k + (type === 'fire' ? BOW.fireDmg : 0), pow: full ? BOW.pow1 : BOW.pow0 });
   const n = 'bow_recoil'; if (rig.actions[n + UPS]) { playOnce(n + UPS, 1.4); playOnce(n + UP, 1.4); } p.fireT = 1; p.bowT = 0; BOW.stat.shots++;
-  snd('swoosh', { g: .55 + k * .35, r: 1.9 - k * .4 }); snd('clang', { g: .12, r: 2.4 }); }
-function bowStep(dt) { const p = player, s = slotNow(), on = !!s.bow;
+  snd('swoosh', { g: .55 + k * .35, r: 1.9 - k * .5 }); snd('clang', { g: .12 + (full ? .2 : 0), r: full ? 1.6 : 2.4 }); if (full) camShake(.05); }
+// a BLAST arrow's burst, wherever it ends
+function arrowBlast(P, dirH) { BOW.stat.blasts++; const R = BOW.blastR;
+  for (let i = 0; i < 3; i++) spkBurst(P.x, P.y, P.z, 18, { col: i ? [1, .55, .15] : [1, 1, .85], spread: 6, size: .22, life: .55 });
+  for (let i = 0; i < 6; i++) smokeAt(P.x + (Math.random() - .5), P.y + Math.random() * .5, P.z + (Math.random() - .5), 3, 1.3, [.35, .32, .3]);
+  snd('boom', { g: .6, r: 1.2 + Math.random() * .1, x: P.x, z: P.z }); camShake(.18);
+  BLOW_SRC = 'rocket'; dummyHit(P.x, P.z, dirH, 1.3, R, BOW.blastDmg, WEAP.palBlast); BLOW_SRC = '';
+  if (SPIDER.list.length) spiderArea(P.x, P.y, P.z, R, 1.2, BOW.blastDmg); if (ARENA.debris.length) debrisArea(P.x, P.y, P.z, R); bldHit(P.x, P.y, P.z, R * .6, 3); if (CWALL.list.length) wallHit(P.x, P.y, P.z, 1, 2, 'blast', dirH); }
+// m15xx (his: "versions of the weapons -- the katana, maybe a flaming katana, maybe green flame"): JIN FIRE on the blade (the left sub-menu while the
+// sword is out). Green flame (`gfire`) licks along the edge from the guard to the tip (`muzzleWorld`, the far end of the blade along its mount),
+// thicker while it swings; every man the blade catches is set BURNING (`burnStart`) and the spiders take a gout of it.
+const BFIRE = { on: 0, rate: 110, swing: 2.5, k: .5 };
+try { BFIRE.on = localStorage.getItem('mel.bfire') === '1' ? 1 : 0; } catch (e) {}
+const bladeFire = () => !!(BFIRE.on && slotNow().blade);
+const _bfA = new THREE.Vector3(), _bfB = new THREE.Vector3();
+function bladeFireStep(dt) { if (!bladeFire() || player.swapHid) return; const w = WEAP.worn[slotNow().key]; if (!w || !w.group || !w.group.visible) return;
+  w.group.getWorldPosition(_bfA); _bfB.copy(muzzleWorld()); const n = BFIRE.rate * dt * (player.melee ? BFIRE.swing : 1);
+  for (let i = 0; i < n || Math.random() < n - i; i++) { const u = .15 + Math.random() * .85; gfire(_bfA.x + (_bfB.x - _bfA.x) * u, _bfA.y + (_bfB.y - _bfA.y) * u, _bfA.z + (_bfB.z - _bfA.z) * u, BFIRE.k * (.7 + u * .5)); if (i > 12) break; } }
+function bowStep(dt) { bladeFireStep(dt); const p = player, s = slotNow(), on = !!s.bow;
   CLIPS._bow = on && rig.actions['bow_draw' + UPS] ? 1 : 0; if (p.aim && on) p.bowT = (p.bowT || 0) + dt;
   if (!BOW.mesh) { if (!on) return; const d = { model: rig.root, root: rig.root, st: '', K: {}, h: 0, ar: '', arT: 0 }; archerBow(d); BOW.mesh = d.bow; BOW.mesh.g.scale.setScalar(BOW.limbK); }
   const B = BOW.mesh, L = rig.bones.mixamorig_LeftHand, Rh = rig.bones.mixamorig_RightHand, vis = on && rig.root.visible && !p.dragon; B.g.visible = B.str.visible = vis; if (!vis || !L || !Rh) { B.nock.visible = false; return; }
@@ -14493,7 +14535,7 @@ function arenaUi() {
       else if (a === 'course') { ARENA.menu = ''; if (COURSE.on) courseClear(); else courseBuild('ACRO'); }     // m1078
       else if (a === 'wrun') { ARENA.menu = ''; if ((WRUN.boxes || []).length) wrunClear(); else wrunSpawn(); }     // m1064; m1072
       else if (a === 'smear') { SMEAR.on = SMEAR.on ? 0 : 1; try { localStorage.setItem('mel.smear', SMEAR.on ? '1' : '0'); } catch (err) {} }
-      else if (a === 'qd') { QD.on = QD.on ? 0 : 1; try { localStorage.setItem('mel.qd', QD.on ? '1' : '0'); } catch (err) {} wepRow._qd = undefined; GEAR.mask = -1; gearSync(1); paintKit(); }
+      else if (a === 'qd') { QD.on = QD.on ? 0 : 1; document.body.classList.toggle('qd', !!QD.on); try { localStorage.setItem('mel.qd', QD.on ? '1' : '0'); } catch (err) {} wepRow._qd = undefined; GEAR.mask = -1; gearSync(1); paintKit(); }
       else if (a === 'lflick') { COVER.left = COVER.left === 'FLIPS' ? 'ROLL' : 'FLIPS'; try { localStorage.setItem('mel.left', COVER.left); } catch (err) {} }
       else if (a === 'tshot') { TURRET.shot = TURRET.shot === 'ROCKET' ? 'BOLT' : 'ROCKET'; try { localStorage.setItem('mel.turret.shot', TURRET.shot); } catch (err) {} }
       else if (a === 'morph') { tmGo(); }
@@ -20259,7 +20301,7 @@ const PALROW = { mid: 180 - MODES.mid };
 // board and the launcher are off it -- the launcher is now ROCKET in the gun's own row on the right), on a THICKER ring (`r1`, a narrower
 // span so its far tip stays on a 390 px screen: 94 - 116 cos 36 = 0). Off restores the old six. The hidden slots still exist (quests, GOD).
 const KIT3 = { on: 1, hide: ['hammer', 'board', 'blaster'], label: { none: 'HANDS', launcher: 'GUN' }, r1: 116, span: 108 };     // m1276: *"keep the rocket launcher, not the blaster"*
-const WEPROW = { mid: PALROW.mid, r0: MODES.r0, get r1() { return KIT3.on ? KIT3.r1 : MODES.r1; }, get span() { return KIT3.on ? KIT3.span : 120; } };
+const WEPROW = { mid: PALROW.mid, get r0() { return typeof QD !== 'undefined' && QD.on ? QD.sub.r0 : MODES.r0; }, get r1() { return KIT3.on ? KIT3.r1 : MODES.r1; }, get span() { return KIT3.on ? KIT3.span : 120; } };
 const OUTROW = { mid: PALROW.mid, get r0() { return WEPROW.r1 + 6; }, get r1() { return WEPROW.r1 + 36; }, span: 72 };
 const kit3Hid = i => KIT3.on && KIT3.hide.includes(WEAP.slots[i].key);
 const modeRow = document.getElementById('modeRow');
@@ -20291,8 +20333,9 @@ function buildArcRow(el, items, mid, onPick, G) {
   const each = SPAN / n;
   items.forEach((m, i) => {
     // LEFT TO RIGHT ON SCREEN IS DESCENDING ANGLE, so the table reads the way it is drawn.
-    const hi = mid + SPAN / 2 - i * each - MODES.gap / 2;
-    const lo = hi - each + MODES.gap;
+    const GAP = G.gap != null ? G.gap : MODES.gap;
+    const hi = mid + SPAN / 2 - i * each - GAP / 2;
+    const lo = hi - each + GAP;
     const big = (hi - lo) > 180 ? 1 : 0;
     // out along the far ring from `lo` to `hi` (counter-clockwise on screen, sweep 0), across,
     // back along the near ring, close
@@ -20307,6 +20350,10 @@ function buildArcRow(el, items, mid, onPick, G) {
     // one thing that must never happen here is a tap that also reaches the pad behind it.
     path.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); onPick(i); });
     svg.appendChild(path);
+    if (G.deco) { const dg = svg._deco || (svg._deco = document.createElementNS(SVGNS, 'g')); dg.setAttribute('class', 'deco');     // m15xx: the reticle's drawn neon -- a wide faint copy of the outline, and an inner hairline
+      const gp = document.createElementNS(SVGNS, 'path'); gp.setAttribute('d', d); gp.setAttribute('class', 'g'); dg.appendChild(gp);
+      const a0 = lo + 2, a1 = hi - 2, q0 = R0 + 4, q1 = R1 - 4, di = 'M' + px(q1, a0) + ' ' + py(q1, a0) + 'A' + q1 + ' ' + q1 + ' 0 0 0 ' + px(q1, a1) + ' ' + py(q1, a1) + 'M' + px(q0, a1) + ' ' + py(q0, a1) + 'A' + q0 + ' ' + q0 + ' 0 0 1 ' + px(q0, a0) + ' ' + py(q0, a0);
+      const ip = document.createElementNS(SVGNS, 'path'); ip.setAttribute('d', di); ip.setAttribute('class', 'in'); dg.appendChild(ip); }
     // THE LABEL IS HORIZONTAL, not set on the arc. At a 32 px band and ten-pixel type, text
     // bent round a curve is decoration that costs legibility -- and legibility is the whole
     // job of a control that says which of two states you are in.
@@ -20316,6 +20363,7 @@ function buildArcRow(el, items, mid, onPick, G) {
     t.textContent = m.label;
     svg.appendChild(t);
   });
+  if (svg._deco) svg.appendChild(svg._deco);
   el.appendChild(svg);
 }
 // AND ONE PLACE LIGHTS ONE, because the row is two nodes per item (a path and its label) and
@@ -20337,9 +20385,11 @@ try { AIM3.on = localStorage.getItem('mel.aim3b') === '1' ? 1 : 0; } catch (e) {
 const aimRow = (() => { const d = document.createElement('div'); d.id = 'aimRow'; d.setAttribute('aria-hidden', 'true'); document.body.appendChild(d); return d; })();
 const AIMROW = { mid: MODES.mid, r0: MODES.r1 + 6, r1: MODES.r1 + 40, span: 44 };
 document.body.classList.toggle('kit3', !!KIT3.on);
-const QD = { on: 1, proj: 'bow', r0: 74, r1: 116, span: 108, top: { r0: 122, r1: 152, span: 46 } };
-try { const v = localStorage.getItem('mel.qd'); if (v === '0') QD.on = 0; const pj = localStorage.getItem('mel.qdProj'); if (pj === 'bow' || pj === 'launcher') QD.proj = pj; } catch (e) {}
+const QD = { on: 1, proj: 'bow', arrow: 'normal', r0: 86, r1: 124, span: 96, gap: 7, deco: 1, top: { r0: 131, r1: 158, span: 40, gap: 0, deco: 1 }, sub: { r0: 86, r1: 124, span: 96, gap: 6, deco: 1 }, sub2: { r0: 131, r1: 146, span: 64, gap: 6, deco: 1 } };     // m15xx: up off the stick, a little air between segments
+try { const v = localStorage.getItem('mel.qd'); if (v === '0') QD.on = 0; const ak = localStorage.getItem('mel.qdArrow'); if (ak === 'fire' || ak === 'blast' || ak === 'normal') QD.arrow = ak; const pj = localStorage.getItem('mel.qdProj'); if (pj === 'bow' || pj === 'launcher') QD.proj = pj; } catch (e) {}
 const qdRow = (() => { const d = document.createElement('div'); d.id = 'qdRow'; d.setAttribute('aria-hidden', 'true'); document.body.appendChild(d); return d; })();
+const qdSub2 = (() => { const d = document.createElement('div'); d.id = 'qdSub2'; d.setAttribute('aria-hidden', 'true'); document.body.appendChild(d); return d; })();
+document.body.classList.toggle('qd', !!QD.on);
 const qdTop = (() => { const d = document.createElement('div'); d.id = 'qdTop'; d.setAttribute('aria-hidden', 'true'); document.body.appendChild(d); return d; })();
 WEAP.modesAll = WEAP.modes.slice();      // every mode, for GOD (m298)
 if (!/[?&]dna\b/.test(location.search)) WEAP.modes = WEAP.modes.filter(m => !m.dna);
@@ -20385,15 +20435,22 @@ function qdBuild() { const pj = qdProj(), lab = pj >= 0 ? (WEAP.slots[pj].key ==
   buildArcRow(qdRow, [{ label: 'SWORD' }, { label: lab }], 90, i => { const n = i ? qdProj() : qdIx('sword'); if (n >= 0) kitPick(n); }, QD);
   buildArcRow(qdTop, [{ label: 'HANDS' }], 90, () => kitPick(0), QD.top); qdRow._lab = lab; }
 // the left wheel as the equipped weapon's sub-menu
-function qdSub() { const s = slotNow(), proj = s.key === 'bow' || s.key === 'launcher';
-  const sig = proj ? 'proj' : ''; if (wepRow._qd !== sig) { wepRow._qd = sig; wepRow._ix = null;
-    if (proj) buildArcRow(wepRow, [{ label: 'BOW' }, { label: 'GUN' }, { label: '3D AIM' }], WEPROW.mid, i => {
-      if (i === 2) { AIM3.on = AIM3.on ? 0 : 1; try { localStorage.setItem('mel.aim3b', AIM3.on ? '1' : '0'); } catch (e) {} triggerStop(); paintKit(); return; }
-      const k = i ? 'launcher' : 'bow'; if (!gearHas(k)) return; QD.proj = k; try { localStorage.setItem('mel.qdProj', k); } catch (e) {} kitPick(qdIx(k)); qdBuild(); }, WEPROW); }
+function aim3Toggle() { AIM3.on = AIM3.on ? 0 : 1; try { localStorage.setItem('mel.aim3b', AIM3.on ? '1' : '0'); } catch (e) {} triggerStop(); paintKit(); }
+function qdProjPick(k) { if (!gearHas(k)) return; QD.proj = k; try { localStorage.setItem('mel.qdProj', k); } catch (e) {} kitPick(qdIx(k)); qdBuild(); }
+const ARROWK = ['normal', 'fire', 'blast'];
+function qdSub() { const s = slotNow(), bow = s.key === 'bow', proj = bow || s.key === 'launcher', sw = !!s.blade, sig = bow ? 'bow' : proj ? 'proj' : sw ? 'sword' : '';
+  if (wepRow._qd !== sig) { wepRow._qd = sig; wepRow._ix = null;
+    if (bow) { buildArcRow(wepRow, [{ label: 'ARROW' }, { label: 'FIRE' }, { label: 'BLAST' }], WEPROW.mid, i => { QD.arrow = ARROWK[i]; try { localStorage.setItem('mel.qdArrow', QD.arrow); } catch (e) {} snd('clang', { g: .2, r: 1.8 }); paintKit(); }, QD.sub);
+      buildArcRow(qdSub2, [{ label: 'GUN' }, { label: '3D AIM' }], WEPROW.mid, i => i ? aim3Toggle() : qdProjPick('launcher'), QD.sub2); }
+    else if (proj) buildArcRow(wepRow, [{ label: 'BOW' }, { label: 'GUN' }, { label: '3D AIM' }], WEPROW.mid, i => i === 2 ? aim3Toggle() : qdProjPick(i ? 'launcher' : 'bow'), QD.sub);
+    else if (sw) buildArcRow(wepRow, [{ label: 'STEEL' }, { label: 'JIN FIRE' }], WEPROW.mid, i => { BFIRE.on = i; try { localStorage.setItem('mel.bfire', String(i)); } catch (e) {} snd(i ? 'swoosh' : 'clang', { g: .4, r: i ? .6 : 1.6 }); paintKit(); }, QD.sub); }
+  paintArcRow(qdSub2, bow, -1); { const k2 = qdSub2.firstChild ? qdSub2.firstChild.childNodes : []; for (const j of [2, 3]) if (k2[j]) k2[j].classList.toggle('sel', !!AIM3.on); }
+  if (sw) { paintArcRow(wepRow, 1, BFIRE.on ? 1 : 0); return; }
   if (!proj) { paintArcRow(wepRow, 0, -1); return; }
-  paintArcRow(wepRow, 1, s.key === 'bow' ? 0 : 1); const kids = wepRow.firstChild ? wepRow.firstChild.childNodes : []; if (kids[4]) kids[4].classList.toggle('on2', !!AIM3.on); }
+  if (bow) { paintArcRow(wepRow, 1, Math.max(0, ARROWK.indexOf(QD.arrow))); return; }
+  paintArcRow(wepRow, 1, 1); const kids = wepRow.firstChild ? wepRow.firstChild.childNodes : []; for (const j of [4, 5]) if (kids[j]) kids[j].classList.toggle('sel', !!AIM3.on); }
 function qdPaint() { const show = QD.on && !player.mphSt && !player.riding;
-  if (!show) { qdRow.classList.remove('on'); qdTop.classList.remove('on'); return false; }
+  if (!show) { qdRow.classList.remove('on'); qdTop.classList.remove('on'); qdSub2.classList.remove('on'); return false; }
   const pj = qdProj(), lab = pj >= 0 ? (WEAP.slots[pj].key === 'launcher' ? 'GUN' : 'BOW') : 'BOW'; if (!qdRow.firstChild || qdRow._lab !== lab) qdBuild();
   const n = player.swap ? player.swapTo : player.slot, k = WEAP.slots[n] && WEAP.slots[n].key;
   paintArcRow(qdRow, 1, WEAP.slots[n] && WEAP.slots[n].blade ? 0 : (k === 'bow' || k === 'launcher') ? 1 : -1); paintArcRow(qdTop, 1, n === 0 ? 0 : -1);
@@ -31332,7 +31389,7 @@ function stepKit(dt) {
   if (s.aim && !noTrig) {
     // THE SAME GATE THE HAMMER USES -- see `padUp`. Two copies of this is two places for
     // the trigger and the wind-up to start disagreeing about what a push up is.
-    if (padUp(p.aim)) {
+    if (s.bow && p.aim ? (stick.R.down && Math.hypot(stick.R.x, stick.R.y) > BOW.keep) : padUp(p.aim)) {     // m15xx: a drawn bow stays drawn while the thumb steers the lens -- the arc test loosed (and re-drew) it on every turn
       p.armT += dt;
       if (p.armT >= WEAP.armT && !p.aim) {
           // **ONE SOUND FOR ONE EVENT.** `chargeStart` already spins up the synth hum -- the
@@ -44582,6 +44639,7 @@ function strikeSweep(dt, power, live, dmg, body) {
           const bh = MELEE.limbDir ? Math.atan2(_sw.x - q.x, _sw.z - q.z)
                                    : (p.melH != null ? p.melH : p.faceH);
           dummyBlow(d, bh, power, dmg);
+          if (bladeFire()) burnStart(d);     // m15xx: JIN FIRE sets him alight
           // **AND IT IS DRAWN WHERE THE LIMB REACHED HIM (m94).** `segBody` left the point in
           // `_hitP` on the line above, so this is the collider's own answer rather than a second
           // guess at it -- a blow and the mark it leaves cannot disagree about where they were.
@@ -47933,7 +47991,7 @@ function formStep() {
   if (on !== form.rowOn) { form.rowOn = on; paintArcRow(form.row, on, form.open ? 0 : -1); if (!on) formClose(); }
 }
 // a third ring, one segment, straight up -- see the block above for the geometry
-const FORMROW = { mid: 90, r0: 148, r1: 178, span: 30 };
+const FORMROW = { mid: 90, r0: 156, r1: 184, span: 30 };     // m15xx: up a ring, over the quick-draw sub-menu's outer row
 
 // ============================================================================================
 // JUICE (m284, ROADMAP A7b) -- a disguise is a resource, not a costume

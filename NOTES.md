@@ -120,6 +120,42 @@ in there so I can transform it between the two states"; "these rocks are kind of
 - **THE HYBRID:** the sky islands over the rim (m1113) showed in FALLEN. KORAJIN: the floating world is what restoration raises -> hidden
   while fallen. (The refinery already sits on the flank when fallen.)
 Next: the painted textures (rock, sand, cliff), his ask in the same message.
+## m15xx -- THE BOW CHARGES, ARROW TYPES, THE JIN FIRE BLADE, AND THE RINGS LIFTED (his weapons pass)
+- **The draw re-pulled while he moved (his: "I'd push up to start the shot, then move around and turn, and he'd re-pull back his bow"):**
+  - Turning the lens is the right thumb going SIDEWAYS, and `padUp`'s `arc` test (thumb within the up cone) called that a release. The
+    arrow fired (weak) and the next frame re-armed the draw.
+  - A drawn bow now stays drawn while the thumb is anywhere off centre (`BOW.keep` .3); only lifting (or centring) looses.
+  - **Measured:** a 30-frame draw, then the thumb swung to (.9, -.2) for 40 frames: still aimed, 0 shots, the draw held at 1.09 s.
+- **The charge IS the shot (his: "the more you charge the faster and stronger; a full charge really true; a regular arrow should just do the
+  hit, maybe three arrows, not knock back"):**
+  - Over `BOW.full` 1.1 s: speed 22 -> 72 m/s (on k squared), gravity .55 -> .05, damage 1 -> 3.
+  - The blow's power is `pow0` .12 (under every body's `fling`: a FLINCH) until the draw is full (`pow1` 1.2: knocked down).
+  - Per-arrow gravity is `A.gk`.
+  - **Measured on an Osari bowman:** medium draws (45 frames, 41 m/s) -> hit, hit, hit, then down on the fourth. A FULL draw (72 m/s) -> down
+    at once.
+- **Arrow types (his: "regular, flaming, ballistic / exploding"):** `QD.arrow` is picked on the left wheel while the bow is out (ARROW /
+  FIRE / BLAST; GUN and 3D AIM moved to an outer row, `#qdSub2`).
+  - FIRE: a green-fire trail, `burnStart` on what it hits, +1 damage, flame where it sticks. Measured: the bowman `hit` and burning.
+  - BLAST: `arrowBlast` on whatever it meets (`dummyHit` 2.6 m, the spiders, debris, `bldHit`, walls) with sparks, smoke and a boom.
+    Measured: 1 blast, the bowman down.
+- **JIN FIRE (his: "a flaming katana, maybe green flame"):** the left wheel while the sword is out is STEEL / JIN FIRE (`BFIRE.on`, saved).
+  - Green flame licks along the blade from the guard to `muzzleWorld`; more while it swings.
+  - Every man the sweep catches is set burning; a spider hit throws a gout of it.
+  - **Measured:** the sub-menu read STEEL/JIN FIRE; one swing at a bowman left him burning and down. Rendered: the flame on the blade,
+    idle and mid-swing (thin at first; the rate is doubled since).
+- **The rings (his: "move up a little, a subtle space between the buttons and the joystick, a tiny space between each other, stylized like
+  the reticle"):**
+  - Quick-draw r 74 -> 86 (12 px of air off the pad rim), 7 deg between halves.
+  - Span 108 -> 96, so the tips stay inside 390 px: measured x 209..383.
+  - The left wheel follows (`WEPROW.r0` reads `QD.sub`), and FORMS moved up a ring (156-184).
+  - Style: the reticle's drawn neon (m257, never a CSS filter) -- each segment has a wide faint copy of its outline and an inner hairline in
+    a trailing `<g class="deco">` (so `paintArcRow`'s path/label stride holds), a dark translucent fill, and a lit fill at .82.
+  - `buildArcRow` takes a per-row `gap` / `deco`.
+- **The start button** (TAP TO START): the reticle's portal -- dark glass, a thin azure line, a fainter outer ring, the glow as box-shadow
+  spreads.
+- **Not built:** the bow's carried pose (he is designing the bow / katana / launcher set), the boomerang / bombs / geta (TOOLS_SANDBOX
+  pieces 2-5). **Not checked:** on his phone; no screenshot of the HUD (SwiftShader times out).
+
 ## m1725 -- THE QUICK-DRAW RING (his UI plan, TOOLS_SANDBOX.md; "yes, do this next")
 - **Right pad:** `#qdRow`, two big halves on the inner ring (r 74-116, span 108): SWORD | the PROJECTILE (BOW, or GUN when that is the
   remembered pick, `QD.proj`, saved). `#qdTop` above them (r 122-152) holds HANDS. Each tap is `kitPick` (the ordinary swap). The selected
