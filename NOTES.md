@@ -97,7 +97,7 @@ in there so I can transform it between the two states"; "these rocks are kind of
 - **THE HYBRID:** the sky islands over the rim (m1113) showed in FALLEN. KORAJIN: the floating world is what restoration raises -> hidden
   while fallen. (The refinery already sits on the flank when fallen.)
 Next: the painted textures (rock, sand, cliff), his ask in the same message.
-## m15xx -- THE QUICK-DRAW RING (his UI plan, TOOLS_SANDBOX.md; "yes, do this next")
+## m1725 -- THE QUICK-DRAW RING (his UI plan, TOOLS_SANDBOX.md; "yes, do this next")
 - **Right pad:** `#qdRow`, two big halves on the inner ring (r 74-116, span 108): SWORD | the PROJECTILE (BOW, or GUN when that is the
   remembered pick, `QD.proj`, saved). `#qdTop` above them (r 122-152) holds HANDS. Each tap is `kitPick` (the ordinary swap). The selected
   one is filled.

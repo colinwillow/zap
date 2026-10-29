@@ -622,7 +622,7 @@ body.dyn.desk .zone { display: none; }
   width: calc(var(--mr) * 2); height: calc(var(--mr) * 2);
 }
 #aimRow.on { display: block; }
-/* m15xx: THE QUICK-DRAW RING over the right stick -- SWORD | BOW (two big halves) and HANDS above them -- positioned like the mode row */
+/* m1725: THE QUICK-DRAW RING over the right stick -- SWORD | BOW (two big halves) and HANDS above them -- positioned like the mode row */
 #qdRow, #qdTop {
   position: fixed; z-index: 6; display: none; --mr: 116px; --rc: var(--sky); pointer-events: none;
   right: calc(20px + var(--padr) - var(--mr) + env(safe-area-inset-right));
@@ -20218,7 +20218,7 @@ function paintKit() {
     if (w && w.group) w.group.visible = (key === s.key) && !player.swapHid;
   }
   padR.classList.toggle('ready', !!(s.aim || s.charge));
-  qdPaint();     // m15xx: the quick-draw ring, and the left wheel as the sub-menu
+  qdPaint();     // m1725: the quick-draw ring, and the left wheel as the sub-menu
 }
 // THE MODE BUTTONS: ANNULAR SECTORS ROUND THE RIGHT STICK (m53).
 // *"Take two rings, one smaller, one larger, and cut pizza slices out of that."*
@@ -20372,7 +20372,7 @@ function gunRowBuild() {
   buildArcRow(modeRow, WEAP.modes, MODES.mid, gunPick);
   buildArcRow(aimRow, [{ key: 'aim3', label: '3D AIM' }], AIMROW.mid, () => { AIM3.on = AIM3.on ? 0 : 1; try { localStorage.setItem('mel.aim3b', AIM3.on ? '1' : '0'); } catch (e) {} triggerStop(); paintKit(); }, AIMROW);
 }
-// m15xx (his: "a really quick draw between projectile and melee -- above the right stick, the left thumb stays free for motion: two meaningfully
+// m1725 (his: "a really quick draw between projectile and melee -- above the right stick, the left thumb stays free for motion: two meaningfully
 // sized buttons, the first row of a ring cut in half, projectile on one and melee on the other -- fight, tap, shoot, tap, fight -- you can only
 // block with the melee weapon out. A third above them for unarmed. The sub-menu for whatever weapon is selected moves to the LEFT: the arrow
 // types on the left"). `QD.on` (TOOLS > QUICK DRAW): the right pad carries SWORD | <projectile> on its inner ring and HANDS on an outer one;

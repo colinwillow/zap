@@ -537,7 +537,7 @@ means anything you can carry from one situation to the next.
 | | left | right |
 |---|---|---|
 | hold | move | **hold UP**: firing position, charge, release to fire (blaster) / wind up (hammer) |
-| inner wheel | **QUICK DRAW on (m1724): the EQUIPPED weapon's sub-menu** (projectile out: BOW / GUN / 3D AIM; sword or hands: hidden). Off: the WEAPONS, one segment each (m173) | **QUICK DRAW (m1724): SWORD \| BOW-or-GUN, two big halves; HANDS on the ring above** (TOOLS > QUICK DRAW) |
+| inner wheel | **QUICK DRAW on (m1725): the EQUIPPED weapon's sub-menu** (projectile out: BOW / GUN / 3D AIM; sword or hands: hidden). Off: the WEAPONS, one segment each (m173) | **QUICK DRAW (m1725): SWORD \| BOW-or-GUN, two big halves; HANDS on the ring above** (TOOLS > QUICK DRAW) |
 | outer wheel | **Clancy: ROAM / PACK**, or **REVERT** while disguised (m121) | — |
 | tap | **jump (m173)** — so a thumb holding the trigger can still jump | jump |
 | hold in place | **charge the ZOOM (m1093; any weapon)** — release: launched (TOOLS > LEFT HOLD: TORNADO) | at rest: backflip wind-up; moving: the sprint (TOOLS > RIGHT HOLD: CROUCH) |
