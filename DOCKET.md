@@ -39,7 +39,7 @@ ladders, ropes, a tightrope that bends ... tighten the dynamics, then layer 1 of
 the building-kit buildings on terrain with plants to see how they hold up ... other agents on some of it -- but the main chat does the hard stuff
 best."* MAIN = this session (dynamics, the feel); AGENT = a separate session can take it from its spec.
 
-17. [~] MAIN **The WALL-RUN SANDBOX** (m15xx: the park + the queued run-up) (`PARKOUR.md` / `WRUN`): one playground with every wall a run can meet -- a long wall (run along), a tall wall
+17. [~] MAIN **The WALL-RUN SANDBOX** (m1751: the park + the queued run-up) (`PARKOUR.md` / `WRUN`): one playground with every wall a run can meet -- a long wall (run along), a tall wall
        to a ledge (run up), a chimney (wall-jump up it), two walls across a pit (run, jump, run), an inside and an outside corner, a wall over
        water/pit to fall off -- then tighten the dynamics against it with him.
 18. [ ] MAIN **The ROPE pieces, one sandbox:** a ROPE BRIDGE of planks on two ropes that sags and sways under HIS weight (verlet, like the willow's

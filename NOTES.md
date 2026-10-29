@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The Wall Park, and a run-up you can start from a stride away (m15xx)
+## The Wall Park, and a run-up you can start from a stride away (m1751)
 *"We still need to figure out a bunch of wall riding stuff so maybe some wall riding sandboxes ... definitely need to figure out the wall run."*
 - **KORAJIN > The Wall Park** (`?w=forge&zone=wall`, `WPARK` / `wparkBuild`): five stations on the white floor, each colour-coded with a floor
   label. 1 LONG WALL (blue, 24 m, platforms at both ends), 2 TALL WALLS (yellow, 4.5 m with a deck and 7 m), 3 CHIMNEY (green, two 12 m walls
