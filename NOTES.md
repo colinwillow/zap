@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The Dwarf idle, fixed; the stair clips off (m15xx)
+## The Dwarf idle, fixed; the stair clips off (m1820)
 *"None of those idles are the ones I meant. The best would be adjusting the Dwarf idle -- his arms, hands and wrists curving in." / "Walking
 upstairs is absolutely f---ed -- revert to what it was; the same on the rope bridge."*
 - `STAIRS.on` 0: back to the ordinary gait on stairs and slopes (and on the bridge's sag). The baked clips stay in his file, unused.
