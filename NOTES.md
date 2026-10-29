@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The m1826 run-up pose, reverted (m15xx)
+## The m1826 run-up pose, reverted (m1827)
 *His screenshot: "This looks even worse, absolutely horrendous."* The legs folded up under him like a curled shrimp: pulling the feet low and the hips
 in made the two-bone IK fold the knees up, not drive them. Back to the m1683 numbers (`upD` .8, `upFoot` -.12, `upAmp` .34, `upLift` .26, `upToeIn`
 .15); the two jumps off the run-up stay. NEXT: his side-profile reference, and the library's real clips -- `Sprint_To_Wall_Climb`,
