@@ -10121,6 +10121,21 @@ const PLANTK = {
     for (const [a, l] of [[0, 1.9], [2.2, 1.7], [4.1, 2]]) parts.push(plantPart(plantTube([[.3, 3.4, 0], [.3 + Math.cos(a) * l * .5, 4.1, Math.sin(a) * l * .5], [.3 + Math.cos(a) * l, 4.5, Math.sin(a) * l]], .13, .05, 6), 0x5a3a2c, sw));
     const pink = plantMix(0xe58aa8, 0xffc8da, R); for (let i = 0; i < 18; i++) { const a = R() * 6.28, d = .4 + R() * 2, y = 4.1 + R() * 1.9; parts.push(plantPart(plantBlob(.5 + R() * .45, 20 + i).translate(.3 + Math.cos(a) * d, y, Math.sin(a) * d), (x, y2) => { const c = pink(); return y2 < 4.4 ? c.map(v => v * .82) : c; }, sw, 1)); }
     return parts; } },
+  // m15xx (his: "bamboo -- a good bamboo model seems very appropriate for the game, fun, and the wood-hit noise when you brush through it; a good
+  // scatter, in the snow world"): a CLUMP of `n` culms, 3.5-6 m, leaning out a little, each a jointed pole -- a node ring every ~.55 m, the wood
+  // green to yellow-green with darker nodes -- and lance leaves in sprays on short twigs up the top half (they flutter). Brushed or struck it
+  // KNOCKS (the hollow `thud`, high), and sheds leaves when hit. Snow dusts its upper leaves where it stands in the snow. It REPLACES the quick
+  // placeholder bamboo (plank leaves .9 m long, no joints) under the same name, so every place that planted that one gets this.
+  bamboo: { h: 5.5, r: .9, stiff: 1, bend: 1.1, knock: 1, make() { const R = plantRnd(91), p = [], H = 5.5, wood = (x, y) => { const t = y / H; return [.36 + t * .16, .5 + t * .1, .16 + t * .02]; };
+    for (let c = 0; c < 7; c++) { const a = c * 2.4 + R() * .5, d = .12 + R() * .42, bx = Math.cos(a) * d, bz = Math.sin(a) * d, h = 3.5 + R() * 2.5, lean = .05 + R() * .07, lx = Math.cos(a) * lean, lz = Math.sin(a) * lean, r = .045 + R() * .025;
+      const tx = (y) => bx + lx * y, tz = (y) => bz + lz * y, sw = (x, y) => Math.pow(Math.max(0, y / H), 1.6);
+      p.push(plantPart(plantTube([[bx, 0, bz], [tx(h * .5), h * .5, tz(h * .5)], [tx(h), h, tz(h)]], r, r * .7, 5, 6), wood, sw));
+      for (let y = .45 + R() * .2; y < h - .2; y += .5 + R() * .12) { const nr = r * (1 - .3 * y / h) + .012; p.push(plantPart(new THREE.CylinderGeometry(nr, nr, .045, 5).translate(tx(y), y, tz(y)), [.3, .4, .14], sw(0, y))); }
+      for (let k = 0; k < 5; k++) { const y = h * (.45 + k * .11 + R() * .05), ox = tx(y), oz = tz(y), ta = R() * 6.283;
+        for (let l = 0; l < 6; l++) { const la = ta + (l - 2.5) * .5, L = .3 + R() * .16, lf = new THREE.PlaneGeometry(.06, L, 1, 2), LP = lf.attributes.position;     /* a LANCE: narrow at the stalk, widest a third up, a point at the tip */
+          for (let v = 0; v < LP.count; v++) { const yy = LP.getY(v); LP.setX(v, LP.getX(v) * (yy > .1 * L ? 0 : yy < -.1 * L ? .35 : 1)); } lf.translate(0, L / 2, 0); lf.rotateX(1.75 + R() * .55); lf.rotateY(la);     // drooping, not flat
+          lf.translate(ox + Math.cos(la) * .12, y + .05, oz + Math.sin(la) * .12); p.push(plantPart(lf, (x, yy) => { const s2 = Math.max(0, (yy - H * .55) / (H * .45)) * .35, g0 = [.12 + R() * .07, .32 + R() * .1, .1]; return g0.map((v, i2) => v + ([.95, .97, 1][i2] - v) * s2 * (this.frost || 0)); }, sw(0, y) * 1.2, 1)); } } }
+    return p; } },
   pine: { h: 7, r: 1.2, stiff: .35, bend: .6, make() { const H = 7, sw = (x, y) => Math.pow(Math.max(0, y / H), 1.8), parts = [plantPart(plantTube([[0, 0, 0], [0, 3, 0], [.1, 6.8, 0]], .3, .08), 0x4a3226, sw)], R = plantRnd(7), gr = plantMix(0x1f5a3c, 0x2f7a4a, R);
     for (let k = 0; k < 5; k++) { const c = new THREE.ConeGeometry(2.4 - k * .4, 2.2, 9, 2).translate(0, 2.2 + k * 1.05, 0), P = c.attributes.position; for (let i = 0; i < P.count; i++) if (P.getY(i) < 1.6 + k * 1.05) { const f = .85 + R() * .3; P.setX(i, P.getX(i) * f); P.setZ(i, P.getZ(i) * f); }
       c.computeVertexNormals(); parts.push(plantPart(c, (x, y) => gr().map(v => v * (.8 + .25 * ((y - 1) % 1.05))), sw, .5)); } return parts; } },
@@ -10133,11 +10148,6 @@ const PLANTK = {
     for (let i = 0; i < 16; i++) { const a = i * 2.4, tilt = .35 + (i % 3) * .28, L = 1.1 + R() * .5, lf = new THREE.ConeGeometry(.16, L, 4, 3).translate(0, L / 2, 0), P = lf.attributes.position;
       for (let j = 0; j < P.count; j++) { P.setZ(j, P.getZ(j) * .35); const t = P.getY(j) / L; P.setY(j, P.getY(j)); P.setZ(j, P.getZ(j) + t * t * .35); }
       lf.rotateX(tilt).rotateY(a); lf.computeVertexNormals(); p.push(plantPart(lf, (x, y) => [.3 + y * .08, .42 + y * .08, .34 + y * .04], (x, y, z) => Math.min(1, Math.hypot(x, y, z) / 1.3) * .8)); } return p; } },
-  bamboo: { h: 6, r: 1, stiff: 1, bend: 1.2, make() { const R = plantRnd(3), p = [], H = 6;
-    for (let i = 0; i < 7; i++) { const a = R() * 6.28, d = R() * .6, x = Math.cos(a) * d, z = Math.sin(a) * d, h = 4.5 + R() * 2, lean = (R() - .5) * .5, sw = (X, y) => Math.pow(Math.max(0, y / H), 1.4) * 1.1;
-      p.push(plantPart(plantTube([[x, 0, z], [x + lean * .3, h * .5, z], [x + lean, h, z + lean * .3]], .07, .05, 6), (X, y) => (y % .9) < .06 ? [.6, .62, .3] : [.45, .66, .32], sw));
-      for (let k = 0; k < 4; k++) { const ty = h * (.6 + k * .12), lx = x + lean * (ty / h), lz = z + lean * .3 * (ty / h); for (let j = 0; j < 3; j++) { const la = R() * 6.28, lv = new THREE.PlaneGeometry(.9, .14).translate(.45, 0, 0).rotateZ(-.4).rotateY(la).translate(lx, ty, lz);
-        p.push(plantPart(lv, 0x5aa040, sw, 1)); } } } return p; } },
   fern: { h: 1.2, r: .9, stiff: .9, bend: 1, make() { const R = plantRnd(13), p = [];
     for (let i = 0; i < 11; i++) { const a = i / 11 * 6.28 + R() * .3, L = 1.2 + R() * .4, fr = new THREE.PlaneGeometry(L, .42, 8, 1).translate(L / 2, 0, 0), P = fr.attributes.position;
       for (let j = 0; j < P.count; j++) { const t = P.getX(j) / L; P.setY(j, P.getY(j) * (1 - t) * (.6 + .4 * Math.abs(Math.sin(t * 22)))); P.setZ(j, Math.sin(t * Math.PI * .9) * .55 - t * t * .5); }
@@ -10187,6 +10197,7 @@ const PLANTK = {
     for (let i = 0; i < 3; i++) { const s = .18 + R() * .3, b = plantBlob(s, 40 + i, 1); b.scale(1, .6, 1).translate((R() - .5) * .7, s * .25, (R() - .5) * .7); const t = .85 + R() * .3; p.push(plantPart(b, (x, y) => [(.5 + y * .2) * t, (.44 + y * .2) * t, (.4 + y * .15) * t], 0)); }
     return p; } },
 };
+PLANTK.bamboo_snow = Object.assign({}, PLANTK.bamboo, { frost: 1 });     // m15xx: the same clump, its upper leaves dusted white (the Snowfield's)
 function plantKind(name) { if (PLANT.kinds[name]) return PLANT.kinds[name]; const K = PLANTK[name], geo = mergeGeometries(K.make()); PLANT.kinds[name] = { K, geo, n: 0, list: [] }; return PLANT.kinds[name]; }
 // put the instanced meshes down for every kind used under `g` (call once after all plantPlant calls for that group)
 function plantPlant(rec, kind, x, y, z, s, yaw) { rec.push({ kind, x, y, z, s, yaw }); }
@@ -10203,7 +10214,7 @@ function plantFlush(g, rec) { const by = {}, C = PLANT.cell; for (const r of rec
     rs.forEach((r, i) => iB.set([0, 0, (r.x * 1.7 + r.z * 2.3) % 6.28, Kd.K.stiff], i * 4)); const at = new THREE.InstancedBufferAttribute(iB, 4); geo.setAttribute('iB', at);
     const m = new THREE.InstancedMesh(geo, plantMat(), rs.length), mx = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(); m.name = "plant:" + kind;
     rs.forEach((r, i) => { mx.compose(new THREE.Vector3(r.x, r.y, r.z), q.setFromEuler(e.set(0, r.yaw, 0)), new THREE.Vector3(r.s, r.s, r.s)); m.setMatrixAt(i, mx);
-      if (!Kd.K.nohit) PLANT.list.push({ at, i, x: r.x, y: r.y, z: r.z, h: Kd.K.h * r.s, r: Kd.K.r * r.s, bend: Kd.K.bend, bx: 0, bz: 0, vx: 0, vz: 0, m }); });
+      if (!Kd.K.nohit) PLANT.list.push({ at, i, x: r.x, y: r.y, z: r.z, h: Kd.K.h * r.s, r: Kd.K.r * r.s, bend: Kd.K.bend, bx: 0, bz: 0, vx: 0, vz: 0, m, knock: Kd.K.knock || 0 }); });
     m.castShadow = !PLANT.noShadow.includes(kind); m.receiveShadow = true; m.userData.kind = kind;
     if (C) { m.computeBoundingSphere(); m.boundingSphere.radius += Kd.K.h * 1.5 + 1; m.frustumCulled = true; PLANT.cells.push(m); } else m.frustumCulled = false;     /* the sway moves a blade off its rest: the sphere carries a margin */
     g.add(m); meshes.push(m); } return meshes; }     /* m1600: ground cover casts NO shadow (the shadow pass drew every blade a second time) */
@@ -10211,10 +10222,13 @@ function plantDrop(meshes) { PLANT.list = PLANT.list.filter(P => !meshes.include
 function plantPush(P, dx, dz, imp) { const L = Math.hypot(dx, dz) || 1; P.vx += dx / L * imp * P.bend; P.vz += dz / L * imp * P.bend; }
 function plantHit(x, y, z, rad) { if (!PLANT.list.length) return 0; let n = 0; const p = player.pos;
   for (const P of PLANT.list) { const d = Math.hypot(P.x - x, P.z - z); if (d > P.r + rad + .4 || y < P.y - .5 || y > P.y + P.h + .5) continue; let dx = P.x - p.x, dz = P.z - p.z; if (Math.hypot(dx, dz) < .2) { dx = P.x - x; dz = P.z - z; }
-    plantPush(P, dx, dz, PLANT.hitK * (1 + Math.random() * .3)); n++; if (Math.random() < .5) spk(x, y, z, (Math.random() - .5) * 2, 1 + Math.random(), (Math.random() - .5) * 2, .06, .5, [.5, .85, .4]); } return n; }
+    plantPush(P, dx, dz, PLANT.hitK * (1 + Math.random() * .3)); n++; if (P.knock) plantKnock(P, 1); if (Math.random() < .5) spk(x, y, z, (Math.random() - .5) * 2, 1 + Math.random(), (Math.random() - .5) * 2, .06, .5, [.5, .85, .4]); } return n; }
+// m15xx: bamboo KNOCKS -- the wood recording, pitched up and short (hollow), louder for a blow than a brush; each clump has its own breath
+function plantKnock(P, k) { const now = performance.now(); if ((P.tokT || 0) > now) return; P.tokT = now + (k > .5 ? 120 : 260); snd('thud', { g: (.1 + .22 * k) * (.8 + Math.random() * .4), r: 1.7 + Math.random() * .5, x: P.x, z: P.z });
+  if (k > .5) for (let i = 0; i < 6; i++) spk(P.x + (Math.random() - .5) * .6, P.y + P.h * (.5 + Math.random() * .4), P.z + (Math.random() - .5) * .6, (Math.random() - .5) * 1.5, -.3, (Math.random() - .5) * 1.5, .07, 1.2, [.3, .55, .2]); }
 function plantStep(dt) { if (PLANT.cells.length) plantCull(); const U = PLANT.U; U.uTime.value += dt; const t = U.uTime.value; U.uWind.value.set(PLANT.wind[0] * (1 + .3 * Math.sin(t * .23)), PLANT.wind[1] * (1 + .3 * Math.cos(t * .17)));
   const p = player, pv = p.vel, sp = Math.hypot(pv.x, pv.z), k = PLANT.k, c = PLANT.damp, dirty = new Set();
-  for (const P of PLANT.list) { if (sp > .5) { const d = Math.hypot(p.pos.x - P.x, p.pos.z - P.z); if (d < P.r + .35 && p.pos.y < P.y + P.h && p.pos.y > P.y - 1) { P.vx += pv.x * PLANT.brushK * dt * 6 * P.bend * (1 - d / (P.r + .35)); P.vz += pv.z * PLANT.brushK * dt * 6 * P.bend * (1 - d / (P.r + .35)); } }
+  for (const P of PLANT.list) { if (sp > .5) { const d = Math.hypot(p.pos.x - P.x, p.pos.z - P.z); if (d < P.r + .35 && p.pos.y < P.y + P.h && p.pos.y > P.y - 1) { if (P.knock) plantKnock(P, Math.min(.5, sp / 14)); P.vx += pv.x * PLANT.brushK * dt * 6 * P.bend * (1 - d / (P.r + .35)); P.vz += pv.z * PLANT.brushK * dt * 6 * P.bend * (1 - d / (P.r + .35)); } }
     if (Math.abs(P.bx) + Math.abs(P.bz) + Math.abs(P.vx) + Math.abs(P.vz) < 1e-4) continue;
     P.vx += (-k * P.bx - c * P.vx) * dt; P.vz += (-k * P.bz - c * P.vz) * dt; P.bx += P.vx * dt; P.bz += P.vz * dt; const L = Math.hypot(P.bx, P.bz), mx = 1.4 * P.bend; if (L > mx) { P.bx *= mx / L; P.bz *= mx / L; }
     P.at.array[P.i * 4] = P.bx; P.at.array[P.i * 4 + 1] = P.bz; dirty.add(P.at); }
@@ -10405,6 +10419,11 @@ function snowStage(g) {
     const M = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(); T.forEach((P, i) => { M.compose(new THREE.Vector3(P.x, 0, P.z), q.setFromEuler(e.set(0, P.yaw, 0)), new THREE.Vector3(P.s, P.s, P.s)); tr.setMatrixAt(i, M); nd.setMatrixAt(i, M); cp.setMatrixAt(i, M);
       BOXES.push({ minx: P.x - .3 * P.s, maxx: P.x + .3 * P.s, miny: 0, maxy: 2 * P.s, minz: P.z - .3 * P.s, maxz: P.z + .3 * P.s }); });
     Z.pine = { T, cp, M, q, e }; }
+  // m15xx (his: "bamboo... a good little scatter -- I could see it in the snow world"): GROVES of snow-dusted bamboo between the pine stands,
+  // 5 groves of 5-9 clumps, kept off the spawn. They sway, bend as he runs through, knock like hollow wood, and shed leaves when struck.
+  { const R = plantRnd(733), rec = []; for (let c = 0; c < 5; c++) { const a = .6 + c * 1.27 + R() * .4, d = 16 + R() * 34, cx = Math.cos(a) * d, cz = Math.sin(a) * d, n = 5 + Math.floor(R() * 5);
+      for (let k = 0; k < n; k++) { const x = cx + (R() - .5) * 9, z = cz + (R() - .5) * 9; if (Math.hypot(x, z - 8) < 10) continue; plantPlant(rec, 'bamboo_snow', x, 0, z, .8 + R() * .5, R() * 6.28); } }
+    Z.bamboo = plantFlush(g, rec); }
   Z.on = { g }; Z.t = 0; Z.acc = 0; Z.breath = 1; }
 function snowAt(x, z) { const Z = SNOWZ, N = Z.res, u = (x / Z.size + .5) * N, v = (.5 - z / Z.size) * N, i = u | 0, j = v | 0; if (i < 0 || j < 0 || i >= N || j >= N) return 1; return Z.D[j * N + i] / 255; }
 // carve a hole of radius r down to `to` (0..1 of the depth) and pile what it moved into a rim

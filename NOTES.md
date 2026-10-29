@@ -120,6 +120,22 @@ in there so I can transform it between the two states"; "these rocks are kind of
 - **THE HYBRID:** the sky islands over the rim (m1113) showed in FALLEN. KORAJIN: the floating world is what restoration raises -> hidden
   while fallen. (The refinery already sits on the flank when fallen.)
 Next: the painted textures (rock, sand, cliff), his ask in the same message.
+## m15xx -- BAMBOO (his: "a good bamboo model seems very appropriate for the game -- fun, and the wood-hit noise when you brush through it; a
+good little scatter; I could see it in the snow world")
+- **There already was a `bamboo`** in `PLANTK` (a quick one: seven tubes and PLANK leaves .9 x .14 m, no joints), planted round four buildings
+  and in the plant library. The new definition was written ABOVE it, and the old key -- later in the same object literal -- silently won:
+  the first render was the old planks. Caught by measuring the built kind (84 leaf quads, no node rings) rather than trusting the edit.
+  **The old one is deleted; the new one has its name**, so every place that planted bamboo gets this.
+- **The clump:** 7 culms (3.5-6 m, leaning out), each a jointed pole: a node ring every ~.55 m, green to yellow-green wood with darker nodes.
+  - Sprays of LANCE leaves (narrow at the stalk, widest a third up, pointed, DROOPING) on the top half; they flutter.
+  - `bamboo_snow` is the same with its upper leaves dusted white.
+  - ~2,300 tris a clump, instanced and culled per cell.
+- **It knocks:** `plantKnock` -- the wood recording (`thud`) pitched up and short (hollow). Soft when he brushes through (scaled by his speed,
+  once per 260 ms a clump), louder when struck (once per 120 ms), with a few leaves shed.
+- **The Snowfield:** 5 groves of 5-9 `bamboo_snow` clumps between the pine stands (30 clumps), off the spawn. Rendered: a grove, close, wide.
+- **Not built:** cutting a stalk (the classic katana-through-bamboo) -- it bends and knocks but does not fall yet. **Not checked:** on his
+  phone, or the knock sound (no audio headless).
+
 ## m1729 -- THE BOW CHARGES, ARROW TYPES, THE JIN FIRE BLADE, AND THE RINGS LIFTED (his weapons pass)
 - **The draw re-pulled while he moved (his: "I'd push up to start the shot, then move around and turn, and he'd re-pull back his bow"):**
   - Turning the lens is the right thumb going SIDEWAYS, and `padUp`'s `arc` test (thumb within the up cone) called that a release. The
