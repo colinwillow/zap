@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## His height: 13.7 m -- and the meter now says HOW (m15xx)
+## His height: 13.7 m -- and the meter now says HOW (m1825)
 *"Here's my height -- pretty easy because you can run up the wall; I don't know if it's taking into account the wall run after the jump or the double
 jump. I got the highest one pretty easily."* BEST **13.7 m up** (the 14 m pillar). The meter measures feet-off to feet-down/grab, so a wall run or
 double inside it is counted -- the 13.7 includes the wall.

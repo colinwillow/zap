@@ -28651,7 +28651,7 @@ function proveBuild() { const Z = PROVE; Z.want = 2; if (Z.on) return; const g =
   Z.el.textContent = 'jump to measure'; document.body.appendChild(Z.el); Z.on = { g }; boxGrid(); }
 function proveStep() { const Z = PROVE, p = player; if (!Z.on) return;
   if (!p.grounded && !Z.jmp) Z.jmp = { x: p.pos.x, y: p.pos.y, z: p.pos.z, top: p.pos.y, wall: 0, dbl: 0, flip: 0 };
-  if (Z.jmp) { Z.jmp.top = Math.max(Z.jmp.top, p.pos.y); if (p.wrun) Z.jmp.wall = 1; if (p.jumps >= 2) Z.jmp.dbl = 1; if (p.aflip || p.flip) Z.jmp.flip = 1;     /* m15xx: what went into it */
+  if (Z.jmp) { Z.jmp.top = Math.max(Z.jmp.top, p.pos.y); if (p.wrun) Z.jmp.wall = 1; if (p.jumps >= 2) Z.jmp.dbl = 1; if (p.aflip || p.flip) Z.jmp.flip = 1;     /* m1825: what went into it */
     if (p.grounded || p.ledge || p.bar) { const J = Z.jmp, d = Math.hypot(p.pos.x - J.x, p.pos.z - J.z), up = J.top - J.y, dy = p.pos.y - J.y; Z.jmp = null;
       if (d > 1 || up > .8) { const kind = (J.wall ? 'WALL' : J.dbl ? 'DOUBLE' : 'JUMP'), tag = [J.wall ? '+WALL' : '', J.dbl ? '+DOUBLE' : '', J.flip ? '+FLIPS' : ''].filter(Boolean).join(' ');
         Z.log.unshift({ d, up, dy, tag }); Z.log.length = Math.min(Z.log.length, 20); Z.best.d = Math.max(Z.best.d, d); Z.best.up = Math.max(Z.best.up, up);
