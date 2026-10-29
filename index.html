@@ -15270,7 +15270,7 @@ function arenaUi() {
       else if (a === 'course') { ARENA.menu = ''; if (COURSE.on) courseClear(); else courseBuild('ACRO'); }     // m1078
       else if (a === 'wrun') { ARENA.menu = ''; if ((WRUN.boxes || []).length) wrunClear(); else wrunSpawn(); }     // m1064; m1072
       else if (a === 'smear') { SMEAR.on = SMEAR.on ? 0 : 1; try { localStorage.setItem('mel.smear', SMEAR.on ? '1' : '0'); } catch (err) {} }
-      else if (a === 'kauto') { CHARGE3.auto = CHARGE3.auto === 'CHAIN' ? 'SINGLE' : 'CHAIN'; try { localStorage.setItem('mel.kauto', CHARGE3.auto); } catch (err) {} }     // m15xx
+      else if (a === 'kauto') { CHARGE3.auto = CHARGE3.auto === 'CHAIN' ? 'SINGLE' : 'CHAIN'; try { localStorage.setItem('mel.kauto', CHARGE3.auto); } catch (err) {} }     // m1798
       else if (a === 'wallmode') { WRUN.mode = WRUN.mode === 'VEL' ? 'STICK' : 'VEL'; try { localStorage.setItem('mel.wallmode', WRUN.mode); } catch (err) {} }     // m1776
       else if (a === 'arcline') { BARC.line = BARC.line ? 0 : 1; try { localStorage.setItem('mel.arcline', BARC.line); } catch (err) {} }     // m1759
       else if (a === 'partaim') { if (!PARTAIM.on) { PARTAIM.on = 1; PARTAIM.by = 'L'; } else if (PARTAIM.by === 'L') PARTAIM.by = 'R'; else PARTAIM.on = 0; try { localStorage.setItem('mel.partaim', PARTAIM.on ? PARTAIM.by : '0'); } catch (err) {} }     // m1738
@@ -31133,7 +31133,7 @@ function aimLeap(t0, k) {
   // animation should end with him striking the ground, not 10 feet in the air"): the slam's rise / hang / DRIVE (`SLAM.down` 12 m/s) made three
   // kinks. This leap is BALLISTIC (`p.slamArc`): one parabola, gravity only, the forward speed constant from the first frame (`d / T`), and the
   // jump attack's clip run from its raise so its STRIKE frame lands at T, the moment his feet do
-  // m15xx (his: "tap the left stick to jump, release -- he launches way up but doesn't come all the way back down; he should come down until he
+  // m1798 (his: "tap the left stick to jump, release -- he launches way up but doesn't come all the way back down; he should come down until he
   // hits the ground, or the box, or whatever he's locked on -- off a cliff, all the way down"): T is solved to the height he will LAND at -- the
   // target's feet if locked, else the ground under where the arc comes down -- not back to the height he left from; and the slam's 1.2 s
   // failsafe (`SLAM.max`) no longer ends a long leap in the air (`p.slamMax`).
@@ -31174,7 +31174,7 @@ function chargeRelease() {
   p.goStill = 0;
   if (!p.wall && slotNow().blade && CHARGE3.on) { const L = stick.L, m = L.down ? Math.hypot(L.x, L.y) : 0, back = m > CHARGE3.dead && L.y > Math.abs(L.x) * .8, side = m > CHARGE3.dead && Math.abs(L.x) > Math.abs(L.y) * .8 ? Math.sign(L.x) : 0;
     if ((back || !p.grounded) && aimLeap(t0, p.kAim > KAIM.min ? p.kAim : CHARGE3.leapK)) return;
-    // m15xx (his: "neutral is AUTOMATIC, like an automatic car versus a manual: nothing within his radius, he stays put; a spider, a dummy, a crate,
+    // m1798 (his: "neutral is AUTOMATIC, like an automatic car versus a manual: nothing within his radius, he stays put; a spider, a dummy, a crate,
     // an enemy within it, he goes to it. And string them: the first neutral release launches to the target and slashes, the next the SPIN toward
     // the next target, the third the high jump and slam down -- then it repeats. Holding a direction is still manual."): neutral asks `chargeAim`
     // for a target in the charge's reach. None: the slash in place (`goStill`). One: `CHARGE3.auto` CHAIN = step `p.autoN` of launch / whirl /

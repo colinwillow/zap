@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The katana's neutral release is AUTOMATIC, and chains; the jumped slam lands (m15xx)
+## The katana's neutral release is AUTOMATIC, and chains; the jumped slam lands (m1798)
 *"Neutral is automatic, like an automatic car versus a manual: nothing in his radius, he stays put; a spider, a dummy, a crate, an enemy in it, he
 goes to it. String them: launch-and-slash, then the spin toward the next target, then the high jump and slam -- and repeat. Holding a direction is
 still manual." / "Tap the left stick to jump, release -- he goes way up and doesn't come all the way back down. He should come down till he hits
