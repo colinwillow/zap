@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The sprint builds itself on a runway; the long jump keeps the double (m15xx)
+## The sprint builds itself on a runway; the long jump keeps the double (m1809)
 *"Instead of holding the right stick and letting go for the long jump: he runs at a normal speed, and after he's been running fifteen feet or so he
 naturally breaks into the sprint, and a jump while sprinting IS the long jump -- so we design levels with runways. And the long jump must still allow
 the double jump."*
