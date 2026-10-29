@@ -309,7 +309,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## THE SKY CASTLE, pass 9: FALLEN -- crashed on the plateau, and the live turn raises it (Worker B)
+## THE SKY CASTLE, pass 9: FALLEN -- crashed on the plateau, and the live turn raises it (m1795, Worker B)
 It only existed RESTORED, and FALLEN left its colliders hanging invisible in the sky. Now FALLEN it lies CRASHED on the west plateau
 (`dyF`: its top 4 m over the lowest ground under its rim, never under the ground at its centre -- 80.8 m down), weathered (`hwPeakAge` on
 its group: the paint drained, metal rusted), its waterfalls dry and its islets gone (`A.isle`). It is no longer a sky island: the live
