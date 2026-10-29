@@ -270,7 +270,7 @@ too, but it seems like it's getting heavy."* And (after m1765): *"after we're do
 - [x] **collision from the side (m1763):** no walking into cliffs or rocks (`hwTerrainOut`), the ledge grab ignores terrain columns, rocks solid
 - [x] **cave chest + crystals (m1763):** turned to face the mouth, detail pass; crystals instead of cones
 - [x] **floating lanterns (m1765):** paper lanterns, halo, fairy dust
-- [x] **the cave BEAST's detail pass (m1767):** an armoured cave salamander -- segments, plates, back crystals, legs and claws, a curled tail, a head with horns and a jaw that opens
+- [x] **the cave BEAST's detail pass (m1768):** an armoured cave salamander -- segments, plates, back crystals, legs and claws, a curled tail, a head with horns and a jaw that opens
 - [ ] the cave plants' second pass (mushrooms, moss, glow worms)
 - [ ] the LADDERS' top-out (he fell getting off the top of one); every stair he can sink into
 - [ ] WEIGHT: a measured budget for the Hollows (spawn view 0.88M tris / 239 calls at m1763) -- the home's timber, shared materials, 171
