@@ -231,7 +231,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## THE SKY CASTLE, landmass pass 2: the rim and the ivy (Worker B)
+## THE SKY CASTLE, landmass pass 2: the rim and the ivy (m1774, Worker B)
 His (after m1769): "run like 6 detail passes in a row". Pass 1 of 6. Every capped lobe's rim (`rims`, its outline turned into the island's
 frame) gets chunky cream LIP ROCKS bulging over the edge (60% of rim points; half with a moss cap) and IVY: leafy curtains (painted leaves,
 double-sided strips 1.1-2.7 m wide, 2-13 m long, tapering, curling out and in as they fall), up to three per rim point. The bastion ring is
