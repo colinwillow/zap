@@ -287,7 +287,7 @@ greenery) drifting round it on chains and lanterns. *"It's gonna need its own pr
 then start building the building, kinda like you built his home -- a ton of passes."*
 - [x] **landmass pass 1 (m1769):** main lobe r30 + 7 bastions + 20 pendants, cream rock map, green caps, the paved plaza, two 70 m waterfalls; GOD > GO: SKY CASTLE
 - [x] **landmass pass 2a (m1774):** lip rocks and moss over every rim, ivy curtains, the falls moved into the gaps between bastions
-- [x] **landmass pass 3 (m1771):** seven iron-and-brass lantern spires and twelve chained lanterns hanging from the real underside
+- [x] **landmass pass 3 (m1775):** seven iron-and-brass lantern spires and twelve chained lanterns hanging from the real underside
 - [ ] landmass pass 2: the rock's face (its own cream rock map), ivy and moss over the lip, hanging chains and lantern spires, the bottom
 - [ ] landmass pass 3: the satellite islets with their pagoda shrines, chained and drifting; how he GETS UP there
 - [ ] castle pass 1..N: the keep, the round towers and roofs, the walls and walkways, the bridges to the satellites, banners, awnings,

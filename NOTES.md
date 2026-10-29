@@ -231,7 +231,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## THE SKY CASTLE, landmass pass 3: the underside's spires and chained lanterns (Worker B)
+## THE SKY CASTLE, landmass pass 3: the underside's spires and chained lanterns (m1775, Worker B)
 Pass 2 of his six. His sheet's BOTTOM view hangs iron-and-brass spires and chained lanterns under the rock. Seven LANTERN SPIRES: stacked
 tiers of dark iron drums with brass bands, discs and rings, glowing lantern cages every few metres (brass cap, a lit glass drum, four iron
 bars, a brass bottom and finial), tapering to an iron spike -- the great one (30 m, x2.8) under the island's lowest point, six more (10-24
