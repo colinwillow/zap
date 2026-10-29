@@ -311,7 +311,7 @@ then start building the building, kinda like you built his home -- a ton of pass
 - [x] (m1807) the gallery towers hollow, spiral stairs out onto their galleries
 - [x] (m1808) a ring of rope bridges to every islet
 - [x] (m1814) eight calm samurai guards: doors, throne, rounds, lift, balcony
-- [x] (m1794) every tower has a room: armoury, library, storeroom, bunk room
+- [x] (m1819) every tower has a room: armoury, library, storeroom, bunk room
 - [ ] townsfolk (non-fighters) on the lawns
 - [x] **the way UP (m1794):** the Jinra lift -- bridge, gantry, a bronze cage on rails from the plateau; plaza steps, interiors, the FALLEN state, wide sails, colliders that follow the live turn
 - [ ] castle pass 1..N: the keep, the round towers and roofs, the walls and walkways, the bridges to the satellites, banners, awnings,

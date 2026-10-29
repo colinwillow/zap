@@ -449,7 +449,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## THE SKY CASTLE, pass 19: every tower has a room (Worker B)
+## THE SKY CASTLE, pass 19: every tower has a room (m1819, Worker B)
 The four even towers (0, 2, 4, 6) are hollow too, one room each through a door facing the keep: 0 an ARMOURY (three racks, each with
 three blades on iron hooks with bronze grips, two spear bundles, round bronze shields), 2 a LIBRARY (four shelves, books in three
 bindings on four planks each, a reading desk), 4 a STOREROOM (strapped crates, iron-hooped barrels, stacked), 6 a BUNK ROOM (two bunks
