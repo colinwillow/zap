@@ -14262,7 +14262,7 @@ function spiderStep(dt) { const p = player, Z = SPIDER; if (Z.globs.length) spid
 //   PIECES   each arm has its own stone (`armHp`); a blow takes from the arm nearest it, and an arm that runs out comes off and flies. Four arms
 //            gone, or no hp, and he BURSTS. A full katana charge takes an arm every time.
 // SPAWN > STONE GUARDIAN. `GUARD` is live on `mel.GUARD`; `h` is his height, `headK` / `arm2K` the boss proportions he asked about.
-const GUARD = { file: 'models/creatures/stone_guardian.glb', clips: 'models/characters/forged/stone_guardian.glb', h: 8.8, headK: 1.22, arm2K: 1.1,     // m1735 (his: "double his size for fun"; the long arms and big hands are in the MODEL now, guardian_rig.py)
+const GUARD = { name: 'the guardian', wander: 0, notice: 99, roam: 0, amble: 1, act: {}, file: 'models/creatures/stone_guardian.glb', clips: 'models/characters/forged/stone_guardian.glb', h: 8.8, headK: 1.22, arm2K: 1.1,     // m1735 (his: "double his size for fun"; the long arms and big hands are in the MODEL now, guardian_rig.py)
   speed: 0, speed0: 2.6, turn: 1.1, near: 6.5, hp: 48, armHp: 7, r: .32, flash: .8, stagEvery: 6, echo: .9, lag: .12, wake: 1.6,
   // m1733 (his: "two little tiny middle arms, you can't even tell they're there -- all four need to stand out like a wrestler stance, equally, like a
   // big X"): THE X. Each arm bone is AIMED at a direction in his own frame (forward +Z, his left +X) after the clip: the upper pair up and
@@ -14273,149 +14273,164 @@ const GUARD = { file: 'models/creatures/stone_guardian.glb', clips: 'models/char
   smash: { r: 12, hit: .36, R: 8, dmg: 20, push: 10, cool: [4, 6.5] },
   throw: { min: 15, max: 50, grab: .2, rel: .5, T: [.9, 1.9], g: .7, dmg: 18, R: 3.6, size: 2.2, cool: [3.5, 5.5] },
   list: [], P: null, rocks: [], stat: { hits: 0, arms: 0, kills: 0, swipes: 0, smashes: 0, throws: 0 } };
+// m1737 (his: "another character -- a mini Olmec; maybe not a big boss, just a little temple dweller that walks around; same procedure: hard-
+// surface rig, statue version"): THE DWELLER, a second KIND on the guardian's code (`G.Z` is the kind; everything not given here is the
+// guardian's). His four views -> Tripo -> blender-addons/pipeline/olmec_rig.py (hard surface, two arms) -> 12 Forge clips. 2.3 m of stone,
+// two arms that come off, a punch-swipe and a ground smash, no boulders. He WANDERS round where he was put (`roam`, at `amble` pace, pausing)
+// until you come within `notice` m or hit him, then roars and comes for you. SPAWN > TEMPLE DWELLER: three, the first as his statue.
+const OLMEC = Object.assign(Object.create(GUARD), { name: 'the dweller', file: 'models/creatures/stone_olmec.glb', clips: 'models/characters/forged/stone_olmec.glb', P: null,
+  h: 2.3, headK: 1, arm2K: 1, X: null, speed: 0, speed0: 1.1, turn: 2.4, near: 1.7, hp: 10, armHp: 4, r: .3, stagEvery: 3, wander: 1, notice: 9, roam: 6, amble: .55,
+  n: 3, statueN: 1, spawnR: 9, swipe: { r: 2.7, hit: .45, R: 2.4, arc: 1.2, dmg: 7, push: 4, cool: [1.2, 2.2] }, smash: { r: 3, hit: .34, R: 2.4, dmg: 9, push: 5, cool: [3, 5] }, throw: null });
 const _gdA = new THREE.Vector3(), _gdB = new THREE.Vector3(), _gdQ = new THREE.Quaternion(), _gdI = new THREE.Quaternion(), _gdC = new THREE.Vector3(), _gdQ2 = new THREE.Quaternion(), _gdQ3 = new THREE.Quaternion();
 // turn bone `b` (by `w`) so it points from itself to its child `c` along `d` (his own frame: x his left, y up, z forward)
 function guardAim(G, b, c, d, side, w) { if (!b || !c || w <= .001) return; b.getWorldPosition(_gdA); c.getWorldPosition(_gdB); _gdB.sub(_gdA); if (_gdB.lengthSq() < 1e-10) return; _gdB.normalize();
   _gdC.set(d[0] * side, d[1], d[2]).normalize().applyQuaternion(G.root.quaternion); _gdQ.setFromUnitVectors(_gdB, _gdC);
   b.getWorldQuaternion(_gdQ2).premultiply(_gdQ); b.parent.getWorldQuaternion(_gdQ3); _gdQ2.premultiply(_gdQ3.invert()); b.quaternion.slerp(_gdQ2, w); b.updateMatrixWorld(true); }
-function guardX(G, dt) { const Z = GUARD, X = Z.X, calm = G.st === 'walk' || G.st === 'statue' || (G.st === 'wake' && G.stT > guardDur(G, 'roar') * .7);
+function guardX(G, dt) { const Z = G.Z, X = Z.X; if (!X) return; const calm = G.st === 'walk' || G.st === 'statue' || (G.st === 'wake' && G.stT > guardDur(G, 'roar') * .7);
   G.xu = damp(G.xu == null ? 1 : G.xu, calm ? Z.xUp : 0, .12, dt); G.xl = damp(G.xl == null ? 1 : G.xl, calm ? Z.xLo : Z.xLoAtk, .12, dt); G.root.updateMatrixWorld(true);
   for (const [s, k] of [['Left', 1], ['Right', -1]]) { const B = n => G.bn[s + n];
     guardAim(G, B('Arm'), B('ForeArm'), X.arm, k, G.xu); guardAim(G, B('ForeArm'), B('Hand'), X.fore, k, G.xu);
     guardAim(G, B('Arm2'), B('ForeArm2'), X.arm2, k, G.xl); guardAim(G, B('ForeArm2'), B('Hand2'), X.fore2, k, G.xl); } }
 const GPIECE = { Shoulder: 'arm', Arm: 'arm', ForeArm: 'arm', Hand: 'arm', Arm2: 'arm2', ForeArm2: 'arm2', Hand2: 'arm2', Neck: 'head', Head: 'head', UpLeg: 'leg', Leg: 'leg', Foot: 'leg', ToeBase: 'leg' };
 function guardPiece(name) { const n = name.replace(/^mixamorig[_:]?/, ''), m = /^(Left|Right)(.*)$/.exec(n); if (!m) return GPIECE[n] || 'body'; const g = GPIECE[m[2]]; return g ? g + (m[1] === 'Left' ? 'L' : 'R') : 'body'; }
-async function guardLoad() { if (GUARD.P) return GUARD.P;
-  const [g, c] = await Promise.all([loadGLB(GUARD.file, 'loading the guardian'), loadGLB(GUARD.clips, 'loading his moves')]); let h = 1;
+async function guardLoad(Z = GUARD) { if (Z.P) return Z.P;
+  const [g, c] = await Promise.all([loadGLB(Z.file, 'loading ' + Z.name), loadGLB(Z.clips, 'loading his moves')]); let h = 1;
   g.scene.traverse(o => { if (o.isSkinnedMesh) { o.geometry.computeBoundingBox(); const b = o.geometry.boundingBox; h = b.max.y - b.min.y; for (const m of [].concat(o.material)) m.side = THREE.FrontSide; } });     // Tripo writes doubleSided on everything
-  const k = GUARD.h / Math.max(.1, h), clips = {}; let walkV = 0;
+  const k = Z.h / Math.max(.1, h), clips = {}; let walkV = 0;
   for (const a of c.animations) { for (const t of a.tracks) if (/Hips\.position$/.test(t.name)) { const v = t.values, n = v.length;
       if (a.name === 'walk' && n >= 6) walkV = Math.hypot(v[n - 3] - v[0], v[n - 1] - v[2]) / Math.max(.1, a.duration) * k;     // the clip's own travel: his feet do not slide
       const x0 = v[0], z0 = v[2]; for (let i = 0; i < n; i += 3) { v[i] = x0; v[i + 2] = z0; } }     // in place: the brain moves him
     clips[a.name] = a; }
-  return (GUARD.P = { proto: g.scene, scale: k, h: h * k, clips, walkV, tris: null }); }
-function guardTris(M) { const P = GUARD.P; if (P.tris) return P.tris; const G = M.geometry, bones = M.skeleton.bones, SI = G.attributes.skinIndex, SW = G.attributes.skinWeight, n = G.attributes.position.count;
+  return (Z.P = { proto: g.scene, scale: k, h: h * k, clips, walkV, tris: null }); }
+function guardTris(Gd, M) { const P = Gd.Z.P; if (P.tris) return P.tris; const G = M.geometry, bones = M.skeleton.bones, SI = G.attributes.skinIndex, SW = G.attributes.skinWeight, n = G.attributes.position.count;
   const grp = bones.map(b => guardPiece(b.name)), vg = new Array(n);
   for (let v = 0; v < n; v++) { let bw = -1, bi = 0; for (let c = 0; c < 4; c++) { const w = SW.getComponent(v, c); if (w > bw) { bw = w; bi = SI.getComponent(v, c); } } vg[v] = grp[bi]; }
   const idx = G.index ? G.index.array : null, tri = (idx ? idx.length : n) / 3, T = {};
   for (let t = 0; t < tri; t++) { const a = idx ? idx[t * 3] : t * 3, b = idx ? idx[t * 3 + 1] : t * 3 + 1, c = idx ? idx[t * 3 + 2] : t * 3 + 2, g = vg[b] === vg[c] ? vg[b] : vg[a]; (T[g] = T[g] || []).push(a, b, c); }
   return (P.tris = T); }
-function guardSpawn(P, x, z, h, statue) { const m = skeletonClone(P.proto); m.scale.setScalar(P.scale); const root = new THREE.Group(); root.add(m);
+function guardSpawn(P, x, z, h, statue, Z = GUARD) { const m = skeletonClone(P.proto); m.scale.setScalar(P.scale); const root = new THREE.Group(); root.add(m);
   root.position.set(x, groundAt(x, z, player.pos.y + 2, 3), z); root.rotation.y = h; scene.add(root);
   let mesh = null; const mats = [], stoneMats = []; m.traverse(o => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; o.material = o.material.clone(); mats.push(o.material); stoneMats.push(statueStone(o.material)); if (o.isSkinnedMesh) mesh = o; } });
   const bn = {}; m.traverse(o => { if (o.isBone) bn[o.name.replace(/^mixamorig[_:]?/, '')] = o; });
-  if (bn.Head) bn.Head.scale.setScalar(GUARD.headK); for (const s of ['Left', 'Right']) if (bn[s + 'Arm2']) bn[s + 'Arm2'].scale.setScalar(GUARD.arm2K);
+  if (bn.Head) bn.Head.scale.setScalar(Z.headK); for (const s of ['Left', 'Right']) if (bn[s + 'Arm2']) bn[s + 'Arm2'].scale.setScalar(Z.arm2K);
   // the echo: each lower-arm bone, its upper twin, and both rests (the delta of the upper from ITS rest, laid on the lower's)
   const echo = []; for (const s of ['Left', 'Right']) for (const [lo, up] of [['Arm2', 'Arm'], ['ForeArm2', 'ForeArm'], ['Hand2', 'Hand']]) { const L = bn[s + lo], U = bn[s + up]; if (L && U) echo.push({ L, U, rL: L.quaternion.clone(), rU: U.quaternion.clone(), q: new THREE.Quaternion() }); }
   const mixer = new THREE.AnimationMixer(m), act = {}; for (const k in P.clips) act[k] = mixer.clipAction(P.clips[k]);
   for (const k of ['swipe', 'punch', 'slam', 'throw', 'stomp', 'smash', 'hit', 'die', 'roar', 'flex']) if (act[k]) { act[k].setLoop(THREE.LoopOnce); act[k].clampWhenFinished = true; }
-  const G = { root, m, mesh, mats, stoneMats, bn, echo, mixer, act, cur: '', hp: GUARD.hp, arm: { armL: GUARD.armHp, armR: GUARD.armHp, arm2L: GUARD.armHp, arm2R: GUARD.armHp }, cut: {},
+  const G = { root, m, mesh, mats, stoneMats, bn, echo, mixer, act, cur: '', Z, hp: Z.hp, arm: {}, cut: {}, roots: Object.keys(GROOT).filter(nm => bn[GROOT[nm]]), home: new THREE.Vector3(x, 0, z), aggro: statue ? 0 : !Z.wander,
     st: statue ? 'statue' : 'walk', stT: 0, cool: 1.5, hitCd: 0, flash: 0, kx: 0, kz: 0, dmgRun: 0, rock: null, dead: 0, statue: statue ? 1 : 0 };
-  GUARD.list.push(G); guardPlay(G, statue ? 'flex' : 'idle', 0);
+  for (const nm of G.roots) G.arm[nm] = Z.armHp; GUARD.list.push(G); guardPlay(G, statue ? 'flex' : 'idle', 0);
   if (statue) { G.m.traverse(o => { if (o.isMesh) o.material = G.stoneMats[G.mats.indexOf(o.material)] || o.material; }); const a = act.flex; if (a) { a.time = a.getClip().duration * .55; } mixer.update(0); mixer.timeScale = 0; }
   return G; }
 function guardPlay(G, k, fade = .25) { const a = G.act[k]; if (!a) return; if (G.cur === k && a.loop !== THREE.LoopOnce) return;
   a.reset(); a.setEffectiveTimeScale(1); a.setEffectiveWeight(1); a.play(); if (fade > 0 && G.cur && G.cur !== k) { G.act[G.cur].fadeOut(fade); a.fadeIn(fade); } else if (G.cur && G.cur !== k) G.act[G.cur].stop(); G.cur = k; }
 function guardDur(G, k) { const a = G.act[k]; return a ? a.getClip().duration : 1; }
-async function guardAdd() { try { const P = await guardLoad(), p = player, a = p.faceH, x = p.pos.x + Math.sin(a) * 14, z = p.pos.z + Math.cos(a) * 14; guardSpawn(P, x, z, Math.atan2(p.pos.x - x, p.pos.z - z), 1);
+async function guardAdd(Z = GUARD) { try { const P = await guardLoad(Z), p = player, a = p.faceH, n = Z.n || 1;
+    for (let i = 0; i < n; i++) { const aa = a + (i - (n - 1) / 2) * .5, r = Z.spawnR || 14, x = p.pos.x + Math.sin(aa) * r, z = p.pos.z + Math.cos(aa) * r; guardSpawn(P, x, z, Math.atan2(p.pos.x - x, p.pos.z - z) + (Z.wander && i ? Math.random() * 3 : 0), Z.statueN == null || i < Z.statueN ? 1 : 0, Z); }
     snd('clang', { g: .5, r: .4 }); } catch (e) { console.error('[melee] guardian', e); note('GUARDIAN FAILED ' + e.message); } }
-function guardClear() { for (const G of GUARD.list) G.root.removeFromParent(); GUARD.list.length = 0; for (const R of GUARD.rocks) R.m.removeFromParent(); GUARD.rocks.length = 0; }
-function guardMid(G, v) { const R = G.root.position; return v.set(R.x, R.y + GUARD.P.h * .5, R.z); }
+function guardClear(Z) { for (const G of GUARD.list.slice()) if (!Z || G.Z === Z) { G.root.removeFromParent(); GUARD.list.splice(GUARD.list.indexOf(G), 1); } if (Z && Z !== GUARD) return; for (const R of GUARD.rocks) R.m.removeFromParent(); GUARD.rocks.length = 0; }
+function guardMid(G, v) { const R = G.root.position; return v.set(R.x, R.y + G.Z.P.h * .5, R.z); }
 function guardWake(G) { if (!G.statue) return; G.statue = 0; G.st = 'wake'; G.stT = 0; G.mixer.timeScale = 1; G.m.traverse(o => { if (o.isMesh) { const i = G.stoneMats.indexOf(o.material); if (i >= 0) o.material = G.mats[i]; } });
   const M = guardMid(G, _gdA); for (let i = 0; i < 4; i++) spkBurst(M.x, M.y - 1 + i * .7, M.z, 20, { col: [.8, .74, .64], spread: 5, size: .14, life: .5 }); for (let i = 0; i < 8; i++) smokeAt(M.x + (Math.random() - .5) * 2, M.y - 1.5 + Math.random() * 3, M.z + (Math.random() - .5) * 2, 3, 1.4, [.82, .76, .66]);
   jinraEmit(M.x, M.y + 1, M.z, 6); snd('boom', { g: .7, r: .55, x: M.x, z: M.z }); camShake(.35); guardPlay(G, 'roar', .2); }
-function guardBake(G, g, dirH, kick) { const T = GUARD.P.tris && GUARD.P.tris[g]; if (!T || !G.mesh) return null; for (const m of G.mats) if (m.emissive) m.emissive.setScalar(0);
+function guardBake(G, g, dirH, kick) { const T = G.Z.P.tris && G.Z.P.tris[g]; if (!T || !G.mesh) return null; for (const m of G.mats) if (m.emissive) m.emissive.setScalar(0);
   return limbBake({ model: G.m, limbMesh: G.mesh }, g, dirH, kick, T); }
 const GROOT = { armL: 'LeftShoulder', armR: 'RightShoulder', arm2L: 'LeftArm2', arm2R: 'RightArm2' };
-function guardCut(G, nm, dirH) { if (G.cut[nm]) return; guardTris(G.mesh); G.root.updateMatrixWorld(true); const D = guardBake(G, nm, dirH, 2);
-  const b = G.bn[GROOT[nm]]; if (b) { b.getWorldPosition(_gdA); b.scale.setScalar(1e-3); } G.cut[nm] = 1; G.arm[nm] = 0; GUARD.stat.arms++;
+function guardCut(G, nm, dirH) { if (G.cut[nm]) return; guardTris(G, G.mesh); G.root.updateMatrixWorld(true); const D = guardBake(G, nm, dirH, 2);
+  const b = G.bn[GROOT[nm]]; if (b) { b.getWorldPosition(_gdA); b.scale.setScalar(1e-3); } G.cut[nm] = 1; G.arm[nm] = 0; GUARD.stat.arms++; G.aggro = 1;
   for (const D2 of ARENA.debris) if (D2.m === D) { D2.r = 1; D2.v.multiplyScalar(.7); }
   spkBurst(_gdA.x, _gdA.y, _gdA.z, 34, { col: [.5, 1, .55], spread: 6, size: .2, life: .6 }); for (let i = 0; i < 22; i++) gfire(_gdA.x + (Math.random() - .5) * .5, _gdA.y, _gdA.z + (Math.random() - .5) * .5, 1.1);
   for (let i = 0; i < 3; i++) smokeAt(_gdA.x, _gdA.y, _gdA.z, 3, 1.2, [.82, .76, .66]); jinraEmit(_gdA.x, _gdA.y, _gdA.z, 4); snd('boom', { g: .6, r: .9, x: _gdA.x, z: _gdA.z }); camShake(.3);
   if (G.rock && (nm === 'armR')) { G.rock.m.removeFromParent(); G.rock = null; } }
-function guardDie(G, dirH) { if (G.dead) return; G.dead = 1; guardTris(G.mesh); G.root.updateMatrixWorld(true);
+function guardDie(G, dirH) { if (G.dead) return; G.dead = 1; guardTris(G, G.mesh); G.root.updateMatrixWorld(true);
   for (const g of ['body', 'head', 'legL', 'legR']) guardBake(G, g, dirH + (Math.random() - .5) * 1.6, g === 'head' ? 4 : 1.5);
-  for (const nm of Object.keys(GROOT)) if (!G.cut[nm]) guardBake(G, nm, dirH + (Math.random() - .5) * 2.4, 3);
+  for (const nm of G.roots) if (!G.cut[nm]) guardBake(G, nm, dirH + (Math.random() - .5) * 2.4, 3);
   const M = guardMid(G, _gdA); killBlast(G.root.position, M.y, 2.4, 1); for (let i = 0; i < 120; i++) { const a = Math.random() * 6.283, r = Math.random() * 1.8; gfire(M.x + Math.cos(a) * r, M.y + (Math.random() - .5) * 3, M.z + Math.sin(a) * r, 1.4); }
   jinraEmit(M.x, M.y, M.z, 14); camShake(.6); if (G.rock) G.rock.m.removeFromParent();
   G.root.removeFromParent(); GUARD.list.splice(GUARD.list.indexOf(G), 1); GUARD.stat.kills++; HORDE.stat.kills++; }
 // ONE BLOW on him: the stone takes it from the arm nearest the hit (hx, hy, hz). 'block' when he is still stone (the blow wakes him), else 1.
 function guardBlow(G, dirH, power, dmg, hx, hy, hz) { if (G.dead || G.hitCd > 0) return 0; G.hitCd = .18; const p = player, M = guardMid(G, _gdA);
   if (G.statue) { spkBurst(hx == null ? M.x : hx, hy == null ? M.y : hy, hz == null ? M.z : hz, 18, { col: [.8, .74, .64], spread: 4, size: .12, life: .4 }); snd('clang', { g: .7, r: .5, x: M.x, z: M.z }); guardWake(G); return 'block'; }
-  dmg = dmg == null ? 1 : dmg; const full = p.chargeGo && slotNow().blade && (p.chargeGoK || 0) >= HALVE.full; GUARD.stat.hits++; G.hp -= dmg; G.flash = GUARD.flash; G.dmgRun += dmg;
+  dmg = dmg == null ? 1 : dmg; const full = p.chargeGo && slotNow().blade && (p.chargeGoK || 0) >= HALVE.full; GUARD.stat.hits++; G.hp -= dmg; G.flash = G.Z.flash; G.aggro = 1; G.dmgRun += dmg;
   G.kx = Math.sin(dirH) * Math.min(1.5, power || 1) * 1.2; G.kz = Math.cos(dirH) * Math.min(1.5, power || 1) * 1.2;
   // the arm nearest the blow (its hand and forearm, in the world)
   let best = '', bd = 1e9; const Hx = hx == null ? M.x : hx, Hy = hy == null ? M.y : hy, Hz = hz == null ? M.z : hz;
-  for (const nm of Object.keys(GROOT)) { if (G.cut[nm]) continue; const s = nm.endsWith('L') ? 'Left' : 'Right', two = nm.startsWith('arm2') ? '2' : '';
+  for (const nm of G.roots) { if (G.cut[nm]) continue; const s = nm.endsWith('L') ? 'Left' : 'Right', two = nm.startsWith('arm2') ? '2' : '';
     for (const bnm of ['ForeArm' + two, 'Hand' + two]) { const b = G.bn[s + bnm]; if (!b) continue; b.getWorldPosition(_gdB); const q = Math.hypot(_gdB.x - Hx, (_gdB.y - Hy) * .7, _gdB.z - Hz); if (q < bd) { bd = q; best = nm; } } }
   spkBurst(Hx, Hy, Hz, 22, { col: [.85, .8, .7], spread: 5, size: .15, life: .45 }); spkBurst(Hx, Hy, Hz, 10, { col: [.55, 1, .6], spread: 4, size: .12, life: .35 }); smokeAt(Hx, Hy, Hz, 1.2, .7, [.82, .76, .66]);
   snd('clang', { g: .7, r: .55 + Math.random() * .15, x: M.x, z: M.z }); snd('hit', { g: .5, r: .6, x: M.x, z: M.z });
-  if (best && (bd < GUARD.P.h * .55 || full)) { G.arm[best] -= full ? 99 : dmg; if (G.arm[best] <= 0) guardCut(G, best, dirH); }
-  if (G.hp <= 0 || Object.keys(GROOT).every(nm => G.cut[nm])) { guardDie(G, dirH); return 1; }
-  if (G.dmgRun >= GUARD.stagEvery && G.st !== 'throw') { G.dmgRun = 0; G.st = 'stag'; G.stT = 0; guardPlay(G, 'hit', .1); }
+  if (best && (bd < G.Z.P.h * .55 || full)) { G.arm[best] -= full ? 99 : dmg; if (G.arm[best] <= 0) guardCut(G, best, dirH); }
+  if (G.hp <= 0 || G.roots.every(nm => G.cut[nm])) { guardDie(G, dirH); return 1; }
+  if (G.dmgRun >= G.Z.stagEvery && G.st !== 'throw') { G.dmgRun = 0; G.st = 'stag'; G.stT = 0; guardPlay(G, 'hit', .1); }
   return 1; }
 function guardArea(x, y, z, r, power, dmg) { let n = 0; for (const G of GUARD.list.slice()) { const R = G.root.position, dx = R.x - x, dz = R.z - z, q = Math.hypot(dx, dz);
-    if (q < r + GUARD.P.h * GUARD.r && y > R.y - 2 && y < R.y + GUARD.P.h + 1 && guardBlow(G, q > 1e-3 ? Math.atan2(dx, dz) : player.faceH, power, dmg, x, y + 1, z)) n++; } return n; }
+    if (q < r + G.Z.P.h * G.Z.r && y > R.y - 2 && y < R.y + G.Z.P.h + 1 && guardBlow(G, q > 1e-3 ? Math.atan2(dx, dz) : player.faceH, power, dmg, x, y + 1, z)) n++; } return n; }
 function guardSweep(a, b, rad, power, dmg, dirH) { let n = 0; for (const G of GUARD.list.slice()) { const R = G.root.position;
-    if (!segBody(a, b, R.x, R.z, GUARD.P.h * GUARD.r + rad, R.y + GUARD.P.h, rad, R.y)) continue;
+    if (!segBody(a, b, R.x, R.z, G.Z.P.h * G.Z.r + rad, R.y + G.Z.P.h, rad, R.y)) continue;
     const r = guardBlow(G, dirH, power, dmg, _hitP.x, _hitP.y, _hitP.z); if (r) { n++; if (r === 1) meleeHit(null, _hitP.x, _hitP.y, _hitP.z, .7 + Math.min(1, power) * .8); } } return n; }
-function guardShot(b) { for (const G of GUARD.list) { const R = G.root.position; if (Math.hypot(b.pos.x - R.x, b.pos.z - R.z) > GUARD.P.h * GUARD.r + b.size * .5 || b.pos.y < R.y || b.pos.y > R.y + GUARD.P.h) continue;
+function guardShot(b) { for (const G of GUARD.list) { const R = G.root.position; if (Math.hypot(b.pos.x - R.x, b.pos.z - R.z) > G.Z.P.h * G.Z.r + b.size * .5 || b.pos.y < R.y || b.pos.y > R.y + G.Z.P.h) continue;
     guardBlow(G, Math.atan2(b.vel.x, b.vel.z), b.rocket ? 1.4 : .6, FOE.dmg.bolt * (b.rocket ? ROCKET.dmgK : 1) * (1 + (b.chg || 0)), b.pos.x, b.pos.y, b.pos.z); return true; } return false; }
-function guardHit(x, y, z) { for (const G of GUARD.list) { const R = G.root.position; if (Math.hypot(x - R.x, z - R.z) < GUARD.P.h * GUARD.r && y > R.y && y < R.y + GUARD.P.h) return G; } return null; }
+function guardHit(x, y, z) { for (const G of GUARD.list) { const R = G.root.position; if (Math.hypot(x - R.x, z - R.z) < G.Z.P.h * G.Z.r && y > R.y && y < R.y + G.Z.P.h) return G; } return null; }
 // the boulder: torn out of the ground at his feet, carried in his right hand, thrown at your lead
-function guardRockMesh() { const g = new THREE.IcosahedronGeometry(GUARD.throw.size * .5, 1), P = g.attributes.position;
+function guardRockMesh(Z) { const g = new THREE.IcosahedronGeometry(Z.throw.size * .5, 1), P = g.attributes.position;
   for (let i = 0; i < P.count; i++) { const k = .78 + Math.random() * .4; P.setXYZ(i, P.getX(i) * k, P.getY(i) * k * .9, P.getZ(i) * k); } g.computeVertexNormals();
   const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: 0x8c8474, roughness: .95, flatShading: true })); m.castShadow = true; scene.add(m); return m; }
-function guardRockLand(R, P, gy) { const p = player, Z = GUARD.throw;
+function guardRockLand(R, P, gy) { const p = player, Z = R.Z.throw;
   for (let i = 0; i < 3; i++) spkBurst(P.x, gy + .3, P.z, 20, { col: [.8, .74, .64], spread: 6, size: .16, life: .5 }); for (let i = 0; i < 6; i++) smokeAt(P.x + (Math.random() - .5) * 1.5, gy + .2 + Math.random(), P.z + (Math.random() - .5) * 1.5, 3, 1.3, [.8, .74, .64]);
   for (let i = 0; i < 6; i++) { const m = new THREE.Mesh(R.m.geometry, R.m.material); m.scale.setScalar(.22 + Math.random() * .22); m.position.set(P.x, gy + .4, P.z); m.castShadow = true; scene.add(m); const a = Math.random() * 6.283;
     ARENA.debris.push({ m, v: new THREE.Vector3(Math.cos(a) * 4, 3 + Math.random() * 3, Math.sin(a) * 4), w: new THREE.Vector3((Math.random() - .5) * 12, (Math.random() - .5) * 12, (Math.random() - .5) * 12), r: .2, rest: 0, hot: 0, mats: [], s0: m.scale.clone() }); }
   while (ARENA.debris.length > 60) { const o = ARENA.debris.shift(); scene.remove(o.m); }
   snd('boom', { g: .6, r: .8, x: P.x, z: P.z }); camShake(.3); R.m.removeFromParent();
   const q = Math.hypot(p.pos.x - P.x, p.pos.z - P.z); if (!R.cut && q < Z.R && Math.abs(p.pos.y - gy) < 1.6 && !p.roll) playerHurt(Z.dmg * (q < Z.R * .45 ? 1 : .6), Math.atan2(p.pos.x - P.x, p.pos.z - P.z), 8, 4, .5, 1); }
-function guardRockStep(dt) { for (let i = GUARD.rocks.length - 1; i >= 0; i--) { const R = GUARD.rocks[i], P = R.m.position; R.t += dt; R.v.y -= MOVE.g * GUARD.throw.g * dt; P.addScaledVector(R.v, dt); R.m.rotation.x += dt * 5; R.m.rotation.z += dt * 3;
+function guardRockStep(dt) { for (let i = GUARD.rocks.length - 1; i >= 0; i--) { const R = GUARD.rocks[i], P = R.m.position; R.t += dt; R.v.y -= MOVE.g * R.Z.throw.g * dt; P.addScaledVector(R.v, dt); R.m.rotation.x += dt * 5; R.m.rotation.z += dt * 3;
     if (Math.random() < .5) smokeAt(P.x, P.y, P.z, .6, .5, [.8, .74, .64]);
-    const p = player, H = RIG.height || 1.25, hitMe = Math.hypot(P.x - p.pos.x, P.z - p.pos.z) < GUARD.throw.size * .5 + .4 && P.y > p.pos.y - .3 && P.y < p.pos.y + H + .4, gy = groundAt(P.x, P.z, P.y + .5, 1);
-    if (!hitMe && P.y - GUARD.throw.size * .4 > gy && R.t < 4) continue;
+    const p = player, H = RIG.height || 1.25, hitMe = Math.hypot(P.x - p.pos.x, P.z - p.pos.z) < R.Z.throw.size * .5 + .4 && P.y > p.pos.y - .3 && P.y < p.pos.y + H + .4, gy = groundAt(P.x, P.z, P.y + .5, 1);
+    if (!hitMe && P.y - R.Z.throw.size * .4 > gy && R.t < 4) continue;
     GUARD.rocks.splice(i, 1); guardRockLand(R, P, hitMe ? Math.min(P.y, p.pos.y) : gy); } }
 // a sword through a boulder in flight breaks it (his: "maybe he throws boulders" -- and Korajin cuts things)
 function guardRockCut(a, b, rad) { for (let i = GUARD.rocks.length - 1; i >= 0; i--) { const R = GUARD.rocks[i], P = R.m.position;
-    if (!segBody(a, b, P.x, P.z, GUARD.throw.size * .5 + rad, P.y + .5, rad, P.y - .5)) continue; GUARD.rocks.splice(i, 1); R.cut = 1; guardRockLand(R, P.clone(), P.y - .4); snd('clang', { g: .8, r: .7 }); } }
-function guardThink(G, d, dt) { const Z = GUARD, R = G.root, p = player, roll = a => a[0] + Math.random() * (a[1] - a[0]); G.stT += dt;
+    if (!segBody(a, b, P.x, P.z, R.Z.throw.size * .5 + rad, P.y + .5, rad, P.y - .5)) continue; GUARD.rocks.splice(i, 1); R.cut = 1; guardRockLand(R, P.clone(), P.y - .4); snd('clang', { g: .8, r: .7 }); } }
+function guardThink(G, d, dt) { const Z = G.Z, R = G.root, p = player, roll = a => a[0] + Math.random() * (a[1] - a[0]); G.stT += dt;
   const facing = Math.abs(wrapAngle(Math.atan2(p.pos.x - R.position.x, p.pos.z - R.position.z) - R.rotation.y)) < .45, armed = !(G.cut.armL && G.cut.armR);
   const u = k => G.stT / guardDur(G, k);
   switch (G.st) {
     case 'statue': break;
     case 'wake': if (G.stT > Math.max(Z.wake, guardDur(G, 'roar') * .9)) { G.st = 'walk'; G.stT = 0; G.cool = 1; } break;
-    case 'walk': if ((G.cool -= dt) > 0 || !facing) break;
+    case 'walk': if ((G.cool -= dt) > 0 || !facing || !G.aggro) break;
       if (d < Z.swipe.r && armed) { G.st = 'swipe'; G.stT = 0; G.hit = 0; guardPlay(G, 'swipe', .15); snd('swoosh', { g: .7, r: .5, x: R.position.x, z: R.position.z }); }
-      else if (d < Z.smash.r && Math.random() < .5) { G.st = 'smash'; G.stT = 0; G.hit = 0; guardPlay(G, 'smash', .15); }
-      else if (d > Z.throw.min && d < Z.throw.max && !G.cut.armR) { G.st = 'throw'; G.stT = 0; G.hit = 0; guardPlay(G, 'throw', .2); }
+      else if (Z.smash && d < Z.smash.r && Math.random() < .5) { G.st = 'smash'; G.stT = 0; G.hit = 0; guardPlay(G, 'smash', .15); }
+      else if (Z.throw && d > Z.throw.min && d < Z.throw.max && !G.cut.armR) { G.st = 'throw'; G.stT = 0; G.hit = 0; guardPlay(G, 'throw', .2); }
       else G.cool = .4; break;
     case 'swipe': if (!G.hit && u('swipe') > Z.swipe.hit) { G.hit = 1; GUARD.stat.swipes++; snd('swoosh', { g: .9, r: .45, x: R.position.x, z: R.position.z });
         const dx = p.pos.x - R.position.x, dz = p.pos.z - R.position.z, q = Math.hypot(dx, dz), off = Math.abs(wrapAngle(Math.atan2(dx, dz) - R.rotation.y));
-        if (q < Z.swipe.R && off < Z.swipe.arc && Math.abs(p.pos.y - R.position.y) < Z.P_h * .6 && !p.roll) playerHurt(Z.swipe.dmg, Math.atan2(dx, dz) + .6, Z.swipe.push, 3, .5, 1); }
+        if (q < Z.swipe.R && off < Z.swipe.arc && Math.abs(p.pos.y - R.position.y) < Z.P.h * .6 && !p.roll) playerHurt(Z.swipe.dmg, Math.atan2(dx, dz) + .6, Z.swipe.push, 3, .5, 1); }
       if (u('swipe') >= 1) { G.st = 'walk'; G.cool = roll(Z.swipe.cool); } break;
-    case 'smash': if (!G.hit && u('smash') > Z.smash.hit) { G.hit = 1; GUARD.stat.smashes++; const f = Z.P_h * .5, cx = R.position.x + Math.sin(R.rotation.y) * f, cz = R.position.z + Math.cos(R.rotation.y) * f, gy = R.position.y;
+    case 'smash': if (!G.hit && u('smash') > Z.smash.hit) { G.hit = 1; GUARD.stat.smashes++; const f = Z.P.h * .5, cx = R.position.x + Math.sin(R.rotation.y) * f, cz = R.position.z + Math.cos(R.rotation.y) * f, gy = R.position.y;
         for (let k = 0; k < 24; k++) { const a = k / 24 * 6.283; smokeAt(cx + Math.cos(a) * Z.smash.R * .7, gy + .2, cz + Math.sin(a) * Z.smash.R * .7, 2.4, 1.2, [.8, .74, .64]); }
         for (let i = 0; i < 3; i++) spkBurst(cx, gy + .3, cz, 26, { col: [.8, .74, .64], spread: 9, size: .18, life: .55 }); for (let i = 0; i < 30; i++) gfire(cx + (Math.random() - .5) * 2, gy + .1, cz + (Math.random() - .5) * 2, 1);
         snd('boom', { g: 1, r: .55, x: cx, z: cz }); camShake(.55); if (DEBRIS.on) debrisArea(cx, gy, cz, Z.smash.R);
         const q = Math.hypot(p.pos.x - cx, p.pos.z - cz), air = p.pos.y - groundAt(p.pos.x, p.pos.z, p.pos.y + .5, 1) > .45; if (q < Z.smash.R && !air && !p.roll) playerHurt(Z.smash.dmg * (q < Z.smash.R * .5 ? 1 : .6), Math.atan2(p.pos.x - cx, p.pos.z - cz), Z.smash.push, 5, .7, 1); }
       if (u('smash') >= 1) { G.st = 'walk'; G.cool = roll(Z.smash.cool); } break;
     case 'throw': { const T = Z.throw;
-      if (!G.rock && !G.hit && u('throw') > T.grab && !G.cut.armR) { G.rock = { m: guardRockMesh(), t: 0, v: new THREE.Vector3() }; const P = R.position; spkBurst(P.x, P.y + .2, P.z, 18, { col: [.8, .74, .64], spread: 4, size: .14, life: .4 }); smokeAt(P.x, P.y + .3, P.z, 2.4, 1, [.8, .74, .64]); snd('thud', { g: .6, r: .6, x: P.x, z: P.z }); }
+      if (!G.rock && !G.hit && u('throw') > T.grab && !G.cut.armR) { G.rock = { m: guardRockMesh(Z), Z, t: 0, v: new THREE.Vector3() }; const P = R.position; spkBurst(P.x, P.y + .2, P.z, 18, { col: [.8, .74, .64], spread: 4, size: .14, life: .4 }); smokeAt(P.x, P.y + .3, P.z, 2.4, 1, [.8, .74, .64]); snd('thud', { g: .6, r: .6, x: P.x, z: P.z }); }
       if (G.rock && !G.hit && u('throw') > T.rel) { G.hit = 1; GUARD.stat.throws++; const S = G.rock.m.position, dd = Math.hypot(p.pos.x - S.x, p.pos.z - S.z), TT = clamp(dd / 18, T.T[0], T.T[1]);
         const tx = p.pos.x + p.vel.x * TT * .8, tz = p.pos.z + p.vel.z * TT * .8, ty = p.pos.y + .6; G.rock.v.set((tx - S.x) / TT, (ty - S.y) / TT + .5 * MOVE.g * T.g * TT, (tz - S.z) / TT);
         GUARD.rocks.push(G.rock); G.rock = null; snd('swoosh', { g: 1, r: .4, x: S.x, z: S.z }); }
       if (u('throw') >= 1) { if (G.rock) { G.rock.m.removeFromParent(); G.rock = null; } G.st = 'walk'; G.cool = roll(T.cool); } break; }
     case 'stag': if (G.stT > guardDur(G, 'hit') * .85) { G.st = 'walk'; G.stT = 0; G.cool = Math.max(G.cool, .6); if (G.rock) { G.rock.m.removeFromParent(); G.rock = null; } } break; } }
-function guardStep(dt) { const p = player, Z = GUARD; if (Z.rocks.length) guardRockStep(dt); Z.P_h = Z.P ? Z.P.h : 4;
-  for (const G of Z.list.slice()) { G.hitCd -= dt; const R = G.root, dx = p.pos.x - R.position.x, dz = p.pos.z - R.position.z, d = Math.hypot(dx, dz);
+function guardStep(dt) { const p = player; if (GUARD.rocks.length) guardRockStep(dt);
+  for (const G of GUARD.list.slice()) { const Z = G.Z; G.hitCd -= dt; const R = G.root, dx = p.pos.x - R.position.x, dz = p.pos.z - R.position.z, d = Math.hypot(dx, dz);
     guardThink(G, d, dt); if (G.dead) continue;
-    const st = G.st, want = Math.atan2(dx, dz);
+    // m1737: a DWELLER (`wander`) minds his temple until he notices you (`notice` m, or a blow): ambling between spots round his home, pausing
+    if (!G.aggro && !G.statue && G.st === 'walk' && d < Z.notice) { G.aggro = 1; G.cool = Math.max(G.cool, .8); if (G.act.roar) { G.st = 'wake'; G.stT = 0; guardPlay(G, 'roar', .2); } }
+    let want = Math.atan2(dx, dz), far = d > Z.near, slow = 1;
+    if (!G.aggro) { const at = G.wp && Math.hypot(G.wp.x - R.position.x, G.wp.z - R.position.z) < .6;
+      if (!G.wp || (at && (G.pause -= dt) <= 0) || G.stT > 14) { const a = Math.random() * 6.283, r = Math.random() * Z.roam; G.wp = { x: G.home.x + Math.sin(a) * r, z: G.home.z + Math.cos(a) * r }; G.pause = 1.5 + Math.random() * 3; G.stT = 0; }
+      const wx = G.wp.x - R.position.x, wz = G.wp.z - R.position.z; want = Math.atan2(wx, wz); far = Math.hypot(wx, wz) > .6; slow = Z.amble; }
+    const st = G.st;
     if (st === 'walk' || (st === 'throw' && !G.hit)) R.rotation.y += clamp(wrapAngle(want - R.rotation.y), -Z.turn * dt, Z.turn * dt);
-    const sp = Z.speed || G_walkV(), go = st === 'walk' && d > Z.near && !G.statue ? sp * clamp(1 - Math.abs(wrapAngle(want - R.rotation.y)) / 1.4, 0, 1) : 0;
-    if (st === 'walk') guardPlay(G, go > .05 ? 'walk' : 'idle', .3);
+    const sp = (Z.speed || G_walkV(G)) * slow, go = st === 'walk' && far && !G.statue ? sp * clamp(1 - Math.abs(wrapAngle(want - R.rotation.y)) / 1.4, 0, 1) : 0;
+    if (st === 'walk') { guardPlay(G, go > .05 ? 'walk' : 'idle', .3); const wa = G.act.walk; if (wa) wa.timeScale = go > .05 ? slow : 1; }
     R.position.x += Math.sin(R.rotation.y) * go * dt + G.kx * dt; R.position.z += Math.cos(R.rotation.y) * go * dt + G.kz * dt; const kd = Math.exp(-5 * dt); G.kx *= kd; G.kz *= kd;
     R.position.y = damp(R.position.y, groundAt(R.position.x, R.position.z, R.position.y + 1.5, 1.5), .08, dt);
     // he is a wall: the player is put back outside his trunk
@@ -14426,7 +14441,7 @@ function guardStep(dt) { const p = player, Z = GUARD; if (Z.rocks.length) guardR
     guardX(G, dt);
     if (G.rock) { const H = G.bn.RightHand; if (H) { H.getWorldPosition(_gdA); G.rock.m.position.copy(_gdA); } }
     G.flash = Math.max(0, G.flash - dt * 3); if (!G.statue) for (const m of G.mats) if (m.emissive) m.emissive.setRGB(G.flash * .5, G.flash * .45, G.flash * .3); } }
-function G_walkV() { return GUARD.P && GUARD.P.walkV > .2 ? GUARD.P.walkV : GUARD.speed0; }
+function G_walkV(G) { const Z = G.Z; return Z.P && Z.P.walkV > .2 ? Z.P.walkV : Z.speed0; }
 function hordeDie(d) {
   const P = d.root.position; jinraBody(d, Math.round(JINRA.burst * .6));     /* m1500 */
   if (d.K.osari) { osariVanish(d); return; }
@@ -14742,7 +14757,8 @@ function arenaUi() {
       else if (a === 'archers') { archerAdd(); }     // m1103
       else if (a === 'statue') { ARENA.menu = ''; if (STATUE.g) statueClear(); else statueAdd(); }     // m1705
       else if (a === 'spider') { ARENA.menu = ''; if (SPIDER.list.length) spiderClear(); else spiderAdd(); }
-      else if (a === 'guard') { ARENA.menu = ''; if (GUARD.list.length) guardClear(); else guardAdd(); }     // m1732     // m1677
+      else if (a === 'guard') { ARENA.menu = ''; if (GUARD.list.some(G => G.Z === GUARD)) guardClear(GUARD); else guardAdd(GUARD); }
+      else if (a === 'olmec') { ARENA.menu = ''; if (GUARD.list.some(G => G.Z === OLMEC)) guardClear(OLMEC); else guardAdd(OLMEC); }     // m1737     // m1732     // m1677
       else if (a === 'hall') { ARENA.menu = ''; if (HALL.on) hallClear(); else hallBuild(); }     // m1116
       else if (a === 'age') { AGE.st = AGE.st === 'fallen' ? 'restored' : 'fallen'; try { localStorage.setItem('mel.age', AGE.st); } catch (err) {} for (const E of BLDG.list) if (E.on()) { const rg = E.rig && E.rig(); if (rg) restorePlay(rg, AGE.st === 'fallen' ? 0 : 1); else { E.clear(); E.build(); } } if (inHome()) { AGE.st = AGE.st === 'fallen' ? 'restored' : 'fallen'; hwAgeLive(); } }     // m1501: FALLEN / RESTORED; a restorable building PLAYS it (m1512); the Red Hollows' pieces read it as they build: reload (Worker B)
       else if (a === 'bld') { ARENA.menu = ''; const E = BLDG.list.find(q => q.key === b.dataset.k); if (E) { if (E.on()) E.clear(); else E.build(); } }     // m1117
@@ -14822,7 +14838,7 @@ function arenaUi() {
   if (m === 'bld') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back') + B('age', 'STATE: ' + (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + '<small>tap to switch -- rebuilds what stands</small>', '', AGE.st === 'fallen' ? '' : 'ar-on');
     for (const E of BLDG.list) h += B('bld', E.t + '<small>' + (E.on() ? 'tap to remove' : E.pass >= 3 ? E.sub : 'IN PROGRESS · pass ' + E.pass + ' of 3') + '</small>', E.key, E.on() ? 'ar-on' : '');
     h += '</div>'; }
-  else if (m === 'top') h += '<div class="ar-menu">' + (inForge() ? B('cat', 'BUILDINGS &rsaquo;', 'bld') : '') + B('cat', 'WARBOSS &rsaquo;', 'boss') + B('cat', 'PEOPLE &rsaquo;', 'people') + B('cat', 'BEASTS &rsaquo;', 'beasts') + B('cat', 'RIVALS &rsaquo;', 'rival') + B('turret', 'TURRET<small>' + (TURRET.list.length ? 'tap to remove' : 'sentry gun') + '</small>', '', TURRET.list.length ? 'ar-on' : '') + B('hbar', 'HIGH BAR<small>' + (HBAR.list.length ? 'tap to remove' : 'swing on it') + '</small>', '', HBAR.list.length ? 'ar-on' : '') + B('beam', 'BALANCE BEAM<small>' + (BEAM.list.length ? 'tap to remove' : 'walk it') + '</small>', '', BEAM.list.length ? 'ar-on' : '') + B('wrun', 'WALL RUN<small>' + ((WRUN.boxes || []).length ? 'tap to remove' : 'run along it') + '</small>', '', (WRUN.boxes || []).length ? 'ar-on' : '') + B('course', 'ACROBATICS<small>' + (COURSE.on ? 'tap to remove' : 'the course') + '</small>', '', COURSE.on ? 'ar-on' : '') + B('slice', 'SLICE DUMMY<small>' + (LIMB.stat.cuts ? LIMB.stat.cuts + ' cut, ' + LIMB.stat.booms + ' blown' : 'cut him up') + '</small>') + B('horde', 'HORDE<small>' + (HORDE.busy ? 'loading...' : HORDE.list.length ? HORDE.list.length + ' left, ' + HORDE.stat.kills + ' down -- +' + HORDE.per : '+' + HORDE.per + (HORDE.slice ? ' (slice)' : ' samurai')) + '</small>', '', HORDE.list.length ? 'ar-on' : '') + B('hall', 'HALL<small>' + (HALL.on ? 'tap to remove' : 'the first building') + '</small>', '', HALL.on ? 'ar-on' : '') + B('archers', 'ARCHERS<small>' + (HORDE.busy ? 'loading...' : '+' + ARCH.per + (ARCH.body === 'OSARI_BOW' ? ' Osari bowmen' : ' red bowmen')) + '</small>') + B('spider', 'OSARI SPIDER<small>' + (SPIDER.list.length ? 'tap to remove' : 'the walker') + '</small>', '', SPIDER.list.length ? 'ar-on' : '') + B('guard', 'STONE GUARDIAN<small>' + (GUARD.list.length ? 'tap to remove' : 'four arms -- hit to wake') + '</small>', '', GUARD.list.length ? 'ar-on' : '') + B('statue', 'STATUES<small>' + (STATUE.g ? 'tap to remove' : 'take the chalice') + '</small>', '', STATUE.g ? 'ar-on' : '') + '<button class="ar-off">GRUNTS<small>soon</small></button><button class="ar-off">GREYS<small>soon</small></button></div>';
+  else if (m === 'top') h += '<div class="ar-menu">' + (inForge() ? B('cat', 'BUILDINGS &rsaquo;', 'bld') : '') + B('cat', 'WARBOSS &rsaquo;', 'boss') + B('cat', 'PEOPLE &rsaquo;', 'people') + B('cat', 'BEASTS &rsaquo;', 'beasts') + B('cat', 'RIVALS &rsaquo;', 'rival') + B('turret', 'TURRET<small>' + (TURRET.list.length ? 'tap to remove' : 'sentry gun') + '</small>', '', TURRET.list.length ? 'ar-on' : '') + B('hbar', 'HIGH BAR<small>' + (HBAR.list.length ? 'tap to remove' : 'swing on it') + '</small>', '', HBAR.list.length ? 'ar-on' : '') + B('beam', 'BALANCE BEAM<small>' + (BEAM.list.length ? 'tap to remove' : 'walk it') + '</small>', '', BEAM.list.length ? 'ar-on' : '') + B('wrun', 'WALL RUN<small>' + ((WRUN.boxes || []).length ? 'tap to remove' : 'run along it') + '</small>', '', (WRUN.boxes || []).length ? 'ar-on' : '') + B('course', 'ACROBATICS<small>' + (COURSE.on ? 'tap to remove' : 'the course') + '</small>', '', COURSE.on ? 'ar-on' : '') + B('slice', 'SLICE DUMMY<small>' + (LIMB.stat.cuts ? LIMB.stat.cuts + ' cut, ' + LIMB.stat.booms + ' blown' : 'cut him up') + '</small>') + B('horde', 'HORDE<small>' + (HORDE.busy ? 'loading...' : HORDE.list.length ? HORDE.list.length + ' left, ' + HORDE.stat.kills + ' down -- +' + HORDE.per : '+' + HORDE.per + (HORDE.slice ? ' (slice)' : ' samurai')) + '</small>', '', HORDE.list.length ? 'ar-on' : '') + B('hall', 'HALL<small>' + (HALL.on ? 'tap to remove' : 'the first building') + '</small>', '', HALL.on ? 'ar-on' : '') + B('archers', 'ARCHERS<small>' + (HORDE.busy ? 'loading...' : '+' + ARCH.per + (ARCH.body === 'OSARI_BOW' ? ' Osari bowmen' : ' red bowmen')) + '</small>') + B('spider', 'OSARI SPIDER<small>' + (SPIDER.list.length ? 'tap to remove' : 'the walker') + '</small>', '', SPIDER.list.length ? 'ar-on' : '') + B('guard', 'STONE GUARDIAN<small>' + (GUARD.list.some(G => G.Z === GUARD) ? 'tap to remove' : 'four arms -- hit to wake') + '</small>', '', GUARD.list.some(G => G.Z === GUARD) ? 'ar-on' : '') + B('olmec', 'TEMPLE DWELLER<small>' + (GUARD.list.some(G => G.Z === OLMEC) ? 'tap to remove' : 'the little Olmec') + '</small>', '', GUARD.list.some(G => G.Z === OLMEC) ? 'ar-on' : '') + B('statue', 'STATUES<small>' + (STATUE.g ? 'tap to remove' : 'take the chalice') + '</small>', '', STATUE.g ? 'ar-on' : '') + '<button class="ar-off">GRUNTS<small>soon</small></button><button class="ar-off">GREYS<small>soon</small></button></div>';
   else if (m === 'boss' || m === 'people' || m === 'beasts' || m === 'rival') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back');
     for (const k in ARENA.kinds) { const A = ARENA.kinds[k]; if (!!A.creature !== (m === 'beasts')) continue; if (!!A.rival !== (m === 'rival')) continue; if (m !== 'beasts' && !A.both && !!A.civ !== (m === 'people')) continue; h += B('spawn', A.t + (A.sub ? '<small>' + A.sub + '</small>' : ''), k); } h += '</div>'; }
   U.innerHTML = h;
@@ -21309,7 +21325,7 @@ function mechTargets(dyMax, wide) { const out = [], p = player, DY = dyMax || ME
   if (FSHIP.on && FSHIP.on.cans) for (const C of FSHIP.on.cans) if (!C.dead) { const W = C.g.getWorldPosition(new THREE.Vector3()); put(C, W.x, W.y - .55, W.z, .6); }
   if (RAMP.on && RAMP.on.sen) for (const S of RAMP.on.sen) if (S.st !== 'fall') { const P = S.g.position; put(S, P.x, P.y, P.z, .5); }
   for (const S of SPIDER.list) if (!S.dead && !S.statue) { const P = S.root.position; put(S, P.x, P.y, P.z, SPIDER.w * S.k * .38); }
-  for (const G of GUARD.list) if (!G.dead) { const P = G.root.position; put(G, P.x, P.y, P.z, GUARD.P.h * GUARD.r); }     // m1732: the guardian (his statue too: a blow wakes him)     // m1711: the spiders -- a swipe tracks and lunges to them like any man
+  for (const G of GUARD.list) if (!G.dead) { const P = G.root.position; put(G, P.x, P.y, P.z, G.Z.P.h * G.Z.r); }     // m1732: the guardian (his statue too: a blow wakes him)     // m1711: the spiders -- a swipe tracks and lunges to them like any man
   // m1260: *"if I'm trying to hit this box and I'm clearly targeted on it, it should lock, and when I let go he should launch and hit it --
   // not launch through it. Whatever he's indicating: a turret, a human, a box, a wall."* For the CHARGE (`wide`): every standing smashable
   // (crates, pots, barrels, supply drops) at its middle, and every breakable wall at the point of it nearest him (its standoff its half depth)

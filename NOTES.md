@@ -17,6 +17,19 @@ sun/hemi colours follow, then B becomes A and the reflection map is rebuilt); th
 `userData.m0` so the weathering can be undone -- `bldAge` alone could not). Everything else that reads the state per frame (the peak
 fire, the shutters, the lamps, the wheel, the refinery's colliders) follows by itself. `?hs=` is dropped from the address with
 `replaceState` so a reload lands in the state he turned it to. The timings are in `HWAGE`.
+## THE TEMPLE DWELLER: a mini Olmec, the second stone kind (m1737)
+His: "another character -- a mini Olmec; maybe not a big boss, just a little temple dweller that walks around; same procedure: hard-surface
+rig, statue version."
+- Tripo multiview (his four views, `--faces 7000`, 120 credits, 160 left): faithful -- the block head, the jade eyes, the bells, the banner.
+  Oriented -90; 0.851 tall, the fists hanging to z .16 at x +/-.42 (measured by z-slices, scratchpad `slices.py` / `arm.py`).
+- `blender-addons/pipeline/olmec_rig.py`: guardian_rig.py's hard-surface method on two arms (face ownership, 624 edges split, the head a
+  block from z .61 within +/-.26 -- the ear discs go with it). 915 KB. 12 Forge clips (`tools/olmec_forge_prof.json`).
+- **The guardian code takes KINDS now** (`G.Z`): `OLMEC = Object.create(GUARD)` + his own numbers; the per-kind asset (`Z.P`), size, hit
+  radius, arms (`G.roots`: whichever arm roots the rig has), attacks (no `throw` for him), X stance (none) all read off the kind.
+  `guardClear(Z)` clears one kind.
+- **Wandering** (`wander`, `roam` 6 m, `amble` .55, pauses 1.5-4.5 s) until the player is within `notice` 9 m or he is hit; then the roar
+  and the fight. Headless: the two awake ones moved 2.3 m in 4 s, both noticed at 5 m (`wake`), four blows on the left hand took `armL`
+  (hp 10 -> 5.2), the statue woke on its blow. SPAWN > TEMPLE DWELLER (three; the first his statue).
 ## The spider: hard surface, SIX legs, and the pieces are the hit points (m1736)
 His: "explode the spider model so we can hard-surface rig it, then duplicate the legs so he can have six -- you don't have to regenerate the
 spider -- chop off half the leg and then the whole leg, so it takes 6 or 12 hits to kill a big spider; small spiders have four legs, 4 x 2."

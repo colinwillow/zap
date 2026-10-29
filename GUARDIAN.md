@@ -62,3 +62,7 @@ clang-off rule, weak points as places on the body, the bomb, the re-attach walk,
 ## Dials (`GUARD`)
 `h` 8.8 m tall (m1735: doubled) · `headK` 1.22 (his bigger head) · `arm2K` 1.1 · the LONG ARMS are in the model (`guardian_rig.py`: upper arm x1.4, forearm x1.5, hands x1.8) · `hp` 48 · `armHp` 7 · hit frames measured
 (the right hand's fastest frame): swipe .48, smash .34, throw .50.
+
+## THE TEMPLE DWELLER (m1737) -- the second kind on this code
+A mini Olmec (his four views): 2.3 m, two arms, `OLMEC` in index.html. Same pipeline with `olmec_rig.py` and `tools/olmec_forge_prof.json`.
+He wanders round where he stands until you come near (9 m) or hit him. Open: his own moves (a head-butt? a roll?), a voice, and where he lives.
