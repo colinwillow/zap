@@ -1359,7 +1359,7 @@ const LEDGE = {
   // The grab needs the stick pushed INTO the face by this much (the cover's own `into` test, a cosine); a jump
   // straight up beside a wall, or drifting past a canopy, no longer hangs him. 0 is the old free catch.
   want: .35,
-  measure: 1, grip: .04, onto: .06,     // m15xx: the hang measured off the worn rig (`ledgeHands`); `grip` the wrists sit that far above the lip (the fingers curl over it), `onto` that far in over its edge
+  measure: 1, grip: .04, onto: .06,     // m1772: the hang measured off the worn rig (`ledgeHands`); `grip` the wrists sit that far above the lip (the fingers curl over it), `onto` that far in over its edge
   hang: .861,       // = 1.076 / 1.25. How far BELOW the lip his root hangs
   out:  .170,       // = 0.212 / 1.25. And how far OUT from the face it sits
   // **AND THE CATCH BAND IS CENTRED ON THAT SAME OFFSET**, because the question is not "how
@@ -30353,7 +30353,7 @@ function ledgeAt(L, o) {
   // ended **0.37 m over it** and the lip crossed her at 64% of her height, which is her hips.
   // His word for it was the measurement.
   const k = RIG.height * bodyK(), M = LEDGE.measure ? ledgeHands() : null;
-  // m15xx (his screenshot: "the ledge hang definitely isn't lined up"): `hang` / `out` were measured off ZAP's hang clip and scaled by height --
+  // m1772 (his screenshot: "the ledge hang definitely isn't lined up"): `hang` / `out` were measured off ZAP's hang clip and scaled by height --
   // Grumbo is another body on another bake, and his hands missed the lip. Now the hang is MEASURED off the rig he is wearing (`ledgeHands`: his
   // two hands in his own frame over the hang clip), and the root is put where those hands land ON the lip: `grip` m down onto it, `onto` m in
   // over the face edge. The two typed numbers are the fallback (no clip, no bones).
