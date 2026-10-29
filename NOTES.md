@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Hands on the lip; one hand with the katana (m15xx)
+*"You do need to adjust the hands. When he's holding the katana he'd hang from the top with one hand -- the left -- and the sword down where it would be
+normally."* (The sheath on his back, his idea for later: DOCKET 29.)
+- `ledgeHandsPose` (after the clip and the hang placement, in `frameBody`): each hand put by two-bone IK (`wrLimb`) on the lip at the point nearest
+  its shoulder (`in` .05 m over the edge, `up` .03 above the top), elbows out and down. With a BLADE out only the LEFT grips; the RIGHT arm hangs
+  straight down at his side (`armDown` .92 of its length, `off` .12 m off the wall) with the sword in it. Not during the climb-up.
+- Measured on the 4.5 m lip: left hand at y 4.45, .11 m off the face (the arm's reach from where the body clearance holds him); rendered from the
+  front, katana and unarmed: one hand up / sword at his side, and both hands up.
+
 ## The wall run STEERS -- his diagram; the hang off the wall; a running cadence; a clean air pose (m1831, DOCKET 17)
 *His diagram: straight up, a curve bending over to straight across. "The angle you hit the wall at is step one; then your left thumb goes from straight up
 over to straight right and the line BENDS -- diagonal, then all the way across. Velocity, the initial angle, and the steering." Also: "the ledge hang --

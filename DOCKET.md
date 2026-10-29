@@ -67,3 +67,6 @@ best."* MAIN = this session (dynamics, the feel); AGENT = a separate session can
 28. [ ] (his, to consider -- no change yet) **A left flick while running = instant sprint**: the flick plays a move (the front handspring is the
        candidate -- some fist moves stop his momentum, so it has to be one that carries it) and he comes out of it already sprinting (`AUTOSPRINT`,
        m1809), skipping the 4.6 m run-up. Or: run, jump, flip, land sprinting. Decide with him before building.
+29. [ ] (his, later) **Sheaths and back-carry:** a scabbard on his back the katana goes into when put away (drawn and sheathed for real, the blade
+       visible on his back); the bow slung on the back too. Not all weapons need showing -- decide which. Then hanging, climbing and wall runs can
+       PUT AWAY the sword (both hands free) instead of the one-hand hang (m15xx).
