@@ -974,7 +974,7 @@ in there so I can transform it between the two states"; "these rocks are kind of
 - **THE HYBRID:** the sky islands over the rim (m1113) showed in FALLEN. KORAJIN: the floating world is what restoration raises -> hidden
   while fallen. (The refinery already sits on the flank when fallen.)
 Next: the painted textures (rock, sand, cliff), his ask in the same message.
-## m@X4@ -- THE TOAD WANDERER: his renders -> Tripo -> Auto-Rig Pro (headless) -> the Forge -> a village NPC and a hero
+## m1812 -- THE TOAD WANDERER: his renders -> Tripo -> Auto-Rig Pro (headless) -> the Forge -> a village NPC and a hero
 His: *"This character needs to be run through Tripo, textured and rigged with Auto-Rig Pro in the headless Blender... he's gonna be like a
 village person, an NPC; we could make it so you could swap him for the main character to try animations."*
 - **Tripo** (API, his four renders as the four views; `models/characters/toad_wanderer_views/`): **Tripo's `left` is the CHARACTER'S left**
