@@ -322,6 +322,16 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## THE SKY CASTLE, pass 12: the hall opens -- a throne room (Worker B)
+The hall was a solid drum with a painted door. Now its wall is a lathe with the DOORWAY cut out (+-.19 rad at the front) under a lintel
+section, an INNER face (the same lathe mirrored, normals recomputed), the plinth an open ring, a planked roof slab that is the ceiling, and
+the doors swung OPEN on their hinges (two iron-strapped leaves; the gold strap and rings went). The hall's frame is turned half a rib so no
+rib crosses the doorway, and no boulder sits in front of it (`gcBoulders` gap). Inside: a stepped DAIS and a timber THRONE facing the door
+(a bronze wheel on its back, his cloth on the seat), eight sandstone PILLARS with timber capitals, six lanterns hanging from the ceiling,
+four of his banners on the inner wall, two feast TABLES with pots, a bronze BRAZIER burning. Collision: the drum's solid is gone; a ring
+of 48 wall boxes leaves the doorway open, a lintel box over it, the pillars and tables solid. FOUND IN THE WALK TEST: the keep's solid ran
+from Y0-60 like everything else -- straight down through the hall; a solid can carry its own base now (`userData.base`), the keep's is its
+foot on the hall roof. Headless: a body walks from the plaza in through the door to the dais (local z -1.2) on the floor (116.51).
 ## THE SKY CASTLE, pass 11: broken towers (m1797, Worker B)
 FALLEN read as weathered, not wrecked. Three tiled roofs (towers 2, 4, 6) are now their own groups pivoted at the roof's foot (`gcRoofPut`
 collects their geometry instead of the tower bucket; `gcRoofFlush`): FALLEN two hang knocked askew and slid outward (.55 rad, 1.6 m down),
