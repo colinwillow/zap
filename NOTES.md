@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The Proving Ground: measure him, then design (m15xx)
+## The Proving Ground: measure him, then design (m1806)
 *"The distances this character can get are a lot bigger and higher than you think -- run, jump off a ledge, double jump, flick flick flick; a high
 jump and a jump at its top; wall runs. A sandbox with two platforms a gap apart, the measurement written next to it, then a bit farther -- I'll
 see the biggest I can clear and report back; the same with height. Then design levels that really push this character."*

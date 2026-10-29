@@ -28612,7 +28612,7 @@ const WPARK = { want: 0, on: null, H: { long: 4.5, low: 4.5, tall: 7, chim: 12, 
 try { if (/[?&]zone=wall\b/.test(location.search)) WPARK.want = 1; } catch (e) {}
 function wparkLabel(g, text, x, z, rot, col) { const cv = document.createElement('canvas'); cv.width = 512; cv.height = 128; const q = cv.getContext('2d'); q.fillStyle = col; q.font = 'bold 72px sans-serif'; q.textAlign = 'center'; q.textBaseline = 'middle'; q.fillText(text, 256, 66);
   const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; const m = new THREE.Mesh(new THREE.PlaneGeometry(6, 1.5).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false })); m.rotation.y = rot || 0; m.position.set(x, .03, z); g.add(m); }
-// m15xx: THE PROVING GROUND (his: "the distances this character can get are bigger and higher than you think -- run, jump off a ledge, double jump,
+// m1806: THE PROVING GROUND (his: "the distances this character can get are bigger and higher than you think -- run, jump off a ledge, double jump,
 // flick flick flick; a high jump, a jump at its top, wall runs. A sandbox with two platforms a gap apart, the measurement written beside it, the next a
 // bit farther, the next farther -- I see the biggest I can clear and report back; the same with height. Then design levels to really push this
 // character."). KORAJIN > The Proving Ground (`?w=forge&zone=prove`):
