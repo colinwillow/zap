@@ -367,7 +367,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## THE SKY CASTLE, pass 17: a ring of rope bridges round the islets (Worker B)
+## THE SKY CASTLE, pass 17: a ring of rope bridges round the islets (m1808, Worker B)
 A RING of nine rope bridges joins every islet to its neighbours (0-1-2-...-8-0), edge to edge at their tops (sag up to 2.2 m, planks,
 rope rails), so all nine shrines and rocks are walkable from the two lawn bridges -- a loop round the castle that climbs and drops through
 its three tiers. The ring's meshes hide with the islets FALLEN, and its walk tris are their own range of the store (`A.rtri`, added after

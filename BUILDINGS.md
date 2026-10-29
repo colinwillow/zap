@@ -309,7 +309,7 @@ then start building the building, kinda like you built his home -- a ton of pass
 - [x] (m1803) the rubble solid; the brazier's fire
 - [x] (m1804) two satellite shrines reachable by rope bridges; islets ride their bob
 - [x] (m1807) the gallery towers hollow, spiral stairs out onto their galleries
-- [x] (m1792) a ring of rope bridges to every islet
+- [x] (m1808) a ring of rope bridges to every islet
 - [ ] NPCs; the even towers' interiors
 - [x] **the way UP (m1794):** the Jinra lift -- bridge, gantry, a bronze cage on rails from the plateau; plaza steps, interiors, the FALLEN state, wide sails, colliders that follow the live turn
 - [ ] castle pass 1..N: the keep, the round towers and roofs, the walls and walkways, the bridges to the satellites, banners, awnings,
