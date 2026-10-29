@@ -293,6 +293,12 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## THE SKY CASTLE, style pass 3: clutter and life (Worker B)
+The home's stalls are full; the castle's lawns were bare. Under every awning a two-tier plank SHELF against the hall (two at the door)
+with glazed POTS in four glazes (terracotta, violet, teal, ochre: lathes, a few gaps); CRATES (strapped) and iron-hooped BARRELS at every
+tower's foot; ten timber LANTERN POSTS round the plaza, each an arm with a lit bronze lantern (the front left open); two STONE LANTERNS
+(base, pillar, glowing light box, pyramid cap) either side of the door path; and ~20 AGAVES (spiky leaf rosettes) and CACTI (capsule trunk
+and arms, painted leaves) on the lawns, kept off the towers. Merged into the dressing buckets (+5 draws).
 ## THE SKY CASTLE, style pass 2: the home's roofs and chimneys (m1787, Worker B)
 Every other bastion tower now wears GRUMBO'S ROOF instead of the tiled bell: his red/cream diamond cloth cone (`ghClothTex('cone')`, its
 eight panels on an eight-sided cone), six timber POLES running up its faces, crossing at the top and poking out a metre and a half, an iron
