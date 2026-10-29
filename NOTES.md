@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## Red Hollows: the tiling lines and the sky islands (Worker B)
+## Red Hollows: the tiling lines and the sky islands (m1740, Worker B)
 His (m1733 screenshots): "fix some of this texture tiling -- on the rock it looks like lines, and on the cliffs the bluffs, more lines";
 "this upside-down triangle cone thing -- those floating islands need to be broken up and made way more organic... shorter... irregular...
 lumpy pieces sticking out... different textures". TILING: the rock map is horizontal STRATA, and the triplanar's top projection laid it
