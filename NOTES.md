@@ -293,6 +293,13 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## THE SKY CASTLE, style pass 7: shrines in the home's language, chimney smoke, a ladder that climbs (Worker B)
+The seven satellite SHRINES lose their red pagoda roofs: six timber posts with bronze bands, a timber ring beam, his diamond cloth CONE
+(`ghClothTex('cone')`, bobbing -- `putB` now keeps uvs for a mapped material) with four timber poles crossing out of its top and a bronze
+collar, two lanterns under the eaves. SMOKE rises from the hall's three chimneys (`gcastleStep`, one puff every .3 s, only while the castle
+is shown). The keep's scaffold LADDER now climbs: rails and rungs to the balcony (yT = keepTop - 3.5), a `kitClimbAdd` volume in world
+space (the castle is turned: its normal rotated by the yaw), its top-out mark on the balcony deck, and the balcony a walkable ring
+(r 5.15-6.1, 64 tris) -- so a walk goes plaza -> hall door... -> scaffold landings -> ladder -> balcony.
 ## THE SKY CASTLE, style pass 6: galleries and the keep's scaffold (m1791, Worker B)
 His key art: timber galleries and scaffolds cling to everything. On every odd tower a cantilevered plank GALLERY (3 x 2.2 m) on two
 angled braces, railed, a lantern on a post at its corner, a ragged banner hanging off its front -- walkable (both windings). Up the back of
