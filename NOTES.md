@@ -293,7 +293,7 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
-## THE SKY CASTLE, style pass 5: the home's bellies and boulders (Worker B)
+## THE SKY CASTLE, style pass 5: the home's bellies and boulders (m1790, Worker B)
 The home's walls bulge; the castle's were ruler cylinders. `gcBelly(r0, r1, b)` -- a radius at t with a belly (b of the radius, peaking
 mid-height) and a flared foot -- and `gcLathe` build every round wall as a lathe: towers bellied .09-.15 (each its own), the keep .06, the
 hall .04. `gcFrame` now runs its ribs ALONG that profile (tubes, not boxes) and sets its hoops and straps on it. And `gcBoulders` heaps
