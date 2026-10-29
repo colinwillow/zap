@@ -13205,7 +13205,7 @@ function wrunJump() {
 function stepWrun(dt) {
   const p = player, R = p.wrun; R.t += dt;
   let vyKeep = null; if (R.velMode) { if (p.jump && R.t > .05) { p.jump = 0; wrunJump(); return; }
-    // m15xx (his diagram: "the angle you hit the wall at is step one -- straight up, straight across, or between; then, running, your left thumb
+    // m1831 (his diagram: "the angle you hit the wall at is step one -- straight up, straight across, or between; then, running, your left thumb
     // goes from straight up over to straight right and that line BENDS -- diagonal, then all the way across. Velocity, the initial angle, and the
     // steering"): his speed ON THE WALL'S PLANE is one vector (`vu` up, `R.vt` along); gravity takes the up part (`vG`), friction the along part
     // (`vFric`); the LEFT STICK, read onto the wall (toward the wall = up, along it = across), turns that vector toward itself at `steer` rad/s
@@ -13230,7 +13230,7 @@ function stepWrun(dt) {
   else { p.vel.x = -R.nx * .5; p.vel.z = -R.nz * .5; p.vel.y += (MOVE.g - WRUN.gUp) * dt; }     // pressed to the face
   if (vyKeep != null) { p.vel.y = vyKeep; p.vel.x = -R.nz * R.vt - R.nx * .5; p.vel.z = R.nx * R.vt - R.nz * .5; }     // m1776: the velocity run -- his own speed on the wall's plane
   p.faceH = p.heading = R.kind === 'side' ? Math.atan2(R.dx, R.dz) : R.kind === 'slide' ? Math.atan2(R.nx, R.nz) : Math.atan2(-R.nx, -R.nz);
-  if (R.velMode && R.kind !== 'slide' && R.a != null) { const cu = Math.max(0, Math.cos(R.a)), sa = Math.sin(R.a), fx = -R.nx * cu + -R.nz * sa, fz = -R.nz * cu + R.nx * sa; if (Math.hypot(fx, fz) > .1) p.faceH = p.heading = Math.atan2(fx, fz); }     // m15xx: faces between the wall and the way he runs along it
+  if (R.velMode && R.kind !== 'slide' && R.a != null) { const cu = Math.max(0, Math.cos(R.a)), sa = Math.sin(R.a), fx = -R.nx * cu + -R.nz * sa, fz = -R.nz * cu + R.nx * sa; if (Math.hypot(fx, fz) > .1) p.faceH = p.heading = Math.atan2(fx, fz); }     // m1831: faces between the wall and the way he runs along it
   integrate(dt, 0, 0, 0, false);
   // still on the face? (its end, or past the top of it, lets him go)
   const d = boxNear(R.b, p.pos.x, p.pos.z, _wrN), on = d > 0 && d < p.r + .4 && _wrN.nx * R.nx + _wrN.nz * R.nz > .9 && R.b.maxy - p.pos.y > .9;
@@ -13261,7 +13261,7 @@ function wrunPose() {
   if (R.kind !== 'side') return;
   // rolled about his forward axis so his head leans OFF the wall and his feet stay on it; ramps in and out over .12 s
   const fx = R.dx, fz = R.dz, right = R.nx * -fz + R.nz * fx, k = Math.min(1, (R.t - (R.t0 || 0)) / .15), sg = Math.sign(right);     // his right is (-fz, fx)
-  _wrA.set(fx, 0, fz); _wrQ.setFromAxisAngle(_wrA, sg * (WRUN.sideClip && rig.actions && rig.actions.wall_side ? WRUN.sideLean : WRUN.lean) * k * (R.velMode && R.a != null ? Math.sin(R.a) ** 2 : 1));     /* m15xx: the lean grows as the run bends across */ rig.root.quaternion.premultiply(_wrQ);     /* m1829: the clip's own lean is smaller */
+  _wrA.set(fx, 0, fz); _wrQ.setFromAxisAngle(_wrA, sg * (WRUN.sideClip && rig.actions && rig.actions.wall_side ? WRUN.sideLean : WRUN.lean) * k * (R.velMode && R.a != null ? Math.sin(R.a) ** 2 : 1));     /* m1831: the lean grows as the run bends across */ rig.root.quaternion.premultiply(_wrQ);     /* m1829: the clip's own lean is smaller */
   // m1072: *"his feet could make better contact with the wall, and his whole body is straight -- just at an angle. From the torso up he should rotate
   // back so he's pointed more straight up; the legs do the slant. And a mirror."* The roll pivots at his feet, which the run holds `p.r + gap`
   // off the face -- so the drawn body is slid that far IN (`footIn` short of it), and the spine is turned back `torso` rad about the same axis:
@@ -13273,7 +13273,7 @@ function wrunPose() {
     sp.parent.getWorldQuaternion(_wrQ3).invert(); sp.quaternion.copy(_wrQ3.multiply(_wrQ)); sp.updateMatrixWorld(true); }
 }
 const _wrQ2 = new THREE.Quaternion(), _wrQ3 = new THREE.Quaternion();
-Object.assign(WRUN, { upArms: 'RUN', upArmTs: 1.5, sideClip: 1, sideLean: .65, sideTorso: .25, sideRef: 5.5, steer: 2.6, upClip: 1, upClipD: .45, upClipRef: 3.2, upClipTs: [1.8, 3.4],     /* m15xx: a RUNNING cadence (his: "the pace of the climb, really slow") */ upD: .8, upFoot: -.12, upAmp: .34, upLift: .26, upToeIn: .15, upJumpV: 9.5,     /* m1827: m1826's pose REVERTED (his: "even worse, horrendous") -- the jumps stay */     /* m1826 (his: "not a chair at 90 degrees -- down at 45 or less, knees with room to run, toes brushing the wall, not flat-footed"): hips closer (upD .8 -> .5), feet lower under him (upFoot -.12 -> -.55), toes turned INTO the wall (`upToeIn`) */ upD0: .8, upRate: 2.4, upW: .14, upTorso: .32, perchD: .42, perchFoot: -.18, perchKnee: -.55, perchFwd: .12, perchDrop: .22, perchLean: .45, perchW: .2, perchHand: .05, perchHandW: .55, ik: 1 });     /* m1683: the perch faces away -- back to the wall, a foot planted on it behind, hands back on it at the hips */
+Object.assign(WRUN, { upArms: 'RUN', upArmTs: 1.5, sideClip: 1, sideLean: .65, sideTorso: .25, sideRef: 5.5, steer: 2.6, upClip: 1, upClipD: .45, upClipRef: 3.2, upClipTs: [1.8, 3.4],     /* m1831: a RUNNING cadence (his: "the pace of the climb, really slow") */ upD: .8, upFoot: -.12, upAmp: .34, upLift: .26, upToeIn: .15, upJumpV: 9.5,     /* m1827: m1826's pose REVERTED (his: "even worse, horrendous") -- the jumps stay */     /* m1826 (his: "not a chair at 90 degrees -- down at 45 or less, knees with room to run, toes brushing the wall, not flat-footed"): hips closer (upD .8 -> .5), feet lower under him (upFoot -.12 -> -.55), toes turned INTO the wall (`upToeIn`) */ upD0: .8, upRate: 2.4, upW: .14, upTorso: .32, perchD: .42, perchFoot: -.18, perchKnee: -.55, perchFwd: .12, perchDrop: .22, perchLean: .45, perchW: .2, perchHand: .05, perchHandW: .55, ik: 1 });     /* m1683: the perch faces away -- back to the wall, a foot planted on it behind, hands back on it at the hips */
 try { const v = localStorage.getItem('mel.uparms'); if (v === 'RUN' || v === 'CLIMB') WRUN.upArms = v; } catch (e) {}
 const _wsA = new THREE.Vector3(), _wsB = new THREE.Vector3(), _wsC = new THREE.Vector3(), _wsT = new THREE.Vector3(), _wsK = new THREE.Vector3(), _wsQ = new THREE.Quaternion(), _wsQ2 = new THREE.Quaternion();
 // two bones onto `T`, the middle joint bent toward `pole` (a world direction); `end` turned so its child points along `aim` (optional)
@@ -20833,7 +20833,7 @@ function skinWeights(skin, t, dt, snapHL, fb) {
     else if (cur > .002 || a.getEffectiveWeight() > .002 || a.isRunning()) { a.setEffectiveWeight(0); a.stop(); }
   }
 }
-function setWeights(t, dt, snapHL) { if (player.wallAirSnap > 0) { player.wallAirSnap -= dt; snapHL = Math.min(snapHL || 1, .02); } skinWeights(rig, t, dt, snapHL, CLIPS.idle); }     // m15xx: off a wall, straight into the air pose (the wall clips lingered: "a weird pose in the air")
+function setWeights(t, dt, snapHL) { if (player.wallAirSnap > 0) { player.wallAirSnap -= dt; snapHL = Math.min(snapHL || 1, .02); } skinWeights(rig, t, dt, snapHL, CLIPS.idle); }     // m1831: off a wall, straight into the air pose (the wall clips lingered: "a weird pose in the air")
 // RE-ENTERING A `ONCE` CLIP HAS TO REWIND IT, AND THE DAMPED WEIGHT CANNOT BE WHAT DECIDES.
 // Rewinding only when the weight has decayed below a threshold is right for a clip you have
 // left alone and wrong for one you are re-entering immediately: roll, roll again before the
@@ -30628,7 +30628,7 @@ function ledgeAt(L, o) {
   // Grumbo is another body on another bake, and his hands missed the lip. Now the hang is MEASURED off the rig he is wearing (`ledgeHands`: his
   // two hands in his own frame over the hang clip), and the root is put where those hands land ON the lip: `grip` m down onto it, `onto` m in
   // over the face edge. The two typed numbers are the fallback (no clip, no bones).
-  if (M) { const fwd = Math.max(M.z - LEDGE.onto, M.body + LEDGE.bodyClear);     /* m15xx (his: "in the ledge hang he's THROUGH the wall -- his feet need to be on its surface"): far enough out that the toes, knees and chest stay `bodyClear` off the face */ o.x = L.cx + L.nx * fwd; o.z = L.cz + L.nz * fwd; o.y = L.y - M.y + LEDGE.grip; return o; }
+  if (M) { const fwd = Math.max(M.z - LEDGE.onto, M.body + LEDGE.bodyClear);     /* m1831 (his: "in the ledge hang he's THROUGH the wall -- his feet need to be on its surface"): far enough out that the toes, knees and chest stay `bodyClear` off the face */ o.x = L.cx + L.nx * fwd; o.z = L.cz + L.nz * fwd; o.y = L.y - M.y + LEDGE.grip; return o; }
   o.x = L.cx + L.nx * (k * LEDGE.out);
   o.z = L.cz + L.nz * (k * LEDGE.out);
   o.y = L.y - k * LEDGE.hang;
@@ -30640,7 +30640,7 @@ function ledgeHands() {
   const a = rig.actions[LEDGE.clips.hang], LH = rig.bones && rig.bones.mixamorig_LeftHand, RH = rig.bones && rig.bones.mixamorig_RightHand; if (!a || !LH || !RH) return null;
   const c = a.getClip(), was = []; for (const k in rig.actions) { const x = rig.actions[k]; was.push([x, x.getEffectiveWeight(), x.time, x.enabled, x.paused]); x.setEffectiveWeight(0); }
   const mxr = rig.mixer, v = new THREE.Vector3(), w = new THREE.Vector3(), o = new THREE.Vector3(), qi = new THREE.Quaternion(), n = 12; let sy = 0, sz = 0, bz = -9; a.enabled = true; a.paused = false; if (!a.isRunning()) a.play(); a.setEffectiveWeight(1);
-  const BODY = ['LeftToeBase', 'RightToeBase', 'LeftFoot', 'RightFoot', 'LeftLeg', 'RightLeg', 'Spine2', 'Hips'].map(n2 => rig.bones['mixamorig_' + n2]).filter(Boolean);     // m15xx: the body's forward reach
+  const BODY = ['LeftToeBase', 'RightToeBase', 'LeftFoot', 'RightFoot', 'LeftLeg', 'RightLeg', 'Spine2', 'Hips'].map(n2 => rig.bones['mixamorig_' + n2]).filter(Boolean);     // m1831: the body's forward reach
   for (let i = 0; i < n; i++) { a.time = c.duration * (i + .5) / n; mxr.update(0); rig.root.updateMatrixWorld(true);
     rig.root.getWorldPosition(o); rig.root.getWorldQuaternion(qi).invert(); LH.getWorldPosition(v).add(RH.getWorldPosition(w)).multiplyScalar(.5).sub(o).applyQuaternion(qi); sy += v.y; sz += v.z;
     for (const b of BODY) { b.getWorldPosition(v).sub(o).applyQuaternion(qi); bz = Math.max(bz, v.z); } }
@@ -35435,7 +35435,7 @@ function rigAnim(dt) {
   // m1829 (his horizontal reference: tilted along the wall, the near hand reaching to it, legs running): the library's Wall_Run_1 (`wall_side`, in
   // place) on the SIDE run -- its near arm reaches LEFT, so a wall on his right plays its mirror (`wall_side_m`, MIRROR) -- under the game's own
   // roll toward the wall (`WRUN.lean`, eased to `sideLean` with the clip); rate by his speed along the wall (`sideRef` m/s at 1x)
-  if (p.wrun && p.wrun.velMode && p.wrun.kind !== 'slide' && p.wrun.a != null && WRUN.sideClip && rig.actions.wall_side && WRUN.upClip && wallUpHalves()) { const R = p.wrun, H = rig.wuSplit, c = Math.cos(R.a), wu = c > 0 ? c * c : 0;     // m15xx: the two runs BLENDED by the angle
+  if (p.wrun && p.wrun.velMode && p.wrun.kind !== 'slide' && p.wrun.a != null && WRUN.sideClip && rig.actions.wall_side && WRUN.upClip && wallUpHalves()) { const R = p.wrun, H = rig.wuSplit, c = Math.cos(R.a), wu = c > 0 ? c * c : 0;     // m1831: the two runs BLENDED by the angle
     const nm = (R.vt || 0) < 0 || !rig.actions.wall_side_m ? 'wall_side' : 'wall_side_m';     // along -t the wall is on his left (measured from the side branch's own test)
     const sp = Math.hypot(R.vt || 0, Math.max(0, p.vel.y)); rig.actions[H.L].timeScale = clamp(sp / WRUN.upClipRef, WRUN.upClipTs[0], WRUN.upClipTs[1]); rig.actions[H.U].timeScale = WRUN.upArmTs; rig.actions[nm].timeScale = clamp(sp / WRUN.sideRef, .7, 2.2);
     if (wu > .01) { t[H.L] = wu; t[H.U] = wu; } if (wu < .99) t[nm] = 1 - wu; setWeights(t, dt); return; }
