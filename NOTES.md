@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## Turquoise is the flame now -- the bow, the sword, the debris; the Osari stay green (m15xx)
+## Turquoise is the flame now -- the bow, the sword, the debris; the Osari stay green (m1779)
 *"I'd like this turquoise to be the flame colour for the other things that use the green -- the bow or the sword."*
 - `gfire`'s default palette is TURQUOISE (1); `ofire` is the Osari's green (0), used only by the Osari's vanish / fade and the spider's acid spit.
   So the fire arrow (its trail, its burn, its head `hc` [.3, 1, .9]), sword-cut debris dissolving, statues waking, the guardian's and spider's

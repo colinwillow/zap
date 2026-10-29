@@ -14285,7 +14285,7 @@ function gfireInit() { const N = GFIRE.n, g = new THREE.BufferGeometry(), P = ne
   GFIRE.pts = pts; GFIRE.P = P; GFIRE.C = C; GFIRE.S = S; GFIRE.A = A; GFIRE.F = Fr; GFIRE.R = Ro; GFIRE.w = new Float32Array(N); GFIRE.pal = new Uint8Array(N); GFIRE.v = new Float32Array(N * 3); GFIRE.life = new Float32Array(N); GFIRE.L0 = new Float32Array(N); GFIRE.s0 = new Float32Array(N); GFIRE.live = 0; }
 // m1777 (his: "I like the turquoise in the guardian -- the green mist cloud needs to match it"): a second palette, TURQUOISE (the hard-surface
 // caps' own colour), for the guardian's and the spider's breaks (`tfire`); the Osari keep the green
-const tfire = (x, y, z, k = 1) => gfire(x, y, z, k, 1), ofire = (x, y, z, k = 1) => gfire(x, y, z, k, 0);     // m15xx: turquoise is the DEFAULT now (his: "this turquoise for the other things that use the green -- the bow, the sword"); `ofire` = the Osari's green
+const tfire = (x, y, z, k = 1) => gfire(x, y, z, k, 1), ofire = (x, y, z, k = 1) => gfire(x, y, z, k, 0);     // m1779: turquoise is the DEFAULT now (his: "this turquoise for the other things that use the green -- the bow, the sword"); `ofire` = the Osari's green
 function gfire(x, y, z, k = 1, pal = 1) { if (!GFIRE.pts) gfireInit(); const G = GFIRE, i = G.i = (G.i + 1) % G.n; G.pal[i] = pal;
   G.P[i * 3] = x; G.P[i * 3 + 1] = y; G.P[i * 3 + 2] = z; G.v[i * 3] = (Math.random() - .5) * 1.6 * k; G.v[i * 3 + 1] = (2.6 + Math.random() * 2.4) * k; G.v[i * 3 + 2] = (Math.random() - .5) * 1.6 * k;
   G.L0[i] = G.life[i] = .32 + Math.random() * .42; G.s0[i] = (.24 + Math.random() * .26) * k; G.R[i] = (Math.random() - .5) * 1.4; G.w[i] = (Math.random() - .5) * 5;     /* m1691 (his: "a little tall, no rotation -- random rotation, smaller") */ G.F[i] = Math.floor(Math.random() * 4); G.live = 1; }
@@ -14302,7 +14302,7 @@ function gfireStep(dt) { const G = GFIRE; if (!G.pts || !G.live) return; let any
     if (G.life[i] <= 0) { G.P[o + 1] = -999; G.A[i] = 0; } }
   const g = G.pts.geometry; for (const n of ['position', 'aCol', 'aSize', 'aA', 'aF', 'aR']) g.attributes[n].needsUpdate = true;
   G.pts.material.uniforms.uPx.value = renderer.domElement.height / (2 * Math.tan(camera.fov * Math.PI / 360)); if (!any) G.live = 0; }
-const TURQ = { shade: () => { const r = Math.random(); return r < .6 ? [.2 + Math.random() * .1, .95, .9 + Math.random() * .1] : r < .85 ? [.45, 1, .95] : [.1, .75, .8]; } };     // m15xx: turquoise smoke
+const TURQ = { shade: () => { const r = Math.random(); return r < .6 ? [.2 + Math.random() * .1, .95, .9 + Math.random() * .1] : r < .85 ? [.45, 1, .95] : [.1, .75, .8]; } };     // m1779: turquoise smoke
 const OSARI = { shade: () => { const r = Math.random(); return r < .55 ? [.3 + Math.random() * .15, 1, .35 + Math.random() * .15] : r < .8 ? [.1, 1, .7 + Math.random() * .2] : [.7 + Math.random() * .15, 1, .2]; },     /* m1702 (his: "not shades -- HUES: a little more turquoise, a little more slime green-yellow; glowing neon"): neon green, turquoise, slime */ fadeT: .7, col: [.12, .85, .32], col2: [.04, .5, .2], fades: [] };
 // m1695 (his: "there used to be this EXPLOSION when you killed the samurai -- that's what I want when you slice through them; a little explosion in
 // the green smoke, and it billows up"): THE KILL BLAST, shared by the halving and the Osari's end. A hot flash of sparks (the samurai's
@@ -14986,7 +14986,7 @@ function arrowBlast(P, dirH) { BOW.stat.blasts++; const R = BOW.blastR;
 // sword is out). Green flame (`gfire`) licks along the edge from the guard to the tip (`muzzleWorld`, the far end of the blade along its mount),
 // thicker while it swings; every man the blade catches is set BURNING (`burnStart`) and the spiders take a gout of it.
 const BFIRE = { on: 0, rate: 110, swing: 2.5, k: .5 };
-try { const v = +localStorage.getItem('mel.bfire'); BFIRE.on = v === 1 || v === 2 ? v : 0; } catch (e) {}     // m15xx: 2 = JIN, the turquoise flame
+try { const v = +localStorage.getItem('mel.bfire'); BFIRE.on = v === 1 || v === 2 ? v : 0; } catch (e) {}     // m1779: 2 = JIN, the turquoise flame
 const bladeFire = () => !!(BFIRE.on && slotNow().blade);
 const _bfA = new THREE.Vector3(), _bfB = new THREE.Vector3();
 // m1762 (his: "the katana fire -- not green, an actual burning fire. It's not coming out of the right spot: it should be on the blade, a lot at
@@ -15016,7 +15016,7 @@ function bflStep(dt) { const B = BFL; if (!B.pts || !B.live) return; const g = B
     if (e) { g.aSize.array[i] = B.s0[i]; g.aA.array[i] = B.life[i] <= 0 ? 0 : (1 - u) * (.7 + .3 * Math.sin(t * 40 + i)); if (BFIRE.on === 2) { C[o] = .5; C[o + 1] = 1; C[o + 2] = .95; } else { C[o] = 1; C[o + 1] = .55 + .3 * (1 - u); C[o + 2] = .15; } }
     else { g.aSize.array[i] = B.s0[i] * (.8 + .5 * Math.sin(Math.min(1, u * 1.6) * Math.PI * .5)) * (1 - u * .45);     // swells a little, then narrows as it burns out
       g.aA.array[i] = B.life[i] <= 0 ? 0 : Math.min(1, u * 9) * Math.pow(1 - u, .9) * .95; g.aR.array[i] += B.w[i] * dt; if (Math.random() < .06) g.aF.array[i] = Math.floor(Math.random() * 4);
-      const c = BFIRE.on === 2 ? (u < .3 ? [.55 - u, 1, .95] : u < .65 ? [.25 - (u - .3) * .3, .95 - (u - .3) * .3, .9] : [.12, .82 - (u - .65) * .6, .85 - (u - .65) * .5]) : u < .3 ? [1, .78 - u * .6, .25 - u * .4] : u < .65 ? [1 - (u - .3) * .5, .6 - (u - .3) * 1, .13 - (u - .3) * .2] : [.82 - (u - .65) * 1.2, .25 - (u - .65) * .4, .06];     // m15xx: JIN = turquoise
+      const c = BFIRE.on === 2 ? (u < .3 ? [.55 - u, 1, .95] : u < .65 ? [.25 - (u - .3) * .3, .95 - (u - .3) * .3, .9] : [.12, .82 - (u - .65) * .6, .85 - (u - .65) * .5]) : u < .3 ? [1, .78 - u * .6, .25 - u * .4] : u < .65 ? [1 - (u - .3) * .5, .6 - (u - .3) * 1, .13 - (u - .3) * .2] : [.82 - (u - .65) * 1.2, .25 - (u - .65) * .4, .06];     // m1779: JIN = turquoise
       C[o] = c[0]; C[o + 1] = Math.max(.05, c[1]); C[o + 2] = Math.max(.02, c[2]); }
     if (B.life[i] <= 0) { P[o + 1] = -999; g.aA.array[i] = 0; } }
   for (const n of ['position', 'aCol', 'aSize', 'aA', 'aF', 'aR']) g[n].needsUpdate = true;
