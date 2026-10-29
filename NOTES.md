@@ -73,6 +73,18 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## The mill runs on the stream, and HAND-BUILT edges (Worker B)
+His (m1749): "the whole idea was it was being powered by the motion of the stream -- weird that the wheel isn't actually in the stream";
+"the spout -- the water is flowing off the backside of it"; and "very, very rigid straight lines... is there a way to solve this with a
+shader rather than geometry... an erosion shader... make that perfectly generated straight line look a little less perfect". THE MILL:
+the chute, its fall, the boil and the pool are gone. The wheel holder is turned 90 deg (axle ACROSS the stream, `wh.rotation.y`) and
+lowered .4 m so its bottom paddles dip into a MILL RACE: one water ribbon from a stone intake upstream (z -9.6), through the arch in a
+kerbed channel under the wheel, over a lip at z +9.6 and down into the stream (`hwFallMat` with `rep` 5 so streaks keep their size over
+a long run; a boil under the paddles, another where it lands, spray). Water +z, and the wheel's existing `rotation.z -=` about the turned
+axle pushes the bottom paddles +z, with the water. FALLEN hides the race (`A.water`). HAND-BUILT: a fragment shader cannot move a
+silhouette, so it is the vertex shader (`hwWobble`): each vertex is pushed by a smooth noise of its own POSITION (never its normal, so a
+box's shared corners move together and nothing tears), and the mill's `vbox` now SUBDIVIDES (~.6 m cells, max 14) so a wall has points to
+bend. On the mill's wood, planks, stone and plaster for now. TOOLS > HAND-BUILT cycles 7 cm / 13 cm / OFF (`mel.wob`), live.
 ## The mill's fall lands in its pool (m1749, Worker B)
 His (after m1742): "the watermill's waterfall didn't really look like it was pouring into the stream -- it had a straight line at the
 bottom... make the water more watery like you did here". It was still the textured MeshBasic plane ending exactly at the pool's surface
