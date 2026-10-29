@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## A wall RUN is not a climb: no hands (m15xx, DOCKET 17)
+## A wall RUN is not a climb: no hands (m1830, DOCKET 17)
 *"A wall run is not climbing up a wall -- you're going so fast you break gravity for a second, Sonic-style; a wall climb is Spider-Man. Use the clip for
 the feet, and have the hands doing the typical run -- the ninja thing. No hands is what makes it a wall run."*
 - `WRUN.upArms` RUN (default; TOOLS > WALL UP ARMS RUN / CLIMB): the run-up plays TWO HALVES built once at runtime (`wallUpHalves`) -- the

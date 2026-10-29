@@ -15293,7 +15293,7 @@ function arenaUi() {
       else if (a === 'idlepick') { const I = IDLEPICK; I.pick = I.picks[(I.picks.indexOf(I.pick) + 1) % I.picks.length]; try { localStorage.setItem('mel.idlepick2', I.pick); } catch (err) {} }     // m1815
       else if (a === 'asprint') { AUTOSPRINT.on = AUTOSPRINT.on ? 0 : 1; try { localStorage.setItem('mel.autosprint', AUTOSPRINT.on); } catch (err) {} }     // m1809
       else if (a === 'kauto') { CHARGE3.auto = CHARGE3.auto === 'CHAIN' ? 'SINGLE' : 'CHAIN'; try { localStorage.setItem('mel.kauto', CHARGE3.auto); } catch (err) {} }     // m1798
-      else if (a === 'uparms') { WRUN.upArms = WRUN.upArms === 'RUN' ? 'CLIMB' : 'RUN'; try { localStorage.setItem('mel.uparms', WRUN.upArms); } catch (err) {} }     // m15xx
+      else if (a === 'uparms') { WRUN.upArms = WRUN.upArms === 'RUN' ? 'CLIMB' : 'RUN'; try { localStorage.setItem('mel.uparms', WRUN.upArms); } catch (err) {} }     // m1830
       else if (a === 'wallmode') { WRUN.mode = WRUN.mode === 'VEL' ? 'STICK' : 'VEL'; try { localStorage.setItem('mel.wallmode', WRUN.mode); } catch (err) {} }     // m1776
       else if (a === 'arcline') { BARC.line = BARC.line ? 0 : 1; try { localStorage.setItem('mel.arcline', BARC.line); } catch (err) {} }     // m1759
       else if (a === 'partaim') { if (!PARTAIM.on) { PARTAIM.on = 1; PARTAIM.by = 'L'; } else if (PARTAIM.by === 'L') PARTAIM.by = 'R'; else PARTAIM.on = 0; try { localStorage.setItem('mel.partaim', PARTAIM.on ? PARTAIM.by : '0'); } catch (err) {} }     // m1738
@@ -35425,7 +35425,7 @@ function rigAnim(dt) {
   // roll toward the wall (`WRUN.lean`, eased to `sideLean` with the clip); rate by his speed along the wall (`sideRef` m/s at 1x)
   if (p.wrun && p.wrun.kind === 'side' && WRUN.sideClip && rig.actions.wall_side) { const R = p.wrun, right = R.nx * -R.dz + R.nz * R.dx, nm = right > 0 || !rig.actions.wall_side_m ? 'wall_side' : 'wall_side_m', a = rig.actions[nm];
     a.timeScale = clamp((R.v || WRUN.v) / WRUN.sideRef, .7, 2.2); t[nm] = 1; setWeights(t, dt); return; }
-  // m15xx (his: "a wall RUN is not climbing -- you're going so fast you break gravity, Sonic-style; his hands shouldn't touch the wall. Use the clip
+  // m1830 (his: "a wall RUN is not climbing -- you're going so fast you break gravity, Sonic-style; his hands shouldn't touch the wall. Use the clip
   // for the feet, the arms doing the typical run, the ninja thing"): `upArms` RUN = the climb's LEGS (and hips) with a sprint's UPPER body -- two
   // halves built once at runtime (`wallUpHalves`), each bone owned by exactly one; CLIMB = the whole climb clip (m1828). TOOLS > WALL UP ARMS.
   if (p.wrun && p.wrun.kind === 'up' && WRUN.upClip && WRUN.upArms === 'RUN' && wallUpHalves()) { const H = rig.wuSplit; rig.actions[H.L].timeScale = clamp(Math.max(0, p.vel.y) / WRUN.upClipRef, WRUN.upClipTs[0], WRUN.upClipTs[1]); rig.actions[H.U].timeScale = WRUN.upArmTs; t[H.L] = 1; t[H.U] = 1; setWeights(t, dt); return; }
