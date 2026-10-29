@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## Rope bridge LOOK B: the Korajin layer (m15xx, ROPEWORKS 1 / DOCKET 25)
+## Rope bridge LOOK B: the Korajin layer (m1818, ROPEWORKS 1 / DOCKET 25)
 - A turquoise JINRA THREAD twisted through the straw ropes (painted into `ropeTex.rope`, lit by its own emissive map `ropeGlow`).
 - The planks WEATHERED: each its own shade, about one in five mossy-green (`setColorAt`), each a touch askew (a small yaw) and not all one length.
 - MOSS along the joints of the tower stone.
