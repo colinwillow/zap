@@ -28660,12 +28660,12 @@ function ropeBuild() { const Z = ROPEB; Z.want = 2; if (Z.on) return; const g = 
     stone = new THREE.MeshStandardMaterial({ map: T.stone, roughness: .95 }), red = new THREE.MeshStandardMaterial({ color: 0xb3261e, roughness: .35, metalness: .05 }),
     gold = new THREE.MeshStandardMaterial({ color: 0xd8a640, roughness: .3, metalness: .8 }), jin = new THREE.MeshBasicMaterial({ color: 0x3ff0d8, toneMapped: false }),
     lamp = new THREE.MeshStandardMaterial({ color: 0xd8382a, emissive: 0xff5a30, emissiveIntensity: 1.6, roughness: .6 }), paper = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .8, side: THREE.DoubleSide }),
-    straw = new THREE.MeshStandardMaterial({ map: T.rope, color: 0xe8c890, roughness: .95 });
+    straw = new THREE.MeshStandardMaterial({ map: T.rope, color: 0xe8c890, roughness: .95, emissiveMap: T.ropeGlow, emissive: 0xffffff, emissiveIntensity: .9 }), ofuda = new THREE.MeshStandardMaterial({ map: T.ofuda, emissiveMap: T.ofuda, emissive: 0x2a8a7a, emissiveIntensity: .35, roughness: .8, side: THREE.DoubleSide });
   const box = (x0, x1, y0, y1, z0, z1, m) => { const o = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), m); o.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); o.castShadow = o.receiveShadow = true; g.add(o); BOXES.push({ minx: x0, maxx: x1, miny: y0, maxy: y1, minz: z0, maxz: z1 }); };
   const x0 = Z.x0, x1 = x0 + Z.L, zc = Z.z, H = Z.H, hw = Z.w / 2;
   box(x0 - 4, x0, 0, H, zc - 2.5, zc + 2.5, stone); box(x1, x1 + 4, 0, H, zc - 2.5, zc + 2.5, stone);     // the two towers
   for (let k = 0; k < 15; k++) box(x0 - 4 - (k + 1) * .42, x0 - 4 - k * .42, 0, H - k * .3, zc - 1.2, zc + 1.2, stone);     // stairs up to the first (a .3 rise: under his .357 step)
-  ropeDeco(g, { x0, x1, zc, H, hw, red, dark, gold, jin, lamp, paper, straw, stone });
+  ropeDeco(g, { x0, x1, zc, H, hw, red, dark, gold, jin, lamp, paper, straw, stone, ofuda });
   const N = Z.N, P = [], Q = [], sag = Math.sqrt(3 / 8 * Z.L * Z.L * (Z.slack - 1));
   for (let c = 0; c < 4; c++) { const a = new Float32Array((N + 1) * 3), sz = c % 2 ? 1 : -1, y0 = H - .02 + (c >= 2 ? Z.rail : 0);
     for (let i = 0; i <= N; i++) { const u = i / N; a[i * 3] = x0 + u * Z.L; a[i * 3 + 1] = y0 - sag * 4 * u * (1 - u); a[i * 3 + 2] = zc + sz * hw; } P.push(a); Q.push(a.slice()); }
@@ -28675,6 +28675,7 @@ function ropeBuild() { const Z = ROPEB; Z.want = 2; if (Z.on) return; const g = 
   const p = player; p.pos.set(x0 - 12, 0, zc); p.vel.set(0, 0, 0); p.faceH = p.heading = Math.PI / 2; cam.az = Math.PI / 2;
   const nk = 2 * (N - 1), knots = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(.075, 0), new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false }), nk); knots.frustumCulled = false; g.add(knots);     // the Jinra knots at the deck joints
   for (let i = 0; i < nk; i++) knots.setColorAt(i, new THREE.Color(0x2fd8c0));
+  { const pr = plantRnd(4242); for (let i = 0; i < N - 1; i++) { const v = .72 + pr() * .38, moss = pr() < .22; planks.setColorAt(i, new THREE.Color(v * (moss ? .78 : 1), v * (moss ? 1.05 : .96), v * (moss ? .7 : .92))); } }     // m15xx LOOK B: weathered, some mossy
   const lamps = [], lb = new THREE.InstancedMesh(new THREE.CylinderGeometry(.13, .13, .32, 10), lamp, 10), lc = new THREE.InstancedMesh(new THREE.CylinderGeometry(.07, .14, .07, 10), dark, 20); lb.frustumCulled = lc.frustumCulled = false; g.add(lb, lc);     // paper lanterns hung from the hand ropes
   for (const c of [2, 3]) for (const i of [3, 7, 11, 15, 19]) lamps.push({ c, i, sw: 0, v: 0 });
   Z.on = { g, P, Q, seg, planks, ropes, knots, lamps, lb, lc, t: 0 }; boxGrid(); for (let k = 0; k < 150; k++) ropeStep(1 / 30); Z.stat.lands = Z.stat.kicks = 0; Z.stat.dip = 0; ropeDraw(); }     // m1802: settled before he arrives (it drifted 25 cm in the first seconds)
@@ -28682,7 +28683,7 @@ const _rbM = new THREE.Matrix4(), _rbA = new THREE.Vector3(), _rbB = new THREE.V
 function ropeDraw() { const B = ROPEB.on, Z = ROPEB, N = Z.N, [L, Rr, HL, HR] = B.P;
   for (let i = 1; i < N; i++) { const a = i * 3; _rbA.set(L[a], L[a + 1], L[a + 2]); _rbB.set(Rr[a], Rr[a + 1], Rr[a + 2]); _rbZ.subVectors(_rbB, _rbA); const w = _rbZ.length(); _rbZ.normalize();
     _rbX.set(L[a + 3] + Rr[a + 3] - L[a - 3] - Rr[a - 3], L[a + 4] + Rr[a + 4] - L[a - 2] - Rr[a - 2], L[a + 5] + Rr[a + 5] - L[a - 1] - Rr[a - 1]).normalize(); _rbY.crossVectors(_rbZ, _rbX).normalize(); _rbX.crossVectors(_rbY, _rbZ);
-    _rbM.makeBasis(_rbX, _rbY, _rbZ); _rbM.scale(_rbS.set(Z.plank * (.9 + (i * 37 % 7) * .02), 1, w + .12)); _rbM.setPosition((_rbA.x + _rbB.x) / 2, (_rbA.y + _rbB.y) / 2, (_rbA.z + _rbB.z) / 2); B.planks.setMatrixAt(i - 1, _rbM); }
+    _rbM.makeBasis(_rbX, _rbY, _rbZ); _rbM.multiply(_rbJ.makeRotationY(((i * 53) % 11 - 5) * .014)); _rbM.scale(_rbS.set(Z.plank * (.9 + (i * 37 % 7) * .02), 1, w + .12 - ((i * 29) % 5) * .03)); /* m15xx: a little askew, not all one length */ _rbM.setPosition((_rbA.x + _rbB.x) / 2, (_rbA.y + _rbB.y) / 2, (_rbA.z + _rbB.z) / 2); B.planks.setMatrixAt(i - 1, _rbM); }
   B.planks.instanceMatrix.needsUpdate = true; let k = 0;
   const cyl = (ax, ay, az, bx, by, bz) => { _rbA.set(ax, ay, az); _rbB.set(bx - ax, by - ay, bz - az); const l = _rbB.length() || 1e-3; _rbQ.setFromUnitVectors(_UPV, _rbB.multiplyScalar(1 / l)); _rbM.compose(_rbA, _rbQ, _rbS.set(1, l, 1)); B.ropes.setMatrixAt(k++, _rbM); };
   for (const C of B.P) for (let i = 0; i < N; i++) { const a = i * 3; cyl(C[a], C[a + 1], C[a + 2], C[a + 3], C[a + 4], C[a + 5]); }
@@ -28697,21 +28698,26 @@ function ropeDraw() { const B = ROPEB.on, Z = ROPEB, N = Z.N, [L, Rr, HL, HR] = 
       _rbQ.setFromAxisAngle(_rbX.set(1, 0, 0), Lp.sw); _rbA.set(0, -L2, 0).applyQuaternion(_rbQ); _rbM.compose(_rbB.set(ax + _rbA.x, ay + _rbA.y, az + _rbA.z), _rbQ, _rbS.set(1, 1, 1)); B.lb.setMatrixAt(n, _rbM);
       for (const dy of [.19, -.19]) { _rbA.set(0, -L2 + dy, 0).applyQuaternion(_rbQ); _rbM.compose(_rbB.set(ax + _rbA.x, ay + _rbA.y, az + _rbA.z), _rbQ, _rbS.set(1, 1, 1)); B.lc.setMatrixAt(k2++, _rbM); } });
     B.lb.instanceMatrix.needsUpdate = true; B.lc.instanceMatrix.needsUpdate = true; } }
-const _rbC = new THREE.Color();
+const _rbC = new THREE.Color(), _rbJ = new THREE.Matrix4();
 // the painted textures: lacquered plank (grain, two dark LASHING bands where the rope binds it), twisted straw rope, dressed stone
 let _ropeTex = null; function ropeTex() { if (_ropeTex) return _ropeTex; const mk = (w, h, f, rep) => { const cv = document.createElement('canvas'); cv.width = w; cv.height = h; f(cv.getContext('2d'), w, h); const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; if (rep) t.repeat.set(rep[0], rep[1]); t.anisotropy = 4; return t; };
   const R = plantRnd(818);
   const wood = mk(128, 256, (q, w, h) => { q.fillStyle = '#5a2a1c'; q.fillRect(0, 0, w, h); for (let k = 0; k < 40; k++) { q.strokeStyle = `rgba(${30 + R() * 40 | 0},${12 + R() * 14 | 0},${8 + R() * 10 | 0},.55)`; q.lineWidth = 1 + R() * 2; q.beginPath(); const x = R() * w; q.moveTo(x, 0); for (let y = 0; y <= h; y += 16) q.lineTo(x + Math.sin(y * .05 + k) * 4, y); q.stroke(); }
     const g2 = q.createLinearGradient(0, 0, w, 0); g2.addColorStop(0, 'rgba(255,200,150,.12)'); g2.addColorStop(.5, 'rgba(0,0,0,0)'); g2.addColorStop(1, 'rgba(0,0,0,.25)'); q.fillStyle = g2; q.fillRect(0, 0, w, h);
     for (const y0 of [.06, .86]) { q.fillStyle = '#c8a46a'; q.fillRect(0, y0 * h, w, .08 * h); q.strokeStyle = 'rgba(80,55,30,.7)'; q.lineWidth = 2; for (let x = -20; x < w + 20; x += 7) { q.beginPath(); q.moveTo(x, y0 * h); q.lineTo(x + 9, (y0 + .08) * h); q.stroke(); } } });
-  const rope = mk(64, 64, (q, w, h) => { q.fillStyle = '#d9b67a'; q.fillRect(0, 0, w, h); q.strokeStyle = 'rgba(110,75,35,.55)'; q.lineWidth = 5; for (let k = -2; k < 6; k++) { q.beginPath(); q.moveTo(0, k * 16); q.lineTo(w, k * 16 + 32); q.stroke(); } }, [1, 8]);
-  const stone = mk(256, 256, (q, w, h) => { q.fillStyle = '#4a4650'; q.fillRect(0, 0, w, h); for (let row = 0; row < 8; row++) { const off = row % 2 ? 24 : 0; for (let c = -1; c < 6; c++) { const v = 110 + R() * 45 | 0; q.fillStyle = `rgb(${v},${v - 4},${v + 6})`; q.fillRect(c * 48 + off + 2, row * 32 + 2, 44, 28); } } }, [2, 2]);
-  return (_ropeTex = { wood, rope, stone }); }
+  const rope = mk(64, 64, (q, w, h) => { q.fillStyle = '#d9b67a'; q.fillRect(0, 0, w, h); q.strokeStyle = 'rgba(110,75,35,.55)'; q.lineWidth = 5; for (let k = -2; k < 6; k++) { q.beginPath(); q.moveTo(0, k * 16); q.lineTo(w, k * 16 + 32); q.stroke(); }
+    q.strokeStyle = '#3ff0d8'; q.lineWidth = 2; for (let k = -2; k < 4; k++) { q.beginPath(); q.moveTo(0, k * 32 + 8); q.lineTo(w, k * 32 + 40); q.stroke(); } }, [1, 8]);     // m15xx LOOK B: a Jinra thread twisted through the straw
+  const ropeGlow = mk(64, 64, (q, w, h) => { q.fillStyle = '#000'; q.fillRect(0, 0, w, h); q.strokeStyle = '#3ff0d8'; q.lineWidth = 2; for (let k = -2; k < 4; k++) { q.beginPath(); q.moveTo(0, k * 32 + 8); q.lineTo(w, k * 32 + 40); q.stroke(); } }, [1, 8]);
+  const ofuda = mk(64, 192, (q, w, h) => { q.fillStyle = '#f2ead8'; q.fillRect(0, 0, w, h); q.fillStyle = '#b3261e'; q.fillRect(0, 0, w, 14); q.fillRect(0, h - 10, w, 10); q.strokeStyle = '#1fbfa8'; q.lineWidth = 5; q.lineCap = 'round';
+    for (let k = 0; k < 4; k++) { const y = 30 + k * 38; q.beginPath(); q.moveTo(18, y); q.lineTo(46, y); q.moveTo(32, y - 10); q.lineTo(32, y + 18); q.moveTo(20, y + 16); q.lineTo(30, y + 6); q.stroke(); } });     // a paper talisman, its glyphs in Jinra
+  const stone = mk(256, 256, (q, w, h) => { q.fillStyle = '#4a4650'; q.fillRect(0, 0, w, h); for (let row = 0; row < 8; row++) { const off = row % 2 ? 24 : 0; for (let c = -1; c < 6; c++) { const v = 110 + R() * 45 | 0; q.fillStyle = `rgb(${v},${v - 4},${v + 6})`; q.fillRect(c * 48 + off + 2, row * 32 + 2, 44, 28); } }
+    for (let k = 0; k < 70; k++) { const x = R() * w, y = (R() * 8 | 0) * 32 + (R() < .5 ? 0 : 30), r = 3 + R() * 9; q.fillStyle = `rgba(${70 + R() * 30 | 0},${110 + R() * 40 | 0},${50 + R() * 20 | 0},.75)`; q.beginPath(); q.ellipse(x, y, r * 1.6, r * .6, 0, 0, 7); q.fill(); } }, [2, 2]);     // moss along the joints
+  return (_ropeTex = { wood, rope, stone, ropeGlow, ofuda }); }
 // THE TOWERS AND THE GATES: a dark stone cornice and a turquoise Jinra band round each tower; on each a PAGODA pavilion (four red-lacquer posts,
 // a red beam ring, two black roofs with upswept eaves, a gold finial, a lantern under it); at the bridgehead a red GATE (posts with black caps and
 // gold rings, a curved black lintel, a red tie beam) with a sagging shimenawa rope and white shide, and two lanterns. Posts that stand where he
 // walks are colliders.
-function ropeDeco(g, o) { const { x0, x1, zc, H, hw, red, dark, gold, jin, lamp, paper, straw } = o, add = (m, x, y, z) => { m.position.set(x, y, z); m.castShadow = true; g.add(m); return m; };
+function ropeDeco(g, o) { const { x0, x1, zc, H, hw, red, dark, gold, jin, lamp, paper, straw, ofuda } = o, add = (m, x, y, z) => { m.position.set(x, y, z); m.castShadow = true; g.add(m); return m; };
   const col = (x0c, x1c, y0, y1, z0, z1) => BOXES.push({ minx: x0c, maxx: x1c, miny: y0, maxy: y1, minz: z0, maxz: z1 });
   const roof = (r, h, flare) => { const geo = new THREE.ConeGeometry(r, h, 4, 3, true).rotateY(Math.PI / 4), P = geo.attributes.position;
     for (let i = 0; i < P.count; i++) { const y = P.getY(i), u = (h / 2 - y) / h; P.setY(i, y + Math.pow(u, 3) * flare - u * u * h * .25); } P.needsUpdate = true; geo.computeVertexNormals(); return new THREE.Mesh(geo, dark); };
@@ -28725,7 +28731,8 @@ function ropeDeco(g, o) { const { x0, x1, zc, H, hw, red, dark, gold, jin, lamp,
     add(new THREE.Mesh(new THREE.CylinderGeometry(.24, .24, .55, 12), lamp), cx, H + PH - .8, zc);
     const gx = side > 0 ? tb - .25 : ta + .25, GH = 2.7;     // the gate at the bridgehead
     for (const sz of [-1, 1]) { const z = zc + sz * (hw + .12); add(new THREE.Mesh(new THREE.CylinderGeometry(.11, .13, GH, 10), red), gx, H + GH / 2, z); add(new THREE.Mesh(new THREE.CylinderGeometry(.17, .17, .1, 10), dark), gx, H + GH + .05, z);
-      for (const y of [.35, GH - .45]) add(new THREE.Mesh(new THREE.TorusGeometry(.13, .025, 6, 14).rotateX(Math.PI / 2), gold), gx, H + y, z); }
+      for (const y of [.35, GH - .45]) add(new THREE.Mesh(new THREE.TorusGeometry(.13, .025, 6, 14).rotateX(Math.PI / 2), gold), gx, H + y, z);
+      const of = add(new THREE.Mesh(new THREE.PlaneGeometry(.17, .5), ofuda), gx - side * .14, H + 1.35, z); of.rotation.y = side > 0 ? -Math.PI / 2 : Math.PI / 2; of.rotation.z = (sz * .05); }     // m15xx: an ofuda talisman on each, facing the walker
     const kasa = new THREE.Mesh(new THREE.BoxGeometry(.26, .2, hw * 2 + 1.5, 1, 1, 14), dark); { const P = kasa.geometry.attributes.position; for (let i = 0; i < P.count; i++) { const z = P.getZ(i); P.setY(i, P.getY(i) + Math.pow(Math.abs(z) / (hw + .75), 3) * .3); } P.needsUpdate = true; kasa.geometry.computeVertexNormals(); }
     add(kasa, gx, H + GH + .2, zc); add(new THREE.Mesh(new THREE.BoxGeometry(.16, .14, hw * 2 + .5), red), gx, H + GH - .35, zc);
     const curve = new THREE.CatmullRomCurve3([new THREE.Vector3(gx, H + GH - .62, zc - hw - .12), new THREE.Vector3(gx, H + GH - .95, zc), new THREE.Vector3(gx, H + GH - .62, zc + hw + .12)]);

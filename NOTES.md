@@ -5,6 +5,14 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Rope bridge LOOK B: the Korajin layer (m15xx, ROPEWORKS 1 / DOCKET 25)
+- A turquoise JINRA THREAD twisted through the straw ropes (painted into `ropeTex.rope`, lit by its own emissive map `ropeGlow`).
+- The planks WEATHERED: each its own shade, about one in five mossy-green (`setColorAt`), each a touch askew (a small yaw) and not all one length.
+- MOSS along the joints of the tower stone.
+- OFUDA talismans -- paper strips with red bands and glowing Jinra glyphs -- on every gate post, facing the walker.
+- (The Jinra knots that brighten under his weight were LOOK A's.) Rendered headless from below and from the bridgehead.
+- Caught before shipping: a `//` comment swallowed the rest of the plank line (the SYNTAX gate caught it -- this file's oldest trap).
+
 ## Rope bridge pass 3c: hang under the deck, swing up (m1817, ROPEWORKS 1 / DOCKET 25)
 - The catch takes the DECK's edge ropes too (after the hand ropes): falling past the planks' edge he hangs from it, under the deck.
 - The SWING-UP: hanging from any rope, a jump tap with the stick toward the bridge (`swingIn` .4 of it inward) drops the hang and flips him up and
