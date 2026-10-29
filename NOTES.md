@@ -345,6 +345,13 @@ see"; "in the Red ... I can't tell where the arrow would land if I released now"
 - **The arrows**: his are x1.35, carry a glow sprite at the head and leave a bright streak (3 sparks a frame along the flight); the glow goes
   out when one sticks. The bow's 2D sight is bigger (54 px), heavier and jade (`#retic.bow`).
 - Not done: his HOLD of the bow (the grip and the arm through the limb) still wants the stylised bow model he is making.
+## THE SKY CASTLE, pass 15: rope bridges out to the shrines (Worker B)
+Two ROPE BRIDGES from planked landings on the lawn out to the nearest islets -- islet 8 a tier UP (+4 m) and islet 1 a tier DOWN (-10 m;
+the curtain wall between towers 1 and 2 left open for it): planks along a sagging line, rope handrails on posts, walkable (walk tris per
+plank). Every islet's top is now a dynamic BDYN box riding its own bob (`gcIsleStep`, `hwBobY`) and carrying him; the islets' bob is
+.3 m now (was .7), under his .357 step, so stepping off a bridge always lands. Off while the castle is down or hidden. The bridges stay
+FALLEN (broken bridges to nowhere on the ruin -- their islets are gone). Headless: from the lawn a body walks each bridge to its islet's
+centre (8: ends at 120.51 against a top of 120.68 +- the bob; 1: 106.56 against 106.75).
 ## THE SKY CASTLE, pass 14: the brazier burns, the rubble is solid (m1803, Worker B)
 The throne room's BRAZIER burns: flame-coloured sparks lift off it every .07 s with a curl of smoke now and then (`gcastleStep`, only while
 the castle is up and he is within 40 m). The FALLEN RUBBLE is solid: each mound rastered by `hwSolid` (1.2 m cells, 2,227 columns), kept
