@@ -86,6 +86,24 @@ in there so I can transform it between the two states"; "these rocks are kind of
 - **THE HYBRID:** the sky islands over the rim (m1113) showed in FALLEN. KORAJIN: the floating world is what restoration raises -> hidden
   while fallen. (The refinery already sits on the flank when fallen.)
 Next: the painted textures (rock, sand, cliff), his ask in the same message.
+## m15xx -- THE CHARGE BY THE LEFT STICK, AND THE FLIP DODGES EVERYWHERE (his controls pass)
+- **The katana charge's release (his: "up on the left stick: the lunge forward down the middle; left: the spinning whirlwind; right: the same
+  mirrored; down: the high one; neutral stays the lunge for now"):**
+  - `chargeRelease` reads the left stick: down = `aimLeap`; left / right = `whirlGo(k, mir)` (the left one plays `katana_360h_m` and turns the
+    other way: `T.mir` flips the per-spin turn); up / neutral = the lunge.
+  - m1711's `CHARGE3.swap` is gone.
+- **The left flicks (his: "flick left / right = the side-flip barrel rolls from the guard, even when not in guard; flick down = a BACKFLIP
+  dodge: you stay looking forward and move backwards, instead of the whirlwind kick"):**
+  - `leftFlick` sends any grounded flick to his side or behind him (judged against his FACING, as the guard does) to `cartGo`, unless cover
+    is down that line (the slide still wins).
+  - A flick ahead does what it did. The tornado kick on the down flick is off (`LDODGE.on` 0 restores it).
+- **Measured headless** (the katana, facing the up-flick line):
+  - Flicks: left = cart 'left', 3.62 m to his LEFT; right = 3.62 m to his right; down = cart 'back', 4.28 m BACK. All facing unchanged,
+    apex 1.0 m.
+  - Up = the old strike.
+  - Release: L-left = whirl `_m`, L-right = whirl, L-up = lunge, neutral = lunge, L-down = leap.
+- The control map in CLAUDE.md carries both. **Not checked:** on his phone.
+
 ## m1721 -- THE BOW WAS BACKWARDS (his: "you have him holding the bow backwards -- the wooden part facing backwards, inverted")
 - `archerBow`'s limb curve had the GRIP (a = 0) at z = -bend and the tips at +bend/4. In the bow's frame (+Z = the draw line, forward) that put
   the grip BEHIND the tips: the belly bowed at the archer. That has been wrong on every bowman since m1103 and on his bow since m1719. Now the

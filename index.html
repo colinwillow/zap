@@ -20874,13 +20874,13 @@ function tornGo() { const p = player; TORN.stat.charges++; p.torn = { n: TORN.sp
 // from the clip's own wind-up (0), the last plays on into the settle (`last`). And it LAUNCHES: `go` m/s along the way he faced, bleeding
 // at `bleed`/s, with the left stick steering on top (`TORN.speed`).
 const WHIRL = { on: 1, idle: .3, spins: [2, 3], R: 3, Rk: 1, dmg: 3, power: 1.1, dur: .21,     /* m1347: *"at least double the speed"* -- .42 -> .21 s a spin */ from: .078, to: .3125, last: .36, turn: 276, go: 8, bleed: 1.1, stat: { whirls: 0, hits: 0 } };
-function whirlGo(k) { const p = player; WHIRL.stat.whirls++; const g = WHIRL.go * (.7 + .3 * k); p.torn = { n: Math.round(lerp(WHIRL.spins[0], WHIRL.spins[1], k)), whirl: 1, k, i: 0, vx: Math.sin(p.faceH) * g, vz: Math.cos(p.faceH) * g }; p.ltHold = 0; p.jump = 0; whirlSpin(); }
+function whirlGo(k, mir) { const p = player; WHIRL.stat.whirls++; const g = WHIRL.go * (.7 + .3 * k); p.torn = { n: Math.round(lerp(WHIRL.spins[0], WHIRL.spins[1], k)), whirl: 1, k, i: 0, mir: !!(mir && rig.actions[TORNADO.sword + '_m']), vx: Math.sin(p.faceH) * g, vz: Math.cos(p.faceH) * g }; p.ltHold = 0; p.jump = 0; whirlSpin(); }
 function whirlSpin() {
-  const p = player, nm = TORNADO.sword; if (!rig.actions[nm]) { p.torn = null; return; }
+  const p = player, nm = TORNADO.sword + (p.torn && p.torn.mir ? '_m' : ''); if (!rig.actions[nm]) { p.torn = null; return; }     // m15xx: `mir` = the leftward whirl
   p.melee = 1; p.meleeIx = 0; p.meleeT = 0; p.meleeName = nm; p.meleeAir = 0; p.meleeBody = 0; p.melWall = 0; p.melFist = 0; p.melFront = 0; p.multi = 1;
   p.meleeDur = WHIRL.dur; p.meleeChain = 0; p.melFired = 0; p.melU = 0; p.swPrev = null; p.swRootX = null; p.swRootZ = null; p.melV = 0; p.melTgt = null; p.melH = p.faceH;
   { const W = WHIRL, T = p.torn || { i: 0, n: 1 }, first = !T.i, lastS = T.n <= 1, a0 = first ? 0 : W.from, a1 = lastS ? W.last : W.to, L0 = clipLen(nm);
-    if (!first) { p.faceH -= W.turn * Math.PI / 180; p.heading = p.faceH; p.melH = p.faceH; }     /* cancel the pose's snap-back: one unbroken turn */
+    if (!first) { p.faceH -= (T.mir ? -1 : 1) * W.turn * Math.PI / 180; p.heading = p.faceH; p.melH = p.faceH; }     /* cancel the pose's snap-back: one unbroken turn */
     p.meleeDur = W.dur * (a1 - a0) / (W.to - W.from); playOnce(nm, L0 * (a1 - a0) / p.meleeDur); rig.actions[nm].time = L0 * a0; T.i = (T.i || 0) + 1; }
   snd('swoosh', { r: .7 + Math.random() * .2, g: 1 }); if (!p.torn || p.torn.i <= 1) snd('swoosh', { r: 1.1, g: .6 });
   // the RING: everyone within reach, all the way round, takes the blow outward (the clip's own sweep may catch them too -- `tierHit`'s 140 ms
@@ -21436,13 +21436,20 @@ function airPush(h) {
   const sp = Math.hypot(p.vel.x, p.vel.z); if (sp > AFLIP.pushMax) { p.vel.x *= AFLIP.pushMax / sp; p.vel.z *= AFLIP.pushMax / sp; }
   p.airPushT = AFLIP.pushHold; AFLIP.stat = (AFLIP.stat || 0) + 1;
 }
+const LDODGE = { on: 1, stat: 0 };
 function leftFlick(dx, dy) {
   const h = flickH(dx, dy), p = player;
   if (p.block && p.grounded && cartGo(dx, dy)) return;
   // m1094: *"Flick down on the left stick is the tornado kick -- it just needs to not make him turn around: do it the way he's facing, still
   // controllable, and keep flicking and it keeps spinning, like a top, until somebody hits you."* DOWN (not in guard, which flips): a spin
   // the way he faces; flicked again while it spins, one more (to `TORN.max`), so a thumb flicking down keeps the top going.
-  if (TORN.flick && dy > Math.abs(dx) && p.grounded && !p.wall && !p.knock && !p.riding && !mphBare()) {
+  // m15xx (his: "running around, flick left / right on the left stick = the side-flip barrel rolls you get in guard -- have them even when you're not
+  // in guard; flick DOWN = a BACKFLIP dodge instead of the whirlwind kick: you stay looking forward, backflip and move backwards"). The guard's
+  // own `cartGo` for any flick to his side or behind him (judged against his FACING, as in the guard); a flick ahead keeps what it did. The
+  // tornado kick on the down flick is off (`LDODGE.on` 0 puts it back).
+  if (LDODGE.on && p.grounded && !p.wall && !p.knock && !p.riding && !mphBare() && !p.slide) { const h0 = flickH(dx, dy), fw = Math.sin(h0) * Math.sin(p.faceH) + Math.cos(h0) * Math.cos(p.faceH);
+    if (fw < .5 && !coverSeek(h0) && cartGo(dx, dy)) { LDODGE.stat++; return; } }
+  if (!LDODGE.on && TORN.flick && dy > Math.abs(dx) && p.grounded && !p.wall && !p.knock && !p.riding && !mphBare()) {
     if (p.torn) { p.torn.n = Math.min(TORN.max, p.torn.n + 1); return; }
     if (!p.melee && !p.roll) { p.torn = { n: 1 }; TORN.stat.charges++; tornSpin(); return; }
   }     // m1061/m1062: the guard held + any flick = a cartwheel (sides) or a front / back flip
@@ -30125,7 +30132,7 @@ function coverLeap() {
 // above `top` (pushed up, as it charged) 0 = the flat launch forward as before; down to `bot` 1 = the highest leap. Over `min` the release is
 // `aimLeap`: straight up to `h0`..`h1` m and the katana's air slam (`slamGo`), its horizontal solved from the slam's clock to land where the
 // flat launch would have (the man in reach, or the hold's distance). An arc of dots shows the leap before he goes (`KAIM.line`).
-const CHARGE3 = { on: 1, dead: .3, leapK: .75, swap: 1 };     // m1711 `swap` (his: "I keep trying to do the lunge and it does the spiral"): 1 = NEUTRAL lunges forward, FORWARD spins; 0 = the m1688 way round
+const CHARGE3 = { on: 1, dead: .3, leapK: .75 };     // m1711 `swap` (his: "I keep trying to do the lunge and it does the spiral"): 1 = NEUTRAL lunges forward, FORWARD spins; 0 = the m1688 way round
 const KAIM = { top: .35, bot: -.8, min: .12, h0: 1.4, h1: 5.2, line: null, n: 28, dots: 0 };
 function kaimHold() {
   const p = player, R = stick.R; return slotNow().blade && R.down && p.chargeT >= MELEE.charge * .5 && !p.chargeGo && !p.knock && p.grounded;
@@ -30175,9 +30182,12 @@ function chargeRelease() {
   // m1688 (his: "if you are holding FORWARD on the left stick when you release, the forward slash; holding DOWN, the leap in the air and slam down;
   // neither, the spin"): the LEFT stick at the release picks the move. Up the pad = forward, down the pad = the leap (at the right thumb's aimed
   // height if it was aimed, else `CHARGE3.leapK`), anything else = the spin. `CHARGE3.on` 0 is the old reading (right-thumb height, world dot)
-  if (!p.wall && slotNow().blade && CHARGE3.on) { const L = stick.L, m = L.down ? Math.hypot(L.x, L.y) : 0, fwd = m > CHARGE3.dead && -L.y > Math.abs(L.x) * .8, back = m > CHARGE3.dead && L.y > Math.abs(L.x) * .8;
+  // m15xx (his: "press UP on the left stick and release: the lunge forward down the middle; LEFT: the spinning whirlwind; RIGHT: the same,
+  // mirrored; DOWN: the high one; neutral stays the lunge for now"). The LEFT stick at the release picks it: up / neutral = the lunge, left /
+  // right = the whirlwind turning that way (`katana_360h_m` / `katana_360h`, the right pad's own left / right spins), down = the leap.
+  if (!p.wall && slotNow().blade && CHARGE3.on) { const L = stick.L, m = L.down ? Math.hypot(L.x, L.y) : 0, back = m > CHARGE3.dead && L.y > Math.abs(L.x) * .8, side = m > CHARGE3.dead && Math.abs(L.x) > Math.abs(L.y) * .8 ? Math.sign(L.x) : 0;
     if (back && aimLeap(t0, p.kAim > KAIM.min ? p.kAim : CHARGE3.leapK)) return;
-    if ((CHARGE3.swap ? fwd : !fwd) && WHIRL.on && rig.actions[TORNADO.sword]) { whirlGo(clamp(t0 / MELEE.charge, 0, 1)); return; } }
+    if (side && WHIRL.on && rig.actions[TORNADO.sword]) { whirlGo(clamp(t0 / MELEE.charge, 0, 1), side < 0); return; } }
   else if (!p.wall && slotNow().blade && p.kAim > KAIM.min && aimLeap(t0, p.kAim)) return;     // m1071: the thumb held low aimed it UP
   // m1279: THE WHIRLWIND. *"A full 360 Link-style whirlwind... if you charge it up and you're pressing FORWARD on the left stick when you release,
   // he does the launch; if you DON'T, he spin-attacks."* The left stick at rest (or pulled BACK) on the release = `whirlGo`: 1-3 full spins of
