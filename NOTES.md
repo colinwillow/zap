@@ -5,6 +5,17 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## the CAVES: solid floors and walls, and a lens that stays inside (Worker B)
+His (m1724 phone): "the walls of the caves don't stop you, you walk through them"; "we need a smart camera that stays within the confines of
+the inside of the cave -- right now it goes outside".
+- **WHAT WAS WRONG (sim):** the walls DO stop him; what let him through was the FLOOR. The cave floor was only the carved land, and the land
+  is a 2 m grid: where a carved vertex meets an uncarved one its triangles slope steeply up into the rock, and at such a point `groundAt`
+  returned -1000 though the height said 1.34 -- he dropped through to y .17 at the tunnel/chamber join (x -27.4, z 15) and was then under
+  and behind everything. Now each cave lays its OWN FLAT FLOOR in the walk store (`triAdd`, a .8 m grid over its whole volume), and the
+  carve runs 2 m past the shell (was 1) so the land's slope is behind the walls. Same sim after: y 1.35 throughout, stopped by the wall.
+- **THE LENS (`caveCamFree`, in the camera's `free`):** when the look point is inside a cave, the lens may only go back along its ray as far
+  as the cave's own volume (walls in .35, under .95 of the vault, above the floor) -- or out through the open mouth into the canyon.
+  Sim: standing 9 m in, the camera turned through five headings: inside every time (3.6-5.2 m back). Render: the shipped camera's frame.
 ## THINGS THAT FLOAT, FLOAT: the sky islands, the refinery's stepping stones, its island -- and you ride them (Worker B)
 His (m1704): "if they're gonna be floating they need some wiggle to them". `bobPatch(mat, amp, speed)` lifts every vertex whose `aBob`
 attribute is set (its PHASE, >= 1) by sin(t * speed + phase * 2.3) * amp in the vertex shader, so a merged bucket of many floating things
