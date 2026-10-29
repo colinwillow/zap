@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## Arrows you can SEE and that HIT the targets; the arena no longer opens on a straw post; CINEMA.md (m15xx)
+## Arrows you can SEE and that HIT the targets; the arena no longer opens on a straw post; CINEMA.md (m1747)
 His: "with any meaningful amount of speed you can't even see the arrow"; "I was shooting the test dummies -- you hit them with the sword and they
 move; with explosive arrows they don't; the arrows don't hit things they're supposed to hit"; "when you start the arena the sparring dummy is the
 first thing you see"; and should cutscenes be rendered in Blender or done in game.
