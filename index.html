@@ -32871,7 +32871,7 @@ const MIRROR = { clips: ['katana_slash_1', 'katana_combo', 'katana_360h', 'hurri
 // library idles Forge-baked onto Grumbo (`idle_relaxed` = Neutral Idle, `idle_ready` = Ready Idle, `idle_fight` = Fight Idle). TOOLS > IDLE
 // picks; DWARF is the old one. Grumbo only (another hero keeps its own idle).
 const IDLEPICK = { pick: 'DWARF', picks: ['DWARF', 'RELAXED', 'READY', 'FIGHT'], base: null,     /* m1820: none of the three were his; DWARF back as default, FIXED below */
-  fix: { on: 1, arm: .45, elbow: .3, wrist: .85 } };
+  fix: { on: 1, arm: .12, elbow: .2, wrist: .85 } };     /* m15xx (his: "the wrists are fixed, but now his shoulders are too narrow -- like a minnow"): arm .45 -> .12, elbow .3 -> .2 */
 // m1820 (his: "the best would be adjusting the Dwarf idle -- his arms and his hands and wrists curving in"): IDLE FIX, on top of the clip, weighted by
 // how much the idle is playing: each upper arm's direction is pulled `arm` of the way toward straight DOWN (it hangs at his side instead of flaring),
 // each forearm `elbow` of the way toward the line of its upper arm (less bent), each hand `wrist` of the way back to its BIND rotation (the bind
