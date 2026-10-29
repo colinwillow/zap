@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The katana's charge flips without letting go; the bow's arc over a low wall; the bow's emblem (m15xx)
+## The katana's charge flips without letting go; the bow's arc over a low wall; the bow's emblem (m1761)
 *"Holding up to charge and I flick the left stick, he does a layout flip -- which I don't mind -- but then he releases the attack even though I
 haven't released. It should just do the flips, like dodging in parry mode." / "A wall in front of me, the terrace round the willow -- the reticle
 stayed fixed on that little ledge." / "The rings are too thick -- something closer to the sword's stylised one, like our emblem, a different colour."*
