@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The waterfalls: cut out of the island, and water (Worker B)
+## The waterfalls: cut out of the island, and water (m1742, Worker B)
 His (m1741 screenshot): "make the waterfall actually cut out of the island and have it actually look like water". The refinery's Jinra
 fall was a flat 2.2 x 40 m plane at R + .2 running straight down THROUGH the lumpy lobes. `gjFall` now: every island geometry is kept
 (`islG`, via `pi`) so the rock in the fall's wedge (+-.16 rad round a = 2.4) is MEASURED -- the lip `r0` is the furthest rock in the top
