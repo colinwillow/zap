@@ -276,6 +276,11 @@
    "edit": {
     "inPlace": 1
    }
+  },
+  {
+   "role": "hang_drop",
+   "stem": "Braced_Hang_To_Crouch",
+   "name": "Braced_Hang_To_Crouch"
   }
  ]
 }

@@ -5,6 +5,19 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Walk off an edge -> down into the hang (m15xx)
+*"If you're near the edge and you walk off, he should go down to a ledge hang automatically -- almost in reverse, a little somersault twist
+from standing on top to the hang."*
+- No "stand to hang" clip in the library, but `Braced_Hang_To_Crouch` BACKWARDS is the move: baked onto Grumbo as `hang_drop` (33 roles,
+  3.60 MB), with its root motion left in, because the hands are what is placed (below).
+- `edgeHangTry`: the first `airT` .2 s off a top WITHOUT a jump (`jumps` 0, not rising, slower than `maxV` 5 m/s, at least `minDrop` 1.6 m of
+  drop below) asks `ledgeFind` at his FEET's height for the lip he just left, then `ledgeSt` 'drop': the facing turns to the wall at once and
+  the drawn yaw eases the 160-180 deg turn out (`p.turnOff`); the clip plays backwards by hand over `clipLen / rate`; his HANDS ARE PINNED to the
+  lip in `ledgeHandsPose` (pinned in over the first `pinIn` of it) while `p.pos` slides from the edge to the hang. Then 'hold' as before; the
+  straight-arm body offsets ease in at .1 s instead of .05, so the hand-off doesn't pop.
+- Headless, the wall course's 4.5 m block: it fires (`EDGEHANG.n` 1), and he goes from the top (y 4.50) into the hold at y 3.11 in 60 frames.
+  The turn eases 2.76 rad -> 0 in about .4 s. TOOLS > EDGE HANG turns it off. Shipped unverified.
+
 ## Ledge hands and arms, weapons anywhere, the wall jump's direction, the vertical run as a tilted RUN (m1836)
 *"His fingers are weird when he's hanging... the elbows are buckled in... I can't take my sword out on a ledge... when I jump off a wall he does
 the long jump hurdle... the vertical run: the run animation with the hips bent 20 degrees and the torso compensating... holding up and jump should
