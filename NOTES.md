@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The wall entry keeps its angle (billiards), the thumb you arrive with steers nothing, and WALL RAYS shows it (m15xx)
+## The wall entry keeps its angle (billiards), the thumb you arrive with steers nothing, and WALL RAYS shows it (m1839)
 *"Whenever I hit the wall at an angle he still does a perfectly vertical wall run -- it should be diagonal. A debug button so I can see the
 angle -- like a billiards table: the vector of the character, the angle it hits the wall, the angle reflected or projected along -- and use it
 to decide how the wall run is initiated."*

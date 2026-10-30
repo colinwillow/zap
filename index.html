@@ -13140,7 +13140,7 @@ function wrunCatch() { const p = player; if (p.grounded || p.vel.y < -WRUN.slide
   const W = wrunFind(p.pos.x, p.pos.y, p.pos.z, p.r + WRUN.slideReach, p.wrunCoolB && p.wrunCool > 0 ? p.wrunCoolB : null); if (!W) return 0;
   const into = -(p.vel.x * W.nx + p.vel.z * W.nz), hs = Math.hypot(p.vel.x, p.vel.z), al = p.vel.x * -W.nz + p.vel.z * W.nx; if (into < -.5) return 0;
   const C = { head: into > .5 && into >= hs * WRUN.headK, upV: Math.min(WRUN.upMax, Math.max(WRUN.upMin, into * WRUN.upK)), sideV: Math.max(WRUN.sideMin, Math.abs(al)), al: al >= 0 ? 1 : -1 };
-  // m15xx (his: "whenever I hit the wall at an angle he still does a perfectly vertical run -- it should be diagonal; like a billiards table, the
+  // m1839 (his: "whenever I hit the wall at an angle he still does a perfectly vertical run -- it should be diagonal; like a billiards table, the
   // vector of the character, the angle it hits the wall, the angle it's reflected or projected along"): ENTRY 'ANGLE' (default) keeps the angle --
   // `inc` = the angle between his horizontal travel and the wall's inward normal (0 head-on, 90 grazing) becomes the run's angle on the face
   // (0 = straight up, 90 = straight along) x `angK`, at `entryK` x his horizontal speed, plus `riseK` of what he was rising. 'PROJECT' = m1776's
@@ -13176,7 +13176,7 @@ function wrunSet(R, kind) { const p = player, tx = -R.nz, tz = R.nx;
   R.kind = kind; R.t0 = R.t; R.vy0 = p.vel.y;
   p.faceH = p.heading = kind === 'side' ? Math.atan2(R.dx, R.dz) : kind === 'slide' ? Math.atan2(R.nx, R.nz) : Math.atan2(-R.nx, -R.nz); if (kind !== 'slide') p.camWant = p.faceH; }
 function wrunStickAng(R) { const SL = stick.L, sm = SL.down ? Math.hypot(SL.x, SL.y) : 0; if (sm < .3) return null; const cr = camera.matrixWorld.elements, tsg = (-R.nz * cr[0] + R.nx * cr[2]) >= 0 ? 1 : -1; return Math.atan2(SL.x * tsg / sm, -SL.y / sm); }
-// m15xx: THE BILLIARDS VIEW (TOOLS > WALL RAYS). Live, whenever he is off a wall: his travel cast forward (yellow) to the first tall face, its
+// m1839: THE BILLIARDS VIEW (TOOLS > WALL RAYS). Live, whenever he is off a wall: his travel cast forward (yellow) to the first tall face, its
 // normal there (white), the bounce (grey), and the run that hit would start, drawn ON the face (cyan) with the numbers in a chip: IN = the angle
 // off head-on, RUN = the angle off straight up, the speed. At the catch the same lines FREEZE (for `hold` s) with what really happened, and the
 // magenta line is his real path on the face. `wallRayCatch` stores the catch; `wallRayStep` draws.
@@ -13272,7 +13272,7 @@ function stepWrun(dt) {
     if (R.kind !== 'slide') { const gk = clamp((R.t - WRUN.gripT) / WRUN.rampT, 0, 1); let vu = p.vel.y - WRUN.vG * gk * dt, vt = R.vt * Math.exp(-WRUN.vFric * dt);
       { const sp0 = Math.hypot(vu, vt); if (sp0 > WRUN.capV) { const f = 1 - (1 - WRUN.capV / sp0) * Math.min(1, dt / WRUN.capHalf); vu *= f; vt *= f; } }
       const SL = stick.L, sm = SL.down ? Math.hypot(SL.x, SL.y) : 0, cr = camera.matrixWorld.elements, crx = cr[0], crz = cr[2], tsg = (-R.nz * crx + R.nx * crz) >= 0 ? 1 : -1, S = { mag: sm };
-      if (WRUN.steer && sm > .3 && !R.steerOn) { const ang = Math.atan2(SL.x * tsg / sm, -SL.y / sm); if (R.st0 == null || Math.abs(wrapAngle(ang - R.st0)) > WRUN.steerDead) R.steerOn = 1; }     // m15xx: the thumb you ARRIVED with steers nothing; move it to steer
+      if (WRUN.steer && sm > .3 && !R.steerOn) { const ang = Math.atan2(SL.x * tsg / sm, -SL.y / sm); if (R.st0 == null || Math.abs(wrapAngle(ang - R.st0)) > WRUN.steerDead) R.steerOn = 1; }     // m1839: the thumb you ARRIVED with steers nothing; move it to steer
       if (sm <= .3 && R.st0 != null) R.st0 = null;     // let go: the next touch steers at once
       if (WRUN.steer && sm > .3 && R.steerOn) { const tin = -SL.y / sm, ts = SL.x * tsg / sm, tg = Math.atan2(ts, tin), sp = Math.hypot(vu, vt);
         if (sp > .5) { let cur = Math.atan2(vt, vu); cur += clamp(wrapAngle(tg - cur), -WRUN.steer * dt, WRUN.steer * dt); vt = Math.sin(cur) * sp; vu = Math.cos(cur) * sp; } }
@@ -15379,8 +15379,8 @@ function arenaUi() {
       else if (a === 'ltapj') { LTAP.jump = LTAP.jump ? 0 : 1; try { localStorage.setItem('mel.ltapjump', LTAP.jump); } catch (err) {} }     // m1836
       else if (a === 'edgehang') { EDGEHANG.on = EDGEHANG.on ? 0 : 1; try { localStorage.setItem('mel.edgehang', EDGEHANG.on); } catch (err) {} }     // m1837
       else if (a === 'hangblade') { LHANDS.bladePick = LHANDS.bladePick === 'LOW' ? 'HIGH' : 'LOW'; try { localStorage.setItem('mel.hangblade', LHANDS.bladePick); } catch (err) {} }     // m1838
-      else if (a === 'wrays') { WRAY.on = WRAY.on ? 0 : 1; try { localStorage.setItem('mel.wallrays', WRAY.on); } catch (err) {} }     // m15xx
-      else if (a === 'wentry') { WRUN.entry = WRUN.entry === 'ANGLE' ? 'PROJECT' : 'ANGLE'; try { localStorage.setItem('mel.wentry', WRUN.entry); } catch (err) {} }     // m15xx
+      else if (a === 'wrays') { WRAY.on = WRAY.on ? 0 : 1; try { localStorage.setItem('mel.wallrays', WRAY.on); } catch (err) {} }     // m1839
+      else if (a === 'wentry') { WRUN.entry = WRUN.entry === 'ANGLE' ? 'PROJECT' : 'ANGLE'; try { localStorage.setItem('mel.wentry', WRUN.entry); } catch (err) {} }     // m1839
       else if (a === 'wproxy') { WRUN.proxy = WRUN.proxy ? 0 : 1; if (!WRUN.proxy) rig.root.visible = true; }     // m1833
       else if (a === 'uplook') { WRUN.upLook = WRUN.upLook === 'RUN' ? 'CLIP' : 'RUN'; try { localStorage.setItem('mel.uplook', WRUN.upLook); } catch (err) {} }     // m1836
       else if (a === 'uparms') { WRUN.upArms = WRUN.upArms === 'RUN' ? 'CLIMB' : 'RUN'; try { localStorage.setItem('mel.uparms', WRUN.upArms); } catch (err) {} }     // m1830
@@ -68288,7 +68288,7 @@ function frameBody() {
     gsidePose();                       // m1073: the mirrored guard's blade, laid along the reflection of his own
     beamPose();                        // m1037: on the beam, tilted with the balance, arms out
     wallProxyStep();                   // m1833: the wall lab's ball and path
-    wallRayStep(1 / 60);               // m15xx: the billiards view
+    wallRayStep(1 / 60);               // m1839: the billiards view
     ledgeHandsPose();                  // m1832: hands on the lip (one hand with a blade)
     idleFixPose();                     // m1820: the Dwarf idle's arms and wrists corrected
     ropePose();                        // m1805: on the rope bridge, leaning against its tilt and swing
