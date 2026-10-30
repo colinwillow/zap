@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The sword hand on the ledge: down and out to the side (m15xx)
+## The sword hand on the ledge: down and out to the side (m1838)
 *"Not really what I pictured for him holding the katana while hanging -- his right arm down to the right, holding the katana down and out to
 the side, or holding it up a little."* (His screenshots: the arm folded behind him, the blade flat under his hip.)
 - The one-handed hang's right arm now hangs DOWN AND OUT: target `armDown` (.82) of its length below the shoulder, `sideK` (.38) out to his

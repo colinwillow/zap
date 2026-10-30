@@ -15329,7 +15329,7 @@ function arenaUi() {
       else if (a === 'kauto') { CHARGE3.auto = CHARGE3.auto === 'CHAIN' ? 'SINGLE' : 'CHAIN'; try { localStorage.setItem('mel.kauto', CHARGE3.auto); } catch (err) {} }     // m1798
       else if (a === 'ltapj') { LTAP.jump = LTAP.jump ? 0 : 1; try { localStorage.setItem('mel.ltapjump', LTAP.jump); } catch (err) {} }     // m1836
       else if (a === 'edgehang') { EDGEHANG.on = EDGEHANG.on ? 0 : 1; try { localStorage.setItem('mel.edgehang', EDGEHANG.on); } catch (err) {} }     // m1837
-      else if (a === 'hangblade') { LHANDS.bladePick = LHANDS.bladePick === 'LOW' ? 'HIGH' : 'LOW'; try { localStorage.setItem('mel.hangblade', LHANDS.bladePick); } catch (err) {} }     // m15xx
+      else if (a === 'hangblade') { LHANDS.bladePick = LHANDS.bladePick === 'LOW' ? 'HIGH' : 'LOW'; try { localStorage.setItem('mel.hangblade', LHANDS.bladePick); } catch (err) {} }     // m1838
       else if (a === 'wproxy') { WRUN.proxy = WRUN.proxy ? 0 : 1; if (!WRUN.proxy) rig.root.visible = true; }     // m1833
       else if (a === 'uplook') { WRUN.upLook = WRUN.upLook === 'RUN' ? 'CLIP' : 'RUN'; try { localStorage.setItem('mel.uplook', WRUN.upLook); } catch (err) {} }     // m1836
       else if (a === 'uparms') { WRUN.upArms = WRUN.upArms === 'RUN' ? 'CLIMB' : 'RUN'; try { localStorage.setItem('mel.uparms', WRUN.upArms); } catch (err) {} }     // m1830
@@ -28891,7 +28891,7 @@ function ledgeHandsPose() { const p = player, L = p.ledge; if (!LHANDS.on || !L 
   for (const [S, sd] of [['Left', -1], ['Right', 1]]) { const UA = B['mixamorig_' + S + 'Arm'], FA = B['mixamorig_' + S + 'ForeArm'], HA = B['mixamorig_' + S + 'Hand']; if (!UA || !FA || !HA) continue;
     UA.getWorldPosition(_lhS);
     if (oneHand && S === 'Right') { FA.getWorldPosition(_lhE); const len = _lhE.distanceTo(_lhS) + HA.getWorldPosition(_lhP).distanceTo(_lhE);
-      // m15xx (his screenshots: the sword arm folded behind him, the blade flat under his hip -- "I pictured his arm down to the right, holding the
+      // m1838 (his screenshots: the sword arm folded behind him, the blade flat under his hip -- "I pictured his arm down to the right, holding the
       // katana down and out to the side, or holding it up a little"): the arm hangs DOWN AND OUT to his right (`sideK` of its length), off the wall
       // (`off`), elbow toward the floor and out; then the hand is turned so the BLADE (mount -> tip, `bladeSeg`) points where TOOLS > HANG BLADE says:
       // LOW = down and out to the side, HIGH = raised out to the side.
