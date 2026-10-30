@@ -44,6 +44,12 @@ CI cannot turn Pages on by itself either: `enablement: true` on `configure-pages
 may deploy to a Pages site but may not create one.) **The gates run here, before the push, not
 on a server.**
 
+## KORAJIN IS BUILT TO OPEN IN SCENE COMPANION (Colin, Oct 29 2026) -- READ `SCENE_COMPANION.md` BEFORE ADDING A KORAJIN FEATURE
+New characters, places and systems are written data-first: placed things in a placement list with stable ids, builders
+as pure functions of their table, export tables between `SC_<NAME>:START`/`:END` markers, state on the entity, events for
+story-worthy moments. No rewrites of working code; it changes the shape of NEW work. The port plan is
+`scene-companion/docs/korajin.md`.
+
 ## Loop mode (`/loop`)
 
 When running on a loop: **`git pull origin main` and then read `ROADMAP.md` first, every pass** (a planning session edits it from elsewhere, so a local copy goes stale) — its `STEER` section outranks
