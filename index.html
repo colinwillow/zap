@@ -30880,11 +30880,11 @@ const _lp = { x: 0, y: 0, z: 0 };
 //   UP    -- spring up over the lip (just enough to clear it by `clear`, `inward` m/s onto the top) and slam down ONTO the top at the apex
 //   LEFT / RIGHT -- stay hanging: the hop along the lip that way, and with a blade a one-arm SWING that way over his head and down
 //            (`p.lsw`, drawn by `ledgeHandsPose`; `strikeSweep` on the swung arm does the hitting). Unarmed: the hop.
-const LSW = { dur: .32, a0: .15, a1: 2.5, open: [.25, .85], clear: 1, inward: 5, over: .45 };
+const LSW = { flip: 1, flipMax: 1, flipLeft: .3, dur: .32, a0: .15, a1: 2.5, open: [.25, .85], clear: 1.6, inward: 5, over: .45 };
 function ledgeFlick(dx, dy) { const p = player, L = p.ledge; if (!L || !(p.ledgeSt === 'hold' || p.ledgeSt === 'hop')) return 0;
   if (dy > 0 && dy > Math.abs(dx) * .8) { ledgeDrop(0); p.slamUsed = 0; if (!slamGo(0, 1)) { p.vel.y = -2; } return 1; }
   if (-dy > Math.abs(dx) * .8) { const rise = Math.max(.5, L.y + LSW.clear - p.pos.y), vy = Math.sqrt(2 * MOVE.g * rise); ledgeDrop(0);
-    p.vel.set(0, vy, 0); p.faceH = p.heading = Math.atan2(-L.nx, -L.nz); p.slamUsed = 0; p.lsUp = { L, t: 0 };     /* straight up the face first: inward only once over the lip (measured: inward from the start, the face stopped him) */ p.jumps = 1; snd('swoosh', { r: 1.1, g: .5 }); return 1; }
+    p.vel.set(0, vy, 0); p.faceH = p.heading = Math.atan2(-L.nx, -L.nz); p.slamUsed = 0; p.lsUp = { L, t: 0 }; if (LSW.flip) airFlipGo(0, -1, 1);     /* m15xx: his -- a FRONT FLIP up over the lip (a handspring), then the slam onto the top */     /* straight up the face first: inward only once over the lip (measured: inward from the start, the face stopped him) */ p.jumps = 1; snd('swoosh', { r: 1.1, g: .5 }); return 1; }
   const h = flickH(dx, dy), tx = -L.nz, tz = L.nx, side = Math.sign(Math.sin(h) * tx + Math.cos(h) * tz) || 1;     // +1 = along (-nz, nx), his LEFT facing the wall
   if (p.ledgeSt === 'hold') { p.ledgeSide = side; p.ledgeSt = 'hop'; p.ledgeT = 0; p.lx0 = p.pos.x; p.ly0 = p.pos.y; p.lz0 = p.pos.z; const nm = side > 0 ? LEDGE.clips.L : LEDGE.clips.R, cl = clipLen(nm); p.ledgeDur = cl > .05 ? cl / LEDGE.hopRate : LEDGE.hopDur; if (cl > .05) playOnce(nm, LEDGE.hopRate); }     /* the hop exactly as stepLedge starts one */
   if (slotNow().blade) { p.lsw = { t: 0, side, hit: 0 }; p.swPrev = null; p.melFired = 0; snd('swoosh', { r: 1.3, g: .55 }); }
@@ -34060,7 +34060,8 @@ function stepPlayer(dt) {
   if (p.lsUp) { const U = p.lsUp, L = U.L; U.t += dt; if (p.grounded || p.ledge || p.wrun || U.t > 1.5) p.lsUp = 0;
     else { const over = (L.cx - p.pos.x) * L.nx + (L.cz - p.pos.z) * L.nz;     // how far in over the top he is (+ = over it)
       if (p.pos.y > L.y + .1 && over < LSW.over) { p.vel.x = -L.nx * LSW.inward; p.vel.z = -L.nz * LSW.inward; }
-      if ((p.vel.y <= .5 && over >= LSW.over) || p.vel.y < -4) { p.lsUp = 0; p.vel.x = p.vel.z = 0; p.slamUsed = 0; slamGo(0, 1); } } }     // m1840: the ledge's UP flick slams onto the top at the apex
+      const flipped = !p.aflip || Math.abs(p.aflip.th) > Math.PI * 2 - LSW.flipLeft || U.t > LSW.flipMax;     // the handspring nearly round
+      if ((p.vel.y <= .5 && over >= LSW.over && flipped) || p.vel.y < -6) { p.lsUp = 0; p.aflip = null; p.vel.x = p.vel.z = 0; p.slamUsed = 0; slamGo(0, 1); } } }     // m1840: the ledge's UP flick slams onto the top at the apex
   if (!p.ledge && edgeHangTry()) { /* m1837: walked off an edge -> down into the hang */ }
   if (p.ledge) { stepLedge(dt); return; }
   if (p.barCool > 0) p.barCool = Math.max(0, p.barCool - dt);     // m1034: THE HIGH BAR owns the body like the ledge

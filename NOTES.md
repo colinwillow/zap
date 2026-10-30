@@ -5,6 +5,16 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The ledge's UP flick is a handspring: a front flip up over the lip, then the slam onto the top (m15xx)
+*"When you're doing a ledge hang and you swipe up on the right stick, he should do a flip -- almost like a handspring up -- and slam: with the
+katana, he flips and slams the sword on top of the roof."*
+- The UP flick now starts the air flip (`airFlipGo(0, -1, 1)`: a FRONT flip, head toward the wall, no extra pop) as he springs; the rise is
+  higher (`LSW.clear` 1 -> 1.6 m over the lip) so the flip has time; the slam waits until the flip is within `flipLeft` .3 rad of round (or
+  `flipMax` 1 s), then clears it and drives down onto the top.
+- Headless, the 8 m face: the flip goes 0.2 -> 5.9 rad over 36 frames rising to 9.5 m, the slam starts at frame 42, lands ON the top (y 8.00,
+  1.84 m in). Render: tucked and turning over the lip, then the slam.
+- DOCKET 36 added: his small ship on a real sea (later). Shipped unverified.
+
 ## The edge drop blends (his pick) and the hang eases; the NINJA GYM pass 1: the wall course rebuilt bigger (m1841, NINJAGYM.md)
 *"Two points where the animation glitches to its new state -- the dismount, and with the katana out: the normal hang, then a glitch and the
 katana's out and his arm is down. Ease those states. The rotation feels offset weird. The non-animation -- just blending from standing to the

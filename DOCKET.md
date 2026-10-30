@@ -95,3 +95,8 @@ check, ticked with the build number like the rest. Scene Companion's side of the
        `HERO.pick === 'agoblin'` clip checks) move into a `clips:` table on their feature (role words per `SCENE_COMPANION.md` rule 4).
 35. [ ] (later, MAIN's call) **Builders as pure functions of their table** (`SCENE_COMPANION.md` rule 2) -- only when a builder is being
        reworked anyway; Scene Companion's bake tool reads their output as it is, so this is never a pass of its own.
+36. [ ] (his, LATER -- after the ninja gym) **THE SMALL SHIP ON A REAL SEA** (a sandbox): not the big flying ship -- a smaller, personal
+       seafaring boat on a big, semi-realistic, rough (not violent) ocean. He STEERS and drives it -- the feel of a jet ski without being one:
+       it rides the waves, pitching and rolling up and down them (it doesn't catch air), a real sea dynamic. Needs: a wave field (summed
+       Gerstner waves, sampled for height + slope on the CPU so the hull can float on the same water it draws), buoyancy at a few hull
+       points, throttle / rudder on the sticks, spray and wake. Own design doc with a DONE WHEN when it starts.
