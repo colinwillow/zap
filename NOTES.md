@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The ledge's UP flick is a handspring: a front flip up over the lip, then the slam onto the top (m15xx)
+## The ledge's UP flick is a handspring: a front flip up over the lip, then the slam onto the top (m1842)
 *"When you're doing a ledge hang and you swipe up on the right stick, he should do a flip -- almost like a handspring up -- and slam: with the
 katana, he flips and slams the sword on top of the roof."*
 - The UP flick now starts the air flip (`airFlipGo(0, -1, 1)`: a FRONT flip, head toward the wall, no extra pop) as he springs; the rise is
