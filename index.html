@@ -15382,7 +15382,7 @@ function arenaUi() {
       else if (a === 'hangblade') { LHANDS.bladePick = LHANDS.bladePick === 'LOW' ? 'HIGH' : 'LOW'; try { localStorage.setItem('mel.hangblade', LHANDS.bladePick); } catch (err) {} }     // m1838
       else if (a === 'wrays') { WRAY.on = WRAY.on ? 0 : 1; try { localStorage.setItem('mel.wallrays', WRAY.on); } catch (err) {} }     // m1839
       else if (a === 'wentry') { WRUN.entry = WRUN.entry === 'ANGLE' ? 'PROJECT' : 'ANGLE'; try { localStorage.setItem('mel.wentry', WRUN.entry); } catch (err) {} }     // m1839
-      else if (a === 'online') { if (NET.on) netLeave(); else { const c = prompt('ONLINE room code (share it with the other phone):', (NET.room || '').replace(NET.prefix, '') || Math.random().toString(36).slice(2, 6).toUpperCase()); if (c) netJoin(c); } }     // m15xx
+      else if (a === 'online') { if (NET.on) netLeave(); else { const c = prompt('ONLINE room code (share it with the other phone):', (NET.room || '').replace(NET.prefix, '') || Math.random().toString(36).slice(2, 6).toUpperCase()); if (c) netJoin(c); } }     // m1843
       else if (a === 'wproxy') { WRUN.proxy = WRUN.proxy ? 0 : 1; if (!WRUN.proxy) rig.root.visible = true; }     // m1833
       else if (a === 'uplook') { WRUN.upLook = WRUN.upLook === 'RUN' ? 'CLIP' : 'RUN'; try { localStorage.setItem('mel.uplook', WRUN.upLook); } catch (err) {} }     // m1836
       else if (a === 'uparms') { WRUN.upArms = WRUN.upArms === 'RUN' ? 'CLIMB' : 'RUN'; try { localStorage.setItem('mel.uparms', WRUN.upArms); } catch (err) {} }     // m1830
@@ -29052,7 +29052,7 @@ function gymBuild(T) { const g = new THREE.Group(), boxes = [], by = {};
     m.position.set(nx ? fx + nx * .03 : sx + tx * u, y, nz ? fz + nz * .03 : sz + tz * u); m.lookAt(m.position.x + nx, y, m.position.z + nz);
     m.rotateZ(ang * Math.PI / 180); g.add(m); }     // +tangent reads to the viewer's LEFT, so +ang (CCW) points along it
   return { g, boxes }; }
-// m15xx: ONLINE, STAGE 1 (NETPLAY.md). His Robits relay (colinwillow/robits-server, a ~250-line room relay on Render) carries it -- the server
+// m1843: ONLINE, STAGE 1 (NETPLAY.md). His Robits relay (colinwillow/robits-server, a ~250-line room relay on Render) carries it -- the server
 // knows nothing about games, so KORAJIN shares it under its own room codes (`KJ-...`). What is sent is NOT inputs or clip names: it is his
 // FINISHED POSE -- the drawn root (position + rotation) and every bone's rotation, quantised to int16 and base64'd, `hz` times a second.
 // So every flip, wall run, ledge IK, katana pose and cape spring arrives exactly as his phone drew it, with no second animation system
@@ -68434,7 +68434,7 @@ function frameBody() {
     dragRiderPose();                   // m1619: in the saddle, pitched and banked with his dragon (after every pose that writes the root)
     rig.root.updateMatrixWorld(true); springsStep(dt);     // m1058: hair / cape chains, on the FINAL root (after every pose above)
     dollStep(dt);
-    try { netStep(dt); } catch (e) { NET.err = e.message; }     // m15xx: ONLINE -- send his finished pose, draw the others' (after every pose pass and the springs)
+    try { netStep(dt); } catch (e) { NET.err = e.message; }     // m1843: ONLINE -- send his finished pose, draw the others' (after every pose pass and the springs)
     _pt = pT('rig', _pt);
   }
   gatePush(dt);                 // gates: after he moves, before the lens follows him (m285)
