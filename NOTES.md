@@ -5,6 +5,21 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The edge drop blends (his pick) and the hang eases; the NINJA GYM pass 1: the wall course rebuilt bigger (m15xx, NINJAGYM.md)
+*"Two points where the animation glitches to its new state -- the dismount, and with the katana out: the normal hang, then a glitch and the
+katana's out and his arm is down. Ease those states. The rotation feels offset weird. The non-animation -- just blending from standing to the
+hang -- actually worked really well before."* And: *"extend the wall running course: bigger, taller, longer, more spaced out..."* (NINJAGYM.md)
+- **EDGE DROP: BLEND (default)** -- no clip: the walk-off goes into the ordinary 'in' swing, its duration `EDGEHANG.blendDur` .5 s, the turn to
+  the wall eased over `turnHL` .12 s (half-life). TOOLS > EDGE DROP: CLIP is m1837's reversed clip.
+- **The hang's IK is EASED:** every arm, hand and finger bone it writes slerps toward its new pose (`LHANDS.ease` .09 s) from last frame's --
+  and on the first frame of a hang, from the clip's own pose -- so the clip-to-IK hand-off, the katana coming out (the one-hand pose) and the
+  drop's end all blend. The ledge swing is not eased. The straight-arm body offsets restart from 0 on every catch.
+- **NINJA GYM pass 1** (`GYM`, `SC_GYM` markers, `gymBuild(T)`): A long wall 50 m x 6; B tall faces 8 / 14 / 22 m; C chimney 5.5 m apart
+  (was 2.8), 20 m tall (was 12); D zigzag: three 16 m walls 8 m apart with 4 m gaps along -- run, jump across, run, jump back; E a 32 m wall
+  that runs into an 18 m tower face; F corners. Chevron arrows (2.2 m) on the faces point the line: along, diagonal, up. Headless render: the
+  layout reads, arrows point the right ways. Next pass: the twin towers + ladder.
+- Shipped unverified.
+
 ## Hanging, the right flick is a LEDGE ATTACK by direction (m1840)
 *"When you're hanging from a ledge and swipe the right stick, he does a weird melee and then he's standing in the air. He should be able to
 swing right, overhead, down low or left -- or attack vectors off the wall: swipe down, a slam to the ground; swipe up, he launches up over the

@@ -13233,7 +13233,7 @@ function wrunStick(R) { const SL = stick.L, sm = SL.down ? Math.hypot(SL.x, SL.y
   const cr = camera.matrixWorld.elements, tsg = (-R.nz * cr[0] + R.nx * cr[2]) >= 0 ? 1 : -1; return { tin: -SL.y / sm, ts: SL.x * tsg / sm, mag: sm }; }
 // m1836: OFF THE WALL HE TURNS, HE DOES NOT POP. The jump sets the facing outright (one writer); the DRAWN yaw carries the difference
 // (`p.turnOff`) and eases it out over `WRUN.turnHalf` -- *"he sort of teleports or does a 180 spin, there's no real transition"*.
-function wrunJump() { const p = player, h0 = p.faceH, r = wrunJump0(); if (r) { p.ljump = 0; p.turnOff = wrapAngle(h0 - p.faceH); } return r; }
+function wrunJump() { const p = player, h0 = p.faceH, r = wrunJump0(); if (r) { p.ljump = 0; p.turnOff = wrapAngle(h0 - p.faceH); p.turnOffHL = 0; } return r; }
 function wrunJump0() {
   const p = player, R = p.wrun;
   // m1776 (his: "the angle of jumping out away from the wall seems to be only directly orthogonal -- there should be variation"): off ANY state the
@@ -15377,6 +15377,7 @@ function arenaUi() {
       else if (a === 'asprint') { AUTOSPRINT.on = AUTOSPRINT.on ? 0 : 1; try { localStorage.setItem('mel.autosprint', AUTOSPRINT.on); } catch (err) {} }     // m1809
       else if (a === 'kauto') { CHARGE3.auto = CHARGE3.auto === 'CHAIN' ? 'SINGLE' : 'CHAIN'; try { localStorage.setItem('mel.kauto', CHARGE3.auto); } catch (err) {} }     // m1798
       else if (a === 'ltapj') { LTAP.jump = LTAP.jump ? 0 : 1; try { localStorage.setItem('mel.ltapjump', LTAP.jump); } catch (err) {} }     // m1836
+      else if (a === 'edgemode') { EDGEHANG.mode = EDGEHANG.mode === 'BLEND' ? 'CLIP' : 'BLEND'; try { localStorage.setItem('mel.edgemode', EDGEHANG.mode); } catch (err) {} }     // m15xx
       else if (a === 'edgehang') { EDGEHANG.on = EDGEHANG.on ? 0 : 1; try { localStorage.setItem('mel.edgehang', EDGEHANG.on); } catch (err) {} }     // m1837
       else if (a === 'hangblade') { LHANDS.bladePick = LHANDS.bladePick === 'LOW' ? 'HIGH' : 'LOW'; try { localStorage.setItem('mel.hangblade', LHANDS.bladePick); } catch (err) {} }     // m1838
       else if (a === 'wrays') { WRAY.on = WRAY.on ? 0 : 1; try { localStorage.setItem('mel.wallrays', WRAY.on); } catch (err) {} }     // m1839
@@ -15456,7 +15457,7 @@ function arenaUi() {
   // in the RED HOLLOWS (his: "I need the debug menu in there so I can transform it between the two states") the bar is the STATE switch + TOOLS
   let h = '<div class="ar-bar">' + (inHome() ? B('age', (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + '<small>tap: ' + (AGE.st === 'fallen' ? 'restore it all' : 'make it fall') + '</small>', '', 'ar-main' + (AGE.st === 'fallen' ? '' : ' on'))
     : B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('vend', 'VEND')) + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
-    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('climbspd', 'CLIMB ' + CLIMB.speed.toFixed(1) + ' m/s') + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('qd', 'QUICK DRAW ' + (QD.on ? 'ON' : 'OFF')) + B('idlepick', 'IDLE ' + IDLEPICK.pick) + B('idleamp', 'IDLE ENERGY x' + IDLEPICK.energy) + B('asprint', 'SPRINT ' + (AUTOSPRINT.on ? 'AUTO (run builds it)' : 'HOLD (right stick)')) + B('kauto', 'K-AUTO ' + CHARGE3.auto) + B('ltapj', 'LEFT TAP ' + (LTAP.jump ? 'JUMP' : 'NOTHING')) + B('edgehang', 'EDGE HANG ' + (EDGEHANG.on ? 'ON' : 'OFF')) + B('hangblade', 'HANG BLADE ' + LHANDS.bladePick) + B('wrays', 'WALL RAYS ' + (WRAY.on ? 'ON' : 'OFF')) + B('wentry', 'WALL ENTRY ' + (WRUN.entry === 'ANGLE' ? 'ANGLE (billiards)' : 'PROJECT (old)')) + B('wproxy', 'WALL PROXY ' + (WRUN.proxy ? 'BALL' : 'OFF')) + B('uplook', 'WALL UP ' + (WRUN.upLook === 'RUN' ? 'RUN + HIP TILT' : 'CLIMB CLIP')) + B('uparms', 'WALL UP ARMS ' + WRUN.upArms) + B('wallmode', 'WALL ' + (WRUN.mode === 'VEL' ? 'VELOCITY' : 'STICK')) + B('arcline', 'BOW ARC ' + (BARC.line ? 'LINE' : 'OFF')) + B('partaim', 'PART AIM ' + (PARTAIM.on ? (PARTAIM.by === 'L' ? 'LEFT' : 'RIGHT') : 'OFF')) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('btrail', 'TRAIL ' + (BTRAIL.jin ? 'JIN' : 'BLUE')) + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('sample', 'DNA SAMPLE ' + (SAMPLE.on ? 'ON' : 'OFF')) + B('runslash', 'RUN SLASH ' + (RUNSLASH.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('dsky', 'SKY ' + DOJO.skyPick) + B('dfx', 'DOJO FX ' + (DOJO.fx || 'FULL')) + B('rwsky', 'HOLLOWS SKY ' + RW.skyPick + (RW.skyKey && /restored/.test(RW.skyKey) ? ' (restored)' : ' (fallen)')) + B('wob', 'HAND-BUILT ' + (HWWOB.amp.value ? (HWWOB.amp.value * 1000).toFixed(0) + ' mm' : 'OFF (ruler)')) + B('dragon', 'DRAGON ' + (DRAGZ.on ? DRAGZ.look : DOJO.dragonPick)) + B('dwing', 'DRAGON WINGS ' + DRAGZ.wingPick) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
+    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('climbspd', 'CLIMB ' + CLIMB.speed.toFixed(1) + ' m/s') + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('qd', 'QUICK DRAW ' + (QD.on ? 'ON' : 'OFF')) + B('idlepick', 'IDLE ' + IDLEPICK.pick) + B('idleamp', 'IDLE ENERGY x' + IDLEPICK.energy) + B('asprint', 'SPRINT ' + (AUTOSPRINT.on ? 'AUTO (run builds it)' : 'HOLD (right stick)')) + B('kauto', 'K-AUTO ' + CHARGE3.auto) + B('ltapj', 'LEFT TAP ' + (LTAP.jump ? 'JUMP' : 'NOTHING')) + B('edgehang', 'EDGE HANG ' + (EDGEHANG.on ? 'ON' : 'OFF')) + B('edgemode', 'EDGE DROP ' + EDGEHANG.mode) + B('hangblade', 'HANG BLADE ' + LHANDS.bladePick) + B('wrays', 'WALL RAYS ' + (WRAY.on ? 'ON' : 'OFF')) + B('wentry', 'WALL ENTRY ' + (WRUN.entry === 'ANGLE' ? 'ANGLE (billiards)' : 'PROJECT (old)')) + B('wproxy', 'WALL PROXY ' + (WRUN.proxy ? 'BALL' : 'OFF')) + B('uplook', 'WALL UP ' + (WRUN.upLook === 'RUN' ? 'RUN + HIP TILT' : 'CLIMB CLIP')) + B('uparms', 'WALL UP ARMS ' + WRUN.upArms) + B('wallmode', 'WALL ' + (WRUN.mode === 'VEL' ? 'VELOCITY' : 'STICK')) + B('arcline', 'BOW ARC ' + (BARC.line ? 'LINE' : 'OFF')) + B('partaim', 'PART AIM ' + (PARTAIM.on ? (PARTAIM.by === 'L' ? 'LEFT' : 'RIGHT') : 'OFF')) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('btrail', 'TRAIL ' + (BTRAIL.jin ? 'JIN' : 'BLUE')) + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('sample', 'DNA SAMPLE ' + (SAMPLE.on ? 'ON' : 'OFF')) + B('runslash', 'RUN SLASH ' + (RUNSLASH.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('dsky', 'SKY ' + DOJO.skyPick) + B('dfx', 'DOJO FX ' + (DOJO.fx || 'FULL')) + B('rwsky', 'HOLLOWS SKY ' + RW.skyPick + (RW.skyKey && /restored/.test(RW.skyKey) ? ' (restored)' : ' (fallen)')) + B('wob', 'HAND-BUILT ' + (HWWOB.amp.value ? (HWWOB.amp.value * 1000).toFixed(0) + ' mm' : 'OFF (ruler)')) + B('dragon', 'DRAGON ' + (DRAGZ.on ? DRAGZ.look : DOJO.dragonPick)) + B('dwing', 'DRAGON WINGS ' + DRAGZ.wingPick) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
   if (m === 'bld') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back') + B('age', 'STATE: ' + (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + '<small>tap to switch -- rebuilds what stands</small>', '', AGE.st === 'fallen' ? '' : 'ar-on');
     for (const E of BLDG.list) h += B('bld', E.t + '<small>' + (E.on() ? 'tap to remove' : E.pass >= 3 ? E.sub : 'IN PROGRESS · pass ' + E.pass + ' of 3') + '</small>', E.key, E.on() ? 'ar-on' : '');
     h += '</div>'; }
@@ -28917,10 +28918,22 @@ function ropePose() { const Z = ROPEB, p = player; if (!Z.on || !Z.bal) return; 
 // it would be normally"): HANDS ON THE LIP. Hanging (or coming in to the hang, or hopping), each hand is put by two-bone IK (`wrLimb`) on the lip
 // at the point nearest its shoulder, `in` m over the edge and `up` above the top, the elbow bent out and down. With a BLADE in hand only the LEFT
 // grips; the RIGHT arm hangs straight down at his side (`armDown` of its length below the shoulder, a little off the wall) with the sword in it.
-const LHANDS = { sideK: .38, bladePick: 'LOW', blade: { LOW: [.75, -.6, .35], HIGH: [.7, .55, .45] }, on: 1, in: .05, up: .06, armDown: .82, off: .12, straight: .93, palmK: .25, outK: .5, pullMax: .5, pitch: .45, dropMax: .6, fingers: 1, tip: .08, curl: [.55, .45, .3], thumbK: .5 };     // m1836: straight / fingers
+const LHANDS = { ease: .09, sideK: .38, bladePick: 'LOW', blade: { LOW: [.75, -.6, .35], HIGH: [.7, .55, .45] }, on: 1, in: .05, up: .06, armDown: .82, off: .12, straight: .93, palmK: .25, outK: .5, pullMax: .5, pitch: .45, dropMax: .6, fingers: 1, tip: .08, curl: [.55, .45, .3], thumbK: .5 };     // m1836: straight / fingers
 try { const v = localStorage.getItem('mel.hangblade'); if (v === 'LOW' || v === 'HIGH') LHANDS.bladePick = v; } catch (e) {}
 const _lhS = new THREE.Vector3(), _lhT = new THREE.Vector3(), _lhP = new THREE.Vector3(), _lhE = new THREE.Vector3();
-function ledgeHandsPose() { const p = player, L = p.ledge; if (!LHANDS.on || !L || !rig.bones || p.ledgeSt === 'up') return; const B = rig.bones, tx = -L.nz, tz = L.nx, oneHand = slotNow().blade;
+// m15xx (his: "two points where the animation glitches to its new state ... once he gets into the hang he goes into the normal hang position and
+// then glitches and now his katana is out and his arm is down -- ease those states"): every arm, hand and finger bone the hang's IK writes is
+// EASED toward its new pose (`LHANDS.ease` s) from what it was last frame -- and on the first frame of a hang, from the CLIP's own pose -- so the
+// clip-to-IK hand-off, a weapon coming out (the one-hand pose) and the drop's end all blend instead of snapping. The swing (`p.lsw`) is not eased.
+const LHB = ['Arm', 'ForeArm', 'Hand', 'HandThumb1', 'HandThumb2', 'HandThumb3', 'HandMiddle1', 'HandMiddle2', 'HandMiddle3', 'HandPinky1', 'HandPinky2', 'HandPinky3', 'HandIndex1', 'HandIndex2', 'HandIndex3', 'HandRing1', 'HandRing2', 'HandRing3'];
+function ledgeHandsPose() { const p = player; if (!rig.bones || !p.ledge || !LHANDS.on || p.ledgeSt === 'up' || p.ledgeSt === 'drop') { p.lhPrev = null; ledgeHandsPose0(); return; }
+  const bs = []; for (const S of ['Left', 'Right']) for (const n of LHB) { const b = rig.bones['mixamorig_' + S + n]; if (b) bs.push(b); }
+  const first = !p.lhPrev; if (first) p.lhPrev = bs.map(b => b.quaternion.clone());
+  ledgeHandsPose0();
+  const a = 1 - Math.exp(-(1 / 60) / LHANDS.ease), swing = !!p.lsw;
+  for (let i = 0; i < bs.length; i++) { const b = bs[i], q = p.lhPrev[i]; if (!q) continue; if (swing && /Right/.test(b.name)) { q.copy(b.quaternion); continue; } q.slerp(b.quaternion, a); b.quaternion.copy(q); }
+  rig.root.updateMatrixWorld(true); }
+function ledgeHandsPose0() { const p = player, L = p.ledge; if (!LHANDS.on || !L || !rig.bones || p.ledgeSt === 'up') return; const B = rig.bones, tx = -L.nz, tz = L.nx, oneHand = slotNow().blade;
   rig.root.updateMatrixWorld(true);
   if (p.ledgeSt === 'drop') { const LH = B.mixamorig_LeftHand, RH = B.mixamorig_RightHand; if (!LH || !RH) return;     // m1837: the walk-off swings down UNDER his hands
     LH.getWorldPosition(_lhP); RH.getWorldPosition(_lhE); _lhP.add(_lhE).multiplyScalar(.5); const s0 = (_lhP.x - L.cx) * tx + (_lhP.z - L.cz) * tz;
@@ -28987,22 +29000,59 @@ function wallProxyStep() { const W = WPROXY, p = player; if (!WRUN.proxy) { if (
   W.ball.visible = on; rig.root.visible = !on; if (!on && W.t <= 0) { W.cnt = 0; W.line.visible = false; return; }
   if (on) { W.ball.position.set(p.pos.x, p.pos.y + .9, p.pos.z); if (W.cnt >= W.n) { W.pts.copyWithin(0, 3); W.cnt = W.n - 1; } W.pts.set([p.pos.x, p.pos.y + .9, p.pos.z], W.cnt * 3); W.cnt++; }
   W.line.geometry.setDrawRange(0, W.cnt); W.line.geometry.attributes.position.needsUpdate = true; W.line.visible = W.cnt > 1; }
-function wparkBuild() { const Z = WPARK; Z.want = 2; if (Z.on) return; const g = new THREE.Group(); scene.add(g); const boxes = [], H = Z.H;
+// m15xx: THE NINJA GYM (NINJAGYM.md, pass 1) -- the wall course rebuilt bigger, taller, longer and spread out, data-first (SCENE_COMPANION.md):
+// every piece is a row with a stable id; arrows painted on the faces show the line to run (`ang` = the chevron's direction ON the face: 0 up,
+// 90 along the face's +tangent (-nz, nx), -90 the other way, 45 diagonal). His: "parallel ones much farther apart, the horizontal wall longer,
+// the high one taller, ones that lead from one style to another, gaps you run along, jump across to a parallel wall and back, arrows on the
+// walls you're supposed to run on."
+// SC_GYM:START
+const GYM = { spawn: { id: 'spawn_gym', at: [0, 0, 10], yaw: Math.PI },
+  pieces: [
+    // A LONG WALL (blue): 50 m of face, a start step and an end deck
+    { id: 'a_wall', box: [-12, -11.5, 0, 6, -58, -8], c: 0x4a8fd8, label: ['A  LONG WALL', -9, -4, '#2a6ab8'] },
+    { id: 'a_start', box: [-11.5, -7, 0, 2, -10, -6], c: 0x8a8f99 }, { id: 'a_end', box: [-11.5, -7, 0, 4, -60, -56], c: 0x8a8f99 },
+    // B TALL FACES (yellow): 8, 14 and 22 m, decks on top
+    { id: 'b_8', box: [-2, 4, 0, 8, -36, -30], c: 0xe8b23a, label: ['B  TALL FACES', 8, -25, '#a07010'] },
+    { id: 'b_14', box: [5, 11, 0, 14, -36, -30], c: 0xd8a22a }, { id: 'b_22', box: [12, 18, 0, 22, -36, -30], c: 0xc8921a },
+    // C CHIMNEY (green): two 20 m walls 5.5 m apart, a deck across the top
+    { id: 'c_l', box: [26, 26.5, 0, 20, -30, -14], c: 0x3fae6a, label: ['C  CHIMNEY', 29.3, -9, '#1f7a45'] },
+    { id: 'c_r', box: [32, 32.5, 0, 20, -30, -14], c: 0x3fae6a }, { id: 'c_top', box: [26, 32.5, 20, 20.5, -30, -26], c: 0x2f9e5a },
+    // D ZIGZAG WITH GAPS (purple): run wall 1, jump the 8 m across to wall 2 (a 4 m gap along), run it, jump back to wall 3, land
+    { id: 'd_start', box: [44, 48, 0, 2, -6, -2], c: 0x8a8f99, label: ['D  ZIGZAG', 46, 2, '#7a3a98'] },
+    { id: 'd_1', box: [42, 42.5, 0, 7, -22, -6], c: 0xb05ad0 }, { id: 'd_2', box: [50, 50.5, 0, 7, -42, -26], c: 0xb05ad0 }, { id: 'd_3', box: [42, 42.5, 0, 7, -62, -46], c: 0xb05ad0 },
+    { id: 'd_end', box: [42.5, 50, 0, 3, -68, -64], c: 0x8a8f99 },
+    // E RUN INTO A TOWER (orange): along a wall and straight up the 18 m face it runs into
+    { id: 'e_wall', box: [62, 62.5, 0, 6, -40, -8], c: 0xe06a3a, label: ['E  RUN TO TOWER', 60, -4, '#b04010'] },
+    { id: 'e_tower', box: [56, 68, 0, 18, -48, -40], c: 0xc04f22 },
+    // F CORNERS (teal): an inside corner and an outside one
+    { id: 'f_l1', box: [80, 80.5, 0, 6, -12, 4], c: 0x2aa8b0, label: ['F  CORNERS', 88, 8, '#14787f'] }, { id: 'f_l2', box: [80.5, 94, 0, 6, -12.5, -12], c: 0x2aa8b0 },
+    { id: 'f_blk', box: [88, 94, 0, 6, 0, 6], c: 0x1a8890 } ],
+  // arrows: [face piece id, face side ('+x' '-x' '+z' '-z'), u (m along the face's tangent from its start), y, ang deg]
+  arrows: [ ['a_wall', '+x', 6, 3, -90], ['a_wall', '+x', 16, 3, -90], ['a_wall', '+x', 26, 3, -90], ['a_wall', '+x', 36, 3, -90], ['a_wall', '+x', 46, 3, -90],
+    ['b_8', '+z', 3, 3, 0], ['b_14', '+z', 3, 3, 0], ['b_14', '+z', 3, 8, 0], ['b_22', '+z', 3, 3, 0], ['b_22', '+z', 3, 9, 0], ['b_22', '+z', 3, 15, 0],
+    ['c_l', '+x', 8, 4, 0], ['c_r', '-x', 8, 8, 0], ['c_l', '+x', 8, 12, 0], ['c_r', '-x', 8, 16, 0],
+    ['d_1', '+x', 4, 3, -60], ['d_1', '+x', 12, 4, -60], ['d_2', '-x', 4, 3, 60], ['d_2', '-x', 12, 4, 60], ['d_3', '+x', 4, 3, -60], ['d_3', '+x', 12, 4, -60],
+    ['e_wall', '-x', 8, 3, 90], ['e_wall', '-x', 20, 3, 90], ['e_tower', '+z', 6, 3, 0], ['e_tower', '+z', 6, 9, 0], ['e_tower', '+z', 6, 14, 0] ] };
+// SC_GYM:END
+let _gymArrowTex = null;
+function gymArrowTex() { if (_gymArrowTex) return _gymArrowTex; const cv = document.createElement('canvas'); cv.width = cv.height = 128; const q = cv.getContext('2d');
+  q.fillStyle = 'rgba(255,255,255,.92)'; for (const y0 of [18, 62]) { q.beginPath(); q.moveTo(64, y0); q.lineTo(112, y0 + 40); q.lineTo(92, y0 + 40); q.lineTo(64, y0 + 18); q.lineTo(36, y0 + 40); q.lineTo(16, y0 + 40); q.closePath(); q.fill(); }
+  _gymArrowTex = new THREE.CanvasTexture(cv); _gymArrowTex.colorSpace = THREE.SRGBColorSpace; return _gymArrowTex; }
+// builder: a pure function of its table -> { g, boxes }
+function gymBuild(T) { const g = new THREE.Group(), boxes = [], by = {};
   const mats = {}, mat = c => mats[c] || (mats[c] = new THREE.MeshStandardMaterial({ color: c, roughness: .85 }));
-  const box = (x0, x1, y0, y1, z0, z1, c) => { const m = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), mat(c)); m.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); m.castShadow = m.receiveShadow = true; g.add(m);
-    const b = { minx: x0, maxx: x1, miny: y0, maxy: y1, minz: z0, maxz: z1 }; BOXES.push(b); boxes.push(b); };
-  const ox = 0, oz = 0, B = 0x4a8fd8, Y = 0xe8b23a, G = 0x3fae6a, P = 0xb05ad0, O = 0xe06a3a, D = 0x8a8f99;
-  // 1 LONG WALL (blue): along -z at x -6, platforms at each end
-  box(ox - 6.5, ox - 6, 0, H.long, oz - 30, oz - 6, B); box(ox - 6, ox - 2.5, 0, 2, oz - 9, oz - 5, D); box(ox - 6, ox - 2.5, 0, 2, oz - 31, oz - 27, D); wparkLabel(g, '1 LONG WALL', ox - 4, oz - 3, 0, '#2a6ab8');
-  // 2 TALL WALLS (yellow): a 4.5 m and a 7 m block, faces at z -40, decks on top
-  box(ox - 4, ox + 1, 0, H.low, oz - 46, oz - 40, Y); box(ox + 2, ox + 8, 0, H.tall, oz - 46, oz - 40, 0xd09a28); wparkLabel(g, '2 TALL WALLS', ox + 2, oz - 37, 0, '#a07010');
-  // 3 CHIMNEY (green): two 12 m walls 2.8 m apart, a deck across the top
-  box(ox + 12, ox + 12.5, 0, H.chim, oz - 36, oz - 28, G); box(ox + 15.3, ox + 15.8, 0, H.chim, oz - 36, oz - 28, G); box(ox + 12, ox + 15.8, H.chim, H.chim + .4, oz - 36, oz - 33, G); wparkLabel(g, '3 CHIMNEY', ox + 14, oz - 25, 0, '#1f7a45');
-  // 4 RUN-JUMP-RUN (purple): a start platform, wall A on the right of the line, wall B on the left further on, a landing platform
-  box(ox + 20, ox + 24, 0, 2, oz - 8, oz - 4, D); box(ox + 24, ox + 24.5, 0, H.run, oz - 20, oz - 9, P); box(ox + 19.5, ox + 20, 0, H.run, oz - 34, oz - 23, P); box(ox + 20, ox + 24, 0, 2, oz - 40, oz - 36, D); wparkLabel(g, '4 RUN-JUMP-RUN', ox + 22, oz - 1, 0, '#7a3a98');
-  // 5 CORNERS (orange): an inside corner (an L) and an outside corner (a block)
-  box(ox + 30, ox + 30.5, 0, H.corner, oz - 12, oz + 2, O); box(ox + 30.5, ox + 42, 0, H.corner, oz - 12.5, oz - 12, O); box(ox + 36, ox + 42, 0, H.corner, oz + 2, oz + 8, 0xc04f22); wparkLabel(g, '5 CORNERS', ox + 36, oz - 6, 0, '#b04010');
-  boxGrid(); Z.on = { g, boxes }; player.pos.set(ox + 8, 0, oz + 6); player.vel.set(0, 0, 0); player.faceH = player.heading = Math.PI; cam.az = Math.PI; }
+  for (const P of T.pieces) { const [x0, x1, y0, y1, z0, z1] = P.box, m = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), mat(P.c)); m.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); m.castShadow = m.receiveShadow = true; m.name = P.id; g.add(m);
+    const b = { minx: x0, maxx: x1, miny: y0, maxy: y1, minz: z0, maxz: z1, id: P.id }; boxes.push(b); by[P.id] = b; if (P.label) wparkLabel(g, P.label[0], P.label[1], P.label[2], 0, P.label[3]); }
+  const am = new THREE.MeshBasicMaterial({ map: gymArrowTex(), transparent: true, depthWrite: false, opacity: .9 }), ag = new THREE.PlaneGeometry(2.2, 2.2);
+  for (const [id, side, u, y, ang] of T.arrows) { const b = by[id]; if (!b) continue; const m = new THREE.Mesh(ag, am);
+    const nx = side === '+x' ? 1 : side === '-x' ? -1 : 0, nz = side === '+z' ? 1 : side === '-z' ? -1 : 0, tx = -nz, tz = nx;     // the face's +tangent (-nz, nx)
+    const fx = nx > 0 ? b.maxx : nx < 0 ? b.minx : 0, fz = nz > 0 ? b.maxz : nz < 0 ? b.minz : 0;
+    const sx = tx > 0 ? b.minx : tx < 0 ? b.maxx : 0, sz = tz > 0 ? b.minz : tz < 0 ? b.maxz : 0;     // the face's start along +tangent
+    m.position.set(nx ? fx + nx * .03 : sx + tx * u, y, nz ? fz + nz * .03 : sz + tz * u); m.lookAt(m.position.x + nx, y, m.position.z + nz);
+    m.rotateZ(ang * Math.PI / 180); g.add(m); }     // +tangent reads to the viewer's LEFT, so +ang (CCW) points along it
+  return { g, boxes }; }
+function wparkBuild() { const Z = WPARK; Z.want = 2; if (Z.on) return; const R = gymBuild(GYM); scene.add(R.g); for (const b of R.boxes) BOXES.push(b);
+  boxGrid(); Z.on = { g: R.g, boxes: R.boxes }; const S = GYM.spawn; player.pos.set(S.at[0], S.at[1], S.at[2]); player.vel.set(0, 0, 0); player.faceH = player.heading = S.yaw; cam.az = S.yaw; }
 function shipBuild() { const Z = SHIPZ; Z.want = 2; if (Z.on) return; const S = shipMake(0), g = S.g; scene.add(g);
   bldTris(S.O, S.tris); for (const b of S.O.boxes) BOXES.push(b); boxGrid();
   Z.on = { g, O: S.O, climbs: S.climbs, rings: S.rings, gulls: S.gulls, sprayT: 0, bowH: 0, coreM: S.coreM, flags: S.flags, sparkAt: S.sparkAt, fish: shipFishMake(g), chimney: S.chimney, whale: shipWhaleMake(), serpent: shipSerpentMake() }; bldXrayTag(g); shipHome(); }
@@ -30762,20 +30812,22 @@ function stepWall(dt) {
 // find the lip he just left (`ledgeFind`, asked at his FEET's height) and go into the hang through `ledgeSt` 'drop': the library's
 // Braced_Hang_To_Crouch played BACKWARDS (`hang_drop`), his facing turned round to the wall at once (the drawn yaw eases it, `p.turnOff`), and
 // his HANDS PINNED to the lip the whole way (`ledgeHandsPose`) -- the clip's own body swings down under them. TOOLS > EDGE HANG.
-const EDGEHANG = { pinIn: .15, on: 1, maxV: 5, minDrop: 1.6, airT: .2, rate: 1.15, reach: .7 };
-try { if (localStorage.getItem('mel.edgehang') === '0') EDGEHANG.on = 0; } catch (e) {}
+const EDGEHANG = { mode: 'BLEND', blendDur: .5, turnHL: .12, pinIn: .15, on: 1, maxV: 5, minDrop: 1.6, airT: .2, rate: 1.15, reach: .7 };
+try { if (localStorage.getItem('mel.edgehang') === '0') EDGEHANG.on = 0; const v = localStorage.getItem('mel.edgemode'); if (v === 'BLEND' || v === 'CLIP') EDGEHANG.mode = v; } catch (e) {}
 function edgeHangTry() { const p = player, E = EDGEHANG;
   if (!E.on || !LEDGE.on || p.grounded || p.jumps || p.vel.y > .05 || p.airT > E.airT || p.edgeTried || (p.ledgeCool > 0) || p.wrun || p.bar || p.rope || p.zip || p.board || p.dragon || p.wing || p.knock || p.slam) { if (p.grounded) p.edgeTried = 0; return 0; }
   p.edgeTried = 1; if (Math.hypot(p.vel.x, p.vel.z) > E.maxV || !rig.actions || !rig.actions.hang_drop || !rig.actions[LEDGE.clips.hang]) return 0;
   const L = ledgeFind(p.pos.x, p.pos.y - RIG.height * LEDGE.hang * bodyK(), p.pos.z, p.r + E.reach); if (!L) return 0;
   const gy = groundAt(p.pos.x + L.nx * .4, p.pos.z + L.nz * .4, p.pos.y - .1, 0); if (gy > L.y - E.minDrop) return 0;
-  const h0 = p.faceH; if (!ledgeGo(L)) return 0; p.ledgeSt = 'drop'; p.ledgeDropDur = clipLen('hang_drop') / E.rate; p.pos.y = Math.max(p.pos.y, L.y - .02);
+  const h0 = p.faceH; if (!ledgeGo(L)) return 0; p.pos.y = Math.max(p.pos.y, L.y - .02);
+  if (E.mode === 'BLEND') { p.ledgeSt = 'in'; p.ledgeInDur = E.blendDur; p.lx0 = p.pos.x; p.ly0 = p.pos.y; p.lz0 = p.pos.z; p.faceH = p.heading = Math.atan2(-L.nx, -L.nz); p.turnOff = wrapAngle(h0 - p.faceH); p.turnOffHL = E.turnHL; EDGEHANG.n = (EDGEHANG.n || 0) + 1; return 1; }     // m15xx: his pick -- no clip, standing BLENDS into the hang
+  p.ledgeSt = 'drop'; p.ledgeDropDur = clipLen('hang_drop') / E.rate;
   p.lx0 = p.pos.x; p.ly0 = p.pos.y; p.lz0 = p.pos.z; p.faceH = p.heading = Math.atan2(-L.nx, -L.nz); p.turnOff = wrapAngle(h0 - p.faceH); EDGEHANG.n = (EDGEHANG.n || 0) + 1; return 1; }
 function ledgeGo(L) {
   if (mphBare()) return 0;             // no hang clips without zap's pool on him (m119)
   const p = player;
   swapStop(); triggerStop();
-  p.ledge = L; p.ledgeSt = 'in'; p.ledgeT = 0; p.ledgeOff = 0; p.ledgeSide = 0;
+  p.ledge = L; p.ledgeSt = 'in'; p.ledgeT = 0; p.ledgeOff = 0; p.ledgeSide = 0; p.ledgeInDur = 0; p.lhDh = 0; p.lhDv = 0; p.lhPrev = null;     /* m15xx */
   p.lx0 = p.pos.x; p.ly0 = p.pos.y; p.lz0 = p.pos.z;
   p.vel.set(0, 0, 0);
   p.melee = 0; p.roll = 0; p.slam = 0; p.flip = ''; p.block = 0; p.center = 0;
@@ -31028,9 +31080,9 @@ function stepLedge(dt) {
     p.pos.x = lerp(p.lx0, H.x, e); p.pos.y = lerp(p.ly0, H.y, e); p.pos.z = lerp(p.lz0, H.z, e); if (u >= 1) { p.ledgeSt = 'hold'; p.ledgeT = 0; } return; }
   // ---- the swing onto the lip
   if (p.ledgeSt === 'in') {
-    const u = clamp(p.ledgeT / LEDGE.grabDur, 0, 1), e = u * u * (3 - 2 * u);
+    const u = clamp(p.ledgeT / (p.ledgeInDur || LEDGE.grabDur), 0, 1), e = u * u * (3 - 2 * u);     /* m15xx: the walk-off's blend is longer */
     p.pos.x = lerp(p.lx0, H.x, e); p.pos.y = lerp(p.ly0, H.y, e); p.pos.z = lerp(p.lz0, H.z, e);
-    if (u >= 1) { p.ledgeSt = 'hold'; p.ledgeT = 0; }
+    if (u >= 1) { p.ledgeSt = 'hold'; p.ledgeT = 0; p.ledgeInDur = 0; }
     return;
   }
 
@@ -68286,7 +68338,7 @@ function frameBody() {
     else if (player.board && !player.blade) rig.root.position.y += board.deck;
     // ON HER SKATES THE GUN TURNS HER WHOLE BODY, her swivel (m271) -- not his rigid barrel comp
     rig.root.rotation.x = 0;           // m1034: the high bar writes the whole quaternion (`hbarPose`); its pitch must not outlive it
-    if (player.turnOff) { player.turnOff *= Math.exp(-dt * .693 / WRUN.turnHalf); if (Math.abs(player.turnOff) < .01) player.turnOff = 0; }     // m1836
+    if (player.turnOff) { player.turnOff *= Math.exp(-dt * .693 / (player.turnOffHL || WRUN.turnHalf)); if (Math.abs(player.turnOff) < .01) { player.turnOff = 0; player.turnOffHL = 0; } }     // m1836
     rig.root.rotation.y = player.faceH + (player.turnOff || 0) + rig.faceOff + RIG.spin + (bladeOn() ? ((rig.bl && rig.bl.body) || 0) : aimComp(dt));
     rig.drawnYaw = rig.root.rotation.y;
     // **THE BARREL ROLL (m167).** No clip: the whole of him turns about his own forward axis,
