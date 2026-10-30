@@ -15328,7 +15328,7 @@ function arenaUi() {
       else if (a === 'asprint') { AUTOSPRINT.on = AUTOSPRINT.on ? 0 : 1; try { localStorage.setItem('mel.autosprint', AUTOSPRINT.on); } catch (err) {} }     // m1809
       else if (a === 'kauto') { CHARGE3.auto = CHARGE3.auto === 'CHAIN' ? 'SINGLE' : 'CHAIN'; try { localStorage.setItem('mel.kauto', CHARGE3.auto); } catch (err) {} }     // m1798
       else if (a === 'ltapj') { LTAP.jump = LTAP.jump ? 0 : 1; try { localStorage.setItem('mel.ltapjump', LTAP.jump); } catch (err) {} }     // m1836
-      else if (a === 'edgehang') { EDGEHANG.on = EDGEHANG.on ? 0 : 1; try { localStorage.setItem('mel.edgehang', EDGEHANG.on); } catch (err) {} }     // m15xx
+      else if (a === 'edgehang') { EDGEHANG.on = EDGEHANG.on ? 0 : 1; try { localStorage.setItem('mel.edgehang', EDGEHANG.on); } catch (err) {} }     // m1837
       else if (a === 'wproxy') { WRUN.proxy = WRUN.proxy ? 0 : 1; if (!WRUN.proxy) rig.root.visible = true; }     // m1833
       else if (a === 'uplook') { WRUN.upLook = WRUN.upLook === 'RUN' ? 'CLIP' : 'RUN'; try { localStorage.setItem('mel.uplook', WRUN.upLook); } catch (err) {} }     // m1836
       else if (a === 'uparms') { WRUN.upArms = WRUN.upArms === 'RUN' ? 'CLIMB' : 'RUN'; try { localStorage.setItem('mel.uparms', WRUN.upArms); } catch (err) {} }     // m1830
@@ -28869,7 +28869,7 @@ const LHANDS = { on: 1, in: .05, up: .06, armDown: .92, off: .12, straight: .93,
 const _lhS = new THREE.Vector3(), _lhT = new THREE.Vector3(), _lhP = new THREE.Vector3(), _lhE = new THREE.Vector3();
 function ledgeHandsPose() { const p = player, L = p.ledge; if (!LHANDS.on || !L || !rig.bones || p.ledgeSt === 'up') return; const B = rig.bones, tx = -L.nz, tz = L.nx, oneHand = slotNow().blade;
   rig.root.updateMatrixWorld(true);
-  if (p.ledgeSt === 'drop') { const LH = B.mixamorig_LeftHand, RH = B.mixamorig_RightHand; if (!LH || !RH) return;     // m15xx: the walk-off swings down UNDER his hands
+  if (p.ledgeSt === 'drop') { const LH = B.mixamorig_LeftHand, RH = B.mixamorig_RightHand; if (!LH || !RH) return;     // m1837: the walk-off swings down UNDER his hands
     LH.getWorldPosition(_lhP); RH.getWorldPosition(_lhE); _lhP.add(_lhE).multiplyScalar(.5); const s0 = (_lhP.x - L.cx) * tx + (_lhP.z - L.cz) * tz;
     const k = clamp(p.ledgeT / (p.ledgeDropDur * EDGEHANG.pinIn), 0, 1);
     rig.root.position.x += (L.cx + tx * s0 - L.nx * LHANDS.in - _lhP.x) * k; rig.root.position.z += (L.cz + tz * s0 - L.nz * LHANDS.in - _lhP.z) * k; rig.root.position.y += (L.y + LHANDS.up - _lhP.y) * k;
@@ -30690,7 +30690,7 @@ function stepWall(dt) {
 // and no second gesture, which is `wallGo`'s own rule one surface up. **AND CATCHING ONE WHILE
 // RISING IS DELIBERATE**, not an oversight: jumping at a fire escape and being caught by it on
 // the way up is the move, and a test for `vel.y < 0` would take it away.
-// m15xx (his: "if you're near the edge and you walk off, he should go down to a ledge hang automatically -- almost the reverse, a little somersault
+// m1837 (his: "if you're near the edge and you walk off, he should go down to a ledge hang automatically -- almost the reverse, a little somersault
 // twist from standing on top to the hang"): the first frames off a top WITHOUT a jump (`jumps` 0, not rising, under `maxV`, a real drop below)
 // find the lip he just left (`ledgeFind`, asked at his FEET's height) and go into the hang through `ledgeSt` 'drop': the library's
 // Braced_Hang_To_Crouch played BACKWARDS (`hang_drop`), his facing turned round to the wall at once (the drawn yaw eases it, `p.turnOff`), and
@@ -30941,7 +30941,7 @@ function stepLedge(dt) {
   p.vel.set(0, 0, 0); p.speed = 0; p.grounded = false; p.airT = 0; p.jumps = 1;
   const H = ledgeAt(L, _lp);
 
-  if (p.ledgeSt === 'drop') { const u = clamp(p.ledgeT / p.ledgeDropDur, 0, 1), e = u * u * (3 - 2 * u);     // m15xx: the walk-off; the hands are pinned in ledgeHandsPose
+  if (p.ledgeSt === 'drop') { const u = clamp(p.ledgeT / p.ledgeDropDur, 0, 1), e = u * u * (3 - 2 * u);     // m1837: the walk-off; the hands are pinned in ledgeHandsPose
     p.pos.x = lerp(p.lx0, H.x, e); p.pos.y = lerp(p.ly0, H.y, e); p.pos.z = lerp(p.lz0, H.z, e); if (u >= 1) { p.ledgeSt = 'hold'; p.ledgeT = 0; } return; }
   // ---- the swing onto the lip
   if (p.ledgeSt === 'in') {
@@ -33922,7 +33922,7 @@ function stepPlayer(dt) {
   // returns. Above the gait, below the slam, beside cover -- one place, one order.
   if (p.ledgeCool > 0) p.ledgeCool = Math.max(0, p.ledgeCool - dt);
   if (p.ledgeAway > 0) p.ledgeAway = Math.max(0, p.ledgeAway - dt);
-  if (!p.ledge && edgeHangTry()) { /* m15xx: walked off an edge -> down into the hang */ }
+  if (!p.ledge && edgeHangTry()) { /* m1837: walked off an edge -> down into the hang */ }
   if (p.ledge) { stepLedge(dt); return; }
   if (p.barCool > 0) p.barCool = Math.max(0, p.barCool - dt);     // m1034: THE HIGH BAR owns the body like the ledge
   if (!p.zip && !p.grounded && ZIPS.length && !p.rope && !p.bar && !p.knock && p.vel.y < 6) zipCatch();     // m1168
@@ -35594,7 +35594,7 @@ function rigAnim(dt) {
     // wall cover (m99) and for a reason that is in the clips: `idle_to_wall_cover_right` carries
     // its own half turn and `ledge_hang_idle` does not, which the hand measurement is what says
     // (hands at local +Z rather than -Z). Two surfaces, two answers, one derivation each.
-    if (p.ledgeSt === 'drop' && rig.actions.hang_drop) { const a = rig.actions.hang_drop, d = a.getClip().duration; a.timeScale = 0; a.time = d * (1 - clamp(p.ledgeT / p.ledgeDropDur, 0, 1)) * .999; t.hang_drop = 1; setWeights(t, dt, .03); return; }     // m15xx: BACKWARDS, by hand
+    if (p.ledgeSt === 'drop' && rig.actions.hang_drop) { const a = rig.actions.hang_drop, d = a.getClip().duration; a.timeScale = 0; a.time = d * (1 - clamp(p.ledgeT / p.ledgeDropDur, 0, 1)) * .999; t.hang_drop = 1; setWeights(t, dt, .03); return; }     // m1837: BACKWARDS, by hand
     const nm = p.ledgeSt === 'up' ? LEDGE.clips.up
              : p.ledgeSt === 'hop' ? (p.ledgeSide > 0 ? LEDGE.clips.L : LEDGE.clips.R)
              : LEDGE.clips.hang;

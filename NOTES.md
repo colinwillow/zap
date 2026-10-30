@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## Walk off an edge -> down into the hang (m15xx)
+## Walk off an edge -> down into the hang (m1837)
 *"If you're near the edge and you walk off, he should go down to a ledge hang automatically -- almost in reverse, a little somersault twist
 from standing on top to the hang."*
 - No "stand to hang" clip in the library, but `Braced_Hang_To_Crouch` BACKWARDS is the move: baked onto Grumbo as `hang_drop` (33 roles,
