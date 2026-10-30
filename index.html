@@ -980,7 +980,7 @@ body.kit3 #wepRow text { font-size: 12px; }
 <div id="fxKey"><b>FX</b><i data-fx="sun">SUN</i><i data-fx="sky">HDRI</i><i data-fx="shafts">RAYS</i><i data-fx="ibl">IBL</i><i data-fx="dust">DUST</i><i data-fx="tint">TINT</i><i data-fx="flat">FLAT</i><i data-fx="rim">RIM</i><i data-fx="toon">TOON</i><i data-fx="paint">PAINT</i><i data-fx="doors">DOORS</i><i data-fx="inside">INSIDE</i><i data-fx="run">RUN</i><i data-fx="res">RES</i><i data-fx="tune">TUNE</i></div>
 
 <div class="zone" id="zoneL"></div><div class="zone" id="zoneR"></div>
-<div class="pad" id="padL"><div class="knob"></div><div class="hint">move &middot; tap = jump</div></div>
+<div class="pad" id="padL"><div class="knob"></div><div class="hint">move</div></div>
 <div id="aim3ring"><i></i></div>
 <div class="pad" id="padR"><div class="knob"></div><svg class="pkico" viewBox="0 0 24 24" fill="#fff" stroke="#0b0d12" stroke-width="1.2" stroke-linejoin="round"><path d="M8 11V5.5a1.5 1.5 0 0 1 3 0V10V4a1.5 1.5 0 0 1 3 0v6V5a1.5 1.5 0 0 1 3 0v6.5V8a1.5 1.5 0 0 1 3 0v6c0 4.4-3 7.5-7 7.5c-3.2 0-5-1.6-6.6-4.2L3.6 13a1.6 1.6 0 0 1 2.6-1.8L8 13z"/></svg><div class="hint">look &middot; tap = jump</div></div>
 <div id="talk"><span class="nm"></span><span class="tx"></span><span class="go"></span></div>
@@ -13177,10 +13177,18 @@ function wrunGo(W, kind, mx, mz, upV) {
   snd('swoosh', { r: .9, g: .5 }); return 1;
 }
 function wrunEnd(push) {
-  const p = player, R = p.wrun; if (!R) return; p.wrun = null; p.wallAirSnap = .25; p.wrunCool = WRUN.cool; p.wrunCoolB = R.b;
+  const p = player, R = p.wrun; if (!R) return; p.wrun = null; p.ljump = 0; p.wallAirSnap = .25;     /* m15xx: a long jump into the wall left ljump set, so the jump off it played the long jump's hurdle */ p.wrunCool = WRUN.cool; p.wrunCoolB = R.b;
   if (push) { p.vel.x += R.nx * push; p.vel.z += R.nz * push; }
 }
-function wrunJump() {
+// m15xx: THE STICK ON THE WALL, IN SCREEN TERMS (m1833's rule, now for the jump too). stickWorld is camera-relative and the wall cam swings
+// the camera, so "up" read through it came out as "away" -- *"no matter what he jumps out away from the wall"*. Pad up = into / up the wall
+// (`tin`), pad sideways = along it (`ts`, on the tangent (-nz, nx)), signed by the camera's right vector.
+function wrunStick(R) { const SL = stick.L, sm = SL.down ? Math.hypot(SL.x, SL.y) : 0; if (sm < .25) return { tin: 0, ts: 0, mag: 0 };
+  const cr = camera.matrixWorld.elements, tsg = (-R.nz * cr[0] + R.nx * cr[2]) >= 0 ? 1 : -1; return { tin: -SL.y / sm, ts: SL.x * tsg / sm, mag: sm }; }
+// m15xx: OFF THE WALL HE TURNS, HE DOES NOT POP. The jump sets the facing outright (one writer); the DRAWN yaw carries the difference
+// (`p.turnOff`) and eases it out over `WRUN.turnHalf` -- *"he sort of teleports or does a 180 spin, there's no real transition"*.
+function wrunJump() { const p = player, h0 = p.faceH, r = wrunJump0(); if (r) { p.ljump = 0; p.turnOff = wrapAngle(h0 - p.faceH); } return r; }
+function wrunJump0() {
   const p = player, R = p.wrun;
   // m1776 (his: "the angle of jumping out away from the wall seems to be only directly orthogonal -- there should be variation"): off ANY state the
   // jump leaves along the normal (`wjOut`) PLUS, along the wall, the left stick's share of it (`jumpSide` x its tangent component) and `keep` of
@@ -13188,10 +13196,10 @@ function wrunJump() {
   // m1826 (his: "running straight up the wall: holding UP and jump -- he jumps straight up, to grab the ledge above; let go of up and jump -- he jumps
   // straight out away from the wall, and the camera turns to see where he's going"): on the RUN-UP, the stick toward the wall (`tin` > .5) + jump =
   // a fresh climb (`upJumpV`), still on the face; anything else = turned round and kicked straight out (no back flip), the lens swung behind him
-  if (R.kind === 'up') { const S = stickWorld(), tin = S.mag > .3 ? (S.x * -R.nx + S.z * -R.nz) / S.mag : 0;
+  if (R.kind === 'up' || (R.velMode && R.kind !== 'slide' && R.a != null && Math.abs(R.a) < WRUN.upJumpA)) { const tin = wrunStick(R).tin;     /* m15xx: the VEL run's near-vertical leg counts as the run-up too */
     if (tin > .5) { p.vel.y = Math.max(p.vel.y, WRUN.upJumpV); R.t0 = R.t; R.upOK = 1; R.vy0 = p.vel.y; if (R.upV != null) R.upV = Math.max(R.upV, WRUN.upJumpV); snd('swoosh', { r: 1.25, g: .45 }); WRUN.stat = WRUN.stat || {}; WRUN.stat.upJumps = (WRUN.stat.upJumps || 0) + 1; return 1; }
     wrunEnd(0); p.vel.set(R.nx * WRUN.wjOut, WRUN.wjUp, R.nz * WRUN.wjOut); p.faceH = p.heading = Math.atan2(R.nx, R.nz); p.camWant = p.faceH; p.wallCamT = 0; p.jumps = 1; p.grounded = false; snd('swoosh', { r: 1.1, g: .55 }); return 1; }
-  if (WRUN.jumpVar && (R.velMode || R.head !== undefined)) { const S = stickWorld(), tx = -R.nz, tz = R.nx, ts = S.mag > .25 ? S.x * tx + S.z * tz : 0, along = ts * WRUN.jumpSide + (R.kind !== 'slide' ? (R.vt != null ? R.vt : (R.dx * tx + R.dz * tz) * (R.v || 0)) * WRUN.keep : 0);
+  if (WRUN.jumpVar && (R.velMode || R.head !== undefined)) { const tx = -R.nz, tz = R.nx, ts = wrunStick(R).ts, along = ts * WRUN.jumpSide + (R.kind !== 'slide' ? (R.vt != null ? R.vt : (R.dx * tx + R.dz * tz) * (R.v || 0)) * WRUN.keep : 0);
     const backflip = R.kind === 'up' && Math.abs(ts) < .3; wrunEnd(0);
     if (backflip) { p.vel.set(R.nx * WRUN.offV + tx * along, WRUN.offUp, R.nz * WRUN.offV + tz * along); p.aflipPop = 1; airFlipGo(0, 1, 1); }
     else { p.vel.set(R.nx * WRUN.wjOut + tx * along, WRUN.wjUp, R.nz * WRUN.wjOut + tz * along); p.faceH = p.heading = Math.atan2(p.vel.x, p.vel.z); }
@@ -13261,6 +13269,15 @@ function wrunPose() {
   // face with the hips at .5, the legs trailing AWAY from the wall. Now each leg is a two-bone IK onto a point ON the face (`wrLimb`, its knee bent
   // toward a pole), the foot turned so its toes point up the wall, and the hips held a set distance off it -- so the soles are on the wall by
   // construction, whatever the clip under it does. The perch adds both hands on the face above his head.
+  // m15xx (his: "use the run animation and bend his hips about 20 degrees, slanted up the wall, and compensate with the torso so it's still straight
+  // up and down"): on the VEL run's vertical share (cos^2 of R.a), the whole drawn body pitches `upHip` rad back about his right axis (pivot at the
+  // feet: head off the wall, feet onto it), slid in so the soles meet the face, and the spine turns the same angle forward so the chest is upright.
+  if (WRUN.upLook === 'RUN' && R.velMode && R.kind !== 'slide' && R.a != null) { const c = Math.cos(R.a), wu = (c > 0 ? c * c : 0) * Math.min(1, R.t / WRUN.upIn);
+    if (wu > .01) { const fx = Math.sin(p.faceH), fz = Math.cos(p.faceH); _wrA.set(-fz, 0, fx); _wrQ.setFromAxisAngle(_wrA, WRUN.upHip * wu); rig.root.quaternion.premultiply(_wrQ);     // his right is (-fz, fx)
+      const inn = (p.r + WRUN.gap - WRUN.upFootIn) * wu; rig.root.position.x -= R.nx * inn; rig.root.position.z -= R.nz * inn;
+      const sp = rig.bones && (rig.bones.mixamorig_Spine || rig.bones.mixamorig_Spine1);
+      if (sp) { rig.root.updateMatrixWorld(true); sp.getWorldQuaternion(_wrQ2); _wrQ.setFromAxisAngle(_wrA, -WRUN.upHip * WRUN.upTorso * wu).multiply(_wrQ2); sp.parent.getWorldQuaternion(_wrQ3).invert(); sp.quaternion.copy(_wrQ3.multiply(_wrQ)); sp.updateMatrixWorld(true); } }
+    if (wu > .99 || R.kind === 'up') return; }
   if (R.kind === 'up' && WRUN.upClip && rig.actions && rig.actions.wall_up) { const k = Math.min(1, (R.t - (R.t0 || 0)) / .12), off = (WRUN.upClipD * (rig.hipY || .77) * bodyK() - (player.r + WRUN.gap)) * k;     // m1828: the clip's body, held its own distance off the face
     rig.root.position.x += R.nx * off; rig.root.position.z += R.nz * off; return; }
   if (R.kind === 'up' || R.kind === 'slide') { if (!rig.bones) return; wrunSolve(R); return; }
@@ -13279,7 +13296,8 @@ function wrunPose() {
     sp.parent.getWorldQuaternion(_wrQ3).invert(); sp.quaternion.copy(_wrQ3.multiply(_wrQ)); sp.updateMatrixWorld(true); }
 }
 const _wrQ2 = new THREE.Quaternion(), _wrQ3 = new THREE.Quaternion();
-Object.assign(WRUN, { gripT: .35, rampT: .9, capV: 8, capHalf: .12, topV: 3.5, proxy: 0, upArms: 'RUN', upArmTs: 1.5, sideClip: 1, sideLean: .65, sideTorso: .25, sideRef: 5.5, steer: 2.6, upClip: 1, upClipD: .45, upClipRef: 3.2, upClipTs: [1.8, 3.4],     /* m1831: a RUNNING cadence (his: "the pace of the climb, really slow") */ upD: .8, upFoot: -.12, upAmp: .34, upLift: .26, upToeIn: .15, upJumpV: 9.5,     /* m1827: m1826's pose REVERTED (his: "even worse, horrendous") -- the jumps stay */     /* m1826 (his: "not a chair at 90 degrees -- down at 45 or less, knees with room to run, toes brushing the wall, not flat-footed"): hips closer (upD .8 -> .5), feet lower under him (upFoot -.12 -> -.55), toes turned INTO the wall (`upToeIn`) */ upD0: .8, upRate: 2.4, upW: .14, upTorso: .32, perchD: .42, perchFoot: -.18, perchKnee: -.55, perchFwd: .12, perchDrop: .22, perchLean: .45, perchW: .2, perchHand: .05, perchHandW: .55, ik: 1 });     /* m1683: the perch faces away -- back to the wall, a foot planted on it behind, hands back on it at the hips */
+Object.assign(WRUN, { upLook: 'RUN', upHip: .35, upTorso: 1, upIn: .15, upFootIn: .12, upRunK: 1, upRunTs: [.9, 2.6], upJumpA: .6, offBlend: .07, turnHalf: .09, gripT: .35, rampT: .9, capV: 8, capHalf: .12, topV: 3.5, proxy: 0, upArms: 'RUN', upArmTs: 1.5, sideClip: 1, sideLean: .65, sideTorso: .25, sideRef: 5.5, steer: 2.6, upClip: 1, upClipD: .45, upClipRef: 3.2, upClipTs: [1.8, 3.4],     /* m1831: a RUNNING cadence (his: "the pace of the climb, really slow") */ upD: .8, upFoot: -.12, upAmp: .34, upLift: .26, upToeIn: .15, upJumpV: 9.5,     /* m1827: m1826's pose REVERTED (his: "even worse, horrendous") -- the jumps stay */     /* m1826 (his: "not a chair at 90 degrees -- down at 45 or less, knees with room to run, toes brushing the wall, not flat-footed"): hips closer (upD .8 -> .5), feet lower under him (upFoot -.12 -> -.55), toes turned INTO the wall (`upToeIn`) */ upD0: .8, upRate: 2.4, upW: .14, upTorso: .32, perchD: .42, perchFoot: -.18, perchKnee: -.55, perchFwd: .12, perchDrop: .22, perchLean: .45, perchW: .2, perchHand: .05, perchHandW: .55, ik: 1 });     /* m1683: the perch faces away -- back to the wall, a foot planted on it behind, hands back on it at the hips */
+try { const v = localStorage.getItem('mel.uplook'); if (v === 'RUN' || v === 'CLIP') WRUN.upLook = v; } catch (e) {}
 try { const v = localStorage.getItem('mel.uparms'); if (v === 'RUN' || v === 'CLIMB') WRUN.upArms = v; } catch (e) {}
 const _wsA = new THREE.Vector3(), _wsB = new THREE.Vector3(), _wsC = new THREE.Vector3(), _wsT = new THREE.Vector3(), _wsK = new THREE.Vector3(), _wsQ = new THREE.Quaternion(), _wsQ2 = new THREE.Quaternion();
 // two bones onto `T`, the middle joint bent toward `pole` (a world direction); `end` turned so its child points along `aim` (optional)
@@ -15309,7 +15327,9 @@ function arenaUi() {
       else if (a === 'idlepick') { const I = IDLEPICK; I.pick = I.picks[(I.picks.indexOf(I.pick) + 1) % I.picks.length]; try { localStorage.setItem('mel.idlepick2', I.pick); } catch (err) {} }     // m1815
       else if (a === 'asprint') { AUTOSPRINT.on = AUTOSPRINT.on ? 0 : 1; try { localStorage.setItem('mel.autosprint', AUTOSPRINT.on); } catch (err) {} }     // m1809
       else if (a === 'kauto') { CHARGE3.auto = CHARGE3.auto === 'CHAIN' ? 'SINGLE' : 'CHAIN'; try { localStorage.setItem('mel.kauto', CHARGE3.auto); } catch (err) {} }     // m1798
+      else if (a === 'ltapj') { LTAP.jump = LTAP.jump ? 0 : 1; try { localStorage.setItem('mel.ltapjump', LTAP.jump); } catch (err) {} }     // m15xx
       else if (a === 'wproxy') { WRUN.proxy = WRUN.proxy ? 0 : 1; if (!WRUN.proxy) rig.root.visible = true; }     // m1833
+      else if (a === 'uplook') { WRUN.upLook = WRUN.upLook === 'RUN' ? 'CLIP' : 'RUN'; try { localStorage.setItem('mel.uplook', WRUN.upLook); } catch (err) {} }     // m15xx
       else if (a === 'uparms') { WRUN.upArms = WRUN.upArms === 'RUN' ? 'CLIMB' : 'RUN'; try { localStorage.setItem('mel.uparms', WRUN.upArms); } catch (err) {} }     // m1830
       else if (a === 'wallmode') { WRUN.mode = WRUN.mode === 'VEL' ? 'STICK' : 'VEL'; try { localStorage.setItem('mel.wallmode', WRUN.mode); } catch (err) {} }     // m1776
       else if (a === 'arcline') { BARC.line = BARC.line ? 0 : 1; try { localStorage.setItem('mel.arcline', BARC.line); } catch (err) {} }     // m1759
@@ -15383,7 +15403,7 @@ function arenaUi() {
   // in the RED HOLLOWS (his: "I need the debug menu in there so I can transform it between the two states") the bar is the STATE switch + TOOLS
   let h = '<div class="ar-bar">' + (inHome() ? B('age', (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + '<small>tap: ' + (AGE.st === 'fallen' ? 'restore it all' : 'make it fall') + '</small>', '', 'ar-main' + (AGE.st === 'fallen' ? '' : ' on'))
     : B('open', ARENA.busy ? 'BEAMING...' : 'SPAWN', '', 'ar-main' + (m ? ' on' : '')) + B('clear', 'CLEAR') + B('morph', 'MORPH') + B('vend', 'VEND')) + B('tools', tools ? 'TOOLS ▴' : 'TOOLS ▾', '', ARENA.tools ? 'ar-on' : '') +
-    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('climbspd', 'CLIMB ' + CLIMB.speed.toFixed(1) + ' m/s') + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('qd', 'QUICK DRAW ' + (QD.on ? 'ON' : 'OFF')) + B('idlepick', 'IDLE ' + IDLEPICK.pick) + B('idleamp', 'IDLE ENERGY x' + IDLEPICK.energy) + B('asprint', 'SPRINT ' + (AUTOSPRINT.on ? 'AUTO (run builds it)' : 'HOLD (right stick)')) + B('kauto', 'K-AUTO ' + CHARGE3.auto) + B('wproxy', 'WALL PROXY ' + (WRUN.proxy ? 'BALL' : 'OFF')) + B('uparms', 'WALL UP ARMS ' + WRUN.upArms) + B('wallmode', 'WALL ' + (WRUN.mode === 'VEL' ? 'VELOCITY' : 'STICK')) + B('arcline', 'BOW ARC ' + (BARC.line ? 'LINE' : 'OFF')) + B('partaim', 'PART AIM ' + (PARTAIM.on ? (PARTAIM.by === 'L' ? 'LEFT' : 'RIGHT') : 'OFF')) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('btrail', 'TRAIL ' + (BTRAIL.jin ? 'JIN' : 'BLUE')) + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('sample', 'DNA SAMPLE ' + (SAMPLE.on ? 'ON' : 'OFF')) + B('runslash', 'RUN SLASH ' + (RUNSLASH.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('dsky', 'SKY ' + DOJO.skyPick) + B('dfx', 'DOJO FX ' + (DOJO.fx || 'FULL')) + B('rwsky', 'HOLLOWS SKY ' + RW.skyPick + (RW.skyKey && /restored/.test(RW.skyKey) ? ' (restored)' : ' (fallen)')) + B('wob', 'HAND-BUILT ' + (HWWOB.amp.value ? (HWWOB.amp.value * 1000).toFixed(0) + ' mm' : 'OFF (ruler)')) + B('dragon', 'DRAGON ' + (DRAGZ.on ? DRAGZ.look : DOJO.dragonPick)) + B('dwing', 'DRAGON WINGS ' + DRAGZ.wingPick) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
+    (tools ? '<div class="ar-tools">' + Hd('MOVE') + B('run', 'RUN ' + GAIT.runSet.toUpperCase()) + B('sprint', 'SPRINT ' + NINJA.look) + B('rhold', 'RIGHT HOLD ' + CROUCH.mode) + B('lhold', 'LEFT HOLD ' + LHOLD.pick) + B('prewarm', 'PRELOAD ' + (BOOTWARM.kinds ? 'ALL (no stutter)' : 'FAST (stutters)')) + B('runland', 'RUN LAND ' + RUNLAND.mode) + B('climbspd', 'CLIMB ' + CLIMB.speed.toFixed(1) + ' m/s') + B('airlegs', 'AIR LEGS ' + (AIRLEGS.on ? 'ON' : 'OFF')) + B('jfloat', 'JUGGLE FLOAT ' + (JUGGLE.float ? 'ON' : 'OFF')) + B('toprun', 'TOP SPEED ' + (GAIT.topRun ? 'RUN SPED UP' : 'OWN CLIP')) + B('runarm', 'RUN ARMS ' + RUNARM.out) + B('landfov', 'LAND FOV ' + CAM.landFov) + B('acam', 'ACTION CAM ' + (ACAM.on ? 'ON' : 'OFF')) + B('grip', 'GRIP ' + MOVE.gripPick) + B('lflick', 'LEFT ' + COVER.left) + B('qd', 'QUICK DRAW ' + (QD.on ? 'ON' : 'OFF')) + B('idlepick', 'IDLE ' + IDLEPICK.pick) + B('idleamp', 'IDLE ENERGY x' + IDLEPICK.energy) + B('asprint', 'SPRINT ' + (AUTOSPRINT.on ? 'AUTO (run builds it)' : 'HOLD (right stick)')) + B('kauto', 'K-AUTO ' + CHARGE3.auto) + B('ltapj', 'LEFT TAP ' + (LTAP.jump ? 'JUMP' : 'NOTHING')) + B('wproxy', 'WALL PROXY ' + (WRUN.proxy ? 'BALL' : 'OFF')) + B('uplook', 'WALL UP ' + (WRUN.upLook === 'RUN' ? 'RUN + HIP TILT' : 'CLIMB CLIP')) + B('uparms', 'WALL UP ARMS ' + WRUN.upArms) + B('wallmode', 'WALL ' + (WRUN.mode === 'VEL' ? 'VELOCITY' : 'STICK')) + B('arcline', 'BOW ARC ' + (BARC.line ? 'LINE' : 'OFF')) + B('partaim', 'PART AIM ' + (PARTAIM.on ? (PARTAIM.by === 'L' ? 'LEFT' : 'RIGHT') : 'OFF')) + B('cart', 'CARTWHEEL ' + CART.pose) + B('runswipe', 'SLIDE ' + RUNSWIPE.mode) + Hd('KATANA') + B('btrail', 'TRAIL ' + (BTRAIL.jin ? 'JIN' : 'BLUE')) + B('kswing', 'SWING ' + KATANA.style) + B('swseg', 'SWING LURCH ' + (SWSEG.on ? 'ON' : 'OFF')) + B('hslice', 'HORDE ' + (HORDE.slice ? 'SLICE' : 'PLAIN')) + B('defl', 'DEFLECT ASSIST ' + (DEFL.on ? 'ON' : 'OFF')) + B('sample', 'DNA SAMPLE ' + (SAMPLE.on ? 'ON' : 'OFF')) + B('runslash', 'RUN SLASH ' + (RUNSLASH.on ? 'ON' : 'OFF')) + B('aslam', 'AIR SLAM ' + SLAM.katPick) + B('sideflick', 'SIDE FLICK ' + TORNADO.pick) + B('gside', 'GUARD SIDE ' + GSIDE.by) + B('kcslow', 'K-CHARGE x' + KATANA.chargeSlow) + B('ktilt', 'TILT ' + KATANA.runTilt) + Hd('COVER') + B('carm', 'ARM ' + CARM.lift) + B('duck', 'DUCK ' + (DUCK.drop ? DUCK.drop : 'OFF')) + B('hurdle', 'HURDLE ' + VAULT.clip.toUpperCase()) + B('bargrip', 'BAR GRIP ' + HBAR.grip) + B('cblocks', COVER.show ? 'BLOCKS ON' : 'BLOCKS OFF') + B('tshot', 'TURRET ' + TURRET.shot) + B('ric', 'RICOCHET ' + RIC.mode) + B('getup', 'GET UP ' + KNOCK.getUp) + Hd('ARENA') + B('lvl', ARENA.duel.lvl) + B('forge', FORGED.on ? 'FORGE ON' : 'FORGE OFF') + B('notice', DRINK.notice === 'notice' ? 'CEO: OOH' : 'CEO: LOOK') + B('glow', 'LIGHT ' + ARENA.look.glow) + B('charge', 'CHARGE ' + ARENA.heavy.pick) + B('entry', 'ENTRY ' + ARENA.door.entry) + B('dsky', 'SKY ' + DOJO.skyPick) + B('dfx', 'DOJO FX ' + (DOJO.fx || 'FULL')) + B('rwsky', 'HOLLOWS SKY ' + RW.skyPick + (RW.skyKey && /restored/.test(RW.skyKey) ? ' (restored)' : ' (fallen)')) + B('wob', 'HAND-BUILT ' + (HWWOB.amp.value ? (HWWOB.amp.value * 1000).toFixed(0) + ' mm' : 'OFF (ruler)')) + B('dragon', 'DRAGON ' + (DRAGZ.on ? DRAGZ.look : DOJO.dragonPick)) + B('dwing', 'DRAGON WINGS ' + DRAGZ.wingPick) + B('tlie', 'TAIL ' + TAIL.lie) + B('rhue', 'RIVAL ' + RIVAL.pick) + Hd('MORPH') + B('mmode', ARENA.morph.mode) + B('mpose', 'BOSS ' + (ARENA.morph.boss.pose === 'T' ? 'T-POSE' : 'LIVE')) + B('mwave', 'WAVE ' + ARENA.morph.boss.wave) + B('stun', 'STUN ' + (ARENA.stun.on ? 'ON' : 'OFF') + (ARENA.stun.on ? '<small>' + (ARENA.stun.fail ? 'NO SKELETON' : ARENA.stun.srcs[ARENA.stun.files.human] ? 'skeleton ready' : 'loading skeleton') + '</small>' : ''), '', ARENA.stun.on ? 'ar-on' : '') + '</div>' : '') + '</div>';
   if (m === 'bld') { h += '<div class="ar-menu">' + B('back', '&lsaquo; BACK', '', 'ar-back') + B('age', 'STATE: ' + (AGE.st === 'fallen' ? 'FALLEN' : 'RESTORED') + '<small>tap to switch -- rebuilds what stands</small>', '', AGE.st === 'fallen' ? '' : 'ar-on');
     for (const E of BLDG.list) h += B('bld', E.t + '<small>' + (E.on() ? 'tap to remove' : E.pass >= 3 ? E.sub : 'IN PROGRESS · pass ' + E.pass + ' of 3') + '</small>', E.key, E.on() ? 'ar-on' : '');
     h += '</div>'; }
@@ -20840,7 +20860,7 @@ function skinWeights(skin, t, dt, snapHL, fb) {
     else if (cur > .002 || a.getEffectiveWeight() > .002 || a.isRunning()) { a.setEffectiveWeight(0); a.stop(); }
   }
 }
-function setWeights(t, dt, snapHL) { if (player.wallAirSnap > 0) { player.wallAirSnap -= dt; snapHL = Math.min(snapHL || 1, .02); } skinWeights(rig, t, dt, snapHL, CLIPS.idle); }     // m1831: off a wall, straight into the air pose (the wall clips lingered: "a weird pose in the air")
+function setWeights(t, dt, snapHL) { if (player.wallAirSnap > 0) { player.wallAirSnap -= dt; snapHL = Math.min(snapHL || 1, WRUN.offBlend); }     /* m15xx: .02 was a pop; offBlend eases it */ skinWeights(rig, t, dt, snapHL, CLIPS.idle); }     // m1831: off a wall, straight into the air pose (the wall clips lingered: "a weird pose in the air")
 // RE-ENTERING A `ONCE` CLIP HAS TO REWIND IT, AND THE DAMPED WEIGHT CANNOT BE WHAT DECIDES.
 // Rewinding only when the weight has decayed below a threshold is right for a clip you have
 // left alone and wrong for one you are re-entering immediately: roll, roll again before the
@@ -21498,9 +21518,10 @@ function cycleKit() {
 // exactly what `applySlot` does with it.
 function kitPick(n) {
   const p = player;
-  if (p.swap || p.knock || p.ledge || p.mphSt) return;     // m1018: not `p.wall` -- a weapon picked in cover is picked (the wheel was refused there)
+  if (p.swap || p.knock || p.mphSt) return;     // m15xx: not p.ledge -- *"you should always be able to switch weapons"*     // m1018: not `p.wall` -- a weapon picked in cover is picked (the wheel was refused there)
   if (n === p.slot || !WEAP.slots[n] || !gearHas(WEAP.slots[n].key)) return;   // m465: not found yet
   if (WEAP.slots[n].board && bladeOn()) return;      // on her skates a deck in her hands means nothing (m271)
+  if (p.ledge || p.wrun || p.dragon || p.bar || p.rope || p.zip || !p.grounded) { applySlot(n); return; }     // m15xx: the hands are holding on (or he is in the air): no reach clip, it simply arrives
   swapGo(n);
 }
 // ---- melee ---------------------------------------------------------------------------------
@@ -28843,17 +28864,45 @@ function ropePose() { const Z = ROPEB, p = player; if (!Z.on || !Z.bal) return; 
 // it would be normally"): HANDS ON THE LIP. Hanging (or coming in to the hang, or hopping), each hand is put by two-bone IK (`wrLimb`) on the lip
 // at the point nearest its shoulder, `in` m over the edge and `up` above the top, the elbow bent out and down. With a BLADE in hand only the LEFT
 // grips; the RIGHT arm hangs straight down at his side (`armDown` of its length below the shoulder, a little off the wall) with the sword in it.
-const LHANDS = { on: 1, in: .05, up: .03, armDown: .92, off: .12 };
+const LHANDS = { on: 1, in: .05, up: .06, armDown: .92, off: .12, straight: .93, palmK: .25, outK: .5, pullMax: .5, pitch: .45, dropMax: .6, fingers: 1, tip: .08, curl: [.55, .45, .3], thumbK: .5 };     // m15xx: straight / fingers
 const _lhS = new THREE.Vector3(), _lhT = new THREE.Vector3(), _lhP = new THREE.Vector3(), _lhE = new THREE.Vector3();
 function ledgeHandsPose() { const p = player, L = p.ledge; if (!LHANDS.on || !L || !rig.bones || p.ledgeSt === 'up') return; const B = rig.bones, tx = -L.nz, tz = L.nx, oneHand = slotNow().blade;
   rig.root.updateMatrixWorld(true);
+  // m15xx (his: "the elbows are kind of buckled in"): measured, his shoulders sat .23 m under the lip, so the IK had nothing to do but fold the arms.
+  // The DRAWN body drops until the hanging arm(s) reach the lip at `straight` of their length -- a hang on straight arms. (Drawn only; `p.pos` stays.)
+  if (LHANDS.straight) { let n = 0, len = 0; const Sm = _lhS.set(0, 0, 0);
+    for (const S of oneHand ? ['Left'] : ['Left', 'Right']) { const UA = B['mixamorig_' + S + 'Arm'], FA = B['mixamorig_' + S + 'ForeArm'], HA = B['mixamorig_' + S + 'Hand']; if (!UA || !FA || !HA) continue;
+      UA.getWorldPosition(_lhE); Sm.add(_lhE); const e = _lhE.clone(); FA.getWorldPosition(_lhE); len += e.distanceTo(_lhE); HA.getWorldPosition(_lhP); len += _lhE.distanceTo(_lhP) * (1 + LHANDS.palmK); n++; }
+    if (n) { Sm.multiplyScalar(1 / n); len /= n; const kl = len * LHANDS.straight, hs = kl * LHANDS.outK, vs = Math.sqrt(Math.max(0, kl * kl - hs * hs)), Ty = L.y + LHANDS.up;
+      const dOut = (Sm.x - L.cx) * L.nx + (Sm.z - L.cz) * L.nz + LHANDS.in, dh = clamp(dOut - hs, 0, LHANDS.pullMax), dv = clamp(Sm.y - (Ty - vs), 0, LHANDS.dropMax);     // m15xx: shoulders `dOut` off the lip's line
+      p.lhDh = damp(p.lhDh || 0, dh, .05, 1 / 60); p.lhDv = damp(p.lhDv || 0, dv, .05, 1 / 60);
+      rig.root.position.x -= L.nx * p.lhDh; rig.root.position.z -= L.nz * p.lhDh; rig.root.position.y -= p.lhDv;
+      if (LHANDS.pitch) { const fx = -L.nx, fz = -L.nz, Pv = Sm.clone(); Pv.x -= L.nx * p.lhDh; Pv.z -= L.nz * p.lhDh; Pv.y -= p.lhDv;     // pivot at the shoulders: head in, the tucked knees swing OUT off the face
+        _wrA.set(-fz, 0, fx); _wrQ.setFromAxisAngle(_wrA, -LHANDS.pitch); const r = rig.root.position.clone().sub(Pv).applyQuaternion(_wrQ); rig.root.position.copy(Pv).add(r); rig.root.quaternion.premultiply(_wrQ); }
+      rig.root.updateMatrixWorld(true); } }
   for (const [S, sd] of [['Left', -1], ['Right', 1]]) { const UA = B['mixamorig_' + S + 'Arm'], FA = B['mixamorig_' + S + 'ForeArm'], HA = B['mixamorig_' + S + 'Hand']; if (!UA || !FA || !HA) continue;
     UA.getWorldPosition(_lhS);
     if (oneHand && S === 'Right') { FA.getWorldPosition(_lhE); const len = _lhE.distanceTo(_lhS) + HA.getWorldPosition(_lhP).distanceTo(_lhE);
       _lhT.set(_lhS.x + L.nx * LHANDS.off, _lhS.y - len * LHANDS.armDown, _lhS.z + L.nz * LHANDS.off); wrLimb(UA, FA, HA, _lhT.clone(), new THREE.Vector3(L.nx * .4, 0, L.nz * .4).add(new THREE.Vector3(tx * sd, 0, tz * sd))); continue; }
     const s0 = (_lhS.x - L.cx) * tx + (_lhS.z - L.cz) * tz;
     _lhT.set(L.cx + tx * s0 - L.nx * LHANDS.in, L.y + LHANDS.up, L.cz + tz * s0 - L.nz * LHANDS.in);
-    wrLimb(UA, FA, HA, _lhT.clone(), new THREE.Vector3(L.nx * .6 + tx * sd * .5, -.4, L.nz * .6 + tz * sd * .5)); } }
+    wrLimb(UA, FA, HA, _lhT.clone(), new THREE.Vector3(L.nx * .6 + tx * sd * .5, -.4, L.nz * .6 + tz * sd * .5)); lhGrip(S, L, sd); } }
+// m15xx (his: "his fingers are weird when he's hanging -- he only has three or four fingers, maybe the Mixamo animations are doing the wrong thing"):
+// his hand is Thumb / Middle / Pinky. After the arm IK the hand is turned to lie ON the lip, its knuckles pointing in over the top (-n, dipped `tip`),
+// then each finger joint is curled `curl[j]` rad about the knuckle line (pinky -> middle), the way that takes its tip DOWN -- found per joint by
+// trying it, not by trusting an axis this rig never promised. The thumb wraps less (`thumbK`).
+const _lhgA = new THREE.Vector3(), _lhgB = new THREE.Vector3(), _lhgC = new THREE.Vector3(), _lhgQ = new THREE.Quaternion(), _lhgQ2 = new THREE.Quaternion();
+function lhgTurnW(bone, q) { bone.getWorldQuaternion(_lhgQ2); _lhgQ2.premultiply(q); bone.parent.getWorldQuaternion(_lhgQ).invert(); bone.quaternion.copy(_lhgQ.multiply(_lhgQ2)); bone.updateMatrixWorld(true); }
+function lhGrip(S, L, sd) { if (!LHANDS.fingers) return; const B = rig.bones, HA = B['mixamorig_' + S + 'Hand'], M1 = B['mixamorig_' + S + 'HandMiddle1'], P1 = B['mixamorig_' + S + 'HandPinky1'] || B['mixamorig_' + S + 'HandIndex1']; if (!HA || !M1) return;
+  HA.getWorldPosition(_lhgA); M1.getWorldPosition(_lhgB); _lhgB.sub(_lhgA).normalize(); _lhgC.set(-L.nx, -LHANDS.tip, -L.nz).normalize(); _lhgQ.setFromUnitVectors(_lhgB, _lhgC); lhgTurnW(HA, _lhgQ.clone());
+  if (P1) { const d = _lhgC, l = new THREE.Vector3(), tg = new THREE.Vector3(L.nz * -sd, 0, -L.nx * -sd);     // m15xx: measured, the knuckle line stood VERTICAL (the hand on its side): rolled about the pointing axis so pinky -> middle runs toward his middle (palm down)
+    M1.getWorldPosition(l); P1.getWorldPosition(_lhgA); l.sub(_lhgA); l.addScaledVector(d, -l.dot(d)); tg.addScaledVector(d, -tg.dot(d));
+    if (l.lengthSq() > 1e-10 && tg.lengthSq() > 1e-10) { _lhgQ.setFromUnitVectors(l.normalize(), tg.normalize()); lhgTurnW(HA, _lhgQ.clone()); } }
+  const ax = new THREE.Vector3(); if (P1) { P1.getWorldPosition(_lhgA); M1.getWorldPosition(ax); ax.sub(_lhgA); } if (ax.lengthSq() < 1e-8) ax.set(-L.nz, 0, L.nx); ax.normalize();
+  for (const f of ['Middle', 'Pinky', 'Index', 'Ring', 'Thumb']) { const k = f === 'Thumb' ? LHANDS.thumbK : 1;
+    for (let j = 1; j <= 3; j++) { const b = B['mixamorig_' + S + 'Hand' + f + j], c = B['mixamorig_' + S + 'Hand' + f + (j + 1)]; if (!b || !c) break;
+      const ang = LHANDS.curl[j - 1] * k; b.getWorldPosition(_lhgA); c.getWorldPosition(_lhgB); _lhgB.sub(_lhgA); const y0 = _lhgB.y; _lhgQ.setFromAxisAngle(ax, ang); const yp = _lhgB.clone().applyQuaternion(_lhgQ).y;
+      if (yp > y0) _lhgQ.setFromAxisAngle(ax, -ang); lhgTurnW(b, _lhgQ.clone()); } } }
 // m1833 (his: "I'm picturing doing this with just a circle on a wall to get the locomotion -- we're solving too many problems at once"): THE WALL
 // PROXY (TOOLS > WALL PROXY). On a wall the character is hidden and a plain BALL rides where he is, drawing its PATH (the last `n` points, kept
 // a few seconds after he leaves) -- the movement judged alone, before any animation is asked to sell it.
@@ -31771,6 +31820,8 @@ for (const t of ['blur', 'pagehide', 'visibilitychange']) addEventListener(t, ()
 // The two halves have to keep meaning the same thing in every state or neither pad means
 // anything you can carry from one situation to the next.
 // --------------------------------------------------------------------------------------------
+const LTAP = { jump: 0 };     // m15xx: *"get rid of the left stick ability to jump... I keep accidentally jumping"* -- the right tap is the jump
+try { if (localStorage.getItem('mel.ltapjump') === '1') LTAP.jump = 1; } catch (e) {}
 const padL = document.getElementById('padL'), padR = document.getElementById('padR');
 const zoneL = document.getElementById('zoneL'), zoneR = document.getElementById('zoneR');
 PADS.L = bindStick(padL, stick.L,
@@ -31781,7 +31832,7 @@ PADS.L = bindStick(padL, stick.L,
   // left wheel (`kitPick`).
   // tap: jump -- flying, a double tap is her BOOST (m266); on her skates on the ground, her SWIVEL (m268)
   () => {     // m1327: the left tap is the jump again in 3D AIM too (m1282's left-tap trigger is gone)
-    if (player.dragon) { dragTapL(); return; }     /* m1614: no jump from the saddle; m1619: a wing beat (on the ground, the take-off) */ if (wingTapL()) return; if (fakieSwivel()) return; if (player.wall && player.wallLow && player.wallSt === 'hold') { wallDrop(0); return; } if (coverTap()) return; player.jump = 1; },     // m1009: in cover, a left tap stands him up out of it; m1012: near a half block, takes it
+    if (player.dragon) { dragTapL(); return; }     /* m1614: no jump from the saddle; m1619: a wing beat (on the ground, the take-off) */ if (wingTapL()) return; if (fakieSwivel()) return; if (player.wall && player.wallLow && player.wallSt === 'hold') { wallDrop(0); return; } if (coverTap()) return; if (LTAP.jump) player.jump = 1; },     /* m15xx: the left tap no longer jumps unless TOOLS > LEFT TAP JUMP */     // m1009: in cover, a left tap stands him up out of it; m1012: near a half block, takes it
   // flick: a BODY FLIP on the board, otherwise the dodge roll in the flicked direction. The
   // board takes it first and says so, because a dodge roll on a moving deck is nothing.
   // Flying (m266) it is her loop / barrel roll.
@@ -33793,6 +33844,7 @@ function stepPlayer(dt) {
   if (ROCK.loose.length || ROCK.broken.length) rockStep(dt);     // m1745
   if (RESTORE.list.length) restoreStep(dt);     // m1505     // m1105; m1119; m1120: each building's own life
   const p = player;
+  swapTick(dt);     // m15xx: ONE swap clock for every state -- the ledge, the dragon, the bar, the rope never ticked it, so a swap begun there hung for ever and kitPick refused every pick after
   if (p.dragon) { dragRide(dt); return; }     // m1614: on his dragon, the dragon owns the body
   stepFeet(dt);
   const hadLock = p.lock;
@@ -33836,14 +33888,14 @@ function stepPlayer(dt) {
   }
   // HER WING SUIT (m266) owns the body above the board -- a flight has no ground and no gravity
   if (p.wing && stepWing(dt)) return;
-  if (p.board) { swapTick(dt); stepSkate(dt); bladeFxStep(dt); return; }
+  if (p.board) { stepSkate(dt); bladeFxStep(dt); return; }
   if (p.wallCool > 0) p.wallCool = Math.max(0, p.wallCool - dt);
   // COVER OWNS THE BODY, so it sits with the other states that do -- above the gait, below the
   // slam, and it returns.
-  if (p.mantle) { swapTick(dt); stepMantle(dt); return; }     // m1039
-  if (p.vault) { swapTick(dt); stepVault(dt); return; }     // m1027
-  if (p.slide) { swapTick(dt); stepSlide(dt); return; }     // m1008
-  if (p.wall) { swapTick(dt); stepWall(dt); return; }     // m1013: a weapon swap started in cover FINISHES in cover (it never ticked here)
+  if (p.mantle) { stepMantle(dt); return; }     // m1039
+  if (p.vault) { stepVault(dt); return; }     // m1027
+  if (p.slide) { stepSlide(dt); return; }     // m1008
+  if (p.wall) { stepWall(dt); return; }     // m1013: a weapon swap started in cover FINISHES in cover (it never ticked here)
   // AND THE LEDGE OWNS THE BODY THE SAME WAY, so it sits with the states that do and it
   // returns. Above the gait, below the slam, beside cover -- one place, one order.
   if (p.ledgeCool > 0) p.ledgeCool = Math.max(0, p.ledgeCool - dt);
@@ -33858,12 +33910,12 @@ function stepPlayer(dt) {
   if (p.hook) { stepHook(dt); if (!p.bar) return; }     // m1063: the air swipe onto the bar
   if (p.wrunCool > 0) p.wrunCool = Math.max(0, p.wrunCool - dt);
   if (!p.wrun && wrunAuto()) { /* m1251: head-on into a wall at speed */ }
-  if (p.wrun) { swapTick(dt); stepWrun(dt); return; }     // m1064: the wall run owns the body
+  if (p.wrun) { stepWrun(dt); return; }     // m1064: the wall run owns the body
   if (p.bar) { stepBar(dt); return; }
   if (!p.grounded && HBAR.list.length && hbarCatch()) { stepBar(dt); return; }
   if (p.barFly) hbarFly(dt);
   if (p.aflip) airFlipStep(dt);     // m1050
-  if (p.cart) { swapTick(dt); stepCart(dt); return; }     // m1061: the guard cartwheel owns the body
+  if (p.cart) { stepCart(dt); return; }     // m1061: the guard cartwheel owns the body
   if (p.beamCool > 0) p.beamCool = Math.max(0, p.beamCool - dt);     // m1037: THE BEAM owns him too
   if (p.beam && stepBeam(dt)) return;
   if (!p.beam && BEAM.list.length && !p.slide && !p.roll && !p.melee) { const F = beamFind(); if (F) { beamEnter(F); if (stepBeam(dt)) return; } }
@@ -34091,8 +34143,7 @@ function stepPlayer(dt) {
   if (p.hurtNm) { p.hurtClipT += dt; if (p.hurtClipT >= HURT.stagger) p.hurtNm = ''; }
   if (p.parryT > 0) p.parryT = Math.max(0, p.parryT - dt);
   // THE REACH, and the weapon arrives PART-WAY THROUGH IT -- `SWAP.at`, fired on the crossing
-  // rather than every frame past it, which is `p.gotUp`'s own rule one state over.
-  swapTick(dt);
+  // rather than every frame past it, which is `p.gotUp`'s own rule one state over. (m15xx: ticked once, at the top of stepPlayer)
   // HOW LONG HE HAS ACTUALLY BEEN RUNNING, which is what the tackle opener is gated on. It is
   // last frame's speed, which is the right one: what is being asked is whether he ARRIVED at
   // this flick running, not whether the thumb is pointed somewhere.
@@ -35471,6 +35522,8 @@ function rigAnim(dt) {
   if (p.wrun && p.wrun.velMode && p.wrun.kind !== 'slide' && p.wrun.a != null && WRUN.sideClip && rig.actions.wall_side && WRUN.upClip && wallUpHalves()) { const R = p.wrun, H = rig.wuSplit, c = Math.cos(R.a), wu = c > 0 ? c * c : 0;     // m1831: the two runs BLENDED by the angle
     const nm = (R.vt || 0) < 0 || !rig.actions.wall_side_m ? 'wall_side' : 'wall_side_m';     // along -t the wall is on his left (measured from the side branch's own test)
     const sp = Math.hypot(R.vt || 0, Math.max(0, p.vel.y)); rig.actions[H.L].timeScale = clamp(sp / WRUN.upClipRef, WRUN.upClipTs[0], WRUN.upClipTs[1]); rig.actions[H.U].timeScale = WRUN.upArmTs; rig.actions[nm].timeScale = clamp(sp / WRUN.sideRef, .7, 2.2);
+    if (WRUN.upLook === 'RUN' && rig.actions[CLIPS.run]) { const a = rig.actions[CLIPS.run]; a.timeScale = clamp(Math.max(0, p.vel.y) / Math.max(1, GAIT.runRef || 3) * WRUN.upRunK, WRUN.upRunTs[0], WRUN.upRunTs[1]);     /* m15xx: his idea -- the plain RUN, its cadence matched to how fast he rises */
+      if (wu > .01) t[CLIPS.run] = (t[CLIPS.run] || 0) + wu; if (wu < .99) t[nm] = 1 - wu; setWeights(t, dt); return; }
     if (wu > .01) { t[H.L] = wu; t[H.U] = wu; } if (wu < .99) t[nm] = 1 - wu; setWeights(t, dt); return; }
   if (p.wrun && p.wrun.kind === 'side' && WRUN.sideClip && rig.actions.wall_side) { const R = p.wrun, right = R.nx * -R.dz + R.nz * R.dx, nm = right > 0 || !rig.actions.wall_side_m ? 'wall_side' : 'wall_side_m', a = rig.actions[nm];
     a.timeScale = clamp((R.v || WRUN.v) / WRUN.sideRef, .7, 2.2); t[nm] = 1; setWeights(t, dt); return; }
@@ -68122,7 +68175,8 @@ function frameBody() {
     else if (player.board && !player.blade) rig.root.position.y += board.deck;
     // ON HER SKATES THE GUN TURNS HER WHOLE BODY, her swivel (m271) -- not his rigid barrel comp
     rig.root.rotation.x = 0;           // m1034: the high bar writes the whole quaternion (`hbarPose`); its pitch must not outlive it
-    rig.root.rotation.y = player.faceH + rig.faceOff + RIG.spin + (bladeOn() ? ((rig.bl && rig.bl.body) || 0) : aimComp(dt));
+    if (player.turnOff) { player.turnOff *= Math.exp(-dt * .693 / WRUN.turnHalf); if (Math.abs(player.turnOff) < .01) player.turnOff = 0; }     // m15xx
+    rig.root.rotation.y = player.faceH + (player.turnOff || 0) + rig.faceOff + RIG.spin + (bladeOn() ? ((rig.bl && rig.bl.body) || 0) : aimComp(dt));
     rig.drawnYaw = rig.root.rotation.y;
     // **THE BARREL ROLL (m167).** No clip: the whole of him turns about his own forward axis,
     // which is `rotation.z` on an XYZ root -- Z applied innermost, so it is his frame and not

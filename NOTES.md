@@ -5,6 +5,35 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Ledge hands and arms, weapons anywhere, the wall jump's direction, the vertical run as a tilted RUN (m15xx)
+*"His fingers are weird when he's hanging... the elbows are buckled in... I can't take my sword out on a ledge... when I jump off a wall he does
+the long jump hurdle... the vertical run: the run animation with the hips bent 20 degrees and the torso compensating... holding up and jump should
+go straight up... everything needs to transition, no popping... get rid of the left stick jump."*
+- **ELBOWS, MEASURED (headless, the wall course's 4.5 m face):** his shoulders hung .53 m OUT from the lip and .23 m under it, against an arm of
+  .46 m, so the IK could only fold the arms. `ledgeHandsPose` now moves the DRAWN body: shoulders brought in to `outK` x reach off the lip line,
+  dropped until the arms are at `straight` (.93) of their length, and pitched `pitch` (.45 rad) head-in about the shoulders so the clip's tucked
+  knees swing off the face. After: shoulders .16 m off the face, knee .04, foot .19, arms straight up to the lip. `p.pos` does not move.
+- **FINGERS:** his hand is Thumb / Middle / Pinky. Measured, the knuckle line stood VERTICAL (the hand on its side, fingers curling back up).
+  `lhGrip` points the hand in over the top (`tip` dip), rolls it so pinky -> middle runs toward his middle (palm down), then curls each joint
+  `curl` the way that takes its tip DOWN (found by trying it, not by trusting an axis). Fingers rest on the lip top (middle 4.47-4.54 vs lip 4.50).
+- **WEAPONS EVERYWHERE:** `swapTick` was called per state, and the ledge, the dragon, the bar, the rope, the zip and the beam never called it -- a
+  swap begun there hung, and `kitPick` refused every pick after. One call at the top of `stepPlayer` now. `kitPick` no longer refuses the ledge,
+  and on a ledge / wall / bar / rope / dragon / in the air the weapon simply ARRIVES (no reach clip -- the hands are holding on).
+- **THE HURDLE OFF THE WALL** was `p.ljump`: a long jump into a wall left it set, and the air pose plays the long jump's clip while it is.
+  Cleared when the wall run ends.
+- **STRAIGHT UP OFF THE WALL:** the jump read the stick through `stickWorld`, which the wall cam had rotated. `wrunStick` reads it in screen
+  terms (m1833's rule). Pad UP + jump on the run-up (or a VEL run within `upJumpA` of vertical) = a fresh climb up the face; pad down or
+  neutral = kicked out.
+- **NO 180 POP:** the jump still sets the facing outright, but the drawn yaw carries the difference (`p.turnOff`) and eases it out
+  (`WRUN.turnHalf` .09 s). The wall-to-air weight snap went from a .02 s half-life (a pop) to `WRUN.offBlend` .07.
+- **THE VERTICAL RUN, HIS WAY (TOOLS > WALL UP: RUN + HIP TILT, default):** the plain run clip, its cadence = rising speed / the run's
+  reference speed (`upRunK`, held to `upRunTs`), the whole body pitched `upHip` (.35 rad, 20 deg) back about his right axis so the feet reach
+  the face, slid `upFootIn` in, the spine turned the same angle forward so the chest is upright. Blended by the run's vertical share (cos^2 a).
+  CLIMB CLIP is m1830's.
+- **LEFT TAP:** no longer a jump (TOOLS > LEFT TAP: JUMP puts it back). Its other jobs (dragon wing beat, cover, wall drop) stay.
+- Next: walking off an edge drops him into a hang -- the library's `Braced_Hang_To_Crouch` played BACKWARDS is the move he described.
+  Not run on a phone; the ledge numbers above are from the headless render. Shipped unverified.
+
 ## The wall run starts over with a ball on a wall (m1833, WALLRUN.md step 1)
 *"When I try to run straight up the wall he goes up for a second and then always converts into a horizontal run... the weird in-air
 pose, the ninja sprint... I'm picturing doing this with just a circle on a wall... damping... very good control."*
