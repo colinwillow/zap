@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## The edge drop blends (his pick) and the hang eases; the NINJA GYM pass 1: the wall course rebuilt bigger (m15xx, NINJAGYM.md)
+## The edge drop blends (his pick) and the hang eases; the NINJA GYM pass 1: the wall course rebuilt bigger (m1841, NINJAGYM.md)
 *"Two points where the animation glitches to its new state -- the dismount, and with the katana out: the normal hang, then a glitch and the
 katana's out and his arm is down. Ease those states. The rotation feels offset weird. The non-animation -- just blending from standing to the
 hang -- actually worked really well before."* And: *"extend the wall running course: bigger, taller, longer, more spaced out..."* (NINJAGYM.md)
