@@ -5,6 +5,15 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The sword hand on the ledge: down and out to the side (m15xx)
+*"Not really what I pictured for him holding the katana while hanging -- his right arm down to the right, holding the katana down and out to
+the side, or holding it up a little."* (His screenshots: the arm folded behind him, the blade flat under his hip.)
+- The one-handed hang's right arm now hangs DOWN AND OUT: target `armDown` (.82) of its length below the shoulder, `sideK` (.38) out to his
+  right (`(nz, -nx)` facing the wall), `off` off the face, elbow toward the floor and out. Then the hand is turned so the BLADE (mount -> tip,
+  `bladeSeg`) points along `LHANDS.blade[pick]`: LOW = [.75 right, -.6 down, .35 off the wall], HIGH = [.7, +.55 up, .45].
+- TOOLS > HANG BLADE LOW / HIGH (remembered). Headless render from behind: left hand on the lip, the arm out at his side, the blade down
+  past his hip (LOW) or raised out to his side (HIGH). Shipped unverified.
+
 ## Walk off an edge -> down into the hang (m1837)
 *"If you're near the edge and you walk off, he should go down to a ledge hang automatically -- almost in reverse, a little somersault twist
 from standing on top to the hang."*
