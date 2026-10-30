@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## The wall entry keeps its angle (billiards), the thumb you arrive with steers nothing, and WALL RAYS shows it (m15xx)
+*"Whenever I hit the wall at an angle he still does a perfectly vertical wall run -- it should be diagonal. A debug button so I can see the
+angle -- like a billiards table: the vector of the character, the angle it hits the wall, the angle reflected or projected along -- and use it
+to decide how the wall run is initiated."*
+- **Why it was vertical, from the code:** VEL's catch put (rise + 1.25 x speed INTO the wall) up it and (1 x speed along) along it -- a 45 deg
+  hit at 7 m/s jumping started ~26 deg off vertical -- and then m1833's steering read the stick he was HOLDING TOWARD THE WALL as "up" and turned
+  the rest of it vertical at 2.6 rad/s.
+- **WALL ENTRY: ANGLE (default):** the incidence (angle between his horizontal travel and head-on) IS the run's angle on the face (0 = up,
+  90 = along) x `angK` 1, at `entryK` 1.15 x his horizontal speed, plus `riseK` .5 of his rise on the up part. PROJECT = the old rule.
+  Headless: hits at 45 and 20 deg caught as RUN 45 and RUN 20 deg off up.
+- **Steering deadband:** the stick angle at the catch is remembered (`R.st0`); the stick steers only after it moves `steerDead` (.45 rad) off
+  it, or after a release and a new touch. The chip says STEERING when it is.
+- **TOOLS > WALL RAYS:** off a wall, his travel is cast forward (yellow) to the first tall face; its normal (white), the bounce (grey) and the run
+  that hit would start, drawn ON the face (cyan); the chip: distance, IN deg, RUN deg off up, speed. At the catch it freezes for 4 s with what
+  happened, and his real path on the face draws in magenta. Thick bars, not GL lines (1 px lines vanished even in the headless render).
+- Shipped unverified.
+
 ## The sword hand on the ledge: down and out to the side (m1838)
 *"Not really what I pictured for him holding the katana while hanging -- his right arm down to the right, holding the katana down and out to
 the side, or holding it up a little."* (His screenshots: the arm folded behind him, the blade flat under his hip.)
