@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## ONLINE stage 1: two phones in one room see each other (m15xx, NETPLAY.md)
+*"Co-op or even versus -- Robits had a server, a separate repository, and it worked pretty well... start with one sandbox, another player on
+another device logs in and sees the same things, and you can knock each other around."*
+- **His Robits relay, as is:** `colinwillow/robits-server` is a ~250-line Node + `ws` room relay on Render (`wss://robits-server.onrender.com`)
+  that knows nothing about the game -- so KORAJIN uses it unchanged, under `KJ-` room codes (a plain `join` to a new code makes a private room).
+- **What is sent is his FINISHED POSE** (`netStep`, after every pose pass and the springs): the drawn root (position + quaternion) and every
+  bone's quaternion -- 137 bones on Grumbo, int16, base64 -- at `NET.hz` 15. The other phone's PUPPET (`skeletonClone` of the hero model, a P2
+  tag) is set from the two snapshots that bracket `delay` .13 s ago, interpolated. So flips, wall runs, the ledge IK and the katana pose arrive
+  exactly as drawn, with no second animation system (the Robits back-and-forth). Hidden when the other phone is in another zone.
+- **TOOLS > ONLINE: JOIN A ROOM** asks for a code (one is suggested -- type the same on both phones), or `?room=CODE` in the URL (`?net=ws://..`
+  points at another server). A chip at the top: room, state, how many here, packets/s. Render's free tier sleeps: the first join can take a
+  minute while it wakes (the chip says `waking` / `retry n`).
+- **Tested for real, headless:** his relay run locally (`PORT=8091 node server.js`), two pages in room `KJ-TEST1`: both joined, each saw one
+  peer; page A moved to (3, 0, -5) and B's puppet of A read (3.00, 0.00, -5.00), posed, tagged (render). NOT tested against the live Render
+  server from here. Stage 2 next: their weapon and FX; stage 3: knocks.
+- Shipped unverified.
+
 ## The ledge's UP flick is a handspring: a front flip up over the lip, then the slam onto the top (m1842)
 *"When you're doing a ledge hang and you swipe up on the right stick, he should do a flip -- almost like a handspring up -- and slam: with the
 katana, he flips and slams the sword on top of the roof."*
