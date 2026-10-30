@@ -28947,6 +28947,12 @@ function ledgeHandsPose() { const p = player, L = p.ledge; if (!LHANDS.on || !L 
       // (`off`), elbow toward the floor and out; then the hand is turned so the BLADE (mount -> tip, `bladeSeg`) points where TOOLS > HANG BLADE says:
       // LOW = down and out to the side, HIGH = raised out to the side.
       const rx = L.nz, rz = -L.nx, B2 = LHANDS.blade[LHANDS.bladePick] || LHANDS.blade.LOW;     // his right, facing the wall (-n)
+      const W = p.lsw; if (W) { W.t += 1 / 60; const u = clamp(W.t / LSW.dur, 0, 1), e = u * u * (3 - 2 * u), th = LSW.a0 + (LSW.a1 - LSW.a0) * e, sx = -L.nz * W.side, sz = L.nx * W.side;     // m15xx: the ledge SWING, overhead -> out that way -> down
+        const ax = sx * Math.sin(th) + L.nx * .35, ay = Math.cos(th), az = sz * Math.sin(th) + L.nz * .35, al = Math.hypot(ax, ay, az);
+        _lhT.set(_lhS.x + ax / al * len * .92, _lhS.y + ay / al * len * .92, _lhS.z + az / al * len * .92); wrLimb(UA, FA, HA, _lhT.clone(), new THREE.Vector3(L.nx, -.3, L.nz));
+        const sg = bladeSeg(); if (sg) { const t2 = th + .35; lhgTurnW(HA, new THREE.Quaternion().setFromUnitVectors(sg.a, new THREE.Vector3(sx * Math.sin(t2) + L.nx * .45, Math.cos(t2), sz * Math.sin(t2) + L.nz * .45).normalize())); }
+        const dm = FOE.dmg.weap * KATANA.dmgK * ((heroSword() || {}).dmgK || 1); if (strikeSweep(1 / 60, 1, u >= LSW.open[0] && u <= LSW.open[1] && !W.hit, dm, false)) W.hit = 1;
+        if (u >= 1) p.lsw = null; continue; }
       _lhT.set(_lhS.x + rx * len * LHANDS.sideK + L.nx * LHANDS.off, _lhS.y - len * LHANDS.armDown, _lhS.z + rz * len * LHANDS.sideK + L.nz * LHANDS.off);
       wrLimb(UA, FA, HA, _lhT.clone(), new THREE.Vector3(rx * .5 + L.nx * .3, -.6, rz * .5 + L.nz * .3));
       const sg = bladeSeg(); if (sg) { const D = new THREE.Vector3(rx * B2[0] + L.nx * B2[2], B2[1], rz * B2[0] + L.nz * B2[2]).normalize(); lhgTurnW(HA, new THREE.Quaternion().setFromUnitVectors(sg.a, D)); }
@@ -30815,8 +30821,24 @@ const _lp = { x: 0, y: 0, z: 0 };
 // LETTING GO. The drop is simply the air code taking over, which is right: `in_air` IS the pose
 // for a man who has let go of something, and a get-off-the-ledge transition played while
 // falling would be two things at once -- `wallDrop`'s own argument.
+// m15xx (his: "when you're hanging from a ledge and swipe the right stick, he does a weird melee and then he's standing in the air"): the flick
+// fell through to `slamGo` (he is not grounded on a ledge) and `meleeGo`, neither of which knows the ledge. Now, hanging, the right flick is
+// a LEDGE ATTACK by direction:
+//   DOWN  -- let go and SLAM straight down (`slamGo`, the air slam he already has)
+//   UP    -- spring up over the lip (just enough to clear it by `clear`, `inward` m/s onto the top) and slam down ONTO the top at the apex
+//   LEFT / RIGHT -- stay hanging: the hop along the lip that way, and with a blade a one-arm SWING that way over his head and down
+//            (`p.lsw`, drawn by `ledgeHandsPose`; `strikeSweep` on the swung arm does the hitting). Unarmed: the hop.
+const LSW = { dur: .32, a0: .15, a1: 2.5, open: [.25, .85], clear: 1, inward: 5, over: .45 };
+function ledgeFlick(dx, dy) { const p = player, L = p.ledge; if (!L || !(p.ledgeSt === 'hold' || p.ledgeSt === 'hop')) return 0;
+  if (dy > 0 && dy > Math.abs(dx) * .8) { ledgeDrop(0); p.slamUsed = 0; if (!slamGo(0, 1)) { p.vel.y = -2; } return 1; }
+  if (-dy > Math.abs(dx) * .8) { const rise = Math.max(.5, L.y + LSW.clear - p.pos.y), vy = Math.sqrt(2 * MOVE.g * rise); ledgeDrop(0);
+    p.vel.set(0, vy, 0); p.faceH = p.heading = Math.atan2(-L.nx, -L.nz); p.slamUsed = 0; p.lsUp = { L, t: 0 };     /* straight up the face first: inward only once over the lip (measured: inward from the start, the face stopped him) */ p.jumps = 1; snd('swoosh', { r: 1.1, g: .5 }); return 1; }
+  const h = flickH(dx, dy), tx = -L.nz, tz = L.nx, side = Math.sign(Math.sin(h) * tx + Math.cos(h) * tz) || 1;     // +1 = along (-nz, nx), his LEFT facing the wall
+  if (p.ledgeSt === 'hold') { p.ledgeSide = side; p.ledgeSt = 'hop'; p.ledgeT = 0; p.lx0 = p.pos.x; p.ly0 = p.pos.y; p.lz0 = p.pos.z; const nm = side > 0 ? LEDGE.clips.L : LEDGE.clips.R, cl = clipLen(nm); p.ledgeDur = cl > .05 ? cl / LEDGE.hopRate : LEDGE.hopDur; if (cl > .05) playOnce(nm, LEDGE.hopRate); }     /* the hop exactly as stepLedge starts one */
+  if (slotNow().blade) { p.lsw = { t: 0, side, hit: 0 }; p.swPrev = null; p.melFired = 0; snd('swoosh', { r: 1.3, g: .55 }); }
+  return 1; }
 function ledgeDrop(away) {
-  const p = player;
+  const p = player; p.lsw = null;
   p.ledge = null; p.ledgeSt = ''; p.ledgeCool = LEDGE.cool;
   p.grounded = false; p.coyote = 0; p.airT = 0;
   if (away) {
@@ -31928,7 +31950,7 @@ PADS.R = bindStick(padR, stick.R,
   // ...unless someone in reach has something to say: then it is TALK (m277), and the left tap still jumps
   () => { if (aim3Now()) return; /* m1345: 3D AIM owns the whole right pad -- a tap is not a jump */ if (talkTap()) return; if (player.dragon) { if (player.dragon.st === 'sit') dragTapR(); return; } if (dragTap()) return; /* m1614 */ if (pickTap()) return; if (portalTap()) return; if (wingTapR()) return; if (hurdleTap()) return; if (mantleTap()) return; if (wrunTap()) return; player.jump = 1; },     // m1064: a tall face beside / ahead -> wall run     // m1063: pushing into a half block -> hurdle it     // m1039: a ledge in reach -> climb it
   // flick: a SLAM if he is in the air and it went down, otherwise a strike in that direction
-  (dx, dy) => { if (player.dragon) { dragBreath(); return; } /* m1621: his fireball */ if (player.wing || aim3Now()) return; /* m1282: in 3D AIM a fast drag moves the cursor, it never swings */ if (tossQuick(dx, dy)) return; if (boardFlick(dx, dy, 0)) return; if (zipKick(dx, dy)) return; if (wrunSwipe(dx, dy)) return; if (runSwipe(dx, dy)) return; if (!slamGo(dx, dy)) { KATANA.dir = katanaDir(dx, dy); meleeGo(KATANA.dir === 'down' ? player.faceH : flickH(dx, dy)); } },     // m1054: DOWN is not a direction -- the strike goes where he faces (a slot kept for a grab / throw / special)     // m1014: the right pad is MELEE, by direction (m1012's down-slide is off it)
+  (dx, dy) => { if (player.dragon) { dragBreath(); return; } /* m1621: his fireball */ if (player.wing || aim3Now()) return; /* m1282: in 3D AIM a fast drag moves the cursor, it never swings */ if (ledgeFlick(dx, dy)) return; /* m15xx: off the ledge, by direction */ if (tossQuick(dx, dy)) return; if (boardFlick(dx, dy, 0)) return; if (zipKick(dx, dy)) return; if (wrunSwipe(dx, dy)) return; if (runSwipe(dx, dy)) return; if (!slamGo(dx, dy)) { KATANA.dir = katanaDir(dx, dy); meleeGo(KATANA.dir === 'down' ? player.faceH : flickH(dx, dy)); } },     // m1054: DOWN is not a direction -- the strike goes where he faces (a slot kept for a grab / throw / special)     // m1014: the right pad is MELEE, by direction (m1012's down-slide is off it)
   null,
   // THE RELEASE IS THE SHOT, so this must NOT clear `p.aim` -- `stepKit` sees the pad is no
   // longer held and fires on that edge. Clearing it here would eat every shot in the game.
@@ -33983,6 +34005,10 @@ function stepPlayer(dt) {
   // returns. Above the gait, below the slam, beside cover -- one place, one order.
   if (p.ledgeCool > 0) p.ledgeCool = Math.max(0, p.ledgeCool - dt);
   if (p.ledgeAway > 0) p.ledgeAway = Math.max(0, p.ledgeAway - dt);
+  if (p.lsUp) { const U = p.lsUp, L = U.L; U.t += dt; if (p.grounded || p.ledge || p.wrun || U.t > 1.5) p.lsUp = 0;
+    else { const over = (L.cx - p.pos.x) * L.nx + (L.cz - p.pos.z) * L.nz;     // how far in over the top he is (+ = over it)
+      if (p.pos.y > L.y + .1 && over < LSW.over) { p.vel.x = -L.nx * LSW.inward; p.vel.z = -L.nz * LSW.inward; }
+      if ((p.vel.y <= .5 && over >= LSW.over) || p.vel.y < -4) { p.lsUp = 0; p.vel.x = p.vel.z = 0; p.slamUsed = 0; slamGo(0, 1); } } }     // m15xx: the ledge's UP flick slams onto the top at the apex
   if (!p.ledge && edgeHangTry()) { /* m1837: walked off an edge -> down into the hang */ }
   if (p.ledge) { stepLedge(dt); return; }
   if (p.barCool > 0) p.barCool = Math.max(0, p.barCool - dt);     // m1034: THE HIGH BAR owns the body like the ledge

@@ -5,6 +5,23 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
+## Hanging, the right flick is a LEDGE ATTACK by direction (m15xx)
+*"When you're hanging from a ledge and swipe the right stick, he does a weird melee and then he's standing in the air. He should be able to
+swing right, overhead, down low or left -- or attack vectors off the wall: swipe down, a slam to the ground; swipe up, he launches up over the
+top and attacks onto it; right or left, he launches that way but stays hanging -- both swings."*
+- **What was wrong:** the flick went to `slamGo` (a ledge is not grounded) and `meleeGo`, neither of which knows the ledge -- so a slam or a
+  ground swing started from the hang and left him standing on air. `ledgeFlick` now takes the flick FIRST while he hangs (`hold` / `hop`).
+- **DOWN:** let go and the air slam (`slamGo`) straight down.
+- **UP:** spring STRAIGHT up the face -- `sqrt(2 g rise)` for a rise that clears the lip by `LSW.clear` 1 m -- then, once above the lip,
+  `inward` 5 m/s onto the top, and when he is `over` .45 m in over it and done rising (`p.lsUp`), the same slam, down ONTO the top. Measured
+  headless: with the inward speed from the start, the face stopped him and he fell back to the ground; now apex 5.42 over a 4.50 lip, landed
+  ON the top (y 4.50, .89 m in). DOWN landed on the ground; LEFT/RIGHT hopped along the lip with the swing (render: the blade sweeps out
+  and down, its trail on).
+- **LEFT / RIGHT:** he stays on the ledge: the hop along the lip that way (started exactly as `stepLedge` starts one), and with a blade a
+  one-arm SWING that way -- the sword arm sweeps from overhead (`a0`) out that side and down (`a1`) over `dur` .32 s, the blade leading it,
+  drawn in `ledgeHandsPose`; `strikeSweep` on the swung arm does the hitting between `open` .25-.85 (one hit per swing). Unarmed: the hop.
+- Shipped unverified.
+
 ## The wall entry keeps its angle (billiards), the thumb you arrive with steers nothing, and WALL RAYS shows it (m1839)
 *"Whenever I hit the wall at an angle he still does a perfectly vertical wall run -- it should be diagonal. A debug button so I can see the
 angle -- like a billiards table: the vector of the character, the angle it hits the wall, the angle reflected or projected along -- and use it
