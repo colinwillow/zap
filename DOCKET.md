@@ -70,3 +70,28 @@ best."* MAIN = this session (dynamics, the feel); AGENT = a separate session can
 29. [ ] (his, later) **Sheaths and back-carry:** a scabbard on his back the katana goes into when put away (drawn and sheathed for real, the blade
        visible on his back); the bow slung on the back too. Not all weapons need showing -- decide which. Then hanging, climbing and wall runs can
        PUT AWAY the sword (both hands free) instead of the one-hand hang (m1832).
+
+# THE DOCKET, part 3: the SCENE COMPANION RETROFIT (his, Oct 30 2026)
+*"If you think they should do it since they know it better, just add it to their road."* The rules are `SCENE_COMPANION.md`. This is the
+one-time pass that makes the EXISTING work exportable; new work follows the rules as it is written. **None of it changes what he sees or
+plays** -- it is plumbing, so it never jumps ahead of his items above; an AGENT takes these when it has nothing of his. One build each, bump,
+check, ticked with the build number like the rest. Scene Companion's side of the plan: `scene-companion/docs/korajin.md` (Stage 11).
+30. [ ] AGENT **The export markers** (one build, zero behaviour change): wrap each table below in `// SC_<NAME>:START` / `// SC_<NAME>:END`
+       (this repo's `COLS:` convention): `HERO`, `CLIPS`, `ARENA.kinds` (the object it lives in), `ARENA.beast`, `GUARD`, `OLMEC`, `SPIDER`,
+       `TOADK`, `DRAGZ`, `LVG1`, `BEACON`, `CHUNKS`, `BCH`, `COURSE`, `HOME`, `HOLLOW`, `HCAVE`, `GHOME`, `GMERCH`, `GMILL`, `GPEAK`, `GJINRA`,
+       `GCASTLE`, `DOJO`, `FISL`, `BLDG.list`, and every `RESTORE` fallen-pose table. Add a check to `npm run check` that every marker pair
+       exists and the text between them still parses as one statement, so a later edit cannot silently break an export.
+31. [ ] AGENT **The events** (additive, nothing listens yet): a tiny `emit(name, data)` (an array of listeners, no-op when empty) and one call
+       at each story-worthy moment that already exists: `kill` (a body / spider / guardian dies: kind, at), `limb` (cut), `jinra` (collected:
+       amount), `coin` (collected: total), `restore` (a place turns: key, state), `tame` (the dragon), `parry`, `deflect` (arrow/rocket back),
+       `beacon` (when beacons exist). Log the names in `SCENE_COMPANION.md`'s vocabulary.
+32. [ ] AGENT **Placement lists, the Red Hollows, ONE PLACE PER BUILD** (GHOME, then GMERCH, GMILL, GPEAK, GJINRA, GCASTLE, then `HCAVE`):
+       the coins, chests, ladders, bars, zips, rings, gates, smashables, turrets, plates, NPCs and enemy spawns a builder places inline move
+       into its table's `place: [{ id, kind, at, yaw, p }]` with stable ids, and the builder walks the list. **Same positions, same game** --
+       verify with `npm run places` that nothing moved (paste it in NOTES). Spawns too (`HOME.spawn` -> `spawn_home`).
+33. [ ] AGENT **Placement lists, the Dojo and the forge zones** (`dojoBuild`'s island arrays -> `DOJO.isl` entries with ids; `WPARK`,
+       `PROVE`, `ROPEB`, `SNOWZ`, `DRAGZ`, `SHIPZ` spawns and props), the same way, one zone per build.
+34. [ ] AGENT **Clip roles out of step code**: the role-name string literals in feature code (`dragAnim`'s `'ride_seat'` etc., the
+       `HERO.pick === 'agoblin'` clip checks) move into a `clips:` table on their feature (role words per `SCENE_COMPANION.md` rule 4).
+35. [ ] (later, MAIN's call) **Builders as pure functions of their table** (`SCENE_COMPANION.md` rule 2) -- only when a builder is being
+       reworked anyway; Scene Companion's bake tool reads their output as it is, so this is never a pass of its own.
