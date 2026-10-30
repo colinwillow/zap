@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## Hanging, the right flick is a LEDGE ATTACK by direction (m15xx)
+## Hanging, the right flick is a LEDGE ATTACK by direction (m1840)
 *"When you're hanging from a ledge and swipe the right stick, he does a weird melee and then he's standing in the air. He should be able to
 swing right, overhead, down low or left -- or attack vectors off the wall: swipe down, a slam to the ground; swipe up, he launches up over the
 top and attacks onto it; right or left, he launches that way but stays hanging -- both swings."*
