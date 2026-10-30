@@ -5,7 +5,7 @@ automatically — `grep -n` it for a symbol, a build number (`(m146`), or the wo
 report, and read the entry before touching that system. New notes go at the TOP of the
 landmine list, in the same shape: what he said, what was actually wrong, what was measured.
 
-## Ledge hands and arms, weapons anywhere, the wall jump's direction, the vertical run as a tilted RUN (m15xx)
+## Ledge hands and arms, weapons anywhere, the wall jump's direction, the vertical run as a tilted RUN (m1836)
 *"His fingers are weird when he's hanging... the elbows are buckled in... I can't take my sword out on a ledge... when I jump off a wall he does
 the long jump hurdle... the vertical run: the run animation with the hips bent 20 degrees and the torso compensating... holding up and jump should
 go straight up... everything needs to transition, no popping... get rid of the left stick jump."*
